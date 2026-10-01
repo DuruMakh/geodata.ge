@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
+import { DemographyStopError } from "./stops";
 
 const citizenshipSchema = z.object({
   table_label: z.string().min(1),
@@ -38,7 +39,7 @@ export async function loadCitizenships(repositoryRoot = path.resolve(process.cwd
   return {
     resolve(label) {
       const id = byLabel.get(label.trim());
-      if (!id) throw new Error(`Unreviewed citizenship label: ${label}`);
+      if (!id) throw new DemographyStopError("unreviewed_label", `Unreviewed citizenship label: ${label}`);
       return id;
     },
     ids: [...ids],

@@ -4,6 +4,7 @@ import { parse } from "csv-parse/sync";
 import { z } from "zod";
 import { MUNICIPAL_COUNTRY_ID } from "../municipal/types";
 import type { StoredSheet } from "./readStoredSheet";
+import { DemographyStopError } from "./stops";
 
 const MUNICIPAL_PACKAGE = "docs/Raw Data/Municipalities/geostat-population-regional-gdp";
 const MAPPINGS = "data/mappings/demography";
@@ -68,7 +69,7 @@ async function readRecords<T>(file: string, schema: z.ZodType<T>): Promise<T[]> 
  */
 export function readUnitRows(sheet: StoredSheet): Array<{ row: number; label: string }> {
   if (sheet.label("A4") !== "regions, self-governed units") {
-    throw new Error(`Unexpected header in sheet ${sheet.name}: A4 is not the unit-table heading`);
+    throw new DemographyStopError("layout_changed", `Unexpected header in sheet ${sheet.name}: A4 is not the unit-table heading`);
   }
   const rows: Array<{ row: number; label: string }> = [];
   for (let row = 5; row <= sheet.lastRow; row += 1) {
@@ -168,7 +169,7 @@ export async function loadDemographyGeography(
         if (component) return { kind: "city_component", ...component };
       }
       if (excluded.has(label)) return { kind: "excluded", geographyId: null };
-      throw new Error(`Unreviewed geography label in ${scope}: ${rawLabel}`);
+      throw new DemographyStopError("unreviewed_label", `Unreviewed geography label in ${scope}: ${rawLabel}`);
     },
   };
 }

@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { DemographyStopError } from "./stops";
 
 /** The only text Geostat prints where a number is missing. Any other text in a numeric cell stops preparation. */
 export const REVIEWED_MISSING_MARKERS: readonly string[] = ["-"];
@@ -9,24 +10,24 @@ export const REVIEWED_MISSING_MARKERS: readonly string[] = ["-"];
  */
 const WHOLE_PERSON_TOLERANCE = 1e-6;
 
-export class UnexpectedCellError extends Error {
+export class UnexpectedCellError extends DemographyStopError {
   constructor(
     readonly sheetName: string,
     readonly cellRef: string,
     readonly value: unknown,
   ) {
-    super(`Unexpected cell ${sheetName}!${cellRef}: ${JSON.stringify(value)}`);
+    super("unexpected_cell", `Unexpected cell ${sheetName}!${cellRef}: ${JSON.stringify(value)}`);
     this.name = "UnexpectedCellError";
   }
 }
 
-export class NotWholePersonError extends Error {
+export class NotWholePersonError extends DemographyStopError {
   constructor(
     readonly sheetName: string,
     readonly cellRef: string,
     readonly persons: number,
   ) {
-    super(`Cell ${sheetName}!${cellRef} holds ${persons} persons, which is not a whole number`);
+    super("not_whole_person", `Cell ${sheetName}!${cellRef} holds ${persons} persons, which is not a whole number`);
     this.name = "NotWholePersonError";
   }
 }
@@ -126,8 +127,8 @@ export class StoredSheet {
     for (let row = fromRow; row <= toRow; row += 1) {
       if (this.label(this.ref(column, row)) === label) rows.push(row);
     }
-    if (rows.length === 0) throw new Error(`Row label not found in sheet ${this.name}: ${label}`);
-    if (rows.length > 1) throw new Error(`Row label appears more than once in sheet ${this.name}: ${label}`);
+    if (rows.length === 0) throw new DemographyStopError("layout_changed", `Row label not found in sheet ${this.name}: ${label}`);
+    if (rows.length > 1) throw new DemographyStopError("layout_changed", `Row label appears more than once in sheet ${this.name}: ${label}`);
     return rows[0]!;
   }
 }
@@ -136,10 +137,10 @@ export class StoredSheet {
 export function readStoredSheet(bytes: Buffer, expectedSheet?: string): StoredSheet {
   const workbook = XLSX.read(bytes, { type: "buffer", cellText: false, cellNF: false });
   if (workbook.SheetNames.length !== 1) {
-    throw new Error(`A Geostat demography workbook must hold exactly one sheet, found ${workbook.SheetNames.length}`);
+    throw new DemographyStopError("layout_changed", `A Geostat demography workbook must hold exactly one sheet, found ${workbook.SheetNames.length}`);
   }
   const name = workbook.SheetNames[0]!;
-  if (expectedSheet !== undefined && name !== expectedSheet) throw new Error(`Missing sheet ${expectedSheet}; found ${name}`);
+  if (expectedSheet !== undefined && name !== expectedSheet) throw new DemographyStopError("layout_changed", `Missing sheet ${expectedSheet}; found ${name}`);
   return new StoredSheet(name, workbook.Sheets[name]!);
 }
 
@@ -155,7 +156,7 @@ export function findYearColumns(sheet: StoredSheet, headerRow: number): Map<numb
     const ref = sheet.ref(column, headerRow);
     const year = sheet.yearAt(ref);
     if (year !== null) {
-      if (columns.has(year)) throw new Error(`Year ${year} appears twice in header row ${headerRow} of sheet ${sheet.name}`);
+      if (columns.has(year)) throw new DemographyStopError("layout_changed", `Year ${year} appears twice in header row ${headerRow} of sheet ${sheet.name}`);
       current = [column];
       columns.set(year, current);
     } else if (sheet.isBlank(ref)) {
@@ -164,7 +165,7 @@ export function findYearColumns(sheet: StoredSheet, headerRow: number): Map<numb
       throw new UnexpectedCellError(sheet.name, ref, sheet.label(ref));
     }
   }
-  if (columns.size === 0) throw new Error(`No year header found in row ${headerRow} of sheet ${sheet.name}`);
+  if (columns.size === 0) throw new DemographyStopError("layout_changed", `No year header found in row ${headerRow} of sheet ${sheet.name}`);
   return columns;
 }
 
@@ -181,10 +182,10 @@ export function findYearBlocks(sheet: StoredSheet): YearBlock[] {
     for (let column = 2; column <= sheet.lastColumn && alone; column += 1) alone = sheet.isBlank(sheet.ref(column, row));
     if (alone) starts.push({ year, row });
   }
-  if (starts.length === 0) throw new Error(`No year blocks found in sheet ${sheet.name}`);
+  if (starts.length === 0) throw new DemographyStopError("layout_changed", `No year blocks found in sheet ${sheet.name}`);
   const seen = new Set<number>();
   for (const start of starts) {
-    if (seen.has(start.year)) throw new Error(`Year ${start.year} has two blocks in sheet ${sheet.name}`);
+    if (seen.has(start.year)) throw new DemographyStopError("layout_changed", `Year ${start.year} has two blocks in sheet ${sheet.name}`);
     seen.add(start.year);
   }
   return starts.map((start, index) => ({
