@@ -140,3 +140,13 @@ export function inflationCatalogueSeries(snapshot: FactQuerySnapshot) {
 export function inflationDatasetPeriods(snapshot: FactQuerySnapshot): PeriodRange {
   return rangeOf([...snapshot.inflation.facts, ...snapshot.inflation.categories].map((fact) => fact.period))!;
 }
+
+/** First and last month of any city value, per city (describe_coverage). Late starts per series come back as missing cells. */
+export function inflationEntityPeriods(snapshot: FactQuerySnapshot): Map<string, PeriodRange> {
+  const result = new Map<string, PeriodRange>();
+  for (const city of snapshot.inflation.cityEntities) {
+    const range = rangeOf(snapshot.inflation.cities.filter((fact) => fact.cityId === city.id).map((fact) => fact.period));
+    if (range !== null) result.set(city.id, range);
+  }
+  return result;
+}

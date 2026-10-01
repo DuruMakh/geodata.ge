@@ -210,7 +210,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     }
   }
 
-  if (isMunicipal !== (input.dimension === "entities")) {
+  const entityRanking = input.dimension === "entities";
+  const inflationCities = isInflation && entityRanking;
+  if ((entityRanking && !isMunicipal && !isInflation) || (!entityRanking && isMunicipal)) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
       messageKa: serviceMessage(snapshot, "ka", "errors.rankDimension"),
@@ -253,7 +255,18 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     }
   } else {
     const series = catalogueSeries(snapshot, input.datasetId);
-    if (isInflation) {
+    if (inflationCities) {
+      if (input.seriesId === undefined || input.entityType !== "city") {
+        return errorResponse(snapshot, {
+          code: "invalid_parameters",
+          messageKa: serviceMessage(snapshot, "ka", "errors.rankInflationCityInput"),
+          messageEn: serviceMessage(snapshot, "en", "errors.rankInflationCityInput"),
+          retryable: false,
+        });
+      }
+      seriesIds = [input.seriesId];
+      universeKey = "ranking.inflationCities";
+    } else if (isInflation) {
       // Peers only: one COICOP level, never the headline, the target or the residual.
       seriesIds = snapshot.inflation.groups
         .filter((group) => group.level === input.level)
@@ -285,10 +298,10 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         .sort();
       universeKey = "ranking.publicFields";
     }
-    entityIds = ["country.georgia"];
+    entityIds = inflationCities ? snapshot.inflation.cityEntities.map((city) => city.id) : ["country.georgia"];
   }
 
-  const candidateCount = isMunicipal ? entityIds.length : seriesIds.length;
+  const candidateCount = isMunicipal || inflationCities ? entityIds.length : seriesIds.length;
 
   if (candidateCount === 0) {
     return errorResponse(snapshot, {
@@ -327,7 +340,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   if (isValueMetric) {
     const result = isInflation
-      ? inflationObservations(snapshot, { seriesIds, measure: input.measure, periods: [input.period as string] }, { includeResidual: false })
+      ? inflationObservations(snapshot, { seriesIds, measure: input.measure, periods: [input.period as string], ...(inflationCities ? { entityIds } : {}) }, { includeResidual: false })
       : runObservations([input.year as number]);
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
@@ -338,7 +351,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
 
     for (const observation of observations) {
-      const stableId = isMunicipal ? observation.entityId : observation.seriesId;
+      const stableId = isMunicipal || inflationCities ? observation.entityId : observation.seriesId;
       if (observation.value === null) {
         exclusions.push({ id: stableId, reason: observation.missingReason ?? serviceMessage(snapshot, "ka", REASON_NO_VALUE), reasonEn: observation.missingReasonEn ?? serviceMessage(snapshot, "en", REASON_NO_VALUE) });
         continue;
@@ -360,7 +373,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     }
   } else {
     const target = isInflation
-      ? ({ dataset: "inflation", seriesIds } as const)
+      ? ({ dataset: "inflation", seriesIds, ...(inflationCities ? { entityIds } : {}) } as const)
       : isMunicipal
         ? ({ dataset: "municipal", entityIds, seriesIds } as const)
         : input.datasetId === "ministries"
@@ -381,7 +394,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     caveats = result.meta.caveats;
 
     for (const comparison of comparisons) {
-      const stableId = isMunicipal ? comparison.entityId : comparison.seriesId;
+      const stableId = isMunicipal || inflationCities ? comparison.entityId : comparison.seriesId;
 
       // Spec section 6.7: omit what is not comparable and report it. A
       // `limited` comparison may remain, carrying its caveat.

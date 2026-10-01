@@ -284,6 +284,8 @@ export async function renderConnectPage(locale: Locale) {
                   <a className="underline" href="/downloads/data/inflation-national.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-categories.csv">CSV</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-categories.json">{message(messages, "connect.inflationCategoriesMetadata")}</a>{" · "}
+                  <a className="underline" href="/downloads/data/inflation-cities.csv">{message(messages, "connect.inflationCitiesCsv")}</a>{" · "}
+                  <a className="underline" href="/downloads/data/inflation-cities.json">{message(messages, "connect.inflationCitiesMetadata")}</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
               </div>

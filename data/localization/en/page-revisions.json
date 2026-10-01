@@ -95,9 +95,9 @@
   "/methodology/gdp": "2026-09-26",
   "/explorer/economy/sectors": "2026-09-26",
   "/methodology/economic-sectors": "2026-09-26",
-  "/explorer/inflation": "2026-09-29",
+  "/explorer/inflation": "2026-10-01",
   "/explorer/inflation/overview": "2026-09-26",
-  "/methodology/inflation": "2026-09-29",
+  "/methodology/inflation": "2026-10-01",
   "/explorer/economy/regions": "2026-09-26",
   "/explorer/economy/regions/tbilisi": "2026-09-26",
   "/explorer/economy/regions/adjara": "2026-09-26",
@@ -112,5 +112,12 @@
   "/explorer/economy/regions/shida_kartli": "2026-09-26",
   "/methodology/regional-economies": "2026-09-26",
   "/explorer/inflation/categories": "2026-09-26",
-  "/explorer/inflation/products": "2026-09-29"
+  "/explorer/inflation/products": "2026-09-29",
+  "/explorer/inflation/cities": "2026-09-30",
+  "/explorer/inflation/cities/tbilisi": "2026-09-30",
+  "/explorer/inflation/cities/kutaisi": "2026-09-30",
+  "/explorer/inflation/cities/batumi": "2026-09-30",
+  "/explorer/inflation/cities/gori": "2026-09-30",
+  "/explorer/inflation/cities/telavi": "2026-09-30",
+  "/explorer/inflation/cities/zugdidi": "2026-09-30"
 }

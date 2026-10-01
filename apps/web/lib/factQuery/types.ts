@@ -23,7 +23,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.3.0" as const;
+export const SCHEMA_VERSION = "1.4.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;
@@ -266,6 +266,8 @@ export type FactQuerySnapshot = {
     categories: import("../data/inflation/types").ServedCpiCategoryFact[];
     weights: import("../data/inflation/types").ServedBasketWeightRow[];
     groups: import("./inflationSeries").InflationGroup[];
+    cities: import("../data/inflation/types").ServedCpiCityFact[];
+    cityEntities: import("./inflationSeries").InflationCityEntity[];
   };
   gdpFacts: ServedNationalGdpFact[];
   sources: ResolvedSource[];

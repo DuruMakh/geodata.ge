@@ -66,6 +66,7 @@ export const SERVED_DATA_FILES = {
   inflationTargets: "../../data/imports/nbg-inflation-target.csv",
   inflationCategoryFacts: "../../data/imports/cpi-categories-monthly.csv",
   inflationBasketWeights: "../../data/imports/cpi-basket-weights.csv",
+  inflationCityFacts: "../../data/imports/cpi-cities-monthly.csv",
   budgetFacts: "../../data/imports/budget-facts-2004-2025.csv",
   adminSpendingFacts: "../../data/imports/admin-spending-facts-2004-2025.csv",
   glossary: "../../data/glossary/category-glossary.csv",

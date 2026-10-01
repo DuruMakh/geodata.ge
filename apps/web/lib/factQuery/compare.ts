@@ -256,8 +256,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     endpointResult = inflationObservations(
       snapshot,
       monthly
-        ? { seriesIds: target.seriesIds, measure: input.measure, periods: [fromKey, toKey] }
-        : { seriesIds: target.seriesIds, measure: input.measure, years },
+        ? { seriesIds: target.seriesIds, measure: input.measure, periods: [fromKey, toKey], entityIds: target.entityIds }
+        : { seriesIds: target.seriesIds, measure: input.measure, years, entityIds: target.entityIds },
       { includeResidual: false, comparison: comparisonWindow },
     );
   } else if (target.dataset === "deficit") {

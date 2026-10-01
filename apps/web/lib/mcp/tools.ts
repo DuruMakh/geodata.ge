@@ -109,8 +109,9 @@ export const TOOLS: readonly ToolDefinition[] = [
       "A measure a series does not publish is rejected with the valid measures. Percent values use 2.4 for 2.4%. " +
       "Contributions are percentage points, never mix divisions and subgroups, and arrive with a residual series that closes them on the published headline. " +
       "Take the latest month from describe_coverage. Monthly changes do not add up to annual inflation, and the 12-month average is not annual inflation. " +
-      "One answer fits about 250 cells (series × months): a single series' full history, or a year of every division's contributions. " +
-      "Beyond that ask for fewer months or groups; a result over the response-size limit is refused and points to the bulk files.",
+      "One answer fits about 250 cells (entities × series × months): a single series' full history, or a year of every division's contributions. " +
+      "Beyond that ask for fewer months or groups; a result over the response-size limit is refused and points to the bulk files. " +
+      "Optional entityIds: country.georgia (default) or the six city.* ids from describe_coverage — Tbilisi, Kutaisi, Batumi, Gori, Telavi, Zugdidi — from 2016-01, for cpi.headline and cpi.cat.01–12 (yoy_pct, mom_pct; avg12_pct for cpi.headline). Cells count entities × series × months.",
     schema: queryInflationInput,
     run: (snapshot, input) => queryInflation(snapshot, input),
   },
@@ -211,7 +212,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "metrics require `fromYear` and `toYear` (cross-field rules the JSON Schema cannot express). " +
       "Ranking municipalities requires `entityType` and exactly one `seriesId`. Reports ties and " +
       "says when the cutoff splits one, and names every excluded candidate with its reason. For inflation: dimension series, " +
-      "level division or subgroup (optionally parentSeriesId), and period with metric value or fromPeriod and toPeriod with percentage_point_change.",
+      "level division or subgroup (optionally parentSeriesId), and period with metric value or fromPeriod and toPeriod with percentage_point_change. " +
+      "For inflation cities: dimension entities, entityType city, one seriesId, and the same period fields.",
     schema: rankInput,
     run: (snapshot, input) => rank(snapshot, input),
   },

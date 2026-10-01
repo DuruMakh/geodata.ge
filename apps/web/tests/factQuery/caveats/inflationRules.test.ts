@@ -10,7 +10,7 @@ beforeAll(async () => {
   snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
 });
 
-type Cell = { seriesId: string; period: string; value: number | null };
+type Cell = { seriesId: string; period: string; value: number | null; entityId?: string };
 
 function context(measure: Measure, cells: Cell[], comparison: CaveatContext["comparison"] = null): CaveatContext {
   return {
@@ -18,9 +18,9 @@ function context(measure: Measure, cells: Cell[], comparison: CaveatContext["com
     measure,
     years: [...new Set(cells.map((cell) => Number(cell.period.slice(0, 4))))],
     seriesIds: [...new Set(cells.map((cell) => cell.seriesId))],
-    entityIds: ["country.georgia"],
+    entityIds: [...new Set(cells.map((cell) => cell.entityId ?? "country.georgia"))],
     observations: cells.map((cell) => ({
-      entityId: "country.georgia",
+      entityId: cell.entityId ?? "country.georgia",
       seriesId: cell.seriesId,
       level: "division",
       parentSeriesId: null,
@@ -74,5 +74,16 @@ describe("inflation caveat rules", () => {
   it("calls a missing early target unverified, and says nothing once a target is in force", () => {
     expect(codes(context("target_pct", [{ seriesId: "cpi.target", period: "2014-06", value: null }]))).toEqual(["inflation_target_unverified_before_2015"]);
     expect(codes(context("target_pct", [{ seriesId: "cpi.target", period: "2026-08", value: 3 }]))).toEqual([]);
+  });
+
+  it("flags a city division cell for centrally recorded prices, and says nothing for the country", () => {
+    const caveats = evaluateCaveats(
+      snapshot,
+      context("yoy_pct", [{ seriesId: "cpi.cat.07", period: "2026-08", value: 6.1, entityId: "city.telavi" }]),
+      CAVEAT_RULES,
+    );
+    expect(caveats.map((caveat) => caveat.code)).toEqual(["inflation_city_central_prices"]);
+    expect(caveats[0]!.affects).toEqual(["city.telavi:cpi.cat.07:2026"]);
+    expect(codes(context("yoy_pct", [{ seriesId: "cpi.cat.07", period: "2026-08", value: 15.1989 }]))).not.toContain("inflation_city_central_prices");
   });
 });

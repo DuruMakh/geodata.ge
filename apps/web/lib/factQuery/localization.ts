@@ -16,6 +16,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "caveats.gdp_sna_break_2010",
   "caveats.gdp_world_bank_history",
   "caveats.gdp_world_bank_preliminary_basis",
+  "caveats.inflation_city_central_prices",
   "caveats.inflation_contribution_derived",
   "caveats.inflation_contribution_residual",
   "caveats.inflation_contribution_weights_differ",
@@ -78,6 +79,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "definitions.shareOfGdp",
   "errors.contributionMixedLevels",
   "errors.dataVersionChanged",
+  "errors.inflationCityInput",
   "errors.invalidParameters",
   "errors.measureSeriesMismatch",
   "errors.periodRangeReversed",
@@ -85,6 +87,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "errors.rankAmountChanges",
   "errors.rankChangeYears",
   "errors.rankDimension",
+  "errors.rankInflationCityInput",
   "errors.rankMixedBasis",
   "errors.rankMunicipalInput",
   "errors.rankNoCandidates",
@@ -104,6 +107,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "exclusions.municipalObservation",
   "missing.balanceYear",
   "missing.gdpDenominator",
+  "missing.inflationCityNotObserved",
   "missing.inflationContribution",
   "missing.inflationContributionStart",
   "missing.inflationMonth",
@@ -119,6 +123,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "missing.totalDenominator",
   "publication.catalogueNotice",
   "publication.inflationCategoriesNotice",
+  "publication.inflationCitiesNotice",
   "publication.sourcesNotice",
   "publication.sumWarning",
   "ranking.ascending",
@@ -126,6 +131,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "ranking.changeDefinition",
   "ranking.changeDefinitionPeriod",
   "ranking.descending",
+  "ranking.inflationCities",
   "ranking.inflationDivisions",
   "ranking.inflationSubgroups",
   "ranking.inflationSubgroupsWithinParent",
@@ -281,6 +287,7 @@ export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka:
       "year"
     ]
   },
+  "missing.inflationCityNotObserved": { ka: ["first"], en: ["first"] },
   "missing.perResidentYear": {
     "ka": [
       "year"

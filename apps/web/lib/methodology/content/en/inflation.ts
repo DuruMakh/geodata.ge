@@ -4,8 +4,8 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   id: "inflation",
   slug: "inflation",
   title: "Inflation",
-  summary: "Georgia's consumer price index, inflation categories and individual-product price changes, alongside the National Bank of Georgia's inflation target.",
-  reviewedAt: "2026-09-29",
+  summary: "Georgia's consumer price index, inflation categories, city inflation and individual-product price changes, alongside the National Bank of Georgia's inflation target.",
+  reviewedAt: "2026-10-01",
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/inflation-cpi-national.md", "docs/data-methodology/inflation-products.md"],
@@ -32,7 +32,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
       kind: "sources",
       title: "Sources",
       paragraphs: [
-        "Six Geostat consumer price index files, national sheet (Georgia) only. The English files are canonical; the Georgian files confirm that the values are identical.",
+        "Six Geostat consumer price index files: the national sheet (Georgia) and, in the annual, monthly and 12-month average files, one sheet for each of six cities. The English files are canonical; the Georgian files confirm that the values are identical.",
         "Geostat publishes annual, monthly and 12-month average change as indices (comparison period = 100); Fiscal.ge stores the percentage change, which is exactly the published index minus 100.",
         "Inflation target: National Bank of Georgia, Monetary Policy Strategy — 5% (2015–2016), 4% (2017), 3% (from 2018).",
         "Consumer basket weights: a separate Geostat file, refreshed once a year in January, covering 12 groups and 41 subgroups from 2012.",
@@ -57,6 +57,16 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
         "Geostat publishes each product's same-month-of-prior-year index and previous-month index with comparison period = 100. Annual product inflation is the published annual index minus 100. Fiscal.ge calculates the selected-years cumulative percentage by multiplying every published previous-month index divided by 100, from January of the selected first year through December of the last complete year or the latest published month. The baseline is the December immediately before the selected start year. This cumulative figure is derived by Fiscal.ge, not published as a Geostat series.",
         "If a product entered after the selected start or any monthly index in that span is missing, the full-range cumulative value is unavailable (—); a shorter history is never silently substituted. The latest annual ranking always uses the newest published month, even when the selected years end earlier. These product indices are not GEL shop prices, product-level basket weights, city prices or contributions to headline inflation.",
         "Two conservative identity splits keep p0179 Coffee cup with saucer from 2019 and p0269 Tourist trip abroad from 2020. Earlier descriptions and annual arithmetic suggest statistical continuity, but do not prove the earlier and current goods/services are the same specification. Geostat's p0148 English label says Chipboard while its Georgian label describes plasterboard; both official labels are preserved and the discrepancy is disclosed. The four archived English/Georgian product-index workbooks are listed among the original sources below.",
+      ],
+    },
+    {
+      id: "cities",
+      kind: "scope",
+      title: "Cities",
+      paragraphs: [
+        "Geostat records prices in six cities — Tbilisi, Kutaisi, Batumi, Gori, Telavi and Zugdidi — with the same consumer basket in each. The cities pages show annual inflation from January 2016: one page compares the six cities' overall rates with Georgia's, and each city has its own page with its 12 COICOP groups. Zugdidi's annual inflation starts in December 2016 and its 12-month average in December 2017, because Geostat began recording prices there in December 2015; those months are left empty, not filled.",
+        "Some prices — fuel, medicines, cars, mobile tariffs, flights and train fares — are recorded once and applied to every city, so differences between cities in those items are not measured differences.",
+        "The national index is a weighted average of the city indices. Geostat does not publish the city weights, and Fiscal.ge does not show them; it uses the published figures only to check that the six cities add up to the national index every year. The price index (2010 = 100) is not shown for cities: each city's index is relative to its own 2010 prices, so it cannot say which city is more expensive.",
       ],
     },
     {

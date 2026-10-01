@@ -6,6 +6,7 @@ import {
   assertInflationParity,
   loadBasketWeights,
   loadCpiCategoryFacts,
+  loadCpiCityFacts,
   loadCpiFacts,
   loadInflationTargets,
   loadServedInflationData,
@@ -18,6 +19,7 @@ describe("inflation serving", () => {
       targets: await loadInflationTargets(),
       categories: await loadCpiCategoryFacts(),
       weights: await loadBasketWeights(),
+      cities: await loadCpiCityFacts(),
     };
     expect(() => assertInflationParity(csv, csv)).not.toThrow();
     expect(() => assertInflationParity(csv, { ...csv, facts: [{ ...csv.facts[0]!, value: "1" }, ...csv.facts.slice(1)] })).toThrow(/differs/);
@@ -34,6 +36,9 @@ describe("inflation serving", () => {
     expect(() =>
       assertInflationParity(csv, { ...csv, weights: [{ ...csv.weights[0]!, sourceId: "source.wrong" }, ...csv.weights.slice(1)] }),
     ).toThrow(/differs/);
+    expect(() =>
+      assertInflationParity(csv, { ...csv, cities: [{ ...csv.cities[0]!, value: "1" }, ...csv.cities.slice(1)] }),
+    ).toThrow(/differs/);
   });
 
   it("serves numbers and refuses an unknown series", async () => {
@@ -43,5 +48,11 @@ describe("inflation serving", () => {
     const temp = path.join(await fs.mkdtemp(path.join(os.tmpdir(), "cpi-csv-")), "bad.csv");
     await fs.writeFile(temp, "series_id,measure,period,value,status,source_id,source_locator,last_reviewed_at\ncpi.food,yoy_pct,2020-01,1,published,source.geostat_cpi_yoy,Georgia!D5,2026-09-12\n");
     await expect(loadCpiFacts(temp)).rejects.toThrow(/Unknown CPI series/);
+  });
+
+  it("serves the city facts as numbers", async () => {
+    const { cities } = await loadServedInflationData();
+    expect(cities).toHaveLength(20570);
+    expect(typeof cities[0]!.value).toBe("number");
   });
 });
