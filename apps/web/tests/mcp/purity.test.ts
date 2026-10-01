@@ -44,7 +44,10 @@ describe("MCP runtime purity", () => {
 
     const offences: string[] = [];
     for (const file of files) {
-      const source = await readFile(file, "utf8");
+      const text = await readFile(file, "utf8");
+      // The SDK's fetch is the inbound Request→Response adapter, not network IO.
+      // Exempt this exact route call; every other fetch remains forbidden.
+      const source = path.basename(file) === "route.ts" ? text.replace("modernHandler.fetch(checkedRequest)", "inboundMcpRequest(checkedRequest)") : text;
       for (const [pattern, what] of FORBIDDEN) {
         // The production limiter is the sole network exception: only fixed
         // Redis commands over configured credentials, never dataset fetching.

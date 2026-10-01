@@ -22,7 +22,7 @@ Considered approaches:
 | Support both protocols at the existing address | Recommended: preserves existing connections and admits modern clients. |
 | Replace the old protocol or create a second address | Adds a migration burden for users or duplicate deployment/maintenance work. |
 
-Use the official TypeScript SDK's `createMcpHandler` with its stateless legacy posture and JSON response mode, keeping the query core unchanged. Registry metadata checked on 2026-10-01 reports stable `@modelcontextprotocol/server` and `@modelcontextprotocol/client` 2.2.0. Recheck the release documentation when writing the implementation plan and pin reviewed exact versions. Retain a v1 SDK client as a development-only test dependency if required to exercise actual old-client behavior; do not ship two server implementations to production merely for tests.
+Use the official TypeScript SDK's HTTP adapters, keeping the query core unchanged. Registry metadata checked on 2026-10-01 reports stable `@modelcontextprotocol/server` and `@modelcontextprotocol/client` 2.2.0. During execution, actual pinned modern/v1 clients proved equal city/source results, but the installed handler's `responseMode: "json"` did not apply to its legacy fallback. Preserve plain JSON through the SDK's documented composition: `isLegacyRequest` routes legacy requests to its exported `WebStandardStreamableHTTPServerTransport` with `sessionIdGenerator: undefined` and `enableJsonResponse: true`; modern requests use `createMcpHandler` with `legacy: "reject"` and `responseMode: "json"`. Both use the same fresh-server tool factory and the same endpoint. No manual event-stream conversion or SDK patch is introduced. Retain the v1 SDK client as a development-only test dependency; do not ship a second server implementation merely for tests.
 
 Before replacing the transport, prove the chosen SDK can serve both eras without stored sessions or standalone streams. If that proof fails, report the incompatibility and revise the design rather than hand-build a protocol stack or weaken the existing limits.
 
@@ -40,7 +40,7 @@ No authentication, accounts, write tools, model calls, prompts, resources, tasks
 ### Current clients
 
 - Implement `server/discover` with correct identity, capabilities, supported modern versions and instructions using the SDK's discovery contract.
-- Accept direct tool listing/calls carrying required per-request protocol version, client identity and capabilities metadata; an initialization handshake is not required.
+- Accept direct tool listing/calls carrying required per-request protocol version and capabilities metadata; an initialization handshake is not required. Client identity is recommended by the final standard, rather than mandatory: accept its omission and validate it when present, following the SDK.
 - Validate `MCP-Protocol-Version`, `Mcp-Method` and, where applicable, `Mcp-Name` against the body. Delegate version-specific parsing/validation, including permitted name encoding, to the SDK.
 - Reject missing/mismatched required modern headers and metadata with the appropriate protocol response. Unsupported versions return the recognized modern error with supported versions; unsupported methods use the modern method-not-found status/error behavior.
 - Include `resultType: complete` on modern protocol results. The Fiscal.ge data envelope inside `structuredContent` is unchanged by transport migration.

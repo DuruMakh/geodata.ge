@@ -3,7 +3,7 @@
 // The read-only tools, wired to the pure query core. This file owns names,
 // descriptions, schemas and annotations; it owns no arithmetic. Every figure
 // still comes from lib/factQuery/, and every error envelope is the core's own.
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/server";
 import type { ZodTypeAny } from "zod";
 import { compare } from "../factQuery/compare";
 import { describeCoverage } from "../factQuery/describeCoverage";
@@ -266,6 +266,7 @@ export function createMcpServer(): McpServer {
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
     {
+      capabilities: { tools: { listChanged: false } },
       instructions: serverInstructions(
         coverage,
         {

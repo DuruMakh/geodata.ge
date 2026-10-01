@@ -11,6 +11,23 @@ beforeAll(async () => {
   snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-04T00:00:00.000Z" });
 });
 
+it("retains two-element period/year ranges with exact element types", () => {
+  const response = TOOLS.find(tool => tool.name === "describe_coverage")!.run(snapshot, { datasetId: "inflation" });
+  if (response.kind !== "catalogue") throw new Error("Expected catalogue");
+  const schema = outputSchemaFor("describe_coverage");
+  expect(schema.safeParse(response).success).toBe(true);
+  for (const years of [[2020], [2020, 2021, 2022], ["2020", 2021]]) {
+    const invalid = structuredClone(response);
+    (invalid.data as { datasets: { years: unknown[] }[] }).datasets[0]!.years = years;
+    expect(schema.safeParse(invalid).success).toBe(false);
+  }
+  for (const periods of [["2020-01"], ["2020-01", "2021-01", "2022-01"], [2020, "2021-01"]]) {
+    const invalid = structuredClone(response);
+    (invalid.data as { datasets: { periods: unknown[] }[] }).datasets[0]!.periods = periods;
+    expect(schema.safeParse(invalid).success).toBe(false);
+  }
+});
+
 /**
  * One real, successful call per tool. The SDK validates structuredContent
  * against the declared output schema and fails the call on a mismatch, so a
