@@ -68,6 +68,7 @@ All checks below were run on the archived files on 2026-10-01.
 | Each region row equals the sum of its municipalities, population | 0 persons, 2015–2026 |
 | Same two checks for births, deaths and natural increase | Exact, 2014–2025 (starred city rows added for 2014–2016) |
 | Age tables: ages sum to total; males plus females equal both sexes; single years rebuild the 5-year groups; totals equal table 01 | Exact in table 02 (1994–2026) and table 02-1 (2015–2026) |
+| Migration totals: tables 32 and 33 agree; immigrants minus emigrants equal net migration (table 31); males plus females equal both sexes | Exact in every year 2012–2025; tables 32 and 31 also agree for 2002–2011 |
 | Share aged 65+ and the three dependency ratios recomputed from table 02 | Within 0.0497 of Geostat's published values (rounded to one decimal; bound 0.05) |
 | Crude birth, crude death, natural increase and net migration rates recomputed from counts and mid-year population | Within 0.049, 0.047, 0.045 and 0.048 (bound 0.05) |
 | Infant mortality rate recomputed from infant deaths and live births | Within 0.044 (bound 0.05) |
@@ -86,12 +87,13 @@ Mid-year population equals the average of consecutive 1 January values in every 
 
 ## 7. Source anomalies and identity decisions for implementation
 
-- **Stored precision against display.** Cells such as Tbilisi 2025 store `1335.671` (thousand) while the workbook's `#,##0.0` format displays `1,335.7`. Of 75 rows in 2025, 71 are stored to the person. At stored precision the 64 municipalities sum to Georgia **exactly**, and the −0.3 to +0.5 thousand "published component rounding" recorded in `docs/data-methodology/municipal-population-regional-gdp.md` disappears. It comes from one-decimal values, not from Geostat's publication. The shipped `data/imports/municipal-population-2025.csv` holds one-decimal values (Tbilisi `1335.7`), a difference of up to 50 persons per municipality. It is unchanged by this audit. The demography reader must use stored values, with a test.
+- **Stored precision against display.** Cells such as Tbilisi 2025 store `1335.671` (thousand) while the workbook's `#,##0.0` format displays `1,335.7`. Of 75 rows in 2025, 71 are stored to the person. Stored cells also carry float noise (Georgia 2025 is stored as `3930.4279999999999`); all 2,550 numeric cells of table 01 and 1,980 of table 02 are within 2×10⁻⁹ persons of a whole number, so converting thousands to integer persons by rounding is lossless. At stored precision the 64 municipalities sum to Georgia **exactly**, and the −0.3 to +0.5 thousand "published component rounding" recorded in `docs/data-methodology/municipal-population-regional-gdp.md` disappears. It comes from one-decimal values, not from Geostat's publication. The shipped `data/imports/municipal-population-2025.csv` holds one-decimal values (Tbilisi `1335.7`), a difference of up to 50 persons per municipality. It is unchanged by this audit. The demography reader must use stored values, with a test.
 - **Four spelling variants** between table 01 (`Dedoplistsqaro`, `Tetritsqaro`, `Tqibuli`, `Tsqaltubo`) and tables 09, 19 and 29 (`Dedoplistskaro`, `Tetritskaro`, `Tkibuli`, `Tskaltubo`). The census table uses the second spelling and labels cities `C. Name`. Only reviewed aliases may bridge them; no fuzzy matching and no row-position joins, although the row order is identical across tables 01, 04, 09, 19 and 29.
 - **Starred city rows** (Ozurgeti, Telavi, Mtskheta, Ambrolauri, Zugdidi, Akhaltsikhe, Gori) are published separately for population on 1 January 2015–2017, and for events during 2014–2016. In other years they are blank and the municipality row includes them. Events need their own component rule.
 - **Stray zero**: table 29, `C. Gori*`, 2020, cell `AB85` holds `0` where births and deaths have no cell. Reviewed anomaly; it must not enter any total.
 - **Rows outside the 64**: `Abkhazia A.R.`, `Ajara Municipality`, `Akhalgori`, `Eredvi`, `Tighva` and `Kurta` hold no values in 2014–2025 in the event tables and are not in the 64.
 - **Infant mortality rate** is stored at full precision for early years and rounded to one decimal for recent years.
+- **Citizenship rows change by year.** Table 33 lists 15 rows a year: `Total` and 14 categories. Nine labels appear in every year and 22 in at least one year (for example Armenia, India, China and Kazakhstan are listed in some years only), because only the countries large enough in that year are shown. `Other` therefore changes meaning from year to year, and a country missing from a year's list is inside `Other`, not zero. Store explicit rows only, never infer a zero, and do not treat `Other` as a comparable series.
 
 ## 8. Release calendar (Geostat, 2026)
 
@@ -115,9 +117,9 @@ Decided on 2026-10-01 after this review:
 1. **Modelled years.** Start at the registered years: vital events from 2014 and migration from 2012. The 2014 and 2012 method changes become series start dates and do not appear inside the served data.
 2. **Rates.** Carry total fertility rate, infant mortality rate, life expectancy and the crude birth and death rates. The natural increase rate, net migration rate, mid-year population and Geostat's published ratios stay validation inputs.
 3. **Precision of the shipped municipal population file** (§7): left unchanged until the denominator policy is chosen.
+4. **Single years of age** (table 02-1): stay as the original archived file; not in the dataset until a page needs school-age or pension-age groups.
+5. **Population and age structure before 2015.** Geostat's metadata says the 2018 re-estimate covered "the main demographic indicators for the period 1994-2014", which includes the 1 January population, although table 01 carries no retro-projection footnote. Carried from 2004 with an explicit `retro_projection` flag for 1 January 2004–2014.
 
-Still open:
+Open:
 
-4. **Single years of age** (table 02-1): archive only, or include 2015–2026 in the structure file. Needed later for school-age and pension-age cohorts.
-5. **Population and age structure before 2015.** Geostat's metadata says the 2018 re-estimate covered "the main demographic indicators for the period 1994-2014", which includes the 1 January population, although table 01 carries no retro-projection footnote. These figures are the official series and the denominator that per-resident figures for 2004–2013 would need. Carry them from 2004 with an explicit flag, or start at 2015.
-6. **Licences** for Eurostat, the World Bank and the UN extract were not reviewed. Geostat's Terms of Use (reviewed 2026-09-11) permit redistribution with credit. The cross-check files are evidence only and nothing from them is served.
+6. **Licences** for Eurostat, the World Bank and the UN extract were not reviewed. Geostat's Terms of Use (reviewed 2026-09-11) permit redistribution with credit. The cross-check files are evidence only and nothing from them is served, so this does not block the data stage.

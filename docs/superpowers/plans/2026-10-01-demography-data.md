@@ -1,0 +1,144 @@
+# Demography Data Foundation Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Produce reviewed, reproducible annual demography data from Geostat (population on 1 January, age structure, vital events, international migration) with explicit lineage flags, one registered census break and a validation report, without changing any existing public figure.
+
+**Architecture:** Follow the regional-economies pipeline. A hash-verified source package is read through `readVerifiedPackageFile`. Stored-value sheet readers feed typed observations. Reviewed alias and component maps bridge Geostat's naming. One `prepareDemography` validates the observations against the audit's identities and writes the canonical CSVs and the validation report in `--write` and `--check` modes.
+
+**Tech Stack:** TypeScript, SheetJS `xlsx` already in `apps/web`, `decimal.js`, `csv-parse`, Vitest, existing static data pipeline.
+
+**Spec:** `docs/superpowers/specs/2026-10-01-demography-data-design.md`
+
+**Evidence:** `docs/Raw Data/Demography/geostat-demography/2026-10/source-review.md` and `source-manifest.csv` (29 rows, already archived and verified).
+
+## Global Constraints
+
+- Coverage, from the spec: population and age structure for Georgia from 1 January 2004 through 2026, with `estimate_basis` `retro_projection` through 2014, `pre_census` for 2015–2024 and `census_based` from 2025; regions and municipalities from 2015. Vital events for Georgia 2014–2025, regions and municipalities 2015–2025. Migration for Georgia 2012–2025. Carry nothing earlier, although the archived tables hold it.
+- Served series: population by Georgia, region and municipality; population by sex and 5-year age group with derived 0–14, 15–64 and 65+; live births, deaths, natural increase; crude birth rate, crude death rate, total fertility rate, infant mortality rate, life expectancy at birth by sex; immigrants, emigrants and net migration, with immigrants and emigrants by citizenship. Everything else in the archive is validation only. Single years of age (table 02-1) stay in the archive and out of the dataset.
+- Read stored cell values, never displayed text: no `raw: false`. Convert thousands to integer persons by rounding after asserting each value is within 1e-6 persons of a whole number, then compare in integers.
+- The census recalculation is the only break in the served data. The break register has that one entry and no growth or rate may be computed across it. Event counts and border-police migration counts do not break at the census; the population stock, age structure and every rate with a population denominator do.
+- The balancing residual (change in 1 January population minus births, plus deaths, minus net migration) is 0 in every transition except 2024→2025, where it must equal +225,922. Any other residual stops preparation.
+- A label difference is bridged only by a reviewed alias; row position never joins tables. A country missing from a year's citizenship list produces no row, never a zero.
+- Annual data only; no extraction from PDF; no 2024 census detail.
+- Leave `data/imports/municipal-population-2025.csv` and `docs/data-methodology/municipal-population-regional-gdp.md` unchanged.
+- This plan adds no route, serving-mirror import, MCP data, publication, workbook or sidebar change. The database import and the `lib/methodology/sourceInventory.ts` entry belong to the page stage.
+- Registering fact sources changes the fact-query snapshot's source count (precedent: the product-index data stage). Update the counts in `tests/factQuery/sources.test.ts` and `tests/factQuery/buildSnapshot.test.ts` (both 132 today) and run `npx vitest run tests/factQuery/reference.test.ts`; a disagreement there is a stop condition (`CLAUDE.md`).
+- Work in `apps/web` for commands. A fresh checkout has no `node_modules`; run `npm ci` once. Use targeted tests while working, then `npm run check` and `npm run build` once at the end.
+
+## Review Focus
+
+1. A display-rounded value must never enter. Task 2 reads Tbilisi 2025 as 1,335,671 persons, not 1,335,700.
+2. The census step is the only unexplained residual. Task 6 tests that +225,922 passes and that any other residual stops.
+3. Spelling variants and starred cities. Task 3 tests that an unreviewed label stops, that city components are added only for their published years (events 2014–2016, population 2015–2017), and that the stray zero (table 29, `C. Gori*`, 2020, cell `AB85`) is ignored at that cell only.
+4. Start years. Tasks 4 and 5 test that no vital-event row before 2014, no migration row before 2012 and no regional row before 2015 exists in the canonical files.
+5. Citizenship. Task 5 tests that a country absent from a year's list produces no row, that `Other` is kept as published, and that an unreviewed label stops.
+6. A future capture that rewrites 2015–2024 or moves the census residual cannot silently replace the canonical files. Task 6 tests both.
+
+## File Map
+
+| Responsibility | Files |
+| --- | --- |
+| Source package (archived) | `docs/Raw Data/Demography/geostat-demography/2026-10/{source-manifest.csv,source-review.md,official/,cross-checks/}` |
+| Package and sheet readers | `apps/web/lib/data/demography/sourceFiles.ts`, `readStoredSheet.ts`, `types.ts` |
+| Reviewed identity maps | `data/mappings/demography/{geography-aliases,event-city-components,citizenship}.csv`; `apps/web/lib/data/demography/geography.ts`, `citizenship.ts` |
+| Family readers | `apps/web/lib/data/demography/{readPopulation,readVital,readMigration}.ts` |
+| Calculations and validation | `apps/web/lib/data/demography/{calculations,validation,breaks}.ts` |
+| Preparation and canonical output | `apps/web/lib/data/demography/prepareDemography.ts`, `apps/web/scripts/prepare-demography.ts`, `data/imports/demography-{population,structure,vital,migration}-annual.csv`, `data/imports/demography-series-breaks.csv`, `data/reports/demography-validation.json` |
+| Registration and methods | `data/sources/source-documents.csv`, `data/localization/en/{documents,sources}.json`, `data/localization/{en,ka}/service-messages.json`, `docs/data-methodology/demography.md`, `Project_Definition.md`, `apps/web/package.json` |
+| Tests | `apps/web/tests/data/demography/*.test.ts`, plus the two fact-query count updates |
+
+---
+
+### Task 1: Verify the source package
+
+**Files:** Create `apps/web/lib/data/demography/sourceFiles.ts`, `types.ts`; test in `apps/web/tests/data/demography/sourceFiles.test.ts`.
+
+**Interfaces:** `loadDemographySources(repositoryRoot: string): Promise<DemographySources>`; `DemographySources.get(sourceId: string): { bytes: Buffer; row: ManifestRow }`. The manifest is the BOM-prefixed `source-manifest.csv`, with upper-case SHA-256.
+
+- [ ] **Step 1: Install the locked dependencies if absent.** Run `npm ci` in `apps/web`.
+- [ ] **Step 2: Write failing tests.** Assert 29 manifest rows with the expected columns and the roles 13 canonical, 8 validation, 1 archived, 4 definitions, 3 cross-check; every file matches its bytes and SHA-256; table 01 resolves through the municipal package and equals the 2026-08-03 bytes (`8BD7A1B56E756E8D6BC92192095795B204B23FD18274AAFF39B78C0B0A487A57`, 34,994 bytes); a tampered byte, a duplicate source ID, a missing file and a path escape each throw.
+- [ ] **Step 3: Run `npx vitest run tests/data/demography/sourceFiles.test.ts`.** Expected: fails, because the reader does not exist.
+- [ ] **Step 4: Implement the reader on `readVerifiedPackageFile`** (containment and symlink checks). A `local_file` that starts with `docs/` resolves against the repository root, the rest against the package folder.
+- [ ] **Step 5: Run the targeted test.** Expected: pass. Commit the reader and test only.
+
+### Task 2: Stored-value sheet reader
+
+**Files:** Create `readStoredSheet.ts`; test in `tests/data/demography/readStoredSheet.test.ts`.
+
+**Interfaces:** `readStoredSheet(bytes: Buffer, expectedSheet?: string): StoredSheet`; `StoredSheet.text(ref): string | null`; `StoredSheet.persons(ref): number | null`, which converts thousands to integer persons and throws `NotWholePersonError` past 1e-6 persons; `findYearColumns(sheet, headerRow)` for tables with three columns per year (02, 02-1); `findYearBlocks(sheet)` for tables stacked by year (32, 33).
+
+- [ ] **Step 1: Write failing tests on the archived files.** Table 01 `AG5` is 3,930,428 persons; `AG6` (Tbilisi 2025) is 1,335,671 persons although the workbook displays 1,335.7; in table 02 each year's 19 age rows sum to its total in integer persons; a synthetic cell 0.0001 persons off a whole number throws; a missing sheet or moved header row throws.
+- [ ] **Step 2: Run the test.** Expected: fails.
+- [ ] **Step 3: Implement with `XLSX.read(bytes, { type: "buffer" })` and `sheet[ref].v`.** Never call `sheet_to_json` with `raw: false`, which returns displayed text.
+- [ ] **Step 4: Run the test; commit.**
+
+### Task 3: Reviewed identity maps
+
+**Files:** Create the three mapping CSVs under `data/mappings/demography/`, `geography.ts`, `citizenship.ts`; tests in `tests/data/demography/geography.test.ts` and `citizenship.test.ts`.
+
+**Content:** `geography-aliases.csv` holds the reviewed spelling bridges: `Dedoplistskaro`/`Dedoplistsqaro`, `Tetritskaro`/`Tetritsqaro`, `Tkibuli`/`Tqibuli`, `Tskaltubo`/`Tsqaltubo` for the event tables, plus the census table's `C. Name` city labels and the census spelling of Sighnagi (find it in the archived census table and record it). `event-city-components.csv` lists the seven starred cities for 2014–2016; the population component years (2015–2017) come from the existing `population-component-map.csv`, which is reused, not copied. `citizenship.csv` maps every label seen in table 33 (22 countries plus `Total`, `Other`, `Stateless`, `Not stated`) to a stable lowercase ASCII ID. The existing `geography-map.csv` and `data/imports/municipalities.csv` stay the municipality and region authority.
+
+**Interfaces:** `resolveEventUnit(label: string): { geographyId: string; kind: "georgia" | "region" | "municipality" | "city_component" | "excluded" }`; `resolveCitizenship(label: string): string`. Both throw on an unreviewed label.
+
+- [ ] **Step 1: Write failing tests.** Every label in tables 01, 09, 19 and 29 resolves; an invented spelling throws; the five aggregate-only codes and `Abkhazia A.R.`, `Akhalgori`, `Eredvi`, `Tighva`, `Kurta` resolve to `excluded`; component years are enforced; the `AB85` zero is the only accepted stray cell; all 26 citizenship labels resolve and an unseen label throws.
+- [ ] **Step 2: Run the tests.** Expected: fail.
+- [ ] **Step 3: Implement the resolvers and add the reviewed rows with a `mapping_note` for each.**
+- [ ] **Step 4: Run the tests; commit the maps and resolvers.**
+
+### Task 4: Population and structure observations
+
+**Files:** Create `readPopulation.ts`, `calculations.ts`; test in `tests/data/demography/readPopulation.test.ts`.
+
+**Interfaces:** `readPopulation(sources): DemographyObservation[]` for table 01 (Georgia 2004–2026; the 11 regions and 64 municipalities 2015–2026, starred city components added for 2015–2017); `readAgeStructure(sources): DemographyObservation[]` for table 02 (Georgia 2004–2026, sexes `total`, `male`, `female`, 19 age groups); `ageBands(rows): { age_0_14, age_15_64, age_65_plus }` in integer persons. `DemographyObservation` carries `seriesId`, `geographyId`, `year`, `referenceDate`, `value` (integer persons as a string), `unit`, `estimateBasis`, `status`, `sourceId`, `sourceLocator` (sheet, cell and year), `lastReviewedAt`.
+
+- [ ] **Step 1: Write failing tests with the audit's values.** Georgia on 1 January: 2004 3,937,716 (`retro_projection`), 2014 3,716,911 (`retro_projection`), 2024 3,694,608 (`pre_census`), 2025 3,930,428 (`census_based`). Derived bands, in persons: 2004 774,246 / 2,609,421 / 554,049; 2014 685,299 / 2,504,647 / 526,965; 2024 721,620 / 2,376,293 / 596,695; 2025 773,322 / 2,466,699 / 690,407; each trio sums to the year's total. Georgia equals the sum of the 64 municipalities in every year 2015–2026 and each region row equals its members; no regional row before 2015; the population file has 923 rows.
+- [ ] **Step 2: Run the tests.** Expected: fail.
+- [ ] **Step 3: Implement the readers and the band calculation on integers.** `estimateBasis` follows the reference year; the source locator keeps the stored cell.
+- [ ] **Step 4: Run the tests; commit.**
+
+### Task 5: Vital-event and migration observations
+
+**Files:** Create `readVital.ts`, `readMigration.ts`; tests in `tests/data/demography/readVital.test.ts` and `readMigration.test.ts`.
+
+**Interfaces:** `readVitalEvents(sources): DemographyObservation[]` for tables 09, 19, 29 (counts), 15, 24, 16, 25, 28 (rates, carried as published); `readMigration(sources): DemographyObservation[]` for tables 31 and 32 (totals) and 33 (citizenship). Rates carry the published precision as a decimal string with a `unit` of `per_1000_population`, `children_per_woman`, `per_1000_live_births` or `years`.
+
+- [ ] **Step 1: Write failing tests.** Births 2014 are 60,635 and 2025 37,867; deaths 2014 49,087 and 2025 44,319; natural increase 2014 11,548. Georgia equals the sum of the 64 municipalities (components added for 2014–2016) and each region equals its members, 2015–2025. Georgia-level series start in 2014 and no earlier row exists; municipalities and regions start in 2015. Total fertility rate 2025 is 1.53, infant mortality rate 7.6, life expectancy 76.0 (males 71.4, females 80.6). Migration for 2012 is 69,063 immigrants, 90,584 emigrants, net −21,521; for 2025, 131,501, 114,374 and +17,127; table 33 Georgian citizens in 2012 are 29,173 immigrants and 60,307 emigrants. No migration row before 2012. A country absent from a year's list yields no row, `Other` is kept as published, and the natural increase rate and net migration rate are not in the output.
+- [ ] **Step 2: Run the tests.** Expected: fail.
+- [ ] **Step 3: Implement both readers.** `estimateBasis` is `registered` for vital events and `border_police` for migration; ignore the `AB85` zero only at that cell.
+- [ ] **Step 4: Run the tests; commit.**
+
+### Task 6: Validation, break register and report
+
+**Files:** Create `validation.ts`, `breaks.ts`; test in `tests/data/demography/validation.test.ts`.
+
+**Interfaces:** `validateDemography(observations, sources): DemographyValidationReport`, which throws a named `DemographyStopError` for each stop condition; `buildBreakRegister(): BreakRow[]` returning the one census entry (`2025-01-01`, applies to population stock, structure and every rate with a population denominator including the crude rates, not to event counts, quoting Geostat's footnote).
+
+- [ ] **Step 1: Write failing tests for each check in spec §7.** Archive integrity; geography (64 municipalities, 11 regions, excluded codes absent, unique keys); parts to wholes exactly in integer persons, including immigrants minus emigrants equal to net migration and tables 32 and 33 agreeing; the balancing check over the archived 1994–2025 range, passing with 0 in 31 transitions and +225,922 in 2024→2025; census anchor (3,930,428 minus 3,929,581 is +847; every municipality's 1 January 2025 value within ±1% of its census count, after Task 3's aliases; the audit's 58 matched municipalities had a largest gap of 0.82%); rates recomputed within 0.05 (observed maximum 0.049) and 0.005 for total fertility rate; life expectancy in table 27 within 0.25 years of table 28 (observed 0.157); cross-source expectations (Eurostat equals Geostat for 2018–2024, the World Bank total equals mid-year population except 2024, UN differences reported only); a refresh diff that flags a changed historical value.
+- [ ] **Step 2: Add one corrupting test per stop condition.** A second residual, a changed census residual, a display-rounded value, a new missing-value pattern, a changed layout, an unreviewed label, a changed 2015–2024 value, an Eurostat departure from its expected relationship. Each must throw.
+- [ ] **Step 3: Run the tests.** Expected: fail.
+- [ ] **Step 4: Implement the checks and the report.** The report records source hashes, coverage by family, the blank-cell inventory, the balancing residual by year, the census anchor, recomputed-rate deviations, cross-source differences and any reviewed revision.
+- [ ] **Step 5: Run the tests; commit.**
+
+### Task 7: Preparation, canonical files and wiring
+
+**Files:** Create `prepareDemography.ts`, `apps/web/scripts/prepare-demography.ts`, the five canonical CSVs and `data/reports/demography-validation.json`; modify `apps/web/package.json`; test in `tests/data/demography/prepareDemography.test.ts`.
+
+**Interfaces:** `buildDemographyArtifacts(repositoryRoot)` and `writeDemographyArtifacts(write: boolean, repositoryRoot: string)` follow `writeRegionalEconomyArtifacts`; CSVs use `serializeBomCsvRows`. All four family files share `series_id, geography_id, year, value, unit, estimate_basis, status, source_id, source_locator, last_reviewed_at`; the structure file adds `sex`, `age_group`; the migration file adds `sex`, `citizenship_id`.
+
+- [ ] **Step 1: Write failing tests.** `--write` produces byte-identical files on a second run; `--check` fails when any committed file differs; the written files contain no row outside the coverage rules in Global Constraints.
+- [ ] **Step 2: Run the tests.** Expected: fail.
+- [ ] **Step 3: Implement preparation and the script.** Add `data:prepare-demography` and `data:check-demography` to `package.json` and append `npm run data:check-demography` to `data:validate`.
+- [ ] **Step 4: Run `npm run data:prepare-demography`, then `npm run data:check-demography`.** Read the report and the row counts. **Review checkpoint:** the user inspects the break register and the canonical-data diff before Task 8.
+- [ ] **Step 5: Commit the code, canonical files and report.**
+
+### Task 8: Registration, methodology, scope amendment and final verification
+
+**Files:** Modify `data/sources/source-documents.csv`, `data/localization/en/documents.json`, `data/localization/en/sources.json`, `data/localization/en/service-messages.json`, `data/localization/ka/service-messages.json`, `tests/factQuery/sources.test.ts`, `tests/factQuery/buildSnapshot.test.ts`, `Project_Definition.md`; create `docs/data-methodology/demography.md`.
+
+- [ ] **Step 1: Register the 12 new canonical-input sources** (tables 02, 09, 15, 16, 19, 24, 25, 28, 29, 31, 32, 33) with the IDs in `source-manifest.csv`. `source.geostat_municipal_population` is already registered. Validation-only, definition and cross-check files stay methodology originals. For each, add the source name, document title, publisher and attribution in English and Georgian to `data/localization/{en,ka}/service-messages.json` (keys `sources.<id>.name` and `documents.<id>.title|publisher|attribution`) and the English entries to `en/documents.json` and `en/sources.json`, following the product-index precedent. Run `npm run i18n:check`. **The Georgian strings are reviewed build inputs: draft them, and the user reviews them before this task is accepted.**
+- [ ] **Step 2: Update the two source-count tests from 132 to 144.** Run `npx vitest run tests/factQuery/reference.test.ts`; a disagreement is a stop condition, reported and not edited away.
+- [ ] **Step 3: Write `docs/data-methodology/demography.md`.** Scope, sources and hashes, definitions from Geostat's metadata, the census break and the 2014 and 2012 start dates, the integer-persons rule, the identities and tolerances, the revision precedent, the refresh rhythm and the stored-versus-displayed note about `municipal-population-2025.csv`.
+- [ ] **Step 4: Amend `Project_Definition.md`** with a bounded demography data-stage approval. The `დემოგრაფია` sidebar marker stays non-clickable and no page, route or export is approved.
+- [ ] **Step 5: Run the done-check once.** From `apps/web`: `npm run check`, then `npm run build`. No UI changes, so no browser tests. Report any failure with its output.
+- [ ] **Step 6: Commit.** Do not open a pull request unless asked.

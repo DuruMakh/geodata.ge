@@ -2,7 +2,7 @@
 
 Date: 2026-10-01
 
-Status: Draft. Scope decisions were approved in conversation on 2026-10-01 (§2). The source audit (§3, §4) was run the same day. Its evidence is in `docs/Raw Data/Demography/geostat-demography/2026-10/source-review.md`, with every archived file in `source-manifest.csv`. Three decisions taken after the audit are recorded in §2, and three remain open. This document covers the data stage only.
+Status: Draft. Scope decisions were approved in conversation on 2026-10-01 (§2). The source audit (§3, §4) was run the same day. Its evidence is in `docs/Raw Data/Demography/geostat-demography/2026-10/source-review.md`, with every archived file in `source-manifest.csv`. Five decisions taken after the audit are recorded in §2. Only the licence review of the cross-check sources remains open. This document covers the data stage only.
 
 ## 1. Outcome and scope
 
@@ -42,11 +42,10 @@ Decided after the audit, on 2026-10-01:
 2. **Rates.** Carry crude birth rate, crude death rate, total fertility rate, infant mortality rate and life expectancy. Natural increase rate, net migration rate, mid-year population and Geostat's published ratios stay validation inputs.
 3. **Precision of the shipped `data/imports/municipal-population-2025.csv`**, which holds one-decimal values while Geostat stores persons (§3): left unchanged until the denominator policy is chosen, then changed in one recorded step.
 
-Still open (source review §9), each with a recommendation:
+4. **Single years of age** (table 02-1, 2015–2026, exact persons) stay in the evidence package as the original file. They enter the dataset only when a page needs school-age or pension-age groups.
+5. **Population and age structure before 2015** are carried from 2004 and flagged `estimate_basis = retro_projection` for 1 January 2004–2014. Geostat's metadata describes the 2018 re-estimate of 1994–2014 as covering the main demographic indicators, so these figures are retro-projected too, although the tables carry no footnote. They are the official series and the denominator any per-resident figure for 2004–2013 would need.
 
-4. **Single years of age** (table 02-1, 2015–2026, exact persons): archive only, or include in the structure file. *Recommended: archive only; add it when school-age and pension-age cohorts are needed.*
-5. **Population and age structure before 2015.** Geostat's metadata describes the 2018 re-estimate of 1994–2014 as covering the main demographic indicators, so the 1 January figures up to 2014 are retro-projected too, although the tables carry no footnote. They are the official series, and the denominator that per-resident figures for 2004–2013 would need. *Recommended: carry them from 2004 with `estimate_basis = retro_projection`.*
-6. **Licences.** Geostat's Terms of Use were reviewed on 2026-09-11. Eurostat, World Bank and UN terms are not reviewed; their files are evidence only.
+Open: **licences.** Geostat's Terms of Use were reviewed on 2026-09-11. Eurostat, World Bank and UN terms are not reviewed. Their files are evidence only, so this does not block the data stage; it must be settled before any non-Geostat value is served.
 
 ## 3. What the audit found
 
@@ -56,7 +55,7 @@ Still open (source review §9), each with a recommendation:
 - **Revision precedent.** After the 2014 census, retro-projected results for 1994–2014 appeared in 2018, three to four years later. Expect 2015–2024 to be re-estimated at an unknown date, so today's numbers are one version of the series.
 - **Stored precision.** Cells such as Tbilisi 2025 store `1335.671` thousand while the workbook displays `1,335.7`. At stored precision the 64 municipalities sum to Georgia exactly. The −0.3 to +0.5 thousand "published rounding" in `docs/data-methodology/municipal-population-regional-gdp.md` comes from one-decimal values, not from Geostat's publication. The reader must use stored values.
 - **Two population bases on the site.** The 2025 GDP per capita implies 3,704.5k people, the pre-census 1 January 2025 estimate. The municipal budget-per-resident map uses the census-based 2025 values. Eurostat also still shows the pre-census 3,704,506 for 2025, and the World Bank's 2024 total spans the break. Choosing a denominator policy belongs to the later budget-linked stage.
-- **Identity work needed.** Four spelling variants between tables, starred city rows that are separate for 2014–2016 in event tables, and one stray zero (table 29, `C. Gori*`, 2020).
+- **Identity work needed.** Four spelling variants between tables, starred city rows that are separate for 2014–2016 in event tables, one stray zero (table 29, `C. Gori*`, 2020), and migration citizenship rows that change by year: only the countries large enough in that year are listed, so `Other` is not comparable across years and a missing country is inside `Other`, not zero.
 
 ## 4. Audit answers
 
@@ -74,13 +73,13 @@ Still open (source review §9), each with a recommendation:
 
 The package is `docs/Raw Data/Demography/geostat-demography/2026-10/`: `source-manifest.csv`, `source-review.md`, `official/` (tables, `metadata/`, `census-2024/`) and `cross-checks/`. Table 01 is referenced from the municipal package, not duplicated. Follow the latest-vintage retention rule; earlier files remain recoverable from git history. Register source IDs in `data/sources/source-documents.csv` when the canonical files exist. No automated production fetching.
 
-A deterministic `scripts/prepare-demography.ts` with `--write` and `--check`, wired into `data:validate`, follows the other prepare scripts. The reader reads **stored** cell values, never displayed ones, finds sheets, headers and year blocks by validated content, and rejects a changed layout rather than guessing.
+A deterministic `scripts/prepare-demography.ts` with `--write` and `--check`, wired into `data:validate`, follows the other prepare scripts. The reader reads **stored** cell values, never displayed ones. Stored cells carry float noise (`3930.4279999999999`), so it converts thousands to integer persons by rounding, after asserting that each value is within 10⁻⁶ persons of a whole number (the audit's largest distance was 2×10⁻⁹). It finds sheets, headers and year blocks by validated content and rejects a changed layout rather than guessing.
 
 ## 6. Canonical files and missing values
 
 Reviewed files under `data/imports/`, one per family (`demography-population-annual.csv`, `demography-structure-annual.csv`, `demography-vital-annual.csv`, `demography-migration-annual.csv`), plus `demography-series-breaks.csv`. Conventions follow `regional-economies-annual.csv`: stable lowercase ASCII `series_id` such as `demography.population_total`, geography IDs from the existing taxonomy, published precision, explicit `unit`, `status`, `source_id`, a sheet-and-cell `source_locator` and `last_reviewed_at`. Exact columns are fixed after the open decisions.
 
-`estimate_basis` takes `pre_census` or `census_based` for population stock and structure, plus `retro_projection` if decision 5 carries the years before 2015; `registered` for vital events; `border_police` for migration.
+`estimate_basis` takes `retro_projection` (1 January 2004–2014), `pre_census` (2015–2024) or `census_based` (2025 onward) for population stock and structure; `registered` for vital events; `border_police` for migration. The step from `retro_projection` to `pre_census` is a change of lineage, not a break: the totals are continuous through 2014/2015.
 
 An unpublished, suppressed or non-numeric cell stays blank and is counted in the validation report. It is never zero and never interpolated.
 
@@ -92,8 +91,8 @@ Tolerances come from the audit's observed precision and are not widened to pass.
 
 1. Every archived file matches its manifest bytes and SHA-256; source IDs are registered; headers parse; coverage is derived from the file.
 2. Municipality codes equal the existing 64, region IDs equal the existing 11, excluded codes are absent, keys are unique. Name differences are bridged only by reviewed aliases; row position is never a join key.
-3. Parts add to wholes, **exactly at stored precision**: municipalities to regions to Georgia, with the starred city components added for the years they are published; sexes to total; ages to total; births minus deaths to natural increase.
-4. Balancing check, run on the archived tables over their full range (1994–2025) including years that are not served: the change between consecutive 1 January values equals births minus deaths plus net migration within 0.5 person, in every transition except those the break register explains. The census step must equal the recalculation currently published (+225,922); any other residual stops preparation.
+3. Parts add to wholes, **exactly in integer persons**: municipalities to regions to Georgia, with the starred city components added for the years they are published; sexes to total; ages to total; births minus deaths to natural increase; immigrants minus emigrants to net migration; the migration totals in tables 32 and 33 to each other.
+4. Balancing check, run on the archived tables over their full range (1994–2025) including years that are not served: the change between consecutive 1 January values equals births minus deaths plus net migration exactly, in integer persons, in every transition except those the break register explains. The census step must equal the recalculation currently published (+225,922); any other residual stops preparation.
 5. Census anchor: Geostat's census count is compared with the 1 January 2025 value and the difference reported (+847 persons in the audit). Municipal 1 January 2025 values must be within ±1% of their census counts (observed largest 0.82%).
 6. Published rates are recomputed from counts: within 0.05 for rates published to one decimal, within 0.005 for total fertility rate. Life expectancy in the abridged table 27 is compared with table 28 within 0.25 years (observed 0.157, a method difference), reported and not corrected.
 7. Cross-source expectations: Eurostat equals Geostat on 1 January 2018–2024; the World Bank total equals Geostat's mid-year population except 2024; UN differences are reported only. A departure from an expected relationship stops for review.
