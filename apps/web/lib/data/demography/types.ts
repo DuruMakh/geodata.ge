@@ -30,3 +30,27 @@ export type DemographySources = {
   readonly rows: readonly DemographyManifestRow[];
   get(sourceId: string): VerifiedDemographySource;
 };
+
+/** Where a value comes from, which decides how far it can be compared with its neighbours. */
+export type EstimateBasis = "retro_projection" | "pre_census" | "census_based" | "registered" | "border_police";
+export type Sex = "total" | "male" | "female";
+
+/** One published Geostat value in the canonical demography files. */
+export type DemographyObservation = {
+  seriesId: string;
+  /** `country.georgia`, a `region.*` id, or a two-digit municipality code. */
+  geographyId: string;
+  year: number;
+  /** A whole number of persons, or a published rate as its shortest decimal text. */
+  value: string;
+  unit: string;
+  estimateBasis: EstimateBasis;
+  status: "published";
+  sourceId: string;
+  /** Sheet, cell and reference date or year, e.g. `1!AG5 [2025-01-01]`. */
+  sourceLocator: string;
+  lastReviewedAt: string;
+  sex?: Sex;
+  ageGroup?: string;
+  citizenshipId?: string;
+};

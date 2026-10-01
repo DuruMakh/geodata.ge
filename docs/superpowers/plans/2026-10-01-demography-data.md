@@ -41,8 +41,9 @@
 | --- | --- |
 | Source package (archived) | `docs/Raw Data/Demography/geostat-demography/2026-10/{source-manifest.csv,source-review.md,official/}` |
 | Package and sheet readers | `apps/web/lib/data/demography/sourceFiles.ts`, `readStoredSheet.ts`, `types.ts` |
+| Shared constants and stop conditions | `apps/web/lib/data/demography/{series,stops}.ts` |
 | Reviewed identity maps | `data/mappings/demography/{geography-aliases,excluded-units,event-city-components,source-anomalies,citizenship}.csv`; `apps/web/lib/data/demography/{geography,citizenship,anomalies}.ts` |
-| Family readers | `apps/web/lib/data/demography/{readPopulation,readVital,readMigration}.ts` |
+| Family readers | `apps/web/lib/data/demography/{readUnitTable,readPopulation,readVital,readMigration}.ts` |
 | Calculations and validation | `apps/web/lib/data/demography/{calculations,validation,breaks}.ts` |
 | Preparation and canonical output | `apps/web/lib/data/demography/prepareDemography.ts`, `apps/web/scripts/prepare-demography.ts`, `data/imports/demography-{population,structure,vital,migration}-annual.csv`, `data/imports/demography-series-breaks.csv`, `data/reports/demography-validation.json` |
 | Registration and methods | `data/sources/source-documents.csv`, `data/localization/en/{documents,sources}.json`, `data/localization/{en,ka}/service-messages.json`, `docs/data-methodology/demography.md`, `Project_Definition.md`, `apps/web/package.json` |
@@ -88,14 +89,14 @@
 
 ### Task 4: Population and structure observations
 
-**Files:** Create `readPopulation.ts`, `calculations.ts`; test in `tests/data/demography/readPopulation.test.ts`.
+**Files:** Create `readUnitTable.ts` (the Georgia, region and unit table reader that Task 5 reuses for tables 09, 19 and 29), `readPopulation.ts`, `calculations.ts`; tests in `tests/data/demography/readPopulation.test.ts` and `calculations.test.ts`.
 
-**Interfaces:** `readPopulation(sources): DemographyObservation[]` for table 01 (Georgia 2004–2026; the 11 regions and 64 municipalities 2015–2026, starred city components added for 2015–2017); `readAgeStructure(sources): DemographyObservation[]` for table 02 (Georgia 2004–2026, sexes `total`, `male`, `female`, 19 age groups); `ageBands(rows): { age_0_14, age_15_64, age_65_plus }` in integer persons. `DemographyObservation` carries `seriesId`, `geographyId`, `year`, `referenceDate`, `value` (integer persons as a string), `unit`, `estimateBasis`, `status`, `sourceId`, `sourceLocator` (sheet, cell and year), `lastReviewedAt`.
+**Interfaces:** `readPopulation(sources, geography): DemographyObservation[]` for table 01 (Georgia 2004–2026; the 11 regions and 64 municipalities 2015–2026, starred city components added for 2015–2017; Tbilisi's region takes its municipality's row because Geostat prints no separate one); `readAgeStructure(sources): DemographyObservation[]` for table 02 (Georgia 2004–2026, sexes `total`, `male`, `female`, an all-ages total, 19 age groups and the derived bands, 1,587 rows); `ageBands(groups): { band_0_14, band_15_64, band_65_plus }` in integer persons. `DemographyObservation` carries `seriesId`, `geographyId`, `year`, `value` (integer persons as a string), `unit`, `estimateBasis`, `status`, `sourceId`, `sourceLocator` (sheet, cell and reference date, e.g. `1!AG5 [2025-01-01]`; a band is its summed cell range) and `lastReviewedAt`; the structure rows add `sex` and `ageGroup`. The reference date lives in the locator, as in the canonical columns of Task 7.
 
-- [ ] **Step 1: Write failing tests with the audit's values.** Georgia on 1 January: 2004 3,937,716 (`retro_projection`), 2014 3,716,911 (`retro_projection`), 2024 3,694,608 (`pre_census`), 2025 3,930,428 (`census_based`). Derived bands, in persons: 2004 774,246 / 2,609,421 / 554,049; 2014 685,299 / 2,504,647 / 526,965; 2024 721,620 / 2,376,293 / 596,695; 2025 773,322 / 2,466,699 / 690,407; each trio sums to the year's total. Georgia equals the sum of the 64 municipalities in every year 2015–2026 and each region row equals its members; no regional row before 2015; the population file has 923 rows.
-- [ ] **Step 2: Run the tests.** Expected: fail.
-- [ ] **Step 3: Implement the readers and the band calculation on integers.** `estimateBasis` follows the reference year; the source locator keeps the stored cell.
-- [ ] **Step 4: Run the tests; commit.**
+- [x] **Step 1: Write failing tests with the audit's values.** Georgia on 1 January: 2004 3,937,716 (`retro_projection`), 2014 3,716,911 (`retro_projection`), 2024 3,694,608 (`pre_census`), 2025 3,930,428 (`census_based`). Derived bands, in persons: 2004 774,246 / 2,609,421 / 554,049; 2014 685,299 / 2,504,647 / 526,965; 2024 721,620 / 2,376,293 / 596,695; 2025 773,322 / 2,466,699 / 690,407; each trio sums to the year's total. Georgia equals the sum of the 64 municipalities in every year 2015–2026 and each region row equals its members; no regional row before 2015; the population file has 923 rows.
+- [x] **Step 2: Run the tests.** Expected: fail.
+- [x] **Step 3: Implement the readers and the band calculation on integers.** `estimateBasis` follows the reference year; the source locator keeps the stored cell.
+- [x] **Step 4: Run the tests; commit.**
 
 ### Task 5: Vital-event and migration observations
 
