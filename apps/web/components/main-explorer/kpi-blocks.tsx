@@ -43,6 +43,7 @@ export type SideKpi = {
   unit: string;
   color: string;
   detail: string;
+  wrapDetail?: boolean;
   spark: { values: (number | null)[]; color: string } | null;
 };
 
@@ -68,7 +69,7 @@ export function SideKpiList({ kpis }: { kpis: SideKpi[] }) {
                 </span>
               ) : null}
             </p>
-            <p title={kpi.detail} className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]">
+            <p title={kpi.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${kpi.wrapDetail ? "break-words" : "overflow-hidden text-ellipsis whitespace-nowrap"}`}>
               {kpi.detail}
             </p>
           </div>

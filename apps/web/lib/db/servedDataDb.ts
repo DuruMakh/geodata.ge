@@ -25,8 +25,11 @@ import {
   loadRegionalEconomyFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
   loadInflationCategoryFactsFromMirror,
+  loadInflationCityFactsFromMirror,
   loadInflationCpiFactsFromMirror,
   loadInflationTargetsFromMirror,
+  loadProductCatalogueFromMirror,
+  loadProductFactsFromMirror,
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
@@ -113,11 +116,19 @@ export async function loadRegionalEconomyFactsFromDb() {
 }
 
 export async function loadInflationDataFromDb() {
-  const [facts, targets, categories, weights] = await Promise.all([
+  const [facts, targets, categories, weights, cities] = await Promise.all([
     loadInflationCpiFactsFromMirror(prisma),
     loadInflationTargetsFromMirror(prisma),
     loadInflationCategoryFactsFromMirror(prisma),
     loadInflationBasketWeightsFromMirror(prisma),
+    loadInflationCityFactsFromMirror(prisma),
   ]);
-  return { facts, targets, categories, weights };
+  return { facts, targets, categories, weights, cities };
+}
+
+export async function loadProductDataFromDb() {
+  const [catalogue, facts] = await Promise.all([
+    loadProductCatalogueFromMirror(prisma), loadProductFactsFromMirror(prisma),
+  ]);
+  return { catalogue, facts };
 }

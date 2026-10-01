@@ -233,8 +233,15 @@ describe("search before you know the dataset", () => {
 
   it("names the dataset each cross-dataset match belongs to", () => {
     const found = data(describeCoverage(snapshot, { search: "ბათუმი" }));
-    for (const entity of found.entities ?? []) expect(entity.datasetId).toBe("municipal-expenditure");
-    expect((found.entities ?? []).length).toBeGreaterThan(0);
+    const entities = found.entities ?? [];
+    // "ბათუმი" now genuinely matches across two datasets: the Batumi
+    // municipality and the Batumi inflation city entity added by schema 1.4.0.
+    // Each match must carry the dataset it actually belongs to, not a
+    // hardcoded single dataset from when only one ever matched.
+    expect(entities.length).toBeGreaterThan(0);
+    for (const entity of entities) expect(["municipal-expenditure", "inflation"]).toContain(entity.datasetId);
+    expect(entities.find((e) => e.entityId === "06")?.datasetId).toBe("municipal-expenditure");
+    expect(entities.find((e) => e.entityId === "city.batumi")?.datasetId).toBe("inflation");
   });
 
   it("finds a national series with no datasetId given", () => {

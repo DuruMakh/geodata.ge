@@ -20,7 +20,7 @@ export type Observation = {
   datasetId: DatasetId;
   budgetScope: string;
   entityId: string;
-  entityType: "country" | "municipality" | "region";
+  entityType: "country" | "municipality" | "region" | "city";
   entityLabelKa: string;
   entityLabelEn: string;
   /** The existing URL slug. Present for municipalities only; null otherwise. */

@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import * as XLSX from "xlsx";
 import { makePeriod } from "./periods";
-import type { CpiMeasure, CpiSeriesId } from "./types";
+import { categoryIdFromCoicop, type CpiMeasure, type CpiSeriesId } from "./types";
 
 // Reads the national table of one Geostat CPI workbook. Rows and columns are
 // located by content — the I–XII month header, the year labels, the Total / სულ
@@ -18,7 +18,7 @@ type Rows = unknown[][];
 type Layout = "yearRows" | "total" | "core";
 
 const MONTHS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-const NATIONAL_SHEET: Record<CpiLanguage, string> = { en: "Georgia", ka: "საქართველო" };
+export const NATIONAL_SHEET: Record<CpiLanguage, string> = { en: "Georgia", ka: "საქართველო" };
 const TOTAL_LABEL: Record<CpiLanguage, string> = { en: "Total", ka: "სულ" };
 const EN_CORE_LABELS = ["Core Inflation*", "Core Inflation without tobacco**"];
 
@@ -61,6 +61,18 @@ function locator(sheet: string, row: number, column: number): string {
   return `${sheet}!${XLSX.utils.encode_cell({ r: row, c: column })}`;
 }
 
+// One parse per workbook buffer: the national, category and city readers all read
+// the same yoy/mom/avg12 files, and each parse costs about three seconds.
+const books = new WeakMap<Buffer, XLSX.WorkBook>();
+function readBook(content: Buffer): XLSX.WorkBook {
+  let book = books.get(content);
+  if (book === undefined) {
+    book = XLSX.read(content, { type: "buffer" });
+    books.set(content, book);
+  }
+  return book;
+}
+
 function findMonthHeader(rows: Rows): { row: number; col: number } {
   for (let row = 0; row < rows.length; row += 1) {
     const cells = rows[row] ?? [];
@@ -72,7 +84,7 @@ function findMonthHeader(rows: Rows): { row: number; col: number } {
 }
 
 // index_2010 and avg12: one row per year, January–December in columns B–M.
-function readYearRows(rows: Rows, sheet: string, rebase: boolean): ParsedCpiCell[] {
+function readYearRows(rows: Rows, sheet: string, rebase: boolean, allowLateStart = false): ParsedCpiCell[] {
   const header = findMonthHeader(rows);
   if (header.col !== 1) throw new Error("CPI layout: year-row table must start its months in column B");
   const cells: ParsedCpiCell[] = [];
@@ -88,7 +100,8 @@ function readYearRows(rows: Rows, sheet: string, rebase: boolean): ParsedCpiCell
     for (let month = 1; month <= 12; month += 1) {
       const raw = numeric(values[month]);
       if (raw === null) {
-        ended = true;
+        // A city may start later than the table (Zugdidi); a hole after the start is still a layout fault.
+        if (!allowLateStart || cells.length > 0) ended = true;
         continue;
       }
       if (ended) throw new Error(`CPI layout: value after a gap at ${locator(sheet, row, month)}`);
@@ -99,7 +112,14 @@ function readYearRows(rows: Rows, sheet: string, rebase: boolean): ParsedCpiCell
 }
 
 // yoy, mom and core: years across a header row, I–XII beneath, one data row.
-function readYearColumns(rows: Rows, sheet: string, header: { row: number; col: number }, dataRow: number, rebase: boolean): ParsedCpiCell[] {
+function readYearColumns(
+  rows: Rows,
+  sheet: string,
+  header: { row: number; col: number },
+  dataRow: number,
+  rebase: boolean,
+  allowLateStart = false,
+): ParsedCpiCell[] {
   const years = rows[header.row - 1] ?? [];
   const months = rows[header.row] ?? [];
   const values = rows[dataRow] ?? [];
@@ -114,7 +134,8 @@ function readYearColumns(rows: Rows, sheet: string, header: { row: number; col: 
     if (year === null || !Number.isInteger(year)) throw new Error(`CPI layout: no year above ${locator(sheet, header.row, col)}`);
     const raw = numeric(values[col]);
     if (raw === null) {
-      ended = true;
+      // A city may start later than the table (Zugdidi); a hole after the start is still a layout fault.
+      if (!allowLateStart || cells.length > 0) ended = true;
       continue;
     }
     if (ended) throw new Error(`CPI layout: value after a gap at ${locator(sheet, dataRow, col)}`);
@@ -125,7 +146,7 @@ function readYearColumns(rows: Rows, sheet: string, header: { row: number; col: 
 
 export function readGeostatCpiFile(content: Buffer, role: CpiFileRole, language: CpiLanguage): ParsedCpiSeries[] {
   const spec = ROLES[role];
-  const book = XLSX.read(content, { type: "buffer" });
+  const book = readBook(content);
   let sheetName: string;
   if (spec.layout === "core") {
     if (book.SheetNames.length !== 1) throw new Error(`CPI layout: ${role} must have one sheet, found ${book.SheetNames.length}`);
@@ -178,7 +199,7 @@ export type ParsedCategorySeries = { coicopCode: string; level: 2 | 3; label: st
 // may start late, end early or skip months, so unlike the Total row they are read
 // gap-tolerantly — but the months are still located by the shared header.
 export function readGeostatCpiCategories(content: Buffer, role: "yoy" | "mom", language: CpiLanguage): ParsedCategorySeries[] {
-  const book = XLSX.read(content, { type: "buffer" });
+  const book = readBook(content);
   const found = book.SheetNames.find((name) => name.trim() === NATIONAL_SHEET[language]);
   if (!found) throw new Error(`CPI layout: national sheet "${NATIONAL_SHEET[language]}" not found in ${role}`);
   const rows = XLSX.utils.sheet_to_json<unknown[]>(book.Sheets[found]!, { header: 1, raw: true, defval: null });
@@ -226,4 +247,49 @@ export function readGeostatCpiCategories(content: Buffer, role: "yoy" | "mom", l
     throw new Error(`CPI layout: expected 12 COICOP divisions in ${role}, found ${series.filter((row) => row.level === 2).length}`);
   }
   return series;
+}
+
+export type CityRole = "yoy" | "mom" | "avg12";
+export type ParsedCitySeries = { seriesId: string; cells: ParsedCpiCell[] };
+
+/**
+ * Total and the 12 COICOP divisions from each named sheet (Total only for the
+ * 12-month average, which Geostat publishes for no category). Full history: the
+ * caller trims to the city window, and the consistency and weights checks need
+ * the months before it (spec §4.3). A city may start late; after its first
+ * value, a gap is a layout fault and throws.
+ */
+export function readGeostatCpiCitySheets(
+  content: Buffer,
+  role: CityRole,
+  language: CpiLanguage,
+  sheetNames: readonly string[],
+): Map<string, ParsedCitySeries[]> {
+  const book = readBook(content);
+  const result = new Map<string, ParsedCitySeries[]>();
+  for (const wanted of sheetNames) {
+    const found = book.SheetNames.find((name) => name.trim().toLowerCase() === wanted.toLowerCase());
+    if (!found) throw new Error(`CPI layout: sheet "${wanted}" not found in ${role}`);
+    const rows = XLSX.utils.sheet_to_json<unknown[]>(book.Sheets[found]!, { header: 1, raw: true, defval: null });
+    if (language === "en" && !text(rows[0]?.[0]).toLowerCase().includes(EN_TITLES[role].toLowerCase())) {
+      throw new Error(`CPI layout: ${role} sheet ${found.trim()} title does not contain "${EN_TITLES[role]}"`);
+    }
+    const sheet = found.trim();
+    if (role === "avg12") {
+      result.set(wanted, [{ seriesId: "cpi.headline", cells: readYearRows(rows, sheet, true, true) }]);
+      continue;
+    }
+    const header = findMonthHeader(rows);
+    const totals = rows.flatMap((row, index) => (index > header.row && text(row[2]) === TOTAL_LABEL[language] ? [index] : []));
+    if (totals.length !== 1) throw new Error(`CPI layout: expected one "${TOTAL_LABEL[language]}" row on ${sheet} in ${role}, found ${totals.length}`);
+    const series: ParsedCitySeries[] = [{ seriesId: "cpi.headline", cells: readYearColumns(rows, sheet, header, totals[0]!, true, true) }];
+    for (let row = header.row + 1; row < rows.length; row += 1) {
+      if (numeric(rows[row]?.[0]) !== 2) continue;
+      const { categoryId } = categoryIdFromCoicop(text(rows[row]?.[1]), 2);
+      series.push({ seriesId: categoryId, cells: readYearColumns(rows, sheet, header, row, true, true) });
+    }
+    if (series.length !== 13) throw new Error(`CPI layout: expected Total and 12 divisions on ${sheet} in ${role}, found ${series.length}`);
+    result.set(wanted, series);
+  }
+  return result;
 }

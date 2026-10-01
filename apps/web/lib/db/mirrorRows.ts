@@ -6,7 +6,9 @@ import type {
 import type { GlossaryEntry } from "../data/glossary";
 import type { BudgetFactImportRow } from "../data/importBudgetFacts";
 import type { NationalGdpFact } from "../data/nationalGdp/types";
-import type { BasketWeightRow, CpiCategoryFact, CpiFact, InflationTargetRow } from "../data/inflation/types";
+import type { BasketWeightRow, CpiCategoryFact, CpiCityFact, CpiFact, InflationTargetRow } from "../data/inflation/types";
+import type { ProductCatalogueRow } from "../data/inflation/productIdentity";
+import type { ProductFactRow } from "../data/inflation/productTypes";
 import type {
   ServedGeneralGovernmentBalanceFact,
   ServedGovernmentDebtFact,
@@ -560,5 +562,37 @@ export async function loadInflationBasketWeightsFromMirror(db: MirrorClient): Pr
     weightPct: row.weightPct.toFixed(),
     sourceId: row.sourceDocumentId,
     lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadInflationCityFactsFromMirror(db: MirrorClient): Promise<CpiCityFact[]> {
+  const rows = await db.inflationCityFact.findMany({ orderBy: [{ cityId: "asc" }, { seriesId: "asc" }, { measure: "asc" }, { period: "asc" }] });
+  return rows.map((row) => ({
+    cityId: row.cityId as CpiCityFact["cityId"],
+    seriesId: row.seriesId,
+    measure: row.measure as CpiCityFact["measure"],
+    period: row.period,
+    value: row.value.toFixed(),
+    status: row.status as CpiCityFact["status"],
+    sourceId: row.sourceDocumentId,
+    sourceLocator: row.sourceLocator,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadProductCatalogueFromMirror(db: MirrorClient): Promise<ProductCatalogueRow[]> {
+  const rows = await db.inflationProduct.findMany({ orderBy: { productId: "asc" } });
+  return rows.map((row) => ({
+    productId: row.productId, coicopCode: row.coicopCode, labelEn: row.labelEn, labelKa: row.labelKa,
+    firstPeriod: row.firstPeriod, decisionRef: row.decisionRef,
+  }));
+}
+
+export async function loadProductFactsFromMirror(db: MirrorClient): Promise<ProductFactRow[]> {
+  const rows = await db.inflationProductFact.findMany({ orderBy: [{ productId: "asc" }, { measure: "asc" }, { period: "asc" }] });
+  return rows.map((row) => ({
+    productId: row.productId, measure: row.measure as ProductFactRow["measure"], period: row.period,
+    index100: row.index100?.toFixed() ?? null, availability: row.availability as ProductFactRow["availability"],
+    sourceId: row.sourceDocumentId, sourceLocator: row.sourceLocator, lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
 }

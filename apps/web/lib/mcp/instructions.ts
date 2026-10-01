@@ -74,7 +74,7 @@ Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
 LANGUAGES AND COMPATIBILITY
-Schema 1.3.0 adds regional economies after schema 1.2.0 introduced the optional period (YYYY-MM) on inflation observations, comparison endpoints and ranking entries, while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
+Schema 1.4.0 adds inflation cities (the city entity type and query_inflation entityIds) after schema 1.3.0 added regional economies and schema 1.2.0 introduced the optional period (YYYY-MM) on inflation observations, comparison endpoints and ranking entries, while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
 missing-value explanations, comparison reasons, rankings and source descriptions.
 Answer in the user's language using those fields. Catalogue search matches both
 languages. The discovered tools and input schemas work without a language argument.
@@ -83,7 +83,7 @@ translated companions describe it without replacing it. documentLanguage is null
 when unverified; a translated title does not mean the source document was translated.
 Translation corrections change dataVersion because the text is part of the pinned
 data identity. Reuse a dataVersion only with responses from that same snapshot.
-Clients must accept additive fields and schema 1.3.0; exact-version or unknown-field
+Clients must accept additive fields and schema 1.4.0; exact-version or unknown-field
 validators need updating. Byte-for-byte response compatibility is not promised.
 Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
 publications. Static publications carry the same bilingual evidence and remain
@@ -91,8 +91,9 @@ available without an MCP connection. Text rows include both languages; values an
 stable identifiers are not translated.
 
 WHAT IS NOT SERVED
-Quarterly or monthly data for any dataset other than inflation; city or product
-price indices, HICP and other price indices; live budget execution, individual
+Quarterly or monthly data for any dataset other than inflation; product
+price indices, city subgroups, city price-index levels, city weights and core
+inflation by city, HICP and other price indices; live budget execution, individual
 capital projects, procurement, and anything after the last reviewed year that is not
 explicitly served as a projection. There
 is no such thing as a partial answer assembled from outside sources: if the data
@@ -158,13 +159,21 @@ INFLATION
 - The National Bank of Georgia target is a reference. "Above target" compares
   two published numbers; it is not a verdict on the central bank. No target
   before the first reviewed month is verified; do not say none existed.
-- The national CPI is a weighted mean of city indices. It is not a region's
-  inflation, a household's cost of living, or wage growth.
+- City figures (query_inflation entityIds, rank dimension entities with entityType
+  city) cover the six cities where Geostat records prices, from 2016-01, for the
+  total and the 12 divisions. A city's inflation is not its region's, nor that
+  city's cost of living or price level. Some prices are recorded once and applied
+  to every city; say so when a city difference in a division is the point.
+- The national CPI is a weighted mean of the city indices. Geostat does not publish
+  the city weights and this service does not supply them: the national rate is not
+  the plain average of the cities, and do not estimate weights yourself. It is not
+  a household's cost of living or wage growth.
 - This service does not adjust budget figures for inflation. If you do, present
   it as your own calculation, not as a Fiscal.ge figure.
 - Do not state causes of price changes or the success or failure of monetary policy.
-- One inflation answer fits about 250 cells (series × months), below the general
-  500-cell limit. For more, split the request by period or use the bulk files.
+- One inflation answer fits about 250 cells (entities × series × months), below
+  the general 500-cell limit. For more, split the request by period or use the
+  bulk files.
 
 HOW TO PRESENT AN ANSWER
 The reader is a member of the public asking about their country's budget, not a

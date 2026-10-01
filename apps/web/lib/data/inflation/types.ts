@@ -81,3 +81,54 @@ export function categoryIdFromCoicop(code: string, level: 2 | 3): { categoryId: 
   const parentId = `cpi.cat.${String(division).padStart(2, "0")}`;
   return level === 2 ? { categoryId: parentId, parentId: null } : { categoryId: `${parentId}_${code.slice(-1)}`, parentId };
 }
+
+/** The six cities where Geostat collects prices (metadata §3.7), in Geostat's sheet order. */
+export const CPI_CITY_IDS = ["city.tbilisi", "city.kutaisi", "city.batumi", "city.gori", "city.telavi", "city.zugdidi"] as const;
+export type CpiCityId = (typeof CPI_CITY_IDS)[number];
+
+/** Sheet names as Geostat writes them; the reader matches them trimmed and case-insensitively. */
+export const CITY_SHEETS: Readonly<Record<CpiCityId, { en: string; ka: string }>> = {
+  "city.tbilisi": { en: "Tbilisi", ka: "თბილისი" },
+  "city.kutaisi": { en: "Kutaisi", ka: "ქუთაისი" },
+  "city.batumi": { en: "Batumi", ka: "ბათუმი" },
+  "city.gori": { en: "Gori", ka: "გორი" },
+  "city.telavi": { en: "Telavi", ka: "თელავი" },
+  "city.zugdidi": { en: "Zugdidi", ka: "ზუგდიდი" },
+};
+
+/** Spec §1.1: the first month every city is observed, so all six share one window. */
+export const CITY_FIRST_PERIOD = "2016-01";
+
+/** Total and the 12 COICOP divisions; subgroups are out of scope for cities (spec §1.1). */
+export const CITY_SERIES_IDS: readonly string[] = [
+  "cpi.headline",
+  ...Array.from({ length: 12 }, (_, index) => `cpi.cat.${String(index + 1).padStart(2, "0")}`),
+];
+
+export const CPI_CITY_MEASURES = ["yoy_pct", "mom_pct", "avg12_pct"] as const;
+export type CpiCityMeasure = (typeof CPI_CITY_MEASURES)[number];
+
+export type CpiCityFact = {
+  cityId: CpiCityId;
+  seriesId: string;
+  measure: CpiCityMeasure;
+  period: string;
+  value: string;
+  status: "published";
+  sourceId: string;
+  sourceLocator: string;
+  lastReviewedAt: string;
+};
+
+export type ServedCpiCityFact = Omit<CpiCityFact, "value"> & { value: number };
+
+/**
+ * What the page needs from a city or national fact. `lineId` is a city ID or
+ * `country.georgia`: the page draws Georgia beside the cities from the national
+ * and category facts, which are never copied into the city CSV.
+ */
+export type CityFactInput = { lineId: string; seriesId: string; measure: CpiCityMeasure; period: string; value: number };
+
+export function cityFactInput(fact: ServedCpiCityFact): CityFactInput {
+  return { lineId: fact.cityId, seriesId: fact.seriesId, measure: fact.measure, period: fact.period, value: fact.value };
+}

@@ -3253,5 +3253,29 @@
       "reviewedAt": "2026-09-13"
     },
     "documentLanguage": "ka"
+  },
+  "source.geostat_product_mom": {
+    "title": { "text": "Consumer price detail indices, previous month = 100 (English)", "reviewedAt": "2026-09-26" },
+    "publisher": { "text": "National Statistics Office of Georgia", "reviewedAt": "2026-09-26" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-09-26" },
+    "documentLanguage": "en"
+  },
+  "source.geostat_product_yoy": {
+    "title": { "text": "Consumer price detail indices, same month of previous year = 100 (English)", "reviewedAt": "2026-09-26" },
+    "publisher": { "text": "National Statistics Office of Georgia", "reviewedAt": "2026-09-26" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-09-26" },
+    "documentLanguage": "en"
+  },
+  "source.geostat_product_mom_ka": {
+    "title": { "text": "Consumer price detail indices, previous month = 100 (Georgian)", "reviewedAt": "2026-09-26" },
+    "publisher": { "text": "National Statistics Office of Georgia", "reviewedAt": "2026-09-26" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-09-26" },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_product_yoy_ka": {
+    "title": { "text": "Consumer price detail indices, same month of previous year = 100 (Georgian)", "reviewedAt": "2026-09-26" },
+    "publisher": { "text": "National Statistics Office of Georgia", "reviewedAt": "2026-09-26" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-09-26" },
+    "documentLanguage": "ka"
   }
 }

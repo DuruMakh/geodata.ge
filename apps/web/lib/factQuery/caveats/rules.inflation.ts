@@ -19,6 +19,7 @@ const contributionCells = (c: CaveatContext) =>
   c.measure === "contribution_pp" ? c.observations.filter((o) => o.seriesId !== RESIDUAL_SERIES_ID && o.value !== null) : [];
 const residualCells = (c: CaveatContext) => c.observations.filter((o) => o.seriesId === RESIDUAL_SERIES_ID);
 const targetGaps = (c: CaveatContext) => c.observations.filter((o) => o.seriesId === TARGET_SERIES_ID && o.value === null);
+const cityDivisionCells = (c: CaveatContext) => c.observations.filter((o) => o.entityId.startsWith("city.") && o.level === "division" && o.value !== null);
 
 export const INFLATION_CAVEAT_RULES: readonly CaveatRule[] = [
   {
@@ -52,6 +53,17 @@ export const INFLATION_CAVEAT_RULES: readonly CaveatRule[] = [
     methodologyRefEn: OWNER_EN,
     applies: (c) => c.datasetId === DATASET_ID && c.comparison !== null && c.comparison.fromYear !== c.comparison.toYear && contributionCells(c).length > 0,
     affects: (c) => contributionCells(c).map(cellKey),
+  },
+  {
+    code: "inflation_city_central_prices",
+    severity: "note",
+    comparisonEffect: "none",
+    messageKey: "caveats.inflation_city_central_prices",
+    methodologyRef: OWNER,
+    methodologyRefEn: OWNER_EN,
+    // Geostat extends centrally recorded prices to every city (metadata §18.3).
+    applies: (c) => c.datasetId === DATASET_ID && cityDivisionCells(c).length > 0,
+    affects: (c) => [...new Set(cityDivisionCells(c).map((cell) => `${cell.entityId}:${cell.seriesId}:${cell.year}`))],
   },
   {
     code: "inflation_target_unverified_before_2015",

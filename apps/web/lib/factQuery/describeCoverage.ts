@@ -7,7 +7,7 @@
 import { GDP_QUERY_SERIES } from "./gdpSeries";
 import { SECTOR_QUERY_MEASURES } from "./economicSectorsSeries";
 import { REGIONAL_ECONOMY_QUERY_MEASURES } from "./regionalEconomySeries";
-import { inflationCatalogueSeries, inflationDatasetPeriods } from "./inflationData";
+import { inflationCatalogueSeries, inflationDatasetPeriods, inflationEntityPeriods } from "./inflationData";
 import { INFLATION_MEASURES } from "./inflationSeries";
 import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
@@ -34,7 +34,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "inflation",
 ];
 
-type EntityType = "country" | "municipality" | "region";
+type EntityType = "country" | "municipality" | "region" | "city";
 type Availability = "served" | "calculated_total" | "taxonomy_only";
 
 // Reuses the exact vocabulary lib/explorer/explorerData.ts already assigns to
@@ -70,6 +70,7 @@ type BaseEntityEntry = {
   entityType: EntityType;
   labelKa: string;
   entitySlug: string | null;
+  periods?: [string, string];
 };
 
 type EntityEntry = BaseEntityEntry & { labelEn: string };
@@ -177,7 +178,7 @@ const DATASET_META: Record<
   inflation: {
     budgetScope: "consumer_prices",
     labelKa: "ინფლაცია",
-    entityTypes: ["country"],
+    entityTypes: ["country", "city"],
     measures: [...INFLATION_MEASURES],
   },
   "general-government-balance": {
@@ -693,6 +694,13 @@ function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): 
       labelEn: serviceLabelEn(snapshot, region.id),
       entitySlug: null,
     }));
+  if (datasetId === "inflation") {
+    const periods = inflationEntityPeriods(snapshot);
+    return [
+      { entityId: "country.georgia", entityType: "country", labelKa: "საქართველო", labelEn: "Georgia", entitySlug: null, periods: inflationDatasetPeriods(snapshot) },
+      ...snapshot.inflation.cityEntities.map((city) => ({ entityId: city.id, entityType: "city" as const, labelKa: city.labelKa, labelEn: city.labelEn, entitySlug: null, periods: periods.get(city.id)! })),
+    ];
+  }
   return undefined;
 }
 
