@@ -6,7 +6,7 @@
 import { buildContributionIndex } from "../data/inflation/contributions";
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { categoryFactInput } from "../data/inflation/types";
-import { NATIONAL_SERIES, TARGET_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
+import { INFLATION_ENTITY_ID, NATIONAL_SERIES, TARGET_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
 import type { FactQuerySnapshot } from "./types";
 
 export type PeriodRange = [first: string, last: string];
@@ -105,6 +105,25 @@ export function inflationSeriesCoverage(snapshot: FactQuerySnapshot): Map<string
 /** Where a monthly measure is published anywhere in the dataset; requests outside it are refused. */
 export function measurePeriodRange(snapshot: FactQuerySnapshot, measure: InflationMeasure): PeriodRange | null {
   return rangeOf([...inflationSeriesCoverage(snapshot).values()].flatMap((coverage) => coverage.periodsByMeasure[measure] ?? []));
+}
+
+/** City-inclusive coverage spans the selected facts; intervening months can still be missing. */
+export function inflationRequestCoverage(
+  snapshot: FactQuerySnapshot,
+  entityIds: readonly string[],
+  seriesIds: readonly string[],
+  measure: InflationMeasure,
+): { availablePeriods: PeriodRange | null; availableYears: number[] } {
+  const periods = snapshot.inflation.cities
+    .filter((fact) => entityIds.includes(fact.cityId) && seriesIds.includes(fact.seriesId) && fact.measure === measure)
+    .map((fact) => fact.period);
+  if (entityIds.includes(INFLATION_ENTITY_ID)) {
+    periods.push(
+      ...snapshot.inflation.facts.filter((fact) => seriesIds.includes(fact.seriesId) && fact.measure === measure).map((fact) => fact.period),
+      ...snapshot.inflation.categories.filter((fact) => seriesIds.includes(fact.categoryId) && fact.measure === measure).map((fact) => fact.period),
+    );
+  }
+  return { availablePeriods: rangeOf(periods), availableYears: [...new Set(periods.map(yearOfPeriod))].sort((a, b) => a - b) };
 }
 
 export function weightYearRange(snapshot: FactQuerySnapshot): [number, number] {

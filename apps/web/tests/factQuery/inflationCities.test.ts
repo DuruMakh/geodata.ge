@@ -3,18 +3,25 @@ import { compare } from "../../lib/factQuery/compare";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { queryInflation, inflationCellCount } from "../../lib/factQuery/queryInflation";
 import { rank } from "../../lib/factQuery/rank";
-import { SCHEMA_VERSION } from "../../lib/factQuery/types";
+import { SCHEMA_VERSION, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 
 const snapshot = loadPackagedSnapshot();
 type Obs = { observationId: string; entityType: string; value: number | null; availability: string; missingReasonEn: string | null; caveatIds: string[] };
 const observations = (response: ReturnType<typeof queryInflation>) => (response as { data: { observations: Obs[] } }).data.observations;
+type CityFact = FactQuerySnapshot["inflation"]["cities"][number];
+const cityFact = (cityId: CityFact["cityId"], period: string, overrides: Partial<CityFact> = {}): CityFact => ({
+  ...snapshot.inflation.cities.find((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")!,
+  cityId, period, ...overrides,
+});
+const withCities = (cities: CityFact[]): FactQuerySnapshot => ({ ...snapshot, inflation: { ...snapshot.inflation, cities } });
 
 describe("query_inflation for cities", () => {
   it("answers a city's annual inflation", () => {
     const response = queryInflation(snapshot, { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" });
     expect(response.status).toBe("ok");
     expect(observations(response)[0]).toMatchObject({ observationId: "inflation:city.batumi:cpi.headline:2026-08:yoy_pct", entityType: "city", value: 7.0857 });
+    expect(response).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-08"] } } });
   });
 
   it("keeps the default answer for Georgia unchanged", () => {
@@ -27,6 +34,60 @@ describe("query_inflation for cities", () => {
     expect(response.status).toBe("empty");
     expect(observations(response)[0]).toMatchObject({ value: null, availability: "missing" });
     expect(observations(response)[0]!.missingReasonEn).toMatch(/2016-12/);
+    expect(response).toMatchObject({ data: { coverage: { availablePeriods: ["2016-12", "2026-08"] } } });
+  });
+
+  it("reports Zugdidi's average coverage while keeping earlier months missing", () => {
+    const response = queryInflation(snapshot, { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "avg12_pct", fromPeriod: "2016-06", toPeriod: "2016-06" });
+    expect(response).toMatchObject({ data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-08"] } } });
+    expect(observations(response)[0]!.missingReasonEn).toContain("2017-12");
+  });
+
+  it("uses only the selected city, series and measure across full history, without inventing gap years", () => {
+    const synthetic = withCities([
+      cityFact("city.batumi", "2018-02"), cityFact("city.batumi", "2020-03"),
+      cityFact("city.gori", "2016-01"),
+      cityFact("city.batumi", "2017-01", { seriesId: "cpi.cat.01" }),
+      cityFact("city.batumi", "2026-08", { measure: "mom_pct" }),
+    ]);
+    const response = queryInflation(synthetic, { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2019-06", toPeriod: "2019-06" });
+    expect(response).toMatchObject({ status: "empty", data: { observations: [{ value: null, availability: "missing" }], coverage: { availablePeriods: ["2018-02", "2020-03"], availableYears: [2018, 2020] } } });
+    expect(observations(response)[0]!.missingReasonEn).toContain("2018-02");
+  });
+
+  it("returns null coverage when the supported city selection has no facts", () => {
+    const synthetic = withCities([cityFact("city.gori", "2018-02")]);
+    const response = queryInflation(synthetic, { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2019-06", toPeriod: "2019-06" });
+    expect(response).toMatchObject({ status: "empty", data: { observations: [{ value: null, availability: "missing" }], coverage: { availablePeriods: null, availableYears: [] } } });
+    expect(observations(response)[0]!.missingReasonEn).toContain("2016-01");
+  });
+
+  it("unites two cities' observed months and years without filling their gaps", () => {
+    const synthetic = withCities([cityFact("city.batumi", "2018-02"), cityFact("city.gori", "2020-03")]);
+    const response = queryInflation(synthetic, { entityIds: ["city.batumi", "city.gori"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2018-02", toPeriod: "2018-02" });
+    expect(response).toMatchObject({ status: "partial", data: { observations: [{ availability: "available" }, { value: null, availability: "missing" }], coverage: { availablePeriods: ["2018-02", "2020-03"], availableYears: [2018, 2020] } } });
+  });
+
+  it("unites selected country and city history while keeping the city missing before publication", () => {
+    const synthetic = withCities([cityFact("city.batumi", "2018-02"), cityFact("city.batumi", "2020-03")]);
+    const response = queryInflation(synthetic, { entityIds: ["country.georgia", "city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2014-06", toPeriod: "2014-06" });
+    const national = snapshot.inflation.facts.find((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && fact.period === "2014-06")!;
+    expect(response).toMatchObject({ status: "partial", data: { observations: [{ value: national.value }, { value: null, availability: "missing" }], coverage: { availablePeriods: ["2004-01", "2026-08"], availableYears: Array.from({ length: 23 }, (_, index) => 2004 + index) } } });
+    expect(observations(response)[1]!.missingReasonEn).toContain("2018-02");
+  });
+
+  it("includes only the selected national category in country/city coverage", () => {
+    const synthetic = withCities([cityFact("city.batumi", "2018-02", { seriesId: "cpi.cat.01" })]);
+    synthetic.inflation.categories = [
+      ...snapshot.inflation.categories.filter((fact) => fact.categoryId !== "cpi.cat.01"),
+      ...["2010-01", "2025-12"].map((period) => ({ ...snapshot.inflation.categories.find((fact) => fact.categoryId === "cpi.cat.01" && fact.measure === "yoy_pct")!, period })),
+    ];
+    const response = queryInflation(synthetic, { entityIds: ["country.georgia", "city.batumi"], seriesIds: ["cpi.cat.01"], measure: "yoy_pct", fromPeriod: "2010-01", toPeriod: "2010-01" });
+    expect(response).toMatchObject({ data: { observations: [{ availability: "available" }, { value: null }], coverage: { availablePeriods: ["2010-01", "2025-12"], availableYears: [2010, 2018, 2025] } } });
+  });
+
+  it("still refuses city dates outside the existing dataset window", () => {
+    expect(queryInflation(snapshot, { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "1999-12", toPeriod: "1999-12" })).toMatchObject({ kind: "error", error: { code: "year_out_of_range" } });
   });
 
   it("refuses what Geostat does not publish for cities", () => {

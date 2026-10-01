@@ -11,7 +11,7 @@ import { CONTRIBUTION_FIRST_YEAR } from "../data/inflation/contributions";
 import { CITY_FIRST_PERIOD } from "../data/inflation/types";
 import { periodFromKey } from "../data/inflation/periods";
 import { CAVEAT_RULES, evaluateCaveats, type CaveatContext } from "./caveats";
-import { contributionIndex, measurePeriodRange, periodsBetween, weightYearRange, yearOfPeriod, type PeriodRange } from "./inflationData";
+import { contributionIndex, inflationRequestCoverage, measurePeriodRange, periodsBetween, weightYearRange, yearOfPeriod, type PeriodRange } from "./inflationData";
 import {
   CITY_SERIES_MEASURES,
   GROUP_MEASURES,
@@ -188,6 +188,8 @@ export function inflationObservations(snapshot: FactQuerySnapshot, request: Infl
       });
     }
   }
+
+  if (hasCity) ({ availablePeriods, availableYears } = inflationRequestCoverage(snapshot, entityIds, request.seriesIds, measure));
 
   const factMeasure = measure === "contribution_pp" ? "yoy_pct" : measure;
   const nationalFacts = new Map(snapshot.inflation.facts.filter((f) => f.measure === factMeasure).map((f) => [`${f.seriesId}|${f.period}`, f]));

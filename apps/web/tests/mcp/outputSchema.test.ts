@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { TOOLS } from "../../lib/mcp/tools";
-import { toolOutput } from "../../lib/mcp/outputSchema";
+import { outputSchemaFor, toolOutput } from "../../lib/mcp/outputSchema";
 import { toolResult } from "../../lib/mcp/result";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
@@ -76,6 +76,29 @@ describe("every tool's structured output matches its declared schema", () => {
   // validated against the schema it now advertises.
   it("covers every tool", () => {
     expect(Object.keys(CALLS).sort()).toEqual(TOOLS.map((tool) => tool.name).sort());
+  });
+
+  it("accepts transported empty city coverage with no available period span", () => {
+    const emptySnapshot = { ...snapshot, inflation: { ...snapshot.inflation, cities: [] } };
+    const response = TOOLS.find((tool) => tool.name === "query_inflation")!.run(emptySnapshot, {
+      entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2019-06", toPeriod: "2019-06",
+    });
+    const result = toolResult(response);
+    expect(result.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }], coverage: { availablePeriods: null, availableYears: [] } } });
+    expect(outputSchemaFor("query_inflation").safeParse(result.structuredContent).success).toBe(true);
+    expect(toolOutput.safeParse(result.structuredContent).success).toBe(true);
+  });
+
+  it("declares a null period span as valid for a transported no-data answer", () => {
+    const emptySnapshot = { ...snapshot, inflation: { ...snapshot.inflation, cities: [] } };
+    const response = TOOLS.find((tool) => tool.name === "query_inflation")!.run(emptySnapshot, {
+      entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2019-06", toPeriod: "2019-06",
+    });
+    const result = toolResult(response);
+    const structured = result.structuredContent as { data: { coverage: Record<string, unknown> } };
+    structured.data.coverage.availablePeriods = null;
+    structured.data.coverage.availableYears = [];
+    expect(outputSchemaFor("query_inflation").safeParse(structured).success).toBe(true);
   });
 
   // A failed call carries no structured payload, which is why the schema

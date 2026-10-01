@@ -278,6 +278,21 @@ describe("MCP tool surface", () => {
     expect((result.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t5.6479\t");
   });
 
+  it("transports city-specific coverage and keeps the published value and missing-start text", async () => {
+    const client = await connected();
+    try {
+      const batumi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" } });
+      expect(batumi.isError).toBeFalsy();
+      expect(batumi.structuredContent).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-08"] } } });
+      expect((batumi.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t7.0857\t");
+
+      const zugdidi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "avg12_pct", fromPeriod: "2016-06", toPeriod: "2016-06" } });
+      expect(zugdidi.isError).toBeFalsy();
+      expect(zugdidi.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-08"] } } });
+      expect((zugdidi.content as { text: string }[])[0]!.text).toContain("2017-12");
+    } finally { await client.close(); }
+  });
+
   it("names both months of an inflation comparison in the text twin", async () => {
     const client = await connected();
     const result = await client.callTool({
