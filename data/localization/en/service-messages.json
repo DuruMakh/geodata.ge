@@ -1,4 +1,8 @@
 {
+  "coverage.inflationProductCumulative": "Periods and years describe published monthly inputs. Cumulative availability depends on startYear and complete inputs from January through the endpoint; spans do not guarantee every product or month is available.",
+  "errors.compareProductCumulative": "Cumulative product comparison is unsupported. Use query_inflation_products with measure cumulative_pct, startYear and the endpoint period to obtain accumulated price change relative to the preceding December.",
+  "ranking.inflationProducts": "Every product in the current reviewed consumer basket; products with missing values or incomplete calculation inputs are explicitly excluded.",
+  "ranking.productCumulativeDefinition": "Fiscal.ge-calculated cumulative product price change at {period}, relative to {basePeriod}, ordered {order}; every monthly input in the selected span is required.",
   "errors.rankInflationCityInput": "An inflation city ranking needs entityType city and exactly one seriesId (cpi.headline or cpi.cat.01–12).",
   "ranking.inflationCities": "The six cities where Geostat records prices; Georgia's national rate is not a candidate.",
   "caveats.inflation_city_central_prices": "Some prices — fuel, medicines, cars, mobile tariffs, flights and train fares — are recorded once and applied to every city, so city differences in those items are not measured differences.",

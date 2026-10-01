@@ -156,6 +156,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     ...snapshot.debt.facts.map((fact) => fact.year),
     ...snapshot.deficit.facts.map((f) => f.year),
     ...snapshot.gdpOverview.facts.map(f=>f.year),
+    ...snapshot.inflationProducts.facts.map(fact => Number(fact.period.slice(0, 4))),
   ];
   const minYear = Math.min(...coveredYears);
   const maxYear = Math.max(...coveredYears);
@@ -213,6 +214,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     // would leave the sentence unsupported by what is displayed.
     if (hasNarrowing && source.derivation === null) {
       const filtered = source.documents.filter((document) => {
+        if (input.datasetId === "inflation-products" && !["source.geostat_product_yoy", "source.geostat_product_mom"].includes(source.sourceId)) return false;
         // A document with no datasetId is NOT treated as matching every dataset.
         // Exempting it returned the Geostat municipal-population workbook as a
         // match for national-revenue; the honest outcome is that the filter

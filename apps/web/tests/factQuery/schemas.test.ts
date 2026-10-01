@@ -1,8 +1,15 @@
 // apps/web/tests/factQuery/schemas.test.ts
 import { describe, expect, it } from "vitest";
-import { envelopeSchema, queryNationalInput } from "../../lib/factQuery/schemas";
+import { compareInput, envelopeSchema, queryNationalInput, rankInput } from "../../lib/factQuery/schemas";
 
 describe("query input schemas", () => {
+  it("accepts product annual compare and cumulative value rank while excluding cumulative from legacy modes", () => {
+    expect(compareInput.safeParse({ target: { dataset: "inflation-products", seriesIds: ["cpi.product.p0001"] }, measure: "yoy_pct", fromPeriod: "2025-01", toPeriod: "2026-01" }).success).toBe(true);
+    expect(rankInput.safeParse({ datasetId: "inflation-products", dimension: "series", metric: "value", measure: "cumulative_pct", startYear: 2025, period: "2026-01" }).success).toBe(true);
+    expect(compareInput.safeParse({ target: { dataset: "inflation", seriesIds: ["cpi.headline"] }, measure: "cumulative_pct", fromPeriod: "2025-01", toPeriod: "2026-01" }).success).toBe(false);
+    expect(rankInput.safeParse({ datasetId: "inflation", level: "division", dimension: "series", metric: "value", measure: "cumulative_pct", period: "2026-01", startYear: 2025 }).success).toBe(false);
+    expect(rankInput.safeParse({ datasetId: "national-revenue", dimension: "series", metric: "value", measure: "amount_gel", year: 2026, startYear: 2025 }).success).toBe(false);
+  });
   it("normalizes years to unique ascending order", () => {
     const parsed = queryNationalInput.parse({
       side: "revenue",

@@ -2,13 +2,12 @@ import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { productAnnual, productCumulative } from "../explorer/inflationProducts";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { periodsBetween, yearOfPeriod } from "./inflationData";
-import { inflationProductIndex, productQueryCoverage } from "./inflationProductData";
+import { inflationProductIndex, inflationProductSources, productQueryCoverage } from "./inflationProductData";
 import { PRODUCT_DATASET_ID } from "./inflationProductSeries";
 import { serviceMessage, type ServiceMessageKey } from "./localization";
 import { buildResponseMeta } from "./meta";
 import { buildObservationId, caveatIdsForObservation, countryLevelCaveatContext, resolveDocumentIds, type Observation } from "./observations";
 import { queryInflationProductsInput, type QueryInflationProductsInput } from "./schemas";
-import { selectSources } from "./sources";
 import type { FactQueryError, FactQueryResponse, FactQuerySnapshot } from "./types";
 
 /** Returned cells only; the preceding compounding inputs do not consume the output allowance. */
@@ -45,15 +44,7 @@ export function queryInflationProducts(snapshot: FactQuerySnapshot, rawInput: un
   const sourceId = input.measure === "yoy_pct" ? "source.geostat_product_yoy" : "source.geostat_product_mom";
   const definitionKey = input.measure === "yoy_pct" ? "definitions.inflationProductAnnual" : "definitions.inflationProductCumulative";
   const definitionValues: Record<string, string | number> = basePeriod === undefined ? {} : { basePeriod };
-  // Only this response treats the monthly originals as upstream inputs to a
-  // Fiscal.ge calculation. The snapshot keeps their primary-publication role.
-  const sources = selectSources(snapshot, [sourceId]).map(source => basePeriod === undefined ? source : ({
-    ...source,
-    derivation: serviceMessage(snapshot, "ka", "definitions.inflationProductCumulativeSource"),
-    derivationKa: serviceMessage(snapshot, "ka", "definitions.inflationProductCumulativeSource"),
-    derivationEn: serviceMessage(snapshot, "en", "definitions.inflationProductCumulativeSource"),
-    documents: source.documents.map(document => ({ ...document, role: "derivation_upstream" as const })),
-  }));
+  const sources = inflationProductSources(snapshot, input.measure);
   const observations: Observation[] = input.seriesIds.flatMap(id => periods.map(period => {
     const product = index.productById.get(id)!;
     const cumulative = basePeriod === undefined ? null : productCumulative(index, id, input.startYear!, periodFromKey(period));

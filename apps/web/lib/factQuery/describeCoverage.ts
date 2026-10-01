@@ -10,6 +10,7 @@ import { REGIONAL_ECONOMY_QUERY_MEASURES } from "./regionalEconomySeries";
 import { inflationCatalogueSeries, inflationDatasetPeriods, inflationEntityPeriods } from "./inflationData";
 import { INFLATION_MEASURES } from "./inflationSeries";
 import { PRODUCT_QUERY_MEASURES } from "./inflationProductSeries";
+import { inflationProductCatalogue } from "./inflationProductData";
 import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
@@ -63,6 +64,11 @@ type BaseSeriesEntry = {
   yearsByMeasure?: Record<string, number[]>;
   periods?: [string, string];
   periodsByMeasure?: Record<string, [string, string]>;
+  labelEn?: string;
+  coicopCode?: string;
+  firstPeriod?: string;
+  measures?: Measure[];
+  historyNotes?: { boundaryYear: number; noteKa: string; noteEn: string }[];
 };
 
 type SeriesEntry = BaseSeriesEntry & { labelEn: string };
@@ -281,6 +287,7 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
   }
 
   const meta = DATASET_META[datasetId];
+  const productPeriods = datasetId === "inflation-products" ? snapshot.inflationProducts.facts.map(fact => fact.period).sort() : [];
   // entityTypes/measures are copied out of DATASET_META rather than spread by
   // reference: describeCoverage is called repeatedly against the same
   // long-lived snapshot (§4.2 "reuse calculations without rebuilding the
@@ -326,6 +333,11 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
         }
       : {}),
     ...(datasetId === "inflation" ? { periods: inflationDatasetPeriods(snapshot) } : {}),
+    ...(datasetId === "inflation-products" ? {
+      periods: [productPeriods[0]!, productPeriods.at(-1)!] as [string, string],
+      measureNotesKa: { yoy_pct: serviceMessage(snapshot, "ka", "definitions.inflationProductAnnual"), cumulative_pct: serviceMessage(snapshot, "ka", "coverage.inflationProductCumulative") },
+      measureNotesEn: { yoy_pct: serviceMessage(snapshot, "en", "definitions.inflationProductAnnual"), cumulative_pct: serviceMessage(snapshot, "en", "coverage.inflationProductCumulative") },
+    } : {}),
     ...(datasetId === "municipal-expenditure"
       ? {
           measureNotesKa: {
@@ -651,7 +663,7 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId)
     case "inflation":
       return inflationCatalogueSeries(snapshot);
     case "inflation-products":
-      return [];
+      return inflationProductCatalogue(snapshot);
   }
 }
 
@@ -694,7 +706,7 @@ function municipalEntitiesFor(snapshot: FactQuerySnapshot): BaseEntityEntry[] {
 }
 
 function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): SeriesEntry[] {
-  return baseSeriesForDataset(snapshot, datasetId).map(series => ({ ...series, labelEn: serviceLabelEn(snapshot, series.seriesId) }));
+  return baseSeriesForDataset(snapshot, datasetId).map(series => ({ ...series, labelEn: series.labelEn ?? serviceLabelEn(snapshot, series.seriesId) }));
 }
 
 function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): EntityEntry[] | undefined {
