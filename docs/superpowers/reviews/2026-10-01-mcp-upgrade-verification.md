@@ -2,13 +2,39 @@
 
 ## Current integrated state — Task 10
 
-Date: **2026-10-02 (Asia/Tbilisi)**. Integrated baseline: `ccf50e9e8c898a337a9ce4c8e5e7906bf0107b62`. Data schema is now **1.5.0**, with **14 read-only tools / 11 dataset families**. Tasks 1–9 completed their independent task reviews. Task 10 completed local gate components, the production build/postbuild, **632 browser tests**, bundle inspection and compiled-endpoint proof. Its initial full `check` stopped on three outdated test assumptions; the affected tests and remaining components passed separately, as recorded below. No nonexistent all-green combined rerun is claimed. Final independent review remains parent-owned; publishing is not authorized.
+Date: **2026-10-02 (Asia/Tbilisi)**. Integrated baseline: `ccf50e9e8c898a337a9ce4c8e5e7906bf0107b62`. Data schema is now **1.5.0**, with **14 read-only tools / 11 dataset families**. Tasks 1–9 completed their independent task reviews. Task 10 completed local gate components, the production build/postbuild, **632 browser tests**, bundle inspection and compiled-endpoint proof. Its initial full `check` stopped on three outdated test assumptions; the affected tests and remaining components passed separately, as recorded below. No nonexistent all-green combined rerun is claimed. A fresh GPT-6 Astra [whole-branch and Task 10 review](2026-10-02-mcp-final-review.md) approved local readiness at `b8b9c262`, with zero Critical/Important findings and one temporary-guide pointer corrected below. Publishing is not authorized.
 
 Tasks 3–7 package **305 current products / 84,056 exact-decimal facts / 47 public bilingual history notes** without source locators or internal identity-decision fields. Product annual queries subtract 100 from published annual indices; cumulative queries use the shared explorer's complete monthly compounding from January `startYear`, relative to the preceding December. Missing inputs and reviewed identity splits remain explicit nulls/qualifications. Catalogue/source discovery, annual comparisons and value ranking cover the current roster with unchanged public input/result caps. Two product publications join the shared manifest: **22 listed files / 23 artifacts**. Complete tool schemas/text retain classifications, history notes, sources, caveats and cumulative bases. Eight product reference cases, including independently CSV-derived values, the unsupported cumulative-comparison contract and an explicitly synthetic missing-input check, augment the unchanged forty earlier intents; the reference test suite contains **59 tests**.
 
 The preserved [Task 7 contract report](2026-10-01-mcp-tool-contract-report.md), [independent CSV reference audit](2026-10-01-mcp-independent-reference.cjs) and [results](2026-10-01-mcp-independent-reference.json), [real-SDK wire audit](2026-10-01-mcp-wire-evidence.ts) and [historical results](2026-10-01-mcp-wire-evidence.json), and [Task 8 runtime import audit](2026-10-01-mcp-import-audit.cjs) and [results](2026-10-01-mcp-import-audit.json) now live in durable review storage. Their original evidence meaning is preserved; compiled-server results will be recorded separately.
 
 Task 8 measured the packaged snapshot and complete response budgets; Task 9 added bilingual dynamic national/city/product examples and qualified current official client guidance. Human application/account/protocol/sourced-answer proof and actual safe database-mirror parity remain **unverified**. Automated SDK, CSV and structural parity evidence cannot substitute for those boundaries. Production Upstash enforcement and live deployment also remain unverified.
+
+### Recorded decisions and their costs if wrong
+
+These are the controller's execution rulings, in order. None changes the reviewed numbers or raises an operating limit.
+
+1. Use the official SDK's separate legacy/modern JSON adapters and one tool factory because its default legacy handler streamed. If wrong, adapter wiring needs repair; real-client parity and teardown tests cover it.
+2. Disable tool-change subscriptions and set subscription capacity to zero because listening otherwise opened SSE. If wrong after an SDK change, refusal behavior needs adjustment.
+3. Treat modern client identity as recommended/optional, following the final standard and installed SDK; version/capabilities and invalid-present identity remain validated. If wrong, metadata validation needs revisiting; identity is never authentication.
+4. Declare the cumulative measure type in Task 3 so basic product discovery compiles before Task 4. If wrong, type declarations or task sequencing need repair; old validators were not widened.
+5. Apply history notes conservatively to older mapped histories and the p0148 discrepancy throughout its public history, based on reviewed evidence. If wrong, notes may need narrowing; values remain unchanged.
+6. Defer actual bundle tracing to the single Task 10 build while checking configuration/imports in Task 8. If wrong, a bundle defect is discovered later; actual trace proof remained required and passed.
+7. Reuse independent reviewer sessions when the agent harness refused new threads. If wrong, retained context may bias a task review; scoped packages and the later fresh Astra whole-branch review mitigate this. New slots later permitted Luna's final mechanical inventory and that fresh review.
+8. Use existing Playwright tools for screenshots when the Windows agent-browser helper failed to launch. If wrong, the alternate tool may miss an automation-specific problem; visual inspection and the 632-test browser gate complement it.
+9. Complete the failed broad check through affected-test reruns and the remaining validation steps because only assertions changed. If wrong, a cross-file test effect could be missed; unchanged full-run results, corrected files, types and lint cover the changed tree. The initial command failure remains recorded.
+
+### Verified flow and retained access boundaries
+
+| Boundary | Local evidence |
+| --- | --- |
+| Connection pages and copy controls | Both languages, desktop/390px screenshots and connection assertions within 632 passing browser tests |
+| SDK clients to the compiled endpoint | 18 real HTTP requests, both protocol eras, 14 tools and six full-schema-equal call pairs |
+| Endpoint to bundled data | Snapshot/data identity, 121-entry trace, eight compiled files and complementary import audit |
+| Data to values and source evidence | 59 passing reference tests, independent CSV arithmetic, explicit missingness, definitions and caveats |
+| Bulk publications | 22 manifest-listed files plus the manifest; build checks and served product hashes agree |
+| Human assistant account and sourced model answer | Unverified; SDK evidence is separate |
+| Real mirror, production counter, CI and live deployment | Unverified; future authorized release must prove them |
 
 ## Historical Task 2 — transport-only checkpoint
 
@@ -20,7 +46,7 @@ Status: local SDK compatibility verified; integration gates and human applicatio
 
 `npm ls @modelcontextprotocol/server @modelcontextprotocol/client @modelcontextprotocol/sdk @modelcontextprotocol/core` reports server/client/core **2.2.0** and SDK **1.30.1**. All three direct packages are pinned exactly. Only the server package is a production dependency; both client packages are development dependencies. `npm ls --omit=dev` reports only `@modelcontextprotocol/server@2.2.0` among the three direct packages. Lockfile changes were made through npm with the task-local cache.
 
-The exact installed server declarations and implementation were checked, alongside the refreshed official protocol/HTTP/legacy guides held in the task scratch directory and the [official 2026-07-28 migration guide](https://ts.sdk.modelcontextprotocol.io/v2/migration/support-2026-07-28) checked by the task lead. These revealed three details requiring explicit handling:
+The exact installed server declarations and implementation were checked, alongside the official [protocol-version guide](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/protocol-versions.md), [HTTP-serving guide](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/serving/http.md), [legacy-client guide](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/serving/legacy-clients.md) and [2026-07-28 migration guide](https://ts.sdk.modelcontextprotocol.io/v2/migration/support-2026-07-28). These sources were checked for the pinned SDK during implementation. They revealed three details requiring explicit handling:
 
 1. `responseMode: "json"` affects only modern traffic. The default stateless legacy adapter still returns SSE. Independent actual pinned v2/v1 HTTP calls returned identical city/source results, but failed the all-JSON assertion. The approved correction uses SDK `isLegacyRequest`, the v2 package's stateless JSON `WebStandardStreamableHTTPServerTransport`, and one shared tool factory. Modern traffic uses a shared `createMcpHandler` with `legacy: "reject"` and `responseMode: "json"`. No stream conversion or SDK patch is used.
 2. The SDK defaults `tools.listChanged` to true, and its subscription handler can stream despite JSON mode. A controlled test failed with advertised true and SSE/log parsing failure. Explicit `tools.listChanged: false` and `maxSubscriptions: 0` now produce finite JSON refusals without opening streams.
@@ -205,4 +231,4 @@ Before the full browser gate, the task lead captured and inspected both `/connec
 
 The [owned server log](2026-10-02-mcp-server.log) contains the two expected initial Host refusals and seven framework `Internal: NoFallbackError` messages observed while negative-404 browser coverage ran. Request-path correlation is not present in those framework lines, so a precise cause is not claimed; all recovery/404/browser assertions passed. Successful compiled MCP calls logged only approved activity fields and `outcome: ok`; the SDK's fixed JSON-mode warning appeared once. No model call, account operation or sensitive request-body logging occurred.
 
-The owned server's listener was stopped after all verification. An independent port-3100 bind probe succeeded; no unrelated process was terminated and no rebuild occurred while serving. The managed terminal wrapper remained allocated after Ctrl-C, but the serving listener was gone. Local evidence is ready for the parent's final task/whole-branch review. Human assistant access, safe database-mirror parity, production Upstash, GitHub CI and deployed/live behavior remain unverified; no push/PR/merge/deployment was performed.
+The owned server's listener was stopped after all verification. An independent port-3100 bind probe succeeded; no unrelated process was terminated and no rebuild occurred while serving. The managed terminal wrapper remained allocated after Ctrl-C, but the serving listener was gone. Final independent approval and its documentation resolution are recorded at the top of this report. Human assistant access, safe database-mirror parity, production Upstash, GitHub CI and deployed/live behavior remain unverified; no push/PR/merge/deployment was performed.
