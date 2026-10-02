@@ -227,6 +227,8 @@ The four specifications remain the authoritative scope. The user subsequently au
 
 Execution used sequential subagents, Luna for straightforward setup/evidence checks, and independent task reviews. A fresh GPT-6 Astra whole-branch review approved local readiness at `b8b9c262`, with one documentation pointer subsequently corrected. The preserved verification report owns actual commands, counts, build identity and remaining boundaries.
 
+The user's subsequent requesting-code-review invocation produced another fresh independent review. Its monthly text-coverage finding was corrected and re-reviewed; the [follow-up report](../reviews/2026-10-02-mcp-requested-review.md) owns the new verification and source-build identity. This does not complete or authorize the unchecked external release steps.
+
 Delivery requires separate explicit authorization, followed by Task 11's CI, mirror-parity, deployment and production proof. The user-owned branch and worktree are preserved.
 
 Primary SDK references checked for this plan: [official protocol versions](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/protocol-versions.md), [HTTP serving](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/serving/http.md), [legacy clients](https://github.com/modelcontextprotocol/typescript-sdk/blob/main/docs/serving/legacy-clients.md). The exact stable package version was rechecked against the npm registry on 2026-10-01; its stateless legacy and JSON handler options were checked against current official documentation.

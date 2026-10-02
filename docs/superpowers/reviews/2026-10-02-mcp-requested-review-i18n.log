@@ -1,0 +1,5 @@
+
+> web@0.1.0 i18n:check
+> tsx scripts/check-localization.ts --check
+
+Translation catalogue and registered messages valid: 287 labels; 121 public page identities. Page-body completion is checked separately.
