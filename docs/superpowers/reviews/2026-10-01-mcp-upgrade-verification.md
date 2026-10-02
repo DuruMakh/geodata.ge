@@ -1,5 +1,17 @@
 # MCP upgrade verification
 
+## Current integrated state — Task 10
+
+Date: **2026-10-02 (Asia/Tbilisi)**. Integrated baseline: `ccf50e9e8c898a337a9ce4c8e5e7906bf0107b62`. Data schema is now **1.5.0**, with **14 read-only tools / 11 dataset families**. Tasks 1–9 completed their independent task reviews. Task 10 completed local gate components, the production build/postbuild, **632 browser tests**, bundle inspection and compiled-endpoint proof. Its initial full `check` stopped on three outdated test assumptions; the affected tests and remaining components passed separately, as recorded below. No nonexistent all-green combined rerun is claimed. Final independent review remains parent-owned; publishing is not authorized.
+
+Tasks 3–7 package **305 current products / 84,056 exact-decimal facts / 47 public bilingual history notes** without source locators or internal identity-decision fields. Product annual queries subtract 100 from published annual indices; cumulative queries use the shared explorer's complete monthly compounding from January `startYear`, relative to the preceding December. Missing inputs and reviewed identity splits remain explicit nulls/qualifications. Catalogue/source discovery, annual comparisons and value ranking cover the current roster with unchanged public input/result caps. Two product publications join the shared manifest: **22 listed files / 23 artifacts**. Complete tool schemas/text retain classifications, history notes, sources, caveats and cumulative bases. Eight product reference cases, including independently CSV-derived values, the unsupported cumulative-comparison contract and an explicitly synthetic missing-input check, augment the unchanged forty earlier intents; the reference test suite contains **59 tests**.
+
+The preserved [Task 7 contract report](2026-10-01-mcp-tool-contract-report.md), [independent CSV reference audit](2026-10-01-mcp-independent-reference.cjs) and [results](2026-10-01-mcp-independent-reference.json), [real-SDK wire audit](2026-10-01-mcp-wire-evidence.ts) and [historical results](2026-10-01-mcp-wire-evidence.json), and [Task 8 runtime import audit](2026-10-01-mcp-import-audit.cjs) and [results](2026-10-01-mcp-import-audit.json) now live in durable review storage. Their original evidence meaning is preserved; compiled-server results will be recorded separately.
+
+Task 8 measured the packaged snapshot and complete response budgets; Task 9 added bilingual dynamic national/city/product examples and qualified current official client guidance. Human application/account/protocol/sourced-answer proof and actual safe database-mirror parity remain **unverified**. Automated SDK, CSV and structural parity evidence cannot substitute for those boundaries. Production Upstash enforcement and live deployment also remain unverified.
+
+## Historical Task 2 — transport-only checkpoint
+
 Date: 2026-10-01 (Asia/Tbilisi)
 Task: 2, transport migration only; baseline `c58a7389`.
 Status: local SDK compatibility verified; integration gates and human application/production proof remain pending.
@@ -94,7 +106,7 @@ The missing-history date is chosen by scanning real annual facts for the fewest 
 
 The **512 KiB / 524,288-byte limit** accepts the whole catalogue with **54,867 bytes tool-result headroom**. The 500-cell cumulative request demonstrates the binding byte boundary: no source, history warning or text was trimmed; the complete oversized answer was replaced by the bilingual refusal directing callers to narrower requests and `https://fiscal.ge/downloads/data/manifest.json`. All 45 bounded outputs fit the byte limit. The largest local request-cost sample is **220.42 ms**; five fresh cold processes also completed below the existing ten-second ceiling on this machine. Startup on Vercel, SDK/HTTP work and shared rate-limiter latency are outside these timings, so no ten-second hosted guarantee is claimed.
 
-Actual final wire proof remains the separate Task 7 real-client evidence: its complete catalogue was **469,455 legacy / 469,565 modern bytes**, with **54,833 / 54,723 bytes final-wire headroom**. Task 8's 469,421-byte tool result matches that earlier bounded result, but is not being presented as a newly measured HTTP wire. Preserved detailed evidence currently resides in `.superpowers/sdd/2026-10-01-mcp-unified-implementation/task-7-report.md` and `task-7-wire-evidence.json`; Task 10 owns moving that preserved evidence out of execution scratch. No account or network request was made for Task 8.
+Actual final wire proof remains the separate Task 7 real-client evidence: its complete catalogue was **469,455 legacy / 469,565 modern bytes**, with **54,833 / 54,723 bytes final-wire headroom**. Task 8's 469,421-byte tool result matches that earlier bounded result, but is not being presented as a newly measured HTTP wire. Preserved detailed evidence resides in the [Task 7 report](2026-10-01-mcp-tool-contract-report.md) and [wire results](2026-10-01-mcp-wire-evidence.json), relocated from execution scratch by Task 10. No account or network request was made for Task 8.
 
 ### Bundle and failure boundaries
 
@@ -142,3 +154,55 @@ Native application control is disabled here and no Fiscal.ge connector is expose
 - Browser assertions now cover both locales at **390px**, ten total examples, actual product publication/catalogue counts and coverage, shared downloads, methodology links, both copy controls invoked by keyboard, no horizontal overflow and no page/console errors. Existing desktop/mobile and budget/economy assertions remain. **These browser assertions have not run**; Task 10 owns the single built-artifact browser/visual gate and full check/build.
 
 No source facts, snapshot content, query arithmetic, transport, rates, limits, route, CSS system, account/configuration or database mirror changed. No publication was edited by hand or regenerated. Publishing remains unauthorized; actual human connection proof remains an explicit access boundary, not a passing SDK inference.
+
+## Task 10: integrated local gate and compiled artifact
+
+All npm/npx commands ran from `apps/web`, with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`; Git and the standalone CJS audits ran from the repository root. This task changed no production behavior. The only test repairs are the demonstrated generic-label assumption and stale agent-guide matcher/link inventory. The reference fixture's sole change is its relocated evidence path in a comment; every numeric expectation remains unchanged.
+
+### Completion commands and actual results
+
+| Check | Actual result | Recorded output |
+| --- | --- | --- |
+| `npm run check` once | Full lint and types passed; units: **2,705 passed / 3 failed / 7 skipped**, **314 passed / 2 failed / 1 skipped files**, 293.19 s. Chain stopped before data/localization steps. | [Initial check](2026-10-02-mcp-check.log) |
+| Affected `localization.test.ts` + `agentFiles.test.ts` | **10/10 passed**, 9.88 s; subsequent typecheck and scoped ESLint passed. | [Repair tests](2026-10-02-mcp-repair-tests.log) |
+| Remaining `npm run data:validate` | Passed all fifteen validation stages, including all source/archive and publication-input checks. Products: **305 / 84,056 facts / 83,880 published / 176 unavailable / zero monthly gaps**. | [Data validation](2026-10-02-mcp-data-validation.log) |
+| Remaining `npm run i18n:check` | **287 labels / 121 public page identities**, registered messages valid. | [Localization](2026-10-02-mcp-i18n.log) |
+| `npm run build` once | Compilation, TypeScript and **251 generated static pages** passed; `/mcp` is the only dynamic route. All postbuild checks passed; **23 publications current / 22 manifest-listed files**, hashes verified. | [Build and postbuild](2026-10-02-mcp-build.log) |
+| `CI=1 PLAYWRIGHT_BASE_URL=http://localhost:3100 npx playwright test` | **632/632 passed using four workers**, 3.4 minutes, against the built artifact. | [Browser gate](2026-10-02-mcp-browser.log) |
+
+The three initial failures were: the translation test calling the old generic dictionary for a product ID instead of checking its reviewed product-catalogue label; the guide test matching a superseded tool-list sentence; and the guide's exact link inventory missing the approved product explorer/CSV/JSON links. The repair verifies every returned product English label against the reviewed snapshot catalogue, nonempty and without Georgian characters. Every old dictionary/unknown-label check is retained. The guide test now verifies all fourteen named tools and all **47 earlier links plus three added links = 50**, without changing public content.
+
+Assembled passing unit evidence is **2,708 passed / 7 skipped across 316 passing files / one skipped file**. The full run included the unchanged **59-test reference suite** (48 bilingual intents plus eleven inventory/boundary tests); none failed or was skipped. A [declaration inventory](2026-10-02-mcp-reference-inventory.json) confirms the selected file; its twelve static templates are not an extra execution or a claim of twelve reference tests. The seven skipped tests belong to the existing disposable-local-debt-database suite, because no `GEODATA_TEST_DATABASE_URL` was configured. No database connection was attempted. Passing broad components were not repeated after the test-only repairs.
+
+Other validation counts include 132 resolved logical sources, 30 national GDP facts, 37 balance facts, 126 debt facts, 6,930 regional-economy facts, and 47 nominal-GDP artifact comparisons. Product validation independently checked **41,830 monthly arithmetic cells / 3,157 prior-year checks**, with **29 reviewed links / 18 splits** and unchanged archived-original hashes. The build's five existing public CSV output checks, regional-economy CSV check and inflation CSV check all passed.
+
+### Bundle and runtime separation
+
+The [reproducible build audit](2026-10-02-mcp-bundle-audit.cjs) and [actual trace/chunk evidence](2026-10-02-mcp-bundle-audit.json) resolve `.next/server/app/mcp/route.js.nft.json`: **121 trace entries**, including the **46,285,296-byte snapshot**, schema **1.5.0**, dataVersion `2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7`, generation commit **ccf50e9e8c898a337a9ce4c8e5e7906bf0107b62**. Snapshot SHA-256 is `fb2b358d3c41952bfc35a8f4be7142a0aa714d53d69aa26bc31a47e474945107`, generated at `2026-10-01T22:37:33.069Z`. Two trace entries resolve to the same snapshot; the recorded byte size is the actual file size, not two copies added together.
+
+The audit inspected **eight compiled route/trace JavaScript files**, as well as the trace paths and current Next tracing configuration. No serving-data loader, snapshot builder, database module/client/configuration, product-identity file reader, raw-import/original-document path or development v1 SDK file matched the recorded bans. The relocated Task 8 AST audit still reports **62 project-local runtime modules / 209 edges**, with `node:fs` imported only by `lib/mcp/snapshot.ts`. These complementary checks inspect bundled code as well as traced files; trace absence alone is not used to claim every source module is absent. They establish this local artifact, not hosted function size/performance or safe mirror parity.
+
+### Actual compiled SDK endpoint proof
+
+After the successful build, an owned `next start --port 3100` ran with temporary local-only `MCP_ENABLED=true`, `MCP_RATE_LIMITER=memory`, `VERCEL_ENV=development` and the Fiscal.ge site URL. The production Host/origin guards were retained. The [audit utility](2026-10-02-mcp-built-endpoint.ts), [JSON evidence](2026-10-02-mcp-built-endpoint.json) and [output](2026-10-02-mcp-built-endpoint.log) use actual modern SDK **2.2.0 pinned to 2026-07-28** and legacy SDK **1.30.1** transports against the compiled Next route, not the source bridge.
+
+The initial global-fetch Host override was refused with `forbidden_host`; a direct global-fetch check reproduced it. The supported SDK custom-fetch option now uses bounded `node:http` solely to send `Host: fiscal.ge` while its socket URL stays localhost:3100. No server guard, production setting or MCP negotiation code changed. The successful audit made **18 SDK HTTP requests**, below the existing minute limit. Discovery/initialization and both cached fourteen-tool listings completed; all six subsequent call pairs validated their declared output schemas and returned deeply identical full structured content, matching the build's schema/dataVersion/releaseCommit. No session was issued.
+
+| Compiled call | Observed content | Legacy wire / modern wire bytes |
+| --- | --- | ---: |
+| Full product catalogue | 305 current series, full reviewed metadata | 469,455 / 469,565 |
+| Rice annual, 2026-08 | **1.8973%**, published annual source | 7,191 / 7,301 |
+| Rice cumulative, January–December 2025 | **−13.7927891681444%**, **2024-12 base**, upstream monthly source and derivation caveat | 11,133 / 11,243 |
+| Annual rank100 | 305 candidates / 305 eligible / 100 returned | 63,523 / 63,633 |
+| Since-2015 cumulative rank100 | 305 candidates / 287 eligible / 100 returned, qualified missing histories | 105,317 / 105,427 |
+| Product sources | Two original source records, unchanged registered metadata | 12,871 / 12,981 |
+
+Every final JSON-RPC reply stays below **524,288 bytes**, with **54,723 bytes modern catalogue headroom**. The annual/cumulative numeric checks use the independent direct-CSV audit, not an application output copied to an expectation. Served product CSV (**7,150,643 bytes**, SHA-256 `1485663e95d3b40cf5a35166f859df5045a5b013ecee3953a09894700080b7ff`) and metadata JSON (**492,893 bytes**, SHA-256 `d2b81db6992ad274d2d3174b011b196da91d9800e03e19f91a803f4fc58170d8`) match the served manifest. [Separate rerun source-bridge evidence](2026-10-02-mcp-source-bridge-evidence.json) verifies the relocated wire utility; the historical Task 7 reference/wire JSON files were independently compared byte-for-byte to their base Git versions and preserved.
+
+### Browser, logs and process cleanup
+
+Before the full browser gate, the task lead captured and inspected both `/connect` locales at **390×844** and **1280×900** using the existing Playwright screenshot CLI. All four captures completed, with meaningful content, preserved typography/copy blocks and no visible clipping, blank page or error overlay. Screenshot review alone is not measured overflow, console or keyboard proof. The succeeding full browser suite includes the exact mobile overflow, console/page-error, copy-control keyboard, current examples, download/link and existing product-explorer assertions.
+
+The [owned server log](2026-10-02-mcp-server.log) contains the two expected initial Host refusals and seven framework `Internal: NoFallbackError` messages observed while negative-404 browser coverage ran. Request-path correlation is not present in those framework lines, so a precise cause is not claimed; all recovery/404/browser assertions passed. Successful compiled MCP calls logged only approved activity fields and `outcome: ok`; the SDK's fixed JSON-mode warning appeared once. No model call, account operation or sensitive request-body logging occurred.
+
+The owned server's listener was stopped after all verification. An independent port-3100 bind probe succeeded; no unrelated process was terminated and no rebuild occurred while serving. The managed terminal wrapper remained allocated after Ctrl-C, but the serving listener was gone. Local evidence is ready for the parent's final task/whole-branch review. Human assistant access, safe database-mirror parity, production Upstash, GitHub CI and deployed/live behavior remain unverified; no push/PR/merge/deployment was performed.

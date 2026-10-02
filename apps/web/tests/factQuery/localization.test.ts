@@ -20,7 +20,15 @@ describe("snapshot-pinned translations", () => {
       const response = describeCoverage(snapshot, { datasetId: dataset.datasetId });
       if (response.kind !== "catalogue") throw new Error("Expected catalogue");
       const data = response.data as CoverageData;
-      for (const id of [...(data.series ?? []).map(series => series.seriesId), ...(data.entities ?? []).map(entity => entity.entityId), ...data.exclusions.map(entity => entity.entityId)]) expect(serviceLabelEn(snapshot, id), id).not.toBe("");
+      for (const series of data.series ?? []) {
+        if (dataset.datasetId === "inflation-products") {
+          const reviewed = snapshot.inflationProducts.catalogue.find(product => product.productId === series.seriesId);
+          expect(series.labelEn, series.seriesId).toBe(reviewed?.labelEn);
+          expect(series.labelEn.trim(), series.seriesId).not.toBe("");
+          expect(series.labelEn, series.seriesId).not.toMatch(/\p{Script=Georgian}/u);
+        } else expect(serviceLabelEn(snapshot, series.seriesId), series.seriesId).not.toBe("");
+      }
+      for (const id of [...(data.entities ?? []).map(entity => entity.entityId), ...data.exclusions.map(entity => entity.entityId)]) expect(serviceLabelEn(snapshot, id), id).not.toBe("");
     }
   });
   it("rejects unreviewed source companions and incomplete sentence contracts", async () => {

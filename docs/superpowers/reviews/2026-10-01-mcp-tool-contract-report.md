@@ -30,12 +30,12 @@ Commands ran from `apps/web` except the independent CSV audit and Git commands.
 
    exited 0: **8 files / 189 tests passed**, duration **8.05 s**. This includes the prescribed suite plus only three affected MCP files. The known Node `MODULE_TYPELESS_PACKAGE_JSON` warning appeared; unrelated package configuration was not changed.
 8. Scoped ESLint exited 0 with `--max-warnings 0` on all 13 changed application/test files. `git diff --check` passed. No service-message keys/parameters were added, so a new i18n generation/check was not required for this task.
-9. `node .superpowers/sdd/2026-10-01-mcp-unified-implementation/task-7-independent-reference.cjs` from the repository root exited 0, independently recalculating the references and checking archived-original bytes/hashes. Its first invocation failed to resolve an absolute package subpath; corrected the audit-only loader to `createRequire(apps/web/package.json)` and reran successfully.
-10. `npx tsx ../../.superpowers/sdd/2026-10-01-mcp-unified-implementation/task-7-wire-evidence.ts` exited 0, writing exact bounded-result and final HTTP wire measurements. The SDK emitted its documented JSON-response notification warning; stateless request/response behavior and subscription refusal remain intentionally unchanged.
+9. `node docs/superpowers/reviews/2026-10-01-mcp-independent-reference.cjs` from the repository root exited 0, independently recalculating the references and checking archived-original bytes/hashes. Its first invocation failed to resolve an absolute package subpath; corrected the audit-only loader to `createRequire(apps/web/package.json)` and reran successfully.
+10. `npx tsx ../../docs/superpowers/reviews/2026-10-01-mcp-wire-evidence.ts` exited 0, writing exact bounded-result and final HTTP wire measurements. The SDK emitted its documented JSON-response notification warning; stateless request/response behavior and subscription refusal remain intentionally unchanged.
 
 ## Independent reference provenance
 
-Tracked audit script `task-7-independent-reference.cjs` reads only `data/imports/cpi-products-monthly.csv`, `data/imports/cpi-products.csv` and the source manifest, using `csv-parse` and an isolated Decimal class at precision 100. It does not import fact-query/explorer arithmetic, run a query or copy any actual response to an expectation. Its output is `task-7-independent-reference.json`.
+Tracked audit script `2026-10-01-mcp-independent-reference.cjs` reads only `data/imports/cpi-products-monthly.csv`, `data/imports/cpi-products.csv` and the source manifest, using `csv-parse` and an isolated Decimal class at precision 100. It does not import fact-query/explorer arithmetic, run a query or copy any actual response to an expectation. Its output is `2026-10-01-mcp-independent-reference.json`.
 
 The original evidence brief and inventory were used to choose cases, then recalculated from scratch:
 
@@ -57,7 +57,7 @@ Locators and identity-decision details occur only in reference-authoring evidenc
 
 ## Complete-output and final wire budget
 
-Tracked `task-7-wire-evidence.ts` uses the production `POST` route behind the existing test HTTP bridge with real modern SDK 2.2.0 and legacy SDK 1.30.1 clients. Each client calls `listTools` first, installing cached declared output validators, then calls product annual/cumulative query, full catalogue, annual rank and cumulative rank. Applications return deeply equal full structured responses in both eras; Zod parse equals each original response rather than stripping fields. Protocol tests also compare the product input and output schemas exactly. Modern results include `resultType=complete` and SDK server metadata. No session or subscription is introduced.
+Tracked `2026-10-01-mcp-wire-evidence.ts` uses the production `POST` route behind the existing test HTTP bridge with real modern SDK 2.2.0 and legacy SDK 1.30.1 clients. Each client calls `listTools` first, installing cached declared output validators, then calls product annual/cumulative query, full catalogue, annual rank and cumulative rank. Applications return deeply equal full structured responses in both eras; Zod parse equals each original response rather than stripping fields. Protocol tests also compare the product input and output schemas exactly. Modern results include `resultType=complete` and SDK server metadata. No session or subscription is introduced.
 
 All sizes below include UTF-8 bytes. Final wires include JSON-RPC framing and SDK fields. Limit is **524,288 bytes (512 KiB)**. Counts are 305 catalogue entries, 100 annual rank entries from 305 eligible candidates, and 100 cumulative rank entries from 287 eligible / 305 candidates with all 18 ineligible histories explicitly excluded.
 

@@ -25,6 +25,7 @@ const requiredTargets = [
   "https://fiscal.ge/downloads/data/inflation-cpi-national.csv",
   "https://fiscal.ge/explorer/inflation/categories",
   "https://fiscal.ge/explorer/inflation/cities",
+  "https://fiscal.ge/explorer/inflation/products",
   "https://fiscal.ge/methodology",
   "https://fiscal.ge/methodology/expenditure",
   "https://fiscal.ge/methodology/revenue",
@@ -44,6 +45,8 @@ const requiredTargets = [
   "https://fiscal.ge/downloads/data/inflation-categories.json",
   "https://fiscal.ge/downloads/data/inflation-cities.csv",
   "https://fiscal.ge/downloads/data/inflation-cities.json",
+  "https://fiscal.ge/downloads/data/inflation-products.csv",
+  "https://fiscal.ge/downloads/data/inflation-products.json",
   "https://fiscal.ge/downloads/data/manifest.json",
   "https://fiscal.ge/downloads/data/government-debt.json",
   "https://fiscal.ge/downloads/data/general-government-balance.json",
@@ -89,7 +92,7 @@ describe("Fiscal.ge agent instructions", () => {
   });
   it("advertises every registered read-only tool", async () => {
     const content = await readFile(llmsPath, "utf8");
-    const advertised = content.match(/It exposes these read-only tools: ([^.]+)\./)?.[1].match(/[a-z]+(?:_[a-z]+)*/g);
+    const advertised = content.match(/Its current read-only tools are ([^;]+); tools\/list is authoritative\./)?.[1].split(/,\s*/);
     expect(advertised?.sort()).toEqual(TOOLS.map(tool => tool.name).sort());
   });
   it("publishes a concise guide with clear scope and unique public links", async () => {
@@ -117,6 +120,7 @@ describe("Fiscal.ge agent instructions", () => {
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
     expect(targets).toEqual(requiredTargets);
+    expect(targets).toHaveLength(50);
     expect(new Set(targets).size).toBe(targets.length);
   });
 

@@ -1,0 +1,110 @@
+[
+  {
+    "name": "section 14.3 bilingual reference fixture > covers 48 intents, each asked in both languages",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 84,
+      "column": 3
+    }
+  },
+  {
+    "name": "section 14.3 bilingual reference fixture > intent ${intent.id}: ${intent.promptEn} > returns the reviewed answer with its scope, sources and caveats",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 99,
+      "column": 7
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > excludes every aggregate-only municipal code, not just 05",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 279,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > suggests real neighbours for an unknown series id and invents none",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 295,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > refuses an unknown entity id",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 321,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > refuses a year beyond this baseline rather than extrapolating",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 333,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > refuses a measure the dataset does not support",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 345,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > reports a data version change rather than answering from a different release",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 356,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > declines a percentage change from a non-positive base instead of dividing by zero",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 369,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > caps a ranking at its declared limit",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 398,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > rejects a ranking limit above the documented maximum",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 415,
+      "column": 3
+    }
+  },
+  {
+    "name": "boundary cases beyond the section 14.3 table > rejects an unknown source id rather than resolving a sentinel",
+    "file": "C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/tests/factQuery/reference.test.ts",
+    "projectName": "parallel",
+    "location": {
+      "line": 431,
+      "column": 3
+    }
+  }
+]

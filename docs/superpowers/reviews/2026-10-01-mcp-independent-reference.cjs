@@ -36,5 +36,5 @@ const output = {
     return { sourceId: row.source_id, officialUrl: row.retrieved_file_url, archive: row.local_file, sha256, bytes: bytes.length };
   }),
 };
-fs.writeFileSync(path.join(__dirname, "task-7-independent-reference.json"), JSON.stringify(output, null, 2) + "\n");
+fs.writeFileSync(path.join(__dirname, "2026-10-01-mcp-independent-reference.json"), JSON.stringify(output, null, 2) + "\n");
 process.stdout.write(JSON.stringify({ roster: output.rosterCount, annual: output.annual.percent, cumulative: output.cumulative.percent, monthlyGaps: output.missingMonthlyInputs }) + "\n");

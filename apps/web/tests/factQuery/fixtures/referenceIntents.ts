@@ -1058,7 +1058,7 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
   },
   // Product expectations independently established from reviewed CSV rows and
   // Decimal precision 100, without any query/explorer helper. Audit calculation,
-  // source locators and verified archive hashes are in task-7-independent-reference.json.
+  // source locators and verified archive hashes are in docs/superpowers/reviews/2026-10-01-mcp-independent-reference.json.
   // Originals: docs/Raw Data/Inflation/geostat-products/2026-08/en/products-{yoy,mom}.xlsx;
   // source-manifest.csv pins official URLs, bytes and SHA-256. Reference locators
   // below are authoring evidence only and must never enter public responses.

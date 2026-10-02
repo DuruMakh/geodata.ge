@@ -79,7 +79,9 @@ async function main() {
       const bytes = Buffer.byteLength(JSON.stringify(result));
       bounded.push({ label: call.label, bytes, headroom: LIMITS.resultBytes - bytes });
     }
-    writeFileSync(path.join(root, ".superpowers/sdd/2026-10-01-mcp-unified-implementation/task-7-wire-evidence.json"), JSON.stringify({
+    const outputArg = process.argv.indexOf("--output");
+    const output = outputArg >= 0 ? path.resolve(process.argv[outputArg + 1]!) : path.join(root, "docs/superpowers/reviews/2026-10-01-mcp-wire-evidence.json");
+    writeFileSync(output, JSON.stringify({
       snapshotDataVersion: snapshot.dataVersion, schemaVersion: snapshot.schemaVersion, resultLimit: LIMITS.resultBytes,
       clients: { legacy: "1.30.1", modern: "2.2.0" }, bounded, wires,
       proof: "Real SDK listTools installs cached validators; subsequent HTTP calls validate same schemas and equal full application responses. Wire bytes include SDK era fields, server metadata and JSON-RPC framing.",

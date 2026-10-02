@@ -1,0 +1,264 @@
+{
+  "checkedAt": "2026-10-01T22:42:53.777Z",
+  "endpoint": "http://localhost:3100/mcp",
+  "hostHeader": "fiscal.ge",
+  "releaseCommit": "ccf50e9e8c898a337a9ce4c8e5e7906bf0107b62",
+  "schemaVersion": "1.5.0",
+  "dataVersion": "2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7",
+  "snapshotBytes": 46285296,
+  "clients": {
+    "modern": "2.2.0 pinned 2026-07-28",
+    "legacy": "1.30.1"
+  },
+  "requests": 18,
+  "tools": 14,
+  "resultLimit": 524288,
+  "summary": [
+    {
+      "label": "catalogue",
+      "kind": "catalogue",
+      "status": "ok",
+      "count": 305,
+      "value": null,
+      "calculationBasePeriod": null,
+      "universe": null,
+      "sourceIds": []
+    },
+    {
+      "label": "annual",
+      "kind": "observations",
+      "status": "ok",
+      "count": 1,
+      "value": 1.8973,
+      "calculationBasePeriod": null,
+      "universe": null,
+      "sourceIds": [
+        "source.geostat_product_yoy"
+      ]
+    },
+    {
+      "label": "cumulative",
+      "kind": "observations",
+      "status": "ok",
+      "count": 1,
+      "value": -13.7927891681444,
+      "calculationBasePeriod": "2024-12",
+      "universe": null,
+      "sourceIds": [
+        "source.geostat_product_mom"
+      ]
+    },
+    {
+      "label": "annualRank100",
+      "kind": "ranking",
+      "status": "ok",
+      "count": 100,
+      "value": null,
+      "calculationBasePeriod": null,
+      "universe": {
+        "dimension": "series",
+        "description": "განხილულ მიმდინარე სამომხმარებლო კალათაში შემავალი ყველა პროდუქტი; გამოტოვებული მნიშვნელობის ან არასრული საანგარიშო მონაცემების მქონე პროდუქტები ცალკეა ჩამოთვლილი.",
+        "descriptionEn": "Every product in the current reviewed consumer basket; products with missing values or incomplete calculation inputs are explicitly excluded.",
+        "candidateCount": 305,
+        "eligibleCount": 305,
+        "returnedCount": 100,
+        "cutoffSplitsTie": false
+      },
+      "sourceIds": [
+        "source.geostat_product_yoy"
+      ]
+    },
+    {
+      "label": "cumulativeRank100",
+      "kind": "ranking",
+      "status": "partial",
+      "count": 100,
+      "value": null,
+      "calculationBasePeriod": null,
+      "universe": {
+        "dimension": "series",
+        "description": "განხილულ მიმდინარე სამომხმარებლო კალათაში შემავალი ყველა პროდუქტი; გამოტოვებული მნიშვნელობის ან არასრული საანგარიშო მონაცემების მქონე პროდუქტები ცალკეა ჩამოთვლილი.",
+        "descriptionEn": "Every product in the current reviewed consumer basket; products with missing values or incomplete calculation inputs are explicitly excluded.",
+        "candidateCount": 305,
+        "eligibleCount": 287,
+        "returnedCount": 100,
+        "cutoffSplitsTie": false
+      },
+      "sourceIds": [
+        "source.geostat_product_mom"
+      ]
+    },
+    {
+      "label": "sources",
+      "kind": "sources",
+      "status": "ok",
+      "count": 2,
+      "value": null,
+      "calculationBasePeriod": null,
+      "universe": null,
+      "sourceIds": [
+        "source.geostat_product_mom",
+        "source.geostat_product_yoy"
+      ]
+    }
+  ],
+  "wires": [
+    {
+      "era": "modern",
+      "method": "server/discover",
+      "tool": null,
+      "status": 200,
+      "bytes": 14851,
+      "headroom": 509437,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "initialize",
+      "tool": null,
+      "status": 200,
+      "bytes": 14732,
+      "headroom": 509556,
+      "resultType": null
+    },
+    {
+      "era": "modern",
+      "method": "tools/list",
+      "tool": null,
+      "status": 200,
+      "bytes": 120133,
+      "headroom": 404155,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "tools/list",
+      "tool": null,
+      "status": 200,
+      "bytes": 119990,
+      "headroom": 404298,
+      "resultType": null
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "describe_coverage",
+      "status": 200,
+      "bytes": 469565,
+      "headroom": 54723,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "describe_coverage",
+      "status": 200,
+      "bytes": 469455,
+      "headroom": 54833,
+      "resultType": null
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "query_inflation_products",
+      "status": 200,
+      "bytes": 7301,
+      "headroom": 516987,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "query_inflation_products",
+      "status": 200,
+      "bytes": 7191,
+      "headroom": 517097,
+      "resultType": null
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "query_inflation_products",
+      "status": 200,
+      "bytes": 11243,
+      "headroom": 513045,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "query_inflation_products",
+      "status": 200,
+      "bytes": 11133,
+      "headroom": 513155,
+      "resultType": null
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "rank",
+      "status": 200,
+      "bytes": 63633,
+      "headroom": 460655,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "rank",
+      "status": 200,
+      "bytes": 63523,
+      "headroom": 460765,
+      "resultType": null
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "rank",
+      "status": 200,
+      "bytes": 105427,
+      "headroom": 418861,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "rank",
+      "status": 200,
+      "bytes": 105317,
+      "headroom": 418971,
+      "resultType": null
+    },
+    {
+      "era": "modern",
+      "method": "tools/call",
+      "tool": "get_sources",
+      "status": 200,
+      "bytes": 12981,
+      "headroom": 511307,
+      "resultType": "complete"
+    },
+    {
+      "era": "legacy",
+      "method": "tools/call",
+      "tool": "get_sources",
+      "status": 200,
+      "bytes": 12871,
+      "headroom": 511417,
+      "resultType": null
+    }
+  ],
+  "publications": [
+    {
+      "name": "inflation-products.csv",
+      "bytes": 7150643,
+      "sha256": "1485663e95d3b40cf5a35166f859df5045a5b013ecee3953a09894700080b7ff"
+    },
+    {
+      "name": "inflation-products.json",
+      "bytes": 492893,
+      "sha256": "d2b81db6992ad274d2d3174b011b196da91d9800e03e19f91a803f4fc58170d8"
+    }
+  ],
+  "boundary": "Actual local next start compiled route with memory limiter; no human app, database mirror, production Upstash or live deployment proof."
+}

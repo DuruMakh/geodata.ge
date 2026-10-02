@@ -1,0 +1,297 @@
+
+> web@0.1.0 data:validate
+> tsx scripts/validate-data-files.ts && npm run data:check-national-gdp && npm run data:check-general-government-balance && npm run data:check-municipal-indicators && npm run data:check-municipal-population && npm run data:check-methodology-archives && npm run data:check-nominal-gdp-consistency && npm run data:validate-public-dataset-inputs && npm run data:check-government-debt && npm run data:check-fact-query-snapshot && npm run data:check-gdp-overview && npm run data:check-economic-sectors && npm run data:check-regional-economies && npm run data:check-inflation && npm run data:check-inflation-products
+
+Validated municipal function rows: 7040
+Validated municipal total rows: 704
+Validated Georgia municipal function rows: 110
+Validated Georgia municipal total rows: 11
+Validated Adjara budget adjustment rows: 11
+Validated municipal population rows: 64
+Validated municipalities: 64
+Validated municipality map polygons: 60
+Validated taxonomy rows: 27
+Validated glossary rows: 27
+Validated source rows: 132
+Validated fact rows: 527
+Validated admin spending fact rows: 852
+Validated national GDP fact rows: 30
+Validated regional economy fact rows: 6930
+Validated general-government balance fact rows: 37
+Report written: C:\Users\Mylaptop\.codex\worktrees\e3aa\Geodata.ge\data\reports\real-budget-2004-2025-import-report.json
+
+> web@0.1.0 data:check-national-gdp
+> tsx scripts/prepare-national-gdp.ts --check
+
+Validated 30 national GDP facts (1996–2025).
+
+> web@0.1.0 data:check-general-government-balance
+> tsx scripts/prepare-general-government-balance.ts --check
+
+Validated 37 general-government balance facts (1995-2031).
+
+> web@0.1.0 data:check-municipal-indicators
+> tsx scripts/prepare-geostat-municipal-indicators.ts --check
+
+Validated the Geostat municipal indicators package.
+Population rows: 704
+Regional GDP rows: 165
+Regional GDP years: 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024
+Validation: complete
+
+> web@0.1.0 data:check-municipal-population
+> tsx scripts/prepare-municipal-population-2025.ts --check
+
+Validated 64 municipal population facts for 2025.
+
+> web@0.1.0 data:check-methodology-archives
+> tsx scripts/prepare-methodology-archives.ts --check
+
+expenditure: PASS (79 originals, 58628862 source bytes)
+revenue: PASS (22 originals, 5465153 source bytes)
+municipalities: PASS (79 originals, 3571415 source bytes)
+debt: PASS (10 originals, 16250452 source bytes)
+gdp: PASS (5 originals, 173654 source bytes)
+economic-sectors: PASS (3 originals, 139132 source bytes)
+regional-economies: PASS (2 originals, 112960 source bytes)
+inflation: PASS (20 originals, 6156753 source bytes)
+
+> web@0.1.0 data:check-nominal-gdp-consistency
+> tsx scripts/check-nominal-gdp-consistency.ts
+
+Nominal GDP artifacts agree for 1996–2025 (47 comparisons).
+
+> web@0.1.0 data:validate-public-dataset-inputs
+> tsx scripts/prepare-public-datasets.ts --check
+
+national-expenditure: PASS (286 rows, 76177 bytes, a04cf54c7e47f126f8e6040dab0e4df5465411e7d24c82a44cec43f7a2dbe8d1)
+national-revenue: PASS (241 rows, 47565 bytes, 0880b5baf921780c4609b217d5564812358c2edc5ebfed492da6aa14bcf83b31)
+municipal-expenditure: PASS (7865 rows, 831760 bytes, 0d71b38fce4a81765149e75aa8d37d40311ca274d3484e4a3fa7eb93bc306b2c)
+government-debt: PASS (126 rows, 13903 bytes, 6e4f4f66e2d647b77baec394460740e840567feed79bd3dfc88b233d100f1b5b)
+general-government-balance: PASS (37 rows, 3650 bytes, ed69798751b015f6c21de1919eb0e51744f3da76241ede5d5a8a944551554401)
+
+> web@0.1.0 data:check-government-debt
+> tsx scripts/prepare-government-debt.ts --check
+
+Validated the government debt research package.
+Stock rows: 39
+Actual service rows: 39
+Interest-rate rows: 33
+Forecast rows: 15
+Serving facts: 126
+Validation: complete_with_documented_rate_gaps
+
+> web@0.1.0 data:check-fact-query-snapshot
+> tsx scripts/prepare-fact-query-snapshot.ts --check
+
+snapshot valid dataVersion=2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7 sources=132 all resolved
+
+> web@0.1.0 data:check-gdp-overview
+> tsx scripts/prepare-gdp-overview.ts --check
+
+{
+  "status": "PASS",
+  "counts": {
+    "real_usd_2015": 66,
+    "real_growth_percent": 65,
+    "nominal_gel": 30,
+    "nominal_usd": 30,
+    "per_capita_gel": 30,
+    "per_capita_usd": 30
+  },
+  "sourceHashes": {
+    "sources/geostat_nominal_current.xlsx": "21a576c9c20434a87bcb32047cd143eef2b8d3f3ff360442b420c76b0da27d34",
+    "sources/geostat_nominal_legacy.xlsx": "1f9befdca89f3a635f66abb14892386a9947bf7294045e4442832aa53e63dc8e",
+    "sources/NY.GDP.MKTP.KD.json": "a29136443c2aa7abb57299a95d712f9f74b9b39df9e247333a4a95e903050fc0",
+    "sources/NY.GDP.MKTP.KD.ZG.json": "98fbea3447eb4c0c8836ff741a1d3fb147ba027ea0ab50652415f9e2f9dd7b38",
+    "sources/wb_indicator_metadata.json": "bc4bc0ffec1755410f52b1091c6b1f46917c7417977102350d3d1102b4659216"
+  },
+  "budgetDenominatorUnchanged": true,
+  "maxGrowthErrorPercentagePoints": 5.782041512247815e-13
+}
+
+> web@0.1.0 data:check-economic-sectors
+> tsx scripts/prepare-economic-sectors.ts --check
+
+{
+  "status": "PASS",
+  "counts": {
+    "nominal": 336,
+    "share_of_gdp": 336,
+    "real_growth": 315
+  },
+  "missingCells": 21,
+  "reconciledYears": 16,
+  "growthChecks": 315
+}
+
+> web@0.1.0 data:check-regional-economies
+> tsx scripts/prepare-regional-economies.ts --check
+
+{
+  "status": "PASS",
+  "capturedOn": "2026-09-10",
+  "reviewedAt": "2026-09-13",
+  "coverage": {
+    "firstYear": 2010,
+    "lastYear": 2024,
+    "regions": 11,
+    "sectors": 20
+  },
+  "sourceCounts": {
+    "regionalTotals": 165,
+    "regionalSectorAmounts": 3300,
+    "reconciliationRows": 495
+  },
+  "validationCounts": {
+    "regions": 11,
+    "years": 15,
+    "selectableSeries": 21,
+    "nominal": 3465,
+    "shareOfRegionGdp": 3465,
+    "total": 6930
+  },
+  "missingValues": 0,
+  "duplicateKeys": 0,
+  "allRegionAccountsReconcile": true,
+  "allRegionTotalsReconcileToNational": true,
+  "regionalAccountingToleranceGel": "0.01",
+  "nationalSectorPublicationDifferences": [
+    {
+      "year": 2020,
+      "seriesId": "sector.a",
+      "regionalMinusNationalMillionGel": "-45.000000000000721"
+    },
+    {
+      "year": 2020,
+      "seriesId": "sector.c",
+      "regionalMinusNationalMillionGel": "-34.999999999999393"
+    },
+    {
+      "year": 2020,
+      "seriesId": "sector.r",
+      "regionalMinusNationalMillionGel": "79.999999999999974"
+    },
+    {
+      "year": 2021,
+      "seriesId": "sector.c",
+      "regionalMinusNationalMillionGel": "-60.000000000020284"
+    },
+    {
+      "year": 2021,
+      "seriesId": "sector.f",
+      "regionalMinusNationalMillionGel": "60.0000000000005447"
+    },
+    {
+      "year": 2022,
+      "seriesId": "sector.k",
+      "regionalMinusNationalMillionGel": "-4.9999999999998745"
+    },
+    {
+      "year": 2022,
+      "seriesId": "sector.o",
+      "regionalMinusNationalMillionGel": "4.999999999999802"
+    }
+  ],
+  "sourceHashes": {
+    "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx": "dd2042dff5e2c44b98b4bb140163b5736cf5a71f4683b9e6a359373907d59c35",
+    "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx": "88e337bd82a5232ea5260f011b11cb2d82c2cec5115fddbe92d14d1ff3945337",
+    "docs/Raw Data/Economy/gdp-overview/sources/geostat_nominal_current.xlsx": "21a576c9c20434a87bcb32047cd143eef2b8d3f3ff360442b420c76b0da27d34"
+  }
+}
+
+> web@0.1.0 data:check-inflation
+> tsx scripts/prepare-inflation.ts --check
+
+{
+  "status": "PASS",
+  "vintage": "2026-08",
+  "lastPeriod": "2026-08",
+  "counts": {
+    "cpi.headline:index_2010": 320,
+    "cpi.headline:yoy_pct": 272,
+    "cpi.headline:mom_pct": 272,
+    "cpi.headline:avg12_pct": 296,
+    "cpi.core:yoy_pct": 200,
+    "cpi.core:mom_pct": 200,
+    "cpi.core_ex_tobacco:yoy_pct": 200,
+    "cpi.core_ex_tobacco:mom_pct": 200
+  },
+  "firstPeriods": {
+    "cpi.headline:index_2010": "2000-01",
+    "cpi.headline:yoy_pct": "2004-01",
+    "cpi.headline:mom_pct": "2004-01",
+    "cpi.headline:avg12_pct": "2002-01",
+    "cpi.core:yoy_pct": "2010-01",
+    "cpi.core:mom_pct": "2010-01",
+    "cpi.core_ex_tobacco:yoy_pct": "2010-01",
+    "cpi.core_ex_tobacco:mom_pct": "2010-01"
+  },
+  "maxRecomputeErrorPp": {
+    "yoy": 0.0002,
+    "mom": 0.0001,
+    "avg12": 0.0001
+  },
+  "languageParity": "PASS",
+  "sourceHashes": {
+    "en/cpi-index-2010.xlsx": "4aa2a8b2d923f915855fa70c3aac54dff8080bcbe24dfcf784816edb915d5492",
+    "en/cpi-yoy.xlsx": "fbd93bf2891e3691975eea5e92f754e03e8e93c2c86a71b3e582ceaaf79863e9",
+    "en/cpi-mom.xlsx": "26f32d7a37a262c084afd935b01632e6dc02c4b21ef13608c27c2e50a0cc403c",
+    "en/cpi-avg12.xlsx": "32a8891f69d1786ab4fee21e285f465370159d097e0acf7a7875f45f7b7d5b80",
+    "en/core-yoy.xlsx": "19c93828962e0ec28a7b3d784e7bc473697924fa74f43e9f9f96dc525cc4bfb3",
+    "en/core-mom.xlsx": "14f2fffc80674fd8a3fef1820776af36bbfdeeb4799195b93a565d2b5a9676aa",
+    "ka/cpi-index-2010.xlsx": "e5a1c33a64a589c1c91f09524e79035d8b29565bbb254aeffd4fb1c42a11d5db",
+    "ka/cpi-yoy.xlsx": "77da6b090f6e727d5919c81ff0de36851fc2d7e1c09346da47fbfd32b2b22a17",
+    "ka/cpi-mom.xlsx": "5dc52f3ff44449641fe702a32639b72e95509fbd01c591712bc0bd8992fb427d",
+    "ka/cpi-avg12.xlsx": "004c85f71de48a99063561b3be1b0337169bb77d6ba03ef085574e0e8cda1237",
+    "ka/core-yoy.xlsx": "55b5274a90d05744b4529da3a2a0d0ec68bc4de28553dc6eeb54fa695f602c9a",
+    "ka/core-mom.xlsx": "592bb00db5bd953da88fb0101dd1ccd992652b47ec1a22a43a47523f3f033cf2"
+  }
+}
+
+> web@0.1.0 data:check-inflation-products
+> tsx scripts/prepare-inflation-products.ts --check
+
+{
+  "latestPeriod": "2026-08",
+  "includedProducts": 305,
+  "sourceRowsRead": 4778,
+  "rosterByYear": {
+    "2011": 266,
+    "2012": 288,
+    "2013": 288,
+    "2014": 295,
+    "2015": 295,
+    "2016": 295,
+    "2017": 305,
+    "2018": 305,
+    "2019": 306,
+    "2020": 305,
+    "2021": 305,
+    "2022": 305,
+    "2023": 305,
+    "2024": 305,
+    "2025": 305,
+    "2026": 305
+  },
+  "languageParity": "PASS",
+  "sourceHashes": {
+    "en/products-mom.xlsx": "26d9b429229cbad2ad6ee2bbefd5e86f52d4482d49abdcc14e270d4a956dcf20",
+    "en/products-yoy.xlsx": "ec9cd520693db0479f7fd576f0d2f4cfa65c9c9ba607c46ec7679e13b900faf9",
+    "ka/products-mom.xlsx": "7154963abfe05c0f8e5edd953ef0fb91274fde4911ce0a45eac7f3efc02bbd9c",
+    "ka/products-yoy.xlsx": "c4f87ab0b44d94538d7a0783371c28d639359977d8d00d12dcf588fa4b9390df"
+  },
+  "reviewedLinks": 29,
+  "reviewedSplits": 18,
+  "sourceRowsOutsideCurrentTrace": 1174,
+  "excludedSourceRowsSince2015": 37,
+  "reviewedRevisions": [],
+  "factCount": 84056,
+  "publishedCells": 83880,
+  "unavailableCells": 176,
+  "arithmeticChecked": 41830,
+  "arithmeticPriorYearChecked": 3157,
+  "arithmeticUncomparable": 22,
+  "maxArithmeticError": 0.00061239483704408,
+  "gapCount": 0
+}
