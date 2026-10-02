@@ -3,6 +3,7 @@ import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { compare } from "../../lib/factQuery/compare";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
+import { queryInflation } from "../../lib/factQuery/queryInflation";
 import { LIMITS, boundedToolResult, toolResult, tooLargeResponse } from "../../lib/mcp/result";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
@@ -19,12 +20,37 @@ beforeAll(async () => {
 const size = (value: unknown) => Buffer.byteLength(JSON.stringify(value), "utf8");
 
 describe("MCP tool results", () => {
+  it.each([
+    { name: "Batumi", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2016-01", "2026-08"], years: Array.from({ length: 11 }, (_, i) => 2016 + i) },
+    { name: "Zugdidi average", entityIds: ["city.zugdidi"], measure: "avg12_pct", periods: ["2017-12", "2026-08"], years: Array.from({ length: 10 }, (_, i) => 2017 + i) },
+    { name: "country and city", entityIds: ["country.georgia", "city.batumi"], measure: "yoy_pct", periods: ["2004-01", "2026-08"], years: Array.from({ length: 23 }, (_, i) => 2004 + i) },
+    { name: "no city facts", entityIds: ["city.batumi"], measure: "yoy_pct", periods: null, years: [], synthetic: "empty" },
+    { name: "sparse city years", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2018-02", "2020-03"], years: [2018, 2020], synthetic: "sparse" },
+  ])("preserves $name availability in the text a client reads", ({ entityIds, measure, periods, years, synthetic }) => {
+    const fact = snapshot.inflation.cities.find(row => row.cityId === "city.batumi" && row.seriesId === "cpi.headline" && row.measure === "yoy_pct")!;
+    const selectedSnapshot = synthetic === undefined ? snapshot : {
+      ...snapshot, inflation: { ...snapshot.inflation, cities: synthetic === "empty" ? [] : ["2018-02", "2020-03"].map(period => ({ ...fact, period })) },
+    };
+    const response = queryInflation(selectedSnapshot, { entityIds, seriesIds: ["cpi.headline"], measure, fromPeriod: "2016-06", toPeriod: "2016-06" });
+    expect(response).toMatchObject({ kind: "observations", data: { coverage: { availablePeriods: periods, availableYears: years } } });
+    const result = boundedToolResult(selectedSnapshot, response);
+    expect(result.isError).toBe(false);
+    expect(result.structuredContent).toEqual(response);
+    const text = result.content[0]!.text;
+    expect(text).toContain(`availablePeriods ${JSON.stringify(periods)}`);
+    expect(text).toContain(`availableYears ${JSON.stringify(years)}`);
+    expect(text).toContain(periods === null ? "No available months" : "gaps and later starts may remain");
+  });
+
   it("prints cumulative bases, derivation, sources, missingness and caveats with their structured values", () => {
     const response = queryInflationProducts(snapshot, { seriesIds: ["cpi.product.p0001", "cpi.product.p0051"], measure: "cumulative_pct", startYear: 2015, fromPeriod: "2026-08", toPeriod: "2026-08" });
     if (response.kind !== "observations") throw new Error("Expected product observations");
     const result = boundedToolResult(snapshot, response);
     expect(result.isError).toBe(false);
     const text = result.content[0]!.text;
+    const coverage = (response.data as { coverage: { availablePeriods: [string, string] | null; availableYears: number[] } }).coverage;
+    expect(text).toContain(`availablePeriods ${JSON.stringify(coverage.availablePeriods)}`);
+    expect(text).toContain(`availableYears ${JSON.stringify(coverage.availableYears)}`);
     expect(text).toContain("calculationBasePeriod");
     expect(text).toContain("2014-12");
     expect(text).toContain("Fiscal.ge");

@@ -164,12 +164,19 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   const data = response.data as Record<string, unknown>;
 
   if (response.kind === "observations") {
-    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
+    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; availableYears: number[]; availablePeriods?: [string, string] | null; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     const includeBase = observations.some(observation => observation.calculationBasePeriod !== undefined);
     return [
       "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionId\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds" + (includeBase ? "\tcalculationBasePeriod" : ""),
       ...observations.map(observation => observationLine(observation, includeBase)),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
+      ...(coverage.availablePeriods === undefined ? [] : [
+        `ხელმისაწვდომი თვეების დიაპაზონი / availablePeriods ${JSON.stringify(coverage.availablePeriods)}`,
+        `ხელმისაწვდომი წლები / availableYears ${JSON.stringify(coverage.availableYears)}`,
+        coverage.availablePeriods === null
+          ? "არ არის ხელმისაწვდომი თვეები / No available months."
+          : "დიაპაზონი აერთიანებს შერჩეულ ისტორიებს; შესაძლებელია გამოტოვებული თვეები და გვიანი დასაწყისი. / Span combines selected histories; gaps and later starts may remain.",
+      ]),
       ...excludedLines(coverage),
       ...definitionLines(observations),
     ];

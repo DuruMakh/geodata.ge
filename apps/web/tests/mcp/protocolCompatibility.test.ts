@@ -72,6 +72,10 @@ it("pinned and automatic v2 clients and a real v1 client complete the same sourc
     const legacyCall = { result: await legacy.callTool(CITY) };
     expect(modernCall.result.structuredContent).toEqual(legacyCall.result.structuredContent);
     expect(modernCall.result.structuredContent).toMatchObject({ data: { observations: [{ entityId: "city.batumi", value: 7.0857 }] } });
+    for (const result of [modernCall.result, legacyCall.result]) {
+      expect(result.content).toContainEqual({ type: "text", text: expect.stringContaining('availablePeriods ["2016-01","2026-08"]') });
+      expect(result.content).toContainEqual({ type: "text", text: expect.stringContaining('availableYears [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026]') });
+    }
     expect((await automatic.callTool(CITY)).structuredContent).toEqual(legacyCall.result.structuredContent);
     const sourceIds = (modernCall.result.structuredContent as { meta: { sources: { sourceId: string }[] } }).meta.sources.map(source => source.sourceId);
     expect(sourceIds.length).toBeGreaterThan(0);
