@@ -6,7 +6,10 @@ import { serializeBomCsvRows } from "../csvEscape";
 import { loadReviewedAnomalies } from "./anomalies";
 import { buildBreakRegister } from "./breaks";
 import { loadCitizenships } from "./citizenship";
+import { groupMigrationByCitizenship, loadCitizenshipGroups } from "./citizenshipGroups";
+import { loadDensityRows } from "./densityRows";
 import { loadDemographyGeography } from "./geography";
+import { readDensity } from "./readDensity";
 import { readMigration } from "./readMigration";
 import { readAgeStructure, readPopulation } from "./readPopulation";
 import { readVitalEvents } from "./readVital";
@@ -23,6 +26,7 @@ const FILES = [
   { family: "structure", file: "data/imports/demography-structure-annual.csv", dimensions: ["sex", "age_group"] },
   { family: "vital", file: "data/imports/demography-vital-annual.csv", dimensions: [] },
   { family: "migration", file: "data/imports/demography-migration-annual.csv", dimensions: ["sex", "citizenship_id"] },
+  { family: "density", file: "data/imports/demography-density-annual.csv", dimensions: [] },
 ] as const;
 const BREAKS_FILE = "data/imports/demography-series-breaks.csv";
 const REPORT_FILE = "data/reports/demography-validation.json";
@@ -106,14 +110,21 @@ export async function prepareDemography(repositoryRoot: string) {
     loadCitizenships(repositoryRoot),
     loadPreviousObservations(repositoryRoot),
   ]);
+  const [density, groups] = await Promise.all([
+    loadDensityRows(repositoryRoot, geography.regions.map((region) => region.id)),
+    loadCitizenshipGroups(repositoryRoot, citizenships),
+  ]);
+  const migration = readMigration(sources, citizenships);
   const observations = [
     ...readPopulation(sources, geography),
     ...readAgeStructure(sources),
     ...readVitalEvents(sources, geography, anomalies),
-    ...readMigration(sources, citizenships),
+    ...migration,
+    ...groupMigrationByCitizenship(migration, groups),
+    ...readDensity(sources, density),
   ];
   await checkSourcesRegistered(repositoryRoot, observations);
-  const report = validateDemography({ observations, sources, geography, previous });
+  const report = validateDemography({ observations, sources, geography, density, previous });
   return { observations, report, breaks: buildBreakRegister() };
 }
 

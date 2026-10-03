@@ -17,15 +17,23 @@ async function editManifest(root: string, edit: (lines: string[]) => string[]) {
 describe("demography source package", () => {
   cleanUpTempRoots();
 
-  test("lists the 26 reviewed files with their roles", async () => {
+  test("lists the 27 reviewed files with their roles", async () => {
     const sources = await loadDemographySources(repositoryRoot);
 
     expect(sources.vintage).toBe("2026-10");
-    expect(sources.rows).toHaveLength(26);
+    expect(sources.rows).toHaveLength(27);
     const count = (role: string) => sources.rows.filter((row) => row.role === role).length;
     expect([count("canonical_input"), count("validation_only"), count("archived_not_served"), count("definitions")]).toEqual([
-      12, 9, 1, 4,
+      13, 9, 1, 4,
     ]);
+  });
+
+  test("archives Geostat's density table as a canonical input serving the March-2014 area basis", async () => {
+    const sources = await loadDemographySources(repositoryRoot);
+    const { row, bytes } = sources.get("source.geostat_demography_density");
+
+    expect(row).toMatchObject({ role: "canonical_input", family: "E density", localFile: "official/03-density-by-regions.xlsx", bytes: 13_917, servedYearMin: 2014, servedYearMax: 2026, unit: "persons_per_km2" });
+    expect(bytes.length).toBe(13_917);
   });
 
   test("records the years each canonical input serves, and none for evidence files", async () => {

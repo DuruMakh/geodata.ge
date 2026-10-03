@@ -2,7 +2,10 @@ import { beforeAll, describe, expect, test } from "vitest";
 import type * as XLSX from "xlsx";
 import { loadReviewedAnomalies, type ReviewedAnomalies } from "../../../lib/data/demography/anomalies";
 import { loadCitizenships, type CitizenshipMap } from "../../../lib/data/demography/citizenship";
+import { groupMigrationByCitizenship, loadCitizenshipGroups, type CitizenshipGroups } from "../../../lib/data/demography/citizenshipGroups";
+import { loadDensityRows, type DensityRows } from "../../../lib/data/demography/densityRows";
 import { loadDemographyGeography, type DemographyGeography } from "../../../lib/data/demography/geography";
+import { readDensity } from "../../../lib/data/demography/readDensity";
 import { readMigration } from "../../../lib/data/demography/readMigration";
 import { readAgeStructure, readPopulation } from "../../../lib/data/demography/readPopulation";
 import { findYearBlocks, readStoredSheet } from "../../../lib/data/demography/readStoredSheet";
@@ -18,6 +21,8 @@ let sources: DemographySources;
 let geography: DemographyGeography;
 let anomalies: ReviewedAnomalies;
 let citizenships: CitizenshipMap;
+let groups: CitizenshipGroups;
+let density: DensityRows;
 let observations: DemographyObservation[];
 beforeAll(async () => {
   [sources, geography, anomalies, citizenships] = await Promise.all([
@@ -26,20 +31,25 @@ beforeAll(async () => {
     loadReviewedAnomalies(repositoryRoot),
     loadCitizenships(repositoryRoot),
   ]);
+  groups = await loadCitizenshipGroups(repositoryRoot, citizenships);
+  density = await loadDensityRows(repositoryRoot, geography.regions.map((region) => region.id));
   observations = readAll(sources);
 });
 
 /** What preparation does before it writes anything: read every family, then validate the whole. */
 function readAll(from: DemographySources): DemographyObservation[] {
+  const migration = readMigration(from, citizenships);
   return [
     ...readPopulation(from, geography),
     ...readAgeStructure(from),
     ...readVitalEvents(from, geography, anomalies),
-    ...readMigration(from, citizenships),
+    ...migration,
+    ...groupMigrationByCitizenship(migration, groups),
+    ...readDensity(from, density),
   ];
 }
 const prepare = (from: DemographySources, previous?: readonly DemographyObservation[]) =>
-  validateDemography({ observations: readAll(from), sources: from, geography, previous });
+  validateDemography({ observations: readAll(from), sources: from, geography, density, previous });
 /** The condition of the stop a run raises, or why it did not stop. */
 const stop = (run: () => unknown) => {
   try {
@@ -53,10 +63,10 @@ const bump = (sheet: XLSX.WorkSheet, ref: string, by: number) => setCell(sheet, 
 
 describe("validation of the reviewed archive", () => {
   test("passes and records the archive and the coverage", () => {
-    const report = validateDemography({ observations, sources, geography });
+    const report = validateDemography({ observations, sources, geography, density });
 
     expect(report.vintage).toBe("2026-10");
-    expect(report.sources).toHaveLength(26);
+    expect(report.sources).toHaveLength(27);
     expect(report.sources[0]).toMatchObject({ sourceId: "source.geostat_municipal_population", role: "canonical_input", bytes: 34_994 });
     expect(report.sources.every((source) => /^[0-9a-f]{64}$/.test(source.sha256))).toBe(true);
     const coverage = (seriesId: string) => report.coverage.find((entry) => entry.seriesId === seriesId);
@@ -65,11 +75,14 @@ describe("validation of the reviewed archive", () => {
     expect(coverage("demography.live_births")).toMatchObject({ family: "vital", geographies: 76, firstYear: 2014, lastYear: 2025, rows: 837 });
     expect(coverage("demography.life_expectancy_male")).toMatchObject({ family: "vital", geographies: 1, firstYear: 2014, lastYear: 2025 });
     expect(coverage("demography.net_migration")).toMatchObject({ family: "migration", firstYear: 2012, lastYear: 2025, rows: 14 });
-    expect(report.coverage).toHaveLength(16);
+    expect(coverage("demography.population_density")).toEqual({ family: "density", seriesId: "demography.population_density", geographies: 12, firstYear: 2014, lastYear: 2026, rows: 13 + 11 * 12 });
+    expect(coverage("demography.immigrants_by_citizenship_group")).toEqual({ family: "migration", seriesId: "demography.immigrants_by_citizenship_group", geographies: 1, firstYear: 2012, lastYear: 2025, rows: 6 * 3 * 14 });
+    expect(coverage("demography.emigrants_by_citizenship_group")).toMatchObject({ family: "migration", geographies: 1, rows: 6 * 3 * 14 });
+    expect(report.coverage).toHaveLength(19);
   });
 
   test("balances the 1 January population over the whole archive, with the census step the only residual", () => {
-    const { balancing } = validateDemography({ observations, sources, geography });
+    const { balancing } = validateDemography({ observations, sources, geography, density });
 
     expect(balancing.fromYear).toBe(1994);
     expect(balancing.toYear).toBe(2025);
@@ -79,14 +92,14 @@ describe("validation of the reviewed archive", () => {
   });
 
   test("anchors 1 January 2025 to the census: +847 persons in total and every municipality within 1%", () => {
-    const { censusAnchor } = validateDemography({ observations, sources, geography });
+    const { censusAnchor } = validateDemography({ observations, sources, geography, density });
 
     expect(censusAnchor).toMatchObject({ censusCount: 3_929_581, january2025: 3_930_428, difference: 847, municipalities: 64, largestGapMunicipality: "68" });
     expect(censusAnchor.largestGapPercent).toBeCloseTo(0.818, 3);
   });
 
   test("recomputes every published rate within its published rounding and reports the observed deviation", () => {
-    const { rates, midYear } = validateDemography({ observations, sources, geography });
+    const { rates, midYear } = validateDemography({ observations, sources, geography, density });
     const observed = (check: string) => rates.find((entry) => entry.check === check)!;
 
     expect(midYear).toMatchObject({ firstYear: 2014, lastYear: 2025 });
@@ -103,6 +116,7 @@ describe("validation of the reviewed archive", () => {
       "child_dependency_ratio",
       "old_age_dependency_ratio",
       "life_expectancy_abridged_vs_headline",
+      "population_density",
     ]);
     for (const entry of rates) expect(entry.maxDeviation, entry.check).toBeLessThanOrEqual(entry.bound + 1e-9);
     expect(observed("crude_birth_rate").maxDeviation).toBeCloseTo(0.028, 3);
@@ -114,10 +128,11 @@ describe("validation of the reviewed archive", () => {
     expect(observed("share_65_plus").maxDeviation).toBeCloseTo(0.0496, 3);
     expect(observed("life_expectancy_abridged_vs_headline")).toMatchObject({ bound: 0.25, firstYear: 1994, lastYear: 2025, at: "2009 males" });
     expect(observed("life_expectancy_abridged_vs_headline").maxDeviation).toBeCloseTo(0.158, 3);
+    expect(observed("population_density")).toMatchObject({ bound: 0.05, firstYear: 2014, lastYear: 2026 });
   });
 
   test("inventories the blank cells it expects: occupied territories, city rows outside their years, absent countries", () => {
-    const { blankCells } = validateDemography({ observations, sources, geography });
+    const { blankCells } = validateDemography({ observations, sources, geography, density });
     const table = (sourceId: string) => blankCells.unitTables.find((entry) => entry.sourceId === sourceId)!;
 
     expect(table(SOURCE_ID.populationUnits)).toEqual({ sourceId: SOURCE_ID.populationUnits, excludedUnitCells: 6 * 12, cityRowCellsOutsideWindow: 7 * 9, ignoredValueCells: 0 });
@@ -131,10 +146,10 @@ describe("validation of the reviewed archive", () => {
     const changed = observations.map((row) => (row.seriesId === "demography.live_births" && row.geographyId === "country.georgia" && row.year === 2020 ? { ...row, value: "1" } : row));
     const removed = [...observations, { ...observations[0]!, year: 1999 }];
 
-    expect(() => validateDemography({ observations, sources, geography, previous: earlier })).not.toThrow();
-    expect(() => validateDemography({ observations, sources, geography, previous: changed })).toThrow(/live_births\|country\.georgia\|2020\S* value 1 → \d+/);
-    expect(stop(() => validateDemography({ observations, sources, geography, previous: changed }))).toBe("revision");
-    expect(stop(() => validateDemography({ observations, sources, geography, previous: removed }))).toBe("revision");
+    expect(() => validateDemography({ observations, sources, geography, density, previous: earlier })).not.toThrow();
+    expect(() => validateDemography({ observations, sources, geography, density, previous: changed })).toThrow(/live_births\|country\.georgia\|2020\S* value 1 → \d+/);
+    expect(stop(() => validateDemography({ observations, sources, geography, density, previous: changed }))).toBe("revision");
+    expect(stop(() => validateDemography({ observations, sources, geography, density, previous: removed }))).toBe("revision");
   });
 });
 
@@ -197,10 +212,27 @@ describe("one corrupted case per stop condition", () => {
     for (const from of corrupted) expect(stop(() => prepare(from))).toBe("rate_deviation");
   });
 
+  test("a density that no longer matches its population and area", () => {
+    const region = editSource(sources, SOURCE_ID.density, (sheet) => setCell(sheet, unitCell(sheet, "Guria", 2024), 99));
+    const nudged = editSource(sources, SOURCE_ID.density, (sheet) => bump(sheet, unitCell(sheet, "Georgia", 2020), 0.2));
+
+    expect(stop(() => prepare(region))).toBe("rate_deviation");
+    expect(stop(() => prepare(nudged))).toBe("rate_deviation");
+  });
+
+  test("citizenship groups that no longer add up to the published total, or to both sexes", () => {
+    const russia = (row: DemographyObservation) => row.seriesId === "demography.immigrants_by_citizenship_group" && row.citizenshipId === "citizenship.russian_federation" && row.year === 2020;
+    const total = observations.map((row) => (russia(row) && row.sex === "total" ? { ...row, value: String(Number(row.value) + 1) } : row));
+    const male = observations.map((row) => (russia(row) && row.sex === "male" ? { ...row, value: String(Number(row.value) + 1) } : row));
+
+    expect(stop(() => validateDemography({ observations: total, sources, geography, density }))).toBe("identity_failed");
+    expect(stop(() => validateDemography({ observations: male, sources, geography, density }))).toBe("identity_failed");
+  });
+
   test("a changed 2015 to 2024 value", () => {
     const earlier = observations.map((row) => (row.seriesId === "demography.population_total" && row.geographyId === "04" && row.year === 2018 ? { ...row, value: "1" } : row));
 
-    expect(stop(() => validateDemography({ observations, sources, geography, previous: earlier }))).toBe("revision");
+    expect(stop(() => validateDemography({ observations, sources, geography, density, previous: earlier }))).toBe("revision");
   });
 
   test("a part that no longer adds to its whole, wherever the whole is read", () => {
@@ -222,9 +254,9 @@ describe("one corrupted case per stop condition", () => {
       rows: sources.rows.map((row) => (row.sourceId === sourceId ? { ...row, servedYearMax } : row)),
     });
 
-    expect(() => validateDemography({ observations, sources, geography })).not.toThrow();
-    expect(stop(() => validateDemography({ observations, sources: stale("source.geostat_demography_births", 2024), geography }))).toBe("layout_changed");
-    expect(stop(() => validateDemography({ observations, sources: stale("source.geostat_municipal_population", 2025), geography }))).toBe("layout_changed");
+    expect(() => validateDemography({ observations, sources, geography, density })).not.toThrow();
+    expect(stop(() => validateDemography({ observations, sources: stale("source.geostat_demography_births", 2024), geography, density }))).toBe("layout_changed");
+    expect(stop(() => validateDemography({ observations, sources: stale("source.geostat_municipal_population", 2025), geography, density }))).toBe("layout_changed");
   });
 
   test("a row outside the coverage rules, a repeated key and a geography nobody reviewed", () => {
@@ -233,7 +265,11 @@ describe("one corrupted case per stop condition", () => {
     const regional = [...observations, { ...observations.find((row) => row.seriesId === "demography.net_migration")!, geographyId: "region.adjara" }];
     const repeated = [...observations, births];
     const unknown = [...observations, { ...births, geographyId: "05", year: 2020 }];
+    const georgiaDensity = observations.find((row) => row.seriesId === "demography.population_density" && row.geographyId === "country.georgia")!;
+    const municipalDensity = [...observations, { ...georgiaDensity, geographyId: "04", year: 2020 }];
+    const earlyDensity = [...observations, { ...georgiaDensity, year: 2013 }];
+    const earlyRegionalDensity = [...observations, { ...georgiaDensity, geographyId: "region.adjara", year: 2014 }];
 
-    for (const rows of [early, regional, repeated, unknown]) expect(stop(() => validateDemography({ observations: rows, sources, geography }))).toBe("layout_changed");
+    for (const rows of [early, regional, repeated, unknown, municipalDensity, earlyDensity, earlyRegionalDensity]) expect(stop(() => validateDemography({ observations: rows, sources, geography, density }))).toBe("layout_changed");
   });
 });

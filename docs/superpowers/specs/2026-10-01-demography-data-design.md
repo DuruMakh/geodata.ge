@@ -106,3 +106,25 @@ Review checkpoints: first the audit and break register (this stage); then the ca
 Archived originals, canonical files, break register and validation report are reproducible from the reviewed sources. Published cells match the source exactly at stored precision, blank cells stay blank, the census break is registered, the 2014 and 2012 start dates are documented, the balancing residual is reported for every year, and every stop condition is exercised by a test. Existing datasets and their public figures stay unchanged. No page, route or deployment is part of this stage.
 
 When accepted: amend `Project_Definition.md` with a bounded demography extension (the `დემოგრაფია` sidebar marker stays non-clickable until a page spec is approved), write `docs/data-methodology/demography.md` alongside the data, and add a `demography` entry to `lib/methodology/sourceInventory.ts` when the methodology page ships.
+
+## 10. Addendum of 2026-10-03: density and citizenship groups
+
+Approved by the user in conversation on 2026-10-03, after the data stage passed and before any page design. It amends §1 and §6; everything else in this document stands.
+
+**Decisions**
+
+1. **Citizenship groups.** Name only the countries Geostat lists in every year 2012–2025: Georgia, Russia, Turkey, Azerbaijan and Ukraine. Every other listed citizenship, Stateless, Not stated and Geostat's own `Other` included, goes to one computed group, so it means the same in every year. Armenia, India, the United States, China and Iran are missing from at least one year and stay inside it. Geostat's own `Other` row stays as published and is still not a comparable series. This amends §3 and §6, which treated `Other` as not comparable and offered no comparable remainder.
+2. **Density, regions only.** A fifth family, `demography.population_density` from Geostat's table 03, for Georgia from 2014 and the 11 regions from 2015. The municipalities are out: no official municipal area was found, and the source that would hold one fails certificate verification from the audit environment. A municipal density waits for an approved source.
+3. **Regional age structure and urban/rural split.** Approved in principle. They need the 2024 census table "Population by regions, self-governed units, 5-year age groups, urban-rural settlements and sex", which is not yet archived and needs its own download approval. They are a single snapshot of 14 November 2024, not a series. This addendum does not carry them.
+
+**Findings that shaped the decisions**
+
+- Geostat's density is the 1 January population divided by one fixed area as of March 2014. All 156 values for 2014–2026 reproduce from the served population and the reviewed areas within the displayed rounding. The table prints no area; the areas are derived from its own 2022 column, which is stored unrounded, and the 11 regions add up to Georgia's 57,178.6706 km² (occupied territories excluded).
+- Tbilisi is 504.24 km² in Geostat's convention, not the 726 km² often cited elsewhere. A page must say which area it uses.
+- Before 2014 the table rests on other areas (its notes: Tbilisi's borders changed in 2006, the occupied territories were removed in 2008), so nothing earlier is served.
+- The census recalculation of 1 January 2025 applies to density: the 2025 values use the census-based population and are about 6% higher. The break register gains `demography.population_density`.
+- A press quote of 64.8 persons per km² for 1 January 2025 was the pre-census value; the archived table holds the census-based 68.7.
+
+**Validation added.** Every density is recomputed from the served population and the reviewed area within 0.05; the region areas add up to Georgia's; the density table's row labels and its March-2014 note are guarded; a value for Abkhazia stops preparation; the citizenship groups add to Geostat's total and to both sexes; a named country that a year no longer lists stops preparation. Each has a test that corrupts one case.
+
+**Delivery.** Table 03 (`official/03-density-by-regions.xlsx`, 13,917 bytes) is archived, hashed and registered as a twelfth canonical input. No page, route, download, MCP data or serving-mirror import is added.

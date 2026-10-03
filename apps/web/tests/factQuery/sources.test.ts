@@ -181,9 +181,9 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      // The eleven demography canonical inputs extend the existing inventory;
+      // The twelve demography canonical inputs extend the existing inventory;
       // the package's validation inputs and definitions are evidence, not sources.
-      expect(snapshot.sources.length).toBe(143);
+      expect(snapshot.sources.length).toBe(144);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
@@ -219,7 +219,7 @@ describe("public source resolution", () => {
       const births = demography.find((source) => source.sourceId === "source.geostat_demography_births");
       const documentIds = snapshot.sources.flatMap((source) => source.documents.map((document) => document.documentId));
 
-      expect(demography).toHaveLength(11);
+      expect(demography).toHaveLength(12);
       expect(births?.documents).toHaveLength(1);
       expect(births?.documents[0]).toMatchObject({
         officialUrl: "https://geostat.ge/media/77847/09-number-of-live-births-by-self-governed-units.xlsx",
@@ -227,10 +227,18 @@ describe("public source resolution", () => {
         byteSize: 26206,
         years: Array.from({ length: 12 }, (_, index) => 2014 + index),
       });
+      const density = demography.find((source) => source.sourceId === "source.geostat_demography_density");
+      expect(density?.documents).toHaveLength(1);
+      expect(density?.documents[0]).toMatchObject({
+        officialUrl: "https://geostat.ge/media/78361/03-density-by-regions.xlsx",
+        sha256: "77d29d84cb7530f4fb6294f17a768e220f02636d77debfc438509b5c17ac28b8",
+        byteSize: 13917,
+        years: Array.from({ length: 13 }, (_, index) => 2014 + index),
+      });
       // The validation inputs and definition PDFs stay evidence, and table 01 stays the municipal package's one document.
       expect(documentIds).not.toContain("source.geostat_demography_median_age");
       expect(documentIds).not.toContain("source.geostat_demography_metadata_population");
-      expect(documentIds.filter((id) => id.startsWith("source.geostat_demography_"))).toHaveLength(11);
+      expect(documentIds.filter((id) => id.startsWith("source.geostat_demography_"))).toHaveLength(12);
       expect(snapshot.sources.find((source) => source.sourceId === "source.geostat_municipal_population")?.documents).toHaveLength(1);
     });
 

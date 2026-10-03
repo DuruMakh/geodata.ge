@@ -22,6 +22,8 @@ export const UNAFFECTED_BY_CENSUS: readonly string[] = [
   SERIES.immigrants,
   SERIES.emigrants,
   SERIES.netMigration,
+  SERIES.immigrantsByCitizenshipGroup,
+  SERIES.emigrantsByCitizenshipGroup,
 ];
 
 /** The breaks inside the served data. The method changes of 2014 and 2012 are series start dates, not breaks. */

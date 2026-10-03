@@ -17,7 +17,10 @@ export const SERIES = {
   lifeExpectancyFemale: "demography.life_expectancy_female",
   immigrants: "demography.immigrants",
   emigrants: "demography.emigrants",
+  immigrantsByCitizenshipGroup: "demography.immigrants_by_citizenship_group",
+  emigrantsByCitizenshipGroup: "demography.emigrants_by_citizenship_group",
   netMigration: "demography.net_migration",
+  populationDensity: "demography.population_density",
 } as const;
 
 /** The archived Geostat tables, by the source ids in the package manifest. */
@@ -35,6 +38,7 @@ export const SOURCE_ID = {
   lifeExpectancy: "source.geostat_demography_life_expectancy",
   netMigration: "source.geostat_demography_net_migration",
   migrationCitizenship: "source.geostat_demography_migration_citizenship",
+  density: "source.geostat_demography_density",
   /** Validation inputs: archived and compared with the served rows, never served. */
   infantDeaths: "source.geostat_demography_infant_deaths",
   lifeTables: "source.geostat_demography_life_tables",
@@ -47,6 +51,8 @@ export const SOURCE_ID = {
 
 /** The day the 2026-10 Geostat capture was reviewed; every observation carries it as `last_reviewed_at`. */
 export const REVIEWED_AT = "2026-10-01";
+/** The day density and the citizenship groups were added after the audit; their rows carry it as `last_reviewed_at`. */
+export const EXTENSION_REVIEWED_AT = "2026-10-03";
 
 /** Where each series starts. These are decisions, not properties of the files; the end is whatever the file holds. */
 export const COVERAGE = {
@@ -58,6 +64,8 @@ export const COVERAGE = {
   vitalFrom: 2014,
   /** Migration starts where Geostat moves to border-police data. */
   migrationFrom: 2012,
+  /** Density rests on one area as of March 2014 (Geostat's note), so it starts there; earlier years use other areas. */
+  densityFrom: 2014,
 } as const;
 
 /** Lineage of the 1 January population: Geostat's 2018 retro-projection, the 2014-census estimates, then the 2024 census. */
@@ -85,7 +93,8 @@ export const FAMILIES = {
     SERIES.lifeExpectancyMale,
     SERIES.lifeExpectancyFemale,
   ],
-  migration: [SERIES.immigrants, SERIES.emigrants, SERIES.netMigration],
+  migration: [SERIES.immigrants, SERIES.emigrants, SERIES.netMigration, SERIES.immigrantsByCitizenshipGroup, SERIES.emigrantsByCitizenshipGroup],
+  density: [SERIES.populationDensity],
 } as const;
 
 /** The 2025 census recalculation of the 1 January population: the one balancing residual the archive may hold. */

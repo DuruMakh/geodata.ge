@@ -23,7 +23,7 @@ describe("break register", () => {
     expect(register[0]!.reason).toContain("225,922");
   });
 
-  test("applies to population stock, structure and every rate with a population denominator", () => {
+  test("applies to population stock, structure, density and every rate with a population denominator", () => {
     expect(buildBreakRegister()[0]!.appliesTo).toEqual([
       SERIES.populationTotal,
       SERIES.populationByAgeSex,
@@ -34,10 +34,11 @@ describe("break register", () => {
       SERIES.lifeExpectancyTotal,
       SERIES.lifeExpectancyMale,
       SERIES.lifeExpectancyFemale,
+      SERIES.populationDensity,
     ]);
   });
 
-  test("leaves out event counts, the infant mortality rate and migration", () => {
+  test("leaves out event counts, the infant mortality rate, migration and its citizenship groups", () => {
     expect(UNAFFECTED_BY_CENSUS).toEqual([
       SERIES.liveBirths,
       SERIES.deaths,
@@ -46,6 +47,8 @@ describe("break register", () => {
       SERIES.immigrants,
       SERIES.emigrants,
       SERIES.netMigration,
+      SERIES.immigrantsByCitizenshipGroup,
+      SERIES.emigrantsByCitizenshipGroup,
     ]);
   });
 

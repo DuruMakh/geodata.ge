@@ -23,6 +23,13 @@
       "bytes": 33012
     },
     {
+      "sourceId": "source.geostat_demography_density",
+      "role": "canonical_input",
+      "localFile": "official/03-density-by-regions.xlsx",
+      "sha256": "77d29d84cb7530f4fb6294f17a768e220f02636d77debfc438509b5c17ac28b8",
+      "bytes": 13917
+    },
+    {
       "sourceId": "source.geostat_demography_population_mid_year",
       "role": "validation_only",
       "localFile": "official/04-mid-year-population-by-self-governed-units.xlsx",
@@ -312,6 +319,30 @@
       "firstYear": 2012,
       "lastYear": 2025,
       "rows": 14
+    },
+    {
+      "family": "migration",
+      "seriesId": "demography.immigrants_by_citizenship_group",
+      "geographies": 1,
+      "firstYear": 2012,
+      "lastYear": 2025,
+      "rows": 252
+    },
+    {
+      "family": "migration",
+      "seriesId": "demography.emigrants_by_citizenship_group",
+      "geographies": 1,
+      "firstYear": 2012,
+      "lastYear": 2025,
+      "rows": 252
+    },
+    {
+      "family": "density",
+      "seriesId": "demography.population_density",
+      "geographies": 12,
+      "firstYear": 2014,
+      "lastYear": 2026,
+      "rows": 145
     }
   ],
   "blankCells": {
@@ -582,6 +613,14 @@
       "maxDeviation": 0.157926,
       "at": "2009 males",
       "bound": 0.25
+    },
+    {
+      "check": "population_density",
+      "firstYear": 2014,
+      "lastYear": 2026,
+      "maxDeviation": 0.049911,
+      "at": "region.mtskheta_mtianeti 2025",
+      "bound": 0.05
     }
   ]
 }

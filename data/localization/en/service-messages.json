@@ -398,6 +398,7 @@
   "sources.source.geostat_demography_natural_increase.name": "Natural increase by regions and self-governed units",
   "sources.source.geostat_demography_net_migration.name": "Net migration (number and rate)",
   "sources.source.geostat_demography_migration_citizenship.name": "Immigrants and emigrants by sex and citizenship",
+  "sources.source.geostat_demography_density.name": "Population density by regions",
   "documents.source.geostat_demography_population_age_sex.title": "Population as of 1 January by 5-year age groups and sex",
   "documents.source.geostat_demography_population_age_sex.publisher": "National Statistics Office of Georgia (Geostat)",
   "documents.source.geostat_demography_births.title": "Number of live births by regions and self-governed units",
@@ -419,5 +420,7 @@
   "documents.source.geostat_demography_net_migration.title": "Net migration (number and rate)",
   "documents.source.geostat_demography_net_migration.publisher": "National Statistics Office of Georgia (Geostat)",
   "documents.source.geostat_demography_migration_citizenship.title": "Number of immigrants and emigrants by sex and citizenship",
-  "documents.source.geostat_demography_migration_citizenship.publisher": "National Statistics Office of Georgia (Geostat)"
+  "documents.source.geostat_demography_migration_citizenship.publisher": "National Statistics Office of Georgia (Geostat)",
+  "documents.source.geostat_demography_density.title": "Density by regions (number of population per 1 sq.km)",
+  "documents.source.geostat_demography_density.publisher": "National Statistics Office of Georgia (Geostat)"
 }

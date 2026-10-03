@@ -1005,5 +1005,12 @@
       "reviewedAt": "2026-10-01"
     },
     "derivation": null
+  },
+  "source.geostat_demography_density": {
+    "name": {
+      "text": "Population density by regions",
+      "reviewedAt": "2026-10-03"
+    },
+    "derivation": null
   }
 }

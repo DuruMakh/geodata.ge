@@ -1,9 +1,10 @@
 import { MUNICIPAL_COUNTRY_ID } from "../municipal/types";
+import type { DensityRows } from "./densityRows";
 import type { DemographyGeography } from "./geography";
 import { findYearBlocks, findYearColumns, findYearRows, readStoredSheet } from "./readStoredSheet";
 import { AGE_BANDS, CENSUS_STEP, COVERAGE, SERIES, SOURCE_ID } from "./series";
 import { DemographyStopError } from "./stops";
-import type { DemographySources, Sex } from "./types";
+import type { DemographyObservation, DemographySources, Sex } from "./types";
 
 /**
  * Checks that read the archived tables beyond the served rows, or compare the served rows with a
@@ -228,6 +229,23 @@ function worst(check: string, bound: number, points: readonly Point[]): RateChec
   }
   const years = points.map((point) => point.year);
   return { check, firstYear: Math.min(...years), lastYear: Math.max(...years), maxDeviation: round6(deviation(top)), at: top.label, bound };
+}
+
+/**
+ * Geostat's density is the 1 January population over a fixed area, so every served density is
+ * recomputed from the served population and the reviewed area and must sit within the one decimal
+ * the table displays. This is also what keeps the reviewed areas honest.
+ */
+export function checkDensity(rows: readonly DemographyObservation[], lookup: Lookup, density: DensityRows): RateCheck {
+  const points = rows
+    .filter((row) => row.seriesId === SERIES.populationDensity)
+    .map((row) => ({
+      year: row.year,
+      label: `${row.geographyId} ${row.year}`,
+      published: Number(row.value),
+      recomputed: lookup(SERIES.populationTotal, row.geographyId, row.year) / density.areaOf(row.geographyId),
+    }));
+  return worst("population_density", ONE_DECIMAL, points);
 }
 
 /**

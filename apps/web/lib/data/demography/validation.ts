@@ -2,12 +2,14 @@ import { MUNICIPAL_COUNTRY_ID } from "../municipal/types";
 import {
   checkBalancing,
   checkCensusAnchor,
+  checkDensity,
   checkMidYear,
   checkMigrationTotals,
   checkRates,
   readMidYear,
 } from "./crossChecks";
 import type { Balancing, CensusAnchor, Lookup, RateCheck } from "./crossChecks";
+import type { DensityRows } from "./densityRows";
 import { readUnitRows } from "./geography";
 import type { DemographyGeography, UnitScope } from "./geography";
 import { findYearColumns, readStoredSheet } from "./readStoredSheet";
@@ -20,13 +22,22 @@ const GEORGIA = MUNICIPAL_COUNTRY_ID;
 const ALL_CITIZENSHIPS = "citizenship.total";
 const AGGREGATE_CITIZENSHIPS = new Set([ALL_CITIZENSHIPS, "citizenship.other", "citizenship.stateless", "citizenship.not_stated"]);
 const SEXES: readonly Sex[] = ["total", "male", "female"];
+/** Each direction of migration, as Geostat publishes it and as the reviewed citizenship groups add it up. */
+const DIRECTIONS = [
+  { published: SERIES.immigrants, grouped: SERIES.immigrantsByCitizenshipGroup },
+  { published: SERIES.emigrants, grouped: SERIES.emigrantsByCitizenshipGroup },
+] as const;
+const CITIZENSHIP_SERIES: readonly string[] = DIRECTIONS.flatMap((direction) => [direction.published, direction.grouped]);
 /** Series published for Georgia, every region and every municipality. The rest are Georgia-level only. */
 const UNIT_SERIES: readonly string[] = [SERIES.populationTotal, SERIES.liveBirths, SERIES.deaths, SERIES.naturalIncrease];
+/** Series published for Georgia and the 11 regions only: Geostat's density table has no municipal rows. */
+const REGION_SERIES: readonly string[] = [SERIES.populationDensity];
 const FAMILY_START: Record<Family, number> = {
   population: COVERAGE.populationFrom,
   structure: COVERAGE.populationFrom,
   vital: COVERAGE.vitalFrom,
   migration: COVERAGE.migrationFrom,
+  density: COVERAGE.densityFrom,
 };
 const FAMILY_OF = new Map<string, Family>(Object.entries(FAMILIES).flatMap(([family, ids]) => ids.map((id) => [id, family as Family] as const)));
 
@@ -34,6 +45,8 @@ export type ValidationInput = {
   observations: readonly DemographyObservation[];
   sources: DemographySources;
   geography: DemographyGeography;
+  /** The reviewed areas behind Geostat's densities. */
+  density: DensityRows;
   /** The committed canonical rows. A change to any of them stops preparation. Omit on a first build. */
   previous?: readonly DemographyObservation[];
 };
@@ -70,20 +83,22 @@ function indexRows(rows: readonly DemographyObservation[]): Map<string, Demograp
 /** Geography, start years and series: the served rows are exactly the reviewed coverage, and nothing earlier. */
 function checkCoverage(rows: readonly DemographyObservation[], geography: DemographyGeography): void {
   const reviewed = new Set([GEORGIA, ...geography.regions.map((region) => region.id), ...geography.municipalities.map((municipality) => municipality.code)]);
+  const regional = new Set([GEORGIA, ...geography.regions.map((region) => region.id)]);
   const geographiesOf = new Map<string, Set<string>>();
   for (const row of rows) {
     const family = FAMILY_OF.get(row.seriesId);
     if (!family) throw new DemographyStopError("layout_changed", `Unknown series ${row.seriesId}`);
     if (!reviewed.has(row.geographyId)) throw new DemographyStopError("layout_changed", `${row.seriesId} has a row for ${row.geographyId}, which is not a reviewed unit`);
-    if (row.geographyId !== GEORGIA && !UNIT_SERIES.includes(row.seriesId)) {
-      throw new DemographyStopError("layout_changed", `${row.seriesId} is published for Georgia only, not ${row.geographyId}`);
+    const regionSeries = REGION_SERIES.includes(row.seriesId);
+    if (row.geographyId !== GEORGIA && !UNIT_SERIES.includes(row.seriesId) && !(regionSeries && regional.has(row.geographyId))) {
+      throw new DemographyStopError("layout_changed", `${row.seriesId} is published for ${regionSeries ? "Georgia and the regions" : "Georgia"} only, not ${row.geographyId}`);
     }
     const start = row.geographyId === GEORGIA ? FAMILY_START[family] : COVERAGE.unitsFrom;
     if (row.year < start) throw new DemographyStopError("layout_changed", `${row.seriesId} has a ${row.geographyId} row for ${row.year}, before its start year ${start}`);
     geographiesOf.set(row.seriesId, (geographiesOf.get(row.seriesId) ?? new Set()).add(row.geographyId));
   }
   for (const seriesId of FAMILY_OF.keys()) {
-    const expected = UNIT_SERIES.includes(seriesId) ? reviewed.size : 1;
+    const expected = UNIT_SERIES.includes(seriesId) ? reviewed.size : REGION_SERIES.includes(seriesId) ? regional.size : 1;
     if ((geographiesOf.get(seriesId)?.size ?? 0) !== expected) {
       throw new DemographyStopError("layout_changed", `${seriesId} covers ${geographiesOf.get(seriesId)?.size ?? 0} geographies, expected ${expected}`);
     }
@@ -153,12 +168,14 @@ function checkWholes(rows: readonly DemographyObservation[], lookup: Lookup, geo
   }
   const citizenships = new Map<string, { parts: number; total: number | undefined }>();
   const sexes = new Map<string, Partial<Record<Sex, number>>>();
-  for (const row of rows.filter((entry) => entry.seriesId === SERIES.immigrants || entry.seriesId === SERIES.emigrants)) {
+  for (const row of rows.filter((entry) => CITIZENSHIP_SERIES.includes(entry.seriesId))) {
     const value = Number(row.value);
-    const group = citizenships.get(`${row.seriesId} ${row.year} ${row.sex}`) ?? { parts: 0, total: undefined };
-    if (row.citizenshipId === ALL_CITIZENSHIPS) group.total = value;
-    else group.parts += value;
-    citizenships.set(`${row.seriesId} ${row.year} ${row.sex}`, group);
+    if (DIRECTIONS.some((direction) => direction.published === row.seriesId)) {
+      const group = citizenships.get(`${row.seriesId} ${row.year} ${row.sex}`) ?? { parts: 0, total: undefined };
+      if (row.citizenshipId === ALL_CITIZENSHIPS) group.total = value;
+      else group.parts += value;
+      citizenships.set(`${row.seriesId} ${row.year} ${row.sex}`, group);
+    }
     sexes.set(`${row.seriesId} ${row.year} ${row.citizenshipId}`, { ...sexes.get(`${row.seriesId} ${row.year} ${row.citizenshipId}`), [row.sex!]: value });
   }
   for (const [key, group] of citizenships) {
@@ -166,6 +183,14 @@ function checkWholes(rows: readonly DemographyObservation[], lookup: Lookup, geo
     equal(`${key}: the citizenships against the total`, group.parts, group.total);
   }
   for (const [key, bySex] of sexes) equal(`${key}: males and females against both sexes`, bySex.male! + bySex.female!, bySex.total!);
+  for (const { published, grouped } of DIRECTIONS) {
+    for (const sex of SEXES) {
+      for (const year of georgiaYears(SERIES.netMigration)) {
+        const parts = rows.filter((row) => row.seriesId === grouped && row.sex === sex && row.year === year);
+        equal(`${grouped} ${year} ${sex}: the citizenship groups against the published total`, sum(parts.map((row) => Number(row.value))), lookup(published, GEORGIA, year, { sex, citizenshipId: ALL_CITIZENSHIPS }));
+      }
+    }
+  }
 }
 
 /** Every change to a previously captured row, including a row that disappeared. New rows are not changes. */
@@ -222,7 +247,7 @@ function absentCitizenshipRows(rows: readonly DemographyObservation[]): number {
  * matters: the archive balance runs before the identities, so a changed census step is named as such.
  */
 export function validateDemography(input: ValidationInput): DemographyValidationReport {
-  const { observations: rows, sources, geography, previous } = input;
+  const { observations: rows, sources, geography, density, previous } = input;
   const index = indexRows(rows);
   const lookup: Lookup = (seriesId, geographyId, year, dims = {}) => {
     const key = keyOf({ seriesId, geographyId, year, ...dims });
@@ -242,7 +267,7 @@ export function validateDemography(input: ValidationInput): DemographyValidation
   const midYearValues = readMidYear(sources);
   const midYear = checkMidYear(midYearValues, lookup, years.vital);
   const censusAnchor = checkCensusAnchor(sources, geography, lookup);
-  const rates = checkRates(sources, lookup, midYearValues, years);
+  const rates = [...checkRates(sources, lookup, midYearValues, years), checkDensity(rows, lookup, density)];
 
   const problems = previous ? findRevisions(previous, index) : [];
   if (problems.length > 0) {

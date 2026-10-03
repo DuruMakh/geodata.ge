@@ -398,6 +398,7 @@
   "sources.source.geostat_demography_natural_increase.name": "ბუნებრივი მატება რეგიონებისა და თვითმმართველი ერთეულების მიხედვით",
   "sources.source.geostat_demography_net_migration.name": "მიგრაციის სალდო (რაოდენობა და კოეფიციენტი)",
   "sources.source.geostat_demography_migration_citizenship.name": "იმიგრანტები და ემიგრანტები სქესისა და მოქალაქეობის მიხედვით",
+  "sources.source.geostat_demography_density.name": "მოსახლეობის სიმჭიდროვე რეგიონების მიხედვით",
   "documents.source.geostat_demography_population_age_sex.title": "მოსახლეობა 1 იანვრის მდგომარეობით, 5-წლიანი ასაკობრივი ჯგუფებისა და სქესის მიხედვით",
   "documents.source.geostat_demography_population_age_sex.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
   "documents.source.geostat_demography_births.title": "ცოცხლად დაბადებულთა რაოდენობა რეგიონებისა და თვითმმართველი ერთეულების მიხედვით",
@@ -419,5 +420,7 @@
   "documents.source.geostat_demography_net_migration.title": "მიგრაციის სალდო (რაოდენობა და კოეფიციენტი)",
   "documents.source.geostat_demography_net_migration.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
   "documents.source.geostat_demography_migration_citizenship.title": "იმიგრანტებისა და ემიგრანტების რაოდენობა სქესისა და მოქალაქეობის მიხედვით",
-  "documents.source.geostat_demography_migration_citizenship.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)"
+  "documents.source.geostat_demography_migration_citizenship.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
+  "documents.source.geostat_demography_density.title": "მოსახლეობის სიმჭიდროვე რეგიონების მიხედვით (მოსახლეობის რაოდენობა 1 კვ.კმ-ზე)",
+  "documents.source.geostat_demography_density.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)"
 }
