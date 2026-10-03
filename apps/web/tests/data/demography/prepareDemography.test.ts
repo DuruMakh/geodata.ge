@@ -11,6 +11,7 @@ const FILES = {
   vital: "data/imports/demography-vital-annual.csv",
   migration: "data/imports/demography-migration-annual.csv",
   density: "data/imports/demography-density-annual.csv",
+  census: "data/imports/demography-census-2024-population.csv",
   breaks: "data/imports/demography-series-breaks.csv",
   report: "data/reports/demography-validation.json",
 };
@@ -25,7 +26,7 @@ const rowsOf = async (root: string, file: string) =>
 describe("preparing the demography files", () => {
   cleanUpTempRoots();
 
-  test("writes the six canonical files and the report, and a second write is byte-identical", async () => {
+  test("writes the seven canonical files and the report, and a second write is byte-identical", async () => {
     const root = await copyPreparationInputs();
     const report = await writeDemographyArtifacts(true, root);
     const first = await readAll(root);
@@ -48,6 +49,7 @@ describe("preparing the demography files", () => {
     expect(await header(FILES.vital)).toEqual([...SHARED, ...TAIL]);
     expect(await header(FILES.migration)).toEqual([...SHARED, "sex", "citizenship_id", ...TAIL]);
     expect(await header(FILES.density)).toEqual([...SHARED, ...TAIL]);
+    expect(await header(FILES.census)).toEqual([...SHARED, "sex", "age_group", "settlement", ...TAIL]);
     expect(await header(FILES.breaks)).toEqual(["break_id", "applies_to", "reference_date", "reason", "source_note"]);
     for (const file of Object.values(FILES)) expect((await fs.readFile(path.join(root, file))).subarray(0, 3).toString("hex"), file).toBe(file.endsWith(".json") ? "7b0a20" : "efbbbf");
     expect((await rowsOf(root, FILES.population)).length).toBe(923);
@@ -55,6 +57,7 @@ describe("preparing the demography files", () => {
     expect((await rowsOf(root, FILES.vital)).length).toBe(2595);
     expect((await rowsOf(root, FILES.migration)).length).toBe(1274 + 2 * 6 * 3 * 14);
     expect((await rowsOf(root, FILES.density)).length).toBe(13 + 11 * 12);
+    expect((await rowsOf(root, FILES.census)).length).toBe(12 * 9 * 18 + 76 * 9);
     const breaks = await rowsOf(root, FILES.breaks);
     expect(breaks).toHaveLength(1);
     expect(breaks[0]).toMatchObject({ break_id: "census_recalculation_2025", reference_date: "2025-01-01" });
@@ -74,6 +77,9 @@ describe("preparing the demography files", () => {
         if (family === "structure" || family === "migration") expect(georgia).toBe(true);
       }
     }
+    const census = await rowsOf(root, FILES.census);
+    expect(census.every((row) => row.year === "2024" && row.estimate_basis === "census_count")).toBe(true);
+    expect(census.filter((row) => row.series_id === "demography.census_population_by_age").every((row) => row.geography_id === "country.georgia" || row.geography_id.startsWith("region."))).toBe(true);
     const densities = await rowsOf(root, FILES.density);
     expect(Math.min(...densities.filter((row) => row.geography_id === "country.georgia").map((row) => Number(row.year)))).toBe(2014);
     expect(Math.min(...densities.filter((row) => row.geography_id !== "country.georgia").map((row) => Number(row.year)))).toBe(2015);

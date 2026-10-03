@@ -17,14 +17,14 @@ async function editManifest(root: string, edit: (lines: string[]) => string[]) {
 describe("demography source package", () => {
   cleanUpTempRoots();
 
-  test("lists the 27 reviewed files with their roles", async () => {
+  test("lists the 28 reviewed files with their roles", async () => {
     const sources = await loadDemographySources(repositoryRoot);
 
     expect(sources.vintage).toBe("2026-10");
-    expect(sources.rows).toHaveLength(27);
+    expect(sources.rows).toHaveLength(28);
     const count = (role: string) => sources.rows.filter((row) => row.role === role).length;
     expect([count("canonical_input"), count("validation_only"), count("archived_not_served"), count("definitions")]).toEqual([
-      13, 9, 1, 4,
+      14, 9, 1, 4,
     ]);
   });
 
@@ -34,6 +34,17 @@ describe("demography source package", () => {
 
     expect(row).toMatchObject({ role: "canonical_input", family: "E density", localFile: "official/03-density-by-regions.xlsx", bytes: 13_917, servedYearMin: 2014, servedYearMax: 2026, unit: "persons_per_km2" });
     expect(bytes.length).toBe(13_917);
+  });
+
+  test("archives the 2024 census age table under a short name and serves only the census date", async () => {
+    const sources = await loadDemographySources(repositoryRoot);
+    const { row, bytes } = sources.get("source.geostat_census2024_population_by_age_settlement");
+
+    expect(row).toMatchObject({ role: "canonical_input", family: "F census", localFile: "official/census-2024/1.1-population-by-region-unit-age-settlement-sex.xlsx", bytes: 111_570, servedYearMin: 2024, servedYearMax: 2024, unit: "persons" });
+    // Geostat's own file name is 100 characters and, in a long worktree path, passes Windows' 260-character limit.
+    expect(row.retrievedFileUrl).toContain("1.1-Population-by-regions");
+    expect(row.localFile.length).toBeLessThan(80);
+    expect(bytes.length).toBe(111_570);
   });
 
   test("records the years each canonical input serves, and none for evidence files", async () => {

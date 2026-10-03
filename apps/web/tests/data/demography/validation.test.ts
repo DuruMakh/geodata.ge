@@ -5,6 +5,7 @@ import { loadCitizenships, type CitizenshipMap } from "../../../lib/data/demogra
 import { groupMigrationByCitizenship, loadCitizenshipGroups, type CitizenshipGroups } from "../../../lib/data/demography/citizenshipGroups";
 import { loadDensityRows, type DensityRows } from "../../../lib/data/demography/densityRows";
 import { loadDemographyGeography, type DemographyGeography } from "../../../lib/data/demography/geography";
+import { readCensusAge } from "../../../lib/data/demography/readCensusAge";
 import { readDensity } from "../../../lib/data/demography/readDensity";
 import { readMigration } from "../../../lib/data/demography/readMigration";
 import { readAgeStructure, readPopulation } from "../../../lib/data/demography/readPopulation";
@@ -46,6 +47,7 @@ function readAll(from: DemographySources): DemographyObservation[] {
     ...migration,
     ...groupMigrationByCitizenship(migration, groups),
     ...readDensity(from, density),
+    ...readCensusAge(from, geography),
   ];
 }
 const prepare = (from: DemographySources, previous?: readonly DemographyObservation[]) =>
@@ -66,7 +68,7 @@ describe("validation of the reviewed archive", () => {
     const report = validateDemography({ observations, sources, geography, density });
 
     expect(report.vintage).toBe("2026-10");
-    expect(report.sources).toHaveLength(27);
+    expect(report.sources).toHaveLength(28);
     expect(report.sources[0]).toMatchObject({ sourceId: "source.geostat_municipal_population", role: "canonical_input", bytes: 34_994 });
     expect(report.sources.every((source) => /^[0-9a-f]{64}$/.test(source.sha256))).toBe(true);
     const coverage = (seriesId: string) => report.coverage.find((entry) => entry.seriesId === seriesId);
@@ -78,7 +80,16 @@ describe("validation of the reviewed archive", () => {
     expect(coverage("demography.population_density")).toEqual({ family: "density", seriesId: "demography.population_density", geographies: 12, firstYear: 2014, lastYear: 2026, rows: 13 + 11 * 12 });
     expect(coverage("demography.immigrants_by_citizenship_group")).toEqual({ family: "migration", seriesId: "demography.immigrants_by_citizenship_group", geographies: 1, firstYear: 2012, lastYear: 2025, rows: 6 * 3 * 14 });
     expect(coverage("demography.emigrants_by_citizenship_group")).toMatchObject({ family: "migration", geographies: 1, rows: 6 * 3 * 14 });
-    expect(report.coverage).toHaveLength(19);
+    expect(coverage("demography.census_population_by_age")).toEqual({ family: "census", seriesId: "demography.census_population_by_age", geographies: 12, firstYear: 2024, lastYear: 2024, rows: 12 * 9 * 18 });
+    expect(coverage("demography.census_population_by_settlement")).toEqual({ family: "census", seriesId: "demography.census_population_by_settlement", geographies: 76, firstYear: 2024, lastYear: 2024, rows: 76 * 9 });
+    expect(report.coverage).toHaveLength(21);
+  });
+
+  test("checks the whole census age table, municipal age rows included, and records what it covered", () => {
+    const { censusSnapshot } = validateDemography({ observations, sources, geography, density });
+
+    // 75 printed units, each a unit row and 18 age rows, in nine columns; Georgia and the 64 municipalities agree with the census unit table.
+    expect(censusSnapshot).toEqual({ units: 75, cellsChecked: 75 * 19 * 9, agreeingWithCensusUnitTable: 65 });
   });
 
   test("balances the 1 January population over the whole archive, with the census step the only residual", () => {
@@ -229,6 +240,35 @@ describe("one corrupted case per stop condition", () => {
     expect(stop(() => validateDemography({ observations: male, sources, geography, density }))).toBe("identity_failed");
   });
 
+  test("a municipal census age cell that no longer adds to its region, which no served row shows", () => {
+    const row = readStoredSheet(sources.get(SOURCE_ID.censusAge).bytes, "1").findRow("Keda Municipality");
+    // Add one boy aged 5-9 to Keda in every cell that must move with him (both sexes, males; total and urban; the age row and the
+    // unit total), so the municipality stays consistent with itself and only the regional and national sums can notice.
+    const municipal = editSource(sources, SOURCE_ID.censusAge, (sheet) => {
+      for (const at of [row, row + 2]) for (const column of ["B", "C", "E", "F"]) bump(sheet, `${column}${at}`, 1);
+    });
+
+    expect(stop(() => prepare(municipal))).toBe("identity_failed");
+  });
+
+  test("a census age table that disagrees with the census unit table", () => {
+    const disagree = editSource(sources, SOURCE_ID.census, (sheet) => bump(sheet, "C6", 1));
+
+    expect(stop(() => prepare(disagree))).toBe("identity_failed");
+  });
+
+  test("served census rows that no longer add up: urban and rural to the total, ages to the settlement total", () => {
+    const urban = observations.map((row) =>
+      row.seriesId === "demography.census_population_by_settlement" && row.geographyId === "region.tbilisi" && row.sex === "total" && row.settlement === "urban" ? { ...row, value: String(Number(row.value) + 1) } : row,
+    );
+    const ages = observations.map((row) =>
+      row.seriesId === "demography.census_population_by_age" && row.geographyId === "country.georgia" && row.sex === "total" && row.settlement === "total" && row.ageGroup === "age_0_4" ? { ...row, value: String(Number(row.value) + 1) } : row,
+    );
+
+    expect(stop(() => validateDemography({ observations: urban, sources, geography, density }))).toBe("identity_failed");
+    expect(stop(() => validateDemography({ observations: ages, sources, geography, density }))).toBe("identity_failed");
+  });
+
   test("a changed 2015 to 2024 value", () => {
     const earlier = observations.map((row) => (row.seriesId === "demography.population_total" && row.geographyId === "04" && row.year === 2018 ? { ...row, value: "1" } : row));
 
@@ -270,6 +310,10 @@ describe("one corrupted case per stop condition", () => {
     const earlyDensity = [...observations, { ...georgiaDensity, year: 2013 }];
     const earlyRegionalDensity = [...observations, { ...georgiaDensity, geographyId: "region.adjara", year: 2014 }];
 
-    for (const rows of [early, regional, repeated, unknown, municipalDensity, earlyDensity, earlyRegionalDensity]) expect(stop(() => validateDemography({ observations: rows, sources, geography, density }))).toBe("layout_changed");
+    const censusAge = observations.find((row) => row.seriesId === "demography.census_population_by_age")!;
+    const municipalCensusAge = [...observations, { ...censusAge, geographyId: "04" }];
+    const lateCensus = [...observations, { ...censusAge, year: 2025, ageGroup: "age_0_4", sex: "male" as const, settlement: "urban" as const }];
+
+    for (const rows of [early, regional, repeated, unknown, municipalDensity, earlyDensity, earlyRegionalDensity, municipalCensusAge, lateCensus]) expect(stop(() => validateDemography({ observations: rows, sources, geography, density }))).toBe("layout_changed");
   });
 });

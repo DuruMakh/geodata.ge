@@ -1,10 +1,11 @@
 import { MUNICIPAL_COUNTRY_ID } from "../municipal/types";
 import type { DensityRows } from "./densityRows";
 import type { DemographyGeography } from "./geography";
+import { CENSUS_SETTLEMENTS, CENSUS_SEXES, readCensusGrid } from "./readCensusAge";
 import { findYearBlocks, findYearColumns, findYearRows, readStoredSheet } from "./readStoredSheet";
 import { AGE_BANDS, CENSUS_STEP, COVERAGE, SERIES, SOURCE_ID } from "./series";
 import { DemographyStopError } from "./stops";
-import type { DemographyObservation, DemographySources, Sex } from "./types";
+import type { DemographyObservation, DemographySources, Settlement, Sex } from "./types";
 
 /**
  * Checks that read the archived tables beyond the served rows, or compare the served rows with a
@@ -34,7 +35,7 @@ export type Lookup = (
   seriesId: string,
   geographyId: string,
   year: number,
-  dims?: { sex?: Sex; ageGroup?: string; citizenshipId?: string },
+  dims?: { sex?: Sex; ageGroup?: string; citizenshipId?: string; settlement?: Settlement },
 ) => number;
 
 const sheetOf = (sources: DemographySources, sourceId: string) => readStoredSheet(sources.get(sourceId).bytes, "1");
@@ -216,6 +217,84 @@ export function checkCensusAnchor(sources: DemographySources, geography: Demogra
     largestGapPercent: round6(largest.percent),
     largestGapMunicipality: largest.code,
   };
+}
+
+export type CensusSnapshot = { units: number; cellsChecked: number; agreeingWithCensusUnitTable: number };
+
+/**
+ * The whole census age table, municipal age rows included, which no served row shows: every unit's
+ * sexes add to both sexes, urban and rural to the total, and its 18 age groups to its own total;
+ * municipalities add up to their region and to Georgia for every age group and column; and Georgia
+ * and each municipality's total agree with the census unit table, which comes from the same count.
+ * All exact, in whole persons. The table's dash is the nil its own note defines.
+ */
+export function checkCensusAge(sources: DemographySources, geography: DemographyGeography): CensusSnapshot {
+  const grid = readCensusGrid(sources, geography);
+  const offsets = Array.from({ length: 19 }, (_, index) => index);
+  const equal = (what: string, parts: number, whole: number) => {
+    if (parts !== whole) throw new DemographyStopError("identity_failed", `Census age table, ${what}: the parts add to ${parts}, not ${whole}`);
+  };
+  const at = (unitRow: number, offset: number, sex: Sex, settlement: Settlement) => grid.count(unitRow + offset, sex, settlement);
+
+  let cells = 0;
+  for (const [geographyId, unitRow] of grid.printed) {
+    for (const offset of offsets) {
+      const where = `${geographyId} row ${unitRow + offset}`;
+      for (const { settlement } of CENSUS_SETTLEMENTS) {
+        equal(`${where} ${settlement}: males and females against both sexes`, at(unitRow, offset, "male", settlement) + at(unitRow, offset, "female", settlement), at(unitRow, offset, "total", settlement));
+      }
+      for (const { sex } of CENSUS_SEXES) {
+        equal(`${where} ${sex}: urban and rural against the total`, at(unitRow, offset, sex, "urban") + at(unitRow, offset, sex, "rural"), at(unitRow, offset, sex, "total"));
+      }
+      cells += CENSUS_SEXES.length * CENSUS_SETTLEMENTS.length;
+    }
+    for (const { sex } of CENSUS_SEXES) {
+      for (const { settlement } of CENSUS_SETTLEMENTS) {
+        const ages = offsets.slice(1).reduce((total, offset) => total + at(unitRow, offset, sex, settlement), 0);
+        equal(`${geographyId} ${sex} ${settlement}: the age groups against the unit total`, ages, at(unitRow, 0, sex, settlement));
+      }
+    }
+  }
+
+  const memberSum = (members: readonly string[], offset: number, sex: Sex, settlement: Settlement) =>
+    members.reduce((total, code) => total + at(grid.rowOf(code), offset, sex, settlement), 0);
+  const allMunicipalities = geography.municipalities.map((municipality) => municipality.code);
+  const groups = [
+    { id: GEORGIA, members: allMunicipalities },
+    ...geography.regions
+      .filter((region) => grid.printed.has(region.id))
+      .map((region) => ({ id: region.id, members: geography.municipalities.filter((municipality) => municipality.regionId === region.id).map((municipality) => municipality.code) })),
+  ];
+  for (const { id, members } of groups) {
+    for (const offset of offsets) {
+      for (const { sex } of CENSUS_SEXES) {
+        for (const { settlement } of CENSUS_SETTLEMENTS) {
+          equal(`${id} row offset ${offset} ${sex} ${settlement}: its municipalities against the unit`, memberSum(members, offset, sex, settlement), at(grid.rowOf(id), offset, sex, settlement));
+        }
+      }
+    }
+  }
+
+  const unitTable = sheetOf(sources, SOURCE_ID.census);
+  unitTable.expectLabel("A6", "Georgia");
+  const printed = new Map<string, number>([[GEORGIA, 6]]);
+  for (let row = 7; row <= unitTable.lastRow; row += 1) {
+    const label = unitTable.label(unitTable.ref("A", row));
+    const unit = label === null ? null : municipalityOf(geography, label);
+    if (unit === null) continue;
+    if (printed.has(unit.geographyId)) throw new DemographyStopError("identity_failed", `The census unit table lists ${label} twice`);
+    printed.set(unit.geographyId, row);
+  }
+  for (const code of allMunicipalities) {
+    if (!printed.has(code)) throw new DemographyStopError("identity_failed", `The census unit table has no row for municipality ${code}`);
+  }
+  for (const [geographyId, row] of printed) {
+    CENSUS_SEXES.forEach(({ sex }, index) => {
+      const there = required(unitTable.count(unitTable.ref(1 + index, row)), `${SOURCE_ID.census} ${unitTable.ref(1 + index, row)}`);
+      equal(`${geographyId} ${sex} against the census unit table`, at(grid.rowOf(geographyId), 0, sex, "total"), there);
+    });
+  }
+  return { units: grid.printed.size, cellsChecked: cells, agreeingWithCensusUnitTable: printed.size };
 }
 
 export type RateCheck = { check: string; firstYear: number; lastYear: number; maxDeviation: number; at: string; bound: number };

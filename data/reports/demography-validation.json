@@ -189,6 +189,13 @@
       "localFile": "official/census-2024/1.Population-of-Georgia-by-administrative-territorial-units-and-sex.xlsx",
       "sha256": "d6348f94cb4827c4c9433f3ee5820ec35dc016254316ae65eb07fe923edc0de1",
       "bytes": 172604
+    },
+    {
+      "sourceId": "source.geostat_census2024_population_by_age_settlement",
+      "role": "canonical_input",
+      "localFile": "official/census-2024/1.1-population-by-region-unit-age-settlement-sex.xlsx",
+      "sha256": "691329dbd890070a888234f2f182496e4132f67948879675a188584c5e34dec7",
+      "bytes": 111570
     }
   ],
   "coverage": [
@@ -343,6 +350,22 @@
       "firstYear": 2014,
       "lastYear": 2026,
       "rows": 145
+    },
+    {
+      "family": "census",
+      "seriesId": "demography.census_population_by_age",
+      "geographies": 12,
+      "firstYear": 2024,
+      "lastYear": 2024,
+      "rows": 1944
+    },
+    {
+      "family": "census",
+      "seriesId": "demography.census_population_by_settlement",
+      "geographies": 76,
+      "firstYear": 2024,
+      "lastYear": 2024,
+      "rows": 684
     }
   ],
   "blankCells": {
@@ -524,6 +547,11 @@
     "municipalities": 64,
     "largestGapPercent": 0.818498,
     "largestGapMunicipality": "68"
+  },
+  "censusSnapshot": {
+    "units": 75,
+    "cellsChecked": 12825,
+    "agreeingWithCensusUnitTable": 65
   },
   "rates": [
     {

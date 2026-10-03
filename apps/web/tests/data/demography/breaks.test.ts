@@ -38,7 +38,7 @@ describe("break register", () => {
     ]);
   });
 
-  test("leaves out event counts, the infant mortality rate, migration and its citizenship groups", () => {
+  test("leaves out event counts, the infant mortality rate, migration, its citizenship groups and the single-date census counts", () => {
     expect(UNAFFECTED_BY_CENSUS).toEqual([
       SERIES.liveBirths,
       SERIES.deaths,
@@ -49,6 +49,8 @@ describe("break register", () => {
       SERIES.netMigration,
       SERIES.immigrantsByCitizenshipGroup,
       SERIES.emigrantsByCitizenshipGroup,
+      SERIES.censusPopulationByAge,
+      SERIES.censusPopulationBySettlement,
     ]);
   });
 

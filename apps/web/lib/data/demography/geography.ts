@@ -139,7 +139,9 @@ export async function loadDemographyGeography(
   const aliasKey = (scope: string, label: string) => `${scope}\u0000${label}`;
   const aliases = new Map<string, string>();
   for (const row of aliasRows) {
-    if (!municipalityByLabel.has(row.canonical_label)) throw new Error(`Alias target is not a municipality label: ${row.canonical_label}`);
+    if (!municipalityByLabel.has(row.canonical_label) && !regionByLabel.has(row.canonical_label)) {
+      throw new Error(`Alias target is not a municipality or region label: ${row.canonical_label}`);
+    }
     if (municipalityByLabel.has(row.table_label) || regionByLabel.has(row.table_label)) {
       throw new Error(`Alias ${row.table_label} would shadow a label the geography map already knows`);
     }

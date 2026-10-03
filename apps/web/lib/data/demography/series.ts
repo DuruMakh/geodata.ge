@@ -21,6 +21,8 @@ export const SERIES = {
   emigrantsByCitizenshipGroup: "demography.emigrants_by_citizenship_group",
   netMigration: "demography.net_migration",
   populationDensity: "demography.population_density",
+  censusPopulationByAge: "demography.census_population_by_age",
+  censusPopulationBySettlement: "demography.census_population_by_settlement",
 } as const;
 
 /** The archived Geostat tables, by the source ids in the package manifest. */
@@ -39,6 +41,7 @@ export const SOURCE_ID = {
   netMigration: "source.geostat_demography_net_migration",
   migrationCitizenship: "source.geostat_demography_migration_citizenship",
   density: "source.geostat_demography_density",
+  censusAge: "source.geostat_census2024_population_by_age_settlement",
   /** Validation inputs: archived and compared with the served rows, never served. */
   infantDeaths: "source.geostat_demography_infant_deaths",
   lifeTables: "source.geostat_demography_life_tables",
@@ -51,6 +54,8 @@ export const SOURCE_ID = {
 
 /** The day the 2026-10 Geostat capture was reviewed; every observation carries it as `last_reviewed_at`. */
 export const REVIEWED_AT = "2026-10-01";
+/** The reference year of the census counts: one snapshot, counted on 14 November 2024. */
+export const CENSUS_YEAR = 2024;
 /** The day density and the citizenship groups were added after the audit; their rows carry it as `last_reviewed_at`. */
 export const EXTENSION_REVIEWED_AT = "2026-10-03";
 
@@ -95,6 +100,7 @@ export const FAMILIES = {
   ],
   migration: [SERIES.immigrants, SERIES.emigrants, SERIES.netMigration, SERIES.immigrantsByCitizenshipGroup, SERIES.emigrantsByCitizenshipGroup],
   density: [SERIES.populationDensity],
+  census: [SERIES.censusPopulationByAge, SERIES.censusPopulationBySettlement],
 } as const;
 
 /** The 2025 census recalculation of the 1 January population: the one balancing residual the archive may hold. */
@@ -104,6 +110,28 @@ export const CENSUS_STEP = { fromYear: 2024, toYear: 2025, referenceDate: "2025-
 export const AGE_GROUPS = [
   { label: "0", id: "age_0" },
   { label: "1-4", id: "age_1_4" },
+  { label: "5-9", id: "age_5_9" },
+  { label: "10-14", id: "age_10_14" },
+  { label: "15-19", id: "age_15_19" },
+  { label: "20-24", id: "age_20_24" },
+  { label: "25-29", id: "age_25_29" },
+  { label: "30-34", id: "age_30_34" },
+  { label: "35-39", id: "age_35_39" },
+  { label: "40-44", id: "age_40_44" },
+  { label: "45-49", id: "age_45_49" },
+  { label: "50-54", id: "age_50_54" },
+  { label: "55-59", id: "age_55_59" },
+  { label: "60-64", id: "age_60_64" },
+  { label: "65-69", id: "age_65_69" },
+  { label: "70-74", id: "age_70_74" },
+  { label: "75-79", id: "age_75_79" },
+  { label: "80-84", id: "age_80_84" },
+  { label: "85+", id: "age_85_plus" },
+] as const;
+
+/** The 18 age rows of the census table, which prints 0-4 as one group where the annual age table prints 0 and 1-4. */
+export const CENSUS_AGE_GROUPS = [
+  { label: "0-4", id: "age_0_4" },
   { label: "5-9", id: "age_5_9" },
   { label: "10-14", id: "age_10_14" },
   { label: "15-19", id: "age_15_19" },

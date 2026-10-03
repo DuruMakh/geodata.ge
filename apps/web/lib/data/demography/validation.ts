@@ -1,6 +1,7 @@
 import { MUNICIPAL_COUNTRY_ID } from "../municipal/types";
 import {
   checkBalancing,
+  checkCensusAge,
   checkCensusAnchor,
   checkDensity,
   checkMidYear,
@@ -8,14 +9,14 @@ import {
   checkRates,
   readMidYear,
 } from "./crossChecks";
-import type { Balancing, CensusAnchor, Lookup, RateCheck } from "./crossChecks";
+import type { Balancing, CensusAnchor, CensusSnapshot, Lookup, RateCheck } from "./crossChecks";
 import type { DensityRows } from "./densityRows";
 import { readUnitRows } from "./geography";
 import type { DemographyGeography, UnitScope } from "./geography";
 import { findYearColumns, readStoredSheet } from "./readStoredSheet";
-import { AGE_BANDS, AGE_GROUPS, COVERAGE, FAMILIES, SERIES, SOURCE_ID } from "./series";
+import { AGE_BANDS, AGE_GROUPS, CENSUS_AGE_GROUPS, CENSUS_YEAR, COVERAGE, FAMILIES, SERIES, SOURCE_ID } from "./series";
 import { DemographyStopError } from "./stops";
-import type { DemographyObservation, DemographySources, Sex } from "./types";
+import type { DemographyObservation, DemographySources, Settlement, Sex } from "./types";
 
 type Family = keyof typeof FAMILIES;
 const GEORGIA = MUNICIPAL_COUNTRY_ID;
@@ -31,13 +32,17 @@ const CITIZENSHIP_SERIES: readonly string[] = DIRECTIONS.flatMap((direction) => 
 /** Series published for Georgia, every region and every municipality. The rest are Georgia-level only. */
 const UNIT_SERIES: readonly string[] = [SERIES.populationTotal, SERIES.liveBirths, SERIES.deaths, SERIES.naturalIncrease];
 /** Series published for Georgia and the 11 regions only: Geostat's density table has no municipal rows. */
-const REGION_SERIES: readonly string[] = [SERIES.populationDensity];
+const REGION_SERIES: readonly string[] = [SERIES.populationDensity, SERIES.censusPopulationByAge];
+/** Series with a row for Georgia, every region and every municipality. The census split is read for all of them; the census ages for Georgia and the regions only. */
+const ALL_UNIT_SERIES: readonly string[] = [...UNIT_SERIES, SERIES.censusPopulationBySettlement];
+const SETTLEMENTS: readonly Settlement[] = ["total", "urban", "rural"];
 const FAMILY_START: Record<Family, number> = {
   population: COVERAGE.populationFrom,
   structure: COVERAGE.populationFrom,
   vital: COVERAGE.vitalFrom,
   migration: COVERAGE.migrationFrom,
   density: COVERAGE.densityFrom,
+  census: CENSUS_YEAR,
 };
 const FAMILY_OF = new Map<string, Family>(Object.entries(FAMILIES).flatMap(([family, ids]) => ids.map((id) => [id, family as Family] as const)));
 
@@ -62,11 +67,12 @@ export type DemographyValidationReport = {
   balancing: Balancing;
   midYear: { firstYear: number; lastYear: number; maxDifferencePersons: number };
   censusAnchor: CensusAnchor;
+  censusSnapshot: CensusSnapshot;
   rates: RateCheck[];
 };
 
-type Keyed = Pick<DemographyObservation, "seriesId" | "geographyId" | "year" | "sex" | "ageGroup" | "citizenshipId">;
-const keyOf = (row: Keyed) => [row.seriesId, row.geographyId, row.year, row.sex ?? "", row.ageGroup ?? "", row.citizenshipId ?? ""].join("|");
+type Keyed = Pick<DemographyObservation, "seriesId" | "geographyId" | "year" | "sex" | "ageGroup" | "citizenshipId" | "settlement">;
+const keyOf = (row: Keyed) => [row.seriesId, row.geographyId, row.year, row.sex ?? "", row.ageGroup ?? "", row.citizenshipId ?? "", row.settlement ?? ""].join("|");
 const sum = (values: readonly number[]) => values.reduce((total, value) => total + value, 0);
 const unique = (values: readonly number[]) => [...new Set(values)].sort((a, b) => a - b);
 
@@ -90,7 +96,8 @@ function checkCoverage(rows: readonly DemographyObservation[], geography: Demogr
     if (!family) throw new DemographyStopError("layout_changed", `Unknown series ${row.seriesId}`);
     if (!reviewed.has(row.geographyId)) throw new DemographyStopError("layout_changed", `${row.seriesId} has a row for ${row.geographyId}, which is not a reviewed unit`);
     const regionSeries = REGION_SERIES.includes(row.seriesId);
-    if (row.geographyId !== GEORGIA && !UNIT_SERIES.includes(row.seriesId) && !(regionSeries && regional.has(row.geographyId))) {
+    if (family === "census" && row.year !== CENSUS_YEAR) throw new DemographyStopError("layout_changed", `${row.seriesId} has a row for ${row.year}; the census counts hold ${CENSUS_YEAR} only`);
+    if (row.geographyId !== GEORGIA && !ALL_UNIT_SERIES.includes(row.seriesId) && !(regionSeries && regional.has(row.geographyId))) {
       throw new DemographyStopError("layout_changed", `${row.seriesId} is published for ${regionSeries ? "Georgia and the regions" : "Georgia"} only, not ${row.geographyId}`);
     }
     const start = row.geographyId === GEORGIA ? FAMILY_START[family] : COVERAGE.unitsFrom;
@@ -98,7 +105,7 @@ function checkCoverage(rows: readonly DemographyObservation[], geography: Demogr
     geographiesOf.set(row.seriesId, (geographiesOf.get(row.seriesId) ?? new Set()).add(row.geographyId));
   }
   for (const seriesId of FAMILY_OF.keys()) {
-    const expected = UNIT_SERIES.includes(seriesId) ? reviewed.size : REGION_SERIES.includes(seriesId) ? regional.size : 1;
+    const expected = ALL_UNIT_SERIES.includes(seriesId) ? reviewed.size : REGION_SERIES.includes(seriesId) ? regional.size : 1;
     if ((geographiesOf.get(seriesId)?.size ?? 0) !== expected) {
       throw new DemographyStopError("layout_changed", `${seriesId} covers ${geographiesOf.get(seriesId)?.size ?? 0} geographies, expected ${expected}`);
     }
@@ -193,6 +200,49 @@ function checkWholes(rows: readonly DemographyObservation[], lookup: Lookup, geo
   }
 }
 
+/**
+ * The served census counts add up exactly: in every unit the sexes to both sexes and urban plus rural to
+ * the total; the 64 municipalities to each region and to Georgia; and, for Georgia and the regions, the
+ * 18 age groups to the unit's total and the regions to Georgia for every age group. The table the rows
+ * come from is checked in full, municipal age rows included, by checkCensusAge.
+ */
+function checkCensusWholes(lookup: Lookup, geography: DemographyGeography): void {
+  const equal = (what: string, parts: number, whole: number) => {
+    if (parts !== whole) throw new DemographyStopError("identity_failed", `Census ${what}: the parts add to ${parts}, not ${whole}`);
+  };
+  const split = (id: string, sex: Sex, settlement: Settlement) => lookup(SERIES.censusPopulationBySettlement, id, CENSUS_YEAR, { sex, settlement });
+  const aged = (id: string, sex: Sex, settlement: Settlement, ageGroup: string) => lookup(SERIES.censusPopulationByAge, id, CENSUS_YEAR, { sex, settlement, ageGroup });
+  const regionIds = geography.regions.map((region) => region.id);
+  const aggregates = [GEORGIA, ...regionIds];
+  const municipalities = geography.municipalities;
+
+  for (const id of [...aggregates, ...municipalities.map((municipality) => municipality.code)]) {
+    for (const settlement of SETTLEMENTS) equal(`${id} ${settlement}: males and females against both sexes`, split(id, "male", settlement) + split(id, "female", settlement), split(id, "total", settlement));
+    for (const sex of SEXES) equal(`${id} ${sex}: urban and rural against the total`, split(id, sex, "urban") + split(id, sex, "rural"), split(id, sex, "total"));
+  }
+  for (const sex of SEXES) {
+    for (const settlement of SETTLEMENTS) {
+      equal(`${sex} ${settlement}: the municipalities against Georgia`, sum(municipalities.map((municipality) => split(municipality.code, sex, settlement))), split(GEORGIA, sex, settlement));
+      for (const regionId of regionIds) {
+        const members = municipalities.filter((municipality) => municipality.regionId === regionId);
+        equal(`${sex} ${settlement}: the members of ${regionId}`, sum(members.map((municipality) => split(municipality.code, sex, settlement))), split(regionId, sex, settlement));
+      }
+      for (const group of CENSUS_AGE_GROUPS) {
+        equal(`${sex} ${settlement} ${group.id}: the regions against Georgia`, sum(regionIds.map((regionId) => aged(regionId, sex, settlement, group.id))), aged(GEORGIA, sex, settlement, group.id));
+      }
+      for (const id of aggregates) {
+        equal(`${id} ${sex} ${settlement}: the age groups against the unit total`, sum(CENSUS_AGE_GROUPS.map((group) => aged(id, sex, settlement, group.id))), split(id, sex, settlement));
+      }
+    }
+  }
+  for (const id of aggregates) {
+    for (const group of CENSUS_AGE_GROUPS) {
+      for (const settlement of SETTLEMENTS) equal(`${id} ${settlement} ${group.id}: males and females against both sexes`, aged(id, "male", settlement, group.id) + aged(id, "female", settlement, group.id), aged(id, "total", settlement, group.id));
+      for (const sex of SEXES) equal(`${id} ${sex} ${group.id}: urban and rural against the total`, aged(id, sex, "urban", group.id) + aged(id, sex, "rural", group.id), aged(id, sex, "total", group.id));
+    }
+  }
+}
+
 /** Every change to a previously captured row, including a row that disappeared. New rows are not changes. */
 function findRevisions(previous: readonly DemographyObservation[], index: ReadonlyMap<string, DemographyObservation>): string[] {
   const problems: string[] = [];
@@ -260,6 +310,7 @@ export function validateDemography(input: ValidationInput): DemographyValidation
   checkServedYears(sources, rows);
   const balancing = checkBalancing(sources);
   checkWholes(rows, lookup, geography);
+  checkCensusWholes(lookup, geography);
   checkMigrationTotals(sources);
 
   const georgiaYears = (seriesId: string) => unique(rows.filter((row) => row.seriesId === seriesId && row.geographyId === GEORGIA).map((row) => row.year));
@@ -267,6 +318,7 @@ export function validateDemography(input: ValidationInput): DemographyValidation
   const midYearValues = readMidYear(sources);
   const midYear = checkMidYear(midYearValues, lookup, years.vital);
   const censusAnchor = checkCensusAnchor(sources, geography, lookup);
+  const censusSnapshot = checkCensusAge(sources, geography);
   const rates = [...checkRates(sources, lookup, midYearValues, years), checkDensity(rows, lookup, density)];
 
   const problems = previous ? findRevisions(previous, index) : [];
@@ -303,6 +355,7 @@ export function validateDemography(input: ValidationInput): DemographyValidation
     balancing,
     midYear,
     censusAnchor,
+    censusSnapshot,
     rates,
   };
 }

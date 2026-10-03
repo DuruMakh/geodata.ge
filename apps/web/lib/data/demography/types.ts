@@ -35,9 +35,11 @@ export type DemographySources = {
 };
 
 /** Where a value comes from, which decides how far it can be compared with its neighbours. */
-export const ESTIMATE_BASES = ["retro_projection", "pre_census", "census_based", "registered", "border_police"] as const;
+/** `census_count` is the 2024 census itself, counted on 14 November 2024, before any recalculation to a 1 January value. */
+export const ESTIMATE_BASES = ["retro_projection", "pre_census", "census_based", "census_count", "registered", "border_police"] as const;
 export type EstimateBasis = (typeof ESTIMATE_BASES)[number];
 export type Sex = "total" | "male" | "female";
+export type Settlement = "total" | "urban" | "rural";
 
 /** One published Geostat value in the canonical demography files. */
 export type DemographyObservation = {
@@ -57,4 +59,5 @@ export type DemographyObservation = {
   sex?: Sex;
   ageGroup?: string;
   citizenshipId?: string;
+  settlement?: Settlement;
 };

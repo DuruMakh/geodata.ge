@@ -9,6 +9,7 @@ import { loadCitizenships } from "./citizenship";
 import { groupMigrationByCitizenship, loadCitizenshipGroups } from "./citizenshipGroups";
 import { loadDensityRows } from "./densityRows";
 import { loadDemographyGeography } from "./geography";
+import { readCensusAge } from "./readCensusAge";
 import { readDensity } from "./readDensity";
 import { readMigration } from "./readMigration";
 import { readAgeStructure, readPopulation } from "./readPopulation";
@@ -27,6 +28,7 @@ const FILES = [
   { family: "vital", file: "data/imports/demography-vital-annual.csv", dimensions: [] },
   { family: "migration", file: "data/imports/demography-migration-annual.csv", dimensions: ["sex", "citizenship_id"] },
   { family: "density", file: "data/imports/demography-density-annual.csv", dimensions: [] },
+  { family: "census", file: "data/imports/demography-census-2024-population.csv", dimensions: ["sex", "age_group", "settlement"] },
 ] as const;
 const BREAKS_FILE = "data/imports/demography-series-breaks.csv";
 const REPORT_FILE = "data/reports/demography-validation.json";
@@ -35,6 +37,7 @@ const DIMENSION: Record<(typeof FILES)[number]["dimensions"][number], (row: Demo
   sex: (row) => row.sex ?? "",
   age_group: (row) => row.ageGroup ?? "",
   citizenship_id: (row) => row.citizenshipId ?? "",
+  settlement: (row) => row.settlement ?? "",
 };
 
 const rowSchema = z.object({
@@ -51,6 +54,7 @@ const rowSchema = z.object({
   sex: z.enum(["total", "male", "female"]).optional(),
   age_group: z.string().optional(),
   citizenship_id: z.string().optional(),
+  settlement: z.enum(["total", "urban", "rural"]).optional(),
 });
 
 /** The rows of the committed canonical files, which a refresh may add to but never change. Undefined on a first build. */
@@ -85,6 +89,7 @@ async function loadPreviousObservations(repositoryRoot: string): Promise<Demogra
         ...(row.sex ? { sex: row.sex } : {}),
         ...(row.age_group ? { ageGroup: row.age_group } : {}),
         ...(row.citizenship_id ? { citizenshipId: row.citizenship_id } : {}),
+        ...(row.settlement ? { settlement: row.settlement } : {}),
       });
     });
   }
@@ -122,6 +127,7 @@ export async function prepareDemography(repositoryRoot: string) {
     ...migration,
     ...groupMigrationByCitizenship(migration, groups),
     ...readDensity(sources, density),
+    ...readCensusAge(sources, geography),
   ];
   await checkSourcesRegistered(repositoryRoot, observations);
   const report = validateDemography({ observations, sources, geography, density, previous });

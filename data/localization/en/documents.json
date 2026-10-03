@@ -3349,5 +3349,11 @@
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-03" },
     "attribution": null,
     "documentLanguage": "en"
+  },
+  "source.geostat_census2024_population_by_age_settlement": {
+    "title": { "text": "Population by regions, self-governed units, 5-year age groups, urban-rural settlements and sex (as of November 14, 2024)", "reviewedAt": "2026-10-03" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-03" },
+    "attribution": null,
+    "documentLanguage": "en"
   }
 }

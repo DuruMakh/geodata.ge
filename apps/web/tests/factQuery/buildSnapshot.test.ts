@@ -13,9 +13,9 @@ describe("buildFactQuerySnapshot", () => {
       buildFactQuerySnapshot(OPTIONS),
       loadSourceDocuments("../../data/sources/source-documents.csv"),
     ]);
-    // The twelve demography canonical inputs supply new fact sources; the
+    // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    expect(sources).toHaveLength(144);
+    expect(sources).toHaveLength(145);
     expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.map(source => source.sourceId).sort());
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",

@@ -143,3 +143,4 @@ source.geostat_demography_natural_increase,Natural increase by regions and self-
 source.geostat_demography_net_migration,Net migration (number and rate),docs/Raw Data/Demography/geostat-demography/2026-10/official/31-net-migration.xlsx,2026-10-01
 source.geostat_demography_migration_citizenship,Immigrants and emigrants by sex and citizenship,docs/Raw Data/Demography/geostat-demography/2026-10/official/33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx,2026-10-01
 source.geostat_demography_density,Population density by regions,docs/Raw Data/Demography/geostat-demography/2026-10/official/03-density-by-regions.xlsx,2026-10-03
+source.geostat_census2024_population_by_age_settlement,"2024 census population by region, age, sex and urban or rural settlement",docs/Raw Data/Demography/geostat-demography/2026-10/official/census-2024/1.1-population-by-region-unit-age-settlement-sex.xlsx,2026-10-03

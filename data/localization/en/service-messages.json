@@ -399,6 +399,7 @@
   "sources.source.geostat_demography_net_migration.name": "Net migration (number and rate)",
   "sources.source.geostat_demography_migration_citizenship.name": "Immigrants and emigrants by sex and citizenship",
   "sources.source.geostat_demography_density.name": "Population density by regions",
+  "sources.source.geostat_census2024_population_by_age_settlement.name": "2024 census population by region, age, sex and settlement",
   "documents.source.geostat_demography_population_age_sex.title": "Population as of 1 January by 5-year age groups and sex",
   "documents.source.geostat_demography_population_age_sex.publisher": "National Statistics Office of Georgia (Geostat)",
   "documents.source.geostat_demography_births.title": "Number of live births by regions and self-governed units",
@@ -422,5 +423,7 @@
   "documents.source.geostat_demography_migration_citizenship.title": "Number of immigrants and emigrants by sex and citizenship",
   "documents.source.geostat_demography_migration_citizenship.publisher": "National Statistics Office of Georgia (Geostat)",
   "documents.source.geostat_demography_density.title": "Density by regions (number of population per 1 sq.km)",
-  "documents.source.geostat_demography_density.publisher": "National Statistics Office of Georgia (Geostat)"
+  "documents.source.geostat_demography_density.publisher": "National Statistics Office of Georgia (Geostat)",
+  "documents.source.geostat_census2024_population_by_age_settlement.title": "Population by regions, self-governed units, 5-year age groups, urban-rural settlements and sex (as of November 14, 2024)",
+  "documents.source.geostat_census2024_population_by_age_settlement.publisher": "National Statistics Office of Georgia (Geostat)"
 }

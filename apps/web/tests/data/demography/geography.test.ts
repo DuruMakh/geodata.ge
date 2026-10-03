@@ -62,6 +62,24 @@ describe("demography geography", () => {
     expect(kinds).toEqual({ country: 1, region: 10, municipality: 64, city_component: 7, excluded: 6 });
   });
 
+  test("resolves every unit label of the 2024 census age table, which spells Adjara its own way", () => {
+    const sheet = unitSheet("source.geostat_census2024_population_by_age_settlement");
+    const ages = new Set(["0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85+"]);
+    const kinds: Record<string, number> = {};
+    for (let row = 7; row <= sheet.lastRow; row += 1) {
+      const label = sheet.label(sheet.ref("A", row));
+      if (label === null) break;
+      if (ages.has(label)) continue;
+      const kind = geography.resolve(label, "census").kind;
+      kinds[kind] = (kinds[kind] ?? 0) + 1;
+    }
+
+    expect(kinds).toEqual({ country: 1, region: 10, municipality: 64 });
+    expect(geography.resolve("Adjara of Autonomous Republic", "census")).toEqual({ kind: "region", geographyId: "region.adjara" });
+    expect(() => geography.resolve("Adjara of Autonomous Republic", "population")).toThrow(/Unreviewed geography label/);
+    expect(() => geography.resolve("Adjara of Autonomous Republic", "events")).toThrow(/Unreviewed geography label/);
+  });
+
   test("uses the existing identifiers: the country, region ids and two-digit municipality codes", () => {
     expect(geography.resolve("Georgia", "population")).toEqual({ kind: "country", geographyId: "country.georgia" });
     expect(geography.resolve("C. Tbilisi Municipality", "population")).toEqual({

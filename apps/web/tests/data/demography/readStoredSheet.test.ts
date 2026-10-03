@@ -112,6 +112,18 @@ describe("stored-value sheet reader", () => {
     expect(sheet.count("B5")).toBe(12);
   });
 
+  test("reads the marker as a true zero by name, leaving the ordinary readers to treat it as unpublished", () => {
+    const sheet = syntheticSheet({ A1: "x", B1: "-", C1: 12, D1: "n/a", E1: 3.5, A5: "- Magnitude nil" });
+
+    expect(sheet.countNilAsZero("B1")).toBe(0);
+    expect(sheet.countNilAsZero("C1")).toBe(12);
+    expect(sheet.countNilAsZero("F1")).toBeNull();
+    expect(() => sheet.countNilAsZero("D1")).toThrow(UnexpectedCellError);
+    expect(() => sheet.countNilAsZero("E1")).toThrow(NotWholePersonError);
+    // The ordinary readers still treat the same marker as an unpublished value.
+    expect(sheet.count("B1")).toBeNull();
+  });
+
   test("rejects a missing sheet, a second sheet and a moved header row", () => {
     const bytes = sources.get("source.geostat_municipal_population").bytes;
 

@@ -1012,5 +1012,12 @@
       "reviewedAt": "2026-10-03"
     },
     "derivation": null
+  },
+  "source.geostat_census2024_population_by_age_settlement": {
+    "name": {
+      "text": "2024 census population by region, age, sex and settlement",
+      "reviewedAt": "2026-10-03"
+    },
+    "derivation": null
   }
 }

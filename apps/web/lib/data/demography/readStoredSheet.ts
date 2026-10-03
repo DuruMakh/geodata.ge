@@ -93,6 +93,17 @@ export class StoredSheet {
     return whole + 0;
   }
 
+  /**
+   * A count in a table whose own footnote defines `-` as "magnitude nil": there the marker is a true zero,
+   * not an unpublished value. Only a reader that has checked that footnote calls this; `count` keeps
+   * reading the same marker as missing. A blank cell is still null and any other text still throws.
+   */
+  countNilAsZero(ref: string): number | null {
+    const cell = this.cell(ref);
+    if (cell?.t === "s" && REVIEWED_MISSING_MARKERS.includes(String(cell.v).trim())) return 0;
+    return this.count(ref);
+  }
+
   /** A value published in thousands, as a whole number of persons. */
   persons(ref: string): number | null {
     return this.whole(ref, 1000);

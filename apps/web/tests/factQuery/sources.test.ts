@@ -181,9 +181,9 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      // The twelve demography canonical inputs extend the existing inventory;
+      // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) extend the existing inventory;
       // the package's validation inputs and definitions are evidence, not sources.
-      expect(snapshot.sources.length).toBe(144);
+      expect(snapshot.sources.length).toBe(145);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
@@ -234,6 +234,14 @@ describe("public source resolution", () => {
         sha256: "77d29d84cb7530f4fb6294f17a768e220f02636d77debfc438509b5c17ac28b8",
         byteSize: 13917,
         years: Array.from({ length: 13 }, (_, index) => 2014 + index),
+      });
+      const censusAge = snapshot.sources.find((source) => source.sourceId === "source.geostat_census2024_population_by_age_settlement");
+      expect(censusAge?.documents).toHaveLength(1);
+      expect(censusAge?.documents[0]).toMatchObject({
+        officialUrl: "https://geostat.ge/media/80811/1.1-Population-by-regions%2C-self-governed-units%2C-5-year-age-groups%2C-urban-rural-settlements-and-sex.xlsx",
+        sha256: "691329dbd890070a888234f2f182496e4132f67948879675a188584c5e34dec7",
+        byteSize: 111570,
+        years: [2024],
       });
       // The validation inputs and definition PDFs stay evidence, and table 01 stays the municipal package's one document.
       expect(documentIds).not.toContain("source.geostat_demography_median_age");

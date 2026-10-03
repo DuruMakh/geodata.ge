@@ -1,10 +1,10 @@
 # Demography
 
-Owner of: `data/imports/demography-population-annual.csv`, `demography-structure-annual.csv`, `demography-vital-annual.csv`, `demography-migration-annual.csv`, `demography-density-annual.csv`, `demography-series-breaks.csv`, `data/reports/demography-validation.json`, `data/mappings/demography/`, `docs/Raw Data/Demography/geostat-demography/`, `apps/web/lib/data/demography/`, and `npm run data:prepare-demography` / `data:check-demography`. Approved data scope: `docs/superpowers/specs/2026-10-01-demography-data-design.md`. Source evidence and the audit: `docs/Raw Data/Demography/geostat-demography/2026-10/source-review.md`.
+Owner of: `data/imports/demography-population-annual.csv`, `demography-structure-annual.csv`, `demography-vital-annual.csv`, `demography-migration-annual.csv`, `demography-density-annual.csv`, `demography-census-2024-population.csv`, `demography-series-breaks.csv`, `data/reports/demography-validation.json`, `data/mappings/demography/`, `docs/Raw Data/Demography/geostat-demography/`, `apps/web/lib/data/demography/`, and `npm run data:prepare-demography` / `data:check-demography`. Approved data scope: `docs/superpowers/specs/2026-10-01-demography-data-design.md`. Source evidence and the audit: `docs/Raw Data/Demography/geostat-demography/2026-10/source-review.md`.
 
 ## Meaning and coverage
 
-Geostat is the only source, and only its annual tables are used. Five families are carried, as reviewed observations with the exact workbook cell each value came from:
+Geostat is the only source, and only its annual tables are used. Six families are carried, as reviewed observations with the exact workbook cell each value came from:
 
 | Family | Series | Unit | Coverage |
 | --- | --- | --- | --- |
@@ -15,8 +15,10 @@ Geostat is the only source, and only its annual tables are used. Five families a
 | Migration | `immigrants`, `emigrants` by sex and citizenship, and `net_migration` | persons | Georgia 2012–2025 |
 | | `immigrants_by_citizenship_group`, `emigrants_by_citizenship_group`: five named countries and one computed remainder (see Citizenship groups) | persons | Georgia 2012–2025 |
 | Density | `population_density`, persons per km² on 1 January | persons per km² | Georgia 2014–2026; the 11 regions 2015–2026; no municipalities |
+| Census 2024 | `census_population_by_age`: 18 five-year age groups (0–4 to 85+) by sex and urban or rural settlement | persons | Georgia and the 11 regions, counted on 14 November 2024 |
+| | `census_population_by_settlement`: all ages by sex and urban or rural settlement | persons | Georgia, the 11 regions and the 64 municipalities, 14 November 2024 |
 
-The files hold 923, 1,587, 2,595, 1,778 and 145 rows. Coverage starts are decisions, not properties of the files. The archive holds more than is carried (Georgia from 1994, single years of age, the natural increase and net migration rates, mid-year population, median age, the age-dependency ratios, life tables), and that extra material is used only to validate. Not carried: census detail (including the age structure and urban/rural split of regions and municipalities, which only the 2024 census tables hold), population density for municipalities (no official municipal areas), population projections, marriages and divorces, per-resident budget indicators, sub-annual releases and anything read from a PDF. The 64 municipalities are those of `data/imports/municipalities.csv`, so the codes `AGENTS.md` excludes from municipal budgets (05, 42, 43, 46, 64) never appear. The six unit rows outside the 64 (`Abkhazia A.R.`, `Ajara Municipality`, `Akhalgori`, `Eredvi`, `Tighva`, `Kurta`) must hold no value in the served years, and a value there stops preparation.
+The files hold 923, 1,587, 2,595, 1,778, 145 and 2,628 rows. Coverage starts are decisions, not properties of the files. The archive holds more than is carried (Georgia from 1994, single years of age, the natural increase and net migration rates, mid-year population, median age, the age-dependency ratios, life tables), and that extra material is used only to validate. Not carried: census detail beyond age, sex and urban or rural settlement (households, education, nationality, language, religion, internal migration, displaced persons), the age structure of municipalities (read and validated, not served), population density for municipalities (no official municipal areas), population projections, marriages and divorces, per-resident budget indicators, sub-annual releases and anything read from a PDF. The 64 municipalities are those of `data/imports/municipalities.csv`, so the codes `AGENTS.md` excludes from municipal budgets (05, 42, 43, 46, 64) never appear. The six unit rows outside the 64 (`Abkhazia A.R.`, `Ajara Municipality`, `Akhalgori`, `Eredvi`, `Tighva`, `Kurta`) must hold no value in the served years, and a value there stops preparation.
 
 ## The census break and the start dates
 
@@ -58,6 +60,18 @@ Density is served from 2014 for Georgia and from 2015 for the regions, where the
 
 Regions only: no official municipal area was found. Geostat's municipal comparison tool lists area and density by municipality, but its certificate fails verification from the audit environment, as `database.geostat.ge` did, and it is not bypassed. A municipal density needs an approved source for 64 areas first.
 
+## Census 2024 snapshot
+
+The 2024 census counted the population on 14 November 2024. Geostat's table "Population by regions, self-governed units, 5-year age groups, urban-rural settlements and sex" gives every unit's count by sex, 18 age groups and urban or rural settlement. It is a **single snapshot**: it makes no 1 January estimate and cannot be compared with the annual series without care, because the 1 January 2025 values were recalculated from it (3,930,428, which is 847 persons above the census count) and the earlier annual values were not. Rows carry `estimate_basis` `census_count`, and every locator ends in `[2024-11-14]`.
+
+Two series are served, both `year` 2024. `census_population_by_age` covers Georgia and the 11 regions (12 units × 3 sexes × 3 settlement types × 18 age groups = 1,944 rows), which is what a regional population pyramid needs, and urban and rural pyramids as well. `census_population_by_settlement` covers all 76 units for all ages (684 rows): the urban and rural split of every region and municipality. Municipal age rows are read and validated against their regions but not served; adding them is a change to the served coverage, not to the reader.
+
+**The dash is a true zero here.** In this table `-` is "magnitude nil", which its own note says: a city has no rural settlements, and Khelvachauri no urban ones. It is the opposite of the other tables, where `-` marks an unpublished value. The reader uses a separate method for it, only after checking that the note is present, and the ordinary readers still treat the dash as missing. The reading is confirmed rather than assumed: with the dash as zero, every identity below holds exactly in all 75 units and no cell is left blank, so nothing is suppressed.
+
+The table is checked in full on every preparation, municipal age rows included: in every unit the sexes add to both sexes, urban and rural to the total, and the 18 age groups to the unit's total; the 64 municipalities add up to each region and to Georgia for every age group and column; and Georgia and every municipality's total agree with the census unit table (which comes from the same count). That is 12,825 cells. The national figures equal Geostat's published census findings: 3,929,581 people (1,881,004 males, 2,048,577 females), urban 2,455,444 and rural 1,474,137, and ages 0–14 770,823, 15–64 2,466,058 and 65+ 692,700. Tbilisi has one row, as a municipality, and its region takes it. The census counts hold one date, so the census break does not span them.
+
+Geostat's file name for this table is 100 characters long and, in a long worktree path, passes Windows' 260-character path limit, so the archive keeps it under a short name and the manifest records Geostat's URL.
+
 ## Validation
 
 `npm run data:prepare-demography` stops, naming the condition, at the first of these, and `data/reports/demography-validation.json` records the results:
@@ -67,6 +81,7 @@ Regions only: no official municipal area was found. Geostat's municipal comparis
 - The 1 January population balances with births, deaths and net migration in every transition 1994→1995 to 2025→2026, served or not: the residual is 0 in 31 of 32, and the census step must equal exactly +225,922. Any other residual, or a moved census step, stops.
 - Census anchor: all 64 municipalities are within ±1% of their census count (median −0.14%, largest 0.82%).
 - Rates recomputed from counts: the crude birth rate, crude death rate, natural increase rate, net migration rate and infant mortality rate within 0.05 (observed up to 0.028, 0.047, 0.045, 0.048 and 0.044), the total fertility rate within 0.005, and the share aged 65+ and three dependency ratios from the served age bands within 0.05 (observed 0.0496). Mid-year population is the 1 January value plus half of that year's natural increase and net migration; Geostat's 2008 value is 10,147.5 persons above that, unexplained and outside the served years, so these checks run over the served years. Life expectancy in the abridged table 27 is within 0.25 years of table 28 (observed 0.158, a method difference, reported and not corrected).
+- Census 2024: every identity above, in the whole table and not only the served rows; the two served series must also agree with each other (the age groups of Georgia and each region add to its settlement total) and hold 2024 only.
 - Density: every served value is recomputed from the served 1 January population and the reviewed area and must sit within 0.05 of it (observed 0.0499), the region areas must add up to Georgia's, the row labels must be the reviewed ones once each, Geostat's note about the March-2014 area must be present, and a value on the Abkhazia row stops preparation.
 - The comparison with the committed files stops on any changed value, unit, lineage or source of a row already captured.
 
@@ -80,4 +95,4 @@ Geostat releases vital events in late March and population and migration in Apri
 
 ## Delivery boundary
 
-This stage adds data only. It adds no page, route, workbook, download, MCP tool or sidebar link (the `დემოგრაფია` marker stays non-clickable), and no database import: the serving mirror, the methodology source-archive entry and the denominator policy for per-resident indicators belong to the page stage. The twelve canonical inputs (the eleven of the first capture and table 03) are registered in `data/sources/source-documents.csv` and cited to Geostat's original files; the validation inputs and definition PDFs stay evidence. The reviewed CSVs are UTF-8 with a BOM for direct opening in Excel.
+This stage adds data only. It adds no page, route, workbook, download, MCP tool or sidebar link (the `დემოგრაფია` marker stays non-clickable), and no database import: the serving mirror, the methodology source-archive entry and the denominator policy for per-resident indicators belong to the page stage. The thirteen canonical inputs (the eleven of the first capture, table 03 and the census age table) are registered in `data/sources/source-documents.csv` and cited to Geostat's original files; the validation inputs and definition PDFs stay evidence. The reviewed CSVs are UTF-8 with a BOM for direct opening in Excel.

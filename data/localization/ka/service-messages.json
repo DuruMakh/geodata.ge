@@ -399,6 +399,7 @@
   "sources.source.geostat_demography_net_migration.name": "მიგრაციის სალდო (რაოდენობა და კოეფიციენტი)",
   "sources.source.geostat_demography_migration_citizenship.name": "იმიგრანტები და ემიგრანტები სქესისა და მოქალაქეობის მიხედვით",
   "sources.source.geostat_demography_density.name": "მოსახლეობის სიმჭიდროვე რეგიონების მიხედვით",
+  "sources.source.geostat_census2024_population_by_age_settlement.name": "2024 წლის აღწერა: მოსახლეობა რეგიონების, ასაკის, სქესისა და დასახლების ტიპის მიხედვით",
   "documents.source.geostat_demography_population_age_sex.title": "მოსახლეობა 1 იანვრის მდგომარეობით, 5-წლიანი ასაკობრივი ჯგუფებისა და სქესის მიხედვით",
   "documents.source.geostat_demography_population_age_sex.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
   "documents.source.geostat_demography_births.title": "ცოცხლად დაბადებულთა რაოდენობა რეგიონებისა და თვითმმართველი ერთეულების მიხედვით",
@@ -422,5 +423,7 @@
   "documents.source.geostat_demography_migration_citizenship.title": "იმიგრანტებისა და ემიგრანტების რაოდენობა სქესისა და მოქალაქეობის მიხედვით",
   "documents.source.geostat_demography_migration_citizenship.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
   "documents.source.geostat_demography_density.title": "მოსახლეობის სიმჭიდროვე რეგიონების მიხედვით (მოსახლეობის რაოდენობა 1 კვ.კმ-ზე)",
-  "documents.source.geostat_demography_density.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)"
+  "documents.source.geostat_demography_density.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
+  "documents.source.geostat_census2024_population_by_age_settlement.title": "მოსახლეობა რეგიონების, თვითმმართველი ერთეულების, 5-წლიანი ასაკობრივი ჯგუფების, ქალაქ-სოფლის დასახლებებისა და სქესის მიხედვით (2024 წლის 14 ნოემბრის მდგომარეობით)",
+  "documents.source.geostat_census2024_population_by_age_settlement.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)"
 }
