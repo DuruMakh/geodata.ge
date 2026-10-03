@@ -15,10 +15,12 @@ import { compare } from "./compare";
 import { describeCoverage } from "./describeCoverage";
 import { buildResponseMeta } from "./meta";
 import { inflationObservations } from "./queryInflation";
+import { queryInflationProducts } from "./queryInflationProducts";
+import { inflationProductSources } from "./inflationProductData";
 import { queryMinistries } from "./queryMinistries";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
-import { rankInput } from "./schemas";
+import { INPUT_LIMITS, rankInput } from "./schemas";
 import { selectSources } from "./sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
@@ -45,6 +47,7 @@ export type RankEntry = {
   caveatIds: string[];
   /** Inflation value rankings only: the month ranked. */
   period?: string;
+  calculationBasePeriod?: string;
 };
 
 export type RankData = {
@@ -83,6 +86,7 @@ type Candidate = {
   basis: Basis | null;
   caveatIds: string[];
   period?: string;
+  calculationBasePeriod?: string;
   /** Stable sort key, used only to break exact ties reproducibly. */
   stableId: string;
 };
@@ -156,6 +160,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   const isMunicipal = input.datasetId === "municipal-expenditure";
   const isInflation = input.datasetId === "inflation";
+  const isProduct = input.datasetId === "inflation-products";
   const isValueMetric = input.metric === "value";
 
   if (input.withinRegionId !== undefined && !snapshot.municipal.regions.some((r) => r.id === input.withinRegionId)) {
@@ -254,7 +259,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       if (input.withinRegionId) universeValues = { regionId: input.withinRegionId };
     }
   } else {
-    const series = catalogueSeries(snapshot, input.datasetId);
+    const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId);
     if (inflationCities) {
       if (input.seriesId === undefined || input.entityType !== "city") {
         return errorResponse(snapshot, {
@@ -266,6 +271,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       }
       seriesIds = [input.seriesId];
       universeKey = "ranking.inflationCities";
+    } else if (isProduct) {
+      seriesIds = snapshot.inflationProducts.catalogue.map(product => product.productId).sort();
+      universeKey = "ranking.inflationProducts";
     } else if (isInflation) {
       // Peers only: one COICOP level, never the headline, the target or the residual.
       seriesIds = snapshot.inflation.groups
@@ -339,14 +347,36 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   };
 
   if (isValueMetric) {
-    const result = isInflation
+    let result: FactQueryResponse;
+    if (isProduct) {
+      const observations: Observation[] = [];
+      const mergedCaveats = new Map<string, FactQueryResponse["meta"]["caveats"][number]>();
+      // Keep each query within the public series cap, while covering the entire roster.
+      for (let offset = 0; offset < seriesIds.length; offset += INPUT_LIMITS.series) {
+        const batch = queryInflationProducts(snapshot, {
+          seriesIds: seriesIds.slice(offset, offset + INPUT_LIMITS.series), measure: input.measure,
+          fromPeriod: input.period, toPeriod: input.period,
+          ...(input.startYear === undefined ? {} : { startYear: input.startYear }),
+        });
+        if (batch.kind === "error") return errorResponse(snapshot, batch.error);
+        observations.push(...(batch.data as { observations: Observation[] }).observations);
+        for (const caveat of batch.meta.caveats) {
+          const previous = mergedCaveats.get(caveat.code);
+          mergedCaveats.set(caveat.code, { ...caveat, affects: [...new Set([...(previous?.affects ?? []), ...caveat.affects])] });
+        }
+      }
+      sources = inflationProductSources(snapshot, input.measure as "yoy_pct" | "cumulative_pct");
+      result = { kind: "observations", status: "ok", data: { observations }, meta: buildResponseMeta(snapshot, { sources, caveats: [...mergedCaveats.values()], citedDocumentIds: [...new Set(observations.flatMap(observation => observation.documentIds))] }) };
+    } else result = isInflation
       ? inflationObservations(snapshot, { seriesIds, measure: input.measure, periods: [input.period as string], ...(inflationCities ? { entityIds } : {}) }, { includeResidual: false })
       : runObservations([input.year as number]);
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
     const observations = (result.data as { observations: Observation[] }).observations;
-    sources = selectSources(snapshot, result.meta.sources.map((source) => source.sourceId));
-    citedDocumentIds = result.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId));
+    if (!isProduct) sources = selectSources(snapshot, result.meta.sources.map((source) => source.sourceId));
+    citedDocumentIds = isProduct
+      ? [...new Set(observations.flatMap(observation => observation.documentIds))]
+      : result.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId));
     caveats = result.meta.caveats;
 
 
@@ -368,6 +398,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         basis: observation.basis,
         caveatIds: observation.caveatIds,
         ...(observation.period !== undefined ? { period: observation.period } : {}),
+        ...(observation.calculationBasePeriod !== undefined ? { calculationBasePeriod: observation.calculationBasePeriod } : {}),
         stableId,
       });
     }
@@ -501,11 +532,13 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     basis: entry.basis,
     caveatIds: entry.caveatIds,
     ...(entry.period !== undefined ? { period: entry.period } : {}),
+    ...(entry.calculationBasePeriod !== undefined ? { calculationBasePeriod: entry.calculationBasePeriod } : {}),
   }));
 
   const rankingDefinitionFor = (locale: "ka" | "en") => {
     const order = serviceMessage(snapshot, locale, input.order === "ascending" ? "ranking.ascending" : "ranking.descending");
-    if (isInflation) {
+    if (isProduct && input.measure === "cumulative_pct") return serviceMessage(snapshot, locale, "ranking.productCumulativeDefinition", { period: input.period!, basePeriod: `${input.startYear! - 1}-12`, order });
+    if (isInflation || isProduct) {
       return isValueMetric
         ? serviceMessage(snapshot, locale, "ranking.valueDefinitionPeriod", { measure: input.measure, period: input.period as string, order })
         : serviceMessage(snapshot, locale, "ranking.changeDefinitionPeriod", { metric: input.metric, measure: input.measure, fromPeriod: input.fromPeriod as string, toPeriod: input.toPeriod as string, order });

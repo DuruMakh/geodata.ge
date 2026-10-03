@@ -1,0 +1,57 @@
+
+> web@0.1.0 check
+> npm run lint && npm run typecheck && npm run test && npm run data:validate && npm run i18n:check
+
+
+> web@0.1.0 lint
+> eslint --max-warnings 0
+
+
+> web@0.1.0 typecheck
+> tsc --noEmit
+
+
+> web@0.1.0 pretest
+> npm run data:prepare-fact-query-snapshot
+
+
+> web@0.1.0 data:prepare-fact-query-snapshot
+> tsx scripts/prepare-fact-query-snapshot.ts --write
+
+wrote C:\Users\Mylaptop\.codex\worktrees\e3aa\Geodata.ge\apps\web\lib\factQuery\generated\snapshot.json dataVersion=2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7
+
+> web@0.1.0 test
+> vitest run --configLoader native --maxWorkers=4
+
+(node:25620) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/vitest.config.ts?fresh-import-b8p8akw1yc6=0,file:///C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/vitest.config.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\Mylaptop\.codex\worktrees\e3aa\Geodata.ge\apps\web\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v5.0.2 C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web
+
+ ❯ |heavy| tests/data/inflation/prepareProducts.test.ts (11 tests | 1 failed) 2249941ms
+   ❯ reviewed product identity mapping (11)
+     × reports historical value, missing-marker and removed-row revisions before cohort filtering 2146268ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |heavy| tests/data/inflation/prepareProducts.test.ts > reviewed product identity mapping > reports historical value, missing-marker and removed-row revisions before cohort filtering
+Error: Test timed out in 90000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/data/inflation/prepareProducts.test.ts:103:3
+    101|   });
+    102|
+    103|   it("reports historical value, missing-marker and removed-row revisio…
+       |   ^
+    104|     expect(findProductRevisions(prepared.facts, catalogue, rows, decis…
+    105|     const valueChanged = rows.map((row) => row.year === 2019 && row.or…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 315 passed | 1 skipped (317)
+      Tests  1 failed | 2712 passed | 7 skipped (2720)
+   Start at  17:40:54
+   Duration  2727.44s (tests 97%, import 3%)
+

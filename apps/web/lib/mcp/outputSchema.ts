@@ -13,7 +13,7 @@
 // union below supports validation of any response; registration narrows it to
 // the one kind of answer the selected tool returns.
 import { z } from "zod";
-import { observationSchema } from "../factQuery/schemas";
+import { observationSchema, periodKeySchema } from "../factQuery/schemas";
 
 const caveat = z
   .object({
@@ -99,7 +99,7 @@ const coverage = z.object({
   requestedYears: z.array(z.number().int()), availableYears: z.array(z.number().int()), returnedYears: z.array(z.number().int()),
   missingCells: z.array(z.object({ entityId: z.string(), seriesId: z.string(), year: z.number().int(), period: z.string().optional(), reason: z.string(), reasonEn: z.string().min(1) })),
   excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
-  requestedPeriods: z.array(z.string()).optional(), availablePeriods: z.tuple([z.string(), z.string()]).optional(),
+  requestedPeriods: z.array(z.string()).optional(), availablePeriods: z.array(z.string()).length(2).nullable().optional(),
 });
 const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
 const dataShapes = {
@@ -111,20 +111,23 @@ const dataShapes = {
       absoluteChange: z.number().nullable(), percentageChange: z.number().nullable(), percentagePointChange: z.number().nullable(),
       comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), reasonsEn: z.array(z.string()), caveatIds: z.array(z.string()),
     })),
-    coverage: z.object({ requestedYears: z.array(z.number()), requestedPeriods: z.tuple([z.string(), z.string()]).optional(), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(bilingualExcludedEntity) }),
+    coverage: z.object({ requestedYears: z.array(z.number()), requestedPeriods: z.array(z.string()).length(2).optional(), requestedPairs: z.number(), comparedPairs: z.number(), comparableCount: z.number(), notComparableCount: z.number(), excludedEntities: z.array(bilingualExcludedEntity) }),
   }),
   ranking: z.object({
     entries: z.array(z.object({
       position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
-      value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()), period: z.string().optional(),
+      value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()), period: z.string().optional(), calculationBasePeriod: periodKeySchema.optional(),
     })),
     universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), descriptionEn: z.string().min(1), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
     exclusions: z.array(z.object({ reason: z.string(), reasonEn: z.string().min(1), ids: z.array(z.string()) })), rankingDefinition: z.string(), rankingDefinitionEn: z.string().min(1),
   }),
   catalogue: z.object({
-    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.tuple([z.number(), z.number()]), entityTypes: z.array(z.string()), measures: z.array(z.string()), periods: z.tuple([z.string(), z.string()]).optional(), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional() })),
-series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(), periods: z.tuple([z.string(), z.string()]).optional(), periodsByMeasure: z.record(z.string(), z.tuple([z.string(), z.string()])).optional(), datasetId: z.string().optional() })).optional(),
-    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), periods: z.tuple([z.string(), z.string()]).optional(), datasetId: z.string().optional() })).optional(),
+    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.array(z.number()).length(2), entityTypes: z.array(z.string()), measures: z.array(z.string()), periods: z.array(z.string()).length(2).optional(), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional() })),
+    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(), periods: z.array(z.string()).length(2).optional(), periodsByMeasure: z.record(z.string(), z.array(z.string()).length(2)).optional(), datasetId: z.string().optional(),
+      coicopCode: z.string().optional(), firstPeriod: periodKeySchema.optional(), measures: z.array(z.enum(["yoy_pct", "cumulative_pct"])).optional(),
+      historyNotes: z.array(z.object({ boundaryYear: z.number().int(), noteKa: z.string().min(1), noteEn: z.string().min(1) })).optional(),
+    })).optional(),
+    entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), periods: z.array(z.string()).length(2).optional(), datasetId: z.string().optional() })).optional(),
     exclusions: z.array(bilingualExcludedEntity),
   }),
   sources: z.object({

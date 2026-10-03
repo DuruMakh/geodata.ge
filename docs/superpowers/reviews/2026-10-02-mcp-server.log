@@ -1,0 +1,43 @@
+
+> web@0.1.0 start
+> next start --port 3100
+
+▲ Next.js 16.3.8
+- Local:         http://localhost:3100
+- Network:       http://172.19.160.1:3100
+✓ Ready in 153ms
+✓ Running next.config.ts took 41ms
+{"tool":"unparsed","dataVersion":"unavailable","resultBytes":341,"durationMs":2,"outcome":"error","errorCode":"forbidden_host"}
+{"tool":"unparsed","dataVersion":"unavailable","resultBytes":341,"durationMs":1,"outcome":"error","errorCode":"forbidden_host"}
+responseMode: 'json' drops mid-call notifications. subscriptions/listen streams are always served over SSE regardless; other notifications emitted before a result are dropped.
+{"tool":"server/discover","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":14851,"durationMs":266,"outcome":"ok"}
+{"tool":"initialize","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":14732,"durationMs":41,"outcome":"ok"}
+{"tool":"notifications/initialized","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":0,"durationMs":22,"outcome":"ok"}
+{"tool":"tools/list","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":120133,"durationMs":35,"outcome":"ok"}
+{"tool":"tools/list","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":119990,"durationMs":31,"outcome":"ok"}
+{"tool":"describe_coverage","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":469565,"durationMs":70,"outcome":"ok"}
+{"tool":"describe_coverage","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":469455,"durationMs":62,"outcome":"ok"}
+{"tool":"query_inflation_products","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":7301,"durationMs":205,"outcome":"ok"}
+{"tool":"query_inflation_products","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":7191,"durationMs":21,"outcome":"ok"}
+{"tool":"query_inflation_products","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":11243,"durationMs":21,"outcome":"ok"}
+{"tool":"query_inflation_products","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":11133,"durationMs":21,"outcome":"ok"}
+{"tool":"rank","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":63633,"durationMs":75,"outcome":"ok"}
+{"tool":"rank","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":63523,"durationMs":50,"outcome":"ok"}
+{"tool":"rank","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":105427,"durationMs":110,"outcome":"ok"}
+{"tool":"rank","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":105317,"durationMs":99,"outcome":"ok"}
+{"tool":"get_sources","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":12981,"durationMs":28,"outcome":"ok"}
+{"tool":"get_sources","dataVersion":"2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7","resultBytes":12871,"durationMs":28,"outcome":"ok"}
+Error: Internal: NoFallbackError
+    at ignore-listed frames
+Error: Internal: NoFallbackError
+    at ignore-listed frames
+Error: Internal: NoFallbackError
+    at ignore-listed frames
+Error: Internal: NoFallbackError
+    at ignore-listed frames
+Error: Internal: NoFallbackError
+    at ignore-listed frames
+Error: Internal: NoFallbackError
+    at ignore-listed frames
+Error: Internal: NoFallbackError
+    at ignore-listed frames

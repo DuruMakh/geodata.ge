@@ -5,14 +5,49 @@ const ENDPOINT = "https://fiscal.ge/mcp";
 
 for (const prefix of ["", "/en"]) {
   test(`bilingual examples and shared contract on ${prefix}/connect`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", error => errors.push(error.message));
+    page.on("console", entry => { if (entry.type() === "error") errors.push(entry.text()); });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (value: string) => { document.documentElement.dataset.testClipboard = value; } } });
+    });
     await page.goto(`${BASE_URL}${prefix}/connect`);
     await expect(page.getByTestId("connect-endpoint")).toHaveText(ENDPOINT);
     const bilingual = page.getByTestId("connect-bilingual");
-    await expect(bilingual.locator("li")).toHaveCount(5);
+    await expect(bilingual.locator("li")).toHaveCount(10);
     await expect(bilingual).toContainText("2025");
     await expect(bilingual).toContainText("2024");
-    await expect(page.getByTestId("connect-technical")).toContainText("1.4.0");
+    await expect(page.getByTestId("connect-technical")).toContainText("1.5.0");
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
+    await expect(page.getByTestId("connect-technical")).toContainText("2026-07-28");
+    await expect(page.getByTestId("connect-technical")).toContainText("2025-11-25");
+    const catalogue = await (await page.request.get(`${BASE_URL}/downloads/data/catalogue.json`)).json();
+    const products = catalogue.datasets.find((dataset: { datasetId: string }) => dataset.datasetId === "inflation-products");
+    await expect(page.getByTestId("connect-product-coverage")).toContainText(products.periods.join("–"));
+    const productCatalogue = await (await page.request.get(`${BASE_URL}/downloads/data/inflation-products.json`)).json();
+    await expect(page.getByTestId("connect-product-coverage")).toContainText(String(productCatalogue.catalogue.series.length));
+    for (const id of ["inflation-national", "inflation-cities", "inflation-batumi", "products-annual", "products-cumulative"]) await expect(page.getByTestId(`connect-example-${id}`)).toBeVisible();
+    await expect(page.getByTestId("connect-example-inflation-batumi")).toContainText(prefix ? "percentage points" : "პროცენტული პუნქტ");
+    await expect(page.getByTestId("connect-example-products-cumulative")).toContainText(prefix ? "December" : "დეკემბ");
+    const productDiscovery = page.getByTestId("connect-product-discovery");
+    for (const file of ["inflation-products.csv", "inflation-products.json"]) {
+      await expect(productDiscovery.locator(`a[href="/downloads/data/${file}"]`)).toHaveCount(1);
+      expect((await page.request.get(`${BASE_URL}/downloads/data/${file}`)).ok()).toBe(true);
+    }
+    await expect(productDiscovery.locator(`a[href="${prefix}/methodology/inflation"]`)).toHaveCount(1);
+    const clients = page.getByTestId("connect-client");
+    await expect(clients.filter({ hasText: "Codex" })).not.toContainText("ChatGPT");
+    const endpointCopy = page.getByTestId("connect-copy");
+    await endpointCopy.focus();
+    await endpointCopy.press("Enter");
+    await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", ENDPOINT);
+    const promptCopy = page.getByTestId("connect-copy-prompt");
+    await promptCopy.focus();
+    await promptCopy.press("Enter");
+    await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", (await page.getByTestId("connect-prompt").innerText()).slice(1, -1));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    expect(errors).toEqual([]);
     if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
     else await expect(bilingual).toContainText("ხულოს");
     const sectors = page.getByTestId("connect-sector-coverage");
@@ -85,7 +120,8 @@ test.describe("connection page", () => {
     // green - which is the exact drift this page exists to prevent.
     const servedLines = (await served.innerText()).split("\n").filter((line) => line.includes("—"));
     const catalogue = await (await page.request.get(`${BASE_URL}/downloads/data/catalogue.json`)).json();
-    expect(servedLines).toHaveLength(catalogue.datasets.length);
+    // City coverage is a separate line within the inflation dataset.
+    expect(servedLines).toHaveLength(catalogue.datasets.length + 1);
     expect(servedLines.find(line => line.startsWith("მშპ,"))).toContain("1960–2025");
 
     // Debt and the balance are served now, so the page must not still deny
@@ -97,7 +133,7 @@ test.describe("connection page", () => {
     // A range, optionally followed by the projection note the two forward-
     // looking datasets carry. The range itself must still be the last data on
     // the line, so a dataset silently losing its years is still caught.
-    for (const line of servedLines.filter(line => !line.startsWith("ეკონომიკური სექტორები") && !line.startsWith("სამომხმარებლო ფასების ინფლაცია"))) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
+    for (const line of servedLines.filter(line => !line.startsWith("ეკონომიკური სექტორები") && !line.startsWith("სამომხმარებლო ფასების ინფლაცია") && !line.startsWith("ინფლაცია საქსტატის") && !line.startsWith("მოქმედი კალათის"))) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
     // Inflation is monthly, so like the sector line it carries several ranges; its
     // month span and the contribution start must still be real data.
     const inflation = servedLines.find((line) => line.startsWith("სამომხმარებლო ფასების ინფლაცია"))!;

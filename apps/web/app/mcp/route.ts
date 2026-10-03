@@ -1,4 +1,4 @@
-import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { createMcpHandler, isLegacyRequest, WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 import {
   LIMITS,
   RATE_MAX_REQUESTS,
@@ -12,6 +12,7 @@ import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 import { logToolCall } from "../../lib/mcp/log";
 import { errorCodeSchema } from "../../lib/factQuery/schemas";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
+import { tooLargeResponse, toolResult } from "../../lib/mcp/result";
 
 // The only request-time code in the repository. Every other route is
 // prerendered. Node runtime because the snapshot loader reads the artifact from
@@ -31,16 +32,19 @@ function counter(): ReturnType<typeof createCounter> {
   return (counterInstance ??= createCounter());
 }
 
+// Shared HTTP entry, fresh server for each exchange; no subscription capability.
+let modernHandler: ReturnType<typeof createMcpHandler> | undefined;
+
 /** Global daily ceiling across all instances (spec 11.3): 10,000 accepted requests per UTC day. */
 const DAILY_MAX = 10_000;
 const DAY_SECONDS = 24 * 60 * 60;
 
-function rpcError(status: number, code: string, messageKa: string, messageEn: string, headers: HeadersInit = {}, rpcCode = -32000): Response {
+function rpcError(status: number, code: string, messageKa: string, messageEn: string, headers: HeadersInit = {}, rpcCode = -32000, id: string | number | null = null): Response {
   return new Response(
     JSON.stringify({
       jsonrpc: "2.0",
       error: { code: rpcCode, message: `${code}: ${messageEn}`, data: { code, messageKa, messageEn } },
-      id: null,
+      id,
     }),
     { status, headers: { "content-type": "application/json", ...headers } },
   );
@@ -75,7 +79,7 @@ function methodNotAllowed(): Response {
 }
 
 /** The protocol methods this server implements, so the log can name them. */
-const PROTOCOL_METHODS = new Set(["initialize", "notifications/initialized", "ping", "tools/list", "tools/call"]);
+const PROTOCOL_METHODS = new Set(["server/discover", "initialize", "notifications/initialized", "ping", "tools/list", "tools/call"]);
 
 /**
  * What this call was, for the log. Never the arguments, never the body.
@@ -148,7 +152,7 @@ function preflight(request: Request): Response {
     headers: {
       "access-control-allow-origin": origin,
       "access-control-allow-methods": "POST, OPTIONS",
-      "access-control-allow-headers": "content-type, accept, mcp-protocol-version, mcp-session-id",
+      "access-control-allow-headers": "content-type, accept, mcp-protocol-version, mcp-session-id, mcp-method, mcp-name",
       "access-control-max-age": "600",
       vary: "origin",
     },
@@ -177,7 +181,7 @@ function withResponseHeaders(request: Request, response: Response): Response {
 
 const LOG_ERROR_CODES = new Set<string>([...errorCodeSchema.options, "request_too_large", "forbidden_host", "forbidden_origin", "internal_error"]);
 
-type RequestContext = { tool: string; dataVersion: string };
+type RequestContext = { tool: string; dataVersion: string; id?: string | number };
 
 async function handle(request: Request): Promise<Response> {
   const startedAt = Date.now();
@@ -190,6 +194,7 @@ async function handle(request: Request): Promise<Response> {
       500, "internal_error",
       "სერვისში მოხდა შეცდომა. მონაცემები ხელმისაწვდომია საიტზე და ჩამოსატვირთ ფაილებში.",
       "The service failed to answer this request. The data remains available at https://fiscal.ge/downloads/data/manifest.json.",
+      {}, -32000, context.id,
     );
   }
   withResponseHeaders(request, response);
@@ -277,6 +282,7 @@ async function serve(request: Request, context: RequestContext): Promise<Respons
     return rpcError(400, "invalid_parameters", "თითოეული მოთხოვნა ცალკე გაგზავნეთ.", "Send one JSON-RPC message per HTTP request; batches are not supported.", {}, -32600);
   }
   context.tool = toolNameOf(parsedBody);
+  if (typeof parsedBody === "object" && parsedBody !== null && "id" in parsedBody && (typeof parsedBody.id === "string" || typeof parsedBody.id === "number")) context.id = parsedBody.id;
 
   // 4. Rate limits. A counter failure stops expensive processing with a
   // retryable error rather than quietly disabling the limit (spec 11.3).
@@ -304,24 +310,38 @@ async function serve(request: Request, context: RequestContext): Promise<Respons
   const dailyRefusal = refusalFor(daily);
   if (dailyRefusal !== null) return dailyRefusal;
 
-  // 5. Stateless: no sessionIdGenerator, so no session store and no
-  // cross-request state to keep consistent across instances (spec 11.1).
-  // enableJsonResponse keeps a fixed single POST a plain JSON reply.
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: undefined,
-    enableJsonResponse: true,
-  });
-  const server = createMcpServer();
+  // 5. The SDK classifies protocol eras. Its default legacy adapter streams
+  // even with responseMode: json, so use its published JSON transport for
+  // that era and the discovery handler for modern traffic (same tool factory).
   context.dataVersion = loadPackagedSnapshot().dataVersion;
-
-  await server.connect(transport);
+  const checkedRequest = new Request(request.url, {
+    method: "POST", headers: request.headers, body: raw, signal: request.signal,
+  });
   let response: Response;
-  try {
-    response = await transport.handleRequest(request, { parsedBody });
-  } finally {
-    // One transport per request: close it whether the call succeeded or threw,
-    // so a failed request cannot leave a stream open on a reused instance.
-    await server.close();
+  if (await isLegacyRequest(checkedRequest, parsedBody)) {
+    const server = createMcpServer();
+    const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+    try {
+      await server.connect(transport);
+      response = await transport.handleRequest(checkedRequest, { parsedBody });
+    } finally { await server.close(); }
+  } else {
+    modernHandler ??= createMcpHandler(createMcpServer, { legacy: "reject", responseMode: "json", maxSubscriptions: 0 });
+    response = await modernHandler.fetch(checkedRequest);
+    // The SDK catches factory exceptions itself; keep the application's safe,
+    // bilingual failure boundary rather than exposing its generic 500 body.
+    if (response.status >= 500) throw new Error("MCP serving failed");
+  }
+
+  // SDK resultType/server identity metadata adds bytes after the tool's own
+  // size check. Refuse the full answer if the final serialized reply is over
+  // the limit; never remove evidence or return a partially trimmed answer.
+  const text = await response.clone().text();
+  if (Buffer.byteLength(text, "utf8") > LIMITS.resultBytes) {
+    const reply = JSON.parse(text);
+    const result = toolResult(tooLargeResponse(loadPackagedSnapshot(), { returned: 0, bytes: Buffer.byteLength(text, "utf8") }));
+    reply.result = { ...result, ...(reply.result?.resultType ? { resultType: reply.result.resultType } : {}), ...(reply.result?._meta ? { _meta: reply.result._meta } : {}) };
+    response = new Response(JSON.stringify(reply), { status: response.status, headers: response.headers });
   }
 
   return response;

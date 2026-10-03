@@ -35,7 +35,7 @@ jobs:
       - name: Audit dependencies
         run: |
           for attempt in 1 2 3; do
-            if npm audit --audit-level=high --fetch-retries=0 --fetch-timeout=30000; then
+            if npx tsx scripts/audit-dependencies.ts; then
               exit 0
             fi
             if [ "$attempt" -lt 3 ]; then

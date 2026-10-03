@@ -33,6 +33,8 @@ export type Observation = {
   year: number;
   /** Monthly observations only (inflation): YYYY-MM. `year` stays the calendar year of that month. */
   period?: string;
+  /** December before the first cumulative calculation year; absent for other measures. */
+  calculationBasePeriod?: string;
   measure: Measure;
   unit: Unit;
   value: number | null;

@@ -39,7 +39,7 @@ beforeAll(async () => {
   catalogueFile = allPublications.find((file) => file.fileName === "catalogue.json")!;
   sourcesFile = allPublications.find((file) => file.fileName === "sources.json")!;
   datasetFiles = allPublications.filter(
-    (file) => file.fileName.endsWith(".json") && !["catalogue.json", "sources.json", "manifest.json", "inflation-categories.json", "inflation-cities.json"].includes(file.fileName),
+    (file) => file.fileName.endsWith(".json") && !["catalogue.json", "sources.json", "manifest.json", "inflation-categories.json", "inflation-cities.json", "inflation-products.json"].includes(file.fileName),
   );
 });
 
@@ -71,6 +71,7 @@ describe("catalogue.json", () => {
       "general-government-balance",
       "government-debt",
       "inflation",
+      "inflation-products",
       "ministries",
       "municipal-expenditure",
       "national-expenditure",
@@ -275,6 +276,8 @@ describe("dataset publications", () => {
       "inflation-categories.json",
       "inflation-cities.csv",
       "inflation-cities.json",
+      "inflation-products.csv",
+      "inflation-products.json",
       "manifest.json",
     ]);
   });

@@ -1,0 +1,229 @@
+
+> web@0.1.0 prebuild
+> npm run data:prepare-methodology-archives && npm run i18n:check && npm run data:prepare-public-datasets && npm run data:prepare-fact-query-snapshot && npm run data:prepare-regional-economies-public && npm run data:prepare-inflation-public && npm run data:prepare-fact-query-publications
+
+
+> web@0.1.0 data:prepare-methodology-archives
+> tsx scripts/prepare-methodology-archives.ts --write
+
+expenditure: PASS (79 originals, 58628862 source bytes)
+revenue: PASS (22 originals, 5465153 source bytes)
+municipalities: PASS (79 originals, 3571415 source bytes)
+debt: PASS (10 originals, 16250452 source bytes)
+gdp: PASS (5 originals, 173654 source bytes)
+economic-sectors: PASS (3 originals, 139132 source bytes)
+regional-economies: PASS (2 originals, 112960 source bytes)
+inflation: PASS (20 originals, 6156753 source bytes)
+
+> web@0.1.0 i18n:check
+> tsx scripts/check-localization.ts --check
+
+Translation catalogue and registered messages valid: 287 labels; 121 public page identities. Page-body completion is checked separately.
+
+> web@0.1.0 data:prepare-public-datasets
+> tsx scripts/prepare-public-datasets.ts --write
+
+national-expenditure: PASS (286 rows, 76177 bytes, a04cf54c7e47f126f8e6040dab0e4df5465411e7d24c82a44cec43f7a2dbe8d1)
+national-revenue: PASS (241 rows, 47565 bytes, 0880b5baf921780c4609b217d5564812358c2edc5ebfed492da6aa14bcf83b31)
+municipal-expenditure: PASS (7865 rows, 831760 bytes, 0d71b38fce4a81765149e75aa8d37d40311ca274d3484e4a3fa7eb93bc306b2c)
+government-debt: PASS (126 rows, 13903 bytes, 6e4f4f66e2d647b77baec394460740e840567feed79bd3dfc88b233d100f1b5b)
+general-government-balance: PASS (37 rows, 3650 bytes, ed69798751b015f6c21de1919eb0e51744f3da76241ede5d5a8a944551554401)
+
+> web@0.1.0 data:prepare-fact-query-snapshot
+> tsx scripts/prepare-fact-query-snapshot.ts --write
+
+wrote C:\Users\Mylaptop\.codex\worktrees\e3aa\Geodata.ge\apps\web\lib\factQuery\generated\snapshot.json dataVersion=2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7
+
+> web@0.1.0 data:prepare-regional-economies-public
+> tsx scripts/prepare-regional-economies-public.ts
+
+Regional economies public CSV: 6930 observations
+
+> web@0.1.0 data:prepare-inflation-public
+> tsx scripts/prepare-inflation.ts --public
+
+Inflation public CSV written
+
+> web@0.1.0 data:prepare-fact-query-publications
+> tsx scripts/prepare-fact-query-publications.ts --write
+
+catalogue.json: 525 rows, 792055 bytes
+sources.json: 132 rows, 506275 bytes
+national-revenue.json: 264 rows, 426421 bytes
+national-expenditure.json: 308 rows, 542474 bytes
+ministries.json: 1386 rows, 2851882 bytes
+municipal-expenditure.json: 9196 rows, 14477582 bytes
+government-debt.json: 108 rows, 174625 bytes
+government-debt-rates.json: 33 rows, 81678 bytes
+general-government-balance.json: 37 rows, 73439 bytes
+gdp-overview.json: 396 rows, 681704 bytes
+gdp-overview.csv: 251 rows, 22847 bytes
+economic-sectors.json: 1008 rows, 1719329 bytes
+economic-sectors.csv: 987 rows, 303268 bytes
+regional-economies.json: 6930 rows, 11654126 bytes
+regional-economies.csv: 6930 rows, 2594147 bytes
+inflation-national.json: 3345 rows, 5602969 bytes
+inflation-categories.csv: 36580 rows, 4517315 bytes
+inflation-categories.json: 36580 rows, 378496 bytes
+inflation-cities.csv: 20570 rows, 1801931 bytes
+inflation-cities.json: 20570 rows, 128147 bytes
+inflation-products.csv: 84056 rows, 7150643 bytes
+inflation-products.json: 84056 rows, 492893 bytes
+manifest.json: 22 rows, 7693 bytes
+wrote 23 publications dataVersion=2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7
+
+> web@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 287ms
+- Experiments (use with caution):
+  ✓ globalNotFound
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.4s
+  Running TypeScript ...
+  Finished TypeScript in 16.6s ...
+  Collecting page data using 13 workers ...
+  Generating static pages using 13 workers (0/251) ...
+  Generating static pages using 13 workers (62/251) 
+  Generating static pages using 13 workers (125/251) 
+  Generating static pages using 13 workers (188/251) 
+✓ Generating static pages using 13 workers (251/251) in 31.3s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ○ /apple-icon.png
+├ ○ /connect
+├ ○ /en
+├ ○ /en/about
+├ ○ /en/connect
+├ ○ /en/explorer
+├ ○ /en/explorer/analysis
+├ ○ /en/explorer/debt
+├ ○ /en/explorer/deficit
+├ ○ /en/explorer/economy
+├ ○ /en/explorer/economy/gdp
+├ ○ /en/explorer/economy/regions
+├   /en/explorer/economy/regions/[id]
+│ ├ ● /en/explorer/economy/regions/tbilisi
+│ ├ ● /en/explorer/economy/regions/adjara
+│ ├ ● /en/explorer/economy/regions/guria
+│ └ ● [+8 more paths]
+├ ○ /en/explorer/economy/sectors
+├ ○ /en/explorer/expenditure
+├ ○ /en/explorer/inflation
+├ ○ /en/explorer/inflation/categories
+├ ○ /en/explorer/inflation/cities
+├   /en/explorer/inflation/cities/[city]
+│ ├ ● /en/explorer/inflation/cities/tbilisi
+│ ├ ● /en/explorer/inflation/cities/kutaisi
+│ ├ ● /en/explorer/inflation/cities/batumi
+│ └ ● [+3 more paths]
+├ ○ /en/explorer/inflation/overview
+├ ○ /en/explorer/inflation/products
+├ ○ /en/explorer/municipalities
+├   /en/explorer/municipalities/[slug]
+│ ├ ● /en/explorer/municipalities/tbilisi
+│ ├ ● /en/explorer/municipalities/batumi
+│ ├ ● /en/explorer/municipalities/kobuleti
+│ └ ● [+61 more paths]
+├ ○ /en/explorer/municipalities/georgia
+├   /en/explorer/municipalities/region/[id]
+│ ├ ● /en/explorer/municipalities/region/tbilisi
+│ ├ ● /en/explorer/municipalities/region/adjara
+│ ├ ● /en/explorer/municipalities/region/guria
+│ └ ● [+8 more paths]
+├ ○ /en/explorer/revenue
+├ ○ /en/methodology
+├   /en/methodology/[dataset]
+│ ├ ● /en/methodology/expenditure
+│ ├ ● /en/methodology/revenue
+│ ├ ● /en/methodology/municipalities
+│ └ ● [+5 more paths]
+├ ○ /en/opengraph-image
+├ ○ /explorer
+├ ○ /explorer/analysis
+├ ○ /explorer/debt
+├ ○ /explorer/deficit
+├ ○ /explorer/economy
+├ ○ /explorer/economy/gdp
+├ ○ /explorer/economy/regions
+├   /explorer/economy/regions/[id]
+│ ├ ● /explorer/economy/regions/tbilisi
+│ ├ ● /explorer/economy/regions/adjara
+│ ├ ● /explorer/economy/regions/guria
+│ └ ● [+8 more paths]
+├ ○ /explorer/economy/sectors
+├ ○ /explorer/expenditure
+├ ○ /explorer/inflation
+├ ○ /explorer/inflation/categories
+├ ○ /explorer/inflation/cities
+├   /explorer/inflation/cities/[city]
+│ ├ ● /explorer/inflation/cities/tbilisi
+│ ├ ● /explorer/inflation/cities/kutaisi
+│ ├ ● /explorer/inflation/cities/batumi
+│ └ ● [+3 more paths]
+├ ○ /explorer/inflation/overview
+├ ○ /explorer/inflation/products
+├ ○ /explorer/municipalities
+├   /explorer/municipalities/[slug]
+│ ├ ● /explorer/municipalities/tbilisi
+│ ├ ● /explorer/municipalities/batumi
+│ ├ ● /explorer/municipalities/kobuleti
+│ └ ● [+61 more paths]
+├ ○ /explorer/municipalities/georgia
+├   /explorer/municipalities/region/[id]
+│ ├ ● /explorer/municipalities/region/tbilisi
+│ ├ ● /explorer/municipalities/region/adjara
+│ ├ ● /explorer/municipalities/region/guria
+│ └ ● [+8 more paths]
+├ ○ /explorer/revenue
+├ ○ /icon.svg
+├ ƒ /mcp
+├ ○ /methodology
+├   /methodology/[dataset]
+│ ├ ● /methodology/expenditure
+│ ├ ● /methodology/revenue
+│ ├ ● /methodology/municipalities
+│ └ ● [+5 more paths]
+├ ○ /opengraph-image
+├ ○ /robots.txt
+└ ○ /sitemap.xml
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+
+> web@0.1.0 postbuild
+> npm run data:check-fact-query-publications && npm run data:check-public-datasets-output && npm run data:check-regional-economies-public && npm run data:check-inflation-public
+
+
+> web@0.1.0 data:check-fact-query-publications
+> tsx scripts/prepare-fact-query-publications.ts --check
+
+23 publications current, manifest hashes verified, dataVersion=2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7
+
+> web@0.1.0 data:check-public-datasets-output
+> tsx scripts/prepare-public-datasets.ts --check-output
+
+national-expenditure: PASS (286 rows, 76177 bytes, a04cf54c7e47f126f8e6040dab0e4df5465411e7d24c82a44cec43f7a2dbe8d1)
+national-revenue: PASS (241 rows, 47565 bytes, 0880b5baf921780c4609b217d5564812358c2edc5ebfed492da6aa14bcf83b31)
+municipal-expenditure: PASS (7865 rows, 831760 bytes, 0d71b38fce4a81765149e75aa8d37d40311ca274d3484e4a3fa7eb93bc306b2c)
+government-debt: PASS (126 rows, 13903 bytes, 6e4f4f66e2d647b77baec394460740e840567feed79bd3dfc88b233d100f1b5b)
+general-government-balance: PASS (37 rows, 3650 bytes, ed69798751b015f6c21de1919eb0e51744f3da76241ede5d5a8a944551554401)
+
+> web@0.1.0 data:check-regional-economies-public
+> tsx scripts/prepare-regional-economies-public.ts --check
+
+Regional economies public CSV: 6930 observations
+
+> web@0.1.0 data:check-inflation-public
+> tsx scripts/prepare-inflation.ts --check-public
+
+Inflation public CSV matches

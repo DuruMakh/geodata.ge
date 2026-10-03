@@ -1,0 +1,329 @@
+{
+  "snapshotDataVersion": "2776fc1896f85c77d7b951aa4f13e5d94fdef8135acf92f076df35a6bbec8aa7",
+  "schemaVersion": "1.5.0",
+  "resultLimit": 524288,
+  "clients": {
+    "legacy": "1.30.1",
+    "modern": "2.2.0"
+  },
+  "bounded": [
+    {
+      "label": "full305Catalogue",
+      "bytes": 469421,
+      "headroom": 54867
+    },
+    {
+      "label": "annualRank100",
+      "bytes": 63489,
+      "headroom": 460799
+    },
+    {
+      "label": "cumulativeRank100With18Exclusions",
+      "bytes": 105283,
+      "headroom": 419005
+    },
+    {
+      "label": "annualReference",
+      "bytes": 7157,
+      "headroom": 517131
+    },
+    {
+      "label": "cumulativeReference",
+      "bytes": 11099,
+      "headroom": 513189
+    }
+  ],
+  "wires": [
+    {
+      "label": "full305Catalogue",
+      "era": "2025-11-25",
+      "bytes": 469455,
+      "headroom": 54833,
+      "resultType": null,
+      "serverMetadataKeys": [],
+      "count": 305,
+      "universe": null,
+      "exclusions": [
+        {
+          "entityId": "05",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "42",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "43",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "46",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "64",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        }
+      ]
+    },
+    {
+      "label": "full305Catalogue",
+      "era": "2026-07-28",
+      "bytes": 469565,
+      "headroom": 54723,
+      "resultType": "complete",
+      "serverMetadataKeys": [
+        "io.modelcontextprotocol/serverInfo"
+      ],
+      "count": 305,
+      "universe": null,
+      "exclusions": [
+        {
+          "entityId": "05",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "42",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "43",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "46",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        },
+        {
+          "entityId": "64",
+          "reason": "მითითებული კოდის ბიუჯეტი ტერიტორიულად მიკუთვნებადი ხარჯი არ არის და გამორიცხულია.",
+          "reasonEn": "The named code's budget is not territorially attributable expenditure and is excluded."
+        }
+      ]
+    },
+    {
+      "label": "annualRank100",
+      "era": "2025-11-25",
+      "bytes": 63523,
+      "headroom": 460765,
+      "resultType": null,
+      "serverMetadataKeys": [],
+      "count": 100,
+      "universe": {
+        "dimension": "series",
+        "description": "განხილულ მიმდინარე სამომხმარებლო კალათაში შემავალი ყველა პროდუქტი; გამოტოვებული მნიშვნელობის ან არასრული საანგარიშო მონაცემების მქონე პროდუქტები ცალკეა ჩამოთვლილი.",
+        "descriptionEn": "Every product in the current reviewed consumer basket; products with missing values or incomplete calculation inputs are explicitly excluded.",
+        "candidateCount": 305,
+        "eligibleCount": 305,
+        "returnedCount": 100,
+        "cutoffSplitsTie": false
+      },
+      "exclusions": []
+    },
+    {
+      "label": "annualRank100",
+      "era": "2026-07-28",
+      "bytes": 63633,
+      "headroom": 460655,
+      "resultType": "complete",
+      "serverMetadataKeys": [
+        "io.modelcontextprotocol/serverInfo"
+      ],
+      "count": 100,
+      "universe": {
+        "dimension": "series",
+        "description": "განხილულ მიმდინარე სამომხმარებლო კალათაში შემავალი ყველა პროდუქტი; გამოტოვებული მნიშვნელობის ან არასრული საანგარიშო მონაცემების მქონე პროდუქტები ცალკეა ჩამოთვლილი.",
+        "descriptionEn": "Every product in the current reviewed consumer basket; products with missing values or incomplete calculation inputs are explicitly excluded.",
+        "candidateCount": 305,
+        "eligibleCount": 305,
+        "returnedCount": 100,
+        "cutoffSplitsTie": false
+      },
+      "exclusions": []
+    },
+    {
+      "label": "cumulativeRank100With18Exclusions",
+      "era": "2025-11-25",
+      "bytes": 105317,
+      "headroom": 418971,
+      "resultType": null,
+      "serverMetadataKeys": [],
+      "count": 100,
+      "universe": {
+        "dimension": "series",
+        "description": "განხილულ მიმდინარე სამომხმარებლო კალათაში შემავალი ყველა პროდუქტი; გამოტოვებული მნიშვნელობის ან არასრული საანგარიშო მონაცემების მქონე პროდუქტები ცალკეა ჩამოთვლილი.",
+        "descriptionEn": "Every product in the current reviewed consumer basket; products with missing values or incomplete calculation inputs are explicitly excluded.",
+        "candidateCount": 305,
+        "eligibleCount": 287,
+        "returnedCount": 100,
+        "cutoffSplitsTie": false
+      },
+      "exclusions": [
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2019-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2019-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0010",
+            "cpi.product.p0089",
+            "cpi.product.p0170",
+            "cpi.product.p0179"
+          ]
+        },
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2017-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2017-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0051",
+            "cpi.product.p0124",
+            "cpi.product.p0125",
+            "cpi.product.p0130",
+            "cpi.product.p0134",
+            "cpi.product.p0139",
+            "cpi.product.p0162",
+            "cpi.product.p0193",
+            "cpi.product.p0202",
+            "cpi.product.p0210",
+            "cpi.product.p0259"
+          ]
+        },
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2023-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2023-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0233"
+          ]
+        },
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2020-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2020-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0251",
+            "cpi.product.p0269"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "cumulativeRank100With18Exclusions",
+      "era": "2026-07-28",
+      "bytes": 105427,
+      "headroom": 418861,
+      "resultType": "complete",
+      "serverMetadataKeys": [
+        "io.modelcontextprotocol/serverInfo"
+      ],
+      "count": 100,
+      "universe": {
+        "dimension": "series",
+        "description": "განხილულ მიმდინარე სამომხმარებლო კალათაში შემავალი ყველა პროდუქტი; გამოტოვებული მნიშვნელობის ან არასრული საანგარიშო მონაცემების მქონე პროდუქტები ცალკეა ჩამოთვლილი.",
+        "descriptionEn": "Every product in the current reviewed consumer basket; products with missing values or incomplete calculation inputs are explicitly excluded.",
+        "candidateCount": 305,
+        "eligibleCount": 287,
+        "returnedCount": 100,
+        "cutoffSplitsTie": false
+      },
+      "exclusions": [
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2019-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2019-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0010",
+            "cpi.product.p0089",
+            "cpi.product.p0170",
+            "cpi.product.p0179"
+          ]
+        },
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2017-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2017-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0051",
+            "cpi.product.p0124",
+            "cpi.product.p0125",
+            "cpi.product.p0130",
+            "cpi.product.p0134",
+            "cpi.product.p0139",
+            "cpi.product.p0162",
+            "cpi.product.p0193",
+            "cpi.product.p0202",
+            "cpi.product.p0210",
+            "cpi.product.p0259"
+          ]
+        },
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2023-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2023-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0233"
+          ]
+        },
+        {
+          "reason": "პროდუქტის დადასტურებული ისტორია იწყება 2020-01-დან; მოთხოვნილი წინა პერიოდის მონაცემი არ არის ხელმისაწვდომი.",
+          "reasonEn": "The product’s verified history starts at 2020-01; the requested earlier history is unavailable.",
+          "ids": [
+            "cpi.product.p0251",
+            "cpi.product.p0269"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "annualReference",
+      "era": "2025-11-25",
+      "bytes": 7191,
+      "headroom": 517097,
+      "resultType": null,
+      "serverMetadataKeys": [],
+      "count": 1,
+      "universe": null,
+      "exclusions": null
+    },
+    {
+      "label": "annualReference",
+      "era": "2026-07-28",
+      "bytes": 7301,
+      "headroom": 516987,
+      "resultType": "complete",
+      "serverMetadataKeys": [
+        "io.modelcontextprotocol/serverInfo"
+      ],
+      "count": 1,
+      "universe": null,
+      "exclusions": null
+    },
+    {
+      "label": "cumulativeReference",
+      "era": "2025-11-25",
+      "bytes": 11133,
+      "headroom": 513155,
+      "resultType": null,
+      "serverMetadataKeys": [],
+      "count": 1,
+      "universe": null,
+      "exclusions": null
+    },
+    {
+      "label": "cumulativeReference",
+      "era": "2026-07-28",
+      "bytes": 11243,
+      "headroom": 513045,
+      "resultType": "complete",
+      "serverMetadataKeys": [
+        "io.modelcontextprotocol/serverInfo"
+      ],
+      "count": 1,
+      "universe": null,
+      "exclusions": null
+    }
+  ],
+  "proof": "Real SDK listTools installs cached validators; subsequent HTTP calls validate same schemas and equal full application responses. Wire bytes include SDK era fields, server metadata and JSON-RPC framing."
+}

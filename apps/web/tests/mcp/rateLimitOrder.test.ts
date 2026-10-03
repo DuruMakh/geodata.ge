@@ -10,7 +10,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 // /mcp down for everybody until the next UTC day, with the per-key limit
 // offering no protection at all, because the very requests it denied were the
 // ones doing the spending.
-const state = vi.hoisted(() => ({ hits: [] as string[], perKeyVerdict: "allow" as "allow" | "deny" }));
+const state = vi.hoisted(() => ({ hits: [] as string[], perKeyVerdict: "allow" as "allow" | "deny" | "unavailable", dailyVerdict: "allow" as "allow" | "deny" | "unavailable" }));
 
 vi.mock("../../lib/mcp/limits", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../lib/mcp/limits")>();
@@ -19,7 +19,7 @@ vi.mock("../../lib/mcp/limits", async (importOriginal) => {
     createCounter: () => ({
       hit: (key: string) => {
         state.hits.push(key);
-        return Promise.resolve(key.startsWith("mcp:rate:") ? state.perKeyVerdict : "allow");
+        return Promise.resolve(key.startsWith("mcp:rate:") ? state.perKeyVerdict : state.dailyVerdict);
       },
     }),
   };
@@ -44,6 +44,46 @@ afterAll(() => {
 beforeEach(() => {
   state.hits.length = 0;
   state.perKeyVerdict = "allow";
+  state.dailyVerdict = "allow";
+});
+
+describe.each(["legacy", "modern"])("%s rate-limit failures", era => {
+  function request(): Request {
+    const legacy = post();
+    if (era === "legacy") return legacy;
+    const headers = new Headers(legacy.headers);
+    headers.set("mcp-protocol-version", "2026-07-28");
+    headers.set("mcp-method", "server/discover");
+    return new Request(legacy.url, { method: "POST", headers, body: JSON.stringify({ jsonrpc: "2.0", id: 61, method: "server/discover", params: { _meta: {
+      "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+      "io.modelcontextprotocol/clientInfo": { name: "limit-test", version: "1" },
+      "io.modelcontextprotocol/clientCapabilities": {},
+    } } }) });
+  }
+
+  it("does not drain the daily allowance on minute denial", async () => {
+    state.perKeyVerdict = "deny";
+    const response = await POST(request());
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("60");
+    expect(dailyHits()).toEqual([]);
+  });
+  it("refuses exhausted daily allowance after the minute check", async () => {
+    state.dailyVerdict = "deny";
+    const response = await POST(request());
+    expect(response.status).toBe(429);
+    expect(Number(response.headers.get("retry-after"))).toBeGreaterThan(0);
+    expect(Number(response.headers.get("retry-after"))).toBeLessThanOrEqual(86400);
+    expect(await response.text()).toContain("/downloads/data/manifest.json");
+    expect(state.hits).toHaveLength(2);
+  });
+  it.each(["minute", "daily"])("fails closed if the %s limiter is unavailable", async limit => {
+    if (limit === "minute") state.perKeyVerdict = "unavailable"; else state.dailyVerdict = "unavailable";
+    const response = await POST(request());
+    expect(response.status).toBe(503);
+    expect(await response.text()).toContain("service_unavailable");
+    expect(state.hits).toHaveLength(limit === "minute" ? 1 : 2);
+  });
 });
 
 function post(headers: Record<string, string> = {}): Request {

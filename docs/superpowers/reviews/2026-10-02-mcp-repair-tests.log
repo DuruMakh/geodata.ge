@@ -1,0 +1,13 @@
+(node:18836) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/vitest.config.ts?fresh-import-rosqhqo85if=0,file:///C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web/vitest.config.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\Mylaptop\.codex\worktrees\e3aa\Geodata.ge\apps\web\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v5.0.2 C:/Users/Mylaptop/.codex/worktrees/e3aa/Geodata.ge/apps/web
+
+
+ Test Files  2 passed (2)
+      Tests  10 passed (10)
+   Start at  02:35:19
+   Duration  9.88s (tests 81%, transform 15%, import 4%)
+

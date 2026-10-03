@@ -20,15 +20,16 @@
 
 import { GDP_QUERY_SERIES } from "../factQuery/gdpSeries";
 import type { InflationMeasure } from "../factQuery/inflationSeries";
+import type { ProductQueryMeasure } from "../factQuery/inflationProductSeries";
 import type { DatasetId, Measure } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
 
 /**
  * Every published dataset except `ministries`, which has no page of its own,
- * and `inflation`, whose pages do not render Dataset JSON-LD from this vocabulary.
+ * and the inflation datasets, whose pages do not render Dataset JSON-LD from this vocabulary.
  */
-export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation">;
-type FiscalMeasure = Exclude<Measure, InflationMeasure>;
+export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "inflation-products">;
+type FiscalMeasure = Exclude<Measure, InflationMeasure | ProductQueryMeasure>;
 
 type Localized = Record<Locale, string>;
 

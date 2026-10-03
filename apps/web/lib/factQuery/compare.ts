@@ -24,6 +24,7 @@ import { queryMinistries } from "./queryMinistries";
 import { queryDebt } from "./queryDebt";
 import { queryDeficit } from "./queryDeficit";
 import { inflationObservations } from "./queryInflation";
+import { queryInflationProducts } from "./queryInflationProducts";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
@@ -193,10 +194,18 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   }
 
   const target = input.target;
+  if (target.dataset === "inflation-products" && input.measure === "cumulative_pct") {
+    return errorResponse(snapshot, {
+      code: "unsupported_comparison",
+      messageKa: serviceMessage(snapshot, "ka", "errors.compareProductCumulative"),
+      messageEn: serviceMessage(snapshot, "en", "errors.compareProductCumulative"),
+      retryable: false,
+    });
+  }
   // Inflation's monthly measures pair endpoints on their period; everything
   // else, basket weights included, pairs on the year. The schema guarantees
   // whichever pair applies is present.
-  const monthly = target.dataset === "inflation" && input.measure !== "basket_weight_pct";
+  const monthly = target.dataset === "inflation-products" || target.dataset === "inflation" && input.measure !== "basket_weight_pct";
   const fromKey = monthly ? input.fromPeriod! : String(input.fromYear!);
   const toKey = monthly ? input.toPeriod! : String(input.toYear!);
   const fromYear = monthly ? Number(fromKey.slice(0, 4)) : input.fromYear!;
@@ -249,6 +258,26 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       },
       comparisonWindow,
     );
+  } else if (target.dataset === "inflation-products") {
+    datasetId = "inflation-products";
+    // Separate one-month queries avoid requesting or counting intervening cells.
+    const endpoints: FactQueryResponse[] = [];
+    for (const period of [fromKey, toKey]) {
+      const result = queryInflationProducts(snapshot, { seriesIds: target.seriesIds, measure: input.measure, fromPeriod: period, toPeriod: period });
+      if (result.kind === "error") { endpoints.push(result); break; }
+      endpoints.push(result);
+    }
+    const failure = endpoints.find(result => result.kind === "error");
+    if (failure !== undefined) endpointResult = failure;
+    else {
+      const observations = endpoints.flatMap(result => (result as { data: { observations: Observation[] } }).data.observations);
+      const caveats = new Map<string, FactQueryResponse["meta"]["caveats"][number]>();
+      for (const result of endpoints) for (const caveat of result.meta.caveats) {
+        const previous = caveats.get(caveat.code);
+        caveats.set(caveat.code, { ...caveat, affects: [...new Set([...(previous?.affects ?? []), ...caveat.affects])] });
+      }
+      endpointResult = { kind: "observations", status: "ok", data: { observations, coverage: { expectedCount: observations.length, excludedEntities: [] } }, meta: buildResponseMeta(snapshot, { sources: selectSources(snapshot, ["source.geostat_product_yoy"]), caveats: [...caveats.values()] }) };
+    }
   } else if (target.dataset === "inflation") {
     datasetId = "inflation";
     // No residual: its value depends on the rest of the selection, so a change

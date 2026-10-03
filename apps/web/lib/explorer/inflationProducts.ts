@@ -21,11 +21,11 @@ export type ProductIndex = {
   defaultRange: { startYear: number; endYear: number };
 };
 
-function runKey(fact: ProductFactRow): string {
+function runKey(fact: Pick<ProductFactRow, "productId" | "measure">): string {
   return `${fact.productId}:${fact.measure === "yoy_index_100" ? "a" : "m"}`;
 }
 
-export function packProductFacts(facts: ProductFactRow[]): PackedProductSeries[] {
+export function packProductFacts(facts: readonly Pick<ProductFactRow, "productId" | "measure" | "period" | "index100">[]): PackedProductSeries[] {
   const groups = new Map<string, Map<number, string | null>>();
   for (const fact of facts) {
     const key = runKey(fact);
@@ -123,14 +123,17 @@ export function productCumulative(index: ProductIndex, id: string, startYear: nu
   if (!run || (first && periodFromKey(first) > start) || run.start > start) {
     return { value: null, reason: "late_start", missingPeriod: run?.start ?? (first ? periodFromKey(first) : null) };
   }
-  if (endPeriod < start || endPeriod >= run.start + run.values.length) {
+  if (endPeriod < start) {
     return { value: null, reason: "missing_month", missingPeriod: Math.max(start, run.start + run.values.length) };
   }
   const left = start - run.start;
-  const right = endPeriod - run.start + 1;
+  const right = Math.min(endPeriod - run.start + 1, run.values.length);
   if (run.bad[right]! > run.bad[left]!) {
     const missing = run.values.findIndex((value, offset) => offset >= left && offset < right && value === null);
     return { value: null, reason: "missing_month", missingPeriod: run.start + missing };
+  }
+  if (endPeriod >= run.start + run.values.length) {
+    return { value: null, reason: "missing_month", missingPeriod: Math.max(start, run.start + run.values.length) };
   }
   return { value: run.prefix[right]!.div(run.prefix[left]!).minus(1).mul(100).toNumber(), reason: null, missingPeriod: null };
 }
