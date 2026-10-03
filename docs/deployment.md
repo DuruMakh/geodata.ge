@@ -111,6 +111,40 @@ server-side at request time.
   are scoped to Production only), so data-PR previews never depend on the
   mirror. Preview deployments are automatically `noindex`ed by Vercel.
 
+## Temporary dependency-security exception
+
+On **2026-10-03** the owner explicitly approved temporary acceptance of
+[GHSA-vfj7-8cjw-p6xm / CVE-2026-93687](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+for `braces@3.0.3`, through the existing development-only chain
+`eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch → braces`.
+The advisory has no published patched version; [upstream PR #72](https://github.com/micromatch/braces/pull/72)
+is a proposed fix, not a released remedy. This is accepted risk, not a claim
+that the dependency is fixed.
+
+The inspected Next ESLint helper receives its root-directory pattern from
+repository-owned ESLint settings; this repository does not set `next.rootDir`,
+so the helper uses the trusted working directory. Lockfile entries are all
+development-only, and the actual built MCP trace excludes these packages.
+No request argument, reviewed workbook, upload or external data supplies a
+brace pattern on this path. Changing this usage requires reassessment.
+
+`scripts/audit-dependencies.ts` still asks npm to audit **all dependencies,
+including development tools**, prints the unfiltered report, and fails for
+other high/critical findings. It accepts only this exact advisory, its current
+named development-only ancestors and the reviewed package/version paths.
+The reviewed ancestor versions are `micromatch@4.0.8`, `fast-glob@3.3.1`,
+`@next/eslint-plugin-next@16.3.8` and `eslint-config-next@16.3.8`; a version
+change is blocking until reassessed.
+Production-use findings, changed paths, additional advisories, malformed
+reports, registry failures and expiry remain blocking. CI retains the existing
+three attempts for registry failures and its original high-severity threshold.
+
+The exception **expires at 2026-11-02 00:00 UTC**. Check the upstream advisory
+and release during dependency maintenance; once an official fix is available,
+update the compatible dependency chain, verify lint/audit and remove this
+exception and its tests. Extending acceptance beyond expiry requires explicit
+owner approval and fresh exposure evidence. No automatic renewal is permitted.
+
 ## Methodology archive release checks
 
 `npm run build` runs `npm run data:prepare-methodology-archives` through
