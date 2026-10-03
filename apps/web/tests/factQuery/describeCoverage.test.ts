@@ -22,6 +22,12 @@ type CoverageData = {
 const data = (result: ReturnType<typeof describeCoverage>) => (result as { data: CoverageData }).data;
 
 describe("describeCoverage", () => {
+  it("keeps a two-endpoint product coverage span even with only one fact month", () => {
+    const current = { ...snapshot, inflationProducts: { ...snapshot.inflationProducts, facts: [snapshot.inflationProducts.facts[0]!] } };
+    const result = describeCoverage(current, { datasetId: "inflation-products" });
+    const month = current.inflationProducts.facts[0]!.period;
+    expect((result as { data: { datasets: { periods: string[] }[] } }).data.datasets[0]?.periods).toEqual([month, month]);
+  });
   it("lists debt and the balance with the ranges their own facts carry", () => {
     const response = describeCoverage(snapshot, {});
     if (response.kind !== "catalogue") throw new Error("expected a catalogue");
@@ -64,6 +70,7 @@ describe("describeCoverage", () => {
       "general-government-balance",
       "government-debt",
       "inflation",
+      "inflation-products",
       "ministries",
       "municipal-expenditure",
       "national-expenditure",

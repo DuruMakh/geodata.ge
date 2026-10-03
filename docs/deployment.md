@@ -7,8 +7,8 @@ check, and connecting the custom domain.
 
 ## Bilingual release contract
 
-The current human route inventory contains 94 page identities, each with Georgian
-and English HTML (188 sitemap URLs). Georgian addresses remain unchanged; English
+The current human route inventory is owned by the localized route inventory and
+published `sitemap.xml`, with paired Georgian and English HTML. Georgian addresses remain unchanged; English
 uses `/en`, self canonicals and reciprocal `ka`/`en`/`x-default` links. Sitemap
 Georgian dates retain existing data/content freshness; English dates use the later
 of that date and the reviewed translation date. Do not infer indexing from a
@@ -20,10 +20,15 @@ The two social images at `/opengraph-image` and `/en/opengraph-image` use explic
 are generated at build time. All human pages remain prerendered and `/mcp` remains
 the sole request-time route; the older all-static description below predates MCP.
 
-Schema 1.3.0 includes reviewed language companions for thirteen MCP tools and nineteen
-publication artifacts (fifteen JSON files including the manifest, and four CSV files).
-Requests do not gain a language argument. Clients must accept
-new fields and version 1.1.0; byte-identical response compatibility is not promised.
+Data schema **1.5.0** includes current-product inflation and reviewed language
+companions. The authoritative tool inventory is `tools/list`; dataset families
+and coverage are in `catalogue.json`. `manifest.json` lists every publication
+with row count, bytes and SHA-256; the manifest itself is one additional artifact,
+not one of its listed files. Derive changing inventories from these owners rather
+than retaining old fixed counts. Requests do not gain a language argument.
+Clients must accept additive fields and data schema 1.5.0; byte-identical response
+compatibility is not promised. Transport revisions are a separate contract:
+modern `2026-07-28` and preserved legacy `2025-11-25` share the endpoint.
 Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
 ranking, byte, duration, rate and pause limits. Large bilingual evidence responses
 can require narrower queries; never trim evidence or increase limits to fit.
@@ -35,7 +40,8 @@ URLs, language-switch state, original archives and English workbook sheets.
 `scripts/measure-bilingual-output.ts` records decoded HTML/asset bytes separately
 from supplied encoded-length headers, build inventory, publication hashes and
 baseline comparison; `scripts/measure-bilingual-mcp.ts` retains complete-result
-measurements. Reports are local evidence under `.tmp/bilingual/`, not deployment
+measurements. Historical asset reports are local evidence under `.tmp/bilingual/`;
+current MCP evidence lives under `docs/superpowers/reviews/`. Neither is deployment
 proof. A local CSV build with credential-free database-loader fixtures does not
 replace the production pipeline's database-mode parity check. Verify the deployed
 commit and both language URL families separately after an authorized release.
@@ -104,6 +110,40 @@ server-side at request time.
   gets its own preview deployment, always CSV-mode (the database env vars
   are scoped to Production only), so data-PR previews never depend on the
   mirror. Preview deployments are automatically `noindex`ed by Vercel.
+
+## Temporary dependency-security exception
+
+On **2026-10-03** the owner explicitly approved temporary acceptance of
+[GHSA-vfj7-8cjw-p6xm / CVE-2026-93687](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
+for `braces@3.0.3`, through the existing development-only chain
+`eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch → braces`.
+The advisory has no published patched version; [upstream PR #72](https://github.com/micromatch/braces/pull/72)
+is a proposed fix, not a released remedy. This is accepted risk, not a claim
+that the dependency is fixed.
+
+The inspected Next ESLint helper receives its root-directory pattern from
+repository-owned ESLint settings; this repository does not set `next.rootDir`,
+so the helper uses the trusted working directory. Lockfile entries are all
+development-only, and the actual built MCP trace excludes these packages.
+No request argument, reviewed workbook, upload or external data supplies a
+brace pattern on this path. Changing this usage requires reassessment.
+
+`scripts/audit-dependencies.ts` still asks npm to audit **all dependencies,
+including development tools**, prints the unfiltered report, and fails for
+other high/critical findings. It accepts only this exact advisory, its current
+named development-only ancestors and the reviewed package/version paths.
+The reviewed ancestor versions are `micromatch@4.0.8`, `fast-glob@3.3.1`,
+`@next/eslint-plugin-next@16.3.8` and `eslint-config-next@16.3.8`; a version
+change is blocking until reassessed.
+Production-use findings, changed paths, additional advisories, malformed
+reports, registry failures and expiry remain blocking. CI retains the existing
+three attempts for registry failures and its original high-severity threshold.
+
+The exception **expires at 2026-11-02 00:00 UTC**. Check the upstream advisory
+and release during dependency maintenance; once an official fix is available,
+update the compatible dependency chain, verify lint/audit and remove this
+exception and its tests. Extending acceptance beyond expiry requires explicit
+owner approval and fresh exposure evidence. No automatic renewal is permitted.
 
 ## Methodology archive release checks
 
@@ -306,8 +346,14 @@ before rerunning.
 ## The `/mcp` runtime
 
 `/mcp` is the only request-time route. Explorer pages, `/connect`, methodology,
-and publications remain static. The endpoint exposes 13 read-only tools
-through the pinned MCP SDK, stateless Streamable HTTP revision `2025-11-25`.
+and publications remain static. The endpoint exposes the read-only tools listed
+by `tools/list` through pinned server SDK 2.2.0. Stateless Streamable HTTP supports
+modern `2026-07-28` discovery and per-request metadata, and preserved legacy
+`2025-11-25` initialization. Both return finite JSON responses; neither creates
+sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.5.0,
+independent of either protocol revision.
+The legacy adapter also retains `2025-06-18`, `2025-03-26`, `2024-11-05` and
+`2024-10-07`; the modern era is never proposed during legacy initialization.
 There is no session store, model invocation, authentication, or write tool.
 
 ### Snapshot and network boundary
@@ -375,10 +421,18 @@ free plan. Upgrading or enabling automatic upgrades needs explicit approval.
 | Serialized tool result | 512 KiB across text and structured content |
 | Function duration | 10 seconds |
 
+For product cumulative queries, only output endpoints count as cells; the monthly
+inputs from January of `startYear` do not consume the output allowance. Ranking
+retains default 10 / maximum 100 entries and considers the whole current roster,
+with missing/incomplete histories explicitly excluded.
+
 The byte ceiling, not the cell count, is what binds. The text representation
 prints each value definition once, in a legend keyed by `definitionId`, not on
-every row. Even so, an inflation answer fits about 250 cells, and the
-`query_inflation` description and server instructions say so.
+every row. Practical accepted cell counts depend on definitions and source
+evidence; no fixed cell count guarantees byte acceptance. The final post-SDK
+JSON-RPC result also passes the same 512 KiB wire guard, including modern metadata.
+See `docs/superpowers/reviews/2026-10-01-mcp-upgrade-verification.md` and its linked
+measurement JSON for recorded local costs, complete result sizes and limits.
 
 An oversized request is rejected in full with guidance to narrow it. Source
 references and caveats are never silently trimmed. Every tool publishes its own
@@ -419,10 +473,13 @@ production limiter and switch before the final deployment; do not bypass CI.
 After Vercel reports READY for the merge commit:
 
 - Check the published catalogue's releaseCommit and dataVersion.
-- Connect an SDK client, list all 13 tools, discover an entity, and query
+- Connect real modern pinned/automatic and legacy SDK clients, compare the
+  complete `tools/list` inventory with the registered tools, discover an entity, and query
   revenue, expenditure, ministries, municipal totals, debt, deficit, GDP,
-  national sectors, regional economies, and inflation. Exercise `compare`,
-  `rank`, and `get_sources` as well.
+  national sectors, regional economies, national/city inflation, and current
+  product annual/cumulative inflation. Check per-city/per-measure available dates,
+  percentage-point annual comparisons, full-roster rankings/exclusions and
+  `get_sources`; validate complete outputs and both final wire budgets.
 - Check missing values, invalid inputs, source narrowing, and a stale version.
 - Verify rate enforcement with bounded test counters or a preview deployment;
   do not consume the global production quota for a load test.
@@ -430,6 +487,35 @@ After Vercel reports READY for the merge commit:
   controls, and check that the bulk fallback resolves.
 - Inspect the post-release runtime error window. A successful build or hook
   alone is not proof the endpoint is live.
+
+### Human application guidance and evidence boundary
+
+Official documentation was checked **2026-10-02**. [OpenAI's Codex MCP guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
+documents remote Streamable HTTP and shared configuration across desktop/CLI/IDE.
+The documented app path is Settings → MCP servers → Add server, name/transport/URL,
+then save/restart. [OpenAI's docs-MCP quickstart](https://developers.openai.com/learn/docs-mcp)
+also documents `codex mcp add <name> --url <url>`. Local `codex --version` reports
+**codex-cli 0.146.1**; that is executable-version evidence only. Current desktop
+menus, account/plan eligibility, selected protocol and a completed sourced model
+question were not tested. No configuration, login, credentials or model request
+was touched.
+
+[Claude's current remote-connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
+documents remote connectors for Free/Pro/Max/Team/Enterprise, with one custom
+connector on Free; organization owners manage workspace permissions. The individual
+flow documented for Pro/Max is Customize → Connectors → Add → Add custom connector,
+then name/URL/authentication and confirmation. Fiscal.ge itself requires no bearer
+token or extra headers; the documented No sign in option applies to this public
+server. Claude's authenticated application/version, personal eligibility, negotiated
+protocol and one sourced question remain unverified. SDK compatibility is not proof
+of an application's account access or menus.
+
+`/connect` labels these steps as official guidance and links the primary guides.
+Historical owner clickthroughs are earlier provenance, not current app proof.
+Direct ChatGPT custom-connector setup remains unverified and is not advertised;
+the page retains its separate web-reading prompt and static-file fallback. Future
+human proof must record app/version, account eligibility, date, protocol and a
+completed question citing Fiscal.ge's source/limitations, without collecting secrets.
 
 ### Logs and privacy
 

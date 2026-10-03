@@ -19,8 +19,8 @@ function catalogue(input: unknown): CoverageData {
 }
 
 describe("inflation snapshot and catalogue", () => {
-  it("is schema 1.4.0 after adding inflation cities", () => {
-    expect(SCHEMA_VERSION).toBe("1.4.0");
+  it("retains inflation city coverage under schema 1.5.0", () => {
+    expect(SCHEMA_VERSION).toBe("1.5.0");
   });
 
   it("carries every served inflation row", async () => {

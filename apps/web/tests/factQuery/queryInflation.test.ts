@@ -28,6 +28,23 @@ const headlineYoy = (period: string) =>
   snapshot.inflation.facts.find((f) => f.seriesId === "cpi.headline" && f.measure === "yoy_pct" && f.period === period)!.value;
 
 describe("queryInflation", () => {
+  it("keeps national-only headline, target, weight and contribution coverage unchanged", () => {
+    for (const [seriesId, measure, period, first] of [
+      ["cpi.headline", "yoy_pct", "2026-08", "2004-01"],
+      ["cpi.headline", "avg12_pct", "2026-08", "2002-01"],
+      ["cpi.target", "target_pct", "2014-06", "2004-01"],
+      ["cpi.cat.01", "contribution_pp", "2012-06", "2004-01"],
+    ]) {
+      expect(queryInflation(snapshot, { seriesIds: [seriesId], measure, fromPeriod: period, toPeriod: period })).toMatchObject({
+        data: { coverage: { availablePeriods: [first, "2026-08"], availableYears: Array.from({ length: 2026 - Number(first!.slice(0, 4)) + 1 }, (_, index) => Number(first!.slice(0, 4)) + index) } },
+      });
+    }
+    const weightResponse = queryInflation(snapshot, { seriesIds: ["cpi.cat.01"], measure: "basket_weight_pct", fromPeriod: "2024-06", toPeriod: "2025-02" });
+    expect(weightResponse).toMatchObject({ data: { coverage: { availableYears: Array.from({ length: 15 }, (_, index) => 2012 + index) } } });
+    if (weightResponse.kind !== "observations") throw new Error(JSON.stringify(weightResponse));
+    expect((weightResponse.data as { coverage: object }).coverage).not.toHaveProperty("availablePeriods");
+  });
+
   it("returns a published monthly value with its period, unit and evidence", () => {
     const [row] = rows(queryInflation(snapshot, { seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" }));
     observationSchema.parse(row);

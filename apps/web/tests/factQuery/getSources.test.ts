@@ -17,6 +17,14 @@ const errorOf = (result: ReturnType<typeof getSources>) =>
   (result as { error: { code: string; validChoices?: string[] } }).error;
 
 describe("getSources", () => {
+  it("accepts years covered only by product facts when narrowing product originals", () => {
+    const sourceId = "source.geostat_product_yoy";
+    const current = { ...snapshot, inflationProducts: { ...snapshot.inflationProducts, facts: [{ ...snapshot.inflationProducts.facts[0]!, period: "2035-01" }] }, sources: snapshot.sources.map(source => source.sourceId === sourceId ? { ...source, documents: source.documents.map(document => ({ ...document, years: [2035] })) } : source) };
+    const result = getSources(current, { sourceIds: [sourceId], datasetId: "inflation-products", years: [2035] });
+    expect(result.kind).toBe("sources");
+    expect(data(result).sources[0]?.narrowingOutcome).toBe("applied");
+    expect(data(result).sources[0]?.documents.every(document => document.years.includes(2035))).toBe(true);
+  });
   it("returns a conforming sources envelope", () => {
     const result = getSources(snapshot, { sourceIds: ["source.mof_2017_revenue_form1_pdf"] });
 

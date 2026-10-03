@@ -1,6 +1,7 @@
 // apps/web/lib/factQuery/schemas.ts
 import { z } from "zod";
 import { INFLATION_MEASURES } from "./inflationSeries";
+import { PRODUCT_QUERY_MEASURES } from "./inflationProductSeries";
 
 /**
  * Spec section 11.3's input array bounds.
@@ -46,6 +47,20 @@ export const deficitMeasure = z.enum(["share_of_gdp_pct", "amount_gel"]);
 export const economicSectorMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "real_growth_pct"]);
 export const queryEconomicSectorsInput = z.strictObject({ seriesIds: seriesIdList, years: uniqueSortedYears, measure: economicSectorMeasure, expectedDataVersion });
 export const inflationMeasure = z.enum(INFLATION_MEASURES);
+export const queryInflationProductsInput = z.strictObject({
+  seriesIds: z.array(z.string().min(1)).min(1).max(INPUT_LIMITS.series).refine(ids => new Set(ids).size === ids.length, "seriesIds must be unique"),
+  measure: z.enum(PRODUCT_QUERY_MEASURES),
+  fromPeriod: periodKeySchema,
+  toPeriod: periodKeySchema,
+  startYear: z.number().int().optional().describe("First calendar year of compounding, relative to the preceding December; required only for cumulative_pct."),
+  expectedDataVersion,
+}).superRefine((input, context) => {
+  if (input.fromPeriod > input.toPeriod) context.addIssue({ code: "custom", path: ["toPeriod"], message: "toPeriod must not precede fromPeriod" });
+  if (input.measure === "cumulative_pct" ? input.startYear === undefined || input.startYear > Number(input.fromPeriod.slice(0, 4)) : input.startYear !== undefined) {
+    context.addIssue({ code: "custom", path: ["startYear"], message: "startYear is required only for cumulative_pct and must not follow fromPeriod's year" });
+  }
+});
+export type QueryInflationProductsInput = z.infer<typeof queryInflationProductsInput>;
 export const queryInflationInput = z.strictObject({
   seriesIds: seriesIdList,
   measure: inflationMeasure,
@@ -56,7 +71,7 @@ export const queryInflationInput = z.strictObject({
 });
 
 export const describeCoverageInput = z.strictObject({
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]).optional(),
   search: z.string().max(120).optional(),
   entityType: z.enum(["country", "municipality", "region", "city"]).optional(),
   level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
@@ -118,6 +133,7 @@ export const compareInput = z
       // No seriesIds: the balance dataset has exactly one series.
       z.strictObject({ dataset: z.literal("deficit") }),
       z.strictObject({ dataset: z.literal("inflation"), seriesIds: seriesIdList, entityIds: entityIdList.optional() }),
+      z.strictObject({ dataset: z.literal("inflation-products"), seriesIds: seriesIdList }),
     ]),
     fromYear: z.number().int().optional(),
     toYear: z.number().int().optional(),
@@ -125,13 +141,14 @@ export const compareInput = z
     toPeriod: periodKeySchema.optional().describe("Inflation monthly measures only: the later month, YYYY-MM."),
     measure: z.enum([
       "amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "rate_percent",
-      "yoy_pct", "mom_pct", "avg12_pct", "index_2010", "target_pct", "basket_weight_pct", "contribution_pp",
+      "yoy_pct", "mom_pct", "avg12_pct", "index_2010", "target_pct", "basket_weight_pct", "contribution_pp", "cumulative_pct",
     ]),
     expectedDataVersion,
   })
   .superRefine((input, context) => {
     const issue = (path: string, message: string) => context.addIssue({ code: "custom", path: [path], message });
-    const monthly = input.target.dataset === "inflation" && input.measure !== "basket_weight_pct";
+    const monthly = input.target.dataset === "inflation-products" || input.target.dataset === "inflation" && input.measure !== "basket_weight_pct";
+    if (input.measure === "cumulative_pct" && input.target.dataset !== "inflation-products") issue("measure", "cumulative_pct applies only to inflation-products");
     if (monthly) {
       if (input.fromYear !== undefined || input.toYear !== undefined) issue("fromYear", "inflation monthly measures take fromPeriod and toPeriod, not years");
       if (input.fromPeriod === undefined || input.toPeriod === undefined) issue("fromPeriod", "inflation monthly measures need fromPeriod and toPeriod");
@@ -147,7 +164,7 @@ export const rankInput = z
   .strictObject({
     // Deliberately excludes government-debt and general-government-balance:
     // both are country-level, so there is nothing to rank.
-    datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation"]),
+    datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation", "inflation-products"]),
     dimension: z.enum(["series", "entities"]),
     level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
     parentSeriesId: z.string().optional().describe("For ministries with level major_program, or inflation with level subgroup: filters to that parent."),
@@ -155,24 +172,36 @@ export const rankInput = z
     seriesId: z.string().optional(),
     withinRegionId: z.string().optional().describe("Only for municipal rankings with entityType municipality; obtain the region id from describe_coverage."),
     year: z.number().int().optional(),
+    startYear: z.number().int().optional().describe("inflation-products cumulative_pct only: first calendar year of compounding."),
     fromYear: z.number().int().optional(),
     toYear: z.number().int().optional(),
     period: periodKeySchema.optional().describe("Inflation only, with metric value: the month to rank, YYYY-MM."),
     fromPeriod: periodKeySchema.optional().describe("Inflation only, with percentage_point_change: the earlier month."),
     toPeriod: periodKeySchema.optional().describe("Inflation only, with percentage_point_change: the later month."),
-    measure: z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "yoy_pct", "mom_pct", "contribution_pp"]),
+    measure: z.enum(["amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "yoy_pct", "mom_pct", "contribution_pp", "cumulative_pct"]),
     metric: z.enum(["value", "absolute_change", "percentage_change", "percentage_point_change"]),
     order: z.enum(["descending", "ascending"]).default("descending"),
     limit: z.number().int().min(1).max(100).default(10),
     expectedDataVersion,
   })
-  .refine((input) => input.datasetId === "inflation" || (input.metric === "value" ? input.year !== undefined : input.fromYear !== undefined && input.toYear !== undefined), {
+  .refine((input) => input.datasetId === "inflation" || input.datasetId === "inflation-products" || (input.metric === "value" ? input.year !== undefined : input.fromYear !== undefined && input.toYear !== undefined), {
     message: "value ranking needs one year; change rankings need fromYear and toYear",
   })
   .refine((input) => input.datasetId !== "inflation" || (input.metric === "value" ? input.period !== undefined : input.fromPeriod !== undefined && input.toPeriod !== undefined), {
     message: "inflation value ranking needs one period; change rankings need fromPeriod and toPeriod",
   })
   .superRefine((input, context) => {
+    const products = input.datasetId === "inflation-products";
+    const issue = (path: string, message: string) => context.addIssue({ code: "custom", path: [path], message });
+    if (products) {
+      if (input.dimension !== "series") issue("dimension", "product rankings take dimension series");
+      if (input.metric !== "value") issue("metric", "product rankings support value only");
+      if (!(PRODUCT_QUERY_MEASURES as readonly string[]).includes(input.measure)) issue("measure", "product rankings support yoy_pct and cumulative_pct only");
+      if (input.period === undefined) issue("period", "product rankings need one endpoint period");
+      if (input.measure === "cumulative_pct" && (input.startYear === undefined || input.period !== undefined && input.startYear > Number(input.period.slice(0, 4)))) issue("startYear", "cumulative_pct needs startYear no later than period's year");
+    }
+    if (input.startYear !== undefined && !(products && input.measure === "cumulative_pct")) issue("startYear", "startYear applies only to cumulative product rankings");
+    if (input.measure === "cumulative_pct" && !products) issue("measure", "cumulative_pct applies only to inflation-products");
     const municipal = input.datasetId === "municipal-expenditure";
     const ministries = input.datasetId === "ministries";
     const inflation = input.datasetId === "inflation";
@@ -188,8 +217,8 @@ export const rankInput = z
       (!municipal || input.entityType !== "municipality") && input.withinRegionId !== undefined ? "withinRegionId" : null,
       input.level !== undefined && !(ministries && ministriesLevel) && !(inflation && inflationLevel) ? "level" : null,
       input.parentSeriesId !== undefined && !(ministries && input.level === "major_program") && !(inflation && input.level === "subgroup") ? "parentSeriesId" : null,
-      inflation && (input.year !== undefined || input.fromYear !== undefined || input.toYear !== undefined) ? "year" : null,
-      !inflation && (input.period !== undefined || input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "period" : null,
+      (inflation || products) && (input.year !== undefined || input.fromYear !== undefined || input.toYear !== undefined) ? "year" : null,
+      !inflation && !products && (input.period !== undefined || input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "period" : null,
       // Mirrors errors.rankValueYearOnly / errors.rankChangeYears for months: a
       // stray field must be refused, never silently ignored.
       inflation && input.metric === "value" && (input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "fromPeriod" : null,
@@ -197,6 +226,7 @@ export const rankInput = z
       inflationCities && input.entityType !== "city" ? "entityType" : null,
       municipal && input.entityType === "city" ? "entityType" : null,
       inflationCities && input.level !== undefined ? "level" : null,
+      products && (input.fromPeriod !== undefined || input.toPeriod !== undefined) ? "fromPeriod" : null,
     ];
     for (const field of invalid) {
       if (field !== null) context.addIssue({ code: "custom", path: [field], message: `${field} does not apply to this ranking mode; omit it or choose its supported mode.` });
@@ -205,7 +235,7 @@ export const rankInput = z
 
 export const getSourcesInput = z.strictObject({
   sourceIds: sourceIdList,
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation"]).optional(),
+  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]).optional(),
   years: uniqueSortedYears.optional(),
   entityIds: entityIdList.optional(),
   expectedDataVersion,
@@ -251,6 +281,7 @@ export const observationSchema = z.object({
   parentSeriesId: z.string().nullable(),
   year: z.number().int(),
   period: periodKeySchema.optional(),
+  calculationBasePeriod: periodKeySchema.optional().describe("Cumulative products only: December preceding startYear; all returned endpoints share this base."),
   measure: z.string(),
   unit: z.enum(["GEL", "percent", "GEL_per_resident", "USD", "USD_2015", "GEL_per_person", "USD_per_person", "index_2010_100", "percentage_points"]),
   value: z.number().finite().nullable(),

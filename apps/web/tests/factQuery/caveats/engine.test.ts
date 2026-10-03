@@ -75,7 +75,7 @@ describe("CAVEAT_RULES registry", () => {
   // disclosure registered by the data-refresh safeguards, plus one city-inflation
   // code registered on 2026-09-26 when city CPI facts began being served.
   it("registers spec section 9.2's codes, less nominal_gel, plus the approved splits, new datasets and 2004 component guard", () => {
-    expect(CAVEAT_RULES).toHaveLength(39);
+    expect(CAVEAT_RULES).toHaveLength(42);
     const codes = CAVEAT_RULES.map((rule) => rule.code);
     expect(codes).toContain("admin_category_not_yet_established");
     expect(codes).toContain("program_parent_category_modern_grouping");
@@ -88,5 +88,8 @@ describe("CAVEAT_RULES registry", () => {
     expect(codes).toContain("inflation_contribution_weights_differ");
     expect(codes).toContain("inflation_target_unverified_before_2015");
     expect(codes).toContain("inflation_city_central_prices");
+    expect(codes).toContain("inflation_product_cumulative_derived");
+    expect(codes).toContain("inflation_product_history_limits");
+    expect(codes).toContain("inflation_product_label_discrepancy");
   });
 });

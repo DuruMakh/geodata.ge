@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
@@ -25,6 +25,7 @@ const TOOL_NAMES = [
   "query_economic_sectors",
   "query_gdp",
   "query_inflation",
+  "query_inflation_products",
   "query_ministries",
   "query_municipal",
   "query_national",
@@ -33,6 +34,29 @@ const TOOL_NAMES = [
 ];
 
 describe("MCP tool surface", () => {
+  it("preflights 501 product output cells before calculation while accepting a long input span", async () => {
+    const client = await connected();
+    try {
+      const product = TOOLS.find(tool => tool.name === "query_inflation_products");
+      expect(product).toBeDefined();
+      const calculate = vi.spyOn(product!, "run");
+      const refused = await client.callTool({ name: "query_inflation_products", arguments: {
+        seriesIds: loadPackagedSnapshot().inflationProducts.catalogue.slice(0, 167).map(product => product.productId),
+        measure: "yoy_pct", fromPeriod: "2026-06", toPeriod: "2026-08",
+      } });
+      expect(refused.isError).toBe(true);
+      expect((refused.content as { text: string }[])[0]!.text).toContain("result_too_large");
+      expect(calculate).not.toHaveBeenCalled();
+      const endpoint = await client.callTool({ name: "query_inflation_products", arguments: {
+        seriesIds: ["cpi.product.p0001", "cpi.product.p0002", "cpi.product.p0003", "cpi.product.p0004", "cpi.product.p0005"],
+        measure: "cumulative_pct", startYear: 2015, fromPeriod: "2026-08", toPeriod: "2026-08",
+      } });
+      expect(endpoint.isError).toBeFalsy();
+      expect(endpoint.structuredContent).toMatchObject({ data: { coverage: { expectedCount: 5 } } });
+      expect((endpoint.structuredContent as { data: { observations: { calculationBasePeriod: string }[] } }).data.observations.every(row => row.calculationBasePeriod === "2014-12")).toBe(true);
+      calculate.mockRestore();
+    } finally { await client.close(); }
+  });
   it("advertises exactly the read-only query functions", async () => {
     const { tools } = await (await connected()).listTools();
 
@@ -278,6 +302,21 @@ describe("MCP tool surface", () => {
     expect((result.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t5.6479\t");
   });
 
+  it("transports city-specific coverage and keeps the published value and missing-start text", async () => {
+    const client = await connected();
+    try {
+      const batumi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" } });
+      expect(batumi.isError).toBeFalsy();
+      expect(batumi.structuredContent).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-08"] } } });
+      expect((batumi.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t7.0857\t");
+
+      const zugdidi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "avg12_pct", fromPeriod: "2016-06", toPeriod: "2016-06" } });
+      expect(zugdidi.isError).toBeFalsy();
+      expect(zugdidi.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-08"] } } });
+      expect((zugdidi.content as { text: string }[])[0]!.text).toContain("2017-12");
+    } finally { await client.close(); }
+  });
+
   it("names both months of an inflation comparison in the text twin", async () => {
     const client = await connected();
     const result = await client.callTool({
@@ -339,7 +378,7 @@ describe("MCP tool surface", () => {
     const instructions = serverInstructions({}, ENTITY_COUNTS);
     expect(instructions).toContain("INFLATION");
     expect(instructions).toContain("only monthly dataset");
-    expect(instructions).toContain("schema 1.4.0");
+    expect(instructions).toContain("schema 1.5.0");
     expect(instructions).not.toContain("Quarterly or monthly data, live budget execution");
   });
 

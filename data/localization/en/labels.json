@@ -1186,5 +1186,9 @@
   "inflation": {
     "text": "Consumer price inflation",
     "reviewedAt": "2026-09-14"
+  },
+  "inflation-products": {
+    "text": "Inflation by product",
+    "reviewedAt": "2026-10-01"
   }
 }

@@ -3,7 +3,7 @@
 // The read-only tools, wired to the pure query core. This file owns names,
 // descriptions, schemas and annotations; it owns no arithmetic. Every figure
 // still comes from lib/factQuery/, and every error envelope is the core's own.
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/server";
 import type { ZodTypeAny } from "zod";
 import { compare } from "../factQuery/compare";
 import { describeCoverage } from "../factQuery/describeCoverage";
@@ -19,6 +19,8 @@ import { queryRegionalEconomiesInput } from "./schemas.regional-economies";
 import { inflationDatasetPeriods } from "../factQuery/inflationData";
 import { inflationCellCount, queryInflation } from "../factQuery/queryInflation";
 import { queryInflationInput } from "../factQuery/schemas";
+import { productQueryCellCount, queryInflationProducts } from "../factQuery/queryInflationProducts";
+import { queryInflationProductsInput } from "../factQuery/schemas";
 import { queryDeficit } from "../factQuery/queryDeficit";
 import { queryMunicipal } from "../factQuery/queryMunicipal";
 import { queryNational } from "../factQuery/queryNational";
@@ -116,6 +118,19 @@ export const TOOLS: readonly ToolDefinition[] = [
     run: (snapshot, input) => queryInflation(snapshot, input),
   },
   {
+    name: "query_inflation_products",
+    title: "პროდუქტების ინფლაცია / Product inflation",
+    describe: coverage =>
+      `Reviewed current-basket products for Georgia, ${coverage["inflation-products"]}. Discover IDs, firstPeriod and measure coverage with describe_coverage datasetId inflation-products. ` +
+      "Measures are exactly yoy_pct (published annual index minus 100) and cumulative_pct (Fiscal.ge-derived compounded monthly inputs). " +
+      "Pass inclusive fromPeriod and toPeriod (YYYY-MM). Cumulative requires startYear <= the year of fromPeriod and uses the previous December as calculationBasePeriod; annual rejects startYear. " +
+      "One cumulative endpoint is one output cell even when its inputs span many years. Incomplete inputs or a later product start return missing with reasons, never a partial calculation. " +
+      "No retail GEL prices, product weights, contributions, city products or retired products. Keep identity-history and derived-value caveats. " +
+      "At most 500 output cells (products × output months); the 512 KiB evidence-inclusive limit can require fewer products/months or bulk files.",
+    schema: queryInflationProductsInput,
+    run: queryInflationProducts,
+  },
+  {
     name: "describe_coverage",
     title: "დაფარვა და შესაძლებლობები",
     describe: (_coverage, facts) =>
@@ -200,7 +215,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "cross-field rules the JSON Schema cannot express. Returns absolute, " +
       "percentage and percentage-point change as the measure allows, plus a comparability of " +
       "comparable, limited or not_comparable. Use this rather than subtracting two query results " +
-      "yourself: it is what detects a definition change between the two years.",
+      "yourself: it is what detects a definition change between the two years. " +
+      "Product target { dataset: inflation-products, seriesIds } supports yoy_pct percentage-point change only. Cumulative comparison is refused; query_inflation_products with startYear returns accumulated price change.",
     schema: compareInput,
     run: (snapshot, input) => compare(snapshot, input),
   },
@@ -213,7 +229,9 @@ export const TOOLS: readonly ToolDefinition[] = [
       "Ranking municipalities requires `entityType` and exactly one `seriesId`. Reports ties and " +
       "says when the cutoff splits one, and names every excluded candidate with its reason. For inflation: dimension series, " +
       "level division or subgroup (optionally parentSeriesId), and period with metric value or fromPeriod and toPeriod with percentage_point_change. " +
-      "For inflation cities: dimension entities, entityType city, one seriesId, and the same period fields.",
+      "For inflation cities: dimension entities, entityType city, one seriesId, and the same period fields. " +
+      "For inflation-products: dimension series, metric value, period, and yoy_pct or cumulative_pct (the latter requires startYear and states its previous-December base). " +
+      "All current products are candidates; incomplete histories are explicitly excluded. No product entity/region/parent/level filters or change-ranking metrics.",
     schema: rankInput,
     run: (snapshot, input) => rank(snapshot, input),
   },
@@ -266,6 +284,7 @@ export function createMcpServer(): McpServer {
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
     {
+      capabilities: { tools: { listChanged: false } },
       instructions: serverInstructions(
         coverage,
         {
@@ -316,6 +335,8 @@ export function createMcpServer(): McpServer {
             ? (input.regionIds?.length ?? snapshot.regionalEconomies.regions.length) * (input.seriesIds?.length ?? snapshot.regionalEconomies.registry.length) * regionalYears
           : tool.name === "query_inflation"
             ? inflationCellCount(args as Parameters<typeof inflationCellCount>[0])
+            : tool.name === "query_inflation_products"
+              ? productQueryCellCount(args as Parameters<typeof productQueryCellCount>[0])
             : tool.name.startsWith("query_")
               ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
               : 0;

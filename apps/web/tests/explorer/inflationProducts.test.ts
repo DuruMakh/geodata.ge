@@ -14,6 +14,25 @@ const fact = (measure: ProductFactRow["measure"], period: string, index100: stri
 });
 
 describe("individual-product inflation model", () => {
+  it("names the selected January when the required span starts after the monthly run", () => {
+    const index = buildProductIndex([{ ...product, firstPeriod: "2025-01" }], packProductFacts([
+      fact("mom_index_100", "2025-01", "101"),
+      fact("mom_index_100", "2025-02", "102"),
+      fact("yoy_index_100", "2026-01", "110"),
+    ]));
+    expect(productCumulative(index, id, 2026, makePeriod(2026, 1))).toEqual({
+      value: null, reason: "missing_month", missingPeriod: makePeriod(2026, 1),
+    });
+  });
+  it("names the earliest missing input even when the endpoint exceeds the monthly run", () => {
+    const index = buildProductIndex([product], packProductFacts([
+      fact("mom_index_100", "2026-01", null),
+      fact("mom_index_100", "2026-02", "102"),
+    ]));
+    expect(productCumulative(index, id, 2026, makePeriod(2026, 3))).toMatchObject({
+      value: null, reason: "missing_month", missingPeriod: makePeriod(2026, 1),
+    });
+  });
   it("packs source precision without rounding or inventing unavailable values", () => {
     const packed = packProductFacts([
       fact("mom_index_100", "2026-01", "101.6031"),

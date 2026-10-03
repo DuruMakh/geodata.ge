@@ -1,4 +1,4 @@
-import type { Locale } from "../i18n/types";
+import type { Locale, TemplateValues } from "../i18n/types";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
@@ -8,7 +8,10 @@ import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { describeCoverage } from "../factQuery/describeCoverage";
 import type { CoverageData } from "../factQuery/describeCoverage";
-import { inflationCatalogueSeries, inflationDatasetPeriods } from "../factQuery/inflationData";
+import { inflationCatalogueSeries, inflationDatasetPeriods, inflationEntityPeriods } from "../factQuery/inflationData";
+import { inflationProductIndex } from "../factQuery/inflationProductData";
+import { productCumulative } from "../explorer/inflationProducts";
+import { periodFromKey } from "../data/inflation/periods";
 import { loadPackagedSnapshot } from "../mcp/snapshot";
 import { loadServedLandingData } from "../data/servedData";
 import { buildLandingContext } from "../landing/landingData";
@@ -41,7 +44,8 @@ function coverage(): {
   excludedCodes: string[];
   sectorCount: number;
   sectorRanges: Record<string, string>;
-  inflation: { nationalRange: string; groupCount: number; weightRange: string; contributionStart: string; targetStart: string };
+  inflation: { nationalRange: string; groupCount: number; weightRange: string; contributionStart: string; targetStart: string; nationalLatest: string; cityCount: number; cityRange: string; cityLatest: string; batumiFrom: string; batumiTo: string };
+  products: { count: number; range: string; annualLatest: string; startPeriod: string; endPeriod: string; basePeriod: string; labelKa: string; labelEn: string };
 } {
   const snapshot = loadPackagedSnapshot();
   const response = describeCoverage(snapshot, {});
@@ -68,13 +72,37 @@ function coverage(): {
         series.map((entry) => entry.periodsByMeasure[measure]?.[0]).filter((period): period is string => period !== undefined).sort()[0]!;
       const [firstPeriod, lastPeriod] = inflationDatasetPeriods(snapshot);
       const years = snapshot.inflation.weights.map((row) => row.year);
+      const citySpans = [...inflationEntityPeriods(snapshot).values()].flat().sort();
+      const foodPeriods = new Map<string, Set<string>>();
+      for (const fact of snapshot.inflation.cities.filter(fact => fact.seriesId === "cpi.cat.01" && fact.measure === "yoy_pct")) {
+        const cities = foodPeriods.get(fact.period) ?? new Set<string>();
+        cities.add(fact.cityId);
+        foodPeriods.set(fact.period, cities);
+      }
+      const cityCount = snapshot.inflation.cityEntities.length;
+      const cityLatest = [...foodPeriods].filter(([, cities]) => cities.size === cityCount).map(([period]) => period).sort().at(-1)!;
+      const batumiPeriods = snapshot.inflation.cities.filter(fact => fact.cityId === "city.batumi" && fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct").map(fact => fact.period).sort();
       return {
         nationalRange: `${firstPeriod}–${lastPeriod}`,
         groupCount: snapshot.inflation.groups.length,
         weightRange: `${Math.min(...years)}–${Math.max(...years)}`,
         contributionStart: firstOf("contribution_pp"),
         targetStart: firstOf("target_pct"),
+        nationalLatest: series.find(entry => entry.seriesId === "cpi.headline")!.periodsByMeasure.yoy_pct![1],
+        cityCount, cityRange: `${citySpans[0]}–${citySpans.at(-1)}`, cityLatest,
+        batumiFrom: batumiPeriods.at(-2)!, batumiTo: batumiPeriods.at(-1)!,
       };
+    })(),
+    products: (() => {
+      const index = inflationProductIndex(snapshot);
+      const published = snapshot.inflationProducts.facts.filter(fact => fact.index100 !== null);
+      const annualPeriods = published.filter(fact => fact.measure === "yoy_index_100").map(fact => fact.period).sort();
+      const monthlyPeriods = published.filter(fact => fact.measure === "mom_index_100").map(fact => fact.period).sort();
+      const startYear = Number(monthlyPeriods[0].slice(0, 4));
+      const endPeriod = monthlyPeriods.at(-1)!;
+      const product = snapshot.inflationProducts.catalogue.find(product => productCumulative(index, product.productId, startYear, periodFromKey(endPeriod)).value !== null)!;
+      const periods = datasets.find(dataset => dataset.datasetId === "inflation-products")!.periods!;
+      return { count: snapshot.inflationProducts.catalogue.length, range: `${periods[0]}–${periods[1]}`, annualLatest: annualPeriods.at(-1)!, startPeriod: `${startYear}-01`, endPeriod, basePeriod: `${startYear - 1}-12`, labelKa: product.labelKa, labelEn: product.labelEn };
     })(),
     municipalities: snapshot.municipal.municipalities.length,
     regions: snapshot.municipal.regions.length,
@@ -83,15 +111,13 @@ function coverage(): {
   };
 }
 
-// Menu paths, not terminal commands. Both recipes below are what the owner
-// actually clicked through in each application - Claude's was used to connect
-// to this very endpoint, and Codex's dialog is the one that asks for a Name, a
-// Type (STDIO or Streamable HTTP) and a URL. Advertise only what has been
-// seen; menu names drift, so if a step stops matching, fix the step rather
-// than retreating to "see your client's docs".
+// Earlier owner clickthroughs are historical provenance. These steps follow
+// current official documentation; Task 9 records account/application proof
+// separately from SDK compatibility and the local CLI version check.
 const CLIENTS = [
   {
     name: "Claude",
+    documentation: "https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp",
     note: "connect.claudeNote",
     steps: [
       "connect.claudeStep1",
@@ -100,7 +126,8 @@ const CLIENTS = [
     ],
   },
   {
-    name: "Codex / ChatGPT",
+    name: "Codex",
+    documentation: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli",
     note: "connect.codexNote",
     steps: [
       "connect.codexStep1",
@@ -124,7 +151,14 @@ const NOT_SERVED = [
 export async function renderConnectPage(locale: Locale) {
   const messages = await getMessages(locale, ["common", "connect"]);
   const model = buildLandingContext(await loadServedLandingData());
-  const { ranges, municipalities, regions, regionalRegions, excludedCodes, sectorCount, sectorRanges, inflation } = coverage();
+  const { ranges, municipalities, regions, regionalRegions, excludedCodes, sectorCount, sectorRanges, inflation, products } = coverage();
+  const inflationExamples: { id: string; key: string; values: TemplateValues }[] = [
+    { id: "inflation-national", key: "connect.exampleInflationNational", values: { period: inflation.nationalLatest } },
+    { id: "inflation-cities", key: "connect.exampleInflationCities", values: { count: inflation.cityCount, period: inflation.cityLatest } },
+    { id: "inflation-batumi", key: "connect.exampleInflationBatumi", values: { fromPeriod: inflation.batumiFrom, toPeriod: inflation.batumiTo } },
+    { id: "products-annual", key: "connect.exampleProductAnnual", values: { period: products.annualLatest } },
+    { id: "products-cumulative", key: "connect.exampleProductCumulative", values: { product: locale === "en" ? products.labelEn : products.labelKa, fromPeriod: products.startPeriod, toPeriod: products.endPeriod, basePeriod: products.basePeriod } },
+  ];
   const endpoint = `${resolveSiteUrl()}/mcp`;
 
   return (
@@ -183,6 +217,7 @@ export async function renderConnectPage(locale: Locale) {
                       </li>
                     ))}
                   </ol>
+                  <a className="mt-3 inline-block text-[12px] underline" href={client.documentation}>{message(messages, "connect.clientDocumentation")}</a>
                 </div>
               ))}
             </div>
@@ -226,6 +261,7 @@ export async function renderConnectPage(locale: Locale) {
             <h3 className="mt-5 text-[14px] font-semibold">{message(messages, "connect.examplesHeading")}</h3>
             <ul className="mt-3 grid max-w-[820px] list-disc gap-2 pl-5 text-[13.5px] leading-[1.8] text-[var(--body)]">
               {["connect.exampleNational", "connect.exampleMunicipal", "connect.exampleRegional", "connect.exampleDebt", "connect.exampleDeficit"].map(key => <li key={key}>{message(messages, key)}</li>)}
+              {inflationExamples.map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
             </ul>
           </section>
 
@@ -266,6 +302,8 @@ export async function renderConnectPage(locale: Locale) {
                   <li data-testid="connect-sector-coverage">{message(messages, "connect.sectorCoverage", { count: sectorCount, nominalRange: sectorRanges.nominal, shareRange: sectorRanges.share_of_gdp, growthRange: sectorRanges.real_growth })}</li>
                   <li data-testid="connect-regional-coverage">{message(messages, "connect.regionalCoverage", { count: regionalRegions, range: ranges["regional-economies"] })}</li>
                   <li data-testid="connect-inflation-coverage">{message(messages, "connect.inflationCoverage", { nationalRange: inflation.nationalRange, groupCount: inflation.groupCount, weightRange: inflation.weightRange, contributionStart: inflation.contributionStart, targetStart: inflation.targetStart })}</li>
+                  <li data-testid="connect-city-coverage">{message(messages, "connect.cityCoverage", { count: inflation.cityCount, range: inflation.cityRange })}</li>
+                  <li data-testid="connect-product-coverage">{message(messages, "connect.productCoverage", { count: products.count, range: products.range })}</li>
                 </ul>
                 <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-sector-discovery">
                   {message(messages, "connect.sectorQuery")} {" "}
@@ -286,6 +324,12 @@ export async function renderConnectPage(locale: Locale) {
                   <a className="underline" href="/downloads/data/inflation-categories.json">{message(messages, "connect.inflationCategoriesMetadata")}</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-cities.csv">{message(messages, "connect.inflationCitiesCsv")}</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-cities.json">{message(messages, "connect.inflationCitiesMetadata")}</a>{" · "}
+                  <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
+                </p>
+                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-product-discovery">
+                  {message(messages, "connect.productQuery")}{" "}
+                  <a className="underline" href="/downloads/data/inflation-products.json">JSON</a>{" · "}
+                  <a className="underline" href="/downloads/data/inflation-products.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
               </div>

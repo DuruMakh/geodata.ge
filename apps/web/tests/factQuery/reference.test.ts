@@ -19,6 +19,7 @@ import { queryDeficit } from "../../lib/factQuery/queryDeficit";
 import { queryEconomicSectors } from "../../lib/factQuery/queryEconomicSectors";
 import { queryGdp } from "../../lib/factQuery/queryGdp";
 import { queryInflation } from "../../lib/factQuery/queryInflation";
+import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
 import { queryRegionalEconomies } from "../../lib/factQuery/queryRegionalEconomies";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
@@ -35,7 +36,7 @@ beforeAll(async () => {
   snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-02T00:00:00.000Z" });
 });
 
-function run(tool: string, args: unknown): FactQueryResponse {
+function run(tool: string, args: unknown, productSnapshot = snapshot): FactQueryResponse {
   const dispatch: Record<string, (input: unknown) => FactQueryResponse> = {
     describe_coverage: (input) => describeCoverage(snapshot, input),
     query_national: (input) => queryNational(snapshot, input),
@@ -46,6 +47,7 @@ function run(tool: string, args: unknown): FactQueryResponse {
     query_gdp: (input) => queryGdp(snapshot, input),
     query_economic_sectors: (input) => queryEconomicSectors(snapshot, input),
     query_inflation: (input) => queryInflation(snapshot, input),
+    query_inflation_products: (input) => queryInflationProducts(productSnapshot, input),
     query_regional_economies: (input) => queryRegionalEconomies(snapshot, input),
     compare: (input) => compare(snapshot, input),
     rank: (input) => rank(snapshot, input),
@@ -76,9 +78,12 @@ describe("section 14.3 bilingual reference fixture", () => {
   // point change, and a division ranking. Three more on 2026-09-27 for city
   // inflation: a single city's total, a cross-city food ranking, and a city's
   // late-starting series reported missing rather than filled.
-  it("covers 40 intents, each asked in both languages", () => {
-    expect(REFERENCE_INTENTS).toHaveLength(40);
-    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 40 }, (_, i) => i + 1));
+  // Eight product intents add independently calculated annual/cumulative values,
+  // published annual missingness, a late start, both ranking directions, a
+  // refused cumulative comparison and a clearly synthetic monthly-input gap.
+  it("covers 48 intents, each asked in both languages", () => {
+    expect(REFERENCE_INTENTS).toHaveLength(48);
+    expect(REFERENCE_INTENTS.map((intent) => intent.id)).toEqual(Array.from({ length: 48 }, (_, i) => i + 1));
 
     for (const intent of REFERENCE_INTENTS) {
       expect(intent.promptKa.length, `intent ${intent.id} promptKa`).toBeGreaterThan(10);
@@ -92,7 +97,14 @@ describe("section 14.3 bilingual reference fixture", () => {
   for (const intent of REFERENCE_INTENTS) {
     describe(`intent ${intent.id}: ${intent.promptEn}`, () => {
       it("returns the reviewed answer with its scope, sources and caveats", () => {
-        const response = run(intent.call.tool, intent.call.arguments);
+        const gap = intent.syntheticMissingMonthlyInput;
+        const productSnapshot = gap === undefined ? snapshot : {
+          ...snapshot, inflationProducts: { ...snapshot.inflationProducts, facts: snapshot.inflationProducts.facts.map(fact =>
+            fact.productId === gap.seriesId && fact.period === gap.period && fact.measure === "mom_index_100"
+              ? { ...fact, index100: null, availability: "not_published" as const } : fact,
+          ) },
+        };
+        const response = run(intent.call.tool, intent.call.arguments, productSnapshot);
 
         function verifyLanguageCompanions(value: unknown): void {
           if (value === null || typeof value !== "object") return;
@@ -123,6 +135,9 @@ describe("section 14.3 bilingual reference fixture", () => {
         if (response.kind === "error") throw new Error(`unexpected error: ${response.error.messageEn}`);
 
         const data = response.data as Record<string, unknown>;
+        if (intent.expectedAvailablePeriods !== undefined) {
+          expect((data.coverage as { availablePeriods: unknown }).availablePeriods).toEqual(intent.expectedAvailablePeriods);
+        }
 
         // --- observation cells -------------------------------------------
         if (intent.expectedCells !== undefined) {
@@ -134,6 +149,12 @@ describe("section 14.3 bilingual reference fixture", () => {
             expect(actual, `missing cell ${expected.id}`).toBeDefined();
             near(actual!.value, expected.value, intent.allowedRounding, expected.id);
             expect(actual!.unit, `${expected.id} unit`).toBe(expected.unit);
+            if (expected.calculationBasePeriod !== undefined) {
+              expect(actual!.calculationBasePeriod).toBe(expected.calculationBasePeriod);
+              expect(actual!.valueDefinitionId).toContain(`base=${expected.calculationBasePeriod}`);
+              expect(actual!.valueDefinitionEn).toContain(expected.calculationBasePeriod);
+            }
+            if (expected.missingReasonIncludes !== undefined) expect(actual!.missingReasonEn).toContain(expected.missingReasonIncludes);
             // A null value must be reported as MISSING with a reason, never as
             // an available zero.
             if (expected.value === null) {

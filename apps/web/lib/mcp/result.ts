@@ -64,7 +64,7 @@ function line(...cells: (string | number | null)[]): string {
   return cells.map((cell) => (cell === null ? "" : String(cell))).join("\t");
 }
 
-function observationLine(observation: Observation): string {
+function observationLine(observation: Observation, includeBase: boolean): string {
   const value =
     observation.value === null ? `missing${observation.missingReason ? ` (${observation.missingReason})` : ""}` : observation.value;
   return line(
@@ -90,6 +90,7 @@ function observationLine(observation: Observation): string {
     observation.seriesId,
     observation.sourceIds.join(","),
     observation.documentIds.join(","),
+    ...(includeBase ? [observation.calculationBasePeriod ?? null] : []),
   );
 }
 
@@ -163,11 +164,19 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   const data = response.data as Record<string, unknown>;
 
   if (response.kind === "observations") {
-    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
+    const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; availableYears: number[]; availablePeriods?: [string, string] | null; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
+    const includeBase = observations.some(observation => observation.calculationBasePeriod !== undefined);
     return [
-      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionId\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds",
-      ...observations.map(observationLine),
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionId\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds" + (includeBase ? "\tcalculationBasePeriod" : ""),
+      ...observations.map(observation => observationLine(observation, includeBase)),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
+      ...(coverage.availablePeriods === undefined ? [] : [
+        `ხელმისაწვდომი თვეების დიაპაზონი / availablePeriods ${JSON.stringify(coverage.availablePeriods)}`,
+        `ხელმისაწვდომი წლები / availableYears ${JSON.stringify(coverage.availableYears)}`,
+        coverage.availablePeriods === null
+          ? "არ არის ხელმისაწვდომი თვეები / No available months."
+          : "დიაპაზონი აერთიანებს შერჩეულ ისტორიებს; შესაძლებელია გამოტოვებული თვეები და გვიანი დასაწყისი. / Span combines selected histories; gaps and later starts may remain.",
+      ]),
       ...excludedLines(coverage),
       ...definitionLines(observations),
     ];
@@ -185,13 +194,15 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
 
   if (response.kind === "ranking") {
     const { entries, universe, exclusions, rankingDefinition, rankingDefinitionEn } = data as RankData;
+    const includePeriod = entries.some(entry => entry.period !== undefined);
+    const includeBase = entries.some(entry => entry.calculationBasePeriod !== undefined);
     return [
       rankingDefinition,
       rankingDefinitionEn,
       `${universe.description} | ${universe.descriptionEn}`,
-      "# position\tentityKa\tentityEn\tseriesKa\tseriesEn\tvalue\tunit\tbasis\ttied\tcaveats\tentityId\tseriesId",
+      "# position\tentityKa\tentityEn\tseriesKa\tseriesEn\tvalue\tunit\tbasis\ttied\tcaveats\tentityId\tseriesId" + (includePeriod ? "\tperiod" : "") + (includeBase ? "\tcalculationBasePeriod" : ""),
       ...entries.map((entry) =>
-        line(entry.position, entry.entityLabelKa, entry.entityLabelEn, entry.seriesLabelKa, entry.seriesLabelEn, entry.value, entry.unit, entry.basis, entry.tied ? "tied" : "", entry.caveatIds.join(","), entry.entityId, entry.seriesId),
+        line(entry.position, entry.entityLabelKa, entry.entityLabelEn, entry.seriesLabelKa, entry.seriesLabelEn, entry.value, entry.unit, entry.basis, entry.tied ? "tied" : "", entry.caveatIds.join(","), entry.entityId, entry.seriesId, ...(includePeriod ? [entry.period ?? null] : []), ...(includeBase ? [entry.calculationBasePeriod ?? null] : [])),
       ),
       `${universe.returnedCount} of ${universe.eligibleCount} eligible from ${universe.candidateCount} candidates` +
         (universe.cutoffSplitsTie ? " — the cutoff splits a tie, so the last place is arbitrary" : ""),

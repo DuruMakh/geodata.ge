@@ -9,6 +9,8 @@ import { SECTOR_QUERY_MEASURES } from "./economicSectorsSeries";
 import { REGIONAL_ECONOMY_QUERY_MEASURES } from "./regionalEconomySeries";
 import { inflationCatalogueSeries, inflationDatasetPeriods, inflationEntityPeriods } from "./inflationData";
 import { INFLATION_MEASURES } from "./inflationSeries";
+import { PRODUCT_QUERY_MEASURES } from "./inflationProductSeries";
+import { inflationProductCatalogue } from "./inflationProductData";
 import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
@@ -32,6 +34,7 @@ const DATASET_IDS: readonly DatasetId[] = [
   "economic-sectors",
   "regional-economies",
   "inflation",
+  "inflation-products",
 ];
 
 type EntityType = "country" | "municipality" | "region" | "city";
@@ -61,6 +64,11 @@ type BaseSeriesEntry = {
   yearsByMeasure?: Record<string, number[]>;
   periods?: [string, string];
   periodsByMeasure?: Record<string, [string, string]>;
+  labelEn?: string;
+  coicopCode?: string;
+  firstPeriod?: string;
+  measures?: Measure[];
+  historyNotes?: { boundaryYear: number; noteKa: string; noteEn: string }[];
 };
 
 type SeriesEntry = BaseSeriesEntry & { labelEn: string };
@@ -181,6 +189,12 @@ const DATASET_META: Record<
     entityTypes: ["country", "city"],
     measures: [...INFLATION_MEASURES],
   },
+  "inflation-products": {
+    budgetScope: "consumer_prices",
+    labelKa: "ინფლაცია პროდუქტების მიხედვით",
+    entityTypes: ["country"],
+    measures: [...PRODUCT_QUERY_MEASURES],
+  },
   "general-government-balance": {
     // General government per the IMF: wider than either national series here,
     // and NOT their difference.
@@ -261,6 +275,9 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
     case "inflation":
       years = yearRange(inflationCatalogueSeries(snapshot).flatMap((series) => series.years), datasetId);
       break;
+    case "inflation-products":
+      years = yearRange(snapshot.inflationProducts.facts.map(row => Number(row.period.slice(0, 4))), datasetId);
+      break;
     case "general-government-balance":
       years = yearRange(
         snapshot.deficit.facts.map((f) => f.year),
@@ -270,6 +287,7 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
   }
 
   const meta = DATASET_META[datasetId];
+  const productPeriods = datasetId === "inflation-products" ? snapshot.inflationProducts.facts.map(fact => fact.period).sort() : [];
   // entityTypes/measures are copied out of DATASET_META rather than spread by
   // reference: describeCoverage is called repeatedly against the same
   // long-lived snapshot (§4.2 "reuse calculations without rebuilding the
@@ -315,6 +333,11 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
         }
       : {}),
     ...(datasetId === "inflation" ? { periods: inflationDatasetPeriods(snapshot) } : {}),
+    ...(datasetId === "inflation-products" ? {
+      periods: [productPeriods[0]!, productPeriods.at(-1)!] as [string, string],
+      measureNotesKa: { yoy_pct: serviceMessage(snapshot, "ka", "definitions.inflationProductAnnual"), cumulative_pct: serviceMessage(snapshot, "ka", "coverage.inflationProductCumulative") },
+      measureNotesEn: { yoy_pct: serviceMessage(snapshot, "en", "definitions.inflationProductAnnual"), cumulative_pct: serviceMessage(snapshot, "en", "coverage.inflationProductCumulative") },
+    } : {}),
     ...(datasetId === "municipal-expenditure"
       ? {
           measureNotesKa: {
@@ -639,6 +662,8 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId)
       }));
     case "inflation":
       return inflationCatalogueSeries(snapshot);
+    case "inflation-products":
+      return inflationProductCatalogue(snapshot);
   }
 }
 
@@ -681,10 +706,11 @@ function municipalEntitiesFor(snapshot: FactQuerySnapshot): BaseEntityEntry[] {
 }
 
 function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): SeriesEntry[] {
-  return baseSeriesForDataset(snapshot, datasetId).map(series => ({ ...series, labelEn: serviceLabelEn(snapshot, series.seriesId) }));
+  return baseSeriesForDataset(snapshot, datasetId).map(series => ({ ...series, labelEn: series.labelEn ?? serviceLabelEn(snapshot, series.seriesId) }));
 }
 
 function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): EntityEntry[] | undefined {
+  if (datasetId === "inflation-products") return [{ entityId: "country.georgia", entityType: "country", labelKa: "საქართველო", labelEn: "Georgia", entitySlug: null }];
   if (datasetId === "municipal-expenditure") return municipalEntitiesFor(snapshot).map(entity => ({ ...entity, labelEn: serviceLabelEn(snapshot, entity.entityId) }));
   if (datasetId === "regional-economies")
     return snapshot.regionalEconomies.regions.map(region => ({

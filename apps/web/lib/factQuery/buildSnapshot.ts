@@ -26,6 +26,7 @@ import { loadServedRegionalEconomyRows, REGIONAL_ECONOMY_REGIONS, REGIONAL_ECONO
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { REGIONAL_ECONOMY_DEFINITIONS } from "./regionalEconomySeries";
 import { loadServedInflationData } from "../data/inflation/importInflation";
+import { loadServedProductData } from "../data/inflation/importProducts";
 import { CPI_CITY_IDS } from "../data/inflation/types";
 import { NATIONAL_SERIES, RESIDUAL_SERIES, RESIDUAL_SERIES_ID, TARGET_SERIES, TARGET_SERIES_ID, type InflationCityEntity, type InflationGroup } from "./inflationSeries";
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
@@ -525,7 +526,7 @@ export function enrichSourceTranslations(sources: readonly RawResolvedSource[], 
 
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
   const repositoryRoot = path.resolve(process.cwd(), "../..");
-  const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit, catalogue, serviceKa, serviceEn, gdpOverview, economicSectors, regionalEconomies] = await Promise.all([
+  const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit, catalogue, serviceKa, serviceEn, gdpOverview, economicSectors, regionalEconomies, products, productHistory] = await Promise.all([
     loadServedExplorerData(),
     loadServedMunicipalData(),
     loadTaxonomyFiles("../../data/taxonomy"),
@@ -538,7 +539,21 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     loadServedGdpOverviewRows(),
     loadServedEconomicSectorsRows(),
     loadServedRegionalEconomyRows(),
+    loadServedProductData(),
+    readFile(path.join(repositoryRoot, "data/localization/inflation-product-history.json"), "utf8").then(text => z.array(z.strictObject({
+      productId: z.string().regex(/^cpi\.product\.p\d{4,}$/),
+      boundaryYear: z.number().int(),
+      noteKa: z.string().trim().min(1),
+      noteEn: z.string().trim().min(1),
+    })).parse(JSON.parse(text))),
   ]);
+  const productIds = new Set(products.catalogue.map(row => row.productId));
+  const historyKeys = new Set<string>();
+  for (const note of productHistory) {
+    const key = `${note.productId}:${note.boundaryYear}`;
+    if (!productIds.has(note.productId) || historyKeys.has(key)) throw new Error(`Invalid or duplicate product history note ${key}`);
+    historyKeys.add(key);
+  }
   const messageErrors = validateServiceMessages(serviceKa, serviceEn);
   if (messageErrors.length) throw new Error(messageErrors.join("\n"));
   const labelIds = [...new Set([
@@ -550,7 +565,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID, ...Object.keys(GDP_QUERY_SERIES), "gdp-overview",
     ...ECONOMIC_SECTORS.map(r=>r.id), "economic-sectors",
     ...REGIONAL_ECONOMY_REGIONS.map(region => region.id), REGIONAL_GDP_TOTAL, "regional-economies",
-    "inflation",
+    "inflation", "inflation-products",
     "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
   ])].sort();
   const localization: ServiceLocalization = {
@@ -732,6 +747,11 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       groups: inflationGroups,
       cities: sortedBy(inflation.cities, (f) => f.cityId, (f) => f.seriesId, (f) => f.measure, (f) => f.period),
       cityEntities: inflationCities,
+    },
+    inflationProducts: {
+      catalogue: sortedBy(products.catalogue.map(({ productId, coicopCode, labelKa, labelEn, firstPeriod }) => ({ productId, coicopCode, labelKa, labelEn, firstPeriod })), row => row.productId),
+      facts: sortedBy(products.facts.map(({ productId, measure, period, index100, availability, sourceId }) => ({ productId, measure, period, index100, availability, sourceId })), row => row.productId, row => row.measure, row => row.period),
+      historyNotes: sortedBy(productHistory, row => row.productId, row => row.boundaryYear),
     },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     sources,

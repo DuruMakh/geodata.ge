@@ -61,6 +61,24 @@ function post(): Request {
 }
 
 describe("an unexpected failure inside the handler", () => {
+  it("preserves a modern request ID while keeping snapshot failures bilingual and private", async () => {
+    const response = await POST(new Request(ENDPOINT, {
+      method: "POST", headers: { host: "fiscal.ge", "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2026-07-28", "mcp-method": "server/discover" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: "failed-modern-id", method: "server/discover", params: { _meta: {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": { name: "failure-test", version: "1" },
+        "io.modelcontextprotocol/clientCapabilities": {},
+      } } }),
+    }));
+    const text = await response.text();
+    expect(response.status).toBe(500);
+    expect(JSON.parse(text).id).toBe("failed-modern-id");
+    expect(text).toContain("internal_error");
+    expect(text).toMatch(/[Ⴀ-ჿ]/);
+    expect(text).not.toContain("snapshot.json");
+    expect(text).not.toContain("ENOENT");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+  });
   it("answers with the service's own bilingual error, not the framework's", async () => {
     const response = await POST(post());
     const body = await response.text();

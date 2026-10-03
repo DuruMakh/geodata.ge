@@ -2,6 +2,23 @@ import type { FactQuerySnapshot } from "./types";
 
 // Authored service sentence keys; their text is supplied by the snapshot.
 export const SERVICE_MESSAGE_KEYS = [
+  "publication.inflationProductsNotice",
+  "definitions.inflationProductMonthlyIndex",
+  "definitions.inflationProductAnnualIndex",
+  "definitions.inflationProductCumulativeBase",
+  "coverage.inflationProductCumulative",
+  "errors.compareProductCumulative",
+  "ranking.inflationProducts",
+  "ranking.productCumulativeDefinition",
+  "caveats.inflation_product_cumulative_derived",
+  "caveats.inflation_product_history_limits",
+  "caveats.inflation_product_label_discrepancy",
+  "definitions.inflationProductAnnual",
+  "definitions.inflationProductCumulative",
+  "definitions.inflationProductCumulativeSource",
+  "missing.inflationProductStart",
+  "missing.inflationProductAnnual",
+  "missing.inflationProductMonthlyInput",
   "caveats.adjara_consolidation_applied",
   "caveats.admin_category_not_yet_established",
   "caveats.budget_scopes_differ",
@@ -153,6 +170,11 @@ export type ServiceMessageKey = (typeof SERVICE_MESSAGE_KEYS)[number];
 // Existing Georgian errors intentionally omit the SDK's English validation
 // detail. Keep each language's established parameters explicit.
 export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka: readonly string[]; en: readonly string[] }>> = {
+  "ranking.productCumulativeDefinition": { ka: ["basePeriod", "order", "period"], en: ["basePeriod", "order", "period"] },
+  "definitions.inflationProductCumulative": { ka: ["basePeriod"], en: ["basePeriod"] },
+  "missing.inflationProductStart": { ka: ["first"], en: ["first"] },
+  "missing.inflationProductAnnual": { ka: ["period"], en: ["period"] },
+  "missing.inflationProductMonthlyInput": { ka: ["period"], en: ["period"] },
   "supporting.populationTransformation": { ka: ["cell", "sheet", "year"], en: ["cell", "sheet", "year"] },
   "errors.periodsOutOfRange": { ka: ["first", "last", "outOfRangePeriods"], en: ["first", "last", "outOfRangePeriods"] },
   "missing.inflationContributionStart": { ka: ["firstYear"], en: ["firstYear"] },
