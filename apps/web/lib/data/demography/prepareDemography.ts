@@ -11,6 +11,7 @@ import { loadDensityRows } from "./densityRows";
 import { loadDemographyGeography } from "./geography";
 import { readCensusAge } from "./readCensusAge";
 import { readDensity } from "./readDensity";
+import { readFertilityByAge } from "./readFertilityAge";
 import { readMigration } from "./readMigration";
 import { readAgeStructure, readPopulation } from "./readPopulation";
 import { readVitalEvents } from "./readVital";
@@ -29,6 +30,7 @@ const FILES = [
   { family: "migration", file: "data/imports/demography-migration-annual.csv", dimensions: ["sex", "citizenship_id"] },
   { family: "density", file: "data/imports/demography-density-annual.csv", dimensions: [] },
   { family: "census", file: "data/imports/demography-census-2024-population.csv", dimensions: ["sex", "age_group", "settlement"] },
+  { family: "fertility", file: "data/imports/demography-fertility-age-annual.csv", dimensions: ["age_group"] },
 ] as const;
 const BREAKS_FILE = "data/imports/demography-series-breaks.csv";
 const REPORT_FILE = "data/reports/demography-validation.json";
@@ -128,6 +130,7 @@ export async function prepareDemography(repositoryRoot: string) {
     ...groupMigrationByCitizenship(migration, groups),
     ...readDensity(sources, density),
     ...readCensusAge(sources, geography),
+    ...readFertilityByAge(sources),
   ];
   await checkSourcesRegistered(repositoryRoot, observations);
   const report = validateDemography({ observations, sources, geography, density, previous });

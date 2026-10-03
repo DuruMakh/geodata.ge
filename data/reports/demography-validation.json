@@ -366,6 +366,14 @@
       "firstYear": 2024,
       "lastYear": 2024,
       "rows": 684
+    },
+    {
+      "family": "fertility",
+      "seriesId": "demography.age_specific_fertility_rate",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 84
     }
   ],
   "blankCells": {
@@ -649,6 +657,14 @@
       "maxDeviation": 0.049911,
       "at": "region.mtskheta_mtianeti 2025",
       "bound": 0.05
+    },
+    {
+      "check": "age_specific_fertility_vs_total_fertility_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.005,
+      "at": "2015",
+      "bound": 0.005
     }
   ]
 }

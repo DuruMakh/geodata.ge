@@ -7,6 +7,7 @@ import { loadDensityRows, type DensityRows } from "../../../lib/data/demography/
 import { loadDemographyGeography, type DemographyGeography } from "../../../lib/data/demography/geography";
 import { readCensusAge } from "../../../lib/data/demography/readCensusAge";
 import { readDensity } from "../../../lib/data/demography/readDensity";
+import { readFertilityByAge } from "../../../lib/data/demography/readFertilityAge";
 import { readMigration } from "../../../lib/data/demography/readMigration";
 import { readAgeStructure, readPopulation } from "../../../lib/data/demography/readPopulation";
 import { findYearBlocks, readStoredSheet } from "../../../lib/data/demography/readStoredSheet";
@@ -48,6 +49,7 @@ function readAll(from: DemographySources): DemographyObservation[] {
     ...groupMigrationByCitizenship(migration, groups),
     ...readDensity(from, density),
     ...readCensusAge(from, geography),
+    ...readFertilityByAge(from),
   ];
 }
 const prepare = (from: DemographySources, previous?: readonly DemographyObservation[]) =>
@@ -82,7 +84,8 @@ describe("validation of the reviewed archive", () => {
     expect(coverage("demography.emigrants_by_citizenship_group")).toMatchObject({ family: "migration", geographies: 1, rows: 6 * 3 * 14 });
     expect(coverage("demography.census_population_by_age")).toEqual({ family: "census", seriesId: "demography.census_population_by_age", geographies: 12, firstYear: 2024, lastYear: 2024, rows: 12 * 9 * 18 });
     expect(coverage("demography.census_population_by_settlement")).toEqual({ family: "census", seriesId: "demography.census_population_by_settlement", geographies: 76, firstYear: 2024, lastYear: 2024, rows: 76 * 9 });
-    expect(report.coverage).toHaveLength(21);
+    expect(coverage("demography.age_specific_fertility_rate")).toEqual({ family: "fertility", seriesId: "demography.age_specific_fertility_rate", geographies: 1, firstYear: 2014, lastYear: 2025, rows: 7 * 12 });
+    expect(report.coverage).toHaveLength(22);
   });
 
   test("checks the whole census age table, municipal age rows included, and records what it covered", () => {
@@ -128,6 +131,7 @@ describe("validation of the reviewed archive", () => {
       "old_age_dependency_ratio",
       "life_expectancy_abridged_vs_headline",
       "population_density",
+      "age_specific_fertility_vs_total_fertility_rate",
     ]);
     for (const entry of rates) expect(entry.maxDeviation, entry.check).toBeLessThanOrEqual(entry.bound + 1e-9);
     expect(observed("crude_birth_rate").maxDeviation).toBeCloseTo(0.028, 3);
@@ -140,6 +144,7 @@ describe("validation of the reviewed archive", () => {
     expect(observed("life_expectancy_abridged_vs_headline")).toMatchObject({ bound: 0.25, firstYear: 1994, lastYear: 2025, at: "2009 males" });
     expect(observed("life_expectancy_abridged_vs_headline").maxDeviation).toBeCloseTo(0.158, 3);
     expect(observed("population_density")).toMatchObject({ bound: 0.05, firstYear: 2014, lastYear: 2026 });
+    expect(observed("age_specific_fertility_vs_total_fertility_rate")).toMatchObject({ bound: 0.005, firstYear: 2014, lastYear: 2025, maxDeviation: 0.005 });
   });
 
   test("inventories the blank cells it expects: occupied territories, city rows outside their years, absent countries", () => {
@@ -269,6 +274,13 @@ describe("one corrupted case per stop condition", () => {
     expect(stop(() => validateDemography({ observations: ages, sources, geography, density }))).toBe("identity_failed");
   });
 
+  test("age-specific fertility rates that no longer match the total fertility rate", () => {
+    const rate = (row: DemographyObservation) => row.seriesId === "demography.age_specific_fertility_rate" && row.ageGroup === "mother_25_29" && row.year === 2020;
+    const shifted = observations.map((row) => (rate(row) ? { ...row, value: String(Number(row.value) + 10) } : row));
+
+    expect(stop(() => validateDemography({ observations: shifted, sources, geography, density }))).toBe("rate_deviation");
+  });
+
   test("a changed 2015 to 2024 value", () => {
     const earlier = observations.map((row) => (row.seriesId === "demography.population_total" && row.geographyId === "04" && row.year === 2018 ? { ...row, value: "1" } : row));
 
@@ -310,10 +322,13 @@ describe("one corrupted case per stop condition", () => {
     const earlyDensity = [...observations, { ...georgiaDensity, year: 2013 }];
     const earlyRegionalDensity = [...observations, { ...georgiaDensity, geographyId: "region.adjara", year: 2014 }];
 
+    const fertilityRate = observations.find((row) => row.seriesId === "demography.age_specific_fertility_rate")!;
+    const regionalFertility = [...observations, { ...fertilityRate, geographyId: "region.adjara", ageGroup: "mother_20_24" }];
+    const earlyFertility = [...observations, { ...fertilityRate, year: 2013 }];
     const censusAge = observations.find((row) => row.seriesId === "demography.census_population_by_age")!;
     const municipalCensusAge = [...observations, { ...censusAge, geographyId: "04" }];
     const lateCensus = [...observations, { ...censusAge, year: 2025, ageGroup: "age_0_4", sex: "male" as const, settlement: "urban" as const }];
 
-    for (const rows of [early, regional, repeated, unknown, municipalDensity, earlyDensity, earlyRegionalDensity, municipalCensusAge, lateCensus]) expect(stop(() => validateDemography({ observations: rows, sources, geography, density }))).toBe("layout_changed");
+    for (const rows of [early, regional, repeated, unknown, municipalDensity, earlyDensity, earlyRegionalDensity, municipalCensusAge, lateCensus, regionalFertility, earlyFertility]) expect(stop(() => validateDemography({ observations: rows, sources, geography, density }))).toBe("layout_changed");
   });
 });

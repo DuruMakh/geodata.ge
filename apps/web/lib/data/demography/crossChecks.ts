@@ -3,7 +3,7 @@ import type { DensityRows } from "./densityRows";
 import type { DemographyGeography } from "./geography";
 import { CENSUS_SETTLEMENTS, CENSUS_SEXES, readCensusGrid } from "./readCensusAge";
 import { findYearBlocks, findYearColumns, findYearRows, readStoredSheet } from "./readStoredSheet";
-import { AGE_BANDS, CENSUS_STEP, COVERAGE, SERIES, SOURCE_ID } from "./series";
+import { AGE_BANDS, CENSUS_STEP, COVERAGE, MOTHER_AGE_GROUPS, SERIES, SOURCE_ID } from "./series";
 import { DemographyStopError } from "./stops";
 import type { DemographyObservation, DemographySources, Settlement, Sex } from "./types";
 
@@ -325,6 +325,22 @@ export function checkDensity(rows: readonly DemographyObservation[], lookup: Loo
       recomputed: lookup(SERIES.populationTotal, row.geographyId, row.year) / density.areaOf(row.geographyId),
     }));
   return worst("population_density", ONE_DECIMAL, points);
+}
+
+/**
+ * The seven age-specific rates are the components of the total fertility rate in the same table, so five
+ * times their sum, per 1,000 women, must equal the total fertility rate the vital file carries, to within the
+ * two decimals it is published at. Checked on the served rows for every year the rates cover.
+ */
+export function checkFertilityByAge(rows: readonly DemographyObservation[], lookup: Lookup): RateCheck {
+  const years = [...new Set(rows.filter((row) => row.seriesId === SERIES.ageSpecificFertilityRate).map((row) => row.year))].sort((a, b) => a - b);
+  const points = years.map((year) => ({
+    year,
+    label: String(year),
+    published: lookup(SERIES.totalFertilityRate, GEORGIA, year),
+    recomputed: (5 * sum(MOTHER_AGE_GROUPS.map((group) => lookup(SERIES.ageSpecificFertilityRate, GEORGIA, year, { ageGroup: group.id })))) / 1000,
+  }));
+  return worst("age_specific_fertility_vs_total_fertility_rate", TWO_DECIMALS, points);
 }
 
 /**

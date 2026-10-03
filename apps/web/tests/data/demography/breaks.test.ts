@@ -23,7 +23,7 @@ describe("break register", () => {
     expect(register[0]!.reason).toContain("225,922");
   });
 
-  test("applies to population stock, structure, density and every rate with a population denominator", () => {
+  test("applies to population stock, structure, density and every rate with a population denominator, the age-specific fertility rates included", () => {
     expect(buildBreakRegister()[0]!.appliesTo).toEqual([
       SERIES.populationTotal,
       SERIES.populationByAgeSex,
@@ -35,6 +35,7 @@ describe("break register", () => {
       SERIES.lifeExpectancyMale,
       SERIES.lifeExpectancyFemale,
       SERIES.populationDensity,
+      SERIES.ageSpecificFertilityRate,
     ]);
   });
 

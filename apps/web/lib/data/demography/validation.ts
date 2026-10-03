@@ -4,6 +4,7 @@ import {
   checkCensusAge,
   checkCensusAnchor,
   checkDensity,
+  checkFertilityByAge,
   checkMidYear,
   checkMigrationTotals,
   checkRates,
@@ -43,6 +44,7 @@ const FAMILY_START: Record<Family, number> = {
   migration: COVERAGE.migrationFrom,
   density: COVERAGE.densityFrom,
   census: CENSUS_YEAR,
+  fertility: COVERAGE.vitalFrom,
 };
 const FAMILY_OF = new Map<string, Family>(Object.entries(FAMILIES).flatMap(([family, ids]) => ids.map((id) => [id, family as Family] as const)));
 
@@ -319,7 +321,7 @@ export function validateDemography(input: ValidationInput): DemographyValidation
   const midYear = checkMidYear(midYearValues, lookup, years.vital);
   const censusAnchor = checkCensusAnchor(sources, geography, lookup);
   const censusSnapshot = checkCensusAge(sources, geography);
-  const rates = [...checkRates(sources, lookup, midYearValues, years), checkDensity(rows, lookup, density)];
+  const rates = [...checkRates(sources, lookup, midYearValues, years), checkDensity(rows, lookup, density), checkFertilityByAge(rows, lookup)];
 
   const problems = previous ? findRevisions(previous, index) : [];
   if (problems.length > 0) {

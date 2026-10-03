@@ -23,6 +23,7 @@ export const SERIES = {
   populationDensity: "demography.population_density",
   censusPopulationByAge: "demography.census_population_by_age",
   censusPopulationBySettlement: "demography.census_population_by_settlement",
+  ageSpecificFertilityRate: "demography.age_specific_fertility_rate",
 } as const;
 
 /** The archived Geostat tables, by the source ids in the package manifest. */
@@ -101,6 +102,7 @@ export const FAMILIES = {
   migration: [SERIES.immigrants, SERIES.emigrants, SERIES.netMigration, SERIES.immigrantsByCitizenshipGroup, SERIES.emigrantsByCitizenshipGroup],
   density: [SERIES.populationDensity],
   census: [SERIES.censusPopulationByAge, SERIES.censusPopulationBySettlement],
+  fertility: [SERIES.ageSpecificFertilityRate],
 } as const;
 
 /** The 2025 census recalculation of the 1 January population: the one balancing residual the archive may hold. */
@@ -149,6 +151,17 @@ export const CENSUS_AGE_GROUPS = [
   { label: "75-79", id: "age_75_79" },
   { label: "80-84", id: "age_80_84" },
   { label: "85+", id: "age_85_plus" },
+] as const;
+
+/** The seven age-of-mother columns of the fertility table (B to H); Geostat prints "-20" for under 20. */
+export const MOTHER_AGE_GROUPS = [
+  { label: "-20", id: "mother_under_20" },
+  { label: "20-24", id: "mother_20_24" },
+  { label: "25-29", id: "mother_25_29" },
+  { label: "30-34", id: "mother_30_34" },
+  { label: "35-39", id: "mother_35_39" },
+  { label: "40-44", id: "mother_40_44" },
+  { label: "45-54", id: "mother_45_54" },
 ] as const;
 
 /** Derived bands, as inclusive ranges of indexes into AGE_GROUPS. */
