@@ -44,3 +44,18 @@ Release must still pass fresh required CI on the final immutable commit, followe
 by the existing Actions import/parity/database-build pipeline and actual deployed
 commit/live proof. Earlier local implementation and browser evidence retain their
 original artifact identities.
+
+## Subsequent CI scheduling repair
+
+GitHub CI at `7082c7ec` passed the approved audit and browser job, then timed out
+four resource-intensive suites: full and bilingual publications, serving parity,
+and the packaged measurement subprocess. No result assertion disagreed with a
+reviewed number. These four files now use the existing isolated sequential test
+group; all assertions and 30/60-second setup/subprocess budgets are unchanged.
+They remain included exactly once and excluded from the ordinary parallel group.
+Independent review approved this scoped runner change. Its comment now describes
+isolation accurately without promising execution before other groups.
+
+All **28 tests across those four suites passed** in the focused one-worker run;
+typecheck and scoped configuration lint passed. Fresh required CI on the final
+commit still owns release acceptance.
