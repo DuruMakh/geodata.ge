@@ -121,4 +121,4 @@ git commit -m "fix: clarify entity picker affordance"
 git push origin codex/municipality-map-upgrade
 ```
 
-Expected: PR #40 updates; CodeRabbit, Vercel, browser CI, and the main CI job rerun. Main CI may remain blocked only by the separately documented `nanoid 3.3.12` audit finding until that lockfile update is approved.
+Expected: PR #40 updates; Vercel, browser CI, and the main CI job rerun. Main CI may remain blocked only by the separately documented `nanoid 3.3.12` audit finding until that lockfile update is approved.
