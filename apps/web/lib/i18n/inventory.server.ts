@@ -10,6 +10,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { LIVE_METHODOLOGY_IDS } from "../methodology/types";
 import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
+import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -18,6 +19,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
   return [
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
+    "/explorer/unemployment",
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),
     "/explorer/inflation", "/explorer/inflation/overview", "/explorer/inflation/categories", "/explorer/inflation/products", "/explorer/inflation/cities",
@@ -31,9 +33,9 @@ export async function listPublicPagePaths(): Promise<string[]> {
 }
 
 export async function loadTranslationInventory(): Promise<TranslationInventory> {
-  const [explorer, municipal, documents, debtDocuments, pagePaths] = await Promise.all([
+  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, pagePaths] = await Promise.all([
     loadServedExplorerData(), loadServedMunicipalData(), loadManifestDocuments(),
-    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), listPublicPagePaths(),
+    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), listPublicPagePaths(),
   ]);
   const sources = resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments: documents });
   const programmeHistory = explorer.adminFacts.filter((fact) => fact.level === "major_program").map((fact) => {
@@ -44,6 +46,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
     pagePaths,
     labelIds: sortedUnique([
       ...sectorRegistry.map(row => row.id), "economic-sectors",
+      ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),
       "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia", "snapshot.other",
@@ -53,11 +56,12 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
     ]),
     sourceIds: sortedUnique(sources.map((row) => row.sourceId)),
-    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id)]),
+    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id), ...unemploymentDocuments.map(row => row.source_id)]),
     derivedSourceIds: sortedUnique(sources.filter((row) => row.derivation !== null).map((row) => row.sourceId)),
     attributedDocumentIds: sortedUnique([
       ...documents.filter((row) => row.attribution !== null).map((row) => row.documentId),
       ...debtDocuments.map((row) => row.source_id),
+      ...unemploymentDocuments.map(row => row.source_id),
     ]),
     programmeHistory,
   };

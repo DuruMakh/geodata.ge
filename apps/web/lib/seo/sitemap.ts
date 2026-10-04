@@ -6,6 +6,7 @@ import { loadServedProductData } from "../data/inflation/importProducts";
 import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
+import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
 import {
   aggregateFactsForEntity,
@@ -30,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -40,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedRegionalEconomyData(),
     loadServedGdpOverviewData(),
     loadServedEconomicSectorsData(),
+    loadServedUnemploymentData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -48,6 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // inflation or debt refresh moves theirs. They used to carry the budget date.
   const gdpModified = new Date(gdpOverviewFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const sectorsModified = new Date(sectorFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
+  const unemploymentModified = new Date(unemploymentFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const economyModified = gdpModified > sectorsModified ? gdpModified : sectorsModified;
   const lastReviewedAt = sourceDocuments
     .map((source) => source.lastReviewedAt)
@@ -86,6 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/economy`, lastModified: economyModified },
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified: sectorsModified },
+    { url: `${siteUrl}/explorer/unemployment`, lastModified: unemploymentModified },
     { url: `${siteUrl}/explorer/economy/regions`, lastModified: regionalModified },
     ...regions.map((region) => ({
       url: `${siteUrl}/explorer/economy/regions/${region.id.replace("region.", "")}`,

@@ -1,4 +1,3 @@
-import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeAll, expect, test } from "vitest";
 import { UnemploymentExplorer } from "../../components/unemployment/unemployment-explorer";
@@ -10,7 +9,7 @@ let facts: ClientUnemploymentObservation[];
 beforeAll(async () => { facts = (await loadServedUnemploymentData()).facts; });
 test.each(["ka", "en"] as const)("renders the existing workspace, two chart types and national-only default in %s", async locale => {
   const messages = await getMessages(locale, ["unemployment", "common", "controls", "main", "format", "workbook"]);
-  const markup = renderToStaticMarkup(createElement(I18nProvider, { locale, messages, englishLabels: {}, children: createElement(UnemploymentExplorer, { facts, registry: UNEMPLOYMENT_GROUPS, sources: [], lastReviewedAt: "2026-10-03", siteOrigin: "https://fiscal.ge" }) }));
+  const markup = renderToStaticMarkup(<I18nProvider locale={locale} messages={messages}><UnemploymentExplorer facts={facts} registry={UNEMPLOYMENT_GROUPS} sources={[]} lastReviewedAt="2026-10-03" siteOrigin="https://fiscal.ge" /></I18nProvider>);
   expect(markup).toContain('data-testid="explorer-workspace"');
   expect(markup).toContain('data-testid="chart-mode-table"');
   expect(markup).toContain('data-testid="unemployment-indicator"');

@@ -21,6 +21,7 @@ describe("dataset footer attribution", () => {
     ["/en/explorer/inflation/overview", "Geostat and the National Bank", "Ministry of Finance"],
     ["/en/explorer/inflation/categories", "Geostat", "National Bank"],
     ["/en/explorer/inflation/products", "Geostat", "National Bank"],
+    ["/en/explorer/unemployment", "Geostat", "Ministry of Finance"],
   ])("uses the sources for %s without an unrelated site-wide date", async (pathname, source, unrelatedSource) => {
     route.pathname = pathname;
     const footer = footerText(renderToStaticMarkup(await renderExplorerLayout("en", null)));
@@ -42,5 +43,12 @@ describe("dataset footer attribution", () => {
     expect(footer).toContain("Latest source review across Fiscal.ge:");
     expect(footer).toContain("2026-09-13");
     expect(footer).not.toContain("Ministry of Finance");
+  });
+
+  it("credits the Georgian unemployment survey to Geostat", async () => {
+    route.pathname = "/explorer/unemployment";
+    const footer = footerText(renderToStaticMarkup(await renderExplorerLayout("ka", null)));
+    expect(footer).toContain("საქსტატი");
+    expect(footer).not.toContain("ფინანსთა სამინისტრო");
   });
 });

@@ -120,5 +120,6 @@
   "/explorer/inflation/cities/gori": "2026-09-30",
   "/explorer/inflation/cities/telavi": "2026-09-30",
   "/explorer/inflation/cities/zugdidi": "2026-09-30",
-  "/methodology/unemployment": "2026-10-04"
+  "/methodology/unemployment": "2026-10-04",
+  "/explorer/unemployment": "2026-10-04"
 }

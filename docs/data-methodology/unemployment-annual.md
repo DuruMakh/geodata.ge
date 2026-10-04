@@ -8,6 +8,8 @@ This methodology governs the research package at `docs/Raw Data/Unemployment/geo
 
 Geostat's Labour Force Survey is the sole statistical source. Seven annual workbooks cover the national total, breakdowns by sex, settlement type, age, region and educational attainment, and long-term unemployment. The source page and survey metadata are preserved alongside the original workbooks. Exact URLs, retrieval dates, hashes and byte sizes live in the source manifest.
 
+The approved static pages are `/explorer/unemployment` and `/en/explorer/unemployment`, with `/methodology/unemployment` in both languages. Only an applicable published reference is selected by default. Education references are clipped to its own source coverage; historical age bands and combined regions remain separate. The national composition chart uses exact employed, unemployed and outside-labour-force counts. The existing Excel writer exports the active indicator, selected groups and years with correct units and source links. Database mode checks every observation against CSV and fails on missing/mismatched rows; it never falls back silently.
+
 ## Indicators, units and definitions
 
 | Indicator ID | Meaning | Unit / denominator |
