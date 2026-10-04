@@ -1,7 +1,7 @@
 # Unemployment explorer — first version using existing components
 
 Date: 2026-10-04
-Status: Proposed design awaiting written-spec approval. The user has approved starting with simple reuse of existing components; implementation, publication and deployment have not begun.
+Status: Design approved in this conversation on 2026-10-04, after clarification of the rate, count and supporting-indicator scope. The implementation plan is awaiting review; implementation, publication and deployment have not begun.
 
 ## 1. Intended result
 
