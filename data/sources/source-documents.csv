@@ -144,3 +144,12 @@ source.geostat_demography_net_migration,Net migration (number and rate),docs/Raw
 source.geostat_demography_migration_citizenship,Immigrants and emigrants by sex and citizenship,docs/Raw Data/Demography/geostat-demography/2026-10/official/33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx,2026-10-01
 source.geostat_demography_density,Population density by regions,docs/Raw Data/Demography/geostat-demography/2026-10/official/03-density-by-regions.xlsx,2026-10-03
 source.geostat_census2024_population_by_age_settlement,"2024 census population by region, age, sex and urban or rural settlement",docs/Raw Data/Demography/geostat-demography/2026-10/official/census-2024/1.1-population-by-region-unit-age-settlement-sex.xlsx,2026-10-03
+source.geostat_lfs_annual_total,შრომის ძალის მაჩვენებლები,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/01-labour-force-indicators.xlsx,2026-10-04
+source.geostat_lfs_annual_sex,შრომის ძალის მაჩვენებლები სქესის მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/02-labour-force-indicators-by-sex.xlsx,2026-10-04
+source.geostat_lfs_annual_settlement,შრომის ძალის მაჩვენებლები ქალაქისა და სოფლის მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/03-labour-force-indicators-urban-rural.xlsx,2026-10-04
+source.geostat_lfs_annual_age,შრომის ძალის მაჩვენებლები ასაკის მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/04-labour-force-indicators-by-age.xlsx,2026-10-04
+source.geostat_lfs_annual_region,შრომის ძალის მაჩვენებლები რეგიონების მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/05-labour-force-indicators-by-region.xlsx,2026-10-04
+source.geostat_lfs_metadata_2026,შრომის ძალის გამოკვლევის მეტამონაცემები,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/labour-force-survey-metadata-2026.pdf,2026-10-04
+source.geostat_lfs_source_page,დასაქმებისა და უმუშევრობის წყაროს გვერდი,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/employment-unemployment-en.html,2026-10-04
+source.geostat_lfs_annual_education,შრომის ძალის მაჩვენებლები განათლების მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/13-labour-force-indicators-by-education.xlsx,2026-10-04
+source.geostat_lfs_annual_long_term,ხანგრძლივი უმუშევრობა,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/16-long-term-unemployment.xlsx,2026-10-04

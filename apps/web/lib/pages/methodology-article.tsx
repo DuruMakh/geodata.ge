@@ -63,6 +63,7 @@ const DATASET_SOURCE_NOTES = {
   "economic-sectors": "common.geostatSourceNote",
   "regional-economies": "common.geostatSourceNote",
   inflation: "common.inflationSourceNote",
+  unemployment: "common.geostatSourceNote",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -74,6 +75,7 @@ const DATASET_DOWNLOADS = {
   "economic-sectors": "/downloads/data/economic-sectors.csv",
   "regional-economies": "/downloads/data/regional-economies.csv",
   inflation: "/downloads/data/inflation-cpi-national.csv",
+  unemployment: null,
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -90,6 +92,7 @@ const DATASET_JSON_DOWNLOADS = {
   municipalities: [{ href: "/downloads/data/municipal-expenditure.json", labelKey: "methodology.jsonMunicipalities" }],
   gdp: [],
   inflation: [],
+  unemployment: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
     { href: "/downloads/data/government-debt-rates.json", labelKey: "methodology.jsonRates" },
@@ -111,6 +114,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   debt: ["/downloads/data/government-debt.json"],
   gdp: [],
   inflation: [],
+  unemployment: [],
 } as const;
 
 export async function methodologyArticleMetadata(locale: Locale, { params }: MethodologyDatasetPageProps): Promise<Metadata> {
@@ -153,7 +157,14 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   return (
     <>
       <JsonLd
-        data={dataset === "inflation" ? {
+        data={dataset === "unemployment" ? {
+          "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
+          url: `${resolveSiteUrl()}${pageHref("/methodology/unemployment", locale)}`,
+          temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
+          spatialCoverage: { "@type": "Place", name: seoMessage(locale, "seo.country") },
+          creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
+          publisher: { "@id": `${resolveSiteUrl()}/#organization` },
+        } : dataset === "inflation" ? {
           "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,
           url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
           inLanguage:["ka","en"], dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:seoMessage(locale,"seo.country")},

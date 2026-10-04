@@ -17,7 +17,7 @@ type MethodologyArticleProps = {
   coverage: { firstYear: number; lastYear: number };
   rows: readonly PublicSourceManifestRow[];
   archiveSummary: MethodologyArchiveSummary;
-  processedDataHref: `/downloads/data/${string}.csv`;
+  processedDataHref: `/downloads/data/${string}.csv` | null;
   processedDataJsonLinks: readonly { href: `/downloads/data/${string}.json`; label: string }[];
   breadcrumbItems: readonly BreadcrumbItem[];
 };
@@ -69,7 +69,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
         ))}
       </dl>
 
-      <div className="border-b border-[var(--ink)] py-6">
+      {processedDataHref ? <div className="border-b border-[var(--ink)] py-6">
         <a
           data-testid="processed-dataset-download"
           href={processedDataHref}
@@ -100,7 +100,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
           {message(messages, "methodology.jsonNote")}
         </p>
         ) : null}
-      </div>
+      </div> : null}
 
       <aside
         data-testid="methodology-disclosure"

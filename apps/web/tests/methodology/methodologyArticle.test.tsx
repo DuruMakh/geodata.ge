@@ -42,6 +42,17 @@ const archiveSummary = {
   validated: true,
 };
 
+it("omits processed-data links for an article without a public dataset publication", () => {
+  const markup = renderToStaticMarkup(createElement(MethodologyArticle, {
+    locale: "ka", messages: { ...common, ...methodology }, content: METHODOLOGY_CONTENT.debt,
+    coverage: { firstYear: 2013, lastYear: 2030 }, rows: [], archiveSummary,
+    processedDataHref: null, processedDataJsonLinks: [], breadcrumbItems: [],
+  }));
+  expect(markup).not.toContain('data-testid="processed-dataset-download"');
+  expect(markup).not.toContain("CC BY 4.0");
+  expect(markup).toContain('id="source-archive"');
+});
+
 function renderArticle(dataset: "debt" | "expenditure") {
   return renderToStaticMarkup(createElement(MethodologyArticle, {
     locale: "ka",

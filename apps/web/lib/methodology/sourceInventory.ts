@@ -48,6 +48,7 @@ const inventoryRules = {
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
+  unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
 } satisfies Record<MethodologyDatasetId, readonly InventoryRule[]>;
 
 function dirname(candidatePath: string) {
