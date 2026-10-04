@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-04-unemployment-reuse-explorer-design.md`.
 
-**Execution status:** Tasks 1–7 implemented and locally verified on 2026-10-04. Final completion checks and one independent review are in progress. Publication and live database operations remain outside this authorization.
+**Execution status:** Tasks 1–8 implemented and locally verified on 2026-10-05. One independent whole-branch review completed; both Important findings were fixed and verified with failing-then-passing regressions. The local branch and preview are preserved. Publication and live database operations remain outside this authorization.
 
 ## Global Constraints
 
@@ -144,8 +144,29 @@ All application commands below run from `apps/web` unless explicitly stated othe
 
 ## Task 8: Completion Gate and Independent Review
 
-- [ ] Check the final diff against the approved spec and every Review Focus item; remove unrelated changes and any generated scratch files created by this task. Mark completed plan steps only when their evidence exists.
-- [ ] Run `npm run check` once after implementation inputs settle, then build with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build`. Use PowerShell environment syntax on Windows. Expected: lint, types, unit/data/localization checks and the static production build pass.
-- [ ] Serve that built artifact on an available local port and run `npm run test:browser` against it with `CI=1`, `NEXT_PUBLIC_SITE_URL=https://fiscal.ge` and `PLAYWRIGHT_BASE_URL` set consistently. Stop the server before any rebuild. Inspect desktop/mobile screenshots for both languages; verify console, sources and a representative workbook. Do not repeat a passing gate unless its inputs change.
-- [ ] Obtain one independent final code review of the whole change, focused on statistical denominators/classification, complete serving parity, export/source correctness, state/selection behavior and strict component reuse. Resolve actionable findings and rerun only checks affected by those fixes.
-- [ ] Update this plan/spec with actual local implementation/verification status and report the preview, checks and remaining delivery boundary. Keep live database migration/import, GitHub publication, merge and production deployment pending separate authorization. Do not claim a public URL is live from local evidence.
+- [x] Check the final diff against the approved spec and every Review Focus item; remove unrelated changes and any generated scratch files created by this task. Mark completed plan steps only when their evidence exists.
+- [x] Run `npm run check` once after implementation inputs settle, then build with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build`. Use PowerShell environment syntax on Windows. Expected: lint, types, unit/data/localization checks and the static production build pass.
+- [x] Serve that built artifact on an available local port and run `npm run test:browser` against it with `CI=1`, `NEXT_PUBLIC_SITE_URL=https://fiscal.ge` and `PLAYWRIGHT_BASE_URL` set consistently. Stop the server before any rebuild. Inspect desktop/mobile screenshots for both languages; verify console, sources and a representative workbook. Do not repeat a passing gate unless its inputs change.
+- [x] Obtain one independent final code review of the whole change, focused on statistical denominators/classification, complete serving parity, export/source correctness, state/selection behavior and strict component reuse. Resolve actionable findings and rerun only checks affected by those fixes.
+- [x] Update this plan/spec with actual local implementation/verification status and report the preview, checks and remaining delivery boundary. Keep live database migration/import, GitHub publication, merge and production deployment pending separate authorization. Do not claim a public URL is live from local evidence.
+
+## Completion evidence — 2026-10-05
+
+- `npm run check` passed: 346 test files and 2,968 tests passed, with one existing skipped file/seven skipped tests. All data validation passed, including 3,142 unemployment observations; localization passed for 315 labels and 123 public page identities. The query reference fixture passed without expectation changes.
+- The final production build passed with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`; all four unemployment explorer/methodology URLs are in the prerender manifest. The existing 23 query publications and snapshot data version remain unchanged.
+- The full 647-case browser run passed 646 cases and hit a 90-second timeout in the bilingual all-URL request test while the completion suite ran concurrently. After the review fixes, the affected browser specs ran sequentially against the rebuilt artifact: 21/21 passed, including that all-URL test in 18.2 seconds and six new count-scale checks. No behavior failure remains; unchanged passing browser checks were not repeated.
+- Both languages were visually inspected at 390, 768 and 1440px. Count-axis labels fit, historical labels and gaps are readable, browser page errors are empty, a representative education workbook agrees with the screen, and all nine downloaded originals match their captured hashes.
+- One independent read-only review checked `75a5cd51..c121e52d`, source cells, fingerprints and coverage. It found clipped count-scale labels and rounding before database parity; both Important findings were reproduced by failing tests and fixed in `f07da652`. The whole unit suite and affected browser specs passed afterward. No Critical or deferred Minor finding remains.
+
+Local preview: `http://127.0.0.1:31841/explorer/unemployment` and `/en/explorer/unemployment`. Verification logs, review notes and screenshots are preserved under the ignored `.tmp/unemployment-verification/` and `.tmp/unemployment-preview/` directories. The disposable plan-execution workspace is removed after completion.
+
+The Prisma migration was generated and validated offline; live migration/import, production database permissions, GitHub publication, required CI, merge and production deployment have not been performed or verified.
+
+## Implementation decisions
+
+1. Register `source.<original-id>` where the existing source register requires dot-namespaced IDs, retaining original research IDs in observations and archives. If this mapping is wrong, source-relation/parity validation rejects the import.
+2. Exclude the nine human-only unemployment source entries from the existing query snapshot. If the exclusion is wrong, unsupported unemployment sources could appear in the query service.
+3. Create the planned bilingual message scope with the workbook task, before the page task, because export labels need it first. Incorrect labels fail localization checks.
+4. Leave live database/release operations outside the review and this local authorization. Release-specific failures may remain until the separately authorized delivery checks.
+5. Use the approved reviewed Geostat package as the statistical authority, verifying source consistency rather than independently re-estimating the statistics. A source-level statistical error would require Geostat or a separate research review.
+6. Have the executor run and record full completion/browser gates while the independent reviewer performs separate targeted checks. A missed regression could escape the automated checks; no duplicate full review run was requested.
