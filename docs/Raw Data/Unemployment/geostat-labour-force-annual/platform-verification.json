@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-10-04",
+  "repository_head": "ae77d08ed1beddd48716106e1d71751d5d7c5836",
+  "scope": "Final local checks for research-only repository delivery; no product integration",
+  "unemployment_data_validation": "passed",
+  "independent_excel_cell_comparison": "passed",
+  "research_tests_passed": 13,
+  "lint": "passed",
+  "typecheck": "passed",
+  "existing_data_validation": "passed",
+  "translation_catalogue_check": "passed",
+  "full_platform_check": {
+    "status": "passed",
+    "unit_tests_passed": 2738,
+    "unit_tests_skipped": 7,
+    "unit_tests_failed": 0
+  },
+  "production_build": {
+    "status": "passed",
+    "compilation": "passed",
+    "typecheck": "passed",
+    "publications_verified": 23
+  },
+  "application_source_changes": 0,
+  "earlier_image_font_timeouts": "Cleared on an unchanged retry with normal network access; isolated image test, full check and build now pass",
+  "release_scope": "research files and methodology only; no public unemployment product integration"
+}

@@ -1,0 +1,73 @@
+﻿year,sex,education_level,participation_rate_pct,employment_rate_pct,unemployment_rate_pct,source_sheet,unemployment_rate_source_cell
+2020,total,Primary or Lower Secondary,20.7,15.2,26.7,Total,B19
+2020,total,Upper Secondary,46.6,36.0,22.8,Total,B20
+2020,total,Vocational,50.0,41.8,16.3,Total,B21
+2020,total,Higher,67.4,57.5,14.8,Total,B22
+2020,women,Primary or Lower Secondary,12.1,9.5,21.3,Women,B19
+2020,women,Upper Secondary,30.9,24.1,21.8,Women,B20
+2020,women,Vocational,40.9,34.6,15.3,Women,B21
+2020,women,Higher,61.1,53.1,13.1,Women,B22
+2020,men,Primary or Lower Secondary,30.2,21.5,29.1,Men,B19
+2020,men,Upper Secondary,61.5,47.2,23.3,Men,B20
+2020,men,Vocational,63.0,52.2,17.2,Men,B21
+2020,men,Higher,75.6,63.1,16.5,Men,B22
+2021,total,Primary or Lower Secondary,20.6,13.5,34.1,Total,C19
+2021,total,Upper Secondary,46.9,34.6,26.1,Total,C20
+2021,total,Vocational,50.9,41.9,17.7,Total,C21
+2021,total,Higher,68.1,57.6,15.5,Total,C22
+2021,women,Primary or Lower Secondary,11.5,8.2,28.2,Women,C19
+2021,women,Upper Secondary,29.5,22.1,25.3,Women,C20
+2021,women,Vocational,42.6,35.6,16.4,Women,C21
+2021,women,Higher,62.1,53.6,13.7,Women,C22
+2021,men,Primary or Lower Secondary,30.9,19.6,36.6,Men,C19
+2021,men,Upper Secondary,62.9,46.2,26.5,Men,C20
+2021,men,Vocational,63.7,51.7,18.9,Men,C21
+2021,men,Higher,75.8,62.7,17.4,Men,C22
+2022,total,Primary or Lower Secondary,21.8,15.9,27.0,Total,D19
+2022,total,Upper Secondary,48.8,37.9,22.3,Total,D20
+2022,total,Vocational,52.5,45.3,13.6,Total,D21
+2022,total,Higher,66.9,58.3,12.9,Total,D22
+2022,women,Primary or Lower Secondary,12.6,9.7,23.0,Women,D19
+2022,women,Upper Secondary,32.2,25.4,21.1,Women,D20
+2022,women,Vocational,44.9,39.1,12.9,Women,D21
+2022,women,Higher,60.0,53.4,10.9,Women,D22
+2022,men,Primary or Lower Secondary,32.4,23.1,28.8,Men,D19
+2022,men,Upper Secondary,64.2,49.5,22.9,Men,D20
+2022,men,Vocational,64.7,55.4,14.4,Men,D21
+2022,men,Higher,75.8,64.5,14.9,Men,D22
+2023,total,Primary or Lower Secondary,20.4,15.8,22.3,Total,E19
+2023,total,Upper Secondary,51.5,40.5,21.2,Total,E20
+2023,total,Vocational,52.4,46.2,11.8,Total,E21
+2023,total,Higher,67.6,58.9,13.0,Total,E22
+2023,women,Primary or Lower Secondary,12.7,10.5,17.5,Women,E19
+2023,women,Upper Secondary,35.9,28.4,21.0,Women,E20
+2023,women,Vocational,44.8,39.8,11.2,Women,E21
+2023,women,Higher,60.2,54.0,10.3,Women,E22
+2023,men,Primary or Lower Secondary,29.4,22.1,24.7,Men,E19
+2023,men,Upper Secondary,65.8,51.8,21.3,Men,E20
+2023,men,Vocational,65.2,57.0,12.6,Men,E21
+2023,men,Higher,77.2,65.1,15.7,Men,E22
+2024,total,Primary or Lower Secondary,20.8,17.2,17.6,Total,F19
+2024,total,Upper Secondary,53.1,43.6,17.7,Total,F20
+2024,total,Vocational,52.7,47.1,10.8,Total,F21
+2024,total,Higher,70.7,63.0,11.0,Total,F22
+2024,women,Primary or Lower Secondary,14.5,12.7,12.6,Women,F19
+2024,women,Upper Secondary,36.7,30.8,16.0,Women,F20
+2024,women,Vocational,45.0,40.8,9.2,Women,F21
+2024,women,Higher,64.8,59.1,8.7,Women,F22
+2024,men,Primary or Lower Secondary,27.8,22.1,20.5,Men,F19
+2024,men,Upper Secondary,68.2,55.5,18.6,Men,F20
+2024,men,Vocational,66.1,57.7,12.6,Men,F21
+2024,men,Higher,78.3,67.9,13.4,Men,F22
+2025,total,Primary or Lower Secondary,19.8,16.7,15.5,Total,G19
+2025,total,Upper Secondary,52.7,43.1,18.2,Total,G20
+2025,total,Vocational,53.1,47.5,10.5,Total,G21
+2025,total,Higher,69.8,62.5,10.4,Total,G22
+2025,women,Primary or Lower Secondary,12.8,11.6,9.1,Women,G19
+2025,women,Upper Secondary,35.8,30.1,15.9,Women,G20
+2025,women,Vocational,45.2,40.7,10.1,Women,G21
+2025,women,Higher,63.6,57.9,8.9,Women,G22
+2025,men,Primary or Lower Secondary,27.3,22.2,18.7,Men,G19
+2025,men,Upper Secondary,68.0,54.9,19.3,Men,G20
+2025,men,Vocational,66.4,59.1,10.9,Men,G21
+2025,men,Higher,78.0,68.7,12.0,Men,G22

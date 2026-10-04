@@ -1,0 +1,65 @@
+{
+  "status": "passed",
+  "verified_at": "2026-10-04T07:53:44+00:00",
+  "reader": "openpyxl 3.1.5 (read only; independent of the XML extraction)",
+  "source_cells_compared": 7073,
+  "omitted_numeric_indicator_cells": 0,
+  "core_source_cells_compared": 6209,
+  "education_source_cells_compared": 810,
+  "long_term_source_cells_compared": 54,
+  "max_decimal_difference_from_float_reader": "2E-13",
+  "float_reader_tolerance": "0.000000001",
+  "published_precision_matches": 7073,
+  "year_classifications_checked": 16,
+  "csv_utf8_bom_checks": 14,
+  "negative_and_zero_tests": [
+    {
+      "test": "duplicate_observation_rejected",
+      "passed": true
+    },
+    {
+      "test": "blank_value_remains_missing_and_fails_validation",
+      "passed": true
+    },
+    {
+      "test": "incorrect_unemployment_rate_rejected",
+      "passed": true
+    },
+    {
+      "test": "zero_labour_force_denominator_rejected",
+      "passed": true
+    },
+    {
+      "test": "blank_source_cell_is_not_converted_to_zero",
+      "passed": true
+    },
+    {
+      "test": "negative_and_over_100_rates_rejected",
+      "passed": true
+    },
+    {
+      "test": "altered_original_capture_rejected",
+      "passed": true
+    },
+    {
+      "test": "published_zero_values_are_preserved_and_accepted",
+      "passed": true
+    }
+  ],
+  "artifact_sha256": {
+    "coverage.csv": "3FB26049CCD706A3C68313615694B80C63C127689E5FD18DB499EF7E9A759D49",
+    "education-annual.csv": "A6B4694858769F1DADD69801584EA7361547D364B621E461AA89D2029108AAB0",
+    "education-source-observations.csv": "98A9D9457A6F49BDE65338E89F59D299CC98B75C65451A9628153F8D0F8E6498",
+    "education-summary.csv": "2BA79389F0ED8D7DC3F33FAAD30E0FD9E1BA289947D4E1302B2FAEEDCF9DCB6E",
+    "long-term-unemployment-annual.csv": "FCD8069A005B528ACC5D20069065D2F8E520E6A8AD4F806B19C98EC601C97CC2",
+    "long-term-unemployment-summary.csv": "B2BCCA11B76F203F7876802A04318F9FBCCA867F039E90F9A7FAF57C6AC55D68",
+    "reconciliation.csv": "81B5849D872737635402F02AA086E7EB17BDABCB605ACF118EBE1D788144A42B",
+    "source-manifest.csv": "A88827BDE07733231ED47E3AB3930FB98D80D99DFA4C53FBFA2A33D42F1328DD",
+    "source-observations.csv": "2E6DA6CC0BD030C32867F641107E62AA15B150D316E015B9D1688532D61F14BE",
+    "supplemental-coverage.csv": "52CDE57CF21F32A3EBEBA7645F1BE7EA740296C85323CFD5D349DF6B89F25085",
+    "supplemental-reconciliation.csv": "FCBD402035459E1CA0D56996E010FADAA78D7D19EFC6EBA8B5EC51C46DE0D293",
+    "supplemental-unpublished-rates.csv": "A9497C9D428421D7F262999C36FFC04A7F9B5326D7689ED39C98F8838B11B7BB",
+    "unemployment-annual.csv": "DF4579123BA5233BB7DF607E81FCFAD6DA976BA06E9AE84749805EA7164B3366",
+    "unemployment-summary.csv": "C01ED14DB0F52CD3A28EAAE12391B9DC00D2B9DBA7600773232FEBA442993CBA"
+  }
+}
