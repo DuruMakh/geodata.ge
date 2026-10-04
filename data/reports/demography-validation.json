@@ -1,0 +1,670 @@
+{
+  "vintage": "2026-10",
+  "sources": [
+    {
+      "sourceId": "source.geostat_municipal_population",
+      "role": "canonical_input",
+      "localFile": "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx",
+      "sha256": "8bd7a1b56e756e8d6bc92192095795b204b23fd18274aaff39b78c0b0a487a57",
+      "bytes": 34994
+    },
+    {
+      "sourceId": "source.geostat_demography_population_age_sex",
+      "role": "canonical_input",
+      "localFile": "official/02-population-by-age-groups-and-sex.xlsx",
+      "sha256": "24090597005b62bcba6ec966a4cbf6726e97f1c8fb03245404f8edf94a5770f1",
+      "bytes": 30302
+    },
+    {
+      "sourceId": "source.geostat_demography_population_single_age",
+      "role": "archived_not_served",
+      "localFile": "official/02-1-population-by-age-and-sex.xlsx",
+      "sha256": "bfdd598e88337464e56f6063fa34dd4e7b20c8912053106648a3d42eb06cd015",
+      "bytes": 33012
+    },
+    {
+      "sourceId": "source.geostat_demography_density",
+      "role": "canonical_input",
+      "localFile": "official/03-density-by-regions.xlsx",
+      "sha256": "77d29d84cb7530f4fb6294f17a768e220f02636d77debfc438509b5c17ac28b8",
+      "bytes": 13917
+    },
+    {
+      "sourceId": "source.geostat_demography_population_mid_year",
+      "role": "validation_only",
+      "localFile": "official/04-mid-year-population-by-self-governed-units.xlsx",
+      "sha256": "1b443df324a99d7036bbff3dffbc9a8a0ae4ef0c3e0f2ccace45626e440458d6",
+      "bytes": 35244
+    },
+    {
+      "sourceId": "source.geostat_demography_median_age",
+      "role": "validation_only",
+      "localFile": "official/06-median-age-by-sex.xlsx",
+      "sha256": "544d92189c9d853f5fe5b403bcaff04cb3f8e96b30739a783e706965d0d34571",
+      "bytes": 10942
+    },
+    {
+      "sourceId": "source.geostat_demography_share_65_plus",
+      "role": "validation_only",
+      "localFile": "official/07-percentage-of-population-at-aged-65-and-over-by-sex.xlsx",
+      "sha256": "b0c48daf2f71f6cff246fa4a2fe8aa57c719db11c08f9d1911ae6ee85048541d",
+      "bytes": 11009
+    },
+    {
+      "sourceId": "source.geostat_demography_age_dependency",
+      "role": "validation_only",
+      "localFile": "official/08-age-dependency-ratios.xlsx",
+      "sha256": "d5a8896e6882a379c5d9f5a80b853360e111bc09b0802f49f26fde2ebf3df24a",
+      "bytes": 12602
+    },
+    {
+      "sourceId": "source.geostat_demography_births",
+      "role": "canonical_input",
+      "localFile": "official/09-number-of-live-births-by-self-governed-units.xlsx",
+      "sha256": "b8b2b0c352aa1e787925e896773b40aa7181d7b2c83bb05c9a1646c7f798a58d",
+      "bytes": 26206
+    },
+    {
+      "sourceId": "source.geostat_demography_crude_birth_rate",
+      "role": "canonical_input",
+      "localFile": "official/15-crude-birth-rate.xlsx",
+      "sha256": "9a22452c6363f3b55f43487811fbf9169e6d94b01432a0f8ad393f39d63c55db",
+      "bytes": 10365
+    },
+    {
+      "sourceId": "source.geostat_demography_fertility",
+      "role": "canonical_input",
+      "localFile": "official/16-age-specific-fertility-rates-and-total-fertility-rate.xlsx",
+      "sha256": "86bf7dc84062e4356cd62626dcda9bbf0e9bb56a74e063e08b1dfa04413a75aa",
+      "bytes": 12201
+    },
+    {
+      "sourceId": "source.geostat_demography_deaths",
+      "role": "canonical_input",
+      "localFile": "official/19-number-of-deaths-by-self-governed-units.xlsx",
+      "sha256": "e3f63ef59c1dc81973d38077b062ddc7d63fb4c77650358f7a5295ebeb911a5f",
+      "bytes": 25857
+    },
+    {
+      "sourceId": "source.geostat_demography_infant_deaths",
+      "role": "validation_only",
+      "localFile": "official/21-number-of-infant-deaths-by-age-and-sex.xlsx",
+      "sha256": "f4753cba6bb5a2f5970e09202200581a2eaf99955e5394e88b00683da45384cd",
+      "bytes": 12198
+    },
+    {
+      "sourceId": "source.geostat_demography_crude_death_rate",
+      "role": "canonical_input",
+      "localFile": "official/24-crude-death-rate.xlsx",
+      "sha256": "76c2f5d4a152d7e0241c0a7582efbc59c7b2a12d41243fee1a5fed9e3cfce07e",
+      "bytes": 10249
+    },
+    {
+      "sourceId": "source.geostat_demography_infant_mortality",
+      "role": "canonical_input",
+      "localFile": "official/25-infant-mortality-rate-by-sex.xlsx",
+      "sha256": "ca9e127b04eeef4be4af0038ffc4605ed11fddddb14b38f7b432e5a6753160d1",
+      "bytes": 11517
+    },
+    {
+      "sourceId": "source.geostat_demography_life_tables",
+      "role": "validation_only",
+      "localFile": "official/27-life-tables.xlsx",
+      "sha256": "023040e8160ab3c1a488ccdc0bf13dbe0e07a361cacfb310ec477f66dc245bef",
+      "bytes": 209318
+    },
+    {
+      "sourceId": "source.geostat_demography_life_expectancy",
+      "role": "canonical_input",
+      "localFile": "official/28-life-expectancy-at-births-by-sex.xlsx",
+      "sha256": "fc679c041fe6190848056081977afa8d0e17db103667176a5c02e918d70fb6d6",
+      "bytes": 11040
+    },
+    {
+      "sourceId": "source.geostat_demography_natural_increase",
+      "role": "canonical_input",
+      "localFile": "official/29-Natural-increase-by-regions-and-self-governed-units.xlsx",
+      "sha256": "db4c2d808f17936de45cf5b8be6eb2f7c267c9b09ce7a182f873c3fd4591417e",
+      "bytes": 26528
+    },
+    {
+      "sourceId": "source.geostat_demography_natural_increase_rate",
+      "role": "validation_only",
+      "localFile": "official/30-natural-increase-rate.xlsx",
+      "sha256": "fad8ef27b29077a3f3f8b5cb399ff58d1b7dfb452e595539dc7dbe58511f95ad",
+      "bytes": 10393
+    },
+    {
+      "sourceId": "source.geostat_demography_net_migration",
+      "role": "canonical_input",
+      "localFile": "official/31-net-migration.xlsx",
+      "sha256": "05aedd93e72ba63ab12b13feec8c46d6ce8870dadef3ece94fc7b87f65fa2196",
+      "bytes": 11440
+    },
+    {
+      "sourceId": "source.geostat_demography_migration_age_sex",
+      "role": "validation_only",
+      "localFile": "official/32-number-of-immigrants-and-emigrants-by-age-and-sex.xlsx",
+      "sha256": "222a1cf5430db5d44253282e34be1fdcad8d3afec43c355bf04c98ba7ab21cb1",
+      "bytes": 48483
+    },
+    {
+      "sourceId": "source.geostat_demography_migration_citizenship",
+      "role": "canonical_input",
+      "localFile": "official/33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx",
+      "sha256": "6b7fc1d8714e3acacaa5167b8e7c424a3ddb2a13f9c60a95cbd700cd83bb20a0",
+      "bytes": 25694
+    },
+    {
+      "sourceId": "source.geostat_demography_metadata_population",
+      "role": "definitions",
+      "localFile": "official/metadata/0901_240426_EN.PDF",
+      "sha256": "8914f62d19a9e0315e39f26fd764f872e9c768f28daed178081d84549c307dd0",
+      "bytes": 96938
+    },
+    {
+      "sourceId": "source.geostat_demography_metadata_external_migration",
+      "role": "definitions",
+      "localFile": "official/metadata/0902_240426_EN.PDF",
+      "sha256": "17d033bf71c1dd0809fe3f986995edc5793cd7915e74f23a13a8c3960ac78505",
+      "bytes": 89354
+    },
+    {
+      "sourceId": "source.geostat_demography_metadata_births",
+      "role": "definitions",
+      "localFile": "official/metadata/0903_270326_EN.PDF",
+      "sha256": "80da6f51905d77823b0f986fb9dc0bb42507abaa6a32826d575d30050194527a",
+      "bytes": 128985
+    },
+    {
+      "sourceId": "source.geostat_demography_metadata_deaths",
+      "role": "definitions",
+      "localFile": "official/metadata/0904_270326_EN.PDF",
+      "sha256": "e32b1110ba8ae048e311163a7975cb22f681b1bf2a62359c538fbf8740cd7a3c",
+      "bytes": 95579
+    },
+    {
+      "sourceId": "source.geostat_census2024_population_by_unit",
+      "role": "validation_only",
+      "localFile": "official/census-2024/1.Population-of-Georgia-by-administrative-territorial-units-and-sex.xlsx",
+      "sha256": "d6348f94cb4827c4c9433f3ee5820ec35dc016254316ae65eb07fe923edc0de1",
+      "bytes": 172604
+    },
+    {
+      "sourceId": "source.geostat_census2024_population_by_age_settlement",
+      "role": "canonical_input",
+      "localFile": "official/census-2024/1.1-population-by-region-unit-age-settlement-sex.xlsx",
+      "sha256": "691329dbd890070a888234f2f182496e4132f67948879675a188584c5e34dec7",
+      "bytes": 111570
+    }
+  ],
+  "coverage": [
+    {
+      "family": "population",
+      "seriesId": "demography.population_total",
+      "geographies": 76,
+      "firstYear": 2004,
+      "lastYear": 2026,
+      "rows": 923
+    },
+    {
+      "family": "structure",
+      "seriesId": "demography.population_by_age_sex",
+      "geographies": 1,
+      "firstYear": 2004,
+      "lastYear": 2026,
+      "rows": 1380
+    },
+    {
+      "family": "structure",
+      "seriesId": "demography.population_age_band",
+      "geographies": 1,
+      "firstYear": 2004,
+      "lastYear": 2026,
+      "rows": 207
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.live_births",
+      "geographies": 76,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 837
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.deaths",
+      "geographies": 76,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 837
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.natural_increase",
+      "geographies": 76,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 837
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.crude_birth_rate",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 12
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.crude_death_rate",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 12
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.total_fertility_rate",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 12
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.infant_mortality_rate",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 12
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.life_expectancy_total",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 12
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.life_expectancy_male",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 12
+    },
+    {
+      "family": "vital",
+      "seriesId": "demography.life_expectancy_female",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 12
+    },
+    {
+      "family": "migration",
+      "seriesId": "demography.immigrants",
+      "geographies": 1,
+      "firstYear": 2012,
+      "lastYear": 2025,
+      "rows": 630
+    },
+    {
+      "family": "migration",
+      "seriesId": "demography.emigrants",
+      "geographies": 1,
+      "firstYear": 2012,
+      "lastYear": 2025,
+      "rows": 630
+    },
+    {
+      "family": "migration",
+      "seriesId": "demography.net_migration",
+      "geographies": 1,
+      "firstYear": 2012,
+      "lastYear": 2025,
+      "rows": 14
+    },
+    {
+      "family": "migration",
+      "seriesId": "demography.immigrants_by_citizenship_group",
+      "geographies": 1,
+      "firstYear": 2012,
+      "lastYear": 2025,
+      "rows": 252
+    },
+    {
+      "family": "migration",
+      "seriesId": "demography.emigrants_by_citizenship_group",
+      "geographies": 1,
+      "firstYear": 2012,
+      "lastYear": 2025,
+      "rows": 252
+    },
+    {
+      "family": "density",
+      "seriesId": "demography.population_density",
+      "geographies": 12,
+      "firstYear": 2014,
+      "lastYear": 2026,
+      "rows": 145
+    },
+    {
+      "family": "census",
+      "seriesId": "demography.census_population_by_age",
+      "geographies": 12,
+      "firstYear": 2024,
+      "lastYear": 2024,
+      "rows": 1944
+    },
+    {
+      "family": "census",
+      "seriesId": "demography.census_population_by_settlement",
+      "geographies": 76,
+      "firstYear": 2024,
+      "lastYear": 2024,
+      "rows": 684
+    },
+    {
+      "family": "fertility",
+      "seriesId": "demography.age_specific_fertility_rate",
+      "geographies": 1,
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "rows": 84
+    }
+  ],
+  "blankCells": {
+    "unitTables": [
+      {
+        "sourceId": "source.geostat_municipal_population",
+        "excludedUnitCells": 72,
+        "cityRowCellsOutsideWindow": 63,
+        "ignoredValueCells": 0
+      },
+      {
+        "sourceId": "source.geostat_demography_births",
+        "excludedUnitCells": 66,
+        "cityRowCellsOutsideWindow": 63,
+        "ignoredValueCells": 0
+      },
+      {
+        "sourceId": "source.geostat_demography_deaths",
+        "excludedUnitCells": 66,
+        "cityRowCellsOutsideWindow": 63,
+        "ignoredValueCells": 0
+      },
+      {
+        "sourceId": "source.geostat_demography_natural_increase",
+        "excludedUnitCells": 66,
+        "cityRowCellsOutsideWindow": 62,
+        "ignoredValueCells": 1
+      }
+    ],
+    "absentCitizenshipRows": 98
+  },
+  "balancing": {
+    "fromYear": 1994,
+    "toYear": 2025,
+    "censusStep": {
+      "fromYear": 2024,
+      "residual": 225922
+    },
+    "residuals": [
+      {
+        "fromYear": 1994,
+        "residual": 0
+      },
+      {
+        "fromYear": 1995,
+        "residual": 0
+      },
+      {
+        "fromYear": 1996,
+        "residual": 0
+      },
+      {
+        "fromYear": 1997,
+        "residual": 0
+      },
+      {
+        "fromYear": 1998,
+        "residual": 0
+      },
+      {
+        "fromYear": 1999,
+        "residual": 0
+      },
+      {
+        "fromYear": 2000,
+        "residual": 0
+      },
+      {
+        "fromYear": 2001,
+        "residual": 0
+      },
+      {
+        "fromYear": 2002,
+        "residual": 0
+      },
+      {
+        "fromYear": 2003,
+        "residual": 0
+      },
+      {
+        "fromYear": 2004,
+        "residual": 0
+      },
+      {
+        "fromYear": 2005,
+        "residual": 0
+      },
+      {
+        "fromYear": 2006,
+        "residual": 0
+      },
+      {
+        "fromYear": 2007,
+        "residual": 0
+      },
+      {
+        "fromYear": 2008,
+        "residual": 0
+      },
+      {
+        "fromYear": 2009,
+        "residual": 0
+      },
+      {
+        "fromYear": 2010,
+        "residual": 0
+      },
+      {
+        "fromYear": 2011,
+        "residual": 0
+      },
+      {
+        "fromYear": 2012,
+        "residual": 0
+      },
+      {
+        "fromYear": 2013,
+        "residual": 0
+      },
+      {
+        "fromYear": 2014,
+        "residual": 0
+      },
+      {
+        "fromYear": 2015,
+        "residual": 0
+      },
+      {
+        "fromYear": 2016,
+        "residual": 0
+      },
+      {
+        "fromYear": 2017,
+        "residual": 0
+      },
+      {
+        "fromYear": 2018,
+        "residual": 0
+      },
+      {
+        "fromYear": 2019,
+        "residual": 0
+      },
+      {
+        "fromYear": 2020,
+        "residual": 0
+      },
+      {
+        "fromYear": 2021,
+        "residual": 0
+      },
+      {
+        "fromYear": 2022,
+        "residual": 0
+      },
+      {
+        "fromYear": 2023,
+        "residual": 0
+      },
+      {
+        "fromYear": 2024,
+        "residual": 225922
+      },
+      {
+        "fromYear": 2025,
+        "residual": 0
+      }
+    ]
+  },
+  "midYear": {
+    "firstYear": 2014,
+    "lastYear": 2025,
+    "maxDifferencePersons": 0
+  },
+  "censusAnchor": {
+    "censusCount": 3929581,
+    "january2025": 3930428,
+    "difference": 847,
+    "municipalities": 64,
+    "largestGapPercent": 0.818498,
+    "largestGapMunicipality": "68"
+  },
+  "censusSnapshot": {
+    "units": 75,
+    "cellsChecked": 12825,
+    "agreeingWithCensusUnitTable": 65
+  },
+  "rates": [
+    {
+      "check": "crude_birth_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.027641,
+      "at": "2024",
+      "bound": 0.05
+    },
+    {
+      "check": "crude_death_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.046778,
+      "at": "2021",
+      "bound": 0.05
+    },
+    {
+      "check": "natural_increase_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.044536,
+      "at": "2016",
+      "bound": 0.05
+    },
+    {
+      "check": "net_migration_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.048369,
+      "at": "2025",
+      "bound": 0.05
+    },
+    {
+      "check": "infant_mortality_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.043637,
+      "at": "2023",
+      "bound": 0.05
+    },
+    {
+      "check": "total_fertility_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.005,
+      "at": "2015",
+      "bound": 0.005
+    },
+    {
+      "check": "share_65_plus",
+      "firstYear": 2004,
+      "lastYear": 2026,
+      "maxDeviation": 0.049572,
+      "at": "2024 both sexes",
+      "bound": 0.05
+    },
+    {
+      "check": "total_dependency_ratio",
+      "firstYear": 2004,
+      "lastYear": 2026,
+      "maxDeviation": 0.049634,
+      "at": "2009 males",
+      "bound": 0.05
+    },
+    {
+      "check": "child_dependency_ratio",
+      "firstYear": 2004,
+      "lastYear": 2026,
+      "maxDeviation": 0.049519,
+      "at": "2025 both sexes",
+      "bound": 0.05
+    },
+    {
+      "check": "old_age_dependency_ratio",
+      "firstYear": 2004,
+      "lastYear": 2026,
+      "maxDeviation": 0.049607,
+      "at": "2026 both sexes",
+      "bound": 0.05
+    },
+    {
+      "check": "life_expectancy_abridged_vs_headline",
+      "firstYear": 1994,
+      "lastYear": 2025,
+      "maxDeviation": 0.157926,
+      "at": "2009 males",
+      "bound": 0.25
+    },
+    {
+      "check": "population_density",
+      "firstYear": 2014,
+      "lastYear": 2026,
+      "maxDeviation": 0.049911,
+      "at": "region.mtskheta_mtianeti 2025",
+      "bound": 0.05
+    },
+    {
+      "check": "age_specific_fertility_vs_total_fertility_rate",
+      "firstYear": 2014,
+      "lastYear": 2025,
+      "maxDeviation": 0.005,
+      "at": "2015",
+      "bound": 0.005
+    }
+  ]
+}

@@ -928,5 +928,96 @@
       "reviewedAt": "2026-09-26"
     },
     "derivation": null
+  },
+  "source.geostat_demography_population_age_sex": {
+    "name": {
+      "text": "Population as of 1 January by age group and sex",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_births": {
+    "name": {
+      "text": "Live births by regions and self-governed units",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_crude_birth_rate": {
+    "name": {
+      "text": "Crude birth rate",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_fertility": {
+    "name": {
+      "text": "Age-specific fertility rates and total fertility rate",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_deaths": {
+    "name": {
+      "text": "Deaths by regions and self-governed units",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_crude_death_rate": {
+    "name": {
+      "text": "Crude death rate",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_infant_mortality": {
+    "name": {
+      "text": "Infant mortality rate by sex",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_life_expectancy": {
+    "name": {
+      "text": "Life expectancy at birth by sex",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_natural_increase": {
+    "name": {
+      "text": "Natural increase by regions and self-governed units",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_net_migration": {
+    "name": {
+      "text": "Net migration (number and rate)",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_migration_citizenship": {
+    "name": {
+      "text": "Immigrants and emigrants by sex and citizenship",
+      "reviewedAt": "2026-10-01"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_density": {
+    "name": {
+      "text": "Population density by regions",
+      "reviewedAt": "2026-10-03"
+    },
+    "derivation": null
+  },
+  "source.geostat_census2024_population_by_age_settlement": {
+    "name": {
+      "text": "2024 census population by region, age, sex and settlement",
+      "reviewedAt": "2026-10-03"
+    },
+    "derivation": null
   }
 }

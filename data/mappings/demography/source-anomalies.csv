@@ -1,0 +1,2 @@
+﻿source_id,cell,observed_value,decision,mapping_note,reviewed_at
+source.geostat_demography_natural_increase,AB85,0,ignore,"C. Gori*, 2020: Geostat prints 0 where the births and deaths tables have no cell for this city row. The municipality row already includes the city, so the cell must not enter any total.",2026-10-01

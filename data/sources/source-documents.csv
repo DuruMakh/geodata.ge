@@ -131,3 +131,16 @@ source.fiscal_regional_economy_share,Fiscal.ge regional activity share derived f
 source.geostat_basket_weights,"Geostat consumer basket weights, %",docs/Raw Data/Inflation/geostat-basket-weights/2026/en/basket-weights.xlsx,2026-09-12
 source.geostat_product_mom,"Geostat detailed product price index, mom (en)",docs/Raw Data/Inflation/geostat-products/2026-08/en/products-mom.xlsx,2026-09-26
 source.geostat_product_yoy,"Geostat detailed product price index, yoy (en)",docs/Raw Data/Inflation/geostat-products/2026-08/en/products-yoy.xlsx,2026-09-26
+source.geostat_demography_population_age_sex,Population as of 1 January by age group and sex,docs/Raw Data/Demography/geostat-demography/2026-10/official/02-population-by-age-groups-and-sex.xlsx,2026-10-01
+source.geostat_demography_births,Live births by regions and self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/09-number-of-live-births-by-self-governed-units.xlsx,2026-10-01
+source.geostat_demography_crude_birth_rate,Crude birth rate,docs/Raw Data/Demography/geostat-demography/2026-10/official/15-crude-birth-rate.xlsx,2026-10-01
+source.geostat_demography_fertility,Age-specific fertility rates and total fertility rate,docs/Raw Data/Demography/geostat-demography/2026-10/official/16-age-specific-fertility-rates-and-total-fertility-rate.xlsx,2026-10-01
+source.geostat_demography_deaths,Deaths by regions and self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/19-number-of-deaths-by-self-governed-units.xlsx,2026-10-01
+source.geostat_demography_crude_death_rate,Crude death rate,docs/Raw Data/Demography/geostat-demography/2026-10/official/24-crude-death-rate.xlsx,2026-10-01
+source.geostat_demography_infant_mortality,Infant mortality rate by sex,docs/Raw Data/Demography/geostat-demography/2026-10/official/25-infant-mortality-rate-by-sex.xlsx,2026-10-01
+source.geostat_demography_life_expectancy,Life expectancy at birth by sex,docs/Raw Data/Demography/geostat-demography/2026-10/official/28-life-expectancy-at-births-by-sex.xlsx,2026-10-01
+source.geostat_demography_natural_increase,Natural increase by regions and self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/29-Natural-increase-by-regions-and-self-governed-units.xlsx,2026-10-01
+source.geostat_demography_net_migration,Net migration (number and rate),docs/Raw Data/Demography/geostat-demography/2026-10/official/31-net-migration.xlsx,2026-10-01
+source.geostat_demography_migration_citizenship,Immigrants and emigrants by sex and citizenship,docs/Raw Data/Demography/geostat-demography/2026-10/official/33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx,2026-10-01
+source.geostat_demography_density,Population density by regions,docs/Raw Data/Demography/geostat-demography/2026-10/official/03-density-by-regions.xlsx,2026-10-03
+source.geostat_census2024_population_by_age_settlement,"2024 census population by region, age, sex and urban or rural settlement",docs/Raw Data/Demography/geostat-demography/2026-10/official/census-2024/1.1-population-by-region-unit-age-settlement-sex.xlsx,2026-10-03

@@ -1,0 +1,16 @@
+﻿table_label,canonical_label,applies_to,mapping_note,reviewed_at
+Dedoplistskaro Municipality,Dedoplistsqaro Municipality,events,Geostat's event tables spell the Georgian letter ყ as sk where its population table writes sq.,2026-10-01
+Tetritskaro Municipality,Tetritsqaro Municipality,events,Geostat's event tables spell the Georgian letter ყ as sk where its population table writes sq.,2026-10-01
+Tkibuli Municipality,Tqibuli Municipality,events,Geostat's event tables spell the Georgian letter ყ as sk where its population table writes sq.,2026-10-01
+Tskaltubo Municipality,Tsqaltubo Municipality,events,Geostat's event tables spell the Georgian letter ყ as sk where its population table writes sq.,2026-10-01
+Dedoplistskaro Municipality,Dedoplistsqaro Municipality,census,The 2024 census table uses the same spelling as the event tables.,2026-10-01
+Tetritskaro Municipality,Tetritsqaro Municipality,census,The 2024 census table uses the same spelling as the event tables.,2026-10-01
+Tkibuli Municipality,Tqibuli Municipality,census,The 2024 census table uses the same spelling as the event tables.,2026-10-01
+Tskaltubo Municipality,Tsqaltubo Municipality,census,The 2024 census table uses the same spelling as the event tables.,2026-10-01
+Sighnaghi Municipality,Sighnagi Municipality,census,The 2024 census table writes Sighnaghi where the population table writes Sighnagi.,2026-10-01
+C. Tbilisi,C. Tbilisi Municipality,census,The 2024 census table prints the five city municipalities without the word Municipality.,2026-10-01
+C. Batumi,C. Batumi Municipality,census,The 2024 census table prints the five city municipalities without the word Municipality.,2026-10-01
+C. Kutaisi,C. Kutaisi Municipality,census,The 2024 census table prints the five city municipalities without the word Municipality.,2026-10-01
+C. Poti,C. Poti Municipality,census,The 2024 census table prints the five city municipalities without the word Municipality.,2026-10-01
+C. Rustavi,C. Rustavi Municipality,census,The 2024 census table prints the five city municipalities without the word Municipality.,2026-10-01
+Adjara of Autonomous Republic,Adjara A.R.,census,The 2024 census age table prints the region Adjara of Autonomous Republic where the population table writes Adjara A.R.,2026-10-03
