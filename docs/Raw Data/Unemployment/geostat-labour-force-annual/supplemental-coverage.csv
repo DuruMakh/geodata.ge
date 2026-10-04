@@ -1,0 +1,16 @@
+﻿dataset,sex,group_id,year_min,year_max,year_count
+education,men,education.higher,2020,2025,6
+education,men,education.primary_or_lower_secondary,2020,2025,6
+education,men,education.upper_secondary,2020,2025,6
+education,men,education.vocational,2020,2025,6
+education,total,education.higher,2020,2025,6
+education,total,education.primary_or_lower_secondary,2020,2025,6
+education,total,education.upper_secondary,2020,2025,6
+education,total,education.vocational,2020,2025,6
+education,women,education.higher,2020,2025,6
+education,women,education.primary_or_lower_secondary,2020,2025,6
+education,women,education.upper_secondary,2020,2025,6
+education,women,education.vocational,2020,2025,6
+long_term,men,men,2020,2025,6
+long_term,total,georgia,2020,2025,6
+long_term,women,women,2020,2025,6

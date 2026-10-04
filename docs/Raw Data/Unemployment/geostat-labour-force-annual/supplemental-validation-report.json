@@ -1,0 +1,407 @@
+{
+  "status": "passed",
+  "year_min": 2020,
+  "year_max": 2025,
+  "education_source_observation_count": 810,
+  "education_primary_rate_observation_count": 216,
+  "education_group_year_sex_records": 72,
+  "long_term_observation_count": 54,
+  "long_term_group_year_records": 18,
+  "source_observation_count": 864,
+  "primary_observation_count": 270,
+  "education_unpublished_rate_combinations": 54,
+  "unpublished_rates": [
+    {
+      "year": 2020,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2020,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2021,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2022,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2023,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2024,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "total",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "women",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "participation_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "employment_rate",
+      "reason": "Rate row not published in the official source"
+    },
+    {
+      "year": 2025,
+      "sex": "men",
+      "group_id": "education.no_education",
+      "indicator_id": "unemployment_rate",
+      "reason": "Rate row not published in the official source"
+    }
+  ],
+  "gaps": [],
+  "duplicate_keys": 0,
+  "imputed_values": 0,
+  "check_count": 912,
+  "failed_check_count": 0,
+  "failures": [],
+  "limitations": [
+    "Both additional workbooks publish only 2020-2025; no earlier observations are invented.",
+    "Education has percentage rates and distributions, with no published absolute counts per education level.",
+    "No education has distribution shares only; its three rates are unpublished.",
+    "Count controls reconstructed from shares are used for validation only and are not exported as official counts.",
+    "Long-term unemployment means unemployed for 12 months or more.",
+    "Long-term rate uses labour force; long-term share uses all unemployed persons. These percentages are different measures."
+  ]
+}

@@ -1,0 +1,802 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-03",
+  "scope": "Annual research only; core series plus education and long-term unemployment; no serving or UI integration",
+  "current_year_min": 2010,
+  "current_year_max": 2025,
+  "source_observation_count": 6209,
+  "current_core_observation_count": 2872,
+  "summary_group_year_count": 359,
+  "legacy_observation_count": 2409,
+  "duplicate_keys": 0,
+  "gaps": [],
+  "imputed_values": 0,
+  "source_checks": [
+    {
+      "source_id": "geostat_lfs_annual_total",
+      "sha256": "9A55E31CC79F7B7A68CF10F99B0C21055A0397CCD4D604210E45BC2B3C347214",
+      "bytes": 16390,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_annual_sex",
+      "sha256": "8F1A14EFCEFE5C4F6492C26E93891CC4B97CE03B361C3880AAB0EFBC83B5B086",
+      "bytes": 21765,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_annual_settlement",
+      "sha256": "33017C802395860DC87D6623878EA8EB7CA723996B60763664E6BD88F6BC8652",
+      "bytes": 33177,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_annual_age",
+      "sha256": "FBA38F484B553C90A08015ACC31FABC3320D0514EF870DFB65E525CD6136198C",
+      "bytes": 53839,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_annual_region",
+      "sha256": "502BAF07875D7200D457EFCF847E73D97029DAA25BF5681138B6ECEE0AA1E59E",
+      "bytes": 55086,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_metadata_2026",
+      "sha256": "61A991AE824B681F41406D55FE7E9A58410BD9CB183E73AFDB1F57B5E521A708",
+      "bytes": 131365,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_source_page",
+      "sha256": "FBEEED7AB2124B53153261A9D978ECF076AC023EC9799382DBFED0231020C889",
+      "bytes": 120925,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_annual_education",
+      "sha256": "89F26C4D3C6DF720ACC7A297676B8A04E00CFF59EFDAAB21DDD2106988971418",
+      "bytes": 28096,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_annual_long_term",
+      "sha256": "DE2E83068136F1A05EB352F09D41C5B0512E233883662A4DD84D6D8BD068E846",
+      "bytes": 11609,
+      "passed": true
+    }
+  ],
+  "reconciliation_check_count": 4400,
+  "reconciliation_failed_count": 0,
+  "failures": [],
+  "coverage": [
+    {
+      "dimension": "national",
+      "group_id": "georgia",
+      "group_label_en": "Georgia",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "sex",
+      "group_id": "men",
+      "group_label_en": "Men",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "sex",
+      "group_id": "women",
+      "group_label_en": "Women",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "settlement",
+      "group_id": "rural",
+      "group_label_en": "Rural",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "settlement",
+      "group_id": "urban",
+      "group_label_en": "Urban",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.15_19",
+      "group_label_en": "15-19",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.15_24",
+      "group_label_en": "15-24",
+      "year_min": 2010,
+      "year_max": 2019,
+      "year_count": 10,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.20_24",
+      "group_label_en": "20-24",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.25_29",
+      "group_label_en": "25-29",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.25_34",
+      "group_label_en": "25-34",
+      "year_min": 2010,
+      "year_max": 2019,
+      "year_count": 10,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.30_34",
+      "group_label_en": "30-34",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.35_39",
+      "group_label_en": "35-39",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.35_44",
+      "group_label_en": "35-44",
+      "year_min": 2010,
+      "year_max": 2019,
+      "year_count": 10,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.40_44",
+      "group_label_en": "40-44",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.45_49",
+      "group_label_en": "45-49",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.45_54",
+      "group_label_en": "45-54",
+      "year_min": 2010,
+      "year_max": 2019,
+      "year_count": 10,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.50_54",
+      "group_label_en": "50-54",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.55_59",
+      "group_label_en": "55-59",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.55_64",
+      "group_label_en": "55-64",
+      "year_min": 2010,
+      "year_max": 2019,
+      "year_count": 10,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.60_64",
+      "group_label_en": "60-64",
+      "year_min": 2020,
+      "year_max": 2025,
+      "year_count": 6,
+      "years": "2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "age",
+      "group_id": "age.65_plus",
+      "group_label_en": "65+",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.adjara",
+      "group_label_en": "Adjara",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.guria",
+      "group_label_en": "Guria",
+      "year_min": 2017,
+      "year_max": 2025,
+      "year_count": 9,
+      "years": "2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.imereti",
+      "group_label_en": "Imereti",
+      "year_min": 2019,
+      "year_max": 2025,
+      "year_count": 7,
+      "years": "2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.imereti_racha_lechkhumi_kvemo_svaneti",
+      "group_label_en": "Imereti, Racha-Lechkhumi and Kvemo Svaneti",
+      "year_min": 2010,
+      "year_max": 2018,
+      "year_count": 9,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.kakheti",
+      "group_label_en": "Kakheti",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.kvemo_kartli",
+      "group_label_en": "Kvemo Kartli",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.mtskheta_mtianeti",
+      "group_label_en": "Mtskheta-Mtianeti",
+      "year_min": 2017,
+      "year_max": 2025,
+      "year_count": 9,
+      "years": "2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.racha_lechkhumi_kvemo_svaneti",
+      "group_label_en": "Racha-Lechkhumi and Kvemo Svaneti",
+      "year_min": 2019,
+      "year_max": 2025,
+      "year_count": 7,
+      "years": "2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.samegrelo_zemo_svaneti",
+      "group_label_en": "Samegrelo-Zemo Svaneti",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.samtskhe_javakheti",
+      "group_label_en": "Samtskhe-Javakheti",
+      "year_min": 2017,
+      "year_max": 2025,
+      "year_count": 9,
+      "years": "2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.samtskhe_javakheti_guria_mtskheta_mtianeti",
+      "group_label_en": "Samtskhe-Javakheti, Guria and Mtskheta-Mtianeti",
+      "year_min": 2010,
+      "year_max": 2016,
+      "year_count": 7,
+      "years": "2010|2011|2012|2013|2014|2015|2016"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.shida_kartli",
+      "group_label_en": "Shida Kartli",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    },
+    {
+      "dimension": "region",
+      "group_id": "region.tbilisi",
+      "group_label_en": "Tbilisi",
+      "year_min": 2010,
+      "year_max": 2025,
+      "year_count": 16,
+      "years": "2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025"
+    }
+  ],
+  "supplemental": {
+    "status": "passed",
+    "year_min": 2020,
+    "year_max": 2025,
+    "education_source_observation_count": 810,
+    "education_primary_rate_observation_count": 216,
+    "education_group_year_sex_records": 72,
+    "long_term_observation_count": 54,
+    "long_term_group_year_records": 18,
+    "source_observation_count": 864,
+    "primary_observation_count": 270,
+    "education_unpublished_rate_combinations": 54,
+    "unpublished_rates": [
+      {
+        "year": 2020,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2020,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2021,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2022,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2023,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2024,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "total",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "women",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "participation_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "employment_rate",
+        "reason": "Rate row not published in the official source"
+      },
+      {
+        "year": 2025,
+        "sex": "men",
+        "group_id": "education.no_education",
+        "indicator_id": "unemployment_rate",
+        "reason": "Rate row not published in the official source"
+      }
+    ],
+    "gaps": [],
+    "duplicate_keys": 0,
+    "imputed_values": 0,
+    "check_count": 912,
+    "failed_check_count": 0,
+    "failures": [],
+    "limitations": [
+      "Both additional workbooks publish only 2020-2025; no earlier observations are invented.",
+      "Education has percentage rates and distributions, with no published absolute counts per education level.",
+      "No education has distribution shares only; its three rates are unpublished.",
+      "Count controls reconstructed from shares are used for validation only and are not exported as official counts.",
+      "Long-term unemployment means unemployed for 12 months or more.",
+      "Long-term rate uses labour force; long-term share uses all unemployed persons. These percentages are different measures."
+    ]
+  },
+  "total_source_observation_count": 7073,
+  "total_primary_observation_count": 3142,
+  "total_reconciliation_check_count": 5312,
+  "limitations": [
+    "1998-2009 use ILO 13th ICLS; do not join to the 2010+ ILO 19th/20th ICLS series.",
+    "Age bands are ten-year groups in 2010-2019 and five-year groups from 2020; 65+ is unchanged.",
+    "Imereti includes Racha-Lechkhumi/Kvemo Svaneti through 2018; separate from 2019.",
+    "Samtskhe-Javakheti, Guria and Mtskheta-Mtianeti are combined through 2016; separate from 2017.",
+    "Survey estimates cover private households aged 15+, excluding occupied territories and institutional households.",
+    "Unemployment uses the labour force denominator; non-employment and population outside the labour force are different measures.",
+    "Counts are thousand persons; source cells retain additional precision but are published to one decimal.",
+    "The source page contains quarterly headlines, which are excluded from this annual package.",
+    "Sampling error matters; the metadata reports a 2025 national unemployment-rate 95% interval of 13.0%-14.8%."
+  ]
+}
