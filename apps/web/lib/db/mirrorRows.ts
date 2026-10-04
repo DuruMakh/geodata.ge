@@ -25,6 +25,7 @@ import {
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
 import type { SectorObservation } from "../data/economicSectors/types";
+import type { UnemploymentObservation } from "../data/unemployment/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -476,6 +477,25 @@ export async function loadGdpOverviewFactsFromMirror(
     sourceLocator: row.sourceLocator,
     lastReviewedAt: isoDate(row.lastReviewedAt),
   }));
+}
+
+export function unemploymentMirrorCreateRows(facts: readonly UnemploymentObservation[], importRunId: string): Prisma.UnemploymentFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: `source.${fact.sourceId}`, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadUnemploymentFactsFromMirror(db: MirrorClient): Promise<UnemploymentObservation[]> {
+  const rows = await db.unemploymentFact.findMany({ orderBy: [{ dimension: "asc" }, { groupId: "asc" }, { sex: "asc" }, { indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== `source.${row.sourceId}`) throw new Error("Unemployment source relation mismatch");
+    return {
+      dimension: row.dimension as UnemploymentObservation["dimension"], groupId: row.groupId, sex: row.sex as UnemploymentObservation["sex"], indicatorId: row.indicatorId as UnemploymentObservation["indicatorId"], year: row.year,
+      frequency: row.frequency as "annual", groupLabelEn: row.groupLabelEn, unit: row.unit as UnemploymentObservation["unit"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(1), basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate", methodologyEpoch: row.methodologyEpoch as "ilo19_20", role: row.role as "primary",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceGroupLabel: row.sourceGroupLabel, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
 }
 
 export async function loadEconomicSectorFactsFromMirror(db: MirrorClient): Promise<SectorObservation[]> {

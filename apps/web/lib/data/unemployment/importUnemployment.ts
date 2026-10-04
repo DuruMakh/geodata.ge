@@ -2,8 +2,9 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { readCsvRecords, type CsvRecord } from "../csv";
 import { assertSameServedRows } from "../servedDataParity";
+import { resolveServedDataSource } from "../servedDataSource";
 import { validateUnemploymentFacts, assertCompleteUnemploymentCoverage } from "./validation";
-import { unemploymentObservationKey, type UnemploymentObservation, type UnemploymentGroupDefinition } from "./types";
+import { unemploymentObservationKey, type UnemploymentObservation, type UnemploymentGroupDefinition, type ServedUnemploymentObservation } from "./types";
 
 export const UNEMPLOYMENT_GROUPS: UnemploymentGroupDefinition[] = JSON.parse(readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "../../data/taxonomy/unemployment-groups.json"), "utf8"));
 export function unemploymentObservationFromCsv(row: CsvRecord, lastReviewedAt: string): UnemploymentObservation {
@@ -27,4 +28,25 @@ export async function loadUnemploymentFacts(): Promise<UnemploymentObservation[]
   validateUnemploymentFacts(facts); assertCompleteUnemploymentCoverage(facts);
   if (facts.some(f => !UNEMPLOYMENT_GROUPS.some(group => group.id === f.groupId && (group.labelEn === f.groupLabelEn || (f.dimension === "long_term" && f.groupId === "georgia" && f.groupLabelEn === "Total"))))) throw new Error("Unreviewed unemployment group label");
   return facts;
+}
+
+let servedRowsPromise: Promise<{ facts: UnemploymentObservation[] }> | null = null;
+let servedNumbersPromise: Promise<{ facts: ServedUnemploymentObservation[] }> | null = null;
+export function resetUnemploymentCacheForTests(): void { servedRowsPromise = null; servedNumbersPromise = null; }
+export function loadServedUnemploymentRows(): Promise<{ facts: UnemploymentObservation[] }> {
+  servedRowsPromise ??= (async () => {
+    const mode = resolveServedDataSource();
+    let facts = await loadUnemploymentFacts();
+    if (mode === "db") {
+      const { loadUnemploymentFactsFromDb } = await import("../../db/servedDataDb");
+      const mirror = await loadUnemploymentFactsFromDb();
+      assertUnemploymentParity(facts, mirror); facts = mirror;
+    }
+    return { facts };
+  })();
+  return servedRowsPromise;
+}
+export function loadServedUnemploymentData(): Promise<{ facts: ServedUnemploymentObservation[] }> {
+  servedNumbersPromise ??= loadServedUnemploymentRows().then(({ facts }) => ({ facts: facts.map(f => ({ ...f, value: Number(f.value), publishedValue: Number(f.publishedValue) })) }));
+  return servedNumbersPromise;
 }

@@ -81,6 +81,7 @@ model SourceDocument {
   governmentDebtFacts GovernmentDebtFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  unemploymentFacts UnemploymentFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
@@ -112,6 +113,7 @@ model ImportRun {
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  unemploymentFacts UnemploymentFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
@@ -422,6 +424,38 @@ model GdpOverviewFact {
   importRunId String?
   importRun ImportRun? @relation(fields:[importRunId], references:[id])
   @@id([seriesId, year])
+}
+
+model UnemploymentFact {
+  dimension        String
+  groupId          String
+  sex              String
+  indicatorId      String
+  year             Int
+  frequency        String
+  groupLabelEn     String
+  unit             String
+  value            Decimal        @db.Decimal(40, 20)
+  publishedValue   Decimal        @db.Decimal(40, 20)
+  basis            String
+  valueStatus      String
+  methodologyEpoch String
+  role             String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceGroupLabel String
+  sourceLabel      String
+  sourceNumberFormat String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([dimension, groupId, sex, indicatorId, year])
+  @@index([sourceDocumentId])
+  @@index([importRunId])
 }
 
 model EconomicSectorFact {
