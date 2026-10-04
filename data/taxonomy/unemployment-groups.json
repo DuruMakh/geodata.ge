@@ -1,0 +1,230 @@
+[
+  {
+    "id": "age.15_19",
+    "labelKa": "15–19 წლის",
+    "labelEn": "15-19",
+    "sortOrder": 0
+  },
+  {
+    "id": "age.15_24",
+    "labelKa": "15–24 წლის",
+    "labelEn": "15-24",
+    "sortOrder": 1
+  },
+  {
+    "id": "age.20_24",
+    "labelKa": "20–24 წლის",
+    "labelEn": "20-24",
+    "sortOrder": 2
+  },
+  {
+    "id": "age.25_29",
+    "labelKa": "25–29 წლის",
+    "labelEn": "25-29",
+    "sortOrder": 3
+  },
+  {
+    "id": "age.25_34",
+    "labelKa": "25–34 წლის",
+    "labelEn": "25-34",
+    "sortOrder": 4
+  },
+  {
+    "id": "age.30_34",
+    "labelKa": "30–34 წლის",
+    "labelEn": "30-34",
+    "sortOrder": 5
+  },
+  {
+    "id": "age.35_39",
+    "labelKa": "35–39 წლის",
+    "labelEn": "35-39",
+    "sortOrder": 6
+  },
+  {
+    "id": "age.35_44",
+    "labelKa": "35–44 წლის",
+    "labelEn": "35-44",
+    "sortOrder": 7
+  },
+  {
+    "id": "age.40_44",
+    "labelKa": "40–44 წლის",
+    "labelEn": "40-44",
+    "sortOrder": 8
+  },
+  {
+    "id": "age.45_49",
+    "labelKa": "45–49 წლის",
+    "labelEn": "45-49",
+    "sortOrder": 9
+  },
+  {
+    "id": "age.45_54",
+    "labelKa": "45–54 წლის",
+    "labelEn": "45-54",
+    "sortOrder": 10
+  },
+  {
+    "id": "age.50_54",
+    "labelKa": "50–54 წლის",
+    "labelEn": "50-54",
+    "sortOrder": 11
+  },
+  {
+    "id": "age.55_59",
+    "labelKa": "55–59 წლის",
+    "labelEn": "55-59",
+    "sortOrder": 12
+  },
+  {
+    "id": "age.55_64",
+    "labelKa": "55–64 წლის",
+    "labelEn": "55-64",
+    "sortOrder": 13
+  },
+  {
+    "id": "age.60_64",
+    "labelKa": "60–64 წლის",
+    "labelEn": "60-64",
+    "sortOrder": 14
+  },
+  {
+    "id": "age.65_plus",
+    "labelKa": "65+ წლის",
+    "labelEn": "65+",
+    "sortOrder": 15
+  },
+  {
+    "id": "education.higher",
+    "labelKa": "უმაღლესი",
+    "labelEn": "Higher",
+    "sortOrder": 16
+  },
+  {
+    "id": "education.primary_or_lower_secondary",
+    "labelKa": "დაწყებითი ან საბაზო",
+    "labelEn": "Primary or Lower Secondary",
+    "sortOrder": 17
+  },
+  {
+    "id": "education.upper_secondary",
+    "labelKa": "საშუალო",
+    "labelEn": "Upper Secondary",
+    "sortOrder": 18
+  },
+  {
+    "id": "education.vocational",
+    "labelKa": "პროფესიული",
+    "labelEn": "Vocational",
+    "sortOrder": 19
+  },
+  {
+    "id": "georgia",
+    "labelKa": "საქართველო",
+    "labelEn": "Georgia",
+    "sortOrder": 20
+  },
+  {
+    "id": "men",
+    "labelKa": "კაცები",
+    "labelEn": "Men",
+    "sortOrder": 21
+  },
+  {
+    "id": "region.adjara",
+    "labelKa": "აჭარა",
+    "labelEn": "Adjara",
+    "sortOrder": 22
+  },
+  {
+    "id": "region.guria",
+    "labelKa": "გურია",
+    "labelEn": "Guria",
+    "sortOrder": 23
+  },
+  {
+    "id": "region.imereti",
+    "labelKa": "იმერეთი",
+    "labelEn": "Imereti",
+    "sortOrder": 24
+  },
+  {
+    "id": "region.imereti_racha_lechkhumi_kvemo_svaneti",
+    "labelKa": "იმერეთი, რაჭა-ლეჩხუმი და ქვემო სვანეთი",
+    "labelEn": "Imereti, Racha-Lechkhumi and Kvemo Svaneti",
+    "sortOrder": 25
+  },
+  {
+    "id": "region.kakheti",
+    "labelKa": "კახეთი",
+    "labelEn": "Kakheti",
+    "sortOrder": 26
+  },
+  {
+    "id": "region.kvemo_kartli",
+    "labelKa": "ქვემო ქართლი",
+    "labelEn": "Kvemo Kartli",
+    "sortOrder": 27
+  },
+  {
+    "id": "region.mtskheta_mtianeti",
+    "labelKa": "მცხეთა-მთიანეთი",
+    "labelEn": "Mtskheta-Mtianeti",
+    "sortOrder": 28
+  },
+  {
+    "id": "region.racha_lechkhumi_kvemo_svaneti",
+    "labelKa": "რაჭა-ლეჩხუმი და ქვემო სვანეთი",
+    "labelEn": "Racha-Lechkhumi and Kvemo Svaneti",
+    "sortOrder": 29
+  },
+  {
+    "id": "region.samegrelo_zemo_svaneti",
+    "labelKa": "სამეგრელო-ზემო სვანეთი",
+    "labelEn": "Samegrelo-Zemo Svaneti",
+    "sortOrder": 30
+  },
+  {
+    "id": "region.samtskhe_javakheti",
+    "labelKa": "სამცხე-ჯავახეთი",
+    "labelEn": "Samtskhe-Javakheti",
+    "sortOrder": 31
+  },
+  {
+    "id": "region.samtskhe_javakheti_guria_mtskheta_mtianeti",
+    "labelKa": "სამცხე-ჯავახეთი, გურია და მცხეთა-მთიანეთი",
+    "labelEn": "Samtskhe-Javakheti, Guria and Mtskheta-Mtianeti",
+    "sortOrder": 32
+  },
+  {
+    "id": "region.shida_kartli",
+    "labelKa": "შიდა ქართლი",
+    "labelEn": "Shida Kartli",
+    "sortOrder": 33
+  },
+  {
+    "id": "region.tbilisi",
+    "labelKa": "თბილისი",
+    "labelEn": "Tbilisi",
+    "sortOrder": 34
+  },
+  {
+    "id": "rural",
+    "labelKa": "სოფელი",
+    "labelEn": "Rural",
+    "sortOrder": 35
+  },
+  {
+    "id": "urban",
+    "labelKa": "ქალაქი",
+    "labelEn": "Urban",
+    "sortOrder": 36
+  },
+  {
+    "id": "women",
+    "labelKa": "ქალები",
+    "labelEn": "Women",
+    "sortOrder": 37
+  }
+]

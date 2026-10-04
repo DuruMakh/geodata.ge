@@ -23,7 +23,7 @@
     "seo:measure": "tsx scripts/measure-seo-output.ts",
     "check": "npm run lint && npm run typecheck && npm run test && npm run data:validate && npm run i18n:check",
     "i18n:check": "tsx scripts/check-localization.ts --check",
-    "data:validate": "tsx scripts/validate-data-files.ts && npm run data:check-national-gdp && npm run data:check-general-government-balance && npm run data:check-municipal-indicators && npm run data:check-municipal-population && npm run data:check-methodology-archives && npm run data:check-nominal-gdp-consistency && npm run data:validate-public-dataset-inputs && npm run data:check-government-debt && npm run data:check-fact-query-snapshot && npm run data:check-gdp-overview && npm run data:check-economic-sectors && npm run data:check-regional-economies && npm run data:check-inflation && npm run data:check-inflation-products && npm run data:check-demography",
+    "data:validate": "tsx scripts/validate-data-files.ts && npm run data:check-national-gdp && npm run data:check-general-government-balance && npm run data:check-municipal-indicators && npm run data:check-municipal-population && npm run data:check-methodology-archives && npm run data:check-nominal-gdp-consistency && npm run data:validate-public-dataset-inputs && npm run data:check-government-debt && npm run data:check-fact-query-snapshot && npm run data:check-gdp-overview && npm run data:check-economic-sectors && npm run data:check-regional-economies && npm run data:check-inflation && npm run data:check-inflation-products && npm run data:check-demography && npm run data:check-unemployment",
     "data:prepare-government-debt": "tsx scripts/prepare-government-debt.ts --write",
     "data:check-government-debt": "tsx scripts/prepare-government-debt.ts --check",
     "data:prepare-national-gdp": "tsx scripts/prepare-national-gdp.ts --write",
@@ -113,7 +113,9 @@
     "data:prepare-inflation-public": "tsx scripts/prepare-inflation.ts --public",
     "data:check-inflation-public": "tsx scripts/prepare-inflation.ts --check-public",
     "data:validate-public-dataset-inputs": "tsx scripts/prepare-public-datasets.ts --check",
-    "data:check-public-datasets-output": "tsx scripts/prepare-public-datasets.ts --check-output"
+    "data:check-public-datasets-output": "tsx scripts/prepare-public-datasets.ts --check-output",
+    "data:prepare-unemployment": "tsx scripts/prepare-unemployment.ts --write",
+    "data:check-unemployment": "tsx scripts/prepare-unemployment.ts --check"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.2.0",
