@@ -15,3 +15,11 @@ test("import mapping round-trips all natural keys and refuses a lost row before 
   const incomplete = await loadUnemploymentFactsFromMirror(client);
   expect(() => assertUnemploymentParity(facts, incomplete)).toThrow(/missing unemployment indicator/i);
 });
+
+test("a sub-tenth published-value change is refused before mirror parity can accept it", async () => {
+  const facts = await loadUnemploymentFacts();
+  const rows = unemploymentMirrorCreateRows(facts, "run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  rows[0].publishedValue = rows[0].publishedValue.plus("0.01");
+  const client = { unemploymentFact: { findMany: async () => rows } } as unknown as MirrorClient;
+  await expect(loadUnemploymentFactsFromMirror(client).then(mirror => assertUnemploymentParity(facts, mirror))).rejects.toThrow(/published precision/i);
+});

@@ -25,6 +25,24 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   });
 }
 
+for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+  test(`count chart scales remain readable ${prefix || "ka"} at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`${prefix}/explorer/unemployment#indicator=unemployed`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await page.evaluate(() => document.fonts.ready);
+    const unitLabel = prefix ? "thousand persons" : "ათასი ადამიანი";
+    for (const indicator of ["unemployed", "employed", "labour_force", "outside_labour_force", "population_15_plus"]) {
+      await page.getByTestId("unemployment-indicator").selectOption(indicator);
+      const labels = page.getByTestId("chart-panel").getByRole("img").locator('text[text-anchor="end"]').filter({ hasText: unitLabel });
+      await expect(labels.first()).toBeVisible();
+      const leftEdges = await labels.evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x));
+      expect(leftEdges.length).toBeGreaterThan(0);
+      expect(Math.min(...leftEdges)).toBeGreaterThanOrEqual(0);
+    }
+  });
+}
+
 test("breakdown and indicator controls keep valid metrics, coverage and reference selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   for (const breakdown of ["national", "sex", "settlement", "age", "region", "education", "long_term"]) {

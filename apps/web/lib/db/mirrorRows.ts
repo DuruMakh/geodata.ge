@@ -489,6 +489,7 @@ export async function loadUnemploymentFactsFromMirror(db: MirrorClient): Promise
   const rows = await db.unemploymentFact.findMany({ orderBy: [{ dimension: "asc" }, { groupId: "asc" }, { sex: "asc" }, { indicatorId: "asc" }, { year: "asc" }] });
   return rows.map(row => {
     if (row.sourceDocumentId !== `source.${row.sourceId}`) throw new Error("Unemployment source relation mismatch");
+    if (!row.publishedValue.eq(row.publishedValue.toFixed(1))) throw new Error("Unemployment published precision mismatch");
     return {
       dimension: row.dimension as UnemploymentObservation["dimension"], groupId: row.groupId, sex: row.sex as UnemploymentObservation["sex"], indicatorId: row.indicatorId as UnemploymentObservation["indicatorId"], year: row.year,
       frequency: row.frequency as "annual", groupLabelEn: row.groupLabelEn, unit: row.unit as UnemploymentObservation["unit"],
