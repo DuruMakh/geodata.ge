@@ -16,12 +16,19 @@ type Props = {
   model: RegionalEconomyMapModel;
   activeRegionId: string | null;
   onActiveRegionChange: (regionId: string | null) => void;
+  /** Choosing mode, for pages that pick regions: each region becomes a button that calls this instead of a link to its page. */
+  onSelect?: (regionId: string) => void;
+  /** Regions outlined as chosen (choosing mode). */
+  selectedIds?: readonly string[];
+  /** Replaces the built-in GEL wording; each region's own value text is `display` on the model. */
+  wording?: { groupAria: string; legendMin: string; legendMax: string; legendCaption: string };
 };
 
-export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange }: Props) {
+export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange, onSelect, selectedIds, wording }: Props) {
   const { locale, messages, englishLabels } = useI18n();
   const [rovingIndex, setRovingIndex] = useState(0);
   const byRegion = useMemo(() => new Map(model.regions.map((region) => [region.regionId, region])), [model.regions]);
+  const chosen = useMemo(() => new Set(selectedIds ?? []), [selectedIds]);
   const active = activeRegionId ? byRegion.get(activeRegionId) ?? null : null;
   const move = (index: number, key: string) => {
     if (key === "ArrowRight" || key === "ArrowDown") return (index + 1) % model.regions.length;
@@ -36,7 +43,7 @@ export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange
       <svg
         viewBox={model.viewBox}
         role="group"
-        aria-label={message(messages, "regionalEconomies.mapAria", { year: model.year })}
+        aria-label={wording?.groupAria ?? message(messages, "regionalEconomies.mapAria", { year: model.year })}
         className="block h-auto w-full"
       >
         <defs>
@@ -47,24 +54,37 @@ export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange
         </defs>
         {model.regions.map((region, index) => {
           const selected = region.regionId === activeRegionId;
+          const name = publicLabel(locale, region.regionId, region.nameKa, englishLabels);
           return (
             <a
               key={region.regionId}
-              href={pageHref(regionalEconomyHref(region.regionId), locale)}
+              {...(onSelect
+                ? { role: "button", "aria-pressed": chosen.has(region.regionId) }
+                : { href: pageHref(regionalEconomyHref(region.regionId), locale) })}
               data-region-map-target=""
               data-region-id={region.regionId}
               data-active={selected ? "true" : undefined}
               tabIndex={index === rovingIndex ? 0 : -1}
-              aria-label={message(messages, "regionalEconomies.mapEntityAria", {
-                name: publicLabel(locale, region.regionId, region.nameKa, englishLabels),
-                amount: formatAmount(region.totalGdpGel, locale),
-                year: model.year,
-              })}
+              aria-label={
+                region.display !== undefined
+                  ? `${name}, ${region.display}`
+                  : message(messages, "regionalEconomies.mapEntityAria", {
+                      name,
+                      amount: formatAmount(region.totalGdpGel, locale),
+                      year: model.year,
+                    })
+              }
+              onClick={onSelect ? () => onSelect(region.regionId) : undefined}
               onMouseEnter={() => onActiveRegionChange(region.regionId)}
               onMouseLeave={() => onActiveRegionChange(null)}
               onFocus={() => { setRovingIndex(index); onActiveRegionChange(region.regionId); }}
               onBlur={() => onActiveRegionChange(null)}
               onKeyDown={(event) => {
+                if (onSelect && (event.key === "Enter" || event.key === " ")) {
+                  event.preventDefault();
+                  onSelect(region.regionId);
+                  return;
+                }
                 const next = move(index, event.key);
                 if (next === null) return;
                 event.preventDefault();
@@ -86,6 +106,21 @@ export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange
             </a>
           );
         })}
+        {onSelect
+          ? model.regions.filter((region) => chosen.has(region.regionId)).map((region) => (
+              <path
+                key={`chosen-${region.regionId}`}
+                data-testid="regional-map-chosen"
+                d={region.pathD}
+                fill="none"
+                stroke="var(--ink)"
+                strokeWidth={2.4}
+                strokeLinejoin="round"
+                pointerEvents="none"
+                aria-hidden="true"
+              />
+            ))
+          : null}
         {model.occupiedAreas.map((area) => (
           <path
             key={area.key}
@@ -106,14 +141,14 @@ export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange
       {active ? (
         <div role="tooltip" data-testid="regional-map-tooltip" className="mt-2 flex items-baseline justify-between gap-3 border border-[var(--hairline)] bg-[var(--tile)] px-3 py-2 text-[12px]">
           <span>{publicLabel(locale, active.regionId, active.nameKa, englishLabels)}</span>
-          <span className="font-[family-name:var(--font-numeric)]">{formatAmount(active.totalGdpGel, locale)} · {model.year}</span>
+          <span className="font-[family-name:var(--font-numeric)]">{active.display ?? <>{formatAmount(active.totalGdpGel, locale)} · {model.year}</>}</span>
         </div>
       ) : null}
       <div data-testid="regional-map-legend" className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
-        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{formatAmount(model.legendMinGel, locale)}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{wording?.legendMin ?? formatAmount(model.legendMinGel, locale)}</span>
         <span className="flex flex-none">{MAP_RAMP.map((fill) => <span key={fill} aria-hidden className="h-[9px] w-8" style={{ backgroundColor: fill }} />)}</span>
-        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{formatAmount(model.legendMaxGel, locale)}</span>
-        <span className="text-[10px] text-[var(--faint)]">{message(messages, "regionalEconomies.legend")}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{wording?.legendMax ?? formatAmount(model.legendMaxGel, locale)}</span>
+        <span className="text-[10px] text-[var(--faint)]">{wording?.legendCaption ?? message(messages, "regionalEconomies.legend")}</span>
       </div>
     </div>
   );
