@@ -60,7 +60,7 @@ describe("ExplorerTable break", () => {
   const table = (extra: { breakYears?: number[]; breakLabel?: string } = {}) =>
     renderGeorgianMarkup(createElement(ExplorerTable, {
       caption: "Population",
-      rows: [],
+      rows: [{ ...row, itemId: "region.adjara", kaLabel: "Adjara", valuesByYear: { 2024: 1_000, 2025: 2_000 } }],
       totalRow: row,
       showTotal: true,
       totalFirst: true,
@@ -81,7 +81,8 @@ describe("ExplorerTable break", () => {
 
   it("draws a 2px rule left of the break year on the header and the cells, and labels the header", () => {
     const html = table({ breakYears: [2025], breakLabel: "Census re-base" });
-    expect(count(html, /border-left:2px solid var\(--ink\)/g)).toBe(2);
+    // The header, the total row and the one body row each carry it once.
+    expect(count(html, /border-left:2px solid var\(--ink\)/g)).toBe(3);
     expect(count(html, /Census re-base/g)).toBe(1);
   });
 
