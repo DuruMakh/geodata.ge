@@ -2,7 +2,7 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import type { Municipality, MunicipalRegion } from "../data/municipal/types";
 import { publicLabel } from "../i18n/labels";
 import type { Locale } from "../i18n/types";
-import { EDITORIAL_PALETTE, INK } from "./colors";
+import { INK, colorForItem } from "./colors";
 
 export const GEORGIA_PLACE_ID = MUNICIPAL_COUNTRY_ID;
 export const TBILISI_PLACE_ID = "region.tbilisi";
@@ -96,8 +96,7 @@ export function placesAtLevel(places: readonly DemographyPlace[], level: "region
 /** Georgia is ink; regions and municipalities cycle the editorial palette by their registry order, so a place keeps its colour on every page. */
 export function placeColor(place: DemographyPlace): string {
   if (place.level === "country") return INK;
-  const index = place.level === "region" ? place.sortOrder - 1 : place.sortOrder;
-  return EDITORIAL_PALETTE[index % EDITORIAL_PALETTE.length]!;
+  return colorForItem(place.id, place.level === "region" ? place.sortOrder - 1 : place.sortOrder);
 }
 
 export function placeLabel(place: DemographyPlace, locale: Locale): string {

@@ -11,6 +11,7 @@ import {
   type DemographyPlace,
 } from "./demographyAreas";
 import { resolveRange, type PeriodRange } from "./periodRange";
+import { rankByEndValue } from "./regionalEconomies";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
 export type PopulationLevel = "regions" | "municipalities";
@@ -104,19 +105,7 @@ export function rankPlaces(
   places: readonly DemographyPlace[],
   endValues: Readonly<Record<string, number | null>>,
 ): DemographyPlace[] {
-  return [...places].sort((left, right) => {
-    if (left.id === GEORGIA_PLACE_ID) return -1;
-    if (right.id === GEORGIA_PLACE_ID) return 1;
-    const leftValue = endValues[left.id] ?? null;
-    const rightValue = endValues[right.id] ?? null;
-    if (leftValue === null && rightValue !== null) return 1;
-    if (rightValue === null && leftValue !== null) return -1;
-    return (
-      (leftValue !== null && rightValue !== null ? rightValue - leftValue : 0) ||
-      left.sortOrder - right.sortOrder ||
-      left.id.localeCompare(right.id)
-    );
-  });
+  return rankByEndValue(places, endValues, GEORGIA_PLACE_ID);
 }
 
 export function buildPopulationModel({

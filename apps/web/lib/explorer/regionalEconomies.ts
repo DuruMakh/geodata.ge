@@ -45,20 +45,35 @@ export function regionalEconomyColor(seriesId: string) {
   return seriesId === REGIONAL_GDP_TOTAL ? INK : sectorColor(seriesId);
 }
 
+/**
+ * The order of a picker list: the pinned item first, then by the value at the end of the range
+ * (descending, a missing value last), ties by registry order and finally by id.
+ */
+export function rankByEndValue<T extends { id: string; sortOrder: number }>(
+  items: readonly T[],
+  endValues: Readonly<Record<string, number | null>>,
+  firstId: string,
+): T[] {
+  return [...items].sort((left, right) => {
+    if (left.id === firstId) return -1;
+    if (right.id === firstId) return 1;
+    const leftValue = endValues[left.id] ?? null;
+    const rightValue = endValues[right.id] ?? null;
+    if (leftValue === null && rightValue !== null) return 1;
+    if (rightValue === null && leftValue !== null) return -1;
+    return (
+      (leftValue !== null && rightValue !== null ? rightValue - leftValue : 0) ||
+      left.sortOrder - right.sortOrder ||
+      left.id.localeCompare(right.id)
+    );
+  });
+}
+
 export function rankRegionalEconomyDefinitions(
   definitions: readonly RegionalEconomySeriesDefinition[],
   endValues: Record<string, number | null>,
 ) {
-  return [...definitions].sort((left, right) => {
-    if (left.id === REGIONAL_GDP_TOTAL) return -1;
-    if (right.id === REGIONAL_GDP_TOTAL) return 1;
-    const leftValue = endValues[left.id];
-    const rightValue = endValues[right.id];
-    if (leftValue === null && rightValue !== null) return 1;
-    if (rightValue === null && leftValue !== null) return -1;
-    return (leftValue !== null && rightValue !== null ? rightValue - leftValue : 0) ||
-      left.sortOrder - right.sortOrder;
-  });
+  return rankByEndValue(definitions, endValues, REGIONAL_GDP_TOTAL);
 }
 
 export function parseRegionalEconomyHash(
