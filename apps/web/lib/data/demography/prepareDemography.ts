@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { z } from "zod";
 import { serializeBomCsvRows } from "../csvEscape";
 import { loadReviewedAnomalies } from "./anomalies";
 import { buildBreakRegister } from "./breaks";
+import { parseCanonicalDemographyRows } from "./canonicalRows";
 import { loadCitizenships } from "./citizenship";
 import { groupMigrationByCitizenship, loadCitizenshipGroups } from "./citizenshipGroups";
 import { loadDensityRows } from "./densityRows";
@@ -18,7 +18,6 @@ import { readVitalEvents } from "./readVital";
 import { FAMILIES } from "./series";
 import { loadDemographySources } from "./sourceFiles";
 import { DemographyStopError } from "./stops";
-import { ESTIMATE_BASES } from "./types";
 import type { DemographyObservation } from "./types";
 import { validateDemography } from "./validation";
 
@@ -42,23 +41,6 @@ const DIMENSION: Record<(typeof FILES)[number]["dimensions"][number], (row: Demo
   settlement: (row) => row.settlement ?? "",
 };
 
-const rowSchema = z.object({
-  series_id: z.string().min(1),
-  geography_id: z.string().min(1),
-  year: z.coerce.number().int(),
-  value: z.string().min(1),
-  unit: z.string().min(1),
-  estimate_basis: z.enum(ESTIMATE_BASES),
-  status: z.literal("published"),
-  source_id: z.string().min(1),
-  source_locator: z.string().min(1),
-  last_reviewed_at: z.string().min(1),
-  sex: z.enum(["total", "male", "female"]).optional(),
-  age_group: z.string().optional(),
-  citizenship_id: z.string().optional(),
-  settlement: z.enum(["total", "urban", "rural"]).optional(),
-});
-
 /** The rows of the committed canonical files, which a refresh may add to but never change. Undefined on a first build. */
 async function loadPreviousObservations(repositoryRoot: string): Promise<DemographyObservation[] | undefined> {
   const rows: DemographyObservation[] = [];
@@ -72,28 +54,7 @@ async function loadPreviousObservations(repositoryRoot: string): Promise<Demogra
       throw error;
     }
     found = true;
-    const records = parse(text, { bom: true, columns: true, skip_empty_lines: true }) as Record<string, string>[];
-    records.forEach((record, index) => {
-      const result = rowSchema.safeParse(record);
-      if (!result.success) throw new Error(`${file} row ${index + 2} is invalid: ${result.error.message}`);
-      const row = result.data;
-      rows.push({
-        seriesId: row.series_id,
-        geographyId: row.geography_id,
-        year: row.year,
-        value: row.value,
-        unit: row.unit,
-        estimateBasis: row.estimate_basis,
-        status: row.status,
-        sourceId: row.source_id,
-        sourceLocator: row.source_locator,
-        lastReviewedAt: row.last_reviewed_at,
-        ...(row.sex ? { sex: row.sex } : {}),
-        ...(row.age_group ? { ageGroup: row.age_group } : {}),
-        ...(row.citizenship_id ? { citizenshipId: row.citizenship_id } : {}),
-        ...(row.settlement ? { settlement: row.settlement } : {}),
-      });
-    });
+    rows.push(...parseCanonicalDemographyRows(text, file));
   }
   return found ? rows : undefined;
 }

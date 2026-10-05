@@ -61,6 +61,26 @@ export function adjaraBudgetAdjustmentParityKey(row: {
   return [row.year, row.scopeId].join(":");
 }
 
+export function demographyFactParityKey(row: {
+  seriesId: string;
+  geographyId: string;
+  year: number;
+  sex?: string;
+  ageGroup?: string;
+  citizenshipId?: string;
+  settlement?: string;
+}): string {
+  return [
+    row.seriesId,
+    row.geographyId,
+    row.year,
+    row.sex ?? "",
+    row.ageGroup ?? "",
+    row.citizenshipId ?? "",
+    row.settlement ?? "",
+  ].join(":");
+}
+
 // Serialize with sorted top-level keys. Sorting is applied by rebuilding the
 // object (not via a JSON.stringify replacer array, which would filter keys at
 // every nesting depth and silently blank out any future nested field).
