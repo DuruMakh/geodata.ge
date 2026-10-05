@@ -1,4 +1,5 @@
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, expect, test } from "vitest";
 import { prepareUnemploymentData } from "../../../lib/data/unemployment/prepareUnemployment";
@@ -21,7 +22,7 @@ test("canonical files preserve every reviewed numeric token and source column by
 });
 
 test("preparation refuses altered original captures before producing serving data", async () => {
-  const directory = await mkdtemp(path.join(root, ".tmp/unemployment-capture-"));
+  const directory = await mkdtemp(path.join(tmpdir(), "unemployment-capture-"));
   fixtures.push(directory);
   await cp(path.join(root, research), path.join(directory, research), { recursive: true });
   await writeFile(path.join(directory, research, "official/01-labour-force-indicators.xlsx"), "changed source");
