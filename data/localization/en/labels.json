@@ -1190,5 +1190,117 @@
   "inflation-products": {
     "text": "Inflation by product",
     "reviewedAt": "2026-10-01"
+  },
+  "age.15_19": {
+    "text": "15-19",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.15_24": {
+    "text": "15-24",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.20_24": {
+    "text": "20-24",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.25_29": {
+    "text": "25-29",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.25_34": {
+    "text": "25-34",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.30_34": {
+    "text": "30-34",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.35_39": {
+    "text": "35-39",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.35_44": {
+    "text": "35-44",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.40_44": {
+    "text": "40-44",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.45_49": {
+    "text": "45-49",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.45_54": {
+    "text": "45-54",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.50_54": {
+    "text": "50-54",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.55_59": {
+    "text": "55-59",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.55_64": {
+    "text": "55-64",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.60_64": {
+    "text": "60-64",
+    "reviewedAt": "2026-10-04"
+  },
+  "age.65_plus": {
+    "text": "65+",
+    "reviewedAt": "2026-10-04"
+  },
+  "education.higher": {
+    "text": "Higher",
+    "reviewedAt": "2026-10-04"
+  },
+  "education.primary_or_lower_secondary": {
+    "text": "Primary or Lower Secondary",
+    "reviewedAt": "2026-10-04"
+  },
+  "education.upper_secondary": {
+    "text": "Upper Secondary",
+    "reviewedAt": "2026-10-04"
+  },
+  "education.vocational": {
+    "text": "Vocational",
+    "reviewedAt": "2026-10-04"
+  },
+  "georgia": {
+    "text": "Georgia",
+    "reviewedAt": "2026-10-04"
+  },
+  "men": {
+    "text": "Men",
+    "reviewedAt": "2026-10-04"
+  },
+  "region.imereti_racha_lechkhumi_kvemo_svaneti": {
+    "text": "Imereti, Racha-Lechkhumi and Kvemo Svaneti",
+    "reviewedAt": "2026-10-04"
+  },
+  "region.samtskhe_javakheti_guria_mtskheta_mtianeti": {
+    "text": "Samtskhe-Javakheti, Guria and Mtskheta-Mtianeti",
+    "reviewedAt": "2026-10-04"
+  },
+  "rural": {
+    "text": "Rural",
+    "reviewedAt": "2026-10-04"
+  },
+  "urban": {
+    "text": "Urban",
+    "reviewedAt": "2026-10-04"
+  },
+  "women": {
+    "text": "Women",
+    "reviewedAt": "2026-10-04"
+  },
+  "unemployment": {
+    "text": "Unemployment",
+    "reviewedAt": "2026-10-04"
   }
 }

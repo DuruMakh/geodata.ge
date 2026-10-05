@@ -40,7 +40,7 @@ export async function renderMethodologyPage(locale: Locale) {
   return (
     <>
       <JsonLd
-        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.map(entry => entry.href), locale, [
+        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.filter(entry => entry.id !== "unemployment").map(entry => entry.href), locale, [
           "/explorer/economy/gdp",
           "/explorer/expenditure",
           "/explorer/revenue",

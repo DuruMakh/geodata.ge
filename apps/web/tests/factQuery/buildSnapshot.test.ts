@@ -8,15 +8,15 @@ import { loadSourceDocuments } from "../../lib/data/sources";
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
 
 describe("buildFactQuerySnapshot", () => {
-  it("preserves every registered source, including the sector growth and volume originals", async () => {
+  it("preserves approved query sources, including the sector growth and volume originals", async () => {
     const [snapshot, sources] = await Promise.all([
       buildFactQuerySnapshot(OPTIONS),
       loadSourceDocuments("../../data/sources/source-documents.csv"),
     ]);
     // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    expect(sources).toHaveLength(145);
-    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.map(source => source.sourceId).sort());
+    expect(sources).toHaveLength(154);
+    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_")).map(source => source.sourceId).sort());
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",
       "source.geostat_regional_gdp", "source.geostat_regional_gdp_by_activity", "source.fiscal_regional_economy_share",

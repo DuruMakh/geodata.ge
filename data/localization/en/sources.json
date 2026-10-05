@@ -1019,5 +1019,68 @@
       "reviewedAt": "2026-10-03"
     },
     "derivation": null
+  },
+  "source.geostat_lfs_annual_total": {
+    "name": {
+      "text": "Labour Force Indicators",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_annual_sex": {
+    "name": {
+      "text": "Labour Force Indicators by Sex",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_annual_settlement": {
+    "name": {
+      "text": "Labour Force Indicators by Urban-Rural Areas",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_annual_age": {
+    "name": {
+      "text": "Labour Force Indicators by Age Groups",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_annual_region": {
+    "name": {
+      "text": "Labour Force Indicators by Regions",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_metadata_2026": {
+    "name": {
+      "text": "Labour Force Survey metadata, updated 20 May 2026",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_source_page": {
+    "name": {
+      "text": "Employment and Unemployment source page, English",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_annual_education": {
+    "name": {
+      "text": "Labour Force Indicators by educational attainment level",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_annual_long_term": {
+    "name": {
+      "text": "Number of long-term unemployed and long-term unemployment rate",
+      "reviewedAt": "2026-10-04"
+    },
+    "derivation": null
   }
 }

@@ -15,7 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 // 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
 // platform whose first dataset is the budget; teaser rows are markers only.
 
-const TEASERS = ["unemployment", "demography"];
+const TEASERS = ["demography"];
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
 const MOBILE_NAV_ID = "data-sidebar-navigation";
@@ -30,7 +30,8 @@ export function DataSidebar() {
   const pathname = usePathname();
   const economyActive = pathname.includes("/explorer/economy");
   const inflationActive = pathname.includes("/explorer/inflation");
-  const budgetActive = !economyActive && !inflationActive;
+  const unemploymentActive = pathname.endsWith("/explorer/unemployment");
+  const budgetActive = !economyActive && !inflationActive && !unemploymentActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
   const regionsActive = pathname.includes("/explorer/economy/regions");
@@ -169,7 +170,7 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
@@ -278,6 +279,10 @@ export function DataSidebar() {
               </Link>
             ) : null}
 
+            <Link href={pageHref("/explorer/unemployment", locale)} data-testid="unemployment-link" aria-current={unemploymentActive ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 border-l-2 px-2.5 py-2 text-[12.5px] font-semibold no-underline ${unemploymentActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.unemployment")}
+            </Link>
             {/* No aria-disabled on the rows: the listitem role ignores it (jsx-a11y
                 flags it), and the ComingSoonBadge text already reads out. */}
             <ul className="mt-2 flex list-none flex-col gap-0.5">

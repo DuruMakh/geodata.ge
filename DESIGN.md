@@ -3,7 +3,7 @@
 Version: 4.1
 Last updated: 2026-09-26
 Status: Production visual system for Fiscal.ge
-Scope: Explorer product UI (budget, economy and inflation), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
+Scope: Explorer product UI (budget, economy, inflation and unemployment), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
@@ -28,11 +28,11 @@ Superseded and must not appear in production:
 
 Fiscal.ge is a Georgian-first explorer of reviewed annual budget and economy data plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
+Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), the annual unemployment explorer, methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
 Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
-Municipal budgets are a budget **section** at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). The two teaser datasets in the sidebar (`უმუშევრობა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
+Municipal budgets are a budget **section** at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). The annual unemployment explorer is active at `/explorer/unemployment` and its English mirror. The `დემოგრაფია` teaser remains a marker with no public data or route.
 
 Regional economies are an Economy route family at `/explorer/economy/regions` (§2.1, §6.2, §26): one All Regions index and 11 detail pages.
 
@@ -48,6 +48,7 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - Municipal expenditure by functional category: **2015–2025** (10 main functions plus the public total headline). The public entity set is 64 municipalities across 11 data-bearing regions. Adjara's total combines its six municipalities with Adjara republican actual payments net of transfers to territorial budgets. The separate Georgia scope aggregates all 69 reviewed municipal-budget series and adds the same net Adjara amount once; the 110 function rows remain municipal-only. Five occupied-territory-associated bodies appear only inside that country aggregate. Served at `/explorer/municipalities` (§20).
 - General-government balance: **1995–2031** (1995–2025 actual; 2026–2031 IMF projection), published directly as percent of GDP and nominal GEL.
 - Regional economies: **2010–2024**, 11 regions, Total regional GDP plus 20 NACE Rev. 2 activities, with current-price GEL and share of the selected region's market-price GDP only.
+- Unemployment: comparable core annual observations **2010–2025**; education and long-term **2020–2025**. Historical age bands and combined regions remain distinct, with source-derived coverage and missing-year gaps.
 - Government Debt, GDP overview, national economic sectors and inflation: coverage is stated in `Project_Definition.md` §2 and §2C and in each dataset's methodology page.
 - All current budget facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned budget facts ever load; debt and deficit projections use the separate `პროგნოზი` treatment.
 
@@ -405,9 +406,9 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- Three dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
+- Four dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `უმუშევრობა` → `/explorer/unemployment`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
 - Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, or Inflation's overview / categories / cities, all in the section-row style below.
-- `უმუშევრობა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
+- `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a).
 
@@ -1039,3 +1040,9 @@ The Economy hub links to `/explorer/economy/regions`. Its index uses 11 region-l
 Each `/explorer/economy/regions/[id]` page reuses the editorial line chart, table, range strip, unlimited series panel, region picker, highlights and Excel action. Total regional GDP is first, selected by default and removable; all 20 NACE Rev. 2 activities are selectable. Activities wear the sector colours above; total regional GDP is ink. The joined measure control has exactly two choices: nominal GEL, shown with the literal `₾`, and share of that selected region's GDP, shown with Lucide `ChartPie`. There is no share of Georgia, real-growth, per-capita, USD, forecast or 2025 control.
 
 Activity amounts are gross value added at basic prices. The share denominator is the same region and year's complete GDP at market prices and never changes with series selection. Net product taxes explain why activity shares need not sum to 100%. The end-year highlights use all 20 activities independently of chart selection. Georgian and English pages, three-sheet Excel workbooks, methodology originals, Dataset JSON-LD, the read-only query tool and central JSON/CSV files all carry the same 2010–2024 boundary. Bounded decisions: `docs/superpowers/specs/2026-09-13-regional-economies-design.md`.
+
+## 27. Annual unemployment explorer
+
+The bounded 2026-10-04 design reuses the economic-sectors workspace and the existing line chart, table, RangeStrip, series selector, segmented tabs and Excel action. One active indicator keeps percent and thousand-person counts on separate axes. Only the applicable published reference is selected by default; it remains pinned, selectable and removable. The breakdown control precedes search; education alone adds Total/Women/Men tabs. Search never limits bulk actions or the selection denominator. URL settings and language changes preserve the indicator, breakdown, education sex, years, selection and view. Changed coverage is fitted to loaded years and announced accessibly.
+
+The national context below the workspace uses the existing stacked-column chart for employed, unemployed and outside-labour-force counts. It uses exact national source values over the active years, with one-decimal display, independently of the main selected groups. Survey-estimate limitations and original-source methodology remain visible. No heatmap, paired-dot plot, scatterplot, map or new chart library belongs to this first version. The authoritative scope is `Project_Definition.md` §2D; bounded decisions are in `docs/superpowers/specs/2026-10-04-unemployment-reuse-explorer-design.md`.

@@ -2,9 +2,13 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Unemployment/geostat-labour-force-annual/`, collected on 2026-10-03. The approved collection frequency is annual. It prepares unemployment data for later review and integration; it does not change the platform's current unemployment marker, routes, serving data, database, downloads or MCP.
+This methodology governs the research package at `docs/Raw Data/Unemployment/geostat-labour-force-annual/`, collected on 2026-10-03, and its approved annual explorer integration. The three primary CSVs are promoted byte for byte to `data/imports/unemployment-annual.csv`, `unemployment-education-annual.csv` and `unemployment-long-term-annual.csv`. The research captures remain immutable. The bounded explorer design is `docs/superpowers/specs/2026-10-04-unemployment-reuse-explorer-design.md`; MCP and central machine-readable publication integration are excluded.
+
+`npm run data:prepare-unemployment` promotes the reviewed files; `npm run data:check-unemployment` checks byte equality, all nine source fingerprints, every primary value against its original worksheet cell, complete independent coverage inventories, published precision and statistical identities. The latter runs inside `data:validate`. Loaders preserve exact decimal strings and normalize sex explicitly; the long-term workbook's `Total` label is preserved as provenance while the public reference uses Georgia. Counts display as thousand persons and rates to one decimal. Missing historic groups remain unavailable.
 
 Geostat's Labour Force Survey is the sole statistical source. Seven annual workbooks cover the national total, breakdowns by sex, settlement type, age, region and educational attainment, and long-term unemployment. The source page and survey metadata are preserved alongside the original workbooks. Exact URLs, retrieval dates, hashes and byte sizes live in the source manifest.
+
+The approved static pages are `/explorer/unemployment` and `/en/explorer/unemployment`, with `/methodology/unemployment` in both languages. Only an applicable published reference is selected by default. Education references are clipped to its own source coverage; historical age bands and combined regions remain separate. The national composition chart uses exact employed, unemployed and outside-labour-force counts. The existing Excel writer exports the active indicator, selected groups and years with correct units and source links. Database mode checks every observation against CSV and fails on missing/mismatched rows; it never falls back silently.
 
 ## Indicators, units and definitions
 
