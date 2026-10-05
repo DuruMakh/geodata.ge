@@ -16,6 +16,10 @@ type MunicipalityMapProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel"
   activeCode: string | null;
   onActiveCodeChange: (code: string | null) => void;
   onOpenMunicipality: (code: string) => void;
+  /** Choosing mode, for pages that pick places rather than open them: these codes are outlined and every target is a button. */
+  selectedCodes?: readonly string[];
+  /** Replaces the per-resident budget wording; each place's own value text is `display` on the model. */
+  wording?: { groupAria: string; legendCaption: string };
 };
 
 function isActivationKey(key: string): boolean {
@@ -29,6 +33,7 @@ type InteractionTarget = {
   nameKa: string;
   budgetPerResidentGel: number;
   totalBudgetGel: number;
+  display?: string;
   element: SVGGraphicsElement;
 };
 
@@ -75,9 +80,14 @@ export function MunicipalityMap({
   activeCode,
   onActiveCodeChange,
   onOpenMunicipality,
+  selectedCodes,
+  wording,
 }: MunicipalityMapProps) {
   const { locale, messages, englishLabels } = useI18n();
-  const accessibleName = (code: string, nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number) => message(messages, "municipal.mapEntityAria", { name: publicLabel(locale, code, nameKa, englishLabels), perResident: formatPerResidentGel(budgetPerResidentGel, locale), total: formatAmount(totalBudgetGel, locale) });
+  const accessibleName = (code: string, nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number, display?: string) =>
+    display !== undefined
+      ? `${publicLabel(locale, code, nameKa, englishLabels)}, ${display}`
+      : message(messages, "municipal.mapEntityAria", { name: publicLabel(locale, code, nameKa, englishLabels), perResident: formatPerResidentGel(budgetPerResidentGel, locale), total: formatAmount(totalBudgetGel, locale) });
   const svgRef = useRef<SVGSVGElement>(null);
   const [pointerTarget, setPointerTarget] = useState<InteractionTarget | null>(null);
   const [focusTarget, setFocusTarget] = useState<InteractionTarget | null>(null);
@@ -85,6 +95,8 @@ export function MunicipalityMap({
   const activeTarget = focusTarget ?? pointerTarget;
   const describedTarget =
     activeTarget?.code === activeCode && tooltipPosition !== null ? activeTarget : null;
+  const choosing = selectedCodes !== undefined;
+  const chosen = useMemo(() => new Set(selectedCodes ?? []), [selectedCodes]);
   // Tbilisi (04) is the only entity the artifact carries as both a polygon and a
   // self-governing-city marker. The legend names the green dot
   // "თვითმმართველი ქალაქები", so the marker is the encoding that gets the
@@ -196,7 +208,7 @@ export function MunicipalityMap({
           ref={svgRef}
           viewBox={viewBox}
           role="group"
-          aria-label={message(messages, "municipal.mapAria", { year: MUNICIPAL_PER_RESIDENT_YEAR })}
+          aria-label={wording?.groupAria ?? message(messages, "municipal.mapAria", { year: MUNICIPAL_PER_RESIDENT_YEAR })}
           className="block h-auto w-full"
         >
           <defs>
@@ -235,6 +247,7 @@ export function MunicipalityMap({
                     nameKa: shape.nameKa,
                     budgetPerResidentGel: shape.budgetPerResidentGel,
                     totalBudgetGel: shape.totalBudgetGel,
+                    display: shape.display,
                     element: event.currentTarget,
                   });
                 }}
@@ -265,8 +278,9 @@ export function MunicipalityMap({
                   strokeWidth={active ? 2.2 : 0.7}
                   strokeLinejoin="round"
                   tabIndex={targetIndex === rovingIndex ? 0 : -1}
-                  role="link"
-                  aria-label={accessibleName(shape.code, shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
+                  role={choosing ? "button" : "link"}
+                  aria-pressed={choosing ? chosen.has(shape.code) : undefined}
+                  aria-label={accessibleName(shape.code, shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel, shape.display)}
                   aria-describedby={describedTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
                   className="cursor-pointer"
                   onMouseEnter={(event) => {
@@ -276,6 +290,7 @@ export function MunicipalityMap({
                       nameKa: shape.nameKa,
                       budgetPerResidentGel: shape.budgetPerResidentGel,
                       totalBudgetGel: shape.totalBudgetGel,
+                      display: shape.display,
                       element: event.currentTarget,
                     });
                   }}
@@ -287,6 +302,7 @@ export function MunicipalityMap({
                       nameKa: shape.nameKa,
                       budgetPerResidentGel: shape.budgetPerResidentGel,
                       totalBudgetGel: shape.totalBudgetGel,
+                      display: shape.display,
                       element: event.currentTarget,
                     }, targetIndex);
                   }}
@@ -310,14 +326,15 @@ export function MunicipalityMap({
                 data-active={active ? "true" : undefined}
                 cx={marker.x}
                 cy={marker.y}
-                r={active ? 9.5 : 7.5}
+                r={active || chosen.has(marker.code) ? 9.5 : 7.5}
                 fill="var(--positive)"
-                stroke="var(--tile)"
-                strokeWidth={active ? 2.2 : 1.2}
+                stroke={chosen.has(marker.code) ? "var(--ink)" : "var(--tile)"}
+                strokeWidth={chosen.has(marker.code) ? 2.4 : active ? 2.2 : 1.2}
                 vectorEffect="non-scaling-stroke"
                 tabIndex={targetIndex === rovingIndex ? 0 : -1}
-                role="link"
-                aria-label={accessibleName(marker.code, marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel)}
+                role={choosing ? "button" : "link"}
+                aria-pressed={choosing ? chosen.has(marker.code) : undefined}
+                aria-label={accessibleName(marker.code, marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel, marker.display)}
                 aria-describedby={describedTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
                 className="cursor-pointer"
                 onMouseEnter={(event) => {
@@ -327,6 +344,7 @@ export function MunicipalityMap({
                     nameKa: marker.nameKa,
                     budgetPerResidentGel: marker.budgetPerResidentGel,
                     totalBudgetGel: marker.totalBudgetGel,
+                    display: marker.display,
                     element: event.currentTarget,
                   });
                 }}
@@ -338,6 +356,7 @@ export function MunicipalityMap({
                     nameKa: marker.nameKa,
                     budgetPerResidentGel: marker.budgetPerResidentGel,
                     totalBudgetGel: marker.totalBudgetGel,
+                    display: marker.display,
                     element: event.currentTarget,
                   }, targetIndex);
                 }}
@@ -347,6 +366,22 @@ export function MunicipalityMap({
               />
             );
           })}
+
+          {choosing
+            ? shapes.filter((shape) => chosen.has(shape.code)).map((shape) => (
+                <use
+                  key={`chosen:${shape.code}`}
+                  data-testid={`municipality-chosen-${shape.code}`}
+                  href={`${municipalityMapDefinitions.src}#municipality-shape-${shape.code}`}
+                  fill="none"
+                  stroke="var(--ink)"
+                  strokeWidth={2.4}
+                  strokeLinejoin="round"
+                  pointerEvents="none"
+                  aria-hidden
+                />
+              ))
+            : null}
 
           {occupiedAreas.map((area) => (
             <use
@@ -378,13 +413,21 @@ export function MunicipalityMap({
             <div className="truncate text-[12px] font-medium text-[var(--ink)]">
               {publicLabel(locale, describedTarget.code, describedTarget.nameKa, englishLabels)}
             </div>
-            <div data-testid="municipality-map-tooltip-per-resident" className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
-              {formatPerResidentGel(describedTarget.budgetPerResidentGel, locale)} {message(messages, "municipal.perResident")}
-            </div>
-            <div data-testid="municipality-map-tooltip-total" className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-              {message(messages, "municipal.mapTotal", { amount: formatAmount(describedTarget.totalBudgetGel, locale) })}
-            </div>
-            <span aria-hidden className="absolute top-2 right-2.5 text-[12px] text-[var(--muted)]">→</span>
+            {describedTarget.display !== undefined ? (
+              <div data-testid="municipality-map-tooltip-value" className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
+                {describedTarget.display}
+              </div>
+            ) : (
+              <>
+                <div data-testid="municipality-map-tooltip-per-resident" className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
+                  {formatPerResidentGel(describedTarget.budgetPerResidentGel, locale)} {message(messages, "municipal.perResident")}
+                </div>
+                <div data-testid="municipality-map-tooltip-total" className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+                  {message(messages, "municipal.mapTotal", { amount: formatAmount(describedTarget.totalBudgetGel, locale) })}
+                </div>
+                <span aria-hidden className="absolute top-2 right-2.5 text-[12px] text-[var(--muted)]">→</span>
+              </>
+            )}
           </div>
         ) : null}
       </div>
@@ -397,7 +440,7 @@ export function MunicipalityMap({
           ))}
         </span>
         <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMax}</span>
-        <span className="text-[10px] text-[var(--faint)]">{message(messages, "municipal.perResident")}</span>
+        <span className="text-[10px] text-[var(--faint)]">{wording?.legendCaption ?? message(messages, "municipal.perResident")}</span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-[var(--tile)] bg-[var(--positive)]" />
           <span className="text-[11px] text-[var(--faint)]">{message(messages, "municipal.cities")}</span>
