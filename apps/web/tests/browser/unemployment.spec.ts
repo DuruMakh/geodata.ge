@@ -100,6 +100,20 @@ test("screen table and downloaded education workbook agree and cite only the sel
   expect(sources.rowCount).toBe(4);
 });
 
+for (const prefix of ["", "/en"]) test(`national export drops the remembered education-sex label ${prefix || "ka"}`, async ({ page }) => {
+  await page.goto(`${prefix}/explorer/unemployment#breakdown=education&sex=women`);
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await page.getByTestId("unemployment-breakdown").selectOption("national");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", "national");
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("unemployment-excel-download").click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe(`fiscal-unemployment-national-unemployment_rate-2010-2025${prefix ? "-en" : ""}.xlsx`);
+  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
+  expect(workbook.worksheets[0].getCell("A4").value).toBe(prefix ? "Georgia" : "საქართველო");
+  expect(workbook.worksheets[0].getCell("Q4").value).toBeCloseTo(0.139, 3);
+});
+
 for (const prefix of ["", "/en"]) test(`new controls and year handles work with the keyboard ${prefix || "ka"}`, async ({ page }) => {
   await page.goto(`${prefix}/explorer/unemployment`); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const breakdown = page.getByTestId("unemployment-breakdown"); await breakdown.focus(); await breakdown.press("End");

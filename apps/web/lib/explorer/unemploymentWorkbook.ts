@@ -22,7 +22,7 @@ export function buildUnemploymentWorkbookExportModel(facts: ClientUnemploymentOb
   const valueAt = (id: string, year: number) => { const fact = byCell.get(`${id}:${year}`); return fact ? fact.value / (model.percent ? 100 : 1) : null; };
   const numberFormat = model.percent ? "0.0%" : "#,##0.0";
   return {
-    locale, filename: workbookFilename(`unemployment-${state.breakdown}-${state.indicator}-${state.educationSex}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
+    locale, filename: workbookFilename(`unemployment-${state.breakdown}-${state.indicator}${state.breakdown === "education" ? `-${state.educationSex}` : ""}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title: message(messages, "unemployment.workbookTitle", { indicator, breakdown }),
       subtitle: `${model.range.start}–${model.range.end} · ${unitLabel} · ${t("surveyEstimate")}`,

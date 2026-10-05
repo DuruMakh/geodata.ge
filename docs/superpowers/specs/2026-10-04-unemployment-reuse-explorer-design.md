@@ -1,7 +1,7 @@
 # Unemployment explorer — first version using existing components
 
 Date: 2026-10-04
-Status: Design and inline implementation plan approved in this conversation on 2026-10-04, after clarification of the rate, count and supporting-indicator scope. Implemented and locally verified on 2026-10-05, including one independent review and regression-tested fixes. Publication, deployment and live database operations are not authorized.
+Status: Design and inline implementation plan approved in this conversation on 2026-10-04, after clarification of the rate, count and supporting-indicator scope. Implemented and locally verified on 2026-10-05, with independent reviews and regression-tested fixes. The user authorized GitHub delivery, synchronization and the CI-gated production release on 2026-10-05.
 
 ## 1. Intended result
 

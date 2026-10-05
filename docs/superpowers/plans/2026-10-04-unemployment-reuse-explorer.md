@@ -10,7 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-04-unemployment-reuse-explorer-design.md`.
 
-**Execution status:** Tasks 1–8 implemented and locally verified on 2026-10-05. One independent whole-branch review completed; both Important findings were fixed and verified with failing-then-passing regressions. The local branch and preview are preserved. Publication and live database operations remain outside this authorization.
+**Execution status:** Tasks 1–8 implemented and locally verified on 2026-10-05. Independent whole-branch reviews completed; both Important findings were fixed and verified with failing-then-passing regressions. The follow-up Minor filename finding was also reproduced and corrected in both languages. GitHub delivery, synchronization and the CI-gated production release were authorized on 2026-10-05.
 
 ## Global Constraints
 
@@ -160,7 +160,7 @@ All application commands below run from `apps/web` unless explicitly stated othe
 
 Local preview: `http://127.0.0.1:31841/explorer/unemployment` and `/en/explorer/unemployment`. Verification logs, review notes and screenshots are preserved under the ignored `.tmp/unemployment-verification/` and `.tmp/unemployment-preview/` directories. The disposable plan-execution workspace is removed after completion.
 
-The Prisma migration was generated and validated offline; live migration/import, production database permissions, GitHub publication, required CI, merge and production deployment have not been performed or verified.
+At local implementation completion, the Prisma migration had been generated and validated offline; live migration/import, production database permissions, GitHub publication, required CI, merge and production deployment had not been performed or verified. The subsequent delivery request authorizes those release operations through the repository's existing pipeline.
 
 ## Implementation decisions
 

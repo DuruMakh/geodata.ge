@@ -4,7 +4,7 @@ import { beforeAll, expect, test } from "vitest";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/unemployment/importUnemployment";
 import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/types";
 import { buildUnemploymentWorkbookExportModel } from "../../lib/explorer/unemploymentWorkbook";
-import { DEFAULT_UNEMPLOYMENT_STATE, type UnemploymentState } from "../../lib/explorer/unemploymentState";
+import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, DEFAULT_UNEMPLOYMENT_STATE, type UnemploymentState } from "../../lib/explorer/unemploymentState";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
@@ -50,6 +50,16 @@ test("education-only exports exclude a removed national reference and unrelated 
   expect(model.readable.title).toContain("Women");
   const withReference = await workbook("en", { breakdown: "education", educationSex: "women", selectedIds: ["education.higher", "women"] });
   expect(withReference.sources).toHaveLength(2);
+});
+
+test.each(["ka", "en"] as const)("export filenames describe the active population after leaving education in %s", async locale => {
+  const education = changeUnemploymentEducationSex(changeUnemploymentBreakdown(DEFAULT_UNEMPLOYMENT_STATE, "education", facts), "women", facts);
+  const national = changeUnemploymentBreakdown(education, "national", facts);
+  const suffix = locale === "en" ? "-en" : "";
+  expect(national.educationSex).toBe("women");
+  expect((await workbook(locale, national)).filename).toBe(`fiscal-unemployment-national-unemployment_rate-2010-2025${suffix}.xlsx`);
+  const returned = changeUnemploymentBreakdown(national, "education", facts);
+  expect((await workbook(locale, returned)).filename).toBe(`fiscal-unemployment-education-unemployment_rate-women-2020-2025${suffix}.xlsx`);
 });
 test("missing historical values stay blank with unavailable status and no invented source years", async () => {
   const model = await workbook("en", { breakdown: "age", selectedIds: ["age.15_24", "age.15_19"] });
