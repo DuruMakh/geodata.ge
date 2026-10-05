@@ -1,6 +1,7 @@
 import type {
   ClientBasketWeightRow,
   ClientCpiFact,
+  ClientDemographyObservation,
   ClientGdpObservation,
   ClientGovernmentDebtFact,
   ClientInflationTargetRow,
@@ -21,6 +22,7 @@ import type {
   ServedInflationTargetRow,
 } from "../data/inflation/types";
 import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
+import type { ServedDemographyObservation } from "../data/demography/types";
 
 export type ClientBudgetFact = Omit<ServedBudgetFact, "sourceId">;
 export type ClientAdminFact = Omit<
@@ -140,6 +142,17 @@ export function projectRegionalObservation(
     measure: fact.measure,
     value: fact.value,
     status: fact.status,
+  };
+}
+
+export function projectDemographyObservation(
+  fact: ServedDemographyObservation,
+): ClientDemographyObservation {
+  return {
+    geographyId: fact.geographyId,
+    seriesId: fact.seriesId,
+    year: fact.year,
+    value: fact.value,
   };
 }
 

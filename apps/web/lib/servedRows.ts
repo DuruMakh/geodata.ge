@@ -153,3 +153,11 @@ export type ClientRegionalEconomyObservation = {
   value: number;
   status: "published";
 };
+
+/** A demography observation as the browser receives it: no locator, review date or basis code. */
+export type ClientDemographyObservation = {
+  geographyId: string;
+  seriesId: string;
+  year: number;
+  value: number;
+};
