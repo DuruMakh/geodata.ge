@@ -35,6 +35,9 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   forecastLabel?: string;
   preliminaryYears?: number[];
   preliminaryLabel?: string;
+  /** Years re-based by the publisher: a 2px rule is drawn left of the column and `breakLabel` is printed on its header. */
+  breakYears?: number[];
+  breakLabel?: string;
   /** Each row's `kaLabel` already holds its label in the page language, with no catalogue entry to look up. */
   rowLabelsLocalized?: boolean;
   shareValueForYear: (row: Row, year: number) => number | null;
@@ -66,6 +69,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   forecastLabel,
   preliminaryYears,
   preliminaryLabel,
+  breakYears,
+  breakLabel,
   rowLabelsLocalized = false,
   shareValueForYear,
 }: ExplorerTableProps<Row>) {
@@ -73,6 +78,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   const rowLabel = (row: Row) => (rowLabelsLocalized ? row.kaLabel : publicLabel(locale, row.itemId, row.kaLabel, englishLabels));
   const endYear = years.at(-1);
   const lastIndex = years.length - 1;
+  const breakSet = new Set((breakYears ?? []).filter((year) => years.indexOf(year) > 0));
+  const breakStyle = (year: number) => (breakSet.has(year) ? { borderLeft: "2px solid var(--ink)" } : undefined);
   const cellValue = (row: Row, year: number): string => {
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
@@ -90,7 +97,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         {rowLabel(totalRow)}
       </td>
       {years.map((year) => (
-        <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>
+        <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={{ ...cellPad, ...breakStyle(year) }}>
           {cellValue(totalRow, year)}
           {totalRow.preliminaryByYear?.[year] ? <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{preliminaryLabel}</sup> : null}
           {forecastLabel && forecastYears?.includes(year) ? (
@@ -132,8 +139,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
               {firstColumnLabel}
             </th>
             {years.map((year) => (
-              <th key={year} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
+              <th key={year} style={breakStyle(year)} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
                 {year}
+                {breakLabel && breakSet.has(year) ? <sup className="ml-1 text-[9px] font-medium normal-case tracking-normal text-[var(--faint)]">{breakLabel}</sup> : null}
               </th>
             ))}
             {showChangeColumn ? (
@@ -168,6 +176,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   className={numericCellClass}
                   style={{
                     ...cellPad,
+                    ...breakStyle(year),
                     fontWeight: index === lastIndex ? 600 : 400,
                     color: index === lastIndex ? "var(--ink)" : "var(--body)",
                   }}

@@ -39,6 +39,8 @@ type EditorialLineChartProps = {
   periodsPerYear?: number;
   /** Axis label or tooltip header for a period value. Omit to print the value. */
   formatPeriod?: (period: number, kind: "axis" | "tooltip") => string;
+  /** Annual charts only. No line joins the year before one of these years to it; a dashed rule and the short label mark the gap. */
+  breaks?: ReadonlyArray<{ year: number; label: string }>;
 };
 
 const W = 920;
@@ -87,6 +89,7 @@ export function EditorialLineChart({
   formatPeriod,
   preliminaryLabel,
   formatTooltipValue,
+  breaks,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
   const [hoverRaw, setHover] = useState<number | null>(null);
@@ -138,6 +141,11 @@ export function EditorialLineChart({
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
   const labelIndices = new Set(periodLabelIndices(years, periodsPerYear));
+  // A break needs the year before it on the axis too; a range that starts at the break year has nothing to separate.
+  const breakMarks = (breaks ?? [])
+    .map((entry) => ({ ...entry, index: years.indexOf(entry.year) }))
+    .filter((entry) => entry.index > 0);
+  const breakIndices = new Set(breakMarks.map((entry) => entry.index));
 
   const lattice = buildDotLattice({
     plotWidth: W - axisLeftPadding - PAD_R,
@@ -233,6 +241,18 @@ export function EditorialLineChart({
         {hover !== null ? (
           <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={H - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
+        {breakMarks.map((entry) => {
+          const bx = (x(entry.index - 1) + x(entry.index)) / 2;
+          const toTheLeft = bx > W / 2;
+          return (
+            <g key={`break-${entry.year}`} data-testid="chart-break">
+              <line x1={bx} x2={bx} y1={PAD_T} y2={H - PAD_B} stroke={CHART_AXIS_LABEL} strokeWidth={1} strokeDasharray="4 3" />
+              <text x={toTheLeft ? bx - 5 : bx + 5} y={PAD_T + 10} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor={toTheLeft ? "end" : "start"} style={{ fontFamily: "var(--font-numeric)" }}>
+                {entry.label}
+              </text>
+            </g>
+          );
+        })}
         {series.map((line) => {
           // Interior data gaps (e.g. programs with no 2015 facts) split the path
           // into segments — a bridged line would assert values that don't exist.
@@ -244,6 +264,10 @@ export function EditorialLineChart({
               if (run.length > 0) segments.push(run);
               run = [];
             } else {
+              if (breakIndices.has(index) && run.length > 0) {
+                segments.push(run);
+                run = [];
+              }
               run.push([x(index), y(value), index]);
             }
           }
