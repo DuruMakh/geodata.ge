@@ -26,6 +26,8 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/inflation/categories",
   "https://fiscal.ge/explorer/inflation/cities",
   "https://fiscal.ge/explorer/inflation/products",
+  "https://fiscal.ge/explorer/demography",
+  "https://fiscal.ge/explorer/demography/population",
   "https://fiscal.ge/methodology",
   "https://fiscal.ge/methodology/expenditure",
   "https://fiscal.ge/methodology/revenue",
@@ -34,6 +36,7 @@ const requiredTargets = [
   "https://fiscal.ge/methodology/economic-sectors",
   "https://fiscal.ge/methodology/regional-economies",
   "https://fiscal.ge/methodology/inflation",
+  "https://fiscal.ge/methodology/demography",
   "https://fiscal.ge/downloads/data/gdp-overview.json",
   "https://fiscal.ge/downloads/data/gdp-overview.csv",
   "https://fiscal.ge/downloads/data/economic-sectors.json",
@@ -120,7 +123,7 @@ describe("Fiscal.ge agent instructions", () => {
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
     expect(targets).toEqual(requiredTargets);
-    expect(targets).toHaveLength(50);
+    expect(targets).toHaveLength(53);
     expect(new Set(targets).size).toBe(targets.length);
   });
 

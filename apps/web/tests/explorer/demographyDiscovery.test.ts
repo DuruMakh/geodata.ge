@@ -1,0 +1,54 @@
+import { describe, expect, it, vi } from "vitest";
+import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
+import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
+import sitemap from "../../lib/seo/sitemap";
+
+const PAGES = ["/explorer/demography", "/explorer/demography/population", "/methodology/demography"] as const;
+
+describe("demography discovery", () => {
+  it("indexes the hub, the live page and the methodology in both languages with real English dates", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
+    try {
+      const [paths, revisions, entries] = await Promise.all([listPublicPagePaths(), loadPageRevisions(), sitemap()]);
+      for (const path of PAGES) {
+        expect(paths).toContain(path);
+        expect(revisions[path]).toMatch(/^2026-\d{2}-\d{2}$/);
+        const ka = entries.find((entry) => entry.url === `https://fiscal.ge${path}`);
+        const en = entries.find((entry) => entry.url === `https://fiscal.ge/en${path}`);
+        expect(ka?.alternates?.languages).toEqual({
+          ka: `https://fiscal.ge${path}`,
+          en: `https://fiscal.ge/en${path}`,
+          "x-default": `https://fiscal.ge${path}`,
+        });
+        expect(en?.alternates).toEqual(ka?.alternates);
+      }
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("lists no page that is not live", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
+    try {
+      const [paths, entries] = await Promise.all([listPublicPagePaths(), sitemap()]);
+      const notLive = /\/explorer\/demography\/(age-sex|migration|births-deaths)/;
+      expect(paths.some((path) => notLive.test(path))).toBe(false);
+      expect(entries.some((entry) => notLive.test(entry.url))).toBe(false);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("dates the Georgian pages by the latest review of the figures they show", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
+    try {
+      const entries = await sitemap();
+      for (const path of ["/explorer/demography", "/explorer/demography/population"]) {
+        const entry = entries.find((candidate) => candidate.url === `https://fiscal.ge${path}`);
+        expect(new Date(entry!.lastModified!).toISOString().slice(0, 10)).toBe("2026-10-03");
+      }
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});
