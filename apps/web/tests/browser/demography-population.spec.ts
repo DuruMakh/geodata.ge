@@ -161,14 +161,7 @@ test("ka: the map wording is about people at both levels", async ({ page }) => {
   await expect(block).not.toContainText("მშპ");
 });
 
-// URL state: loading never writes the URL (DESIGN.md section 6.3); only a later change does, and it replaces the entry.
-test("loading a clean URL leaves it clean", async ({ page }) => {
-  await page.goto("/en/explorer/demography/population");
-  await ready(page);
-  await settled(page);
-  expect(new URL(page.url()).hash).toBe("");
-});
-
+// URL state: loading never writes the URL (DESIGN.md section 6.3; pristine-urls.spec.ts covers a clean load); only a later change does, and it replaces the entry.
 test("a shared link restores the view and the URL stays exactly as shared", async ({ page }) => {
   const hash = "#sel=region.imereti&level=regions&map=population&view=table";
   await page.goto(`/en/explorer/demography/population${hash}`);
@@ -227,7 +220,7 @@ for (const width of [320, 390, 768, 900, 1100, 1440]) {
     for (const path of ["/explorer/demography", "/explorer/demography/population", "/en/explorer/demography/population"]) {
       await page.goto(path);
       if (path.endsWith("/population")) await ready(page);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${path} at ${width}px`).toBe(true);
+      expect.soft(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${path} at ${width}px`).toBe(true);
     }
   });
 }
