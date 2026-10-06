@@ -19,11 +19,15 @@ export function RegionPicker({
   onClose,
   regions,
   activeRegionId,
+  hrefForRegion = regionalEconomyHref,
+  indexHref = "/explorer/economy/regions",
 }: {
   open: boolean;
   onClose: () => void;
   regions: readonly MunicipalRegion[];
   activeRegionId: string;
+  hrefForRegion?: (regionId: string) => string;
+  indexHref?: string;
 }) {
   const { locale, messages, englishLabels } = useI18n();
   const [query, setQuery] = useState("");
@@ -69,12 +73,12 @@ export function RegionPicker({
   if (!open) return null;
   const select = (index: number) => {
     if (includeAll && index === 0) {
-      window.location.href = pageHref("/explorer/economy/regions", locale);
+      window.location.href = pageHref(indexHref, locale);
       return;
     }
     const region = filtered[index - regionOffset];
     if (!region) return;
-    window.location.href = pageHref(regionalEconomyHref(region.id), locale);
+    window.location.href = pageHref(hrefForRegion(region.id), locale);
   };
   const move = (delta: 1 | -1) => {
     if (!optionCount) return;
@@ -117,7 +121,7 @@ export function RegionPicker({
         </div>
         <div id={listboxId} role="listbox" aria-label={message(messages, "regionalEconomies.pickerResults")} className="max-h-[340px] overflow-y-auto">
           {includeAll ? (
-            <Link id={`${baseId}-all`} data-testid="region-picker-all-option" href={pageHref("/explorer/economy/regions", locale)} role="option" aria-selected={activeIndex === 0} tabIndex={-1} onClick={onClose} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
+            <Link id={`${baseId}-all`} data-testid="region-picker-all-option" href={pageHref(indexHref, locale)} role="option" aria-selected={activeIndex === 0} tabIndex={-1} onClick={onClose} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
               {allRegionsLabel}
             </Link>
           ) : null}
@@ -125,7 +129,7 @@ export function RegionPicker({
             <Link
               key={region.id}
               id={`${baseId}-${region.id}`}
-              href={pageHref(regionalEconomyHref(region.id), locale)}
+              href={pageHref(hrefForRegion(region.id), locale)}
               role="option"
               aria-selected={index + regionOffset === activeIndex}
               aria-current={region.id === activeRegionId ? "page" : undefined}

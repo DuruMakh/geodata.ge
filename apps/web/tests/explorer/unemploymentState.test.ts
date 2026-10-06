@@ -30,3 +30,18 @@ test("changing education sex resets to its matching published reference", () => 
 test("indicator changes preserve an explicitly empty selection", () => {
   expect(changeUnemploymentIndicator({ ...DEFAULT_UNEMPLOYMENT_STATE, selectedIds: [] }, "unemployed", facts).selectedIds).toEqual([]);
 });
+
+test("each separate page restores its own comparison when the shared link omits a breakdown", () => {
+  expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "regions")).toMatchObject({ breakdown: "region", selectedIds: ["georgia:unemployment_rate"] });
+  expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "age")).toMatchObject({ breakdown: "age", selectedIds: ["georgia"] });
+  expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "gender")).toMatchObject({ breakdown: "sex", selectedIds: ["georgia"] });
+});
+
+test("a page cannot be changed into a different main section by editing its hash", () => {
+  expect(parseUnemploymentHash("breakdown=education&sex=women&indicator=long_term_unemployment_rate", facts, UNEMPLOYMENT_GROUPS, "regions")).toMatchObject({ breakdown: "region", indicator: "unemployment_rate", selectedIds: ["georgia:unemployment_rate"] });
+  expect(parseUnemploymentHash("breakdown=region", facts, UNEMPLOYMENT_GROUPS, "overview").breakdown).toBe("national");
+});
+
+test("education restores its groups and years with unemployment rate as the only overview measure", () => {
+  expect(parseUnemploymentHash("breakdown=education&sex=women&indicator=employment_rate&view=table&start=2021&end=2024&sel=education.higher", facts, UNEMPLOYMENT_GROUPS, "overview")).toMatchObject({ breakdown: "education", educationSex: "women", indicator: "unemployment_rate", mode: "table", range: { kind: "manual", start: 2021, end: 2024 }, selectedIds: ["education.higher"] });
+});

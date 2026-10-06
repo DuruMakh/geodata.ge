@@ -8,7 +8,7 @@ This methodology governs the research package at `docs/Raw Data/Unemployment/geo
 
 Geostat's Labour Force Survey is the sole statistical source. Seven annual workbooks cover the national total, breakdowns by sex, settlement type, age, region and educational attainment, and long-term unemployment. The source page and survey metadata are preserved alongside the original workbooks. Exact URLs, retrieval dates, hashes and byte sizes live in the source manifest.
 
-The approved static pages are `/explorer/unemployment` and `/en/explorer/unemployment`, with `/methodology/unemployment` in both languages. Only an applicable published reference is selected by default. Education references are clipped to its own source coverage; historical age bands and combined regions remain separate. The national composition chart uses exact employed, unemployed and outside-labour-force counts. The existing Excel writer exports the active indicator, selected groups and years with correct units and source links. Database mode checks every observation against CSV and fails on missing/mismatched rows; it never falls back silently.
+The approved static hub is `/explorer/unemployment`, with four data pages under `/overview`, `/regions`, `/age` and `/gender`, mirrored under `/en`. Urban/rural, education and long-term unemployment are supporting tabs on the national overview; its Overview tab contains the national composition chart. Shared links to the former single explorer preserve their settings on the matching new page. `/methodology/unemployment` remains in both languages. Only an applicable published reference is selected by default. Education references are clipped to its own source coverage; historical age bands and combined regions remain separate. The national composition chart uses exact employed, unemployed and outside-labour-force counts. The existing Excel writer exports the active indicator, selected groups and years with correct units and source links. Database mode checks every observation against CSV and fails on missing/mismatched rows; it never falls back silently. This navigation change does not alter canonical observations, source files or serving parity.
 
 ## Indicators, units and definitions
 
@@ -17,6 +17,8 @@ The approved static pages are `/explorer/unemployment` and `/en/explorer/unemplo
 | `population_15_plus` | Survey population aged 15 and older | Thousand persons |
 | `labour_force` | Employed plus unemployed | Thousand persons |
 | `employed` | People who worked for pay/profit for at least one hour in the reference week, or were temporarily absent from a job | Thousand persons |
+| `hired` | Published hired employees, national and urban/rural in 2010–2025; regions in 2020–2025 | Thousand persons |
+| `self_employed` | Published self-employed workers, national and urban/rural in 2010–2025; regions in 2020–2025 | Thousand persons |
 | `unemployed` | People without employment who actively sought work in the preceding four weeks and were available to start within two weeks | Thousand persons |
 | `outside_labour_force` | People neither employed nor meeting the unemployment definition | Thousand persons |
 | `unemployment_rate` | `unemployed / labour_force * 100` | Percent of labour force |
@@ -28,6 +30,10 @@ The survey covers private households and excludes occupied territories and insti
 All rows use `frequency=annual`, `basis=actual` and `value_status=survey_estimate`. Here, actual distinguishes observed survey results from forecasts; it does not mean a census count. The package creates no estimates, interpolation, imputation or gap filling of its own.
 
 ## Time and classification boundaries
+
+The 2026-10-06 regional navigation amendment uses the existing reviewed region-only geometry from Economy. The map and searchable list show each modern region's latest published unemployment rate, not a population-weighted or averaged estimate. Eleven modern regions have separate static pages in Georgian and English. Each page filters to the exact region ID and derives its available years from those observations: Imereti and Racha-Lechkhumi/Kvemo Svaneti start in 2019; Guria, Mtskheta-Mtianeti and Samtskhe-Javakheti start in 2017. No earlier combined value is copied into those series.
+
+Regional pages reuse the overview's checkbox indicators, omitting employment rate. Hired and self-employed counts expand beneath Employed for all eleven modern regions in 2020–2025, as published in `geostat_lfs_annual_region`, sheet `1`. Earlier regional employment-status values remain unavailable. The selected regional series determine the displayed coverage: Employed with its children retains the longer parent history and missing child values before 2020; children alone use 2020–2025. Rates and thousand-person counts cannot be selected together. Excel titles and filenames identify the selected region, and rows preserve the original observations, units, missing values and validated source links. The index's supporting comparison view retains the two historical combined groups and former shared multi-region links, with gaps preserved. The employment-status addition changes no database structure or source archives.
 
 The principal dataset is 2010–2025. Its national, sex and urban/rural series are complete across that period. There are 359 primary group-year records and eight indicators per record, yielding 2,872 observations.
 
@@ -70,7 +76,11 @@ Long-term means unemployment lasting 12 months or more. The 54 source observatio
 
 The last two are percentages with different denominators. Each women's or men's row uses the corresponding totals in the preserved sex workbook. Women plus men must reproduce the total count; each long-term count must be no larger than its matching unemployed count. The source's 2025 total publishes 79.4 thousand, 4.9% of the labour force and 35.5% of all unemployed people. These are three distinct observations. The readable summary has 18 annual records.
 
-Across the core and additions, primary datasets have 3,142 observations. Full source extracts retain 7,073 numeric values: 6,209 core, 810 education and 54 long-term. The original core CSV values and coverage are preserved.
+Across the core and additions, serving datasets have 3,370 observations: the original 3,142 primary observations plus 96 national/urban/rural hired and self-employed observations for 2010–2025 and 132 regional observations (eleven regions × six years × two categories) for 2020–2025. These 228 additional rows are promoted from the existing source extract into `data/imports/unemployment-employment-status-annual.csv`, preserving every source column and decimal string with UTF-8 BOM. Regional repeated Georgia totals are controls and excluded from serving. Complete-coverage validation requires the regional status categories only from 2020; historical combined groups receive no invented components. Full source extracts retain 7,073 numeric values: 6,209 core, 810 education and 54 long-term. The original research CSV values and coverage remain unchanged.
+
+The employed total includes a small published `unidentified_worker` component. Source preparation checks hired + self-employed + unidentified against the official employed total and checks every component against its archived workbook cell, including each regional component in 2020–2025. The visible two subcategories are therefore not forced to sum to the employed total. Serving validation also checks component bounds and urban + rural and regional hired/self-employed totals against their national counterparts in their published years. The existing transactional database import consumes the fourth CSV and applies the same complete-coverage and field-by-field parity requirements.
+
+The Unemployment overview uses multiple indicator checkboxes with one unit at a time. Choosing a percentage clears people counts and choosing a people count clears percentages. Its national list omits employment rate; settlement parents select their unemployment rate and expand to other measures; long-term parent rows select Georgia, with only Men/Women beneath them. Education displays unemployment rate only, while the other two rates remain preserved in the data. Excel exports label each selected indicator/group pair and retain its exact value, correct unit, years and source links.
 
 ## Extraction and provenance
 

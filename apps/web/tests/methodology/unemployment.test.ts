@@ -25,5 +25,5 @@ test.each(["ka", "en"] as const)("methodology resolves a reviewed language compa
   expect(content.archiveManifestId).toBe("unemployment");
   expect(content.coverageSource).toEqual({ kind: "archive" });
   expect(content.canonicalDocuments).toContain("docs/data-methodology/unemployment-annual.md");
-  expect(content.reviewedAt).toBe("2026-10-04");
+  expect(content.reviewedAt).toBe("2026-10-06");
 });

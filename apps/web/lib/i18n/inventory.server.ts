@@ -11,6 +11,8 @@ import { LIVE_METHODOLOGY_IDS } from "../methodology/types";
 import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
+import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
+import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -20,6 +22,8 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
     "/explorer/unemployment",
+    ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
+    ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),
     "/explorer/inflation", "/explorer/inflation/overview", "/explorer/inflation/categories", "/explorer/inflation/products", "/explorer/inflation/cities",

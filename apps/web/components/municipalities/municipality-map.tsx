@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -23,47 +23,7 @@ function isActivationKey(key: string): boolean {
 }
 
 
-type InteractionTarget = {
-  key: `shape:${string}` | `marker:${string}`;
-  code: string;
-  nameKa: string;
-  budgetPerResidentGel: number;
-  totalBudgetGel: number;
-  element: SVGGraphicsElement;
-};
-
-type TooltipPosition = {
-  left: number;
-  top: number;
-};
-
 const HATCH_ID = "municipality-map-no-data-hatch";
-const TOOLTIP_ID = "municipality-map-tooltip";
-const TOOLTIP_WIDTH = 220;
-const TOOLTIP_HEIGHT = 70;
-const TOOLTIP_GAP = 8;
-const TOOLTIP_EDGE = 6;
-
-function getTooltipPosition(svg: SVGSVGElement, target: SVGGraphicsElement): TooltipPosition {
-  const svgBox = svg.getBoundingClientRect();
-  const targetBox = target.getBoundingClientRect();
-  const centeredLeft = targetBox.left - svgBox.left + targetBox.width / 2 - TOOLTIP_WIDTH / 2;
-  const left = Math.min(
-    Math.max(centeredLeft, TOOLTIP_EDGE),
-    Math.max(TOOLTIP_EDGE, svgBox.width - TOOLTIP_WIDTH - TOOLTIP_EDGE),
-  );
-  const roomAbove = targetBox.top - svgBox.top;
-  const preferredTop =
-    roomAbove >= TOOLTIP_HEIGHT + TOOLTIP_GAP + TOOLTIP_EDGE
-      ? roomAbove - TOOLTIP_HEIGHT - TOOLTIP_GAP
-      : targetBox.bottom - svgBox.top + TOOLTIP_GAP;
-  const top = Math.min(
-    Math.max(preferredTop, TOOLTIP_EDGE),
-    Math.max(TOOLTIP_EDGE, svgBox.height - TOOLTIP_HEIGHT - TOOLTIP_EDGE),
-  );
-
-  return { left, top };
-}
 
 export function MunicipalityMap({
   viewBox,
@@ -79,12 +39,8 @@ export function MunicipalityMap({
   const { locale, messages, englishLabels } = useI18n();
   const accessibleName = (code: string, nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number) => message(messages, "municipal.mapEntityAria", { name: publicLabel(locale, code, nameKa, englishLabels), perResident: formatPerResidentGel(budgetPerResidentGel, locale), total: formatAmount(totalBudgetGel, locale) });
   const svgRef = useRef<SVGSVGElement>(null);
-  const [pointerTarget, setPointerTarget] = useState<InteractionTarget | null>(null);
-  const [focusTarget, setFocusTarget] = useState<InteractionTarget | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
-  const activeTarget = focusTarget ?? pointerTarget;
-  const describedTarget =
-    activeTarget?.code === activeCode && tooltipPosition !== null ? activeTarget : null;
+  const [pointerCode, setPointerCode] = useState<string | null>(null);
+  const [focusCode, setFocusCode] = useState<string | null>(null);
   // Tbilisi (04) is the only entity the artifact carries as both a polygon and a
   // self-governing-city marker. The legend names the green dot
   // "თვითმმართველი ქალაქები", so the marker is the encoding that gets the
@@ -143,51 +99,29 @@ export function MunicipalityMap({
       [next]?.focus();
   };
 
-  const positionTooltip = (target: InteractionTarget) => {
-    if (svgRef.current === null) return;
-    setTooltipPosition(getTooltipPosition(svgRef.current, target.element));
-  };
-
-  const activatePointerTarget = (target: InteractionTarget) => {
-    setPointerTarget(target);
-    if (focusTarget === null) positionTooltip(target);
-    onActiveCodeChange(focusTarget?.code ?? target.code);
+  const activatePointerTarget = (code: string) => {
+    setPointerCode(code);
+    onActiveCodeChange(focusCode ?? code);
   };
 
   const clearPointerTarget = () => {
-    setPointerTarget(null);
-    if (focusTarget === null) setTooltipPosition(null);
-    else positionTooltip(focusTarget);
-    onActiveCodeChange(focusTarget?.code ?? null);
+    setPointerCode(null);
+    onActiveCodeChange(focusCode);
   };
 
-  const activateFocusTarget = (target: InteractionTarget, index: number) => {
+  const activateFocusTarget = (code: string, index: number) => {
     // Keep the tab stop on whatever was focused last, however it got focus.
     // Tracking arrow keys alone sent Tab back to the last *arrow-key* target,
     // so clicking a municipality and tabbing away returned somewhere else.
     setRovingIndex(index);
-    setFocusTarget(target);
-    positionTooltip(target);
-    onActiveCodeChange(target.code);
+    setFocusCode(code);
+    onActiveCodeChange(code);
   };
 
   const clearFocusTarget = () => {
-    setFocusTarget(null);
-    if (pointerTarget === null) setTooltipPosition(null);
-    else positionTooltip(pointerTarget);
-    onActiveCodeChange(pointerTarget?.code ?? null);
+    setFocusCode(null);
+    onActiveCodeChange(pointerCode);
   };
-
-  useEffect(() => {
-    if (activeTarget === null) return;
-
-    const handleResize = () => {
-      if (svgRef.current === null) return;
-      setTooltipPosition(getTooltipPosition(svgRef.current, activeTarget.element));
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [activeTarget]);
 
   return (
     <div data-testid="municipality-map">
@@ -228,16 +162,7 @@ export function MunicipalityMap({
                 strokeWidth={active ? 2.2 : 0.7}
                 strokeLinejoin="round"
                 className="cursor-pointer"
-                onMouseEnter={(event) => {
-                  activatePointerTarget({
-                    key: `shape:${shape.code}`,
-                    code: shape.code,
-                    nameKa: shape.nameKa,
-                    budgetPerResidentGel: shape.budgetPerResidentGel,
-                    totalBudgetGel: shape.totalBudgetGel,
-                    element: event.currentTarget,
-                  });
-                }}
+                onMouseEnter={() => activatePointerTarget(shape.code)}
                 onMouseLeave={clearPointerTarget}
                 onClick={() => onOpenMunicipality(shape.code)}
               />
@@ -267,29 +192,10 @@ export function MunicipalityMap({
                   tabIndex={targetIndex === rovingIndex ? 0 : -1}
                   role="link"
                   aria-label={accessibleName(shape.code, shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
-                  aria-describedby={describedTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
                   className="cursor-pointer"
-                  onMouseEnter={(event) => {
-                    activatePointerTarget({
-                      key: `shape:${shape.code}`,
-                      code: shape.code,
-                      nameKa: shape.nameKa,
-                      budgetPerResidentGel: shape.budgetPerResidentGel,
-                      totalBudgetGel: shape.totalBudgetGel,
-                      element: event.currentTarget,
-                    });
-                  }}
+                  onMouseEnter={() => activatePointerTarget(shape.code)}
                   onMouseLeave={clearPointerTarget}
-                  onFocus={(event) => {
-                    activateFocusTarget({
-                      key: `shape:${shape.code}`,
-                      code: shape.code,
-                      nameKa: shape.nameKa,
-                      budgetPerResidentGel: shape.budgetPerResidentGel,
-                      totalBudgetGel: shape.totalBudgetGel,
-                      element: event.currentTarget,
-                    }, targetIndex);
-                  }}
+                  onFocus={() => activateFocusTarget(shape.code, targetIndex)}
                   onBlur={clearFocusTarget}
                   onClick={() => onOpenMunicipality(shape.code)}
                   onKeyDown={(event) => handleTargetKeyDown(targetIndex, shape.code, event)}
@@ -318,29 +224,10 @@ export function MunicipalityMap({
                 tabIndex={targetIndex === rovingIndex ? 0 : -1}
                 role="link"
                 aria-label={accessibleName(marker.code, marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel)}
-                aria-describedby={describedTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
                 className="cursor-pointer"
-                onMouseEnter={(event) => {
-                  activatePointerTarget({
-                    key: `marker:${marker.code}`,
-                    code: marker.code,
-                    nameKa: marker.nameKa,
-                    budgetPerResidentGel: marker.budgetPerResidentGel,
-                    totalBudgetGel: marker.totalBudgetGel,
-                    element: event.currentTarget,
-                  });
-                }}
+                onMouseEnter={() => activatePointerTarget(marker.code)}
                 onMouseLeave={clearPointerTarget}
-                onFocus={(event) => {
-                  activateFocusTarget({
-                    key: `marker:${marker.code}`,
-                    code: marker.code,
-                    nameKa: marker.nameKa,
-                    budgetPerResidentGel: marker.budgetPerResidentGel,
-                    totalBudgetGel: marker.totalBudgetGel,
-                    element: event.currentTarget,
-                  }, targetIndex);
-                }}
+                onFocus={() => activateFocusTarget(marker.code, targetIndex)}
                 onBlur={clearFocusTarget}
                 onClick={() => onOpenMunicipality(marker.code)}
                 onKeyDown={(event) => handleTargetKeyDown(targetIndex, marker.code, event)}
@@ -367,26 +254,6 @@ export function MunicipalityMap({
           ))}
         </svg>
 
-        {describedTarget !== null && tooltipPosition !== null ? (
-          <div
-            id={TOOLTIP_ID}
-            role="tooltip"
-            data-testid="municipality-map-tooltip"
-            className="pointer-events-none absolute z-[2] h-[70px] w-[220px] overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
-            style={{ left: tooltipPosition.left, top: tooltipPosition.top }}
-          >
-            <div className="truncate text-[12px] font-medium text-[var(--ink)]">
-              {publicLabel(locale, describedTarget.code, describedTarget.nameKa, englishLabels)}
-            </div>
-            <div data-testid="municipality-map-tooltip-per-resident" className="mt-0.5 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
-              {formatPerResidentGel(describedTarget.budgetPerResidentGel, locale)} {message(messages, "municipal.perResident")}
-            </div>
-            <div data-testid="municipality-map-tooltip-total" className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-              {message(messages, "municipal.mapTotal", { amount: formatAmount(describedTarget.totalBudgetGel, locale) })}
-            </div>
-            <span aria-hidden className="absolute top-2 right-2.5 text-[12px] text-[var(--muted)]">→</span>
-          </div>
-        ) : null}
       </div>
 
       <div data-testid="municipality-map-legend" className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">

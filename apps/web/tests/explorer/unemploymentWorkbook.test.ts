@@ -4,7 +4,7 @@ import { beforeAll, expect, test } from "vitest";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/unemployment/importUnemployment";
 import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/types";
 import { buildUnemploymentWorkbookExportModel } from "../../lib/explorer/unemploymentWorkbook";
-import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, DEFAULT_UNEMPLOYMENT_STATE, type UnemploymentState } from "../../lib/explorer/unemploymentState";
+import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, DEFAULT_UNEMPLOYMENT_STATE, parseUnemploymentHash, type UnemploymentState } from "../../lib/explorer/unemploymentState";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
@@ -74,4 +74,20 @@ test("long-term labour-force rate and unemployment share have distinct export la
   expect(rate.readable.title).toContain("labour force"); expect(share.readable.title).toContain("all unemployed");
   expect(rate.readable.rows[0].valuesByYear[2025]).toBeCloseTo(0.049, 3);
   expect(share.readable.rows[0].valuesByYear[2025]).toBeCloseTo(0.355, 3);
+});
+
+test.each(["ka", "en"] as const)("overview exports every selected indicator with its own source value and label in %s", async locale => {
+  const state = parseUnemploymentHash("sel=georgia:employed,georgia:self_employed,georgia:hired&start=2025&end=2025", facts, UNEMPLOYMENT_GROUPS, "overview");
+  const model = await workbook(locale, state);
+  expect(model.readable.rows).toHaveLength(3);
+  expect(model.readable.rows.map(row => row.valuesByYear[2025])).toEqual([
+    facts.find(f => f.dimension === "national" && f.year === 2025 && f.indicatorId === "employed")!.value,
+    facts.find(f => f.dimension === "national" && f.year === 2025 && f.indicatorId === "self_employed")!.value,
+    facts.find(f => f.dimension === "national" && f.year === 2025 && f.indicatorId === "hired")!.value,
+  ]);
+  expect(model.readable.rows.map(row => row.label)).toEqual(locale === "en" ? ["Employed people", "Self-employed", "Hired employees"] : ["დასაქმებულები", "თვითდასაქმებული", "დაქირავებული"]);
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  expect(excel.worksheets[0].getCell("B6").value).toBeCloseTo(961.1005993998547, 10);
+  expect(excel.worksheets[1].getCell("C2").numFmt).toBe("#,##0.0");
+  expect(model.sources).toHaveLength(1);
 });

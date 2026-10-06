@@ -103,16 +103,15 @@ test("regional map, ranked list, search and keyboard focus stay coordinated", as
   await page.goto("/en/explorer/economy/regions");
   const row = page.getByTestId("regional-list-row").filter({ hasText: "Imereti" });
   const mapTarget = page.locator('[data-region-map-target][data-region-id="region.imereti"]');
-  const value = (await row.locator("span").nth(2).innerText()).trim();
   await row.hover();
   await expect(row).toHaveAttribute("data-active", "true");
   await expect(mapTarget).toHaveAttribute("data-active", "true");
-  await expect(page.getByTestId("regional-map-tooltip")).toContainText(value);
-  await expect(page.getByTestId("regional-map-tooltip")).toContainText("2024");
+  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
   await expect(row).toHaveAttribute("href", "/en/explorer/economy/regions/imereti");
 
   await mapTarget.focus();
   await expect(row).toHaveAttribute("data-active", "true");
+  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
   await mapTarget.press("ArrowDown");
   await expect(page.locator('[data-region-map-target]:focus')).toHaveCount(1);
 
@@ -123,6 +122,24 @@ test("regional map, ranked list, search and keyboard focus stay coordinated", as
   await expect(page.getByTestId("regional-list-row")).toHaveCount(0);
   await page.getByRole("button", { name: "Clear search" }).click();
   await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
+});
+
+for (const family of ["economy", "unemployment"]) test(`${family} region map restores keyboard highlighting after the pointer leaves`, async ({ page }) => {
+  await page.goto(`/en/explorer/${family}/regions`);
+  const target = page.locator('[data-region-map-target][data-region-id="region.imereti"]');
+  const pointerTarget = page.locator('[data-region-map-target][data-region-id="region.guria"]');
+  const row = page.locator('[data-testid="regional-list-row"][data-region-id="region.imereti"]');
+  await target.focus();
+  await expect(target).toHaveAttribute("data-active", "true");
+  await pointerTarget.hover();
+  await expect(pointerTarget).toHaveAttribute("data-active", "true");
+  await page.getByRole("heading", { level: 1 }).hover();
+  await expect(target).toBeFocused();
+  await expect(target).toHaveAttribute("data-active", "true");
+  await expect(row).toHaveAttribute("data-active", "true");
+  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
+  await target.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`/en/explorer/${family}/regions/imereti$`));
 });
 
 test("regional detail controls retain selection, measure, range and language state", async ({ page }) => {

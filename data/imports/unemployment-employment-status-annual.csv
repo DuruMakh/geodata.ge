@@ -1,0 +1,229 @@
+﻿year,frequency,dimension,group_id,group_label_en,indicator_id,unit,value,published_value,basis,value_status,methodology_epoch,role,source_id,source_sheet,source_cell,source_group_label,source_label,source_number_format
+2010,annual,national,georgia,Georgia,hired,thousand_persons,709.95890019469152,710.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,N7,Georgia,Hired,0.0
+2010,annual,national,georgia,Georgia,self_employed,thousand_persons,455.17570659944244,455.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,N8,Georgia,Self-employed,0.0
+2010,annual,settlement,rural,Rural,hired,thousand_persons,186.65870583558669,186.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,N22,Rural,Hired,0.0
+2010,annual,settlement,rural,Rural,self_employed,thousand_persons,316.71924818154542,316.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,N23,Rural,Self-employed,0.0
+2010,annual,settlement,urban,Urban,hired,thousand_persons,523.30019435910492,523.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,N8,Urban,Hired,0.0
+2010,annual,settlement,urban,Urban,self_employed,thousand_persons,138.4564584178971,138.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,N9,Urban,Self-employed,0.0
+2011,annual,national,georgia,Georgia,hired,thousand_persons,723.98897750850654,724.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,O7,Georgia,Hired,0.0
+2011,annual,national,georgia,Georgia,self_employed,thousand_persons,452.04979925790241,452.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,O8,Georgia,Self-employed,0.0
+2011,annual,settlement,rural,Rural,hired,thousand_persons,178.10710348674675,178.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,O22,Rural,Hired,0.0
+2011,annual,settlement,rural,Rural,self_employed,thousand_persons,333.02450339123021,333.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,O23,Rural,Self-employed,0.0
+2011,annual,settlement,urban,Urban,hired,thousand_persons,545.88187402175981,545.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,O8,Urban,Hired,0.0
+2011,annual,settlement,urban,Urban,self_employed,thousand_persons,119.0252958666721,119.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,O9,Urban,Self-employed,0.0
+2012,annual,national,georgia,Georgia,hired,thousand_persons,759.41939752578674,759.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,P7,Georgia,Hired,0.0
+2012,annual,national,georgia,Georgia,self_employed,thousand_persons,445.1528359420887,445.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,P8,Georgia,Self-employed,0.0
+2012,annual,settlement,rural,Rural,hired,thousand_persons,191.19346311658632,191.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,P22,Rural,Hired,0.0
+2012,annual,settlement,rural,Rural,self_employed,thousand_persons,325.22384114457839,325.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,P23,Rural,Self-employed,0.0
+2012,annual,settlement,urban,Urban,hired,thousand_persons,568.22593440920036,568.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,P8,Urban,Hired,0.0
+2012,annual,settlement,urban,Urban,self_employed,thousand_persons,119.92899479751043,119.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,P9,Urban,Self-employed,0.0
+2013,annual,national,georgia,Georgia,hired,thousand_persons,739.07959919419238,739.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,Q7,Georgia,Hired,0.0
+2013,annual,national,georgia,Georgia,self_employed,thousand_persons,449.47847054077965,449.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,Q8,Georgia,Self-employed,0.0
+2013,annual,settlement,rural,Rural,hired,thousand_persons,202.77532523461699,202.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Q22,Rural,Hired,0.0
+2013,annual,settlement,rural,Rural,self_employed,thousand_persons,311.67164216647723,311.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Q23,Rural,Self-employed,0.0
+2013,annual,settlement,urban,Urban,hired,thousand_persons,536.30427395957543,536.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Q8,Urban,Hired,0.0
+2013,annual,settlement,urban,Urban,self_employed,thousand_persons,137.80682837430248,137.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Q9,Urban,Self-employed,0.0
+2014,annual,national,georgia,Georgia,hired,thousand_persons,795.45993080483208,795.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,R7,Georgia,Hired,0.0
+2014,annual,national,georgia,Georgia,self_employed,thousand_persons,453.02384554716684,453.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,R8,Georgia,Self-employed,0.0
+2014,annual,settlement,rural,Rural,hired,thousand_persons,213.86581985525825,213.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,R22,Rural,Hired,0.0
+2014,annual,settlement,rural,Rural,self_employed,thousand_persons,321.96160368757108,322.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,R23,Rural,Self-employed,0.0
+2014,annual,settlement,urban,Urban,hired,thousand_persons,581.59411094957386,581.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,R8,Urban,Hired,0.0
+2014,annual,settlement,urban,Urban,self_employed,thousand_persons,131.06224185959582,131.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,R9,Urban,Self-employed,0.0
+2015,annual,national,georgia,Georgia,hired,thousand_persons,855.30746881309437,855.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,S7,Georgia,Hired,0.0
+2015,annual,national,georgia,Georgia,self_employed,thousand_persons,445.61740090444528,445.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,S8,Georgia,Self-employed,0.0
+2015,annual,settlement,rural,Rural,hired,thousand_persons,233.83627226901388,233.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,S22,Rural,Hired,0.0
+2015,annual,settlement,rural,Rural,self_employed,thousand_persons,308.52439447091501,308.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,S23,Rural,Self-employed,0.0
+2015,annual,settlement,urban,Urban,hired,thousand_persons,621.47119654408039,621.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,S8,Urban,Hired,0.0
+2015,annual,settlement,urban,Urban,self_employed,thousand_persons,137.09300643353029,137.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,S9,Urban,Self-employed,0.0
+2016,annual,national,georgia,Georgia,hired,thousand_persons,853.85409686284447,853.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,T7,Georgia,Hired,0.0
+2016,annual,national,georgia,Georgia,self_employed,thousand_persons,434.38718125411361,434.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,T8,Georgia,Self-employed,0.0
+2016,annual,settlement,rural,Rural,hired,thousand_persons,228.17329384546761,228.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,T22,Rural,Hired,0.0
+2016,annual,settlement,rural,Rural,self_employed,thousand_persons,306.77343334955003,306.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,T23,Rural,Self-employed,0.0
+2016,annual,settlement,urban,Urban,hired,thousand_persons,625.68080301737689,625.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,T8,Urban,Hired,0.0
+2016,annual,settlement,urban,Urban,self_employed,thousand_persons,127.61374790456354,127.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,T9,Urban,Self-employed,0.0
+2017,annual,national,georgia,Georgia,hired,thousand_persons,869.29301578637978,869.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,U7,Georgia,Hired,0.0
+2017,annual,national,georgia,Georgia,self_employed,thousand_persons,416.76538354817728,416.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,U8,Georgia,Self-employed,0.0
+2017,annual,settlement,rural,Rural,hired,thousand_persons,259.62972442234974,259.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,U22,Rural,Hired,0.0
+2017,annual,settlement,rural,Rural,self_employed,thousand_persons,294.64562185536022,294.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,U23,Rural,Self-employed,0.0
+2017,annual,settlement,urban,Urban,hired,thousand_persons,609.6632913640301,609.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,U8,Urban,Hired,0.0
+2017,annual,settlement,urban,Urban,self_employed,thousand_persons,122.11976169281712,122.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,U9,Urban,Self-employed,0.0
+2018,annual,national,georgia,Georgia,hired,thousand_persons,903.47130757649438,903.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,V7,Georgia,Hired,0.0
+2018,annual,national,georgia,Georgia,self_employed,thousand_persons,392.18463836441811,392.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,V8,Georgia,Self-employed,0.0
+2018,annual,settlement,rural,Rural,hired,thousand_persons,272.09234330686536,272.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,V22,Rural,Hired,0.0
+2018,annual,settlement,rural,Rural,self_employed,thousand_persons,261.34364970022716,261.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,V23,Rural,Self-employed,0.0
+2018,annual,settlement,urban,Urban,hired,thousand_persons,631.37896426962902,631.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,V8,Urban,Hired,0.0
+2018,annual,settlement,urban,Urban,self_employed,thousand_persons,130.840988664191,130.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,V9,Urban,Self-employed,0.0
+2019,annual,national,georgia,Georgia,hired,thousand_persons,897.53423166726247,897.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,W7,Georgia,Hired,0.0
+2019,annual,national,georgia,Georgia,self_employed,thousand_persons,397.88064147417947,397.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,W8,Georgia,Self-employed,0.0
+2019,annual,settlement,rural,Rural,hired,thousand_persons,262.7387107542537,262.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,W22,Rural,Hired,0.0
+2019,annual,settlement,rural,Rural,self_employed,thousand_persons,266.43685724226361,266.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,W23,Rural,Self-employed,0.0
+2019,annual,settlement,urban,Urban,hired,thousand_persons,634.79552091300877,634.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,W8,Urban,Hired,0.0
+2019,annual,settlement,urban,Urban,self_employed,thousand_persons,131.44378423191577,131.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,W9,Urban,Self-employed,0.0
+2020,annual,national,georgia,Georgia,hired,thousand_persons,845.25982588880538,845.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,X7,Georgia,Hired,0.0
+2020,annual,national,georgia,Georgia,self_employed,thousand_persons,395.85784826673455,395.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,X8,Georgia,Self-employed,0.0
+2020,annual,region,region.adjara,Adjara,hired,thousand_persons,79.664898273320986,79.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F216,Adjara A/R,Hired,0.0
+2020,annual,region,region.adjara,Adjara,self_employed,thousand_persons,46.377817318447917,46.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F217,Adjara A/R,Self-employed,0.0
+2020,annual,region,region.guria,Guria,hired,thousand_persons,18.999609941696686,19.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J216,Guria,Hired,0.0
+2020,annual,region,region.guria,Guria,self_employed,thousand_persons,21.653397976443657,21.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J217,Guria,Self-employed,0.0
+2020,annual,region,region.imereti,Imereti,hired,thousand_persons,103.44384654469914,103.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H216,Imereti,Hired,0.0
+2020,annual,region,region.imereti,Imereti,self_employed,thousand_persons,40.253378555159209,40.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H217,Imereti,Self-employed,0.0
+2020,annual,region,region.kakheti,Kakheti,hired,thousand_persons,57.135248131655331,57.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B216,Kakheti,Hired,0.0
+2020,annual,region,region.kakheti,Kakheti,self_employed,thousand_persons,52.362052423752765,52.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B217,Kakheti,Self-employed,0.0
+2020,annual,region,region.kvemo_kartli,Kvemo Kartli,hired,thousand_persons,77.911992357008998,77.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E216,Kvemo Kartli,Hired,0.0
+2020,annual,region,region.kvemo_kartli,Kvemo Kartli,self_employed,thousand_persons,56.041812838674446,56.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E217,Kvemo Kartli,Self-employed,0.0
+2020,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,hired,thousand_persons,21.78108022112913,21.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K216,Mtskheta-Mtianeti,Hired,0.0
+2020,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,self_employed,thousand_persons,9.9185346524773887,9.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K217,Mtskheta-Mtianeti,Self-employed,0.0
+2020,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,hired,thousand_persons,6.2512011884494987,6.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L216,Racha-Lechkhumi and Kvemo-Svaneti,Hired,0.0
+2020,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,self_employed,thousand_persons,1.0662818755093515,1.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L217,Racha-Lechkhumi and Kvemo-Svaneti,Self-employed,0.0
+2020,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,hired,thousand_persons,60.566969511096246,60.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G216,Samegrelo-Zemo Svaneti,Hired,0.0
+2020,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,self_employed,thousand_persons,46.68856663977536,46.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G217,Samegrelo-Zemo Svaneti,Self-employed,0.0
+2020,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,hired,thousand_persons,26.753088095348293,26.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I216,Samtskhe-Javakheti,Hired,0.0
+2020,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,self_employed,thousand_persons,36.806206132596067,36.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I217,Samtskhe-Javakheti,Self-employed,0.0
+2020,annual,region,region.shida_kartli,Shida Kartli,hired,thousand_persons,53.092235128686269,53.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D216,Shida Kartli,Hired,0.0
+2020,annual,region,region.shida_kartli,Shida Kartli,self_employed,thousand_persons,31.338757399778071,31.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D217,Shida Kartli,Self-employed,0.0
+2020,annual,region,region.tbilisi,Tbilisi,hired,thousand_persons,339.65965649571507,339.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C216,Tbilisi,Hired,0.0
+2020,annual,region,region.tbilisi,Tbilisi,self_employed,thousand_persons,53.351042454120659,53.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C217,Tbilisi,Self-employed,0.0
+2020,annual,settlement,rural,Rural,hired,thousand_persons,245.5140187149662,245.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,X22,Rural,Hired,0.0
+2020,annual,settlement,rural,Rural,self_employed,thousand_persons,262.46886321988325,262.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,X23,Rural,Self-employed,0.0
+2020,annual,settlement,urban,Urban,hired,thousand_persons,599.74580717383969,599.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,X8,Urban,Hired,0.0
+2020,annual,settlement,urban,Urban,self_employed,thousand_persons,133.38898504685162,133.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,X9,Urban,Self-employed,0.0
+2021,annual,national,georgia,Georgia,hired,thousand_persons,829.38875822845603,829.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,Y7,Georgia,Hired,0.0
+2021,annual,national,georgia,Georgia,self_employed,thousand_persons,387.12805692621197,387.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,Y8,Georgia,Self-employed,0.0
+2021,annual,region,region.adjara,Adjara,hired,thousand_persons,80.637190410084827,80.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F230,Adjara A/R,Hired,0.0
+2021,annual,region,region.adjara,Adjara,self_employed,thousand_persons,39.867299084756922,39.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F231,Adjara A/R,Self-employed,0.0
+2021,annual,region,region.guria,Guria,hired,thousand_persons,17.835517276939065,17.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J230,Guria,Hired,0.0
+2021,annual,region,region.guria,Guria,self_employed,thousand_persons,25.5560787738718,25.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J231,Guria,Self-employed,0.0
+2021,annual,region,region.imereti,Imereti,hired,thousand_persons,101.95730015417313,102.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H230,Imereti,Hired,0.0
+2021,annual,region,region.imereti,Imereti,self_employed,thousand_persons,45.0643512742651,45.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H231,Imereti,Self-employed,0.0
+2021,annual,region,region.kakheti,Kakheti,hired,thousand_persons,56.537744240995146,56.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B230,Kakheti,Hired,0.0
+2021,annual,region,region.kakheti,Kakheti,self_employed,thousand_persons,59.563479321064918,59.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B231,Kakheti,Self-employed,0.0
+2021,annual,region,region.kvemo_kartli,Kvemo Kartli,hired,thousand_persons,76.42365491647378,76.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E230,Kvemo Kartli,Hired,0.0
+2021,annual,region,region.kvemo_kartli,Kvemo Kartli,self_employed,thousand_persons,47.469395609191864,47.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E231,Kvemo Kartli,Self-employed,0.0
+2021,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,hired,thousand_persons,21.370055571645736,21.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K230,Mtskheta-Mtianeti,Hired,0.0
+2021,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,self_employed,thousand_persons,9.7763585473214327,9.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K231,Mtskheta-Mtianeti,Self-employed,0.0
+2021,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,hired,thousand_persons,7.1023630512748657,7.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L230,Racha-Lechkhumi and Kvemo-Svaneti,Hired,0.0
+2021,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,self_employed,thousand_persons,0.95989746534247566,1.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L231,Racha-Lechkhumi and Kvemo-Svaneti,Self-employed,0.0
+2021,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,hired,thousand_persons,58.569218341156201,58.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G230,Samegrelo-Zemo Svaneti,Hired,0.0
+2021,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,self_employed,thousand_persons,47.211939387579235,47.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G231,Samegrelo-Zemo Svaneti,Self-employed,0.0
+2021,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,hired,thousand_persons,30.006213457987155,30.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I230,Samtskhe-Javakheti,Hired,0.0
+2021,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,self_employed,thousand_persons,26.884507668383456,26.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I231,Samtskhe-Javakheti,Self-employed,0.0
+2021,annual,region,region.shida_kartli,Shida Kartli,hired,thousand_persons,51.550301874435014,51.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D230,Shida Kartli,Hired,0.0
+2021,annual,region,region.shida_kartli,Shida Kartli,self_employed,thousand_persons,32.378526351784913,32.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D231,Shida Kartli,Self-employed,0.0
+2021,annual,region,region.tbilisi,Tbilisi,hired,thousand_persons,327.39919893328835,327.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C230,Tbilisi,Hired,0.0
+2021,annual,region,region.tbilisi,Tbilisi,self_employed,thousand_persons,52.396223442651788,52.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C231,Tbilisi,Self-employed,0.0
+2021,annual,settlement,rural,Rural,hired,thousand_persons,243.62479399821058,243.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Y22,Rural,Hired,0.0
+2021,annual,settlement,rural,Rural,self_employed,thousand_persons,256.15280500310001,256.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Y23,Rural,Self-employed,0.0
+2021,annual,settlement,urban,Urban,hired,thousand_persons,585.76396423024596,585.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Y8,Urban,Hired,0.0
+2021,annual,settlement,urban,Urban,self_employed,thousand_persons,130.97525192311562,131.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Y9,Urban,Self-employed,0.0
+2022,annual,national,georgia,Georgia,hired,thousand_persons,870.89228720065648,870.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,Z7,Georgia,Hired,0.0
+2022,annual,national,georgia,Georgia,self_employed,thousand_persons,412.05791920934638,412.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,Z8,Georgia,Self-employed,0.0
+2022,annual,region,region.adjara,Adjara,hired,thousand_persons,81.185697054456682,81.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F244,Adjara A/R,Hired,0.0
+2022,annual,region,region.adjara,Adjara,self_employed,thousand_persons,42.348008552107416,42.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F245,Adjara A/R,Self-employed,0.0
+2022,annual,region,region.guria,Guria,hired,thousand_persons,20.036647225090906,20.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J244,Guria,Hired,0.0
+2022,annual,region,region.guria,Guria,self_employed,thousand_persons,24.924899080305504,24.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J245,Guria,Self-employed,0.0
+2022,annual,region,region.imereti,Imereti,hired,thousand_persons,114.54639648268306,114.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H244,Imereti,Hired,0.0
+2022,annual,region,region.imereti,Imereti,self_employed,thousand_persons,50.289462031497479,50.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H245,Imereti,Self-employed,0.0
+2022,annual,region,region.kakheti,Kakheti,hired,thousand_persons,59.642770161478552,59.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B244,Kakheti,Hired,0.0
+2022,annual,region,region.kakheti,Kakheti,self_employed,thousand_persons,57.008647963032914,57.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B245,Kakheti,Self-employed,0.0
+2022,annual,region,region.kvemo_kartli,Kvemo Kartli,hired,thousand_persons,85.113417481597978,85.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E244,Kvemo Kartli,Hired,0.0
+2022,annual,region,region.kvemo_kartli,Kvemo Kartli,self_employed,thousand_persons,47.716640575393733,47.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E245,Kvemo Kartli,Self-employed,0.0
+2022,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,hired,thousand_persons,21.758070588992489,21.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K244,Mtskheta-Mtianeti,Hired,0.0
+2022,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,self_employed,thousand_persons,10.719584898791126,10.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K245,Mtskheta-Mtianeti,Self-employed,0.0
+2022,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,hired,thousand_persons,7.9781151278722753,8.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L244,Racha-Lechkhumi and Kvemo-Svaneti,Hired,0.0
+2022,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,self_employed,thousand_persons,1.445926629878161,1.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L245,Racha-Lechkhumi and Kvemo-Svaneti,Self-employed,0.0
+2022,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,hired,thousand_persons,65.122408847506009,65.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G244,Samegrelo-Zemo Svaneti,Hired,0.0
+2022,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,self_employed,thousand_persons,48.517018575059573,48.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G245,Samegrelo-Zemo Svaneti,Self-employed,0.0
+2022,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,hired,thousand_persons,27.700099761441574,27.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I244,Samtskhe-Javakheti,Hired,0.0
+2022,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,self_employed,thousand_persons,31.151367978919893,31.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I245,Samtskhe-Javakheti,Self-employed,0.0
+2022,annual,region,region.shida_kartli,Shida Kartli,hired,thousand_persons,54.896367657143777,54.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D244,Shida Kartli,Hired,0.0
+2022,annual,region,region.shida_kartli,Shida Kartli,self_employed,thousand_persons,36.197593742591387,36.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D245,Shida Kartli,Self-employed,0.0
+2022,annual,region,region.tbilisi,Tbilisi,hired,thousand_persons,332.91229681239304,332.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C244,Tbilisi,Hired,0.0
+2022,annual,region,region.tbilisi,Tbilisi,self_employed,thousand_persons,61.738769181769335,61.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C245,Tbilisi,Self-employed,0.0
+2022,annual,settlement,rural,Rural,hired,thousand_persons,271.65852583483434,271.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Z22,Rural,Hired,0.0
+2022,annual,settlement,rural,Rural,self_employed,thousand_persons,259.74619463570241,259.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Z23,Rural,Self-employed,0.0
+2022,annual,settlement,urban,Urban,hired,thousand_persons,599.23376136582226,599.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Z8,Urban,Hired,0.0
+2022,annual,settlement,urban,Urban,self_employed,thousand_persons,152.31172457364411,152.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,Z9,Urban,Self-employed,0.0
+2023,annual,national,georgia,Georgia,hired,thousand_persons,920.42520843016257,920.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,AA7,Georgia,Hired,0.0
+2023,annual,national,georgia,Georgia,self_employed,thousand_persons,413.61398293634704,413.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,AA8,Georgia,Self-employed,0.0
+2023,annual,region,region.adjara,Adjara,hired,thousand_persons,94.109780845544705,94.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F258,Adjara A/R,Hired,0.0
+2023,annual,region,region.adjara,Adjara,self_employed,thousand_persons,45.382400215261562,45.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F259,Adjara A/R,Self-employed,0.0
+2023,annual,region,region.guria,Guria,hired,thousand_persons,20.555187736201283,20.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J258,Guria,Hired,0.0
+2023,annual,region,region.guria,Guria,self_employed,thousand_persons,19.466938845606105,19.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J259,Guria,Self-employed,0.0
+2023,annual,region,region.imereti,Imereti,hired,thousand_persons,116.94358909299173,116.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H258,Imereti,Hired,0.0
+2023,annual,region,region.imereti,Imereti,self_employed,thousand_persons,46.306599444006061,46.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H259,Imereti,Self-employed,0.0
+2023,annual,region,region.kakheti,Kakheti,hired,thousand_persons,65.31820735278751,65.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B258,Kakheti,Hired,0.0
+2023,annual,region,region.kakheti,Kakheti,self_employed,thousand_persons,52.30610155665628,52.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B259,Kakheti,Self-employed,0.0
+2023,annual,region,region.kvemo_kartli,Kvemo Kartli,hired,thousand_persons,86.356423347865615,86.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E258,Kvemo Kartli,Hired,0.0
+2023,annual,region,region.kvemo_kartli,Kvemo Kartli,self_employed,thousand_persons,48.660260682923628,48.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E259,Kvemo Kartli,Self-employed,0.0
+2023,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,hired,thousand_persons,21.233781783441597,21.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K258,Mtskheta-Mtianeti,Hired,0.0
+2023,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,self_employed,thousand_persons,10.167455215333398,10.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K259,Mtskheta-Mtianeti,Self-employed,0.0
+2023,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,hired,thousand_persons,8.7993435806731171,8.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L258,Racha-Lechkhumi and Kvemo-Svaneti,Hired,0.0
+2023,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,self_employed,thousand_persons,1.2974196246648089,1.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L259,Racha-Lechkhumi and Kvemo-Svaneti,Self-employed,0.0
+2023,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,hired,thousand_persons,66.916365226251244,66.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G258,Samegrelo-Zemo Svaneti,Hired,0.0
+2023,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,self_employed,thousand_persons,42.657924145913022,42.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G259,Samegrelo-Zemo Svaneti,Self-employed,0.0
+2023,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,hired,thousand_persons,27.585511050593709,27.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I258,Samtskhe-Javakheti,Hired,0.0
+2023,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,self_employed,thousand_persons,34.528094514323953,34.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I259,Samtskhe-Javakheti,Self-employed,0.0
+2023,annual,region,region.shida_kartli,Shida Kartli,hired,thousand_persons,57.072684046919775,57.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D258,Shida Kartli,Hired,0.0
+2023,annual,region,region.shida_kartli,Shida Kartli,self_employed,thousand_persons,38.405294218184551,38.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D259,Shida Kartli,Self-employed,0.0
+2023,annual,region,region.tbilisi,Tbilisi,hired,thousand_persons,355.53433436689176,355.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C258,Tbilisi,Hired,0.0
+2023,annual,region,region.tbilisi,Tbilisi,self_employed,thousand_persons,74.435494473473071,74.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C259,Tbilisi,Self-employed,0.0
+2023,annual,settlement,rural,Rural,hired,thousand_persons,286.57522132822044,286.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AA22,Rural,Hired,0.0
+2023,annual,settlement,rural,Rural,self_employed,thousand_persons,254.75903389547597,254.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AA23,Rural,Self-employed,0.0
+2023,annual,settlement,urban,Urban,hired,thousand_persons,633.84998710194259,633.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AA8,Urban,Hired,0.0
+2023,annual,settlement,urban,Urban,self_employed,thousand_persons,158.85494904087074,158.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AA9,Urban,Self-employed,0.0
+2024,annual,national,georgia,Georgia,hired,thousand_persons,960.39314498143563,960.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,AB7,Georgia,Hired,0.0
+2024,annual,national,georgia,Georgia,self_employed,thousand_persons,441.47478162335915,441.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,AB8,Georgia,Self-employed,0.0
+2024,annual,region,region.adjara,Adjara,hired,thousand_persons,99.58598211564599,99.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F272,Adjara A/R,Hired,0.0
+2024,annual,region,region.adjara,Adjara,self_employed,thousand_persons,42.091288237773639,42.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F273,Adjara A/R,Self-employed,0.0
+2024,annual,region,region.guria,Guria,hired,thousand_persons,22.055381612281266,22.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J272,Guria,Hired,0.0
+2024,annual,region,region.guria,Guria,self_employed,thousand_persons,17.297525643078988,17.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J273,Guria,Self-employed,0.0
+2024,annual,region,region.imereti,Imereti,hired,thousand_persons,118.77748027383782,118.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H272,Imereti,Hired,0.0
+2024,annual,region,region.imereti,Imereti,self_employed,thousand_persons,51.47187826226282,51.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H273,Imereti,Self-employed,0.0
+2024,annual,region,region.kakheti,Kakheti,hired,thousand_persons,72.374435887802974,72.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B272,Kakheti,Hired,0.0
+2024,annual,region,region.kakheti,Kakheti,self_employed,thousand_persons,49.574945898335542,49.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B273,Kakheti,Self-employed,0.0
+2024,annual,region,region.kvemo_kartli,Kvemo Kartli,hired,thousand_persons,82.784708686276403,82.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E272,Kvemo Kartli,Hired,0.0
+2024,annual,region,region.kvemo_kartli,Kvemo Kartli,self_employed,thousand_persons,57.594531053195261,57.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E273,Kvemo Kartli,Self-employed,0.0
+2024,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,hired,thousand_persons,23.047357347053282,23.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K272,Mtskheta-Mtianeti,Hired,0.0
+2024,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,self_employed,thousand_persons,10.655529033546429,10.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K273,Mtskheta-Mtianeti,Self-employed,0.0
+2024,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,hired,thousand_persons,9.5582561941666278,9.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L272,Racha-Lechkhumi and Kvemo-Svaneti,Hired,0.0
+2024,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,self_employed,thousand_persons,1.3646177556837447,1.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L273,Racha-Lechkhumi and Kvemo-Svaneti,Self-employed,0.0
+2024,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,hired,thousand_persons,65.46120690831637,65.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G272,Samegrelo-Zemo Svaneti,Hired,0.0
+2024,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,self_employed,thousand_persons,52.095685875239205,52.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G273,Samegrelo-Zemo Svaneti,Self-employed,0.0
+2024,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,hired,thousand_persons,30.941496205428127,30.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I272,Samtskhe-Javakheti,Hired,0.0
+2024,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,self_employed,thousand_persons,29.209335022487025,29.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I273,Samtskhe-Javakheti,Self-employed,0.0
+2024,annual,region,region.shida_kartli,Shida Kartli,hired,thousand_persons,62.538585266292351,62.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D272,Shida Kartli,Hired,0.0
+2024,annual,region,region.shida_kartli,Shida Kartli,self_employed,thousand_persons,39.126961395786076,39.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D273,Shida Kartli,Self-employed,0.0
+2024,annual,region,region.tbilisi,Tbilisi,hired,thousand_persons,373.26825448433146,373.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C272,Tbilisi,Hired,0.0
+2024,annual,region,region.tbilisi,Tbilisi,self_employed,thousand_persons,90.992483445971075,91.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C273,Tbilisi,Self-employed,0.0
+2024,annual,settlement,rural,Rural,hired,thousand_persons,303.45548858295763,303.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AB22,Rural,Hired,0.0
+2024,annual,settlement,rural,Rural,self_employed,thousand_persons,257.0137303049749,257.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AB23,Rural,Self-employed,0.0
+2024,annual,settlement,urban,Urban,hired,thousand_persons,656.93765639847652,656.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AB8,Urban,Hired,0.0
+2024,annual,settlement,urban,Urban,self_employed,thousand_persons,184.46105131838459,184.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AB9,Urban,Self-employed,0.0
+2025,annual,national,georgia,Georgia,hired,thousand_persons,961.10059939985467,961.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,AC7,Georgia,Hired,0.0
+2025,annual,national,georgia,Georgia,self_employed,thousand_persons,426.29408410695277,426.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_total,1,AC8,Georgia,Self-employed,0.0
+2025,annual,region,region.adjara,Adjara,hired,thousand_persons,99.638678257460455,99.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F286,Adjara A/R,Hired,0.0
+2025,annual,region,region.adjara,Adjara,self_employed,thousand_persons,38.913998979491787,38.9,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,F287,Adjara A/R,Self-employed,0.0
+2025,annual,region,region.guria,Guria,hired,thousand_persons,21.114098908885076,21.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J286,Guria,Hired,0.0
+2025,annual,region,region.guria,Guria,self_employed,thousand_persons,20.718657580955576,20.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,J287,Guria,Self-employed,0.0
+2025,annual,region,region.imereti,Imereti,hired,thousand_persons,123.18227477559969,123.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H286,Imereti,Hired,0.0
+2025,annual,region,region.imereti,Imereti,self_employed,thousand_persons,48.298670745699447,48.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,H287,Imereti,Self-employed,0.0
+2025,annual,region,region.kakheti,Kakheti,hired,thousand_persons,75.016315602274346,75.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B286,Kakheti,Hired,0.0
+2025,annual,region,region.kakheti,Kakheti,self_employed,thousand_persons,51.265512714214942,51.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,B287,Kakheti,Self-employed,0.0
+2025,annual,region,region.kvemo_kartli,Kvemo Kartli,hired,thousand_persons,88.544349839936515,88.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E286,Kvemo Kartli,Hired,0.0
+2025,annual,region,region.kvemo_kartli,Kvemo Kartli,self_employed,thousand_persons,54.215316004475376,54.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,E287,Kvemo Kartli,Self-employed,0.0
+2025,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,hired,thousand_persons,23.953198692156516,24.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K286,Mtskheta-Mtianeti,Hired,0.0
+2025,annual,region,region.mtskheta_mtianeti,Mtskheta-Mtianeti,self_employed,thousand_persons,8.3522965671990619,8.4,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,K287,Mtskheta-Mtianeti,Self-employed,0.0
+2025,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,hired,thousand_persons,10.153113954079068,10.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L286,Racha-Lechkhumi and Kvemo-Svaneti,Hired,0.0
+2025,annual,region,region.racha_lechkhumi_kvemo_svaneti,Racha-Lechkhumi and Kvemo Svaneti,self_employed,thousand_persons,1.5320488207213245,1.5,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,L287,Racha-Lechkhumi and Kvemo-Svaneti,Self-employed,0.0
+2025,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,hired,thousand_persons,63.037020222663315,63.0,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G286,Samegrelo-Zemo Svaneti,Hired,0.0
+2025,annual,region,region.samegrelo_zemo_svaneti,Samegrelo-Zemo Svaneti,self_employed,thousand_persons,55.172079078202778,55.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,G287,Samegrelo-Zemo Svaneti,Self-employed,0.0
+2025,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,hired,thousand_persons,33.161802600928063,33.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I286,Samtskhe-Javakheti,Hired,0.0
+2025,annual,region,region.samtskhe_javakheti,Samtskhe-Javakheti,self_employed,thousand_persons,32.28693266548467,32.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,I287,Samtskhe-Javakheti,Self-employed,0.0
+2025,annual,region,region.shida_kartli,Shida Kartli,hired,thousand_persons,62.06909085837416,62.1,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D286,Shida Kartli,Hired,0.0
+2025,annual,region,region.shida_kartli,Shida Kartli,self_employed,thousand_persons,37.247140838611166,37.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,D287,Shida Kartli,Self-employed,0.0
+2025,annual,region,region.tbilisi,Tbilisi,hired,thousand_persons,361.23065568749558,361.2,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C286,Tbilisi,Hired,0.0
+2025,annual,region,region.tbilisi,Tbilisi,self_employed,thousand_persons,78.29143011189538,78.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_region,1,C287,Tbilisi,Self-employed,0.0
+2025,annual,settlement,rural,Rural,hired,thousand_persons,318.78478924113085,318.8,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AC22,Rural,Hired,0.0
+2025,annual,settlement,rural,Rural,self_employed,thousand_persons,258.70789329881052,258.7,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AC23,Rural,Self-employed,0.0
+2025,annual,settlement,urban,Urban,hired,thousand_persons,642.31581015872894,642.3,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AC8,Urban,Hired,0.0
+2025,annual,settlement,urban,Urban,self_employed,thousand_persons,167.58619080814205,167.6,actual,survey_estimate,ilo19_20,primary,geostat_lfs_annual_settlement,1,AC9,Urban,Self-employed,0.0
