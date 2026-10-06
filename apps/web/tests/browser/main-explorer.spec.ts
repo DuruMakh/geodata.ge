@@ -1236,12 +1236,14 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
     "/explorer/economy/regions/imereti",
     "/explorer/inflation/overview",
     "/explorer/inflation/categories",
+    "/explorer/demography",
+    "/explorer/demography/population",
   ]) {
     await page.goto(`${TEST_BASE_URL}${route}`);
-    // The economy hub and the regions index are link maps with no client
-    // explorer, so they never raise the app-ready flag; their payload is in the
-    // served HTML regardless.
-    if (!["/explorer/economy", "/explorer/economy/regions"].includes(route))
+    // The economy and demography hubs and the regions index are link maps with
+    // no client explorer, so they never raise the app-ready flag; their payload
+    // is in the served HTML regardless.
+    if (!["/explorer/economy", "/explorer/economy/regions", "/explorer/demography"].includes(route))
       await expectAppReady(page);
     const occurrences = await readPayloadOccurrences(page);
 
