@@ -837,7 +837,7 @@ In `docs/data-methodology/database-import.md`:
 
 1. After the `RegionalEconomyFact` table row add:
    ```
-   | `DemographyFact` | `data/imports/demography-population-annual.csv` and `data/imports/demography-density-annual.csv` (1 January population 2004–2026 for Georgia, 11 regions and 64 municipalities, 923 rows; density for Georgia and the regions, 145 rows; exact decimals; a dimension a file lacks is stored as an empty string; migration `20261004000000_demography`) |
+   | `DemographyFact` | `data/imports/demography-population-annual.csv` and `data/imports/demography-density-annual.csv` (1 January population: Georgia 2004–2026, 11 regions and 64 municipalities 2015–2026, 923 rows; density: Georgia 2014–2026 and the regions 2015–2026, 145 rows; exact decimals; a dimension a file lacks is stored as an empty string; migration `20261004000000_demography`) |
    ```
 2. After the paragraph that begins "The regional economy mirror follows the same rule." add a paragraph: "The demography mirror follows the same rule. The importer validates all 1,068 served rows and their registered source IDs before opening the transaction, replaces `DemographyFact` before source parents, recreates the rows with the active import-run ID, reads them back through the db-mode serving mapper and compares every field and exact decimal before commit. Later demography pages add their canonical files to the served list and rows to this table; the schema does not change."
 3. After the bullet for `RegionalEconomyFact` in the list of db-mode readers add: "  - **`DemographyFact`** — read by `loadServedDemographyData` on the demography routes and verified field by field at import and whenever those routes build in db mode."

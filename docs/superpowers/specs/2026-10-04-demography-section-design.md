@@ -36,7 +36,7 @@ Owner decisions, 2026-10-04:
 3. Development is split into four plans in the order above. Each plan ends in a shippable state and never regresses an earlier page.
 4. The way into places is a map you click (decided later the same day after an interactive sketch, then narrowed to reuse): the page opens with the maps the site already has, a regions/municipalities switch and a Georgia button, and clicking a place selects it (§3.1). Both levels are in Plan 1, and no new map, list or panel component is built. A separate page for every place stays a possible later plan.
 
-Decisions inherited from the data stage and unchanged: the 2025 census break is shown as Geostat published it and marked; nothing is rescaled, spliced or re-estimated; no growth or rate is computed across it. Density is regions only. Citizenship names five countries and one computed remainder.
+Decisions inherited from the data stage and unchanged: the 1 January 2025 census re-base is shown as Geostat published it and marked; nothing is rescaled, spliced or re-estimated; no growth or rate is computed across it. Density is regions only. Citizenship names five countries and one computed remainder.
 
 ## 3. Section structure and navigation
 
@@ -148,7 +148,7 @@ The source note on every page names Geostat as publisher, the basis of the figur
 
 ## 9. Language and labels
 
-Georgian first, English complete. A new message scope `demography` (`lib/i18n/messages/{ka,en}/demography.json`, added to `MESSAGE_SCOPES`) holds page copy, sex, age-group, settlement, citizenship-group and series labels as reviewed messages, so `npm run i18n:check` governs parity. New keys also go in `common.json` (navigation, rail label, hub). The Georgian text is drafted by the agent and listed in each plan's review table; the owner reviews it before that plan merges, and the six Georgian source descriptions for density and the census in `data/localization/ka/service-messages.json` are reviewed in Plan 1. New routes are added to `lib/i18n/inventory.server.ts`, `data/localization/en/page-revisions.json`, `tests/i18n/routes.test.ts` and, once live, `public/llms.txt` and `tests/seo/agentFiles.test.ts`. An English page carries no Georgian anywhere, including JSON-LD.
+Georgian first, English complete. A new message scope `demography` (`lib/i18n/messages/{ka,en}/demography.json`, added to `MESSAGE_SCOPES`) holds page copy, sex, age-group, settlement, citizenship-group and series labels as reviewed messages, so `npm run i18n:check` governs parity. New keys also go in `common.json` (navigation, rail label, hub). The Georgian text is drafted by the agent and listed in each plan's review table; the owner reviews it before that plan merges, and the six Georgian source descriptions for density and the census in `data/localization/ka/service-messages.json` are reviewed in Plan 1. New routes are added to `lib/i18n/inventory.server.ts`, `data/localization/en/page-revisions.json`, `tests/i18n/routes.test.ts` and, once live, `public/llms.txt` and `tests/seo/agentFiles.test.ts`. English pages carry no Georgian in visible text, attributes, metadata or JSON-LD; the data handed to client components may carry Georgian place names, as on the existing English map pages.
 
 ## 10. SEO and structured data
 
@@ -179,7 +179,7 @@ Canonical owners updated in the same plan that makes the change true:
 | `DESIGN.md` | New "Demography surfaces" section: hub, page anatomy, the break rules, tokens (§7), each new chart form and its interaction | each |
 | `docs/data-methodology/demography.md` | Replace the "Delivery boundary" paragraph; link the pages | each |
 | `docs/data-methodology/database-import.md` | Add `DemographyFact` and its parity rule | 1 |
-| `AGENTS.md` | One line in V1 and Data Non-Negotiables: no growth or rate is computed across the 2025 census break. Needs owner approval | 1 |
+| `AGENTS.md` | One line in V1 and Data Non-Negotiables: no growth or rate is computed across the 1 January 2025 census re-base. Needs owner approval | 1 |
 
 ## 14. Open decisions (for review, defaults recommended)
 
