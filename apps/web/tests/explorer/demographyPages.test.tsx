@@ -12,7 +12,7 @@ import {
   renderDemographyPopulationPage,
 } from "../../lib/pages/demography-population";
 
-const GEORGIAN = /[Ⴀ-ჿ]/;
+const GEORGIAN = /\p{Script=Georgian}/u;
 const original = process.env.NEXT_PUBLIC_SITE_URL;
 beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
@@ -26,6 +26,7 @@ describe("demography hub page", () => {
     expect(html).toContain('href="/en/explorer/demography/population"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
+    expect(html).not.toContain("/downloads/data/");
     expect(html).not.toMatch(GEORGIAN);
   });
 
@@ -53,6 +54,9 @@ describe("population page", () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("ka"));
     expect(html).toContain('data-testid="population-explorer"');
     expect(html).toContain("2004–2026 · 1 იანვრის მდგომარეობით");
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
+    expect(html).not.toContain("/downloads/data/");
     expect(html).toContain('href="/methodology/demography"');
   });
 

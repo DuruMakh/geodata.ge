@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
+import { DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
 import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
 import sitemap from "../../lib/seo/sitemap";
@@ -31,7 +33,10 @@ describe("demography discovery", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
     try {
       const [paths, entries] = await Promise.all([listPublicPagePaths(), sitemap()]);
-      const notLive = /\/explorer\/demography\/(age-sex|migration|births-deaths)/;
+      // Built from the routes module, the one place that says which pages are live. With every page live there is
+      // nothing to exclude, and an empty pattern would match every path, so then the pattern matches nothing.
+      const notLivePaths = DEMOGRAPHY_PAGES.filter((page) => !page.live).map((page) => page.path);
+      const notLive = notLivePaths.length > 0 ? new RegExp(notLivePaths.join("|")) : /(?!)/;
       expect(paths.some((path) => notLive.test(path))).toBe(false);
       expect(entries.some((entry) => notLive.test(entry.url))).toBe(false);
     } finally {
@@ -42,10 +47,13 @@ describe("demography discovery", () => {
   it("dates the Georgian pages by the latest review of the figures they show", async () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
     try {
-      const entries = await sitemap();
+      const [entries, { facts }] = await Promise.all([sitemap(), loadServedDemographyData()]);
+      // The served rows come from two files, population and density, reviewed on different days. The pages show
+      // both, so the date is the latest over every row of both, read from the facts as the economy pages' test does.
+      const latest = (rows: readonly { lastReviewedAt: string }[]) => rows.map((row) => row.lastReviewedAt).sort().at(-1);
       for (const path of ["/explorer/demography", "/explorer/demography/population"]) {
         const entry = entries.find((candidate) => candidate.url === `https://fiscal.ge${path}`);
-        expect(new Date(entry!.lastModified!).toISOString().slice(0, 10)).toBe("2026-10-03");
+        expect(new Date(entry!.lastModified!).toISOString().slice(0, 10)).toBe(latest(facts));
       }
     } finally {
       vi.unstubAllEnvs();

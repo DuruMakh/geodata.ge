@@ -17,6 +17,8 @@ import type { Locale } from "../../lib/i18n/types";
 let html: string;
 let htmlKa: string;
 const count = (token: RegExp) => (html.match(token) ?? []).length;
+// The opening tag of the element with this test id, so an attribute is read from that element and no other.
+const tagOf = (testId: string) => html.match(new RegExp(`<[^>]*data-testid="${testId}"[^>]*>`))?.[0] ?? "";
 
 // The scopes the explorer's page loads: `municipal` is there because the municipality map always prints its legend text.
 async function renderExplorer(locale: Locale): Promise<string> {
@@ -52,6 +54,8 @@ describe("Population explorer, first render", () => {
     expect(html).not.toContain("/explorer/economy/regions/");
     expect(html).toMatch(/data-testid="population-georgia-pill"[^>]*aria-pressed="true"|aria-pressed="true"[^>]*data-testid="population-georgia-pill"/);
     expect(html).toContain('data-testid="population-level-municipalities"');
+    expect(tagOf("population-level-regions")).toContain('aria-pressed="true"');
+    expect(html).toContain('data-testid="population-measure-density"');
     expect(html).not.toMatch(/data-testid="population-measure-density"[^>]*disabled=""/);
     expect(html).not.toContain('data-testid="population-density-note"');
     expect(html).toContain("persons, 1 January 2026");
@@ -65,14 +69,17 @@ describe("Population explorer, first render", () => {
   test("lists Georgia and the 11 regions with full persons and Georgia selected", () => {
     expect(count(/data-testid="series-row"/g)).toBe(12);
     expect(html).toContain("3,941,103");
-    expect(html).toMatch(/1\s*\/\s*12/);
+    // The counter's whole text, so that "11 / 12" or "1 / 120" cannot satisfy it.
+    expect(html).toMatch(/>1\s*\/\s*12</);
     expect(html).toContain('data-testid="population-tab-municipalities"');
   });
 
   test("draws the chart with the labelled census gap and notes the re-base in words", () => {
     expect(html).toContain('role="img"');
+    expect(tagOf("population-mode-line")).toContain('aria-pressed="true"');
     expect(count(/data-testid="chart-break"/g)).toBe(1);
-    expect(html).toContain("Census re-base");
+    // The label is drawn twice: on the chart, at the gap, and on the range strip's marker.
+    expect(count(/Census re-base/g)).toBeGreaterThanOrEqual(2);
     expect(html).toContain("226,000");
     expect(html).toContain("Geostat re-based the population to the 2024 census");
   });

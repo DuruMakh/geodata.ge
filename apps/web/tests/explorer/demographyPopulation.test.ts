@@ -87,6 +87,13 @@ describe("places", () => {
     const colours = places.map(placeColor);
     expect(colours.every((colour) => /^#[0-9A-F]{6}$/i.test(colour))).toBe(true);
   });
+
+  test("the 11 regions have pairwise distinct colours and none is the ink that Georgia wears", () => {
+    const regionColours = places.filter((place) => place.level === "region").map((place) => placeColor(place).toUpperCase());
+    expect(regionColours).toHaveLength(11);
+    expect(new Set(regionColours).size).toBe(11);
+    expect(regionColours).not.toContain(INK.toUpperCase());
+  });
 });
 
 describe("hash state", () => {

@@ -1,9 +1,11 @@
 import { beforeAll, describe, expect, test } from "vitest";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
+import { SERIES } from "../../lib/data/demography/series";
 import type { ServedDemographyObservation } from "../../lib/data/demography/types";
 import type { Municipality, MunicipalRegion } from "../../lib/data/municipal/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { buildPopulationMapModels, type PopulationMapModels } from "../../lib/explorer/demographyPopulationMaps";
+import { formatInUnit, UNIT_DENSITY } from "../../lib/explorer/format";
 
 let facts: ServedDemographyObservation[];
 let regions: MunicipalRegion[];
@@ -39,6 +41,26 @@ describe("population map models", () => {
     expect(maps.municipalitiesPopulation.markers).toHaveLength(5);
     expect(maps.municipalitiesPopulation.markers.find((marker) => marker.code === "04")).toMatchObject({ budgetPerResidentGel: 1_369_356, display: "1,369,356" });
     expect(maps.municipalitiesPopulation.shapes.find((shape) => shape.code === "11")).toMatchObject({ budgetPerResidentGel: 16_098, display: "16,098" });
+  });
+
+  test("the density map has its own latest year: without the newest density year it shows the one before, and the population map stays", () => {
+    // Today both series end in 2026, so "every map shows the latest loaded year" cannot tell densityYear from
+    // populationYear. Dropping every density row of the newest density year makes the two differ.
+    const isDensity = (fact: ServedDemographyObservation) => fact.seriesId === SERIES.populationDensity;
+    const densityYears = facts.filter(isDensity).map((fact) => fact.year);
+    const newest = Math.max(...densityYears);
+    const previous = Math.max(...densityYears.filter((year) => year < newest));
+    const withoutNewest = facts.filter((fact) => !(isDensity(fact) && fact.year === newest));
+    const earlier = buildPopulationMapModels({ facts: withoutNewest, regions, municipalities, densityUnit: "/km²" });
+    expect(earlier.densityYear).toBe(previous);
+    expect(earlier.populationYear).toBe(maps.populationYear);
+    expect(earlier.regionsDensity.year).toBe(earlier.densityYear);
+    // Tbilisi prints the value of that earlier year, read from the facts.
+    const tbilisi = facts.find((fact) => isDensity(fact) && fact.geographyId === "region.tbilisi" && fact.year === previous)!;
+    expect(earlier.regionsDensity.regions.find((region) => region.regionId === "region.tbilisi")).toMatchObject({
+      totalGdpGel: tbilisi.value,
+      display: `${formatInUnit(tbilisi.value, UNIT_DENSITY)} /km²`,
+    });
   });
 
   test("refuses maps whose levels end in different years", () => {
