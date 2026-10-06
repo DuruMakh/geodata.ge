@@ -32,6 +32,21 @@ describe("demography methodology", () => {
     }
   });
 
+  it("dates the re-base by its day in the English disclosure: 1 January 2025, never a 2025 census", () => {
+    // The census was taken in November 2024; the re-base applies from 1 January 2025.
+    const { disclosure } = getMethodologyContent("demography", "en");
+    expect(disclosure).toContain("1 January 2025");
+    expect(disclosure).not.toContain("the 2025 census");
+  });
+
+  it("names the three bases in the exact English words the page shows", () => {
+    const content = getMethodologyContent("demography", "en");
+    const prose = [content.summary, content.disclosure, ...content.sections.flatMap((section) => section.paragraphs)].join(" ");
+    for (const phrase of ["re-estimated in 2018", "estimated before the 2024 census", "based on the 2024 census"]) {
+      expect(prose, phrase).toContain(phrase);
+    }
+  });
+
   it("archives exactly the two Geostat originals it serves, with their recorded hashes", async () => {
     const rows = await loadReviewedSourceManifest(root, "demography");
     expect(rows.map((row) => [row.source_id, row.byte_size, row.sha256])).toEqual([

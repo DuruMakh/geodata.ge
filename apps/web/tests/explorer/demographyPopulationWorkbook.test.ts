@@ -120,6 +120,14 @@ describe("population workbook", () => {
     expect(data.getCell("E12").numFmt).toBe("#,##0.0");
   });
 
+  test("the Data sheet's columns are wide enough for the longest place name and the basis text", async () => {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer(build()));
+    const data = workbook.getWorksheet("Data")!;
+    // Place, Level, Year, Population, Density, Basis, Status. The default widths gave Place 10 and Basis 16.
+    expect(Array.from({ length: 7 }, (_, index) => data.getColumn(index + 1).width)).toEqual([34, 14, 8, 16, 14, 46, 12]);
+  });
+
   test("the Summary sheet header names the places, marks the census re-base on 2025 and has no change column", async () => {
     const model = build();
     const workbook = new ExcelJS.Workbook();

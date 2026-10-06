@@ -78,6 +78,8 @@ export type WorkbookExportModel = {
   };
   analysis: {
     numericFormats?: Record<number,string>;
+    /** Data-sheet column widths in characters, from the first column; a column without one keeps the writer's default. */
+    columnWidths?: number[];
     headers: string[];
     rows: Array<Array<string | number | null>>;
   };

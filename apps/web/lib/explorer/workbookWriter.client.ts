@@ -227,7 +227,7 @@ function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel[
   const widths = [10, 28, 42, 18, 12, 16];
   analysis.headers.forEach((_, index) => {
     const column = index + 1;
-    worksheet.getColumn(column).width = widths[index] ?? 18;
+    worksheet.getColumn(column).width = analysis.columnWidths?.[index] ?? widths[index] ?? 18;
     const header = worksheet.getCell(1, column);
     header.alignment = { vertical: "top", wrapText: true };
     if (column === 2 || column === 3) {

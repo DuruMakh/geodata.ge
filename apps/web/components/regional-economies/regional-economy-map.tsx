@@ -59,7 +59,7 @@ export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange
             <a
               key={region.regionId}
               {...(onSelect
-                ? { role: "button", "aria-pressed": chosen.has(region.regionId) }
+                ? { role: "button", "aria-pressed": chosen.has(region.regionId), className: "cursor-pointer" }
                 : { href: pageHref(regionalEconomyHref(region.regionId), locale) })}
               data-region-map-target=""
               data-region-id={region.regionId}

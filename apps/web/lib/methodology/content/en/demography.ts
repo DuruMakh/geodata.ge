@@ -9,7 +9,7 @@ export const DEMOGRAPHY_METHODOLOGY: MethodologyContent = {
   archiveManifestId: "demography",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/demography.md"],
-  disclosure: "Official annual Geostat observations. Fiscal.ge computes the shares and ranks; because of the 2025 census re-base no change is computed.",
+  disclosure: "Official annual Geostat observations. Fiscal.ge computes the shares and ranks; because of the 1 January 2025 census re-base no change is computed.",
   keyFacts: [
     { label: "Coverage", valueKind: "coverage" },
     { label: "Frequency", valueKind: "frequency", value: "Annual, 1 January" },

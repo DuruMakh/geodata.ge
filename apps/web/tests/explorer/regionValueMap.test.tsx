@@ -5,6 +5,7 @@ import { loadServedDemographyData } from "../../lib/data/demography/importDemogr
 import { SERIES } from "../../lib/data/demography/series";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
+import { formatAmount } from "../../lib/explorer/format";
 import { buildRegionValueMapModel, type RegionalEconomyMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import { I18nProvider } from "../../lib/i18n/provider";
@@ -82,5 +83,21 @@ describe("RegionalEconomyMap choosing mode", () => {
     expect(count(html, /role="button"/g)).toBe(0);
     expect(count(html, /aria-pressed/g)).toBe(0);
     expect(count(html, /data-testid="regional-map-chosen"/g)).toBe(0);
+  });
+
+  test("a region button in choosing mode shows the pointer cursor, as the municipality map's targets do", () => {
+    // A link shows the pointer by itself; a button made from an SVG anchor with no href does not.
+    const targets = render({ onSelect: () => {} }).match(/<a [^>]*data-region-map-target=""[^>]*>/g) ?? [];
+    expect(targets).toHaveLength(11);
+    expect(targets.every((tag) => tag.includes('class="cursor-pointer"'))).toBe(true);
+  });
+
+  test("the tooltip prints the region's own text, its value with its unit, and never a GEL amount or a year", () => {
+    const imereti = model.regions.find((region) => region.regionId === "region.imereti")!;
+    const html = render({ onSelect: () => {}, activeRegionId: "region.imereti" });
+    const tooltip = html.match(/<div role="tooltip" data-testid="regional-map-tooltip"[^>]*>(.*?)<\/div>/)?.[1] ?? "";
+    expect([...tooltip.matchAll(/<span[^>]*>(.*?)<\/span>/g)].map((match) => match[1])).toEqual(["Imereti", imereti.display]);
+    expect(tooltip).not.toContain(formatAmount(imereti.totalGdpGel, "en"));
+    expect(tooltip).not.toMatch(new RegExp(`\\b${model.year}\\b`));
   });
 });

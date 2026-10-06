@@ -9,7 +9,7 @@ export const DEMOGRAPHY_METHODOLOGY: MethodologyContent = {
   archiveManifestId: "demography",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/demography.md"],
-  disclosure: "საქსტატის ოფიციალური წლიური მონაცემები. წილებსა და ადგილებს Fiscal.ge ითვლის; 2025 წლის აღწერით გადათვლის გამო ცვლილება არ ითვლება.",
+  disclosure: "საქსტატის ოფიციალური წლიური მონაცემები. წილებსა და ადგილებს Fiscal.ge ითვლის; 2025 წლის 1 იანვრის აღწერით გადათვლის გამო ცვლილება არ ითვლება.",
   keyFacts: [
     { label: "მოცვა", valueKind: "coverage" },
     { label: "სიხშირე", valueKind: "frequency", value: "წლიური, 1 იანვარი" },
