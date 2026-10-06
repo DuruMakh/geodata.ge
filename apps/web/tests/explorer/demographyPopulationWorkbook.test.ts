@@ -121,10 +121,15 @@ describe("population workbook", () => {
     expect(data.getCell("E12").numFmt).toBe("#,##0.0");
   });
 
-  // The widths are not counted by hand. Whatever the real messages and place names say, no cell of the written Data
-  // sheet, header included, may be longer in characters than its column is wide. Each language is built from its real
-  // message files, over Georgia, the 11 regions and the municipality with the longest name in each language, every year.
-  test.each(["ka", "en"] as const)("the %s Data sheet has no cell longer than its column is wide, header included", async (locale) => {
+  // The widths are not counted by hand. Whatever the real messages and place names say, the written Data sheet must
+  // leave room for every cell. Excel's column unit is the width of a digit and Georgian letters are wider than that
+  // (about 1.1 to 1.3 times on real fonts), so a body cell is weighed with each Georgian letter at 1.2 and every other
+  // character at 1, and must fit within its column's width minus 1 (a column keeps about a unit for padding). It is an
+  // estimate, not a measurement of any one font. Place and Basis cells are the ones Excel can cut off (they do not wrap
+  // and the next cell is filled), but every body cell gets the same rule. Header cells wrap, so they are counted in
+  // plain characters against the whole width. Each language is built from its real message files, over Georgia, the 11
+  // regions and the municipality with the longest name in each language, every year.
+  test.each(["ka", "en"] as const)("the %s Data sheet leaves room for every cell (Georgian script weighted, approximate)", async (locale) => {
     const municipal = await loadServedMunicipalData();
     const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map((region) => region.id), ...municipal.municipalities.map((m) => m.code)];
     const real = await getPresentation(locale, ["demography", "common", "controls", "main", "format", "workbook", "municipal"], ids);
@@ -148,12 +153,18 @@ describe("population workbook", () => {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(model));
     const data = workbook.getWorksheet(model.sheetNames[1])!;
+    // Rounded to a tenth so the sum carries no floating-point noise into the comparison.
+    const weighted = (text: string) =>
+      Math.round(Array.from(text).reduce((sum, character) => sum + (/\p{Script=Georgian}/u.test(character) ? 1.2 : 1), 0) * 10) / 10;
     const tooLong = new Set<string>();
-    data.eachRow((row) =>
+    data.eachRow((row, rowNumber) =>
       row.eachCell((cell, column) => {
         const width = data.getColumn(column).width ?? 0;
-        if (cell.text.length > width) {
-          tooLong.add(`${data.getCell(1, column).text} (column ${column}, ${width} wide): "${cell.text}" is ${cell.text.length} characters`);
+        const header = rowNumber === 1;
+        const length = header ? cell.text.length : weighted(cell.text);
+        const room = header ? width : width - 1;
+        if (length > room) {
+          tooLong.add(`${locale} ${data.getCell(1, column).text} (column ${column}, ${width} wide, room for ${room}): "${cell.text}" is ${length} long`);
         }
       }),
     );
