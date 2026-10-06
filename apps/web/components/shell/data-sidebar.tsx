@@ -10,12 +10,13 @@ import { LanguageSwitch } from "../site/language-switch";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
 // 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
 // platform whose first dataset is the budget; teaser rows are markers only.
 
-const TEASERS = ["unemployment", "demography"];
+const TEASERS = ["unemployment"];
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
 const MOBILE_NAV_ID = "data-sidebar-navigation";
@@ -30,7 +31,8 @@ export function DataSidebar() {
   const pathname = usePathname();
   const economyActive = pathname.includes("/explorer/economy");
   const inflationActive = pathname.includes("/explorer/inflation");
-  const budgetActive = !economyActive && !inflationActive;
+  const demographyActive = pathname.includes("/explorer/demography");
+  const budgetActive = !economyActive && !inflationActive && !demographyActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
   const regionsActive = pathname.includes("/explorer/economy/regions");
@@ -169,7 +171,7 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, demographyActive ? "common.dataDemography" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
@@ -277,6 +279,31 @@ export function DataSidebar() {
                 {message(messages, "common.inflationCities")}
               </Link>
             ) : null}
+            <Link
+              href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}
+              data-testid="demography-link"
+              aria-current={pathname.endsWith(DEMOGRAPHY_HUB_PATH) ? "page" : undefined}
+              className={`flex items-baseline gap-2 border-l-2 px-2.5 py-2 text-[12.5px] font-semibold no-underline ${demographyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
+            >
+              {message(messages, "common.demography")}
+            </Link>
+            {demographyActive
+              ? LIVE_DEMOGRAPHY_PAGES.map((page) => {
+                  const active = pathname.endsWith(page.path);
+                  return (
+                    <Link
+                      key={page.id}
+                      href={pageHref(page.path, locale)}
+                      data-testid={`demography-${page.id}-link`}
+                      aria-current={active ? "page" : undefined}
+                      className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
+                    >
+                      <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                      {message(messages, page.labelKey)}
+                    </Link>
+                  );
+                })
+              : null}
 
             {/* No aria-disabled on the rows: the listitem role ignores it (jsx-a11y
                 flags it), and the ComingSoonBadge text already reads out. */}

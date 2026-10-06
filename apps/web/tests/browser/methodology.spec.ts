@@ -18,7 +18,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 
       const sidebar = page.getByTestId("data-sidebar");
       await expect(sidebar).toBeVisible();
       const inkBadges = sidebar.getByText("მალე", { exact: true });
-      await expect(inkBadges).toHaveCount(2);
+      await expect(inkBadges).toHaveCount(1);
       for (const badge of await inkBadges.all()) {
         await expectReadableText(badge, sidebar);
       }

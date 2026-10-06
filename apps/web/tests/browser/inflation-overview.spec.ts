@@ -111,7 +111,7 @@ test("the sidebar lists three datasets and the hub links all four live sections"
   await page.getByTestId("inflation-hub").getByRole("link").first().click();
   await ready(page);
   await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(2);
+  await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(1);
 });
 
 test("the methodology Dataset is the node the catalog references", async ({ page }) => {
