@@ -94,7 +94,7 @@ export function SourceNote({ children, testId }: SourceNoteProps) {
 }
 
 type SegmentedTabsProps<T extends string> = {
-  options: Array<{ value: T; label: string; icon?: ReactNode; testId?: string; ariaLabel?: string }>;
+  options: Array<{ value: T; label: string; icon?: ReactNode; testId?: string; ariaLabel?: string; disabled?: boolean }>;
   value: T;
   onChange: (next: T) => void;
   ariaLabel: string;
@@ -116,15 +116,16 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
             aria-label={option.ariaLabel ?? (option.icon ? option.label : undefined)}
             data-focus-inset=""
             aria-pressed={active}
+            disabled={option.disabled}
             onClick={() => onChange(option.value)}
             // `data-focus-inset` above draws the focus ring inside the button:
             // the group clips to its rounded box, so an outward ring is cut away
             // on three sides and the survivor lands over the neighbouring tab.
             // Transition only the two properties that change — `transition-colors`
             // also animates outline-color, hiding the ring for its first 150ms.
-            className={`cursor-pointer ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
+            className={`${option.disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer"} ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
               index > 0 ? "border-l border-[var(--control)]" : ""
-            } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
+            } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : option.disabled ? "bg-transparent text-[var(--muted)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
           >
             {option.icon ?? option.label}
           </button>
