@@ -207,7 +207,7 @@ export function PopulationExplorer({
             <RangeStrip
               years={model.availableYears}
               range={model.range}
-              marker={{ year: CENSUS_STEP.toYear, label: breakLabel }}
+              marker={{ year: CENSUS_STEP.toYear, label: breakLabel, labelSide: "auto" }}
               onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))}
             />
           </section>

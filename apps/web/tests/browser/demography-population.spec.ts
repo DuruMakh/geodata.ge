@@ -221,7 +221,7 @@ test("a mouse click chooses a municipality and its tooltip shows population, not
   await expect(page).toHaveURL(/sel=11(&|$)/);
 });
 
-for (const width of [390, 768, 900, 1100, 1440]) {
+for (const width of [320, 390, 768, 900, 1100, 1440]) {
   test(`the hub and the Population page have no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     for (const path of ["/explorer/demography", "/explorer/demography/population", "/en/explorer/demography/population"]) {

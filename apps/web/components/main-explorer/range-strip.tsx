@@ -9,7 +9,12 @@ import type { ResolvedRange } from "./use-explorer-state";
 // 24px rail with year ticks and two accessible slider handles. A monthly strip
 // (periodsPerYear 12) counts the same chips in months and prints formatted periods.
 
-export type RangeMarker = { year: number; label: string };
+export type RangeMarker = {
+  year: number;
+  label: string;
+  /** Omit to centre the label on the marker. "auto" puts it on the side with room, as the chart's break label does. */
+  labelSide?: "auto";
+};
 
 type RangeStripProps = {
   years: number[];
@@ -66,6 +71,10 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
   const span = Math.max(max - min, 1);
   const pct = (year: number) => `${(((year - min) / span) * 100).toFixed(2)}%`;
   const visibleMarker = marker && marker.year >= min && marker.year <= max ? marker : undefined;
+  // Centred on the marker, unless `labelSide: "auto"` applies the chart's break-label rule (`bx > W / 2`):
+  // past the middle of the rail the label ends at the marker, otherwise it starts there.
+  const markerLabelAnchor =
+    visibleMarker?.labelSide === "auto" ? ((visibleMarker.year - min) / span > 0.5 ? "right-0" : "left-0") : "-translate-x-1/2";
 
   const chips = rangeChips(years, min, periodsPerYear).map((chip) => ({ label: message(messages, `controls.${chip.key}`), start: chip.start }));
 
@@ -204,7 +213,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
             className="pointer-events-none absolute top-0 bottom-0 z-[1] w-px bg-[var(--accent)]"
             style={{ left: pct(visibleMarker.year) }}
           >
-            <span className="absolute -top-4 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[9px] font-medium text-[var(--accent)]">
+            <span className={`absolute -top-4 ${markerLabelAnchor} whitespace-nowrap font-[family-name:var(--font-numeric)] text-[9px] font-medium text-[var(--accent)]`}>
               {visibleMarker.label}
             </span>
           </div>
