@@ -119,4 +119,19 @@ describe("population workbook", () => {
     expect(data.getCell("E2").value).toBeNull();
     expect(data.getCell("E12").numFmt).toBe("#,##0.0");
   });
+
+  test("the Summary sheet header names the places, marks the census re-base on 2025 and has no change column", async () => {
+    const model = build();
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer(model));
+    const summary = workbook.getWorksheet("Summary")!;
+    // The writer puts the title on row 1, the subtitle on row 2 and the column headers on row 3.
+    const headers = Array.from({ length: summary.columnCount }, (_, index) => summary.getCell(3, index + 1).value);
+    const yearHeader = (year: number) => headers[model.readable.years.indexOf(year) + 1];
+    expect(headers[0]).toBe("Place");
+    expect(yearHeader(2024)).toBe("2024");
+    expect(yearHeader(2025)).toBe("2025 · Census re-base");
+    expect(yearHeader(2026)).toBe("2026");
+    expect(headers.map((header) => String(header)).join(" ")).not.toMatch(/change/i);
+  });
 });

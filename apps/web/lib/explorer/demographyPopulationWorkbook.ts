@@ -55,6 +55,11 @@ export function buildPopulationWorkbookExportModel(
       amountDecimals: 0,
       showChangeColumn: false,
       years: model.years,
+      // The re-base year says so in its column header, so the Summary table is never read straight across the break.
+      headerLabels: {
+        category: t("placeHeader"),
+        columns: model.years.map((year) => (year === CENSUS_STEP.toYear ? `${year} · ${t("breakLabel")}` : String(year))),
+      },
       rows: model.selected.map((place) => ({
         kind: place.level === "country" ? "total" : "item",
         parentLabel: null,
