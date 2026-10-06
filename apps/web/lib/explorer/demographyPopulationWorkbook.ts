@@ -99,8 +99,9 @@ export function buildPopulationWorkbookExportModel(
       ),
       // Column numbers, counted from 1: Population and Density.
       numericFormats: { 4: "#,##0", 5: "#,##0.0" },
-      // Place, Level, Year, Population, Density, Basis, Status: the place names and the basis text are the long ones.
-      columnWidths: [34, 14, 8, 16, 14, 46, 12],
+      // Place, Level, Year, Population, Density, Basis, Status. Wide enough for the longest text of each column in both
+      // languages, header included (a test measures it): the place names, the basis and status text, the measure headers.
+      columnWidths: [34, 17, 8, 21, 28, 54, 21],
     },
     sources: withAbsoluteUrls(originals.map(({ sourceId: _sourceId, ...source }) => source), siteOrigin),
   };

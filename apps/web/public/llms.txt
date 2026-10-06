@@ -39,7 +39,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Economic sectors methodology](https://fiscal.ge/methodology/economic-sectors) — sector GVA versus GDP, GDP shares, annual real growth and preliminary status.
 - [Regional economies methodology](https://fiscal.ge/methodology/regional-economies) — regional GVA at basic prices, regional GDP at market prices, calculations and original sources.
 - [Inflation methodology](https://fiscal.ge/methodology/inflation) — Geostat CPI definitions, validation, the NBG target and original files.
-- [Demography methodology](https://fiscal.ge/methodology/demography) — Geostat population and density, the 2025 census re-base, definitions and original files.
+- [Demography methodology](https://fiscal.ge/methodology/demography) — Geostat population and density, the 1 January 2025 census re-base, definitions and original files.
 
 ## Bulk data files
 

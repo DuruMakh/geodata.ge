@@ -7,6 +7,7 @@ import { GEORGIA_PLACE_ID, buildDemographyPlaces, type DemographyPlace } from ".
 import { DEFAULT_POPULATION_STATE, type PopulationState } from "../../lib/explorer/demographyPopulation";
 import { buildPopulationWorkbookExportModel } from "../../lib/explorer/demographyPopulationWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { message } from "../../lib/i18n/messages";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
 
@@ -120,12 +121,43 @@ describe("population workbook", () => {
     expect(data.getCell("E12").numFmt).toBe("#,##0.0");
   });
 
-  test("the Data sheet's columns are wide enough for the longest place name and the basis text", async () => {
+  // The widths are not counted by hand. Whatever the real messages and place names say, no cell of the written Data
+  // sheet, header included, may be longer in characters than its column is wide. Each language is built from its real
+  // message files, over Georgia, the 11 regions and the municipality with the longest name in each language, every year.
+  test.each(["ka", "en"] as const)("the %s Data sheet has no cell longer than its column is wide, header included", async (locale) => {
+    const municipal = await loadServedMunicipalData();
+    const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map((region) => region.id), ...municipal.municipalities.map((m) => m.code)];
+    const real = await getPresentation(locale, ["demography", "common", "controls", "main", "format", "workbook", "municipal"], ids);
+    const realPlaces = buildDemographyPlaces({
+      regions: municipal.regions,
+      municipalities: municipal.municipalities,
+      englishLabels: real.englishLabels,
+      georgiaNameKa: message(real.messages, "demography.georgia"),
+    });
+    const municipalities = realPlaces.filter((place) => place.level === "municipality");
+    const longest = (name: (place: DemographyPlace) => string) =>
+      municipalities.reduce((best, place) => (name(place).length > name(best).length ? place : best));
+    const selectedIds = [...new Set([
+      GEORGIA_PLACE_ID,
+      ...realPlaces.filter((place) => place.level === "region").map((place) => place.id),
+      longest((place) => place.nameKa).id,
+      longest((place) => place.nameEn).id,
+    ])];
+    const model = buildPopulationWorkbookExportModel(facts, realPlaces, { ...DEFAULT_POPULATION_STATE, selectedIds }, real, sources, "https://fiscal.ge");
+
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(await createWorkbookBuffer(build()));
-    const data = workbook.getWorksheet("Data")!;
-    // Place, Level, Year, Population, Density, Basis, Status. The default widths gave Place 10 and Basis 16.
-    expect(Array.from({ length: 7 }, (_, index) => data.getColumn(index + 1).width)).toEqual([34, 14, 8, 16, 14, 46, 12]);
+    await workbook.xlsx.load(await createWorkbookBuffer(model));
+    const data = workbook.getWorksheet(model.sheetNames[1])!;
+    const tooLong = new Set<string>();
+    data.eachRow((row) =>
+      row.eachCell((cell, column) => {
+        const width = data.getColumn(column).width ?? 0;
+        if (cell.text.length > width) {
+          tooLong.add(`${data.getCell(1, column).text} (column ${column}, ${width} wide): "${cell.text}" is ${cell.text.length} characters`);
+        }
+      }),
+    );
+    expect([...tooLong]).toEqual([]);
   });
 
   test("the Summary sheet header names the places, marks the census re-base on 2025 and has no change column", async () => {
