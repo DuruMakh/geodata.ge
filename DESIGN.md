@@ -1,9 +1,9 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-09-26
+Last updated: 2026-10-04
 Status: Production visual system for Fiscal.ge
-Scope: Explorer product UI (budget, economy and inflation), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
+Scope: Explorer product UI (budget, economy, inflation and demography), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
@@ -26,13 +26,13 @@ Superseded and must not appear in production:
 
 ## 2. Product Scope Boundary
 
-Fiscal.ge is a Georgian-first explorer of reviewed annual budget and economy data plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
+Fiscal.ge is a Georgian-first explorer of reviewed annual budget, economy and demography data plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
+Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), the Demography hub (Population), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
 Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
-Municipal budgets are a budget **section** at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). The two teaser datasets in the sidebar (`უმუშევრობა`, `დემოგრაფია`) remain markers only, with no data at all. Nothing about a marker may be styled as if it were live.
+Municipal budgets are a budget **section** at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 03 (§6.7). The one teaser dataset in the sidebar (`უმუშევრობა`) remains a marker only, with no data at all. Nothing about a marker may be styled as if it were live.
 
 Regional economies are an Economy route family at `/explorer/economy/regions` (§2.1, §6.2, §26): one All Regions index and 11 detail pages.
 
@@ -300,7 +300,7 @@ No screen card, no outer container. Content sits directly on paper.
 
 ### 6.2 Information Architecture
 
-The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy and Inflation hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
+The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy, Inflation and Demography hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
 
 ```text
 /explorer                              budget hub — the six sections as cards
@@ -324,6 +324,8 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/inflation/categories                          COICOP categories and contributions (§25.1)
 /explorer/inflation/cities                              Inflation by city: Georgia page (§25.3)
 /explorer/inflation/cities/[city]                       Inflation in one city (§25.3)
+/explorer/demography                  დემოგრაფია        Demography hub (§27)
+/explorer/demography/population                         Population on 1 January: maps, chart, table (§27)
 ```
 
 Outside `/explorer` sit the two editorial pages, `/about` (§23) and `/connect`, the MCP connection page (§24), and the methodology centre at `/methodology` and `/methodology/[dataset]` (§21).
@@ -358,6 +360,7 @@ Keys by section. The hash never carries `nav`, and no key is renamed once shippe
 | Inflation overview | `i` indicator, `m` mode, `r=YYYY-MM-YYYY-MM`, `sel`, `t` table series | — |
 | Inflation categories | `i`, `m`, `r`, `sel`, `t`, `x` expanded divisions | — |
 | Inflation cities | `m`, `r`, `sel` (place slugs on the Georgia page; `total`, `01`–`12` on a city page), `t` table line | — |
+| Demography population | `sel`, `level`, `map`, `view`, `range=all` or `start`/`end` | `sel` holds place ids, Tbilisi as `region.tbilisi` at either level; `map=density` needs `level=regions`. |
 
 Write rules: loading a page never adds state to its URL, so a pristine URL stays clean. After that, every change replaces the current history entry, except the discrete switches a section's spec asks Back to step through, which push one — today only the economic sectors measure and view.
 
@@ -405,9 +408,9 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- Three dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
-- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, or Inflation's overview / categories / cities, all in the section-row style below.
-- `უმუშევრობა`, `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
+- Four dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
+- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Inflation's overview / categories / cities, or Demography's published pages (Population), all in the section-row style below.
+- `უმუშევრობა` — an `ink-fg-muted` label with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a).
 
@@ -416,7 +419,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 **Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
 
 - The toggle stays in place at the top, icon flipped to `ChevronsRight`.
-- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Inflation equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
+- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Inflation / Demography equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
 - Beneath it, the compact language switch; at the foot, a Lucide `House` icon is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip. The collapsed rail remains logo-free.
 - **Sections are not reachable while collapsed** — the list is unmounted, not hidden. A 52px rail cannot carry Georgian section names, and reducing them to invented initials would trade one extra click for three ambiguous glyphs. Collapse is a reading posture: it hands the width back to the data and keeps only orientation and escape.
 
@@ -905,7 +908,7 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, Government Debt, GDP, national economic sectors, regional economies, and inflation. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, Government Debt, GDP, national economic sectors, regional economies, inflation, and demography. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only.
 
@@ -1039,3 +1042,11 @@ The Economy hub links to `/explorer/economy/regions`. Its index uses 11 region-l
 Each `/explorer/economy/regions/[id]` page reuses the editorial line chart, table, range strip, unlimited series panel, region picker, highlights and Excel action. Total regional GDP is first, selected by default and removable; all 20 NACE Rev. 2 activities are selectable. Activities wear the sector colours above; total regional GDP is ink. The joined measure control has exactly two choices: nominal GEL, shown with the literal `₾`, and share of that selected region's GDP, shown with Lucide `ChartPie`. There is no share of Georgia, real-growth, per-capita, USD, forecast or 2025 control.
 
 Activity amounts are gross value added at basic prices. The share denominator is the same region and year's complete GDP at market prices and never changes with series selection. Net product taxes explain why activity shares need not sum to 100%. The end-year highlights use all 20 activities independently of chart selection. Georgian and English pages, three-sheet Excel workbooks, methodology originals, Dataset JSON-LD, the read-only query tool and central JSON/CSV files all carry the same 2010–2024 boundary. Bounded decisions: `docs/superpowers/specs/2026-09-13-regional-economies-design.md`.
+
+## 27. Demography surfaces
+
+The sidebar's fourth dataset link, `დემოგრაფია`, opens a hub at `/explorer/demography`: the shared hub cards numbered 01–04, where a page that is not yet published is a non-clickable `მალე` card. The Population card carries Georgia's series as a sparkline broken at the census re-base.
+
+**Population page** (`/explorer/demography/population`): header, serif H1 and a one-line unit statement, then the map block, the standard workspace and the highlights. The map block opens with one row of three controls: a pill `საქართველო` (the Measure Pill style, pressed while Georgia alone is selected), a joined control `რეგიონები / მუნიციპალიტეტები` and a joined control `მოსახლეობა / სიმჭიდროვე`; density is disabled at the municipality level, with its reason as visible text. The maps are the regional-economy map and the budget municipalities map, unchanged in outline, hatching, legend layout and keyboard movement (only the legend, tooltip and accessible-name wording changes, to population or density); a place is a button, choosing it replaces the selection, and every selected place is outlined 2.4px in `ink` above its neighbours (a city dot takes an ink ring and the hover size). Maps show the latest loaded year only and carry the census note. The places list is the standard series panel with the two levels as grouping tabs; ticking a place adds a line to the chart and, when the map shows that place's level, an outline on the map.
+
+**The census re-base** applies wherever a population-based value is drawn: a marked series is drawn in two segments, never joined across 1 January 2025; a dashed vertical rule (`4 3`) sits between the 2024 and 2025 positions with the short label `აღწერით გადათვლა` (11px mono, on the side with room); tables carry a 2px ink rule left of the 2025 column with the label on its header; the range strip marks 2025; tooltips and workbooks name each year's basis in plain words. No growth, change or rank movement is shown for any pair of years that spans the re-base. This page adds no colour token: Georgia is `ink`, and regions and municipalities cycle the editorial palette by their registry order so a place keeps its colour on every page. Bounded decisions: `docs/superpowers/specs/2026-10-04-demography-section-design.md` and `docs/superpowers/specs/2026-10-04-demography-population-design.md`.
