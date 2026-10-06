@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Publish the Demography hub and the Population page (Georgian and `/en`): a clickable map of the 11 regions and 64 municipalities, the standard line/table workspace with the 2025 census re-base marked, highlights for the first selected place, an Excel download and a methodology page, all served from the reviewed CSVs through the Supabase mirror.
+**Goal:** Publish the Demography hub and the Population page (Georgian and `/en`): a clickable map of the 11 regions and 64 municipalities, the standard line/table workspace with the 1 January 2025 census re-base marked, highlights for the first selected place, an Excel download and a methodology page, all served from the reviewed CSVs through the Supabase mirror.
 
 **Architecture:** reviewed CSVs → a demography loader (CSV mode, or the mirror table checked row by row against the CSVs) → a narrow client projection → thin pages → the components the site already has, each with a few optional props (line chart `breaks`, table `breakYears`, the two maps' selecting and wording props plus a value-based model builder each). New code is limited to the serving path, the place and population model, a places list panel, highlights and the page composition.
 
@@ -15,7 +15,7 @@
 - Reuse first (`AGENTS.md`). Every change to an existing component or module is an optional addition whose default leaves current output and tests unchanged. Existing tests stay untouched except where a task says a list must grow. Nothing is copied or forked.
 - Commands run from `apps/web`. While editing, run only what the change can break (`npx vitest run <file>`, `npm run typecheck`). `npm run check`, `npm run build` and the browser suite run once, in Task 16.
 - Every commit message ends with a second `-m` holding the `Co-Authored-By` trailer your own session's instructions specify. The commands below show the one in force when this plan was reviewed (`Claude Opus 5.5`).
-- Georgian is the default language; `/en` mirrors every path through `pageHref`. An English page carries no Georgian text anywhere, including JSON-LD.
+- Georgian is the default language; `/en` mirrors every path through `pageHref`. English pages carry no Georgian in visible text, attributes, metadata or JSON-LD; the data handed to client components may carry Georgian place names, as on the existing English map pages.
 - The 2025-01-01 census re-base (foundation §5): a marked series is never joined across 2024 and 2025 in a chart, a table or the range strip; no growth, change, rate, rank movement or difference is computed from a value before the break and one after it (R4).
 - Basis wording (R6), exact: 2004–2014 "re-estimated in 2018"; 2015–2024 "estimated before the 2024 census"; 2025 onward "based on the 2024 census". Short break label `აღწერით გადათვლა` / "Census re-base".
 - Maps show the latest loaded year only (no year selector). Tbilisi is one place, `region.tbilisi`; municipality `04` is normalised to it. Codes `05`, `42`, `43`, `46`, `64` never appear.
@@ -4355,7 +4355,7 @@ export const DEMOGRAPHY_METHODOLOGY: MethodologyContent = {
   archiveManifestId: "demography",
   coverageSource: { kind: "archive" },
   canonicalDocuments: ["docs/data-methodology/demography.md"],
-  disclosure: "Official annual Geostat observations. Fiscal.ge computes the shares and ranks; because of the 2025 census re-base no change is computed.",
+  disclosure: "Official annual Geostat observations. Fiscal.ge computes the shares and ranks; because of the 1 January 2025 census re-base no change is computed.",
   keyFacts: [
     { label: "Coverage", valueKind: "coverage" },
     { label: "Frequency", valueKind: "frequency", value: "Annual, 1 January" },
@@ -5079,7 +5079,7 @@ In `apps/web/public/llms.txt`:
    ```
 3. After the `[Inflation methodology]` bullet add:
    ```
-   - [Demography methodology](https://fiscal.ge/methodology/demography) — Geostat population and density, the 2025 census re-base, definitions and original files.
+   - [Demography methodology](https://fiscal.ge/methodology/demography) — Geostat population and density, the 1 January 2025 census re-base, definitions and original files.
    ```
 
 - [ ] **Step 5: Run the tests**

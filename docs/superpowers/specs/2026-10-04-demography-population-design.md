@@ -129,6 +129,6 @@ Acceptance: the anchor values in §2 appear in map tooltip, list, highlights, ch
 1. **Choosing a place on the map replaces the selection.** Recommended: exploring is the common use, and the list covers comparison. Alternative: a compare mode on the map.
 2. **Latest year only on the map.** Recommended, for the reason in §2. Alternative: a year selector (a small new control), at the cost of maps that invite 2024-versus-2025 reading.
 3. **City dots stay green**, as on the budget map. Alternative: value colour, one more optional prop on `MunicipalityMap`.
-4. **Density only on the map and in Excel, not the chart.** Recommended: a density trend is the population trend rescaled and a 440-fold spread is unreadable on one axis.
+4. **Density only on the map and in Excel, not the chart.** Recommended: a density trend is the population trend rescaled and a 424-fold spread (Tbilisi's 2026 density of 2,715.7 persons per km² against 6.4 in Racha-Lechkhumi and Kvemo Svaneti) is unreadable on one axis.
 5. **No change figure anywhere.** Recommended (foundation §14.1).
 6. **A page per place** (as the budget Municipalities section has) is a possible later plan, not part of this one.
