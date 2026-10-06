@@ -91,6 +91,10 @@ async function createFixtureRepository() {
       await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-by-activities-eng.xlsx", "regional-activities"),
       await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-eng.xlsx", "regional-totals"),
     ],
+    demography: [
+      await writeReviewedSource(repositoryRoot, "demography", "2004-2026", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx", "downloads/methodology/demography/files/01-population-by-self-governed-unit.xlsx", "demography-population"),
+      await writeReviewedSource(repositoryRoot, "demography", "2014-2026", "docs/Raw Data/Demography/geostat-demography/2026-10/official/03-density-by-regions.xlsx", "downloads/methodology/demography/files/03-density-by-regions.xlsx", "demography-density"),
+    ],
     expenditure: [
       await writeReviewedSource(repositoryRoot, "expenditure", "2005", "docs/Raw Data/Expenditure/2005/source-a.pdf", "downloads/methodology/expenditure/files/2005/source-a.pdf", "source-a"),
       await writeReviewedSource(repositoryRoot, "expenditure", "2006", "docs/Raw Data/Expenditure/2006/source-b.xlsx", "downloads/methodology/expenditure/files/2006/source-b.xlsx", "source-b"),

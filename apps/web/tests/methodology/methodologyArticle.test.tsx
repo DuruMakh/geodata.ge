@@ -3,6 +3,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
 import { METHODOLOGY_CONTENT } from "../../lib/methodology/catalog";
+import { getMessages } from "../../lib/i18n/messages.server";
+import { I18nProvider } from "../../lib/i18n/provider";
 import common from "../../lib/i18n/messages/ka/common.json";
 import methodology from "../../lib/i18n/messages/ka/methodology.json";
 
@@ -113,6 +115,7 @@ describe("methodology footer attribution", () => {
     ["gdp", "World Bank and Geostat"],
     ["economic-sectors", "Geostat"],
     ["regional-economies", "Geostat"],
+    ["demography", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
@@ -122,5 +125,28 @@ describe("methodology footer attribution", () => {
     expect(footer).not.toMatch(/\d{4}-\d{2}-\d{2}/);
     const header = markup.match(/<header[\s\S]*?<\/header>/)?.[0] ?? "";
     expect(header).toContain(`Last methodology review · ${METHODOLOGY_CONTENT[dataset as keyof typeof METHODOLOGY_CONTENT].reviewedAt}`);
+  });
+});
+
+describe("methodology without bulk files", () => {
+  it("renders the demography article with its breadcrumb and archived originals but no download or Dataset markup", async () => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "demography" }) }));
+    expect(markup).not.toContain("processed-dataset-download");
+    expect(markup).not.toContain('data-testid="dataset-json-ld"');
+    expect(markup).not.toContain("/downloads/data/");
+    expect(markup).toContain('data-testid="breadcrumb-json-ld"');
+    expect(markup).toContain("/downloads/methodology/demography/files/");
+  });
+
+  it("lists demography on the hub but keeps it out of the data catalog, which names only Dataset nodes", async () => {
+    const { renderMethodologyPage } = await import("../../lib/pages/methodology");
+    // The hub renders the client-side ComingSoonBadge, which needs the provider the real locale layout supplies.
+    const messages = await getMessages("en", ["common", "methodology"]);
+    const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={messages}>{await renderMethodologyPage("en")}</I18nProvider>);
+    const catalog = markup.match(/<script data-testid="catalog-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!;
+    expect(catalog).toContain('/methodology/inflation"');
+    expect(catalog).not.toContain("/methodology/demography");
+    expect(markup).toContain('href="/en/methodology/demography"');
   });
 });

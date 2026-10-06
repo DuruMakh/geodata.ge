@@ -63,6 +63,7 @@ const DATASET_SOURCE_NOTES = {
   "economic-sectors": "common.geostatSourceNote",
   "regional-economies": "common.geostatSourceNote",
   inflation: "common.inflationSourceNote",
+  demography: "common.geostatSourceNote",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -149,31 +150,36 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   ]);
   const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts, debtData.facts, archiveSummaries[dataset]);
   const publicRows = projectPublicSources(rows, locale, catalogue.documents);
+  // Demography has no bulk files, no Dataset markup and no MCP entry yet (spec section 10): it keeps the
+  // breadcrumb and the archived originals, and nothing that points at a file that does not exist.
+  const downloadable = dataset === "demography" ? null : dataset;
 
   return (
     <>
+      {downloadable === null ? null : (
       <JsonLd
-        data={dataset === "inflation" ? {
+        data={downloadable === "inflation" ? {
           "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,
           url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
           inLanguage:["ka","en"], dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:seoMessage(locale,"seo.country")},
           creator:{"@id":`${resolveSiteUrl()}/#organization`}, publisher:{"@id":`${resolveSiteUrl()}/#organization`},
           includedInDataCatalog:catalogReference(resolveSiteUrl(),locale), license:"https://creativecommons.org/licenses/by/4.0/",
-          distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}${DATASET_DOWNLOADS[dataset]}`}
+          distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}${DATASET_DOWNLOADS[downloadable]}`}
         } : datasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: locale === "en" ? `/en/methodology/${dataset}` : `/methodology/${dataset}`,
-          datasetId: DATASET_SCHEMA_IDS[dataset],
+          datasetId: DATASET_SCHEMA_IDS[downloadable],
           name: content.title,
           description: content.summary,
           firstYear: coverage.firstYear,
           lastYear: coverage.lastYear,
           dateModified: content.reviewedAt,
-          downloadPath: DATASET_DOWNLOADS[dataset],
-          jsonDownloadPaths: DATASET_JSON_DISTRIBUTIONS[dataset],
+          downloadPath: DATASET_DOWNLOADS[downloadable],
+          jsonDownloadPaths: DATASET_JSON_DISTRIBUTIONS[downloadable],
         })}
         testId="dataset-json-ld"
       />
+      )}
       <MethodologyArticle
         locale={locale}
         messages={messages}
@@ -181,8 +187,8 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
         coverage={coverage}
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
-        processedDataHref={DATASET_DOWNLOADS[dataset]}
-        processedDataJsonLinks={DATASET_JSON_DOWNLOADS[dataset].map(link => ({ href: link.href, label: message(messages, link.labelKey) }))}
+        processedDataHref={downloadable === null ? undefined : DATASET_DOWNLOADS[downloadable]}
+        processedDataJsonLinks={downloadable === null ? [] : DATASET_JSON_DOWNLOADS[downloadable].map(link => ({ href: link.href, label: message(messages, link.labelKey) }))}
         breadcrumbItems={[
           { name: message(messages, "common.home"), path: pageHref("/", locale) },
           { name: message(messages, "common.methodology"), path: pageHref("/methodology", locale) },

@@ -79,7 +79,7 @@ export function MethodologyHub({
           {message(messages, "methodology.futureSummary")}
         </p>
         <div className="mt-7 grid gap-x-10 min-[640px]:grid-cols-2">
-          {["population", "unemployment"].map((key) => (
+          {["unemployment"].map((key) => (
             <div
               key={key}
               data-testid="methodology-future-row"

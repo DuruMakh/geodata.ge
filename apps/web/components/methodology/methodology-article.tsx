@@ -17,7 +17,7 @@ type MethodologyArticleProps = {
   coverage: { firstYear: number; lastYear: number };
   rows: readonly PublicSourceManifestRow[];
   archiveSummary: MethodologyArchiveSummary;
-  processedDataHref: `/downloads/data/${string}.csv`;
+  processedDataHref?: `/downloads/data/${string}.csv`;
   processedDataJsonLinks: readonly { href: `/downloads/data/${string}.json`; label: string }[];
   breadcrumbItems: readonly BreadcrumbItem[];
 };
@@ -69,6 +69,8 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
         ))}
       </dl>
 
+      {/* A dataset with no bulk files has nothing to download: no link, no caption. */}
+      {processedDataHref === undefined ? null : (
       <div className="border-b border-[var(--ink)] py-6">
         <a
           data-testid="processed-dataset-download"
@@ -101,6 +103,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
         </p>
         ) : null}
       </div>
+      )}
 
       <aside
         data-testid="methodology-disclosure"
