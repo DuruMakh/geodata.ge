@@ -9,7 +9,8 @@ test("import mapping round-trips all natural keys and refuses a lost row before 
   const rows = unemploymentMirrorCreateRows(facts, "run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
   const client = { unemploymentFact: { findMany: async () => rows } } as unknown as MirrorClient;
   const mirror = await loadUnemploymentFactsFromMirror(client);
-  expect(new Set(mirror.map(unemploymentObservationKey)).size).toBe(3142);
+  expect(new Set(mirror.map(unemploymentObservationKey)).size).toBe(3370);
+  expect(mirror.find(f => f.groupId === "region.tbilisi" && f.year === 2025 && f.indicatorId === "hired")).toMatchObject({ value: "361.23065568749558", sourceCell: "C286" });
   expect(() => assertUnemploymentParity(facts, mirror)).not.toThrow();
   rows.pop();
   const incomplete = await loadUnemploymentFactsFromMirror(client);

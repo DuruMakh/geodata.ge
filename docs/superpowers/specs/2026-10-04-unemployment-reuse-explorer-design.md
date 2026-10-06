@@ -1,7 +1,7 @@
 # Unemployment explorer — first version using existing components
 
 Date: 2026-10-04
-Status: Design and inline implementation plan approved in this conversation on 2026-10-04, after clarification of the rate, count and supporting-indicator scope. Implemented and locally verified on 2026-10-05, with independent reviews and regression-tested fixes. The user authorized GitHub delivery, synchronization and the CI-gated production release on 2026-10-05.
+Status: Design and inline implementation plan approved in this conversation on 2026-10-04, after clarification of the rate, count and supporting-indicator scope. Implemented and locally verified on 2026-10-05, with independent reviews and regression-tested fixes. The user authorized GitHub delivery, synchronization and the CI-gated production release on 2026-10-05. The four-card navigation amendment in §7 was separately approved on 2026-10-05 and supersedes the earlier single-page navigation and breakdown-control descriptions.
 
 ## 1. Intended result
 
@@ -99,3 +99,42 @@ The implementation must prove:
 Expected implementation areas are dataset preparation/loading/parity, the dataset-specific explorer model and state, the reused-component page wrapper, Excel labels/model, bilingual messages/navigation/metadata, methodology/source archives and focused regression/browser tests. Preserve the shared visual components wherever their existing inputs already support the data; do not refactor unrelated explorers.
 
 Publishing, pushing, opening a PR, merging and deployment require separate authorization. Their required CI and production-commit/URL verification remain unchanged.
+
+## 7. Approved four-card navigation amendment — 2026-10-05
+
+The user corrected the initial single-page structure to match the Budget, Economy and Inflation section hubs. The unemployment hub at `/explorer/unemployment` reuses the existing cards and links to four static data pages in this exact order:
+
+| Card | Data page |
+| --- | --- |
+| National overview | `/explorer/unemployment/overview` |
+| Regions | `/explorer/unemployment/regions` |
+| Age groups | `/explorer/unemployment/age` |
+| Gender | `/explorer/unemployment/gender` |
+
+The national overview uses the existing editorial text tabs for Overview, Urban/rural, Education and Long-term unemployment. Those supporting subjects have no separate cards or routes. Education retains its Total/Women/Men control. The national composition chart belongs only to the Overview tab. The other three data pages fix their own comparison, retaining the national reference, unlimited series selection, indicators, years, table and Excel action.
+
+The sidebar repeats the four-card order. Every page has its own heading, description, breadcrumbs, bilingual metadata and sitemap entry. Card years and the national sparkline come from the served facts. Other cards show annual coverage without inventing an aggregate for their groups. Each page receives only its own data and necessary reference facts. Existing shared links migrate from the hub to the matching data page with their hash settings preserved; incompatible hashes cannot change a page into another main section.
+
+Verification must cover card destinations and page defaults in both languages at 390, 768 and 1440 pixels, supporting-tab controls and coverage, history and language switching, legacy-link migration, selected-group table/Excel agreement and source links. Reviewed observations, database structure, original archives and the MCP/publication boundary stay within their existing approved scope. This amendment authorizes implementation; publishing remains a separate operation.
+
+## Approved overview selection amendment — 2026-10-06
+
+The regional map/detail amendment approved later on 2026-10-06 supersedes this section's retained regional dropdown. The user explicitly chose Economy's region-only map/list and separate static `/explorer/unemployment/regions/[id]` pages, mirrored under `/en`, with the existing region picker. The map shows the latest published unemployment rates for eleven modern regions, with non-interactive occupied overlays and reused hover/focus/keyboard interactions.
+
+Region detail and historical comparison views reuse the completed overview's indicator checkboxes, replacing the dropdown. The initial seven indicators omit employment rate; the regional employment-status amendment below adds two children under Employed. Only the selected region's unemployment rate is initially selected, first and removable. Percentages/counts are mutually exclusive; multiple compatible indicators, search-independent bulk actions, charts, tables, range controls and three-sheet Excel exports follow the overview rules. Region names appear in metadata, breadcrumbs, headings, workbook titles and filenames. Each region uses its own published years. Earlier combined groups remain separate in an index comparison view; former shared links retain their groups, years and view with the new checkbox identities. This supersedes the original map/detail exclusion. The navigation change alters no source archives, municipal data or database structure; the data addition is specified below. External publication remains separate.
+
+## Regional employment-status amendment, approved 2026-10-06
+
+The user approved adding Hired and Self-employed beneath each region's Employed row, matching the completed national overview. The archived regional workbook already contains both categories for eleven modern regions in 2020–2025. The earlier description treating them as unavailable was incorrect and is superseded by this amendment.
+
+Promote exactly 132 primary observations to the existing employment-status CSV, preserving all source columns and decimal tokens. Exclude repeated Georgia controls and leave all original captures and the three original canonical CSVs unchanged. Validate the source cells, reconcile hired + self-employed + the unpublished-in-UI unidentified-worker component with Employed, and reconcile regional category totals with the national source.
+
+Use the existing expandable rows and separate rate/count selection rules. A region's selected-series coverage retains its longer Employed history when the parent and children are selected together, with gaps before 2020. Selecting only the children fits to their published 2020–2025 coverage. Display the coverage and remainder explanation in both languages; charts, tables, saved settings and Excel downloads preserve the same values and missing cells. No new database structure, live database import or publication is part of this amendment.
+
+This amendment replaces the overview's single-indicator dropdown and export decisions above. Rename its card, sidebar link and heading to Unemployment overview / უმუშევრობის მიმოხილვა. The Regions, Age groups and Gender pages retain their approved controls.
+
+The national checkbox list uses indicators instead of a Georgia row. Remove employment rate from this overview. Employed people expands to Self-employed and Hired employees. Urban/rural parents select the corresponding unemployment rate and expand to the remaining measures, with employment status grandchildren. Long-term metric parents select Georgia and expand only to Men and Women. Education offers only unemployment rate, retaining education-level checkboxes and Total/Women/Men.
+
+The user explicitly chose mutual exclusion: selecting a percentage unselects all people counts; selecting a people count unselects all percentages. Multiple measures of the same unit remain selectable. Bulk selection uses all series of the current unit, regardless of search. The default is the applicable published unemployment rate. Selections, years and view survive URL restoration and language changes; incompatible mixed selections keep the last valid selected unit. Tables and workbooks identify every selected indicator/group pair, with one unit and exact official source values.
+
+Promote the 96 national/settlement hired and self-employed annual observations from the preserved source extract into an additional canonical BOM CSV. Validate source cells, complete coverage, employed = hired + self-employed + unidentified, and urban/rural component sums. Preserve the unclassified remainder in the official employed total, with a visible explanation. The existing parity-checked import handles the new rows without a schema change. No source recapture, live database write, publication or deployment is authorized by this amendment.

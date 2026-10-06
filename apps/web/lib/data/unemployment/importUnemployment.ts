@@ -23,7 +23,7 @@ export function assertUnemploymentParity(csv: UnemploymentObservation[], mirror:
 export async function loadUnemploymentFacts(): Promise<UnemploymentObservation[]> {
   const manifest = JSON.parse(readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "../../docs/Raw Data/Unemployment/geostat-labour-force-annual/source-manifest.json"), "utf8")) as { source_id: string; retrieved_at: string }[];
   const dates = new Map(manifest.map(source => [source.source_id, source.retrieved_at]));
-  const rows = (await Promise.all(["unemployment-annual.csv", "unemployment-education-annual.csv", "unemployment-long-term-annual.csv"].map(name => readCsvRecords(`../../data/imports/${name}`)))).flat();
+  const rows = (await Promise.all(["unemployment-annual.csv", "unemployment-education-annual.csv", "unemployment-long-term-annual.csv", "unemployment-employment-status-annual.csv"].map(name => readCsvRecords(`../../data/imports/${name}`)))).flat();
   const facts = rows.map(row => unemploymentObservationFromCsv(row, dates.get(row.source_id)!));
   validateUnemploymentFacts(facts); assertCompleteUnemploymentCoverage(facts);
   if (facts.some(f => !UNEMPLOYMENT_GROUPS.some(group => group.id === f.groupId && (group.labelEn === f.groupLabelEn || (f.dimension === "long_term" && f.groupId === "georgia" && f.groupLabelEn === "Total"))))) throw new Error("Unreviewed unemployment group label");

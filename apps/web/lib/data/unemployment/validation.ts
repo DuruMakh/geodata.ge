@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { unemploymentIndicators, unemploymentIsRate, unemploymentObservationKey, type UnemploymentObservation, type UnemploymentBreakdown } from "./types";
+import { EMPLOYMENT_STATUS_INDICATORS, REGIONAL_EMPLOYMENT_STATUS_FIRST_YEAR, unemploymentIndicators, unemploymentIsRate, unemploymentObservationKey, type UnemploymentObservation, type UnemploymentBreakdown } from "./types";
 
 const D = Decimal.clone({ precision: 50 });
 const tolerance = new D("0.000001");
@@ -15,6 +15,7 @@ export function assertCompleteUnemploymentCoverage(facts: readonly UnemploymentO
   const expected = new Set<string>();
   for (const row of readInventory("coverage.csv")) {
     for (const year of row.years.split("|").map(Number)) for (const indicator of unemploymentIndicators(row.dimension as UnemploymentBreakdown)) {
+      if (row.dimension === "region" && EMPLOYMENT_STATUS_INDICATORS.includes(indicator) && year < REGIONAL_EMPLOYMENT_STATUS_FIRST_YEAR) continue;
       expected.add([row.dimension, row.group_id, row.dimension === "sex" ? row.group_id : "total", indicator, year].join(":"));
     }
   }
@@ -71,6 +72,7 @@ export function validateUnemploymentFacts(facts: readonly UnemploymentObservatio
     close(get("unemployment_rate"), get("unemployed").div(force).mul(100), "rate");
     close(get("employment_rate"), get("employed").div(population).mul(100), "employment rate");
     close(get("participation_rate"), force.div(population).mul(100), "participation rate");
+    if ((["national", "settlement"].includes(first.dimension) || first.dimension === "region" && first.year >= REGIONAL_EMPLOYMENT_STATUS_FIRST_YEAR) && get("hired").plus(get("self_employed")).gt(get("employed").plus(tolerance))) throw new Error("Unemployment employment status exceeds the employed total");
   }
   for (const year of new Set(facts.map(f => f.year))) {
     const national = reference("total", year);
@@ -80,6 +82,9 @@ export function validateUnemploymentFacts(facts: readonly UnemploymentObservatio
       if (!members.length) continue;
       for (const indicator of ["population_15_plus", "labour_force", "employed", "unemployed", "outside_labour_force"]) {
         close(members.filter(f => f.indicatorId === indicator).reduce((sum, f) => sum.plus(f.value), new D(0)), new D(national.get(indicator)!.value), `${dimension} count sum`);
+      }
+      if (dimension === "settlement" || dimension === "region" && year >= REGIONAL_EMPLOYMENT_STATUS_FIRST_YEAR) for (const indicator of ["hired", "self_employed"]) {
+        close(members.filter(f => f.indicatorId === indicator).reduce((sum, f) => sum.plus(f.value), new D(0)), new D(national.get(indicator)!.value), `${dimension} employment status sum`);
       }
     }
     const longTerm = facts.filter(f => f.year === year && f.dimension === "long_term" && f.indicatorId === "long_term_unemployed");

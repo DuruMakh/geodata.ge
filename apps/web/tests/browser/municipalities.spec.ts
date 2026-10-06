@@ -212,7 +212,7 @@ test("keeps occupied-area and no-data wording out of the map itself", async ({ p
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });
 
-test("map omits the redundant heading while its legend, tooltip, and accessibility retain the measure", async ({ page }) => {
+test("map shows no data popup while its legend and accessible names retain the measure", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   await expect(page.getByTestId("municipality-map-heading")).toHaveCount(0);
@@ -230,29 +230,20 @@ test("map omits the redundant heading while its legend, tooltip, and accessibili
   const zugdidi = page.getByTestId("municipality-shape-33");
   await zugdidi.hover();
   const tooltip = page.getByTestId("municipality-map-tooltip");
-  await expect(tooltip).toContainText("ზუგდიდი");
-  await expect(tooltip.getByTestId("municipality-map-tooltip-per-resident")).toContainText(perResident);
-  await expect(tooltip.getByTestId("municipality-map-tooltip-total")).toContainText(total);
-  expect(await tooltip.locator("[data-testid$='per-resident'], [data-testid$='total']").evaluateAll(
-    (elements) => elements.map((element) => element.getAttribute("data-testid")),
-  )).toEqual(["municipality-map-tooltip-per-resident", "municipality-map-tooltip-total"]);
-  await expect(tooltip).toContainText("→");
-  await expect(tooltip).not.toContainText(/Open|გახსნა/);
+  await expect(tooltip).toHaveCount(0);
   await expect(zugdidi).toHaveAccessibleName(new RegExp(`ზუგდიდი.*${perResident.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*${total.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}.*გახსნა`));
-  await expect(zugdidi).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
-  await expect(page.locator('[data-municipality-map-target][aria-describedby="municipality-map-tooltip"]')).toHaveCount(1);
+  await expect(zugdidi).not.toHaveAttribute("aria-describedby");
 
   const batumi = page.getByTestId("municipality-marker-06");
   await batumi.focus();
-  await expect(tooltip).toContainText("ბათუმი");
-  await expect(tooltip).toContainText("→");
+  await expect(tooltip).toHaveCount(0);
   await expect(batumi).toHaveAccessibleName(/ბათუმი.*გახსნა/);
-  await expect(batumi).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(batumi).not.toHaveAttribute("aria-describedby");
   await expect(zugdidi).not.toHaveAttribute("aria-describedby");
-  await expect(page.locator('[data-municipality-map-target][aria-describedby="municipality-map-tooltip"]')).toHaveCount(1);
+  await expect(page.locator("[data-municipality-map-target][aria-describedby]")).toHaveCount(0);
 });
 
-test("Tbilisi path and marker activate together while only the map-origin target owns the description", async ({
+test("Tbilisi path and marker activate together with one accessible target and no data popup", async ({
   page,
 }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
@@ -272,11 +263,12 @@ test("Tbilisi path and marker activate together while only the map-origin target
   await marker.focus();
   await expect(path).toHaveAttribute("data-active", "true");
   await expect(marker).toHaveAttribute("data-active", "true");
-  await expect(marker).toHaveAttribute("aria-describedby", "municipality-map-tooltip");
+  await expect(marker).not.toHaveAttribute("aria-describedby");
+  await expect(page.getByTestId("municipality-map-tooltip")).toHaveCount(0);
   await expect(path).not.toHaveAttribute("aria-describedby");
 });
 
-test("list focus suppresses a stale tooltip from a different map pointer target", async ({ page }) => {
+test("list focus takes priority over a different map pointer target without a data popup", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
   const zugdidi = page.getByTestId("municipality-shape-33");
@@ -284,7 +276,7 @@ test("list focus suppresses a stale tooltip from a different map pointer target"
   const tbilisiMarker = page.getByTestId("municipality-marker-04");
 
   await zugdidi.dispatchEvent("mouseover");
-  await expect(page.getByTestId("municipality-map-tooltip")).toContainText("ზუგდიდი");
+  await expect(page.getByTestId("municipality-map-tooltip")).toHaveCount(0);
   await page.locator('[data-municipality-row-code="04"]').evaluate((row) =>
     (row as HTMLElement).focus({ preventScroll: true }),
   );
@@ -369,37 +361,6 @@ test("focus uses the polygon or marker instead of a rectangular outline", async 
   expect(markerStyle.radius).toBeGreaterThan(7.5);
   expect(markerStyle.strokeWidth).toBeGreaterThanOrEqual(2);
   expect(contrastRatio(markerStyle.stroke, markerStyle.fill)).toBeGreaterThanOrEqual(3);
-});
-
-test("keeps the tooltip inside the map after a narrow viewport resize", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-  await expectMunicipalAppReady(page);
-  const map = page.getByTestId("municipality-map");
-  const lowestTestId = await map.locator("[data-municipality-shape]").evaluateAll((elements) => {
-    const lowest = elements.reduce((current, element) =>
-      element.getBoundingClientRect().bottom > current.getBoundingClientRect().bottom ? element : current,
-    );
-    return lowest.getAttribute("data-testid");
-  });
-  expect(lowestTestId).toBeTruthy();
-  await page.getByTestId(lowestTestId!).focus();
-  await expect(page.getByTestId("municipality-map-tooltip")).toBeVisible();
-
-  await page.setViewportSize({ width: 340, height: 844 });
-  await expect
-    .poll(async () => {
-      const svgBox = await map.locator("svg").boundingBox();
-      const tooltipBox = await page.getByTestId("municipality-map-tooltip").boundingBox();
-      if (svgBox === null || tooltipBox === null) return false;
-      return (
-        tooltipBox.x >= svgBox.x &&
-        tooltipBox.y >= svgBox.y &&
-        tooltipBox.x + tooltipBox.width <= svgBox.x + svgBox.width &&
-        tooltipBox.y + tooltipBox.height <= svgBox.y + svgBox.height
-      );
-    })
-    .toBe(true);
 });
 
 test.describe("municipalities index", () => {

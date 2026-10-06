@@ -1,4 +1,4 @@
-export type UnemploymentIndicator = "unemployment_rate" | "unemployed" | "employment_rate" | "employed" | "participation_rate" | "labour_force" | "outside_labour_force" | "population_15_plus" | "long_term_unemployed" | "long_term_unemployment_rate" | "long_term_unemployed_share";
+export type UnemploymentIndicator = "unemployment_rate" | "unemployed" | "employment_rate" | "employed" | "hired" | "self_employed" | "participation_rate" | "labour_force" | "outside_labour_force" | "population_15_plus" | "long_term_unemployed" | "long_term_unemployment_rate" | "long_term_unemployed_share";
 export type UnemploymentBreakdown = "national" | "sex" | "settlement" | "age" | "region" | "education" | "long_term";
 export type UnemploymentSex = "total" | "women" | "men";
 export type UnemploymentObservation = {
@@ -18,8 +18,10 @@ export type UnemploymentGroupDefinition = { id: string; labelKa: string; labelEn
 export const CORE_UNEMPLOYMENT_INDICATORS: UnemploymentIndicator[] = ["unemployment_rate", "unemployed", "employment_rate", "employed", "participation_rate", "labour_force", "outside_labour_force", "population_15_plus"];
 export const EDUCATION_UNEMPLOYMENT_INDICATORS: UnemploymentIndicator[] = ["unemployment_rate", "employment_rate", "participation_rate"];
 export const LONG_TERM_UNEMPLOYMENT_INDICATORS: UnemploymentIndicator[] = ["long_term_unemployment_rate", "long_term_unemployed", "long_term_unemployed_share"];
+export const EMPLOYMENT_STATUS_INDICATORS: UnemploymentIndicator[] = ["self_employed", "hired"];
+export const REGIONAL_EMPLOYMENT_STATUS_FIRST_YEAR = 2020;
 export function unemploymentIndicators(breakdown: UnemploymentBreakdown): UnemploymentIndicator[] {
-  return breakdown === "education" ? EDUCATION_UNEMPLOYMENT_INDICATORS : breakdown === "long_term" ? LONG_TERM_UNEMPLOYMENT_INDICATORS : CORE_UNEMPLOYMENT_INDICATORS;
+  return breakdown === "education" ? EDUCATION_UNEMPLOYMENT_INDICATORS : breakdown === "long_term" ? LONG_TERM_UNEMPLOYMENT_INDICATORS : [...CORE_UNEMPLOYMENT_INDICATORS, ...(["national", "settlement", "region"].includes(breakdown) ? EMPLOYMENT_STATUS_INDICATORS : [])];
 }
 export function unemploymentIsRate(indicator: UnemploymentIndicator): boolean {
   return indicator.endsWith("_rate") || indicator === "long_term_unemployed_share";

@@ -37,7 +37,8 @@ test("the index searches both languages, retains its 64 territories and opens En
   await expect(page).toHaveURL(/\/en\/explorer\/municipalities$/);
   const marker = page.getByTestId("municipality-marker-04");
   await marker.focus();
-  await expect(page.getByTestId("municipality-map-tooltip")).toContainText("Tbilisi");
+  await expect(page.getByTestId("municipality-map-tooltip")).toHaveCount(0);
+  await expect(marker).toHaveAccessibleName(/Tbilisi/);
   await expectEnglish(page);
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/en\/explorer\/municipalities\/tbilisi/);

@@ -20,6 +20,8 @@ import { resolveSiteUrl } from "../siteUrl";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
 import { loadPageRevisions } from "../i18n/page-revisions.server";
 import { pageHref } from "../i18n/routes";
+import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
+import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
@@ -90,6 +92,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified: sectorsModified },
     { url: `${siteUrl}/explorer/unemployment`, lastModified: unemploymentModified },
+    ...UNEMPLOYMENT_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: unemploymentModified })),
+    ...regions.map(region => ({ url: `${siteUrl}${unemploymentRegionHref(region.id)}`, lastModified: new Date(unemploymentFacts.filter(fact => fact.dimension === "region" && fact.groupId === region.id).map(fact => fact.lastReviewedAt).sort().at(-1)!) })),
     { url: `${siteUrl}/explorer/economy/regions`, lastModified: regionalModified },
     ...regions.map((region) => ({
       url: `${siteUrl}/explorer/economy/regions/${region.id.replace("region.", "")}`,

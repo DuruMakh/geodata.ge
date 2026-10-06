@@ -3,19 +3,31 @@ import { unemploymentIsRate } from "../data/unemployment/types";
 import { colorForItem, colorForProgram, EDITORIAL_PALETTE, INK } from "./colors";
 import { resolveRange } from "./periodRange";
 import type { UnemploymentState } from "./unemploymentState";
+import { unemploymentFactSeriesId, unemploymentOverviewDefinitions, unemploymentOverviewIndicators, unemploymentUsesIndicatorSeries } from "./unemploymentOverview";
 
-export function unemploymentReferenceId(state: Pick<UnemploymentState, "breakdown" | "educationSex">): string {
+export function unemploymentReferenceId(state: Pick<UnemploymentState, "breakdown" | "educationSex" | "overview" | "regional" | "regionId">): string {
+  if (state.regional) return `${state.regionId ?? "georgia"}:unemployment_rate`;
+  if (state.overview && state.breakdown !== "education") return `georgia:${state.breakdown === "long_term" ? "long_term_unemployment_rate" : "unemployment_rate"}`;
   return state.breakdown === "education" && state.educationSex !== "total" ? state.educationSex : "georgia";
 }
 function primaryFacts(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState): ClientUnemploymentObservation[] {
-  return facts.filter(f => f.dimension === state.breakdown && f.indicatorId === state.indicator && (state.breakdown !== "education" || f.sex === state.educationSex));
+  return facts.filter(f => f.dimension === state.breakdown && (!state.regionId || f.groupId === state.regionId) && f.indicatorId === state.indicator && (state.breakdown !== "education" || f.sex === state.educationSex));
 }
 export function unemploymentCoverage(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState) {
-  const availableYears = [...new Set(primaryFacts(facts, state).map(f => f.year))].sort((a, b) => a - b);
+  const selectedIndicators = new Set(state.selectedIds.map(id => id.split(":")[1]));
+  const selectedFacts = state.regional && state.selectedIds.length ? facts.filter(f =>
+    (f.dimension === "region" && (!state.regionId || f.groupId === state.regionId) && (state.regionId ? state.selectedIds.includes(unemploymentFactSeriesId(f, state)) : selectedIndicators.has(f.indicatorId))) ||
+    (!state.regionId && f.dimension === "national" && state.selectedIds.includes(unemploymentFactSeriesId(f, state)))) : primaryFacts(facts, state);
+  const availableYears = [...new Set(selectedFacts.map(f => f.year))].sort((a, b) => a - b);
   if (!availableYears.length) throw new Error(`No unemployment source years for ${state.breakdown}:${state.indicator}`);
   return { min: availableYears[0], max: availableYears.at(-1)!, availableYears };
 }
 export function unemploymentScopeFacts(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState): ClientUnemploymentObservation[] {
+  if (unemploymentUsesIndicatorSeries(state)) {
+    const indicators = unemploymentOverviewIndicators(state.breakdown);
+    const years = new Set(state.regional ? unemploymentCoverage(facts, state).availableYears : primaryFacts(facts, state).map(f => f.year));
+    return facts.filter(f => (f.dimension === state.breakdown && (!state.regionId || f.groupId === state.regionId) && indicators.includes(f.indicatorId)) || (!state.regionId && ["settlement", "region"].includes(state.breakdown) && f.dimension === "national" && indicators.includes(f.indicatorId) && (state.breakdown === "region" || f.indicatorId === "unemployment_rate") && years.has(f.year)));
+  }
   const primary = primaryFacts(facts, state);
   if (state.breakdown === "national" || state.breakdown === "long_term") return primary;
   const years = new Set(primary.map(f => f.year)), referenceId = unemploymentReferenceId(state);
@@ -30,27 +42,30 @@ export function unemploymentGroupColor(group: UnemploymentGroupDefinition): stri
 export function buildUnemploymentModel(facts: readonly ClientUnemploymentObservation[], registry: readonly UnemploymentGroupDefinition[], state: UnemploymentState) {
   const coverage = unemploymentCoverage(facts, state), range = resolveRange(state.range, coverage);
   const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
-  const scope = unemploymentScopeFacts(facts, state), ids = new Set(scope.map(f => f.groupId));
+  const scope = unemploymentScopeFacts(facts, state), ids = new Set(scope.map(f => unemploymentFactSeriesId(f, state)));
   const referenceId = unemploymentReferenceId(state);
   const active = scope.filter(f => f.year >= range.start && f.year <= range.end);
-  const byCell = new Map(active.map(f => [`${f.groupId}:${f.year}`, f]));
+  const byCell = new Map(active.map(f => [`${unemploymentFactSeriesId(f, state)}:${f.year}`, f]));
   const endValues: Record<string, number | null> = Object.fromEntries([...ids].map(id => [id, byCell.get(`${id}:${range.end}`)?.value ?? null]));
-  const definitions = registry.filter(group => ids.has(group.id)).sort((a, b) => {
+  const definitions = unemploymentUsesIndicatorSeries(state) ? unemploymentOverviewDefinitions(scope, registry, state) : registry.filter(group => ids.has(group.id)).map(group => ({ ...group, groupId: group.id, indicatorId: state.indicator })).sort((a, b) => {
     if (a.id === referenceId) return -1; if (b.id === referenceId) return 1;
     const av = endValues[a.id], bv = endValues[b.id];
     if (av === null && bv !== null) return 1; if (bv === null && av !== null) return -1;
     return (av !== null && bv !== null ? bv - av : 0) || a.sortOrder - b.sortOrder;
   });
-  const selected = definitions.filter(group => state.selectedIds.includes(group.id)), percent = unemploymentIsRate(state.indicator);
-  const activeFacts = active.filter(f => state.selectedIds.includes(f.groupId));
+  const percent = unemploymentIsRate(state.indicator);
+  const selected = definitions.filter(group => state.selectedIds.includes(group.id) && unemploymentIsRate(group.indicatorId) === percent);
+  const selectedIds = new Set(selected.map(group => group.id));
+  const activeFacts = active.filter(f => selectedIds.has(unemploymentFactSeriesId(f, state)));
+  const color = (group: typeof definitions[number]) => unemploymentUsesIndicatorSeries(state) && group.id === referenceId ? INK : unemploymentGroupColor(group);
   const rows = selected.map(group => ({
-    itemId: group.id, kaLabel: group.labelKa, color: unemploymentGroupColor(group),
+    itemId: group.id, kaLabel: group.labelKa, color: color(group),
     valuesByYear: Object.fromEntries(years.map(year => { const value = byCell.get(`${group.id}:${year}`)?.value; return [year, value === undefined ? null : percent ? value / 100 : value]; })),
   }));
   return {
     range, availableYears: coverage.availableYears, years, definitions, referenceId, rows, percent,
-    series: selected.map(group => ({ id: group.id, label: group.labelKa, color: unemploymentGroupColor(group), vals: years.map(year => byCell.get(`${group.id}:${year}`)?.value ?? null), planned: years.map(() => false) })),
-    endValues, headline: active.filter(f => f.groupId === referenceId).sort((a, b) => a.year - b.year).at(-1) ?? null,
+    series: selected.map(group => ({ id: group.id, label: group.labelKa, color: color(group), vals: years.map(year => byCell.get(`${group.id}:${year}`)?.value ?? null), planned: years.map(() => false) })),
+    endValues, headline: active.filter(f => unemploymentFactSeriesId(f, state) === referenceId).sort((a, b) => a.year - b.year).at(-1) ?? null,
     activeFacts, sourceIds: [...new Set(activeFacts.map(f => f.sourceId))], hasData: activeFacts.length > 0,
   };
 }
