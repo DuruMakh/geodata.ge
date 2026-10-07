@@ -1051,7 +1051,8 @@ test("mobile chart fits its frame and the table keeps contained horizontal scrol
   const chart = page.getByTestId("chart-frame");
   await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await expect(chart).toHaveAttribute("tabindex", "0");
-  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი");
+  // The name mentions sideways scrolling only where the frame scrolls.
+  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი");
   expect(await chart.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
 
   await page.getByTestId("chart-mode-table").click();

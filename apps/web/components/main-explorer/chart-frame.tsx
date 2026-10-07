@@ -146,7 +146,8 @@ export function ChartScrollFrame({
       data-testid={testId}
       role="region"
       tabIndex={0}
-      aria-label={message(messages, "controls.chartScrollable")}
+      // Name the sideways scroll only when there is one (a phone chart fits its frame).
+      aria-label={message(messages, overflowing ? "controls.chartScrollable" : "controls.chartRegion")}
       className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
     >
       <div className={fit ? "relative grid" : "relative grid min-w-[720px] max-[768px]:min-w-0 min-[900px]:max-[1020px]:min-w-0"}>
