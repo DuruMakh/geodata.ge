@@ -11,6 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { SectionTitle } from "../ui/editorial";
 import { InflationProductArt } from "./inflation-product-art";
 import { filteredProductIds } from "./inflation-product-panel";
+import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 
 const BATCH_SIZE = 40;
 
@@ -46,11 +47,12 @@ export function InflationProductTable({ index, state, onToggle }: {
       <SectionTitle>{t("productsBrowseHeading")}</SectionTitle>
       <input
         data-testid="product-list-search"
+        {...SEARCH_FIELD_PROPS}
         value={query}
         onChange={(event) => { setQuery(event.target.value); setShown(Math.min(BATCH_SIZE, index.products.length)); }}
         placeholder={t("productsSearch")}
         aria-label={t("productsSearch")}
-        className="h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
+        className="h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
       />
     </div>
     {ids.length === 0 ? <p data-testid="product-list-empty" className="mt-6 text-[13px] text-[var(--muted)]">{t("productsNoMatches")}</p> : <div className="mt-[18px]">

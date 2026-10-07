@@ -128,3 +128,23 @@ test("the Georgia picker's first option shows its full name at 390px", async ({ 
   expect(await country.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
 });
 
+for (const { path, field } of [
+  { path: "/explorer/expenditure", field: "series-search" },
+  { path: "/explorer/municipalities", field: "municipal-search" },
+  { path: "/explorer/inflation/products", field: "product-list-search" },
+]) {
+  test(`search field rises above the keyboard on focus at 390px: ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    const search = page.getByTestId(field);
+    await expect(search).toHaveAttribute("type", "search");
+    await expect(search).toHaveAttribute("enterkeyhint", "search");
+    // 16px or more, so iOS does not zoom the page on focus.
+    expect(parseFloat(await search.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
+    await search.scrollIntoViewIfNeeded();
+    await search.tap();
+    await expect(search).toBeFocused();
+    await expect.poll(() => search.evaluate((element) => Math.round(element.getBoundingClientRect().top))).toBeLessThanOrEqual(40);
+  });
+}
+
