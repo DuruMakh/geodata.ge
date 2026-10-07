@@ -188,3 +188,32 @@ for (const locale of ["ka", "en"] as const) {
     await expect(notice).toHaveText(locale === "en" ? "Switching to rates cleared the people counts." : "პროცენტულ მაჩვენებლებზე გადასვლისას რაოდენობები მოიხსნა.");
   });
 }
+
+test.describe("expenditure grouping", () => {
+  test("sits at the top of the chart panel on a phone, with the same URL key", async ({ page }) => {
+    await page.goto("/explorer/expenditure");
+    const tabs = page.getByTestId("chart-grouping");
+    await expect(tabs).toBeVisible();
+    await expect(page.getByTestId("aside-grouping-ministries")).toBeHidden();
+    // Above the line/table control, inside the first screen of the chart panel.
+    const panel = (await page.getByTestId("chart-panel").boundingBox())!;
+    const tabsBox = (await tabs.boundingBox())!;
+    const mode = (await page.getByTestId("chart-mode-line").boundingBox())!;
+    expect(tabsBox.y).toBeGreaterThanOrEqual(panel.y);
+    expect(tabsBox.y + tabsBox.height).toBeLessThanOrEqual(mode.y);
+    await page.getByTestId("grouping-ministries").click();
+    await expect(page.getByTestId("grouping-ministries")).toHaveAttribute("aria-pressed", "true");
+    await expect(page).toHaveURL(/#.*g=ministries/);
+  });
+
+  test.describe("desktop", () => {
+    test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
+    test("stays in the series aside", async ({ page }) => {
+      await page.goto("/explorer/expenditure");
+      await expect(page.getByTestId("chart-grouping")).toBeHidden();
+      await page.getByTestId("aside-grouping-ministries").click();
+      await expect(page).toHaveURL(/#.*g=ministries/);
+      await expect(page.getByTestId("aside-grouping-ministries")).toHaveAttribute("aria-pressed", "true");
+    });
+  });
+});

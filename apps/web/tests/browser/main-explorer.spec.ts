@@ -274,10 +274,12 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   const seriesPanel = page.getByTestId("series-selector");
   await expect(chartPanel.getByTestId("chart-mode-line")).toHaveAttribute("aria-pressed", "true");
   await expect(chartPanel.getByTestId("chart-mode-table")).toBeVisible();
-  // The grouping switch lives in the series panel, not in the chart controls row.
-  await expect(seriesPanel.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
-  await expect(seriesPanel.getByTestId("grouping-ministries")).toBeVisible();
-  await expect(seriesPanel.getByTestId("grouping-ministries")).toHaveText("სამინისტროები");
+  // Stacked (this 1280px viewport leaves a column under 1100px), the grouping switch leads
+  // the chart panel; the series panel's copy is for the two-column layout only (owner decision D4).
+  await expect(chartPanel.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
+  await expect(chartPanel.getByTestId("grouping-ministries")).toBeVisible();
+  await expect(chartPanel.getByTestId("grouping-ministries")).toHaveText("სამინისტროები");
+  await expect(seriesPanel.getByTestId("aside-grouping-ministries")).toBeHidden();
   await expect(seriesPanel.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("დიაპაზონი");
@@ -293,7 +295,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await chartPanel.getByTestId("chart-mode-line").click();
   await expect(page.getByTestId("chart-frame")).toBeVisible();
 
-  await seriesPanel.getByTestId("grouping-ministries").click();
+  await chartPanel.getByTestId("grouping-ministries").click();
   await expect(seriesPanel.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
 
   await chartPanel.getByTestId("measure-share-toggle").click();
@@ -457,7 +459,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   ]);
   expect(JSON.stringify(functionalExport.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues())).not.toContain("1500000000");
 
-  await fields.getByTestId("grouping-ministries").click();
+  await page.getByTestId("grouping-ministries").click();
   await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
   await fields.getByTestId("series-toggle-all").click();
   await fields.getByTestId("series-toggle-all").click();
