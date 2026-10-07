@@ -1,0 +1,11 @@
+{
+  "source_files": 45,
+  "workbooks": 31,
+  "worksheets": 79,
+  "source_bytes": 49861225,
+  "checks": 309,
+  "passed": 301,
+  "failed": 0,
+  "unavailable_detail_comparisons": 8,
+  "scope": "Source intake only; full normalized-observation verification remains a later stage."
+}
