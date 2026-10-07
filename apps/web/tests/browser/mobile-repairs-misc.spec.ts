@@ -112,6 +112,27 @@ test.describe("phone", () => {
     await expect(darkest).toHaveCSS("color", "rgb(247, 242, 233)");
   });
 
+  test("methodology article: stacked sources, a visible search field and a contents button", async ({ page }) => {
+    for (const [path, label, placeholder] of [["/methodology/expenditure", "სარჩევი ↑", "ძებნა"], ["/en/methodology/expenditure", "Contents ↑", "Search"]] as const) {
+      await page.goto(path);
+      const archive = page.getByTestId("source-archive");
+      await expect(archive.locator("input[type='search']")).toHaveAttribute("placeholder", placeholder);
+      const cards = archive.getByTestId("source-archive-row");
+      expect(await cards.count()).toBeGreaterThan(10);
+      const overflow = await archive.evaluate((root) => Math.max(...[...root.querySelectorAll("[data-testid='source-archive-row'] a")].map((link) => link.getBoundingClientRect().right)) - document.documentElement.clientWidth);
+      expect(overflow).toBeLessThanOrEqual(-16);
+
+      // The contents button stays on screen deep in the article and jumps back up.
+      const jump = page.getByTestId("methodology-contents-jump");
+      await page.locator("#source-archive").scrollIntoViewIfNeeded();
+      await expect(jump).toBeInViewport();
+      await expect(jump).toHaveText(label);
+      expect((await jump.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      await jump.tap();
+      await expect(page.locator("#methodology-contents")).toBeInViewport();
+    }
+  });
+
   test("municipal map: city markers preview on the first tap and the list scrolls with the page (D7)", async ({ page }) => {
     await page.goto("/explorer/municipalities");
     await ready(page);

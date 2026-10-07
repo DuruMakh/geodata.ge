@@ -34,6 +34,8 @@
   "methodology.archiveCount": "{count} უცვლელი პირველწყარო",
   "methodology.archiveDownload": "სრული არქივი · ZIP ↓",
   "methodology.archiveSearch": "პირველწყაროს ძებნა",
+  "methodology.searchPlaceholder": "ძებნა",
+  "methodology.contentsJump": "სარჩევი ↑",
   "methodology.yearFilter": "წლის ფილტრი",
   "methodology.allYears": "ყველა",
   "methodology.yearRange": "{first}–{last} წლები",

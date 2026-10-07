@@ -72,7 +72,8 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="mt-2 block w-full border-0 border-b border-[var(--control)] bg-transparent px-0 py-2 text-[13px] outline-none focus:border-[var(--accent)]"
+            placeholder={message(messages, "methodology.searchPlaceholder")}
+            className="mt-2 block h-[34px] w-full border-0 border-b border-[var(--control)] bg-transparent px-0 text-[13px] outline-none placeholder:text-[var(--faint)] focus:border-[var(--accent)]"
           />
         </label>
         <div className="overflow-x-auto pb-1" aria-label={message(messages, "methodology.yearFilter")}>
@@ -100,10 +101,13 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
         </div>
       </div>
 
-      <div className="mt-7 overflow-x-auto border-t-2 border-[var(--ink)]">
-        <table className="w-full min-w-[760px] border-collapse text-left text-[11.5px]">
+      {/* Below 760px the same rows render as stacked blocks — year, title, file
+          name, publisher, then a full-width download link showing format and
+          size. The 760px table only scrolled sideways there and hid the links. */}
+      <div className="mt-7 border-t-2 border-[var(--ink)] min-[760px]:overflow-x-auto">
+        <table className="w-full border-collapse text-left text-[11.5px] max-[759px]:block min-[760px]:min-w-[760px]">
           <caption className="sr-only">{message(messages, "methodology.archiveCaption", { dataset: datasetLabel, period: captionPeriod })}</caption>
-          <thead>
+          <thead className="max-[759px]:hidden">
             <tr className="border-b border-[var(--ink)] text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
               <th className="px-2 py-3 font-semibold">{message(messages, "methodology.year")}</th>
               <th className="px-2 py-3 font-semibold">{message(messages, "methodology.file")}</th>
@@ -112,37 +116,38 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
               <th className="px-2 py-3 font-semibold">{message(messages, "methodology.download")}</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="max-[759px]:block">
             {filteredRows.map((row) => {
               const format = formatLabel(row);
               return (
-                <tr key={row.source_id} data-testid="source-archive-row" className="border-b border-[var(--hairline-soft)] align-top">
-                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{row.year}</td>
-                  <td className="max-w-[320px] px-2 py-4">
-                    <span className="block font-semibold text-[var(--ink)]">{row.title}</span>
-                    <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--muted)]">
+                <tr key={row.source_id} data-testid="source-archive-row" className="border-b border-[var(--hairline-soft)] align-top max-[759px]:block max-[759px]:py-4">
+                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[11px] max-[759px]:text-[var(--muted)]">{row.year}</td>
+                  <td className="max-w-[320px] px-2 py-4 max-[759px]:block max-[759px]:max-w-none max-[759px]:p-0 max-[759px]:pt-1">
+                    <span className="block font-semibold text-[var(--ink)] max-[759px]:text-[13px] max-[759px]:leading-snug">{row.title}</span>
+                    <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--muted)] max-[759px]:text-[10.5px]">
                       {row.official_filename}
                     </span>
-                    <span className="mt-1 block text-[10px] text-[var(--faint)]">{row.publisher}</span>
-                    {row.documentLanguage ? <span className="mt-1 block text-[10px] text-[var(--faint)]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
+                    <span className="mt-1 block text-[10px] text-[var(--faint)] max-[759px]:text-[11px]">{row.publisher}</span>
+                    {row.documentLanguage ? <span className="mt-1 block text-[10px] text-[var(--faint)] max-[759px]:text-[11px]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
                   </td>
-                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{format}</td>
-                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)]">{formatBytes(row.byte_size)}</td>
-                  <td className="px-2 py-4">
+                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:hidden">{format}</td>
+                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:hidden">{formatBytes(row.byte_size)}</td>
+                  <td className="px-2 py-4 max-[759px]:block max-[759px]:p-0 max-[759px]:pt-3">
                     <a
                       href={row.downloadHref}
                       aria-label={message(messages, "methodology.downloadFile", { title: row.title, format })}
-                      className="font-semibold text-[var(--accent)] underline underline-offset-4 hover:text-[var(--ink)]"
+                      className="font-semibold text-[var(--accent)] underline underline-offset-4 hover:text-[var(--ink)] max-[759px]:flex max-[759px]:min-h-11 max-[759px]:w-full max-[759px]:items-center max-[759px]:justify-between max-[759px]:gap-3 max-[759px]:border max-[759px]:border-[var(--ink)] max-[759px]:px-3 max-[759px]:text-[12px] max-[759px]:no-underline"
                     >
-                      {message(messages, "methodology.downloadArrow")}
+                      <span>{message(messages, "methodology.downloadArrow")}</span>
+                      <span className="font-[family-name:var(--font-numeric)] text-[11px] font-normal min-[760px]:hidden">{format} · {formatBytes(row.byte_size)}</span>
                     </a>
                   </td>
                 </tr>
               );
             })}
             {filteredRows.length === 0 ? (
-              <tr>
-                <td colSpan={5} data-testid="source-archive-empty" className="py-12 text-center text-[13px] text-[var(--muted)]">
+              <tr className="max-[759px]:block">
+                <td colSpan={5} data-testid="source-archive-empty" className="py-12 text-center text-[13px] text-[var(--muted)] max-[759px]:block">
                   {message(messages, "methodology.empty")}
                 </td>
               </tr>
