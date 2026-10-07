@@ -7,7 +7,7 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { Message } from "../../lib/i18n/message";
 import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { ACCENT, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { compoundAnnualGrowth, rankPeriodDeltas } from "../../lib/explorer/indicators";
+import { compoundAnnualGrowth, isGrowthRankable, rankPeriodDeltas } from "../../lib/explorer/indicators";
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
 import { SectionTitle, SwatchBar } from "../ui/editorial";
@@ -101,9 +101,11 @@ export function Indicators({ model, scope }: IndicatorsProps) {
   // Side KPIs, movers, and the period comparison all rank every top-level scope
   // row. The chart and chart-mode table remain scoped to the user's selection.
   const scopeRows = comparisonRows.filter((row) => row.level !== "major_program");
-  const biggestIncrease = rankPeriodDeltas(scopeRows, startYear, endYear)[0] ?? null;
+  // Growth KPIs skip residual buckets and rows that are zero in the end year (D11).
+  const growthRows = scopeRows.filter((row) => isGrowthRankable(row.itemId, row.valuesByYear[endYear]));
+  const biggestIncrease = rankPeriodDeltas(growthRows, startYear, endYear)[0] ?? null;
   const biggestParts = biggestIncrease ? formatAmountParts(biggestIncrease.delta, true, locale) : { num: MISSING, unit: "" };
-  const slowest = scopeRows.filter((row) => row.change !== null).sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0] ?? null;
+  const slowest = growthRows.filter((row) => row.change !== null).sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0] ?? null;
   const largestShare = [...scopeRows].sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0))[0] ?? null;
 
   const seriesValues = (source: ExplorerTableRow | null) =>

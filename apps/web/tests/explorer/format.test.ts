@@ -53,7 +53,14 @@ describe("editorial formatters", () => {
   it("floors a small standalone amount instead of printing zero", () => {
     expect(formatAmount(1_295)).toBe("<0.01 მლნ ₾");
     expect(formatAmount(-1_295)).toBe(">−0.01 მლნ ₾");
-    expect(formatAmount(0)).toBe("0.00 მლნ ₾");
+  });
+
+  // D11: an unfunded line reads as plain zero, not as a scaled "0.00 მლნ ₾".
+  it("prints an exact zero as 0 ₾ / 0 GEL, unsigned", () => {
+    expect(formatAmount(0)).toBe("0 ₾");
+    expect(formatAmount(0, "en")).toBe("0 GEL");
+    expect(formatSignedAmount(0)).toBe("0 ₾");
+    expect(formatAmountParts(0, true)).toEqual({ num: "0", unit: "₾" });
   });
 
   it("keeps the direction sign on a signed amount below the display threshold", () => {

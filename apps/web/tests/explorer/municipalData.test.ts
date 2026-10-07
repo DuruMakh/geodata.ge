@@ -1200,10 +1200,30 @@ describe("buildMovers", () => {
     expect(buildMovers(build()).up[0]!.label).toBe("ეკონომიკური საქმიანობა");
   });
 
+  // The shared fixture ends health at exactly 0 ₾, which D11 keeps out of the
+  // ranking; a health line that shrinks to 2 ₾ is a real slow mover.
+  const shrinkingHealth = () =>
+    buildMunicipalEntityModel({
+      functions: FUNCTIONS,
+      functionFacts: FUNCTION_FACTS.map((row) =>
+        row.year === 2017 && row.categoryId === "municipal.health" ? { ...row, amountGel: 2 } : row,
+      ),
+      totalFacts: TOTAL_FACTS,
+      startYear: 2015,
+      endYear: 2017,
+    });
+
   it("keeps a shrinking series in the slow-growth column, never called a loss", () => {
-    const down = buildMovers(build()).down;
+    const down = buildMovers(shrinkingHealth()).down;
     expect(down[0]!.label).toBe("ჯანმრთელობის დაცვა");
     expect(down[0]!.growth).toBeLessThan(0);
+  });
+
+  it("leaves a function that is exactly zero in the end year out of both columns (D11)", () => {
+    const movers = buildMovers(build());
+    expect([...movers.up, ...movers.down].some((row) => row.label === "ჯანმრთელობის დაცვა")).toBe(false);
+    expect(movers.down[0]!.label).toBe("განათლება");
+    expect(movers.down.every((row) => (row.growth ?? 0) > -1)).toBe(true);
   });
 
   it("carries each row's category colour", () => {
@@ -1212,7 +1232,11 @@ describe("buildMovers", () => {
 
   it("excludes a zero-start row instead of ranking its unavailable growth as the slowest mover", () => {
     const zeroStartFacts = FUNCTION_FACTS.map((row) =>
-      row.year === 2015 && row.categoryId === "municipal.education" ? { ...row, amountGel: 0 } : row,
+      row.year === 2015 && row.categoryId === "municipal.education"
+        ? { ...row, amountGel: 0 }
+        : row.year === 2017 && row.categoryId === "municipal.health"
+          ? { ...row, amountGel: 2 }
+          : row,
     );
     const model = buildMunicipalEntityModel({
       functions: FUNCTIONS,
