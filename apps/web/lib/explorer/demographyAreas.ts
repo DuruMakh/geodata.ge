@@ -2,7 +2,7 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import type { Municipality, MunicipalRegion } from "../data/municipal/types";
 import { publicLabel } from "../i18n/labels";
 import type { Locale } from "../i18n/types";
-import { INK, colorForItem } from "./colors";
+import { EDITORIAL_PALETTE, INK, colorForItem } from "./colors";
 
 export const GEORGIA_PLACE_ID = MUNICIPAL_COUNTRY_ID;
 export const TBILISI_PLACE_ID = "region.tbilisi";
@@ -24,7 +24,37 @@ export type DemographyPlace = {
   sortOrder: number;
   /** Regions and Georgia: how many municipalities they hold. */
   municipalityCount: number;
+  /** The place's one colour, the same on every page: Georgia is ink and no region shares a colour with a municipality of its own. */
+  color: string;
 };
+
+/**
+ * A municipality wears the palette colour its registry position gives it, unless that is its region's colour. It then takes the
+ * next palette colour, walking on from its own position, that neither the region nor a sibling wears and no moved sibling has
+ * been given, so a region's page never draws two series in one colour and a municipality that did not clash never changes.
+ */
+function municipalityColours(
+  municipalities: readonly Municipality[],
+  regionColours: ReadonlyMap<string, string>,
+): Map<string, string> {
+  const colours = new Map(municipalities.map((municipality) => [municipality.code, colorForItem(municipality.code, municipality.sortId)]));
+  for (const [regionId, regionColour] of regionColours) {
+    const siblings = municipalities
+      .filter((municipality) => municipality.regionId === regionId)
+      .sort((left, right) => left.sortId - right.sortId || left.code.localeCompare(right.code));
+    const worn = new Set([regionColour, ...siblings.map((sibling) => colours.get(sibling.code)!)]);
+    for (const sibling of siblings.filter((candidate) => colours.get(candidate.code) === regionColour)) {
+      const own = sibling.sortId % EDITORIAL_PALETTE.length;
+      const free = EDITORIAL_PALETTE.map((_, step) => EDITORIAL_PALETTE[(own + step + 1) % EDITORIAL_PALETTE.length]!).find(
+        (colour) => !worn.has(colour),
+      );
+      if (free === undefined) throw new Error(`No palette colour is free for municipality ${sibling.code} of ${regionId}`);
+      colours.set(sibling.code, free);
+      worn.add(free);
+    }
+  }
+  return colours;
+}
 
 export function buildDemographyPlaces({
   regions,
@@ -42,6 +72,9 @@ export function buildDemographyPlaces({
   for (const municipality of municipalities) {
     countByRegion.set(municipality.regionId, (countByRegion.get(municipality.regionId) ?? 0) + 1);
   }
+  const members = municipalities.filter((municipality) => municipality.code !== TBILISI_MUNICIPALITY_CODE);
+  const regionColours = new Map(regions.map((region) => [region.id, colorForItem(region.id, region.sortOrder - 1)]));
+  const memberColours = municipalityColours(members, regionColours);
   return [
     {
       id: GEORGIA_PLACE_ID,
@@ -51,6 +84,7 @@ export function buildDemographyPlaces({
       regionId: null,
       sortOrder: 0,
       municipalityCount: municipalities.length,
+      color: INK,
     },
     ...regions.map((region): DemographyPlace => ({
       id: region.id,
@@ -60,18 +94,18 @@ export function buildDemographyPlaces({
       regionId: null,
       sortOrder: region.sortOrder,
       municipalityCount: countByRegion.get(region.id) ?? 0,
+      color: regionColours.get(region.id)!,
     })),
-    ...municipalities
-      .filter((municipality) => municipality.code !== TBILISI_MUNICIPALITY_CODE)
-      .map((municipality): DemographyPlace => ({
-        id: municipality.code,
-        level: "municipality",
-        nameKa: municipality.displayNameKa,
-        nameEn: english(municipality.code, municipality.displayNameKa),
-        regionId: municipality.regionId,
-        sortOrder: municipality.sortId,
-        municipalityCount: 0,
-      })),
+    ...members.map((municipality): DemographyPlace => ({
+      id: municipality.code,
+      level: "municipality",
+      nameKa: municipality.displayNameKa,
+      nameEn: english(municipality.code, municipality.displayNameKa),
+      regionId: municipality.regionId,
+      sortOrder: municipality.sortId,
+      municipalityCount: 0,
+      color: memberColours.get(municipality.code)!,
+    })),
   ];
 }
 
@@ -93,10 +127,9 @@ export function partsOf(place: DemographyPlace, places: readonly DemographyPlace
   return [];
 }
 
-/** Georgia is ink; regions and municipalities cycle the editorial palette by their registry order, so a place keeps its colour on every page. */
+/** The place's own colour, so it keeps it on every page: Georgia is ink; regions and municipalities cycle the editorial palette by their registry order. */
 export function placeColor(place: DemographyPlace): string {
-  if (place.level === "country") return INK;
-  return colorForItem(place.id, place.level === "region" ? place.sortOrder - 1 : place.sortOrder);
+  return place.color;
 }
 
 export function placeLabel(place: DemographyPlace, locale: Locale): string {

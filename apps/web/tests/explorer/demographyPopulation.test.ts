@@ -3,7 +3,8 @@ import { loadServedDemographyData } from "../../lib/data/demography/importDemogr
 import { SERIES } from "../../lib/data/demography/series";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { projectDemographyObservation } from "../../lib/explorer/clientData";
-import { INK } from "../../lib/explorer/colors";
+import type { Municipality, MunicipalRegion } from "../../lib/data/municipal/types";
+import { EDITORIAL_PALETTE, INK, colorForItem } from "../../lib/explorer/colors";
 import {
   GEORGIA_PLACE_ID,
   TBILISI_PLACE_ID,
@@ -85,6 +86,89 @@ describe("places", () => {
     expect(new Set(regionColours).size).toBe(11);
     expect(regionColours).not.toContain(INK.toUpperCase());
   });
+
+  test("Georgia is the only place in ink", () => {
+    expect(places.filter((p) => placeColor(p).toUpperCase() === INK.toUpperCase()).map((p) => p.id)).toEqual([GEORGIA_PLACE_ID]);
+  });
+
+  test("a region and its municipalities never share a colour", () => {
+    for (const region of places.filter((p) => p.level === "region")) {
+      const family = [region, ...places.filter((p) => p.regionId === region.id)].map((p) => placeColor(p));
+      expect(new Set(family).size, region.id).toBe(family.length);
+    }
+  });
+
+  // On the registry's order, four municipalities fell on the colour of their own region.
+  const CLASHED: Array<[code: string, regionId: string]> = [
+    ["31", "region.imereti"],
+    ["18", "region.kakheti"],
+    ["35", "region.samegrelo_zemo_svaneti"],
+    ["51", "region.kvemo_kartli"],
+  ];
+
+  test("the four that wore their region's colour take another colour of the palette", () => {
+    for (const [code, regionId] of CLASHED) {
+      expect(place(code).regionId, code).toBe(regionId);
+      expect(placeColor(place(code)), code).not.toBe(placeColor(place(regionId)));
+      expect(EDITORIAL_PALETTE, code).toContain(placeColor(place(code)));
+    }
+  });
+
+  test("every other municipality keeps the colour its registry position gives it", () => {
+    const moved = new Set(CLASHED.map(([code]) => code));
+    const others = places.filter((p) => p.level === "municipality" && !moved.has(p.id));
+    expect(others).toHaveLength(59);
+    for (const other of others) expect(placeColor(other), other.id).toBe(colorForItem(other.id, other.sortOrder));
+  });
+
+  test("every region keeps the colour its registry position gives it", () => {
+    for (const region of places.filter((p) => p.level === "region")) {
+      expect(placeColor(region), region.id).toBe(colorForItem(region.id, region.sortOrder - 1));
+    }
+  });
+
+  describe("moving off the region's colour, on registries that force each case", () => {
+    const region = (id: string, sortOrder: number): MunicipalRegion => ({ id, kaLabel: id, sortOrder });
+    const member = (code: string, sortId: number, regionId: string): Municipality => ({
+      code, sortId, nameKa: code, displayNameKa: code, regionId, isSelfGoverningCity: false,
+    });
+    const build = (regions: MunicipalRegion[], municipalities: Municipality[]) =>
+      buildDemographyPlaces({
+        regions,
+        municipalities,
+        englishLabels: Object.fromEntries([GEORGIA_PLACE_ID, ...regions.map((r) => r.id), ...municipalities.map((m) => m.code)].map((id) => [id, id])),
+        georgiaNameKa: "საქართველო",
+      });
+    const colourIn = (built: DemographyPlace[], id: string) => placeColor(built.find((p) => p.id === id)!);
+
+    test("it walks on from its own position past colours its siblings wear and colours already given out", () => {
+      // The region wears palette[3]. a and c sit on it; b wears palette[4] and d palette[6].
+      const built = build(
+        [region("region.t", 4)],
+        [member("a", 3, "region.t"), member("b", 4, "region.t"), member("c", 17, "region.t"), member("d", 6, "region.t")],
+      );
+      expect(colourIn(built, "region.t")).toBe(EDITORIAL_PALETTE[3]);
+      // a skips palette[4] (b's), takes palette[5]; c skips 4, 5 (a's now) and 6 (d's), takes 7; b and d stay.
+      expect(["a", "b", "c", "d"].map((id) => colourIn(built, id))).toEqual([
+        EDITORIAL_PALETTE[5],
+        EDITORIAL_PALETTE[4],
+        EDITORIAL_PALETTE[7],
+        EDITORIAL_PALETTE[6],
+      ]);
+    });
+
+    test("the walk wraps round the end of the palette", () => {
+      const last = EDITORIAL_PALETTE.length - 1;
+      const built = build([region("region.t", EDITORIAL_PALETTE.length)], [member("a", last, "region.t")]);
+      expect(colourIn(built, "region.t")).toBe(EDITORIAL_PALETTE[last]);
+      expect(colourIn(built, "a")).toBe(EDITORIAL_PALETTE[0]);
+    });
+
+    test("a region whose municipalities wear the whole palette has no colour to give, and says so", () => {
+      const everyColour = EDITORIAL_PALETTE.map((_, index) => member(`m${index}`, index, "region.t"));
+      expect(() => build([region("region.t", 4)], everyColour)).toThrow(/No palette colour is free/);
+    });
+  });
 });
 
 describe("population model", () => {
@@ -149,7 +233,7 @@ describe("population model", () => {
 
 describe("ranking", () => {
   const fake = (id: string, sortOrder: number): DemographyPlace => ({
-    id, level: "region", nameKa: id, nameEn: id, regionId: null, sortOrder, municipalityCount: 0,
+    id, level: "region", nameKa: id, nameEn: id, regionId: null, sortOrder, municipalityCount: 0, color: "#000000",
   });
 
   test("ties break by registry order, missing values go last and Georgia stays first", () => {
