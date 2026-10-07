@@ -220,3 +220,24 @@ test("the GDP latest value follows the active indicator", async ({ page }) => {
   await page.getByTestId("gdp-tab-growth").click();
   await expect(page.getByTestId("gdp-latest")).toHaveText(/^მშპ-ის ზრდა · \d{4}: [+−]\d+\.\d%( · წინასწარი)?$/);
 });
+
+for (const path of ["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment"]) {
+  test(`${path} hub cards span their sparklines and keep one rhythm`, async ({ page }) => {
+    await page.goto(path);
+    for (const card of await page.getByTestId("hub-card").all()) {
+      const cardBox = (await card.boundingBox())!;
+      const graphic = card.locator("svg, [data-testid=hub-card-graphic-space]").first();
+      const box = (await graphic.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(33);
+      // The card has 18px of padding on each side.
+      expect(box.width).toBeGreaterThan(cardBox.width - 40);
+    }
+  });
+}
+
+test("hub card names and the economy footer", async ({ page }) => {
+  await page.goto("/explorer");
+  await expect(page.getByTestId("hub-card").nth(3).getByRole("heading")).toHaveText("ანალიზი");
+  await page.goto("/explorer/economy");
+  await expect(page.getByTestId("hub-card").first().locator("p").last()).toHaveText(/^\d{4} · ნომინალური მშპ \d+\.\d მლრდ ₾$/);
+});

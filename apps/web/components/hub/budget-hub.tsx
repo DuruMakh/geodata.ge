@@ -33,10 +33,14 @@ function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
       </h2>
       <p className="text-[11.5px] leading-normal text-[var(--muted)]">{card.description}</p>
       {card.series && card.seriesColor ? (
-        <Sparkline values={card.series} color={card.seriesColor} width={200} height={34} />
-      ) : null}
+        <Sparkline values={card.series} color={card.seriesColor} width={200} height={34} fluidOnMobile />
+      ) : (
+        // A card without a graphic keeps the graphic's band, so every card in a
+        // hub has the same rhythm and the footers line up.
+        <div aria-hidden data-testid="hub-card-graphic-space" className="mt-1.5 h-[34px]" />
+      )}
       {card.footer ? (
-        <p className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{card.footer}</p>
+        <p className="mt-auto font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{card.footer}</p>
       ) : null}
     </>
   );

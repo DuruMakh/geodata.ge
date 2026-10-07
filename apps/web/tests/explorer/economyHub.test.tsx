@@ -24,8 +24,10 @@ it("links all three delivered Economy datasets and derives their coverage", asyn
     "/explorer/economy/sectors",
     "/explorer/economy/regions",
   ]);
-  expect(cards[0].footer).toContain("27.1");
-  expect(cards[0].footer).toContain("2025: 27.1 bn (Constant 2015 USD)");
+  // One figure: the latest nominal GDP, as the landing states the economy's size.
+  const nominal = facts.filter((fact) => fact.seriesId === "nominal_gel").sort((a, b) => a.year - b.year).at(-1)!;
+  expect(cards[0].footer).toBe(`${nominal.year} · Nominal GDP ${formatAmount(nominal.value, "en")}`);
+  expect(cards[0].footer).not.toContain("Constant");
   const sectorYear = Math.max(...sectorFacts.map((fact) => fact.year));
   const sectorHighlights = buildSectorHighlights(sectorFacts, ECONOMIC_SECTORS, sectorYear);
   expect(cards[1].series).toEqual(sectorHighlights.trends.topThree);
