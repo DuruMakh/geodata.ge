@@ -258,6 +258,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
               range={range}
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
+              formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
               onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
