@@ -52,16 +52,16 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
           {content.title}
         </h1>
         <p className="mt-6 max-w-[790px] text-pretty text-[15px] leading-[1.8] text-[var(--body)]">{content.summary}</p>
-        <p className="mt-5 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">
+        <p className="mt-5 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--faint)]">
           {message(messages, "methodology.methodologyReviewed", { date: content.reviewedAt })}
         </p>
-        {locale === "en" ? <p className="mt-2 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{message(messages, "methodology.translationReviewed", { date: METHODOLOGY_TRANSLATION_REVIEWED_AT[content.id] })}</p> : null}
+        {locale === "en" ? <p className="mt-2 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--faint)]">{message(messages, "methodology.translationReviewed", { date: METHODOLOGY_TRANSLATION_REVIEWED_AT[content.id] })}</p> : null}
       </header>
 
       <dl className="grid border-b border-[var(--ink)] min-[620px]:grid-cols-2 min-[1040px]:grid-cols-4">
         {content.keyFacts.map((fact) => (
           <div key={fact.label} className="border-b border-[var(--hairline)] py-5 last:border-b-0 min-[620px]:px-4 min-[1040px]:border-b-0 min-[1040px]:border-r min-[1040px]:border-[var(--hairline)] min-[1040px]:first:pl-0 min-[1040px]:last:border-r-0">
-            <dt className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{fact.label}</dt>
+            <dt className="text-[11px] min-[768px]:text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{fact.label}</dt>
             <dd className="mt-2 font-[family-name:var(--font-numeric)] text-[12px] leading-relaxed">
               {fact.valueKind === "coverage" ? `${coverage.firstYear}–${coverage.lastYear}` : fact.value}
             </dd>
@@ -106,18 +106,18 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
         data-testid="methodology-disclosure"
         className="my-10 border-l-2 border-[var(--accent)] bg-[var(--tint)] px-5 py-5 min-[768px]:my-14 min-[768px]:px-7"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--accent)]">{message(messages, "methodology.disclosureTitle")}</p>
+        <p className="text-[11px] min-[768px]:text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--accent)]">{message(messages, "methodology.disclosureTitle")}</p>
         <p className="mt-3 max-w-[920px] text-[13.5px] leading-[1.75] text-[var(--body)]">{content.disclosure}</p>
       </aside>
 
       <div className="grid gap-12 @min-[1100px]:grid-cols-[220px_minmax(0,1fr)] @min-[1100px]:gap-16">
         <nav id="methodology-contents" aria-label={message(messages, "methodology.contentsAria")} className="scroll-mt-6 border-t border-[var(--ink)] pt-4 @min-[1100px]:sticky @min-[1100px]:top-6 @min-[1100px]:self-start">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{message(messages, "methodology.contents")}</p>
+          <p className="text-[11px] min-[768px]:text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{message(messages, "methodology.contents")}</p>
           <ol className="mt-3">
             {content.sections.map((section, index) => (
               <li key={section.id} className="border-b border-[var(--hairline-soft)]">
                 <a href={`#${sectionAnchorId(section)}`} className="grid grid-cols-[24px_1fr] gap-2 py-3 text-[11.5px] leading-relaxed text-[var(--body)] hover:text-[var(--accent)]">
-                  <span className="font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--faint)]">
+                  <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] text-[var(--faint)]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <span>{section.title}</span>

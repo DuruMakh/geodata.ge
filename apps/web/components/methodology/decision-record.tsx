@@ -29,7 +29,7 @@ function DecisionDetails({ decision }: { decision: MethodologyDecision }) {
             <span data-disclosure-state="open" className="hidden group-open:inline">−</span>
           </span>
         </span>
-        <span className="font-[family-name:var(--font-numeric)] text-[9.5px] leading-6 text-[var(--muted)]">
+        <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] leading-6 text-[var(--muted)]">
           {decision.statusLabel}
         </span>
       </summary>

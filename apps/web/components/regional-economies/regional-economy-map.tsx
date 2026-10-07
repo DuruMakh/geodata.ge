@@ -170,11 +170,11 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
         {/* Minimum and maximum stay on one row at the ramp's two ends; the ramp
             narrows on a phone rather than pushing the maximum onto the next line. */}
         <span data-testid="regional-map-legend-scale" className="flex min-w-0 items-center gap-3.5">
-          <span className="font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--faint)]">{metric.formatValue(model.legendMin)}</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] whitespace-nowrap text-[var(--faint)]">{metric.formatValue(model.legendMin)}</span>
           <span className="flex min-w-12 flex-[0_1_192px]">{MAP_RAMP.map((fill) => <span key={fill} aria-hidden className="h-[9px] flex-1" style={{ backgroundColor: fill }} />)}</span>
-          <span className="font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--faint)]">{metric.formatValue(model.legendMax)}</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] whitespace-nowrap text-[var(--faint)]">{metric.formatValue(model.legendMax)}</span>
         </span>
-        <span className="text-[10px] text-[var(--faint)]">{metric.legend}</span>
+        <span className="text-[11px] min-[768px]:text-[10px] text-[var(--faint)]">{metric.legend}</span>
       </div>
     </div>
   );

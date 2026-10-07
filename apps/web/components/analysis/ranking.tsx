@@ -52,7 +52,7 @@ export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
               <th className="border-b-2 border-[var(--ink)] pr-1.5 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] min-[768px]:pr-3">
                 {header}
               </th>
-              <th className={`${headCell} whitespace-nowrap text-[10px] min-[768px]:text-[11px]`}>{message(messages, "analysis.billionUnit")}</th>
+              <th className={`${headCell} whitespace-nowrap text-[11px] min-[768px]:text-[11px]`}>{message(messages, "analysis.billionUnit")}</th>
               <th className={`${headCell} w-[220px]`}>{message(messages, "analysis.share")}</th>
               <th className={`${headCell} pr-0`}>
                 <span className="min-[768px]:hidden">{message(messages, "analysis.changeShort")}</span>
@@ -96,7 +96,7 @@ export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
                   </span>
                 </td>
                 <td
-                  className="py-[11px] pl-1.5 pr-0 text-right font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap min-[768px]:pl-3 min-[768px]:text-[12.5px]"
+                  className="py-[11px] pl-1.5 pr-0 text-right font-[family-name:var(--font-numeric)] text-[11px] whitespace-nowrap min-[768px]:pl-3 min-[768px]:text-[12.5px]"
                   style={{
                     color:
                       row.changeFromPreviousYear === null

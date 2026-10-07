@@ -113,7 +113,7 @@ export function SeriesSelector({
         >
           <span className="inline-block whitespace-nowrap">
             {countLabel ?? message(messages, "controls.series")}{" "}
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
               {selectedCount} / {totalCount}
             </span>
           </span>
@@ -121,7 +121,7 @@ export function SeriesSelector({
             <>
               {" · "}<span className="inline-block whitespace-nowrap">
                 {supplementalSelected.label}{" "}
-                <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+                <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
                   {supplementalSelected.count}
                 </span>
               </span>
@@ -266,12 +266,12 @@ export function SeriesSelectorRow({
           </span>
         </span>
         {meta === undefined ? null : (
-          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--muted)]">
+          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] whitespace-nowrap text-[var(--muted)]">
             {metaLabel === undefined ? null : <span className="sr-only">{metaLabel} </span>}
             {meta}
           </span>
         )}
-        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--muted)]">
+        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--muted)]">
           {withLari(value)}
         </span>
       </button>

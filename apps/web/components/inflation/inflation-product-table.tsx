@@ -118,7 +118,7 @@ export function InflationProductTable({ index, state, onToggle }: {
                 </td>
                 <td className="px-3 py-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold whitespace-nowrap text-[var(--ink)]">
                   {cumulative.value === null ? MISSING : formatShare(cumulative.value / 100, true)}
-                  {missing ? <span className="block max-w-[230px] whitespace-normal text-[10px] leading-snug text-[var(--muted)]">{missing}</span> : null}
+                  {missing ? <span className="block max-w-[230px] whitespace-normal text-[11px] min-[768px]:text-[10px] leading-snug text-[var(--muted)]">{missing}</span> : null}
                 </td>
                 <td className="py-2 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]">
                   {annual === null ? MISSING : formatShare(annual / 100, true)}

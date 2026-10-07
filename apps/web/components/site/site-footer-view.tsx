@@ -69,8 +69,8 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
           </p>
         </div>
         <div className="mt-3 flex flex-wrap justify-between gap-4 border-t border-[var(--hairline-soft)] pt-2.5 min-[768px]:mt-[30px] min-[768px]:pt-3.5">
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">© 2026 Fiscal.ge</span>
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">CC BY 4.0</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">© 2026 Fiscal.ge</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">CC BY 4.0</span>
         </div>
       </div>
     </footer>

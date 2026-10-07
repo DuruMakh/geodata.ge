@@ -63,3 +63,53 @@ test("unemployment denominators count the top-level rows only (§7.7)", async ({
   await page.getByTestId("series-toggle-all").click();
   await expect(status).toHaveText(/3 \/ 3$/);
 });
+
+// D8: the smallest informational text on a phone is 11px. Charts (SVG), the
+// relief's positioned map labels, screen-reader-only and decorative text are out
+// of scope; the year-range strip and the municipal map legend are owned by
+// their own repair specs.
+async function textBelowFloor(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const found: string[] = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const text = walker.currentNode.textContent?.trim();
+      const element = walker.currentNode.parentElement;
+      if (!text || !element) continue;
+      if (element.closest("svg, figure, .sr-only, [aria-hidden='true'], [data-testid='year-range-strip'], [data-testid='municipality-map']")) continue;
+      const box = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      if (box.width === 0 || box.height === 0 || style.visibility === "hidden" || style.opacity === "0") continue;
+      const size = parseFloat(style.fontSize);
+      if (size < 11) found.push(`${size}px "${text.slice(0, 30)}"`);
+    }
+    return [...new Set(found)];
+  });
+}
+
+for (const path of [
+  "/",
+  "/about",
+  "/methodology",
+  "/methodology/expenditure",
+  "/explorer",
+  "/explorer/expenditure",
+  "/explorer/municipalities",
+  "/explorer/municipalities/batumi",
+  "/explorer/analysis",
+  "/explorer/economy/regions",
+  "/explorer/inflation/categories",
+  "/en/explorer/unemployment/overview",
+]) {
+  test(`${path}: no informational text below 11px on a phone (D8)`, async ({ page }) => {
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+    expect(await textBelowFloor(page)).toEqual([]);
+  });
+}
+
+test("desktop keeps its compact type (D8 is phone-only)", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/explorer");
+  await expect(page.getByTestId("budget-hub").locator("p").last()).toHaveCSS("font-size", "10px");
+});

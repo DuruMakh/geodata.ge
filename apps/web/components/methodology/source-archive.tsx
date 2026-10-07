@@ -51,7 +51,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
           <p className="font-[family-name:var(--font-display)] text-[18px] font-semibold">
             {message(messages, "methodology.archiveCount", { count: summary.fileCount })}
           </p>
-          <p className="mt-1 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+          <p className="mt-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--muted)]">
             {formatBytes(summary.totalBytes)}
           </p>
         </div>
@@ -108,7 +108,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
         <table className="w-full border-collapse text-left text-[11.5px] max-[759px]:block min-[760px]:min-w-[760px]">
           <caption className="sr-only">{message(messages, "methodology.archiveCaption", { dataset: datasetLabel, period: captionPeriod })}</caption>
           <thead className="max-[759px]:hidden">
-            <tr className="border-b border-[var(--ink)] text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
+            <tr className="border-b border-[var(--ink)] text-[11px] min-[768px]:text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
               <th className="px-2 py-3 font-semibold">{message(messages, "methodology.year")}</th>
               <th className="px-2 py-3 font-semibold">{message(messages, "methodology.file")}</th>
               <th className="px-2 py-3 font-semibold">{message(messages, "methodology.format")}</th>
@@ -124,11 +124,11 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[11px] max-[759px]:text-[var(--muted)]">{row.year}</td>
                   <td className="max-w-[320px] px-2 py-4 max-[759px]:block max-[759px]:max-w-none max-[759px]:p-0 max-[759px]:pt-1">
                     <span className="block font-semibold text-[var(--ink)] max-[759px]:text-[13px] max-[759px]:leading-snug">{row.title}</span>
-                    <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[9.5px] text-[var(--muted)] max-[759px]:text-[10.5px]">
+                    <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] text-[var(--muted)]">
                       {row.official_filename}
                     </span>
-                    <span className="mt-1 block text-[10px] text-[var(--faint)] max-[759px]:text-[11px]">{row.publisher}</span>
-                    {row.documentLanguage ? <span className="mt-1 block text-[10px] text-[var(--faint)] max-[759px]:text-[11px]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
+                    <span className="mt-1 block text-[11px] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[11px]">{row.publisher}</span>
+                    {row.documentLanguage ? <span className="mt-1 block text-[11px] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[11px]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
                   </td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:hidden">{format}</td>
                   <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:hidden">{formatBytes(row.byte_size)}</td>

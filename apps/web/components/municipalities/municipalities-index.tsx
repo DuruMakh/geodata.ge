@@ -126,14 +126,14 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : "bg-transparent"
             }`}
           >
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
               {row.rank === null ? "—" : String(row.rank).padStart(2, "0")}
             </span>
             <span className="min-w-0">
               <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
                 {publicLabel(locale, row.id, row.nameKa, englishLabels)}
               </span>
-              <span className="block truncate text-[10.5px] text-[var(--faint)]">{subtitleFor(row)}</span>
+              <span className="block truncate text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{subtitleFor(row)}</span>
               <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
                 <span
                   data-testid="municipal-row-bar"
@@ -147,7 +147,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                 {formatAmount(row.valueGel, locale)}
               </span>
               {row.budgetPerResidentGel !== null ? (
-                <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">
+                <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">
                   {message(messages, "municipal.perResidentShort", { amount: formatPerResidentGel(row.budgetPerResidentGel, locale).replace(locale === "ka" ? " ₾" : " GEL", "") })}
                 </span>
               ) : null}
@@ -208,7 +208,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               <TabDivider />
               <TextTab label={message(messages, "municipal.regions")} active={level === "region"} onClick={() => setLevel("region")} testId="level-region" />
             </span>
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{message(messages, "municipal.gel")}</span>
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{message(messages, "municipal.gel")}</span>
           </div>
 
           <div className="flex items-center gap-2 pt-3 pb-1">
@@ -221,7 +221,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               aria-label={message(messages, "municipal.search")}
               className="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]"
             />
-            <span data-testid="row-count" className="font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">
+            <span data-testid="row-count" className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--faint)]">
               {rows.length === source.length ? `${source.length}` : `${rows.length} / ${source.length}`}
             </span>
           </div>

@@ -122,7 +122,7 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
             // on three sides and the survivor lands over the neighbouring tab.
             // Transition only the two properties that change — `transition-colors`
             // also animates outline-color, hiding the ring for its first 150ms.
-            className={`cursor-pointer ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
+            className={`cursor-pointer ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
               index > 0 ? "border-l border-[var(--control)]" : ""
             } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
           >

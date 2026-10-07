@@ -43,7 +43,7 @@ export function MethodologyHub({
           <h2 id="datasets-title" className="font-[family-name:var(--font-display)] text-[26px] font-semibold tracking-[-0.01em]">
             {message(messages, "methodology.published")}
           </h2>
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{message(messages, "methodology.datasetCount", { count: liveEntries.length })}</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{message(messages, "methodology.datasetCount", { count: liveEntries.length })}</span>
         </div>
         <div>
           {liveEntries.map((entry) => (
@@ -57,7 +57,7 @@ export function MethodologyHub({
               {/* Below 768px the arrow shares the title's line instead of taking a row of its own. */}
               <div className="max-[768px]:col-span-2 max-[768px]:row-start-2">
                 <p className="text-[13.5px] leading-relaxed text-[var(--body)]">{entry.summary}</p>
-                <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
+                <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--muted)]">
                   <span>{entry.coverage.firstYear}–{entry.coverage.lastYear}</span>
                   <span>{message(messages, "methodology.sourceCount", { count: entry.originalFileCount })}</span>
                   <span>{message(messages, "methodology.reviewed", { date: entry.reviewedAt })}</span>

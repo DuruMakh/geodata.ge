@@ -33,7 +33,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
     >
       <nav
         aria-label="Breadcrumb"
-        className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] max-[768px]:hidden"
+        className="text-[11px] min-[768px]:text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] max-[768px]:hidden"
       >
         {crumbs.map((crumb, index) => {
           const current = index === crumbs.length - 1;
@@ -65,7 +65,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
           </Link>
         </nav>
       ) : null}
-      <p className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)] min-[768px]:whitespace-nowrap">{coverage}</p>
+      <p className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)] min-[768px]:whitespace-nowrap">{coverage}</p>
     </header>
   );
 }

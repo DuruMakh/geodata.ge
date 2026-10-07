@@ -35,7 +35,7 @@ export async function renderAboutPage(locale: Locale) {
           >
             <div aria-hidden="true" className="flex min-w-0 items-start justify-between gap-3">
               <strong className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--accent)]">01</strong>
-              <span className="text-right font-[family-name:var(--font-numeric)] text-[9px] leading-[1.35] tracking-[0.08em] text-[var(--paper)]">
+              <span className="text-right font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9px] leading-[1.35] tracking-[0.08em] text-[var(--paper)]">
                 FISCAL.GE
                 <br />
                 OPEN DATA
@@ -47,7 +47,7 @@ export async function renderAboutPage(locale: Locale) {
             >
               {message(messages, "about.heading")}
             </h1>
-            <span className="self-end font-[family-name:var(--font-numeric)] text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
+            <span className="self-end font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
               {model.updatedAt.slice(0, 4)}
               <br />
               MISSION NOTE

@@ -296,7 +296,7 @@ export function ChartTooltip({
             </span>
             <span className="shrink-0 font-[family-name:var(--font-numeric)] text-[12px] text-[var(--ink)]">
               {formatValue(row.value)}
-              {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[10px]">{preliminaryLabel}</sup> : null}
+              {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[11px] min-[768px]:text-[10px]">{preliminaryLabel}</sup> : null}
             </span>
           </div>
         ))}
@@ -320,7 +320,7 @@ export function ChartTooltip({
           : { [pinned]: "8px", maxWidth: "calc(100% - 16px)" }
       }
     >
-      <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
+      <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--muted)]">
         <span>{header}</span>
         {headerRight ? <span>{headerRight}</span> : null}
       </div>
@@ -332,12 +332,12 @@ export function ChartTooltip({
           </span>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
             {formatValue(row.value)}
-            {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[9px]">{preliminaryLabel}</sup> : null}
+            {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[11px] min-[768px]:text-[9px]">{preliminaryLabel}</sup> : null}
           </span>
         </div>
       ))}
       {hidden > 0 ? (
-        <div className="pt-0.5 text-[10.5px] text-[var(--muted)]">+{hidden} {message(messages, "controls.other")}</div>
+        <div className="pt-0.5 text-[11px] min-[768px]:text-[10.5px] text-[var(--muted)]">+{hidden} {message(messages, "controls.other")}</div>
       ) : null}
     </div>
   );

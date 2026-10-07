@@ -14,9 +14,9 @@ function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
   return (
     <>
       <div className="flex items-baseline justify-between">
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--accent)]">{card.index}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--accent)]">{card.index}</span>
         {card.comingSoon ? (
-          <span className="rounded-[2px] border border-[var(--control)] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[9px] text-[var(--muted)]">
+          <span className="rounded-[2px] border border-[var(--control)] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9px] text-[var(--muted)]">
             {message(getCommonMessages(locale), "common.comingSoon")}
           </span>
         ) : (
@@ -41,7 +41,7 @@ function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
         <div aria-hidden data-testid="hub-card-graphic-space" className="mt-1.5 h-[34px]" />
       )}
       {card.footer ? (
-        <p className="mt-auto font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{withLari(card.footer)}</p>
+        <p className="mt-auto font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--faint)]">{withLari(card.footer)}</p>
       ) : null}
     </>
   );

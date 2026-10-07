@@ -46,7 +46,7 @@ const numericCellClass =
   "px-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap @max-[768px]:px-2.5";
 // On phones a status mark (preliminary, planned, forecast) drops under its number
 // rather than widening every year column.
-const STATUS_MARK_CLASS = "ml-1 text-[9px] font-medium text-[var(--faint)] @max-[768px]:top-0 @max-[768px]:ml-0 @max-[768px]:block @max-[768px]:leading-tight";
+const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-medium text-[var(--faint)] @max-[768px]:top-0 @max-[768px]:ml-0 @max-[768px]:block @max-[768px]:leading-tight";
 
 // Below 768px of table width (DESIGN.md §12) the sticky label column wraps and is capped at
 // 40% of the scroller, and the change/share columns scroll with the years instead of

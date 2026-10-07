@@ -65,7 +65,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
             data-hero-copy
             className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:col-start-1 min-[768px]:row-start-1 min-[768px]:z-10 min-[768px]:mb-6 min-[768px]:mt-[42px] min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:self-start min-[768px]:justify-self-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
           >
-            <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
               {message(messages, "landing.portal")}
             </p>
             <h1
@@ -98,7 +98,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
         >
           {KEY_NUMBERS.map((entry) => (
             <div key={message(messages, entry.label)} data-country-stat className="min-w-0">
-              <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
                 {message(messages, entry.label)}
               </div>
               <div className="mt-2 min-h-[58px] font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em] min-[768px]:min-h-0">
@@ -110,7 +110,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
                   {message(messages, entry.unit)}
                 </span>
               </div>
-              <div className="mt-2 text-[9px] leading-snug text-[var(--muted)] min-[768px]:text-[12px]">
+              <div className="mt-2 text-[11px] leading-snug text-[var(--muted)] min-[768px]:text-[12px]">
                 <span className="hidden min-[381px]:inline">{message(messages, entry.caption)}</span>
                 <span aria-hidden="true" className="min-[381px]:hidden">
                   {message(messages, entry.mobileCaption)}

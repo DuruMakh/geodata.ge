@@ -337,7 +337,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
                   { value: "table", label: message(messages, "municipal.table"), testId: "municipal-mode-table" },
                 ]}
               />
-              <span className="min-w-0 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+              <span className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
                 {message(messages, state.share ? "municipal.shareMeasure" : "municipal.amountMeasure")}
               </span>
             </span>
