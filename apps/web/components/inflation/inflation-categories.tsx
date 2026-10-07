@@ -214,6 +214,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
               <div className="mt-5">
                 <StackedColumnChart
                   periods={stack.periods}
+                  periodsPerYear={12}
                   segments={[
                     ...stack.segments.map((segment) => ({
                       id: segment.categoryId,
