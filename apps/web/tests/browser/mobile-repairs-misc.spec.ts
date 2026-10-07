@@ -96,6 +96,22 @@ test.describe("phone", () => {
     await page.waitForURL("**/en/explorer/unemployment/regions/tbilisi");
   });
 
+  test("age heatmap opens on the newest years and its darkest cells read paper on accent", async ({ page }) => {
+    await page.goto("/explorer/unemployment/age");
+    await ready(page);
+    const scroller = page.getByTestId("age-heatmap-scroller");
+    await expect.poll(() => scroller.evaluate((element) => element.scrollWidth - element.clientWidth - element.scrollLeft)).toBeLessThanOrEqual(1);
+    expect(await scroller.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+    const newest = await page.locator("[data-heatmap-cell='age.20_24:2025']").evaluate((cell) => {
+      const box = cell.getBoundingClientRect(), frame = cell.closest("[data-testid='age-heatmap-scroller']")!.getBoundingClientRect();
+      return box.left >= frame.left && box.right <= frame.right + 1;
+    });
+    expect(newest).toBe(true);
+    const darkest = page.locator("[data-heatmap-cell][data-bin='5']").first();
+    await expect(darkest).toHaveCSS("background-color", "rgb(179, 64, 42)");
+    await expect(darkest).toHaveCSS("color", "rgb(247, 242, 233)");
+  });
+
   test("municipal map: city markers preview on the first tap and the list scrolls with the page (D7)", async ({ page }) => {
     await page.goto("/explorer/municipalities");
     await ready(page);

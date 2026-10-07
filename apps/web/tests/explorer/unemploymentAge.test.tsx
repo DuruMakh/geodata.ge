@@ -4,7 +4,8 @@ import { UnemploymentExplorer } from "../../components/unemployment/unemployment
 import { UnemploymentAgeHeatmap } from "../../components/unemployment/unemployment-age-heatmap";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/unemployment/importUnemployment";
 import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/types";
-import { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
+import { buildUnemploymentAgeHeatmap, unemploymentAgeHeatmapBin } from "../../lib/explorer/unemploymentAge";
+import { MAP_RAMP } from "../../lib/explorer/colors";
 import { buildUnemploymentModel } from "../../lib/explorer/unemployment";
 import { parseUnemploymentHash } from "../../lib/explorer/unemploymentState";
 import { I18nProvider } from "../../lib/i18n/provider";
@@ -60,4 +61,25 @@ test.each(["ka", "en"] as const)("the %s age page retains all eight indicators i
   expect(markup.match(/data-heatmap-group=/g)).toHaveLength(11);
   expect(markup.match(/data-heatmap-cell=/g)).toHaveLength(66);
   expect(markup).toContain("39.0%");
+});
+
+test("the heatmap scale runs in six equal bins from zero to the accent, with readable text on every bin", () => {
+  expect([0, 9, 10, 25, 44, 59.9, 60].map(value => unemploymentAgeHeatmapBin(value, 60, MAP_RAMP.length))).toEqual([0, 0, 1, 2, 4, 5, 5]);
+  expect(unemploymentAgeHeatmapBin(5, 0, MAP_RAMP.length)).toBe(0);
+  expect(MAP_RAMP.at(-1)).toBe("#B3402A");
+  const channel = (hex: string, index: number) => { const c = parseInt(hex.slice(1 + index * 2, 3 + index * 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  const luminance = (hex: string) => 0.2126 * channel(hex, 0) + 0.7152 * channel(hex, 1) + 0.0722 * channel(hex, 2);
+  const contrast = (a: string, b: string) => { const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (high + 0.05) / (low + 0.05); };
+  const ink = "#1E1B16", paper = "#F7F2E9";
+  MAP_RAMP.forEach((fill, bin) => expect(contrast(fill, bin === MAP_RAMP.length - 1 ? paper : ink), fill).toBeGreaterThanOrEqual(4.5));
+});
+
+test("the darkest heatmap cells carry paper text on the accent", async () => {
+  const messages = await getMessages("ka", ["unemployment", "format", "controls"]);
+  const model = buildUnemploymentAgeHeatmap(facts, UNEMPLOYMENT_GROUPS, "unemployment_rate", [2024, 2025]);
+  const markup = renderToStaticMarkup(<I18nProvider locale="ka" messages={messages}><UnemploymentAgeHeatmap model={model} indicator="unemployment_rate" /></I18nProvider>);
+  const darkest = markup.match(/<td[^>]*data-bin="5"[^>]*>/g) ?? [];
+  expect(darkest.length).toBeGreaterThan(0);
+  for (const cell of darkest) expect(cell).toContain("background-color:#B3402A;color:var(--paper)");
+  expect(markup).not.toContain("color-mix");
 });
