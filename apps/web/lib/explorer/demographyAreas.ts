@@ -84,13 +84,13 @@ export function municipalityCodeForPlaceId(id: string): string {
   return id === TBILISI_PLACE_ID ? TBILISI_MUNICIPALITY_CODE : id;
 }
 
-/** Georgia, then the places of one level. Tbilisi is in both lists because it is both a region and a municipality. */
-export function placesAtLevel(places: readonly DemographyPlace[], level: "regions" | "municipalities"): DemographyPlace[] {
-  return places.filter(
-    (place) =>
-      place.id === GEORGIA_PLACE_ID ||
-      (level === "regions" ? place.level === "region" : place.level === "municipality" || place.id === TBILISI_PLACE_ID),
-  );
+/** What a place is made of, for the tick-list: Georgia has its regions, a region its municipalities, a municipality nothing. Tbilisi is a region whose one municipality is itself, so it has none. */
+export function partsOf(place: DemographyPlace, places: readonly DemographyPlace[]): DemographyPlace[] {
+  if (place.level === "country") return places.filter((candidate) => candidate.level === "region");
+  if (place.level === "region") {
+    return places.filter((candidate) => candidate.level === "municipality" && candidate.regionId === place.id);
+  }
+  return [];
 }
 
 /** Georgia is ink; regions and municipalities cycle the editorial palette by their registry order, so a place keeps its colour on every page. */

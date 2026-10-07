@@ -7,98 +7,17 @@ import {
   placeColor,
   placeIdForMunicipalityCode,
   placeLabel,
-  placesAtLevel,
   type DemographyPlace,
 } from "./demographyAreas";
 import { resolveRange, type PeriodRange } from "./periodRange";
 import { rankByEndValue } from "./regionalEconomies";
-import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
-export type PopulationLevel = "regions" | "municipalities";
-export type PopulationMapMeasure = "population" | "density";
-
-export type PopulationState = {
+/** What a place page asks the model for: the places drawn and the period. */
+export type PopulationQuery = {
   /** Place ids; Tbilisi is `region.tbilisi`. */
-  selectedIds: string[];
-  level: PopulationLevel;
-  map: PopulationMapMeasure;
-  mode: "line" | "table";
+  selectedIds: readonly string[];
   range: PeriodRange;
 };
-
-export const DEFAULT_POPULATION_STATE: PopulationState = {
-  selectedIds: [GEORGIA_PLACE_ID],
-  level: "regions",
-  map: "population",
-  mode: "line",
-  range: { kind: "all" },
-};
-
-/** Unknown values are rejected, duplicates removed; an absent `sel` means Georgia only and an explicit empty one stays empty. */
-export function parsePopulationHash(hash: string, validIds: readonly string[]): PopulationState {
-  const params = new URLSearchParams(hash.replace(/^#/, ""));
-  const level: PopulationLevel = params.get("level") === "municipalities" ? "municipalities" : "regions";
-  return {
-    selectedIds: params.has("sel")
-      ? [...new Set(params.get("sel")!.split(",").map(placeIdForMunicipalityCode))].filter((id) => validIds.includes(id))
-      : [GEORGIA_PLACE_ID],
-    level,
-    // Density is published for Georgia and the regions only.
-    map: level === "regions" && params.get("map") === "density" ? "density" : "population",
-    mode: params.get("view") === "table" ? "table" : "line",
-    range: parseYearRangeKeys(params),
-  };
-}
-
-export function serializePopulationHash(state: PopulationState): string {
-  const params = new URLSearchParams({
-    sel: state.selectedIds.join(","),
-    level: state.level,
-    map: state.map,
-    view: state.mode,
-  });
-  writeYearRangeKeys(params, state.range);
-  return params.toString();
-}
-
-/** Choosing a place on a map replaces the selection with that place alone. */
-export function chooseOnMap(state: PopulationState, id: string): PopulationState {
-  return { ...state, selectedIds: [id] };
-}
-
-export function chooseGeorgia(state: PopulationState): PopulationState {
-  return { ...state, selectedIds: [GEORGIA_PLACE_ID] };
-}
-
-/** The selection survives a level change; density does not exist below the regions, so the map falls back to population. */
-export function changeLevel(state: PopulationState, level: PopulationLevel): PopulationState {
-  return { ...state, level, map: level === "municipalities" ? "population" : state.map };
-}
-
-export function changeMeasure(state: PopulationState, map: PopulationMapMeasure): PopulationState {
-  return state.level === "municipalities" ? state : { ...state, map };
-}
-
-/** Ticking a place in the list adds it to, or removes it from, the selection. */
-export function toggleSelected(state: PopulationState, id: string): PopulationState {
-  return {
-    ...state,
-    selectedIds: state.selectedIds.includes(id)
-      ? state.selectedIds.filter((selected) => selected !== id)
-      : [...state.selectedIds, id],
-  };
-}
-
-/** Select all or clear for the places of the active tab; places chosen under the other tab are left as they are. */
-export function setTabSelection(state: PopulationState, tabIds: readonly string[], selected: boolean): PopulationState {
-  const tab = new Set(tabIds);
-  return {
-    ...state,
-    selectedIds: selected
-      ? [...state.selectedIds, ...tabIds.filter((id) => !state.selectedIds.includes(id))]
-      : state.selectedIds.filter((id) => !tab.has(id)),
-  };
-}
 
 /** Georgia first, then by the value at the end of the range (descending, missing last), ties by registry order. */
 export function rankPlaces(
@@ -111,12 +30,12 @@ export function rankPlaces(
 export function buildPopulationModel({
   facts,
   places,
-  state,
+  query,
   locale,
 }: {
   facts: readonly ClientDemographyObservation[];
   places: readonly DemographyPlace[];
-  state: PopulationState;
+  query: PopulationQuery;
   locale: Locale;
 }) {
   const byCell = new Map<string, number>();
@@ -131,14 +50,13 @@ export function buildPopulationModel({
   if (availableYears.length === 0) throw new Error("No population years are available");
   const range = {
     availableYears,
-    ...resolveRange(state.range, { min: availableYears[0]!, max: availableYears.at(-1)! }),
+    ...resolveRange(query.range, { min: availableYears[0]!, max: availableYears.at(-1)! }),
   };
   const years = Array.from({ length: range.end - range.start + 1 }, (_, index) => range.start + index);
   const valueAt = (id: string, year: number): number | null => byCell.get(`${id}:${year}`) ?? null;
   const endValues = Object.fromEntries(places.map((place) => [place.id, valueAt(place.id, range.end)]));
   const ranked = rankPlaces(places, endValues);
-  const listed = placesAtLevel(ranked, state.level);
-  const selected = ranked.filter((place) => state.selectedIds.includes(place.id));
+  const selected = ranked.filter((place) => query.selectedIds.includes(place.id));
   const rows = selected.map((place) => ({
     itemId: place.id,
     kaLabel: placeLabel(place, locale),
@@ -157,13 +75,11 @@ export function buildPopulationModel({
     years,
     availableYears,
     ranked,
-    listed,
     selected,
     rows,
     series,
     endValues,
     valueAt,
-    firstSelected: selected[0] ?? null,
     hasData: selected.some((place) => years.some((year) => valueAt(place.id, year) !== null)),
   };
 }
@@ -262,15 +178,16 @@ const fraction = (part: number | null, whole: number | null) =>
   part === null || whole === null || whole === 0 ? null : part / whole;
 
 /**
- * The highlights describe the first selected place for the end year of the range. Nothing here is a
- * change over time, so nothing spans the census re-base (foundation section 5, R4).
+ * The highlights describe one place, for the end year of the range. Nothing here is a change over time,
+ * so nothing spans the census re-base (foundation section 5, R4).
  */
 export function buildPopulationHighlights(
   model: PopulationModel,
   facts: readonly ClientDemographyObservation[],
   places: readonly DemographyPlace[],
+  placeId: string,
 ): PopulationHighlights | null {
-  const place = model.firstSelected;
+  const place = places.find((candidate) => candidate.id === placeId);
   if (!place) return null;
   const { years, valueAt } = model;
   const year = model.range.end;

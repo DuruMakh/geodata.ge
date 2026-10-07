@@ -99,8 +99,6 @@ export type RegionalEconomyMapRegion = {
   rank: number;
   bucket: number;
   pathD: string;
-  /** What a page that plots something other than GDP prints for this region in the label and tooltip. */
-  display?: string;
 };
 
 export type RegionalEconomyMapModel = {
@@ -123,20 +121,25 @@ function quantileBucket(values: number[]) {
   };
 }
 
-/** Joins one value per region to its outline, rank and equal-count bucket; every region map is built here. */
-function assembleRegionMapModel({
-  latestByRegion,
+export function buildRegionalEconomyMapModel({
+  facts,
   regions,
-  firstYear,
-  year,
-  displayFor,
 }: {
-  latestByRegion: ReadonlyMap<string, number>;
+  facts: readonly ClientRegionalEconomyObservation[];
   regions: readonly MunicipalRegion[];
-  firstYear: number;
-  year: number;
-  displayFor?: (regionId: string, value: number) => string;
 }): RegionalEconomyMapModel {
+  const totalFacts = facts.filter((fact) => fact.seriesId === REGIONAL_GDP_TOTAL && fact.measure === "nominal");
+  if (totalFacts.length === 0) throw new Error("Regional GDP totals are missing");
+  const firstYear = Math.min(...totalFacts.map((fact) => fact.year));
+  const year = Math.max(...totalFacts.map((fact) => fact.year));
+  const latest = totalFacts.filter((fact) => fact.year === year);
+  const latestByRegion = new Map<string, number>();
+  for (const fact of latest) {
+    if (latestByRegion.has(fact.regionId)) throw new Error(`Duplicate latest Regional GDP for ${fact.regionId}`);
+    if (!Number.isFinite(fact.value) || fact.value <= 0) throw new Error(`Invalid latest Regional GDP for ${fact.regionId}`);
+    latestByRegion.set(fact.regionId, fact.value);
+  }
+
   const project = createProjection();
   const pathByRegion = new Map<string, string>();
   for (const geoRegion of GEORGIA_GEO.regions) {
@@ -170,7 +173,6 @@ function assembleRegionMapModel({
         rank: index + 1,
         bucket: bucketOf(region.totalGdpGel),
         pathD,
-        ...(displayFor ? { display: displayFor(region.regionId, region.totalGdpGel) } : {}),
       };
     });
   if (pathByRegion.size !== regions.length) throw new Error("Regional map geometry contains an unknown region");
@@ -187,50 +189,4 @@ function assembleRegionMapModel({
     legendMinGel: Math.min(...regionRows.map((region) => region.totalGdpGel)),
     legendMaxGel: Math.max(...regionRows.map((region) => region.totalGdpGel)),
   };
-}
-
-export function buildRegionalEconomyMapModel({
-  facts,
-  regions,
-}: {
-  facts: readonly ClientRegionalEconomyObservation[];
-  regions: readonly MunicipalRegion[];
-}): RegionalEconomyMapModel {
-  const totalFacts = facts.filter((fact) => fact.seriesId === REGIONAL_GDP_TOTAL && fact.measure === "nominal");
-  if (totalFacts.length === 0) throw new Error("Regional GDP totals are missing");
-  const firstYear = Math.min(...totalFacts.map((fact) => fact.year));
-  const year = Math.max(...totalFacts.map((fact) => fact.year));
-  const latest = totalFacts.filter((fact) => fact.year === year);
-  const latestByRegion = new Map<string, number>();
-  for (const fact of latest) {
-    if (latestByRegion.has(fact.regionId)) throw new Error(`Duplicate latest Regional GDP for ${fact.regionId}`);
-    if (!Number.isFinite(fact.value) || fact.value <= 0) throw new Error(`Invalid latest Regional GDP for ${fact.regionId}`);
-    latestByRegion.set(fact.regionId, fact.value);
-  }
-  return assembleRegionMapModel({ latestByRegion, regions, firstYear, year });
-}
-
-/**
- * A region map of any one positive value per region (population, density). The number goes in the
- * existing numeric field and `display` is the text the page prints in the label and tooltip.
- */
-export function buildRegionValueMapModel({
-  values,
-  regions,
-  year,
-  display,
-}: {
-  values: ReadonlyMap<string, number>;
-  regions: readonly MunicipalRegion[];
-  year: number;
-  display: (regionId: string, value: number) => string;
-}): RegionalEconomyMapModel {
-  for (const [regionId, value] of values) {
-    if (!regions.some((region) => region.id === regionId)) throw new Error(`Map values contain an unknown region ${regionId}`);
-    if (!Number.isFinite(value) || value <= 0) throw new Error(`Invalid map value for ${regionId}`);
-  }
-  for (const region of regions) {
-    if (!values.has(region.id)) throw new Error(`Missing map value for ${region.id}`);
-  }
-  return assembleRegionMapModel({ latestByRegion: values, regions, firstYear: year, year, displayFor: display });
 }

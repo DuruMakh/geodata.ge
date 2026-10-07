@@ -4,7 +4,7 @@ import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 import type { ClientDemographyObservation } from "../servedRows";
 import { placeLabel, type DemographyPlace } from "./demographyAreas";
-import { buildPopulationModel, populationBasisKey, type PopulationState } from "./demographyPopulation";
+import { buildPopulationModel, populationBasisKey, type PopulationQuery } from "./demographyPopulation";
 import {
   SHEET_NAMES,
   withAbsoluteUrls,
@@ -18,15 +18,17 @@ const LEVEL_KEYS = { country: "levelCountry", region: "levelRegion", municipalit
 export function buildPopulationWorkbookExportModel(
   facts: readonly ClientDemographyObservation[],
   places: readonly DemographyPlace[],
-  state: PopulationState,
+  query: PopulationQuery,
   presentation: Presentation,
   sources: readonly (WorkbookPublicSource & { sourceId: string })[],
   siteOrigin: string,
+  /** The place the page is about, named in the file (`batumi`, `region-adjara`, `georgia`); omitted gives the plain name. */
+  scope?: string,
 ): WorkbookExportModel {
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `demography.${key}`);
   const w = (key: Parameters<typeof workbookMessage>[1]) => workbookMessage(locale, key);
-  const model = buildPopulationModel({ facts, places, state, locale });
+  const model = buildPopulationModel({ facts, places, query, locale });
   const densityByCell = new Map<string, number>();
   for (const fact of facts) {
     if (fact.seriesId === SERIES.populationDensity) densityByCell.set(`${fact.geographyId}:${fact.year}`, fact.value);
@@ -46,7 +48,7 @@ export function buildPopulationWorkbookExportModel(
   const unitLabel = t("unitPersons");
   return {
     locale,
-    filename: workbookFilename(`demography-population-${model.range.start}-${model.range.end}`, locale),
+    filename: workbookFilename(`demography-population-${scope ? `${scope}-` : ""}${model.range.start}-${model.range.end}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
       title: t("workbookTitle"),

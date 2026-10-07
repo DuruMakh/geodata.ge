@@ -53,7 +53,7 @@ describe("buildMunicipalityValueMapModel", () => {
   });
 });
 
-describe("MunicipalityMap choosing mode", () => {
+describe("MunicipalityMap population wording", () => {
   const render = (props: Partial<Parameters<typeof MunicipalityMap>[0]> = {}, withText = true) =>
     renderToStaticMarkup(
       <I18nProvider {...presentation}>
@@ -72,25 +72,22 @@ describe("MunicipalityMap choosing mode", () => {
       </I18nProvider>,
     );
 
-  test("makes all 64 targets buttons, outlines the chosen places and uses the page's wording", () => {
-    const html = render({ selectedCodes: ["04", "11"], wording: { groupAria: "Population map", legendCaption: "persons, 1 January 2026" } });
+  test("keeps all 64 targets links and uses the page's wording", () => {
+    const html = render({ wording: { groupAria: "Population map", legendCaption: "persons, 1 January 2026" } });
     expect(count(html, /data-municipality-map-target=""/g)).toBe(64);
-    expect(count(html, /role="button"/g)).toBe(64);
-    expect(count(html, /role="link"/g)).toBe(0);
-    expect(count(html, /aria-pressed="true"/g)).toBe(2);
-    expect(html).toContain('data-testid="municipality-chosen-04"');
-    expect(html).toContain('data-testid="municipality-chosen-11"');
+    expect(count(html, /role="link"/g)).toBe(64);
+    expect(count(html, /role="button"/g)).toBe(0);
+    expect(count(html, /aria-pressed/g)).toBe(0);
+    expect(count(html, /municipality-chosen-/g)).toBe(0);
     expect(html).toContain('aria-label="Population map"');
     expect(html).toContain("persons, 1 January 2026");
     expect(html).toContain("Khulo, 16098 persons");
     expect(html).not.toContain("per resident");
   });
 
-  test("without the new props it is the budget map's links and wording", () => {
+  test("without the new props it is the budget map's wording", () => {
     const html = render({}, false);
     expect(count(html, /role="link"/g)).toBe(64);
-    expect(count(html, /role="button"/g)).toBe(0);
-    expect(count(html, /aria-pressed/g)).toBe(0);
-    expect(count(html, /municipality-chosen-/g)).toBe(0);
+    expect(html).toContain("per resident");
   });
 });

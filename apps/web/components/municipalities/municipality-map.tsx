@@ -16,8 +16,6 @@ type MunicipalityMapProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel"
   activeCode: string | null;
   onActiveCodeChange: (code: string | null) => void;
   onOpenMunicipality: (code: string) => void;
-  /** Choosing mode, for pages that pick places rather than open them: these codes are outlined and every target is a button. */
-  selectedCodes?: readonly string[];
   /** Replaces the per-resident budget wording; each place's own value text is `display` on the model. */
   wording?: { groupAria: string; legendCaption: string };
 };
@@ -80,7 +78,6 @@ export function MunicipalityMap({
   activeCode,
   onActiveCodeChange,
   onOpenMunicipality,
-  selectedCodes,
   wording,
 }: MunicipalityMapProps) {
   const { locale, messages, englishLabels } = useI18n();
@@ -95,8 +92,6 @@ export function MunicipalityMap({
   const activeTarget = focusTarget ?? pointerTarget;
   const describedTarget =
     activeTarget?.code === activeCode && tooltipPosition !== null ? activeTarget : null;
-  const choosing = selectedCodes !== undefined;
-  const chosen = useMemo(() => new Set(selectedCodes ?? []), [selectedCodes]);
   // Tbilisi (04) is the only entity the artifact carries as both a polygon and a
   // self-governing-city marker. The legend names the green dot
   // "თვითმმართველი ქალაქები", so the marker is the encoding that gets the
@@ -278,8 +273,7 @@ export function MunicipalityMap({
                   strokeWidth={active ? 2.2 : 0.7}
                   strokeLinejoin="round"
                   tabIndex={targetIndex === rovingIndex ? 0 : -1}
-                  role={choosing ? "button" : "link"}
-                  aria-pressed={choosing ? chosen.has(shape.code) : undefined}
+                  role="link"
                   aria-label={accessibleName(shape.code, shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel, shape.display)}
                   aria-describedby={describedTarget?.key === `shape:${shape.code}` ? TOOLTIP_ID : undefined}
                   className="cursor-pointer"
@@ -326,14 +320,13 @@ export function MunicipalityMap({
                 data-active={active ? "true" : undefined}
                 cx={marker.x}
                 cy={marker.y}
-                r={active || chosen.has(marker.code) ? 9.5 : 7.5}
+                r={active ? 9.5 : 7.5}
                 fill="var(--positive)"
-                stroke={chosen.has(marker.code) ? "var(--ink)" : "var(--tile)"}
-                strokeWidth={chosen.has(marker.code) ? 2.4 : active ? 2.2 : 1.2}
+                stroke="var(--tile)"
+                strokeWidth={active ? 2.2 : 1.2}
                 vectorEffect="non-scaling-stroke"
                 tabIndex={targetIndex === rovingIndex ? 0 : -1}
-                role={choosing ? "button" : "link"}
-                aria-pressed={choosing ? chosen.has(marker.code) : undefined}
+                role="link"
                 aria-label={accessibleName(marker.code, marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel, marker.display)}
                 aria-describedby={describedTarget?.key === `marker:${marker.code}` ? TOOLTIP_ID : undefined}
                 className="cursor-pointer"
@@ -366,22 +359,6 @@ export function MunicipalityMap({
               />
             );
           })}
-
-          {choosing
-            ? shapes.filter((shape) => chosen.has(shape.code)).map((shape) => (
-                <use
-                  key={`chosen:${shape.code}`}
-                  data-testid={`municipality-chosen-${shape.code}`}
-                  href={`${municipalityMapDefinitions.src}#municipality-shape-${shape.code}`}
-                  fill="none"
-                  stroke="var(--ink)"
-                  strokeWidth={2.4}
-                  strokeLinejoin="round"
-                  pointerEvents="none"
-                  aria-hidden
-                />
-              ))
-            : null}
 
           {occupiedAreas.map((area) => (
             <use

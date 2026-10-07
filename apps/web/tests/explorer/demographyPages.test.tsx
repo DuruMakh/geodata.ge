@@ -40,24 +40,22 @@ describe("demography hub page", () => {
 describe("population page", () => {
   it("renders the heading, coverage, explorer and breadcrumb, with no download and no Georgian text in English", async () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
-    expect(html).toContain('data-testid="population-explorer"');
+    expect(html).toContain('data-testid="explorer-shell"');
     expect(html).toContain("2004–2026 · as of 1 January");
     expect(html).toContain("persons, on 1 January");
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
-    expect(html).toContain('href="/en/methodology/demography"');
     expect(html).not.toMatch(GEORGIAN);
   });
 
   it("renders in Georgian with the same structure", async () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("ka"));
-    expect(html).toContain('data-testid="population-explorer"');
+    expect(html).toContain('data-testid="explorer-shell"');
     expect(html).toContain("2004–2026 · 1 იანვრის მდგომარეობით");
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
-    expect(html).toContain('href="/methodology/demography"');
   });
 
   it("has metadata with the page's own canonical address", async () => {

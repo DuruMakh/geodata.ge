@@ -4,7 +4,7 @@ import { loadServedDemographyData } from "../../lib/data/demography/importDemogr
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { projectDemographyObservation } from "../../lib/explorer/clientData";
 import { GEORGIA_PLACE_ID, buildDemographyPlaces, type DemographyPlace } from "../../lib/explorer/demographyAreas";
-import { DEFAULT_POPULATION_STATE, type PopulationState } from "../../lib/explorer/demographyPopulation";
+import type { PopulationQuery } from "../../lib/explorer/demographyPopulation";
 import { buildPopulationWorkbookExportModel } from "../../lib/explorer/demographyPopulationWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
@@ -40,8 +40,10 @@ const sources = [
   { sourceId: "unrelated", years: [2020], title: "Unrelated", organization: "Other", downloadHref: "/downloads/methodology/demography/files/unrelated.xlsx" as const, retrievedAt: "2026-10-03" },
 ];
 
-const build = (patch: Partial<PopulationState> = {}, extra: Partial<typeof presentation> = {}) =>
-  buildPopulationWorkbookExportModel(facts, places, { ...DEFAULT_POPULATION_STATE, ...patch }, { ...presentation, ...extra }, sources, "https://fiscal.ge");
+const DEFAULT_QUERY: PopulationQuery = { selectedIds: [GEORGIA_PLACE_ID], range: { kind: "all" } };
+
+const build = (patch: Partial<PopulationQuery> = {}, extra: Partial<typeof presentation> = {}) =>
+  buildPopulationWorkbookExportModel(facts, places, { ...DEFAULT_QUERY, ...patch }, { ...presentation, ...extra }, sources, "https://fiscal.ge");
 
 // The length of a text in Excel column units: each Georgian letter counts 1.2 and every other character 1. Rounded to a
 // tenth so the sum carries no floating-point noise into the comparisons.
@@ -115,6 +117,13 @@ describe("population workbook", () => {
     expect(build({}, { locale: "ka" as never }).filename).toBe("fiscal-demography-population-2004-2026.xlsx");
   });
 
+  test("a place page names the place and the range in the file", () => {
+    const all = buildPopulationWorkbookExportModel(facts, places, { selectedIds: ["06"], range: { kind: "all" } }, presentation, sources, "https://fiscal.ge", "batumi");
+    expect(all.filename).toBe("fiscal-demography-population-batumi-2004-2026-en.xlsx");
+    const manual = buildPopulationWorkbookExportModel(facts, places, { selectedIds: ["06"], range: { kind: "manual", start: 2015, end: 2026 } }, presentation, sources, "https://fiscal.ge", "batumi");
+    expect(manual.filename).toBe("fiscal-demography-population-batumi-2015-2026-en.xlsx");
+  });
+
   test("the written file has three sheets and numeric, formatted cells", async () => {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(build()));
@@ -153,7 +162,7 @@ describe("population workbook", () => {
       longest((place) => place.nameKa).id,
       longest((place) => place.nameEn).id,
     ])];
-    const model = buildPopulationWorkbookExportModel(facts, realPlaces, { ...DEFAULT_POPULATION_STATE, selectedIds }, real, sources, "https://fiscal.ge");
+    const model = buildPopulationWorkbookExportModel(facts, realPlaces, { ...DEFAULT_QUERY, selectedIds }, real, sources, "https://fiscal.ge");
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(model));
@@ -197,7 +206,7 @@ describe("population workbook", () => {
   const TWO_LINES = 2 * 15;
   test.each(["ka", "en"] as const)("the %s Summary sheet header wraps and every label fits its lines (Georgian script weighted, approximate)", async (locale) => {
     const real = await getPresentation(locale, ["demography"], []);
-    const model = buildPopulationWorkbookExportModel(facts, places, DEFAULT_POPULATION_STATE, real, sources, "https://fiscal.ge");
+    const model = buildPopulationWorkbookExportModel(facts, places, DEFAULT_QUERY, real, sources, "https://fiscal.ge");
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(model));
     const summary = workbook.getWorksheet(model.sheetNames[0])!;
