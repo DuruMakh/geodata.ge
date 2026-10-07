@@ -18,10 +18,10 @@ function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) 
 
   return (
     <div title={mover.label} className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5">
-      <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+      <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
         {String(mover.rank).padStart(2, "0")}
       </span>
-      <span className={`text-[12.5px] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>{mover.label}</span>
+      <span className={`text-[0.78125rem] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>{mover.label}</span>
       <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
         <span className="block h-full" style={{ width: `${width.toFixed(0)}%`, backgroundColor: growthColor(growth) }} />
       </span>
@@ -42,7 +42,7 @@ function AmountText({ value, signed = false, locale }: { value: number | null | 
   return (
     <>
       <span className="whitespace-nowrap">{parts.num}</span>
-      {parts.unit ? <> <span className="whitespace-nowrap @max-[768px]:text-[11px]">{parts.unit}</span></> : null}
+      {parts.unit ? <> <span className="whitespace-nowrap @max-[768px]:text-[0.6875rem]">{parts.unit}</span></> : null}
     </>
   );
 }
@@ -86,7 +86,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
     <section data-testid="period-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <SectionTitle>{message(messages, "municipal.indicators")}</SectionTitle>
-          <p className="text-[12.5px] text-[var(--muted)]">
+          <p className="text-[0.78125rem] text-[var(--muted)]">
             <Message messages={messages} id="municipal.selectedPeriod" values={{ period: <span className="font-[family-name:var(--font-numeric)]">{singleYear ? startYear : `${startYear}–${endYear}`}</span> }} />
           </p>
         </div>
@@ -94,7 +94,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
         <div data-testid="entity-kpi-grid" className={KPI_GRID_CLASS}>
           {singleYear ? (
             <div className="min-w-0 @min-[1100px]:pr-11">
-              <p data-testid="period-single-year-note" className="max-w-[420px] text-[13px] leading-relaxed text-[var(--muted)]">
+              <p data-testid="period-single-year-note" className="max-w-[420px] text-[0.8125rem] leading-relaxed text-[var(--muted)]">
                 {message(messages, "main.noPeriod")}
               </p>
             </div>
@@ -113,15 +113,15 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                 <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - gaugeBase) * 100).toFixed(1)}%` }} />
               </div>
               <div className="mt-2 flex justify-between gap-4">
-                <p data-testid="municipal-change-start" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                <p data-testid="municipal-change-start" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
                   {startYear} · {formatAmount(headline.start, locale)}
                 </p>
-                <p data-testid="municipal-change-end" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                <p data-testid="municipal-change-end" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
                   {endYear} · {formatAmount(headline.end, locale)}
                 </p>
               </div>
               {showSentence ? (
-                <p data-testid="municipal-change-sentence" className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+                <p data-testid="municipal-change-sentence" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
                   <Message messages={messages} id={grew ? "municipal.changeIncreased" : "municipal.changeDecreased"} values={{
                     start: startYear, end: endYear,
                     amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari(`${deltaParts.num} ${deltaParts.unit}`.trim())}</span>,
@@ -158,7 +158,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
       {singleYear ? null : (
       <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
         <div className="min-w-0">
-          <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "municipal.fastestGrowth")}</h3>
+          <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.fastestGrowth")}</h3>
           <div className="flex flex-col">
             {movers.up.map((mover) => (
               <MoverRow key={mover.label} mover={mover} maxAbs={maxAbs} />
@@ -166,7 +166,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           </div>
         </div>
         <div className="min-w-0">
-          <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "municipal.slowestGrowth")}</h3>
+          <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.slowestGrowth")}</h3>
           <div className="flex flex-col">
             {movers.down.map((mover) => (
               <MoverRow key={mover.label} mover={mover} maxAbs={maxAbs} />
@@ -178,7 +178,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
 
       {singleYear ? null : (
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "municipal.periodComparison")}</h3>
+        <h3 className="mb-1 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.periodComparison")}</h3>
         <div className="overflow-x-auto">
           <table data-testid="comparison-table" className="w-full min-w-[560px] table-fixed border-collapse @max-[768px]:min-w-0">
             <caption className="sr-only">{message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}</caption>
@@ -193,7 +193,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                 {[message(messages, "municipal.function"), String(startYear), message(messages, "municipal.change"), String(endYear)].map((label, index) => (
                   <th
                     key={`comparison-header-${index}`}
-                    className={`border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right @max-[768px]:pl-1" : "px-3 pt-1.5 pb-2 text-right @max-[768px]:px-1"} text-[11px] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em] @max-[768px]:tracking-normal"} text-[var(--muted)]`}
+                    className={`border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right @max-[768px]:pl-1" : "px-3 pt-1.5 pb-2 text-right @max-[768px]:px-1"} text-[0.6875rem] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em] @max-[768px]:tracking-normal"} text-[var(--muted)]`}
                   >
                     {label}
                   </th>
@@ -209,22 +209,22 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                   <td className="py-2.5 pr-3" title={row.label}>
                     <span className="inline-flex min-w-0 items-start gap-[9px]">
                       <SwatchBar color={row.color} className="mt-[7px]" />
-                      <span className="text-[12.5px] leading-[1.4] text-[var(--ink)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
+                      <span className="text-[0.78125rem] leading-[1.4] text-[var(--ink)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                         {row.label}
                       </span>
                     </span>
                   </td>
-                  <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
+                  <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                     <AmountText value={row.fromGel} locale={locale} />
                   </td>
                   <td
                     data-testid="comparison-change-cell"
-                    className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] @max-[768px]:px-1"
+                    className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] @max-[768px]:px-1"
                     style={{ color: growthColor(row.changeShare) }}
                   >
                     <AmountText value={row.changeGel} signed locale={locale} />
                   </td>
-                  <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
+                  <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                     <AmountText value={row.toGel} locale={locale} />
                   </td>
                 </tr>

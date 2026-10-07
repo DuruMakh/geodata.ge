@@ -21,16 +21,16 @@ export function MethodologyHub({
       <BreadcrumbTrail items={breadcrumbItems} />
       <section className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 border-b-2 border-[var(--ink)] pb-14 min-[860px]:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] min-[860px]:gap-16 min-[860px]:pb-20">
         <div className="max-w-[620px]">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.hubOverline")}</p>
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.hubOverline")}</p>
           <h1 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
             {message(messages, "methodology.hubTitle")}
           </h1>
-          <p className="mt-6 max-w-[570px] text-pretty text-[15px] leading-[1.75] text-[var(--body)]">
+          <p className="mt-6 max-w-[570px] text-pretty text-[0.9375rem] leading-[1.75] text-[var(--body)]">
             {message(messages, "methodology.hubSummary")}
           </p>
           <Link
             href="#datasets"
-            className="mt-5 inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[var(--ink)]"
+            className="mt-5 inline-flex min-h-11 items-center text-[0.78125rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[var(--ink)]"
           >
             {message(messages, "methodology.hubJump")}
           </Link>
@@ -43,7 +43,7 @@ export function MethodologyHub({
           <h2 id="datasets-title" className="font-[family-name:var(--font-display)] text-[26px] font-semibold tracking-[-0.01em]">
             {message(messages, "methodology.published")}
           </h2>
-          <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{message(messages, "methodology.datasetCount", { count: liveEntries.length })}</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--faint)]">{message(messages, "methodology.datasetCount", { count: liveEntries.length })}</span>
         </div>
         <div>
           {liveEntries.map((entry) => (
@@ -56,8 +56,8 @@ export function MethodologyHub({
               <h3 className="font-[family-name:var(--font-display)] text-[24px] font-semibold tracking-[-0.01em]">{entry.title}</h3>
               {/* Below 768px the arrow shares the title's line instead of taking a row of its own. */}
               <div className="max-[768px]:col-span-2 max-[768px]:row-start-2">
-                <p className="text-[13.5px] leading-relaxed text-[var(--body)]">{entry.summary}</p>
-                <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--muted)]">
+                <p className="text-[0.84375rem] leading-relaxed text-[var(--body)]">{entry.summary}</p>
+                <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--muted)]">
                   <span>{entry.coverage.firstYear}–{entry.coverage.lastYear}</span>
                   <span>{message(messages, "methodology.sourceCount", { count: entry.originalFileCount })}</span>
                   <span>{message(messages, "methodology.reviewed", { date: entry.reviewedAt })}</span>
@@ -76,7 +76,7 @@ export function MethodologyHub({
 
       <section aria-labelledby="future-title" className="border-t border-[var(--hairline)] py-12 min-[768px]:py-16">
         <h2 id="future-title" className="font-[family-name:var(--font-display)] text-[22px] font-semibold">{message(messages, "methodology.futureTitle")}</h2>
-        <p className="mt-3 max-w-[650px] text-[13px] leading-relaxed text-[var(--muted)]">
+        <p className="mt-3 max-w-[650px] text-[0.8125rem] leading-relaxed text-[var(--muted)]">
           {message(messages, "methodology.futureSummary")}
         </p>
         <div className="mt-7 grid gap-x-10 min-[640px]:grid-cols-2">
@@ -84,7 +84,7 @@ export function MethodologyHub({
             <div
               key={key}
               data-testid="methodology-future-row"
-              className="flex items-center justify-between gap-4 border-b border-[var(--hairline-soft)] py-4 text-[13.5px] text-[var(--muted)]"
+              className="flex items-center justify-between gap-4 border-b border-[var(--hairline-soft)] py-4 text-[0.84375rem] text-[var(--muted)]"
             >
               <span>{message(messages, `methodology.${key}`)}</span>
               <ComingSoonBadge surface="paper" />

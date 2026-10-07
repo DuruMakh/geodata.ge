@@ -116,8 +116,9 @@ describe("Government Debt route composition", () => {
     expect(markup).toContain('aria-label="ვალის გადახდა — ქვესერიების ჩაკეცვა"');
     expect(markup).toContain('aria-label="საპროცენტო განაკვეთი — ქვესერიების ჩაკეცვა"');
     expect(markup).not.toContain('aria-label="ქვეპროგრამები"');
-    expect(seriesRow(markup, "debt.stock.domestic")).toContain("text-[12px]");
-    expect(seriesRow(markup, "debt.stock.domestic")).not.toContain("text-[11.5px]");
+    // Series rows size in rem (D8, the reader's text-size setting applies): 0.75rem = 12px, 0.71875rem = 11.5px.
+    expect(seriesRow(markup, "debt.stock.domestic")).toContain("text-[0.75rem]");
+    expect(seriesRow(markup, "debt.stock.domestic")).not.toContain("text-[0.71875rem]");
     expect((markup.match(/data-testid="chart-frame"/g) ?? [])).toHaveLength(1);
     expect(markup).not.toContain('data-testid="explorer-table"');
     expect(markup).not.toContain('data-testid="site-footer"');

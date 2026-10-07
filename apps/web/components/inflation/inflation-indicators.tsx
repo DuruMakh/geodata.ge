@@ -34,7 +34,7 @@ function TargetGauge({ value, target }: { value: number; target: number | null }
           <span aria-hidden className="absolute -top-1.5 h-[15px] border-l border-dashed border-[var(--accent)]" style={{ left: `${position(target).toFixed(1)}%` }} />
         ) : null}
       </div>
-      <div className="relative mt-2 h-4 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+      <div className="relative mt-2 h-4 font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
         <span className="absolute left-0">0%</span>
         {target !== null ? (
           <span className="absolute -translate-x-1/2 whitespace-nowrap text-[var(--accent)]" style={{ left: `${position(target).toFixed(1)}%` }}>
@@ -77,7 +77,7 @@ export function InflationIndicators({ index, targets }: { index: InflationIndex;
       <div data-testid="period-kpi-cards" className={KPI_GRID_CLASS}>
         <HeroKpi label={`${t("tab.yoy")} · ${periodLabel(messages, latest.period, "long")}`} value={pct(latest.yoy)}>
           <TargetGauge value={latest.yoy} target={latest.target} />
-          <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+          <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
             <Message
               messages={messages}
               id={shownYoy >= 0 ? "inflation.heroRise" : "inflation.heroFall"}

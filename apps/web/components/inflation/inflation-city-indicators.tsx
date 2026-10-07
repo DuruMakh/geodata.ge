@@ -60,7 +60,7 @@ export function InflationCityIndicators({ index }: { index: CityIndex }) {
       <SectionTitle>{message(messages, "main.indicators")}</SectionTitle>
       <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <HeroKpi label={`${t("cityHighest")} · ${periodLabel(messages, latest.period, "long")}`} value={pct(highest.value)}>
-          <p data-testid="inflation-city-hero" className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+          <p data-testid="inflation-city-hero" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
             {t("cityHeroDetail", {
               city: names(highest.cityIds),
               value: pct(highest.value),

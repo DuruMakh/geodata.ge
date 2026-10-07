@@ -33,7 +33,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
     >
       <nav
         aria-label="Breadcrumb"
-        className="text-[11px] min-[768px]:text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] max-[768px]:hidden"
+        className="text-[0.6875rem] min-[768px]:text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] max-[768px]:hidden"
       >
         {crumbs.map((crumb, index) => {
           const current = index === crumbs.length - 1;
@@ -58,14 +58,14 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
         <nav aria-label="Breadcrumb" data-testid="explorer-back-crumb" className="min-[768px]:hidden">
           <Link
             href={pageHref(parent.href, locale)}
-            className="inline-flex min-h-11 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
+            className="inline-flex min-h-11 items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
           >
             <span aria-hidden="true" className="text-[var(--accent)]">←</span>
             {parent.label}
           </Link>
         </nav>
       ) : null}
-      <p className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)] min-[768px]:whitespace-nowrap">{coverage}</p>
+      <p className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--faint)] min-[768px]:whitespace-nowrap">{coverage}</p>
     </header>
   );
 }

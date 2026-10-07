@@ -54,7 +54,7 @@ function ProductRateScale({ value, min, max }: { value: number | null; min: numb
         style={{ left: `${productRatePosition(value, min, max).toFixed(1)}%` }}
       /> : null}
     </div>
-    <div className="mt-2 flex justify-between font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+    <div className="mt-2 flex justify-between font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
       <span>{pct(min)}</span><span>{pct(max)}</span>
     </div>
   </div>;
@@ -104,7 +104,7 @@ export function InflationProductIndicators({ index, state }: { index: ProductInd
         value={pct(latest.heroAnnual)}
       >
         <ProductRateScale value={latest.heroAnnual} min={latest.min} max={latest.max} />
-        <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+        <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
           {latest.heroProductId ? t("productsHeroComparison", {
             current: periodLabel(messages, index.latestPeriod, "long"),
             previous: periodLabel(messages, index.latestPeriod - 12, "long"),

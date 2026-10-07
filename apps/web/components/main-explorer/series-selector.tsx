@@ -79,7 +79,7 @@ export function SeriesSelector({
           onChange={(event) => onQueryChange(event.target.value)}
           placeholder={searchPlaceholder}
           aria-label={message(messages, "controls.searchSeries")}
-          className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
+          className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
         />
       ) : null}
 
@@ -111,7 +111,7 @@ export function SeriesSelector({
             >
               {bulkMark}
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
+            <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
               {message(messages, hasSelection ? "controls.clear" : "controls.selectAll")}
             </span>
           </button>
@@ -119,11 +119,11 @@ export function SeriesSelector({
 
         <span
           data-testid="series-status"
-          className="ml-auto text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
+          className="ml-auto text-right text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
         >
           <span className="inline-block whitespace-nowrap">
             {countLabel ?? message(messages, "controls.series")}{" "}
-            <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
+            <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
               {selectedCount} / {totalCount}
             </span>
           </span>
@@ -131,7 +131,7 @@ export function SeriesSelector({
             <>
               {" · "}<span className="inline-block whitespace-nowrap">
                 {supplementalSelected.label}{" "}
-                <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
+                <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
                   {supplementalSelected.count}
                 </span>
               </span>
@@ -274,18 +274,18 @@ export function SeriesSelectorRow({
           {art ? <span className="-mt-1 flex-none" aria-hidden="true">{art}</span> : null}
           <span
             data-testid="series-label"
-            className={`${wrapLabel ? "min-w-0 break-words" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
+            className={`${wrapLabel ? "min-w-0 break-words" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[0.75rem]" : "text-[0.71875rem]"} font-normal text-[var(--body)]` : "text-[0.78125rem] font-medium text-[var(--ink)]"}`}
           >
             {label}
           </span>
         </span>
         {meta === undefined ? null : (
-          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] whitespace-nowrap text-[var(--muted)]">
+          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10px] whitespace-nowrap text-[var(--muted)]">
             {metaLabel === undefined ? null : <span className="sr-only">{metaLabel} </span>}
             {meta}
           </span>
         )}
-        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--muted)]">
+        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--muted)]">
           {withLari(value)}
         </span>
       </button>

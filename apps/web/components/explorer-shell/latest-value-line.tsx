@@ -7,7 +7,7 @@ import { withLari } from "../ui/lari";
  */
 export function LatestValueLine({ testId, measure, period, value, note }: { testId: string; measure: string; period: string | number; value: string; note?: string }) {
   return (
-    <p data-testid={testId} className="mb-2 text-[13px] text-[var(--body)]">
+    <p data-testid={testId} className="mb-2 text-[0.8125rem] text-[var(--body)]">
       {measure} · {period}:{" "}
       <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{withLari(value)}</span>
       {note ? ` · ${note}` : ""}

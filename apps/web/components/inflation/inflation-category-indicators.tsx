@@ -71,7 +71,7 @@ export function InflationCategoryIndicators({ index }: { index: CategoryIndex })
             label={`${t("largestContributor")} · ${periodLabel(messages, latest.period, "long")}`}
             value={`${formatContribution(hero.value)} ${t("pp")}`}
           >
-            <p data-testid="inflation-category-hero" className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+            <p data-testid="inflation-category-hero" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
               <Message
                 messages={messages}
                 id={hero.value >= 0 ? "inflation.categoryHeroRise" : "inflation.categoryHeroFall"}

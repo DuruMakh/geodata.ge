@@ -36,7 +36,7 @@ export function RegionHighlights({ facts, registry, year }: {
     <section data-testid="regional-highlights" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SectionTitle>{t("highlights")}</SectionTitle>
-        <p className="text-[12.5px] text-[var(--muted)]">{message(messages, "regionalEconomies.rowYear", { year })}</p>
+        <p className="text-[0.78125rem] text-[var(--muted)]">{message(messages, "regionalEconomies.rowYear", { year })}</p>
       </div>
       <div className={KPI_GRID_CLASS}>
         <div className="min-w-0 @min-[1100px]:pr-11">
@@ -45,8 +45,8 @@ export function RegionHighlights({ facts, registry, year }: {
             {amount.num}{amount.unit ? <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-base font-medium text-[var(--body)]">{withLari(amount.unit)}</span> : null}
           </p>
           <div className="mt-7 max-w-[480px]">
-            {model.largestSharePct !== null ? <p className="font-[family-name:var(--font-numeric)] text-[12px] text-[var(--muted)]">{percent(model.largestSharePct)} {t("ofRegionalGdp")}</p> : null}
-            <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
+            {model.largestSharePct !== null ? <p className="font-[family-name:var(--font-numeric)] text-[0.75rem] text-[var(--muted)]">{percent(model.largestSharePct)} {t("ofRegionalGdp")}</p> : null}
+            <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
             <Sparkline values={model.trends.largest} color={model.largest ? regionalEconomyColor(model.largest.seriesId) : "var(--ink)"} />
           </div>
         </div>

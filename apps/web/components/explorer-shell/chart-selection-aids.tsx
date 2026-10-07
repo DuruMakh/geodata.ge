@@ -99,7 +99,7 @@ export function ChartSelectionAids({
   return (
     <div ref={anchor}>
       {chartShown && series.length >= 2 ? (
-        <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-[var(--muted)] @min-[768px]:hidden">
+        <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)] @min-[768px]:hidden">
           {series.map((line) => (
             <li key={line.id} data-legend-series-id={line.id} className="flex min-w-0 items-center gap-2">
               <SwatchBar color={line.color} />
@@ -116,12 +116,12 @@ export function ChartSelectionAids({
             data-testid="chart-return-pill"
             aria-label={`${label}, ${message(messages, "controls.backUp")}`}
             onClick={returnToChart}
-            className="pointer-events-auto inline-flex min-h-11 cursor-pointer items-center gap-2.5 rounded-full border border-[var(--ink)] bg-[var(--paper)] px-4 text-[13px] font-semibold text-[var(--ink)] shadow-[0_2px_12px_rgba(0,0,0,0.18)]"
+            className="pointer-events-auto inline-flex min-h-11 cursor-pointer items-center gap-2.5 rounded-full border border-[var(--ink)] bg-[var(--paper)] px-4 text-[0.8125rem] font-semibold text-[var(--ink)] shadow-[0_2px_12px_rgba(0,0,0,0.18)]"
           >
             {series.length > 0 ? (
               <span aria-hidden className="flex items-center gap-1">
                 {series.slice(0, SWATCH_CAP).map((line) => <SwatchBar key={line.id} color={line.color} />)}
-                {series.length > SWATCH_CAP ? <span className="font-[family-name:var(--font-numeric)] text-[11px] font-normal text-[var(--muted)]">+{series.length - SWATCH_CAP}</span> : null}
+                {series.length > SWATCH_CAP ? <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] font-normal text-[var(--muted)]">+{series.length - SWATCH_CAP}</span> : null}
               </span>
             ) : null}
             <ArrowUp aria-hidden size={18} strokeWidth={1.5} />

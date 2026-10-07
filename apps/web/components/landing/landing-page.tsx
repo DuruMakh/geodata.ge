@@ -65,7 +65,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
             data-hero-copy
             className="pb-[18px] pt-7 min-[768px]:pointer-events-none min-[768px]:col-start-1 min-[768px]:row-start-1 min-[768px]:z-10 min-[768px]:mb-6 min-[768px]:mt-[42px] min-[768px]:flex min-[768px]:w-[340px] min-[768px]:flex-col min-[768px]:items-end min-[768px]:self-start min-[768px]:justify-self-end min-[768px]:p-0 min-[768px]:text-right min-[1100px]:w-[470px]"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[11px]">
+            <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.09em] text-[var(--muted)] min-[768px]:text-[0.6875rem]">
               {message(messages, "landing.portal")}
             </p>
             <h1
@@ -77,7 +77,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
               <Link
                 href={pageHref("/explorer", locale)}
                 data-testid="hero-cta"
-                className="inline-flex min-h-11 items-center text-[12px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:min-h-0 min-[768px]:text-[12.5px]"
+                className="inline-flex min-h-11 items-center text-[0.75rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:min-h-0 min-[768px]:text-[0.78125rem]"
               >
                 {message(messages, "landing.explore")}
               </Link>
@@ -98,7 +98,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
         >
           {KEY_NUMBERS.map((entry) => (
             <div key={message(messages, entry.label)} data-country-stat className="min-w-0">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[11px] min-[768px]:tracking-[0.08em]">
+              <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[0.6875rem] min-[768px]:tracking-[0.08em]">
                 {message(messages, entry.label)}
               </div>
               <div className="mt-2 min-h-[58px] font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em] min-[768px]:min-h-0">
@@ -110,7 +110,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
                   {message(messages, entry.unit)}
                 </span>
               </div>
-              <div className="mt-2 text-[11px] leading-snug text-[var(--muted)] min-[768px]:text-[12px]">
+              <div className="mt-2 text-[0.6875rem] leading-snug text-[var(--muted)] min-[768px]:text-[0.75rem]">
                 <span className="hidden min-[381px]:inline">{message(messages, entry.caption)}</span>
                 <span aria-hidden="true" className="min-[381px]:hidden">
                   {message(messages, entry.mobileCaption)}
@@ -134,10 +134,10 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
               href={pageHref(dataset.href, locale)}
               className="group flex min-h-11 min-w-0 flex-col justify-center gap-1 border-b border-[var(--hairline-soft)] py-3 pr-3 text-[var(--ink)] no-underline"
             >
-              <span className="text-[14px] font-semibold group-hover:text-[var(--accent)]">
+              <span className="text-[0.875rem] font-semibold group-hover:text-[var(--accent)]">
                 {dataset.title} <span aria-hidden="true" className="text-[var(--accent)]">→</span>
               </span>
-              <span className="text-[11.5px] leading-snug text-[var(--muted)]">
+              <span className="text-[0.71875rem] leading-snug text-[var(--muted)]">
                 {dataset.measure} · {dataset.period}:{" "}
                 <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-[var(--ink)]">{withLari(dataset.value)}</span>
               </span>
@@ -193,7 +193,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
             aria-labelledby="landing-methodology-title"
             className="grid gap-5 border-t border-[var(--hairline)] py-8 min-[850px]:grid-cols-[52px_minmax(230px,0.82fr)_minmax(0,1.35fr)] min-[850px]:gap-8 min-[850px]:py-11"
           >
-            <div aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[12px] text-[var(--accent)]">
+            <div aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[0.75rem] text-[var(--accent)]">
               06
             </div>
             <div data-testid="landing-methodology-copy" className="min-w-0">
@@ -203,13 +203,13 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
               >
                 {message(messages, "landing.methodologyHeading")}
               </h2>
-              <p data-testid="landing-methodology-intro" className="mt-4 text-[13px] leading-[1.75] text-[var(--body)]">
+              <p data-testid="landing-methodology-intro" className="mt-4 text-[0.8125rem] leading-[1.75] text-[var(--body)]">
                 {message(messages, "landing.methodologyDescription")}
               </p>
               <Link
                 data-testid="landing-methodology-link"
                 href={pageHref("/methodology", locale)}
-                className="mt-1 inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
+                className="mt-1 inline-flex min-h-11 items-center text-[0.78125rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
               >
                 {message(messages, "landing.methodologyLink")}
               </Link>
@@ -218,7 +218,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
               {METHODOLOGY_STEPS.map((label, index) => (
                 <li
                   key={label}
-                  className="grid grid-cols-[28px_1fr] gap-3 border-b border-[var(--hairline-soft)] py-2.5 text-[11.5px] text-[var(--body)]"
+                  className="grid grid-cols-[28px_1fr] gap-3 border-b border-[var(--hairline-soft)] py-2.5 text-[0.71875rem] text-[var(--body)]"
                 >
                   <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[var(--faint)]">
                     {String(index + 1).padStart(2, "0")}

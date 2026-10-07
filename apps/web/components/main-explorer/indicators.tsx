@@ -57,10 +57,10 @@ function MoverRow({ row, rank, maxAbsChange }: MoverRowProps) {
       title={rowLabel(row)}
       className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5"
     >
-      <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+      <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
         {String(rank).padStart(2, "0")}
       </span>
-      <span className={`text-[12.5px] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>
+      <span className={`text-[0.78125rem] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>
         {rowLabel(row)}
       </span>
       <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
@@ -156,7 +156,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
     <section data-testid="period-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SectionTitle>{message(messages, "main.indicators")}</SectionTitle>
-        <p className="text-[12.5px] text-[var(--muted)]">
+        <p className="text-[0.78125rem] text-[var(--muted)]">
           <Message messages={messages} id="main.selectedPeriod" values={{ years: <span className="font-[family-name:var(--font-numeric)]">{singleYear ? startYear : `${startYear}–${endYear}`}</span> }} />
         </p>
       </div>
@@ -165,7 +165,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
         {singleYear ? (
           // No overline: it would title a block that has no value under it.
           <div className="min-w-0 @min-[1100px]:pr-11">
-            <p data-testid="period-single-year-note" className="max-w-[420px] text-[13px] leading-relaxed text-[var(--muted)]">
+            <p data-testid="period-single-year-note" className="max-w-[420px] text-[0.8125rem] leading-relaxed text-[var(--muted)]">
               {message(messages, "main.noPeriod")}
             </p>
           </div>
@@ -180,15 +180,15 @@ export function Indicators({ model, scope }: IndicatorsProps) {
               <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - gaugeBase) * 100).toFixed(1)}%` }} />
             </div>
             <div className="mt-2 flex justify-between gap-4">
-              <p className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+              <p className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
                 {startYear} · {formatAmount(totalStart, locale)}
               </p>
-              <p className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+              <p className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
                 {endYear} · {formatAmount(totalEnd, locale)}
               </p>
             </div>
             {showSentence ? (
-              <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+              <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
                 <Message messages={messages} id={grew ? "main.periodIncrease" : "main.periodDecrease"} values={{
                   years: startYear + "–" + endYear, totalLabel: sideNoun,
                   amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari((deltaParts.num + " " + deltaParts.unit).trim())}</span>,
@@ -204,7 +204,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       {singleYear ? null : (
       <div data-testid="period-movers" className="mt-9 grid gap-7 border-t border-[var(--hairline)] pt-6 @min-[1100px]:grid-cols-2 @min-[1100px]:gap-x-10">
         <div className="min-w-0">
-          <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "main.fastestGrowth")}</h3>
+          <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "main.fastestGrowth")}</h3>
           <div className="flex flex-col">
             {topGrowth.map((row, index) => (
               <MoverRow key={row.itemId} row={row} rank={index + 1} maxAbsChange={maxAbsChange} />
@@ -212,7 +212,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           </div>
         </div>
         <div className="min-w-0">
-          <h3 className="mb-3 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "main.slowestGrowth")}</h3>
+          <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "main.slowestGrowth")}</h3>
           <div className="flex flex-col">
             {bottomGrowth.map((row, index) => (
               <MoverRow key={row.itemId} row={row} rank={index + 1} maxAbsChange={maxAbsChange} />
@@ -224,7 +224,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
 
       {singleYear ? null : (
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "main.comparison")}</h3>
+        <h3 className="mb-1 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "main.comparison")}</h3>
         <table className="w-full table-fixed border-collapse">
           <caption className="sr-only">{message(messages, "main.comparisonCaption", { scope: message(messages, SCOPE_LABEL[scope]), startYear, endYear })}</caption>
           <colgroup>
@@ -235,16 +235,16 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           </colgroup>
           <thead>
             <tr>
-              <th className="border-b-2 border-[var(--ink)] pr-3 pt-1.5 pb-2 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
+              <th className="border-b-2 border-[var(--ink)] pr-3 pt-1.5 pb-2 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
                 {message(messages, FIRST_COL_LABEL[scope])}
               </th>
-              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--muted)] @max-[768px]:px-1">
+              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] font-semibold text-[var(--muted)] @max-[768px]:px-1">
                 {startYear}
               </th>
-              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] @max-[768px]:px-1 @max-[768px]:tracking-normal">
+              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] @max-[768px]:px-1 @max-[768px]:tracking-normal">
                 {message(messages, "controls.change")}
               </th>
-              <th className="border-b-2 border-[var(--ink)] pl-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--muted)] @max-[768px]:pl-1">
+              <th className="border-b-2 border-[var(--ink)] pl-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] font-semibold text-[var(--muted)] @max-[768px]:pl-1">
                 {endYear}
               </th>
             </tr>
@@ -265,21 +265,21 @@ export function Indicators({ model, scope }: IndicatorsProps) {
                     <td className="py-2.5 pr-3" title={rowLabel(row)}>
                       <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
                         <SwatchBar color={color} className="mt-[7px]" />
-                        <span className="min-w-0 text-[12.5px] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[12px]" style={{ fontWeight: weight }}>
+                        <span className="min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]" style={{ fontWeight: weight }}>
                           {label}
                         </span>
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: weight }}>
+                    <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: weight }}>
                       {comparisonCell(startValue)}
                     </td>
                     <td
-                      className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap @max-[768px]:px-1"
+                      className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap @max-[768px]:px-1"
                       style={{ color: delta === null ? "var(--muted)" : delta >= 0 ? POSITIVE : NEGATIVE }}
                     >
                       {delta === null ? MISSING : `${delta >= 0 ? "+" : "−"}${formatBn(Math.abs(delta))}`}
                     </td>
-                    <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: weight }}>
+                    <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: weight }}>
                       {comparisonCell(endValue)}
                     </td>
                   </tr>

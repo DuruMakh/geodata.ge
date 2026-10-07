@@ -18,7 +18,7 @@ export function TextTab({ label, active, onClick, testId }: TextTabProps) {
       data-testid={testId}
       aria-pressed={active}
       onClick={onClick}
-      className={`-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[12.5px] transition-colors duration-150 ${
+      className={`-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[0.78125rem] transition-colors duration-150 ${
         active
           ? "font-semibold text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4"
           : "font-medium text-[var(--muted)] hover:text-[var(--ink)]"
@@ -42,7 +42,7 @@ export function Callout({ children, testId }: CalloutProps) {
   return (
     <p
       data-testid={testId}
-      className="max-w-[560px] border-l-2 border-[var(--accent)] bg-[var(--tint)] px-3.5 py-3 text-[12.5px] leading-relaxed text-[var(--body)]"
+      className="max-w-[560px] border-l-2 border-[var(--accent)] bg-[var(--tint)] px-3.5 py-3 text-[0.78125rem] leading-relaxed text-[var(--body)]"
     >
       {children}
     </p>
@@ -64,7 +64,7 @@ type OverlineProps = {
 
 export function Overline({ children }: OverlineProps) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{children}</p>
+    <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{children}</p>
   );
 }
 
@@ -122,7 +122,7 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
             // on three sides and the survivor lands over the neighbouring tab.
             // Transition only the two properties that change — `transition-colors`
             // also animates outline-color, hiding the ring for its first 150ms.
-            className={`cursor-pointer ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
+            className={`cursor-pointer ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
               index > 0 ? "border-l border-[var(--control)]" : ""
             } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
           >

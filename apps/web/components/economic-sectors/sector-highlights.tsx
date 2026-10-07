@@ -48,7 +48,7 @@ export function SectorHighlights({ facts, registry, year }: {
     <section data-testid="sector-highlights" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SectionTitle>{t("highlights")}</SectionTitle>
-        <p className="text-[12.5px] text-[var(--muted)]"><Message messages={messages} id="sectors.rowYear" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{year}</span> }} /></p>
+        <p className="text-[0.78125rem] text-[var(--muted)]"><Message messages={messages} id="sectors.rowYear" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{year}</span> }} /></p>
       </div>
       <div data-testid="sector-kpi-layout" className={KPI_GRID_CLASS}>
         <div data-testid="sector-highlight-largest" className="min-w-0 @min-[1100px]:pr-11">
@@ -63,10 +63,10 @@ export function SectorHighlights({ facts, registry, year }: {
                 <div aria-hidden="true" className="flex h-[3px] bg-[var(--hairline-soft)]">
                   <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${Math.max(0, Math.min(100, model.largestShare))}%` }} />
                 </div>
-                <p className="mt-2 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{percentage(model.largestShare)} {t("ofGdp")}</p>
+                <p className="mt-2 font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">{percentage(model.largestShare)} {t("ofGdp")}</p>
               </>
             ) : null}
-            <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
+            <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
           </div>
         </div>
         <div data-testid="sector-side-kpis" className={SIDE_KPI_LIST_CLASS}>
