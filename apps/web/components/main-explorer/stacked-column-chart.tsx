@@ -183,7 +183,7 @@ export function StackedColumnChart({
         <svg
           ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
-          className="block h-auto w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+          className="block h-auto w-full [&:focus:not(:focus-visible)]:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
           role="img"
           aria-label={ariaLabel}
           aria-describedby={captionId}

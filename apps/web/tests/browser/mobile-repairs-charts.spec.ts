@@ -98,6 +98,22 @@ for (const [path, frameId, tooltipId] of [
   });
 }
 
+test("a tap focuses the stacked chart without a focus ring; the keyboard still gets one", async ({ page }) => {
+  await ready(page, "/explorer/unemployment/overview");
+  const frame = page.getByTestId("stack-chart-frame");
+  await frame.scrollIntoViewIfNeeded();
+  const box = (await frame.boundingBox())!;
+  const svg = frame.locator('svg[role="img"]');
+  await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(svg).toBeFocused();
+  expect(await svg.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
+
+  await frame.focus();
+  await page.keyboard.press("Tab");
+  await expect(svg).toBeFocused();
+  expect(await svg.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+});
+
 test("a vertical swipe over a chart still scrolls the page", async ({ page }) => {
   await ready(page, "/explorer/expenditure");
   const frame = page.getByTestId("chart-frame");
