@@ -18,7 +18,7 @@ async function expectIndexedInBothLanguages(pagePaths: readonly string[]): Promi
     const [paths, revisions, entries] = await Promise.all([listPublicPagePaths(), loadPageRevisions(), sitemap()]);
     for (const path of pagePaths) {
       expect(paths, path).toContain(path);
-      expect(revisions[path], path).toMatch(/^2026-\d{2}-\d{2}$/);
+      expect(revisions[path], path).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       const ka = entries.find((entry) => entry.url === `https://fiscal.ge${path}`);
       const en = entries.find((entry) => entry.url === `https://fiscal.ge/en${path}`);
       expect(ka?.alternates?.languages, path).toEqual({

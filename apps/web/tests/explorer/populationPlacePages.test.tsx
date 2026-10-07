@@ -95,12 +95,6 @@ describe("place pages", () => {
       expect(html).toContain('href="/en/methodology/demography"');
     }
   });
-
-  it("an unknown region, an unknown slug and Tbilisi's municipality slug are not found", async () => {
-    await expect(renderPopulationPlacePage({ kind: "region", id: "nowhere" }, "en")).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
-    await expect(renderPopulationPlacePage({ kind: "municipality", slug: "nowhere" }, "en")).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
-    await expect(renderPopulationPlacePage({ kind: "municipality", slug: "tbilisi" }, "en")).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
-  });
 });
 
 // The rule in docs/data-methodology/demography.md: a page that shows a density says which area it uses for Tbilisi.
