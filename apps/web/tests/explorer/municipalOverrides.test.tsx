@@ -33,6 +33,8 @@ const regionRows: MunicipalListRow[] = [
 ];
 const country: MunicipalListRow = { id: MUNICIPAL_COUNTRY_ID, kind: "country", nameKa: "საქართველო", subtitleKa: "64 მუნიციპალიტეტი", regionId: null, valueGel: 3_941_103, budgetPerResidentGel: null, rank: null };
 const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
+// One list row's markup: the map's accessible labels carry the same figures, so a whole-page check would not prove the row's format.
+const listRow = (html: string, code: string) => html.match(new RegExp(`<a [^>]*data-municipality-row-code="${code}"[^>]*>[\\s\\S]*?</a>`))?.[0] ?? "";
 
 beforeAll(async () => {
   const [{ facts }, municipal] = await Promise.all([loadServedDemographyData(), loadServedMunicipalData()]);
@@ -90,7 +92,9 @@ describe("MunicipalitiesIndex overrides", () => {
     expect(html).toContain('href="/en/explorer/demography/population/region/tbilisi"');
     expect(html).toContain('href="/en/explorer/demography/population/georgia"');
     expect(html).not.toContain("/explorer/municipalities/");
-    expect(html).toContain("246,267");
+    const batumi = listRow(html, "06");
+    expect(batumi).toContain("246,267");
+    expect(batumi).not.toContain("GEL");
     expect(html).toContain("3,941,103");
     expect(html).not.toContain("GEL");
     expect(html).toContain("142.5/km²");
@@ -128,6 +132,8 @@ describe("EntityPicker overrides", () => {
       countryDetail: "3,941,103 · 64 municipalities",
     });
     expect(html).toContain('href="/en/explorer/demography/population/batumi"');
+    expect(html).toContain('href="/en/explorer/demography/population/region/adjara"');
+    expect(html).toContain('href="/en/explorer/demography/population/georgia"');
     expect(html).toContain("246,267");
     expect(html).toContain("3,941,103 · 64 municipalities");
     expect(html).not.toContain("municipal budgets");
