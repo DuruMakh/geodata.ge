@@ -7,7 +7,7 @@ This report concerns the annual research foundation approved on 7 October 2026. 
 - All 45 archived source fingerprints match, including the 31 original Geostat workbooks.
 - The separate openpyxl reader matches all 364,495 source observations, all 364,461 primary observations and all 3,473 reviewed derived values across 466 source/year blocks. Its maximum monetary reader-conversion difference is USD 0.000001, within the USD 0.001 reader tolerance. Native-to-USD conversions remain exact.
 - Generated artifacts reproduce byte for byte. The independent report records its input fingerprints and reader fingerprint; preparation rejects stale evidence.
-- The final focused suite passes 39 tests. Its deliberate corruptions cover source bytes, omissions, duplicate keys, leading zeroes, labels, units, values, missingness, unsupported matches, stale artifacts and source acceptance holds.
+- The focused suite passes 44 tests after the requested follow-up review. Its deliberate corruptions cover source bytes, omissions, duplicate keys, leading zeroes, labels, units, values, missingness, unsupported matches, stale artifacts, derived meanings/completeness, mandatory primary columns and source acceptance holds.
 - The strict source-acceptance command returns 2 for the two unresolved UK service-import comparisons. The reconciliation report retains 59,166 passes, 3,220 unavailable comparisons, 82 historical code-allocation exceptions and two failures.
 
 Full evidence is in `independent-verification.json`, `prepared-validation.json`, `prepared-reconciliation.csv`, `artifact-manifest.csv`, `source-review.md` and `unresolved-source-issues.json`.
@@ -21,7 +21,7 @@ The two reproducibility findings were addressed in one fix pass:
 1. Tests create their temporary parent directory on a clean checkout. `FreshCheckoutTests.test_checks_create_their_temporary_parent` failed before the fix and passed afterward.
 2. The source-precision test uses the archived filename's exact capitalization. `FreshCheckoutTests.test_source_precision_check_uses_case_sensitive_filename` failed under a simulated case-sensitive lookup before the fix and passed afterward.
 
-The second finding was raised from Minor to Important because it breaks the documented test command on a case-sensitive checkout. Both regression tests and the complete 39-test suite pass. No review finding is deferred.
+The second finding was raised from Minor to Important because it breaks the documented test command on a case-sensitive checkout. Both regression tests and the complete 39-test suite passed at that stage. No finding from that initial review was deferred.
 
 The reviewer did not choose a preferred UK publisher value, infer undeclared historical classification causes, or approve product integration. Both UK representations and the native historical allocations remain preserved. No publisher contact, public integration or deployment was authorized.
 
@@ -34,3 +34,16 @@ The long single-worker run was interrupted when its tool session and process dis
 The separately completed `npm run data:validate`, `npm run i18n:check` and `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build` all return 0. Build postchecks verify the existing publication fingerprints. Lint and type checking passed in the standard check attempts. Browser tests are outside this change because it introduces no UI behavior.
 
 The research code and extraction are verified locally. Overall source acceptance is still held for the two UK discrepancies. Publishing, source acceptance and the standard CI gate remain separate decisions.
+
+## Requested follow-up review
+
+A fresh read-only reviewer examined `ba44dcff..f488b4c4` after the user explicitly requested another code review. The reviewer reproduced the independent report, all 39 existing tests and the exact acceptance exit code 2. A separate semantic scan found no incorrectly labelled or calculated figure among the committed 3,473 derivations. The review found no Critical issue and two Important validation gaps:
+
+1. Both validators could accept a national balance relabelled as country re-exports because they checked arithmetic without enforcing the indicator's source relationship. They now independently establish eligible source bindings and the complete derived-key set, enforcing domain, role, status, dimension, identity, reviewed counterpart and reviewed year range. Missing, duplicate or extra derivations fail.
+2. The primary CSV comparison used whichever columns a record supplied. It now requires the fixed independent family schema, including essential identities and empty display columns, before comparing source metadata and values.
+
+Five regression tests cover these findings. The original four regression cases failed before implementation and passed afterward; the complete focused suite now passes 44 tests. The refreshed independent walk matches the same 364,495 source observations, 364,461 primary observations and 3,473 derivations. All prepared data fingerprints remain unchanged; only the reader/evidence fingerprints change.
+
+Minor deferred: the artifact manifest's `source_block` column remains empty for 47 product/source chunks. Exact blocks remain available in filenames, coverage and data records; this does not change values, identities or fingerprints. Populating that redundant manifest label is a separate small improvement.
+
+Review boundaries remain explicit: publisher correctness and undeclared historical allocation causes are unresolved; unavailable children and preliminary 2026 markers are preserved; shared approved layouts establish reader coverage rather than independent statistical definitions; reader conversion noise stays within its documented bound. Generalizing module-level paths to another capture was not shown defective in this package's CLI workflow. CI, deployment and earlier red/green history were not treated as new review evidence. The application inputs did not change, so previously verified website checks were not repeated.

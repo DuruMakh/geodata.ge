@@ -53,6 +53,8 @@ NBG's 2024 report publishes services exports/imports of 7,706.3/3,814.8 million 
 
 `verify_independent.py` separately reads every approved range through openpyxl without importing the normalizer readers or helpers. It checks complete source key-set equality, frozen metadata/count fingerprints, original workbook unit headers, every prepared source and primary cell, labels, codes, formats, missingness and derivation references. Native/USD identities must be exact; independent reader conversion noise is limited to USD 0.001. The reconciliation tolerance remains USD 1, and is not widened to pass comparisons.
 
+Primary records must retain the fixed family columns, including empty display fields and product/country identifiers. Both validators independently establish the full eligible derived-key set. Balance and turnover require national goods export/import totals; re-exports require the matching export/domestic-export scope, reviewed source identity and reviewed year range. Domain, dimension, item, source-reference order, status and role must agree. Missing, duplicate, extra or scientifically misidentified derivations fail even if their arithmetic is correct.
+
 `artifact-manifest.csv` records generated data/evidence row counts, sizes and fingerprints, excluding its own hash. The independent report fingerprints its exact input artifacts; check mode rejects stale evidence. Historical identity review and source limitations remain reviewed inputs. The original 19-workbook exploratory audit is preserved separately and does not substitute for this expanded validation.
 
 Run from the repository root:

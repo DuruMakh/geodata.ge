@@ -69,5 +69,5 @@
   "source_acceptance": "requires_source_resolution: two UK country/type conflicts; this reader check does not resolve publisher inconsistencies",
   "source_observations": 364495,
   "status": "source_cells_matched",
-  "verifier_sha256": "8f51b11686b434815a6a1d43affaa615cdbab74172da9d970816b74e4bb7b5a3"
+  "verifier_sha256": "cbe8d7c104c04f092deb27841477838f106f692036143741c6f583205715ef9d"
 }

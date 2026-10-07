@@ -13,6 +13,16 @@ import openpyxl
 
 ROOT=Path(__file__).resolve().parent
 METADATA_FIELDS=('family','geography_id','partner_code','partner_label_en','source_group_id','source_group_label_en','classification','classification_level','product_code','product_label_en','dimension','group_id','group_label_en','geography_label_en','attribution_basis','service_id','service_label_en','year','flow','item_id','source_unit','value_status','publication_status','role','source_block','source_id','source_sheet','source_cell','source_label','source_number_format')
+PRIMARY_COMMON=('year','flow','item_id','value_usd','source_value','source_unit','value_status','publication_status','role','source_block','source_id','source_sheet','source_cell','source_label','source_number_format')
+PRIMARY_DIMENSIONS={
+    'goods_national':('geography_id',),
+    'goods_countries':('partner_code','partner_label_en','source_group_id','source_group_label_en'),
+    'goods_products':('classification','classification_level','product_code','product_label_en'),
+    'goods_domestic':('dimension','geography_id','partner_code','partner_label_en','classification','classification_level','product_code','product_label_en'),
+    'goods_country_groups':('group_id','group_label_en'),
+    'goods_regions':('geography_id','geography_label_en','classification','classification_level','product_code','product_label_en','attribution_basis'),
+    'services':('dimension','partner_code','partner_label_en','service_id','service_label_en'),
+}
 
 def digest(values):
     return hashlib.sha256(json.dumps(sorted(values),ensure_ascii=False,separators=(',',':')).encode('utf-8')).hexdigest()
@@ -32,6 +42,7 @@ def verify_fingerprint(path: Path,descriptor: dict) -> None:
 
 def compare_record(prepared: dict,metadata: dict,native,fields=None) -> Decimal:
     selected=METADATA_FIELDS if fields is None else tuple(f for f in fields if f not in ('value_usd','source_value'))
+    if not set(selected+('source_value','value_usd')).issubset(prepared): raise ValueError('source_metadata: independent required columns omitted')
     if prepared.get('source_unit')!=metadata['source_unit']: raise ValueError('unit_conversion: independent native unit differs')
     if prepared.get('value_status')!=metadata['value_status']: raise ValueError('missingness: independent source status differs')
     for field in selected:
@@ -46,6 +57,53 @@ def compare_record(prepared: dict,metadata: dict,native,fields=None) -> Decimal:
     difference=abs(Decimal(str(native))*scale-usd)
     if difference>Decimal('0.001'): raise ValueError(f'source_value: independent source differs by USD {difference}')
     return difference
+
+def compare_primary_record(prepared: dict,metadata: dict,native) -> Decimal:
+    required=PRIMARY_DIMENSIONS[metadata['family']]+PRIMARY_COMMON
+    if tuple(prepared)!=required: raise ValueError('artifact_schema: primary columns differ from fixed family contract')
+    return compare_record(prepared,metadata,native,required)
+
+def verify_derivations(derived: list[dict],sources: list[dict],identities: list[dict]) -> int:
+    # Establish every eligible binding from source metadata and reviewed periods,
+    # independently of the normalizer's generator and validation helpers.
+    source_index={(r['year'],r['flow'],r['source_id'],r['item_id']):r for r in sources}
+    national={}
+    expected={}
+    def record(indicator,dimension,left,right):
+        key=(left['year'],dimension,left['item_id'],indicator)
+        if key in expected: raise ValueError('duplicate_key: independent ambiguous derived binding')
+        expected[key]=(tuple(left[f] for f in ('source_id','source_sheet','source_cell')),tuple(right[f] for f in ('source_id','source_sheet','source_cell')))
+    for row in sources:
+        if row['family']=='goods_national' and row['role']=='total' and row['geography_id']=='georgia' and row['item_id']=='goods.total' and row['value_status']=='numeric': national[(row['year'],row['flow'])]=row
+    for (year,flow),left in national.items():
+        right=national.get((year,'import'))
+        if flow=='export' and right is not None:
+            record('trade_balance','national',left,right);record('trade_turnover','national',left,right)
+    for review in identities:
+        if review['disposition']!='verified_equivalent' or review['family'] not in ('reexports_national','reexports_country','reexports_product'): continue
+        dimension=review['family'].removeprefix('reexports_')
+        for year in range(int(review['first_year']),int(review['last_year'])+1):
+            left=source_index.get((str(year),'export',review['left_source_id'],review['left_identity']))
+            right=source_index.get((str(year),'domestic_export',review['right_source_id'],review['right_identity']))
+            if left is None or right is None or left['value_status']!='numeric' or right['value_status']!='numeric' or right['family']!='goods_domestic': continue
+            if dimension=='national': eligible=left['family']=='goods_national' and left['role']==right['role']=='total' and left['geography_id']==right['geography_id']=='georgia' and left['item_id']==right['item_id']=='goods.total' and right['dimension']=='country'
+            elif dimension=='country': eligible=left['family']=='goods_countries' and left['role']==right['role']=='detail' and right['dimension']=='country' and bool(left['partner_code']) and left['partner_code']==right['partner_code']
+            else: eligible=left['family']=='goods_products' and left['role']==right['role']=='detail' and right['dimension']=='product' and left['classification']==right['classification']=='hs4' and bool(left['product_code']) and left['product_code']==right['product_code']
+            if eligible: record('reexports',dimension,left,right)
+    lookup={tuple(r[f] for f in ('source_id','source_sheet','source_cell')):r for r in sources}
+    seen=set()
+    for row in derived:
+        key=tuple(row[f] for f in ('year','dimension','item_id','indicator_id'))
+        if key in seen: raise ValueError('duplicate_key: independent derived key repeats')
+        seen.add(key)
+        if any(row.get(field)!=value for field,value in (('domain','goods'),('role','derived'),('value_status','numeric'),('publication_status','unspecified'))): raise ValueError('derived_inputs: independent meaning or status differs')
+        refs=tuple(tuple(ref) for ref in json.loads(row['input_source_refs']))
+        if key not in expected or refs!=expected[key]: raise ValueError('derived_inputs: independent indicator, identity or reviewed period differs')
+        left,right=(lookup[ref] for ref in refs)
+        wanted=Decimal(left['value_usd'])+Decimal(right['value_usd']) if row['indicator_id']=='trade_turnover' else Decimal(left['value_usd'])-Decimal(right['value_usd'])
+        if wanted!=Decimal(row['value_usd']): raise ValueError('derived_inputs: independent arithmetic differs')
+    if seen!=set(expected): raise ValueError('coverage: independent approved derivations omitted')
+    return len(seen)
 
 def check_inventory(rows: list[dict],inventory: dict) -> dict:
     groups=defaultdict(list); keys=set()
@@ -170,18 +228,10 @@ def verify_package(package_root: Path) -> dict:
             key=tuple(row[f] for f in ('source_id','source_sheet','source_cell'))
             if key in seen_primary or key not in primary_keys: raise ValueError('duplicate_key: primary cell repeated or unsupported')
             expected,native=native_lookup[key]
-            compare_record(row,expected,native,row.keys());seen_primary.add(key)
+            compare_primary_record(row,expected,native);seen_primary.add(key)
     if seen_primary!=primary_keys: raise ValueError('coverage: primary family CSV cells omitted')
-    derived_count=0
-    for row in read_csv(package_root/'derived-annual.csv'):
-        refs=json.loads(row['input_source_refs'])
-        if len(refs)!=2 or any(tuple(ref) not in prepared for ref in refs): raise ValueError('derived_inputs: independent missing source reference')
-        left,right=(prepared[tuple(ref)] for ref in refs)
-        if left['year']!=right['year'] or row['year']!=left['year'] or left['value_status']!='numeric' or right['value_status']!='numeric': raise ValueError('derived_inputs: independent incompatible inputs')
-        if row['indicator_id'] not in ('trade_balance','trade_turnover','reexports'): raise ValueError('derived_inputs: independent unapproved indicator')
-        wanted=Decimal(left['value_usd'])+Decimal(right['value_usd']) if row['indicator_id']=='trade_turnover' else Decimal(left['value_usd'])-Decimal(right['value_usd'])
-        if wanted!=Decimal(row['value_usd']): raise ValueError('derived_inputs: independent arithmetic differs')
-        derived_count+=1
+    identities=list(read_csv(package_root/'identity-review.csv'))
+    derived_count=verify_derivations(list(read_csv(package_root/'derived-annual.csv')),list(prepared.values()),identities)
     return dict(status='source_cells_matched',coverage=coverage,source_observations=len(matched),primary_observations=len(seen_primary),derived_observations=derived_count,max_reader_difference_usd=str(maximum),reader_tolerance_usd='0.001',input_artifact_sha256=inputs,verifier_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),source_acceptance='requires_source_resolution: two UK country/type conflicts; this reader check does not resolve publisher inconsistencies')
 
 def main():

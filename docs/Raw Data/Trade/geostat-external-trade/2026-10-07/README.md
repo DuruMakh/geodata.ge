@@ -6,7 +6,7 @@ The core capture preserves 45 original files, including 31 Geostat Excel workboo
 
 See [the methodology](../../../../data-methodology/trade-annual.md), `source-review.md`, `source-limitations.csv` and `unresolved-source-issues.json`. The two UK differences are approximately USD 192,237 (2022) and USD 379,884 (2024). Historical source-code allocation exceptions retain their measured differences and never receive a passing prefix label.
 
-[Verification and final review](verification-review.md) records the independent reader, 39 focused tests, two fresh-checkout fixes and the repository results. The full website suite passes 3,026 tests with a recorded local timing exception; the build, data validation and localization checks pass. The standard combined check's earlier timeouts remain explicitly recorded.
+[Verification and final review](verification-review.md) records the independent reader, 44 focused tests, fresh-checkout fixes and the requested review's derivation/schema fixes. The full website suite passes 3,026 tests with a recorded local timing exception; the build, data validation and localization checks pass. The standard combined check's earlier timeouts remain explicitly recorded. The follow-up review's minor manifest block-label issue is deferred.
 
 ## Reproduction
 

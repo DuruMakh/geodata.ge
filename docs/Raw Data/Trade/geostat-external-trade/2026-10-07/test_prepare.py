@@ -451,5 +451,88 @@ class IndependentTests(PackageTests):
             path.write_bytes(b'changed!')
             with self.assertRaisesRegex(ValueError,'source_fingerprint'): verifier.verify_fingerprint(path,descriptor)
 
+class ReviewRegressionTests(PackageTests):
+    _fixture=None
+    def derived_fixture(self):
+        if self.__class__._fixture is None:
+            with (ROOT/'derived-annual.csv').open(encoding='utf-8-sig',newline='') as stream:
+                available=[r for r in csv.DictReader(stream) if r['year']=='2025']
+            derived=[next(r for r in available if r['indicator_id']==indicator and r['dimension']=='national') for indicator in ('trade_balance','trade_turnover','reexports')]
+            derived.extend(next(r for r in available if r['indicator_id']=='reexports' and r['dimension']==dimension) for dimension in ('country','product'))
+            needed={tuple(ref) for row in derived for ref in json.loads(row['input_source_refs'])}
+            sources=[]
+            for path in sorted((ROOT/'source-observations').glob('*.csv')):
+                if not any(path.name.startswith(key[0]+'-') for key in needed): continue
+                with path.open(encoding='utf-8-sig',newline='') as stream:
+                    sources.extend(r for r in csv.DictReader(stream) if (r['source_id'],r['source_sheet'],r['source_cell']) in needed)
+            with (ROOT/'identity-review.csv').open(encoding='utf-8-sig',newline='') as stream:
+                identities=list(csv.DictReader(stream))
+            self.__class__._fixture=derived,sources,identities
+        return self.__class__._fixture
+
+    def test_normal_validation_rejects_national_balance_labelled_as_country_reexports(self):
+        derived,sources,identities=self.derived_fixture()
+        validation=self.module('validation')
+        validation.validate_derivations(derived,sources)
+        changed=[dict(r) for r in derived]
+        changed[0].update(indicator_id='reexports',dimension='country',item_id='partner.2020-2025.826')
+        with self.assertRaisesRegex(ValueError,'derived_inputs'):
+            validation.validate_derivations(changed,sources)
+
+    def test_normal_validation_rejects_omitted_and_duplicate_derivations(self):
+        derived,sources,identities=self.derived_fixture()
+        validation=self.module('validation')
+        with self.assertRaisesRegex(ValueError,'coverage'):
+            validation.validate_derivations(derived[:-1],sources)
+        with self.assertRaisesRegex(ValueError,'duplicate_key'):
+            validation.validate_derivations(derived+[derived[0]],sources)
+
+    def test_normal_validation_requires_approved_status_and_review_period(self):
+        derived,sources,identities=self.derived_fixture()
+        validation=self.module('validation')
+        for field,value in [('domain','services'),('role','detail'),('value_status','blank'),('publication_status','planned')]:
+            changed=[dict(r) for r in derived];changed[0][field]=value
+            with self.assertRaisesRegex(ValueError,'derived_inputs'):
+                validation.validate_derivations(changed,sources,identities)
+        expired=[dict(r,last_year='2024') if r['disposition']=='verified_equivalent' else r for r in identities]
+        with self.assertRaisesRegex(ValueError,'derived_inputs|coverage'):
+            validation.validate_derivations(derived,sources,expired)
+
+    def test_independent_derivations_require_meaning_reviewed_years_and_complete_keys(self):
+        derived,sources,identities=self.derived_fixture()
+        verifier=self.module('verify_independent')
+        self.assertTrue(hasattr(verifier,'verify_derivations'),'independent derivation semantics are not checked')
+        self.assertEqual(verifier.verify_derivations(derived,sources,identities),len(derived))
+        changed=[dict(r) for r in derived]
+        changed[0].update(indicator_id='reexports',dimension='country',item_id='partner.2020-2025.826')
+        with self.assertRaisesRegex(ValueError,'derived_inputs'): verifier.verify_derivations(changed,sources,identities)
+        with self.assertRaisesRegex(ValueError,'coverage'): verifier.verify_derivations(derived[:-1],sources,identities)
+        with self.assertRaisesRegex(ValueError,'duplicate_key'): verifier.verify_derivations(derived+[derived[0]],sources,identities)
+        for field,value in [('domain','services'),('role','detail'),('value_status','blank'),('publication_status','planned')]:
+            changed=[dict(r) for r in derived];changed[0][field]=value
+            with self.assertRaisesRegex(ValueError,'derived_inputs'): verifier.verify_derivations(changed,sources,identities)
+        expired=[dict(r,last_year='2024') if r['disposition']=='verified_equivalent' else r for r in identities]
+        with self.assertRaisesRegex(ValueError,'derived_inputs|coverage'): verifier.verify_derivations(derived,sources,expired)
+
+    def test_primary_schema_rejects_missing_identity_and_empty_columns(self):
+        verifier=self.module('verify_independent')
+        self.assertTrue(hasattr(verifier,'compare_primary_record'),'independent primary schema is not fixed')
+        source=next(r for r in self.derived_fixture()[1] if r['family']=='goods_products')
+        metadata={f:source.get(f,'') for f in verifier.METADATA_FIELDS}
+        fields=self.module('model').DIMENSIONS['goods_products']+self.module('model').COMMON
+        row={f:source[f] for f in fields}
+        native=float(source['source_value'])
+        verifier.compare_primary_record(row,metadata,native)
+        for field in ('classification','classification_level','product_code','item_id','product_label_en'):
+            changed=dict(row);del changed[field]
+            with self.assertRaisesRegex(ValueError,'source_metadata|artifact_schema'):
+                verifier.compare_primary_record(changed,metadata,native)
+        changed=dict(row,unexpected='extra')
+        with self.assertRaisesRegex(ValueError,'artifact_schema'):
+            verifier.compare_primary_record(changed,metadata,native)
+        changed=dict(row,product_label_en='');del changed['product_label_en']
+        with self.assertRaisesRegex(ValueError,'artifact_schema'):
+            verifier.compare_primary_record(changed,dict(metadata,product_label_en=''),native)
+
 if __name__ == '__main__':
     unittest.main()
