@@ -96,8 +96,9 @@ export function LandingDatasetSection({
           >
             <caption className="sr-only">{message(messages, "landing.tableCaption", { heading, year: summary.latestYear })}</caption>
             <colgroup>
-              <col className="w-[52%]" />
-              <col className="w-[30%]" />
+              {/* The amount column holds "10.2 მლრდ ₾" at the 11px phone floor down to 360px. */}
+              <col className="w-[48%]" />
+              <col className="w-[34%]" />
               <col className="w-[18%]" />
             </colgroup>
             <thead className="text-[var(--muted)]">
