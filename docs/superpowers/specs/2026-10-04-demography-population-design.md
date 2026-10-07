@@ -129,13 +129,15 @@ URL-hash state follows DESIGN.md §6.3: restored on load, loading never writes t
 
 **A pure move.** `MunicipalExplorer`'s heading block (title, picker trigger, picker, meta line, previous/next, the ⌘K shortcut) and its two-column workspace shell become `EntityHeading` and `EntityWorkspaceShell` in `components/municipalities/`, and the Budget region page's list of its municipalities becomes `EntityMemberList` beside them. The Budget pages use the new parts and the Population place page uses them too. Before and after, the Budget pages render identical markup, which the plan proves by comparing the rendered pages, with one exception: the list-header row of `MunicipalitiesIndex`, which the Budget and Population indexes share, gained `flex-wrap`, `gap-x-2.5 gap-y-1` and, on its unit label, `ml-auto`, so that a long Georgian unit label wraps under the tabs instead of pushing the page sideways. It changes nothing where the content already fitted; at 320px the Budget index's currency sign, which stuck out of the header, now fits.
 
+**A pure extraction.** In `lib/explorer/municipalData.ts` the last step of `buildPickerGroups` (the regions with their municipality rows under them, built from the index rows) is now the exported `pickerGroupsFromRows`, and `buildPickerGroups` calls it; what the Budget pages get is unchanged. The Population index builds its picker groups with it, from its own rows.
+
 **Already built and kept:** chart `breaks`, table `breakYears`/`breakLabel`, `RangeStrip` marker with `labelSide`, `format.ts` persons units, the serving path, the workbook model, the hub card, sidebar group, methodology page, `buildMunicipalityValueMapModel`, `rankByEndValue`.
 
 **Removed, made unnecessary:** the `RegionalEconomyMap` and `regionalEconomyMap.ts` additions (back to the merge-base), `population-explorer.tsx`, `population-series-panel.tsx`, `use-population-state.ts`, and the state, hash and level functions of `demographyPopulation.ts`.
 
 **New files, all thin:**
 
-- `lib/explorer/demographyPlaceRoutes.ts` (addresses, route parameters, neighbours), `demographyPopulationIndex.ts` (index rows, density by place, picker groups, map model) and `demographyPopulationKpis.ts` (the key indicators, moved out of the highlights component so the index and the place pages share one builder).
+- `lib/explorer/demographyPlaceRoutes.ts` (addresses, route parameters, neighbours), `demographyPopulationIndex.ts` (index rows and density by place; its map model comes from `demographyPopulationMaps.ts` and its picker groups from `pickerGroupsFromRows` in `municipalData.ts`) and `demographyPopulationKpis.ts` (the key indicators, moved out of the highlights component so the index and the place pages share one builder).
 - `lib/pages/demography-population.tsx` (the index, rewritten, and the loaders both page kinds share) and `lib/pages/demography-population-place.tsx` (place pages, metadata, parameters).
 - `components/demography/population-place-explorer.tsx` (the place page body); `components/municipalities/entity-heading.tsx`, `entity-workspace-shell.tsx` and `entity-member-list.tsx` (the moves).
 - Six route files: `app/(ka)/explorer/demography/population/georgia/page.tsx`, `region/[id]/page.tsx`, `[slug]/page.tsx` and the `app/(en)/en/...` mirrors.
