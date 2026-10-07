@@ -85,6 +85,9 @@ export function buildPopulationIndexModel({
   const density = facts.filter((fact) => fact.seriesId === SERIES.populationDensity);
   if (density.length === 0) throw new Error("No density values for the index");
   const densityYear = Math.max(...density.map((fact) => fact.year));
+  // The list prints a region's density under its persons and the key figures print the densest region of the same year, so the two
+  // years must be one: a density that lagged would show an older year's figure with no word about it.
+  if (densityYear !== year) throw new Error(`The latest density year ${densityYear} is not the latest population year ${year}`);
   const densityByPlace = Object.fromEntries(
     density.filter((fact) => fact.year === densityYear).map((fact) => [fact.geographyId, fact.value]),
   );

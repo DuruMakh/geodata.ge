@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from "vitest";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
+import { SERIES } from "../../lib/data/demography/series";
 import type { ServedDemographyObservation } from "../../lib/data/demography/types";
 import type { Municipality, MunicipalRegion } from "../../lib/data/municipal/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
@@ -74,6 +75,11 @@ describe("population index model", () => {
     const adjara = groups.find((group) => group.regionId === "region.adjara")!;
     expect(adjara.members.map((member) => member.code)).toEqual(["06", "07", "08", "11", "09", "10"]);
     expect(groups.reduce((total, group) => total + group.members.length, 0)).toBe(64);
+  });
+
+  test("a density that lags the population year is refused, not printed under the wrong year", () => {
+    const without = facts.filter((fact) => !(fact.seriesId === SERIES.populationDensity && fact.year === index.year));
+    expect(() => buildPopulationIndexModel({ facts: without, regions, municipalities })).toThrow(/latest density year 2025 is not the latest population year 2026/);
   });
 
   test("a missing municipality value is refused", () => {

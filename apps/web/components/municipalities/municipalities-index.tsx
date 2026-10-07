@@ -26,7 +26,7 @@ export type MunicipalitiesIndexOverrides = {
   valueFormat?: "amount" | "persons";
   /** A second line under a row's figure, by row id; rows not listed keep the per-resident budget line, if they have one. */
   secondaryById?: Readonly<Record<string, string>>;
-  /** The Georgia row's line under its name; the municipal-budget count by default. */
+  /** The Georgia row's line under its name, in English only; the municipal-budget count by default. Georgian reads the row's own `subtitleKa`, so this has no effect there. */
   countrySubtitle?: string;
   /** What sits where the Budget index prints the currency; the currency by default. */
   unitLabel?: string;
