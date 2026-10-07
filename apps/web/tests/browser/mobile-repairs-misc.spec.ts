@@ -133,6 +133,24 @@ test.describe("phone", () => {
     }
   });
 
+  test("unemployment region pages link their neighbours like economy regions, with 44px targets", async ({ page }) => {
+    const slugs = async (testId: string) => {
+      const links = page.getByTestId(testId).getByRole("link");
+      await expect(links).toHaveCount(2);
+      for (const box of await links.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height))) expect(box).toBeGreaterThanOrEqual(44);
+      return (await links.evaluateAll((elements) => elements.map((element) => element.getAttribute("href")!))).map((href) => href.split("/").at(-1));
+    };
+    await page.goto("/explorer/economy/regions/adjara");
+    const economy = await slugs("regional-entity-navigation");
+    await page.goto("/explorer/unemployment/regions/adjara");
+    await ready(page);
+    expect(await slugs("unemployment-region-navigation")).toEqual(economy);
+    await page.getByTestId("unemployment-region-navigation").getByRole("link").last().tap();
+    await page.waitForURL(`**/explorer/unemployment/regions/${economy[1]}`);
+    await page.goto("/en/explorer/unemployment/regions/adjara");
+    await expect(page.getByTestId("unemployment-region-navigation").getByRole("link").first()).toHaveText(/^← \S/);
+  });
+
   test("municipal map: city markers preview on the first tap and the list scrolls with the page (D7)", async ({ page }) => {
     await page.goto("/explorer/municipalities");
     await ready(page);
