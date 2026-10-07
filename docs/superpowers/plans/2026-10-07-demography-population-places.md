@@ -358,12 +358,14 @@ export function buildPopulationWorkbookExportModel(
 In `tests/explorer/demographyPopulationWorkbook.test.ts`: replace the `DEFAULT_POPULATION_STATE`/`PopulationState` import with `type PopulationQuery` and define `const DEFAULT_QUERY: PopulationQuery = { selectedIds: [GEORGIA_PLACE_ID], range: { kind: "all" } };`; make `build` take `Partial<PopulationQuery>` and pass `{ ...DEFAULT_QUERY, ...patch }`; change the two direct calls to `{ ...DEFAULT_QUERY, selectedIds }` and `DEFAULT_QUERY`; and add:
 
 ```ts
-  test("a place page names the place in the file", () => {
-    const model = buildPopulationWorkbookExportModel(facts, places, { selectedIds: ["06"], range: { kind: "all" } }, presentation, sources, "https://fiscal.ge", "batumi");
-    expect(model.filename).toBe("fiscal-demography-population-batumi-2015-2026-en.xlsx");
+  test("a place page names the place and the range in the file", () => {
+    const all = buildPopulationWorkbookExportModel(facts, places, { selectedIds: ["06"], range: { kind: "all" } }, presentation, sources, "https://fiscal.ge", "batumi");
+    expect(all.filename).toBe("fiscal-demography-population-batumi-2004-2026-en.xlsx");
+    const manual = buildPopulationWorkbookExportModel(facts, places, { selectedIds: ["06"], range: { kind: "manual", start: 2015, end: 2026 } }, presentation, sources, "https://fiscal.ge", "batumi");
+    expect(manual.filename).toBe("fiscal-demography-population-batumi-2015-2026-en.xlsx");
   });
 ```
-(Check the expected years in that name against the model: Batumi has values 2015–2026 but the range resolves over all loaded years, 2004–2026; if the name reads `2004-2026`, assert that instead. The file name carries the range, not the place's own years.)
+The file name carries the range, not the place's own years: a place page passes its own years as a manual range, so its files read `2015-2026`.
 
 - [ ] **Step 9: Model tests.** Replace `tests/explorer/demographyPopulation.test.ts` with the file below. It keeps the places tests (minus `placesAtLevel`, plus `partsOf`), drops the hash-state and state-change blocks, and moves the model and highlights tests onto `query` and `placeId`.
 
@@ -2877,7 +2879,7 @@ const { regions } = await loadServedMunicipalData();
 for (const place of populationPlacePaths(regions.map((region) => region.id))) revisions[place] = "2026-10-07";
 writeFileSync(file, `${JSON.stringify(revisions, null, 2)}\n`);
 ```
-Run it with `npx tsx <file>` after copying it next to `package.json` if the relative imports need it, and delete the copy afterwards. Then `git diff --stat data/localization/en/page-revisions.json` must show additions only (75 lines), keeping the file's existing order and LF endings. (The repository is LF; if the write produced CRLF, convert back.)
+Save it as `add-place-revisions.mts` next to `package.json` (the `.mts` extension makes the top-level `await` legal and lets the relative imports resolve), run it with `npx tsx add-place-revisions.mts`, and delete it afterwards. Then `git diff --stat data/localization/en/page-revisions.json` must show additions only (75 lines), keeping the file's existing order and LF endings. (The repository is LF; if the write produced CRLF, convert back.)
 
 - [ ] **Step 3: Recount every pin.** Run `npx vitest run tests/seo tests/i18n tests/explorer tests/methodology`. The only failures should be counts that the 150 new URLs move (sitemap rows 248 → 398, public page identities 124 → 199, and tests that list them). For each, read what the number counts, compute it from the code, and change the number and any comment that explains it; never edit an assertion to a number you did not derive. Also run `npm run i18n:check` (it must report 199 public page identities and no missing page-body entries; if it asks for more data for the new pages, follow what the Budget municipality pages do). List every file you changed in your report.
 
