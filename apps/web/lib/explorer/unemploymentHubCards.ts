@@ -5,10 +5,11 @@ import { formatShare } from "./format";
 import { INK } from "./colors";
 import type { HubCardModel } from "./hubCards";
 import { UNEMPLOYMENT_SECTIONS } from "./unemploymentSections";
+import { UNEMPLOYMENT_AGE_FIRST_YEAR } from "./unemploymentAge";
 
 export function buildUnemploymentHubCards(facts: readonly ClientUnemploymentObservation[], presentation: Presentation): HubCardModel[] {
   return UNEMPLOYMENT_SECTIONS.map((section, index) => {
-    const observations = facts.filter(fact => fact.dimension === section.breakdown && fact.indicatorId === "unemployment_rate");
+    const observations = facts.filter(fact => fact.dimension === section.breakdown && fact.indicatorId === "unemployment_rate" && (section.id !== "age" || fact.year >= UNEMPLOYMENT_AGE_FIRST_YEAR));
     const years = [...new Set(observations.map(fact => fact.year))].sort((a, b) => a - b);
     const first = years[0], last = years.at(-1)!;
     const national = section.id === "overview" ? observations.sort((a, b) => a.year - b.year) : null;

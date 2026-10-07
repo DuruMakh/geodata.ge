@@ -4,15 +4,17 @@ import { colorForItem, colorForProgram, EDITORIAL_PALETTE, INK } from "./colors"
 import { resolveRange } from "./periodRange";
 import type { UnemploymentState } from "./unemploymentState";
 import { unemploymentFactSeriesId, unemploymentOverviewDefinitions, unemploymentOverviewIndicators, unemploymentUsesIndicatorSeries } from "./unemploymentOverview";
+import { UNEMPLOYMENT_AGE_FIRST_YEAR } from "./unemploymentAge";
 
 export function unemploymentReferenceId(state: Pick<UnemploymentState, "breakdown" | "educationSex" | "overview" | "regional" | "regionId">): string {
+  if (state.breakdown === "age") return "";
   if (state.regional) return `${state.regionId ?? "georgia"}:unemployment_rate`;
   if (state.breakdown === "sex") return "georgia:unemployment_rate";
   if (state.overview && state.breakdown !== "education") return `georgia:${state.breakdown === "long_term" ? "long_term_unemployment_rate" : "unemployment_rate"}`;
   return state.breakdown === "education" && state.educationSex !== "total" ? state.educationSex : "georgia";
 }
 function primaryFacts(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState): ClientUnemploymentObservation[] {
-  return facts.filter(f => f.dimension === state.breakdown && (!state.regionId || f.groupId === state.regionId) && f.indicatorId === state.indicator && (state.breakdown !== "education" || f.sex === state.educationSex));
+  return facts.filter(f => f.dimension === state.breakdown && (!state.regionId || f.groupId === state.regionId) && f.indicatorId === state.indicator && (state.breakdown !== "education" || f.sex === state.educationSex) && (state.breakdown !== "age" || f.year >= UNEMPLOYMENT_AGE_FIRST_YEAR));
 }
 export function unemploymentCoverage(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState) {
   const selectedIndicators = new Set(state.selectedIds.map(id => id.split(":")[1]));
@@ -30,7 +32,7 @@ export function unemploymentScopeFacts(facts: readonly ClientUnemploymentObserva
     return facts.filter(f => (f.dimension === state.breakdown && (!state.regionId || f.groupId === state.regionId) && indicators.includes(f.indicatorId)) || (!state.regionId && ["settlement", "sex", "region"].includes(state.breakdown) && f.dimension === "national" && indicators.includes(f.indicatorId) && (state.breakdown === "region" || f.indicatorId === "unemployment_rate") && years.has(f.year)));
   }
   const primary = primaryFacts(facts, state);
-  if (state.breakdown === "national" || state.breakdown === "long_term") return primary;
+  if (state.breakdown === "national" || state.breakdown === "long_term" || state.breakdown === "age") return primary;
   const years = new Set(primary.map(f => f.year)), referenceId = unemploymentReferenceId(state);
   const reference = facts.filter(f => f.dimension === (referenceId === "georgia" ? "national" : "sex") && f.groupId === referenceId && f.indicatorId === state.indicator && years.has(f.year));
   return [...primary, ...reference];
@@ -49,6 +51,7 @@ export function buildUnemploymentModel(facts: readonly ClientUnemploymentObserva
   const byCell = new Map(active.map(f => [`${unemploymentFactSeriesId(f, state)}:${f.year}`, f]));
   const endValues: Record<string, number | null> = Object.fromEntries([...ids].map(id => [id, byCell.get(`${id}:${range.end}`)?.value ?? null]));
   const definitions = unemploymentUsesIndicatorSeries(state) ? unemploymentOverviewDefinitions(scope, registry, state) : registry.filter(group => ids.has(group.id)).map(group => ({ ...group, groupId: group.id, indicatorId: state.indicator })).sort((a, b) => {
+    if (state.breakdown === "age") return a.sortOrder - b.sortOrder;
     if (a.id === referenceId) return -1; if (b.id === referenceId) return 1;
     const av = endValues[a.id], bv = endValues[b.id];
     if (av === null && bv !== null) return 1; if (bv === null && av !== null) return -1;

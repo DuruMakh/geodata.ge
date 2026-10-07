@@ -25,8 +25,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
         await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
         await expect(page.getByTestId("chart-panel")).toHaveCount(0);
       } else await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
-      if (section !== "age") await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
-      else await expect(page.getByTestId("unemployment-headline")).toContainText("13.9%");
+      await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-breakdown")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByTestId("unemployment-national-tabs")).toHaveCount(section === "overview" ? 1 : 0);
@@ -181,13 +180,13 @@ for (const [breakdown, group, query] of [["settlement", "urban", "Urban"], ["edu
 
 test("search does not limit age selection and the national stack survives empty overview selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment/age"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 17");
+  await expect(page.getByTestId("series-status")).toContainText("1 / 11");
   await page.getByTestId("series-search").fill("15-19");
   await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("no-selection-callout")).toBeVisible();
   await expect(page.getByTestId("unemployment-composition")).toHaveCount(0);
-  await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("17 / 17");
+  await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("11 / 11");
   await page.getByTestId("series-search").fill("");
-  await expect(page.getByTestId("series-list").locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(17);
+  await expect(page.getByTestId("series-list").locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(11);
   await page.getByTestId("series-toggle-all").click(); await page.reload();
   await expect(page.getByTestId("no-selection-callout")).toBeVisible();
   await page.goto("/en/explorer/unemployment/overview#sel=");

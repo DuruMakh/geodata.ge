@@ -146,7 +146,7 @@ export function StackedColumnChart({
     // role="img" belongs on the svg, not the figure: it is children-presentational,
     // so on the figure it would hide the sr-only figcaption that carries the numbers.
     <figure className="m-0">
-      <ChartScrollFrame testId="stack-chart-frame" hintTestId="stack-chart-scroll-hint">
+      <ChartScrollFrame testId="stack-chart-frame">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="block h-auto w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
