@@ -29,21 +29,34 @@ const longLabelSelection =
   "#g=fields&m=table&r=2004-2025&sel=expenditure.total%2Cspending.social_protection%2Cspending.infrastructure_regional_development%2Cspending.education";
 
 const cases = [
-  { name: "expenditure with a long-label series", path: `/explorer/expenditure${longLabelSelection}` },
-  { name: "English expenditure with a long-label series", path: `/en/explorer/expenditure${longLabelSelection}` },
-  { name: "Georgia municipal aggregate", path: "/explorer/municipalities/georgia#m=table" },
-  { name: "Batumi", path: "/explorer/municipalities/batumi#m=table" },
+  { name: "expenditure total", path: "/explorer/expenditure#m=table", minYears: 3 },
+  { name: "expenditure with a long-label series", path: `/explorer/expenditure${longLabelSelection}`, minYears: 3 },
+  { name: "English expenditure with a long-label series", path: `/en/explorer/expenditure${longLabelSelection}`, minYears: 3 },
+  { name: "revenue", path: "/explorer/revenue#m=table", minYears: 3 },
+  { name: "debt", path: "/explorer/debt#m=table", minYears: 3 },
+  { name: "deficit", path: "/explorer/deficit#m=table", minYears: 2 },
+  { name: "Georgia municipal aggregate", path: "/explorer/municipalities/georgia#m=table", minYears: 2 },
+  { name: "Batumi", path: "/explorer/municipalities/batumi#m=table", minYears: 3 },
+  { name: "English Batumi", path: "/en/explorer/municipalities/batumi#m=table", minYears: 3 },
+  { name: "Adjara municipal region", path: "/explorer/municipalities/region/adjara#m=table", minYears: 3 },
+  { name: "GDP", path: "/explorer/economy/gdp", minYears: 3 },
+  { name: "economic sectors", path: "/explorer/economy/sectors", minYears: 2 },
+  { name: "unemployment", path: "/explorer/unemployment/overview", minYears: 3 },
 ];
 
-for (const { name, path } of cases) {
+for (const { name, path, minYears } of cases) {
   test(`table mode shows year values at 390px: ${name}`, async ({ page }) => {
     await page.goto(path);
     const scroller = page.getByTestId("explorer-table");
+    if (!path.includes("m=table")) await page.getByRole("button", { name: /^(ცხრილი|Table)$/ }).first().click();
     await scroller.scrollIntoViewIfNeeded();
     await expect(scroller.locator("tbody tr").first()).toBeVisible();
     // The table opens on the latest year, so the latest-year column is in view.
     await expect.poll(() => scroller.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
-    await expect.poll(() => visibleYearCells(scroller)).toBeGreaterThanOrEqual(2);
+    await expect.poll(() => visibleYearCells(scroller)).toBeGreaterThanOrEqual(minYears);
+    // Names wrap at a readable size rather than widening the column.
+    expect(await scroller.locator("tbody td").first().evaluate((cell) => parseFloat(getComputedStyle(cell.querySelector("span span:last-child") ?? cell).fontSize))).toBeGreaterThanOrEqual(12);
+    expect(await scroller.locator("thead th").evaluateAll((cells) => cells.slice(1).filter((cell) => getComputedStyle(cell).position === "sticky").length)).toBe(0);
     const latestVisible = await scroller.evaluate((element) => {
       const latest = element.querySelector("thead th[data-latest-year]")!.getBoundingClientRect();
       const frame = element.getBoundingClientRect();
@@ -53,7 +66,7 @@ for (const { name, path } of cases) {
     // The sticky label column leaves most of the scroller to the numbers.
     const labelWidth = await scroller.locator("thead th").first().evaluate((th) => th.getBoundingClientRect().width);
     const frameWidth = await scroller.evaluate((element) => element.clientWidth);
-    expect(labelWidth).toBeLessThanOrEqual(frameWidth * 0.45);
+    expect(labelWidth).toBeLessThanOrEqual(frameWidth * 0.41);
   });
 }
 

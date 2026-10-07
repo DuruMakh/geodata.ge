@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import type { ExplorerTableRow } from "../../lib/explorer/types";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -42,14 +42,18 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
 
 const headCellClass =
   "border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-[9px] text-right text-[11px] font-semibold text-[var(--muted)] whitespace-nowrap";
-const numericCellClass = "px-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
+const numericCellClass =
+  "px-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap @max-[768px]:px-2.5";
+// On phones a status mark (preliminary, planned, forecast) drops under its number
+// rather than widening every year column.
+const STATUS_MARK_CLASS = "ml-1 text-[9px] font-medium text-[var(--faint)] @max-[768px]:ml-0 @max-[768px]:block";
 
 // Below 768px of table width (DESIGN.md §12) the sticky label column wraps and is capped at
 // 40% of the scroller, and the change/share columns scroll with the years instead of
 // staying pinned: on a phone the pinned columns together were wider than the scroller
 // and left no room for a single year.
 const MOBILE_LABEL_CLASS =
-  "@max-[768px]:w-[40cqw] @max-[768px]:min-w-0 @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:[overflow-wrap:anywhere]";
+  "@max-[768px]:pr-1.5 @max-[768px]:w-[40cqw] @max-[768px]:min-w-[40cqw] @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:[overflow-wrap:anywhere]";
 const PIN_RIGHT_CLASS = "sticky @max-[768px]:static";
 
 function changeColor(change: number | null): string {
@@ -108,15 +112,15 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
 
   const total = showTotal && totalRow ? (
     <tr className="border-t-2 border-[var(--ink)]">
-      <td className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`} style={cellPad}>
+      <td className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35] ${labelClass}`} style={cellPad}>
         {rowLabel(totalRow)}
       </td>
       {years.map((year) => (
         <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={cellPad}>
           {cellValue(totalRow, year)}
-          {totalRow.preliminaryByYear?.[year] ? <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{preliminaryLabel}</sup> : null}
+          {totalRow.preliminaryByYear?.[year] ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
           {forecastLabel && forecastYears?.includes(year) ? (
-            <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{forecastLabel}</sup>
+            <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup>
           ) : null}
         </td>
       ))}
@@ -146,7 +150,12 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         aria-label={message(messages, "controls.tableScrollable")}
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        <table className="w-full border-collapse" style={{ minWidth }}>
+        {/* The desktop minimum spreads columns over a wide frame; on phones it would only pad
+            every year column and push the numbers off-screen, so columns size to content. */}
+        <table
+          className="w-full min-w-[var(--table-min-width)] border-collapse @max-[768px]:min-w-0"
+          style={{ "--table-min-width": `${minWidth}px` } as CSSProperties}
+        >
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
@@ -179,9 +188,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                 style={cellPad}
                 title={rowLabel(row)}
               >
-                <span className="inline-flex items-center gap-[9px]">
+                <span className="inline-flex items-center gap-[9px] @max-[768px]:gap-1">
                   <SwatchBar color={row.color} />
-                  <span className="text-[13px] font-medium text-[var(--ink)]">{rowLabel(row)}</span>
+                  <span className="text-[13px] font-medium text-[var(--ink)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35]">{rowLabel(row)}</span>
                 </span>
               </td>
               {years.map((year, index) => (
@@ -195,12 +204,12 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   }}
                 >
                   {cellValue(row, year)}
-                  {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{preliminaryLabel}</sup> : null}
+                  {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
                   {row.basisByYear?.[year] === "planned" ? (
-                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{message(messages, "controls.planned")}</sup>
+                    <sup className={STATUS_MARK_CLASS}>{message(messages, "controls.planned")}</sup>
                   ) : null}
                   {forecastLabel && forecastYears?.includes(year) ? (
-                    <sup className="ml-1 text-[9px] font-medium text-[var(--faint)]">{forecastLabel}</sup>
+                    <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup>
                   ) : null}
                 </td>
               ))}
