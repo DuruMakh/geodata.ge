@@ -170,5 +170,66 @@ class GoodsTests(PackageTests):
         self.assertFalse(any(r['indicator_id']=='reexports' for r in goods.derive_goods([export,imports,domestic],reviewed)))
         self.assertFalse(any(r['indicator_id']=='reexports' for r in goods.derive_goods([export,imports,dict(domestic,value_status='numeric',value_usd='40')],set())))
 
+class ProductsTests(PackageTests):
+    _data=None
+    def rows(self):
+        module=self.module('read_products')
+        if self.__class__._data is None:
+            self.__class__._data=module.read_products(self.module('archive').load_verified_sources(ROOT),json.loads((ROOT/'source-layouts.json').read_text(encoding='utf-8')),ROOT)
+        return self.__class__._data
+
+    def test_classification_bounds_and_historical_ids(self):
+        rows=self.rows()
+        expected={'hs4':{'1995-1999','2000-2014','2015-2019','2020-2025'},'hs6':{'2000-2008','2009-2014','2015-2019','2020-2025'}}
+        for classification,blocks in expected.items():
+            selected=[r for r in rows if r['classification']==classification]
+            self.assertEqual({r['source_block'] for r in selected},blocks)
+            self.assertEqual(min(int(r['year']) for r in selected),1995 if classification=='hs4' else 2000)
+        leading=next(r for r in rows if r['source_id']=='geostat_trade_export-product-by-6-digit-2000-2014' and r['source_sheet']=='2009-2014-years' and r['source_cell']=='C7')
+        self.assertEqual(leading['product_code'],'010121')
+        self.assertEqual(leading['item_id'],'goods.hs6.2009-2014.010121')
+        self.assertEqual(len({r['item_id'] for r in rows if r['classification']=='hs6' and r['product_code']=='010121'}),3)
+        report=self.module('model').check_coverage(rows,json.loads((ROOT/'expected-observation-inventory.json').read_text()),{'goods_products'})
+        self.assertEqual(report['matched_observations'],len(rows))
+
+    def test_broad_classifications_keep_all_published_categories(self):
+        rows=self.rows()
+        self.assertEqual({r['product_code'] for r in rows if r['classification']=='sitc1' and r['role']=='detail'},set('0123456789'))
+        self.assertEqual({r['product_code'] for r in rows if r['classification']=='bec1' and r['role']=='detail'},set('1234567'))
+
+    def test_zero_product_and_entire_block_omissions_fail(self):
+        rows=self.rows(); model=self.module('model'); inventory=json.loads((ROOT/'expected-observation-inventory.json').read_text())
+        zero=next(r for r in rows if r['role']=='detail' and r['value_usd']=='0')
+        for changed in ([r for r in rows if r is not zero],[r for r in rows if not (r['classification']=='hs6' and r['source_block']=='2000-2008')]):
+            with self.assertRaisesRegex(ValueError,'coverage'): model.check_coverage(changed,inventory,{'goods_products'})
+        with self.assertRaisesRegex(ValueError,'duplicate_key'): model.check_coverage(rows+[rows[0]],inventory,{'goods_products'})
+
+    def test_parent_comparison_has_fixed_tolerance_and_period_matching(self):
+        products=self.module('read_products')
+        def fixture(classification,code,value,source,cell,year='2009'):
+            return dict(family='goods_products',flow='export',year=year,classification=classification,product_code=code,value_status='numeric',value_usd=value,source_id=source,source_sheet='Annual',source_cell=cell,role='detail',item_id='goods.'+classification+'.'+code,source_block='2009-2014')
+        parent=fixture('hs4','0101','100','four','C7')
+        children=[fixture('hs6','010121','30','six','C7'),fixture('hs6','010129','70','six','C8')]
+        result=products.compare_hs_parents([parent]+children,{('six','four')})
+        self.assertEqual([(r['expected_usd'],r['actual_usd'],r['status']) for r in result],[('100','100','pass')])
+        altered=[parent,children[0],dict(children[1],value_usd='68')]
+        self.assertEqual(products.compare_hs_parents(altered,{('six','four')})[0]['status'],'fail')
+        self.assertFalse(any(r['status']=='pass' for r in products.compare_hs_parents([parent]+children,set())))
+        self.assertFalse(any(r['status']=='pass' for r in products.compare_hs_parents([dict(parent,year='2010')]+children,{('six','four')})))
+
+    def test_source_coding_exception_requires_exact_refs_and_balanced_group(self):
+        products=self.module('read_products')
+        self.assertTrue(hasattr(products,'resolve_source_exceptions'),'reviewed source-coding exception checks are not implemented')
+        rows=[dict(family='goods_products',flow='export',year='2000',classification=classification,product_code=code,value_status='numeric',value_usd=value,source_id=source,source_sheet='Annual',source_cell=cell,role='detail',item_id=code,source_block='2000-2004') for classification,code,value,source,cell in [('hs4','0101','100','four','B7'),('hs4','0102','20','four','B8'),('hs6','010121','90','six','B7'),('hs6','010221','30','six','B8')]]
+        comparisons=products.compare_hs_parents(rows,{('six','four')})
+        registry={'groups':{'allocation':{'codes':['0101','0102'],'explanation':'Source allocations differ; preserve separate codes.'}},'cases':[dict(flow=c['flow'],year=c['year'],item_id=c['item_id'],group_id='allocation',difference_usd=c['difference_usd'],source_refs=c['source_refs']) for c in comparisons]}
+        resolved,controls=products.resolve_source_exceptions(comparisons,rows,registry)
+        self.assertEqual({r['status'] for r in resolved},{'source_exception'})
+        self.assertEqual(controls[0]['status'],'pass')
+        self.assertTrue(all(r['difference_usd']!='0' for r in resolved))
+        bad=[dict(r,value_usd='39') if r['classification']=='hs6' and r['product_code']=='010221' else r for r in rows]
+        with self.assertRaisesRegex(ValueError,'source_arithmetic'):
+            products.resolve_source_exceptions(products.compare_hs_parents(bad,{('six','four')}),bad,registry)
+
 if __name__ == '__main__':
     unittest.main()

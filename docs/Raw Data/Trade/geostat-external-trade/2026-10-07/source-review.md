@@ -55,3 +55,9 @@ The 2026-10-07 capture contains 45 original source files, including 31 workbooks
 - Domestic detail retains its selected list and Other commodities. Unknown-region product detail is not published. Service residuals and symbols remain distinct from numerical zero.
 - Country table EU/CIS/Other sections are subtotals over their own published rows. Separate EU/CIS/BSEC/OECD/GUAM aggregates overlap and do not imply equivalent membership.
 - Historical product blocks are retained as distinct identities. Same-year matches will be explicitly reviewed rather than inferred across all years.
+
+## Historical source-code allocation differences
+
+There are 82 individual HS6-prefix/HS4 discrepancies: early-year tools, leather, knitted fabrics and clay/minerals (2000-2004), plus petroleum gases/Mixed goods (2015-2019). All 50 native code-cluster subtotals across the affected windows reconcile within USD 1. No monetary value or code is changed. `source-comparison-exceptions.json` pins exact affected years, codes, differences and source cells. Individual discrepancies retain their measured numbers with `source_exception` status and are never counted as passed prefix comparisons.
+
+The [WCO correlation guidance](https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs_nomenclature_previous_editions/correlation_table_2002.aspx?p=1) documents HS renumbering, including older 4108.00 and newer 4114.10. This supports the need for edition-aware identities; it does not establish a particular edition for every Geostat historical cell. The exact reason for the clay/mineral and Mixed goods allocation differences is not declared by these workbooks. These native source series are not interchangeable, and neither their labels nor classifications are harmonized.
