@@ -33,6 +33,7 @@
   "municipal.table": "ცხრილი",
   "municipal.shareMeasure": "წილი მთლიან ბიუჯეტში, %",
   "municipal.amountMeasure": "მთლიანი ბიუჯეტი · მლნ ₾",
+  "municipal.amountMeasureShort": "მლნ ₾",
   "municipal.shareToggle": "% წილი",
   "municipal.shareOfBudget": "წილი მთლიან ბიუჯეტში",
   "municipal.noSelection": "არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.",

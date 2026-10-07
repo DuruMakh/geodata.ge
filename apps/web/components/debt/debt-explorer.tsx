@@ -174,9 +174,11 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 ]}
               />
               <div className="flex items-center gap-3.5">
-                <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {props.family === "rate" ? "%" : props.shareOfGdp ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
-                </span>
+                {props.family === "stock" && props.shareOfGdp ? null : (
+                  <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                    {props.family === "rate" ? "%" : message(messages, "format.bnGel")}
+                  </span>
+                )}
                 {props.family === "stock" ? (
                   <MeasurePill label={message(messages, "main.percentGdp")} pressed={props.shareOfGdp} onChange={props.onShareChange} />
                 ) : null}

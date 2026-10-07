@@ -32,7 +32,7 @@ exports[`'deficit' shell > keeps its wrapper, heading, workspace, aside and meas
     "<main data-testid="deficit-explorer" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [
-    "<button type="button" data-testid="measure-share-toggle" aria-pressed="true" class="h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]">",
+    "<button type="button" data-testid="measure-share-toggle" aria-pressed="true" class="h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] before:mr-1 before:content-[&#x27;✓&#x27;_/_&#x27;&#x27;]">",
   ],
   "workspace": [
     "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",

@@ -133,9 +133,9 @@ export function ExplorerView({
                 ]}
               />
               <div className="flex items-center gap-3.5">
-                <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {message(messages, share ? "main.percentGdp" : "format.bnGel")}
-                </span>
+                {share ? null : (
+                  <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{message(messages, "format.bnGel")}</span>
+                )}
                 <MeasurePill label={message(messages, "main.percentGdp")} pressed={share} onChange={onShareChange} />
               </div>
             </div>

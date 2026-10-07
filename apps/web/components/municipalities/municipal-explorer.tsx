@@ -324,7 +324,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
         <div className="min-w-0">
           <div
             data-testid="municipal-chart-controls"
-            className="mb-[18px] flex flex-col items-start gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between min-[520px]:gap-5"
+            className="mb-[18px] flex flex-wrap items-center justify-between gap-x-5 gap-y-3"
           >
             <span className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 [&_button]:min-h-9">
               <SegmentedTabs<ChartMode>
@@ -336,8 +336,11 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
                   { value: "table", label: message(messages, "municipal.table"), testId: "municipal-mode-table" },
                 ]}
               />
-              <span className="min-w-0 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                {message(messages, state.share ? "municipal.shareMeasure" : "municipal.amountMeasure")}
+              {/* Phones keep the pill on this row: the caption shortens to the unit, and
+                  in share mode the pressed "% წილი" pill names the unit itself. */}
+              <span data-testid="municipal-measure-label" className="min-w-0 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+                <span className="max-[768px]:hidden">{message(messages, state.share ? "municipal.shareMeasure" : "municipal.amountMeasure")}</span>
+                {state.share ? null : <span className="hidden max-[768px]:inline">{message(messages, "municipal.amountMeasureShort")}</span>}
               </span>
             </span>
             <button
@@ -347,7 +350,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               onClick={() => state.setShare(!state.share)}
               className={`inline-flex min-h-9 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border px-3 text-[11.5px] ${
                 state.share
-                  ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
+                  ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] before:mr-1 before:content-['✓'_/_'']"
                   : "border-[var(--control)] text-[var(--muted)]"
               }`}
             >
@@ -377,10 +380,8 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
           )}
 
           {/* allYears, never model.years — the strip must offer the full span
-              even when the selection has narrowed it. */}
-          <div className="mt-6 border-t border-[var(--hairline-soft)] pt-4">
-            <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
-          </div>
+              even when the selection has narrowed it. The strip draws its own rule. */}
+          <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
 
           <div className="mt-5 max-w-[640px]">
             <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
