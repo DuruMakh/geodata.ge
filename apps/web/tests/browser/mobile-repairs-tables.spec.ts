@@ -57,3 +57,24 @@ for (const { name, path } of cases) {
   });
 }
 
+for (const path of ["/explorer/municipalities/georgia", "/explorer/municipalities/batumi", "/explorer/municipalities/region/adjara", "/en/explorer/municipalities/batumi"]) {
+  test(`period comparison fits a 390px phone without a sideways scroll: ${path}`, async ({ page }) => {
+    await page.goto(path);
+    const table = page.getByTestId("comparison-table");
+    await table.scrollIntoViewIfNeeded();
+    const fit = await table.evaluate((element) => {
+      const scroller = element.parentElement!;
+      const cells = [...element.querySelectorAll("th, td")];
+      return {
+        tableFits: scroller.scrollWidth <= scroller.clientWidth,
+        overflowingCells: cells.filter((cell) => cell.scrollWidth > cell.clientWidth + 1).map((cell) => cell.textContent),
+        headers: [...element.querySelectorAll("thead th")].map((th) => th.getBoundingClientRect().right),
+      };
+    });
+    expect(fit.tableFits).toBe(true);
+    expect(fit.overflowingCells).toEqual([]);
+    expect(fit.headers).toHaveLength(4);
+    for (const right of fit.headers) expect(right).toBeLessThanOrEqual(390);
+  });
+}
+
