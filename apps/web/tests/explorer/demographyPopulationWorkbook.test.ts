@@ -43,6 +43,11 @@ const sources = [
 const build = (patch: Partial<PopulationState> = {}, extra: Partial<typeof presentation> = {}) =>
   buildPopulationWorkbookExportModel(facts, places, { ...DEFAULT_POPULATION_STATE, ...patch }, { ...presentation, ...extra }, sources, "https://fiscal.ge");
 
+// The length of a text in Excel column units: each Georgian letter counts 1.2 and every other character 1. Rounded to a
+// tenth so the sum carries no floating-point noise into the comparisons.
+const weighted = (text: string) =>
+  Math.round(Array.from(text).reduce((sum, character) => sum + (/\p{Script=Georgian}/u.test(character) ? 1.2 : 1), 0) * 10) / 10;
+
 beforeAll(async () => {
   const [{ facts: served }, municipal] = await Promise.all([loadServedDemographyData(), loadServedMunicipalData()]);
   facts = served.map(projectDemographyObservation);
@@ -153,9 +158,6 @@ describe("population workbook", () => {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(model));
     const data = workbook.getWorksheet(model.sheetNames[1])!;
-    // Rounded to a tenth so the sum carries no floating-point noise into the comparison.
-    const weighted = (text: string) =>
-      Math.round(Array.from(text).reduce((sum, character) => sum + (/\p{Script=Georgian}/u.test(character) ? 1.2 : 1), 0) * 10) / 10;
     const tooLong = new Set<string>();
     data.eachRow((row, rowNumber) =>
       row.eachCell((cell, column) => {
@@ -184,5 +186,49 @@ describe("population workbook", () => {
     expect(yearHeader(2025)).toBe("2025 · Census re-base");
     expect(yearHeader(2026)).toBe("2026");
     expect(headers.map((header) => String(header)).join(" ")).not.toMatch(/change/i);
+  });
+
+  // The 2025 column header carries the re-base label, which is longer than a year column: "2025 · Census re-base" is 21
+  // characters and "2025 · აღწერით გადათვლა" is 23, 15 of them Georgian letters. Excel hides the START of text that does
+  // not fit in a right-aligned cell next to a filled one, which here is the year itself. So the header row wraps and is two
+  // lines tall (the writer counts a line as 15 points), and each label must fit the lines it is given. The same estimate as
+  // the Data sheet test: Georgian letters weigh 1.2, a line holds the column's width minus a unit of padding, and the result
+  // is approximate, not a measurement of any one font. The 2025 header gets two lines, every other header one.
+  const TWO_LINES = 2 * 15;
+  test.each(["ka", "en"] as const)("the %s Summary sheet header wraps and every label fits its lines (Georgian script weighted, approximate)", async (locale) => {
+    const real = await getPresentation(locale, ["demography"], []);
+    const model = buildPopulationWorkbookExportModel(facts, places, DEFAULT_POPULATION_STATE, real, sources, "https://fiscal.ge");
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer(model));
+    const summary = workbook.getWorksheet(model.sheetNames[0])!;
+
+    // Place first, then one column per year; there is no change column.
+    const columns = model.readable.years.length + 1;
+    const rebaseColumn = model.readable.years.indexOf(2025) + 2;
+    expect(rebaseColumn).toBeGreaterThan(1);
+    const problems: string[] = [];
+    const height = summary.getRow(3).height ?? 0;
+    if (height < TWO_LINES) problems.push(`${locale}: the header row is ${height} high, two lines need ${TWO_LINES}`);
+    for (let column = 1; column <= columns; column += 1) {
+      const cell = summary.getCell(3, column);
+      if (cell.alignment?.wrapText !== true) problems.push(`${locale}: header cell ${column} "${cell.text}" does not wrap`);
+      const room = (summary.getColumn(column).width ?? 0) - 1;
+      const lines = column === rebaseColumn ? 2 : 1;
+      const length = weighted(cell.text);
+      if (length > lines * room) problems.push(`${locale}: header "${cell.text}" is ${length} long, ${lines} line(s) of ${room} hold ${lines * room}`);
+    }
+    expect(problems).toEqual([]);
+  });
+
+  // Wrapping is opt-in: headerLabels without `wrap` (what the inflation workbooks pass) is written as it always was.
+  test("without the wrap flag the Summary header stays on one line at the default row height", async () => {
+    const model = build();
+    const { category, columns } = model.readable.headerLabels!;
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer({ ...model, readable: { ...model.readable, headerLabels: { category, columns } } }));
+    const summary = workbook.getWorksheet("Summary")!;
+    expect(summary.getCell(3, 1).alignment).toEqual({ horizontal: "left", vertical: "middle" });
+    expect(summary.getCell(3, 2).alignment).toEqual({ horizontal: "right", vertical: "middle" });
+    expect(summary.getRow(3).height).toBeUndefined();
   });
 });
