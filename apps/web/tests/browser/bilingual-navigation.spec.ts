@@ -53,11 +53,9 @@ test("English municipality code redirects keep the English path and query", asyn
 });
 
 test("English municipality redirects preserve the browser fragment", async ({ page }) => {
-  await page.goto("/en/explorer/municipalities/06?source=shared#m=table&r=2020-2025&sel=municipal_spending.total");
-  const destination = new URL(page.url());
-  expect(destination.pathname).toBe("/en/explorer/municipalities/batumi");
-  expect(destination.search).toBe("?source=shared");
-  expect(destination.hash).toBe("#m=table&r=2020-2025&sel=municipal_spending.total");
+  await page.goto("/en/explorer/municipalities/06?source=shared#m=table&r=2020-2025&sel=municipal.total");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page).toHaveURL("/en/explorer/municipalities/batumi?source=shared#m=table&r=2020-2025&sel=municipal.total");
 });
 
 for (const route of ["/no-such-page", "/en/no-such-page", "/explorer/municipalities/no-such-place", "/en/explorer/municipalities/no-such-place", "/methodology/no-such-dataset"]) {
