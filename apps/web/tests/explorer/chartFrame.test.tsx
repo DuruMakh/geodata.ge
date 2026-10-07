@@ -24,6 +24,37 @@ describe("shared chart frame", () => {
     expect(markup).not.toContain("chart-frame-y-axis");
   });
 
+  it("drops the scroll minimum on phones: before measuring by CSS, once fitted entirely", () => {
+    const unmeasured = renderGeorgianMarkup(<ChartScrollFrame><svg /></ChartScrollFrame>);
+    expect(unmeasured).toContain("max-[768px]:min-w-0");
+    const fitted = renderGeorgianMarkup(<ChartScrollFrame fit><svg /></ChartScrollFrame>);
+    expect(fitted).not.toContain("min-w-[720px]");
+    expect(fitted).toContain('role="region"');
+    expect(fitted).toContain('tabindex="0"');
+  });
+
+  it("renders the phone readout in flow, at 12px, with the tooltip's rows in order", () => {
+    const markup = renderGeorgianMarkup(
+      <ChartTooltip
+        variant="panel"
+        leftPercent={70}
+        header="2026-08"
+        rows={[
+          { id: "a", label: "Food", color: "#B3402A", value: 1.2 },
+          { id: "b", label: "Transport", color: "#4A707A", value: 0.4 },
+        ]}
+        hidden={2}
+        formatValue={(value) => value.toFixed(1)}
+      />,
+    );
+    expect(markup).toContain('data-placement="panel"');
+    expect(markup).not.toContain("absolute");
+    expect(markup).not.toContain("text-[11px]");
+    expect(markup).toContain("text-[12px]");
+    expect(markup.indexOf("Food")).toBeLessThan(markup.indexOf("Transport"));
+    expect(markup).toContain("+2");
+  });
+
   it("defaults to the line chart's test id", () => {
     const markup = renderGeorgianMarkup(<ChartScrollFrame><svg /></ChartScrollFrame>);
     expect(markup).toContain('data-testid="chart-frame"');

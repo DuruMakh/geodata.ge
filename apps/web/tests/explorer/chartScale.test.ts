@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { axisLabelWidth, axisLeftPaddingFor, decimalsFor, niceScale } from "../../lib/explorer/chartScale";
+import { axisLabelWidth, axisLeftPaddingFor, decimalsFor, fitAxisLabels, niceScale, periodAnchors } from "../../lib/explorer/chartScale";
 
 describe("chart scale helpers", () => {
   // Review cases (2026-10-07): the old top (max × 1.12 snapped to 1/2/2.5/5/10,
@@ -61,5 +61,55 @@ describe("chart scale helpers", () => {
     const padding = axisLeftPaddingFor(["0.0 მლრდ", "50.0 მლრდ"], 74);
     expect(padding).toBeGreaterThan(74);
     expect(padding - 10 - axisLabelWidth("50.0 მლრდ")).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe("fitted phone axis labels", () => {
+  // A 300-unit plot from x=40, labels 26 units wide: first anchored start,
+  // last anchored end, the rest centred (the line chart's anchoring).
+  const axis = (count: number, plot = 300, labelWidth = 26) => {
+    const x = (index: number) => 40 + (count <= 1 ? plot / 2 : (index * plot) / (count - 1));
+    return (index: number): [number, number] =>
+      index === 0
+        ? [x(index) - 4, x(index) - 4 + labelWidth]
+        : index === count - 1
+          ? [x(index) + 4 - labelWidth, x(index) + 4]
+          : [x(index) - labelWidth / 2, x(index) + labelWidth / 2];
+  };
+  const collisionFree = (indices: number[], extent: (index: number) => [number, number], gap = 8) =>
+    indices.every((index, position) => position === 0 || extent(indices[position - 1]!)[1] + gap <= extent(index)[0]);
+
+  it("always labels the first and the latest period without collisions", () => {
+    for (const count of [2, 5, 12, 22, 45, 66]) {
+      const extent = axis(count);
+      const indices = fitAxisLabels(count, periodAnchors(Array.from({ length: count }, (_, index) => 2000 + index)), extent);
+      expect(indices[0]).toBe(0);
+      expect(indices.at(-1)).toBe(count - 1);
+      expect(collisionFree(indices, extent)).toBe(true);
+    }
+  });
+
+  it("thins 2004–2025 to an even stride on a phone", () => {
+    const indices = fitAxisLabels(22, periodAnchors(Array.from({ length: 22 }, (_, index) => 2004 + index)), axis(22));
+    const regular = indices.slice(0, -1);
+    const strides = new Set(regular.slice(1).map((index, position) => index - regular[position]!));
+    expect(strides.size).toBe(1);
+    expect(indices.length).toBeLessThanOrEqual(8);
+  });
+
+  it("labels Januaries on a monthly axis, plus the first and the latest month", () => {
+    // Mar 2021 … Aug 2026: the first and last periods are not Januaries.
+    const months = Array.from({ length: 66 }, (_, index) => 2021 * 12 + 2 + index);
+    const indices = fitAxisLabels(66, periodAnchors(months, 12), axis(66, 300, 30));
+    expect(indices[0]).toBe(0);
+    expect(indices.at(-1)).toBe(65);
+    for (const index of indices.slice(1, -1)) expect(months[index]! % 12).toBe(0);
+    expect(collisionFree(indices, axis(66, 300, 30))).toBe(true);
+  });
+
+  it("keeps only the latest label when the first and the latest cannot both fit", () => {
+    expect(fitAxisLabels(2, [0, 1], axis(2, 30))).toEqual([1]);
+    expect(fitAxisLabels(1, [0], axis(1))).toEqual([0]);
+    expect(fitAxisLabels(0, [], axis(0))).toEqual([]);
   });
 });

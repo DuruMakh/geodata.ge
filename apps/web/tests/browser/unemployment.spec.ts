@@ -54,7 +54,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await page.getByTestId("series-toggle-all").click();
       await page.locator(`[data-series-id="georgia:${indicator}"] [data-testid="series-row-toggle"]`).click();
       await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
-      const labels = page.getByTestId("chart-panel").getByRole("img").locator('text[text-anchor="end"]').filter({ hasText: unitLabel });
+      // Phones (D1) print the unit once above the axis and plain numbers on the ticks.
+      const chart = page.getByTestId("chart-panel").getByRole("img");
+      if (width < 768) await expect(chart.locator("text[data-unit-caption]")).toHaveText(unitLabel);
+      const labels = chart.locator('text[text-anchor="end"]').filter({ hasText: width < 768 ? /^[\d,.]+$/ : unitLabel });
       await expect(labels.first()).toBeVisible();
       const leftEdges = await labels.evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x));
       expect(leftEdges.length).toBeGreaterThan(0);

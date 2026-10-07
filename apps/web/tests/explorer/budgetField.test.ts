@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderGeorgianMarkup } from "../helpers/render-localized";
+import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import { BudgetField } from "../../components/analysis/budget-field";
 import analysis from "../../lib/i18n/messages/ka/analysis.json";
@@ -56,7 +56,7 @@ function attribute(markup: string, name: string): string {
 
 describe("BudgetField", () => {
   it("renders compact solid amount-scaled circles", () => {
-    const circles = [...renderedChart().matchAll(/<circle\b[^>]*>/g)].map((match) => match[0]);
+    const circles = [...chartGeometry(renderedChart(), "desktop").matchAll(/<circle\b[^>]*>/g)].map((match) => match[0]);
 
     expect(circles).toHaveLength(3);
     expect(circles.map((circle) => Number(attribute(circle, "r")))).toEqual([22, 14, 10]);
@@ -108,5 +108,24 @@ describe("BudgetField", () => {
     );
 
     expect(labels).toEqual(["0%", "+1000%", "+2000%", "+3000%", "+4000%"]);
+  });
+
+  // D1: phones draw the field at the frame's width, every circle inside it.
+  it("draws a phone geometry with every circle inside the drawing", () => {
+    const phone = chartGeometry(renderedChart(), "mobile");
+    const viewBox = /viewBox="0 0 (\d+) (\d+)"/.exec(phone)!;
+    expect(Number(viewBox[1])).toBe(340);
+    const circles = [...phone.matchAll(/<circle\b[^>]*>/g)].map((match) => ({
+      cx: Number(attribute(match[0], "cx")),
+      cy: Number(attribute(match[0], "cy")),
+      r: Number(attribute(match[0], "r")),
+    }));
+    expect(circles).toHaveLength(3);
+    for (const circle of circles) {
+      expect(circle.cx - circle.r).toBeGreaterThanOrEqual(0);
+      expect(circle.cx + circle.r).toBeLessThanOrEqual(Number(viewBox[1]));
+      expect(circle.cy - circle.r).toBeGreaterThanOrEqual(0);
+      expect(circle.cy + circle.r).toBeLessThanOrEqual(Number(viewBox[2]));
+    }
   });
 });

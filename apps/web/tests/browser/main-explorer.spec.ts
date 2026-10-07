@@ -76,7 +76,9 @@ async function expectSidebarWidth(page: Page, width: number) {
 }
 
 async function expectLineChartRendered(page: Page) {
-  const line = page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']").first();
+  // Before hydration the frame holds a desktop and a phone drawing and CSS shows
+  // one (D1), so read the visible drawing.
+  const line = page.getByTestId("chart-frame").locator("svg:visible path[stroke-linejoin='round']").first();
 
   await expect(line).toBeVisible();
 
@@ -913,7 +915,9 @@ test("budget field identifies a circle with its category and amount on hover and
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toContainText("სოციალური დაცვა");
   await expect(tooltip).toContainText("7.2 მლრდ ₾");
-  await expect(tooltip).not.toContainText(/წილი|ზრდა/);
+  // D1 (2026-10-07): the readout also states the growth its y position encodes.
+  await expect(tooltip).toContainText(/ცვლილება \+?−?\d+\.\d%/);
+  await expect(tooltip).not.toContainText(/წილი/);
 
   await page.getByRole("heading", { name: "ბიუჯეტის ველი" }).hover();
   await expect(tooltip).toHaveCount(0);
@@ -1036,16 +1040,18 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   expect(consoleProblems).toEqual([]);
 });
 
-test("mobile chart and table keep contained horizontal scroll", async ({ page }) => {
+test("mobile chart fits its frame and the table keeps contained horizontal scroll", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
+  // D1 (2026-10-07): phones draw the chart at the frame's width, so it no
+  // longer scrolls; the frame keeps its focusable, named region.
   const chart = page.getByTestId("chart-frame");
   await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await expect(chart).toHaveAttribute("tabindex", "0");
   await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი");
-  expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  expect(await chart.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
 
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
@@ -1057,14 +1063,16 @@ test("mobile chart and table keep contained horizontal scroll", async ({ page })
   await expectNoPageOverflow(page);
 });
 
-test("mobile chart accepts a horizontal touch drag", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test("a chart frame that still overflows accepts a horizontal touch drag", async ({ page }) => {
+  // Phones fit the chart (D1); at 768px the desktop drawing's 720px minimum
+  // still overflows its frame, so that is where the scroller has to work.
+  await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chart = page.getByTestId("chart-frame");
   expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-  // A phone opens the chart on the latest data, so the drag goes back in time.
+  // An overflowing frame opens on the latest data, so the drag goes back in time.
   const maxScroll = await chart.evaluate((element) => element.scrollWidth - element.clientWidth);
   await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThanOrEqual(maxScroll - 1);
 

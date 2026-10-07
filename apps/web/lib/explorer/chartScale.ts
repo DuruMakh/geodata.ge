@@ -99,6 +99,58 @@ export function axisLeftPaddingFor(labels: readonly string[], minimum: number, f
 }
 
 /**
+ * The x positions that carry a label on a chart drawn at phone width (DESIGN.md
+ * §8.3, narrow screens): always the first and the latest period, then every
+ * `stride`-th calendar anchor (each year, or each January on a monthly axis) at
+ * the smallest stride where no two labels come within `gap` of each other.
+ * `extent` returns a label's [left, right] edges in the chart's own units, so
+ * the caller's text anchoring and the real label widths decide what collides.
+ */
+export function fitAxisLabels(
+  count: number,
+  anchors: readonly number[],
+  extent: (index: number) => readonly [number, number],
+  gap = 8,
+): number[] {
+  if (count <= 0) return [];
+  const last = count - 1;
+  if (last === 0) return [0];
+  const clear = (a: number, b: number) => {
+    const [aLeft, aRight] = extent(a);
+    const [bLeft, bRight] = extent(b);
+    return aRight + gap <= bLeft || bRight + gap <= aLeft;
+  };
+  // Two labels that cannot sit side by side: the latest one wins.
+  if (!clear(0, last)) return [last];
+
+  const ordered = [...new Set(anchors)].filter((index) => index >= 0 && index <= last).sort((a, b) => a - b);
+  // When the first period is itself an anchor the stride counts from it, so a
+  // label crowding it means the stride is too short; otherwise (a monthly range
+  // starting mid-year) the crowding anchor is dropped. A label crowding the
+  // latest one is dropped either way, as on the desktop axis.
+  const aligned = ordered[0] === 0;
+  for (let stride = Math.max(1, Math.ceil(ordered.length / 12)); stride <= Math.max(1, ordered.length); stride += 1) {
+    const regular = ordered.filter(
+      (index, position) => position % stride === 0 && index !== 0 && index !== last && clear(index, last),
+    );
+    if (aligned && regular.length > 0 && !clear(0, regular[0]!)) continue;
+    const kept = aligned ? regular : regular.filter((index) => clear(index, 0));
+    if (kept.every((index, position) => position === 0 || clear(kept[position - 1]!, index))) {
+      return [0, ...kept, last];
+    }
+  }
+  return [0, last];
+}
+
+/** Calendar anchors of a period axis: every year, or each January of a monthly one. */
+export function periodAnchors(periods: readonly number[], periodsPerYear = 1): number[] {
+  const all = periods.map((_, index) => index);
+  if (periodsPerYear === 1) return all;
+  const starts = all.filter((index) => periods[index]! % periodsPerYear === 0);
+  return starts.length >= 2 ? starts : all;
+}
+
+/**
  * Smallest decimal count (up to max) that renders the gridline step exactly,
  * so axis labels are never rounded into duplicates ("0.3" for a 0.25 step).
  */
