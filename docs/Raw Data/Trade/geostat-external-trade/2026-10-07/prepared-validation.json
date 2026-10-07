@@ -1,0 +1,69 @@
+{
+  "coverage": {
+    "matched_blocks": 466,
+    "matched_observations": 364495
+  },
+  "derived_observations": 3473,
+  "family_counts": {
+    "goods_countries": 12400,
+    "goods_country_groups": 372,
+    "goods_domestic": 3489,
+    "goods_national": 62,
+    "goods_products": 286634,
+    "goods_regions": 51968,
+    "services": 9570
+  },
+  "input_sha256": {
+    "expected-observation-inventory.json": "803f873b2af1b22bb1c2b76061c03413a7dfe86cca5b931dee1369225c6610ad",
+    "full-source-manifest.json": "c9b273fefe788c04240dc353cef46d9dbcc046a5294cfc498591c6e53cb189b2",
+    "identity-review.csv": "ee96ac9b604539c15dc8396b3071068c4ffa9ccd37a4564d94ff1bb28b5ab99b",
+    "source-comparison-exceptions.json": "f568602ef2adefa95c23fe0ef34966b9315267a63a597876835115e07e3f29b1",
+    "source-layouts.json": "607aea395fde2b71ae2f4f6545cdd2c8444eec4bf021b0bc84b2f1f71321a8dc",
+    "source-limitations.csv": "000fb0054a1474876acc66d87b6ba15db61a1be8518c65e5dbd08cb1977516af",
+    "unresolved-source-issues.json": "95473c512e6458a7da8491806ca318bde18b423e302da5756322d61248f6d8c2"
+  },
+  "primary_observations": 364461,
+  "reconciliation_status_counts": {
+    "fail": 2,
+    "not_published": 3220,
+    "pass": 59166,
+    "source_exception": 82
+  },
+  "source_observations": 364495,
+  "status": "requires_source_resolution",
+  "unresolved_source_issues": [
+    {
+      "actual_usd": "32550080.1199999987351000",
+      "check": "service_country_matches_joint",
+      "difference_usd": "192236.9999999937351000",
+      "evidence": "All twelve numeric country/type counterparts are required; absent or symbolic country detail is not zero.",
+      "expected_usd": "32357843.120000005000",
+      "family": "services",
+      "flow": "import",
+      "item_id": "partner.2020-2024.826",
+      "source_refs": "[[\"geostat_services_georgian-imports-of-services-by-countries\",\"Sheet1\",\"E116\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E13\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E71\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E180\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E251\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E290\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E382\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E449\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E519\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E610\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E710\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E772\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E839\"]]",
+      "status": "fail",
+      "tolerance_usd": "1",
+      "year": "2022"
+    },
+    {
+      "actual_usd": "96555372.41999999725000",
+      "check": "service_country_matches_joint",
+      "difference_usd": "379883.87000004625000",
+      "evidence": "All twelve numeric country/type counterparts are required; absent or symbolic country detail is not zero.",
+      "expected_usd": "96175488.549999951000",
+      "family": "services",
+      "flow": "import",
+      "item_id": "partner.2020-2024.826",
+      "source_refs": "[[\"geostat_services_georgian-imports-of-services-by-countries\",\"Sheet1\",\"G116\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G13\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G71\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G180\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G251\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G290\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G382\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G449\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G519\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G610\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G710\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G772\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G839\"]]",
+      "status": "fail",
+      "tolerance_usd": "1",
+      "year": "2024"
+    }
+  ],
+  "value_status_counts": {
+    "blank": 36,
+    "not_applicable": 5218,
+    "numeric": 359241
+  }
+}
