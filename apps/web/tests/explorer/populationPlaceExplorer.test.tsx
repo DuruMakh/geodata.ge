@@ -5,6 +5,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathnam
 
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
+import { SERIES } from "../../lib/data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { projectDemographyObservation } from "../../lib/explorer/clientData";
@@ -39,7 +40,7 @@ beforeAll(async () => {
   }
 });
 
-function render(placeId: string, locale: Locale = "en", withNavigation = false, densityNote?: string): string {
+function render(placeId: string, locale: Locale = "en", withNavigation = false, densityNote?: string, pageFacts: ClientDemographyObservation[] = facts): string {
   const places = placesBy[locale];
   const place = places.find((candidate) => candidate.id === placeId)!;
   return renderToStaticMarkup(
@@ -47,7 +48,7 @@ function render(placeId: string, locale: Locale = "en", withNavigation = false, 
       <PopulationPlaceExplorer
         place={place}
         places={places}
-        facts={facts}
+        facts={pageFacts}
         title="Population —"
         metaLine="the meta line"
         navigation={withNavigation ? { prev: { label: "Before", href: "/a" }, next: { label: "After", href: "/b" } } : undefined}
@@ -184,6 +185,21 @@ describe("place page body: the default selection", () => {
     const rows = tickList(render(placeId));
     expect(rows[0]).toEqual({ id: placeId, pressed: true });
     expect(rows.filter((row) => row.pressed).map((row) => row.id)).toEqual([placeId]);
+  });
+});
+
+describe("place page body: the tick-list order", () => {
+  // The page's own place is first by construction: the model ranks by value and forces only Georgia first, so a region
+  // that has no value at the end of the range would otherwise sink below its parts. The real data cannot produce that
+  // (a place's range is its own years), so the region's population facts are removed here and its parts keep theirs.
+  test("a region with no value in the range still lists first, above parts that have one", () => {
+    const withoutAdjara = facts.filter((fact) => !(fact.seriesId === SERIES.populationTotal && fact.geographyId === "region.adjara"));
+    const html = render("region.adjara", "en", false, undefined, withoutAdjara);
+    expect(html).toContain("246,267");
+    const rows = tickList(html);
+    expect(rows).toHaveLength(7);
+    expect(rows[0]).toEqual({ id: "region.adjara", pressed: true });
+    expect(rows.slice(1).every((row) => !row.pressed)).toBe(true);
   });
 });
 

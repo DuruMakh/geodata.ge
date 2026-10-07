@@ -93,8 +93,11 @@ export function PopulationPlaceExplorer({
     [facts, places, state.selectedIds, state.range.start, state.range.end, locale],
   );
   const highlights = useMemo(() => buildPopulationHighlights(model, facts, places, place.id), [model, facts, places, place.id]);
-  // The tick-list: the place first, then its parts, all in the order the model ranks them.
-  const listed = useMemo(() => model.ranked.filter((candidate) => listedIds.has(candidate.id)), [model, listedIds]);
+  // The tick-list: the page's own place first whatever its value (the total stays first), then its parts in the order the model ranks them.
+  const listed = useMemo(
+    () => [place, ...model.ranked.filter((candidate) => candidate.id !== place.id && listedIds.has(candidate.id))],
+    [model, place, listedIds],
+  );
 
   const [seriesQuery, setSeriesQuery] = useState("");
   const regionOf = (candidate: DemographyPlace) => (candidate.regionId === null ? undefined : places.find((other) => other.id === candidate.regionId));
