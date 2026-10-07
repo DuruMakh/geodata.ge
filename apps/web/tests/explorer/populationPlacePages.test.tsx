@@ -70,6 +70,7 @@ describe("place pages", () => {
     expect(count(html, /data-testid="series-row"/g)).toBe(1);
     expect(html).not.toContain("region-member-row");
     expect(html).toContain('data-testid="municipal-entity-navigation"');
+    expect(html).not.toMatch(GEORGIAN);
   });
 
   it("Tbilisi is a region page with the singular count and no member rows", async () => {
@@ -77,6 +78,7 @@ describe("place pages", () => {
     expect(html).toContain("1 municipality · Rank 1 of 11 · 1 January 2026");
     expect(html).not.toContain("region-member-row");
     expect(count(html, /data-testid="series-row"/g)).toBe(1);
+    expect(html).not.toMatch(GEORGIAN);
   });
 
   it("renders in Georgian with the Georgian ordinal", async () => {
@@ -95,9 +97,9 @@ describe("place pages", () => {
   });
 
   it("an unknown region, an unknown slug and Tbilisi's municipality slug are not found", async () => {
-    await expect(renderPopulationPlacePage({ kind: "region", id: "nowhere" }, "en")).rejects.toThrow();
-    await expect(renderPopulationPlacePage({ kind: "municipality", slug: "nowhere" }, "en")).rejects.toThrow();
-    await expect(renderPopulationPlacePage({ kind: "municipality", slug: "tbilisi" }, "en")).rejects.toThrow();
+    await expect(renderPopulationPlacePage({ kind: "region", id: "nowhere" }, "en")).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
+    await expect(renderPopulationPlacePage({ kind: "municipality", slug: "nowhere" }, "en")).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
+    await expect(renderPopulationPlacePage({ kind: "municipality", slug: "tbilisi" }, "en")).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
   });
 });
 
@@ -115,6 +117,12 @@ describe("place metadata", () => {
     expect(String(ka.title)).toContain("მოსახლეობა");
     const georgia = await populationPlaceMetadata({ kind: "country" }, "en");
     expect(georgia.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography/population/georgia");
+  });
+
+  it("carries no Georgian text in English, for a region or a municipality", async () => {
+    for (const route of [{ kind: "region", id: "adjara" }, { kind: "municipality", slug: "batumi" }] as const) {
+      expect(JSON.stringify(await populationPlaceMetadata(route, "en")), JSON.stringify(route)).not.toMatch(GEORGIAN);
+    }
   });
 });
 
