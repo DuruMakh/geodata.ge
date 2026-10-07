@@ -156,3 +156,38 @@ test("desktop keeps its compact type (D8 is phone-only)", async ({ page }) => {
   await page.goto("/explorer");
   await expect(page.getByTestId("budget-hub").locator("p").last()).toHaveCSS("font-size", "10px");
 });
+
+// Words that wrap across two lines without a space or hyphen to break at.
+async function wordsBrokenMidWord(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const found: string[] = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const element = node.parentElement;
+      if (!element || element.closest("svg, .sr-only, [aria-hidden='true']") || element.getBoundingClientRect().height === 0) continue;
+      for (const match of (node.textContent ?? "").matchAll(/[^\s\-–—/]{4,}/g)) {
+        const range = document.createRange();
+        range.setStart(node, match.index!);
+        range.setEnd(node, match.index! + match[0].length);
+        const lines = new Set([...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top)));
+        if (lines.size > 1) found.push(match[0]);
+      }
+    }
+    return [...new Set(found)];
+  });
+}
+
+for (const path of [
+  "/explorer/expenditure",
+  "/explorer/expenditure#sel=expenditure.total,spending.other_unclassified,spending.education&view=table",
+  "/explorer/expenditure#g=ministries&sel=admin_spending.total,admin_spending.regional_development_infrastructure,admin_spending.health_social_affairs&view=table",
+  "/explorer/municipalities/batumi#view=table",
+]) {
+  test(`${path}: long Georgian words wrap at spaces, not mid-word`, async ({ page }) => {
+    await page.goto(path);
+    await ready(page);
+    expect(await wordsBrokenMidWord(page)).toEqual([]);
+  });
+}
+

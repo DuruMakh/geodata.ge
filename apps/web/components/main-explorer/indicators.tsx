@@ -265,7 +265,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
                     <td className="py-2.5 pr-3" title={rowLabel(row)}>
                       <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
                         <SwatchBar color={color} className="mt-[7px]" />
-                        <span className="min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]" style={{ fontWeight: weight }}>
+                        <span className="min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] break-words @max-[768px]:text-[0.75rem]" style={{ fontWeight: weight }}>
                           {label}
                         </span>
                       </span>

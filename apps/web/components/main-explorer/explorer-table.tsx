@@ -53,7 +53,7 @@ const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-medium t
 // staying pinned: on a phone the pinned columns together were wider than the scroller
 // and left no room for a single year.
 const MOBILE_LABEL_CLASS =
-  "@max-[768px]:pr-1.5 @max-[768px]:w-[40cqw] @max-[768px]:min-w-[40cqw] @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:[overflow-wrap:anywhere]";
+  "@max-[768px]:pr-1.5 @max-[768px]:w-[40cqw] @max-[768px]:min-w-[40cqw] @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:break-words";
 const PIN_RIGHT_CLASS = "sticky @max-[768px]:static";
 // A value cell of the year-rows layout: flush right under its series header.
 const ROWS_VALUE_CELL_CLASS = "pl-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
@@ -107,7 +107,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };
   const minWidth = (wrapRowLabels ? 180 : 320) + years.length * 78 + (showChangeColumn ? 128 : 0) + (shareColumnLabel ? 96 : 0);
-  const labelClass = `${wrapRowLabels ? "w-[180px] min-w-[180px] max-w-[180px] whitespace-normal [overflow-wrap:anywhere]" : "whitespace-nowrap"} ${MOBILE_LABEL_CLASS}`;
+  const labelClass = `${wrapRowLabels ? "w-[180px] min-w-[180px] max-w-[180px] whitespace-normal break-words" : "whitespace-nowrap"} ${MOBILE_LABEL_CLASS}`;
 
   // Narrow screens open on the latest year, the one the page headline talks about: the
   // scroller is moved so the last year column ends at its right edge (the change/share
@@ -178,7 +178,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                     key={row.itemId}
                     scope="col"
                     data-series-id={row.itemId}
-                    className={`border-b-2 border-[var(--ink)] pl-2 pt-1.5 pb-[9px] text-right align-bottom text-[11.5px] leading-[1.35] text-[var(--ink)] [overflow-wrap:anywhere] ${isTotal(row) ? "font-semibold" : "font-medium"}`}
+                    className={`border-b-2 border-[var(--ink)] pl-2 pt-1.5 pb-[9px] text-right align-bottom text-[11.5px] leading-[1.35] text-[var(--ink)] break-words ${isTotal(row) ? "font-semibold" : "font-medium"}`}
                   >
                     <SwatchBar color={row.color} className="mb-1.5 ml-auto block" />
                     {rowLabel(row)}
@@ -189,7 +189,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
             <tbody>
               {summaryRows.map((summary) => (
                 <tr key={summary.key} data-summary={summary.key} className="border-b border-[var(--hairline)]">
-                  <th scope="row" className="pr-2 text-left text-[11px] font-semibold leading-[1.3] text-[var(--muted)] [overflow-wrap:anywhere]" style={cellPad}>
+                  <th scope="row" className="pr-2 text-left text-[11px] font-semibold leading-[1.3] text-[var(--muted)] break-words" style={cellPad}>
                     {summary.label}
                   </th>
                   {seriesRows.map((row) => {
