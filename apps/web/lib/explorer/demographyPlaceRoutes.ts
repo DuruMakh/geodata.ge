@@ -7,7 +7,7 @@ export const POPULATION_PATH = "/explorer/demography/population";
 const TBILISI_SLUG = "tbilisi";
 
 /** The address of a place's own page: Georgia, a region, or one of the 63 municipalities. Municipality 04 is Tbilisi, a region. */
-export function populationPlaceHref(placeId: string): string {
+export function populationPlaceHref(placeId: string): `${typeof POPULATION_PATH}/${string}` {
   const id = placeIdForMunicipalityCode(placeId);
   if (id === GEORGIA_PLACE_ID) return `${POPULATION_PATH}/georgia`;
   if (id.startsWith("region.")) return `${POPULATION_PATH}/region/${id.slice("region.".length)}`;
