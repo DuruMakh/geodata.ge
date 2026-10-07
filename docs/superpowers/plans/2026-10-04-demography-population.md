@@ -1,5 +1,7 @@
 # Demography Plan 1 (Foundation and Population) Implementation Plan
 
+> **Superseded in part, 2026-10-07.** The Population page was rebuilt in the layout of the Budget municipalities pages (an index and one page per place) under `docs/superpowers/plans/2026-10-07-demography-population-places.md`. Tasks 6–9 and 12–16 of this plan, where they describe the page (the choosing mode of the two maps, the one-page explorer with its button row, places panel and state hook, the page and route composition, and the single-page browser spec), are replaced by that plan and must not be executed, and so are the page statements in the Goal, Architecture, Global Constraints and Reuse map below (the clickable map, the URL-hash keys `level`, `map` and `view`, the maps' selecting props). The data, serving, chart, workbook and methodology tasks stand and are done, as are the hub, sidebar and footer parts of Task 14.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Publish the Demography hub and the Population page (Georgian and `/en`): a clickable map of the 11 regions and 64 municipalities, the standard line/table workspace with the 1 January 2025 census re-base marked, highlights for the first selected place, an Excel download and a methodology page, all served from the reviewed CSVs through the Supabase mirror.
