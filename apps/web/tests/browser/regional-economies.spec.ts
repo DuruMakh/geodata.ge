@@ -115,7 +115,7 @@ test("regional map, ranked list, search and keyboard focus stay coordinated", as
   await mapTarget.press("ArrowDown");
   await expect(page.locator('[data-region-map-target]:focus')).toHaveCount(1);
 
-  const search = page.getByRole("textbox", { name: "Search regions" });
+  const search = page.getByRole("searchbox", { name: "Search regions" });
   await search.fill("Imereti");
   await expect(page.getByTestId("regional-list-row")).toHaveCount(1);
   await search.fill("no-such-region");

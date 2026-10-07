@@ -145,12 +145,9 @@ export function GdpOverview({
       </p>
       <div
         data-testid="gdp-indicators"
-        className="mb-3 overflow-x-auto py-2"
-        onFocusCapture={(event) =>
-          event.target.scrollIntoView({ block: "nearest", inline: "nearest" })
-        }
+        className="mb-3 py-2"
       >
-        <div className="mx-auto flex w-max gap-7 px-1">
+        <div className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
           {(["real", "nominal", "growth", "per_capita"] as const).map(
             (id) => (
               <TextTab

@@ -11,6 +11,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { SourceNote } from "../ui/editorial";
+import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 import { RegionMap, regionalEconomyMapData, type RegionMapMetric } from "./regional-economy-map";
 
 export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalEconomyMapModel; sourceNote: string }) {
@@ -71,11 +72,12 @@ export function RegionIndex({ model, sourceNote, metric, summary }: { model: Reg
           </div>
           <div className="flex items-center gap-2 pt-3 pb-1">
             <input
+              {...SEARCH_FIELD_PROPS}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={message(messages, "regionalEconomies.search")}
               aria-label={message(messages, "regionalEconomies.search")}
-              className="h-[38px] min-w-0 flex-1 rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] outline-none focus:border-[var(--ink)]"
+              className="h-[38px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] outline-none focus:border-[var(--ink)]"
             />
             <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{rows.length === model.regions.length ? rows.length : `${rows.length} / ${model.regions.length}`}</span>
           </div>

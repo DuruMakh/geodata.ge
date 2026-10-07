@@ -2,8 +2,21 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import type { ReactNode } from "react";
+import type { FocusEvent, ReactNode } from "react";
 import { SwatchBar } from "../ui/editorial";
+
+/**
+ * On a stacked (<1100px) layout, focusing a search field scrolls it to the top of the
+ * viewport, so its results land above the on-screen keyboard instead of under it.
+ * Wide layouts keep their position: the series aside is sticky there.
+ */
+export function revealSearchField(event: FocusEvent<HTMLInputElement>) {
+  if (!window.matchMedia("(max-width: 1099.98px)").matches) return;
+  event.currentTarget.scrollIntoView({ block: "start" });
+}
+
+/** Mobile keyboard hints shared by the site's search fields. */
+export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFocus: revealSearchField } as const;
 
 type SeriesSelectorProps = {
   controls?: ReactNode;
@@ -19,6 +32,8 @@ type SeriesSelectorProps = {
   onToggleAll: () => void;
   allowSelectAll?: boolean;
   hasVisibleMatches: boolean;
+  /** Optional visible names for the row values, shown above the list. */
+  listHeader?: ReactNode;
   children: ReactNode;
 };
 
@@ -36,6 +51,7 @@ export function SeriesSelector({
   onToggleAll,
   allowSelectAll = true,
   hasVisibleMatches,
+  listHeader,
   children,
 }: SeriesSelectorProps) {
   const { messages } = useI18n();
@@ -50,11 +66,12 @@ export function SeriesSelector({
       <input
         data-testid="series-search"
         data-selector-section="search"
+        {...SEARCH_FIELD_PROPS}
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
         placeholder={searchPlaceholder}
         aria-label={message(messages, "controls.searchSeries")}
-        className={`${controls ? "mt-3.5" : ""} h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
+        className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
       />
 
       <div
@@ -117,6 +134,8 @@ export function SeriesSelector({
           {message(messages, "controls.noMatches")}
         </p>
       ) : null}
+
+      {listHeader}
 
       <div
         data-testid="series-list"
@@ -205,7 +224,9 @@ export function SeriesSelectorRow({
           aria-expanded={hasChildren ? expanded : undefined}
           aria-label={expansionLabel ?? message(messages, "controls.subprogrammes")}
           aria-disabled={expansionLocked || undefined}
-          className={`flex w-[22px] flex-none items-center justify-center text-base leading-none ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
+          // The caret keeps its 22px column; a transparent extension over the row button's
+          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px).
+          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:inset-y-0 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
           tabIndex={hasChildren && !expansionLocked ? 0 : -1}
         >
@@ -241,7 +262,7 @@ export function SeriesSelectorRow({
           </span>
         </span>
         {meta === undefined ? null : (
-          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--muted)] opacity-70">
+          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--muted)]">
             {metaLabel === undefined ? null : <span className="sr-only">{metaLabel} </span>}
             {meta}
           </span>

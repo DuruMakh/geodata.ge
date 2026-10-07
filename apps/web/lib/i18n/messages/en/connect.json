@@ -27,6 +27,7 @@
   "connect.notServed1": "Quarterly and monthly data for any dataset other than inflation",
   "connect.notServed2": "Individual capital projects and procurement",
   "connect.notServed3": "Current in-year execution",
+  "connect.notServed4": "Unemployment data, which for now is on the website pages only",
   "connect.heading": "Connect your AI assistant",
   "connect.introduction": "Fiscal.ge’s verified data on Georgia, available in your AI assistant.",
   "connect.address": "Connection address",

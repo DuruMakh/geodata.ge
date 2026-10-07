@@ -16,6 +16,7 @@ import { parseMunicipalLevel } from "../../lib/explorer/urlState";
 import { municipalityHrefForCode } from "../../lib/explorer/municipalityRoutes";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
+import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 import { MunicipalityMap } from "./municipality-map";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 
@@ -211,11 +212,12 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           <div className="flex items-center gap-2 pt-3 pb-1">
             <input
               data-testid="municipal-search"
+              {...SEARCH_FIELD_PROPS}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={message(messages, "municipal.search")}
               aria-label={message(messages, "municipal.search")}
-              className="h-[38px] min-w-0 flex-1 rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--ink)]"
+              className="h-[38px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--ink)]"
             />
             <span data-testid="row-count" className="font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">
               {rows.length === source.length ? `${source.length}` : `${rows.length} / ${source.length}`}

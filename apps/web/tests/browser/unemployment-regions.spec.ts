@@ -43,7 +43,7 @@ test("regional hover, bilingual search and keyboard links stay coordinated", asy
   await expect(page.locator("[data-region-map-target]").first()).toBeFocused();
   await page.locator("[data-region-map-target]").first().press("End");
   await expect(page.locator("[data-region-map-target]").last()).toBeFocused();
-  await page.getByRole("textbox", { name: "Search regions", exact: true }).fill("გურია");
+  await page.getByRole("searchbox", { name: "Search regions", exact: true }).fill("გურია");
   await expect(page.getByTestId("regional-list-row")).toHaveCount(1);
   await expect(page.getByTestId("regional-list-row")).toContainText("Guria");
   await target.focus(); await target.press("Enter");

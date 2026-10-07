@@ -19,10 +19,10 @@ export function MethodologyHub({
   return (
     <main data-testid="methodology-hub" className="mx-auto w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-14">
       <BreadcrumbTrail items={breadcrumbItems} />
-      <section className="grid items-center gap-10 border-b-2 border-[var(--ink)] pb-14 min-[860px]:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] min-[860px]:gap-16 min-[860px]:pb-20">
+      <section className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 border-b-2 border-[var(--ink)] pb-14 min-[860px]:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] min-[860px]:gap-16 min-[860px]:pb-20">
         <div className="max-w-[620px]">
           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.hubOverline")}</p>
-          <h1 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
+          <h1 className="mt-4 text-balance font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
             {message(messages, "methodology.hubTitle")}
           </h1>
           <p className="mt-6 max-w-[570px] text-pretty text-[15px] leading-[1.75] text-[var(--body)]">

@@ -11,6 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { SectionTitle } from "../ui/editorial";
 import { InflationProductArt } from "./inflation-product-art";
 import { filteredProductIds } from "./inflation-product-panel";
+import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 
 const BATCH_SIZE = 40;
 
@@ -46,11 +47,12 @@ export function InflationProductTable({ index, state, onToggle }: {
       <SectionTitle>{t("productsBrowseHeading")}</SectionTitle>
       <input
         data-testid="product-list-search"
+        {...SEARCH_FIELD_PROPS}
         value={query}
         onChange={(event) => { setQuery(event.target.value); setShown(Math.min(BATCH_SIZE, index.products.length)); }}
         placeholder={t("productsSearch")}
         aria-label={t("productsSearch")}
-        className="h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
+        className="h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
       />
     </div>
     {ids.length === 0 ? <p data-testid="product-list-empty" className="mt-6 text-[13px] text-[var(--muted)]">{t("productsNoMatches")}</p> : <div className="mt-[18px]">
@@ -61,22 +63,24 @@ export function InflationProductTable({ index, state, onToggle }: {
         aria-label={message(messages, "controls.tableScrollable")}
         className="max-w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        <table className="w-full min-w-[560px] table-fixed border-collapse">
+        {/* Short column headers with the periods in the visible caption: on a phone the name and
+            both rate columns fit without a horizontal swipe (DESIGN.md §25.2). */}
+        <table className="w-full table-fixed border-collapse min-[768px]:min-w-[560px]">
           <colgroup>
-            <col className="w-[185px] min-[768px]:w-[45%]" />
-            <col className="w-[160px] min-[768px]:w-[25%]" />
-            <col className="w-[215px] min-[768px]:w-[30%]" />
+            <col className="min-[768px]:w-[45%]" />
+            <col className="w-[92px] min-[768px]:w-[25%]" />
+            <col className="w-[72px] min-[768px]:w-[30%]" />
           </colgroup>
-          <caption className="sr-only">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
+          <caption data-testid="product-table-caption" className="pb-2 text-left text-[12px] leading-[1.5] text-[var(--muted)]">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
           <thead><tr>
             <th scope="col" className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] py-2 pr-3 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)]">
               {t("productsProductColumn")}
             </th>
             <th scope="col" className="border-b-2 border-[var(--ink)] px-2 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsCumulativeColumn", { start: state.range.startYear, end: endLabel })}
+              {t("productsCumulativeColumn")}
             </th>
             <th scope="col" className="border-b-2 border-[var(--ink)] py-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsAnnualColumn", { period: latestLabel })}
+              {t("productsAnnualColumn")}
             </th>
           </tr></thead>
           <tbody>

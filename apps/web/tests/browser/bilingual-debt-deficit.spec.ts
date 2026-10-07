@@ -107,7 +107,7 @@ test("English debt search and existing series controls explain rate gaps without
     const label = page.locator(`[data-series-id="${id}"]`).getByTestId("series-label");
     expect(await label.evaluate(element => element.scrollHeight <= element.clientHeight)).toBe(true);
   }
-  const search = page.getByTestId("series-selector").getByRole("textbox");
+  const search = page.getByTestId("series-selector").getByRole("searchbox");
   for (const query of ["საპროცენტო", "WEIGHTED-AVERAGE"]) {
     await search.fill(query);
     await expect(page.locator('[data-series-id="debt.rate.total"]')).toBeVisible();

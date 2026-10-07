@@ -2,11 +2,12 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
 import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalKpiSet, MunicipalMover } from "../../lib/explorer/municipalData";
-import { formatAmount, formatAmountParts, formatShare, formatSignedAmount } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatShare } from "../../lib/explorer/format";
+import type { Locale } from "../../lib/i18n/types";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { Sparkline } from "../ui/sparkline";
 import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
-import { HERO_KPI_VALUE_CLASS, KPI_GRID_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
+import { HERO_KPI_VALUE_CLASS, KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, MOVER_LABEL_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
 
@@ -19,7 +20,7 @@ function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) 
       <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
         {String(mover.rank).padStart(2, "0")}
       </span>
-      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[12.5px] font-medium leading-[1.4] text-[var(--ink)]">{mover.label}</span>
+      <span className={`text-[12.5px] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>{mover.label}</span>
       <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
         <span className="block h-full" style={{ width: `${width.toFixed(0)}%`, backgroundColor: growthColor(growth) }} />
       </span>
@@ -27,6 +28,21 @@ function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) 
         {formatShare(growth, true)}
       </span>
     </div>
+  );
+}
+
+/**
+ * An amount whose unit may drop under its number: below 768px the comparison table
+ * fits the phone column (as the national one does) instead of scrolling, and each
+ * row carries its own magnitude (მლნ / მლრდ), so the unit cannot move to the header.
+ */
+function AmountText({ value, signed = false, locale }: { value: number | null | undefined; signed?: boolean; locale: Locale }) {
+  const parts = formatAmountParts(value, signed, locale);
+  return (
+    <>
+      <span className="whitespace-nowrap">{parts.num}</span>
+      {parts.unit ? <> <span className="whitespace-nowrap @max-[768px]:text-[11px]">{parts.unit}</span></> : null}
+    </>
   );
 }
 
@@ -129,7 +145,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                         </span>
                       ) : null}
                     </span>
-                    <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]" title={kpi.detail}>{kpi.detail}</span>
+                    <span className={`min-w-0 text-right text-xs text-[var(--muted)] ${KPI_DETAIL_CLIP_CLASS}`} title={kpi.detail}>{kpi.detail}</span>
                   </div>
                   <Sparkline values={sideSeries[index]!} color="var(--ink)" />
                 </div>
@@ -163,12 +179,12 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
       <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
         <h3 className="mb-1 text-[13px] font-semibold text-[var(--ink)]">{message(messages, "municipal.periodComparison")}</h3>
         <div className="overflow-x-auto">
-          <table data-testid="comparison-table" className="min-w-[560px] w-full table-fixed border-collapse">
+          <table data-testid="comparison-table" className="w-full min-w-[560px] table-fixed border-collapse @max-[768px]:min-w-0">
             <caption className="sr-only">{message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}</caption>
             <colgroup>
               <col className="w-[44%]" />
               <col />
-              <col />
+              <col className="@max-[768px]:w-[70px]" />
               <col />
             </colgroup>
             <thead>
@@ -176,7 +192,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                 {[message(messages, "municipal.function"), String(startYear), message(messages, "municipal.change"), String(endYear)].map((label, index) => (
                   <th
                     key={`comparison-header-${index}`}
-                    className={`border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right" : "px-3 pt-1.5 pb-2 text-right"} text-[11px] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em]"} text-[var(--muted)]`}
+                    className={`border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right @max-[768px]:pl-1" : "px-3 pt-1.5 pb-2 text-right @max-[768px]:px-1"} text-[11px] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em] @max-[768px]:tracking-normal"} text-[var(--muted)]`}
                   >
                     {label}
                   </th>
@@ -197,18 +213,18 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                       </span>
                     </span>
                   </td>
-                  <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--muted)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                    {formatAmount(row.fromGel, locale)}
+                  <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
+                    <AmountText value={row.fromGel} locale={locale} />
                   </td>
                   <td
                     data-testid="comparison-change-cell"
-                    className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap"
+                    className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] @max-[768px]:px-1"
                     style={{ color: growthColor(row.changeShare) }}
                   >
-                    {formatSignedAmount(row.changeGel, locale)}
+                    <AmountText value={row.changeGel} signed locale={locale} />
                   </td>
-                  <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                    {formatAmount(row.toGel, locale)}
+                  <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
+                    <AmountText value={row.toGel} locale={locale} />
                   </td>
                 </tr>
               ))}
