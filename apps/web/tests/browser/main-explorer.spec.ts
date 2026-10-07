@@ -1064,18 +1064,20 @@ test("mobile chart accepts a horizontal touch drag", async ({ page }) => {
 
   const chart = page.getByTestId("chart-frame");
   expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-  expect(await chart.evaluate((element) => element.scrollLeft)).toBe(0);
+  // A phone opens the chart on the latest data, so the drag goes back in time.
+  const maxScroll = await chart.evaluate((element) => element.scrollWidth - element.clientWidth);
+  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThanOrEqual(maxScroll - 1);
 
   const box = await chart.boundingBox();
   expect(box).not.toBeNull();
 
   const cdp = await page.context().newCDPSession(page);
   const y = box!.y + Math.min(100, box!.height / 2);
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: box!.x + box!.width - 32, y }] });
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: box!.x + 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: box!.x + 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: box!.x + box!.width - 32, y }] });
   await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
 
-  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeLessThan(maxScroll - 1);
 });
 
 test("captures editorial desktop and mobile screenshots", async ({ page }) => {

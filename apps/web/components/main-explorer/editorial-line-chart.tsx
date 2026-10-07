@@ -152,11 +152,28 @@ export function EditorialLineChart({
     if (index !== hoverRaw) setHover(index);
   }
 
+  const axisText = (value: number, index: number) => (
+    <text key={`axis-${index}`} x={axisLeftPadding - AXIS_LABEL_GAP} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+      {axisLabels[index]}
+    </text>
+  );
+  // The sticky copy stops above the year labels, so it never covers the first one.
+  const stickyAxis = {
+    widthPercent: (axisLeftPadding / W) * 100,
+    node: (
+      <svg viewBox={`0 0 ${axisLeftPadding} ${H - PAD_B + 6}`} className="block h-auto w-full">
+        {gridLines.map(axisText)}
+        <line x1={axisLeftPadding - 0.5} x2={axisLeftPadding - 0.5} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
+      </svg>
+    ),
+  };
+  const scrollKey = `${years[0]}-${years[n - 1]}-${series.map((line) => line.id).join(",")}`;
+
   const hoverX = hover === null ? null : (x(hover) / W) * 100;
   const tooltip = hover === null ? null : buildTooltipRows(series, hover);
 
   return (
-    <ChartScrollFrame>
+    <ChartScrollFrame scrollKey={scrollKey} yAxis={stickyAxis}>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
@@ -210,9 +227,7 @@ export function EditorialLineChart({
                 strokeWidth={1}
               />
             ) : null}
-            <text x={axisLeftPadding - AXIS_LABEL_GAP} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
-              {axisLabels[index]}
-            </text>
+            {axisText(value, index)}
           </g>
         ))}
         <line x1={axisLeftPadding} x2={axisLeftPadding} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />

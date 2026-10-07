@@ -131,6 +131,30 @@ export function StackedColumnChart({
     if (index !== hoverRaw) setHover(index);
   }
 
+  const axisText = (value: number) => (
+    <text
+      key={`axis-${value}`}
+      x={PAD_L - 10}
+      y={y(value) + 4}
+      textAnchor="end"
+      fontSize={11}
+      fill={CHART_AXIS_LABEL}
+      style={{ fontFamily: "var(--font-numeric)" }}
+    >
+      {formatAxis(value)}
+    </text>
+  );
+  // The sticky copy stops above the period labels, so it never covers the first one.
+  const stickyAxis = {
+    widthPercent: (PAD_L / W) * 100,
+    node: (
+      <svg viewBox={`0 0 ${PAD_L} ${H - PAD_B + 6}`} className="block h-auto w-full">
+        {gridLines.map(axisText)}
+      </svg>
+    ),
+  };
+  const scrollKey = `${periods[0]}-${periods[count - 1]}-${segments.map((segment) => segment.id).join(",")}`;
+
   function handleKeyDown(event: KeyboardEvent<SVGSVGElement>) {
     const next = stepPeriodIndex(event.key, hover, count);
     if (next === undefined) return;
@@ -142,7 +166,7 @@ export function StackedColumnChart({
     // role="img" belongs on the svg, not the figure: it is children-presentational,
     // so on the figure it would hide the sr-only figcaption that carries the numbers.
     <figure className="m-0">
-      <ChartScrollFrame testId="stack-chart-frame">
+      <ChartScrollFrame testId="stack-chart-frame" scrollKey={scrollKey} yAxis={stickyAxis}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="block h-auto w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
@@ -183,19 +207,7 @@ export function StackedColumnChart({
             </>
           )}
 
-          {gridLines.map((value) => (
-            <text
-              key={`axis-${value}`}
-              x={PAD_L - 10}
-              y={y(value) + 4}
-              textAnchor="end"
-              fontSize={11}
-              fill={CHART_AXIS_LABEL}
-              style={{ fontFamily: "var(--font-numeric)" }}
-            >
-              {formatAxis(value)}
-            </text>
-          ))}
+          {gridLines.map(axisText)}
 
           {segments.map((segment) =>
             segment.values.map((value, index) => {

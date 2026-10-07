@@ -14,6 +14,16 @@ describe("shared chart frame", () => {
     expect(markup).toContain("min-w-[720px]");
   });
 
+  it("leaves the sticky y-axis copy to the client, so hydration matches", () => {
+    const markup = renderGeorgianMarkup(
+      <ChartScrollFrame yAxis={{ widthPercent: 8, node: <svg data-sticky /> }} scrollKey="2004-2025">
+        <svg />
+      </ChartScrollFrame>,
+    );
+    expect(markup).not.toContain("data-sticky");
+    expect(markup).not.toContain("chart-frame-y-axis");
+  });
+
   it("defaults to the line chart's test id", () => {
     const markup = renderGeorgianMarkup(<ChartScrollFrame><svg /></ChartScrollFrame>);
     expect(markup).toContain('data-testid="chart-frame"');
