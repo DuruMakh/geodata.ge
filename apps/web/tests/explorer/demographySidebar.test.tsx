@@ -20,6 +20,18 @@ describe("sidebar demography group", () => {
     expect((markup.match(/Coming soon/g) ?? []).length).toBe(1);
   });
 
+  it("keeps the Population link current on every place page, in both languages", async () => {
+    for (const [pathname, locale] of [
+      ["/explorer/demography/population/georgia", "ka"],
+      ["/explorer/demography/population/region/adjara", "ka"],
+      ["/en/explorer/demography/population/batumi", "en"],
+    ] as const) {
+      const markup = await render(pathname, locale);
+      expect(markup, pathname).toContain('data-testid="demography-population-link" aria-current="page"');
+      expect(markup, pathname).not.toContain('data-testid="demography-link" aria-current="page"');
+    }
+  });
+
   it("marks the hub link current on the hub and nests the live pages", async () => {
     const markup = await render("/en/explorer/demography");
     expect(markup).toContain('data-testid="demography-link" aria-current="page"');

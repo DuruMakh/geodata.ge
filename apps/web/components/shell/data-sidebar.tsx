@@ -289,7 +289,8 @@ export function DataSidebar() {
             </Link>
             {demographyActive
               ? LIVE_DEMOGRAPHY_PAGES.map((page) => {
-                  const active = pathname.endsWith(page.path);
+                  // `includes`, as for Regions and Cities: a page's own place pages sit under its path.
+                  const active = pathname.includes(page.path);
                   return (
                     <Link
                       key={page.id}
