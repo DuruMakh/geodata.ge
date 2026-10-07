@@ -191,7 +191,9 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
         onPointerCancel={endDrag}
         role="group"
         aria-label={message(messages, monthly ? "controls.monthRange" : "controls.yearRange")}
-        className="relative mt-3 h-6 cursor-pointer touch-none"
+        // A marker label sits above the rail; the extra top margin keeps it clear of
+        // the range chips, which it overlapped on phones.
+        className={`relative ${visibleMarker ? "mt-7" : "mt-3"} h-6 cursor-pointer touch-none`}
       >
         <div className="absolute inset-x-0 top-2.5 h-[3px] bg-[var(--hairline-soft)]" />
         <div
@@ -204,7 +206,12 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
             className="pointer-events-none absolute top-0 bottom-0 z-[1] w-px bg-[var(--accent)]"
             style={{ left: pct(visibleMarker.year) }}
           >
-            <span className="absolute -top-4 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[9px] font-medium text-[var(--accent)]">
+            {/* Shifted by its own width in proportion to the marker position, so a marker
+                near either end keeps its label inside the strip. */}
+            <span
+              className="absolute -top-4 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[9px] font-medium text-[var(--accent)]"
+              style={{ transform: `translateX(-${pct(visibleMarker.year)})` }}
+            >
               {visibleMarker.label}
             </span>
           </div>

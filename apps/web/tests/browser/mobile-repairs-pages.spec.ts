@@ -73,3 +73,26 @@ for (const locale of ["ka", "en"] as const) {
     expect(hit).toEqual({ width: 22, hitsCaret: true });
   });
 }
+
+for (const path of ["/explorer/deficit", "/explorer/debt#f=service&m=line&sel=debt.service.total", "/en/explorer/deficit"]) {
+  for (const width of [360, 390]) {
+    test(`forecast marker label stays clear of the range chips at ${width}px: ${path}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(path);
+      const strip = page.getByTestId("year-range-strip");
+      await strip.scrollIntoViewIfNeeded();
+      const label = page.getByTestId("range-marker").locator("span");
+      await expect(label).toBeVisible();
+      const layout = await strip.evaluate((element) => {
+        const marker = element.querySelector("[data-testid=range-marker] span")!.getBoundingClientRect();
+        const frame = element.getBoundingClientRect();
+        const overlaps = [...element.querySelectorAll("button[aria-pressed]")].filter((chip) => {
+          const box = chip.getBoundingClientRect();
+          return box.left < marker.right && box.right > marker.left && box.top < marker.bottom && box.bottom > marker.top;
+        }).length;
+        return { overlaps, inside: marker.left >= frame.left - 0.5 && marker.right <= frame.right + 0.5 };
+      });
+      expect(layout).toEqual({ overlaps: 0, inside: true });
+    });
+  }
+}
