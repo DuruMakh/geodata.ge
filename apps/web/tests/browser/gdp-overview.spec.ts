@@ -119,8 +119,11 @@ for(const locale of ['ka','en']) test(`GDP real axis and dataset metadata are co
  await page.goto(`${locale==='en'?'/en':''}/explorer/economy/gdp`);
  await expect(page.getByTestId('gdp-tab-real')).toHaveAttribute('aria-pressed','true');
  await page.evaluate(()=>document.fonts.ready);
- const labels=page.getByTestId('chart-panel').locator('svg text');
- for(const label of await labels.all()) expect(await label.evaluate(e=>(e as SVGGraphicsElement).getBBox().x)).toBeGreaterThanOrEqual(0);
+ // Read every label in one pass: after the first measurement the chart drops the
+ // geometry that does not fit, so a label list collected earlier can go stale.
+ const labelXs=await page.getByTestId('chart-panel').evaluate(panel=>[...panel.querySelectorAll('svg text')].map(e=>(e as SVGGraphicsElement).getBBox().x));
+ expect(labelXs.length).toBeGreaterThan(0);
+ for(const x of labelXs) expect(x).toBeGreaterThanOrEqual(0);
  const dataset=JSON.parse(await page.getByTestId('explorer-dataset-json-ld').textContent()??'{}');
  expect(dataset['@id']).toBe('https://fiscal.ge/explorer/economy/gdp#dataset');
  expect(dataset.variableMeasured).toHaveLength(6);

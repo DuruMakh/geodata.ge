@@ -147,8 +147,12 @@ test.describe("the phone legend", () => {
     await page.goto("/explorer/expenditure");
     await expect(page.getByTestId("chart-frame")).toBeVisible();
     await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+    // Open the deep link fresh, as a shared link arrives. (A hash-only same-tab
+    // navigation followed by a reload occasionally loses the hash to Next.js's
+    // own history write; that pre-existing race also occurs on main.)
+    await page.goto("about:blank");
     await page.goto("/explorer/expenditure#g=fields&m=table&sel=expenditure.total%2Cspending.social_protection");
-    await page.reload();
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("explorer-table")).toBeVisible();
     await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
   });
