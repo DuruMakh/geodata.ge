@@ -10,6 +10,11 @@ import { pageHref } from "../../lib/i18n/routes";
 // The crumbs use BreadcrumbTrail's semantics — a nav landmark, aria-hidden
 // separators, aria-current on the last crumb — but not the component, which
 // renders its own BreadcrumbJsonLd and these routes already emit one.
+//
+// Below 768px the full trail wrapped to two or three lines and repeated the
+// title, so phones get one back-crumb to the parent instead (owner decision
+// D10, 2026-10-07). The BreadcrumbList JSON-LD is rendered by each route and
+// is the same at every width.
 
 export type Crumb = { label: string; href?: string };
 
@@ -20,14 +25,15 @@ type PageHeaderProps = {
 
 export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
   const { locale } = useI18n();
+  const parent = crumbs.slice(0, -1).findLast((crumb) => crumb.href);
   return (
     <header
       data-testid="explorer-header"
-      className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b-2 border-[var(--ink)] pt-[18px] pb-3"
+      className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-2 border-[var(--ink)] pt-1 pb-1.5 min-[768px]:gap-y-2 min-[768px]:pt-[18px] min-[768px]:pb-3"
     >
       <nav
         aria-label="Breadcrumb"
-        className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
+        className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] max-[768px]:hidden"
       >
         {crumbs.map((crumb, index) => {
           const current = index === crumbs.length - 1;
@@ -36,7 +42,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
             <span key={crumb.label}>
               {index > 0 ? <span aria-hidden="true" className="mx-1.5 text-[var(--accent)]">/</span> : null}
               {crumb.href ? (
-                <Link href={pageHref(crumb.href, locale)} className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
+                <Link href={pageHref(crumb.href, locale)} className="text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
                   {crumb.label}
                 </Link>
               ) : (
@@ -48,7 +54,18 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
           );
         })}
       </nav>
-      <p className="font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">{coverage}</p>
+      {parent?.href ? (
+        <nav aria-label="Breadcrumb" data-testid="explorer-back-crumb" className="min-[768px]:hidden">
+          <Link
+            href={pageHref(parent.href, locale)}
+            className="inline-flex min-h-11 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
+          >
+            <span aria-hidden="true" className="text-[var(--accent)]">←</span>
+            {parent.label}
+          </Link>
+        </nav>
+      ) : null}
+      <p className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)] min-[768px]:whitespace-nowrap">{coverage}</p>
     </header>
   );
 }

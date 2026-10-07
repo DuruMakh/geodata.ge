@@ -506,8 +506,10 @@ test("municipality index server-renders the existing country and region tab link
 test("municipality breadcrumbs include the region in visible and structured hierarchy", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer/municipalities/chiatura`);
 
+  // Only the trail on screen: below 768px a separate back-link replaces it.
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"] a, nav[aria-label="Breadcrumb"] [aria-current="page"]')
+    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
   const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
@@ -528,7 +530,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
     "იმერეთი",
     "ჭიათურა",
   ]);
-  await expect(page.locator('nav[aria-label="Breadcrumb"] a', { hasText: "იმერეთი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "იმერეთი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/imereti",
   );
@@ -545,7 +547,8 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
     "თბილისი",
   ];
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"] a, nav[aria-label="Breadcrumb"] [aria-current="page"]')
+    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
   const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
@@ -554,7 +557,7 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
 
   expect(visibleLabels).toEqual(expectedLabels);
   expect(structuredLabels).toEqual(expectedLabels);
-  await expect(page.locator('nav[aria-label="Breadcrumb"] a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/tbilisi",
   );

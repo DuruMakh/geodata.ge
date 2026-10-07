@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
@@ -136,7 +137,7 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
           { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
           { label: t("categoriesHeading") },
         ]}
-        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <ExplorerHeading>{t("categoriesHeading")}</ExplorerHeading>
       <p data-testid="inflation-category-unit" className="mb-4 text-[13px] text-[var(--muted)]">

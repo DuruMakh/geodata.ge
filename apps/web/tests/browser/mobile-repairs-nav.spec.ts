@@ -152,3 +152,36 @@ test("404 recovers to the four datasets with no top band on a phone", async ({ p
   expect((await recovery.boundingBox())?.y ?? 999).toBeLessThanOrEqual(40);
   await expect(page.locator('a[href="/sitemap.xml"], a[href="/llms.txt"]')).toHaveCount(0);
 });
+
+for (const { path, back, href, trail } of [
+  { path: "/en/explorer/unemployment/regions/adjara", back: "Unemployment by region", href: "/en/explorer/unemployment/regions", trail: ["Home", "Data", "Unemployment", "Unemployment by region", "Adjara"] },
+  { path: "/explorer/inflation/cities/batumi", back: "ქალაქები", href: "/explorer/inflation/cities", trail: null },
+  { path: "/explorer/expenditure", back: "ბიუჯეტი", href: "/explorer", trail: ["მთავარი", "მონაცემები", "ბიუჯეტი", "ხარჯები"] },
+]) {
+  test(`${path}: one back-crumb on a phone, the full trail from 768px`, async ({ page }) => {
+    await page.goto(path);
+    const header = page.getByTestId("explorer-header");
+    const jsonLd = await page.getByTestId("breadcrumb-json-ld").textContent();
+    const crumb = header.getByRole("navigation", { name: "Breadcrumb" });
+    await expect(crumb.getByRole("link")).toHaveCount(1);
+    await expect(crumb.getByRole("link")).toHaveText(`←${back}`);
+    await expect(crumb.getByRole("link")).toHaveAttribute("href", href);
+    expect((await crumb.getByRole("link").boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
+    expect((await header.boundingBox())?.height ?? 999).toBeLessThanOrEqual(80);
+
+    await page.setViewportSize({ width: 1024, height: 800 });
+    const full = header.getByRole("navigation", { name: "Breadcrumb" });
+    await expect(full.locator("[aria-current=page]")).toHaveCount(1);
+    if (trail) expect((await full.innerText()).split("/").map((part) => part.trim().toLowerCase())).toEqual(trail.map((part) => part.toLowerCase()));
+    // Structured data is server-rendered once and does not depend on the width.
+    expect(await page.getByTestId("breadcrumb-json-ld").textContent()).toBe(jsonLd);
+  });
+}
+
+for (const path of ["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/inflation/overview", "/explorer/economy/regions", "/explorer/economy/regions/adjara"]) {
+  test(`${path} states coverage in the one shared format`, async ({ page }) => {
+    await page.goto(path);
+    const coverage = page.getByTestId("explorer-header").locator("p");
+    await expect(coverage).toHaveText(/^\S+( \d{4})?–\S+( \d{4})? · განახლდა \d{4}-\d{2}-\d{2}$/);
+  });
+}

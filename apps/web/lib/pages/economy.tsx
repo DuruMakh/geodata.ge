@@ -10,6 +10,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { buildEconomyHubCards } from "../explorer/economyHubCards";
+import { coverageLabel } from "../explorer/coverageLabel";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 export async function economyPageMetadata(locale: Locale) {
   const p = await getPresentation(locale, ["gdp"], []);
@@ -41,7 +42,13 @@ export async function renderEconomyPage(locale: Locale) {
               { label: message(p.messages, "common.data") },
               { label: t("economy") },
             ]}
-            coverage=""
+            coverage={coverageLabel(
+              p.messages,
+              locale,
+              Math.min(...facts.map((f) => f.year)),
+              Math.max(...facts.map((f) => f.year)),
+              [...facts, ...sectors.facts, ...regional.facts].map((f) => f.lastReviewedAt).sort().at(-1),
+            )}
           />
           <ExplorerHeading>{t("economy")}</ExplorerHeading>
           <p className="mb-[30px] text-[13px] text-[var(--body)]">

@@ -1,4 +1,5 @@
 "use client";
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { ClientGdpObservation, SourceIdRanges } from "../../lib/servedRows";
@@ -18,7 +19,6 @@ import {
   buildGdpWorkbookExportModel,
   gdpDisplay,
 } from "../../lib/explorer/gdpWorkbook";
-import { formatDisplayDate } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { PageHeader } from "../shell/page-header";
@@ -128,9 +128,7 @@ export function GdpOverview({
           },
           { label: t("heading") },
         ]}
-        coverage={`${m.range.min}–${m.range.max} · ${message(messages, "main.updated", {
-          date: locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt,
-        })}`}
+        coverage={coverageLabel(messages, locale, m.range.min, m.range.max, lastReviewedAt)}
       />
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
       <p

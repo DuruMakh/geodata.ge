@@ -1,3 +1,4 @@
+import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import type { Locale } from "../i18n/types";
 import { getMunicipalPresentation } from "./municipal-presentation.server";
@@ -114,7 +115,7 @@ export async function renderMunicipalIndex(locale: Locale) {
             { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
             { label: message(messages, "common.municipalities") },
           ]}
-          coverage={[`${firstYear}–${latestYear}`, lastUpdatedAt ? message(messages, "municipal.updated", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : ""].filter(Boolean).join(" · ")}
+          coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
         />
         <h1 className="mt-[34px] mb-2.5 max-w-[640px] font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">
           {message(messages, "municipal.indexTitle")}

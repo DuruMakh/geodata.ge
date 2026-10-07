@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
@@ -101,7 +102,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
           citiesCrumb,
           ...(view.kind === "city" ? [{ label: cityLineLabel(messages, view.cityId) }] : []),
         ]}
-        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <InflationCityHeading view={view} />
       <p data-testid="inflation-city-unit" className="mb-4 text-[13px] text-[var(--muted)]">
