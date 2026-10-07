@@ -163,7 +163,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
   }
 
   const handleClass =
-    "absolute -top-1 size-[30px] -translate-x-1/2 max-[768px]:-top-[11px] max-[768px]:size-11 cursor-pointer rounded-full border-0 bg-transparent p-0 before:absolute before:top-1/2 before:left-1/2 before:size-[15px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border-2 before:border-[var(--accent)] before:bg-[var(--paper)] before:shadow-[0_1px_3px_rgba(30,27,22,0.15)] before:content-['']";
+    "absolute -top-1 size-[30px] -translate-x-1/2 max-[768px]:-top-[11px] max-[768px]:h-11 max-[768px]:w-8 cursor-pointer rounded-full border-0 bg-transparent p-0 before:absolute before:top-1/2 before:left-1/2 before:size-[15px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border-2 before:border-[var(--accent)] before:bg-[var(--paper)] before:shadow-[0_1px_3px_rgba(30,27,22,0.15)] before:content-['']";
 
   return (
     <div data-testid="year-range-strip" className="mt-[22px] border-t border-[var(--hairline)] pt-4">
@@ -216,8 +216,9 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
         aria-label={message(messages, monthly ? "controls.monthRange" : "controls.yearRange")}
         // A marker label sits above the rail; the extra top margin keeps it clear of
         // the range chips, which it overlapped on phones. Below 768px the rail is
-        // inset 8px so a handle at rest stays out of the edge-swipe (back) zone, and the
-        // handles' invisible hit area grows to 44px around the same 15px dot.
+        // inset 8px so a handle at rest stays out of the edge-swipe (back) zone; the
+        // handles' invisible hit area grows to 44px tall (32px wide, so it stays out of
+        // that zone too) around the same 15px dot.
         className={`relative ${visibleMarker ? "mt-7" : "mt-3"} h-6 cursor-pointer touch-none max-[768px]:mx-2`}
       >
         <div className="absolute inset-x-0 top-2.5 h-[3px] bg-[var(--hairline-soft)]" />

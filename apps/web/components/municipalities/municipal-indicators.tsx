@@ -183,10 +183,10 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           <table data-testid="comparison-table" className="w-full min-w-[560px] table-fixed border-collapse @max-[768px]:min-w-0">
             <caption className="sr-only">{message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}</caption>
             <colgroup>
-              {/* At 360px the signed change (+3,962.3) needs a little more than 70px. */}
-              <col className="w-[44%] @max-[400px]:w-[38%]" />
+              {/* On a 360px phone (320px column) the signed change (+3,962.3) needs a little more than 70px. */}
+              <col className="w-[44%] @max-[340px]:w-[38%]" />
               <col />
-              <col className="@max-[768px]:w-[70px] @max-[400px]:w-[78px]" />
+              <col className="@max-[768px]:w-[70px] @max-[340px]:w-[78px]" />
               <col />
             </colgroup>
             <thead>
