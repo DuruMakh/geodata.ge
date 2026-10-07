@@ -76,8 +76,14 @@ export async function loadPopulationSources(locale: Locale): Promise<(WorkbookPu
   });
 }
 
-export async function renderDemographyPopulationPage(locale: Locale) {
+/** Tbilisi's area in km² as the reviewed density mapping records it, for the note every page that shows a density carries. */
+export async function loadTbilisiAreaLabel(regionIds: readonly string[]): Promise<string> {
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const densityRows = await loadDensityRows(repositoryRoot, regionIds);
+  return densityRows.areaOf(TBILISI_PLACE_ID).toFixed(2);
+}
+
+export async function renderDemographyPopulationPage(locale: Locale) {
   const { facts, clientFacts, municipal, presentation, places } = await loadPopulationBasics(locale);
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
@@ -93,8 +99,7 @@ export async function renderDemographyPopulationPage(locale: Locale) {
     t("densityUnitLong"),
   );
   // The density note names Tbilisi's area as the reviewed mapping records it, not as a typed number.
-  const densityRows = await loadDensityRows(repositoryRoot, municipal.regions.map((region) => region.id));
-  const tbilisiArea = densityRows.areaOf(TBILISI_PLACE_ID).toFixed(2);
+  const tbilisiArea = await loadTbilisiAreaLabel(municipal.regions.map((region) => region.id));
   const years = facts.filter((fact) => fact.seriesId === SERIES.populationTotal).map((fact) => fact.year);
   const [start, end] = [Math.min(...years), Math.max(...years)];
   const georgia = places.find((place) => place.id === GEORGIA_PLACE_ID)!;

@@ -11,7 +11,14 @@ import { SectionTitle, SourceNote } from "../ui/editorial";
 import { Sparkline } from "../ui/sparkline";
 
 /** The hero and side KPIs the explorers share, describing one place; nothing here is a change over time. */
-export function PopulationHighlightsSection({ highlights }: { highlights: PopulationHighlights }) {
+export function PopulationHighlightsSection({
+  highlights,
+  densityNote,
+}: {
+  highlights: PopulationHighlights;
+  /** The area note for a page that shows a density; it renders under the highlights note, and nothing renders without it. */
+  densityNote?: string;
+}) {
   const { locale, messages } = useI18n();
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const kpis = buildPopulationKpis(highlights, messages, locale);
@@ -31,6 +38,7 @@ export function PopulationHighlightsSection({ highlights }: { highlights: Popula
         <SideKpiList kpis={kpis.side} />
       </div>
       <div className="mt-5"><SourceNote>{t("highlightsNote")}</SourceNote></div>
+      {densityNote ? <div className="mt-1"><SourceNote testId="population-density-note">{densityNote}</SourceNote></div> : null}
     </section>
   );
 }

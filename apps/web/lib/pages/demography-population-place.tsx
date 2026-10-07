@@ -29,7 +29,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadPopulationBasics, loadPopulationSources } from "./demography-population";
+import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel } from "./demography-population";
 
 export type PopulationPlaceRoute = { kind: "country" } | { kind: "region"; id: string } | { kind: "municipality"; slug: string };
 
@@ -121,6 +121,11 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
       }
     : undefined;
   const georgia = places.find((candidate) => candidate.id === GEORGIA_PLACE_ID)!;
+  // Georgia's page shows the densest region's density and a region's page its own; a municipality's page shows none.
+  const showsDensity = place.level === "country" || place.level === "region";
+  const densityNote = showsDensity
+    ? t("densityNote", { area: await loadTbilisiAreaLabel(municipal.regions.map((candidate) => candidate.id)) })
+    : undefined;
   const memberRows =
     place.level === "region" && place.id !== TBILISI_PLACE_ID
       ? index.municipalities
@@ -170,6 +175,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
               </Link>
             </>
           }
+          densityNote={densityNote}
           sources={sources}
           siteOrigin={resolveSiteUrl()}
           workbookScope={workbookScopeFor(route)}

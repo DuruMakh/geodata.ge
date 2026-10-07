@@ -31,8 +31,8 @@ export type DemographyPlace = {
 /**
  * A municipality wears the palette colour its registry position gives it, unless that is its region's colour. It then takes the
  * next palette colour, walking on from its own position, that neither the region nor a sibling wears and no moved sibling has
- * been given, and that is never the grey "other" wears (a hair from the palette's #8A7B65, so it would read as a repeat of it),
- * so a region's page never draws two series in one colour and a municipality that did not clash never changes.
+ * been given, so a region's page never draws two series in one colour and a municipality that did not clash never changes.
+ * The walk also skips the grey "other" wears: it sits a hair from the palette's #8A7B65 and would read as a repeat of it.
  */
 function municipalityColours(
   municipalities: readonly Municipality[],

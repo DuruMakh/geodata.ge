@@ -103,6 +103,31 @@ describe("place pages", () => {
   });
 });
 
+// The rule in docs/data-methodology/demography.md: a page that shows a density says which area it uses for Tbilisi.
+// Georgia's page (densest region) and a region's page (density) show one; a municipality's page shows none.
+describe("the density note", () => {
+  const noteOf = (html: string) => html.match(/<p data-testid="population-density-note"[^>]*>(.*?)<\/p>/)?.[1] ?? "";
+
+  it.each([
+    ["Georgia", { kind: "country" }],
+    ["Adjara", { kind: "region", id: "adjara" }],
+    ["Tbilisi", { kind: "region", id: "tbilisi" }],
+  ] as const)("%s's page names the area it uses for Tbilisi, in English without Georgian and in Georgian", async (_name, route) => {
+    const english = noteOf(await page(route, "en"));
+    expect(english).toContain("504.24");
+    expect(english).not.toMatch(GEORGIAN);
+    const georgian = noteOf(await page(route, "ka"));
+    expect(georgian).toContain("504.24");
+    expect(georgian).toMatch(GEORGIAN);
+  });
+
+  it("is not on a municipality's page, which shows no density, in either language", async () => {
+    for (const locale of ["en", "ka"] as const) {
+      expect(await page({ kind: "municipality", slug: "batumi" }, locale), locale).not.toContain("population-density-note");
+    }
+  });
+});
+
 describe("place metadata", () => {
   it("has the page's own canonical address and reciprocal alternates in both languages", async () => {
     const en = await populationPlaceMetadata({ kind: "municipality", slug: "batumi" }, "en");

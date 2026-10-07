@@ -39,7 +39,7 @@ beforeAll(async () => {
   }
 });
 
-function render(placeId: string, locale: Locale = "en", withNavigation = false): string {
+function render(placeId: string, locale: Locale = "en", withNavigation = false, densityNote?: string): string {
   const places = placesBy[locale];
   const place = places.find((candidate) => candidate.id === placeId)!;
   return renderToStaticMarkup(
@@ -55,6 +55,7 @@ function render(placeId: string, locale: Locale = "en", withNavigation = false):
         pickerGroups={pickerGroupsFromRows(index)}
         pickerOverrides={{ hrefById: populationHrefById(places), valueFormat: "persons", countryDetail: "64 municipalities" }}
         sourceNote="Source: Geostat"
+        densityNote={densityNote}
         sources={[]}
         siteOrigin="https://fiscal.ge"
         workbookScope="test"
@@ -150,6 +151,26 @@ describe("place page body: a region, a municipality and Tbilisi", () => {
 
   test("English carries no Georgian text on a region or a municipality either", () => {
     for (const placeId of ["region.adjara", "06"]) expect(render(placeId), placeId).not.toMatch(GEORGIAN);
+  });
+});
+
+// The page decides whether it shows a density and hands the note on; the section only places it.
+describe("place page body: the density note", () => {
+  const NOTE = "Stand-in density note: Tbilisi is 504.24 km².";
+
+  test("sits directly under the highlights note, inside the highlights section, when the page hands it on", () => {
+    const html = render("region.adjara", "en", false, NOTE);
+    const section = html.slice(html.indexOf('data-testid="population-highlights"'));
+    expect(tagOf(section, "population-density-note")).not.toBe("");
+    expect(section).toContain(`>${NOTE}</p>`);
+    const between = section.slice(section.indexOf("The indicators describe this place"), section.indexOf('data-testid="population-density-note"'));
+    expect(between).not.toBe("");
+    expect(between).not.toMatch(/<(section|h2|ul|table)\b|data-testid=/);
+    expect(count(html, /data-testid="population-density-note"/g)).toBe(1);
+  });
+
+  test("is not rendered when the page hands none on, for any level", () => {
+    for (const placeId of [GEORGIA_PLACE_ID, "region.adjara", "06"]) expect(render(placeId), placeId).not.toContain("population-density-note");
   });
 });
 

@@ -39,6 +39,7 @@ export function PopulationPlaceExplorer({
   pickerGroups,
   pickerOverrides,
   sourceNote,
+  densityNote,
   sources,
   siteOrigin,
   workbookScope,
@@ -56,6 +57,8 @@ export function PopulationPlaceExplorer({
   pickerOverrides?: EntityPickerOverrides;
   /** Inline content only: it renders inside the source note's paragraph. */
   sourceNote: ReactNode;
+  /** The area note for a page that shows a density (Georgia's, a region's); a municipality's page passes none. */
+  densityNote?: string;
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
   /** The place named in the Excel file (`batumi`, `region-adjara`, `georgia`). */
@@ -244,7 +247,7 @@ export function PopulationPlaceExplorer({
           </>
         }
       />
-      {highlights ? <PopulationHighlightsSection highlights={highlights} /> : null}
+      {highlights ? <PopulationHighlightsSection highlights={highlights} densityNote={densityNote} /> : null}
     </>
   );
 }
