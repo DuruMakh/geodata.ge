@@ -13,10 +13,13 @@ export const UNEMPLOYMENT_BREAKDOWNS: UnemploymentBreakdown[] = ["national", "se
 function fit(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): UnemploymentState {
   return { ...state, range: refitRange(state.range, unemploymentCoverage(facts, state), { collapseToAll: false }) };
 }
+function defaultSelection(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): string[] {
+  return [state.breakdown === "age" ? unemploymentScopeFacts(facts, state)[0].groupId : unemploymentReferenceId(state)];
+}
 export function changeUnemploymentBreakdown(state: UnemploymentState, breakdown: UnemploymentBreakdown, facts: readonly ClientUnemploymentObservation[]): UnemploymentState {
   const indicators = state.overview ? unemploymentOverviewIndicators(breakdown) : unemploymentIndicators(breakdown);
   const next = { ...state, breakdown, indicator: state.overview ? indicators[0] : indicators.includes(state.indicator) ? state.indicator : indicators[0] };
-  return fit({ ...next, selectedIds: [unemploymentReferenceId(next)] }, facts);
+  return fit({ ...next, selectedIds: defaultSelection(next, facts) }, facts);
 }
 export function changeUnemploymentOverviewSelection(state: UnemploymentState, selectedIds: string[], facts: readonly ClientUnemploymentObservation[], registry: readonly UnemploymentGroupDefinition[]): UnemploymentState {
   const definitions = unemploymentOverviewDefinitions(facts, registry, state);
@@ -45,7 +48,8 @@ export function parseUnemploymentHash(hash: string, facts: readonly ClientUnempl
     return changeUnemploymentOverviewSelection(state, requested, facts, registry);
   }
   const validIds = new Set(unemploymentScopeFacts(facts, state).map(f => f.groupId).filter(id => registry.some(group => group.id === id)));
-  state.selectedIds = p.has("sel") ? [...new Set(p.get("sel")!.split(","))].filter(id => validIds.has(id)) : [unemploymentReferenceId(state)];
+  state.selectedIds = p.has("sel") ? [...new Set(p.get("sel")!.split(","))].filter(id => validIds.has(id)) : defaultSelection(state, facts);
+  if (breakdown === "age" && p.get("sel") && !state.selectedIds.length) state.selectedIds = defaultSelection(state, facts);
   return fit(state, facts);
 }
 export function serializeUnemploymentHash(state: UnemploymentState): string {

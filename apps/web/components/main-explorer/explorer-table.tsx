@@ -7,7 +7,6 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { SwatchBar } from "../ui/editorial";
-import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
 // Table mode per DESIGN.md §8.4: newspaper anatomy — 2px ink rules on the header and
 // total row, mono right-aligned numerals.
@@ -116,7 +115,6 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
 
   return (
     <div className="mt-[18px]">
-      <HorizontalScrollHint testId="table-scroll-hint" />
       <div
         data-testid="explorer-table"
         role="region"

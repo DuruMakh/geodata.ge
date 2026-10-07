@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ClientUnemploymentObservation, UnemploymentBreakdown, UnemploymentGroupDefinition, UnemploymentIndicator, UnemploymentSex } from "../../lib/data/unemployment/types";
-import { unemploymentIndicators } from "../../lib/data/unemployment/types";
+import { unemploymentIndicators, unemploymentIsRate } from "../../lib/data/unemployment/types";
 import { buildUnemploymentModel, buildUnemploymentComposition } from "../../lib/explorer/unemployment";
+import { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
 import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, changeUnemploymentIndicator, changeUnemploymentOverviewSelection, type UnemploymentState } from "../../lib/explorer/unemploymentState";
 import { unemploymentSeriesLabel, unemploymentUsesIndicatorSeries } from "../../lib/explorer/unemploymentOverview";
 import { NATIONAL_UNEMPLOYMENT_VIEWS, type UnemploymentSectionId } from "../../lib/explorer/unemploymentSections";
@@ -29,6 +30,7 @@ import { Callout, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } 
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
 import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-panel";
 import { useUnemploymentState } from "./use-unemployment-state";
+import { UnemploymentAgeHeatmap } from "./unemployment-age-heatmap";
 
 export type UnemploymentExplorerProps = { section: UnemploymentSectionId; regionId?: string; regions?: MunicipalRegion[]; facts: ClientUnemploymentObservation[]; registry: UnemploymentGroupDefinition[]; sources: (WorkbookPublicSource & { sourceId: string })[]; lastReviewedAt: string; siteOrigin: string };
 const selectClass = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
@@ -42,6 +44,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
   const regionName = region ? locale === "en" ? region.labelEn : region.labelKa : "";
   const model = useMemo(() => buildUnemploymentModel(facts, registry, state), [facts, registry, state]);
   const composition = useMemo(() => buildUnemploymentComposition(facts, model.years), [facts, model.years]);
+  const ageHeatmap = useMemo(() => section === "age" ? buildUnemploymentAgeHeatmap(facts, registry, state.indicator, model.years) : null, [section, facts, registry, state.indicator, model.years]);
   const regionalStatusYears = section === "regions" ? facts.filter(f => f.dimension === "region" && ["hired", "self_employed"].includes(f.indicatorId)).map(f => f.year) : [];
   const labels = new Map(model.definitions.map(group => [group.id, unemploymentSeriesLabel(group, state, presentation)]));
   const selectedIndicators = [...new Set(model.definitions.filter(group => state.selectedIds.includes(group.id)).map(group => group.indicatorId))];
@@ -68,7 +71,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />
     </div> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
-    {section !== "overview" && section !== "regions" ? <><p data-testid="unemployment-headline" className="mb-2 text-[13px] text-[var(--body)]">
+    {section === "gender" ? <><p data-testid="unemployment-headline" className="mb-2 text-[13px] text-[var(--body)]">
       {labels.get(model.referenceId)} · {indicatorLabel} · {model.headline?.year ?? "—"}: <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{valueLabel(model.headline?.value)}</span>
     </p>
     <p className="mb-[30px] text-[12px] leading-relaxed text-[var(--muted)]">{t("surveyEstimate")}{noteKey ? ` · ${t(noteKey)}` : ""}</p></> : null}
@@ -82,10 +85,13 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")}
               options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
-            {section !== "overview" && section !== "regions" ? <label className="min-w-0 w-full text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]">{t("indicator")}
-              <select data-testid="unemployment-indicator" value={state.indicator} className={selectClass} onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>
-                {unemploymentIndicators(state.breakdown).map(indicator => <option key={indicator} value={indicator}>{t(`indicator.${indicator}`)}</option>)}
-              </select>
+            {section !== "overview" && section !== "regions" ? <label className="min-w-0 w-full text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className={section === "age" ? "sr-only" : undefined}>{t("indicator")}</span>
+                <select data-testid="unemployment-indicator" value={state.indicator} className={selectClass}
+                  onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>
+                  {section === "age" ? [true, false].map(rate => <optgroup key={String(rate)} label={t(rate ? "rateHeader" : "countHeader")}>
+                    {unemploymentIndicators(state.breakdown).filter(indicator => unemploymentIsRate(indicator) === rate).map(indicator => <option key={indicator} value={indicator}>{t(`indicator.${indicator}`)}</option>)}
+                  </optgroup>) : unemploymentIndicators(state.breakdown).map(indicator => <option key={indicator} value={indicator}>{t(`indicator.${indicator}`)}</option>)}
+                </select>
             </label> : <span className="text-[11px] text-[var(--muted)]">{model.percent ? "%" : unit.label}</span>}
           </div>
           {!state.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
@@ -107,6 +113,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
         controls={state.breakdown === "education" ? <SegmentedTabs ariaLabel={t("sex")} value={state.educationSex} onChange={(sex: UnemploymentSex) => change(s => changeUnemploymentEducationSex(s, sex, facts))} options={(["total", "women", "men"] as const).map(sex => ({ value: sex, label: t(`sex.${sex}`) }))} /> : undefined}
         downloadAction={downloadAction} />}
     </ExplorerWorkspace>
+    {ageHeatmap ? <UnemploymentAgeHeatmap model={ageHeatmap} indicator={state.indicator} /> : null}
     {section === "overview" && state.breakdown === "national" ? <section data-testid="unemployment-composition" className="mt-12 border-t-2 border-[var(--ink)] pt-5">
       <SectionTitle>{t("compositionTitle")}</SectionTitle>
       <p className="mt-2 max-w-[900px] text-[12px] leading-relaxed text-[var(--muted)]">{t("compositionNote")}</p>
