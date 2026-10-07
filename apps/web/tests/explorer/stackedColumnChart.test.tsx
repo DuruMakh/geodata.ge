@@ -128,6 +128,34 @@ describe("StackedColumnChart", () => {
     expect(labels.at(-1)!.x + 26.4).toBeLessThanOrEqual(340);
   });
 
+  // Annual periods (unemployment) were laid out as months: 2016 was the only
+  // "January" (2016 % 12 === 0), so labels fell back to every third year and the
+  // lattice had one dot column per year instead of the two that line charts use.
+  it("lays annual periods out as years: year-rule labels and two lattice columns per year", () => {
+    const years = Array.from({ length: 16 }, (_, index) => 2010 + index);
+    const render = (periodsPerYear?: number) =>
+      chartGeometry(
+        renderGeorgianMarkup(
+          <StackedColumnChart
+            {...props}
+            periods={years}
+            periodsPerYear={periodsPerYear}
+            segments={[{ id: "employed", label: "Employed", color: "#1F6E56", values: years.map(() => 1300) }]}
+            overlay={null}
+          />,
+        ),
+        "desktop",
+      );
+    const annual = render(undefined);
+    const labels = [...annual.matchAll(/<text[^>]*text-anchor="middle"[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+    expect(labels).toEqual(["2010", "2012", "2014", "2016", "2018", "2020", "2022", "2025"]);
+    const pitch = (svg: string) => Number(/<pattern[^>]*\bwidth="([\d.]+)"/.exec(svg)?.[1]);
+    const yearPitch = (920 - 74 - 30) * (15 / 16) / 15;
+    expect(pitch(annual)).toBeCloseTo(yearPitch / 2, 1);
+    // Monthly charts (inflation contributions) opt in and keep their calendar lattice.
+    expect(pitch(render(12))).toBeCloseTo(yearPitch, 1);
+  });
+
   it("ends the headline overlay in a dot", () => {
     expect(markup).toContain("data-overlay-end");
   });

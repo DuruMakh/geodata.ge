@@ -158,9 +158,11 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                 ]}
               />
               <div className="flex items-center gap-3.5">
-                <span data-testid="deficit-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {percentage ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
-                </span>
+                {percentage ? null : (
+                  <span data-testid="deficit-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                    {message(messages, "format.bnGel")}
+                  </span>
+                )}
                 <MeasurePill label={message(messages, "main.percentGdp")} pressed={percentage} onChange={setPercentage} />
               </div>
             </div>

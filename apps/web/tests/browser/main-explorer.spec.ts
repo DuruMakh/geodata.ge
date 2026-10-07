@@ -959,16 +959,17 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
       clientWidth: element.clientWidth,
       scrollWidth: element.scrollWidth,
     }));
-    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
+    // Phones: one horizontally scrolling row (DESIGN §12), opened on the active year.
+    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
 
     const boxes = await yearButtons.evaluateAll((buttons) =>
       buttons.map((button) => {
         const box = button.getBoundingClientRect();
-        return { left: box.left, right: box.right, top: box.top, width: box.width };
+        return { left: box.left, right: box.right, top: box.top, width: box.width, height: box.height };
       }),
     );
-    expect(boxes.every((box) => box.width >= 36)).toBe(true);
-    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBeGreaterThan(1);
+    expect(boxes.every((box) => box.width >= 36 && box.height >= 36)).toBe(true);
+    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBe(1);
 
     const activeBox = await activeYear.boundingBox();
     const selectorBox = await selector.boundingBox();
@@ -1052,7 +1053,8 @@ test("mobile chart fits its frame and the table keeps contained horizontal scrol
   const chart = page.getByTestId("chart-frame");
   await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await expect(chart).toHaveAttribute("tabindex", "0");
-  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი");
+  // The name mentions sideways scrolling only where the frame scrolls.
+  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი");
   expect(await chart.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
 
   // The default total alone lists its years as rows (owner decision D5): nothing scrolls sideways.

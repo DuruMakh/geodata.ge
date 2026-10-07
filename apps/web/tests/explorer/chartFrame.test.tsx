@@ -14,6 +14,14 @@ describe("shared chart frame", () => {
     expect(markup).toContain("min-w-[720px]");
   });
 
+  // A phone chart fits its frame (D1), so its name no longer promises a sideways
+  // scroll; the browser adds that wording once it measures a real overflow.
+  it("names the region without scroll wording until an overflow is measured", () => {
+    const markup = renderGeorgianMarkup(<ChartScrollFrame fit><svg /></ChartScrollFrame>);
+    expect(markup).toContain('aria-label="მრავალწლიანი გრაფიკი"');
+    expect(markup).not.toContain("ჰორიზონტალურად");
+  });
+
   it("leaves the sticky y-axis copy to the client, so hydration matches", () => {
     const markup = renderGeorgianMarkup(
       <ChartScrollFrame yAxis={{ widthPercent: 8, node: <svg data-sticky /> }} scrollKey="2004-2025">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
@@ -43,6 +44,14 @@ export function AnalysisView({
   onYearChange,
 }: AnalysisViewProps) {
   const { locale, messages } = useI18n();
+  const yearRowRef = useRef<HTMLDivElement>(null);
+  // Below 768px the year buttons sit on one scrolling row (§12); keep the active
+  // year in view, both when the page opens and when the year changes elsewhere.
+  useLayoutEffect(() => {
+    const row = yearRowRef.current;
+    const active = row?.querySelector<HTMLElement>("button[aria-pressed='true']");
+    if (row && active) row.scrollLeft = yearRowScrollLeft(row, active);
+  }, [year, years]);
   const structureTitle = message(messages, side === "revenue" ? "analysis.structureRevenue" : grouping === "ministries" ? "analysis.structureMinistries" : "analysis.structureFields");
 
   return (
@@ -67,7 +76,11 @@ export function AnalysisView({
           </span>
         </div>
 
-        <div data-testid="analysis-year-selector" className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 pb-0.5">
+        <div
+          ref={yearRowRef}
+          data-testid="analysis-year-selector"
+          className="relative mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 pb-0.5 max-[768px]:flex-nowrap max-[768px]:overflow-x-auto"
+        >
           {years.map((candidate) => {
             const active = candidate === year;
 
@@ -145,4 +158,14 @@ export function AnalysisView({
       )}
     </div>
   );
+}
+
+/** Scroll offset that brings `active` fully into the row, centring it only when it
+ *  is (partly) out of view, so a tap on a visible year never moves the row. */
+export function yearRowScrollLeft(row: Pick<HTMLElement, "scrollLeft" | "clientWidth" | "scrollWidth">, active: Pick<HTMLElement, "offsetLeft" | "offsetWidth">) {
+  const start = active.offsetLeft;
+  const end = start + active.offsetWidth;
+  if (start >= row.scrollLeft && end <= row.scrollLeft + row.clientWidth) return row.scrollLeft;
+  const centred = start - (row.clientWidth - active.offsetWidth) / 2;
+  return Math.max(0, Math.min(row.scrollWidth - row.clientWidth, centred));
 }

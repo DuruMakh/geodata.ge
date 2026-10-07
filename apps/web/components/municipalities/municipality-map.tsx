@@ -307,14 +307,18 @@ export function MunicipalityMap({
         ) : null}
       </div>
 
-      <div data-testid="municipality-map-legend" className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
-        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMin}</span>
-        <span className="flex flex-none">
-          {MAP_RAMP.map((fill) => (
-            <span key={fill} aria-hidden className="h-[9px] w-8" style={{ backgroundColor: fill }} />
-          ))}
+      <div data-testid="municipality-map-legend" className="mt-2 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 border-t border-[var(--hairline-soft)] pt-2.5">
+        {/* Minimum and maximum stay on one row at the ramp's two ends; the ramp
+            narrows on a phone rather than pushing the maximum onto the next line. */}
+        <span data-testid="municipality-map-legend-scale" className="flex min-w-0 items-center gap-3.5">
+          <span className="font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--faint)]">{legendMin}</span>
+          <span className="flex min-w-12 flex-[0_1_192px]">
+            {MAP_RAMP.map((fill) => (
+              <span key={fill} aria-hidden className="h-[9px] flex-1" style={{ backgroundColor: fill }} />
+            ))}
+          </span>
+          <span className="font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--faint)]">{legendMax}</span>
         </span>
-        <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{legendMax}</span>
         <span className="text-[10px] text-[var(--faint)]">{message(messages, "municipal.perResident")}</span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-[var(--tile)] bg-[var(--positive)]" />

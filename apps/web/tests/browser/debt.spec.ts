@@ -65,7 +65,8 @@ test.describe("Government Debt explorer", () => {
       await page.getByTestId("measure-share-toggle").click();
       await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
       await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "percent");
-      await expect(page.getByTestId("debt-measure-label")).toHaveText("% მშპ-ში");
+      // The pressed pill names the unit; the caption no longer repeats it.
+      await expect(page.getByTestId("debt-measure-label")).toHaveCount(0);
       await expectNoPageOverflow(page);
 
       if (viewport.name === "mobile") {

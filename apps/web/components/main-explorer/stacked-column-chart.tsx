@@ -32,6 +32,8 @@ export type StackedColumnChartProps = {
   formatPeriod: (period: number) => string;
   formatValue: (value: number) => string;
   ariaLabel: string;
+  /** Periods per calendar year on the x axis: 1 for years (default), 12 for months. */
+  periodsPerYear?: number;
 };
 
 const W = 920;
@@ -78,6 +80,7 @@ export function StackedColumnChart({
   formatPeriod,
   formatValue,
   ariaLabel,
+  periodsPerYear = 1,
 }: StackedColumnChartProps) {
   const captionId = useId();
   const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();
@@ -133,13 +136,13 @@ export function StackedColumnChart({
         const labelWidth = axisLabelWidth(formatPeriod(periods[index]!), FONT);
         return Math.min(width - padRight - labelWidth, Math.max(padLeft, x(index) - labelWidth / 2));
       };
-      const fitted = fitAxisLabels(count, periodAnchors(periods, 12), (index) => [
+      const fitted = fitAxisLabels(count, periodAnchors(periods, periodsPerYear), (index) => [
         start(index),
         start(index) + axisLabelWidth(formatPeriod(periods[index]!), FONT),
       ]);
       for (const index of fitted) labels.set(index, start(index));
     } else {
-      for (const index of periodLabelIndices(periods, 12)) labels.set(index, null);
+      for (const index of periodLabelIndices(periods, periodsPerYear)) labels.set(index, null);
     }
     // The lattice columns run between the first and last column centres.
     const lattice = buildDotLattice({
@@ -147,7 +150,7 @@ export function StackedColumnChart({
       plotHeight: height - PAD_T - PAD_B,
       yearCount: count,
       gridStepCount: gridSteps,
-      periodsPerYear: 12,
+      periodsPerYear,
       firstPeriod: periods[0],
     });
     return {

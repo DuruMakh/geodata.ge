@@ -28,6 +28,7 @@
   "controls.fields": "სფეროები",
   "controls.ministries": "სამინისტროები",
   "controls.chartScrollable": "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი",
+  "controls.chartRegion": "მრავალწლიანი გრაფიკი",
   "controls.chartTrend": "მრავალწლიანი დინამიკა",
   "controls.tableScrollable": "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი",
   "controls.change": "ცვლილება",
