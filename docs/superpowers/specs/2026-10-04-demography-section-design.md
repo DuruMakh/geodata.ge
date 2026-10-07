@@ -1,7 +1,7 @@
 # Demography section: structure and shared foundation — specification
 
 Date: 2026-10-04
-Status: Draft for owner review. The structure, the chart set, the plan order and the clickable-map approach were approved in conversation on 2026-10-04 (§2). Every default marked "for review" in §14 is open.
+Status: Draft for owner review. The structure, the chart set and the plan order were approved in conversation on 2026-10-04 (§2); the way into places was changed by the owner on 2026-10-07 to the Budget → Municipalities pattern (§2.4, §3.1). Every default marked "for review" in §14 is open.
 Scope: how the reviewed demography data (`2026-10-01-demography-data-design.md`, methodology `docs/data-methodology/demography.md`) becomes a public section of Fiscal.ge. This document owns what the pages share. Each page has its own specification and its own implementation plan:
 
 | Page | Route | Specification | Plan |
@@ -34,7 +34,7 @@ Owner decisions, 2026-10-04:
 1. The section is a hub and four pages, as in the table above. Each page has a table behind every chart, one Excel download, a source note and a methodology link.
 2. The new visuals are: a population pyramid with a year selector and a compare outline; census 2024 pyramids by region and by urban/rural settlement with a grid of 12 mini-pyramids; fertility by age of mother; and an age-by-year heat map. The heat map was recommended for a later release and chosen for this one; it ships in Plan 2 with the census gap drawn on it.
 3. Development is split into four plans in the order above. Each plan ends in a shippable state and never regresses an earlier page.
-4. The way into places is a map you click (decided later the same day after an interactive sketch, then narrowed to reuse): the page opens with the maps the site already has, a regions/municipalities switch and a Georgia button, and clicking a place selects it (§3.1). Both levels are in Plan 1, and no new map, list or panel component is built. A separate page for every place stays a possible later plan.
+4. The way into places is the pattern the Budget → Municipalities section already has (owner, 2026-10-07, replacing the 2026-10-04 click-to-select map block): an index with the existing municipality map, key figures and a ranked list with municipalities/regions tabs, and one page for Georgia, for each region and for each municipality (§3.1). No new map, list or panel component is built, and no buttons sit above the map.
 
 Decisions inherited from the data stage and unchanged: the 1 January 2025 census re-base is shown as Geostat published it and marked; nothing is rescaled, spliced or re-estimated; no growth or rate is computed across it. Density is regions only. Citizenship names five countries and one computed remainder.
 
@@ -56,14 +56,14 @@ Routes exist in both languages (`/en` mirrors every path through `pageHref`). Ge
 - **Breadcrumb** `მთავარი / მონაცემები / დემოგრაფია / <page>`; coverage label on the right derived from the page's loaded years.
 - **Footer** (`components/shell/explorer-footer.tsx`): every `/explorer/demography` path uses the existing `common.geostatSourceNote`.
 
-### 3.1 Choosing a place on the map
+### 3.1 Choosing a place
 
-Where the data has places, the page opens with the maps the site already has: the 11-region map of the regional economies and the 64-municipality map of the budget section. A switch chooses the level, a `საქართველო` pill is the starting state and the way back, and clicking or pressing Enter on a place selects it. Population (Plan 1), the census view of Age and sex (Plan 2) and Births, deaths and fertility (Plan 4) work this way; Migration is national and has no places.
+Where the data has places, the way in is the pattern of Budget → Municipalities: an index page (the 64-municipality map, key figures, and a list with `მუნიციპალიტეტები / რეგიონები` tabs) and one page per place (Georgia, each region, each municipality), opened by clicking the map or a list row. Population (Plan 1) works this way: see `2026-10-04-demography-population-design.md` §3. Age and sex (Plan 2) and Births, deaths and fertility (Plan 4) were drawn on 2026-10-04 with a click-to-select map block on one page; before their plans are written, their specifications are re-checked against this pattern, since a place page is the natural home for a place's pyramid or birth figures. Migration is national and has no places.
 
-- **Reuse, not a new map.** `RegionalEconomyMap` and `MunicipalityMap` each gain a few optional props (§6) and render exactly as before when they are omitted. No map component, geometry module, ranked list, side panel or area picker is built. The places list is the series list the page already has (Population) or a single-choice list of the same component (Births), and it is also the way to choose on a phone.
-- **State.** The page's own hash state; choosing on the map and choosing in the list are the same action. A map shows the latest year only: a map for 2024 and one for 2025 are not comparable (the re-base moved Khulo from 28,250 to 16,307 and Batumi from 183,181 to 236,845), so the maps carry no year selector and the chart carries the history.
-- **Highlights follow the first selected place**, in the hero and side-KPI layout the explorers already use, so a clicked place gets its numbers without a new panel.
-- **No availability list.** A page shows only what it has. Statistics that exist for Georgia only (migration, fertility, life expectancy, age over time) live on their own pages, and a highlight that a level lacks prints `—` with a reason (density for a municipality, for example).
+- **Reuse, not a new map.** `MunicipalityMap` renders exactly as the Budget index uses it. No map component, geometry module, side panel or area picker is built; the Budget index, picker and place-page shell take small optional additions or are moved unchanged into shared parts (§6).
+- **State.** A place page keeps its own hash state (the municipal vocabulary); the index keeps the list tab. A map shows the latest year only: a map for 2024 and one for 2025 are not comparable (the re-base moved Khulo from 28,250 to 16,307 and Batumi from 183,181 to 236,845), so the map carries no year selector and the place pages carry the history.
+- **Key indicators follow the place of the page**, in the hero and side-KPI layout the explorers already use.
+- **No availability list.** A page shows only what it has. Statistics that exist for Georgia only (migration, fertility, life expectancy, age over time) live on their own pages, and an indicator that a level lacks prints `—` with a reason (density for a municipality, for example).
 
 ## 4. Serving foundation
 
@@ -111,8 +111,10 @@ Reuse first. Every change below is an optional addition to a component that exis
 | `EditorialLineChart` | `breaks` (R1): segments split at a break exactly where they already split at a data gap; `data-testid="chart-break"`; the tooltip names the basis after a break | 1 |
 | `ExplorerTable` | `breakYears`, `breakLabel` (R2) | 1 |
 | `RangeStrip` | none; its `marker` prop is the R3 marker | |
-| `RegionalEconomyMap`, `MunicipalityMap` | selecting and wording: `onSelect` (region map; the municipal map already has `onOpenMunicipality`), `selectedIds` / `selectedCodes`, per-place `display` strings for the label and tooltip, legend strings | 1 |
-| `regionalEconomyMap.ts`, `municipalityMapData.ts` | a value-based model builder beside each existing builder, reusing the projection, outlines and equal-count buckets already there | 1 |
+| `MunicipalityMap` | wording: per-place `display` text for the accessible name, and `wording` (group label, legend caption), in place of the per-resident budget text | 1 |
+| `municipalityMapData.ts` | a value-based model builder beside the existing one, reusing the outlines and equal-count buckets already there | 1 |
+| `MunicipalitiesIndex`, `EntityPicker` | one optional `overrides` object each (links, number format, row text, unit label, map wording and note; picker links, number format, country detail); `sourceNote` becomes a `ReactNode` | 1 |
+| `MunicipalExplorer` | its heading block and workspace shell move, unchanged, into `EntityHeading` and `EntityWorkspaceShell`, shared with the Population place page | 1 |
 | `format.ts` | persons units: thousands on chart axes, full persons in tables, tooltips and Excel | 1 |
 | `MonthGridTable` | a column count that follows its labels and an optional break year, so the age-by-year table reuses it | 2 |
 | `StackedColumnChart` | `periodsPerYear` (default 12, so the inflation categories page is unchanged), mirrored segments (magnitudes drawn below zero), direction labels | 3 |
@@ -142,7 +144,7 @@ The births-page tokens (births, deaths, the births-per-100-deaths scale) are in 
 
 ## 8. Shared page anatomy
 
-Every page is `ExplorerPage` → `PageHeader` → `ExplorerHeading` → one unit/basis line → content → `SourceNote`, inside `I18nProvider`, with metadata from `fiscalMetadata`. Time-series pages use `ExplorerWorkspace` (chart column plus the 292px `SeriesAside` from 1100px of column width); the rest of each page's content follows its own specification. URL-hash state follows `useReplaceHash` and `useAppReady`: unknown values are rejected, duplicates removed, ranges clamped to loaded facts, an absent selection means the default and an explicit empty one stays empty. Nothing animates on load or on interaction; `prefers-reduced-motion` needs no special case because there is no motion. Every SVG is `role="img"` or a named group with a Georgian label, and every number it draws also exists in a table, tooltip or summary.
+Every page is `ExplorerPage` → `PageHeader` → `ExplorerHeading` → one unit/basis line → content → `SourceNote`, inside `I18nProvider`, with metadata from `fiscalMetadata`. Time-series pages use `ExplorerWorkspace` (chart column plus the 292px `SeriesAside` from 1100px of column width); the Population place pages use the Budget place-page shell (`EntityWorkspaceShell`, a 340px aside) because they copy that page set. The rest of each page's content follows its own specification. URL-hash state follows `useReplaceHash` and `useAppReady`: unknown values are rejected, duplicates removed, ranges clamped to loaded facts, an absent selection means the default and an explicit empty one stays empty. Nothing animates on load or on interaction; `prefers-reduced-motion` needs no special case because there is no motion. Every SVG is `role="img"` or a named group with a Georgian label, and every number it draws also exists in a table, tooltip or summary.
 
 The source note on every page names Geostat as publisher, the basis of the figures shown, and that shares, sums and groups are computed by Fiscal.ge.
 
@@ -189,6 +191,6 @@ Canonical owners updated in the same plan that makes the change true:
 4. **Georgian copy** is drafted by the agent and reviewed by you per plan (§9). Alternative: a single review at the end, which delays Georgian-visible pages.
 5. **One merge or several.** Each merge to `main` deploys. Your earlier preference is one branch and one PR per body of work; Plan 1 can ship alone, or all four can wait for one release. Decide when Plan 1 is ready.
 6. **Order of Plans 3 and 4.** Migration before Births follows your message; Births is the largest page and has the most new chart work, so it also benefits from going last.
-7. **Choosing a place on the map replaces the selection**; comparing places is done by ticking more in the series list. Recommended (Population §12.1). Alternative: a compare mode on the map.
-8. **A page per place** (like the budget Municipalities section) is a possible later plan; it is not part of these four.
+7. **Clicking a place opens its page** (decided by the owner on 2026-10-07, replacing "choosing a place on the map replaces the selection"); comparing places is done by ticking a place's parts in the tick-list on its page.
+8. **A page per place** (like the budget Municipalities section) is part of Plan 1 (owner, 2026-10-07); it was a possible later plan on 2026-10-04.
 9. **Maps show the latest year only**, with no year selector, because maps for 2024 and 2025 are not comparable (Population §12.2). Recommended.

@@ -2,6 +2,7 @@
 
 Date: 2026-10-04
 Status: Draft for owner review. Part of `2026-10-04-demography-section-design.md` (read first: serving §4, census break §5, tokens §7, anatomy §8). Implementation Plan 2; it needs Plan 1 shipped, or the same branch.
+Note 2026-10-07: this specification assumes Plan 1's click-to-select map block (`RegionalEconomyMap` with `onSelect` and `selectedIds`, the `საქართველო` pill, the places series list). Plan 1 now has an index and one page per place (`2026-10-04-demography-population-design.md` §3) and those map additions were removed. Re-check this page against that pattern, and decide with the owner where the census view sits, before its plan is written.
 Scope: `/explorer/demography/age-sex` and `/en/explorer/demography/age-sex`. The page adds the section's first new chart forms: a population pyramid, a grid of mini-pyramids and an age-by-year heat map.
 
 ## 1. Outcome and scope

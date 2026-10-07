@@ -2,6 +2,7 @@
 
 Date: 2026-10-04 (revised twice the same day: map-first, then reuse-first)
 Status: Draft for owner review. Part of `2026-10-04-demography-section-design.md` (read first: serving §4, choosing a place §3.1, census break §5, shared changes §6, anatomy §8). Implementation Plan 4. It needs Plan 1 (the map additions and the series-list pattern) and Plan 3 (the annual and mirrored column chart); Plan 2 is not required.
+Note 2026-10-07: this specification assumes Plan 1's click-to-select map block (the two maps with choosing mode, the `საქართველო` pill, the series-list pattern). Plan 1 now has an index and one page per place (`2026-10-04-demography-population-design.md` §3) and the choosing-mode map additions were removed. Re-check this page against that pattern, and decide with the owner how it reaches places, before its plan is written.
 Scope: `/explorer/demography/births-deaths` and `/en/explorer/demography/births-deaths`. The largest page by content, but almost all of it is existing components: the two maps, the column chart extended in Plan 3, the line chart, the series list and the KPI blocks.
 
 ## 1. Outcome and scope
