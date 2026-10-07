@@ -2,7 +2,9 @@
 
 Date: 2026-10-07
 
-Status: Draft for written review. The user approved starting collection and validation of goods, services and regional trade in conversation on 2026-10-07. The expanded source intake is collected. Approval of this written specification is the next step before the implementation plan and preparation code.
+Status: Approved in writing on 2026-10-07. The user approved the data scope and this specification. The expanded source intake is collected; the implementation plan is the next review before preparation code.
+
+Output packaging refinement proposed for that plan review: large product and source-observation CSVs are divided by their existing published source blocks, with complete individual-year files if a block exceeds the plan's file-handling limit. This changes file organization only, retaining the approved observations, schema and validation requirements.
 
 ## 1. Outcome
 
@@ -60,7 +62,7 @@ Create family-specific research CSVs:
 
 - `goods-national-annual.csv`
 - `goods-countries-annual.csv`
-- `goods-products-annual.csv`
+- `goods-products-annual/`, with one CSV per classification and published source block
 - `goods-domestic-annual.csv`
 - `goods-country-groups-annual.csv`
 - `goods-regions-annual.csv`
@@ -68,7 +70,7 @@ Create family-specific research CSVs:
 
 Every record carries year, flow, original value and unit, normalized USD value, value/publication status, row role, source block, source ID, worksheet, cell and original number format. Relevant dimensions add the original country code and English label, classification and level, product code and label, region identity, or a stable service-type ID and original label. There is no language-label-based identifier. Source and missingness fields remain attached throughout preparation.
 
-`source-observations.csv` is the exhaustive annual source-cell inventory, including repeated totals and validation/supporting rows. `coverage.csv` states the exact source-block years and observed identities. `identity-review.csv` records historical code/label changes and their disposition: verified equivalent or retained as separate source identity. Do not resolve ambiguous changes by guessing.
+`source-observations/` contains the exhaustive annual source-cell inventory, divided by source worksheet/block and including repeated totals and validation/supporting rows. `artifact-manifest.csv` inventories all generated files, row counts and fingerprints. `coverage.csv` states the exact source-block years and observed identities. `identity-review.csv` records historical code/label changes and their disposition: verified equivalent or retained as separate source identity. Do not resolve ambiguous changes by guessing.
 
 `derived-annual.csv` may contain only the previously discussed trade balance, turnover and re-exports: exports minus imports, exports plus imports, and total exports minus domestic exports respectively. Derive them only from matching reviewed inputs, preserve both input references, and identify them as derived. Country/product re-exports remain unavailable where a matching domestic figure is not published. Do not compute growth, shares or other indicators in this stage.
 
