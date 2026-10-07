@@ -218,7 +218,7 @@ test.describe("desktop", () => {
         await page.locator('[data-series-id="georgia:unemployed"] [data-testid="series-row-toggle"]').click();
       }
       const geometry = await page.getByTestId("chart-frame").first().evaluate((frame) => {
-        const svg = frame.querySelector("svg[role='img']")!;
+        const svg = frame.querySelector<SVGSVGElement>("svg[role='img']")!;
         const box = svg.getBoundingClientRect();
         const scale = box.width / svg.viewBox.baseVal.width;
         const labels = [...svg.querySelectorAll("text[text-anchor='end']")].map((text) => text.getBoundingClientRect());
