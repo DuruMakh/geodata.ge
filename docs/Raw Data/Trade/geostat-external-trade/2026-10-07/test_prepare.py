@@ -1,16 +1,24 @@
 """Behavioral checks against original cells and deliberate corruptions."""
 import importlib
+import csv
+import hashlib
+import io
 import json
 from decimal import Decimal
 from pathlib import Path
 import shutil
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent
 TMP = ROOT.parents[4] / '.tmp'
 
 class PackageTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        TMP.mkdir(parents=True,exist_ok=True)
+
     def module(self, name):
         try:
             return importlib.import_module(name)
@@ -31,7 +39,7 @@ class ArchiveTests(PackageTests):
 
     def test_stored_precision_is_not_display_precision(self):
         archive = self.module('archive')
-        cells = archive.read_stored_sheet(ROOT/'official/Georgian-exports-of-services-by-types.xlsx','Sheet1')
+        cells = archive.read_stored_sheet(ROOT/'official/Georgian-Exports-of-services-by-types.xlsx','Sheet1')
         self.assertEqual(cells['F5'].value,Decimal('7706284.9847599976'))
         self.assertEqual(cells['B8'].value,'-')
 
@@ -106,6 +114,30 @@ class ArchiveTests(PackageTests):
         except ValueError as error:
             self.fail(f'published SITC code rejected for storage noise: {error}')
         self.assertEqual(code,'001.1')
+
+class FreshCheckoutTests(PackageTests):
+    def test_checks_create_their_temporary_parent(self):
+        with tempfile.TemporaryDirectory(prefix='.trade-review-fixture-',dir=TMP.parent) as directory:
+            missing_parent=Path(directory)/'new-checkout'/'.tmp'
+            with patch(__name__+'.TMP',missing_parent):
+                result=unittest.TestResult()
+                unittest.TestSuite([ArchiveTests('test_missing_and_duplicate_manifest_entries_fail')]).run(result)
+                self.assertEqual(result.errors,[])
+                self.assertEqual(result.failures,[])
+                self.assertTrue(missing_parent.is_dir())
+
+    def test_source_precision_check_uses_case_sensitive_filename(self):
+        archive=self.module('archive')
+        stored_reader=archive.read_stored_sheet
+        def case_sensitive_reader(path,sheet):
+            if path.name not in {item.name for item in path.parent.iterdir()}:
+                raise FileNotFoundError(path)
+            return stored_reader(path,sheet)
+        with patch.object(archive,'read_stored_sheet',side_effect=case_sensitive_reader):
+            result=unittest.TestResult()
+            ArchiveTests('test_stored_precision_is_not_display_precision').run(result)
+            self.assertEqual(result.errors,[])
+            self.assertEqual(result.failures,[])
 
 class GoodsTests(PackageTests):
     _data=None
@@ -298,6 +330,126 @@ class ServicesTests(PackageTests):
         checks=self.module('read_regions_services').services_comparisons(rows)
         repair=[c for c in checks if c['check']=='service_joint_country_sum' and c['flow']=='export' and c['item_id']=='services.maintenance_repair' and c['year'] in ('2023','2024')]
         self.assertEqual([c['status'] for c in repair],['pass','pass'])
+
+class PrepareTests(PackageTests):
+    def test_independent_evidence_cannot_survive_changed_artifact_inputs(self):
+        prepare=self.module('prepare')
+        self.assertTrue(hasattr(prepare,'check_independent_evidence'),'stale independent-report protection is not implemented')
+        artifacts={'source-observations/fixture.csv':b'original','prepared-validation.json':b'{}'}
+        evidence={'input_artifact_sha256':{name:hashlib.sha256(data).hexdigest() for name,data in artifacts.items()}}
+        prepare.check_independent_evidence(evidence,artifacts)
+        with self.assertRaisesRegex(ValueError,'artifact_mismatch'):
+            prepare.check_independent_evidence(evidence,dict(artifacts,**{'source-observations/fixture.csv':b'changed'}))
+
+    def test_manifest_counts_large_exact_provenance_fields(self):
+        prepare=self.module('prepare')
+        references=json.dumps([['fixture-source-'+'x'*50,'Annual','A7']]*2000)
+        data=prepare.csv_bytes([{'source_refs':references}],('source_refs',))
+        try: manifest=prepare.manifest_bytes({'prepared-reconciliation.csv':data})
+        except csv.Error as error: self.fail(f'exact provenance field could not be inventoried: {error}')
+        row=next(csv.DictReader(io.StringIO(manifest.decode('utf-8-sig'))))
+        self.assertEqual(row['row_count'],'1')
+        self.assertEqual(int(row['bytes']),len(data))
+
+    def test_csv_bom_unicode_quoting_and_leading_zero_text(self):
+        prepare=self.module('prepare')
+        raw=prepare.csv_bytes([{'year':'2024','code':'010121','label':'Türkiye, Côte d\'Ivoire\nSecond line'}],('year','code','label'))
+        self.assertTrue(raw.startswith(b'\xef\xbb\xbf'))
+        self.assertNotIn(b'\r\n',raw)
+        parsed=list(csv.DictReader(io.StringIO(raw.decode('utf-8-sig'))))
+        self.assertEqual(parsed,[{'year':'2024','code':'010121','label':'Türkiye, Côte d\'Ivoire\nSecond line'}])
+
+    def test_repeated_write_and_readonly_check_reject_missing_stale_artifacts(self):
+        prepare=self.module('prepare')
+        artifacts={'goods-national-annual.csv':b'\xef\xbb\xbfyear\n2025\n','source-observations/fixture-01-2020-2021.csv':b'\xef\xbb\xbfyear\n2020\n2021\n'}
+        with tempfile.TemporaryDirectory(dir=TMP) as directory:
+            root=Path(directory)
+            prepare.sync_artifacts(root,artifacts,True)
+            first={p.relative_to(root).as_posix():p.read_bytes() for p in root.rglob('*') if p.is_file()}
+            prepare.sync_artifacts(root,artifacts,True)
+            self.assertEqual(first,{p.relative_to(root).as_posix():p.read_bytes() for p in root.rglob('*') if p.is_file()})
+            before={p.as_posix():p.stat().st_mtime_ns for p in root.rglob('*') if p.is_file()}
+            prepare.sync_artifacts(root,artifacts,False)
+            self.assertEqual(before,{p.as_posix():p.stat().st_mtime_ns for p in root.rglob('*') if p.is_file()})
+            (root/'goods-national-annual.csv').unlink()
+            with self.assertRaisesRegex(ValueError,'artifact_mismatch'): prepare.sync_artifacts(root,artifacts,False)
+            prepare.sync_artifacts(root,artifacts,True)
+            stale=root/'source-observations/stale.csv'; stale.write_bytes(b'keep')
+            with self.assertRaisesRegex(ValueError,'artifact_mismatch'): prepare.sync_artifacts(root,artifacts,False)
+            self.assertEqual(stale.read_bytes(),b'keep')
+
+    def test_large_chunks_split_only_at_complete_year_boundaries(self):
+        prepare=self.module('prepare')
+        rows=[{'year':'2024','label':'A'*35},{'year':'2025','label':'B'*35}]
+        with patch.object(prepare,'MAX_CSV_BYTES',60):
+            chunks=prepare.chunk_csv('source-observations/fixture-01-2024-2025',rows,('year','label'))
+            self.assertEqual(set(chunks),{'source-observations/fixture-01-2024-2025-2024.csv','source-observations/fixture-01-2024-2025-2025.csv'})
+            self.assertTrue(all(len(data)<=60 for data in chunks.values()))
+            with self.assertRaisesRegex(ValueError,'artifact_size'):
+                prepare.chunk_csv('source-observations/fixture-01-2024-2025',[rows[0],dict(rows[0])],('year','label'))
+
+    def test_unit_conversion_and_unavailable_values_cannot_be_fabricated(self):
+        validation=self.module('validation')
+        row=dict(source_unit='thousand_usd',source_value='1',value_status='numeric',value_usd='1000')
+        validation.validate_units([row])
+        with self.assertRaisesRegex(ValueError,'unit_conversion'):
+            validation.validate_units([dict(row,value_usd='1')])
+        with self.assertRaisesRegex(ValueError,'missingness'):
+            validation.validate_units([dict(row,source_value='-',value_status='not_applicable',value_usd='0')])
+
+class IndependentTests(PackageTests):
+    def fixture(self):
+        verifier=self.module('verify_independent')
+        self.assertTrue(hasattr(verifier,'compare_record'),'independent prepared-record comparison is not implemented')
+        metadata=dict.fromkeys(verifier.METADATA_FIELDS,'')
+        metadata.update(family='goods_products',year='2020',flow='export',item_id='goods.hs6.2020-2025.010121',classification='hs6',classification_level='6',product_code='010121',product_label_en='Horses',source_unit='thousand_usd',value_status='numeric',publication_status='unspecified',role='detail',source_block='2020-2025',source_id='fixture',source_sheet='Annual',source_cell='B7',source_label='Horses',source_number_format='0.0')
+        return verifier,metadata,dict(metadata,source_value='0.0001',value_usd='0.1000')
+
+    def test_independent_value_and_exact_normalization_checks(self):
+        verifier,metadata,row=self.fixture()
+        self.assertEqual(verifier.compare_record(row,metadata,0.0001),Decimal('0'))
+        for changed in (dict(row,value_usd='0.1100'),dict(row,source_value='0.00011',value_usd='0.1100')):
+            with self.assertRaisesRegex(ValueError,'source_value|unit_conversion'): verifier.compare_record(changed,metadata,0.0001)
+
+    def test_leading_zero_labels_formats_and_units_cannot_change(self):
+        verifier,metadata,row=self.fixture()
+        for field,value in [('product_code','10121'),('source_label','Changed'),('source_number_format','General'),('source_unit','million_usd')]:
+            with self.assertRaisesRegex(ValueError,'source_metadata|unit_conversion'):
+                verifier.compare_record(dict(row,**{field:value}),metadata,0.0001)
+
+    def test_published_missing_value_cannot_become_numeric_zero(self):
+        verifier,metadata,row=self.fixture()
+        metadata=dict(metadata,value_status='not_applicable')
+        row=dict(row,value_status='not_applicable',source_value='-',value_usd='')
+        verifier.compare_record(row,metadata,'-')
+        with self.assertRaisesRegex(ValueError,'missingness'):
+            verifier.compare_record(dict(row,value_usd='0'),metadata,'-')
+
+    def test_independent_coverage_catches_year_zero_and_duplicate_omissions(self):
+        verifier,metadata,row=self.fixture()
+        self.assertTrue(hasattr(verifier,'check_inventory'),'independent coverage check is not implemented')
+        second=dict(metadata,year='2021',source_cell='C7')
+        blocks=[]
+        for meta in (metadata,second):
+            block={f:meta[f] for f in ('source_id','source_sheet','source_block','family','flow','year')}
+            encode=lambda values:hashlib.sha256(json.dumps(sorted(values),ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+            block.update(source_key_count=1,key_sha256=encode([(meta['source_id'],meta['source_sheet'],meta['source_cell'])]),metadata_sha256=encode([sorted(meta.items())]),status_counts={'numeric':1})
+            blocks.append(block)
+        inventory={'blocks':blocks}
+        verifier.check_inventory([metadata,second],inventory)
+        with self.assertRaisesRegex(ValueError,'coverage'): verifier.check_inventory([metadata],inventory)
+        with self.assertRaisesRegex(ValueError,'coverage'): verifier.check_inventory([],inventory)
+        with self.assertRaisesRegex(ValueError,'duplicate_key'): verifier.check_inventory([metadata,second,metadata],inventory)
+
+    def test_independent_source_fingerprint_detects_corruption(self):
+        verifier=self.module('verify_independent')
+        self.assertTrue(hasattr(verifier,'verify_fingerprint'),'independent source fingerprint check is not implemented')
+        with tempfile.TemporaryDirectory(dir=TMP) as directory:
+            path=Path(directory)/'source.xlsx'; path.write_bytes(b'original')
+            descriptor={'source_id':'fixture','bytes':8,'sha256':hashlib.sha256(b'original').hexdigest()}
+            verifier.verify_fingerprint(path,descriptor)
+            path.write_bytes(b'changed!')
+            with self.assertRaisesRegex(ValueError,'source_fingerprint'): verifier.verify_fingerprint(path,descriptor)
 
 if __name__ == '__main__':
     unittest.main()

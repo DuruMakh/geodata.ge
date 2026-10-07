@@ -1,3 +1,36 @@
+# Prepared annual trade research package
+
+The source capture and reproducible research files are prepared. **Overall source acceptance is held** for two publisher discrepancies in UK service imports (2022 and 2024). Both published representations remain unchanged and the relevant comparisons remain failed. No product integration has been authorized.
+
+The core capture preserves 45 original files, including 31 Geostat Excel workbooks. Preparation covers **364,495 source observations**, **364,461 primary observations** and **3,473 reviewed derivations**. The reconciliation report contains **59,166 passed checks**, **3,220 unavailable comparisons**, **82 source-code allocation exceptions** and **2 unresolved failures**. Source fidelity and the publisher's internal agreement are separate checks.
+
+See [the methodology](../../../../data-methodology/trade-annual.md), `source-review.md`, `source-limitations.csv` and `unresolved-source-issues.json`. The two UK differences are approximately USD 192,237 (2022) and USD 379,884 (2024). Historical source-code allocation exceptions retain their measured differences and never receive a passing prefix label.
+
+[Verification and final review](verification-review.md) records the independent reader, 39 focused tests, two fresh-checkout fixes and the repository results. The full website suite passes 3,026 tests with a recorded local timing exception; the build, data validation and localization checks pass. The standard combined check's earlier timeouts remain explicitly recorded.
+
+## Reproduction
+
+From the repository root, using the bundled Python (or a compatible Python with openpyxl for the independent reader):
+
+```powershell
+$tradePython = 'C:/Users/Mylaptop/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
+$tradePackage = 'docs/Raw Data/Trade/geostat-external-trade/2026-10-07'
+& $tradePython -X utf8 "$tradePackage/prepare.py" --write
+& $tradePython -X utf8 "$tradePackage/prepare.py" --check
+& $tradePython -X utf8 "$tradePackage/verify_independent.py"
+& $tradePython -X utf8 "$tradePackage/prepare.py" --check
+& $tradePython -X utf8 "$tradePackage/prepare.py" --acceptance
+& $tradePython -X utf8 "$tradePackage/test_prepare.py"
+```
+
+Write/check commands reproduce source-faithful files and return 0 on byte parity. The acceptance command returns **2** while the two source discrepancies remain; a passing reproduction or independent cell match does not clear that hold. The independent report is regenerated only by its separate reader. All commands are offline and leave original workbooks untouched.
+
+Family CSVs contain source-preserving series with their roles; `source-observations/` additionally retains supporting/unidentified cells. Product/source chunks follow the published blocks, with complete-year splits only if a chunk exceeds 50,000,000 bytes. Every generated CSV uses UTF-8 BOM and LF records. Excel may auto-convert codes or round long decimals; import code/value text columns explicitly when full fidelity matters.
+
+## Earlier intake evidence
+
+The material below records the exploratory capture before final preparation. Its counts and audits remain evidence of that earlier stage.
+
 # External trade source collection and initial validation
 
 ## Expanded source intake

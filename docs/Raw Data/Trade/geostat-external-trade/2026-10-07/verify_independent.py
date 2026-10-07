@@ -1,8 +1,10 @@
 """Separate openpyxl source walk; never imports normalizer readers/helpers."""
 import argparse
+import csv
 from collections import Counter, defaultdict
 from decimal import Decimal
 import hashlib
+import io
 import json
 from pathlib import Path
 import re
@@ -23,6 +25,44 @@ def independent_code(value,classification):
     text=str(int(value)) if isinstance(value,(int,float)) else str(value).strip()
     return text.zfill(width)
 
+def verify_fingerprint(path: Path,descriptor: dict) -> None:
+    data=path.read_bytes()
+    if len(data)!=descriptor['bytes'] or hashlib.sha256(data).hexdigest()!=descriptor['sha256']:
+        raise ValueError(f'source_fingerprint: independent {descriptor["source_id"]}')
+
+def compare_record(prepared: dict,metadata: dict,native,fields=None) -> Decimal:
+    selected=METADATA_FIELDS if fields is None else tuple(f for f in fields if f not in ('value_usd','source_value'))
+    if prepared.get('source_unit')!=metadata['source_unit']: raise ValueError('unit_conversion: independent native unit differs')
+    if prepared.get('value_status')!=metadata['value_status']: raise ValueError('missingness: independent source status differs')
+    for field in selected:
+        if prepared.get(field,'')!=metadata.get(field,''): raise ValueError(f'source_metadata: independent {field} differs {metadata["source_cell"]}')
+    if metadata['value_status']!='numeric':
+        expected='' if metadata['value_status']=='blank' else '-'
+        if prepared['source_value']!=expected or prepared['value_usd']!='': raise ValueError('missingness: unavailable source value became numeric')
+        return Decimal(0)
+    scale=Decimal(1_000_000) if metadata['source_unit']=='million_usd' else Decimal(1000)
+    source=Decimal(prepared['source_value']); usd=Decimal(prepared['value_usd'])
+    if not source.is_finite() or not usd.is_finite() or source*scale!=usd: raise ValueError('unit_conversion: exact native/USD identity fails')
+    difference=abs(Decimal(str(native))*scale-usd)
+    if difference>Decimal('0.001'): raise ValueError(f'source_value: independent source differs by USD {difference}')
+    return difference
+
+def check_inventory(rows: list[dict],inventory: dict) -> dict:
+    groups=defaultdict(list); keys=set()
+    for row in rows:
+        source_key=tuple(row[f] for f in ('source_id','source_sheet','source_cell'))
+        if source_key in keys: raise ValueError('duplicate_key: independent source key repeated')
+        keys.add(source_key)
+        key=tuple(row[f] for f in ('source_id','source_sheet','source_block','family','flow','year'))
+        groups[key].append(row)
+    expected={tuple(b[f] for f in ('source_id','source_sheet','source_block','family','flow','year')):b for b in inventory['blocks']}
+    if set(groups)!=set(expected): raise ValueError('coverage: independent whole block/year differs')
+    for key,members in groups.items():
+        block=expected[key]
+        if len(members)!=block['source_key_count'] or digest([tuple(r[f] for f in ('source_id','source_sheet','source_cell')) for r in members])!=block['key_sha256'] or digest([sorted({f:r.get(f,'') for f in METADATA_FIELDS}.items()) for r in members])!=block['metadata_sha256'] or dict(Counter(r['value_status'] for r in members))!=block['status_counts']:
+            raise ValueError(f'coverage: independent source inventory differs {key}')
+    return {'matched_observations':len(rows),'matched_blocks':len(groups)}
+
 def walk_sources(package_root: Path):
     manifest=json.loads((package_root/'full-source-manifest.json').read_text(encoding='utf-8'))
     if len(manifest)!=45 or len({r['source_id'] for r in manifest})!=45:
@@ -31,9 +71,8 @@ def walk_sources(package_root: Path):
     by_source=defaultdict(list)
     for table in tables: by_source[table['source_id']].append(table)
     for source in manifest:
-        path=package_root/source['local_file']; data=path.read_bytes()
-        if hashlib.sha256(data).hexdigest()!=source['sha256'] or len(data)!=source['bytes']:
-            raise ValueError(f'source_fingerprint: {source["source_id"]}')
+        path=package_root/source['local_file']
+        verify_fingerprint(path,source)
         if path.suffix!='.xlsx': continue
         with ZipFile(path) as zipped:
             if zipped.testzip() is not None: raise ValueError('source_fingerprint: independent ZIP check')
@@ -46,6 +85,9 @@ def walk_sources(package_root: Path):
                 needed.update(h['cell'] for h in table['header_cells'])
                 needed.update(f'{col}{r["row_index"]}' for r in table['rows'] for col in table['year_columns'].values())
                 cells={c.coordinate:c for row in sheet.iter_rows() for c in row if getattr(c,'coordinate',None) in needed}
+                unit_text=str(cells['A3'].value)
+                actual_unit='million_usd' if 'Mill.' in unit_text else 'thousand_usd' if 'Thsd.' in unit_text else None
+                if actual_unit!=table['source_unit']: raise ValueError('unit_conversion: original workbook unit header differs')
                 for expected in table['header_cells']+[c for row in table['rows'] for c in row['label_cells']+row['code_cells']]:
                     cell=cells.get(expected['cell'])
                     text='' if cell is None or cell.value is None else str(cell.value)
@@ -70,7 +112,7 @@ def walk_sources(package_root: Path):
                         value=None if cell is None else cell.value
                         status='blank' if value is None else 'not_applicable' if value=='-' else 'numeric' if isinstance(value,(int,float)) and not isinstance(value,bool) else 'invalid'
                         if status=='invalid': raise ValueError('cell_type: independent monetary type')
-                        metadata=dict(dimensions,family=table['family'],year=year,flow=table['flow'],item_id=row['item_id'],source_block=table['source_block'],source_id=source['source_id'],source_sheet=table['source_sheet'],source_cell=coordinate,source_unit=table['source_unit'],source_label=label,source_number_format='General' if cell is None else cell.number_format,value_status=status,publication_status='unspecified',role=row['role'])
+                        metadata=dict(dimensions,family=table['family'],year=year,flow=table['flow'],item_id=row['item_id'],source_block=table['source_block'],source_id=source['source_id'],source_sheet=table['source_sheet'],source_cell=coordinate,source_unit=actual_unit,source_label=label,source_number_format='General' if cell is None else cell.number_format,value_status=status,publication_status='unspecified',role=row['role'])
                         yield {field:metadata.get(field,'') for field in METADATA_FIELDS},value
         finally:
             book.close()
@@ -87,11 +129,74 @@ def capture_inventory(package_root: Path) -> dict:
         blocks.append(block)
     return {'full_manifest_sha256':hashlib.sha256((package_root/'full-source-manifest.json').read_bytes()).hexdigest(),'layout_sha256':hashlib.sha256((package_root/'source-layouts.json').read_bytes()).hexdigest(),'source_count':45,'workbook_count':31,'table_count':len(json.loads((package_root/'source-layouts.json').read_text(encoding='utf-8'))),'observation_count':sum(g['source_key_count'] for g in blocks),'blocks':blocks}
 
+def read_csv(path: Path):
+    csv.field_size_limit(50_000_000)
+    if not path.read_bytes().startswith(b'\xef\xbb\xbf'): raise ValueError('artifact_mismatch: CSV lacks UTF-8 BOM')
+    with path.open(encoding='utf-8-sig',newline='') as stream:
+        yield from csv.DictReader(stream)
+
+def verify_package(package_root: Path) -> dict:
+    inventory=json.loads((package_root/'expected-observation-inventory.json').read_text(encoding='utf-8'))
+    for name,key in [('full-source-manifest.json','full_manifest_sha256'),('source-layouts.json','layout_sha256')]:
+        if hashlib.sha256((package_root/name).read_bytes()).hexdigest()!=inventory[key]: raise ValueError('source_inventory: independent reviewed input differs')
+    manifest=list(read_csv(package_root/'artifact-manifest.csv'))
+    inputs={}
+    for entry in manifest:
+        if entry['file']=='independent-verification.json': continue
+        path=package_root/entry['file']; data=path.read_bytes()
+        if hashlib.sha256(data).hexdigest()!=entry['sha256'] or len(data)!=int(entry['bytes']): raise ValueError('artifact_mismatch: independent artifact fingerprint')
+        inputs[entry['file']]=entry['sha256']
+    prepared={}; metadata=[]
+    for name in sorted(n for n in inputs if n.startswith('source-observations/')):
+        for row in read_csv(package_root/name):
+            key=tuple(row[f] for f in ('source_id','source_sheet','source_cell'))
+            if key in prepared: raise ValueError('duplicate_key: independent prepared cell repeats')
+            prepared[key]=row;metadata.append({f:row.get(f,'') for f in METADATA_FIELDS})
+    coverage=check_inventory(metadata,inventory)
+    maximum=Decimal(0); matched=set(); primary_keys=set()
+    native_lookup={}
+    for expected,native in walk_sources(package_root):
+        key=tuple(expected[f] for f in ('source_id','source_sheet','source_cell'))
+        if key in matched or key not in prepared: raise ValueError('coverage: independent raw/prepared key sets differ')
+        difference=compare_record(prepared[key],expected,native)
+        maximum=max(maximum,difference);matched.add(key);native_lookup[key]=(expected,native)
+        if expected['role']!='supporting': primary_keys.add(key)
+    if matched!=set(prepared): raise ValueError('coverage: unmatched prepared cells remain')
+    # Check all primary CSV values/dimensions against the independent source walk.
+    seen_primary=set()
+    primary_files=[name for name in inputs if name.startswith('goods-products-annual/') or name in ('goods-national-annual.csv','goods-countries-annual.csv','goods-domestic-annual.csv','goods-country-groups-annual.csv','goods-regions-annual.csv','services-annual.csv')]
+    for name in primary_files:
+        for row in read_csv(package_root/name):
+            key=tuple(row[f] for f in ('source_id','source_sheet','source_cell'))
+            if key in seen_primary or key not in primary_keys: raise ValueError('duplicate_key: primary cell repeated or unsupported')
+            expected,native=native_lookup[key]
+            compare_record(row,expected,native,row.keys());seen_primary.add(key)
+    if seen_primary!=primary_keys: raise ValueError('coverage: primary family CSV cells omitted')
+    derived_count=0
+    for row in read_csv(package_root/'derived-annual.csv'):
+        refs=json.loads(row['input_source_refs'])
+        if len(refs)!=2 or any(tuple(ref) not in prepared for ref in refs): raise ValueError('derived_inputs: independent missing source reference')
+        left,right=(prepared[tuple(ref)] for ref in refs)
+        if left['year']!=right['year'] or row['year']!=left['year'] or left['value_status']!='numeric' or right['value_status']!='numeric': raise ValueError('derived_inputs: independent incompatible inputs')
+        if row['indicator_id'] not in ('trade_balance','trade_turnover','reexports'): raise ValueError('derived_inputs: independent unapproved indicator')
+        wanted=Decimal(left['value_usd'])+Decimal(right['value_usd']) if row['indicator_id']=='trade_turnover' else Decimal(left['value_usd'])-Decimal(right['value_usd'])
+        if wanted!=Decimal(row['value_usd']): raise ValueError('derived_inputs: independent arithmetic differs')
+        derived_count+=1
+    return dict(status='source_cells_matched',coverage=coverage,source_observations=len(matched),primary_observations=len(seen_primary),derived_observations=derived_count,max_reader_difference_usd=str(maximum),reader_tolerance_usd='0.001',input_artifact_sha256=inputs,verifier_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),source_acceptance='requires_source_resolution: two UK country/type conflicts; this reader check does not resolve publisher inconsistencies')
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--capture-inventory',action='store_true');args=parser.parse_args()
+    if args.capture_inventory:
+        path=ROOT/'expected-observation-inventory.json'
+        if path.exists(): raise ValueError('source_inventory: capture already exists; review changes explicitly')
+        result=capture_inventory(ROOT);path.write_bytes((json.dumps(result,ensure_ascii=False,indent=2)+'\n').encode('utf-8'))
+    else:
+        result=verify_package(ROOT)
+        data=(json.dumps(result,ensure_ascii=False,indent=2,sort_keys=True)+'\n').encode('utf-8');(ROOT/'independent-verification.json').write_bytes(data)
+        rows=[r for r in read_csv(ROOT/'artifact-manifest.csv') if r['file']!='independent-verification.json']
+        rows.append(dict(file='independent-verification.json',family='evidence',source_block='',row_count='',sha256=hashlib.sha256(data).hexdigest(),bytes=str(len(data))))
+        output=io.StringIO(newline='');writer=csv.DictWriter(output,fieldnames=('file','family','source_block','row_count','sha256','bytes'),lineterminator='\n');writer.writeheader();writer.writerows(sorted(rows,key=lambda r:r['file']));(ROOT/'artifact-manifest.csv').write_bytes(output.getvalue().encode('utf-8-sig'))
+    print(json.dumps({k:v for k,v in result.items() if k not in ('blocks','input_artifact_sha256')},indent=2))
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(); parser.add_argument('--capture-inventory',action='store_true'); args=parser.parse_args()
-    if not args.capture_inventory: parser.error('Full prepared verification is implemented in Task 5.')
-    path=ROOT/'expected-observation-inventory.json'
-    if path.exists(): raise ValueError('source_inventory: capture already exists; review changes explicitly')
-    result=capture_inventory(ROOT)
-    path.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    print(json.dumps({k:v for k,v in result.items() if k!='blocks'}))
+    main()
