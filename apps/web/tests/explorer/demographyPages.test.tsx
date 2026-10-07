@@ -97,7 +97,7 @@ describe("population index page", () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
     expect(html).toContain("2,715.7/km²");
     expect(html).toContain("142.5/km²");
-    expect(html).toContain("the maps show the latest year only");
+    expect(html).toContain("the map shows the latest year only");
     expect(html).toContain("504.24");
     expect(html).toContain("persons, 1 January 2026");
   });

@@ -20,7 +20,7 @@
   "demography.mapLegendPopulation": "persons, 1 January {year}",
   "demography.densityUnit": "/km²",
   "demography.densityUnitLong": "persons per km²",
-  "demography.mapCensusNote": "From 2025 the figures are based on the 2024 census, and maps for 2024 and 2025 are not comparable, so the maps show the latest year only.",
+  "demography.mapCensusNote": "From 2025 the figures are based on the 2024 census, and maps for 2024 and 2025 are not comparable, so the map shows the latest year only.",
   "demography.densityNote": "Density is the 1 January population divided by one fixed area as of March 2014, occupied territories excluded. Tbilisi is {area} km² in Geostat's convention, not the 726 km² often cited.",
   "demography.rowYear": "Population on 1 January {year}",
   "demography.placeHeader": "Place",
