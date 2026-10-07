@@ -33,8 +33,8 @@ test("indicator changes preserve an explicitly empty selection", () => {
 
 test("each separate page restores its own comparison when the shared link omits a breakdown", () => {
   expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "regions")).toMatchObject({ breakdown: "region", selectedIds: ["georgia:unemployment_rate"] });
-  expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "age")).toMatchObject({ breakdown: "age", selectedIds: ["age.15_19"] });
-  expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "gender")).toMatchObject({ breakdown: "sex", selectedIds: ["georgia:unemployment_rate"] });
+  expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "age")).toMatchObject({ breakdown: "age", selectedIds: ["age.15_19", "age.25_29"] });
+  expect(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "gender")).toMatchObject({ breakdown: "sex", selectedIds: ["georgia:unemployment_rate", "men:unemployment_rate", "women:unemployment_rate"] });
 });
 
 test("a page cannot be changed into a different main section by editing its hash", () => {

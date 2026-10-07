@@ -26,7 +26,7 @@ test("age scope keeps all reviewed history in the source but displays only moder
 });
 
 test("removed age selections restore a modern default, while an explicitly empty selection stays empty", () => {
-  expect(parseUnemploymentHash("sel=georgia,age.15_24&start=2011&end=2018", facts, UNEMPLOYMENT_GROUPS, "age")).toMatchObject({ selectedIds: ["age.15_19"], range: { kind: "all" } });
+  expect(parseUnemploymentHash("sel=georgia,age.15_24&start=2011&end=2018", facts, UNEMPLOYMENT_GROUPS, "age")).toMatchObject({ selectedIds: ["age.15_19", "age.25_29"], range: { kind: "all" } });
   expect(parseUnemploymentHash("sel=", facts, UNEMPLOYMENT_GROUPS, "age").selectedIds).toEqual([]);
 });
 
