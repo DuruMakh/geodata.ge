@@ -59,7 +59,7 @@ Top to bottom, inside `ExplorerPage`:
 `/explorer/demography/population/georgia`, `/region/{id}` and `/{slug}`, inside `ExplorerPage`:
 
 1. `PageHeader`: `მთავარი / მონაცემები / დემოგრაფია / მოსახლეობა /` then, for a municipality, its region, then the place. Coverage from the place's own years.
-2. Heading `მოსახლეობა — [place ▾]`: the place name is the button that opens the picker, as on the Budget pages. A meta line follows (Georgia: `11 რეგიონი · 64 მუნიციპალიტეტი · {first}–{last}`; a region: `{n} მუნიციპალიტეტი · {rank} ადგილი 11-დან · 1 იანვარი {year}`; a municipality: `{region} · {rank} ადგილი 64-დან · 1 იანვარი {year}`, rank by persons in the end year of the period). Regions and municipalities have previous/next links to their neighbours in registry order, wrapping round; Georgia has none. Tbilisi has no municipality page, so the municipality ring skips it.
+2. Heading `მოსახლეობა — [place ▾]`: the place name is the button that opens the picker, as on the Budget pages. A meta line follows (Georgia: `11 რეგიონი · 64 მუნიციპალიტეტი · {first}–{last}`; a region: `{n} მუნიციპალიტეტი · {rank} ადგილი 11-დან · 1 იანვარი {year}`; a municipality: `{region} · {rank} ადგილი 64-დან · 1 იანვარი {year}`, rank by persons in the latest year; the meta line does not follow the selected range). Regions and municipalities have previous/next links to their neighbours in registry order, wrapping round; Georgia has none. Tbilisi has no municipality page, so the municipality ring skips it.
 3. The workspace, in the Budget place-page shell: on the left `ხაზი / ცხრილი`, a caption naming the unit, the chart or table, the `RangeStrip` over the place's years with the 2025 marker (R3), the source note with the methodology link, and the census note; on the right the tick-list, `ჩამოტვირთვა`, and `← მოსახლეობა` back to the index.
 4. For a region with municipalities, `რეგიონის მუნიციპალიტეტები`: its municipalities ranked by persons, each a link, as on the Budget region page. Georgia and municipalities have none.
 5. `ძირითადი ინდიკატორები` (§6).
@@ -105,9 +105,11 @@ The existing municipality map, unchanged in behaviour (§3.2). The only addition
 
 Each side KPI that is a series carries a `Sparkline` of it over the active range with a `null` between 2024 and 2025 so it is two segments. If the end year is before 2015, the region and municipality cells print `—` and say regional data starts in 2015. Ties break by registry order.
 
+**The density note.** Georgia's page (the densest region) and every region's page (its own density, Tbilisi's included) show a density, so each carries the index's density note (§3.2), in the same words, directly under the key indicators; the area is read from the reviewed mapping, not typed. A municipality's page shows no density and carries no note.
+
 ## 7. State
 
-URL-hash state follows DESIGN.md §6.3: restored on load, loading never writes the URL, every change replaces the history entry. A place page uses the municipal vocabulary through the existing `useMunicipalState`: `m` (mode), `r` (range) and `sel` (ticked place ids; Tbilisi as `region.tbilisi`); `sh` is never written. Unknown values are rejected, duplicates removed, ranges clamped; an absent `sel` means the place alone and an explicit empty one stays empty. The index uses `lvl=region` for the Regions tab. Search text is not persisted. Other pages may link to a place's page.
+URL-hash state follows DESIGN.md §6.3: restored on load, loading never writes the URL, every change replaces the history entry. A place page uses the municipal vocabulary through the existing `useMunicipalState`: `m` (mode), `r` (range) and `sel` (ticked place ids; Tbilisi as `region.tbilisi`). The page never offers `sh` (share), so it never sets it; a pasted `sh=1` is kept in the address and ignored. Unknown values are rejected, duplicates removed, ranges clamped; an absent `sel` means the place alone and an explicit empty one stays empty. The index uses `lvl=region` for the Regions tab. Search text is not persisted. Other pages may link to a place's page.
 
 ## 8. Numbers
 
@@ -167,7 +169,7 @@ Owner, 2026-10-07: the Population pages use the Budget → Municipalities layout
 
 Defaults taken in this specification, open for review:
 
-1. **Density** is not a map or a toggle. It prints under each region's persons in the list and is a key figure on the Georgia and region pages (§3.2, §6).
+1. **Density** is not a map or a toggle. It prints under each region's persons in the list and is a key figure on each region's page (Georgia's page shows the densest region's), with the area note under the key indicators of both (§3.2, §6).
 2. **Tbilisi is one place** with one page (§3.5).
 3. **No "% share" toggle** on the chart. The Budget pages have one; here the parts' shares would sit beside a series that is not comparable across the break.
 4. **The census note** is shown on the index (under the map), on place pages (under the chart) and in the table caption.

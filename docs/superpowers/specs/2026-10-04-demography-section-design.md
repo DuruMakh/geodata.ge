@@ -140,7 +140,7 @@ Each plan adds the tokens it first uses to `DESIGN.md` §4.2 and `lib/explorer/c
 | `citizenship.ukraine` | `#7A4E8C` | 5.71:1 | 3 |
 | `citizenship.all_other_computed` | `#94856D` (`OTHER_COLOR`) | 3.23:1 | 3 |
 
-The births-page tokens (births, deaths, the births-per-100-deaths scale) are in its specification (Plan 4). Georgia as a whole is `ink`. Regions take `EDITORIAL_PALETTE` by their `sortOrder` and municipalities by their sort ID, cycling, so a place keeps its colour on every page. Maps and the heat map reuse the existing ramps. Urban and rural settlement is a filter, not a colour. Colour is never the only carrier of meaning: sex is also left/right and labelled, a group is also a labelled swatch and row.
+The births-page tokens (births, deaths, the births-per-100-deaths scale) are in its specification (Plan 4). Georgia as a whole is `ink`. Regions take `EDITORIAL_PALETTE` by their `sortOrder` and municipalities by their sort ID, cycling, so a place keeps its colour on every page. A municipality whose cycle colour is its region's takes the next free palette colour instead (free: worn by neither the region nor a sibling, and not the grey that "other" wears; DESIGN.md §27 records the rule), so a region's page never draws two series in one colour. Maps and the heat map reuse the existing ramps. Urban and rural settlement is a filter, not a colour. Colour is never the only carrier of meaning: sex is also left/right and labelled, a group is also a labelled swatch and row.
 
 ## 8. Shared page anatomy
 
