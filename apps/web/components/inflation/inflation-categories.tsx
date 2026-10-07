@@ -48,6 +48,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
@@ -240,6 +241,7 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} />
             <RangeStrip
               years={tabPeriods}
               range={range}

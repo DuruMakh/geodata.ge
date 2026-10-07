@@ -32,6 +32,9 @@
   "controls.tableScrollable": "Multi-year table — scroll horizontally",
   "controls.change": "Change",
   "controls.year": "Year",
+  "controls.backToChart": "Chart",
+  "controls.backToTable": "Table",
+  "controls.backUp": "scroll up",
   "controls.planned": "Planned",
   "controls.other": "Others"
 }

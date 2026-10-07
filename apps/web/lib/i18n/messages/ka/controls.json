@@ -32,6 +32,9 @@
   "controls.tableScrollable": "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი",
   "controls.change": "ცვლილება",
   "controls.year": "წელი",
+  "controls.backToChart": "გრაფიკი",
+  "controls.backToTable": "ცხრილი",
+  "controls.backUp": "ზემოთ ასვლა",
   "controls.planned": "გეგმა",
   "controls.other": "სხვა"
 }

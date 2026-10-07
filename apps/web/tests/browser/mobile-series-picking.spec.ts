@@ -68,3 +68,56 @@ for (const locale of ["ka", "en"] as const) {
     expect(await visibleRows()).toBe(total);
   });
 }
+
+test.describe("the ↑ chart pill", () => {
+  test("appears after a selection below the chart and leads back to it", async ({ page }) => {
+    await page.goto("/explorer/expenditure");
+    const row = page.locator('[data-series-id="spending.social_protection"]').getByTestId("series-row-toggle");
+    await row.scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("chart-frame")).not.toBeInViewport({ ratio: 0.5 });
+    await row.click();
+    const pill = page.getByTestId("chart-return-pill");
+    await expect(pill).toBeVisible();
+    await expect(pill).toContainText("გრაფიკი");
+    await expect(pill).toHaveAccessibleName("გრაფიკი, ზემოთ ასვლა");
+    const box = (await pill.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.y + box.height).toBeLessThanOrEqual(844);
+    // One swatch per selected series: the total and the new one.
+    await expect(pill.locator("span[aria-hidden] > span")).toHaveCount(2);
+    await pill.click();
+    await expect(pill).toHaveCount(0);
+    await expect(page.getByTestId("chart-frame")).toBeInViewport({ ratio: 0.5 });
+  });
+
+  test("leaves on its own after a few seconds", async ({ page }) => {
+    await page.goto("/en/explorer/expenditure");
+    const row = page.locator('[data-series-id="spending.education"]').getByTestId("series-row-toggle");
+    await row.scrollIntoViewIfNeeded();
+    await row.click();
+    const pill = page.getByTestId("chart-return-pill");
+    await expect(pill).toContainText("Chart");
+    await expect(pill).toHaveCount(0, { timeout: 6000 });
+  });
+
+  test("does not appear while the chart is on screen", async ({ page }) => {
+    await page.goto("/explorer/expenditure");
+    await page.getByTestId("chart-frame").scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("chart-frame")).toBeInViewport({ ratio: 0.5 });
+    // Change the selection without scrolling the chart away.
+    await page.evaluate(() => (document.querySelector('[data-testid="series-toggle-all"]') as HTMLButtonElement).click());
+    await page.waitForTimeout(300);
+    await expect(page.getByTestId("chart-return-pill")).toHaveCount(0);
+  });
+
+  test.describe("desktop", () => {
+    test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
+    test("never shows", async ({ page }) => {
+      await page.goto("/explorer/expenditure");
+      await page.mouse.wheel(0, 1400);
+      await page.locator('[data-series-id="spending.education"]').getByTestId("series-row-toggle").click();
+      await page.waitForTimeout(300);
+      await expect(page.getByTestId("chart-return-pill")).toBeHidden();
+    });
+  });
+});

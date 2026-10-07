@@ -17,6 +17,7 @@ import { RangeStrip } from "./range-strip";
 import { SeriesPanel } from "./series-panel";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import type { ResolvedRange } from "./use-explorer-state";
 
 // Multi-year explorer per DESIGN.md §8: mode/grouping tabs and the measure pill over
@@ -168,6 +169,7 @@ export function ExplorerView({
                 <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={message(messages, "main.shareGdp")} />
               </div>
             )}
+            <ChartSelectionAids series={series} chartShown={chartMode === "line"} share={share} unit={unit} />
 
             <RangeStrip years={scopeYears} range={range} onChange={onRangeChange} />
           </section>

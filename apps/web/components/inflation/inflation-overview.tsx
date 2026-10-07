@@ -29,6 +29,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation overview (spec §6): the GDP overview's centred tabs over the Budget
@@ -154,6 +155,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "line"} share={state.tab !== "index"} unit={INDEX_UNIT} />
             <RangeStrip
               years={tabPeriods}
               range={range}

@@ -28,6 +28,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
 import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-panel";
@@ -113,6 +114,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.series.map(series => ({ ...series, label: labels.get(series.id)! }))} share={model.percent} unit={unit} shareLabel={indicatorLabel} axisLeftPadding={model.percent ? undefined : 180} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${indicatorLabel} · ${model.percent ? "%" : unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== model.referenceId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized
               years={model.years} firstColumnLabel={t(unemploymentUsesIndicatorSeries(state) ? "series" : "group")} unit={unit} share={model.percent} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
+          <ChartSelectionAids series={model.series.map(series => ({ ...series, label: labels.get(series.id)! }))} chartShown={state.mode === "line"} share={model.percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={model.availableYears} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildUnemploymentModel(facts, registry, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}

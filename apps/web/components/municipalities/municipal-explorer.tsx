@@ -39,6 +39,7 @@ import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 
 export type MunicipalMetricContext =
   | {
@@ -321,7 +322,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
         data-testid="municipal-workspace"
         className="mt-7 grid items-start gap-10 border-t border-[var(--ink)] pt-5 @min-[1100px]:grid-cols-[minmax(0,1fr)_340px]"
       >
-        <div className="min-w-0">
+        <div data-chart-panel className="min-w-0">
           <div
             data-testid="municipal-chart-controls"
             className="mb-[18px] flex flex-col items-start gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between min-[520px]:gap-5"
@@ -375,6 +376,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
             />
           )}
+          <ChartSelectionAids series={series} chartShown={state.chartMode === "line"} share={state.share} unit={unit} />
 
           {/* allYears, never model.years — the strip must offer the full span
               even when the selection has narrowed it. */}

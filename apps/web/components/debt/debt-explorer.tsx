@@ -33,6 +33,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 
 type DebtRange = { start: number; end: number; min: number; max: number };
 
@@ -225,6 +226,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={props.chartMode === "line"} share={isPercent} unit={unit} />
 
             <RangeStrip
               years={familyYears}

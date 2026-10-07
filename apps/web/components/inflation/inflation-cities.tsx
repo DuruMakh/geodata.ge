@@ -33,6 +33,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -141,6 +142,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} />
             <RangeStrip
               years={periods}
               range={range}

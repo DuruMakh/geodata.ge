@@ -20,6 +20,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -112,6 +113,7 @@ export function RegionalEconomyExplorer({
               : !model.hasData ? <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
               : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={measureLabel} formatTooltipValue={share ? undefined : (value) => formatAmount(value, locale)} /></div>
               : <ExplorerTable caption={`${regionLabel} · ${share ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`} rows={model.rows.filter((row) => row.itemId !== REGIONAL_GDP_TOTAL)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels years={model.years} firstColumnLabel={t("sector")} unit={unit} share={share} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
+            <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={share} unit={unit} formatValue={share ? undefined : (value) => formatAmount(value, locale)} />
             <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
           </section>
           <div className="mt-[18px]"><SourceNote testId="regional-source-label">{t("source")} {model.range.start}–{model.range.end}</SourceNote></div>
