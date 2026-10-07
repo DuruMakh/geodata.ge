@@ -189,12 +189,17 @@ async function wordsBrokenMidWord(page: Page): Promise<string[]> {
       const node = walker.currentNode;
       const element = node.parentElement;
       if (!element || element.closest("svg, .sr-only, [aria-hidden='true']") || element.getBoundingClientRect().height === 0) continue;
+      let block: HTMLElement = element;
+      while (getComputedStyle(block).display.startsWith("inline") && block.parentElement) block = block.parentElement;
+      const lineWidth = block.clientWidth;
       for (const match of (node.textContent ?? "").matchAll(/[^\s\-–—/]{4,}/g)) {
         const range = document.createRange();
         range.setStart(node, match.index!);
         range.setEnd(node, match.index! + match[0].length);
-        const lines = new Set([...range.getClientRects()].filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top)));
-        if (lines.size > 1) found.push(match[0]);
+        const rects = [...range.getClientRects()].filter((rect) => rect.width > 0);
+        const lines = new Set(rects.map((rect) => Math.round(rect.top)));
+        const width = rects.reduce((sum, rect) => sum + rect.width, 0);
+        if (lines.size > 1 && width <= lineWidth) found.push(match[0]);
       }
     }
     return [...new Set(found)];
