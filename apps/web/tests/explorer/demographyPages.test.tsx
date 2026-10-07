@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src: "/definitions.svg" } }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathname: () => "/" }));
 
 import {
   demographyPageMetadata,
@@ -37,25 +38,64 @@ describe("demography hub page", () => {
   });
 });
 
-describe("population page", () => {
-  it("renders the heading, coverage, explorer and breadcrumb, with no download and no Georgian text in English", async () => {
+const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
+
+describe("population index page", () => {
+  it("is the Budget index layout with population: map, four key figures, 64 and 12 rows, links to place pages, no button row", async () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
-    expect(html).toContain('data-testid="explorer-shell"');
+    expect(html).toContain('data-testid="municipal-index-workspace"');
+    expect(html).toContain('data-testid="municipality-map"');
+    expect(count(html, /data-testid="index-kpi"/g)).toBe(4);
+    expect(count(html, /data-testid="municipal-list-row"/g)).toBe(64);
     expect(html).toContain("2004–2026 · as of 1 January");
     expect(html).toContain("persons, on 1 January");
+    for (const text of ["3,941,103", "1,369,356", "2,715.7", "5,056", "Lentekhi", "Tbilisi · persons per km²"]) expect(html).toContain(text);
+    expect(html).toContain("64 municipalities");
+    expect(html).not.toMatch(/₾|GEL|per resident|Regional GDP/);
+    expect(html).not.toContain("population-georgia-pill");
+    expect(html).not.toContain("population-level-");
+    expect(html).not.toContain("population-measure-");
+  });
+
+  it("links every row and the map to its own page, Tbilisi to the region page", async () => {
+    const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
+    for (const href of [
+      "/en/explorer/demography/population/batumi",
+      "/en/explorer/demography/population/khulo",
+      "/en/explorer/demography/population/region/tbilisi",
+      "/en/explorer/demography/population/region/adjara",
+      "/en/explorer/demography/population/georgia",
+    ]) expect(html).toContain(`href="${href}"`);
+    expect(html).not.toContain("/explorer/municipalities/");
+    expect(html).not.toContain('href="/en/explorer/demography/population/tbilisi"');
+  });
+
+  it("shows density under the region rows and the two notes under the map", async () => {
+    const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
+    expect(html).toContain("2,715.7/km²");
+    expect(html).toContain("142.5/km²");
+    expect(html).toContain("the maps show the latest year only");
+    expect(html).toContain("504.24");
+    expect(html).toContain("persons, 1 January 2026");
+  });
+
+  it("has a breadcrumb, the methodology link and no dataset markup, download or Georgian text in English", async () => {
+    const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
+    expect(html).toContain('href="/en/methodology/demography"');
     expect(html).not.toMatch(GEORGIAN);
   });
 
   it("renders in Georgian with the same structure", async () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("ka"));
-    expect(html).toContain('data-testid="explorer-shell"');
+    expect(html).toContain('data-testid="municipal-index-workspace"');
     expect(html).toContain("2004–2026 · 1 იანვრის მდგომარეობით");
-    expect(html).toContain('data-testid="breadcrumb-json-ld"');
-    expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
-    expect(html).not.toContain("/downloads/data/");
+    expect(html).toContain("64 მუნიციპალიტეტი");
+    expect(html).toContain('href="/explorer/demography/population/batumi"');
+    expect(html).toContain('href="/methodology/demography"');
+    expect(html).not.toMatch(/₾|მშპ|ერთ მოსახლეზე/);
   });
 
   it("has metadata with the page's own canonical address", async () => {
