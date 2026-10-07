@@ -5,6 +5,7 @@ import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -278,25 +279,16 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
           summary={summary}
           sourceNote={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraSource" : "municipal.regionSource") + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
         >
-          <div className="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
-            <h2 className="mb-3.5 font-[family-name:var(--font-display)] text-[22px] font-semibold">
-              {message(messages, "municipal.regionMembers")}
-            </h2>
-            {memberRows.map((member) => (
-              <a
-                key={member.id}
-                href={pageHref(municipalityHrefForCode(member.id), locale)}
-                data-testid="region-member-row"
-                className="grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-[var(--hairline-soft)] py-2 text-[var(--ink)] no-underline hover:bg-[var(--tint)]"
-              >
-                <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
-                  {String(member.rank).padStart(2, "0")}
-                </span>
-                <span className="truncate text-[12.5px]">{publicLabel(locale, member.id, member.nameKa, englishLabels)}</span>
-                <span className="font-[family-name:var(--font-numeric)] text-[11.5px]">{formatAmount(member.valueGel, locale)}</span>
-              </a>
-            ))}
-          </div>
+          <EntityMemberList
+            heading={message(messages, "municipal.regionMembers")}
+            rows={memberRows.map((member) => ({
+              id: member.id,
+              href: pageHref(municipalityHrefForCode(member.id), locale),
+              rank: member.rank,
+              label: publicLabel(locale, member.id, member.nameKa, englishLabels),
+              value: formatAmount(member.valueGel, locale),
+            }))}
+          />
         </MunicipalExplorer>
       </div>
     </main>

@@ -10,7 +10,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
-import { formatAmount } from "../../lib/explorer/format";
+import { formatAmount, formatInUnit, UNIT_PERSONS } from "../../lib/explorer/format";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
 // Entity picker for the 64 municipality and 11 region pages. A plain popover
@@ -40,12 +40,23 @@ export type EntityPickerCountry = {
   budgetCount: number;
 };
 
+/** Plain data, so a server page can hand it over. Every field is omitted by the Budget pages. */
+export type EntityPickerOverrides = {
+  /** Where each option opens, by id (country id, region id, municipality code). Ids not listed open the Budget page. */
+  hrefById?: Readonly<Record<string, string>>;
+  /** How a figure prints: the budget amount (default) or a whole number of persons. */
+  valueFormat?: "amount" | "persons";
+  /** The country row's right-hand text; the budget amount and count by default. */
+  countryDetail?: string;
+};
+
 type EntityPickerProps = {
   open: boolean;
   onClose: () => void;
   country: EntityPickerCountry;
   groups: EntityPickerGroup[];
   activeId: string;
+  overrides?: EntityPickerOverrides;
 };
 
 type PickerOption =
@@ -74,7 +85,7 @@ function focusTrigger() {
   document.querySelector<HTMLButtonElement>("[data-testid='entity-picker-trigger']")?.focus();
 }
 
-export function EntityPicker({ open, onClose, country, groups, activeId }: EntityPickerProps) {
+export function EntityPicker({ open, onClose, country, groups, activeId, overrides }: EntityPickerProps) {
   const { locale, messages, englishLabels } = useI18n();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -162,11 +173,14 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
     document.getElementById(activeOptionId)?.scrollIntoView({ block: "nearest" });
   }, [activeOptionId]);
 
+  const hrefFor = (kind: "country" | "region" | "municipality", id: string) => overrides?.hrefById?.[id] ?? municipalEntityHref(kind, id);
+  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : formatAmount(value, locale));
+
   function selectOption(option: PickerOption) {
     onClose();
-    if (option.kind === "country") router.push(pageHref(municipalEntityHref("country", country.id), locale));
-    else if (option.kind === "region") router.push(pageHref(municipalEntityHref("region", option.regionId), locale));
-    else router.push(pageHref(municipalEntityHref("municipality", option.code), locale));
+    if (option.kind === "country") router.push(pageHref(hrefFor("country", country.id), locale));
+    else if (option.kind === "region") router.push(pageHref(hrefFor("region", option.regionId), locale));
+    else router.push(pageHref(hrefFor("municipality", option.code), locale));
   }
 
   function moveActive(delta: 1 | -1) {
@@ -235,7 +249,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
         <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[340px] overflow-y-auto">
           {filteredCountry ? (
             <Link
-              href={pageHref(municipalEntityHref("country", country.id), locale)}
+              href={pageHref(hrefFor("country", country.id), locale)}
               id={countryOptionId(baseId)}
               role="option"
               aria-selected={countryOptionId(baseId) === activeOptionId}
@@ -249,7 +263,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
             >
               <span className="truncate text-[12px] font-semibold">{publicLabel(locale, country.id, country.nameKa, englishLabels)}</span>
               <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-                {message(messages, "municipal.pickerCountry", { amount: formatAmount(country.valueGel, locale), count: country.budgetCount })}
+                {overrides?.countryDetail ?? message(messages, "municipal.pickerCountry", { amount: formatValue(country.valueGel), count: country.budgetCount })}
               </span>
             </Link>
           ) : null}
@@ -260,7 +274,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
             return (
               <div key={group.regionId}>
                 <Link
-                  href={pageHref(municipalEntityHref("region", group.regionId), locale)}
+                  href={pageHref(hrefFor("region", group.regionId), locale)}
                   id={regionId}
                   role="option"
                   aria-selected={regionActive}
@@ -274,7 +288,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                 >
                   <span className="truncate text-[12px] font-semibold">{publicLabel(locale, group.regionId, group.nameKa, englishLabels)}</span>
                   <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
-                    {formatAmount(group.valueGel, locale)} · {group.members.length}
+                    {formatValue(group.valueGel)} · {group.members.length}
                   </span>
                 </Link>
                 {group.members.map((member) => {
@@ -284,7 +298,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                   return (
                     <Link
                       key={member.code}
-                      href={pageHref(municipalEntityHref("municipality", member.code), locale)}
+                      href={pageHref(hrefFor("municipality", member.code), locale)}
                       id={memberId}
                       role="option"
                       aria-selected={memberActive}
@@ -298,7 +312,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                     >
                       <span className="truncate text-[13px]">{publicLabel(locale, member.code, member.nameKa, englishLabels)}</span>
                       <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
-                        {formatAmount(member.valueGel, locale)}
+                        {formatValue(member.valueGel)}
                       </span>
                     </Link>
                   );

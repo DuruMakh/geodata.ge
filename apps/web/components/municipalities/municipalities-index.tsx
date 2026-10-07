@@ -7,17 +7,34 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { pageHref } from "../../lib/i18n/routes";
 import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "../../lib/explorer/municipalData";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipalData";
-import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
+import { formatAmount, formatInUnit, formatPerResidentGel, UNIT_PERSONS } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
-import { municipalityHrefForCode } from "../../lib/explorer/municipalityRoutes";
-import { municipalEntityHref } from "../../lib/seo/internalLinks";
+import { municipalEntityHref, type MunicipalEntityKind } from "../../lib/seo/internalLinks";
 import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
 import { MunicipalityMap } from "./municipality-map";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+
+/** Plain data, so a server page can hand it over. Every field is omitted by the Budget index. */
+export type MunicipalitiesIndexOverrides = {
+  /** Where each row and each map shape opens, by id (country id, region id, municipality code). Ids not listed open the Budget page. */
+  hrefById?: Readonly<Record<string, string>>;
+  /** How a row's figure prints: the budget amount (default) or a whole number of persons. */
+  valueFormat?: "amount" | "persons";
+  /** A second line under a row's figure, by row id; rows not listed keep the per-resident budget line, if they have one. */
+  secondaryById?: Readonly<Record<string, string>>;
+  /** The Georgia row's line under its name; the municipal-budget count by default. */
+  countrySubtitle?: string;
+  /** What sits where the Budget index prints the currency; the currency by default. */
+  unitLabel?: string;
+  /** The map's group label and legend caption, in place of the per-resident budget wording. */
+  mapWording?: { groupAria: string; legendCaption: string };
+  /** A note under the map. */
+  mapNote?: ReactNode;
+};
 
 type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel" | "legendMaxPerResidentGel"> & {
   legendMin: string;
@@ -26,11 +43,15 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResident
   regions: MunicipalListRow[];
   country: MunicipalListRow;
   kpis: MunicipalKpi[];
-  sourceNote: string;
+  sourceNote: ReactNode;
+  overrides?: MunicipalitiesIndexOverrides;
 };
 
 export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   const { locale, messages, englishLabels } = useI18n();
+  const { overrides } = props;
+  const hrefFor = (kind: MunicipalEntityKind, id: string) => overrides?.hrefById?.[id] ?? municipalEntityHref(kind, id);
+  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : formatAmount(value, locale));
   function subtitleFor(row: MunicipalListRow): string {
     if (locale === "ka") return row.subtitleKa;
     if (row.kind === "municipality" && row.regionId) return publicLabel(locale, row.regionId, row.subtitleKa, englishLabels);
@@ -38,7 +59,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
       const count = props.municipalities.filter(member => member.regionId === row.id).length;
       return message(messages, count === 1 ? "municipal.memberOne" : "municipal.members", { count });
     }
-    return message(messages, "municipal.budgets", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT });
+    return overrides?.countrySubtitle ?? message(messages, "municipal.budgets", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT });
   }
   const router = useRouter();
   const [level, setLevel] = useState<"muni" | "region">("muni");
@@ -88,7 +109,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   const source = sources[level];
   const rows = rowsByLevel[level];
 
-  const openMunicipality = (code: string) => router.push(pageHref(municipalityHrefForCode(code), locale));
+  const openMunicipality = (code: string) => router.push(pageHref(hrefFor("municipality", code), locale));
 
   function renderRowsFor(panelLevel: "muni" | "region") {
     const panelRows = rowsByLevel[panelLevel];
@@ -104,7 +125,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         {panelRows.map((row) => (
           <Link
             key={row.id}
-            href={pageHref(municipalEntityHref(row.kind, row.id), locale)}
+            href={pageHref(hrefFor(row.kind, row.id), locale)}
             data-testid={activePanel ? "municipal-list-row" : undefined}
             data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
             data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
@@ -142,9 +163,13 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
             </span>
             <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
               <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
-                {formatAmount(row.valueGel, locale)}
+                {formatValue(row.valueGel)}
               </span>
-              {row.budgetPerResidentGel !== null ? (
+              {overrides?.secondaryById?.[row.id] !== undefined ? (
+                <span data-testid="municipal-row-secondary" className="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">
+                  {overrides.secondaryById[row.id]}
+                </span>
+              ) : row.budgetPerResidentGel !== null ? (
                 <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">
                   {message(messages, "municipal.perResidentShort", { amount: formatPerResidentGel(row.budgetPerResidentGel, locale).replace(locale === "ka" ? " ₾" : " GEL", "") })}
                 </span>
@@ -174,8 +199,10 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               activeCode={activeMunicipalityCode}
               onActiveCodeChange={setMapActiveCode}
               onOpenMunicipality={openMunicipality}
+              wording={overrides?.mapWording}
             />
           </div>
+          {overrides?.mapNote}
 
           <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
             <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
@@ -205,7 +232,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               <TabDivider />
               <TextTab label={message(messages, "municipal.regions")} active={level === "region"} onClick={() => setLevel("region")} testId="level-region" />
             </span>
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{message(messages, "municipal.gel")}</span>
+            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{overrides?.unitLabel ?? message(messages, "municipal.gel")}</span>
           </div>
 
           <div className="flex items-center gap-2 pt-3 pb-1">
