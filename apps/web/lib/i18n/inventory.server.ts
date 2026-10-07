@@ -2,6 +2,7 @@ import path from "node:path";
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { BUDGET_SECTIONS, BUDGET_SECTION_ORDER } from "../explorer/sections";
 import { CITY_PAGE_PATHS } from "../explorer/inflationCityRoutes";
+import { populationPlacePaths } from "../explorer/demographyPlaceRoutes";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { loadManifestDocuments } from "../factQuery/buildSnapshot";
@@ -24,6 +25,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/inflation", "/explorer/inflation/overview", "/explorer/inflation/categories", "/explorer/inflation/products", "/explorer/inflation/cities",
     ...CITY_PAGE_PATHS,
     DEMOGRAPHY_HUB_PATH, ...LIVE_DEMOGRAPHY_PAGES.map((page) => page.path),
+    ...populationPlacePaths(regions.map(({ id }) => id)),
     ...BUDGET_SECTION_ORDER.map((id) => BUDGET_SECTIONS[id].href).filter((href): href is string => href !== null),
     "/explorer/municipalities/georgia",
     ...MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}`),

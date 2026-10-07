@@ -15,6 +15,7 @@ import {
   regionFactsFor,
 } from "../explorer/municipalData";
 import { CITY_PAGE_PATHS } from "../explorer/inflationCityRoutes";
+import { populationPlacePaths } from "../explorer/demographyPlaceRoutes";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../siteUrl";
@@ -103,6 +104,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...CITY_PAGE_PATHS.map((path) => ({ url: `${siteUrl}${path}`, lastModified: inflationModified })),
     { url: `${siteUrl}${DEMOGRAPHY_HUB_PATH}`, lastModified: demographyModified },
     ...LIVE_DEMOGRAPHY_PAGES.map((page) => ({ url: `${siteUrl}${page.path}`, lastModified: demographyModified })),
+    ...populationPlacePaths(regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: demographyModified })),
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}/explorer/analysis`, lastModified },
