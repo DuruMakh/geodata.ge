@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { renderGeorgianMarkup } from "../helpers/render-localized";
+import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
 import {
   buildTooltipRows,
@@ -30,7 +30,7 @@ function axisLabels(unit: ValueUnit, values: number[]): string[] {
     }),
   );
 
-  return [...markup.matchAll(/<text\b[^>]*>([^<]+)<\/text>/g)]
+  return [...chartGeometry(markup, "desktop").matchAll(/<text\b[^>]*>([^<]+)<\/text>/g)]
     .map((match) => match[1])
     .filter((label) => label.endsWith(unit.label));
 }
@@ -203,7 +203,7 @@ describe("EditorialLineChart monthly periods", () => {
   );
 
   it("prints formatted calendar-year labels", () => {
-    const labels = [...markup.matchAll(/<text\b[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+    const labels = [...chartGeometry(markup, "desktop").matchAll(/<text\b[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
     expect(labels).toEqual(["2004", "2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022", "2024", "2026"]);
   });
 
@@ -213,7 +213,62 @@ describe("EditorialLineChart monthly periods", () => {
   });
 
   it("spaces lattice columns by half-years", () => {
-    const width = Number(/<pattern[^>]*\swidth="([\d.]+)"/.exec(markup)?.[1]);
+    const width = Number(/<pattern[^>]*\swidth="([\d.]+)"/.exec(chartGeometry(markup, "desktop"))?.[1]);
     expect(width).toBeCloseTo((816 / 271) * 6, 3);
+  });
+
+  it("labels the first and the latest month on a phone, and Januaries between them without collisions", () => {
+    const phone = chartGeometry(markup, "mobile");
+    const labels = [...phone.matchAll(/<text\b[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+    expect(labels[0]).toBe("2004");
+    // The latest period (index 271, 2026) closes the axis; the regular labels between are evenly spaced years.
+    expect(labels.at(-1)).toBe("2026");
+    expect(labels.length).toBeLessThanOrEqual(8);
+    const regular = labels.slice(1, -1).map(Number);
+    const gaps = new Set(regular.slice(1).map((year, index) => year - regular[index]!));
+    expect(gaps.size).toBeLessThanOrEqual(1);
+  });
+});
+
+// D1 (2026-10-07): phones draw the chart at the frame's width instead of
+// scrolling a 920-unit drawing that rendered its 11-unit labels at 8.6px.
+describe("EditorialLineChart phone geometry", () => {
+  const years = Array.from({ length: 22 }, (_, index) => 2004 + index);
+  const markup = renderGeorgianMarkup(
+    createElement(EditorialLineChart, {
+      years,
+      series: [{ id: "total", label: "სულ", color: "#1E1B16", vals: years.map((_, index) => 4e9 + index * 1.2e9), planned: years.map(() => false) }],
+      share: false,
+      unit: UNIT_BN,
+      shareLabel: "% წილი",
+    }),
+  );
+
+  it("renders both drawings before measuring and lets CSS pick one", () => {
+    expect(chartGeometry(markup, "desktop")).toMatch(/class="[^"]*max-\[768px\]:hidden/);
+    expect(chartGeometry(markup, "mobile")).toMatch(/class="[^"]*hidden max-\[768px\]:block/);
+    expect(chartGeometry(markup, "desktop")).toContain('viewBox="0 0 920 320"');
+    expect(chartGeometry(markup, "mobile")).toMatch(/viewBox="0 0 340 \d+"/);
+  });
+
+  it("prints the unit once above the axis and plain numbers on the ticks", () => {
+    const phone = chartGeometry(markup, "mobile");
+    expect(phone).toMatch(/<text data-unit-caption[^>]*>მლრდ<\/text>/);
+    const ticks = [...phone.matchAll(/<text[^>]*text-anchor="end"[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
+    expect(ticks.length).toBeGreaterThan(3);
+    for (const tick of ticks) expect(tick).toMatch(/^−?[\d.,]+$/);
+  });
+
+  it("thins the years so they fit, keeping the first and the latest", () => {
+    const labels = [...chartGeometry(markup, "mobile").matchAll(/<text\b[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+    expect(labels[0]).toBe("2004");
+    expect(labels.at(-1)).toBe("2025");
+    expect(labels.length).toBeLessThanOrEqual(7);
+    expect(labels.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("keeps the desktop drawing's labels untouched", () => {
+    const labels = [...chartGeometry(markup, "desktop").matchAll(/<text\b[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+    expect(labels).toEqual(["2004", "2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022", "2025"]);
   });
 });

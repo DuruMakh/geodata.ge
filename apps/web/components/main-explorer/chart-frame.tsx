@@ -24,18 +24,77 @@ export type StickyYAxis = {
 };
 
 /**
+ * Phones (DESIGN.md §12 mobile, <768px) draw the charts at the frame's own width
+ * instead of shrinking or scrolling the 920-unit desktop drawing. The same query
+ * runs in CSS (Tailwind `max-[768px]:`) and here, so both pick the same geometry.
+ */
+export const MOBILE_CHART_QUERY = "(width < 768px)";
+/** The width the phone drawing assumes before the browser has measured the frame. */
+export const MOBILE_PREVIEW_WIDTH = 340;
+const MOBILE_MIN_WIDTH = 240;
+
+/** Height of a phone drawing: proportional to its width, within bounds. */
+export function mobileChartHeight(width: number, ratio: number, min: number, max: number): number {
+  return Math.round(Math.min(max, Math.max(min, width * ratio)));
+}
+
+/**
+ * Which geometry a chart draws. `undefined` until the browser has measured: the
+ * server and the hydrating client then render BOTH drawings and CSS shows the
+ * one that fits, so a phone never paints the desktop drawing first. After that
+ * `null` means desktop and a number is the phone drawing's width in CSS pixels
+ * (one viewBox unit per pixel, so 11-unit axis text renders at 11px).
+ */
+export function useChartLayout<T extends HTMLElement = HTMLDivElement>() {
+  const ref = useRef<T>(null);
+  const [mobileWidth, setMobileWidth] = useState<number | null | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element || typeof window.matchMedia !== "function") {
+      setMobileWidth(null);
+      return;
+    }
+    const query = window.matchMedia(MOBILE_CHART_QUERY);
+    const measure = () => setMobileWidth(query.matches ? Math.round(element.clientWidth) : null);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    query.addEventListener("change", measure);
+    return () => {
+      observer.disconnect();
+      query.removeEventListener("change", measure);
+    };
+  }, []);
+
+  return {
+    ref,
+    /** The phone drawing's width, or null on desktop (also while unmeasured: the preview width then applies). */
+    mobileWidth: mobileWidth === undefined || mobileWidth === null ? mobileWidth : Math.max(MOBILE_MIN_WIDTH, mobileWidth),
+  };
+}
+
+/** CSS that shows one of the two pre-measurement drawings. */
+export const DESKTOP_ONLY = "max-[768px]:hidden";
+export const MOBILE_ONLY = "hidden max-[768px]:block";
+
+/**
  * Scroll instead of shrink on narrow screens: an unbounded w-full SVG scales its
  * text below the DESIGN.md §13 legibility floor on phones.
+ *
+ * Phones (<768px) no longer reach that floor: they draw a phone geometry that
+ * fits the frame (`fit`), so nothing scrolls and the sticky axis and the
+ * latest-first scroll below have nothing to do there.
  *
  * Exception, 900–1019px: the shell's sidebar leaves the column under 720px, so the
  * floor would put a scrollbar under a desktop-width chart. There the chart shrinks
  * to fit instead — an approved trade of label size for a whole chart (DESIGN.md
- * §12). Below 900px the sidebar is a top bar and the column is wide again, so
- * phones keep the scroll. The inner box is `relative` so a tooltip can position.
+ * §12). The inner box is `relative` so a tooltip can position.
  *
- * When it scrolls, the frame opens on the latest data (the right edge) and
- * re-opens there whenever `scrollKey` changes (range, series); a sticky copy of
- * the y axis keeps the values readable once the axis itself has scrolled away.
+ * When it scrolls (a desktop drawing in a frame under 720px, e.g. a 768px
+ * tablet), the frame opens on the latest data (the right edge) and re-opens
+ * there whenever `scrollKey` changes (range, series); a sticky copy of the y
+ * axis keeps the values readable once the axis itself has scrolled away.
  */
 export function ChartScrollFrame({
   children,
@@ -43,6 +102,7 @@ export function ChartScrollFrame({
   scrollKey,
   yAxis,
   overlay,
+  fit = false,
 }: {
   children: ReactNode;
   testId?: string;
@@ -50,6 +110,8 @@ export function ChartScrollFrame({
   yAxis?: StickyYAxis;
   /** Drawn over the visible part of the frame, whatever its scroll position (a tapped readout). */
   overlay?: ReactNode;
+  /** The chart is drawn at the frame's width (phones): no minimum width. */
+  fit?: boolean;
 }) {
   const { messages } = useI18n();
   const scroller = useRef<HTMLDivElement>(null);
@@ -87,7 +149,7 @@ export function ChartScrollFrame({
       aria-label={message(messages, "controls.chartScrollable")}
       className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
     >
-      <div className="relative grid min-w-[720px] min-[900px]:max-[1020px]:min-w-0">
+      <div className={fit ? "relative grid" : "relative grid min-w-[720px] max-[768px]:min-w-0 min-[900px]:max-[1020px]:min-w-0"}>
         <div className="col-start-1 row-start-1 min-w-0">{children}</div>
         {overflowing && yAxis ? (
           <div
@@ -200,6 +262,7 @@ export function ChartTooltip({
   formatValue,
   preliminaryLabel,
   testId = "chart-tooltip",
+  variant = "float",
 }: {
   leftPercent: number;
   pinned?: PinnedSide | null;
@@ -210,8 +273,39 @@ export function ChartTooltip({
   formatValue: (value: number) => string;
   preliminaryLabel?: string;
   testId?: string;
+  /** "panel": the phone readout, in flow under the chart so it never covers the plot. */
+  variant?: "float" | "panel";
 }) {
   const { messages } = useI18n();
+  if (variant === "panel") {
+    return (
+      <div
+        data-testid={testId}
+        data-placement="panel"
+        className="mt-2 flex flex-col gap-1 rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-3 py-2"
+      >
+        <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[12px] text-[var(--muted)]">
+          <span>{header}</span>
+          {headerRight ? <span className="text-right">{headerRight}</span> : null}
+        </div>
+        {rows.map((row) => (
+          <div key={row.id} className="flex items-center justify-between gap-3">
+            <span className="inline-flex min-w-0 items-center gap-1.5 text-[12px] font-medium text-[var(--body)]">
+              <SwatchBar color={row.color} className="!w-3 shrink-0" />
+              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{row.label}</span>
+            </span>
+            <span className="shrink-0 font-[family-name:var(--font-numeric)] text-[12px] text-[var(--ink)]">
+              {formatValue(row.value)}
+              {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[10px]">{preliminaryLabel}</sup> : null}
+            </span>
+          </div>
+        ))}
+        {hidden > 0 ? (
+          <div className="pt-0.5 text-[12px] text-[var(--muted)]">+{hidden} {message(messages, "controls.other")}</div>
+        ) : null}
+      </div>
+    );
+  }
   return (
     <div
       data-testid={testId}

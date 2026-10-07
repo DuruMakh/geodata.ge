@@ -37,7 +37,14 @@ const axisPages = [
 const atEnd = (frame: import("@playwright/test").Locator) =>
   frame.evaluate((element) => element.scrollWidth - element.clientWidth - element.scrollLeft);
 
-// Charts opened on the oldest data, so the current value was never on a phone's
+// Phones now draw a fitted chart (mobile-fit-charts.spec.ts). The desktop drawing
+// still scrolls where its frame is under 720px but the viewport is not a phone
+// (768–776px); there it opens at the latest data with its axis in view, and a
+// tap pins the floating readout inside the visible frame.
+test.describe("desktop drawing in a frame under 720px", () => {
+test.use({ viewport: { width: 768, height: 1024 } });
+
+// Charts opened on the oldest data, so the current value was never on the
 // first screen; once scrolled to it, the y axis had scrolled away with the plot.
 for (const [path, testId] of [
   ["/explorer/expenditure", "chart-frame"],
@@ -98,6 +105,16 @@ for (const [path, frameId, tooltipId] of [
   });
 }
 
+test("a range change re-opens the chart at the latest data", async ({ page }) => {
+  await ready(page, "/explorer/expenditure");
+  const frame = page.getByTestId("chart-frame");
+  await frame.evaluate((element) => element.scrollTo({ left: 0 }));
+  await expect.poll(() => frame.evaluate((element) => element.scrollLeft)).toBe(0);
+  await page.getByTestId("range-start-handle").press("ArrowRight");
+  await expect.poll(() => atEnd(frame)).toBeLessThanOrEqual(1);
+});
+});
+
 test("a tap focuses the stacked chart without a focus ring; the keyboard still gets one", async ({ page }) => {
   await ready(page, "/explorer/unemployment/overview");
   const frame = page.getByTestId("stack-chart-frame");
@@ -128,15 +145,6 @@ test("a vertical swipe over a chart still scrolls the page", async ({ page }) =>
   await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(before);
   await expect(page.getByTestId("chart-tooltip")).toHaveCount(0);
-});
-
-test("a range change re-opens the chart at the latest data", async ({ page }) => {
-  await ready(page, "/explorer/expenditure");
-  const frame = page.getByTestId("chart-frame");
-  await frame.evaluate((element) => element.scrollTo({ left: 0 }));
-  await expect.poll(() => frame.evaluate((element) => element.scrollLeft)).toBe(0);
-  await page.getByTestId("range-start-handle").press("ArrowRight");
-  await expect.poll(() => atEnd(frame)).toBeLessThanOrEqual(1);
 });
 
 test("a chart that fits keeps its scroll position and draws no sticky axis", async ({ page }) => {

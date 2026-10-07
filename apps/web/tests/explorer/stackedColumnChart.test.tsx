@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { StackedColumnChart, type StackedColumnChartProps } from "../../components/main-explorer/stacked-column-chart";
-import { renderGeorgianMarkup } from "../helpers/render-localized";
+import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props: StackedColumnChartProps = {
   periods: [24157, 24158],
@@ -24,7 +24,8 @@ function segmentY(html: string, id: string): number {
 
 describe("StackedColumnChart", () => {
   it("draws one rect per segment and period", () => {
-    expect(markup.match(/data-segment="/g)).toHaveLength(4);
+    expect(chartGeometry(markup, "desktop").match(/data-segment="/g)).toHaveLength(4);
+    expect(chartGeometry(markup, "mobile").match(/data-segment="/g)).toHaveLength(4);
   });
 
   it("puts negative segments below the zero line", () => {
@@ -81,7 +82,7 @@ describe("StackedColumnChart", () => {
         overlay={null}
       />,
     );
-    const rects = [...wide.matchAll(/<rect[^>]*data-segment="[^"]+"[^>]*>/g)].map((match) => ({
+    const rects = [...chartGeometry(wide, "desktop").matchAll(/<rect[^>]*data-segment="[^"]+"[^>]*>/g)].map((match) => ({
       x: Number(/\bx="([-\d.]+)"/.exec(match[0])?.[1]),
       width: Number(/\bwidth="([-\d.]+)"/.exec(match[0])?.[1]),
     }));
@@ -92,6 +93,39 @@ describe("StackedColumnChart", () => {
     const axis = [...wide.matchAll(/<text[^>]*text-anchor="end"[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
     expect(axis).toContain("3,500");
     expect(axis).not.toContain("3500");
+  });
+
+  // D1: the phone drawing fits the frame (340 units before measuring, one per
+  // pixel) with its columns inside the plot and a thinned, collision-free axis.
+  it("draws a phone geometry that keeps columns inside and labels the first and latest period", () => {
+    const years = Array.from({ length: 16 }, (_, index) => 2010 + index);
+    const wide = renderGeorgianMarkup(
+      <StackedColumnChart
+        {...props}
+        periods={years}
+        segments={[{ id: "employed", label: "Employed", color: "#1F6E56", values: years.map(() => 1300) }]}
+        overlay={null}
+      />,
+    );
+    const phone = chartGeometry(wide, "mobile");
+    expect(phone).toMatch(/viewBox="0 0 340 \d+"/);
+    expect(chartGeometry(wide, "desktop")).toContain('viewBox="0 0 920 320"');
+    const rects = [...phone.matchAll(/<rect[^>]*data-segment="[^"]+"[^>]*>/g)].map((match) => ({
+      x: Number(/\bx="([-\d.]+)"/.exec(match[0])?.[1]),
+      width: Number(/\bwidth="([-\d.]+)"/.exec(match[0])?.[1]),
+    }));
+    expect(rects.length).toBe(16);
+    expect(Math.max(...rects.map((rect) => rect.x + rect.width))).toBeLessThanOrEqual(340 - 12);
+    const labels = [...phone.matchAll(/<text x="([\d.]+)"[^>]*text-anchor="start"[^>]*>(\d{4})<\/text>/g)].map((match) => ({
+      x: Number(match[1]),
+      text: match[2]!,
+    }));
+    expect(labels[0]!.text).toBe("2010");
+    expect(labels.at(-1)!.text).toBe("2025");
+    expect(labels.length).toBeLessThan(16);
+    // Four-digit mono labels are 26.4 units wide; consecutive ones never touch.
+    for (let index = 1; index < labels.length; index += 1) expect(labels[index]!.x - labels[index - 1]!.x).toBeGreaterThan(26.4);
+    expect(labels.at(-1)!.x + 26.4).toBeLessThanOrEqual(340);
   });
 
   it("ends the headline overlay in a dot", () => {
