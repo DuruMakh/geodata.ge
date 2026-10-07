@@ -2,11 +2,9 @@ import type { SideKpi } from "../../components/main-explorer/kpi-blocks";
 import { message } from "../i18n/messages";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
 import { placeColor, placeLabel, type DemographyPlace } from "./demographyAreas";
-import { populationBasisKey, type PopulationHighlights } from "./demographyPopulation";
+import { populationBasisKey, type Figure, type PopulationHighlights } from "./demographyPopulation";
 import { formatInUnit, formatShare, MISSING, UNIT_DENSITY, UNIT_PERSONS } from "./format";
 import type { MunicipalKpi } from "./municipalData";
-
-type Figure = { place: DemographyPlace; value: number; trend: Array<number | null> };
 
 export type PopulationKpis = {
   heroLabel: string;

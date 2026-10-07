@@ -3,7 +3,8 @@ import { loadServedDemographyData } from "../../lib/data/demography/importDemogr
 import type { ServedDemographyObservation } from "../../lib/data/demography/types";
 import type { Municipality, MunicipalRegion } from "../../lib/data/municipal/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
-import { buildPopulationIndexModel, buildPopulationPickerGroups, type PopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
+import { buildPopulationIndexModel, type PopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
+import { pickerGroupsFromRows } from "../../lib/explorer/municipalData";
 
 let facts: ServedDemographyObservation[];
 let regions: MunicipalRegion[];
@@ -65,7 +66,7 @@ describe("population index model", () => {
   });
 
   test("picker groups: 11 regions in value order, each with its municipalities in value order; Tbilisi lists itself", () => {
-    const groups = buildPopulationPickerGroups(index);
+    const groups = pickerGroupsFromRows(index);
     expect(groups).toHaveLength(11);
     expect(groups[0]).toMatchObject({ regionId: "region.tbilisi", valueGel: 1_369_356, members: [{ code: "04", valueGel: 1_369_356 }] });
     const adjara = groups.find((group) => group.regionId === "region.adjara")!;

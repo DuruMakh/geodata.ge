@@ -18,9 +18,10 @@ import {
   populationPlaceHref,
 } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel } from "../explorer/demographyPopulation";
-import { buildPopulationIndexModel, buildPopulationPickerGroups } from "../explorer/demographyPopulationIndex";
+import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
 import { DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
+import { pickerGroupsFromRows } from "../explorer/municipalData";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import { message } from "../i18n/messages";
 import { I18nProvider } from "../i18n/provider";
@@ -155,7 +156,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
           metaLine={metaLine}
           navigation={navigation}
           pickerCountry={{ id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო", valueGel: index.country.valueGel, budgetCount: georgia.municipalityCount }}
-          pickerGroups={buildPopulationPickerGroups(index)}
+          pickerGroups={pickerGroupsFromRows(index)}
           pickerOverrides={{
             hrefById: populationHrefById(places),
             valueFormat: "persons",

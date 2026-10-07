@@ -109,7 +109,7 @@ export function sparkValues(
   return values;
 }
 
-type Figure = { place: DemographyPlace; value: number; trend: Array<number | null> };
+export type Figure = { place: DemographyPlace; value: number; trend: Array<number | null> };
 
 type HighlightBase = {
   place: DemographyPlace;

@@ -10,7 +10,8 @@ import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { projectDemographyObservation } from "../../lib/explorer/clientData";
 import { GEORGIA_PLACE_ID, buildDemographyPlaces, type DemographyPlace } from "../../lib/explorer/demographyAreas";
 import { populationHrefById } from "../../lib/explorer/demographyPlaceRoutes";
-import { buildPopulationIndexModel, buildPopulationPickerGroups } from "../../lib/explorer/demographyPopulationIndex";
+import { buildPopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
+import { pickerGroupsFromRows } from "../../lib/explorer/municipalData";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 import type { Locale, Presentation } from "../../lib/i18n/types";
@@ -51,7 +52,7 @@ function render(placeId: string, locale: Locale = "en", withNavigation = false):
         metaLine="the meta line"
         navigation={withNavigation ? { prev: { label: "Before", href: "/a" }, next: { label: "After", href: "/b" } } : undefined}
         pickerCountry={{ id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო", valueGel: index.country.valueGel, budgetCount: 64 }}
-        pickerGroups={buildPopulationPickerGroups(index)}
+        pickerGroups={pickerGroupsFromRows(index)}
         pickerOverrides={{ hrefById: populationHrefById(places), valueFormat: "persons", countryDetail: "64 municipalities" }}
         sourceNote="Source: Geostat"
         sources={[]}

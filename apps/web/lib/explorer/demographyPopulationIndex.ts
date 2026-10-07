@@ -3,7 +3,7 @@ import type { ServedDemographyObservation } from "../data/demography/types";
 import { MUNICIPAL_COUNTRY_ID, type Municipality, type MunicipalRegion } from "../data/municipal/types";
 import { GEORGIA_PLACE_ID } from "./demographyAreas";
 import { buildPopulationMunicipalityMap } from "./demographyPopulationMaps";
-import type { EntityPickerGroupModel, MunicipalListRow } from "./municipalData";
+import type { MunicipalListRow } from "./municipalData";
 import type { MunicipalityMapModel } from "./municipalityMapData";
 
 /**
@@ -90,16 +90,4 @@ export function buildPopulationIndexModel({
   );
 
   return { year, map, municipalities: municipalityRows, regions: regionRows, country, densityByPlace, densityYear };
-}
-
-/** The picker's groups: regions in value order, each with its municipalities in value order. Tbilisi lists itself. */
-export function buildPopulationPickerGroups(index: Pick<PopulationIndexModel, "municipalities" | "regions">): EntityPickerGroupModel[] {
-  return index.regions.map((region) => ({
-    regionId: region.id,
-    nameKa: region.nameKa,
-    valueGel: region.valueGel,
-    members: index.municipalities
-      .filter((municipality) => municipality.regionId === region.id)
-      .map((municipality) => ({ code: municipality.id, nameKa: municipality.nameKa, valueGel: municipality.valueGel })),
-  }));
 }
