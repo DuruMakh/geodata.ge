@@ -64,22 +64,39 @@ export function InflationCategoryTable({
       legendLabel={t("legend")}
       picker={
         options.length > 1 ? (
-          <div
-            role="group"
-            aria-label={t("tableSeries")}
-            data-testid="inflation-category-table-series"
-            className="flex flex-wrap gap-5"
-          >
-            {options.map((categoryId) => (
-              <TextTab
-                key={categoryId}
-                testId={`inflation-category-table-series-${categoryId}`}
-                label={categoryLabel(messages, categoryId)}
-                active={categoryId === active}
-                onClick={() => onTableSeriesChange(categoryId)}
-              />
-            ))}
-          </div>
+          <>
+            <div
+              role="group"
+              aria-label={t("tableSeries")}
+              data-testid="inflation-category-table-series"
+              className="flex flex-wrap gap-5 @max-[768px]:hidden"
+            >
+              {options.map((categoryId) => (
+                <TextTab
+                  key={categoryId}
+                  testId={`inflation-category-table-series-${categoryId}`}
+                  label={categoryLabel(messages, categoryId)}
+                  active={categoryId === active}
+                  onClick={() => onTableSeriesChange(categoryId)}
+                />
+              ))}
+            </div>
+            {/* Twelve wrapped tabs filled ~550px of a phone before the table; a native
+                select carries the same choice in one row (same state, same URL). */}
+            <label className="block @min-[768px]:hidden">
+              <span className="sr-only">{t("tableSeries")}</span>
+              <select
+                data-testid="inflation-category-table-select"
+                value={active}
+                onChange={(event) => onTableSeriesChange(event.target.value)}
+                className="min-h-11 w-full min-w-0 cursor-pointer rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[13px] font-semibold text-[var(--ink)]"
+              >
+                {options.map((categoryId) => (
+                  <option key={categoryId} value={categoryId}>{categoryLabel(messages, categoryId)}</option>
+                ))}
+              </select>
+            </label>
+          </>
         ) : null
       }
     />

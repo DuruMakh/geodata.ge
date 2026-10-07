@@ -217,3 +217,28 @@ test.describe("expenditure grouping", () => {
     });
   });
 });
+
+for (const locale of ["ka", "en"] as const) {
+  test(`${locale} inflation categories table picks its category from a select on a phone`, async ({ page }) => {
+    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/categories#m=table`);
+    const select = page.getByTestId("inflation-category-table-select");
+    await expect(select).toBeVisible();
+    await expect(page.getByTestId("inflation-category-table-series")).toBeHidden();
+    expect((await select.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    const options = await select.locator("option").evaluateAll((items) => items.map((item) => (item as HTMLOptionElement).value));
+    expect(options.length).toBeGreaterThan(1);
+    const next = options.find((value) => value !== "") === (await select.inputValue()) ? options[1]! : options[0]!;
+    await select.selectOption(next);
+    await expect(page).toHaveURL(new RegExp(`[#&]t=${next.replace(/\./g, "\\.")}`));
+    await expect(select).toHaveValue(next);
+  });
+}
+
+test.describe("inflation categories table on desktop", () => {
+  test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
+  test("keeps the category tabs", async ({ page }) => {
+    await page.goto("/explorer/inflation/categories#m=table");
+    await expect(page.getByTestId("inflation-category-table-series")).toBeVisible();
+    await expect(page.getByTestId("inflation-category-table-select")).toBeHidden();
+  });
+});
