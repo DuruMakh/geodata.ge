@@ -766,7 +766,8 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
 
     const links = page.getByTestId("site-footer").getByRole("link");
     // The production connection is discoverable from every site footer.
-    await expect(links).toHaveCount(7);
+    // Logo, the four datasets, methodology, AI-კავშირი, მიზანი and the address.
+    await expect(links).toHaveCount(9);
     await expect(page.getByTestId("site-footer").getByRole("link", { name: "AI-კავშირი", exact: true })).toHaveAttribute("href", "/connect");
     for (const link of await links.all()) {
       await expectMinimumTarget(link);

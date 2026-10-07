@@ -121,6 +121,29 @@ test("landing calls to action are 44px tap targets", async ({ page }) => {
   for (const target of targets) expect((await target.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
 
+for (const { path, labels, tagline } of [
+  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"], tagline: "საქართველოს საჯარო ფინანსები და ეკონომიკა" },
+  { path: "/en", labels: ["Budget", "Economy", "Inflation", "Unemployment", "Methodology", "AI connection", "About"], tagline: "Georgia’s public finances and economy" },
+]) {
+  test(`${path} footer names the four datasets in a compact two-column grid`, async ({ page }) => {
+    await page.goto(path);
+    const footer = page.getByTestId("site-footer");
+    const nav = footer.locator("ul a");
+    await expect(nav).toHaveText(labels);
+    await expect(footer).toContainText(tagline);
+    const boxes = await nav.evaluateAll((links) => links.map((link) => link.getBoundingClientRect().toJSON() as DOMRect));
+    for (const box of boxes) expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(new Set(boxes.map((box) => Math.round(box.x))).size).toBe(2);
+    // The data line no longer repeats its own heading.
+    await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
+    const height = (await footer.boundingBox())?.height ?? 0;
+    // ~445px against ~600px before; seven 44px rows in two columns are the floor.
+    expect(height).toBeLessThanOrEqual(460);
+    const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
+    expect(marginTop).toBeLessThanOrEqual(48);
+  });
+}
+
 test("404 recovers to the four datasets with no top band on a phone", async ({ page }) => {
   await page.goto("/this-page-does-not-exist");
   const recovery = page.getByTestId("not-found-recovery");
