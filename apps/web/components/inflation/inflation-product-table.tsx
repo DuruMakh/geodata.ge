@@ -8,7 +8,6 @@ import { productAnnual, productCumulative, type ProductIndex } from "../../lib/e
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 import { SectionTitle } from "../ui/editorial";
 import { InflationProductArt } from "./inflation-product-art";
 import { filteredProductIds } from "./inflation-product-panel";
@@ -55,7 +54,6 @@ export function InflationProductTable({ index, state, onToggle }: {
       />
     </div>
     {ids.length === 0 ? <p data-testid="product-list-empty" className="mt-6 text-[13px] text-[var(--muted)]">{t("productsNoMatches")}</p> : <div className="mt-[18px]">
-      <HorizontalScrollHint testId="product-table-scroll-hint" />
       <div
         data-testid="product-table"
         role="region"

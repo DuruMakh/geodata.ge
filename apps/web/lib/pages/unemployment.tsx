@@ -27,6 +27,7 @@ import { buildUnemploymentHubCards } from "../explorer/unemploymentHubCards";
 import { unemploymentIndicators } from "../data/unemployment/types";
 import { unemploymentOverviewIndicators } from "../explorer/unemploymentOverview";
 import { UNEMPLOYMENT_SECTIONS, unemploymentBreakdownsForSection, type UnemploymentSectionId } from "../explorer/unemploymentSections";
+import { UNEMPLOYMENT_AGE_FIRST_YEAR } from "../explorer/unemploymentAge";
 
 export async function unemploymentHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["unemployment"]);
@@ -61,7 +62,7 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   ]);
   const dimensions = new Set([...unemploymentBreakdownsForSection(section), "national", ...(section === "overview" ? ["sex"] : [])]);
   const mainBreakdown = UNEMPLOYMENT_SECTIONS.find(item => item.id === section)!.breakdown;
-  const facts = data.facts.filter(fact => (!regionId || fact.dimension === "region" && fact.groupId === regionId) && dimensions.has(fact.dimension) && (section === "overview" ? (fact.dimension === "sex" ? fact.indicatorId === "unemployment_rate" : unemploymentOverviewIndicators(fact.dimension).includes(fact.indicatorId)) : section === "regions" ? unemploymentOverviewIndicators("region").includes(fact.indicatorId) : unemploymentIndicators(mainBreakdown).includes(fact.indicatorId)));
+  const facts = data.facts.filter(fact => (section !== "age" || fact.dimension === "age" && fact.year >= UNEMPLOYMENT_AGE_FIRST_YEAR) && (!regionId || fact.dimension === "region" && fact.groupId === regionId) && dimensions.has(fact.dimension) && (section === "overview" ? (fact.dimension === "sex" ? fact.indicatorId === "unemployment_rate" : unemploymentOverviewIndicators(fact.dimension).includes(fact.indicatorId)) : section === "regions" ? unemploymentOverviewIndicators("region").includes(fact.indicatorId) : unemploymentIndicators(mainBreakdown).includes(fact.indicatorId)));
   const sectionPath = regionId ? unemploymentRegionHref(regionId) : UNEMPLOYMENT_SECTIONS.find(item => item.id === section)!.href;
   const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
   const sources = manifest.map(source => {

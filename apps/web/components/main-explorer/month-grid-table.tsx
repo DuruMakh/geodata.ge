@@ -5,7 +5,6 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { MISSING } from "../../lib/explorer/format";
 import { GRID_TINTS, type GridCell, type GridRow } from "../../lib/explorer/inflationGrid";
-import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 
 // The ცხრილი view for monthly data (spec §7.1). ExplorerTable's anatomy — 2px ink
 // header rule, hairline rows, mono right-aligned numerals, sticky first column,
@@ -53,7 +52,6 @@ export function MonthGridTable({ caption, yearLabel, monthLabels, monthNames, su
   return (
     <div className="mt-4">
       {picker ? <div className="mb-4">{picker}</div> : null}
-      <HorizontalScrollHint testId="table-scroll-hint" />
       <div
         data-testid="month-grid"
         role="region"

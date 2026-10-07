@@ -120,8 +120,8 @@
   "/explorer/inflation/cities/gori": "2026-09-30",
   "/explorer/inflation/cities/telavi": "2026-09-30",
   "/explorer/inflation/cities/zugdidi": "2026-09-30",
-  "/methodology/unemployment": "2026-10-06",
-  "/explorer/unemployment": "2026-10-06",
+  "/methodology/unemployment": "2026-10-07",
+  "/explorer/unemployment": "2026-10-07",
   "/explorer/unemployment/overview": "2026-10-06",
   "/explorer/unemployment/regions": "2026-10-06",
   "/explorer/unemployment/regions/tbilisi": "2026-10-06",
@@ -135,6 +135,6 @@
   "/explorer/unemployment/regions/samtskhe_javakheti": "2026-10-06",
   "/explorer/unemployment/regions/kvemo_kartli": "2026-10-06",
   "/explorer/unemployment/regions/shida_kartli": "2026-10-06",
-  "/explorer/unemployment/age": "2026-10-05",
+  "/explorer/unemployment/age": "2026-10-07",
   "/explorer/unemployment/gender": "2026-10-05"
 }

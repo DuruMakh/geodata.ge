@@ -28,12 +28,11 @@ test.each(["total", "women", "men"] as const)("education %s coverage does not in
   expect(view.headline?.publishedValue).toBe(sex === "total" ? 13.9 : sex === "women" ? 11.4 : 15.8);
   expect(view.activeFacts.every(f => f.year >= 2020)).toBe(true);
 });
-test("historical age bands keep their own identity and missing years", () => {
+test("age display omits historical bands without modifying their source observations", () => {
   const view = model({ breakdown: "age", selectedIds: ["age.15_24", "age.15_19"] });
-  const older = view.series.find(s => s.id === "age.15_24")!, newer = view.series.find(s => s.id === "age.15_19")!;
-  expect(older.vals.slice(10)).toEqual(Array(6).fill(null));
-  expect(newer.vals.slice(0, 10)).toEqual(Array(10).fill(null));
-  expect(older.vals[9]).not.toBeNull(); expect(newer.vals[10]).not.toBeNull();
+  expect(view.series.map(series => series.id)).toEqual(["age.15_19"]);
+  expect(view.years).toEqual([2020, 2021, 2022, 2023, 2024, 2025]);
+  expect(facts.some(fact => fact.dimension === "age" && fact.groupId === "age.15_24" && fact.year === 2019)).toBe(true);
 });
 test("combined historic regions are not backfilled as their current members", () => {
   const view = model({ breakdown: "region", selectedIds: ["region.imereti", "region.imereti_racha_lechkhumi_kvemo_svaneti"] });
@@ -44,8 +43,8 @@ test("empty selection and a selected historical group with no current values rem
   expect(model({ selectedIds: [] }).hasData).toBe(false);
   expect(model({ selectedIds: [] }).sourceIds).toEqual([]);
   const view = model({ breakdown: "age", selectedIds: ["age.15_24"], range: { kind: "manual", start: 2020, end: 2025 } });
-  expect(view.hasData).toBe(false); expect(view.endValues["age.15_24"]).toBeNull();
-  expect(view.rows).toHaveLength(1);
+  expect(view.hasData).toBe(false); expect(view.endValues["age.15_24"]).toBeUndefined();
+  expect(view.rows).toHaveLength(0);
 });
 test("long-term rate and share retain the two different official percentages", () => {
   expect(model({ breakdown: "long_term", indicator: "long_term_unemployment_rate" }).headline?.publishedValue).toBe(4.9);

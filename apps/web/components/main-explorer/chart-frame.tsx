@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SwatchBar } from "../ui/editorial";
-import { HorizontalScrollHint } from "../ui/horizontal-scroll-hint";
 import type { TooltipRow } from "./editorial-line-chart";
 
 /**
@@ -20,26 +19,21 @@ import type { TooltipRow } from "./editorial-line-chart";
 export function ChartScrollFrame({
   children,
   testId = "chart-frame",
-  hintTestId = "chart-scroll-hint",
 }: {
   children: ReactNode;
   testId?: string;
-  hintTestId?: string;
 }) {
   const { messages } = useI18n();
   return (
-    <>
-      <HorizontalScrollHint testId={hintTestId} />
-      <div
-        data-testid={testId}
-        role="region"
-        tabIndex={0}
-        aria-label={message(messages, "controls.chartScrollable")}
-        className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
-      >
-        <div className="relative min-w-[720px] min-[900px]:max-[1020px]:min-w-0">{children}</div>
-      </div>
-    </>
+    <div
+      data-testid={testId}
+      role="region"
+      tabIndex={0}
+      aria-label={message(messages, "controls.chartScrollable")}
+      className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+    >
+      <div className="relative min-w-[720px] min-[900px]:max-[1020px]:min-w-0">{children}</div>
+    </div>
   );
 }
 

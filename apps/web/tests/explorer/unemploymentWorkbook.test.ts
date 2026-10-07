@@ -61,12 +61,14 @@ test.each(["ka", "en"] as const)("export filenames describe the active populatio
   const returned = changeUnemploymentBreakdown(national, "education", facts);
   expect((await workbook(locale, returned)).filename).toBe(`fiscal-unemployment-education-unemployment_rate-women-2020-2025${suffix}.xlsx`);
 });
-test("missing historical values stay blank with unavailable status and no invented source years", async () => {
-  const model = await workbook("en", { breakdown: "age", selectedIds: ["age.15_24", "age.15_19"] });
-  const historical = model.readable.rows.find(row => row.label === "15-24")!;
-  expect(historical.valuesByYear[2025]).toBeNull(); expect(historical.basisByYear[2025]).toBeNull();
-  expect(model.analysis.rows.some(row => row[1] === "15-24" && row[2] === null && row[3] === "Not available")).toBe(true);
-  expect(model.sources[0].years).toEqual([2024, 2025]);
+test("age exports omit removed historical bands and Georgia and use modern years and age-source links", async () => {
+  const model = await workbook("en", { breakdown: "age", selectedIds: ["georgia", "age.15_24", "age.15_19"], range: { kind: "manual", start: 2010, end: 2025 } });
+  expect(model.readable.years).toEqual([2020, 2021, 2022, 2023, 2024, 2025]);
+  expect(model.readable.rows.map(row => [row.label, row.kind])).toEqual([["15-19", "item"]]);
+  expect(model.readable.rows[0].valuesByYear[2025]).toBeCloseTo(0.39, 2);
+  expect(model.sources).toHaveLength(1);
+  expect(model.sources[0].years).toEqual([2020, 2021, 2022, 2023, 2024, 2025]);
+  expect(model.sources[0].downloadHref).toContain("04-labour-force-indicators-by-age.xlsx");
 });
 test("long-term labour-force rate and unemployment share have distinct export labels and values", async () => {
   const rate = await workbook("en", { breakdown: "long_term", indicator: "long_term_unemployment_rate" });

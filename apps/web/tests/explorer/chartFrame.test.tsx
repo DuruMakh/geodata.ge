@@ -3,22 +3,20 @@ import { ChartScrollFrame, ChartTooltip } from "../../components/main-explorer/c
 import { renderGeorgianMarkup } from "../helpers/render-localized";
 
 describe("shared chart frame", () => {
-  it("wraps a chart in the scroll hint and a focusable scrolling region", () => {
+  it("wraps a chart in a focusable scrolling region", () => {
     const markup = renderGeorgianMarkup(
-      <ChartScrollFrame testId="stack-chart-frame" hintTestId="stack-chart-scroll-hint">
+      <ChartScrollFrame testId="stack-chart-frame">
         <svg />
       </ChartScrollFrame>,
     );
-    expect(markup).toContain('data-testid="stack-chart-scroll-hint"');
     expect(markup).toContain('data-testid="stack-chart-frame"');
     expect(markup).toContain('role="region"');
     expect(markup).toContain("min-w-[720px]");
   });
 
-  it("defaults to the line chart's test ids", () => {
+  it("defaults to the line chart's test id", () => {
     const markup = renderGeorgianMarkup(<ChartScrollFrame><svg /></ChartScrollFrame>);
     expect(markup).toContain('data-testid="chart-frame"');
-    expect(markup).toContain('data-testid="chart-scroll-hint"');
   });
 
   it("lists rows, the header pair and the hidden remainder, flipping past 60%", () => {

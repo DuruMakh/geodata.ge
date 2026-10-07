@@ -27,9 +27,9 @@ for (const [section, breakdown] of [["overview", "national"], ["age", "age"], ["
   expect(markup).not.toContain('data-testid="unemployment-breakdown"');
   expect(markup.includes('data-testid="unemployment-composition"')).toBe(section === "overview");
   expect(markup.includes('data-testid="unemployment-tab-education"')).toBe(section === "overview");
-  expect(markup).toContain("2010–2025"); expect(markup).toContain("2026-10-03");
+  expect(markup).toContain(section === "age" ? "2020–2025" : "2010–2025"); expect(markup).toContain("2026-10-03");
   const json = JSON.parse(/data-testid="explorer-dataset-json-ld"[^>]*>(.*?)<\/script>/.exec(markup)![1]);
-  expect(json.temporalCoverage).toBe("2010/2025");
+  expect(json.temporalCoverage).toBe(section === "age" ? "2020/2025" : "2010/2025");
   expect(json.distribution).toBeUndefined(); expect(json.includedInDataCatalog).toBeUndefined();
   expect(markup).not.toContain("/downloads/data/unemployment");
   const metadata = await unemploymentPageMetadata(locale, section);

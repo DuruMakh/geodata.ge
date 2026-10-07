@@ -62,7 +62,6 @@ describe("StackedColumnChart", () => {
 
   it("sits in the shared scroll frame and is keyboard focusable", () => {
     expect(markup).toContain('data-testid="stack-chart-frame"');
-    expect(markup).toContain('data-testid="stack-chart-scroll-hint"');
     expect(markup).toMatch(/<svg[^>]*tabindex="0"/);
     expect(markup).toMatch(/<svg[^>]*aria-describedby="[^"]+"/);
   });
