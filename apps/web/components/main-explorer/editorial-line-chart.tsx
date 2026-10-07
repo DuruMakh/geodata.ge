@@ -2,14 +2,12 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
-import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import { AXIS_LABEL_GAP, axisLeftPaddingFor, decimalsFor, niceScale } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE } from "../../lib/explorer/colors";
-import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
-import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
+import { ChartScrollFrame, ChartTooltip, useChartPointer } from "./chart-frame";
 
 // Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
 // lattice for the grid, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
@@ -33,6 +31,7 @@ type EditorialLineChartProps = {
   unit: ValueUnit;
   shareLabel: string;
   preliminaryLabel?: string;
+  /** Minimum left padding; it grows to fit the widest y label. */
   axisLeftPadding?: number;
   formatTooltipValue?: (value: number) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
@@ -43,8 +42,8 @@ type EditorialLineChartProps = {
 
 const W = 920;
 const H = 320;
-// A little wider than the reference prototype's 62 so 8-character axis labels
-// ("7.5 მლრდ") never clip at the viewBox edge.
+// The house minimum (DESIGN.md §8.3). Wider labels ("50.0 მლრდ", "10,000 მლნ")
+// widen it through axisLeftPaddingFor, or their first digit clips at the viewBox edge.
 const PAD_L = 74;
 const PAD_R = 30;
 const PAD_T = 16;
@@ -82,18 +81,14 @@ export function EditorialLineChart({
   share,
   unit,
   shareLabel,
-  axisLeftPadding = PAD_L,
+  axisLeftPadding: minLeftPadding = PAD_L,
   periodsPerYear = 1,
   formatPeriod,
   preliminaryLabel,
   formatTooltipValue,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
-  const [hoverRaw, setHover] = useState<number | null>(null);
   const n = years.length;
-  // The hover index survives range shrinks (no pointer event fires), so clamp it
-  // instead of trusting it — a stale index would render a ghost tooltip.
-  const hover = hoverRaw !== null && hoverRaw < n ? hoverRaw : null;
 
   // The domain must cover negative values (e.g. revenue.other_taxes 2019-2020):
   // both bounds snap to one shared gridline step so 0 always sits on a line.
@@ -107,18 +102,12 @@ export function EditorialLineChart({
     }
   }
   if (maxValue <= 0 && minValue >= 0) maxValue = 1;
-  const posSpan = maxValue > 0 ? niceMax(maxValue) : 0;
-  const negSpan = minValue < 0 ? niceMax(-minValue) : 0;
-  const rawStep = Math.max(posSpan, negSpan) / 4;
+  // An amount axis never prints finer than its unit's last decimal, so the
+  // gridline step is a whole multiple of that quantum; a share axis has none.
   const amountQuantum = unit.divisor / 10 ** unit.decimals;
-  const step = share
-    ? rawStep
-    : Math.max(amountQuantum, Math.ceil(rawStep / amountQuantum - 1e-9) * amountQuantum);
-  const top = posSpan > 0 ? Math.ceil(posSpan / step - 1e-9) * step : 0;
-  const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
+  const { top, bottom, step } = niceScale(minValue, maxValue, share ? 0 : amountQuantum);
   const span = top - bottom;
 
-  const x = (index: number) => axisLeftPadding + (n <= 1 ? (W - axisLeftPadding - PAD_R) / 2 : (index * (W - axisLeftPadding - PAD_R)) / (n - 1));
   const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);
   // Axis precision follows the gridline STEP, not the unit's data-derived
   // decimals. The unit carries enough precision for the smallest value in the
@@ -137,6 +126,9 @@ export function EditorialLineChart({
     formatTooltipValue && value !== null ? formatTooltipValue(value) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
+  const axisLabels = gridLines.map(formatAxis);
+  const axisLeftPadding = axisLeftPaddingFor(axisLabels, minLeftPadding);
+  const x = (index: number) => axisLeftPadding + (n <= 1 ? (W - axisLeftPadding - PAD_R) / 2 : (index * (W - axisLeftPadding - PAD_R)) / (n - 1));
   const labelIndices = new Set(periodLabelIndices(years, periodsPerYear));
 
   const lattice = buildDotLattice({
@@ -148,24 +140,50 @@ export function EditorialLineChart({
     firstPeriod: years[0],
   });
 
-  function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const index = nearestPeriodIndex((event.clientX - rect.left) / rect.width, n, W, axisLeftPadding, PAD_R);
-    if (index !== hoverRaw) setHover(index);
-  }
+  const { svgRef, hover, pinned, handlers } = useChartPointer(n, W, axisLeftPadding, PAD_R);
+
+  const axisText = (value: number, index: number) => (
+    <text key={`axis-${index}`} x={axisLeftPadding - AXIS_LABEL_GAP} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+      {axisLabels[index]}
+    </text>
+  );
+  // The sticky copy stops above the year labels, so it never covers the first one.
+  const stickyAxis = {
+    widthPercent: (axisLeftPadding / W) * 100,
+    node: (
+      <svg viewBox={`0 0 ${axisLeftPadding} ${H - PAD_B + 6}`} className="block h-auto w-full">
+        {gridLines.map(axisText)}
+        <line x1={axisLeftPadding - 0.5} x2={axisLeftPadding - 0.5} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
+      </svg>
+    ),
+  };
+  const scrollKey = `${years[0]}-${years[n - 1]}-${series.map((line) => line.id).join(",")}`;
 
   const hoverX = hover === null ? null : (x(hover) / W) * 100;
   const tooltip = hover === null ? null : buildTooltipRows(series, hover);
+  const readout =
+    hover !== null && hoverX !== null && tooltip !== null ? (
+      <ChartTooltip
+        leftPercent={hoverX}
+        pinned={pinned}
+        header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
+        headerRight={share ? shareLabel : null}
+        rows={tooltip.rows}
+        hidden={tooltip.hidden}
+        formatValue={formatValue}
+        preliminaryLabel={preliminaryLabel}
+      />
+    ) : null;
 
   return (
-    <ChartScrollFrame>
+    <ChartScrollFrame scrollKey={scrollKey} yAxis={stickyAxis} overlay={pinned !== null ? readout : null}>
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         role="img"
         aria-label={message(messages, "controls.chartTrend")}
         className="block h-auto w-full"
-        onPointerMove={handlePointerMove}
-        onPointerLeave={() => setHover(null)}
+        {...handlers}
       >
         {lattice ? (
           <>
@@ -212,9 +230,7 @@ export function EditorialLineChart({
                 strokeWidth={1}
               />
             ) : null}
-            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
-              {formatAxis(value)}
-            </text>
+            {axisText(value, index)}
           </g>
         ))}
         <line x1={axisLeftPadding} x2={axisLeftPadding} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
@@ -327,17 +343,7 @@ export function EditorialLineChart({
           );
         })}
       </svg>
-      {hover !== null && hoverX !== null && tooltip !== null ? (
-        <ChartTooltip
-          leftPercent={hoverX}
-          header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
-          headerRight={share ? shareLabel : null}
-          rows={tooltip.rows}
-          hidden={tooltip.hidden}
-          formatValue={formatValue}
-          preliminaryLabel={preliminaryLabel}
-        />
-      ) : null}
+      {pinned === null ? readout : null}
     </ChartScrollFrame>
   );
 }

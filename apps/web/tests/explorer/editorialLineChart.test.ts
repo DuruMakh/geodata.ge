@@ -8,6 +8,7 @@ import {
   type ChartSeries,
 } from "../../components/main-explorer/editorial-line-chart";
 import { UNIT_BN, UNIT_MLN, type ValueUnit } from "../../lib/explorer/format";
+import { axisLabelWidth } from "../../lib/explorer/chartScale";
 
 function axisLabels(unit: ValueUnit, values: number[]): string[] {
   const series: ChartSeries[] = [
@@ -36,18 +37,45 @@ function axisLabels(unit: ValueUnit, values: number[]): string[] {
 
 describe("EditorialLineChart amount axes", () => {
   it("uses distinct whole-million labels for small municipal series", () => {
-    expect(axisLabels(UNIT_MLN, [100_000, 900_000])).toEqual(["0 მლნ", "1 მლნ", "2 მლნ"]);
+    // The top is the first whole-million gridline past the data, not a snapped 2.
+    expect(axisLabels(UNIT_MLN, [100_000, 900_000])).toEqual(["0 მლნ", "1 მლნ"]);
   });
 
   it("uses distinct one-decimal-billion labels across a mixed-sign domain", () => {
     expect(axisLabels(UNIT_BN, [-150_000_000, 450_000_000])).toEqual([
-      "−0.3 მლრდ",
+      "−0.2 მლრდ",
+      "−0.1 მლრდ",
       "0.0 მლრდ",
+      "0.1 მლრდ",
+      "0.2 მლრდ",
       "0.3 მლრდ",
-      "0.6 მლრდ",
-      "0.9 მლრდ",
-      "1.2 მლრდ",
+      "0.4 მლრდ",
+      "0.5 მლრდ",
     ]);
+  });
+});
+
+describe("EditorialLineChart y labels", () => {
+  // Right-aligned labels at a fixed 74-unit padding put the "5" of "50.0 მლრდ"
+  // left of the viewBox, where the svg clips it: the axis read 0.0 … 0.0 მლრდ.
+  it.each([
+    ["billions", UNIT_BN, [27_700_000_000, 31_000_000_000]],
+    ["millions", UNIT_MLN, [9_000_000_000, 9_400_000_000]],
+  ] as const)("never start left of the viewBox for %s", (_, unit, values) => {
+    const markup = renderGeorgianMarkup(
+      createElement(EditorialLineChart, {
+        years: values.map((__, index) => 2024 + index),
+        series: [{ id: "s", label: "s", color: "#B3402A", vals: [...values], planned: values.map(() => false) }],
+        share: false,
+        unit,
+        shareLabel: "% წილი",
+      }),
+    );
+    const labels = [...markup.matchAll(/<text x="([\d.]+)"[^>]*text-anchor="end"[^>]*>([^<]+)<\/text>/g)];
+    expect(labels.length).toBeGreaterThan(2);
+    for (const [, x, label] of labels) {
+      expect(Number(x) - axisLabelWidth(label!)).toBeGreaterThanOrEqual(0);
+    }
   });
 });
 

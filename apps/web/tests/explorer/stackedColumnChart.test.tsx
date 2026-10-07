@@ -66,6 +66,34 @@ describe("StackedColumnChart", () => {
     expect(markup).toMatch(/<svg[^>]*aria-describedby="[^"]+"/);
   });
 
+  // The first column was centred on the plot's left edge and drawn over the
+  // y-axis labels ("250(" for 2500); the axis printed 5000 where lists say 5,000.
+  it("keeps every column inside the plot and groups axis thousands", () => {
+    const years = Array.from({ length: 16 }, (_, index) => 2010 + index);
+    const wide = renderGeorgianMarkup(
+      <StackedColumnChart
+        {...props}
+        periods={years}
+        segments={[
+          { id: "employed", label: "Employed", color: "#1F6E56", values: years.map(() => 1300) },
+          { id: "outside", label: "Outside", color: "#8A7B64", values: years.map(() => 1850) },
+        ]}
+        overlay={null}
+      />,
+    );
+    const rects = [...wide.matchAll(/<rect[^>]*data-segment="[^"]+"[^>]*>/g)].map((match) => ({
+      x: Number(/\bx="([-\d.]+)"/.exec(match[0])?.[1]),
+      width: Number(/\bwidth="([-\d.]+)"/.exec(match[0])?.[1]),
+    }));
+    expect(rects.length).toBe(32);
+    expect(Math.min(...rects.map((rect) => rect.x))).toBeGreaterThanOrEqual(74);
+    expect(Math.max(...rects.map((rect) => rect.x + rect.width))).toBeLessThanOrEqual(920 - 30);
+
+    const axis = [...wide.matchAll(/<text[^>]*text-anchor="end"[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
+    expect(axis).toContain("3,500");
+    expect(axis).not.toContain("3500");
+  });
+
   it("ends the headline overlay in a dot", () => {
     expect(markup).toContain("data-overlay-end");
   });

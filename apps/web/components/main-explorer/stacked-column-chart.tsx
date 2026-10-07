@@ -1,12 +1,13 @@
 "use client";
 
-import { useId, useState, type KeyboardEvent, type PointerEvent } from "react";
-import { nearestPeriodIndex, stepPeriodIndex } from "../../lib/explorer/chartNavigation";
-import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import { useId, type KeyboardEvent } from "react";
+import { stepPeriodIndex } from "../../lib/explorer/chartNavigation";
+import { decimalsFor, niceScale } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE, INK } from "../../lib/explorer/colors";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
+import { formatInUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
-import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
+import { ChartScrollFrame, ChartTooltip, useChartPointer } from "./chart-frame";
 import { buildTooltipRows } from "./editorial-line-chart";
 
 // Bespoke SVG stacked column chart per DESIGN.md §8.3, the only form in which
@@ -51,9 +52,13 @@ export function StackedColumnChart({
   ariaLabel,
 }: StackedColumnChartProps) {
   const captionId = useId();
-  const [hoverRaw, setHover] = useState<number | null>(null);
   const count = periods.length;
-  const hover = hoverRaw !== null && hoverRaw < count ? hoverRaw : null;
+  const plotWidth = W - PAD_L - PAD_R;
+  // Columns sit in the middle of equal bands, so the first and last bars stay
+  // inside the plot instead of straddling its edges (the first one used to be
+  // drawn over the y-axis labels: "250(" for 2500).
+  const band = count > 0 ? plotWidth / count : 0;
+  const { svgRef, hover, pinned, setHover, handlers } = useChartPointer(count, W, PAD_L + band / 2, PAD_R + band / 2);
 
   // The domain covers the tallest positive stack and the deepest negative one, so
   // zero always sits on a gridline and the two halves share one step.
@@ -77,26 +82,23 @@ export function StackedColumnChart({
     if (negative < minStack) minStack = negative;
   }
   if (maxStack <= 0 && minStack >= 0) maxStack = 1;
-  const posSpan = maxStack > 0 ? niceMax(maxStack) : 0;
-  const negSpan = minStack < 0 ? niceMax(-minStack) : 0;
-  const step = Math.max(posSpan, negSpan) / 4 || 1;
-  const top = posSpan > 0 ? Math.ceil(posSpan / step - 1e-9) * step : 0;
-  const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
+  const { top, bottom, step } = niceScale(minStack, maxStack);
   const span = top - bottom || 1;
 
-  const plotWidth = W - PAD_L - PAD_R;
   const plotHeight = H - PAD_T - PAD_B;
-  const x = (index: number) => PAD_L + (count <= 1 ? plotWidth / 2 : (index * plotWidth) / (count - 1));
+  const x = (index: number) => PAD_L + band * (index + 0.5);
   const y = (value: number) => PAD_T + ((top - value) / span) * plotHeight;
   const zeroY = y(0);
-  const barWidth = count === 0 ? 0 : Math.min(MAX_BAR_WIDTH, Math.max(1, (plotWidth / Math.max(count, 1)) * 0.7));
+  const barWidth = count === 0 ? 0 : Math.min(MAX_BAR_WIDTH, Math.max(1, band * 0.7));
 
   const gridSteps = Math.round(span / step);
   const gridLines = Array.from({ length: gridSteps + 1 }, (_, index) => bottom + step * index);
   const axisDigits = decimalsFor(step, 2);
-  const formatAxis = (value: number) => value.toFixed(axisDigits).replace("-", "−");
+  // The same en-US grouping and "−" sign as the lists and tables (5,000, not 5000).
+  const formatAxis = (value: number) => formatInUnit(value, { divisor: 1, label: "", decimals: axisDigits });
+  // The lattice columns run between the first and last column centres.
   const lattice = buildDotLattice({
-    plotWidth,
+    plotWidth: plotWidth - band,
     plotHeight,
     yearCount: count,
     gridStepCount: gridSteps,
@@ -128,12 +130,43 @@ export function StackedColumnChart({
         );
   const overlayAtHover = hover === null || overlay === null ? null : overlay.values[hover] ?? null;
 
-  function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
-    if (count === 0) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const index = nearestPeriodIndex((event.clientX - rect.left) / rect.width, count, W, PAD_L, PAD_R);
-    if (index !== hoverRaw) setHover(index);
-  }
+  const axisText = (value: number) => (
+    <text
+      key={`axis-${value}`}
+      x={PAD_L - 10}
+      y={y(value) + 4}
+      textAnchor="end"
+      fontSize={11}
+      fill={CHART_AXIS_LABEL}
+      style={{ fontFamily: "var(--font-numeric)" }}
+    >
+      {formatAxis(value)}
+    </text>
+  );
+  // The sticky copy stops above the period labels, so it never covers the first one.
+  const stickyAxis = {
+    widthPercent: (PAD_L / W) * 100,
+    node: (
+      <svg viewBox={`0 0 ${PAD_L} ${H - PAD_B + 6}`} className="block h-auto w-full">
+        {gridLines.map(axisText)}
+      </svg>
+    ),
+  };
+  const scrollKey = `${periods[0]}-${periods[count - 1]}-${segments.map((segment) => segment.id).join(",")}`;
+
+  const readout =
+    hover !== null && tooltip !== null && tooltip.rows.length > 0 ? (
+      <ChartTooltip
+        testId="stack-chart-tooltip"
+        pinned={pinned}
+        leftPercent={(x(hover) / W) * 100}
+        header={formatPeriod(periods[hover]!)}
+        headerRight={overlay !== null && overlayAtHover !== null ? `${overlay.label} ${formatValue(overlayAtHover)}` : null}
+        rows={tooltip.rows}
+        hidden={tooltip.hidden}
+        formatValue={formatValue}
+      />
+    ) : null;
 
   function handleKeyDown(event: KeyboardEvent<SVGSVGElement>) {
     const next = stepPeriodIndex(event.key, hover, count);
@@ -146,16 +179,16 @@ export function StackedColumnChart({
     // role="img" belongs on the svg, not the figure: it is children-presentational,
     // so on the figure it would hide the sr-only figcaption that carries the numbers.
     <figure className="m-0">
-      <ChartScrollFrame testId="stack-chart-frame">
+      <ChartScrollFrame testId="stack-chart-frame" scrollKey={scrollKey} yAxis={stickyAxis} overlay={pinned !== null ? readout : null}>
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
-          className="block h-auto w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+          className="block h-auto w-full [&:focus:not(:focus-visible)]:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
           role="img"
           aria-label={ariaLabel}
           aria-describedby={captionId}
           tabIndex={0}
-          onPointerMove={handlePointerMove}
-          onPointerLeave={() => setHover(null)}
+          {...handlers}
           onKeyDown={handleKeyDown}
           onBlur={() => setHover(null)}
         >
@@ -165,7 +198,7 @@ export function StackedColumnChart({
                 <pattern
                   id={LATTICE_ID}
                   patternUnits="userSpaceOnUse"
-                  x={PAD_L + lattice.colOffset - lattice.colPitch / 2}
+                  x={PAD_L + band / 2 + lattice.colOffset - lattice.colPitch / 2}
                   y={PAD_T - lattice.rowPitch / 2}
                   width={lattice.colPitch}
                   height={lattice.rowPitch}
@@ -187,19 +220,7 @@ export function StackedColumnChart({
             </>
           )}
 
-          {gridLines.map((value) => (
-            <text
-              key={`axis-${value}`}
-              x={PAD_L - 10}
-              y={y(value) + 4}
-              textAnchor="end"
-              fontSize={11}
-              fill={CHART_AXIS_LABEL}
-              style={{ fontFamily: "var(--font-numeric)" }}
-            >
-              {formatAxis(value)}
-            </text>
-          ))}
+          {gridLines.map(axisText)}
 
           {segments.map((segment) =>
             segment.values.map((value, index) => {
@@ -260,17 +281,7 @@ export function StackedColumnChart({
           )}
         </svg>
 
-        {hover !== null && tooltip !== null && tooltip.rows.length > 0 ? (
-          <ChartTooltip
-            testId="stack-chart-tooltip"
-            leftPercent={(x(hover) / W) * 100}
-            header={formatPeriod(periods[hover]!)}
-            headerRight={overlay !== null && overlayAtHover !== null ? `${overlay.label} ${formatValue(overlayAtHover)}` : null}
-            rows={tooltip.rows}
-            hidden={tooltip.hidden}
-            formatValue={formatValue}
-          />
-        ) : null}
+        {pinned === null ? readout : null}
       </ChartScrollFrame>
 
       {/* The chart is never colour-only: the same numbers read as text. */}

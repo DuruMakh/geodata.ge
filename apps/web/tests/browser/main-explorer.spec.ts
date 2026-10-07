@@ -1064,18 +1064,20 @@ test("mobile chart accepts a horizontal touch drag", async ({ page }) => {
 
   const chart = page.getByTestId("chart-frame");
   expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-  expect(await chart.evaluate((element) => element.scrollLeft)).toBe(0);
+  // A phone opens the chart on the latest data, so the drag goes back in time.
+  const maxScroll = await chart.evaluate((element) => element.scrollWidth - element.clientWidth);
+  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThanOrEqual(maxScroll - 1);
 
   const box = await chart.boundingBox();
   expect(box).not.toBeNull();
 
   const cdp = await page.context().newCDPSession(page);
   const y = box!.y + Math.min(100, box!.height / 2);
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: box!.x + box!.width - 32, y }] });
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: box!.x + 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: box!.x + 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: box!.x + box!.width - 32, y }] });
   await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
 
-  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeLessThan(maxScroll - 1);
 });
 
 test("captures editorial desktop and mobile screenshots", async ({ page }) => {
@@ -1141,7 +1143,10 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
     };
   });
 
-  const PAD_L = 74;
+  // The left padding grows to fit the widest y label, so read the plot's left
+  // edge from the y-axis hairline instead of assuming the 74-unit minimum.
+  const PAD_L = Number(await chart.locator('svg line[stroke="#D9CFBE"]').first().getAttribute("x1"));
+  expect(PAD_L).toBeGreaterThanOrEqual(74);
   const PAD_T = 16;
   expect(geometry.patternX + geometry.circleCx).toBeCloseTo(PAD_L, 5);
   expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);
