@@ -78,3 +78,21 @@ for (const path of ["/explorer/municipalities/georgia", "/explorer/municipalitie
   });
 }
 
+for (const locale of ["ka", "en"] as const) {
+  test(`${locale} products table shows both rate columns at 390px without scrolling`, async ({ page }) => {
+    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/products`);
+    const region = page.getByTestId("product-table");
+    await region.scrollIntoViewIfNeeded();
+    const fit = await region.evaluate((element) => {
+      const frame = element.getBoundingClientRect();
+      const cells = [...element.querySelectorAll("tbody tr:first-child td, thead th")];
+      return {
+        scrolls: element.scrollWidth > element.clientWidth,
+        outside: cells.filter((cell) => cell.getBoundingClientRect().right > frame.right + 1).length,
+        overflowingHeaders: [...element.querySelectorAll("thead th")].filter((th) => th.scrollWidth > th.clientWidth + 1).length,
+      };
+    });
+    expect(fit).toEqual({ scrolls: false, outside: 0, overflowingHeaders: 0 });
+    await expect(page.getByTestId("product-table-caption")).toBeVisible();
+  });
+}

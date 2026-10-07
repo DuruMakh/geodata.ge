@@ -61,22 +61,24 @@ export function InflationProductTable({ index, state, onToggle }: {
         aria-label={message(messages, "controls.tableScrollable")}
         className="max-w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        <table className="w-full min-w-[560px] table-fixed border-collapse">
+        {/* Short column headers with the periods in the visible caption: on a phone the name and
+            both rate columns fit without a horizontal swipe (DESIGN.md §25.2). */}
+        <table className="w-full table-fixed border-collapse min-[768px]:min-w-[560px]">
           <colgroup>
-            <col className="w-[185px] min-[768px]:w-[45%]" />
-            <col className="w-[160px] min-[768px]:w-[25%]" />
-            <col className="w-[215px] min-[768px]:w-[30%]" />
+            <col className="min-[768px]:w-[45%]" />
+            <col className="w-[92px] min-[768px]:w-[25%]" />
+            <col className="w-[72px] min-[768px]:w-[30%]" />
           </colgroup>
-          <caption className="sr-only">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
+          <caption data-testid="product-table-caption" className="pb-2 text-left text-[12px] leading-[1.5] text-[var(--muted)]">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
           <thead><tr>
             <th scope="col" className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] py-2 pr-3 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)]">
               {t("productsProductColumn")}
             </th>
             <th scope="col" className="border-b-2 border-[var(--ink)] px-2 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsCumulativeColumn", { start: state.range.startYear, end: endLabel })}
+              {t("productsCumulativeColumn")}
             </th>
             <th scope="col" className="border-b-2 border-[var(--ink)] py-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsAnnualColumn", { period: latestLabel })}
+              {t("productsAnnualColumn")}
             </th>
           </tr></thead>
           <tbody>
