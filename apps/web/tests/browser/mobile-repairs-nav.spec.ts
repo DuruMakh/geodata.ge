@@ -206,8 +206,9 @@ for (const { path, testId, text } of [
     const title = await page.getByRole("heading", { level: 1 }).boundingBox();
     const box = await line.boundingBox();
     expect(box!.y).toBeGreaterThan(title!.y + title!.height - 1);
-    // City pages keep their ← previous · next → row between the two.
-    expect(box!.y - (title!.y + title!.height)).toBeLessThan(path.includes("/cities/") ? 60 : 24);
+    // City and region pages keep their 44px ← previous · next → row between the two.
+    const hasNeighbourRow = path.includes("/cities/") || path.includes("/regions/");
+    expect(box!.y - (title!.y + title!.height)).toBeLessThan(hasNeighbourRow ? 80 : 24);
     expect(box!.y + box!.height).toBeLessThan(844);
   });
 }
