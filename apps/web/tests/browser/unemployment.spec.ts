@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { tableSeriesCount } from "./explorer-table";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -37,7 +38,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.getByTestId("chart-mode-table").click();
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("28 / 28");
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(28);
+    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(28);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });
@@ -132,14 +133,14 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(toggle("men:participation_rate")).toHaveAttribute("aria-pressed", "false");
     await page.getByTestId("chart-mode-table").click();
     await page.getByTestId("range-start-handle").focus(); await page.getByTestId("range-start-handle").press("End");
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(2);
+    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(2);
     await expect(page.getByTestId("explorer-table")).toContainText("79.4");
     await expect(page.getByTestId("explorer-table")).toContainText("770.2");
     await page.screenshot({ path: info.outputPath(`unemployment-gender-expanded-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("series-search").fill("participation");
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("10 / 10");
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(10);
+    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(10);
     await page.getByTestId("series-search").fill("");
     await toggle("women:unemployment_rate").click();
     await expect(page.getByTestId("series-status")).toContainText("1 / 7");
@@ -259,7 +260,7 @@ for (const prefix of ["", "/en"]) test(`overview checkboxes never mix rates and 
   await page.getByTestId("series-search").fill("");
   await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "false");
   await page.getByTestId("chart-mode-table").click();
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(7);
+  await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(7);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.goto(`${prefix}/explorer/unemployment/overview#sel=georgia:self_employed,georgia:hired&start=2025&end=2025&view=table`);
   await expect(page.getByTestId("explorer-table")).toContainText("426.3");
@@ -316,12 +317,12 @@ for (const prefix of ["", "/en"]) test(`long-term metric parents select Georgia 
   await expect(page.getByTestId("series-status")).toContainText("3 / 3");
   await expect(rate.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
   await page.getByTestId("chart-mode-table").click();
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(3);
+  await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(3);
   await row("metric.long_term_unemployed_share").getByTestId("series-row-toggle").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
   await expect(count.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
   await rate.getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(2);
+  await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(2);
   await expect(page.getByTestId("explorer-table")).toContainText(prefix ? "% of all unemployed" : "ყველა უმუშევრის %");
   await expect(page.getByTestId("explorer-table")).toContainText(prefix ? "% of labour force" : "შრომის ძალის %");
 });

@@ -1047,9 +1047,18 @@ test("mobile chart and table keep contained horizontal scroll", async ({ page })
   await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი");
   expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
 
+  // The default total alone lists its years as rows (owner decision D5): nothing scrolls sideways.
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
   await expect(page.getByTestId("table-scroll-hint")).toHaveCount(0);
+  await expect(table).toHaveAttribute("data-layout", "rows");
+  expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(false);
+
+  // Four series keep the year columns, a contained, keyboard-scrollable region.
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#g=fields&m=table&sel=expenditure.total,spending.social_protection,spending.education,spending.health`);
+  await page.reload();
+  await expectAppReady(page);
+  await expect(table).toHaveAttribute("data-layout", "columns");
   await expect(table).toHaveAttribute("tabindex", "0");
   await expect(table).toHaveAttribute("aria-label", "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი");
   expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);

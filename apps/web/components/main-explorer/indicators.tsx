@@ -227,7 +227,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           <colgroup>
             <col className="w-[44%]" />
             <col />
-            <col />
+            <col className="@max-[768px]:w-[70px]" />
             <col />
           </colgroup>
           <thead>
@@ -235,13 +235,13 @@ export function Indicators({ model, scope }: IndicatorsProps) {
               <th className="border-b-2 border-[var(--ink)] pr-3 pt-1.5 pb-2 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
                 {message(messages, FIRST_COL_LABEL[scope])}
               </th>
-              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--muted)]">
+              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--muted)] @max-[768px]:px-1">
                 {startYear}
               </th>
-              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
+              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] @max-[768px]:px-1 @max-[768px]:tracking-normal">
                 {message(messages, "controls.change")}
               </th>
-              <th className="border-b-2 border-[var(--ink)] pl-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--muted)]">
+              <th className="border-b-2 border-[var(--ink)] pl-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--muted)] @max-[768px]:pl-1">
                 {endYear}
               </th>
             </tr>
@@ -260,23 +260,23 @@ export function Indicators({ model, scope }: IndicatorsProps) {
                 return (
                   <tr key={row.itemId} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
                     <td className="py-2.5 pr-3" title={rowLabel(row)}>
-                      <span className="inline-flex min-w-0 items-start gap-[9px]">
+                      <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
                         <SwatchBar color={color} className="mt-[7px]" />
-                        <span className="text-[12.5px] leading-[1.4] text-[var(--ink)]" style={{ fontWeight: weight }}>
+                        <span className="min-w-0 text-[12.5px] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[12px]" style={{ fontWeight: weight }}>
                           {label}
                         </span>
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--muted)]" style={{ fontWeight: weight }}>
+                    <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: weight }}>
                       {comparisonCell(startValue)}
                     </td>
                     <td
-                      className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap"
+                      className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap @max-[768px]:px-1"
                       style={{ color: delta === null ? "var(--muted)" : delta >= 0 ? POSITIVE : NEGATIVE }}
                     >
                       {delta === null ? MISSING : `${delta >= 0 ? "+" : "−"}${formatBn(Math.abs(delta))}`}
                     </td>
-                    <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]" style={{ fontWeight: weight }}>
+                    <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: weight }}>
                       {comparisonCell(endValue)}
                     </td>
                   </tr>

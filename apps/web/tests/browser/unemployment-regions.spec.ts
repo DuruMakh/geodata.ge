@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 import { REGIONAL_ECONOMY_REGIONS as UNEMPLOYMENT_REGIONS } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) test(`region map opens separate pages ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
@@ -106,10 +107,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regiona
   await page.screenshot({ path: info.outputPath(`regional-employment-${width}.png`), fullPage: true });
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
-  await expect(table.locator("tbody tr")).toHaveCount(3);
-  const hired = table.locator("tbody tr").filter({ hasText: prefix ? "Hired employees" : "დაქირავებული" });
-  await expect(hired.locator("td").nth(10)).toHaveText("—");
-  await expect(hired.locator("td").last()).toHaveText("361.2");
+  await expect.poll(() => tableSeriesCount(table)).toBe(3);
+  const hired = await tableSeriesValues(table, prefix ? "Hired employees" : "დაქირავებული");
+  expect(hired[9]).toBe("—");
+  expect(hired.at(-1)).toBe("361.2");
   const saved = page.url(); await page.reload(); expect(page.url()).toBe(saved);
   await expect(toggle("hired")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");
