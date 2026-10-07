@@ -19,6 +19,8 @@ type SeriesSelectorProps = {
   onToggleAll: () => void;
   allowSelectAll?: boolean;
   hasVisibleMatches: boolean;
+  /** Optional visible names for the row values, shown above the list. */
+  listHeader?: ReactNode;
   children: ReactNode;
 };
 
@@ -36,6 +38,7 @@ export function SeriesSelector({
   onToggleAll,
   allowSelectAll = true,
   hasVisibleMatches,
+  listHeader,
   children,
 }: SeriesSelectorProps) {
   const { messages } = useI18n();
@@ -117,6 +120,8 @@ export function SeriesSelector({
           {message(messages, "controls.noMatches")}
         </p>
       ) : null}
+
+      {listHeader}
 
       <div
         data-testid="series-list"
@@ -205,7 +210,9 @@ export function SeriesSelectorRow({
           aria-expanded={hasChildren ? expanded : undefined}
           aria-label={expansionLabel ?? message(messages, "controls.subprogrammes")}
           aria-disabled={expansionLocked || undefined}
-          className={`flex w-[22px] flex-none items-center justify-center text-base leading-none ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
+          // The caret keeps its 22px column; a transparent extension over the row button's
+          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px).
+          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:inset-y-0 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
           tabIndex={hasChildren && !expansionLocked ? 0 : -1}
         >
@@ -241,7 +248,7 @@ export function SeriesSelectorRow({
           </span>
         </span>
         {meta === undefined ? null : (
-          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--muted)] opacity-70">
+          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--muted)]">
             {metaLabel === undefined ? null : <span className="sr-only">{metaLabel} </span>}
             {meta}
           </span>

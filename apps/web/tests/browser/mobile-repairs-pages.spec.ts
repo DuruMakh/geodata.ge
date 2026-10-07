@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectReadableText } from "./color-contrast";
 
 // Mobile repairs (2026-10-07 review): page-level layout on phones.
 test.use({ isMobile: true, hasTouch: true });
@@ -42,5 +43,33 @@ for (const { path, strip } of tabStrips) {
       expect(tab.left).toBeGreaterThanOrEqual(0);
       expect(tab.right).toBeLessThanOrEqual(390);
     }
+  });
+}
+
+for (const locale of ["ka", "en"] as const) {
+  test(`${locale} inflation category rows: labelled, readable values and a 24px subgroup target`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/categories`);
+    const columns = page.getByTestId("category-value-columns");
+    await expect(columns).toBeVisible();
+    await expect(columns).toContainText(locale === "en" ? "Basket share" : "წილი კალათაში");
+    await expect(columns).toContainText(locale === "en" ? "pp" : "პპ");
+
+    const rows = page.getByTestId("series-row");
+    const selectedRow = rows.filter({ has: page.locator("[aria-pressed=true]") }).first();
+    const meta = selectedRow.locator("[data-testid=series-row-toggle] > span:has(> .sr-only)").first();
+    expect(await meta.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
+    await expectReadableText(meta, selectedRow);
+    const unselected = rows.filter({ has: page.locator("[data-testid=series-row-toggle][aria-pressed=false]") }).first();
+    if (await unselected.count()) await expectReadableText(unselected.locator("[data-testid=series-row-toggle] > span:has(> .sr-only)").first(), page.locator("body"));
+
+    const caret = page.locator("[data-testid=series-row] button[aria-expanded]").first();
+    await caret.scrollIntoViewIfNeeded();
+    const hit = await caret.evaluate((button) => {
+      const box = button.getBoundingClientRect();
+      const target = document.elementFromPoint(box.left + 24.5, box.top + box.height / 2);
+      return { width: Math.round(box.width), hitsCaret: target === button || button.contains(target) };
+    });
+    expect(hit).toEqual({ width: 22, hitsCaret: true });
   });
 }
