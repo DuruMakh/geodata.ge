@@ -1037,8 +1037,10 @@ test.describe("municipality page", () => {
       tableWidth: container.querySelector("table")!.getBoundingClientRect().width,
     }));
 
-    expect(sizes.tableWidth).toBeGreaterThanOrEqual(560);
-    expect(sizes.containerScrollWidth).toBeGreaterThan(sizes.containerClientWidth);
+    // Below 768px the comparison fits the column, like the national one (§8.7):
+    // the change and latest-year columns must not hide behind a sideways scroll.
+    expect(sizes.tableWidth).toBeLessThanOrEqual(sizes.containerClientWidth);
+    expect(sizes.containerScrollWidth).toBe(sizes.containerClientWidth);
     expect(sizes.pageScrollWidth).toBe(sizes.pageClientWidth);
 
     const boxes = await table.locator("tbody tr").first().locator("td").evaluateAll((cells) => cells.slice(1).map((cell) => {
