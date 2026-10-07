@@ -4,7 +4,7 @@ import { SERIES } from "../../lib/data/demography/series";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { projectDemographyObservation } from "../../lib/explorer/clientData";
 import type { Municipality, MunicipalRegion } from "../../lib/data/municipal/types";
-import { EDITORIAL_PALETTE, INK, colorForItem } from "../../lib/explorer/colors";
+import { EDITORIAL_PALETTE, INK, OTHER_COLOR, colorForItem } from "../../lib/explorer/colors";
 import {
   GEORGIA_PLACE_ID,
   TBILISI_PLACE_ID,
@@ -106,11 +106,12 @@ describe("places", () => {
     ["51", "region.kvemo_kartli"],
   ];
 
-  test("the four that wore their region's colour take another colour of the palette", () => {
+  test("the four that wore their region's colour take another colour of the palette, never the grey that \"other\" wears", () => {
     for (const [code, regionId] of CLASHED) {
       expect(place(code).regionId, code).toBe(regionId);
       expect(placeColor(place(code)), code).not.toBe(placeColor(place(regionId)));
       expect(EDITORIAL_PALETTE, code).toContain(placeColor(place(code)));
+      expect(placeColor(place(code)), code).not.toBe(OTHER_COLOR);
     }
   });
 
@@ -162,6 +163,25 @@ describe("places", () => {
       const built = build([region("region.t", EDITORIAL_PALETTE.length)], [member("a", last, "region.t")]);
       expect(colourIn(built, "region.t")).toBe(EDITORIAL_PALETTE[last]);
       expect(colourIn(built, "a")).toBe(EDITORIAL_PALETTE[0]);
+    });
+
+    test("the walk never takes the grey that \"other\" wears: where that would be the next free colour, it goes on past it", () => {
+      // The region wears palette[5] and a sits on it. m6 to m12 wear palette[6] to palette[12], so the grey (palette[13]) is the next free colour.
+      const others = EDITORIAL_PALETTE.slice(6, 13).map((_, step) => member(`m${6 + step}`, 6 + step, "region.t"));
+      const built = build([region("region.t", 6)], [member("a", 5, "region.t"), ...others]);
+      expect(colourIn(built, "region.t")).toBe(EDITORIAL_PALETTE[5]);
+      expect(EDITORIAL_PALETTE[13]).toBe(OTHER_COLOR);
+      expect(colourIn(built, "a")).toBe(EDITORIAL_PALETTE[0]);
+      expect(built.map(placeColor)).not.toContain(OTHER_COLOR);
+    });
+
+    test("the order the registry lists the municipalities in does not change the colours they are given", () => {
+      // a and c both sit on the region's colour (palette[3]) and each would take palette[4] if it came first: a, the lower sort id, does.
+      const regions = [region("region.t", 4)];
+      const listed = [member("a", 3, "region.t"), member("c", 17, "region.t")];
+      const colours = (built: DemographyPlace[]) => ["a", "c"].map((id) => colourIn(built, id));
+      expect(colours(build(regions, listed))).toEqual([EDITORIAL_PALETTE[4], EDITORIAL_PALETTE[5]]);
+      expect(colours(build(regions, [...listed].reverse()))).toEqual([EDITORIAL_PALETTE[4], EDITORIAL_PALETTE[5]]);
     });
 
     test("a region whose municipalities wear the whole palette has no colour to give, and says so", () => {

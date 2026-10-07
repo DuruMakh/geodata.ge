@@ -2,7 +2,7 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import type { Municipality, MunicipalRegion } from "../data/municipal/types";
 import { publicLabel } from "../i18n/labels";
 import type { Locale } from "../i18n/types";
-import { EDITORIAL_PALETTE, INK, colorForItem } from "./colors";
+import { EDITORIAL_PALETTE, INK, OTHER_COLOR, colorForItem } from "./colors";
 
 export const GEORGIA_PLACE_ID = MUNICIPAL_COUNTRY_ID;
 export const TBILISI_PLACE_ID = "region.tbilisi";
@@ -31,7 +31,8 @@ export type DemographyPlace = {
 /**
  * A municipality wears the palette colour its registry position gives it, unless that is its region's colour. It then takes the
  * next palette colour, walking on from its own position, that neither the region nor a sibling wears and no moved sibling has
- * been given, so a region's page never draws two series in one colour and a municipality that did not clash never changes.
+ * been given, and that is never the grey "other" wears (a hair from the palette's #8A7B65, so it would read as a repeat of it),
+ * so a region's page never draws two series in one colour and a municipality that did not clash never changes.
  */
 function municipalityColours(
   municipalities: readonly Municipality[],
@@ -46,7 +47,7 @@ function municipalityColours(
     for (const sibling of siblings.filter((candidate) => colours.get(candidate.code) === regionColour)) {
       const own = sibling.sortId % EDITORIAL_PALETTE.length;
       const free = EDITORIAL_PALETTE.map((_, step) => EDITORIAL_PALETTE[(own + step + 1) % EDITORIAL_PALETTE.length]!).find(
-        (colour) => !worn.has(colour),
+        (colour) => colour !== OTHER_COLOR && !worn.has(colour),
       );
       if (free === undefined) throw new Error(`No palette colour is free for municipality ${sibling.code} of ${regionId}`);
       colours.set(sibling.code, free);
