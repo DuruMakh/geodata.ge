@@ -10,6 +10,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
 import { Overline, SectionTitle, SourceNote } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 import { Sparkline } from "../ui/sparkline";
 import { sectorColor } from "../../lib/explorer/economicSectors";
 import { KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
@@ -54,7 +55,7 @@ export function SectorHighlights({ facts, registry, year }: {
           <Overline>{t("largest")}</Overline>
           <p data-testid="sector-hero-value" className="mt-3.5 font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]">
             {amount.num}
-            {amount.unit ? <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-base font-medium tracking-normal text-[var(--body)]">{amount.unit}</span> : null}
+            {amount.unit ? <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-base font-medium tracking-normal text-[var(--body)]">{withLari(amount.unit)}</span> : null}
           </p>
           <div className="mt-7 max-w-[480px]">
             {model.largestShare != null ? (

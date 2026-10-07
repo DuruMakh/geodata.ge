@@ -4,6 +4,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import type { FocusEvent, ReactNode } from "react";
 import { SwatchBar } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 
 /**
  * On a stacked (<1100px) layout, focusing a search field scrolls it to the top of the
@@ -271,7 +272,7 @@ export function SeriesSelectorRow({
           </span>
         )}
         <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--muted)]">
-          {value}
+          {withLari(value)}
         </span>
       </button>
     </div>

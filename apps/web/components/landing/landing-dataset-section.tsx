@@ -3,6 +3,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
+import { withLari } from "../ui/lari";
 import type { LandingBasisStatus, LandingDatasetSummary } from "../../lib/landing/landingData";
 
 const STATUS_LABEL: Record<LandingBasisStatus, string> = {
@@ -119,7 +120,7 @@ export function LandingDatasetSection({
                     {row.label}
                   </th>
                   <td className="whitespace-nowrap px-1 py-2.5 text-right font-[family-name:var(--font-numeric)]">
-                    {formatAmount(row.amountGel, locale)}
+                    {withLari(formatAmount(row.amountGel, locale))}
                   </td>
                   <td className="whitespace-nowrap py-2.5 pl-1 text-right font-[family-name:var(--font-numeric)]">
                     {formatShare(row.share)}

@@ -3,6 +3,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
+import { withLari } from "../ui/lari";
 import type { LandingDebtSummary, LandingDeficitSummary } from "../../lib/landing/landingData";
 
 const sectionClassName =
@@ -66,7 +67,7 @@ export function LandingFiscalSections({
               <div key={part.label} className="min-w-0 border-b border-[var(--hairline-soft)] py-3">
                 <dt className="text-[10px] leading-snug text-[var(--muted)]">{part.label}</dt>
                 <dd className="mt-1.5 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[clamp(14px,4.5vw,17px)] font-semibold leading-tight">
-                  {formatAmount(part.value, locale)}
+                  {withLari(formatAmount(part.value, locale))}
                 </dd>
                 <dd className="mt-1 text-[10px] text-[var(--faint)]">{message(messages, "landing.inTotalDebt", { share: formatShare(part.value / debt.totalGel) })}</dd>
               </div>

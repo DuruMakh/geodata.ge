@@ -226,12 +226,14 @@ describe("Government Debt route composition", () => {
       lastUpdatedAt: reviewedAt,
     }));
 
-    expect(seriesRow(markup, "debt.service.total")).toContain("4.4 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.total")).not.toContain("3.7 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.principal")).toContain("2.7 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.principal")).not.toContain("2.9 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.interest")).toContain("1.6 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.interest")).not.toContain("832 მლნ ₾");
+    // Row values read as text: the ₾ sits in its own sans span (withLari).
+    const rowText = (id: DebtSeriesId) => seriesRow(markup, id).replace(/<[^>]*>/g, "");
+    expect(rowText("debt.service.total")).toContain("4.4 მლრდ ₾");
+    expect(rowText("debt.service.total")).not.toContain("3.7 მლრდ ₾");
+    expect(rowText("debt.service.principal")).toContain("2.7 მლრდ ₾");
+    expect(rowText("debt.service.principal")).not.toContain("2.9 მლრდ ₾");
+    expect(rowText("debt.service.interest")).toContain("1.6 მლრდ ₾");
+    expect(rowText("debt.service.interest")).not.toContain("832 მლნ ₾");
     expect(seriesRow(markup, "debt.rate.domestic")).toContain("8.8% · 2024");
     expect(seriesRow(markup, "debt.rate.external")).toContain("3.1% · 2024");
   });

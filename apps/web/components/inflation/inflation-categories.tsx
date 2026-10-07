@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { formatDisplayDate, formatPoints } from "../../lib/explorer/format";
 
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import {
@@ -115,7 +115,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
   const unitLine =
     state.tab === "contrib"
       ? // Two decimals, unrounded: displayedValue() would turn a published 5.65 into 5.70.
-        t("categoryUnit.contrib", { headline: latestHeadline === null ? "—" : latestHeadline.toFixed(2) })
+        t("categoryUnit.contrib", { headline: formatPoints(latestHeadline, false, 2) })
       : t(`categoryUnit.${state.tab}`);
 
   function selectTab(tab: CategoryTab) {

@@ -7,6 +7,7 @@ import type { Locale } from "../../lib/i18n/types";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { Sparkline } from "../ui/sparkline";
 import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 import { HERO_KPI_VALUE_CLASS, KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, MOVER_LABEL_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
@@ -123,7 +124,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                 <p data-testid="municipal-change-sentence" className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
                   <Message messages={messages} id={grew ? "municipal.changeIncreased" : "municipal.changeDecreased"} values={{
                     start: startYear, end: endYear,
-                    amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{`${deltaParts.num} ${deltaParts.unit}`.trim()}</span>,
+                    amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari(`${deltaParts.num} ${deltaParts.unit}`.trim())}</span>,
                     annual: headline.cagr !== null ? <Message messages={messages} id={headline.cagr >= 0 ? "municipal.annualGrowth" : "municipal.annualChange"} values={{ rate: <span className="font-[family-name:var(--font-numeric)] text-xs">{formatShare(headline.cagr, true)}</span> }} /> : ".",
                   }} />
                 </p>
@@ -141,7 +142,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                       {kpi.value}
                       {kpi.unit ? (
                         <span className={KPI_UNIT_CLASS}>
-                          {kpi.unit}
+                          {withLari(kpi.unit)}
                         </span>
                       ) : null}
                     </span>

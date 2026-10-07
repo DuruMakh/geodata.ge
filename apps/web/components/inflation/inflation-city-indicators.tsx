@@ -1,7 +1,7 @@
 "use client";
 
 import { INK } from "../../lib/explorer/colors";
-import { formatShare } from "../../lib/explorer/format";
+import { formatPoints, formatShare } from "../../lib/explorer/format";
 import { formatContribution } from "../../lib/explorer/inflationCategoryLabels";
 import { type CityIndex } from "../../lib/explorer/inflationCities";
 import { latestCityIndicators } from "../../lib/explorer/inflationCityIndicators";
@@ -37,7 +37,7 @@ export function InflationCityIndicators({ index }: { index: CityIndex }) {
     },
     {
       label: t("cityGap"),
-      value: displayedValue(latest.gap.value).toFixed(1),
+      value: formatPoints(displayedValue(latest.gap.value)),
       unit: t("pp"),
       color: "var(--ink)",
       detail: t("cityGapDetail"),

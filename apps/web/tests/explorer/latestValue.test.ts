@@ -15,7 +15,8 @@ describe("formatGdpLatestValue", () => {
     const ka = await getMessages("ka", ["gdp"]);
     expect(formatGdpLatestValue({ indicator: "real", currency: "gel" }, 27_123_000_000, ka)).toBe("27.1 მლრდ აშშ დოლარი");
     expect(formatGdpLatestValue({ indicator: "nominal", currency: "gel" }, 104_600_000_000, ka)).toBe("104.6 მლრდ ₾");
-    expect(formatGdpLatestValue({ indicator: "per_capita", currency: "gel" }, 28_235.4, ka)).toBe("28 235 ₾");
+    // One grouping site-wide (DESIGN §11): comma thousands, like the chart axis and table.
+    expect(formatGdpLatestValue({ indicator: "per_capita", currency: "gel" }, 28_235.4, ka)).toBe("28,235 ₾");
     expect(formatGdpLatestValue({ indicator: "growth", currency: "gel" }, 0.075, ka)).toBe("+7.5%");
     expect(formatGdpLatestValue({ indicator: "growth", currency: "gel" }, -0.063, ka)).toBe("−6.3%");
     const en = await getMessages("en", ["gdp"]);

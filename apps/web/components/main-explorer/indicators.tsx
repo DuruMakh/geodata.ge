@@ -11,6 +11,7 @@ import { compoundAnnualGrowth, isGrowthRankable, rankPeriodDeltas } from "../../
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
 import { SectionTitle, SwatchBar } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 import { HeroKpi, KPI_GRID_CLASS, MOVER_LABEL_CLASS, SideKpiList } from "./kpi-blocks";
 
 // "ძირითადი ინდიკატორები" per DESIGN.md §8.5: hero KPI with a two-segment gauge and
@@ -190,7 +191,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
               <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
                 <Message messages={messages} id={grew ? "main.periodIncrease" : "main.periodDecrease"} values={{
                   years: startYear + "–" + endYear, totalLabel: sideNoun,
-                  amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{(deltaParts.num + " " + deltaParts.unit).trim()}</span>,
+                  amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari((deltaParts.num + " " + deltaParts.unit).trim())}</span>,
                 }} />
                 {cagr !== null ? <Message messages={messages} id={cagr >= 0 ? "main.annualGrowth" : "main.annualChange"} values={{ rate: <span className="font-[family-name:var(--font-numeric)] text-xs">{formatShare(cagr, true)}</span> }} /> : null}.
               </p>

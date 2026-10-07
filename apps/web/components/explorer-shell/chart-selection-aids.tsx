@@ -6,6 +6,7 @@ import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/ex
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SwatchBar } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 
 // Owner decision D4 (2026-10-07), phones only. Rendered directly under the chart (or
 // table) inside its chart panel (the nearest [data-chart-panel] or <section>):
@@ -103,7 +104,7 @@ export function ChartSelectionAids({
             <li key={line.id} data-legend-series-id={line.id} className="flex min-w-0 items-center gap-2">
               <SwatchBar color={line.color} />
               <span className="min-w-0 break-words">{line.label}</span>
-              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{legendValue(line.vals, { share, unit, formatValue })}</span>
+              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{withLari(legendValue(line.vals, { share, unit, formatValue }))}</span>
             </li>
           ))}
         </ul>

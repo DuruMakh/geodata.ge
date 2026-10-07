@@ -6,6 +6,7 @@ import type { LandingModel } from "../../lib/landing/landingData";
 import type { LandingDatasetLink } from "../../lib/landing/landingDatasets";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
+import { withLari } from "../ui/lari";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 import { LandingDatasetSection } from "./landing-dataset-section";
 import { LandingFiscalSections } from "./landing-fiscal-sections";
@@ -138,7 +139,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
               </span>
               <span className="text-[11.5px] leading-snug text-[var(--muted)]">
                 {dataset.measure} · {dataset.period}:{" "}
-                <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-[var(--ink)]">{dataset.value}</span>
+                <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-[var(--ink)]">{withLari(dataset.value)}</span>
               </span>
             </Link>
           ))}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { HubCardModel } from "../../lib/explorer/hubCards";
+import { withLari } from "../ui/lari";
 import { Sparkline } from "../ui/sparkline";
 import type { Locale } from "../../lib/i18n/types";
 import { getCommonMessages } from "../../lib/i18n/common.server";
@@ -40,7 +41,7 @@ function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
         <div aria-hidden data-testid="hub-card-graphic-space" className="mt-1.5 h-[34px]" />
       )}
       {card.footer ? (
-        <p className="mt-auto font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{card.footer}</p>
+        <p className="mt-auto font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{withLari(card.footer)}</p>
       ) : null}
     </>
   );
