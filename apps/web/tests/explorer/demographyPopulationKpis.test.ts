@@ -5,7 +5,9 @@ import { projectDemographyObservation } from "../../lib/explorer/clientData";
 import { GEORGIA_PLACE_ID, buildDemographyPlaces, type DemographyPlace } from "../../lib/explorer/demographyAreas";
 import { buildPopulationHighlights, buildPopulationModel } from "../../lib/explorer/demographyPopulation";
 import { buildPopulationKpis, populationIndexKpis } from "../../lib/explorer/demographyPopulationKpis";
-import { formatShare } from "../../lib/explorer/format";
+import { MISSING, formatShare } from "../../lib/explorer/format";
+import type { PeriodRange } from "../../lib/explorer/periodRange";
+import demographyEn from "../../lib/i18n/messages/en/demography.json";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { Locale, Presentation } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
@@ -27,8 +29,8 @@ beforeAll(async () => {
   });
 });
 
-const kpis = (placeId: string, locale: Locale = "en") => {
-  const model = buildPopulationModel({ facts, places, query: { selectedIds: [placeId], range: { kind: "all" } }, locale });
+const kpis = (placeId: string, locale: Locale = "en", range: PeriodRange = { kind: "all" }) => {
+  const model = buildPopulationModel({ facts, places, query: { selectedIds: [placeId], range }, locale });
   return buildPopulationKpis(buildPopulationHighlights(model, facts, places, placeId)!, presentations[locale].messages, locale);
 };
 
@@ -74,6 +76,18 @@ describe("population key indicators", () => {
       ["Region", "413,214", ""],
     ]);
     expect(result.side[2]!.detail).toBe("Adjara");
+  });
+
+  test("a range that ends before regional data starts: the dash and the note instead of a figure, for a region and a municipality", () => {
+    const note = (demographyEn as Record<string, string>)["demography.regionalFrom"]!.replace("{year}", "2015");
+    expect(note).toContain("2015");
+    for (const placeId of ["region.adjara", "06"]) {
+      const result = kpis(placeId, "en", { kind: "manual", start: 2004, end: 2010 });
+      expect(result.heroValue, placeId).toBe(MISSING);
+      expect(result.unavailable, placeId).toBe(note);
+      expect(result.side[0]!.value, placeId).toBe(MISSING);
+      expect(result.side[0]!.detail, placeId).toBe(note);
+    }
   });
 
   test("Georgian wording", () => {
