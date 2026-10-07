@@ -15,6 +15,7 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import { publicLabel } from "../../lib/i18n/labels";
 import { unemploymentRegionHref } from "../../lib/explorer/unemploymentRegionRoutes";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { RegionPicker } from "../regional-economies/region-picker";
@@ -25,6 +26,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
@@ -42,6 +44,12 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
   const [pickerOpen, setPickerOpen] = useState(false);
   const region = regionId ? registry.find(group => group.id === regionId)! : null;
   const regionName = region ? locale === "en" ? region.labelEn : region.labelKa : "";
+  const orderedRegions = (regions ?? []).slice().sort((left, right) => left.sortOrder - right.sortOrder);
+  const regionIndex = orderedRegions.findIndex(candidate => candidate.id === regionId);
+  const neighbours = regionIndex < 0 ? null : {
+    previous: orderedRegions[(regionIndex - 1 + orderedRegions.length) % orderedRegions.length]!,
+    next: orderedRegions[(regionIndex + 1) % orderedRegions.length]!,
+  };
   const model = useMemo(() => buildUnemploymentModel(facts, registry, state), [facts, registry, state]);
   const composition = useMemo(() => buildUnemploymentComposition(facts, model.years), [facts, model.years]);
   const ageHeatmap = useMemo(() => section === "age" ? buildUnemploymentAgeHeatmap(facts, registry, state.indicator, model.years) : null, [section, facts, registry, state.indicator, model.years]);
@@ -62,13 +70,23 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
     await downloadWorkbook(buildUnemploymentWorkbookExportModel(facts, registry, state, presentation, sources, siteOrigin));
   }} />;
   return <div data-testid="unemployment-explorer" className="@container">
-    {region ? <div className="relative">
-      <ExplorerHeading>{t("regionHeadingLead")}{" "}
-        <button type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
-          {regionName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
-        </button>
-      </ExplorerHeading>
-      <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />
+    {region ? <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
+      <div className="relative min-w-0 min-[768px]:flex-1">
+        <ExplorerHeading>{t("regionHeadingLead")}{" "}
+          <button type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
+            {regionName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
+          </button>
+        </ExplorerHeading>
+        <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />
+      </div>
+      {/* Previous/next in the regions' fixed order, as on Economy region pages;
+          the bottom margin matches the heading's so both share a baseline row. */}
+      {neighbours ? <EntityNeighbourLinks
+        testId="unemployment-region-navigation"
+        className="mb-3"
+        previous={{ href: pageHref(unemploymentRegionHref(neighbours.previous.id), locale), label: publicLabel(locale, neighbours.previous.id, neighbours.previous.kaLabel, presentation.englishLabels) }}
+        next={{ href: pageHref(unemploymentRegionHref(neighbours.next.id), locale), label: publicLabel(locale, neighbours.next.id, neighbours.next.kaLabel, presentation.englishLabels) }}
+      /> : null}
     </div> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
     <p role="status" className="sr-only">{announcement}</p>

@@ -100,7 +100,8 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
       <div
         data-testid={`municipal-list-${panelLevel}`}
         hidden={!activePanel}
-        className="mt-1.5 max-h-[620px] overflow-y-auto"
+        // Below 768px the page scrolls the list; an inner 620px box trapped the swipe.
+        className="mt-1.5 @min-[768px]:max-h-[620px] @min-[768px]:overflow-y-auto"
       >
         {panelRows.map((row) => (
           <Link
@@ -170,6 +171,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               shapes={props.shapes}
               markers={props.markers}
               occupiedAreas={props.occupiedAreas}
+              touchTargets={props.touchTargets}
               legendMin={props.legendMin}
               legendMax={props.legendMax}
               activeCode={activeMunicipalityCode}

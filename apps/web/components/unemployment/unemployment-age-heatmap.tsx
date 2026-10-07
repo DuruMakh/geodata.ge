@@ -1,7 +1,9 @@
 "use client";
+import { useEffect, useRef } from "react";
 import type { UnemploymentIndicator } from "../../lib/data/unemployment/types";
 import { unemploymentIsRate } from "../../lib/data/unemployment/types";
-import type { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
+import { MAP_RAMP } from "../../lib/explorer/colors";
+import { unemploymentAgeHeatmapBin, type buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
 import { formatInUnit, formatShare } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -13,12 +15,19 @@ export function UnemploymentAgeHeatmap({ model, indicator }: { model: ReturnType
   const percent = unemploymentIsRate(indicator), unit = { divisor: 1, decimals: 1, label: t("thousandPersons") };
   const format = (value: number | null) => percent ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
   const caption = `${t(`indicator.${indicator}`)} · ${percent ? "%" : unit.label} · ${model.years[0]}–${model.years.at(-1)}`;
+  const scroller = useRef<HTMLDivElement>(null);
+  const yearsKey = model.years.join(",");
+  // Where the table is wider than its column (phones), open on the newest years.
+  useEffect(() => {
+    const element = scroller.current;
+    if (element) element.scrollLeft = element.scrollWidth;
+  }, [yearsKey]);
   return <section data-testid="unemployment-age-heatmap" data-indicator={indicator} data-unit={percent ? "percent" : "thousand_persons"} className="mt-12 border-t-2 border-[var(--ink)] pt-5">
     <SectionTitle>{t("ageHeatmapTitle")}</SectionTitle>
     <p className="mt-2 text-[12px] text-[var(--body)]">{caption}</p>
     <p className="mt-2 max-w-[800px] text-[12px] leading-relaxed text-[var(--muted)]">{t("ageHeatmapNote")}</p>
     <div className="mt-5">
-      <div role="region" aria-label={caption} tabIndex={0} className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]">
+      <div ref={scroller} data-testid="age-heatmap-scroller" role="region" aria-label={caption} tabIndex={0} className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]">
       <table className="w-full border-separate border-spacing-1 text-[13px]">
         <caption className="sr-only">{caption}</caption>
         <thead><tr>
@@ -27,14 +36,17 @@ export function UnemploymentAgeHeatmap({ model, indicator }: { model: ReturnType
         </tr></thead>
         <tbody>{model.rows.map(row => <tr key={row.id} data-heatmap-group={row.id}>
           <th scope="row" className="sticky left-0 z-10 whitespace-nowrap bg-[var(--paper)] px-3 py-2 text-left font-normal text-[var(--ink)]">{locale === "en" ? row.labelEn : row.labelKa}</th>
-          {row.values.map((value, index) => <td key={model.years[index]} data-heatmap-cell={`${row.id}:${model.years[index]}`} data-value={value ?? ""} className="px-3 py-2 text-center font-[family-name:var(--font-numeric)] tabular-nums text-[var(--ink)]"
-            style={value === null ? undefined : { backgroundColor: `color-mix(in srgb, var(--accent) ${5 + (model.maximum ? value / model.maximum : 0) * 35}%, var(--paper))` }}>{format(value)}</td>)}
+          {row.values.map((value, index) => {
+            const bin = value === null ? null : unemploymentAgeHeatmapBin(value, model.maximum, MAP_RAMP.length);
+            return <td key={model.years[index]} data-heatmap-cell={`${row.id}:${model.years[index]}`} data-value={value ?? ""} data-bin={bin ?? ""} className="px-3 py-2 text-center font-[family-name:var(--font-numeric)] tabular-nums"
+              style={bin === null ? { color: "var(--ink)" } : { backgroundColor: MAP_RAMP[bin], color: bin === MAP_RAMP.length - 1 ? "var(--paper)" : "var(--ink)" }}>{format(value)}</td>;
+          })}
         </tr>)}</tbody>
       </table>
       </div>
     </div>
     <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-[var(--muted)]">
-      <span>{format(0)}</span><span aria-hidden className="h-2 w-28 bg-[linear-gradient(to_right,color-mix(in_srgb,var(--accent)_5%,var(--paper)),color-mix(in_srgb,var(--accent)_40%,var(--paper)))]" /><span>{format(model.maximum)}</span>
+      <span>{format(0)}</span><span aria-hidden className="flex">{MAP_RAMP.map(fill => <span key={fill} className="h-2 w-[18px]" style={{ backgroundColor: fill }} />)}</span><span>{format(model.maximum)}</span>
       <span>{t("ageHeatmapScale")}</span>
     </div>
   </section>;

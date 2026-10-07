@@ -125,6 +125,7 @@ export async function renderMunicipalIndex(locale: Locale) {
           shapes={map.shapes}
           markers={map.markers}
           occupiedAreas={map.occupiedAreas}
+          touchTargets={map.touchTargets}
           legendMin={formatPerResidentGel(map.legendMinPerResidentGel, locale)}
           legendMax={formatPerResidentGel(map.legendMaxPerResidentGel, locale)}
           municipalities={list.municipalities}

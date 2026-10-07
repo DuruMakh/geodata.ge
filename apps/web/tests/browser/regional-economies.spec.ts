@@ -24,7 +24,8 @@ for (const [locale, prefix, heading] of [
     await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
     await expect(page.getByTestId("regional-economy-map")).toBeVisible();
     await expect(page.getByTestId("regional-map-path")).toHaveCount(11);
-    await expect(page.getByTestId("regional-economy-map").locator('use[href*="municipality-shape"], circle')).toHaveCount(0);
+    // No municipality shapes or city markers; the invisible touch disk is not a marker.
+    await expect(page.getByTestId("regional-economy-map").locator('use[href*="municipality-shape"], circle:not([data-map-touch-target])')).toHaveCount(0);
     await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(1);
     await expect(page.getByTestId("regional-list-row").filter({ hasText: locale === "en" ? "Imereti" : "იმერეთი" })).toHaveAttribute(
       "href",

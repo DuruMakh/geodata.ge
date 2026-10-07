@@ -372,12 +372,19 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   await page.goto(`${TEST_BASE_URL}/methodology/expenditure#source-archive`);
   const contents = page.getByRole("navigation", { name: "გვერდის სარჩევი" });
   await expect(contents).toHaveCSS("position", "static");
+  // Phones get each source as a stacked block with a full-width download link
+  // instead of the 760px table in a sideways scroller.
+  await expect(page.getByTestId("source-archive").locator("thead")).toBeHidden();
   const archiveScroller = page.getByTestId("source-archive").locator("table").locator("..");
-  const overflow = await archiveScroller.evaluate((element) => ({
-    clientWidth: element.clientWidth,
-    scrollWidth: element.scrollWidth,
-  }));
-  expect(overflow.scrollWidth).toBeGreaterThan(overflow.clientWidth);
+  expect(await archiveScroller.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
+  const firstCard = page.getByTestId("source-archive-row").first();
+  await expect(firstCard).toBeVisible();
+  const cardDownload = firstCard.getByRole("link", { name: /ჩამოტვირთვა/ });
+  const cardBox = (await firstCard.boundingBox())!;
+  const downloadBox = (await cardDownload.boundingBox())!;
+  expect(downloadBox.height).toBeGreaterThanOrEqual(44);
+  expect(Math.abs(downloadBox.width - cardBox.width)).toBeLessThan(1);
+  await expect(cardDownload).toContainText(/(PDF|XLSX?|ZIP|DOCX?|CSV|HTML?) · [\d.]+ (MB|KB|B)/);
   expect(
     await page.evaluate(() => ({
       body: document.body.scrollWidth,

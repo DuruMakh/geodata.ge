@@ -111,7 +111,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
       </aside>
 
       <div className="grid gap-12 @min-[1100px]:grid-cols-[220px_minmax(0,1fr)] @min-[1100px]:gap-16">
-        <nav aria-label={message(messages, "methodology.contentsAria")} className="border-t border-[var(--ink)] pt-4 @min-[1100px]:sticky @min-[1100px]:top-6 @min-[1100px]:self-start">
+        <nav id="methodology-contents" aria-label={message(messages, "methodology.contentsAria")} className="scroll-mt-6 border-t border-[var(--ink)] pt-4 @min-[1100px]:sticky @min-[1100px]:top-6 @min-[1100px]:self-start">
           <p className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{message(messages, "methodology.contents")}</p>
           <ol className="mt-3">
             {content.sections.map((section, index) => (
@@ -164,6 +164,19 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
               ) : null}
             </section>
           ))}
+          {/* Below 1100px the contents list is not sticky and sits above a long
+              article (DESIGN.md §21 asks for sticky contents), so a small button
+              stays at the bottom of the screen while the article scrolls and
+              jumps back to it. The zero-height wrapper sticks; the link sits above it. */}
+          <div className="pointer-events-none sticky bottom-4 z-20 flex h-0 justify-end @min-[1100px]:hidden">
+            <a
+              href="#methodology-contents"
+              data-testid="methodology-contents-jump"
+              className="pointer-events-auto inline-flex min-h-11 -translate-y-full items-center border border-[var(--ink)] bg-[var(--paper)] px-3.5 text-[12px] font-semibold text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+            >
+              {message(messages, "methodology.contentsJump")}
+            </a>
+          </div>
         </article>
       </div>
     </main>

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { Municipality } from "../data/municipal/types";
 import type { MunicipalListRow } from "./municipalData";
+import { mapTouchTargets, pathBounds, type MapTouchTarget } from "./mapTouchTargets";
 
 export type MunicipalityMapShape = {
   code: string;
@@ -29,6 +30,8 @@ export type MunicipalityMapModel = {
   shapes: MunicipalityMapShape[];
   markers: MunicipalityMapMarker[];
   occupiedAreas: MunicipalityMapOccupiedArea[];
+  /** Touch hit areas for map targets under a fingertip on a phone, keyed by code. */
+  touchTargets: MapTouchTarget[];
   legendMinPerResidentGel: number;
   legendMaxPerResidentGel: number;
 };
@@ -49,6 +52,8 @@ const rawArtifact = JSON.parse(
 ) as unknown;
 
 const EXPECTED_MARKER_CODES = ["04", "06", "20", "32", "48"];
+/** The city marker's drawn radius in map units (municipality-map.tsx). */
+export const MUNICIPALITY_MARKER_RADIUS = 7.5;
 const EXPECTED_OCCUPIED_AREA_KEYS = ["abkhazia", "tskhinvali"];
 const EXPECTED_MUNICIPALITY_CODES = [
   "04", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
@@ -222,6 +227,17 @@ export function buildMunicipalityMapModel({
     (shape) => valueFor(shape.code).budgetPerResidentGel,
   );
   const bucketOf = quantileBucket(polygonValues);
+  // Tbilisi's polygon is decoration under its marker, so the marker is the target.
+  const markerCodes = new Set(MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => marker.code));
+  const touchTargets = mapTouchTargets([
+    ...MUNICIPALITY_MAP_ARTIFACT.municipalityPaths
+      .filter((shape) => !markerCodes.has(shape.code))
+      .map((shape) => ({ id: shape.code, bounds: pathBounds(shape.d) })),
+    ...MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => ({
+      id: marker.code,
+      bounds: { minX: marker.x - MUNICIPALITY_MARKER_RADIUS, minY: marker.y - MUNICIPALITY_MARKER_RADIUS, maxX: marker.x + MUNICIPALITY_MARKER_RADIUS, maxY: marker.y + MUNICIPALITY_MARKER_RADIUS },
+    })),
+  ], Number(MUNICIPALITY_MAP_ARTIFACT.viewBox.split(" ")[2]));
 
   return {
     viewBox: MUNICIPALITY_MAP_ARTIFACT.viewBox,
@@ -241,6 +257,7 @@ export function buildMunicipalityMapModel({
       budgetPerResidentGel: valueFor(marker.code).budgetPerResidentGel,
     })),
     occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ key: area.key })),
+    touchTargets,
     legendMinPerResidentGel: Math.min(...polygonValues),
     legendMaxPerResidentGel: Math.max(...polygonValues),
   };

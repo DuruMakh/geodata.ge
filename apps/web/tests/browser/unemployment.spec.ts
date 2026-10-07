@@ -106,6 +106,13 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("series-row-toggle")).toHaveCount(3);
     await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
     await expect(row("georgia:unemployment_rate")).toContainText("13.9%");
+    // The page opens on its comparison: Men and Women beside the national line.
+    await expect(toggle("men:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
+    await expect(toggle("women:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 7");
+    expect(new URL(page.url()).hash).toBe("");
+    await toggle("men:unemployment_rate").click();
+    await toggle("women:unemployment_rate").click();
     await expect(page.getByTestId("series-status")).toContainText("1 / 7");
     for (const group of ["men", "women"]) {
       const expand = row(`${group}:unemployment_rate`).locator("button[aria-expanded]");
@@ -180,7 +187,7 @@ for (const [breakdown, group, query] of [["settlement", "urban", "Urban"], ["edu
 
 test("search does not limit age selection and the national stack survives empty overview selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment/age"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 11");
+  await expect(page.getByTestId("series-status")).toContainText("2 / 11");
   await page.getByTestId("series-search").fill("15-19");
   await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("no-selection-callout")).toBeVisible();
   await expect(page.getByTestId("unemployment-composition")).toHaveCount(0);
