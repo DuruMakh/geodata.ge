@@ -307,11 +307,13 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
             data-testid="municipal-entity-navigation"
             className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink"
           >
-            <a href={navigation.prev.href} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-              ← {navigation.prev.label}
+            {/* Plain <a> on purpose (full page load); 44px-tall targets below 768px,
+                matching EntityNeighbourLinks on the other detail pages. */}
+            <a href={navigation.prev.href} className="flex min-h-11 min-w-0 items-center font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
+              <span className="min-w-0 truncate">← {navigation.prev.label}</span>
             </a>
-            <a href={navigation.next.href} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-              {navigation.next.label} →
+            <a href={navigation.next.href} className="flex min-h-11 min-w-0 items-center justify-end text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
+              <span className="min-w-0 truncate">{navigation.next.label} →</span>
             </a>
           </span>
         ) : null}

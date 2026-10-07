@@ -13,10 +13,12 @@ import { pageHref } from "../../lib/i18n/routes";
 import { SourceNote } from "../ui/editorial";
 import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 import { RegionMap, regionalEconomyMapData, type RegionMapMetric } from "./regional-economy-map";
+import { useAppReady } from "../explorer-shell/use-app-ready";
 
 export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalEconomyMapModel; sourceNote: string }) {
   const { locale, messages, englishLabels } = useI18n();
   const largest = model.regions[0];
+  useAppReady();
   return <RegionIndex model={regionalEconomyMapData(model)} sourceNote={sourceNote} metric={{
     hrefForRegion: regionalEconomyHref, formatValue: value => formatAmount(value, locale), mapAria: message(messages, "regionalEconomies.mapAria", { year: model.year }),
     entityAria: (name, value, year) => message(messages, "regionalEconomies.mapEntityAria", { name, amount: formatAmount(value, locale), year }),

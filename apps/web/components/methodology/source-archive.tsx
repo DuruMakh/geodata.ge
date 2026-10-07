@@ -76,8 +76,9 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
             className="mt-2 block h-[34px] w-full border-0 border-b border-[var(--control)] bg-transparent px-0 text-[13px] outline-none placeholder:text-[var(--faint)] focus:border-[var(--accent)]"
           />
         </label>
-        <div className="overflow-x-auto pb-1" aria-label={message(messages, "methodology.yearFilter")}>
-          <div className="flex min-w-max gap-2">
+        {/* Below 760px the years wrap onto more rows instead of scrolling sideways. */}
+        <div data-testid="archive-year-filter" className="pb-1 min-[760px]:overflow-x-auto" aria-label={message(messages, "methodology.yearFilter")}>
+          <div className="flex flex-wrap gap-2 min-[760px]:min-w-max min-[760px]:flex-nowrap">
             <button
               type="button"
               aria-pressed={year === null}
