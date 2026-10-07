@@ -274,7 +274,7 @@ export function SeriesSelectorRow({
           {art ? <span className="-mt-1 flex-none" aria-hidden="true">{art}</span> : null}
           <span
             data-testid="series-label"
-            className={`${wrapLabel ? "min-w-0 break-words" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[0.75rem]" : "text-[0.71875rem]"} font-normal text-[var(--body)]` : "text-[0.78125rem] font-medium text-[var(--ink)]"}`}
+            className={`${wrapLabel ? "min-w-0 break-words" : "min-w-0 break-words min-[768px]:line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[0.75rem]" : "text-[0.71875rem]"} font-normal text-[var(--body)]` : "text-[0.78125rem] font-medium text-[var(--ink)]"}`}
           >
             {label}
           </span>

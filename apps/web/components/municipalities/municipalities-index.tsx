@@ -133,7 +133,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
                 {publicLabel(locale, row.id, row.nameKa, englishLabels)}
               </span>
-              <span className="block truncate text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{subtitleFor(row)}</span>
+              <span className="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">{subtitleFor(row)}</span>
               <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
                 <span
                   data-testid="municipal-row-bar"
