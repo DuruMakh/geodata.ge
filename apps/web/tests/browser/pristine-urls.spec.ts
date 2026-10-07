@@ -8,6 +8,9 @@ for (const path of ["", "/en"].flatMap((prefix) => [
   `${prefix}/explorer/inflation/categories`,
   `${prefix}/explorer/economy/sectors`,
   `${prefix}/explorer/demography/population`,
+  `${prefix}/explorer/demography/population/georgia`,
+  `${prefix}/explorer/demography/population/region/adjara`,
+  `${prefix}/explorer/demography/population/batumi`,
 ])) {
   test(`opening ${path} leaves the URL without a hash`, async ({ page }) => {
     await page.goto(path);
