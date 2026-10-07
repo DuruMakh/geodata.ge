@@ -18,7 +18,7 @@ for (const path of ["/methodology", "/en/methodology"]) {
 
 const tabStrips = [
   { path: "/explorer/economy/gdp", strip: "gdp-indicators" },
-  { path: "/explorer/inflation", strip: "inflation-tabs" },
+  { path: "/explorer/inflation/overview", strip: "inflation-tabs" },
   { path: "/explorer/inflation/categories", strip: "inflation-category-tabs" },
   { path: "/en/explorer/inflation/categories", strip: "inflation-category-tabs" },
   { path: "/en/explorer/economy/gdp", strip: "gdp-indicators" },
@@ -127,3 +127,4 @@ test("the Georgia picker's first option shows its full name at 390px", async ({ 
   await expect(country).toBeVisible();
   expect(await country.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
 });
+
