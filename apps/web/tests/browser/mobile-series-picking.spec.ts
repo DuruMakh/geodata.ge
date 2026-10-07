@@ -165,3 +165,26 @@ test.describe("the phone legend", () => {
     });
   });
 });
+
+for (const locale of ["ka", "en"] as const) {
+  test(`${locale} unemployment says when a people count clears the rates`, async ({ page }) => {
+    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/unemployment/overview`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const toggle = (id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
+    await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
+    const notice = page.getByTestId("unemployment-unit-notice");
+    await expect(notice).toHaveCount(0);
+    await toggle("georgia:employed").click();
+    await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "false");
+    await expect(notice).toHaveText(locale === "en" ? "Switching to people counts cleared the rates." : "რაოდენობაზე გადასვლისას პროცენტული მაჩვენებლები მოიხსნა.");
+    // At the top of the list, above the first row.
+    const noticeBox = (await notice.boundingBox())!;
+    const listBox = (await page.getByTestId("series-list").boundingBox())!;
+    expect(noticeBox.y + noticeBox.height).toBeLessThanOrEqual(listBox.y + 1);
+    // A tick in the same unit clears the notice; a tick back to a rate says so.
+    await toggle("georgia:unemployed").click();
+    await expect(notice).toHaveCount(0);
+    await toggle("georgia:unemployment_rate").click();
+    await expect(notice).toHaveText(locale === "en" ? "Switching to rates cleared the people counts." : "პროცენტულ მაჩვენებლებზე გადასვლისას რაოდენობები მოიხსნა.");
+  });
+}
