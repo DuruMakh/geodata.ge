@@ -191,3 +191,16 @@ for (const path of [
   });
 }
 
+test("the tap readout replaces the phone legend while it is open (D1 + D4c)", async ({ page }) => {
+  await page.goto("/explorer/inflation/cities");
+  await ready(page);
+  const legend = page.getByTestId("chart-phone-legend");
+  await expect(legend).toBeVisible();
+  const chart = page.locator("[data-testid='chart-panel'] svg:visible, [data-chart-panel] svg:visible").first();
+  await chart.scrollIntoViewIfNeeded();
+  const box = (await chart.boundingBox())!;
+  await page.touchscreen.tap(box.x + box.width * 0.6, box.y + box.height * 0.5);
+  await expect(page.locator("[data-placement='panel']")).toBeVisible();
+  await expect(legend).toBeHidden();
+});
+
