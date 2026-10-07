@@ -48,8 +48,6 @@ type EditorialLineChartProps = {
   unit: ValueUnit;
   shareLabel: string;
   preliminaryLabel?: string;
-  /** Minimum left padding of the desktop drawing; it grows to fit the widest y label. */
-  axisLeftPadding?: number;
   formatTooltipValue?: (value: number) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
@@ -126,7 +124,6 @@ export function EditorialLineChart({
   share,
   unit,
   shareLabel,
-  axisLeftPadding: minLeftPadding = PAD_L,
   periodsPerYear = 1,
   formatPeriod,
   preliminaryLabel,
@@ -182,7 +179,7 @@ export function EditorialLineChart({
     const padRight = mobile ? MOBILE_PAD_R : PAD_R;
     const padTop = mobile && unitCaption !== null ? MOBILE_PAD_T : PAD_T;
     const axisLabels = gridLines.map((value) => formatAxis(value, !mobile));
-    const padLeft = axisLeftPaddingFor(axisLabels, mobile ? MOBILE_PAD_L : minLeftPadding);
+    const padLeft = axisLeftPaddingFor(axisLabels, mobile ? MOBILE_PAD_L : PAD_L);
     const plotWidth = width - padLeft - padRight;
     const x = (index: number) => padLeft + (n <= 1 ? plotWidth / 2 : (index * plotWidth) / (n - 1));
     const y = (value: number) => padTop + ((top - value) / span) * (height - padTop - PAD_B);
