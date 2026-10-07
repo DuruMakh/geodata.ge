@@ -128,7 +128,7 @@ test.describe("the phone legend", () => {
     const legend = page.getByTestId("chart-phone-legend");
     await expect(legend).toBeVisible();
     await expect(legend.locator("li")).toHaveCount(3);
-    const total = legend.locator('li[data-series-id="expenditure.total"]');
+    const total = legend.locator('li[data-legend-series-id="expenditure.total"]');
     await expect(total).toContainText("მთლიანი ხარჯი");
     await expect(total).toContainText("27.7 მლრდ");
     // Directly below the chart frame, inside the phone's width.

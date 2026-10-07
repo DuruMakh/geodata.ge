@@ -100,7 +100,7 @@ export function ChartSelectionAids({
       {chartShown && series.length >= 2 ? (
         <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-[var(--muted)] @min-[768px]:hidden">
           {series.map((line) => (
-            <li key={line.id} data-series-id={line.id} className="flex min-w-0 items-center gap-2">
+            <li key={line.id} data-legend-series-id={line.id} className="flex min-w-0 items-center gap-2">
               <SwatchBar color={line.color} />
               <span className="min-w-0 break-words">{line.label}</span>
               <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{legendValue(line.vals, { share, unit, formatValue })}</span>
