@@ -5,6 +5,7 @@ import { stepPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { decimalsFor, niceScale } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE, INK } from "../../lib/explorer/colors";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
+import { formatInUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
 import { ChartScrollFrame, ChartTooltip, useChartPointer } from "./chart-frame";
 import { buildTooltipRows } from "./editorial-line-chart";
@@ -52,7 +53,12 @@ export function StackedColumnChart({
 }: StackedColumnChartProps) {
   const captionId = useId();
   const count = periods.length;
-  const { svgRef, hover, pinned, setHover, handlers } = useChartPointer(count, W, PAD_L, PAD_R);
+  const plotWidth = W - PAD_L - PAD_R;
+  // Columns sit in the middle of equal bands, so the first and last bars stay
+  // inside the plot instead of straddling its edges (the first one used to be
+  // drawn over the y-axis labels: "250(" for 2500).
+  const band = count > 0 ? plotWidth / count : 0;
+  const { svgRef, hover, pinned, setHover, handlers } = useChartPointer(count, W, PAD_L + band / 2, PAD_R + band / 2);
 
   // The domain covers the tallest positive stack and the deepest negative one, so
   // zero always sits on a gridline and the two halves share one step.
@@ -79,19 +85,20 @@ export function StackedColumnChart({
   const { top, bottom, step } = niceScale(minStack, maxStack);
   const span = top - bottom || 1;
 
-  const plotWidth = W - PAD_L - PAD_R;
   const plotHeight = H - PAD_T - PAD_B;
-  const x = (index: number) => PAD_L + (count <= 1 ? plotWidth / 2 : (index * plotWidth) / (count - 1));
+  const x = (index: number) => PAD_L + band * (index + 0.5);
   const y = (value: number) => PAD_T + ((top - value) / span) * plotHeight;
   const zeroY = y(0);
-  const barWidth = count === 0 ? 0 : Math.min(MAX_BAR_WIDTH, Math.max(1, (plotWidth / Math.max(count, 1)) * 0.7));
+  const barWidth = count === 0 ? 0 : Math.min(MAX_BAR_WIDTH, Math.max(1, band * 0.7));
 
   const gridSteps = Math.round(span / step);
   const gridLines = Array.from({ length: gridSteps + 1 }, (_, index) => bottom + step * index);
   const axisDigits = decimalsFor(step, 2);
-  const formatAxis = (value: number) => value.toFixed(axisDigits).replace("-", "−");
+  // The same en-US grouping and "−" sign as the lists and tables (5,000, not 5000).
+  const formatAxis = (value: number) => formatInUnit(value, { divisor: 1, label: "", decimals: axisDigits });
+  // The lattice columns run between the first and last column centres.
   const lattice = buildDotLattice({
-    plotWidth,
+    plotWidth: plotWidth - band,
     plotHeight,
     yearCount: count,
     gridStepCount: gridSteps,
@@ -191,7 +198,7 @@ export function StackedColumnChart({
                 <pattern
                   id={LATTICE_ID}
                   patternUnits="userSpaceOnUse"
-                  x={PAD_L + lattice.colOffset - lattice.colPitch / 2}
+                  x={PAD_L + band / 2 + lattice.colOffset - lattice.colPitch / 2}
                   y={PAD_T - lattice.rowPitch / 2}
                   width={lattice.colPitch}
                   height={lattice.rowPitch}
