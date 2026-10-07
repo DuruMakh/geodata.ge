@@ -147,10 +147,9 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
         data-testid="inflation-category-tabs"
         role="group"
         aria-label={t("tabs")}
-        className="mb-3 overflow-x-auto py-2"
-        onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
+        className="mb-3 py-2"
       >
-        <div className="mx-auto flex w-max gap-7 px-1">
+        <div className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
           {CATEGORY_TABS.map((tab) => (
             <TextTab
               key={tab}
