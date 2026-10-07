@@ -71,10 +71,6 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />
     </div> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
-    {section === "gender" ? <><p data-testid="unemployment-headline" className="mb-2 text-[13px] text-[var(--body)]">
-      {labels.get(model.referenceId)} · {indicatorLabel} · {model.headline?.year ?? "—"}: <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{valueLabel(model.headline?.value)}</span>
-    </p>
-    <p className="mb-[30px] text-[12px] leading-relaxed text-[var(--muted)]">{t("surveyEstimate")}{noteKey ? ` · ${t(noteKey)}` : ""}</p></> : null}
     <p role="status" className="sr-only">{announcement}</p>
     {section === "overview" ? <div data-testid="unemployment-national-tabs" role="group" aria-label={t("nationalViews")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
       {NATIONAL_UNEMPLOYMENT_VIEWS.map(breakdown => <TextTab key={breakdown} label={t(breakdown === "national" ? "overviewTab" : `breakdown.${breakdown}`)} active={state.breakdown === breakdown} testId={`unemployment-tab-${breakdown}`} onClick={() => { if (breakdown === state.breakdown) return; setQuery(""); change(s => changeUnemploymentBreakdown(s, breakdown, facts)); }} />)}
@@ -85,12 +81,12 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")}
               options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
-            {section !== "overview" && section !== "regions" ? <label className="min-w-0 w-full text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className={section === "age" ? "sr-only" : undefined}>{t("indicator")}</span>
+            {section === "age" ? <label className="min-w-0 w-full text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("indicator")}</span>
                 <select data-testid="unemployment-indicator" value={state.indicator} className={selectClass}
                   onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>
-                  {section === "age" ? [true, false].map(rate => <optgroup key={String(rate)} label={t(rate ? "rateHeader" : "countHeader")}>
+                  {[true, false].map(rate => <optgroup key={String(rate)} label={t(rate ? "rateHeader" : "countHeader")}>
                     {unemploymentIndicators(state.breakdown).filter(indicator => unemploymentIsRate(indicator) === rate).map(indicator => <option key={indicator} value={indicator}>{t(`indicator.${indicator}`)}</option>)}
-                  </optgroup>) : unemploymentIndicators(state.breakdown).map(indicator => <option key={indicator} value={indicator}>{t(`indicator.${indicator}`)}</option>)}
+                  </optgroup>)}
                 </select>
             </label> : <span className="text-[11px] text-[var(--muted)]">{model.percent ? "%" : unit.label}</span>}
           </div>
