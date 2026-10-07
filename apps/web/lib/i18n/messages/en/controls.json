@@ -31,6 +31,11 @@
   "controls.chartTrend": "Multi-year trend",
   "controls.tableScrollable": "Multi-year table — scroll horizontally",
   "controls.change": "Change",
+  "controls.year": "Year",
+  "controls.legend": "Selected series",
+  "controls.backToChart": "Chart",
+  "controls.backToTable": "Table",
+  "controls.backUp": "scroll up",
   "controls.planned": "Planned",
   "controls.other": "Others"
 }

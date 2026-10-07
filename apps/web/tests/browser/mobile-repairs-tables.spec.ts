@@ -28,28 +28,23 @@ async function visibleYearCells(scroller: Locator): Promise<number> {
 const longLabelSelection =
   "#g=fields&m=table&r=2004-2025&sel=expenditure.total%2Cspending.social_protection%2Cspending.infrastructure_regional_development%2Cspending.education";
 
-const cases = [
-  { name: "expenditure total", path: "/explorer/expenditure#m=table", minYears: 3 },
+const municipalFourSeries = "#m=table&sel=municipal.total,municipal.education,municipal.social_protection,municipal.economic_affairs";
+
+// More than three series keep the year columns (owner decision D5, 2026-10-07).
+const columnCases = [
   { name: "expenditure with a long-label series", path: `/explorer/expenditure${longLabelSelection}`, minYears: 3 },
   { name: "English expenditure with a long-label series", path: `/en/explorer/expenditure${longLabelSelection}`, minYears: 3 },
-  { name: "revenue", path: "/explorer/revenue#m=table", minYears: 3 },
-  { name: "debt", path: "/explorer/debt#m=table", minYears: 3 },
-  { name: "deficit", path: "/explorer/deficit#m=table", minYears: 2 },
-  { name: "Georgia municipal aggregate", path: "/explorer/municipalities/georgia#m=table", minYears: 2 },
-  { name: "Batumi", path: "/explorer/municipalities/batumi#m=table", minYears: 3 },
-  { name: "English Batumi", path: "/en/explorer/municipalities/batumi#m=table", minYears: 3 },
-  { name: "Adjara municipal region", path: "/explorer/municipalities/region/adjara#m=table", minYears: 3 },
-  { name: "GDP", path: "/explorer/economy/gdp", minYears: 3 },
-  { name: "economic sectors", path: "/explorer/economy/sectors", minYears: 2 },
-  { name: "unemployment", path: "/explorer/unemployment/overview", minYears: 3 },
+  { name: "Georgia municipal aggregate, four series", path: `/explorer/municipalities/georgia${municipalFourSeries}`, minYears: 2 },
+  { name: "Batumi, four series", path: `/explorer/municipalities/batumi${municipalFourSeries}`, minYears: 3 },
+  { name: "English Batumi, four series", path: `/en/explorer/municipalities/batumi${municipalFourSeries}`, minYears: 3 },
 ];
 
-for (const { name, path, minYears } of cases) {
+for (const { name, path, minYears } of columnCases) {
   test(`table mode shows year values at 390px: ${name}`, async ({ page }) => {
     await page.goto(path);
     const scroller = page.getByTestId("explorer-table");
-    if (!path.includes("m=table")) await page.getByRole("button", { name: /^(ცხრილი|Table)$/ }).first().click();
     await scroller.scrollIntoViewIfNeeded();
+    await expect(scroller).toHaveAttribute("data-layout", "columns");
     await expect(scroller.locator("tbody tr").first()).toBeVisible();
     // The table opens on the latest year, so the latest-year column is in view.
     await expect.poll(() => scroller.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
@@ -67,6 +62,77 @@ for (const { name, path, minYears } of cases) {
     const labelWidth = await scroller.locator("thead th").first().evaluate((th) => th.getBoundingClientRect().width);
     const frameWidth = await scroller.evaluate((element) => element.clientWidth);
     expect(labelWidth).toBeLessThanOrEqual(frameWidth * 0.41);
+  });
+}
+
+const threeSeries = "#g=fields&m=table&r=2004-2025&sel=expenditure.total%2Cspending.social_protection%2Cspending.infrastructure_regional_development";
+
+// Up to three series list the years as rows, newest first, with no sideways scroll (D5).
+const rowCases = [
+  { name: "expenditure total", path: "/explorer/expenditure#m=table" },
+  { name: "expenditure, three long-label series", path: `/explorer/expenditure${threeSeries}`, series: 3 },
+  { name: "English expenditure, three long-label series", path: `/en/explorer/expenditure${threeSeries}`, series: 3 },
+  { name: "revenue", path: "/explorer/revenue#m=table" },
+  { name: "debt", path: "/explorer/debt#m=table" },
+  { name: "deficit", path: "/explorer/deficit#m=table", mark: "პროგნოზი" },
+  { name: "Georgia municipal aggregate", path: "/explorer/municipalities/georgia#m=table", summary: "ცვლილება" },
+  { name: "Batumi", path: "/explorer/municipalities/batumi#m=table", summary: "ცვლილება" },
+  { name: "English Batumi", path: "/en/explorer/municipalities/batumi#m=table", summary: "Change" },
+  { name: "GDP", path: "/explorer/economy/gdp" },
+  { name: "economic sectors", path: "/explorer/economy/sectors", mark: "წინასწარი" },
+  { name: "Adjara economy", path: "/explorer/economy/regions/adjara" },
+  { name: "unemployment", path: "/explorer/unemployment/overview" },
+];
+
+for (const width of [390, 360]) {
+  test.describe(`${width}px`, () => {
+    test.use({ viewport: { width, height: 844 } });
+    for (const { name, path, series, mark, summary } of rowCases) {
+      test(`small tables list years as rows, newest first: ${name}`, async ({ page }) => {
+        await page.goto(path);
+        const scroller = page.getByTestId("explorer-table");
+        if (!path.includes("m=table")) await page.getByRole("button", { name: /^(ცხრილი|Table)$/ }).first().click();
+        await expect(scroller).toHaveAttribute("data-layout", "rows");
+        await scroller.scrollIntoViewIfNeeded();
+        const shape = await scroller.evaluate((element) => ({
+          scrolls: element.scrollWidth > element.clientWidth,
+          seriesHeaders: element.querySelectorAll("thead th[data-series-id]").length,
+          years: [...element.querySelectorAll("tbody tr[data-year]")].map((row) => Number((row as HTMLElement).dataset.year)),
+          cellsPerYear: [...element.querySelectorAll("tbody tr[data-year]")].map((row) => row.querySelectorAll("td").length),
+          overflowing: [...element.querySelectorAll("th, td")].filter((cell) => cell.scrollWidth > cell.clientWidth + 1).map((cell) => cell.textContent),
+          valueFont: parseFloat(getComputedStyle(element.querySelector("tbody tr[data-year] td")!).fontSize),
+        }));
+        expect(shape.scrolls).toBe(false);
+        expect(shape.overflowing).toEqual([]);
+        expect(shape.seriesHeaders).toBe(series ?? 1);
+        expect(new Set(shape.cellsPerYear)).toEqual(new Set([series ?? 1]));
+        expect(shape.years.length).toBeGreaterThan(3);
+        expect(shape.years).toEqual([...shape.years].sort((a, b) => b - a));
+        expect(shape.valueFont).toBeGreaterThanOrEqual(12);
+        // The newest year is the first row, inside the frame.
+        await expect(scroller.locator("tbody tr[data-year]").first()).toBeInViewport();
+        if (mark) await expect(scroller.locator("tbody tr[data-year]").getByText(mark, { exact: true }).first()).toBeVisible();
+        if (summary) await expect(scroller.locator("tbody tr[data-summary='change'] th")).toHaveText(summary);
+      });
+    }
+  });
+}
+
+test("the share measure keeps percentages in the year rows", async ({ page }) => {
+  await page.goto("/explorer/expenditure#m=table&sh=1");
+  const scroller = page.getByTestId("explorer-table");
+  await expect(scroller).toHaveAttribute("data-layout", "rows");
+  await expect(scroller.locator("tbody tr[data-year]").first().locator("td").first()).toHaveText(/%$/);
+});
+
+for (const path of ["/explorer/expenditure", "/explorer/revenue", "/en/explorer/expenditure"]) {
+  test(`national period comparison keeps every cell inside its column at 390px: ${path}`, async ({ page }) => {
+    await page.goto(path);
+    const table = page.getByTestId("period-comparison").locator("table");
+    await table.scrollIntoViewIfNeeded();
+    const overflowing = await table.evaluate((element) =>
+      [...element.querySelectorAll("th, td")].filter((cell) => cell.scrollWidth > cell.clientWidth + 1).map((cell) => cell.textContent));
+    expect(overflowing).toEqual([]);
   });
 }
 

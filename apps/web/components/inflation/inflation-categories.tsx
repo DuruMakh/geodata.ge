@@ -52,6 +52,7 @@ import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
@@ -253,6 +254,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} />
             <RangeStrip
               years={tabPeriods}
               range={range}

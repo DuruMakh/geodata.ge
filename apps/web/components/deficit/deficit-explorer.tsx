@@ -29,6 +29,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 type DeficitExplorerProps = {
@@ -196,6 +197,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={chartMode === "line"} share={percentage} unit={unit} />
 
             <RangeStrip
               years={years}

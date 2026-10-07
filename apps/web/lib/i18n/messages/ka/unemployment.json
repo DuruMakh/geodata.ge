@@ -53,6 +53,8 @@
   "unemployment.searchIndicators": "მაჩვენებლების ძიება…",
   "unemployment.subcategoriesFor": "{label} — ქვეკატეგორიები",
   "unemployment.unitSelectionNote": "დონის მონიშვნა აუქმებს რაოდენობების მონიშვნას და პირიქით. ყველას მონიშვნა მოქმედებს მიმდინარე ერთეულზე.",
+  "unemployment.unitFlipToCount": "რაოდენობაზე გადასვლისას პროცენტული მაჩვენებლები მოიხსნა.",
+  "unemployment.unitFlipToRate": "პროცენტულ მაჩვენებლებზე გადასვლისას რაოდენობები მოიხსნა.",
   "unemployment.employmentStatusNote": "დასაქმებულები მოიცავს დაქირავებულებს, თვითდასაქმებულებსა და მცირე არაკლასიფიცირებულ ჯგუფს. ამიტომ ორი ქვეკატეგორიის ჯამი სრულ რაოდენობას არ უდრის.",
   "unemployment.regionalEmploymentStatusNote": "დაქირავებულებისა და თვითდასაქმებულების რაოდენობა ხელმისაწვდომია {start}–{end} წლებში. უფრო ადრეული წლების მონაცემები ხელმისაწვდომი არ არის.",
   "unemployment.rateHeader": "დონე (%)",

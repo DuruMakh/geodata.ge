@@ -20,6 +20,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -142,6 +143,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
           </div> : <div className="mt-5"><Callout testId="no-selection-callout">
             {state.selected.length === 0 ? message(messages, "main.noSelection") : t("productsNoCompleteSeries")}
           </Callout></div>}
+          <ChartSelectionAids series={chartSeries} chartShown share unit={PCT_UNIT} />
           {omitted.length > 0 ? <div data-testid="product-chart-omissions" className="mt-3 border-l-2 border-[var(--accent)] pl-3 text-[11px] leading-relaxed text-[var(--muted)]">
             <p className="font-semibold text-[var(--ink)]">{t("productsChartOmitted")}</p>
             <ul className="mt-1 list-disc pl-4">

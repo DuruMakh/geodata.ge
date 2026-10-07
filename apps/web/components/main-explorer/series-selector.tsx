@@ -140,7 +140,10 @@ export function SeriesSelector({
       <div
         data-testid="series-list"
         data-selector-section="list"
-        className="flex max-h-[430px] flex-col overflow-y-auto"
+        // The 430px inner scroll belongs to the sticky two-column aside; stacked under the
+        // chart (owner decision D4, 2026-10-07) the list flows with the page, so a finger
+        // swipe never gets caught inside it.
+        className="flex flex-col @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto"
       >
         {children}
       </div>

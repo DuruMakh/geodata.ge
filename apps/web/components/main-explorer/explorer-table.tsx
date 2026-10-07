@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { ExplorerTableRow } from "../../lib/explorer/types";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -46,7 +46,7 @@ const numericCellClass =
   "px-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap @max-[768px]:px-2.5";
 // On phones a status mark (preliminary, planned, forecast) drops under its number
 // rather than widening every year column.
-const STATUS_MARK_CLASS = "ml-1 text-[9px] font-medium text-[var(--faint)] @max-[768px]:ml-0 @max-[768px]:block";
+const STATUS_MARK_CLASS = "ml-1 text-[9px] font-medium text-[var(--faint)] @max-[768px]:top-0 @max-[768px]:ml-0 @max-[768px]:block @max-[768px]:leading-tight";
 
 // Below 768px of table width (DESIGN.md §12) the sticky label column wraps and is capped at
 // 40% of the scroller, and the change/share columns scroll with the years instead of
@@ -55,6 +55,19 @@ const STATUS_MARK_CLASS = "ml-1 text-[9px] font-medium text-[var(--faint)] @max-
 const MOBILE_LABEL_CLASS =
   "@max-[768px]:pr-1.5 @max-[768px]:w-[40cqw] @max-[768px]:min-w-[40cqw] @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:[overflow-wrap:anywhere]";
 const PIN_RIGHT_CLASS = "sticky @max-[768px]:static";
+// A value cell of the year-rows layout: flush right under its series header.
+const ROWS_VALUE_CELL_CLASS = "pl-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
+
+// Owner decision D5 (2026-10-07): below 768px a table of up to three series turns into
+// one row per year, newest first, with the series as columns (the inflation month
+// grid's layout), so a phone scrolls down instead of sideways. Wider selections keep
+// the year columns above.
+export const ROWS_LAYOUT_MAX_SERIES = 3;
+
+/** Whether a table of `seriesCount` series, `tableWidth` px wide, renders as year rows. */
+export function usesRowsLayout(seriesCount: number, tableWidth: number): boolean {
+  return seriesCount > 0 && seriesCount <= ROWS_LAYOUT_MAX_SERIES && tableWidth > 0 && tableWidth < 768;
+}
 
 function changeColor(change: number | null): string {
   if (change === null) return "var(--muted)";
@@ -101,6 +114,24 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   // columns stay one swipe further right).
   const scrollerRef = useRef<HTMLDivElement>(null);
   const firstYear = years[0];
+
+  // The width decides the layout, so it is measured, not queried in CSS. It starts at 0
+  // on the server and the client alike (hydration matches, year columns); the layout
+  // effect swaps in the year rows before the first paint on a phone.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [tableWidth, setTableWidth] = useState(0);
+  useLayoutEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+    const measure = () => setTableWidth(element.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  const seriesRows = showTotal && totalRow ? (totalFirst ? [totalRow, ...rows] : [...rows, totalRow]) : rows;
+  const rowsLayout = usesRowsLayout(seriesRows.length, tableWidth);
+
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller || scroller.clientWidth >= 768) return;
@@ -108,7 +139,92 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
     if (!latest) return;
     const offset = latest.getBoundingClientRect().right - scroller.getBoundingClientRect().left + scroller.scrollLeft;
     scroller.scrollLeft = Math.max(0, offset - scroller.clientWidth);
-  }, [firstYear, endYear, years.length]);
+  }, [firstYear, endYear, years.length, rowsLayout]);
+
+  const statusMarks = (row: Row, year: number): ReactNode => (
+    <>
+      {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
+      {row.basisByYear?.[year] === "planned" ? <sup className={STATUS_MARK_CLASS}>{message(messages, "controls.planned")}</sup> : null}
+      {forecastLabel && forecastYears?.includes(year) ? <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup> : null}
+    </>
+  );
+
+  if (rowsLayout) {
+    const isTotal = (row: Row) => showTotal && row === totalRow;
+    const summaryRows = [
+      ...(showChangeColumn
+        ? [{ key: "change", label: message(messages, "controls.change"), cell: (row: Row) => ({ text: formatShare(row.change ?? null, true), color: changeColor(row.change ?? null) }) }]
+        : []),
+      ...(shareColumnLabel
+        ? [{ key: "share", label: `${shareColumnLabel} ${endYear ?? ""}`, cell: (row: Row) => ({ text: endYear === undefined ? MISSING : formatShare(shareValueForYear(row, endYear)), color: "var(--ink)" }) }]
+        : []),
+    ];
+    return (
+      <div ref={containerRef} className="@container mt-[18px]">
+        <div ref={scrollerRef} data-testid="explorer-table" data-layout="rows" role="region" aria-label={caption} className="overflow-x-auto">
+          <table className="w-full table-fixed border-collapse">
+            <caption className="sr-only">{caption}</caption>
+            <colgroup>
+              <col className="w-[62px]" />
+              {seriesRows.map((row) => <col key={row.itemId} />)}
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col" className="border-b-2 border-[var(--ink)] pr-2 pt-1.5 pb-[9px] text-left align-bottom text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
+                  {message(messages, "controls.year")}
+                </th>
+                {seriesRows.map((row) => (
+                  <th
+                    key={row.itemId}
+                    scope="col"
+                    data-series-id={row.itemId}
+                    className={`border-b-2 border-[var(--ink)] pl-2 pt-1.5 pb-[9px] text-right align-bottom text-[11.5px] leading-[1.35] text-[var(--ink)] [overflow-wrap:anywhere] ${isTotal(row) ? "font-semibold" : "font-medium"}`}
+                  >
+                    <SwatchBar color={row.color} className="mb-1.5 ml-auto block" />
+                    {rowLabel(row)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {summaryRows.map((summary) => (
+                <tr key={summary.key} data-summary={summary.key} className="border-b border-[var(--hairline)]">
+                  <th scope="row" className="pr-2 text-left text-[11px] font-semibold leading-[1.3] text-[var(--muted)] [overflow-wrap:anywhere]" style={cellPad}>
+                    {summary.label}
+                  </th>
+                  {seriesRows.map((row) => {
+                    const { text, color } = summary.cell(row);
+                    return (
+                      <td key={row.itemId} className={ROWS_VALUE_CELL_CLASS} style={{ ...cellPad, color, fontWeight: isTotal(row) ? 600 : 400 }}>
+                        {text}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+              {years.map((year, index) => ({ year, latest: index === lastIndex })).reverse().map(({ year, latest }) => (
+                <tr key={year} data-year={year} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
+                  <th scope="row" className="pr-2 text-left font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold text-[var(--ink)]" style={cellPad}>
+                    {year}
+                  </th>
+                  {seriesRows.map((row) => (
+                    <td
+                      key={row.itemId}
+                      className={ROWS_VALUE_CELL_CLASS}
+                      style={{ ...cellPad, fontWeight: latest || isTotal(row) ? 600 : 400, color: latest || isTotal(row) ? "var(--ink)" : "var(--body)" }}
+                    >
+                      {cellValue(row, year)}
+                      {statusMarks(row, year)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
 
   const total = showTotal && totalRow ? (
     <tr className="border-t-2 border-[var(--ink)]">
@@ -141,10 +257,11 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   ) : null;
 
   return (
-    <div className="@container mt-[18px]">
+    <div ref={containerRef} className="@container mt-[18px]">
       <div
         ref={scrollerRef}
         data-testid="explorer-table"
+        data-layout="columns"
         role="region"
         tabIndex={0}
         aria-label={message(messages, "controls.tableScrollable")}
@@ -204,13 +321,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   }}
                 >
                   {cellValue(row, year)}
-                  {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
-                  {row.basisByYear?.[year] === "planned" ? (
-                    <sup className={STATUS_MARK_CLASS}>{message(messages, "controls.planned")}</sup>
-                  ) : null}
-                  {forecastLabel && forecastYears?.includes(year) ? (
-                    <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup>
-                  ) : null}
+                  {statusMarks(row, year)}
                 </td>
               ))}
               {showChangeColumn ? (

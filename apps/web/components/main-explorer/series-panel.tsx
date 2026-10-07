@@ -139,9 +139,10 @@ export function SeriesPanel({
       <SeriesSelector
         controls={
           showGrouping ? (
-            <div className="flex gap-[18px] border-b border-[var(--row-border)] pb-3">
-              <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
-              <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
+            // Two-column layout only: stacked, the chart panel carries these tabs (ExplorerView).
+            <div className="flex gap-[18px] border-b border-[var(--row-border)] pb-3 @max-[1100px]:hidden">
+              <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="aside-grouping-fields" />
+              <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="aside-grouping-ministries" />
             </div>
           ) : undefined
         }
