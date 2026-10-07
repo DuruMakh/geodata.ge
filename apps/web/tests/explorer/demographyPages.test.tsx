@@ -4,12 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src: "/definitions.svg" } }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathname: () => "/" }));
 
+import { populationHrefById } from "../../lib/explorer/demographyPlaceRoutes";
+import { buildPopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
 import {
   demographyPageMetadata,
   renderDemographyPage,
 } from "../../lib/pages/demography";
 import {
   demographyPopulationPageMetadata,
+  loadPopulationBasics,
+  loadPopulationSources,
   renderDemographyPopulationPage,
 } from "../../lib/pages/demography-population";
 
@@ -47,6 +51,10 @@ describe("population index page", () => {
     expect(html).toContain('data-testid="municipality-map"');
     expect(count(html, /data-testid="index-kpi"/g)).toBe(4);
     expect(count(html, /data-testid="municipal-list-row"/g)).toBe(64);
+    // The Regions list is in the markup too, hidden behind its tab: Georgia and the 11 regions.
+    const regionList = html.slice(html.indexOf('data-testid="municipal-list-region"'), html.indexOf('data-testid="municipal-source-note"'));
+    expect(count(regionList, /data-testid="municipal-row-name"/g)).toBe(12);
+    expect(regionList).toContain('href="/en/explorer/demography/population/georgia"');
     expect(html).toContain("2004–2026 · as of 1 January");
     expect(html).toContain("persons, on 1 January");
     for (const text of ["3,941,103", "1,369,356", "2,715.7", "5,056", "Lentekhi", "Tbilisi · persons per km²"]) expect(html).toContain(text);
@@ -68,6 +76,21 @@ describe("population index page", () => {
     ]) expect(html).toContain(`href="${href}"`);
     expect(html).not.toContain("/explorer/municipalities/");
     expect(html).not.toContain('href="/en/explorer/demography/population/tbilisi"');
+  });
+
+  it("has an address for every map shape, map marker and row: a map click opens the page by code, so a missing key would open a Budget page", async () => {
+    const { facts, municipal, places } = await loadPopulationBasics("en");
+    const index = buildPopulationIndexModel({ facts, regions: municipal.regions, municipalities: municipal.municipalities });
+    const addresses = populationHrefById(places);
+    const codes = {
+      "map shapes": index.map.shapes.map((shape) => shape.code),
+      "map markers": index.map.markers.map((marker) => marker.code),
+      rows: [index.country, ...index.regions, ...index.municipalities].map((row) => row.id),
+    };
+    for (const [name, ids] of Object.entries(codes)) {
+      expect(ids.length, name).toBeGreaterThan(0);
+      expect(ids.filter((id) => !Object.hasOwn(addresses, id)), name).toEqual([]);
+    }
   });
 
   it("shows density under the region rows and the two notes under the map", async () => {
@@ -102,5 +125,27 @@ describe("population index page", () => {
     const metadata = await demographyPopulationPageMetadata("ka");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/population");
     expect(String(metadata.title)).toContain("მოსახლეობა");
+  });
+});
+
+// The two Geostat originals listed in data/methodology/source-archives/demography.csv.
+const REVIEWED_SOURCE_IDS = ["source.geostat_demography_density", "source.geostat_municipal_population"];
+
+describe("population sources", () => {
+  it("are the two reviewed demography sources in either language, each downloadable from the demography files", async () => {
+    for (const locale of ["en", "ka"] as const) {
+      const sources = await loadPopulationSources(locale);
+      expect(sources, locale).toHaveLength(2);
+      expect(sources.map((source) => source.sourceId).sort(), locale).toEqual(REVIEWED_SOURCE_IDS);
+      for (const source of sources) expect(source.downloadHref, locale).toMatch(/^\/downloads\/methodology\/demography\/files\/[^/]+$/);
+    }
+  });
+
+  it("carry no Georgian letters in English and Georgian titles in Georgian", async () => {
+    for (const source of await loadPopulationSources("en")) {
+      expect(source.title, source.sourceId).not.toMatch(GEORGIAN);
+      expect(source.organization, source.sourceId).not.toMatch(GEORGIAN);
+    }
+    for (const source of await loadPopulationSources("ka")) expect(source.title, source.sourceId).toMatch(GEORGIAN);
   });
 });
