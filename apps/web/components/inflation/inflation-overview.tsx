@@ -12,7 +12,7 @@ import { latestEntry } from "../../lib/explorer/latestValue";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
   DEFAULT_INFLATION_STATE, INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
-  overallCoverage, parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection,
+  parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection,
   type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
 import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -77,7 +77,9 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const coverage = overallCoverage(index);
+  // The eyebrow states the active tab's span — the same months the chart and range strip offer
+  // (the index series starts years before the annual and monthly change series).
+  const coverage = { min: range.min, max: range.max };
   // The headline CPI's latest published month on the active tab.
   const latest = latestEntry(index.values.get(seriesGroup("cpi", state.tab)));
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
