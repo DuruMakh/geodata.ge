@@ -11,6 +11,13 @@ import { Sparkline } from "../ui/sparkline";
 // class strings too: one place to change the grid, the side column and its rules.
 
 /** Hero column beside the side KPIs, stacked below 1100px of column width. */
+/** A side-KPI detail line: one ellipsized line on wide screens, wrapping on phones, where the full name is the information. */
+export const KPI_DETAIL_CLIP_CLASS =
+  "overflow-hidden text-ellipsis whitespace-nowrap @max-[768px]:overflow-visible @max-[768px]:whitespace-normal @max-[768px]:break-words";
+
+/** A mover-row label (DESIGN.md §7.13): ellipsized on wide screens, wrapping on phones so names stay distinguishable. */
+export const MOVER_LABEL_CLASS = KPI_DETAIL_CLIP_CLASS;
+
 export const KPI_GRID_CLASS = "mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]";
 export const HERO_KPI_VALUE_CLASS = "mt-3.5 whitespace-nowrap font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]";
 export const SIDE_KPI_LIST_CLASS = "mt-[26px] flex min-w-0 flex-col border-t border-[var(--hairline)] pt-[18px] @min-[1100px]:mt-0 @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:pt-0 @min-[1100px]:pl-9";
@@ -69,7 +76,7 @@ export function SideKpiList({ kpis }: { kpis: SideKpi[] }) {
                 </span>
               ) : null}
             </p>
-            <p title={kpi.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${kpi.wrapDetail ? "break-words" : "overflow-hidden text-ellipsis whitespace-nowrap"}`}>
+            <p title={kpi.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${kpi.wrapDetail ? "break-words" : KPI_DETAIL_CLIP_CLASS}`}>
               {kpi.detail}
             </p>
           </div>

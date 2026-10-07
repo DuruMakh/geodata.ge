@@ -96,3 +96,34 @@ for (const path of ["/explorer/deficit", "/explorer/debt#f=service&m=line&sel=de
     });
   }
 }
+
+const unclipped = [
+  { path: "/explorer/revenue", selector: "[data-testid=period-movers] span.font-medium" },
+  { path: "/explorer/expenditure", selector: "[data-testid=side-kpi] p[title]" },
+  { path: "/explorer/municipalities/batumi", selector: "[data-testid=period-movers] span.font-medium" },
+  { path: "/explorer/economy/sectors", selector: "[data-testid=sector-side-kpis] p[title]" },
+  { path: "/explorer/municipalities/georgia", selector: "[data-testid=entity-picker-trigger]" },
+];
+
+for (const { path, selector } of unclipped) {
+  test(`names wrap instead of ending in an ellipsis at 390px: ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    const targets = page.locator(selector);
+    await expect(targets.first()).toBeAttached();
+    const clipped = await targets.evaluateAll((elements) =>
+      elements.filter((element) => element.scrollWidth > element.clientWidth + 1).map((element) => element.textContent),
+    );
+    expect(clipped).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  });
+}
+
+test("the Georgia picker's first option shows its full name at 390px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/explorer/municipalities/batumi");
+  await page.getByTestId("entity-picker-trigger").click();
+  const country = page.getByTestId("picker-country").locator("span").first();
+  await expect(country).toBeVisible();
+  expect(await country.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+});

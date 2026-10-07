@@ -7,7 +7,7 @@ import type { Locale } from "../../lib/i18n/types";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { Sparkline } from "../ui/sparkline";
 import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
-import { HERO_KPI_VALUE_CLASS, KPI_GRID_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
+import { HERO_KPI_VALUE_CLASS, KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, MOVER_LABEL_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
 
@@ -20,7 +20,7 @@ function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) 
       <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
         {String(mover.rank).padStart(2, "0")}
       </span>
-      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[12.5px] font-medium leading-[1.4] text-[var(--ink)]">{mover.label}</span>
+      <span className={`text-[12.5px] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>{mover.label}</span>
       <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
         <span className="block h-full" style={{ width: `${width.toFixed(0)}%`, backgroundColor: growthColor(growth) }} />
       </span>
@@ -145,7 +145,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                         </span>
                       ) : null}
                     </span>
-                    <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-xs text-[var(--muted)]" title={kpi.detail}>{kpi.detail}</span>
+                    <span className={`min-w-0 text-right text-xs text-[var(--muted)] ${KPI_DETAIL_CLIP_CLASS}`} title={kpi.detail}>{kpi.detail}</span>
                   </div>
                   <Sparkline values={sideSeries[index]!} color="var(--ink)" />
                 </div>

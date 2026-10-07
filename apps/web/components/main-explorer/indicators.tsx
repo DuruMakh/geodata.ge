@@ -11,7 +11,7 @@ import { compoundAnnualGrowth, rankPeriodDeltas } from "../../lib/explorer/indic
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
 import { SectionTitle, SwatchBar } from "../ui/editorial";
-import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "./kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, MOVER_LABEL_CLASS, SideKpiList } from "./kpi-blocks";
 
 // "ძირითადი ინდიკატორები" per DESIGN.md §8.5: hero KPI with a two-segment gauge and
 // an editorial sentence, three side KPIs, the movers board, and the period comparison.
@@ -59,7 +59,7 @@ function MoverRow({ row, rank, maxAbsChange }: MoverRowProps) {
       <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
         {String(rank).padStart(2, "0")}
       </span>
-      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[12.5px] font-medium leading-[1.4] text-[var(--ink)]">
+      <span className={`text-[12.5px] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>
         {rowLabel(row)}
       </span>
       <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">

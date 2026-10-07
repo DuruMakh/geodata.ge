@@ -247,7 +247,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                 countryOptionId(baseId) === activeOptionId ? "border-l-[var(--ink)]" : "border-l-transparent"
               } ${country.id === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
             >
-              <span className="truncate text-[12px] font-semibold">{publicLabel(locale, country.id, country.nameKa, englishLabels)}</span>
+              <span className="min-w-0 break-words text-[12px] font-semibold">{publicLabel(locale, country.id, country.nameKa, englishLabels)}</span>
               <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
                 {message(messages, "municipal.pickerCountry", { amount: formatAmount(country.valueGel, locale), count: country.budgetCount })}
               </span>

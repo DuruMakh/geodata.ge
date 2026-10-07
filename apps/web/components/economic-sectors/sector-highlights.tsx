@@ -12,7 +12,7 @@ import { Message } from "../../lib/i18n/message";
 import { Overline, SectionTitle, SourceNote } from "../ui/editorial";
 import { Sparkline } from "../ui/sparkline";
 import { sectorColor } from "../../lib/explorer/economicSectors";
-import { KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
+import { KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
 
 export function SectorHighlights({ facts, registry, year }: {
   facts: ClientSectorObservation[]; registry: SectorDefinition[]; year: number;
@@ -74,7 +74,7 @@ export function SectorHighlights({ facts, registry, year }: {
             <Overline>{card.label}</Overline>
             <div className="mt-[7px] flex items-baseline justify-between gap-4">
               <p className={SIDE_KPI_VALUE_CLASS} style={{ color: card.color }}>{card.value}</p>
-              <p title={card.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${card.available ? "overflow-hidden text-ellipsis whitespace-nowrap" : "leading-relaxed"}`}>{card.detail}</p>
+              <p title={card.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${card.available ? KPI_DETAIL_CLIP_CLASS : "leading-relaxed"}`}>{card.detail}</p>
             </div>
             <Sparkline values={card.trend} color={card.trendColor} />
           </div>
