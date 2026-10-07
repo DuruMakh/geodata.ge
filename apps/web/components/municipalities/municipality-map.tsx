@@ -311,15 +311,15 @@ export function MunicipalityMap({
         {/* Minimum and maximum stay on one row at the ramp's two ends; the ramp
             narrows on a phone rather than pushing the maximum onto the next line. */}
         <span data-testid="municipality-map-legend-scale" className="flex min-w-0 items-center gap-3.5">
-          <span className="font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--faint)]">{legendMin}</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] whitespace-nowrap text-[var(--faint)] min-[768px]:text-[10px]">{legendMin}</span>
           <span className="flex min-w-12 flex-[0_1_192px]">
             {MAP_RAMP.map((fill) => (
               <span key={fill} aria-hidden className="h-[9px] flex-1" style={{ backgroundColor: fill }} />
             ))}
           </span>
-          <span className="font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--faint)]">{legendMax}</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11px] whitespace-nowrap text-[var(--faint)] min-[768px]:text-[10px]">{legendMax}</span>
         </span>
-        <span className="text-[10px] text-[var(--faint)]">{message(messages, "municipal.perResident")}</span>
+        <span className="text-[11px] text-[var(--faint)] min-[768px]:text-[10px]">{message(messages, "municipal.perResident")}</span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-[var(--tile)] bg-[var(--positive)]" />
           <span className="text-[11px] text-[var(--faint)]">{message(messages, "municipal.cities")}</span>
