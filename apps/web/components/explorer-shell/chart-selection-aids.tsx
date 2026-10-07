@@ -116,7 +116,7 @@ export function ChartSelectionAids({
             data-testid="chart-return-pill"
             aria-label={`${label}, ${message(messages, "controls.backUp")}`}
             onClick={returnToChart}
-            className="pointer-events-auto inline-flex min-h-11 cursor-pointer items-center gap-2.5 rounded-full border border-[var(--ink)] bg-[var(--paper)] px-4 text-[0.8125rem] font-semibold text-[var(--ink)] shadow-[0_2px_12px_rgba(0,0,0,0.18)]"
+            className="pointer-events-auto inline-flex min-h-11 cursor-pointer items-center gap-2.5 rounded-full border border-[var(--ink)] bg-[var(--paper)] px-4 text-[0.8125rem] font-semibold text-[var(--ink)] shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
           >
             {series.length > 0 ? (
               <span aria-hidden className="flex items-center gap-1">
