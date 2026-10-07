@@ -119,6 +119,15 @@ for (const { path, selector } of unclipped) {
   });
 }
 
+test("the wrapping Georgia heading stays inside a 320px phone", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto("/explorer/municipalities/georgia");
+  const trigger = page.getByTestId("entity-picker-trigger");
+  await expect(trigger).toBeVisible();
+  expect(await trigger.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+});
+
 test("the Georgia picker's first option shows its full name at 390px", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/explorer/municipalities/batumi");

@@ -282,7 +282,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               aria-expanded={pickerOpen}
               aria-haspopup="dialog"
               onClick={() => setPickerOpen((current) => !current)}
-              className="group inline-block max-w-full align-bottom cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]"
+              className="group inline-block max-w-full align-bottom break-words cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]"
             >
               {props.triggerLabel}
               <span
