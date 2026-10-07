@@ -54,6 +54,7 @@ export function PopulationPlaceExplorer({
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
   pickerOverrides?: EntityPickerOverrides;
+  /** Inline content only: it renders inside the source note's paragraph. */
   sourceNote: ReactNode;
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
@@ -65,7 +66,6 @@ export function PopulationPlaceExplorer({
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
-  useAppReady();
 
   const parts = useMemo(() => partsOf(place, places), [place, places]);
   const listedIds = useMemo(() => new Set([place.id, ...parts.map((part) => part.id)]), [place, parts]);
@@ -78,6 +78,7 @@ export function PopulationPlaceExplorer({
     [facts, place],
   );
   const state = useMunicipalState(allYears, [place.id], listedIds);
+  useAppReady();
   const model = useMemo(
     () =>
       buildPopulationModel({

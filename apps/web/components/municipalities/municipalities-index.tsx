@@ -43,6 +43,7 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResident
   regions: MunicipalListRow[];
   country: MunicipalListRow;
   kpis: MunicipalKpi[];
+  /** Inline content only: it renders inside the source note's paragraph. */
   sourceNote: ReactNode;
   overrides?: MunicipalitiesIndexOverrides;
 };
