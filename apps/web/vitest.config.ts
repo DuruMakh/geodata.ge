@@ -17,6 +17,15 @@ const HEAVY_TESTS = [
   "tests/factQuery/bilingualPublications.test.ts",
   "tests/i18n/servingParity.test.ts",
   "tests/mcp/measurements.test.ts",
+  "tests/data/inflation/productIdentity.test.ts",
+  "tests/factQuery/bilingualEvidence.test.ts",
+  "tests/factQuery/rankInflation.test.ts",
+  "tests/factQuery/rankInflationProducts.test.ts",
+  "tests/factQuery/caveats/engine.test.ts",
+  "tests/factQuery/caveats/national.test.ts",
+  "tests/factQuery/inflationProductPublications.test.ts",
+  "tests/mcp/bilingualTransport.test.ts",
+  "tests/mcp/outputSchema.test.ts",
 ] as const;
 
 const shared = {
