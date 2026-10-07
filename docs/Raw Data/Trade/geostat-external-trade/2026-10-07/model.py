@@ -1,5 +1,8 @@
 """Source-faithful string records and exact monetary conversion."""
 from decimal import Decimal, getcontext
+from collections import Counter,defaultdict
+import hashlib
+import json
 import re
 from archive import Cell, read_stored_sheet
 
@@ -16,6 +19,7 @@ DIMENSIONS={
  'services':('dimension','partner_code','partner_label_en','service_id','service_label_en'),
 }
 ALL_FIELDS=tuple(dict.fromkeys(('family',)+tuple(f for fields in DIMENSIONS.values() for f in fields)+COMMON))
+METADATA_FIELDS=tuple(f for f in ALL_FIELDS if f not in ('value_usd','source_value'))
 SCALES={'million_usd':Decimal(1000000),'thousand_usd':Decimal(1000)}
 
 def value_fields(cell: Cell,unit: str) -> dict[str,str]:
@@ -64,3 +68,25 @@ def extract_layouts(sources: dict,layouts: list[dict],package_root,families: set
                 row.update(value_fields(cell,table['source_unit']))
                 observations.append(row)
     return observations
+
+def source_key(row: Observation) -> tuple:
+    return tuple(row[f] for f in ('source_id','source_sheet','source_cell'))
+
+def check_coverage(rows: list[Observation],inventory: dict,families: set[str] | None=None) -> dict:
+    def digest(values):
+        return hashlib.sha256(json.dumps(sorted(values),ensure_ascii=False,separators=(',',':')).encode('utf-8')).hexdigest()
+    selected=rows if families is None else [r for r in rows if r['family'] in families]
+    keys=[source_key(r) for r in selected]
+    if len(set(keys))!=len(keys): raise ValueError('duplicate_key: source observation repeated')
+    groups=defaultdict(list)
+    for row in selected:
+        key=tuple(row[f] for f in ('source_id','source_sheet','source_block','family','flow','year'))
+        groups[key].append(row)
+    expected={tuple(b[f] for f in ('source_id','source_sheet','source_block','family','flow','year')):b for b in inventory['blocks'] if families is None or b['family'] in families}
+    if set(groups)!=set(expected): raise ValueError('coverage: whole source block/year omitted or invented')
+    for key,group in groups.items():
+        block=expected[key]
+        metadata=[sorted({f:r.get(f,'') for f in METADATA_FIELDS}.items()) for r in group]
+        if len(group)!=block['source_key_count'] or digest([source_key(r) for r in group])!=block['key_sha256'] or digest(metadata)!=block['metadata_sha256'] or dict(Counter(r['value_status'] for r in group))!=block['status_counts']:
+            raise ValueError(f'coverage: source keys or metadata differ {key}')
+    return {'matched_observations':len(selected),'matched_blocks':len(groups)}

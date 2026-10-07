@@ -107,5 +107,68 @@ class ArchiveTests(PackageTests):
             self.fail(f'published SITC code rejected for storage noise: {error}')
         self.assertEqual(code,'001.1')
 
+class GoodsTests(PackageTests):
+    _data=None
+    def rows(self):
+        module=self.module('read_goods')
+        if self.__class__._data is None:
+            archive=self.module('archive')
+            self.__class__._data=module.read_goods(archive.load_verified_sources(ROOT),json.loads((ROOT/'source-layouts.json').read_text(encoding='utf-8')),ROOT)
+        return self.__class__._data
+
+    def test_complete_annual_goods_bounds_and_exact_conversion(self):
+        rows=self.rows()
+        report=self.module('model').check_coverage(rows,json.loads((ROOT/'expected-observation-inventory.json').read_text()),{r['family'] for r in rows})
+        self.assertEqual(report['matched_observations'],len(rows))
+        national=[r for r in rows if r['family']=='goods_national']
+        self.assertEqual({int(r['year']) for r in national},set(range(1995,2026)))
+        self.assertEqual(len(national),62)
+        current=next(r for r in national if r['year']=='2025' and r['flow']=='export')
+        self.assertEqual(Decimal(current['value_usd']),Decimal('7287805027.5742908'))
+        self.assertEqual({int(r['year']) for r in rows if r['flow']=='domestic_export'},set(range(2014,2026)))
+        self.assertTrue(all(int(r['year'])<=2025 for r in rows))
+
+    def test_domestic_selected_products_keep_other_commodities(self):
+        rows=self.rows()
+        for year,count in [('2014',96),('2015',99),('2025',99)]:
+            selected=[r for r in rows if r['family']=='goods_domestic' and r['dimension']=='product' and r['year']==year]
+            self.assertEqual(sum(r['role']=='detail' for r in selected),count)
+            residual=[r for r in selected if r['role']=='residual']
+            self.assertEqual(len(residual),1)
+            self.assertEqual(residual[0]['product_label_en'],'Other commodities')
+        inventory=json.loads((ROOT/'expected-observation-inventory.json').read_text())
+        changed=[r for r in rows if not (r['family']=='goods_domestic' and r['role']=='residual')]
+        with self.assertRaisesRegex(ValueError,'coverage'):
+            self.module('model').check_coverage(changed,inventory,{r['family'] for r in rows})
+
+    def test_zero_country_omission_is_rejected(self):
+        rows=self.rows()
+        zero=next(r for r in rows if r['family']=='goods_countries' and r['role']=='detail' and r['value_usd']=='0')
+        changed=[r for r in rows if r is not zero]
+        with self.assertRaisesRegex(ValueError,'coverage'):
+            self.module('model').check_coverage(changed,json.loads((ROOT/'expected-observation-inventory.json').read_text()),{r['family'] for r in rows})
+
+    def test_overlapping_groups_and_partner_subtotals_keep_roles(self):
+        rows=self.rows()
+        groups={r['group_id'] for r in rows if r['family']=='goods_country_groups' and r['role']=='subtotal'}
+        self.assertEqual(groups,{'group.eu','group.cis','group.bsec','group.oecd','group.guam'})
+        section=next(r for r in rows if r['family']=='goods_countries' and r['source_cell']=='C7')
+        self.assertEqual(section['role'],'subtotal')
+        self.assertEqual(section['source_label'],'EU countries')
+
+    def test_permitted_derivations_have_exact_inputs_and_missingness(self):
+        goods=self.module('read_goods')
+        def fixture(flow,value,source,family='goods_national'):
+            return dict(family=family,flow=flow,year='2025',item_id='goods.total',value_status='numeric',value_usd=value,source_id=source,source_sheet='Annual',source_cell='B5',source_block='2025-2025',publication_status='unspecified',role='total',partner_code='',product_code='',dimension='country' if family=='goods_domestic' else '',classification='',geography_id='georgia')
+        export=fixture('export','100','fixture_export'); imports=fixture('import','120','fixture_import'); domestic=fixture('domestic_export','40','fixture_domestic','goods_domestic')
+        reviewed={('fixture_export','goods.total','fixture_domestic','goods.total')}
+        got=goods.derive_goods([export,imports,domestic],reviewed)
+        self.assertEqual({r['indicator_id']:r['value_usd'] for r in got},{'trade_balance':'-20','trade_turnover':'220','reexports':'60'})
+        reexports=next(r for r in got if r['indicator_id']=='reexports')
+        self.assertEqual(json.loads(reexports['input_source_refs']),[['fixture_export','Annual','B5'],['fixture_domestic','Annual','B5']])
+        domestic=dict(domestic,value_status='not_applicable',value_usd='')
+        self.assertFalse(any(r['indicator_id']=='reexports' for r in goods.derive_goods([export,imports,domestic],reviewed)))
+        self.assertFalse(any(r['indicator_id']=='reexports' for r in goods.derive_goods([export,imports,dict(domestic,value_status='numeric',value_usd='40')],set())))
+
 if __name__ == '__main__':
     unittest.main()
