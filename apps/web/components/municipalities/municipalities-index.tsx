@@ -226,13 +226,14 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         </div>
 
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
-          <div className="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
+          {/* The unit label wraps under the tabs when the column is too narrow for both: Georgian tab labels fill a 310px column, and the Georgian word for "persons" does not fit beside them. */}
+          <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-1 border-b-2 border-[var(--ink)] pb-2">
             <span className="flex items-baseline gap-3.5">
               <TextTab label={message(messages, "municipal.municipalities")} active={level === "muni"} onClick={() => setLevel("muni")} testId="level-muni" />
               <TabDivider />
               <TextTab label={message(messages, "municipal.regions")} active={level === "region"} onClick={() => setLevel("region")} testId="level-region" />
             </span>
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{overrides?.unitLabel ?? message(messages, "municipal.gel")}</span>
+            <span className="ml-auto font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{overrides?.unitLabel ?? message(messages, "municipal.gel")}</span>
           </div>
 
           <div className="flex items-center gap-2 pt-3 pb-1">
