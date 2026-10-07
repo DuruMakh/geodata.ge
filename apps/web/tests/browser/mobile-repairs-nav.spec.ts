@@ -88,3 +88,35 @@ for (const { path, menu, datasets, other } of [
     expect(switchBox?.height ?? 0).toBeGreaterThanOrEqual(44);
   });
 }
+
+for (const { path, titles, measures } of [
+  { path: "/", titles: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა"], measures: ["ხარჯები", "ნომინალური მშპ", "წლიური ინფლაცია", "უმუშევრობის დონე"] },
+  { path: "/en", titles: ["Budget", "Economy", "Inflation", "Unemployment"], measures: ["Spending", "Nominal GDP", "Annual inflation", "Unemployment rate"] },
+]) {
+  test(`${path} lists the four datasets with a latest figure right after the country figures`, async ({ page }) => {
+    await page.goto(path);
+    const row = page.getByTestId("landing-datasets");
+    const links = row.getByRole("link");
+    await expect(links).toHaveCount(4);
+    for (const [index, link] of (await links.all()).entries()) {
+      await expect(link).toContainText(titles[index]);
+      // "{measure} · {period}: {value}", the value a number with its unit.
+      await expect(link).toContainText(new RegExp(`${measures[index]} · [^:]+: [−\\d.]+( |%)`));
+      expect((await link.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
+    }
+    const figures = await page.getByTestId("key-numbers").boundingBox();
+    const rowBox = await row.boundingBox();
+    expect(rowBox!.y).toBeGreaterThan(figures!.y + figures!.height - 1);
+    expect(rowBox!.y).toBeLessThan((await page.getByTestId("landing-data").boundingBox())!.y);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  });
+}
+
+test("landing calls to action are 44px tap targets", async ({ page }) => {
+  await page.goto("/");
+  const targets = [
+    page.getByTestId("hero-cta"),
+    ...["landing-dataset-expenditure", "landing-dataset-revenue", "landing-dataset-municipalities", "landing-debt", "landing-deficit", "landing-methodology"].map((id) => page.getByTestId(id).getByRole("link").first()),
+  ];
+  for (const target of targets) expect((await target.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
+});

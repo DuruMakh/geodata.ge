@@ -12,7 +12,7 @@ const overlineClassName = "text-[10px] font-semibold uppercase tracking-[0.09em]
 const headingClassName =
   "mt-2.5 text-balance font-[family-name:var(--font-display)] text-[26px] font-semibold leading-[1.16] tracking-[-0.015em]";
 const linkClassName =
-  "mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]";
+  "mt-1 inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]";
 
 export function LandingFiscalSections({
   presentation,
