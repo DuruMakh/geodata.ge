@@ -9,45 +9,40 @@ import sitemap from "../../lib/seo/sitemap";
 
 const PAGES = ["/explorer/demography", "/explorer/demography/population", "/methodology/demography"] as const;
 
+// What "indexed in both languages" means, in one place: the page is in the public inventory, has a real English
+// review date, and its Georgian and English sitemap rows name each other. The path is in every message, so a failure
+// names the page.
+async function expectIndexedInBothLanguages(pagePaths: readonly string[]): Promise<void> {
+  vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
+  try {
+    const [paths, revisions, entries] = await Promise.all([listPublicPagePaths(), loadPageRevisions(), sitemap()]);
+    for (const path of pagePaths) {
+      expect(paths, path).toContain(path);
+      expect(revisions[path], path).toMatch(/^2026-\d{2}-\d{2}$/);
+      const ka = entries.find((entry) => entry.url === `https://fiscal.ge${path}`);
+      const en = entries.find((entry) => entry.url === `https://fiscal.ge/en${path}`);
+      expect(ka?.alternates?.languages, path).toEqual({
+        ka: `https://fiscal.ge${path}`,
+        en: `https://fiscal.ge/en${path}`,
+        "x-default": `https://fiscal.ge${path}`,
+      });
+      expect(en?.alternates, path).toEqual(ka?.alternates);
+    }
+  } finally {
+    vi.unstubAllEnvs();
+  }
+}
+
 describe("demography discovery", () => {
   it("indexes the hub, the live page and the methodology in both languages with real English dates", async () => {
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
-    try {
-      const [paths, revisions, entries] = await Promise.all([listPublicPagePaths(), loadPageRevisions(), sitemap()]);
-      for (const path of PAGES) {
-        expect(paths).toContain(path);
-        expect(revisions[path]).toMatch(/^2026-\d{2}-\d{2}$/);
-        const ka = entries.find((entry) => entry.url === `https://fiscal.ge${path}`);
-        const en = entries.find((entry) => entry.url === `https://fiscal.ge/en${path}`);
-        expect(ka?.alternates?.languages).toEqual({
-          ka: `https://fiscal.ge${path}`,
-          en: `https://fiscal.ge/en${path}`,
-          "x-default": `https://fiscal.ge${path}`,
-        });
-        expect(en?.alternates).toEqual(ka?.alternates);
-      }
-    } finally {
-      vi.unstubAllEnvs();
-    }
+    await expectIndexedInBothLanguages(PAGES);
   });
 
   it("indexes all 75 place pages in both languages with real English dates", async () => {
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
-    try {
-      const [{ regions }, paths, revisions, entries] = await Promise.all([loadServedMunicipalData(), listPublicPagePaths(), loadPageRevisions(), sitemap()]);
-      const placePaths = populationPlacePaths(regions.map((region) => region.id));
-      expect(placePaths).toHaveLength(75);
-      for (const path of placePaths) {
-        expect(paths, path).toContain(path);
-        expect(revisions[path], path).toMatch(/^2026-\d{2}-\d{2}$/);
-        const ka = entries.find((entry) => entry.url === `https://fiscal.ge${path}`);
-        const en = entries.find((entry) => entry.url === `https://fiscal.ge/en${path}`);
-        expect(ka?.alternates?.languages, path).toEqual({ ka: `https://fiscal.ge${path}`, en: `https://fiscal.ge/en${path}`, "x-default": `https://fiscal.ge${path}` });
-        expect(en?.alternates, path).toEqual(ka?.alternates);
-      }
-    } finally {
-      vi.unstubAllEnvs();
-    }
+    const { regions } = await loadServedMunicipalData();
+    const placePaths = populationPlacePaths(regions.map((region) => region.id));
+    expect(placePaths).toHaveLength(75);
+    await expectIndexedInBothLanguages(placePaths);
   });
 
   it("lists no page that is not live", async () => {
