@@ -160,7 +160,7 @@ test("future routes stay on the static 404 surface and out of navigation", async
   await page.goto(`${TEST_BASE_URL}/methodology`);
   const futureRows = page.getByTestId("methodology-future-row");
   await expect(futureRows).toHaveCount(1);
-  for (const label of ["მოსახლეობა"] as const) {
+  for (const label of ["დემოგრაფია"] as const) {
     await expect(futureRows.getByText(label, { exact: true })).toBeVisible();
   }
   expect(
