@@ -121,16 +121,17 @@ test("landing calls to action are 44px tap targets", async ({ page }) => {
   for (const target of targets) expect((await target.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
 
-for (const { path, labels, tagline } of [
-  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"], tagline: "საქართველოს საჯარო ფინანსები და ეკონომიკა" },
-  { path: "/en", labels: ["Budget", "Economy", "Inflation", "Unemployment", "Methodology", "AI connection", "About"], tagline: "Georgia’s public finances and economy" },
+for (const { path, labels } of [
+  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
+  { path: "/en", labels: ["Budget", "Economy", "Inflation", "Unemployment", "Methodology", "AI connection", "About"] },
 ]) {
   test(`${path} footer names the four datasets in a compact two-column grid`, async ({ page }) => {
     await page.goto(path);
     const footer = page.getByTestId("site-footer");
     const nav = footer.locator("ul a");
     await expect(nav).toHaveText(labels);
-    await expect(footer).toContainText(tagline);
+    // The footer carries no tagline (owner decision 2026-10-08).
+    await expect(footer).not.toContainText(path === "/en" ? "clear, verified, open" : "ნათლად, გადამოწმებულად, ღიად");
     const boxes = await nav.evaluateAll((links) => links.map((link) => link.getBoundingClientRect().toJSON() as DOMRect));
     for (const box of boxes) expect(box.height).toBeGreaterThanOrEqual(44);
     expect(new Set(boxes.map((box) => Math.round(box.x))).size).toBe(2);

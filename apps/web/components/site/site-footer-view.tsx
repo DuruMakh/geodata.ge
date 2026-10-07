@@ -24,7 +24,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
     <footer data-testid="site-footer" className="mt-10 border-t-2 border-[var(--ink)] pb-5 pt-5 min-[768px]:mt-[72px] min-[768px]:pb-10 min-[768px]:pt-[26px]">
       <div data-testid="landing-footer">
         <div className="flex flex-col gap-4 min-[768px]:grid min-[768px]:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] min-[768px]:gap-9">
-          {/* Phones: lockup and address share the first row, the tagline runs full width under them. */}
+          {/* Phones: lockup and address share one row. */}
           <div className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-x-4 gap-y-2 min-[768px]:flex min-[768px]:flex-col min-[768px]:items-stretch min-[768px]:gap-2.5">
             <Link href={pageHref("/", locale)} aria-label={message(messages, "common.brandHome")} className="block w-[150px]">
               {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
@@ -38,9 +38,6 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
                 className="block h-auto w-full"
               />
             </Link>
-            <p className="col-span-2 text-pretty text-[0.78125rem] leading-relaxed text-[var(--body)] min-[768px]:max-w-[300px]">
-              {message(messages, "common.footerDescription")}
-            </p>
             <a
               href="mailto:info@fiscal.ge"
               className="max-[768px]:col-start-2 max-[768px]:row-start-1 max-[768px]:inline-flex max-[768px]:min-h-11 max-[768px]:items-center max-[768px]:justify-self-end font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--accent)] underline underline-offset-[3px] min-[768px]:self-start"
