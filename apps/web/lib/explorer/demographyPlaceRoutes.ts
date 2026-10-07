@@ -1,7 +1,9 @@
 import { GEORGIA_PLACE_ID, placeIdForMunicipalityCode, type DemographyPlace } from "./demographyAreas";
+import { POPULATION_PATH } from "./demographyRoutes";
 import { MUNICIPALITY_ROUTES, municipalityCodeForSlug, municipalitySlugForCode } from "./municipalityRoutes";
 
-export const POPULATION_PATH = "/explorer/demography/population";
+// Defined with the Demography pages, so the address is written once; the place routes build on it and hand it on to their callers.
+export { POPULATION_PATH };
 
 /** Tbilisi has a municipality slug on the Budget pages; here it is a region and has the region page only. */
 const TBILISI_SLUG = "tbilisi";

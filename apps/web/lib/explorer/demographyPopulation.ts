@@ -86,6 +86,13 @@ export function buildPopulationModel({
 
 export type PopulationModel = ReturnType<typeof buildPopulationModel>;
 
+/** The years a place has a population value, ascending and without repeats: Georgia 2004–2026, everything else 2015–2026. Its parts never reach further. */
+export function placeYears(facts: readonly ClientDemographyObservation[], place: DemographyPlace): number[] {
+  return [...new Set(facts
+    .filter((fact) => fact.seriesId === SERIES.populationTotal && placeIdForMunicipalityCode(fact.geographyId) === place.id)
+    .map((fact) => fact.year))].sort((left, right) => left - right);
+}
+
 /** The message key for the plain-language lineage of a 1 January population (foundation section 5, R6). */
 export function populationBasisKey(year: number) {
   const basis = populationEstimateBasis(year);

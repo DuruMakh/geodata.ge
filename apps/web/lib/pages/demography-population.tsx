@@ -24,7 +24,7 @@ import { getMessages } from "../i18n/messages.server";
 import { getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
-import type { Locale, TemplateValues } from "../i18n/types";
+import type { Locale, Presentation, TemplateValues } from "../i18n/types";
 import { projectPublicSources } from "../methodology/publicSources";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
@@ -56,6 +56,18 @@ export async function loadPopulationBasics(locale: Locale) {
     georgiaNameKa: message(georgian, "demography.georgia"),
   });
   return { facts, clientFacts: facts.map(projectDemographyObservation), municipal, presentation, places };
+}
+
+/** The source line of the index and of every place page: the source text for the years shown, then the link to the methodology page. Inline content only. */
+export function populationSourceNote({ locale, messages }: Presentation, start: number, end: number) {
+  return (
+    <>
+      {message(messages, "demography.source", { start, end })}{" "}
+      <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
+        {message(messages, "common.methodology")}
+      </Link>
+    </>
+  );
 }
 
 /** The reviewed originals the workbook and the source note name, in the page's language. */
@@ -134,14 +146,7 @@ export async function renderDemographyPopulationPage(locale: Locale) {
           regions={index.regions}
           country={index.country}
           kpis={kpis}
-          sourceNote={
-            <>
-              {t("source", { start, end })}{" "}
-              <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
-                {message(messages, "common.methodology")}
-              </Link>
-            </>
-          }
+          sourceNote={populationSourceNote(presentation, start, end)}
           overrides={{
             hrefById: populationHrefById(places),
             valueFormat: "persons",

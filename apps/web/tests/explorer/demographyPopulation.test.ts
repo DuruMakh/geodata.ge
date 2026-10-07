@@ -18,6 +18,7 @@ import {
 import {
   buildPopulationHighlights,
   buildPopulationModel,
+  placeYears,
   populationBasisKey,
   rankPlaces,
   sparkValues,
@@ -248,6 +249,27 @@ describe("population model", () => {
       "demography.basisCensus",
       "demography.basisCensus",
     ]);
+  });
+});
+
+describe("placeYears", () => {
+  const years = (id: string, source: readonly ClientDemographyObservation[] = facts) => placeYears(source, place(id));
+  const span = (first: number, last: number) => Array.from({ length: last - first + 1 }, (_, step) => first + step);
+
+  test("a place's own years, each once and ascending: Georgia from 2004, everything else from 2015", () => {
+    expect(years(GEORGIA_PLACE_ID)).toEqual(span(2004, 2026));
+    expect(years("region.adjara")).toEqual(span(2015, 2026));
+    expect(years("06")).toEqual(span(2015, 2026));
+  });
+
+  test("Tbilisi is the facts of region.tbilisi and of municipality 04 together, each year once", () => {
+    expect(years(TBILISI_PLACE_ID)).toEqual(span(2015, 2026));
+  });
+
+  test("only the population total counts, and the order of the facts does not matter", () => {
+    const density = facts.find((fact) => fact.seriesId === SERIES.populationDensity && fact.geographyId === GEORGIA_PLACE_ID)!;
+    const withStray = [{ ...density, year: 1999 }, ...facts].reverse();
+    expect(years(GEORGIA_PLACE_ID, withStray)).toEqual(span(2004, 2026));
   });
 });
 

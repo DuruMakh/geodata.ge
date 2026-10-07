@@ -1,14 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
-import { SERIES } from "../data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { loadServedMunicipalData } from "../data/servedData";
-import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeIdForMunicipalityCode, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
+import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
 import {
   POPULATION_PATH,
   placeNeighbours,
@@ -17,7 +15,7 @@ import {
   populationMunicipalitySlugs,
   populationPlaceHref,
 } from "../explorer/demographyPlaceRoutes";
-import { buildPopulationHighlights, buildPopulationModel } from "../explorer/demographyPopulation";
+import { buildPopulationHighlights, buildPopulationModel, placeYears } from "../explorer/demographyPopulation";
 import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
 import { DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
@@ -29,7 +27,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel } from "./demography-population";
+import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel, populationSourceNote } from "./demography-population";
 
 export type PopulationPlaceRoute = { kind: "country" } | { kind: "region"; id: string } | { kind: "municipality"; slug: string };
 
@@ -54,16 +52,11 @@ function workbookScopeFor(route: PopulationPlaceRoute): string {
   return route.kind === "region" ? `region-${route.id}` : route.slug;
 }
 
-const yearsOf = (facts: readonly { seriesId: string; geographyId: string; year: number }[], place: DemographyPlace) =>
-  [...new Set(facts
-    .filter((fact) => fact.seriesId === SERIES.populationTotal && placeIdForMunicipalityCode(fact.geographyId) === place.id)
-    .map((fact) => fact.year))].sort((left, right) => left - right);
-
 export async function populationPlaceMetadata(route: PopulationPlaceRoute, locale: Locale) {
   const { clientFacts, presentation, places } = await loadPopulationBasics(locale);
   const place = places.find((candidate) => candidate.id === placeIdFor(route));
   if (!place) notFound();
-  const years = yearsOf(clientFacts, place);
+  const years = placeYears(clientFacts, place);
   const t = (key: string, values?: TemplateValues) => message(presentation.messages, `demography.${key}`, values);
   const name = placeLabel(place, locale);
   return fiscalMetadata({
@@ -83,7 +76,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
   if (!place) notFound();
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
-  const years = yearsOf(clientFacts, place);
+  const years = placeYears(clientFacts, place);
   const [first, last] = [years[0]!, years.at(-1)!];
   const index = buildPopulationIndexModel({ facts, regions: municipal.regions, municipalities: municipal.municipalities });
   const model = buildPopulationModel({ facts: clientFacts, places, query: { selectedIds: [place.id], range: { kind: "all" } }, locale });
@@ -167,14 +160,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
             valueFormat: "persons",
             countryDetail: `${formatInUnit(index.country.valueGel, UNIT_PERSONS)} · ${message(messages, "municipal.members", { count: georgia.municipalityCount })}`,
           }}
-          sourceNote={
-            <>
-              {t("source", { start: first, end: last })}{" "}
-              <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
-                {message(messages, "common.methodology")}
-              </Link>
-            </>
-          }
+          sourceNote={populationSourceNote(presentation, first, last)}
           densityNote={densityNote}
           sources={sources}
           siteOrigin={resolveSiteUrl()}

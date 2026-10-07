@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
-import { CENSUS_STEP, SERIES } from "../../lib/data/demography/series";
-import { partsOf, placeColor, placeIdForMunicipalityCode, placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
-import { buildPopulationHighlights, buildPopulationModel, populationBasisKey } from "../../lib/explorer/demographyPopulation";
+import { CENSUS_STEP } from "../../lib/data/demography/series";
+import { partsOf, placeColor, placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
+import { buildPopulationHighlights, buildPopulationModel, placeYears, populationBasisKey } from "../../lib/explorer/demographyPopulation";
 import { buildPopulationWorkbookExportModel } from "../../lib/explorer/demographyPopulationWorkbook";
 import { formatInUnit, thousandsUnit, UNIT_PERSONS } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
@@ -72,14 +72,7 @@ export function PopulationPlaceExplorer({
 
   const parts = useMemo(() => partsOf(place, places), [place, places]);
   const listedIds = useMemo(() => new Set([place.id, ...parts.map((part) => part.id)]), [place, parts]);
-  // The years of the place itself: Georgia 2004–2026, everything else 2015–2026. Its parts never reach further.
-  const allYears = useMemo(
-    () =>
-      [...new Set(facts
-        .filter((fact) => fact.seriesId === SERIES.populationTotal && placeIdForMunicipalityCode(fact.geographyId) === place.id)
-        .map((fact) => fact.year))].sort((left, right) => left - right),
-    [facts, place],
-  );
+  const allYears = useMemo(() => placeYears(facts, place), [facts, place]);
   const state = useMunicipalState(allYears, [place.id], listedIds);
   useAppReady();
   const model = useMemo(
