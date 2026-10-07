@@ -236,6 +236,7 @@ export function PopulationPlaceExplorer({
                     sources,
                     siteOrigin,
                     workbookScope,
+                    place.id,
                   ),
                 );
               }}

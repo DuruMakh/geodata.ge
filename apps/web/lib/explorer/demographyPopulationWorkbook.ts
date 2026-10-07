@@ -3,7 +3,7 @@ import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 import type { ClientDemographyObservation } from "../servedRows";
-import { placeLabel, type DemographyPlace } from "./demographyAreas";
+import { GEORGIA_PLACE_ID, placeLabel, type DemographyPlace } from "./demographyAreas";
 import { buildPopulationModel, populationBasisKey, type PopulationQuery } from "./demographyPopulation";
 import {
   SHEET_NAMES,
@@ -24,6 +24,8 @@ export function buildPopulationWorkbookExportModel(
   siteOrigin: string,
   /** The place the page is about, named in the file (`batumi`, `region-adjara`, `georgia`); omitted gives the plain name. */
   scope?: string,
+  /** The place the page is about: its Summary row is the total row, as on the page. Omitted, Georgia is the total. */
+  totalId: string = GEORGIA_PLACE_ID,
 ): WorkbookExportModel {
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `demography.${key}`);
@@ -65,7 +67,7 @@ export function buildPopulationWorkbookExportModel(
         wrap: true,
       },
       rows: model.selected.map((place) => ({
-        kind: place.level === "country" ? "total" : "item",
+        kind: place.id === totalId ? "total" : "item",
         parentLabel: null,
         label: placeLabel(place, locale),
         change: null,

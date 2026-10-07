@@ -124,6 +124,26 @@ describe("population workbook", () => {
     expect(manual.filename).toBe("fiscal-demography-population-batumi-2015-2026-en.xlsx");
   });
 
+  // On the page the place the page is about is the total row of the table (first, bold). The Summary sheet says the same
+  // when it is told which place that is; told nothing, Georgia is the total, as for every call made before this existed.
+  test("the page's own place is the total row of the Summary sheet; without it Georgia is", async () => {
+    const query: PopulationQuery = { selectedIds: ["region.adjara", "06"], range: { kind: "all" } };
+    const buildFor = (q: PopulationQuery, totalId?: string) =>
+      buildPopulationWorkbookExportModel(facts, places, q, presentation, sources, "https://fiscal.ge", "region-adjara", totalId);
+    const kinds = (q: PopulationQuery, totalId?: string) => buildFor(q, totalId).readable.rows.map((row) => [row.label, row.kind]);
+    expect(kinds(query, "region.adjara")).toEqual([["Adjara", "total"], ["Batumi", "item"]]);
+    expect(kinds(query, "06")).toEqual([["Adjara", "item"], ["Batumi", "total"]]);
+    expect(kinds(query)).toEqual([["Adjara", "item"], ["Batumi", "item"]]);
+    expect(kinds({ ...query, selectedIds: [GEORGIA_PLACE_ID, "region.adjara"] })).toEqual([["Georgia", "total"], ["Adjara", "item"]]);
+
+    // And the written sheet shows it: rows start under the title, the subtitle and the header, and a total row is bold.
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer(buildFor(query, "region.adjara")));
+    const summary = workbook.getWorksheet("Summary")!;
+    expect([summary.getCell(4, 1).value, summary.getCell(4, 1).font?.bold]).toEqual(["Adjara", true]);
+    expect([summary.getCell(5, 1).value, summary.getCell(5, 1).font?.bold]).toEqual(["Batumi", undefined]);
+  });
+
   test("the written file has three sheets and numeric, formatted cells", async () => {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(build()));
