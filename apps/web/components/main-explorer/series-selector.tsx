@@ -16,6 +16,9 @@ export function revealSearchField(event: FocusEvent<HTMLInputElement>) {
   event.currentTarget.scrollIntoView({ block: "start" });
 }
 
+/** A series list with this many rows or fewer drops its search field: it is read at a glance. */
+export const SEARCHABLE_MIN_ROWS = 10;
+
 /** Mobile keyboard hints shared by the site's search fields. */
 export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFocus: revealSearchField } as const;
 
@@ -24,6 +27,8 @@ type SeriesSelectorProps = {
   query: string;
   onQueryChange: (query: string) => void;
   searchPlaceholder: string;
+  /** False hides the search field: a list of ten rows or fewer is read at a glance. */
+  searchable?: boolean;
   countLabel?: string;
   selectedCount: number;
   totalCount: number;
@@ -43,6 +48,7 @@ export function SeriesSelector({
   query,
   onQueryChange,
   searchPlaceholder,
+  searchable = true,
   countLabel,
   selectedCount,
   totalCount,
@@ -64,21 +70,25 @@ export function SeriesSelector({
     <div data-testid="series-selector">
       {controls ? <div data-selector-section="controls">{controls}</div> : null}
 
-      <input
-        data-testid="series-search"
-        data-selector-section="search"
-        {...SEARCH_FIELD_PROPS}
-        value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
-        placeholder={searchPlaceholder}
-        aria-label={message(messages, "controls.searchSeries")}
-        className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
-      />
+      {searchable ? (
+        <input
+          data-testid="series-search"
+          data-selector-section="search"
+          {...SEARCH_FIELD_PROPS}
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder={searchPlaceholder}
+          aria-label={message(messages, "controls.searchSeries")}
+          className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
+        />
+      ) : null}
 
       <div
         data-testid="series-actions"
         data-selector-section="actions"
-        className="mt-3.5 flex items-center justify-between gap-4 pb-2.5"
+        // The bulk toggle is the full 44px height of this row (D8 touch target); the
+        // row's margins shrink by the same amount, so the list does not move.
+        className="mt-1 flex items-center justify-between gap-4 pb-0.5"
       >
         {hasSelection || allowSelectAll ? (
           <button

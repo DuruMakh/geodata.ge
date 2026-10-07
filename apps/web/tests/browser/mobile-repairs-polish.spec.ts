@@ -46,6 +46,22 @@ test.describe("search fields follow §7.7", () => {
   }
 });
 
+for (const { path, searchable } of [
+  { path: "/explorer/debt", searchable: false },
+  { path: "/explorer/deficit", searchable: false },
+  { path: "/explorer/inflation/overview", searchable: false },
+  { path: "/explorer/inflation/cities", searchable: false },
+  { path: "/explorer/inflation/cities/batumi", searchable: true },
+  { path: "/explorer/inflation/categories", searchable: true },
+]) {
+  test(`${path}: a series list of ten rows or fewer has no search field`, async ({ page }) => {
+    await page.goto(path);
+    await ready(page);
+    await expect(page.getByTestId("series-list")).toBeVisible();
+    await expect(page.getByTestId("series-search")).toHaveCount(searchable ? 1 : 0);
+  });
+}
+
 test("unemployment denominators count the top-level rows only (§7.7)", async ({ page }) => {
   await page.goto("/explorer/unemployment/gender");
   await ready(page);

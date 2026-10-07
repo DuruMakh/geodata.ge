@@ -8,7 +8,7 @@ import { INFLATION_COLORS, SELECTION_ORDER, panelValue, type InflationIndex, typ
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
-import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { SeriesAside } from "../explorer-shell/series-aside";
 
 // A thin composition of the shared selector, as DebtSeriesPanel is. The target
@@ -36,6 +36,7 @@ export function InflationSeriesPanel({ index, targets, state, range, onToggle, o
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={message(messages, "controls.search")}
+        searchable={rows.length > SEARCHABLE_MIN_ROWS}
         selectedCount={state.selected.length}
         totalCount={rows.length}
         hasSelection={state.selected.length > 0}
