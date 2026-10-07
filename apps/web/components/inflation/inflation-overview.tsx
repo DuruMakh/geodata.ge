@@ -176,7 +176,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
             <SourceNote testId="source-label">
               {t("source")} {message(messages, "main.lastUpdated", { date: displayDate })}
             </SourceNote>
-            <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
+            <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
               {t("methodology")}
             </Link>
           </div>

@@ -133,7 +133,7 @@ export function InflationProductTable({ index, state, onToggle }: {
       type="button"
       data-testid="product-more"
       onClick={() => setShown((current) => nextProductCount(current, matches.length))}
-      className="mt-5 cursor-pointer border-b border-[var(--accent)] pb-0.5 text-[12.5px] font-semibold text-[var(--ink)] hover:text-[var(--accent)]"
-    >{t("productsMore")}</button> : null}
+      className="mt-3 inline-flex min-h-11 cursor-pointer items-center text-[12.5px] font-semibold text-[var(--ink)] hover:text-[var(--accent)]"
+    ><span className="border-b border-[var(--accent)] pb-0.5">{t("productsMore")}</span></button> : null}
   </section>;
 }

@@ -169,7 +169,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
             <p data-testid="inflation-city-central-prices" className="text-xs text-[var(--muted)]">
               {t("cityCentralPricesNote")}
             </p>
-            <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
+            <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
               {t("methodology")}
             </Link>
           </div>

@@ -30,7 +30,7 @@ export function MethodologyHub({
           </p>
           <Link
             href="#datasets"
-            className="mt-7 inline-block text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[var(--ink)]"
+            className="mt-5 inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[var(--ink)]"
           >
             {message(messages, "methodology.hubJump")}
           </Link>

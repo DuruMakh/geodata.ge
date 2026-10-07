@@ -11,7 +11,7 @@ async function ready(page: Page) {
 
 test.describe("search fields follow §7.7", () => {
   for (const { path, testId, placeholder } of [
-    { path: "/explorer/deficit", testId: "series-search", placeholder: "ძებნა" },
+    { path: "/explorer/expenditure", testId: "series-search", placeholder: "ძებნა" },
     { path: "/explorer/inflation/products", testId: "series-search", placeholder: "ძებნა" },
     { path: "/explorer/inflation/products", testId: "product-list-search", placeholder: "ძებნა" },
     { path: "/explorer/unemployment/overview", testId: "series-search", placeholder: "ძებნა" },
@@ -107,6 +107,33 @@ for (const path of [
     expect(await textBelowFloor(page)).toEqual([]);
   });
 }
+
+test.describe("touch targets (D8)", () => {
+  test("the % მშპ-ში pill and the bulk toggle are comfortable to tap", async ({ page }) => {
+    await page.goto("/explorer/expenditure");
+    await ready(page);
+    expect((await page.getByTestId("measure-share-toggle").boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(36);
+    expect((await page.getByTestId("series-toggle-all").boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
+  });
+
+  test("a series caret answers taps 44px tall without changing the row", async ({ page }) => {
+    await page.goto("/explorer/debt");
+    await ready(page);
+    const parent = page.locator('[data-series-id="debt.service.total"]');
+    const caret = parent.locator("button[aria-expanded]");
+    await expect(caret).toHaveAttribute("aria-expanded", "true");
+    await parent.scrollIntoViewIfNeeded();
+    const rowBox = (await parent.boundingBox())!;
+    const caretBox = (await caret.boundingBox())!;
+    expect(rowBox.height).toBeLessThan(40);
+    // 10px below the row — the first child's empty caret gutter — still reaches this caret.
+    const label = await page.evaluate(
+      ({ x, y }) => document.elementFromPoint(x, y)?.closest("button")?.getAttribute("aria-label") ?? null,
+      { x: caretBox.x + caretBox.width / 2, y: rowBox.y + rowBox.height + 10 },
+    );
+    expect(label).toBe(await caret.getAttribute("aria-label"));
+  });
+});
 
 test("desktop keeps its compact type (D8 is phone-only)", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });

@@ -87,7 +87,7 @@ export function SeriesSelector({
             data-testid="series-toggle-all"
             aria-checked={bulkState}
             onClick={onToggleAll}
-            className="grid shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
+            className="grid min-h-11 shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 pr-1 pl-0.5 text-left"
           >
             <span
               aria-hidden
@@ -144,7 +144,8 @@ export function SeriesSelector({
         // The 430px inner scroll belongs to the sticky two-column aside; stacked under the
         // chart (owner decision D4, 2026-10-07) the list flows with the page, so a finger
         // swipe never gets caught inside it.
-        className="flex flex-col @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto"
+        // overflow-y clip keeps the last caret's downward hit extension inside the list.
+        className="flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto"
       >
         {children}
       </div>
@@ -229,8 +230,11 @@ export function SeriesSelectorRow({
           aria-label={expansionLabel ?? message(messages, "controls.subprogrammes")}
           aria-disabled={expansionLocked || undefined}
           // The caret keeps its 22px column; a transparent extension over the row button's
-          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px).
-          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:inset-y-0 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
+          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px), and
+          // 12px below the row it reaches 44px tall (D8). The extension only runs downward:
+          // a following row's own caret paints over it, so it never steals that row's taps,
+          // and it only lands in the empty caret gutter of a row without children.
+          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:top-0 before:-bottom-3 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
           tabIndex={hasChildren && !expansionLocked ? 0 : -1}
         >

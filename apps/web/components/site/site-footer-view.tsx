@@ -43,7 +43,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
             </p>
             <a
               href="mailto:info@fiscal.ge"
-              className="max-[768px]:col-start-2 max-[768px]:row-start-1 max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center max-[768px]:justify-self-end font-[family-name:var(--font-numeric)] text-[11px] text-[var(--accent)] underline underline-offset-[3px] min-[768px]:self-start"
+              className="max-[768px]:col-start-2 max-[768px]:row-start-1 max-[768px]:inline-flex max-[768px]:min-h-11 max-[768px]:items-center max-[768px]:justify-self-end font-[family-name:var(--font-numeric)] text-[11px] text-[var(--accent)] underline underline-offset-[3px] min-[768px]:self-start"
             >
               info@fiscal.ge
             </a>

@@ -156,19 +156,19 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
         </table>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-[11px]">
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 text-[11px]">
         <span className="text-[var(--muted)]">{message(messages, "methodology.manifest")}</span>
         <a
           href={`/downloads/methodology/${datasetId}/manifest.csv`}
           aria-label={message(messages, "methodology.manifestDownload", { format: "CSV" })}
-          className="text-[var(--accent)] underline underline-offset-4"
+          className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4"
         >
           CSV ↓
         </a>
         <a
           href={`/downloads/methodology/${datasetId}/manifest.json`}
           aria-label={message(messages, "methodology.manifestDownload", { format: "JSON" })}
-          className="text-[var(--accent)] underline underline-offset-4"
+          className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4"
         >
           JSON ↓
         </a>

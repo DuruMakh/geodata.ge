@@ -74,7 +74,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
           data-testid="processed-dataset-download"
           href={processedDataHref}
           download
-          className="inline-flex items-center gap-2 text-[13px] font-semibold text-[var(--accent)] underline underline-offset-4"
+          className="inline-flex min-h-11 items-center gap-2 text-[13px] font-semibold text-[var(--accent)] underline underline-offset-4"
         >
           {message(messages, "methodology.processedDownload")}
         </a>
