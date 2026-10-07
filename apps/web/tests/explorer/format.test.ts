@@ -55,6 +55,15 @@ describe("editorial formatters", () => {
     expect(formatAmount(-1_295)).toBe(">−0.01 მლნ ₾");
   });
 
+  it("groups thousands in percentages and points like every other figure", () => {
+    expect(formatShare(45.651, true)).toBe("+4,565.1%");
+    expect(formatShare(-12.5)).toBe("−1,250.0%");
+    expect(formatShare(0.139)).toBe("13.9%");
+    expect(formatShare(-0.0001, true)).toBe("−0.0%");
+    expect(formatPoints(-1234.56)).toBe("−1,234.6");
+    expect(formatPoints(1.25, true)).toBe("+1.3");
+  });
+
   // D11: an unfunded line reads as plain zero, not as a scaled "0.00 მლნ ₾".
   it("prints an exact zero as 0 ₾ / 0 GEL, unsigned", () => {
     expect(formatAmount(0)).toBe("0 ₾");
