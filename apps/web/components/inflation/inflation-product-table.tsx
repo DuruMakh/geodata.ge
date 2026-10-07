@@ -50,7 +50,7 @@ export function InflationProductTable({ index, state, onToggle }: {
         {...SEARCH_FIELD_PROPS}
         value={query}
         onChange={(event) => { setQuery(event.target.value); setShown(Math.min(BATCH_SIZE, index.products.length)); }}
-        placeholder={t("productsSearch")}
+        placeholder={message(messages, "controls.search")}
         aria-label={t("productsSearch")}
         className="h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
       />

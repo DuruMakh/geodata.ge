@@ -75,9 +75,9 @@ export function RegionIndex({ model, sourceNote, metric, summary }: { model: Reg
               {...SEARCH_FIELD_PROPS}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={message(messages, "regionalEconomies.search")}
+              placeholder={message(messages, "regionalEconomies.searchPlaceholder")}
               aria-label={message(messages, "regionalEconomies.search")}
-              className="h-[38px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] outline-none focus:border-[var(--ink)]"
+              className="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]"
             />
             <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{rows.length === model.regions.length ? rows.length : `${rows.length} / ${model.regions.length}`}</span>
           </div>

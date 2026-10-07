@@ -219,7 +219,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               onChange={(event) => setQuery(event.target.value)}
               placeholder={message(messages, "municipal.search")}
               aria-label={message(messages, "municipal.search")}
-              className="h-[38px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--ink)]"
+              className="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]"
             />
             <span data-testid="row-count" className="font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">
               {rows.length === source.length ? `${source.length}` : `${rows.length} / ${source.length}`}

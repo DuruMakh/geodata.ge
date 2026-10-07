@@ -50,7 +50,7 @@ export function InflationProductPanel({ index, state, onToggle, onClear, downloa
     <SeriesSelector
       query={query}
       onQueryChange={setQuery}
-      searchPlaceholder={message(messages, "inflation.productsSearch")}
+      searchPlaceholder={message(messages, "controls.search")}
       countLabel={message(messages, "inflation.productsCount")}
       selectedCount={state.selected.length}
       totalCount={index.products.length}
