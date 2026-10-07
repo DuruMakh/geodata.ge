@@ -1141,7 +1141,10 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
     };
   });
 
-  const PAD_L = 74;
+  // The left padding grows to fit the widest y label, so read the plot's left
+  // edge from the y-axis hairline instead of assuming the 74-unit minimum.
+  const PAD_L = Number(await chart.locator('svg line[stroke="#D9CFBE"]').first().getAttribute("x1"));
+  expect(PAD_L).toBeGreaterThanOrEqual(74);
   const PAD_T = 16;
   expect(geometry.patternX + geometry.circleCx).toBeCloseTo(PAD_L, 5);
   expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);

@@ -6,7 +6,7 @@ import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
-import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import { AXIS_LABEL_GAP, axisLeftPaddingFor, decimalsFor, niceMax } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE } from "../../lib/explorer/colors";
 import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
@@ -33,6 +33,7 @@ type EditorialLineChartProps = {
   unit: ValueUnit;
   shareLabel: string;
   preliminaryLabel?: string;
+  /** Minimum left padding; it grows to fit the widest y label. */
   axisLeftPadding?: number;
   formatTooltipValue?: (value: number) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
@@ -43,8 +44,8 @@ type EditorialLineChartProps = {
 
 const W = 920;
 const H = 320;
-// A little wider than the reference prototype's 62 so 8-character axis labels
-// ("7.5 მლრდ") never clip at the viewBox edge.
+// The house minimum (DESIGN.md §8.3). Wider labels ("50.0 მლრდ", "10,000 მლნ")
+// widen it through axisLeftPaddingFor, or their first digit clips at the viewBox edge.
 const PAD_L = 74;
 const PAD_R = 30;
 const PAD_T = 16;
@@ -82,7 +83,7 @@ export function EditorialLineChart({
   share,
   unit,
   shareLabel,
-  axisLeftPadding = PAD_L,
+  axisLeftPadding: minLeftPadding = PAD_L,
   periodsPerYear = 1,
   formatPeriod,
   preliminaryLabel,
@@ -118,7 +119,6 @@ export function EditorialLineChart({
   const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
   const span = top - bottom;
 
-  const x = (index: number) => axisLeftPadding + (n <= 1 ? (W - axisLeftPadding - PAD_R) / 2 : (index * (W - axisLeftPadding - PAD_R)) / (n - 1));
   const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);
   // Axis precision follows the gridline STEP, not the unit's data-derived
   // decimals. The unit carries enough precision for the smallest value in the
@@ -137,6 +137,9 @@ export function EditorialLineChart({
     formatTooltipValue && value !== null ? formatTooltipValue(value) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
+  const axisLabels = gridLines.map(formatAxis);
+  const axisLeftPadding = axisLeftPaddingFor(axisLabels, minLeftPadding);
+  const x = (index: number) => axisLeftPadding + (n <= 1 ? (W - axisLeftPadding - PAD_R) / 2 : (index * (W - axisLeftPadding - PAD_R)) / (n - 1));
   const labelIndices = new Set(periodLabelIndices(years, periodsPerYear));
 
   const lattice = buildDotLattice({
@@ -212,8 +215,8 @@ export function EditorialLineChart({
                 strokeWidth={1}
               />
             ) : null}
-            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
-              {formatAxis(value)}
+            <text x={axisLeftPadding - AXIS_LABEL_GAP} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+              {axisLabels[index]}
             </text>
           </g>
         ))}
