@@ -36,6 +36,8 @@ describe("sidebar demography group", () => {
     const markup = await render("/en/explorer/demography");
     expect(markup).toContain('data-testid="demography-link" aria-current="page"');
     expect(markup).toContain('data-testid="demography-population-link"');
+    // The match runs one way: a place page's path contains the Population path, the hub's address does not.
+    expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
   });
 
   it("stays closed on other sections and keeps the budget group out of demography", async () => {
