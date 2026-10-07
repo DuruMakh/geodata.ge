@@ -67,7 +67,7 @@ export function LandingDatasetSection({
         <p className="mt-4 max-w-[470px] text-[13px] leading-[1.75] text-[var(--body)]">{description}</p>
         <Link
           href={pageHref(href, locale)}
-          className="mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
+          className="mt-1 inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
         >
           {linkLabel}
         </Link>

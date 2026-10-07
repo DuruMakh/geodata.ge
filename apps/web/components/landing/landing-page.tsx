@@ -3,6 +3,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
+import type { LandingDatasetLink } from "../../lib/landing/landingDatasets";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
 import { HeroReliefLazy } from "./hero-relief-lazy";
@@ -48,7 +49,7 @@ const METHODOLOGY_STEPS = [
   "landing.methodStep4",
 ] as const;
 
-export function LandingPage({ model, presentation }: { model: LandingModel; presentation: Presentation }) {
+export function LandingPage({ model, datasets, presentation }: { model: LandingModel; datasets: readonly LandingDatasetLink[]; presentation: Presentation }) {
   const { locale, messages } = presentation;
   return (
     <main
@@ -71,11 +72,11 @@ export function LandingPage({ model, presentation }: { model: LandingModel; pres
             >
               {message(messages, "landing.heading")}
             </h1>
-            <div className="mt-3.5 min-[768px]:pointer-events-auto min-[768px]:mt-5">
+            <div className="mt-1 min-[768px]:pointer-events-auto min-[768px]:mt-5">
               <Link
                 href={pageHref("/explorer", locale)}
                 data-testid="hero-cta"
-                className="text-[12px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:text-[12.5px]"
+                className="inline-flex min-h-11 items-center text-[12px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:min-h-0 min-[768px]:text-[12.5px]"
               >
                 {message(messages, "landing.explore")}
               </Link>
@@ -118,6 +119,30 @@ export function LandingPage({ model, presentation }: { model: LandingModel; pres
             </div>
           ))}
         </section>
+
+        {/* One row per dataset hub, each with its latest served figure: the
+            budget ledger below is one dataset of four (owner decision D3). */}
+        <nav
+          aria-label={message(messages, "landing.datasetsLabel")}
+          data-testid="landing-datasets"
+          className="mt-7 grid grid-cols-2 border-t border-[var(--hairline-soft)] min-[768px]:mt-10 min-[768px]:grid-cols-4"
+        >
+          {datasets.map((dataset) => (
+            <Link
+              key={dataset.href}
+              href={pageHref(dataset.href, locale)}
+              className="group flex min-h-11 min-w-0 flex-col justify-center gap-1 border-b border-[var(--hairline-soft)] py-3 pr-3 text-[var(--ink)] no-underline"
+            >
+              <span className="text-[14px] font-semibold group-hover:text-[var(--accent)]">
+                {dataset.title} <span aria-hidden="true" className="text-[var(--accent)]">→</span>
+              </span>
+              <span className="text-[11.5px] leading-snug text-[var(--muted)]">
+                {dataset.measure} · {dataset.period}:{" "}
+                <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-[var(--ink)]">{dataset.value}</span>
+              </span>
+            </Link>
+          ))}
+        </nav>
 
         <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4">
           <LandingDatasetSection
@@ -183,7 +208,7 @@ export function LandingPage({ model, presentation }: { model: LandingModel; pres
               <Link
                 data-testid="landing-methodology-link"
                 href={pageHref("/methodology", locale)}
-                className="mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
+                className="mt-1 inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
               >
                 {message(messages, "landing.methodologyLink")}
               </Link>

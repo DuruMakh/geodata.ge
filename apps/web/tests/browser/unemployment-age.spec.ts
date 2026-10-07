@@ -67,5 +67,6 @@ test("historic age links normalize to 2020 onward and remove the country selecti
   await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
   await expect(page.getByTestId("series-status")).toContainText("1 / 11");
   await expect(page.locator('[data-series-id="age.20_24"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
+  // Owner decision D2 (2026-10-07): the latest value now sits under the title.
+  await expect(page.getByTestId("unemployment-latest")).toContainText(/ · \d{4}: /);
 });

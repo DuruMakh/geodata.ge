@@ -8,14 +8,23 @@ type SparklineProps = {
   color: string;
   width?: number;
   height?: number;
+  /** Stretch to the parent's width below 768px (hub cards); the drawn size from 768px. */
+  fluidOnMobile?: boolean;
 };
 
-export function Sparkline({ values, color, width = 64, height = 16 }: SparklineProps) {
+export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false }: SparklineProps) {
   const segments = buildSparklinePath(values, width, height);
   if (segments.length === 0) return null;
 
   return (
-    <svg aria-hidden viewBox={`0 0 ${width} ${height}`} width={width} height={height} className="mt-1.5 block">
+    <svg
+      aria-hidden
+      viewBox={`0 0 ${width} ${height}`}
+      width={width}
+      height={height}
+      preserveAspectRatio={fluidOnMobile ? "none" : undefined}
+      className={fluidOnMobile ? "mt-1.5 block max-[768px]:w-full" : "mt-1.5 block"}
+    >
       {segments.map((path, index) => (
         <path
           key={index}
@@ -25,6 +34,7 @@ export function Sparkline({ values, color, width = 64, height = 16 }: SparklineP
           strokeWidth={1.2}
           strokeLinejoin="round"
           strokeLinecap="round"
+          vectorEffect={fluidOnMobile ? "non-scaling-stroke" : undefined}
         />
       ))}
     </svg>

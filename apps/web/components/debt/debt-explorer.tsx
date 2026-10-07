@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useMemo } from "react";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
 import { message } from "../../lib/i18n/messages";
@@ -113,10 +114,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   const preliminaryGdpYears = props.family === "stock"
     ? model.years.filter((year) => props.gdpFacts.some((fact) => fact.year === year && fact.status === "preliminary"))
     : [];
-  const coverage = [
-    familyYears.length > 0 ? `${familyYears[0]}–${familyYears.at(-1)}` : "",
-    props.lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt }) : "",
-  ].filter(Boolean).join(" · ");
+  const coverage = coverageLabel(messages, locale, familyYears[0], familyYears.at(-1), props.lastUpdatedAt || undefined);
   const forecastYears = model.forecastStartYear === null
     ? []
     : model.years.filter((year) => year >= model.forecastStartYear!);

@@ -162,6 +162,15 @@ export async function renderConnectPage(locale: Locale) {
     { id: "products-annual", key: "connect.exampleProductAnnual", values: { period: products.annualLatest } },
     { id: "products-cumulative", key: "connect.exampleProductCumulative", values: { product: locale === "en" ? products.labelEn : products.labelKa, fromPeriod: products.startPeriod, toPeriod: products.endPeriod, basePeriod: products.basePeriod } },
   ];
+  const examples: { id: string; key: string; values?: TemplateValues }[] = [
+    { id: "national", key: "connect.exampleNational" },
+    inflationExamples[0],
+    { id: "regional", key: "connect.exampleRegional" },
+    { id: "municipal", key: "connect.exampleMunicipal" },
+    { id: "debt", key: "connect.exampleDebt" },
+    { id: "deficit", key: "connect.exampleDeficit" },
+    ...inflationExamples.slice(1),
+  ];
   const endpoint = `${resolveSiteUrl()}/mcp`;
 
   return (
@@ -220,7 +229,7 @@ export async function renderConnectPage(locale: Locale) {
                       </li>
                     ))}
                   </ol>
-                  <a className="mt-3 inline-block text-[12px] underline" href={client.documentation}>{message(messages, "connect.clientDocumentation")}</a>
+                  <a className="mt-1 inline-flex min-h-11 items-center text-[12px] underline" href={client.documentation}>{message(messages, "connect.clientDocumentation", { client: client.name })}</a>
                 </div>
               ))}
             </div>
@@ -262,10 +271,17 @@ export async function renderConnectPage(locale: Locale) {
             <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">{message(messages, "connect.bilingualHeading")}</h2>
             <p className="mt-4 max-w-[820px] text-[13.5px] leading-[1.8] text-[var(--body)]">{message(messages, "connect.bilingualText")}</p>
             <h3 className="mt-5 text-[14px] font-semibold">{message(messages, "connect.examplesHeading")}</h3>
+            {/* Three questions up front, one per kind of data; the rest wait behind
+                a toggle so a phone reader is not handed ten at once. */}
             <ul className="mt-3 grid max-w-[820px] list-disc gap-2 pl-5 text-[13.5px] leading-[1.8] text-[var(--body)]">
-              {["connect.exampleNational", "connect.exampleMunicipal", "connect.exampleRegional", "connect.exampleDebt", "connect.exampleDeficit"].map(key => <li key={key}>{message(messages, key)}</li>)}
-              {inflationExamples.map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
+              {examples.slice(0, 3).map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
             </ul>
+            <details data-testid="connect-more-examples" className="mt-1 max-w-[820px]">
+              <summary className="inline-flex min-h-11 cursor-pointer items-center text-[13px] font-semibold text-[var(--accent)]">{message(messages, "connect.moreExamples")}</summary>
+              <ul className="mt-1 grid list-disc gap-2 pl-5 text-[13.5px] leading-[1.8] text-[var(--body)]">
+                {examples.slice(3).map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
+              </ul>
+            </details>
           </section>
 
           {/* Spec 12.3: naming what is NOT served is what stops someone asking
@@ -308,19 +324,24 @@ export async function renderConnectPage(locale: Locale) {
                   <li data-testid="connect-city-coverage">{message(messages, "connect.cityCoverage", { count: inflation.cityCount, range: inflation.cityRange })}</li>
                   <li data-testid="connect-product-coverage">{message(messages, "connect.productCoverage", { count: products.count, range: products.range })}</li>
                 </ul>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-sector-discovery">
+                {/* Tool and field names (query_inflation, yoy_pct, entityIds...) answer a
+                    developer's question; DESIGN.md §24 says the page is not written for
+                    one, so they and the raw files sit behind a toggle. */}
+                <details data-testid="connect-developer-details" className="mt-3">
+                  <summary className="inline-flex min-h-11 cursor-pointer items-center text-[12.5px] font-semibold text-[var(--muted)]">{message(messages, "connect.developerDetails")}</summary>
+                <p className="mt-1 text-[12px] leading-[1.8] text-[var(--muted)]" data-testid="connect-sector-discovery">
                   {message(messages, "connect.sectorQuery")} {" "}
                   <a className="underline" href="/downloads/data/economic-sectors.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/economic-sectors.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/economic-sectors", locale)}>{message(messages, "connect.sectorMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-regional-discovery">
+                <p className="mt-3 text-[12px] leading-[1.8] text-[var(--muted)]" data-testid="connect-regional-discovery">
                   {message(messages, "connect.regionalQuery")} {" "}
                   <a className="underline" href="/downloads/data/regional-economies.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/regional-economies.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/regional-economies", locale)}>{message(messages, "connect.regionalMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-inflation-discovery">
+                <p className="mt-3 text-[12px] leading-[1.8] text-[var(--muted)]" data-testid="connect-inflation-discovery">
                   {message(messages, "connect.inflationQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-national.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-categories.csv">CSV</a>{" · "}
@@ -329,12 +350,13 @@ export async function renderConnectPage(locale: Locale) {
                   <a className="underline" href="/downloads/data/inflation-cities.json">{message(messages, "connect.inflationCitiesMetadata")}</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-product-discovery">
+                <p className="mt-3 text-[12px] leading-[1.8] text-[var(--muted)]" data-testid="connect-product-discovery">
                   {message(messages, "connect.productQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-products.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-products.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
+                </details>
               </div>
               <div data-testid="connect-coverage-excluded">
                 <h3 className="text-[14px] font-semibold">{message(messages, "connect.notIncluded")}</h3>

@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useMemo } from "react";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -16,7 +17,7 @@ import type {
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { buildExplorerModel, isDerivedTotalItemId, type ExplorerModel } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
-import { formatAmount, formatDisplayDate, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
+import { formatAmount, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
@@ -226,12 +227,7 @@ function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminC
       : message(messages, "main.revenueHeading");
   const sectionLabel = message(messages, isAnalysis ? "common.analysis" : nav === "revenue" ? "common.revenue" : "common.expenditure");
   const coverageYears = isAnalysis ? analysisYears : scopeYears;
-  const coverage = [
-    coverageYears.length > 0 ? `${coverageYears[0]}–${coverageYears.at(-1)}` : "",
-    lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "",
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const coverage = coverageLabel(messages, locale, coverageYears[0], coverageYears.at(-1), lastUpdatedAt || undefined);
   function buildWorkbookInput(model: ExplorerModel): WorkbookExportInput {
     const labelById = new Map(model.items.map((item) => [item.id, publicLabel(locale, item.id, item.kaLabel, presentation.englishLabels)]));
     const series = model.tableRows.map<WorkbookSeries>((row) => {

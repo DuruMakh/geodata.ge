@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ClientGeneralGovernmentBalanceFact } from "../../lib/explorer/clientData";
 import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
@@ -85,10 +86,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
       ? formatShare(latestActual.generalGovernmentBalancePctGdp / 100)
       : formatAmount(latestActual.generalGovernmentBalanceGel, locale)
     : "—";
-  const coverage = [
-    years.length > 0 ? `${min}–${max}` : "",
-    lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "",
-  ].filter(Boolean).join(" · ");
+  const coverage = coverageLabel(messages, locale, years.length > 0 ? min : undefined, years.length > 0 ? max : undefined, lastUpdatedAt || undefined);
 
   useEffect(() => {
     if (parsedRef.current) return;

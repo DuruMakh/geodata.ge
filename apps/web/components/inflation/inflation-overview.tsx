@@ -1,15 +1,18 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import type { ClientCpiFact } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
-import { periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
+import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
+import { latestEntry } from "../../lib/explorer/latestValue";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
   DEFAULT_INFLATION_STATE, INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
-  overallCoverage, parseInflationHash, rangeFromPatch, resolveInflationRange, serializeInflationHash, toggleSelection,
+  overallCoverage, parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection,
   type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
 import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -75,6 +78,8 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const coverage = overallCoverage(index);
+  // The headline CPI's latest published month on the active tab.
+  const latest = latestEntry(index.values.get(seriesGroup("cpi", state.tab)));
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
   const hasSeries = lines.some((line) => line.key !== "target");
   const chartSeries: ChartSeries[] = lines.map((line) => ({
@@ -102,9 +107,12 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
           { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
           { label: t("heading") },
         ]}
-        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
+      {latest ? (
+        <LatestValueLine testId="inflation-latest" measure={t(`tab.${state.tab}`)} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, state.tab)} />
+      ) : null}
       <p data-testid="inflation-unit" className="mb-4 text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
 
       <div

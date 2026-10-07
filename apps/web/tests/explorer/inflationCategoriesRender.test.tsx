@@ -11,6 +11,7 @@ const props = {
   facts: packCategoryFacts(fixtureFacts),
   weights: fixtureWeights,
   headline: [...fixtureHeadline].map(([period, value]) => ({ period, value })),
+  headlineMom: [],
   lastReviewedAt: "2026-09-11",
   sources: [],
   siteOrigin: "https://fiscal.ge",
@@ -31,9 +32,12 @@ describe("InflationCategories", () => {
     expect(block(markup, "inflation-category-tab-yoy")).toContain('aria-pressed="false"');
   });
 
-  it("carries the unit line alone under the H1, with no headline value line", () => {
+  it("states the latest annual headline under the H1, then the unit line (owner decision D2)", () => {
+    const latest = [...fixtureHeadline].sort((a, b) => a[0] - b[0]).at(-1)!;
+    expect(block(markup, "inflation-category-latest")).toContain("წლიური ინფლაცია · ");
+    expect(block(markup, "inflation-category-latest")).toContain(`${latest[1].toFixed(1)}%`);
+    expect(markup.indexOf('data-testid="inflation-category-latest"')).toBeLessThan(markup.indexOf('data-testid="inflation-category-unit"'));
     expect(block(markup, "inflation-category-unit")).toContain("პროცენტული პუნქტი");
-    expect(markup).not.toContain('data-testid="inflation-category-headline"');
   });
 
   it("names the largest contributor in the indicators hero", () => {

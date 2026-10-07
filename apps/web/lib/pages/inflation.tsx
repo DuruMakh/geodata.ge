@@ -23,6 +23,8 @@ import {
   sourceIdBySeriesMeasure,
 } from "../explorer/clientData";
 import { buildInflationHubCards, buildLatestProductHubSummary } from "../explorer/inflationHubCards";
+import { coverageLabel } from "../explorer/coverageLabel";
+import { periodLabel } from "../explorer/inflationLabels";
 import type { InflationWorkbookSource } from "../explorer/inflationWorkbook";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { getMessages } from "../i18n/messages.server";
@@ -106,12 +108,19 @@ export async function renderInflationHub(locale: Locale) {
     loadServedInflationData(), loadServedProductData(), getPresentation(locale, ["inflation", "common"], []),
   ]);
   const t = (key: string) => message(presentation.messages, key);
+  const periods = facts.map((fact) => fact.period).sort();
+  const coverage = coverageLabel(
+    presentation.messages, locale,
+    periodLabel(presentation.messages, periodFromKey(periods[0]), "short"),
+    periodLabel(presentation.messages, periodFromKey(periods.at(-1)!), "short"),
+    facts.map((fact) => fact.lastReviewedAt).sort().at(-1),
+  );
   return (
     <I18nProvider {...presentation}>
       <BreadcrumbJsonLd items={[{ name: t("common.home"), path: pageHref("/", locale) }, { name: t("common.inflation"), path: pageHref(HUB_PATH, locale) }]} />
       <main className="px-5 pb-16 min-[768px]:px-[34px]">
         <div className="mx-auto max-w-[1180px]">
-          <PageHeader crumbs={[{ label: t("common.home"), href: pageHref("/", locale) }, { label: t("common.data") }, { label: t("common.inflation") }]} coverage="" />
+          <PageHeader crumbs={[{ label: t("common.home"), href: pageHref("/", locale) }, { label: t("common.data") }, { label: t("common.inflation") }]} coverage={coverage} />
           <ExplorerHeading>{t("inflation.hubHeading")}</ExplorerHeading>
           <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{t("inflation.hubDescription")}</p>
           <BudgetHub cards={buildInflationHubCards(facts, presentation, categories, weights, buildLatestProductHubSummary(productData), cities.map(cityFactInput))} locale={locale} testId="inflation-hub" />
@@ -187,6 +196,9 @@ export async function renderInflationCategories(locale: Locale) {
   const headline = facts
     .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
     .map((fact) => ({ period: periodFromKey(fact.period), value: fact.value }));
+  const headlineMom = facts
+    .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "mom_pct")
+    .map((fact) => ({ period: periodFromKey(fact.period), value: fact.value }));
   const t = (key: string) => message(presentation.messages, key);
   return (
     <I18nProvider {...presentation}>
@@ -201,6 +213,7 @@ export async function renderInflationCategories(locale: Locale) {
         facts={packCategoryFacts(categories.map(categoryFactInput))}
         weights={weights.map(projectBasketWeight)}
         headline={headline}
+        headlineMom={headlineMom}
         lastReviewedAt={categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
         sources={sources}
         siteOrigin={resolveSiteUrl()}

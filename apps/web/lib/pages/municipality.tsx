@@ -1,3 +1,4 @@
+import { coverageLabel } from "../explorer/coverageLabel";
 import type { Locale } from "../i18n/types";
 import { getMunicipalPresentation } from "./municipal-presentation.server";
 import { message } from "../i18n/messages";
@@ -207,7 +208,7 @@ export async function renderMunicipality(slug: string, locale: Locale) {
             { label: regionBreadcrumbLabel, href: pageHref(regionPath, locale) },
             { label: name },
           ]}
-          coverage={[`${firstYear}–${latestYear}`, lastUpdatedAt ? message(messages, "municipal.updated", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : ""].filter(Boolean).join(" · ")}
+          coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
         />
 
         <MunicipalExplorer

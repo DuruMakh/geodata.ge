@@ -31,6 +31,7 @@ export {
   renderRegionalEconomiesPage,
 } from "./regional-economies";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
+import { coverageLabel } from "../explorer/coverageLabel";
 
 export function regionalEconomyStaticParams() {
   return REGIONAL_ECONOMY_REGIONS.map((region) => ({ id: region.id.replace(/^region\./, "") }));
@@ -130,7 +131,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         },
       })} />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${reviewedAt}`} />
+        <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, reviewedAt)} />
         <RegionalEconomyExplorer
           facts={regionalFacts.map(projectRegionalObservation)}
           registry={REGIONAL_ECONOMY_SECTORS}

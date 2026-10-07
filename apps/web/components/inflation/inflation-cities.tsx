@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
@@ -16,6 +17,9 @@ import {
   toggleAllCityLines,
   toggleCityLine,
   unpackCityFacts,
+  cityValues,
+  GEORGIA_LINE_ID,
+  HEADLINE_ID,
   type CityState,
   type CityView,
   type PackedCitySeries,
@@ -23,7 +27,9 @@ import {
 import { cityLineLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
 import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
-import { periodLabel } from "../../lib/explorer/inflationLabels";
+import { formatInflationValue, periodLabel } from "../../lib/explorer/inflationLabels";
+import { latestEntry } from "../../lib/explorer/latestValue";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
@@ -77,6 +83,8 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
 
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);
+  // The place's own total: Georgia on the Georgia page, the city on a city page.
+  const latest = latestEntry(cityValues(index, view.kind === "city" ? view.cityId : GEORGIA_LINE_ID, HEADLINE_ID, "yoy_pct"));
   const periods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
   const lines = buildCityLines(index, view, state, range);
@@ -101,9 +109,12 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
           citiesCrumb,
           ...(view.kind === "city" ? [{ label: cityLineLabel(messages, view.cityId) }] : []),
         ]}
-        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <InflationCityHeading view={view} />
+      {latest ? (
+        <LatestValueLine testId="inflation-city-latest" measure={t("tab.yoy")} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, "yoy")} />
+      ) : null}
       <p data-testid="inflation-city-unit" className="mb-4 text-[13px] text-[var(--muted)]">
         {t("categoryUnit.yoy")}
       </p>

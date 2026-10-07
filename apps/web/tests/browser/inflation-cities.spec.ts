@@ -122,7 +122,7 @@ test("Zugdidi's annual series starts late and is never filled", async ({ page })
 
   await page.goto(`/en${CITIES}/zugdidi`);
   await ready(page);
-  await expect(page.getByTestId("explorer-header")).toContainText("Dec 2016 –");
+  await expect(page.getByTestId("explorer-header")).toContainText("Dec 2016–");
 });
 
 test("an old link with the retired tab and category keys still opens", async ({ page }) => {

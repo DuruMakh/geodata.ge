@@ -1,4 +1,5 @@
 "use client";
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { ClientGdpObservation, SourceIdRanges } from "../../lib/servedRows";
@@ -18,7 +19,6 @@ import {
   buildGdpWorkbookExportModel,
   gdpDisplay,
 } from "../../lib/explorer/gdpWorkbook";
-import { formatDisplayDate } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { PageHeader } from "../shell/page-header";
@@ -29,6 +29,8 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { GdpSummary } from "./gdp-summary";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
+import { formatGdpLatestValue } from "../../lib/explorer/latestValue";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -73,6 +75,8 @@ export function GdpOverview({
     [facts, state, sourceIdRanges],
   );
   const d = gdpDisplay(state, presentation);
+  // The latest loaded year of the active indicator, whatever range is selected.
+  const latest = buildGdpOverviewModel(facts, { ...state, range: { kind: "all" } }, sourceIdRanges).headline;
   const row = {
     itemId: "gdp.overview",
     kaLabel: d.label,
@@ -128,11 +132,18 @@ export function GdpOverview({
           },
           { label: t("heading") },
         ]}
-        coverage={`${m.range.min}–${m.range.max} · ${message(messages, "main.updated", {
-          date: locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt,
-        })}`}
+        coverage={coverageLabel(messages, locale, m.range.min, m.range.max, lastReviewedAt)}
       />
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
+      {latest ? (
+        <LatestValueLine
+          testId="gdp-latest"
+          measure={d.label}
+          period={latest.year}
+          value={formatGdpLatestValue(state, latest.value, messages)}
+          note={latest.status === "preliminary" ? t("preliminary") : undefined}
+        />
+      ) : null}
       <p
         data-testid="gdp-unit"
         className="mb-4 text-[13px] text-[var(--muted)]"

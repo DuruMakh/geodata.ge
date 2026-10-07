@@ -27,6 +27,7 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
@@ -58,6 +59,13 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
   const selectedIndicators = [...new Set(model.definitions.filter(group => state.selectedIds.includes(group.id)).map(group => group.indicatorId))];
   const indicatorLabel = (selectedIndicators.length ? selectedIndicators : [state.indicator]).map(indicator => t(`indicator.${indicator}`)).join(" · "), unit = { divisor: 1, label: t("thousandPersons"), decimals: 1 };
   const valueLabel = (value: number | null | undefined) => model.percent ? formatShare(value == null ? null : value / 100) : `${formatInUnit(value, unit)} ${unit.label}`;
+  // Latest value of the active indicator for the page's own place (Georgia, or the region).
+  // The age page carries no national rows, so it states its first selected group instead.
+  const placeFacts = facts.filter(f => f.dimension === (regionId ? "region" : "national") && (!regionId || f.groupId === regionId) && f.indicatorId === state.indicator && f.value != null);
+  const latestGroup = placeFacts.length ? null : model.definitions.find(group => state.selectedIds.includes(group.id)) ?? null;
+  const latest = (latestGroup ? facts.filter(f => f.groupId === latestGroup.groupId && f.indicatorId === latestGroup.indicatorId && f.value != null) : placeFacts).sort((a, b) => a.year - b.year).at(-1);
+  const latestGroupLabel = latestGroup ? registry.find(group => group.id === latestGroup.groupId) : undefined;
+  const latestMeasure = t(`indicator.${latestGroup?.indicatorId ?? state.indicator}`) + (latestGroupLabel ? ` · ${locale === "en" ? latestGroupLabel.labelEn : latestGroupLabel.labelKa}` : "");
   const rows = model.rows.map(row => ({ ...row, kaLabel: labels.get(row.itemId)! }));
   const total = rows.find(row => row.itemId === model.referenceId) ?? null;
   const change = (transform: (previous: UnemploymentState) => UnemploymentState) => {
@@ -88,6 +96,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
         next={{ href: pageHref(unemploymentRegionHref(neighbours.next.id), locale), label: publicLabel(locale, neighbours.next.id, neighbours.next.kaLabel, presentation.englishLabels) }}
       /> : null}
     </div> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
+    {latest ? <LatestValueLine testId="unemployment-latest" measure={latestMeasure} period={latest.year} value={valueLabel(latest.value)} /> : null}
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
     <p role="status" className="sr-only">{announcement}</p>
     {section === "overview" ? <div data-testid="unemployment-national-tabs" role="group" aria-label={t("nationalViews")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">

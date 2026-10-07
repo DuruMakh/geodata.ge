@@ -69,7 +69,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 test("national tabs keep valid metrics, coverage and reference selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment/overview"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const title = await page.getByRole("heading", { level: 1 }).textContent();
-  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p").first();
+  // The page summary; the latest-value line above it (owner decision D2) follows the tab.
+  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p:not([data-testid])").first();
   const description = await subtitle.textContent();
   for (const breakdown of ["national", "settlement", "education", "long_term"]) {
     await page.getByTestId(`unemployment-tab-${breakdown}`).click();

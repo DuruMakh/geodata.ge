@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -95,7 +96,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
         { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
         { label: t("productsHeading") },
       ]}
-      coverage={`${minYear} – ${periodLabel(messages, index.latestPeriod, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+      coverage={coverageLabel(messages, locale, minYear, periodLabel(messages, index.latestPeriod, "short"), lastReviewedAt)}
     />
     <ExplorerHeading>{t("productsHeading")}</ExplorerHeading>
     <p className="mb-4 text-[13px] text-[var(--muted)]">{t("productsUnit")}</p>

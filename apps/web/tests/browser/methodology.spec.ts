@@ -149,7 +149,8 @@ test("future routes stay on the static 404 surface and out of navigation", async
     const response = await page.goto(`${TEST_BASE_URL}/methodology/${slug}`);
     expect(response?.status(), slug).toBe(404);
     await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
-    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(5);
+    // Home, the four dataset hubs and methodology.
+    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(6);
     await expect(page.locator(`link[rel="canonical"][href*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.locator(`meta[property="og:url"][content*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.getByTestId("site-json-ld")).toHaveCount(1);
@@ -160,7 +161,7 @@ test("future routes stay on the static 404 surface and out of navigation", async
   await page.goto(`${TEST_BASE_URL}/methodology`);
   const futureRows = page.getByTestId("methodology-future-row");
   await expect(futureRows).toHaveCount(1);
-  for (const label of ["მოსახლეობა"] as const) {
+  for (const label of ["დემოგრაფია"] as const) {
     await expect(futureRows.getByText(label, { exact: true })).toBeVisible();
   }
   expect(
