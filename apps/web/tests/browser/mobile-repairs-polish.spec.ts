@@ -157,7 +157,30 @@ test("desktop keeps its compact type (D8 is phone-only)", async ({ page }) => {
   await expect(page.getByTestId("budget-hub").locator("p").last()).toHaveCSS("font-size", "10px");
 });
 
-// Words that wrap across two lines without a space or hyphen to break at.
+test.describe("a larger text setting (root font 125%) at 360px", () => {
+  test.use({ viewport: { width: 360, height: 800 } });
+  for (const path of [
+    "/",
+    "/explorer/expenditure",
+    "/explorer/municipalities",
+    "/explorer/inflation/products",
+    "/explorer/unemployment/overview",
+    "/methodology/expenditure",
+  ]) {
+    test(`${path}: body copy grows and nothing overflows (D8)`, async ({ page }) => {
+      await page.goto(path);
+      await page.waitForLoadState("networkidle");
+      await page.addStyleTag({ content: "html { font-size: 125% !important; }" });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+      // Body copy follows the setting: the footer fine print is rem-sized.
+      expect(await page.locator("footer p").last().evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(12);
+    });
+  }
+});
+
+// Words split across two lines although they would fit on one line of their
+// block — a mid-word break that was not the last resort. Hyphens and slashes
+// are normal break points; a word wider than its whole column may still break.
 async function wordsBrokenMidWord(page: Page): Promise<string[]> {
   return page.evaluate(() => {
     const found: string[] = [];

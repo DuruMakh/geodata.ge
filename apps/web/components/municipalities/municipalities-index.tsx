@@ -203,7 +203,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
 
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
-            <span className="flex items-baseline gap-3.5">
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-3.5">
               <TextTab label={message(messages, "municipal.municipalities")} active={level === "muni"} onClick={() => setLevel("muni")} testId="level-muni" />
               <TabDivider />
               <TextTab label={message(messages, "municipal.regions")} active={level === "region"} onClick={() => setLevel("region")} testId="level-region" />

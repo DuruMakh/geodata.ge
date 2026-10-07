@@ -88,7 +88,7 @@ export function SeriesSelector({
         data-selector-section="actions"
         // The bulk toggle is the full 44px height of this row (D8 touch target); the
         // row's margins shrink by the same amount, so the list does not move.
-        className="mt-1 flex items-center justify-between gap-4 pb-0.5"
+        className="mt-1 flex flex-wrap items-center justify-between gap-x-4 pb-0.5"
       >
         {hasSelection || allowSelectAll ? (
           <button
