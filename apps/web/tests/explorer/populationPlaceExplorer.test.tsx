@@ -65,6 +65,11 @@ function render(placeId: string, locale: Locale = "en", withNavigation = false):
 }
 const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
 const tagOf = (html: string, testId: string) => html.match(new RegExp(`<[^>]*data-testid="${testId}"[^>]*>`))?.[0] ?? "";
+/** The tick-list rows in page order: the place id each row stands for and whether its toggle is pressed (ticked). */
+const tickList = (html: string) =>
+  [...html.matchAll(/data-testid="series-row"[^>]*data-series-id="([^"]+)"[\s\S]*?data-testid="series-row-toggle"[^>]*aria-pressed="(true|false)"/g)].map(
+    (match) => ({ id: match[1]!, pressed: match[2] === "true" }),
+  );
 
 describe("place page body: Georgia", () => {
   const html = () => render(GEORGIA_PLACE_ID);
@@ -141,6 +146,23 @@ describe("place page body: a region, a municipality and Tbilisi", () => {
     const html = render("06", "ka");
     expect(html).toContain("აღწერით გადათვლა");
     expect(html).toContain("ბათუმი");
+  });
+
+  test("English carries no Georgian text on a region or a municipality either", () => {
+    for (const placeId of ["region.adjara", "06"]) expect(render(placeId), placeId).not.toMatch(GEORGIAN);
+  });
+});
+
+describe("place page body: the default selection", () => {
+  // Only the place itself is drawn on arrival; its parts are listed below it, unticked.
+  test.each([
+    ["Georgia", GEORGIA_PLACE_ID],
+    ["a region (Adjara)", "region.adjara"],
+    ["a municipality (Batumi)", "06"],
+  ])("%s: its own row comes first and is the only one ticked", (_label, placeId) => {
+    const rows = tickList(render(placeId));
+    expect(rows[0]).toEqual({ id: placeId, pressed: true });
+    expect(rows.filter((row) => row.pressed).map((row) => row.id)).toEqual([placeId]);
   });
 });
 
