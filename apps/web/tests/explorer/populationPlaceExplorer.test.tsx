@@ -166,7 +166,7 @@ describe("place page body: the density note", () => {
     expect(section).toContain(`>${NOTE}</p>`);
     const between = section.slice(section.indexOf("The indicators describe this place"), section.indexOf('data-testid="population-density-note"'));
     expect(between).not.toBe("");
-    expect(between).not.toMatch(/<(section|h2|ul|table)\b|data-testid=/);
+    expect(between).not.toMatch(/<\/?(section|h2|ul|table)\b|data-testid=/);
     expect(count(html, /data-testid="population-density-note"/g)).toBe(1);
   });
 

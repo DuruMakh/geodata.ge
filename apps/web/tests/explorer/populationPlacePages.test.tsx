@@ -115,7 +115,7 @@ describe("the density note", () => {
     expect(georgian).toMatch(GEORGIAN);
   });
 
-  it("is not on a municipality's page, which shows no density, in either language", async () => {
+  it("is not on a municipality's page, in either language", async () => {
     for (const locale of ["en", "ka"] as const) {
       expect(await page({ kind: "municipality", slug: "batumi" }, locale), locale).not.toContain("population-density-note");
     }

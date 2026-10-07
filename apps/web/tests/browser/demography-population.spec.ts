@@ -109,7 +109,7 @@ test("Georgia's page lists Georgia and the 11 regions (12 rows) and has no previ
 });
 
 // A page that shows a density says which area it uses (docs/data-methodology/demography.md): Georgia's shows the densest region's, a region's its own.
-test("Georgia's and a region's page name the area the density uses; a municipality's page shows no density and no note", async ({ page }) => {
+test("Georgia's and a region's page name the area the density uses; a municipality's page carries no density note", async ({ page }) => {
   for (const path of ["/en/explorer/demography/population/georgia", "/en/explorer/demography/population/region/adjara"]) {
     await page.goto(path);
     await ready(page);
@@ -139,6 +139,7 @@ test("Tbilisi opens one page from the map's city dot and from the lists", async 
   await page.goto("/en/explorer/demography/population");
   await ready(page);
   await page.getByTestId("level-region").click();
+  await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
   await page.getByTestId("municipal-list-row").filter({ hasText: "Tbilisi" }).click();
   await expect(page).toHaveURL(/\/population\/region\/tbilisi$/);
   await expect(page.getByTestId("region-member-row")).toHaveCount(0);

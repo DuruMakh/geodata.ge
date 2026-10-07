@@ -105,7 +105,7 @@ The existing municipality map, unchanged in behaviour (§3.2). The only addition
 
 Each side KPI that is a series carries a `Sparkline` of it over the active range with a `null` between 2024 and 2025 so it is two segments. If the end year is before 2015, the region and municipality cells print `—` and say regional data starts in 2015. Ties break by registry order.
 
-**The density note.** Georgia's page (the densest region) and every region's page (its own density, Tbilisi's included) show a density, so each carries the index's density note (§3.2), in the same words, directly under the key indicators; the area is read from the reviewed mapping, not typed. A municipality's page shows no density and carries no note.
+**The density note.** Georgia's page (the densest region) and every region's page (its own density, Tbilisi's included) show a density, so each carries the index's density note (§3.2), in the same words, at the foot of the key indicators, under their note; the area is read from the reviewed mapping, not typed. A municipality's page shows no density and carries no note.
 
 ## 7. State
 
@@ -172,7 +172,7 @@ Owner, 2026-10-07: the Population pages use the Budget → Municipalities layout
 
 Defaults taken in this specification, open for review:
 
-1. **Density** is not a map or a toggle. It prints under each region's persons in the list and is a key figure on each region's page (Georgia's page shows the densest region's), with the area note under the key indicators of both (§3.2, §6).
+1. **Density** is not a map or a toggle. It prints under each region's persons in the list and is a key figure on each region's page (Georgia's page shows the densest region's), with the area note at the foot of the key indicators of both, under their note (§3.2, §6).
 2. **Tbilisi is one place** with one page (§3.5).
 3. **No "% share" toggle** on the chart. The Budget pages have one; here the parts' shares would sit beside a series that is not comparable across the break.
 4. **The census note** is shown on the index (under the map), on place pages (under the chart) and in the table caption.
