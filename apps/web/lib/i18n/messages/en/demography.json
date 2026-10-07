@@ -24,6 +24,8 @@
   "demography.densityNote": "Density is the 1 January population divided by one fixed area as of March 2014, occupied territories excluded. Tbilisi is {area} km² in Geostat's convention, not the 726 km² often cited.",
   "demography.rowYear": "Population on 1 January {year}",
   "demography.placeHeader": "Place",
+  "demography.placeHeading": "Population —",
+  "demography.backToIndex": "← Population",
   "demography.rangeChanged": "Period {start}–{end}",
   "demography.breakLabel": "Census re-base",
   "demography.censusNote": "On 1 January 2025 Geostat re-based the population to the 2024 census, adding about {count} people. Figures before and after are on different bases and are not compared.",
