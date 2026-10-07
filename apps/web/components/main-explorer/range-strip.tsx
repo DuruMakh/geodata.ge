@@ -163,7 +163,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
   }
 
   const handleClass =
-    "absolute -top-1 size-[30px] -translate-x-1/2 cursor-pointer rounded-full border-0 bg-transparent p-0 before:absolute before:top-1/2 before:left-1/2 before:size-[15px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border-2 before:border-[var(--accent)] before:bg-[var(--paper)] before:shadow-[0_1px_3px_rgba(30,27,22,0.15)] before:content-['']";
+    "absolute -top-1 size-[30px] -translate-x-1/2 max-[768px]:-top-[11px] max-[768px]:size-11 cursor-pointer rounded-full border-0 bg-transparent p-0 before:absolute before:top-1/2 before:left-1/2 before:size-[15px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border-2 before:border-[var(--accent)] before:bg-[var(--paper)] before:shadow-[0_1px_3px_rgba(30,27,22,0.15)] before:content-['']";
 
   return (
     <div data-testid="year-range-strip" className="mt-[22px] border-t border-[var(--hairline)] pt-4">
@@ -194,7 +194,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
                 type="button"
                 aria-pressed={active}
                 onClick={() => onChange({ start: chip.start, end: max })}
-                className={`-mx-1.5 -my-[7px] cursor-pointer px-1.5 py-[7px] font-[family-name:var(--font-numeric)] text-[11px] ${
+                className={`-mx-1.5 -my-[7px] min-w-8 cursor-pointer px-1.5 py-[7px] text-center font-[family-name:var(--font-numeric)] text-[11px] ${
                   active
                     ? "font-semibold text-[var(--ink)] underline decoration-[var(--accent)] underline-offset-4"
                     : "font-normal text-[var(--muted)] hover:text-[var(--ink)]"
@@ -216,7 +216,8 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
         aria-label={message(messages, monthly ? "controls.monthRange" : "controls.yearRange")}
         // A marker label sits above the rail; the extra top margin keeps it clear of
         // the range chips, which it overlapped on phones. Below 768px the rail is
-        // inset 8px so a handle at rest stays out of the edge-swipe (back) zone.
+        // inset 8px so a handle at rest stays out of the edge-swipe (back) zone, and the
+        // handles' invisible hit area grows to 44px around the same 15px dot.
         className={`relative ${visibleMarker ? "mt-7" : "mt-3"} h-6 cursor-pointer touch-none max-[768px]:mx-2`}
       >
         <div className="absolute inset-x-0 top-2.5 h-[3px] bg-[var(--hairline-soft)]" />
@@ -233,7 +234,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
             {/* Shifted by its own width in proportion to the marker position, so a marker
                 near either end keeps its label inside the strip. */}
             <span
-              className="absolute -top-4 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[9px] font-medium text-[var(--accent)]"
+              className="absolute -top-4 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] font-medium text-[var(--accent)] min-[768px]:text-[9px]"
               style={{ transform: `translateX(-${pct(visibleMarker.year)})` }}
             >
               {visibleMarker.label}
@@ -270,8 +271,8 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
         />
       </div>
       <div className="mt-1.5 flex justify-between">
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{format(min)}</span>
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{format(max)}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)] min-[768px]:text-[10.5px]">{format(min)}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)] min-[768px]:text-[10.5px]">{format(max)}</span>
       </div>
     </div>
   );
@@ -302,7 +303,8 @@ function PeriodPicker({ handle, value, lo, hi, periods, periodsPerYear, formatMo
     const next = nearestPeriod(periods, nextYear, nextSub, periodsPerYear, lo, hi);
     if (next !== value) onChange(handle === "start" ? { start: next } : { end: next });
   };
-  const selectClass = "absolute inset-0 size-full cursor-pointer appearance-none opacity-0";
+  // The select reaches 14px above and below the token, so a finger gets a ~44px-tall target.
+  const selectClass = "absolute -inset-x-1 -inset-y-3.5 cursor-pointer appearance-none opacity-0";
   const tokenClass =
     "relative inline-block underline decoration-[var(--faint)] decoration-dotted underline-offset-[3px] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--accent)]";
 
