@@ -120,3 +120,12 @@ test("landing calls to action are 44px tap targets", async ({ page }) => {
   ];
   for (const target of targets) expect((await target.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
+
+test("404 recovers to the four datasets with no top band on a phone", async ({ page }) => {
+  await page.goto("/this-page-does-not-exist");
+  const recovery = page.getByTestId("not-found-recovery");
+  const hrefs = await recovery.getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]);
+  expect((await recovery.boundingBox())?.y ?? 999).toBeLessThanOrEqual(40);
+  await expect(page.locator('a[href="/sitemap.xml"], a[href="/llms.txt"]')).toHaveCount(0);
+});

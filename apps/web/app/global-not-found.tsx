@@ -5,18 +5,31 @@ import "./globals.css";
 
 export const metadata: Metadata = { ...rootMetadata("ka"), robots: { index: false, follow: true } };
 
+// People-facing recovery: the homepage, the four dataset hubs and methodology.
+// The XML sitemap and the agent guide stay published for machines; on a phone
+// they opened raw files.
 const destinations = [
   { href: "/", label: "მთავარი გვერდი" },
-  { href: "/explorer", label: "მონაცემების ექსპლორერი" },
+  { href: "/explorer", label: "ბიუჯეტი" },
+  { href: "/explorer/economy", label: "ეკონომიკა" },
+  { href: "/explorer/inflation", label: "ინფლაცია" },
+  { href: "/explorer/unemployment", label: "უმუშევრობა" },
   { href: "/methodology", label: "მეთოდოლოგია" },
-  { href: "/sitemap.xml", label: "საიტის რუკა (XML)" },
-  { href: "/llms.txt", label: "აგენტების გზამკვლევი (LLM)" },
+] as const;
+
+const englishDestinations = [
+  ["/en", "Home"],
+  ["/en/explorer", "Budget"],
+  ["/en/explorer/economy", "Economy"],
+  ["/en/explorer/inflation", "Inflation"],
+  ["/en/explorer/unemployment", "Unemployment"],
+  ["/en/methodology", "Methodology"],
 ] as const;
 
 export default function NotFound() {
   return (
     <RootDocument locale="ka"><main className="min-h-screen bg-[var(--paper)] px-5 py-6 text-[var(--ink)] min-[768px]:px-7 min-[768px]:py-8">
-      <div className="mx-auto max-w-[760px] pt-[min(18vh,11rem)]">
+      <div className="mx-auto max-w-[760px] min-[768px]:pt-[min(18vh,11rem)]">
         <section data-testid="not-found-recovery" className="border-t-2 border-[var(--ink)] pt-5">
           <p className="font-[family-name:var(--font-numeric)] text-[11px] font-medium tracking-[0.08em] text-[var(--muted)]">
             FISCAL.GE · 404
@@ -47,8 +60,8 @@ export default function NotFound() {
         <section lang="en" className="mt-12 border-t border-[var(--hairline)] pt-5">
           <h2 className="font-[family-name:var(--font-display)] text-[28px] font-semibold">Page not found</h2>
           <p className="mt-4 text-[15px] leading-[1.8] text-[var(--body)]">This address does not exist or the page has moved. Continue with one of the links below.</p>
-          <nav aria-label="Recovery links" className="mt-5 flex flex-wrap gap-5">
-            {[["/en", "Home"], ["/en/explorer", "Explore the data"], ["/en/methodology", "Methodology"]].map(([href, label]) => (
+          <nav aria-label="Recovery links" className="mt-5 flex flex-wrap gap-x-5">
+            {englishDestinations.map(([href, label]) => (
               <Link key={href} href={href} prefetch={false} className="flex min-h-11 items-center text-[14px] underline">{label}</Link>
             ))}
           </nav>

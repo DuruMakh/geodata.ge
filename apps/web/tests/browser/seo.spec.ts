@@ -233,7 +233,7 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
 
   expect(response.status()).toBe(404);
   expect(response.headers()["content-type"]?.toLowerCase()).toContain("text/html");
-  for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+  for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]) {
     expect(html).toContain(`href=\"${href}\"`);
   }
 
@@ -260,8 +260,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    await expect(links).toHaveCount(5);
-    for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+    await expect(links).toHaveCount(6);
+    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
     await expectNoPageOverflow(page);
