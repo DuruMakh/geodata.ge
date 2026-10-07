@@ -42,7 +42,7 @@ describe("place addresses", () => {
     expect(populationPlaceHref("04")).toBe("/explorer/demography/population/region/tbilisi");
   });
 
-  test("an unknown place has no address", () => {
+  test("a municipality code the registry does not have has no address", () => {
     expect(() => populationPlaceHref("99")).toThrow(/No population page/);
   });
 
