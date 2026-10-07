@@ -1,6 +1,15 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
+import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SwatchBar } from "../ui/editorial";
@@ -33,22 +42,29 @@ export function ChartScrollFrame({
   testId = "chart-frame",
   scrollKey,
   yAxis,
+  overlay,
 }: {
   children: ReactNode;
   testId?: string;
   scrollKey?: string;
   yAxis?: StickyYAxis;
+  /** Drawn over the visible part of the frame, whatever its scroll position (a tapped readout). */
+  overlay?: ReactNode;
 }) {
   const { messages } = useI18n();
   const scroller = useRef<HTMLDivElement>(null);
   // Starts false on the server and the client alike, so hydration matches; the
   // sticky axis only appears once the browser has measured an overflow.
   const [overflowing, setOverflowing] = useState(false);
+  const [visibleWidth, setVisibleWidth] = useState(0);
 
   useEffect(() => {
     const element = scroller.current;
     if (!element) return;
-    const measure = () => setOverflowing(element.scrollWidth > element.clientWidth + 1);
+    const measure = () => {
+      setOverflowing(element.scrollWidth > element.clientWidth + 1);
+      setVisibleWidth(element.clientWidth);
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
@@ -83,14 +99,100 @@ export function ChartScrollFrame({
             {yAxis.node}
           </div>
         ) : null}
+        {overlay ? (
+          <div
+            className="pointer-events-none sticky left-0 z-[3] col-start-1 row-start-1"
+            style={{ width: visibleWidth > 0 ? `${visibleWidth}px` : "100%" }}
+          >
+            {overlay}
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
 
-/** The bounded hover readout (DESIGN.md §8.3): absolutely positioned, so it never moves the page. */
+export type PinnedSide = "left" | "right";
+
+/**
+ * Pointer state shared by the SVG charts. A mouse reads the chart by hovering.
+ * Touch has no hover, and a touch pointer "leaves" on every pointerup, so a tap
+ * pins the readout instead: the tapped period stays active until the same period
+ * is tapped again or a tap lands outside the chart. Drags are left to the
+ * browser, so vertical page scrolling and the frame's sideways scroll still work.
+ */
+export function useChartPointer(count: number, width: number, padLeft: number, padRight: number) {
+  const [hoverRaw, setHoverRaw] = useState<number | null>(null);
+  const [pinnedRaw, setPinned] = useState<PinnedSide | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const lastPointerType = useRef("mouse");
+  // The index survives range shrinks (no pointer event fires), so clamp it
+  // instead of trusting it — a stale index would render a ghost tooltip.
+  const hover = hoverRaw !== null && hoverRaw < count ? hoverRaw : null;
+  const pinned = hover !== null && pinnedRaw ? pinnedRaw : null;
+  const setState = (next: { index: number; pinned: PinnedSide | null } | null) => {
+    setHoverRaw(next === null ? null : next.index);
+    setPinned(next === null ? null : next.pinned);
+  };
+
+  useEffect(() => {
+    if (pinned === null) return;
+    const release = (event: PointerEvent) => {
+      if (svgRef.current?.contains(event.target as Node)) return;
+      setHoverRaw(null);
+      setPinned(null);
+    };
+    document.addEventListener("pointerdown", release);
+    return () => document.removeEventListener("pointerdown", release);
+  }, [pinned]);
+
+  const indexAt = (event: { clientX: number; currentTarget: Element }) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return nearestPeriodIndex((event.clientX - rect.left) / rect.width, count, width, padLeft, padRight);
+  };
+
+  const handlers = {
+    onPointerDown: (event: ReactPointerEvent<SVGSVGElement>) => {
+      lastPointerType.current = event.pointerType;
+    },
+    onPointerMove: (event: ReactPointerEvent<SVGSVGElement>) => {
+      if (event.pointerType === "touch" || count === 0) return;
+      const index = indexAt(event);
+      if (index !== hover || pinned !== null) setState({ index, pinned: null });
+    },
+    onPointerLeave: (event: ReactPointerEvent<SVGSVGElement>) => {
+      if (event.pointerType !== "touch") setState(null);
+    },
+    onClick: (event: ReactMouseEvent<SVGSVGElement>) => {
+      if (lastPointerType.current !== "touch" || count === 0) return;
+      const index = indexAt(event);
+      if (pinned !== null && index === hover) {
+        setState(null);
+        return;
+      }
+      // The readout goes to the half of the visible frame the finger is not on.
+      const visible = (event.currentTarget.closest('[role="region"]') ?? event.currentTarget).getBoundingClientRect();
+      setState({ index, pinned: event.clientX - visible.left > visible.width / 2 ? "left" : "right" });
+    },
+  };
+
+  return {
+    svgRef,
+    hover,
+    pinned,
+    setHover: (index: number | null) => setState(index === null ? null : { index, pinned: null }),
+    handlers,
+  };
+}
+
+/**
+ * The bounded hover readout (DESIGN.md §8.3): absolutely positioned, so it never
+ * moves the page. A pinned (tapped) readout sits in a top corner of the frame's
+ * visible part instead of beside the guide, so a scrolled phone frame never cuts it.
+ */
 export function ChartTooltip({
   leftPercent,
+  pinned = null,
   header,
   headerRight = null,
   rows,
@@ -100,6 +202,7 @@ export function ChartTooltip({
   testId = "chart-tooltip",
 }: {
   leftPercent: number;
+  pinned?: PinnedSide | null;
   header: string;
   headerRight?: string | null;
   rows: TooltipRow[];
@@ -112,11 +215,16 @@ export function ChartTooltip({
   return (
     <div
       data-testid={testId}
+      data-pinned={pinned ?? undefined}
       className="pointer-events-none absolute top-0 z-[2] flex max-h-full min-w-[200px] flex-col gap-1 overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
-      style={{
-        left: `${leftPercent}%`,
-        transform: leftPercent > 60 ? "translateX(calc(-100% - 12px))" : "translateX(12px)",
-      }}
+      style={
+        pinned === null
+          ? {
+              left: `${leftPercent}%`,
+              transform: leftPercent > 60 ? "translateX(calc(-100% - 12px))" : "translateX(12px)",
+            }
+          : { [pinned]: "8px", maxWidth: "calc(100% - 16px)" }
+      }
     >
       <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
         <span>{header}</span>

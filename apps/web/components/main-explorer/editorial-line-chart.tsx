@@ -2,14 +2,12 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
 import { AXIS_LABEL_GAP, axisLeftPaddingFor, decimalsFor, niceScale } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE } from "../../lib/explorer/colors";
-import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
-import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
+import { ChartScrollFrame, ChartTooltip, useChartPointer } from "./chart-frame";
 
 // Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
 // lattice for the grid, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
@@ -90,11 +88,7 @@ export function EditorialLineChart({
   formatTooltipValue,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
-  const [hoverRaw, setHover] = useState<number | null>(null);
   const n = years.length;
-  // The hover index survives range shrinks (no pointer event fires), so clamp it
-  // instead of trusting it — a stale index would render a ghost tooltip.
-  const hover = hoverRaw !== null && hoverRaw < n ? hoverRaw : null;
 
   // The domain must cover negative values (e.g. revenue.other_taxes 2019-2020):
   // both bounds snap to one shared gridline step so 0 always sits on a line.
@@ -146,11 +140,7 @@ export function EditorialLineChart({
     firstPeriod: years[0],
   });
 
-  function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const index = nearestPeriodIndex((event.clientX - rect.left) / rect.width, n, W, axisLeftPadding, PAD_R);
-    if (index !== hoverRaw) setHover(index);
-  }
+  const { svgRef, hover, pinned, handlers } = useChartPointer(n, W, axisLeftPadding, PAD_R);
 
   const axisText = (value: number, index: number) => (
     <text key={`axis-${index}`} x={axisLeftPadding - AXIS_LABEL_GAP} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
@@ -171,16 +161,29 @@ export function EditorialLineChart({
 
   const hoverX = hover === null ? null : (x(hover) / W) * 100;
   const tooltip = hover === null ? null : buildTooltipRows(series, hover);
+  const readout =
+    hover !== null && hoverX !== null && tooltip !== null ? (
+      <ChartTooltip
+        leftPercent={hoverX}
+        pinned={pinned}
+        header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
+        headerRight={share ? shareLabel : null}
+        rows={tooltip.rows}
+        hidden={tooltip.hidden}
+        formatValue={formatValue}
+        preliminaryLabel={preliminaryLabel}
+      />
+    ) : null;
 
   return (
-    <ChartScrollFrame scrollKey={scrollKey} yAxis={stickyAxis}>
+    <ChartScrollFrame scrollKey={scrollKey} yAxis={stickyAxis} overlay={pinned !== null ? readout : null}>
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         role="img"
         aria-label={message(messages, "controls.chartTrend")}
         className="block h-auto w-full"
-        onPointerMove={handlePointerMove}
-        onPointerLeave={() => setHover(null)}
+        {...handlers}
       >
         {lattice ? (
           <>
@@ -340,17 +343,7 @@ export function EditorialLineChart({
           );
         })}
       </svg>
-      {hover !== null && hoverX !== null && tooltip !== null ? (
-        <ChartTooltip
-          leftPercent={hoverX}
-          header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
-          headerRight={share ? shareLabel : null}
-          rows={tooltip.rows}
-          hidden={tooltip.hidden}
-          formatValue={formatValue}
-          preliminaryLabel={preliminaryLabel}
-        />
-      ) : null}
+      {pinned === null ? readout : null}
     </ChartScrollFrame>
   );
 }

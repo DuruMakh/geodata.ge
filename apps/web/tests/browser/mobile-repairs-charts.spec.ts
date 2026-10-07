@@ -64,6 +64,56 @@ for (const [path, testId] of [
   });
 }
 
+// Charts only listened to pointermove/pointerleave, so touch never showed a value.
+for (const [path, frameId, tooltipId] of [
+  ["/explorer/expenditure", "chart-frame", "chart-tooltip"],
+  ["/explorer/unemployment/overview", "stack-chart-frame", "stack-chart-tooltip"],
+] as const) {
+  test(`a tap reads ${frameId} inside the visible frame (${path})`, async ({ page }) => {
+    await ready(page, path);
+    const frame = page.getByTestId(frameId).first();
+    await frame.scrollIntoViewIfNeeded();
+    const box = (await frame.boundingBox())!;
+    const tooltip = page.getByTestId(tooltipId);
+
+    for (const fraction of [0.2, 0.8]) {
+      await page.touchscreen.tap(box.x + box.width * fraction, box.y + box.height * 0.5);
+      await expect(tooltip).toBeVisible();
+      await expect(tooltip).toHaveAttribute("data-pinned", fraction < 0.5 ? "right" : "left");
+      const tip = (await tooltip.boundingBox())!;
+      expect(tip.x).toBeGreaterThanOrEqual(box.x);
+      expect(tip.x + tip.width).toBeLessThanOrEqual(box.x + box.width + 0.5);
+      expect(tip.width).toBeGreaterThan(150);
+
+      // The same period again lets it go.
+      await page.touchscreen.tap(box.x + box.width * fraction, box.y + box.height * 0.5);
+      await expect(tooltip).toHaveCount(0);
+    }
+
+    // A tap anywhere else lets it go too.
+    await page.touchscreen.tap(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await expect(tooltip).toBeVisible();
+    await page.getByRole("heading", { level: 1 }).tap();
+    await expect(tooltip).toHaveCount(0);
+  });
+}
+
+test("a vertical swipe over a chart still scrolls the page", async ({ page }) => {
+  await ready(page, "/explorer/expenditure");
+  const frame = page.getByTestId("chart-frame");
+  await frame.scrollIntoViewIfNeeded();
+  const box = (await frame.boundingBox())!;
+  const before = await page.evaluate(() => scrollY);
+  const cdp = await page.context().newCDPSession(page);
+  const x = box.x + box.width / 2;
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y: box.y + box.height - 10 }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: box.y + box.height / 2 }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: box.y + 10 }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(before);
+  await expect(page.getByTestId("chart-tooltip")).toHaveCount(0);
+});
+
 test("a range change re-opens the chart at the latest data", async ({ page }) => {
   await ready(page, "/explorer/expenditure");
   const frame = page.getByTestId("chart-frame");

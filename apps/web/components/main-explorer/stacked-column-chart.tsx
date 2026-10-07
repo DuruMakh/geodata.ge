@@ -1,12 +1,12 @@
 "use client";
 
-import { useId, useState, type KeyboardEvent, type PointerEvent } from "react";
-import { nearestPeriodIndex, stepPeriodIndex } from "../../lib/explorer/chartNavigation";
+import { useId, type KeyboardEvent } from "react";
+import { stepPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { decimalsFor, niceScale } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE, INK } from "../../lib/explorer/colors";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
-import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
+import { ChartScrollFrame, ChartTooltip, useChartPointer } from "./chart-frame";
 import { buildTooltipRows } from "./editorial-line-chart";
 
 // Bespoke SVG stacked column chart per DESIGN.md §8.3, the only form in which
@@ -51,9 +51,8 @@ export function StackedColumnChart({
   ariaLabel,
 }: StackedColumnChartProps) {
   const captionId = useId();
-  const [hoverRaw, setHover] = useState<number | null>(null);
   const count = periods.length;
-  const hover = hoverRaw !== null && hoverRaw < count ? hoverRaw : null;
+  const { svgRef, hover, pinned, setHover, handlers } = useChartPointer(count, W, PAD_L, PAD_R);
 
   // The domain covers the tallest positive stack and the deepest negative one, so
   // zero always sits on a gridline and the two halves share one step.
@@ -124,13 +123,6 @@ export function StackedColumnChart({
         );
   const overlayAtHover = hover === null || overlay === null ? null : overlay.values[hover] ?? null;
 
-  function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
-    if (count === 0) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const index = nearestPeriodIndex((event.clientX - rect.left) / rect.width, count, W, PAD_L, PAD_R);
-    if (index !== hoverRaw) setHover(index);
-  }
-
   const axisText = (value: number) => (
     <text
       key={`axis-${value}`}
@@ -155,6 +147,20 @@ export function StackedColumnChart({
   };
   const scrollKey = `${periods[0]}-${periods[count - 1]}-${segments.map((segment) => segment.id).join(",")}`;
 
+  const readout =
+    hover !== null && tooltip !== null && tooltip.rows.length > 0 ? (
+      <ChartTooltip
+        testId="stack-chart-tooltip"
+        pinned={pinned}
+        leftPercent={(x(hover) / W) * 100}
+        header={formatPeriod(periods[hover]!)}
+        headerRight={overlay !== null && overlayAtHover !== null ? `${overlay.label} ${formatValue(overlayAtHover)}` : null}
+        rows={tooltip.rows}
+        hidden={tooltip.hidden}
+        formatValue={formatValue}
+      />
+    ) : null;
+
   function handleKeyDown(event: KeyboardEvent<SVGSVGElement>) {
     const next = stepPeriodIndex(event.key, hover, count);
     if (next === undefined) return;
@@ -166,16 +172,16 @@ export function StackedColumnChart({
     // role="img" belongs on the svg, not the figure: it is children-presentational,
     // so on the figure it would hide the sr-only figcaption that carries the numbers.
     <figure className="m-0">
-      <ChartScrollFrame testId="stack-chart-frame" scrollKey={scrollKey} yAxis={stickyAxis}>
+      <ChartScrollFrame testId="stack-chart-frame" scrollKey={scrollKey} yAxis={stickyAxis} overlay={pinned !== null ? readout : null}>
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${W} ${H}`}
           className="block h-auto w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
           role="img"
           aria-label={ariaLabel}
           aria-describedby={captionId}
           tabIndex={0}
-          onPointerMove={handlePointerMove}
-          onPointerLeave={() => setHover(null)}
+          {...handlers}
           onKeyDown={handleKeyDown}
           onBlur={() => setHover(null)}
         >
@@ -268,17 +274,7 @@ export function StackedColumnChart({
           )}
         </svg>
 
-        {hover !== null && tooltip !== null && tooltip.rows.length > 0 ? (
-          <ChartTooltip
-            testId="stack-chart-tooltip"
-            leftPercent={(x(hover) / W) * 100}
-            header={formatPeriod(periods[hover]!)}
-            headerRight={overlay !== null && overlayAtHover !== null ? `${overlay.label} ${formatValue(overlayAtHover)}` : null}
-            rows={tooltip.rows}
-            hidden={tooltip.hidden}
-            formatValue={formatValue}
-          />
-        ) : null}
+        {pinned === null ? readout : null}
       </ChartScrollFrame>
 
       {/* The chart is never colour-only: the same numbers read as text. */}
