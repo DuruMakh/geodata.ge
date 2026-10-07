@@ -25,7 +25,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
         await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
         await expect(page.getByTestId("chart-panel")).toHaveCount(0);
       } else await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
-      if (section === "overview" || section === "regions") await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
+      if (section !== "age") await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
       else await expect(page.getByTestId("unemployment-headline")).toContainText("13.9%");
       await expect(page.getByTestId("unemployment-breakdown")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
@@ -93,6 +93,78 @@ test("national tabs keep valid metrics, coverage and reference selection", async
   await expect(page.locator('[data-series-id="women"]')).toContainText("11.4%");
   await expect(page.locator('[data-series-id="women"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
+});
+
+for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+  test(`gender indicators expand beneath Men and Women ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+    const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`${prefix}/explorer/unemployment/gender`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const row = (id: string) => page.locator(`[data-series-id="${id}"]`);
+    const toggle = (id: string) => row(id).getByTestId("series-row-toggle");
+    await expect(page.getByTestId("unemployment-indicator")).toHaveCount(0);
+    await expect(page.getByTestId("series-row-toggle")).toHaveCount(3);
+    await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
+    await expect(row("georgia:unemployment_rate")).toContainText("13.9%");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 7");
+    for (const group of ["men", "women"]) {
+      const expand = row(`${group}:unemployment_rate`).locator("button[aria-expanded]");
+      await expand.focus(); await expand.press("Space");
+      await expect(expand).toHaveAttribute("aria-expanded", "true");
+      await expect(page.locator(`[data-parent-id="${group}:unemployment_rate"]`)).toHaveCount(7);
+      await expect(row(`${group}:employment_rate`)).toBeVisible();
+    }
+    await toggle("women:employment_rate").click();
+    await toggle("men:participation_rate").click();
+    await expect(page.getByTestId("series-status")).toContainText("3 / 7");
+    await toggle("women:unemployed").click();
+    await toggle("men:employed").click();
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
+    await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "false");
+    await expect(toggle("women:employment_rate")).toHaveAttribute("aria-pressed", "false");
+    await expect(toggle("men:participation_rate")).toHaveAttribute("aria-pressed", "false");
+    await page.getByTestId("chart-mode-table").click();
+    await page.getByTestId("range-start-handle").focus(); await page.getByTestId("range-start-handle").press("End");
+    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(2);
+    await expect(page.getByTestId("explorer-table")).toContainText("79.4");
+    await expect(page.getByTestId("explorer-table")).toContainText("770.2");
+    await page.screenshot({ path: info.outputPath(`unemployment-gender-expanded-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
+    await page.getByTestId("series-search").fill("participation");
+    await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
+    await expect(page.getByTestId("series-status")).toContainText("10 / 10");
+    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(10);
+    await page.getByTestId("series-search").fill("");
+    await toggle("women:unemployment_rate").click();
+    await expect(page.getByTestId("series-status")).toContainText("1 / 7");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
+    await expect(page.getByTestId("explorer-table")).toContainText("11.4%");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(errors).toEqual([]);
+  });
+}
+
+test("gender count selections survive history, language changes and Excel download", async ({ page }) => {
+  await page.goto("/en/explorer/unemployment/gender#indicator=unemployed&view=table&start=2025&end=2025&sel=women,men");
+  const toggle = (id: string) => page.locator(`[data-series-id="${id}"] [data-testid="series-row-toggle"]`);
+  await expect(toggle("women:unemployed")).toHaveAttribute("aria-pressed", "true");
+  await expect(toggle("men:unemployed")).toHaveAttribute("aria-pressed", "true");
+  await toggle("women:employed").click();
+  await page.goBack(); await expect(toggle("women:employed")).toHaveAttribute("aria-pressed", "false");
+  await page.goForward(); await expect(toggle("women:employed")).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("link", { name: "ქართული", exact: true }).click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
+  await page.reload();
+  await expect(page.getByTestId("series-status")).toContainText("3 / 10");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2025–2025");
+  const downloadPromise = page.waitForEvent("download"); await page.getByTestId("unemployment-excel-download").click();
+  const download = await downloadPromise;
+  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
+  expect(workbook.worksheets).toHaveLength(3);
+  expect(workbook.worksheets[0].getCell("B4").value).toBeCloseTo(144.58946215608808, 10);
+  expect(workbook.worksheets[0].getCell("B5").value).toBeCloseTo(79.40887847046638, 10);
+  expect(workbook.worksheets[0].getCell("B6").value).toBeCloseTo(619.47560792423394, 10);
+  expect(workbook.worksheets[2].getCell("D4").value).toMatchObject({ hyperlink: "https://fiscal.ge/downloads/methodology/unemployment/files/02-labour-force-indicators-by-sex.xlsx" });
 });
 
 for (const [breakdown, group, query] of [["settlement", "urban", "Urban"], ["education", "education.higher", "Higher"]]) test(`clicking the active national tab preserves the ${breakdown} comparison`, async ({ page }) => {

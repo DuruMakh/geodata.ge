@@ -91,3 +91,12 @@ test.each(["ka", "en"] as const)("overview exports every selected indicator with
   expect(excel.worksheets[1].getCell("C2").numFmt).toBe("#,##0.0");
   expect(model.sources).toHaveLength(1);
 });
+
+test.each(["ka", "en"] as const)("gender exports identify each group's selected indicator in %s", async locale => {
+  const state = parseUnemploymentHash("sel=women:unemployed,men:employed&start=2025&end=2025", facts, UNEMPLOYMENT_GROUPS, "gender");
+  const model = await workbook(locale, state);
+  expect(model.readable.rows.map(row => row.label)).toEqual(locale === "en" ? ["Men · Employed people", "Women · Unemployed people"] : ["კაცები · დასაქმებულები", "ქალები · უმუშევრები"]);
+  expect(model.readable.rows.map(row => row.valuesByYear[2025])).toEqual([770.17689056414815, 79.40887847046638]);
+  expect(model.readable.numberFormat).toBe("#,##0.0");
+  expect(model.sources.map(source => source.downloadHref)).toEqual(["/downloads/methodology/unemployment/files/02-labour-force-indicators-by-sex.xlsx"]);
+});

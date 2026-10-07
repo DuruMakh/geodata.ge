@@ -68,7 +68,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />
     </div> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
-    {section !== "overview" && section !== "regions" ? <><p data-testid="unemployment-headline" className="mb-2 text-[13px] text-[var(--body)]">
+    {section === "age" ? <><p data-testid="unemployment-headline" className="mb-2 text-[13px] text-[var(--body)]">
       {labels.get(model.referenceId)} · {indicatorLabel} · {model.headline?.year ?? "—"}: <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{valueLabel(model.headline?.value)}</span>
     </p>
     <p className="mb-[30px] text-[12px] leading-relaxed text-[var(--muted)]">{t("surveyEstimate")}{noteKey ? ` · ${t(noteKey)}` : ""}</p></> : null}
@@ -82,7 +82,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")}
               options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
-            {section !== "overview" && section !== "regions" ? <label className="min-w-0 w-full text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]">{t("indicator")}
+            {section === "age" ? <label className="min-w-0 w-full text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]">{t("indicator")}
               <select data-testid="unemployment-indicator" value={state.indicator} className={selectClass} onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>
                 {unemploymentIndicators(state.breakdown).map(indicator => <option key={indicator} value={indicator}>{t(`indicator.${indicator}`)}</option>)}
               </select>

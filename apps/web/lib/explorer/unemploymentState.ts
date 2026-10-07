@@ -42,7 +42,9 @@ export function parseUnemploymentHash(hash: string, facts: readonly ClientUnempl
   const state: UnemploymentState = { indicator, breakdown, educationSex: sex === "women" || sex === "men" ? sex : "total", mode: p.get("view") === "table" ? "table" : "line", range: parseYearRangeKeys(p), selectedIds: [], ...(section === "overview" ? { overview: true as const } : {}), ...(section === "regions" ? { regional: true as const, ...(regionId ? { regionId } : {}) } : {}) };
   if (unemploymentUsesIndicatorSeries(state)) {
     const requested = p.has("sel") ? p.get("sel")!.split(",").map(id => id.includes(":") ? id : `${id}:${indicator}`) : [`${regionId ?? "georgia"}:${indicator}`];
-    return changeUnemploymentOverviewSelection(state, requested, facts, registry);
+    const next = changeUnemploymentOverviewSelection(state, requested, facts, registry);
+    if (breakdown === "sex" && !next.selectedIds.length && requested.includes(`georgia:${indicator}`)) return changeUnemploymentOverviewSelection(state, [unemploymentReferenceId(state)], facts, registry);
+    return next;
   }
   const validIds = new Set(unemploymentScopeFacts(facts, state).map(f => f.groupId).filter(id => registry.some(group => group.id === id)));
   state.selectedIds = p.has("sel") ? [...new Set(p.get("sel")!.split(","))].filter(id => validIds.has(id)) : [unemploymentReferenceId(state)];
