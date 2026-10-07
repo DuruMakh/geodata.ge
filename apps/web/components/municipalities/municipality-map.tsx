@@ -1,9 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
+import { pageHref } from "../../lib/i18n/routes";
+import { municipalityHrefForCode } from "../../lib/explorer/municipalityRoutes";
+import { useTouchPreview } from "../explorer-shell/use-touch-preview";
 import { MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
@@ -30,6 +34,7 @@ export function MunicipalityMap({
   shapes,
   markers,
   occupiedAreas,
+  touchTargets,
   legendMin,
   legendMax,
   activeCode,
@@ -41,6 +46,14 @@ export function MunicipalityMap({
   const svgRef = useRef<SVGSVGElement>(null);
   const [pointerCode, setPointerCode] = useState<string | null>(null);
   const [focusCode, setFocusCode] = useState<string | null>(null);
+  const preview = useTouchPreview();
+  const openOnClick = (code: string) => {
+    if (preview.opens(code)) onOpenMunicipality(code);
+  };
+  const isActive = (code: string) => code === activeCode || code === preview.previewId;
+  const previewTarget = preview.previewId === null
+    ? null
+    : markers.find((marker) => marker.code === preview.previewId) ?? shapes.find((shape) => shape.code === preview.previewId) ?? null;
   // Tbilisi (04) is the only entity the artifact carries as both a polygon and a
   // self-governing-city marker. The legend names the green dot
   // "თვითმმართველი ქალაქები", so the marker is the encoding that gets the
@@ -132,6 +145,7 @@ export function MunicipalityMap({
           role="group"
           aria-label={message(messages, "municipal.mapAria", { year: MUNICIPAL_PER_RESIDENT_YEAR })}
           className="block h-auto w-full"
+          onPointerDown={preview.onPointerDown}
         >
           <defs>
             <pattern id={HATCH_ID} patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(35)">
@@ -141,7 +155,7 @@ export function MunicipalityMap({
           </defs>
 
           {decorativeShapes.map((shape) => {
-            const active = shape.code === activeCode;
+            const active = isActive(shape.code);
 
             return (
               <use
@@ -164,7 +178,7 @@ export function MunicipalityMap({
                 className="cursor-pointer"
                 onMouseEnter={() => activatePointerTarget(shape.code)}
                 onMouseLeave={clearPointerTarget}
-                onClick={() => onOpenMunicipality(shape.code)}
+                onClick={() => openOnClick(shape.code)}
               />
             );
           })}
@@ -172,7 +186,7 @@ export function MunicipalityMap({
           {orderedTargets.map((target, targetIndex) => {
             if (target.kind === "shape") {
               const { shape } = target;
-              const active = shape.code === activeCode;
+              const active = isActive(shape.code);
 
               return (
                 <use
@@ -197,14 +211,14 @@ export function MunicipalityMap({
                   onMouseLeave={clearPointerTarget}
                   onFocus={() => activateFocusTarget(shape.code, targetIndex)}
                   onBlur={clearFocusTarget}
-                  onClick={() => onOpenMunicipality(shape.code)}
+                  onClick={() => openOnClick(shape.code)}
                   onKeyDown={(event) => handleTargetKeyDown(targetIndex, shape.code, event)}
                 />
               );
             }
 
             const { marker } = target;
-            const active = marker.code === activeCode;
+            const active = isActive(marker.code);
 
             return (
               <circle
@@ -229,11 +243,29 @@ export function MunicipalityMap({
                 onMouseLeave={clearPointerTarget}
                 onFocus={() => activateFocusTarget(marker.code, targetIndex)}
                 onBlur={clearFocusTarget}
-                onClick={() => onOpenMunicipality(marker.code)}
+                onClick={() => openOnClick(marker.code)}
                 onKeyDown={(event) => handleTargetKeyDown(targetIndex, marker.code, event)}
               />
             );
           })}
+
+          {/* Fingertip-sized hit areas for municipalities and city markers under
+              24px on a phone. Coarse pointers only, so mouse hover and clicks are
+              unchanged; hidden from assistive technology, which reaches each
+              municipality through its own target. */}
+          {touchTargets.map((target) => (
+            <circle
+              key={`touch:${target.id}`}
+              data-map-touch-target={target.id}
+              cx={target.cx}
+              cy={target.cy}
+              r={target.r}
+              fill="transparent"
+              aria-hidden="true"
+              className="pointer-events-none pointer-coarse:pointer-events-auto"
+              onClick={() => openOnClick(target.id)}
+            />
+          ))}
 
           {occupiedAreas.map((area) => (
             <use
@@ -254,6 +286,25 @@ export function MunicipalityMap({
           ))}
         </svg>
 
+      </div>
+
+      <div aria-live="polite">
+        {previewTarget ? (
+          <Link
+            href={pageHref(municipalityHrefForCode(previewTarget.code), locale)}
+            data-testid="map-touch-preview"
+            className="mt-2 flex min-h-11 items-center justify-between gap-3 border-t border-[var(--hairline-soft)] text-[13px] text-[var(--ink)]"
+          >
+            <span className="min-w-0">
+              <span className="font-semibold">{publicLabel(locale, previewTarget.code, previewTarget.nameKa, englishLabels)}</span>
+              {" · "}
+              <span className="font-[family-name:var(--font-numeric)]">{formatPerResidentGel(previewTarget.budgetPerResidentGel, locale)}</span>
+              {" "}
+              {message(messages, "municipal.perResident")}
+            </span>
+            <span aria-hidden className="text-[var(--accent)]">→</span>
+          </Link>
+        ) : null}
       </div>
 
       <div data-testid="municipality-map-legend" className="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">

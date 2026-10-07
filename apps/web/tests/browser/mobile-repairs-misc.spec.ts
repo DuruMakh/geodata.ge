@@ -7,6 +7,15 @@ async function ready(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
+// The economy regions index does not mark the body ready; wait for React to
+// attach its handlers to the map instead.
+async function mapHydrated(page: Page) {
+  await page.waitForFunction(() => {
+    const target = document.querySelector("[data-region-map-target]");
+    return target !== null && Object.keys(target).some((key) => key.startsWith("__reactProps"));
+  });
+}
+
 test.describe("phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
@@ -44,6 +53,81 @@ test.describe("phone", () => {
     expect(geometry.clipped).toBe(0);
     expect(geometry.pageOverflow).toBeLessThanOrEqual(0);
   });
+
+  test("economy map: Tbilisi gets a fingertip target, the first tap previews and the second opens (D7)", async ({ page }) => {
+    await page.goto("/explorer/economy/regions");
+    await mapHydrated(page);
+    expect(await page.evaluate(() => matchMedia("(pointer: coarse)").matches)).toBe(true);
+    const disk = page.locator("[data-map-touch-target='region.tbilisi']");
+    const box = (await disk.boundingBox())!;
+    expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(24);
+
+    await disk.tap();
+    const strip = page.getByTestId("map-touch-preview");
+    await expect(strip).toBeVisible();
+    await expect(strip).toContainText("თბილისი ·");
+    await expect(strip).toHaveAttribute("href", "/explorer/economy/regions/tbilisi");
+    expect((await strip.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    expect(new URL(page.url()).pathname).toBe("/explorer/economy/regions");
+    await expect(page.locator("[data-region-map-target][data-region-id='region.tbilisi']")).toHaveAttribute("data-active", "true");
+
+    // A different place replaces the preview; tapping it again opens it.
+    const kakheti = page.locator("[data-region-map-target][data-region-id='region.kakheti']");
+    await kakheti.tap();
+    await expect(strip).toContainText("კახეთი ·");
+    expect(new URL(page.url()).pathname).toBe("/explorer/economy/regions");
+    await kakheti.tap();
+    await page.waitForURL("**/explorer/economy/regions/kakheti");
+  });
+
+  test("unemployment map: the preview strip is a link to the region (D7), and the legend keeps min and max on one row", async ({ page }) => {
+    await page.goto("/en/explorer/unemployment/regions");
+    await ready(page);
+    const scale = page.getByTestId("regional-map-legend-scale");
+    const [minimum, ramp, maximum] = await scale.locator(":scope > span").evaluateAll((parts) => parts.map((part) => part.getBoundingClientRect()));
+    expect(Math.abs(minimum!.top + minimum!.height / 2 - (maximum!.top + maximum!.height / 2))).toBeLessThan(2);
+    expect(minimum!.right).toBeLessThanOrEqual(ramp!.left);
+    expect(ramp!.right).toBeLessThanOrEqual(maximum!.left);
+
+    await page.locator("[data-map-touch-target='region.tbilisi']").tap();
+    const strip = page.getByTestId("map-touch-preview");
+    await expect(strip).toContainText(/^Tbilisi · \d+\.\d%/);
+    await strip.tap();
+    await page.waitForURL("**/en/explorer/unemployment/regions/tbilisi");
+  });
+
+  test("municipal map: city markers preview on the first tap and the list scrolls with the page (D7)", async ({ page }) => {
+    await page.goto("/explorer/municipalities");
+    await ready(page);
+    const list = page.getByTestId("municipal-list-muni");
+    const scroll = await list.evaluate((element) => ({ client: element.clientHeight, scroll: element.scrollHeight, overflow: getComputedStyle(element).overflowY }));
+    expect(scroll.overflow).toBe("visible");
+    expect(scroll.client).toBe(scroll.scroll);
+
+    const disk = page.locator("[data-map-touch-target='04']");
+    expect(Math.min(...Object.values((await disk.boundingBox())!).slice(2))).toBeGreaterThanOrEqual(15);
+    await disk.tap();
+    const strip = page.getByTestId("map-touch-preview");
+    await expect(strip).toContainText(/^თბილისი · .+ ₾ ერთ მოსახლეზე/);
+    await expect(page.getByTestId("municipality-marker-04")).toHaveAttribute("data-active", "true");
+    expect(new URL(page.url()).pathname).toBe("/explorer/municipalities");
+
+    // Rustavi's dot sits under its fingertip disk, which takes the tap.
+    const rustavi = page.locator("[data-map-touch-target='48']");
+    await rustavi.tap();
+    await expect(strip).toContainText("რუსთავი");
+    await rustavi.tap();
+    await page.waitForURL("**/explorer/municipalities/rustavi");
+  });
+});
+
+test("mouse clicks still open a map place at once and the touch disks ignore the mouse", async ({ page }) => {
+  await page.goto("/explorer/economy/regions");
+  await mapHydrated(page);
+  expect(await page.locator("[data-map-touch-target='region.tbilisi']").evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");
+  await page.locator("[data-region-map-target][data-region-id='region.kakheti']").click();
+  await page.waitForURL("**/explorer/economy/regions/kakheti");
+  await expect(page.getByTestId("map-touch-preview")).toHaveCount(0);
 });
 
 test("treemap tiles stay inside the treemap at tablet width", async ({ page }) => {
