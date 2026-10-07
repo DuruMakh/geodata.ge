@@ -121,3 +121,47 @@ test.describe("the ↑ chart pill", () => {
     });
   });
 });
+
+test.describe("the phone legend", () => {
+  test("lists two or more lines with their latest values under the chart", async ({ page }) => {
+    await page.goto("/explorer/expenditure#g=fields&r=2004-2025&sel=expenditure.total%2Cspending.social_protection%2Cspending.education");
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend).toBeVisible();
+    await expect(legend.locator("li")).toHaveCount(3);
+    const total = legend.locator('li[data-series-id="expenditure.total"]');
+    await expect(total).toContainText("მთლიანი ხარჯი");
+    await expect(total).toContainText("27.7 მლრდ");
+    // Directly below the chart frame, inside the phone's width.
+    const frame = (await page.getByTestId("chart-frame").boundingBox())!;
+    const list = (await legend.boundingBox())!;
+    expect(list.y).toBeGreaterThanOrEqual(frame.y + frame.height - 1);
+    expect(list.y - (frame.y + frame.height)).toBeLessThanOrEqual(24);
+    expect(list.x + list.width).toBeLessThanOrEqual(390);
+  });
+
+  test("is absent for a single line and in table mode", async ({ page }) => {
+    await page.goto("/explorer/expenditure");
+    await expect(page.getByTestId("chart-frame")).toBeVisible();
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+    await page.goto("/explorer/expenditure#g=fields&m=table&sel=expenditure.total%2Cspending.social_protection");
+    await page.reload();
+    await expect(page.getByTestId("explorer-table")).toBeVisible();
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+  });
+
+  test("prints English percentages on the unemployment gender page", async ({ page }) => {
+    await page.goto("/en/explorer/unemployment/gender");
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend.locator("li")).toHaveCount(3);
+    for (const item of await legend.locator("li").all()) await expect(item).toContainText(/\d%$/);
+  });
+
+  test.describe("desktop", () => {
+    test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
+    test("leaves the chart's own labels alone", async ({ page }) => {
+      await page.goto("/explorer/expenditure#g=fields&sel=expenditure.total%2Cspending.social_protection");
+      await expect(page.getByTestId("chart-frame")).toBeVisible();
+      await expect(page.getByTestId("chart-phone-legend")).toBeHidden();
+    });
+  });
+});

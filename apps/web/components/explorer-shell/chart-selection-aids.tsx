@@ -2,13 +2,15 @@
 
 import { ArrowUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { ValueUnit } from "../../lib/explorer/format";
+import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SwatchBar } from "../ui/editorial";
 
 // Owner decision D4 (2026-10-07), phones only. Rendered directly under the chart (or
 // table) inside its chart panel (the nearest [data-chart-panel] or <section>):
+// - a compact legend of the selected lines, each with its latest value, when two or more
+//   lines are drawn (below 768px of column width);
 // - a floating "↑ chart" pill that appears when the selection changes while the chart is
 //   off-screen (stacked layouts, below 1100px), and leads back to it.
 
@@ -17,6 +19,17 @@ export type AidSeries = { id: string; label: string; color: string; vals: (numbe
 /** How long the pill waits for the next selection change before it leaves. */
 export const RETURN_PILL_MS = 4000;
 const SWATCH_CAP = 6;
+
+/** The legend's value for a line: its value in the last period drawn, formatted like the chart. */
+export function legendValue(
+  vals: readonly (number | null)[],
+  { share, unit, formatValue }: { share: boolean; unit: ValueUnit; formatValue?: (value: number) => string },
+): string {
+  const value = vals.at(-1);
+  if (value === null || value === undefined) return MISSING;
+  if (formatValue) return formatValue(value);
+  return share ? formatShare(value / 100) : `${formatInUnit(value, unit)} ${unit.label}`.trim();
+}
 
 /** Whether `visible` px of a `height` px element are enough to call it in view on a `viewport` px screen. */
 export function enoughInView(visible: number, height: number, viewport: number): boolean {
@@ -36,12 +49,14 @@ function chartInView(anchor: HTMLElement | null): boolean {
 export function ChartSelectionAids({
   series,
   chartShown,
+  share,
+  unit,
+  formatValue,
 }: {
   /** The selected series, in the chart's own units (shares ×100, as EditorialLineChart takes them). */
   series: AidSeries[];
-  /** The chart, not the table, is showing. */
+  /** The chart, not the table, is showing: the legend belongs under it. */
   chartShown: boolean;
-  /** Value formatting, as the chart's; read by the phone legend. */
   share: boolean;
   unit: ValueUnit;
   formatValue?: (value: number) => string;
@@ -82,6 +97,17 @@ export function ChartSelectionAids({
 
   return (
     <div ref={anchor}>
+      {chartShown && series.length >= 2 ? (
+        <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-[var(--muted)] @min-[768px]:hidden">
+          {series.map((line) => (
+            <li key={line.id} data-series-id={line.id} className="flex min-w-0 items-center gap-2">
+              <SwatchBar color={line.color} />
+              <span className="min-w-0 break-words">{line.label}</span>
+              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{legendValue(line.vals, { share, unit, formatValue })}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[max(16px,env(safe-area-inset-bottom))] @min-[1100px]:hidden">
         {pill ? (
           <button
