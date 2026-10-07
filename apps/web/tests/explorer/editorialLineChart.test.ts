@@ -37,17 +37,20 @@ function axisLabels(unit: ValueUnit, values: number[]): string[] {
 
 describe("EditorialLineChart amount axes", () => {
   it("uses distinct whole-million labels for small municipal series", () => {
-    expect(axisLabels(UNIT_MLN, [100_000, 900_000])).toEqual(["0 მლნ", "1 მლნ", "2 მლნ"]);
+    // The top is the first whole-million gridline past the data, not a snapped 2.
+    expect(axisLabels(UNIT_MLN, [100_000, 900_000])).toEqual(["0 მლნ", "1 მლნ"]);
   });
 
   it("uses distinct one-decimal-billion labels across a mixed-sign domain", () => {
     expect(axisLabels(UNIT_BN, [-150_000_000, 450_000_000])).toEqual([
-      "−0.3 მლრდ",
+      "−0.2 მლრდ",
+      "−0.1 მლრდ",
       "0.0 მლრდ",
+      "0.1 მლრდ",
+      "0.2 მლრდ",
       "0.3 მლრდ",
-      "0.6 მლრდ",
-      "0.9 მლრდ",
-      "1.2 მლრდ",
+      "0.4 მლრდ",
+      "0.5 მლრდ",
     ]);
   });
 });

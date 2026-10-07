@@ -1,12 +1,61 @@
 // Shared y-axis scale helpers for the bespoke SVG charts (DESIGN.md §8.3).
 
-/** The rounded top of a domain: the raw maximum plus 12% headroom, snapped to 1, 2, 2.5, 5 or 10 × 10ⁿ. */
-export function niceMax(rawMax: number): number {
-  const raw = rawMax * 1.12;
-  const magnitude = 10 ** Math.floor(Math.log10(raw));
-  const normalized = raw / magnitude;
-  const step = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 2.5 ? 2.5 : normalized <= 5 ? 5 : 10;
-  return step * magnitude;
+export type NiceScale = { top: number; bottom: number; step: number };
+
+const HEADROOM = 1.05;
+const NICE_MULTIPLIERS = [1, 2, 2.5, 5];
+// 4–7 gridline intervals: enough labels to read a value against, and at 7 the
+// lattice's three rows per step still clear its 12-unit density floor.
+const MIN_INTERVALS = 4;
+const MAX_INTERVALS = 7;
+
+/**
+ * The y domain of a chart: one gridline step shared by both sides of zero, so 0
+ * always sits on a gridline (DESIGN.md §8.3), with the top and bottom the first
+ * gridlines past the data plus 5% headroom. The step is chosen, not derived from
+ * a snapped maximum: snapping the top to 1/2/2.5/5/10 first put a 27.7 series
+ * under a 50 axis and a −45% low over a −100% floor.
+ *
+ * `quantum`, when given, is the smallest step the axis can print (an amount
+ * unit's last decimal); steps that are not a whole multiple of it are skipped,
+ * so the debt axis reads 0/10/20 rather than 0/13/26.
+ */
+export function niceScale(minValue: number, maxValue: number, quantum = 0): NiceScale {
+  const high = Math.max(0, maxValue) * HEADROOM;
+  const low = Math.max(0, -minValue) * HEADROOM;
+  const extent = Math.max(high, low) || 1;
+  const exponent = Math.floor(Math.log10(extent));
+  const lastPower = Math.max(exponent + 1, quantum > 0 ? Math.ceil(Math.log10(quantum)) : -Infinity);
+
+  const candidates: Array<NiceScale & { intervals: number; digits: number }> = [];
+  for (let power = exponent - 2; power <= lastPower; power += 1) {
+    for (const multiplier of NICE_MULTIPLIERS) {
+      const step = multiplier * 10 ** power;
+      if (quantum > 0) {
+        const ratio = step / quantum;
+        if (ratio < 1 - 1e-9 || Math.abs(ratio - Math.round(ratio)) > 1e-6) continue;
+      }
+      const top = high > 0 ? Math.ceil(high / step - 1e-9) * step : 0;
+      const bottom = low > 0 ? -Math.ceil(low / step - 1e-9) * step : 0;
+      const intervals = Math.round((top - bottom) / step);
+      if (intervals < 1) continue;
+      candidates.push({ top, bottom, step, intervals, digits: decimalsFor(step, 6) });
+    }
+  }
+
+  const inRange = candidates.filter((option) => option.intervals >= MIN_INTERVALS && option.intervals <= MAX_INTERVALS);
+  // Spans are float products (3 × 0.1), so equal spans can differ in the last bit.
+  const spanOrder = (a: NiceScale, b: NiceScale) => {
+    const difference = a.top - a.bottom - (b.top - b.bottom);
+    return Math.abs(difference) <= extent * 1e-9 ? 0 : difference;
+  };
+  const pick = inRange.length > 0
+    // Tightest domain first; then the rounder step; then fewer gridlines.
+    ? inRange.sort((a, b) => spanOrder(a, b) || a.digits - b.digits || a.intervals - b.intervals)[0]!
+    // A quantum can leave no step fine enough for four intervals (a 0.9 mln
+    // series printed in whole millions): take the finest step it allows.
+    : candidates.filter((option) => option.intervals <= MAX_INTERVALS).sort((a, b) => a.step - b.step)[0]!;
+  return { top: pick.top, bottom: pick.bottom, step: pick.step };
 }
 
 // Advance widths in em of the chart's numeric face (`--font-numeric`): Geist Mono

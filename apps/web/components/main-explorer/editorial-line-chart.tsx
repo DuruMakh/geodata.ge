@@ -6,7 +6,7 @@ import { useState } from "react";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
-import { AXIS_LABEL_GAP, axisLeftPaddingFor, decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import { AXIS_LABEL_GAP, axisLeftPaddingFor, decimalsFor, niceScale } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE } from "../../lib/explorer/colors";
 import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
@@ -108,15 +108,10 @@ export function EditorialLineChart({
     }
   }
   if (maxValue <= 0 && minValue >= 0) maxValue = 1;
-  const posSpan = maxValue > 0 ? niceMax(maxValue) : 0;
-  const negSpan = minValue < 0 ? niceMax(-minValue) : 0;
-  const rawStep = Math.max(posSpan, negSpan) / 4;
+  // An amount axis never prints finer than its unit's last decimal, so the
+  // gridline step is a whole multiple of that quantum; a share axis has none.
   const amountQuantum = unit.divisor / 10 ** unit.decimals;
-  const step = share
-    ? rawStep
-    : Math.max(amountQuantum, Math.ceil(rawStep / amountQuantum - 1e-9) * amountQuantum);
-  const top = posSpan > 0 ? Math.ceil(posSpan / step - 1e-9) * step : 0;
-  const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
+  const { top, bottom, step } = niceScale(minValue, maxValue, share ? 0 : amountQuantum);
   const span = top - bottom;
 
   const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);

@@ -2,7 +2,7 @@
 
 import { useId, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { nearestPeriodIndex, stepPeriodIndex } from "../../lib/explorer/chartNavigation";
-import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import { decimalsFor, niceScale } from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE, INK } from "../../lib/explorer/colors";
 import { buildDotLattice } from "../../lib/explorer/dotLattice";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
@@ -77,11 +77,7 @@ export function StackedColumnChart({
     if (negative < minStack) minStack = negative;
   }
   if (maxStack <= 0 && minStack >= 0) maxStack = 1;
-  const posSpan = maxStack > 0 ? niceMax(maxStack) : 0;
-  const negSpan = minStack < 0 ? niceMax(-minStack) : 0;
-  const step = Math.max(posSpan, negSpan) / 4 || 1;
-  const top = posSpan > 0 ? Math.ceil(posSpan / step - 1e-9) * step : 0;
-  const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
+  const { top, bottom, step } = niceScale(minStack, maxStack);
   const span = top - bottom || 1;
 
   const plotWidth = W - PAD_L - PAD_R;
