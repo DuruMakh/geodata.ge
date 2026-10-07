@@ -45,7 +45,7 @@
   "analysis.every100Cell": "{name}: {amount} GEL / {share}%",
   "analysis.every100Item": "{name} — {amount} GEL",
   "analysis.radar": "Budget radar",
-  "analysis.radarNote": "Shares · leading categories · visual comparison",
+  "analysis.radarNote": "Shares · leading categories · exact values in the ranking below",
   "analysis.budgetField": "Budget field",
   "analysis.budgetFieldNote": "x — share of total · y — growth from the previous year · size — amount",
   "analysis.budgetFieldEmpty": "Previous-year data is unavailable, so growth cannot be shown for this year. Choose a later year.",
