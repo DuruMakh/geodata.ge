@@ -7,5 +7,6 @@
   "about.paragraph2": "Finding the information is only part of the problem. Data is often presented in a form that is difficult to understand without specialist knowledge. Comparing different years, regions or economic indicators and seeing the wider picture can also be difficult. As a result, much of this publicly available data is easy to use in practice for only a small group of people.",
   "about.paragraph3": "Fiscal.ge was created to address this problem. Our aim is to bring a substantial part of Georgia’s publicly available economic and financial data into one place, organise it, connect it and present it in a clear visual form.",
   "about.closing": "We want people to find the data they need, compare it and understand its context in seconds, instead of spending hours searching.",
-  "about.statement": "Our aim is for Georgia’s data to be more than public: it should be accessible, understandable and useful."
+  "about.statement": "Our aim is for Georgia’s data to be more than public: it should be accessible, understandable and useful.",
+  "about.exploreLink": "Explore the data →"
 }

@@ -241,3 +241,44 @@ test("hub card names and the economy footer", async ({ page }) => {
   await page.goto("/explorer/economy");
   await expect(page.getByTestId("hub-card").first().locator("p").last()).toHaveText(/^\d{4} · ნომინალური მშპ \d+\.\d მლრდ ₾$/);
 });
+
+test("/about opens on a compact cover and ends with a way into the data", async ({ page }) => {
+  await page.goto("/about");
+  expect((await page.getByTestId("mission-cover").boundingBox())!.height).toBeLessThanOrEqual(230);
+  const explore = page.getByTestId("mission-explore");
+  await expect(explore).toHaveText("გაეცანი მონაცემებს →");
+  await expect(explore).toHaveAttribute("href", "/explorer");
+  expect((await explore.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+});
+
+test("/methodology rows keep the arrow on the title line", async ({ page }) => {
+  await page.goto("/methodology");
+  for (const row of await page.getByTestId("methodology-live-row").all()) {
+    const title = (await row.getByRole("heading").boundingBox())!;
+    const arrow = (await row.locator("span[aria-hidden=true]").last().boundingBox())!;
+    expect(arrow.y).toBeLessThan(title.y + title.height);
+    expect(arrow.x).toBeGreaterThan(title.x);
+  }
+});
+
+for (const { path, more, guides } of [
+  { path: "/connect", more: "მეტი მაგალითი", guides: ["Claude-ის ოფიციალური ინსტრუქცია", "Codex-ის ოფიციალური ინსტრუქცია"] },
+  { path: "/en/connect", more: "More examples", guides: ["Claude official setup guide", "Codex official setup guide"] },
+]) {
+  test(`${path} keeps developer vocabulary behind toggles`, async ({ page }) => {
+    await page.goto(path);
+    const main = page.locator("main");
+    expect(await main.innerText()).not.toMatch(/query_inflation|yoy_pct|entityIds/);
+    const bilingual = page.getByTestId("connect-bilingual");
+    await expect(bilingual.locator("li:visible")).toHaveCount(3);
+    await page.getByTestId("connect-more-examples").getByText(more, { exact: true }).click();
+    expect(await bilingual.locator("li:visible").count()).toBeGreaterThan(3);
+    await page.getByTestId("connect-developer-details").locator("summary").click();
+    await expect(page.getByTestId("connect-inflation-discovery")).toBeVisible();
+    for (const name of guides) {
+      const link = page.getByRole("link", { name, exact: true });
+      await expect(link).toHaveCount(1);
+      expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    }
+  });
+}

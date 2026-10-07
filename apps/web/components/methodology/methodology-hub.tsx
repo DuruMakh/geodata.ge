@@ -51,10 +51,11 @@ export function MethodologyHub({
               key={entry.id}
               data-testid="methodology-live-row"
               href={entry.href}
-              className="group grid gap-5 border-b border-[var(--hairline)] py-7 transition-[background-color,transform] duration-150 hover:translate-x-1 hover:bg-[var(--tint)] focus-visible:translate-x-1 focus-visible:bg-[var(--tint)] motion-reduce:transform-none motion-reduce:transition-none min-[768px]:grid-cols-[minmax(180px,0.75fr)_minmax(300px,1.25fr)_auto] min-[768px]:items-center min-[768px]:gap-8 min-[768px]:px-3"
+              className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-3 border-b border-[var(--hairline)] py-7 transition-[background-color,transform] duration-150 hover:translate-x-1 hover:bg-[var(--tint)] focus-visible:translate-x-1 focus-visible:bg-[var(--tint)] motion-reduce:transform-none motion-reduce:transition-none min-[768px]:grid-cols-[minmax(180px,0.75fr)_minmax(300px,1.25fr)_auto] min-[768px]:items-center min-[768px]:gap-8 min-[768px]:px-3"
             >
               <h3 className="font-[family-name:var(--font-display)] text-[24px] font-semibold tracking-[-0.01em]">{entry.title}</h3>
-              <div>
+              {/* Below 768px the arrow shares the title's line instead of taking a row of its own. */}
+              <div className="max-[768px]:col-span-2 max-[768px]:row-start-2">
                 <p className="text-[13.5px] leading-relaxed text-[var(--body)]">{entry.summary}</p>
                 <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">
                   <span>{entry.coverage.firstYear}–{entry.coverage.lastYear}</span>
@@ -64,7 +65,7 @@ export function MethodologyHub({
               </div>
               <span
                 aria-hidden="true"
-                className="text-xl text-[var(--accent)] transition-transform duration-150 group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
+                className="text-xl text-[var(--accent)] max-[768px]:col-start-2 max-[768px]:row-start-1 transition-transform duration-150 group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
               >
                 →
               </span>

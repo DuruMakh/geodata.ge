@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
@@ -29,7 +31,7 @@ export async function renderAboutPage(locale: Locale) {
           <section
             data-testid="mission-cover"
             aria-labelledby="mission-title"
-            className="grid min-h-[310px] grid-cols-[170px_minmax(0,1fr)_210px] gap-10 bg-[var(--ink)] px-10 pb-[43px] pt-[38px] text-[var(--paper)] max-[767.99px]:min-h-[350px] max-[767.99px]:grid-cols-1 max-[767.99px]:gap-0 max-[767.99px]:px-5 max-[767.99px]:py-6"
+            className="grid min-h-[310px] grid-cols-[170px_minmax(0,1fr)_210px] gap-10 bg-[var(--ink)] px-10 pb-[43px] pt-[38px] text-[var(--paper)] max-[767.99px]:min-h-[200px] max-[767.99px]:grid-cols-1 max-[767.99px]:gap-0 max-[767.99px]:px-5 max-[767.99px]:py-6"
           >
             <div aria-hidden="true" className="flex min-w-0 items-start justify-between gap-3">
               <strong className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--accent)]">01</strong>
@@ -41,11 +43,11 @@ export async function renderAboutPage(locale: Locale) {
             </div>
             <h1
               id="mission-title"
-              className="self-center font-[family-name:var(--font-display)] text-[clamp(48px,7vw,84px)] font-semibold leading-none tracking-[-0.035em] text-[var(--paper)] max-[767.99px]:mt-12 max-[767.99px]:self-start max-[767.99px]:text-[clamp(48px,16vw,72px)]"
+              className="self-center font-[family-name:var(--font-display)] text-[clamp(48px,7vw,84px)] font-semibold leading-none tracking-[-0.035em] text-[var(--paper)] max-[767.99px]:mt-5 max-[767.99px]:self-start max-[767.99px]:text-[clamp(48px,16vw,72px)]"
             >
               {message(messages, "about.heading")}
             </h1>
-            <span className="self-end font-[family-name:var(--font-numeric)] text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-12">
+            <span className="self-end font-[family-name:var(--font-numeric)] text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
               {model.updatedAt.slice(0, 4)}
               <br />
               MISSION NOTE
@@ -75,6 +77,14 @@ export async function renderAboutPage(locale: Locale) {
                 {message(messages, "about.statement")}
               </strong>
             </p>
+            {/* The essay ended with no way back to the data before the footer. */}
+            <Link
+              data-testid="mission-explore"
+              href={pageHref("/explorer", locale)}
+              className="inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
+            >
+              {message(messages, "about.exploreLink")}
+            </Link>
           </article>
         </main>
         <SiteFooter locale={locale} updatedAt={model.updatedAt} />
