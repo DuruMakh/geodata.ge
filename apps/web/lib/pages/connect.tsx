@@ -146,6 +146,9 @@ const NOT_SERVED = [
   "connect.notServed1",
   "connect.notServed2",
   "connect.notServed3",
+  // The unemployment explorer is approved for people only; the query service does
+  // not serve it (lib/factQuery/buildSnapshot.ts).
+  "connect.notServed4",
 ] as const;
 
 export async function renderConnectPage(locale: Locale) {

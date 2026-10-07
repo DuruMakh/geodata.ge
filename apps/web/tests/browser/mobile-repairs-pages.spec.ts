@@ -148,3 +148,32 @@ for (const { path, field } of [
   });
 }
 
+for (const locale of ["ka", "en"] as const) {
+  test(`${locale} /connect lists unemployment among the data the endpoint does not serve`, async ({ page }) => {
+    await page.goto(`${locale === "en" ? "/en" : ""}/connect`);
+    await expect(page.getByTestId("connect-coverage-excluded")).toContainText(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
+  });
+}
+
+for (const path of ["/explorer/expenditure", "/explorer/unemployment/overview", "/en/explorer/inflation/overview"]) {
+  test(`explorer menu rows are at least 36px tall below 900px: ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
+    const panel = page.locator("#data-sidebar-navigation");
+    await expect(panel).toBeVisible();
+    const short = await panel.locator("a, li").evaluateAll((rows) =>
+      rows.filter((row) => row.getBoundingClientRect().height > 0 && row.getBoundingClientRect().height < 36 && !row.closest("[role=group]") && !row.querySelector("a"))
+        .map((row) => `${row.textContent?.trim()} ${Math.round(row.getBoundingClientRect().height)}`),
+    );
+    expect(short).toEqual([]);
+  });
+}
+
+test("the unemployment dataset row keeps the menu rhythm below 900px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/explorer/unemployment/overview");
+  await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
+  const marginTop = await page.locator("#data-sidebar-navigation nav > a[href$=\"/explorer/unemployment\"]").evaluate((link) => getComputedStyle(link).marginTop);
+  expect(marginTop).toBe("0px");
+});
