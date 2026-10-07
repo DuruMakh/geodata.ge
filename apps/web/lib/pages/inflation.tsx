@@ -196,6 +196,9 @@ export async function renderInflationCategories(locale: Locale) {
   const headline = facts
     .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
     .map((fact) => ({ period: periodFromKey(fact.period), value: fact.value }));
+  const headlineMom = facts
+    .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "mom_pct")
+    .map((fact) => ({ period: periodFromKey(fact.period), value: fact.value }));
   const t = (key: string) => message(presentation.messages, key);
   return (
     <I18nProvider {...presentation}>
@@ -210,6 +213,7 @@ export async function renderInflationCategories(locale: Locale) {
         facts={packCategoryFacts(categories.map(categoryFactInput))}
         weights={weights.map(projectBasketWeight)}
         headline={headline}
+        headlineMom={headlineMom}
         lastReviewedAt={categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
         sources={sources}
         siteOrigin={resolveSiteUrl()}

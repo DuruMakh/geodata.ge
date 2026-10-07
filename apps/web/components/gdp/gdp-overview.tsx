@@ -29,6 +29,8 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { GdpSummary } from "./gdp-summary";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
+import { formatGdpLatestValue } from "../../lib/explorer/latestValue";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -73,6 +75,8 @@ export function GdpOverview({
     [facts, state, sourceIdRanges],
   );
   const d = gdpDisplay(state, presentation);
+  // The latest loaded year of the active indicator, whatever range is selected.
+  const latest = buildGdpOverviewModel(facts, { ...state, range: { kind: "all" } }, sourceIdRanges).headline;
   const row = {
     itemId: "gdp.overview",
     kaLabel: d.label,
@@ -131,6 +135,15 @@ export function GdpOverview({
         coverage={coverageLabel(messages, locale, m.range.min, m.range.max, lastReviewedAt)}
       />
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
+      {latest ? (
+        <LatestValueLine
+          testId="gdp-latest"
+          measure={d.label}
+          period={latest.year}
+          value={formatGdpLatestValue(state, latest.value, messages)}
+          note={latest.status === "preliminary" ? t("preliminary") : undefined}
+        />
+      ) : null}
       <p
         data-testid="gdp-unit"
         className="mb-4 text-[13px] text-[var(--muted)]"

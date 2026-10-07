@@ -48,13 +48,16 @@ import { InflationCategoryTable } from "./inflation-category-table";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
+import { latestEntry } from "../../lib/explorer/latestValue";
+import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
-// headline. No headline value line under the H1 — DESIGN.md §25 carries the unit
-// line alone on both overviews, and this page follows the same family.
+// headline. Under the H1 the published national headline's latest month on the
+// active rate (owner decision D2, 2026-10-07), then the unit line.
 
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
@@ -63,12 +66,14 @@ export type InflationCategoriesProps = {
   facts: PackedCategorySeries[];
   weights: ClientBasketWeightRow[];
   headline: Array<{ period: number; value: number }>;
+  /** The national monthly change, for the latest-value line on the monthly tab only. */
+  headlineMom: Array<{ period: number; value: number }>;
   lastReviewedAt: string;
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };
 
-export function InflationCategories({ facts, weights, headline, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
+export function InflationCategories({ facts, weights, headline, headlineMom, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
@@ -99,6 +104,10 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
   const stack = buildStackModel(index, state, range, headlineByPeriod);
   const lines = buildCategoryLines(index, state, range);
   const hasSeries = state.tab === "contrib" ? stack.segments.length > 0 : lines.lines.length > 0;
+
+  // The contribution tab decomposes the annual rate, so it states the annual headline.
+  const latestTab = state.tab === "mom" ? "mom" : "yoy";
+  const latest = latestEntry(new Map((latestTab === "mom" ? headlineMom : headline).map((row) => [row.period, row.value])));
 
   // The unit line names the published headline the stack closes on.
   const latestHeadline = [...stack.headline].reverse().find((value) => value !== null) ?? null;
@@ -140,6 +149,9 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
         coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <ExplorerHeading>{t("categoriesHeading")}</ExplorerHeading>
+      {latest ? (
+        <LatestValueLine testId="inflation-category-latest" measure={t(`categoryTab.${latestTab}`)} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, latestTab)} />
+      ) : null}
       <p data-testid="inflation-category-unit" className="mb-4 text-[13px] text-[var(--muted)]">
         {unitLine}
       </p>

@@ -185,3 +185,38 @@ for (const path of ["/explorer", "/explorer/economy", "/explorer/inflation", "/e
     await expect(coverage).toHaveText(/^\S+( \d{4})?–\S+( \d{4})? · განახლდა \d{4}-\d{2}-\d{2}$/);
   });
 }
+
+for (const { path, testId, text } of [
+  { path: "/explorer/economy/gdp", testId: "gdp-latest", text: /^რეალური მშპ · \d{4}: \d+\.\d მლრდ აშშ დოლარი( · წინასწარი)?$/ },
+  { path: "/explorer/inflation/overview", testId: "inflation-latest", text: /^წლიური ინფლაცია · \S+ \d{4}: −?\d+\.\d%$/ },
+  { path: "/explorer/inflation/categories", testId: "inflation-category-latest", text: /^წლიური ინფლაცია · \S+ \d{4}: −?\d+\.\d%$/ },
+  { path: "/explorer/inflation/cities", testId: "inflation-city-latest", text: /^წლიური ინფლაცია · \S+ \d{4}: −?\d+\.\d%$/ },
+  { path: "/explorer/inflation/cities/batumi", testId: "inflation-city-latest", text: /^წლიური ინფლაცია · \S+ \d{4}: −?\d+\.\d%$/ },
+  { path: "/explorer/unemployment/overview", testId: "unemployment-latest", text: /^უმუშევრობის დონე · \d{4}: \d+\.\d%$/ },
+  { path: "/explorer/unemployment/gender", testId: "unemployment-latest", text: /^უმუშევრობის დონე · \d{4}: \d+\.\d%$/ },
+  // No national rows on the age page: the line names its first selected group.
+  { path: "/explorer/unemployment/age", testId: "unemployment-latest", text: /^უმუშევრობის დონე · .+ · \d{4}: \d+\.\d%$/ },
+  { path: "/en/explorer/unemployment/regions/adjara", testId: "unemployment-latest", text: /^Unemployment rate · \d{4}: \d+\.\d%$/ },
+]) {
+  test(`${path} states the latest value on the first screen, right under the title`, async ({ page }) => {
+    await page.goto(path);
+    await ready(page);
+    const line = page.getByTestId(testId);
+    await expect(line).toHaveText(text);
+    const title = await page.getByRole("heading", { level: 1 }).boundingBox();
+    const box = await line.boundingBox();
+    expect(box!.y).toBeGreaterThan(title!.y + title!.height - 1);
+    // City pages keep their ← previous · next → row between the two.
+    expect(box!.y - (title!.y + title!.height)).toBeLessThan(path.includes("/cities/") ? 60 : 24);
+    expect(box!.y + box!.height).toBeLessThan(844);
+  });
+}
+
+test("the GDP latest value follows the active indicator", async ({ page }) => {
+  await page.goto("/explorer/economy/gdp");
+  await ready(page);
+  await page.getByTestId("gdp-tab-nominal").click();
+  await expect(page.getByTestId("gdp-latest")).toHaveText(/^ნომინალური მშპ · \d{4}: \d+\.\d მლრდ ₾( · წინასწარი)?$/);
+  await page.getByTestId("gdp-tab-growth").click();
+  await expect(page.getByTestId("gdp-latest")).toHaveText(/^მშპ-ის ზრდა · \d{4}: [+−]\d+\.\d%( · წინასწარი)?$/);
+});
