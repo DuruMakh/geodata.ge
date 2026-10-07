@@ -23,6 +23,7 @@ describe("population index model", () => {
   test("the latest year, Georgia and the map", () => {
     expect(index.year).toBe(2026);
     expect(index.country).toMatchObject({ id: "country.georgia", kind: "country", valueGel: 3_941_103, rank: null });
+    expect(index.country.subtitleKa).toBe("64 მუნიციპალიტეტი");
     expect(index.map.shapes).toHaveLength(60);
     expect(index.map.markers).toHaveLength(5);
   });
@@ -47,7 +48,8 @@ describe("population index model", () => {
       "region.shida_kartli", "region.samtskhe_javakheti", "region.guria", "region.mtskheta_mtianeti", "region.racha_lechkhumi_kvemo_svaneti",
     ]);
     expect(index.regions[3]).toMatchObject({ id: "region.adjara", rank: 4, valueGel: 413_214 });
-    expect(index.regions[3]!.subtitleKa).toContain("6");
+    expect(index.regions[3]!.subtitleKa).toBe("6 მუნიციპალიტეტი");
+    expect(index.regions.find((row) => row.id === "region.tbilisi")!.subtitleKa).toBe("1 მუნიციპალიტეტი");
   });
 
   test("the parts add up: the regions and the municipalities each sum to Georgia, Adjara to its six", () => {
