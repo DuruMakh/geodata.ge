@@ -107,11 +107,9 @@ test("English debt search and existing series controls explain rate gaps without
     const label = page.locator(`[data-series-id="${id}"]`).getByTestId("series-label");
     expect(await label.evaluate(element => element.scrollHeight <= element.clientHeight)).toBe(true);
   }
-  const search = page.getByTestId("series-selector").getByRole("searchbox");
-  for (const query of ["საპროცენტო", "WEIGHTED-AVERAGE"]) {
-    await search.fill(query);
-    await expect(page.locator('[data-series-id="debt.rate.total"]')).toBeVisible();
-  }
+  // Nine rows read at a glance: the debt list has no search field (lists of ten rows or fewer).
+  await expect(page.getByTestId("series-selector").getByRole("searchbox")).toHaveCount(0);
+  await expect(page.locator('[data-series-id="debt.rate.total"]')).toBeVisible();
   await page.locator('[data-series-id="debt.rate.total"]').getByTestId("series-row-toggle").click();
   await expect(page.getByTestId("debt-measure-label")).toHaveText("%");
   expect(new URL(page.url()).hash).toContain("f=rate");

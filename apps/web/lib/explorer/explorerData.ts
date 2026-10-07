@@ -9,6 +9,7 @@ import { publicLabel } from "../i18n/labels";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import { chooseActivePublicFacts } from "../data/activeFacts";
 import { colorForItem, colorForProgram, OTHER_COLOR } from "./colors";
+import { isGrowthRankable } from "./indicators";
 import type {
   ExpenditureGrouping,
   GdpMetadata,
@@ -138,7 +139,10 @@ function buildGrowthBoards(rows: ExplorerTableRow[], years: number[]): {
   const sortedGrowth = rows
     .filter(
       (row) =>
-        row.valuesByYear[startYear] !== undefined && row.valuesByYear[endYear] !== undefined && row.change !== null,
+        row.valuesByYear[startYear] !== undefined &&
+        row.valuesByYear[endYear] !== undefined &&
+        row.change !== null &&
+        isGrowthRankable(row.itemId, row.valuesByYear[endYear]),
     )
     .sort((a, b) => (b.change ?? -Infinity) - (a.change ?? -Infinity));
 

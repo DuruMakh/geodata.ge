@@ -20,12 +20,16 @@ for (const path of listPages) {
     await page.goto(path);
     const list = page.getByTestId("series-list");
     await list.scrollIntoViewIfNeeded();
+    // `clip` (not a scroll container) only trims the last caret's 12px hit extension (D8);
+    // every row stays inside the list's own height.
     const box = await list.evaluate((element) => ({
       overflowY: getComputedStyle(element).overflowY,
       maxHeight: getComputedStyle(element).maxHeight,
-      clipped: element.scrollHeight > element.clientHeight + 1,
+      rowsInside: [...element.querySelectorAll("[data-testid='series-row']")].every(
+        (row) => row.getBoundingClientRect().bottom <= element.getBoundingClientRect().bottom + 1,
+      ),
     }));
-    expect(box).toEqual({ overflowY: "visible", maxHeight: "none", clipped: false });
+    expect(box).toEqual({ overflowY: "clip", maxHeight: "none", rowsInside: true });
   });
 }
 

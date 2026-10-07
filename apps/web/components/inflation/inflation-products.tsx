@@ -162,7 +162,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
         <div className="mt-[18px] space-y-2">
           <SourceNote testId="source-label">{t("productsSource")} {message(messages, "main.lastUpdated", { date: displayDate })}</SourceNote>
           <p className="text-xs text-[var(--muted)]">{t("productsDerivedNote")}</p>
-          <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
+          <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
             {t("methodology")}
           </Link>
         </div>

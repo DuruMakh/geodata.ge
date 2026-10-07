@@ -34,8 +34,8 @@ export async function renderAboutPage(locale: Locale) {
             className="grid min-h-[310px] grid-cols-[170px_minmax(0,1fr)_210px] gap-10 bg-[var(--ink)] px-10 pb-[43px] pt-[38px] text-[var(--paper)] max-[767.99px]:min-h-[200px] max-[767.99px]:grid-cols-1 max-[767.99px]:gap-0 max-[767.99px]:px-5 max-[767.99px]:py-6"
           >
             <div aria-hidden="true" className="flex min-w-0 items-start justify-between gap-3">
-              <strong className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--accent)]">01</strong>
-              <span className="text-right font-[family-name:var(--font-numeric)] text-[9px] leading-[1.35] tracking-[0.08em] text-[var(--paper)]">
+              <strong className="font-[family-name:var(--font-numeric)] text-[0.8125rem] font-medium text-[var(--accent)]">01</strong>
+              <span className="text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9px] leading-[1.35] tracking-[0.08em] text-[var(--paper)]">
                 FISCAL.GE
                 <br />
                 OPEN DATA
@@ -47,7 +47,7 @@ export async function renderAboutPage(locale: Locale) {
             >
               {message(messages, "about.heading")}
             </h1>
-            <span className="self-end font-[family-name:var(--font-numeric)] text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
+            <span className="self-end font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
               {model.updatedAt.slice(0, 4)}
               <br />
               MISSION NOTE
@@ -57,7 +57,7 @@ export async function renderAboutPage(locale: Locale) {
           <article
             data-testid="mission-copy"
             aria-label={message(messages, "about.articleAria")}
-            className="mx-auto mt-[72px] max-w-[760px] font-[family-name:var(--font-ui)] text-[16px] leading-[1.96] text-[var(--body)] max-[767.99px]:mt-[48px] max-[767.99px]:px-0 max-[767.99px]:text-[15px] max-[767.99px]:leading-[1.88]"
+            className="mx-auto mt-[72px] max-w-[760px] font-[family-name:var(--font-ui)] text-[1rem] leading-[1.96] text-[var(--body)] max-[767.99px]:mt-[48px] max-[767.99px]:px-0 max-[767.99px]:text-[0.9375rem] max-[767.99px]:leading-[1.88]"
           >
             <p className="first-letter:float-left first-letter:mr-2 first-letter:mt-[5px] first-letter:font-[family-name:var(--font-display)] first-letter:text-[58px] first-letter:font-semibold first-letter:leading-[0.8] first-letter:text-[var(--accent)] max-[767.99px]:first-letter:text-[50px]">
               {message(messages, "about.paragraph1")}
@@ -70,7 +70,7 @@ export async function renderAboutPage(locale: Locale) {
             </p>
             <p
               data-testid="mission-closing"
-              className="mt-[39px] py-[25px] pb-[27px] text-[16px] leading-[1.96] text-[var(--body)] max-[767.99px]:mt-[31px] max-[767.99px]:py-[20px] max-[767.99px]:pb-[23px] max-[767.99px]:text-[15px] max-[767.99px]:leading-[1.88]"
+              className="mt-[39px] py-[25px] pb-[27px] text-[1rem] leading-[1.96] text-[var(--body)] max-[767.99px]:mt-[31px] max-[767.99px]:py-[20px] max-[767.99px]:pb-[23px] max-[767.99px]:text-[0.9375rem] max-[767.99px]:leading-[1.88]"
             >
               {message(messages, "about.closing")}{" "}
               <strong className="mt-[21px] block border-l-4 border-[var(--accent)] pl-[25px] font-[family-name:var(--font-display)] text-[clamp(25px,3.2vw,38px)] font-semibold leading-[1.45] tracking-[-0.02em] text-[var(--ink)] max-[767.99px]:mt-[18px] max-[767.99px]:pl-[18px] max-[767.99px]:text-[23px]">
@@ -81,7 +81,7 @@ export async function renderAboutPage(locale: Locale) {
             <Link
               data-testid="mission-explore"
               href={pageHref("/explorer", locale)}
-              className="inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
+              className="inline-flex min-h-11 items-center text-[0.78125rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
             >
               {message(messages, "about.exploreLink")}
             </Link>

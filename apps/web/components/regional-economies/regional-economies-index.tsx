@@ -70,18 +70,18 @@ export function RegionIndex({ model, sourceNote, metric, summary }: { model: Reg
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
             <span className="font-[family-name:var(--font-display)] text-[19px] font-semibold">{message(messages, "regionalEconomies.regions")}</span>
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{model.year}</span>
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{model.year}</span>
           </div>
           <div className="flex items-center gap-2 pt-3 pb-1">
             <input
               {...SEARCH_FIELD_PROPS}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={message(messages, "regionalEconomies.search")}
+              placeholder={message(messages, "regionalEconomies.searchPlaceholder")}
               aria-label={message(messages, "regionalEconomies.search")}
-              className="h-[38px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] outline-none focus:border-[var(--ink)]"
+              className="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]"
             />
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{rows.length === model.regions.length ? rows.length : `${rows.length} / ${model.regions.length}`}</span>
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{rows.length === model.regions.length ? rows.length : `${rows.length} / ${model.regions.length}`}</span>
           </div>
           {rows.length === 0 ? (
             <div className="px-1 py-[26px] text-center text-[13px] text-[var(--body)]">
@@ -103,7 +103,7 @@ export function RegionIndex({ model, sourceNote, metric, summary }: { model: Reg
                   onBlur={() => setFocusActive(null)}
                   className={`grid grid-cols-[22px_minmax(0,1fr)_112px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[9px] pr-1 transition-colors hover:bg-[var(--tint)] ${region.regionId === activeRegionId ? "bg-[var(--tint)]" : "bg-transparent"}`}
                 >
-                  <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{String(region.rank).padStart(2, "0")}</span>
+                  <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{String(region.rank).padStart(2, "0")}</span>
                   <span className="min-w-0 text-[12.5px] font-medium">{publicLabel(locale, region.regionId, region.nameKa, englishLabels)}</span>
                   <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(region.value)}</span>
                   <span aria-hidden className="text-[var(--faint)]">→</span>

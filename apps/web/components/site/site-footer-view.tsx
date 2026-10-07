@@ -38,23 +38,23 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
                 className="block h-auto w-full"
               />
             </Link>
-            <p className="col-span-2 text-pretty text-[12.5px] leading-relaxed text-[var(--body)] min-[768px]:max-w-[300px]">
+            <p className="col-span-2 text-pretty text-[0.78125rem] leading-relaxed text-[var(--body)] min-[768px]:max-w-[300px]">
               {message(messages, "common.footerDescription")}
             </p>
             <a
               href="mailto:info@fiscal.ge"
-              className="max-[768px]:col-start-2 max-[768px]:row-start-1 max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center max-[768px]:justify-self-end font-[family-name:var(--font-numeric)] text-[11px] text-[var(--accent)] underline underline-offset-[3px] min-[768px]:self-start"
+              className="max-[768px]:col-start-2 max-[768px]:row-start-1 max-[768px]:inline-flex max-[768px]:min-h-11 max-[768px]:items-center max-[768px]:justify-self-end font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--accent)] underline underline-offset-[3px] min-[768px]:self-start"
             >
               info@fiscal.ge
             </a>
           </div>
           <div className="flex flex-col gap-[9px]">
-            <span className="hidden text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] min-[768px]:block">{message(messages, "common.navigation")}</span>
+            <span className="hidden text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] min-[768px]:block">{message(messages, "common.navigation")}</span>
             {/* Below 768px a two-column grid of 44px rows replaces the long list of 24px links. */}
             <ul className="grid list-none grid-cols-2 gap-x-4 min-[768px]:flex min-[768px]:flex-col min-[768px]:gap-[9px]">
               {FOOTER_LINKS.map(({ href, labelKey }) => (
                 <li key={href}>
-                  <Link href={pageHref(href, locale)} className="flex min-h-11 items-center text-[12.5px] text-[var(--body)] hover:text-[var(--ink)] min-[768px]:inline min-[768px]:min-h-0">
+                  <Link href={pageHref(href, locale)} className="flex min-h-11 items-center text-[0.78125rem] text-[var(--body)] hover:text-[var(--ink)] min-[768px]:inline min-[768px]:min-h-0">
                     {message(messages, labelKey)}
                   </Link>
                 </li>
@@ -63,14 +63,14 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
           </div>
           {/* One fine-print paragraph. The source sentence already opens with
               "მონაცემები:", so the old "მონაცემები" heading above it said it twice. */}
-          <p className="text-pretty text-[12px] leading-relaxed text-[var(--muted)] min-[768px]:max-w-[340px]">
+          <p className="text-pretty text-[0.75rem] leading-relaxed text-[var(--muted)] min-[768px]:max-w-[340px]">
             {sourcePrefix}{sourceSuffix !== undefined && <span className="font-[family-name:var(--font-numeric)]">{updatedAt}</span>}{sourceSuffix}{" "}
             {message(messages, "common.footerLicence")}
           </p>
         </div>
         <div className="mt-3 flex flex-wrap justify-between gap-4 border-t border-[var(--hairline-soft)] pt-2.5 min-[768px]:mt-[30px] min-[768px]:pt-3.5">
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">© 2026 Fiscal.ge</span>
-          <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">CC BY 4.0</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--faint)]">© 2026 Fiscal.ge</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--faint)]">CC BY 4.0</span>
         </div>
       </div>
     </footer>

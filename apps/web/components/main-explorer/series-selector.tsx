@@ -4,6 +4,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import type { FocusEvent, ReactNode } from "react";
 import { SwatchBar } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 
 /**
  * On a stacked (<1100px) layout, focusing a search field scrolls it to the top of the
@@ -15,6 +16,9 @@ export function revealSearchField(event: FocusEvent<HTMLInputElement>) {
   event.currentTarget.scrollIntoView({ block: "start" });
 }
 
+/** A series list with this many rows or fewer drops its search field: it is read at a glance. */
+export const SEARCHABLE_MIN_ROWS = 10;
+
 /** Mobile keyboard hints shared by the site's search fields. */
 export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFocus: revealSearchField } as const;
 
@@ -23,6 +27,8 @@ type SeriesSelectorProps = {
   query: string;
   onQueryChange: (query: string) => void;
   searchPlaceholder: string;
+  /** False hides the search field: a list of ten rows or fewer is read at a glance. */
+  searchable?: boolean;
   countLabel?: string;
   selectedCount: number;
   totalCount: number;
@@ -42,6 +48,7 @@ export function SeriesSelector({
   query,
   onQueryChange,
   searchPlaceholder,
+  searchable = true,
   countLabel,
   selectedCount,
   totalCount,
@@ -63,21 +70,25 @@ export function SeriesSelector({
     <div data-testid="series-selector">
       {controls ? <div data-selector-section="controls">{controls}</div> : null}
 
-      <input
-        data-testid="series-search"
-        data-selector-section="search"
-        {...SEARCH_FIELD_PROPS}
-        value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
-        placeholder={searchPlaceholder}
-        aria-label={message(messages, "controls.searchSeries")}
-        className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
-      />
+      {searchable ? (
+        <input
+          data-testid="series-search"
+          data-selector-section="search"
+          {...SEARCH_FIELD_PROPS}
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder={searchPlaceholder}
+          aria-label={message(messages, "controls.searchSeries")}
+          className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
+        />
+      ) : null}
 
       <div
         data-testid="series-actions"
         data-selector-section="actions"
-        className="mt-3.5 flex items-center justify-between gap-4 pb-2.5"
+        // The bulk toggle is the full 44px height of this row (D8 touch target); the
+        // row's margins shrink by the same amount, so the list does not move.
+        className="mt-1 flex flex-wrap items-center justify-between gap-x-4 pb-0.5"
       >
         {hasSelection || allowSelectAll ? (
           <button
@@ -86,7 +97,7 @@ export function SeriesSelector({
             data-testid="series-toggle-all"
             aria-checked={bulkState}
             onClick={onToggleAll}
-            className="grid shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1 pr-1 pl-0.5 text-left"
+            className="grid min-h-11 shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 pr-1 pl-0.5 text-left"
           >
             <span
               aria-hidden
@@ -100,7 +111,7 @@ export function SeriesSelector({
             >
               {bulkMark}
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
+            <span className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--ink)]">
               {message(messages, hasSelection ? "controls.clear" : "controls.selectAll")}
             </span>
           </button>
@@ -108,11 +119,11 @@ export function SeriesSelector({
 
         <span
           data-testid="series-status"
-          className="ml-auto text-right text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
+          className="ml-auto text-right text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]"
         >
           <span className="inline-block whitespace-nowrap">
             {countLabel ?? message(messages, "controls.series")}{" "}
-            <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+            <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
               {selectedCount} / {totalCount}
             </span>
           </span>
@@ -120,7 +131,7 @@ export function SeriesSelector({
             <>
               {" · "}<span className="inline-block whitespace-nowrap">
                 {supplementalSelected.label}{" "}
-                <span className="font-[family-name:var(--font-numeric)] text-[10.5px] font-normal text-[var(--faint)]">
+                <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] font-normal text-[var(--faint)]">
                   {supplementalSelected.count}
                 </span>
               </span>
@@ -143,7 +154,8 @@ export function SeriesSelector({
         // The 430px inner scroll belongs to the sticky two-column aside; stacked under the
         // chart (owner decision D4, 2026-10-07) the list flows with the page, so a finger
         // swipe never gets caught inside it.
-        className="flex flex-col @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto"
+        // overflow-y clip keeps the last caret's downward hit extension inside the list.
+        className="flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto"
       >
         {children}
       </div>
@@ -228,8 +240,11 @@ export function SeriesSelectorRow({
           aria-label={expansionLabel ?? message(messages, "controls.subprogrammes")}
           aria-disabled={expansionLocked || undefined}
           // The caret keeps its 22px column; a transparent extension over the row button's
-          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px).
-          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:inset-y-0 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
+          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px), and
+          // 12px below the row it reaches 44px tall (D8). The extension only runs downward:
+          // a following row's own caret paints over it, so it never steals that row's taps,
+          // and it only lands in the empty caret gutter of a row without children.
+          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:top-0 before:-bottom-3 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
           tabIndex={hasChildren && !expansionLocked ? 0 : -1}
         >
@@ -259,19 +274,19 @@ export function SeriesSelectorRow({
           {art ? <span className="-mt-1 flex-none" aria-hidden="true">{art}</span> : null}
           <span
             data-testid="series-label"
-            className={`${wrapLabel ? "min-w-0 break-words" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[12px]" : "text-[11.5px]"} font-normal text-[var(--body)]` : "text-[12.5px] font-medium text-[var(--ink)]"}`}
+            className={`${wrapLabel ? "min-w-0 break-words" : "line-clamp-2"} leading-[1.35] ${isChild ? `${childLabelSize === "standard" ? "text-[0.75rem]" : "text-[0.71875rem]"} font-normal text-[var(--body)]` : "text-[0.78125rem] font-medium text-[var(--ink)]"}`}
           >
             {label}
           </span>
         </span>
         {meta === undefined ? null : (
-          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10px] whitespace-nowrap text-[var(--muted)]">
+          <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10px] whitespace-nowrap text-[var(--muted)]">
             {metaLabel === undefined ? null : <span className="sr-only">{metaLabel} </span>}
             {meta}
           </span>
         )}
-        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--muted)]">
-          {value}
+        <span className="mt-0.5 flex-none font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--muted)]">
+          {withLari(value)}
         </span>
       </button>
     </div>

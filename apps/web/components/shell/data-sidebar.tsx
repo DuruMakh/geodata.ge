@@ -155,7 +155,7 @@ export function DataSidebar() {
               <span className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--paper)]">
                 Fiscal.ge
               </span>
-              <span className="font-[family-name:var(--font-numeric)] text-[8.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]">
+              <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[8.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]">
                 {message(messages, "common.openData")}
               </span>
             </span>
@@ -182,7 +182,7 @@ export function DataSidebar() {
       {railed ? (
         <>
           <p
-            className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
+            className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
             {message(messages, unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
@@ -206,7 +206,7 @@ export function DataSidebar() {
           className={`${sheetOpen ? "flex" : "hidden min-[900px]:flex"} flex-1 flex-col max-[900px]:absolute max-[900px]:inset-x-0 max-[900px]:top-full max-[900px]:max-h-[calc(100dvh-56px-env(safe-area-inset-top))] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:border-b max-[900px]:border-[rgba(247,242,233,0.12)] max-[900px]:bg-[var(--ink)] max-[900px]:px-4 max-[900px]:pb-4 min-[900px]:flex-col`}
         >
           <div aria-hidden className="mt-4 mb-3.5 h-px bg-[rgba(247,242,233,0.12)] max-[900px]:mt-0" />
-          <p className="mb-3 font-[family-name:var(--font-numeric)] text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
+          <p className="mb-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
             {message(messages, "common.dataSection")}
           </p>
           <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5">

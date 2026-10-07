@@ -9,7 +9,7 @@ import { useState, type ReactNode } from "react";
 import type { GovernmentDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
 import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../../lib/servedRows";
-import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { SeriesAside } from "../explorer-shell/series-aside";
 
 type DebtSeriesPanelProps = {
@@ -94,6 +94,7 @@ export function DebtSeriesPanel({
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={message(messages, "controls.search")}
+        searchable={items.length > SEARCHABLE_MIN_ROWS}
         selectedCount={selectedIds.length}
         totalCount={items.length}
         hasSelection={hasSelection}

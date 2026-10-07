@@ -238,7 +238,8 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
           <SeriesSelector
             query={query}
             onQueryChange={setQuery}
-            searchPlaceholder={message(messages, "controls.searchSeries")}
+            searchPlaceholder={message(messages, "controls.search")}
+            searchable={false}
             selectedCount={selected ? 1 : 0}
             totalCount={1}
             hasSelection={selected}

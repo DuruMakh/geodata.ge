@@ -64,3 +64,21 @@ export function rankPeriodDeltas(
     })
     .sort((left, right) => right.delta - left.delta);
 }
+
+/**
+ * Reviewed residual buckets: rows the mapping could not place with confidence.
+ * They stay in tables, series and the period comparison, but a bucket that
+ * shrinks as classification improves says nothing about spending, so it never
+ * competes in a growth ranking.
+ */
+const GROWTH_RANKING_EXCLUDED_IDS: ReadonlySet<string> = new Set(["spending.other_unclassified"]);
+
+/**
+ * Whether a row may appear in a growth ranking (the movers boards and the
+ * biggest-increase / slowest-growth KPIs). Residual buckets never do, and
+ * neither does a row that is exactly zero in the end year: "−100%" there means
+ * the line was closed or moved elsewhere, not that it grew the least.
+ */
+export function isGrowthRankable(itemId: string, endValue: number | null | undefined): boolean {
+  return !GROWTH_RANKING_EXCLUDED_IDS.has(itemId) && endValue !== 0;
+}

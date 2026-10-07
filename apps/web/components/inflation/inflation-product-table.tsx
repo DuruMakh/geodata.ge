@@ -50,7 +50,7 @@ export function InflationProductTable({ index, state, onToggle }: {
         {...SEARCH_FIELD_PROPS}
         value={query}
         onChange={(event) => { setQuery(event.target.value); setShown(Math.min(BATCH_SIZE, index.products.length)); }}
-        placeholder={t("productsSearch")}
+        placeholder={message(messages, "controls.search")}
         aria-label={t("productsSearch")}
         className="h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
       />
@@ -120,7 +120,7 @@ export function InflationProductTable({ index, state, onToggle }: {
                 </td>
                 <td className="px-1.5 py-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold whitespace-nowrap text-[var(--ink)] min-[768px]:px-3">
                   {cumulative.value === null ? MISSING : formatShare(cumulative.value / 100, true)}
-                  {missing ? <span className="block max-w-[230px] whitespace-normal text-[10px] leading-snug text-[var(--muted)]">{missing}</span> : null}
+                  {missing ? <span className="block max-w-[230px] whitespace-normal text-[11px] min-[768px]:text-[10px] leading-snug text-[var(--muted)]">{missing}</span> : null}
                 </td>
                 <td className="py-2 pl-1.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)] min-[768px]:pl-3">
                   {annual === null ? MISSING : formatShare(annual / 100, true)}
@@ -135,7 +135,7 @@ export function InflationProductTable({ index, state, onToggle }: {
       type="button"
       data-testid="product-more"
       onClick={() => setShown((current) => nextProductCount(current, matches.length))}
-      className="mt-5 cursor-pointer border-b border-[var(--accent)] pb-0.5 text-[12.5px] font-semibold text-[var(--ink)] hover:text-[var(--accent)]"
-    >{t("productsMore")}</button> : null}
+      className="mt-3 inline-flex min-h-11 cursor-pointer items-center text-[12.5px] font-semibold text-[var(--ink)] hover:text-[var(--accent)]"
+    ><span className="border-b border-[var(--accent)] pb-0.5">{t("productsMore")}</span></button> : null}
   </section>;
 }

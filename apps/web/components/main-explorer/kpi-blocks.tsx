@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Overline } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 import { Sparkline } from "../ui/sparkline";
 
 // The two presentational halves of ძირითადი ინდიკატორები (DESIGN.md §8.5),
@@ -72,7 +73,7 @@ export function SideKpiList({ kpis }: { kpis: SideKpi[] }) {
               {kpi.value}
               {kpi.unit ? (
                 <span className={KPI_UNIT_CLASS}>
-                  {kpi.unit}
+                  {withLari(kpi.unit)}
                 </span>
               ) : null}
             </p>

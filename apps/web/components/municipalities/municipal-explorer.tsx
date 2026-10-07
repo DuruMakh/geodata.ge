@@ -341,7 +341,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               />
               {/* Phones keep the pill on this row: the caption shortens to the unit, and
                   in share mode the pressed "% წილი" pill names the unit itself. */}
-              <span data-testid="municipal-measure-label" className="min-w-0 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+              <span data-testid="municipal-measure-label" className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
                 <span className="max-[768px]:hidden">{message(messages, state.share ? "municipal.shareMeasure" : "municipal.amountMeasure")}</span>
                 {state.share ? null : <span className="hidden max-[768px]:inline">{message(messages, "municipal.amountMeasureShort")}</span>}
               </span>
@@ -438,7 +438,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
 
             <Link
               href={pageHref("/explorer/municipalities", locale)}
-              className="mt-3.5 block text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
+              className="mt-1.5 flex min-h-11 items-center text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
             >
               {message(messages, "municipal.allMunicipalities")}
             </Link>

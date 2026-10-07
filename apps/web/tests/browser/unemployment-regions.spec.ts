@@ -82,10 +82,11 @@ for (const prefix of ["", "/en"]) test(`regional indicators, units and workbook 
   await toggle("unemployed").click();
   await page.getByTestId("series-search").fill(prefix ? "Unemployed" : "უმუშევარი");
   await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
-  await expect(page.getByTestId("series-status")).toContainText("7 / 7");
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(7);
+  // §7.7: the bulk action covers the five top-level people counts; hired and self-employed sit under employed.
+  await expect(page.getByTestId("series-status")).toContainText("5 / 5");
+  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(5);
   const saved = page.url(); await page.reload(); expect(page.url()).toBe(saved);
-  await expect(page.getByTestId("series-status")).toContainText("7 / 7");
+  await expect(page.getByTestId("series-status")).toContainText("5 / 5");
 });
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regional employed children preserve source coverage and Excel values ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
@@ -102,7 +103,9 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regiona
   await toggle("hired").click(); await toggle("self_employed").click();
   await expect(toggle("unemployment_rate")).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
-  await expect(page.getByTestId("series-status")).toContainText("3 / 7");
+  // Employed is the one top-level row; its two ticked children are reported beside the count (§7.7).
+  await expect(page.getByTestId("series-status")).toContainText("1 / 5");
+  await expect(page.getByTestId("series-status")).toContainText(prefix ? "Subcategories 2" : "ქვეკატეგორიები 2");
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");
   await page.screenshot({ path: info.outputPath(`regional-employment-${width}.png`), fullPage: true });
   await page.getByTestId("chart-mode-table").click();

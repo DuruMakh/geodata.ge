@@ -109,7 +109,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")}
               options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
-            {section === "age" ? <label className="min-w-0 w-full text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("indicator")}</span>
+            {section === "age" ? <label className="min-w-0 w-full text-[11px] min-[768px]:text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("indicator")}</span>
                 <select data-testid="unemployment-indicator" value={state.indicator} className={selectClass}
                   onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>
                   {[true, false].map(rate => <optgroup key={String(rate)} label={t(rate ? "rateHeader" : "countHeader")}>

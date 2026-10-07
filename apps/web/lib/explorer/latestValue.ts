@@ -1,6 +1,6 @@
 import { message } from "../i18n/messages";
 import type { Messages } from "../i18n/types";
-import { formatShare } from "./format";
+import { formatInUnit, formatShare, UNIT_BN } from "./format";
 import type { GdpState } from "./gdpOverview";
 
 // The one-line latest value under an explorer title (owner decision D2,
@@ -17,11 +17,12 @@ export function latestEntry<K extends number>(values: ReadonlyMap<K, number> | u
   return latest;
 }
 
-/** GDP in the overview's own units: "27.1 მლრდ აშშ დოლარი", "28 235 ₾", "+7.5%". `value` is a fraction for growth. */
+/** GDP in the overview's own units: "27.1 მლრდ აშშ დოლარი", "28,235 ₾", "+7.5%". `value` is a fraction for growth. */
 export function formatGdpLatestValue(state: Pick<GdpState, "indicator" | "currency">, value: number, messages: Messages): string {
   const t = (key: string) => message(messages, `gdp.${key}`);
   if (state.indicator === "growth") return formatShare(value, true);
   const currency = t(state.indicator === "real" ? "usd" : state.currency);
-  if (state.indicator === "per_capita") return `${Math.round(value).toLocaleString("en-US").replace(/,/g, " ")} ${currency}`;
-  return `${(value / 1e9).toFixed(1)} ${t("bn")} ${currency}`;
+  // Same grouping, decimal point and minus as the chart axis and table (DESIGN §11).
+  if (state.indicator === "per_capita") return `${formatInUnit(value, { divisor: 1, label: "", decimals: 0 })} ${currency}`;
+  return `${formatInUnit(value, UNIT_BN)} ${t("bn")} ${currency}`;
 }

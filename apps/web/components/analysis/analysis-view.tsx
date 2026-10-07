@@ -96,7 +96,7 @@ export function AnalysisView({
               >
                 {candidate}
                 {plannedYears.has(candidate) ? (
-                  <span className="ml-1 align-super text-[9px] text-[var(--faint)]">{message(messages, "analysis.planned")}</span>
+                  <span className="ml-1 align-super text-[11px] min-[768px]:text-[9px] text-[var(--faint)]">{message(messages, "analysis.planned")}</span>
                 ) : null}
               </button>
             );

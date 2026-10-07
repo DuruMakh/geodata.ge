@@ -442,3 +442,45 @@ describe("main explorer data model", () => {
     expect(model.comparisonRows.map((row) => row.itemId)).toEqual(["spending.education", "spending.health"]);
   });
 });
+
+describe("growth boards (D11)", () => {
+  const rankingGlossary = new Map<string, GlossaryEntry>([
+    ...glossary,
+    ["spending.other_unclassified", { id: "spending.other_unclassified", kaLabel: "სხვა / დაუკლასიფიცირებელი", enLabel: "Other / unclassified", description: "", notes: "" }],
+    ["spending.defence", { id: "spending.defence", kaLabel: "თავდაცვა", enLabel: "Defence", description: "", notes: "" }],
+  ]);
+  const at = (year: number, itemId: string, amountGel: number): BudgetFactImportRow => ({
+    ...facts[0]!,
+    year,
+    itemId,
+    amountGel,
+    basis: "actual",
+    publicSpendingFieldId: itemId,
+  });
+  const rankingFacts: BudgetFactImportRow[] = [
+    at(2024, "spending.health", 100), at(2025, "spending.health", 90),
+    at(2024, "spending.education", 100), at(2025, "spending.education", 150),
+    at(2024, "spending.other_unclassified", 40), at(2025, "spending.other_unclassified", 10),
+    at(2024, "spending.defence", 50), at(2025, "spending.defence", 0),
+  ];
+
+  it("ranks neither the residual bucket nor a row that ended at zero, but keeps both in the comparison", () => {
+    const model = buildExplorerModel({
+      facts: rankingFacts,
+      glossary: rankingGlossary,
+      side: "expenditure",
+      selectedItemIds: ["expenditure.total"],
+      startYear: 2024,
+      endYear: 2025,
+      measure: "nominal",
+    });
+    const ranked = [...model.topGrowth, ...model.bottomGrowth].map((row) => row.itemId);
+
+    expect(ranked).not.toContain("spending.other_unclassified");
+    expect(ranked).not.toContain("spending.defence");
+    expect(model.bottomGrowth[0]?.itemId).toBe("spending.health");
+    expect(model.comparisonRows.map((row) => row.itemId)).toEqual(
+      expect.arrayContaining(["spending.other_unclassified", "spending.defence"]),
+    );
+  });
+});
