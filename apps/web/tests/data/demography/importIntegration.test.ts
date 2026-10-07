@@ -6,6 +6,7 @@ test("demography import verifies its serving mapper before committing", async ()
   const code = await fs.readFile("scripts/import-budget-facts.ts", "utf8");
   expect(code).toContain("loadDemographyFactsFromMirror(tx)");
   expect(code).toContain("assertDemographyParity(demographyFacts, mirrorDemographyFacts)");
+  expect(code).toContain("tx.demographyFact.deleteMany()");
   expect(code.indexOf("tx.demographyFact.deleteMany()")).toBeLessThan(code.indexOf("tx.sourceDocument.deleteMany()"));
   expect(code).toContain('table: "DemographyFact"');
   expect(code).toContain('assertSubset("Demography source IDs"');
