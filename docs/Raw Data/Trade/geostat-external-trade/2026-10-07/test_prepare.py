@@ -231,5 +231,73 @@ class ProductsTests(PackageTests):
         with self.assertRaisesRegex(ValueError,'source_arithmetic'):
             products.resolve_source_exceptions(products.compare_hs_parents(bad,{('six','four')}),bad,registry)
 
+class RegionTests(PackageTests):
+    _data=None
+    def rows(self):
+        module=self.module('read_regions_services')
+        if self.__class__._data is None:
+            self.__class__._data=module.read_regions(self.module('archive').load_verified_sources(ROOT),json.loads((ROOT/'source-layouts.json').read_text(encoding='utf-8')),ROOT)
+        return self.__class__._data
+
+    def test_registered_address_annual_regions_keep_unknown(self):
+        rows=self.rows(); totals=[r for r in rows if r['role']=='total']
+        expected={'region.tbilisi','region.adjara','region.guria','region.imereti','region.kakheti','region.mtskheta_mtianeti','region.racha_lechkhumi_kvemo_svaneti','region.samegrelo_zemo_svaneti','region.samtskhe_javakheti','region.kvemo_kartli','region.shida_kartli','region.unknown'}
+        self.assertEqual({r['geography_id'] for r in totals},expected)
+        self.assertEqual(len(totals),96)
+        self.assertEqual({r['year'] for r in rows},{'2022','2023','2024','2025'})
+        self.assertEqual({r['attribution_basis'] for r in rows},{'registered_address'})
+        self.assertTrue(any(r['source_cell']=='W4789' for r in totals))
+        self.assertTrue(any(r['source_cell']=='W8255' for r in totals))
+        self.assertFalse(any(r['role']=='detail' and r['geography_id']=='region.unknown' for r in rows))
+        report=self.module('model').check_coverage(rows,json.loads((ROOT/'expected-observation-inventory.json').read_text()),{'goods_regions'})
+        self.assertEqual(report['matched_observations'],len(rows))
+
+    def test_unpublished_unknown_products_are_eight_unavailable_checks(self):
+        comparisons=self.module('read_regions_services').region_comparisons(self.rows())
+        unknown=[r for r in comparisons if r['check']=='regional_product_sum' and r['item_id']=='region.unknown']
+        self.assertEqual(len(unknown),8)
+        self.assertEqual({r['status'] for r in unknown},{'not_published'})
+        self.assertTrue(all(r['actual_usd']=='' and r['expected_usd']=='' for r in unknown))
+        self.assertFalse(any(r['status']=='fail' for r in comparisons))
+
+class ServicesTests(PackageTests):
+    _data=None
+    def rows(self):
+        module=self.module('read_regions_services')
+        if self.__class__._data is None:
+            self.__class__._data=module.read_services(self.module('archive').load_verified_sources(ROOT),json.loads((ROOT/'source-layouts.json').read_text(encoding='utf-8')),ROOT)
+        return self.__class__._data
+
+    def test_all_types_countries_and_joint_source_keys_are_preserved(self):
+        rows=self.rows()
+        self.assertEqual({r['dimension'] for r in rows},{'type','country','type_country'})
+        self.assertEqual({r['year'] for r in rows},{'2020','2021','2022','2023','2024'})
+        types={r['service_id'] for r in rows if r['dimension']=='type' and r['role']=='detail'}
+        self.assertEqual(len(types),12)
+        current=next(r for r in rows if r['dimension']=='type' and r['flow']=='export' and r['year']=='2024' and r['role']=='total')
+        self.assertEqual(Decimal(current['value_usd']),Decimal('7706284984.7599976'))
+        self.assertEqual(current['source_cell'],'F5')
+        report=self.module('model').check_coverage(rows,json.loads((ROOT/'expected-observation-inventory.json').read_text()),{'services'})
+        self.assertEqual(report['matched_observations'],len(rows))
+
+    def test_published_dash_and_sparse_country_details_stay_unavailable(self):
+        rows=self.rows()
+        repair=next(r for r in rows if r['dimension']=='type' and r['flow']=='export' and r['year']=='2020' and r['service_id']=='services.maintenance_repair')
+        self.assertEqual((repair['source_value'],repair['value_usd'],repair['value_status']),('-','','not_applicable'))
+        comparisons=self.module('read_regions_services').services_comparisons(rows)
+        conflicts=[r for r in comparisons if r['status']=='fail']
+        self.assertEqual({(r['check'],r['flow'],r['year'],r['item_id']) for r in conflicts},{('service_country_matches_joint','import','2022','partner.2020-2024.826'),('service_country_matches_joint','import','2024','partner.2020-2024.826')})
+        self.assertTrue(any(r['status']=='not_published' for r in comparisons))
+        self.assertTrue(any(r['check']=='service_type_sum' and r['status']=='pass' for r in comparisons))
+
+    def test_unlabelled_maintenance_amounts_reconcile_without_country_allocation(self):
+        rows=self.rows()
+        blank=[r for r in rows if r['dimension']=='type_country' and r['flow']=='export' and r['service_id']=='services.maintenance_repair' and r['source_cell']=='G36']
+        self.assertEqual(len(blank),1)
+        self.assertEqual((blank[0]['partner_code'],blank[0]['partner_label_en'],blank[0]['role']),('','','supporting'))
+        checks=self.module('read_regions_services').services_comparisons(rows)
+        repair=[c for c in checks if c['check']=='service_joint_country_sum' and c['flow']=='export' and c['item_id']=='services.maintenance_repair' and c['year'] in ('2023','2024')]
+        self.assertEqual([c['status'] for c in repair],['pass','pass'])
+
 if __name__ == '__main__':
     unittest.main()
