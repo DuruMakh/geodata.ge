@@ -12,6 +12,13 @@ type SiteHeaderProps = {
   testId: string;
 };
 
+const MENU_DATASETS = [
+  { href: "/explorer", labelKey: "common.budget" },
+  { href: "/explorer/economy", labelKey: "common.economy" },
+  { href: "/explorer/inflation", labelKey: "common.inflation" },
+  { href: "/explorer/unemployment", labelKey: "common.unemployment" },
+] as const;
+
 function navLinkClass(isActive: boolean) {
   return isActive
     ? "flex min-h-11 items-center text-[13px] font-semibold text-[var(--ink)] underline decoration-2 decoration-[var(--accent)] underline-offset-[5px] min-[900px]:min-h-8"
@@ -60,10 +67,24 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
           <Link
             href={pageHref("/explorer", locale)}
             aria-current={active === "explorer" ? "page" : undefined}
-            className={navLinkClass(active === "explorer")}
+            className={`${navLinkClass(active === "explorer")} max-[900px]:hidden`}
           >
             {message(messages, "common.data")}
           </Link>
+          {/* In the ☰ panel the single data link would open the budget hub only;
+              the panel names all four datasets under a plain label instead. */}
+          <div data-testid="menu-datasets" className="min-[900px]:hidden">
+            <span className="flex min-h-9 items-center text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--faint)]">{message(messages, "common.data")}</span>
+            <ul className="flex list-none flex-col border-l border-[var(--hairline)] pl-4">
+              {MENU_DATASETS.map(({ href, labelKey }) => (
+                <li key={href}>
+                  <Link href={pageHref(href, locale)} className={navLinkClass(false)}>
+                    {message(messages, labelKey)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
           <Link
             href={pageHref("/connect", locale)}
             aria-current={active === "connect" ? "page" : undefined}

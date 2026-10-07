@@ -68,3 +68,23 @@ test("tapping a menu link from mid-page closes the menu on arrival", async ({ pa
   await expect(page).toHaveURL(/\/explorer\/unemployment$/);
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
+
+for (const { path, menu, datasets, other } of [
+  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა"], other: "English" },
+  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Inflation", "Unemployment"], other: "ქართული" },
+]) {
+  test(`${path} ☰ menu lists the four datasets as 44px rows`, async ({ page }) => {
+    await page.goto(path);
+    const header = page.getByTestId("landing-header");
+    await header.getByRole("button", { name: menu, exact: true }).click();
+    const group = header.getByTestId("menu-datasets");
+    await expect(group.getByRole("link")).toHaveText(datasets);
+    const hrefs = await group.getByRole("link").evaluateAll((links) => links.map((link) => new URL((link as HTMLAnchorElement).href).pathname));
+    const prefix = path === "/en" ? "/en" : "";
+    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment"].map((href) => `${prefix}${href}`));
+    for (const row of await heights(header.getByRole("navigation").getByRole("link"))) expect(row.height, row.text).toBeGreaterThanOrEqual(44);
+    const switchBox = await header.getByRole("group").getByRole("link", { name: other }).boundingBox();
+    expect(switchBox?.width ?? 0).toBeGreaterThanOrEqual(44);
+    expect(switchBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+  });
+}
