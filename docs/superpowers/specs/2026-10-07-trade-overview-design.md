@@ -1,7 +1,7 @@
 # Trade hub and national goods overview
 
 Date: 2026-10-07
-Status: Draft for written review. The user confirmed a Trade hub, work on Overview first, and checkboxes for comparing indicators. The complete design below awaits written approval; no product implementation or publishing is authorized by this document alone.
+Status: Approved in this conversation on 2026-10-08, when the user said "continue" after the written-design review request. The Trade hub, Overview-first scope and checkbox comparison are confirmed. The implementation plan is the next review; publishing and live database operations remain separate.
 
 ## 1. Intended result
 
