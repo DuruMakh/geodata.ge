@@ -260,8 +260,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    await expect(links).toHaveCount(6);
-    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]) {
+    await expect(links).toHaveCount(7);
+    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/trade", "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
     await expectNoPageOverflow(page);

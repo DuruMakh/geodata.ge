@@ -20,8 +20,8 @@ for (const locale of ["ka", "en"] as const) {
       await page.keyboard.press("Enter");
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
       const nav = header.getByRole("navigation", { includeHidden: false });
-      // მთავარი, the four datasets (in place of the single budget-only data link), AI, მიზანი.
-      await expect(nav.getByRole("link")).toHaveCount(7);
+      // მთავარი, the five datasets (in place of the single budget-only data link), AI, მიზანი.
+      await expect(nav.getByRole("link")).toHaveCount(8);
       await expect(nav.getByRole("link").first()).toHaveAttribute("aria-current", "page");
       const languages = header.getByRole("group");
       await expect(languages).toBeVisible();

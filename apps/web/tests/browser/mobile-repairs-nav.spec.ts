@@ -73,7 +73,7 @@ for (const { path, menu, datasets, other } of [
   { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა"], other: "English" },
   { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Inflation", "Unemployment", "Trade"], other: "ქართული" },
 ]) {
-  test(`${path} ☰ menu lists the four datasets as 44px rows`, async ({ page }) => {
+  test(`${path} ☰ menu lists every dataset as 44px rows`, async ({ page }) => {
     await page.goto(path);
     const header = page.getByTestId("landing-header");
     await header.getByRole("button", { name: menu, exact: true }).click();
@@ -81,7 +81,7 @@ for (const { path, menu, datasets, other } of [
     await expect(group.getByRole("link")).toHaveText(datasets);
     const hrefs = await group.getByRole("link").evaluateAll((links) => links.map((link) => new URL((link as HTMLAnchorElement).href).pathname));
     const prefix = path === "/en" ? "/en" : "";
-    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment"].map((href) => `${prefix}${href}`));
+    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/trade"].map((href) => `${prefix}${href}`));
     for (const row of await heights(header.getByRole("navigation").getByRole("link"))) expect(row.height, row.text).toBeGreaterThanOrEqual(44);
     const switchBox = await header.getByRole("group").getByRole("link", { name: other }).boundingBox();
     expect(switchBox?.width ?? 0).toBeGreaterThanOrEqual(44);
@@ -125,7 +125,7 @@ for (const { path, labels } of [
   { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
   { path: "/en", labels: ["Budget", "Economy", "Inflation", "Unemployment", "Trade", "Methodology", "AI connection", "About"] },
 ]) {
-  test(`${path} footer names the four datasets in a compact two-column grid`, async ({ page }) => {
+  test(`${path} footer names every dataset in a compact two-column grid`, async ({ page }) => {
     await page.goto(path);
     const footer = page.getByTestId("site-footer");
     const nav = footer.locator("ul a");
@@ -145,11 +145,11 @@ for (const { path, labels } of [
   });
 }
 
-test("404 recovers to the four datasets with no top band on a phone", async ({ page }) => {
+test("404 recovers to every dataset with no top band on a phone", async ({ page }) => {
   await page.goto("/this-page-does-not-exist");
   const recovery = page.getByTestId("not-found-recovery");
   const hrefs = await recovery.getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]);
+  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/trade", "/methodology"]);
   expect((await recovery.boundingBox())?.y ?? 999).toBeLessThanOrEqual(40);
   await expect(page.locator('a[href="/sitemap.xml"], a[href="/llms.txt"]')).toHaveCount(0);
 });
