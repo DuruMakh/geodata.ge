@@ -9,6 +9,7 @@ const FOOTER_LINKS = [
   { href: "/explorer/economy", labelKey: "common.economy" },
   { href: "/explorer/inflation", labelKey: "common.inflation" },
   { href: "/explorer/unemployment", labelKey: "common.unemployment" },
+  { href: "/explorer/trade", labelKey: "common.trade" },
   { href: "/methodology", labelKey: "common.methodology" },
   { href: "/connect", labelKey: "common.aiConnection" },
   { href: "/about", labelKey: "common.about" },

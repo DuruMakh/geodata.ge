@@ -73,5 +73,6 @@
   "landing.datasetBudgetMeasure": "ხარჯები",
   "landing.datasetEconomyMeasure": "ნომინალური მშპ",
   "landing.datasetInflationMeasure": "წლიური ინფლაცია",
+  "landing.datasetTradeMeasure": "საგარეო სავაჭრო ბრუნვა",
   "landing.datasetUnemploymentMeasure": "უმუშევრობის დონე"
 }

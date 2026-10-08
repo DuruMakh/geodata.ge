@@ -5,6 +5,7 @@ import { buildLandingDatasetLinks } from "../landing/landingDatasets";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
+import { loadServedTradeOverviewData, toClientTradeOverviewFact } from "../data/tradeOverview/importTradeOverview";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import type { Locale } from "../i18n/types";
@@ -21,12 +22,12 @@ export async function homePageMetadata(locale: Locale) {
 }
 
 export async function renderHomePage(locale: Locale) {
-  const [landingData, municipalData, debtData, balanceData, gdpData, inflationData, unemploymentData] = await Promise.all([
+  const [landingData, municipalData, debtData, balanceData, gdpData, inflationData, unemploymentData, tradeData] = await Promise.all([
     loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
-    loadServedGdpOverviewData(), loadServedInflationData(), loadServedUnemploymentData(),
+    loadServedGdpOverviewData(), loadServedInflationData(), loadServedUnemploymentData(), loadServedTradeOverviewData(),
   ]);
   // "inflation" supplies the short month names of the inflation figure's period.
-  const presentation = await getPresentation(locale, ["common", "landing", "inflation"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
+  const presentation = await getPresentation(locale, ["common", "landing", "inflation", "trade"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
   const model = buildLandingModel({
     ...landingData,
     municipalities: municipalData.municipalities,
@@ -40,6 +41,7 @@ export async function renderHomePage(locale: Locale) {
     gdpFacts: gdpData.facts,
     cpiFacts: inflationData.facts,
     unemploymentFacts: unemploymentData.facts,
+    tradeFacts: tradeData.facts.map(toClientTradeOverviewFact),
   }, presentation);
   const rootUrl = new URL(pageHref("/", locale), `${resolveSiteUrl()}/`).href;
   const ka = `${resolveSiteUrl()}/`;

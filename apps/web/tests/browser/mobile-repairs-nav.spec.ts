@@ -70,8 +70,8 @@ test("tapping a menu link from mid-page closes the menu on arrival", async ({ pa
 });
 
 for (const { path, menu, datasets, other } of [
-  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა"], other: "English" },
-  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Inflation", "Unemployment"], other: "ქართული" },
+  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა"], other: "English" },
+  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Inflation", "Unemployment", "Trade"], other: "ქართული" },
 ]) {
   test(`${path} ☰ menu lists the four datasets as 44px rows`, async ({ page }) => {
     await page.goto(path);
@@ -90,14 +90,14 @@ for (const { path, menu, datasets, other } of [
 }
 
 for (const { path, titles, measures } of [
-  { path: "/", titles: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა"], measures: ["ხარჯები", "ნომინალური მშპ", "წლიური ინფლაცია", "უმუშევრობის დონე"] },
-  { path: "/en", titles: ["Budget", "Economy", "Inflation", "Unemployment"], measures: ["Spending", "Nominal GDP", "Annual inflation", "Unemployment rate"] },
+  { path: "/", titles: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა"], measures: ["ხარჯები", "ნომინალური მშპ", "წლიური ინფლაცია", "უმუშევრობის დონე", "საგარეო სავაჭრო ბრუნვა"] },
+  { path: "/en", titles: ["Budget", "Economy", "Inflation", "Unemployment", "Trade"], measures: ["Spending", "Nominal GDP", "Annual inflation", "Unemployment rate", "Total trade"] },
 ]) {
-  test(`${path} lists the four datasets with a latest figure right after the country figures`, async ({ page }) => {
+  test(`${path} lists every dataset with a latest figure right after the country figures`, async ({ page }) => {
     await page.goto(path);
     const row = page.getByTestId("landing-datasets");
     const links = row.getByRole("link");
-    await expect(links).toHaveCount(4);
+    await expect(links).toHaveCount(titles.length);
     for (const [index, link] of (await links.all()).entries()) {
       await expect(link).toContainText(titles[index]);
       // "{measure} · {period}: {value}", the value a number with its unit.
@@ -122,8 +122,8 @@ test("landing calls to action are 44px tap targets", async ({ page }) => {
 });
 
 for (const { path, labels } of [
-  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
-  { path: "/en", labels: ["Budget", "Economy", "Inflation", "Unemployment", "Methodology", "AI connection", "About"] },
+  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
+  { path: "/en", labels: ["Budget", "Economy", "Inflation", "Unemployment", "Trade", "Methodology", "AI connection", "About"] },
 ]) {
   test(`${path} footer names the four datasets in a compact two-column grid`, async ({ page }) => {
     await page.goto(path);

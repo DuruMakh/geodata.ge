@@ -315,7 +315,7 @@ export function DataSidebar() {
               </Link>;
             }) : null}
             <Link href={pageHref("/explorer/trade", locale)} data-testid="trade-link" aria-current={pathname.endsWith("/explorer/trade") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 border-l-2 px-2.5 py-2 text-[12.5px] font-semibold no-underline ${tradeActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${tradeActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.trade")}
             </Link>
             {tradeActive ? <Link href={pageHref("/explorer/trade/overview", locale)} data-testid="trade-overview-link" aria-current={tradeOverviewActive ? "page" : undefined}
@@ -323,7 +323,7 @@ export function DataSidebar() {
                 if (tradeOverviewActive) event.preventDefault();
                 setSheetOpen(false);
               }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${tradeOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeOverview")}
             </Link> : null}

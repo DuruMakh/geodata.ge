@@ -14,6 +14,7 @@ const destinations = [
   { href: "/explorer/economy", label: "ეკონომიკა" },
   { href: "/explorer/inflation", label: "ინფლაცია" },
   { href: "/explorer/unemployment", label: "უმუშევრობა" },
+  { href: "/explorer/trade", label: "საგარეო ვაჭრობა" },
   { href: "/methodology", label: "მეთოდოლოგია" },
 ] as const;
 
@@ -23,6 +24,7 @@ const englishDestinations = [
   ["/en/explorer/economy", "Economy"],
   ["/en/explorer/inflation", "Inflation"],
   ["/en/explorer/unemployment", "Unemployment"],
+  ["/en/explorer/trade", "Trade"],
   ["/en/methodology", "Methodology"],
 ] as const;
 

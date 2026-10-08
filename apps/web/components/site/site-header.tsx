@@ -17,6 +17,7 @@ const MENU_DATASETS = [
   { href: "/explorer/economy", labelKey: "common.economy" },
   { href: "/explorer/inflation", labelKey: "common.inflation" },
   { href: "/explorer/unemployment", labelKey: "common.unemployment" },
+  { href: "/explorer/trade", labelKey: "common.trade" },
 ] as const;
 
 function navLinkClass(isActive: boolean) {

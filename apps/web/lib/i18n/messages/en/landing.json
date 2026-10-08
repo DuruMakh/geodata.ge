@@ -73,5 +73,6 @@
   "landing.datasetBudgetMeasure": "Spending",
   "landing.datasetEconomyMeasure": "Nominal GDP",
   "landing.datasetInflationMeasure": "Annual inflation",
+  "landing.datasetTradeMeasure": "Total trade",
   "landing.datasetUnemploymentMeasure": "Unemployment rate"
 }

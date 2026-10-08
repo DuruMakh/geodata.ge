@@ -122,11 +122,11 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
         </section>
 
         {/* One row per dataset hub, each with its latest served figure: the
-            budget ledger below is one dataset of four (owner decision D3). */}
+            budget ledger below is one dataset of five (owner decision D3). */}
         <nav
           aria-label={message(messages, "landing.datasetsLabel")}
           data-testid="landing-datasets"
-          className="mt-7 grid grid-cols-2 border-t border-[var(--hairline-soft)] min-[768px]:mt-10 min-[768px]:grid-cols-4"
+          className="mt-7 grid grid-cols-2 border-t border-[var(--hairline-soft)] min-[768px]:mt-10 min-[768px]:grid-cols-5 [&>*:last-child:nth-child(odd)]:col-span-2 min-[768px]:[&>*:last-child:nth-child(odd)]:col-span-1"
         >
           {datasets.map((dataset) => (
             <Link
