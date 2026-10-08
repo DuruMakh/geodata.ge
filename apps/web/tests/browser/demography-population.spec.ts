@@ -202,6 +202,87 @@ for (const [locale, prefix, label] of [
   });
 }
 
+// The strip shifts a marker's label by its own width in proportion to the marker's place (DESIGN.md 7.4), so the 2025 label,
+// 95% along Georgia's strip, ends inside it. Measured as main's forecast-marker test measures it, with the same slack.
+for (const width of [320, 390, 1440]) {
+  test(`the re-base label stays inside the range strip and clear of its chips at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of ["/explorer/demography/population/georgia", "/en/explorer/demography/population/georgia", "/en/explorer/demography/population/region/adjara"]) {
+      await page.goto(path);
+      await ready(page);
+      const strip = page.getByTestId("year-range-strip");
+      await strip.scrollIntoViewIfNeeded();
+      await expect(page.getByTestId("range-marker").locator("span")).toBeVisible();
+      const layout = await strip.evaluate((element) => {
+        const marker = element.querySelector("[data-testid=range-marker] span")!.getBoundingClientRect();
+        const frame = element.getBoundingClientRect();
+        const overlaps = [...element.querySelectorAll("button[aria-pressed]")].filter((chip) => {
+          const box = chip.getBoundingClientRect();
+          return box.left < marker.right && box.right > marker.left && box.top < marker.bottom && box.bottom > marker.top;
+        }).length;
+        return { overlaps, inside: marker.left >= frame.left - 0.5 && marker.right <= frame.right + 0.5 };
+      });
+      expect(layout, path).toEqual({ overlaps: 0, inside: true });
+    }
+  });
+}
+
+// Main's phone layouts (owner decisions D1, D4 and D5) keep the census re-base: no line, row pair or readout joins 2024 to 2025.
+test.describe("phone layouts at 390px", () => {
+  test.use({ isMobile: true, hasTouch: true, viewport: { width: 390, height: 844 } });
+  const twoPlaces = "sel=country.georgia%2Cregion.adjara";
+
+  for (const [locale, prefix, label] of [
+    ["ka", "", "აღწერით გადათვლა"],
+    ["en", "/en", "Census re-base"],
+  ] as const) {
+    test(`${locale}: the table lists years as rows with the re-base between 2025 and 2024`, async ({ page }) => {
+      await page.goto(`${prefix}/explorer/demography/population/georgia#m=table&${twoPlaces}`);
+      await ready(page);
+      const table = page.getByTestId("explorer-table");
+      await expect(table).toHaveAttribute("data-layout", "rows");
+      const rows = await table.evaluate((element) =>
+        [...element.querySelectorAll("tbody tr[data-year]")].map((row) => ({
+          year: Number((row as HTMLElement).dataset.year),
+          rule: getComputedStyle(row).borderBottomWidth,
+          header: row.querySelector("th")?.textContent ?? "",
+        })),
+      );
+      const at = rows.findIndex((row) => row.year === 2025);
+      expect(rows[at + 1]?.year).toBe(2024);
+      expect(rows[at]!.rule).toBe("2px");
+      expect(rows[at]!.header).toContain(label);
+      expect(rows.filter((row) => row.header.includes(label))).toHaveLength(1);
+      expect(rows.filter((row) => row.rule === "2px")).toHaveLength(1);
+      // No change figure anywhere in the table: no summary row and no signed percentage.
+      await expect(table.locator("tr[data-summary]")).toHaveCount(0);
+      expect(await table.innerText()).not.toMatch(/[+−]\d|%/);
+    });
+
+    test(`${locale}: the phone chart keeps its gap, its legend and tap readout print levels`, async ({ page }) => {
+      await page.goto(`${prefix}/explorer/demography/population/georgia#${twoPlaces}`);
+      await ready(page);
+      const drawing = page.locator('svg[data-geometry="mobile"]');
+      await expect(drawing).toBeVisible();
+      await expect(drawing.getByTestId("chart-break")).toHaveCount(1);
+      await expect(drawing.getByTestId("chart-break")).toContainText(label);
+      // Georgia's line and Adjara's: each path starts again at 2025.
+      const moves = await drawing.locator('path[stroke-linejoin="round"]').evaluateAll((paths) => paths.map((path) => (path.getAttribute("d")!.match(/M/g) ?? []).length));
+      expect(moves).toEqual([2, 2]);
+      const legend = page.getByTestId("chart-phone-legend");
+      await expect(legend.locator("li")).toHaveCount(2);
+      expect(await legend.innerText()).not.toMatch(/[+−]\d|%/);
+      await drawing.scrollIntoViewIfNeeded();
+      const box = (await drawing.boundingBox())!;
+      await page.touchscreen.tap(box.x + box.width * 0.9, box.y + box.height * 0.5);
+      const readout = page.locator("[data-placement='panel']");
+      await expect(readout).toBeVisible();
+      await expect(legend).toBeHidden();
+      expect(await readout.innerText()).not.toMatch(/[+−]\d|%/);
+    });
+  }
+});
+
 test("the Excel download of a place page has three sheets and numeric population", async ({ page }, testInfo) => {
   await page.goto("/en/explorer/demography/population/batumi");
   await ready(page);
