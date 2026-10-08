@@ -4,6 +4,8 @@ import { loadEconomicSectorFacts, assertEconomicSectorParity } from "../lib/data
 import { loadUnemploymentFacts, assertUnemploymentParity } from "../lib/data/unemployment/importUnemployment";
 import { loadTradeOverviewFacts, assertTradeOverviewParity } from "../lib/data/tradeOverview/importTradeOverview";
 import { TRADE_OVERVIEW_DOCUMENT_ID } from "../lib/data/tradeOverview/types";
+import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tradePartners/importTradePartners";
+import { TRADE_PARTNER_DOCUMENT_IDS } from "../lib/data/tradePartners/types";
 import {
   assertRegionalEconomyParity,
   loadRegionalEconomyFacts,
@@ -23,6 +25,9 @@ import {
   unemploymentMirrorCreateRows,
   loadTradeOverviewFactsFromMirror,
   tradeOverviewMirrorCreateRows,
+  tradePartnerEntityMirrorCreateRows,
+  tradePartnerFactMirrorCreateRows,
+  loadTradePartnersDataFromMirror,
   loadInflationBasketWeightsFromMirror,
   loadInflationCategoryFactsFromMirror,
   loadInflationCityFactsFromMirror,
@@ -261,6 +266,8 @@ async function main() {
   assertSubset("Unemployment source IDs", unemploymentFacts.map(f => `source.${f.sourceId}`), sourceIds);
   const tradeOverviewFacts = await loadTradeOverviewFacts();
   assertSubset("Trade Overview source IDs", [TRADE_OVERVIEW_DOCUMENT_ID], sourceIds);
+  const tradePartners = await loadTradePartnersData();
+  assertSubset("Trade partner source IDs", Object.values(TRADE_PARTNER_DOCUMENT_IDS), sourceIds);
   const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
   assertSubset("Regional economy source IDs", regionalEconomyFacts.map((fact) => fact.sourceId), sourceIds);
   assertSubset("GDP overview source IDs",gdpOverviewFacts.map(f=>f.sourceId),sourceIds);
@@ -432,6 +439,8 @@ async function main() {
         await tx.economicSectorFact.deleteMany();
         await tx.unemploymentFact.deleteMany();
         await tx.tradeOverviewFact.deleteMany();
+        await tx.tradePartnerFact.deleteMany();
+        await tx.tradePartnerEntity.deleteMany();
         await tx.regionalEconomyFact.deleteMany();
         await tx.inflationCpiFact.deleteMany();
         await tx.inflationTarget.deleteMany();
@@ -704,6 +713,10 @@ async function main() {
         await tx.tradeOverviewFact.createMany({ data: tradeOverviewMirrorCreateRows(tradeOverviewFacts, run.id) });
         const mirrorTradeOverviewFacts = await loadTradeOverviewFactsFromMirror(tx);
         assertTradeOverviewParity(tradeOverviewFacts, mirrorTradeOverviewFacts);
+        await tx.tradePartnerEntity.createMany({ data: tradePartnerEntityMirrorCreateRows(tradePartners.entities, run.id) });
+        await tx.tradePartnerFact.createMany({ data: tradePartnerFactMirrorCreateRows(tradePartners.facts, run.id) });
+        const mirrorTradePartners = await loadTradePartnersDataFromMirror(tx);
+        assertTradePartnersParity(tradePartners, mirrorTradePartners);
         await tx.regionalEconomyFact.createMany({
           data: regionalEconomyFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
             ...fact,
@@ -982,6 +995,8 @@ async function main() {
             { table: "EconomicSectorFact", csvRows: economicSectorFacts.length, dbRows: mirrorEconomicSectorFacts.length },
             { table: "UnemploymentFact", csvRows: unemploymentFacts.length, dbRows: mirrorUnemploymentFacts.length },
             { table: "TradeOverviewFact", csvRows: tradeOverviewFacts.length, dbRows: mirrorTradeOverviewFacts.length },
+            { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
+            { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },
             { table: "RegionalEconomyFact", csvRows: regionalEconomyFacts.length, dbRows: mirrorRegionalEconomyFacts.length },
             { table: "InflationCpiFact", csvRows: inflationCpiFacts.length, dbRows: mirrorInflation.facts.length },
             { table: "InflationTarget", csvRows: inflationTargets.length, dbRows: mirrorInflation.targets.length },

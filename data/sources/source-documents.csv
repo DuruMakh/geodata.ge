@@ -154,3 +154,7 @@ source.geostat_lfs_source_page,დასაქმებისა და უმ�
 source.geostat_lfs_annual_education,შრომის ძალის მაჩვენებლები განათლების მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/13-labour-force-indicators-by-education.xlsx,2026-10-04
 source.geostat_lfs_annual_long_term,ხანგრძლივი უმუშევრობა,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/16-long-term-unemployment.xlsx,2026-10-04
 source.geostat_trade_ftrade_1995_2026,საქონლის ექსპორტი და იმპორტი 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx,2026-10-08
+source.geostat_trade_export_country_1995_2026,საქონლის ექსპორტი ქვეყნების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Export-Country_1995-2026.xlsx,2026-10-08
+source.geostat_trade_import_country_1995_2026,საქონლის იმპორტი ქვეყნების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import-Country-1995-2026.xlsx,2026-10-08
+source.geostat_trade_export__country_group_1995_2026,საქონლის ექსპორტი ქვეყნების ჯგუფების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Export-_Country_Group-1995-2026.xlsx,2026-10-08
+source.geostat_trade_import_country_group_1995_2026,საქონლის იმპორტი ქვეყნების ჯგუფების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import_Country_Group-1995-2026.xlsx,2026-10-08

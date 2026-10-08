@@ -27,6 +27,7 @@ import type { SourceDocumentRow } from "../data/sources";
 import type { SectorObservation } from "../data/economicSectors/types";
 import type { UnemploymentObservation } from "../data/unemployment/types";
 import { TRADE_OVERVIEW_DOCUMENT_ID, type TradeOverviewFact } from "../data/tradeOverview/types";
+import { TRADE_PARTNER_DOCUMENT_IDS, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData } from "../data/tradePartners/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -484,6 +485,27 @@ export function tradeOverviewMirrorCreateRows(facts: readonly TradeOverviewFact[
   return facts.map(({ lastReviewedAt, ...fact }) => ({
     ...fact, sourceDocumentId: TRADE_OVERVIEW_DOCUMENT_ID, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
   }));
+}
+
+export function tradePartnerEntityMirrorCreateRows(entities: readonly TradePartnerEntity[], importRunId: string): Prisma.TradePartnerEntityCreateManyInput[] {
+  return entities.map(entity => ({ ...entity, importRunId }));
+}
+
+export function tradePartnerFactMirrorCreateRows(facts: readonly TradePartnerFact[], importRunId: string): Prisma.TradePartnerFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({ ...fact, sourceDocumentId: TRADE_PARTNER_DOCUMENT_IDS[fact.sourceId], lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId }));
+}
+
+export async function loadTradePartnersDataFromMirror(db: Pick<MirrorClient, "tradePartnerEntity" | "tradePartnerFact">): Promise<TradePartnersData> {
+  const [entityRows, factRows] = await Promise.all([
+    db.tradePartnerEntity.findMany({ orderBy: { id: "asc" } }),
+    db.tradePartnerFact.findMany({ orderBy: [{ entityId: "asc" }, { year: "asc" }, { indicatorId: "asc" }] }),
+  ]);
+  const entities = entityRows.map(({ id, kind, sourceCode, labelKa }) => ({ id, kind: kind as TradePartnerEntity["kind"], sourceCode, labelKa }));
+  const facts = factRows.map(row => {
+    if (!TRADE_PARTNER_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_PARTNER_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId) throw new Error("Trade partner source relation mismatch");
+    return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradePartnerFact["indicatorId"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as TradePartnerFact["valueStatus"], publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradePartnerFact["role"], sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock, lastReviewedAt: isoDate(row.lastReviewedAt) };
+  });
+  return { entities, facts };
 }
 
 export async function loadTradeOverviewFactsFromMirror(db: Pick<MirrorClient, "tradeOverviewFact">): Promise<TradeOverviewFact[]> {
