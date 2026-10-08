@@ -23,6 +23,11 @@ function segmentY(html: string, id: string): number {
 }
 
 describe("StackedColumnChart", () => {
+  it("preserves monthly calendar boundaries by default", () => {
+    const months = Array.from({ length: 36 }, (_, i) => 24288 + i);
+    const monthly = renderGeorgianMarkup(<StackedColumnChart {...props} periods={months} formatPeriod={period => `month.${period}`} />);
+    expect(monthly.match(/>month\.\d+<\/text>/g)).toHaveLength(3);
+  });
   it("draws one rect per segment and period", () => {
     expect(markup.match(/data-segment="/g)).toHaveLength(4);
   });

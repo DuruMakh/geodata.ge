@@ -3,7 +3,7 @@
 Version: 4.1
 Last updated: 2026-09-26
 Status: Production visual system for Fiscal.ge
-Scope: Explorer product UI (budget, economy, inflation and unemployment), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
+Scope: Explorer product UI (budget, economy, inflation, unemployment and trade), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
@@ -331,6 +331,8 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/unemployment/regions/[id]                     Region indicators and trends (§27)
 /explorer/unemployment/age                              Age-group comparisons (§27)
 /explorer/unemployment/gender                           Women/men comparisons (§27)
+/explorer/trade                       საგარეო ვაჭრობა   Trade hub (§28)
+/explorer/trade/overview                                National goods overview (§28)
 ```
 
 Outside `/explorer` sit the two editorial pages, `/about` (§23) and `/connect`, the MCP connection page (§24), and the methodology centre at `/methodology` and `/methodology/[dataset]` (§21).
@@ -412,8 +414,8 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- Four dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `უმუშევრობა` → `/explorer/unemployment`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
-- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Inflation's overview / categories / cities, or Unemployment's national overview / regions / age groups / gender, all in the section-row style below.
+- Five dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `უმუშევრობა` → `/explorer/unemployment`, `საგარეო ვაჭრობა` → `/explorer/trade`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
+- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Inflation's overview / categories / cities, Unemployment's national overview / regions / age groups / gender, or Trade's Overview, all in the section-row style below.
 - `დემოგრაფია` — `ink-fg-muted` labels with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`). Markers only: not links, not focusable, no route, no data.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a).
@@ -1072,3 +1074,15 @@ The national overview header keeps only its fixed title and subtitle across all 
 The Gender amendment requested on 2026-10-07 removes its indicator dropdown and single-indicator headline. Men and Women select their own unemployment rate and expand to the other seven existing indicators, including employment rate, following the Urban/rural panel. The national unemployment-rate reference remains first, selectable and the only default selection. The existing checkbox panel keeps percentages and people counts separate, with search-independent bulk selection, complete group/indicator labels in charts, tables and Excel exports, and saved selections preserved across language changes. This amendment adds no data or employment-status estimates.
 
 The national context below the workspace appears only on the national overview's Overview tab and uses the existing stacked-column chart for employed, unemployed and outside-labour-force counts. It uses exact national source values over the active years, with one-decimal display, independently of the main selected groups. Survey-estimate limitations and original-source methodology remain visible. No paired-dot plot, scatterplot or new chart library belongs to this version. The age heatmap below is the approved exception. The authoritative scope is `Project_Definition.md` §2D; bounded decisions are in `docs/superpowers/specs/2026-10-04-unemployment-reuse-explorer-design.md`.
+
+## 28. Trade hub and national goods Overview
+
+Approved on 2026-10-08; scope owner: `Project_Definition.md` §2E. Both routes and their English mirrors reuse the editorial shell. The hub has one working Overview card, with a data-derived turnover sparkline and coverage. Trade follows Unemployment in the sidebar; its Overview child appears only in the active Trade context. Demography remains a teaser.
+
+The Overview workspace reuses the existing line chart, table, annual range strip, series aside and Excel button. Four checkbox rows remain in this order: `საგარეო სავაჭრო ბრუნვა` / Total trade (ink), `ექსპორტი` / Exports (editorial green), `იმპორტი` / Imports (editorial blue), `სავაჭრო სალდო` / Trade balance (editorial muted brown). Only turnover is selected initially and it is removable. Search never narrows bulk selection or the denominator of four. Default mode is line and the range derives from all loaded annual observations.
+
+Choose one million/billion USD display scale from all four indicators over the active years; changing checkboxes cannot change that scale. The table shows selected indicators and annual amounts without share or change columns. Preserve all years, mode and explicit empty selections in URL state and across languages.
+
+Below the workspace, four end-year figures remain independent of selection; an absent end-year observation is a dash. Below them, reuse the signed column chart for one balance series, with no overlay, over the same years. It remains present in main-table and empty-selection modes. Explain that negative means imports exceed exports and positive means exports exceed imports; avoid favorable/unfavorable color judgments. Both charts, summaries and table declare USD units.
+
+The native three-sheet Excel workbook follows selected indicators and years, with USD amount headings, neutral signed formatting, actual-record basis, unspecified publication status, both formulas and original-source links. The public methodology explains nominal USD and FOB/CIF valuation. Sources, language alternates, breadcrumbs and coverage match the accepted national goods subset. No new chart primitive, Trade section or additional indicator is implied. Bounded spec: `docs/superpowers/specs/2026-10-07-trade-overview-design.md`.

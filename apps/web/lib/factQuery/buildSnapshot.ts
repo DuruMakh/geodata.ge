@@ -606,8 +606,8 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   // manifests' own source_id, unique across all four manifests — verified by
   // inspection, not just assumed).
   const sources: ResolvedSource[] = sortedBy(
-    // Unemployment is approved for human explorers only, outside the query/publication scope.
-    enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_")), manifestDocuments }), catalogue, serviceKa),
+      // Unemployment and Trade are human explorers, outside the query/publication scope.
+      enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_")), manifestDocuments }), catalogue, serviceKa),
     (source) => source.sourceId,
   ).map((source) => ({
     ...source,

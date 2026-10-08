@@ -22,6 +22,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
     "/explorer/unemployment",
+    "/explorer/trade", "/explorer/trade/overview",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
@@ -37,9 +38,9 @@ export async function listPublicPagePaths(): Promise<string[]> {
 }
 
 export async function loadTranslationInventory(): Promise<TranslationInventory> {
-  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, pagePaths] = await Promise.all([
+  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, tradeDocuments, pagePaths] = await Promise.all([
     loadServedExplorerData(), loadServedMunicipalData(), loadManifestDocuments(),
-    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), listPublicPagePaths(),
+    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "trade"), listPublicPagePaths(),
   ]);
   const sources = resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments: documents });
   const programmeHistory = explorer.adminFacts.filter((fact) => fact.level === "major_program").map((fact) => {
@@ -60,12 +61,13 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
     ]),
     sourceIds: sortedUnique(sources.map((row) => row.sourceId)),
-    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id), ...unemploymentDocuments.map(row => row.source_id)]),
+    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id), ...unemploymentDocuments.map(row => row.source_id), ...tradeDocuments.map(row => row.source_id)]),
     derivedSourceIds: sortedUnique(sources.filter((row) => row.derivation !== null).map((row) => row.sourceId)),
     attributedDocumentIds: sortedUnique([
       ...documents.filter((row) => row.attribution !== null).map((row) => row.documentId),
       ...debtDocuments.map((row) => row.source_id),
       ...unemploymentDocuments.map(row => row.source_id),
+      ...tradeDocuments.map(row => row.source_id),
     ]),
     programmeHistory,
   };

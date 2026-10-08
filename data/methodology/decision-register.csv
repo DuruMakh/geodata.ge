@@ -78,3 +78,7 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "municipalities.encoding.excel_bom","municipalities","docs/data-methodology/municipal-functional-annual-2015-2025.md","Encoding","municipalities.encoding.excel_bom","geodata_decision","2026-08-11"
 "municipalities.validation.coverage_reconciliation","municipalities","docs/data-methodology/municipal-functional-annual-2015-2025.md","Validation","municipalities.validation.coverage_reconciliation","official_fact","2026-08-11"
 "municipalities.limitation.source_transition","municipalities","docs/data-methodology/municipal-functional-annual-2015-2025.md","Limitations","municipalities.limitation.source_transition","limitation","2026-08-11"
+"trade.scope","trade","docs/data-methodology/trade-annual.md","National goods Overview serving subset","trade.scope","geodata_decision","2026-10-08"
+"trade.formulas","trade","docs/data-methodology/trade-annual.md","National goods Overview serving subset","trade.formulas","geodata_decision","2026-10-08"
+"trade.valuation","trade","docs/data-methodology/trade-annual.md","National goods Overview serving subset","trade.valuation","geodata_decision","2026-10-08"
+"trade.publication","trade","docs/data-methodology/trade-annual.md","National goods Overview serving subset","trade.publication","geodata_decision","2026-10-08"
