@@ -17,6 +17,8 @@ const chart = (years: number[], vals: (number | null)[], breaks?: Array<{ year: 
   }));
 const pathOf = (html: string) => new RegExp(`<path d="([^"]+)" fill="none" stroke="${COLOR}"`).exec(html)![1]!;
 const count = (text: string, token: RegExp) => (text.match(token) ?? []).length;
+// Before the browser measures, the markup holds the desktop and the phone drawing (CSS shows one); each must keep the gap.
+const drawings = (html: string) => [...html.matchAll(/<svg[^>]*data-geometry="(desktop|mobile)"[^]*?<\/svg>/g)].map((match) => ({ geometry: match[1]!, svg: match[0] }));
 
 describe("EditorialLineChart break", () => {
   const years = [2023, 2024, 2025, 2026];
@@ -28,17 +30,22 @@ describe("EditorialLineChart break", () => {
     expect(html).not.toContain('data-testid="chart-break"');
   });
 
-  it("never joins the year before a break to the break year", () => {
+  it("never joins the year before a break to the break year, in the desktop and the phone drawing", () => {
     const html = chart(years, vals, [{ year: 2025, label: "Census re-base" }]);
-    expect(count(pathOf(html), /M/g)).toBe(2);
-    expect(count(pathOf(html), /L/g)).toBe(2);
+    expect(drawings(html).map((drawing) => drawing.geometry)).toEqual(["desktop", "mobile"]);
+    for (const { geometry, svg } of drawings(html)) {
+      expect(count(pathOf(svg), /M/g), geometry).toBe(2);
+      expect(count(pathOf(svg), /L/g), geometry).toBe(2);
+    }
   });
 
-  it("marks the gap with one labelled dashed rule", () => {
+  it("marks the gap with one labelled dashed rule in each drawing", () => {
     const html = chart(years, vals, [{ year: 2025, label: "Census re-base" }]);
-    expect(count(html, /data-testid="chart-break"/g)).toBe(1);
-    expect(html).toContain("Census re-base");
-    expect(html).toMatch(/data-testid="chart-break"[^]*?stroke-dasharray="4 3"/);
+    for (const { geometry, svg } of drawings(html)) {
+      expect(count(svg, /data-testid="chart-break"/g), geometry).toBe(1);
+      expect(svg, geometry).toContain("Census re-base");
+      expect(svg, geometry).toMatch(/data-testid="chart-break"[^]*?stroke-dasharray="4 3"/);
+    }
   });
 
   it("draws nothing for a break the range does not separate", () => {

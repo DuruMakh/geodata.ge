@@ -89,7 +89,11 @@ describe("place page body: Georgia", () => {
   test("the chart draws the labelled census gap, the range strip marks it and the note says why", () => {
     expect(html()).toContain('role="img"');
     expect(tagOf(html(), "population-mode-line")).toContain('aria-pressed="true"');
-    expect(count(html(), /data-testid="chart-break"/g)).toBe(1);
+    // One break in each drawing: before the browser measures, the markup holds the desktop and the phone drawing.
+    for (const geometry of ["desktop", "mobile"]) {
+      const svg = new RegExp(`<svg[^>]*data-geometry="${geometry}"[^]*?</svg>`).exec(html())?.[0] ?? "";
+      expect(count(svg, /data-testid="chart-break"/g), geometry).toBe(1);
+    }
     expect(count(html(), /Census re-base/g)).toBeGreaterThanOrEqual(2);
     expect(html()).toContain("226,000");
     expect(html()).toContain("Geostat re-based the population to the 2024 census");
