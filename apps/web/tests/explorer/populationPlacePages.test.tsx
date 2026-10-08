@@ -160,7 +160,8 @@ function explorerIn(node: ReactNode): ExplorerElement | null {
   return node.type === PopulationPlaceExplorer ? (node as ExplorerElement) : explorerIn(node.props.children);
 }
 const previousAndNext = (html: string) => {
-  const found = html.match(/data-testid="municipal-entity-navigation"[^>]*><a href="([^"]*)"[^>]*>← ([^<]*)<\/a><a href="([^"]*)"[^>]*>([^<]*) →<\/a>/);
+  // Each label sits in a span inside its 44px link (main's phone heading).
+  const found = html.match(/data-testid="municipal-entity-navigation"[^>]*><a href="([^"]*)"[^>]*><span[^>]*>← ([^<]*)<\/span><\/a><a href="([^"]*)"[^>]*><span[^>]*>([^<]*) →<\/span><\/a>/);
   return found ? [[found[1], found[2]], [found[3], found[4]]] : null;
 };
 const breadcrumbUrls = (html: string): string[] => {
