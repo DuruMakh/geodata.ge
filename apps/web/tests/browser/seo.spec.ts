@@ -437,7 +437,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
-  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(276);
+  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(282);
 
   const consoleIssues: string[] = [];
   page.on("console", (message) => {
