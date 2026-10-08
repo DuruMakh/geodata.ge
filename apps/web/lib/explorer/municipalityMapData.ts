@@ -9,7 +9,7 @@ export type MunicipalityMapShape = {
   totalBudgetGel: number;
   budgetPerResidentGel: number;
   bucket: number;
-  /** What a page that plots something other than the budget prints for this place in the label and tooltip. */
+  /** What a page that plots something other than the budget says for this place in its map target's accessible name. */
   display?: string;
 };
 
@@ -20,7 +20,7 @@ export type MunicipalityMapMarker = {
   y: number;
   totalBudgetGel: number;
   budgetPerResidentGel: number;
-  /** What a page that plots something other than the budget prints for this place in the label and tooltip. */
+  /** What a page that plots something other than the budget says for this place in its map target's accessible name. */
   display?: string;
 };
 
@@ -271,7 +271,7 @@ export function buildMunicipalityMapModel({
 
 /**
  * A municipality map of any one positive value per municipality (population). The number goes in the
- * existing numeric fields and `display` is the text the page prints in the label and tooltip.
+ * existing numeric fields and `display` is the text each map target's accessible name carries.
  */
 export function buildMunicipalityValueMapModel({
   municipalities,
