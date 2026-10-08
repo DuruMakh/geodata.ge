@@ -153,4 +153,4 @@ source.geostat_lfs_metadata_2026,შრომის ძალის გამო
 source.geostat_lfs_source_page,დასაქმებისა და უმუშევრობის წყაროს გვერდი,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/employment-unemployment-en.html,2026-10-04
 source.geostat_lfs_annual_education,შრომის ძალის მაჩვენებლები განათლების მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/13-labour-force-indicators-by-education.xlsx,2026-10-04
 source.geostat_lfs_annual_long_term,ხანგრძლივი უმუშევრობა,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/16-long-term-unemployment.xlsx,2026-10-04
-source.geostat_trade_ftrade-1995-2026,საქონლის ექსპორტი და იმპორტი 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx,2026-10-08
+source.geostat_trade_ftrade_1995_2026,საქონლის ექსპორტი და იმპორტი 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx,2026-10-08

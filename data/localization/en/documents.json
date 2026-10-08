@@ -3490,5 +3490,50 @@
       "reviewedAt": "2026-10-04"
     },
     "documentLanguage": "en"
+  },
+  "geostat_trade_ftrade-1995-2026": {
+    "title": {
+      "text": "Goods exports and imports in 1995–2026",
+      "reviewedAt": "2026-10-08"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-08"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-08"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_methodology": {
+    "title": {
+      "text": "Brief methodology of external merchandise trade",
+      "reviewedAt": "2026-10-08"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-08"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-08"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_page_metadata": {
+    "title": {
+      "text": "External trade metadata",
+      "reviewedAt": "2026-10-08"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-08"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-08"
+    },
+    "documentLanguage": "en"
   }
 }

@@ -26,7 +26,7 @@ import {
 import type { SourceDocumentRow } from "../data/sources";
 import type { SectorObservation } from "../data/economicSectors/types";
 import type { UnemploymentObservation } from "../data/unemployment/types";
-import type { TradeOverviewFact } from "../data/tradeOverview/types";
+import { TRADE_OVERVIEW_DOCUMENT_ID, type TradeOverviewFact } from "../data/tradeOverview/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -482,14 +482,14 @@ export async function loadGdpOverviewFactsFromMirror(
 
 export function tradeOverviewMirrorCreateRows(facts: readonly TradeOverviewFact[], importRunId: string): Prisma.TradeOverviewFactCreateManyInput[] {
   return facts.map(({ lastReviewedAt, ...fact }) => ({
-    ...fact, sourceDocumentId: `source.${fact.sourceId}`, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+    ...fact, sourceDocumentId: TRADE_OVERVIEW_DOCUMENT_ID, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
   }));
 }
 
 export async function loadTradeOverviewFactsFromMirror(db: Pick<MirrorClient, "tradeOverviewFact">): Promise<TradeOverviewFact[]> {
   const rows = await db.tradeOverviewFact.findMany({ orderBy: [{ year: "asc" }, { indicatorId: "asc" }] });
   return rows.map(row => {
-    if (row.sourceDocumentId !== `source.${row.sourceId}`) throw new Error("Trade Overview source relation mismatch");
+    if (row.sourceDocumentId !== TRADE_OVERVIEW_DOCUMENT_ID) throw new Error("Trade Overview source relation mismatch");
     return {
       year: row.year, indicatorId: row.indicatorId as TradeOverviewFact["indicatorId"], valueUsd: row.valueUsd.toFixed(),
       unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as "numeric", publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradeOverviewFact["role"],

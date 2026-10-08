@@ -9,7 +9,7 @@ test("database mappings retain native tokens, derived nulls, exact decimals and 
   const rows = tradeOverviewMirrorCreateRows(facts, "trade-run-1").map(row => ({ ...row, valueUsd: new Decimal(row.valueUsd as string) }));
   const db = { tradeOverviewFact: { findMany: async () => rows } } as unknown as Pick<Prisma.TransactionClient, "tradeOverviewFact">;
   expect(await loadTradeOverviewFactsFromMirror(db)).toEqual(facts);
-  expect(rows[0].sourceDocumentId).toBe("source.geostat_trade_ftrade-1995-2026");
+  expect(rows[0].sourceDocumentId).toBe("source.geostat_trade_ftrade_1995_2026");
   expect(rows[0].importRunId).toBe("trade-run-1");
 });
 test("database mapping refuses a row linked to another registered source", async () => {
