@@ -82,6 +82,7 @@ model SourceDocument {
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
   unemploymentFacts UnemploymentFact[]
+  tradeOverviewFacts TradeOverviewFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
@@ -114,6 +115,7 @@ model ImportRun {
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
   unemploymentFacts UnemploymentFact[]
+  tradeOverviewFacts TradeOverviewFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
@@ -496,6 +498,30 @@ model RegionalEconomyFact {
   importRun         ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([regionId, seriesId, measure, year])
+}
+
+model TradeOverviewFact {
+  year               Int
+  indicatorId        String
+  valueUsd           Decimal        @db.Decimal(40, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  publicationStatus  String
+  role               String
+  sourceId           String
+  sourceRefs         String
+  sourceValue        String?
+  sourceUnit         String?
+  sourceLabel        String?
+  sourceNumberFormat String?
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
 }
 
 model InflationCpiFact {

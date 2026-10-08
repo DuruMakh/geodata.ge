@@ -32,7 +32,7 @@ export type StackedColumnChartProps = {
   formatPeriod: (period: number) => string;
   formatValue: (value: number) => string;
   ariaLabel: string;
-  /** Periods per calendar year on the x axis: 1 for years (default), 12 for months. */
+  /** Periods per calendar year on the x axis: 12 for months (default), 1 for years. */
   periodsPerYear?: number;
 };
 
@@ -80,7 +80,7 @@ export function StackedColumnChart({
   formatPeriod,
   formatValue,
   ariaLabel,
-  periodsPerYear = 1,
+  periodsPerYear = 12,
 }: StackedColumnChartProps) {
   const captionId = useId();
   const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();

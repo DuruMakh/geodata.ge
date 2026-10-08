@@ -53,5 +53,8 @@
   "common.inflationCategories": "Categories",
   "common.inflationProducts": "Products",
   "common.inflationCities": "Cities",
-  "common.updated": "Updated {date}"
+  "common.updated": "Updated {date}",
+  "common.trade": "Trade",
+  "common.tradeOverview": "Overview",
+  "common.dataTrade": "DATA · TRADE"
 }

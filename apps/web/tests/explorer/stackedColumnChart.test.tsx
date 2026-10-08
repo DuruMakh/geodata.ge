@@ -23,6 +23,11 @@ function segmentY(html: string, id: string): number {
 }
 
 describe("StackedColumnChart", () => {
+  it("preserves monthly calendar boundaries by default", () => {
+    const months = Array.from({ length: 36 }, (_, i) => 24288 + i);
+    const monthly = chartGeometry(renderGeorgianMarkup(<StackedColumnChart {...props} periods={months} formatPeriod={period => `month.${period}`} />), "desktop");
+    expect(monthly.match(/>month\.\d+<\/text>/g)).toHaveLength(3);
+  });
   it("draws one rect per segment and period", () => {
     expect(chartGeometry(markup, "desktop").match(/data-segment="/g)).toHaveLength(4);
     expect(chartGeometry(markup, "mobile").match(/data-segment="/g)).toHaveLength(4);
@@ -146,14 +151,14 @@ describe("StackedColumnChart", () => {
         ),
         "desktop",
       );
-    const annual = render(undefined);
+    const annual = render(1);
     const labels = [...annual.matchAll(/<text[^>]*text-anchor="middle"[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
     expect(labels).toEqual(["2010", "2012", "2014", "2016", "2018", "2020", "2022", "2025"]);
     const pitch = (svg: string) => Number(/<pattern[^>]*\bwidth="([\d.]+)"/.exec(svg)?.[1]);
     const yearPitch = (920 - 74 - 30) * (15 / 16) / 15;
     expect(pitch(annual)).toBeCloseTo(yearPitch / 2, 1);
-    // Monthly charts (inflation contributions) opt in and keep their calendar lattice.
-    expect(pitch(render(12))).toBeCloseTo(yearPitch, 1);
+    // Monthly is the default (inflation contributions) and keeps its calendar lattice.
+    expect(pitch(render(undefined))).toBeCloseTo(yearPitch, 1);
   });
 
   it("ends the headline overlay in a dot", () => {

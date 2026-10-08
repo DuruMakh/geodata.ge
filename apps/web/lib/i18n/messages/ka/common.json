@@ -53,5 +53,8 @@
   "common.inflationCategories": "კატეგორიები",
   "common.inflationProducts": "პროდუქტები",
   "common.inflationCities": "ქალაქები",
-  "common.updated": "განახლდა {date}"
+  "common.updated": "განახლდა {date}",
+  "common.trade": "საგარეო ვაჭრობა",
+  "common.tradeOverview": "მიმოხილვა",
+  "common.dataTrade": "მონაცემები · საგარეო ვაჭრობა"
 }

@@ -1,0 +1,26 @@
+import ExcelJS from "exceljs";
+import { expect, test } from "vitest";
+import { tradeFixtureFacts } from "../data/tradeOverview/fixtures";
+import { buildTradeOverviewWorkbookExportModel } from "../../lib/explorer/tradeOverviewWorkbook";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Presentation } from "../../lib/i18n/types";
+test.each(["en", "ka"] as const)("native %s workbook keeps selected years, USD, neutral sign and unspecified finality", async locale => {
+  const presentation: Presentation = { locale, englishLabels: {}, messages: { ...await getMessages(locale, ["workbook"]), "trade.unit.million": "million USD", "trade.unit.billion": "billion USD", "trade.indicator.trade.exports": "Exports", "trade.indicator.trade.balance": "Trade balance", "trade.title": "Trade Overview", "trade.workbook.formulas": "Total trade = exports + imports; balance = exports − imports", "trade.workbook.amount": "Amount (USD)", "trade.workbook.publication": "Publication status", "trade.publicationUnspecified": "Unspecified" } };
+  const model = buildTradeOverviewWorkbookExportModel({ facts: tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) })), state: { mode: "table", selectedIds: ["trade.exports", "trade.balance"], range: { kind: "manual", start: 2025, end: 2025 } }, sources: [{ years: [2024, 2025], title: "Geostat annual goods", organization: "Geostat", downloadHref: "/downloads/methodology/trade/files/FTrade_1995-2026.xlsx", retrievedAt: "2026-10-07" }], siteOrigin: "https://fiscal.ge" }, presentation);
+  expect(model.readable.rows.map(row => row.label)).toEqual(["Exports", "Trade balance"]);
+  expect(model.readable.years).toEqual([2025]);
+  expect(model.readable.showChangeColumn).toBe(false);
+  expect(model.readable.subtitle).toContain("exports + imports");
+  expect(model.analysis.headers[3]).toBe("Amount (USD)");
+  expect(model.analysis.headers.join(" ")).not.toMatch(/GEL|₾|GDP|ბიუჯეტ|ლარი/);
+  expect(model.analysis.rows.map(row => row[3])).toEqual([100.25, -100.25]);
+  expect(model.analysis.rows.every(row => row[5] === "Unspecified")).toBe(true);
+  expect(model.readable.numberFormat).not.toContain("Red");
+  expect(model.sources[0].years).toEqual([2025]);
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  expect(excel.worksheets).toHaveLength(3);
+  expect(excel.worksheets[1].getCell("D3").value).toBe(-100.25);
+  expect(excel.worksheets[1].getCell("D3").numFmt).not.toContain("Red");
+  expect(excel.worksheets[2].getCell("D4").value).toMatchObject({ hyperlink: "https://fiscal.ge/downloads/methodology/trade/files/FTrade_1995-2026.xlsx" });
+});

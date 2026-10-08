@@ -113,7 +113,7 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(9);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(10);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(1);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -141,6 +141,7 @@ test("sitemap publishes exactly the live methodology routes", async ({ page }) =
     "/methodology/regional-economies",
     "/methodology/inflation",
     "/methodology/unemployment",
+    "/methodology/trade",
   ]);
 });
 

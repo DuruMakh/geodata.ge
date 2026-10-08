@@ -51,7 +51,7 @@ describe("indexable Fiscal.ge routes", () => {
     // add bilingual identities, and the inflation cities page and its six city
     // pages add seven more bilingual pairs (the Georgia page plus one per city).
     // The four unemployment data pages add four bilingual pairs behind their hub.
-    expect(urls).toHaveLength(276);
+    expect(urls).toHaveLength(282);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

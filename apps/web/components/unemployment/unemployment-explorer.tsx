@@ -143,7 +143,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       <SectionTitle>{t("compositionTitle")}</SectionTitle>
       <p className="mt-2 max-w-[900px] text-[12px] leading-relaxed text-[var(--muted)]">{t("compositionNote")}</p>
       <div className="my-4 flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-[var(--muted)]">{composition.segments.map(segment => <span key={segment.id} className="flex items-center gap-2"><SwatchBar color={segment.color} />{t(`composition.${segment.id}`)}</span>)}</div>
-      <StackedColumnChart {...composition} segments={composition.segments.map(segment => ({ ...segment, label: t(`composition.${segment.id}`) }))} formatPeriod={String} formatValue={value => `${formatInUnit(value, unit)} ${unit.label}`} ariaLabel={t("compositionAria")} />
+      <StackedColumnChart {...composition} periodsPerYear={1} segments={composition.segments.map(segment => ({ ...segment, label: t(`composition.${segment.id}`) }))} formatPeriod={String} formatValue={value => `${formatInUnit(value, unit)} ${unit.label}`} ariaLabel={t("compositionAria")} />
     </section> : null}
   </div>;
 }
