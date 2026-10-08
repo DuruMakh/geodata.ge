@@ -1,14 +1,21 @@
 // apps/web/tests/factQuery/sources.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { findSourceProvenanceFailures, resolvePublicSources, selectSources } from "../../lib/factQuery/sources";
 import { packageManifestRowSchema } from "../../lib/factQuery/buildSnapshot";
+import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
 
+// These tests only read the snapshot, so prepare the real data once for this file.
+let snapshot: FactQuerySnapshot;
+
+beforeAll(async () => {
+  snapshot = await buildFactQuerySnapshot(OPTIONS);
+});
+
 describe("public source resolution", () => {
   it("never emits an internal repository path as a public url", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expect(snapshot.sources.length).toBeGreaterThan(0);
 
     for (const source of snapshot.sources) {
@@ -34,7 +41,6 @@ describe("public source resolution", () => {
   // contains whitespace or either prose fragment. A future manifest row
   // combining a real URL with trailing notes fails here instead of shipping.
   it("every resolved officialUrl and archiveUrl is a clean, single https:// URL with no embedded prose", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     let checked = 0;
 
     for (const source of snapshot.sources) {
@@ -56,7 +62,6 @@ describe("public source resolution", () => {
   });
 
   it("links Geostat GDP originals without changing their historical metadata or scope", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     for (const [id, file] of [
       ["source.geostat_national_gdp_sna_1993", "geostat_nominal_legacy.xlsx"],
       ["source.geostat_national_gdp_sna_2008", "geostat_nominal_current.xlsx"],
@@ -69,7 +74,6 @@ describe("public source resolution", () => {
   });
 
   it("never emits a sentinel source id", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     for (const source of snapshot.sources) {
       expect(source.sourceId).not.toMatch(/^mixed:/);
       expect(source.sourceId.length).toBeGreaterThan(0);
@@ -77,7 +81,6 @@ describe("public source resolution", () => {
   });
 
   it("resolves every source id referenced by a served national fact", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     const known = new Set(snapshot.sources.map((s) => s.sourceId));
     const referenced = new Set(snapshot.national.facts.flatMap((f) => f.sourceId.split(";").map((s) => s.trim())));
 
@@ -85,7 +88,6 @@ describe("public source resolution", () => {
   });
 
   it("returns only the requested sources, deduplicated and ordered", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     const target = snapshot.sources[0]!.sourceId;
 
     const selected = selectSources(snapshot, [target, target, "source.does_not_exist"]);
@@ -104,7 +106,6 @@ describe("public source resolution", () => {
   // wrong or missing citation.
   describe("golden document mappings", () => {
     it("a straightforward single-path source resolves to exactly its one archived document", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.mof_2017_revenue_form1_pdf");
 
       expect(source?.documents).toMatchObject([
@@ -118,7 +119,6 @@ describe("public source resolution", () => {
     });
 
     it("a ' + '-joined multi-file source resolves to both archived documents", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find(
         (s) => s.sourceId === "source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual",
       );
@@ -148,7 +148,6 @@ describe("public source resolution", () => {
     // workbook"), so the two documents exercise both branches of the
     // officialUrl guard side by side.
     it("a directory-prefix-fallback source resolves to every file under it, with a real officialUrl where the manifest records one", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.adjara_republic_budget_actual");
 
       expect(source?.documents).toMatchObject([
@@ -175,7 +174,6 @@ describe("public source resolution", () => {
   // its own test rather than one "everything resolves" assertion.
   describe("every source resolves to a document or a stated derivation", () => {
     it("leaves no source unresolved", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const unresolved = snapshot.sources
         .filter((source) => source.documents.length === 0 && source.derivation === null)
         .map((source) => source.sourceId);
@@ -187,7 +185,6 @@ describe("public source resolution", () => {
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.municipal_portal_archive");
 
       // source_url_or_file names functionals/functionals.csv; the ZIP it was
@@ -202,7 +199,6 @@ describe("public source resolution", () => {
     });
 
     it("resolves the Geostat population package manifest", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.geostat_municipal_population");
 
       expect(source?.documents[0]?.officialUrl).toBe(
@@ -214,7 +210,6 @@ describe("public source resolution", () => {
     });
 
     it("resolves the Geostat demography package to the files it serves and publishes nothing else", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const demography = snapshot.sources.filter((source) => source.sourceId.startsWith("source.geostat_demography_"));
       const births = demography.find((source) => source.sourceId === "source.geostat_demography_births");
       const documentIds = snapshot.sources.flatMap((source) => source.documents.map((document) => document.documentId));
@@ -251,7 +246,6 @@ describe("public source resolution", () => {
     });
 
     it("states the derivation of the consolidated Adjara calculation and cites its upstream originals", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.adjara_consolidated_budget");
 
       expect(source?.derivation).toBe(source?.name);
@@ -264,7 +258,6 @@ describe("public source resolution", () => {
     });
 
     it("leaves every ordinary source's derivation null", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const derived = snapshot.sources.filter((s) => s.derivation !== null).map((s) => s.sourceId);
 
       // The field is for genuinely derived sources, not a dumping ground.
@@ -272,7 +265,6 @@ describe("public source resolution", () => {
     });
 
     it("carries provenance metadata on every document", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       let checked = 0;
 
       for (const source of snapshot.sources) {
@@ -293,7 +285,6 @@ describe("public source resolution", () => {
     });
 
     it("does not alias a path that was never an extracted file", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const source = snapshot.sources.find((s) => s.sourceId === "source.mof_2017_revenue_form1_pdf");
 
       // The alias map is exact, not a "strip a segment and retry" heuristic:
@@ -416,7 +407,6 @@ describe("public source resolution", () => {
     });
 
     it("passes the real snapshot", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       expect(findSourceProvenanceFailures(snapshot.sources)).toEqual([]);
       expect(snapshot.sources.length).toBeGreaterThan(100);
     });
@@ -424,7 +414,6 @@ describe("public source resolution", () => {
 
   describe("an upstream original is not shaped like a publication", () => {
     it("marks the derived source documents as derivation upstreams", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const derived = snapshot.sources.find((s) => s.sourceId === "source.adjara_consolidated_budget");
 
       // These two PDFs publish the republican payments, not the consolidated
@@ -434,7 +423,6 @@ describe("public source resolution", () => {
     });
 
     it("marks every ordinary document primary", async () => {
-      const snapshot = await buildFactQuerySnapshot(OPTIONS);
       const roles = new Set(
         snapshot.sources
           .filter((s) => s.derivation === null)
@@ -452,7 +440,6 @@ describe("the debt and balance sources", () => {
     // manifest row would ship a number with no citation. This is exactly the
     // failure the deficit merge produced: the IMF source was registered in
     // source-documents.csv while its manifest directory was read by nothing.
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     // The debt facts cite bare manifest ids; queryDebt namespaces them to the
     // registry's form, so this joins the same way the query does.
     const cited = new Set<string>([

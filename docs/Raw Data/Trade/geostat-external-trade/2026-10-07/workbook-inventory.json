@@ -1,0 +1,2633 @@
+[
+  {
+    "file": "FTrade_1995-2026.xlsx",
+    "sheet": "1995-2026",
+    "rows": 70,
+    "cols": 35,
+    "title": [
+      "A1:Georgian Exports and Imports in 1995-2026"
+    ],
+    "unit": [
+      "A3:(Mill. USD)"
+    ],
+    "period_headers": [
+      [
+        "B4:1995",
+        "C4:1996",
+        "D4:1997",
+        "E4:1998",
+        "F4:1999",
+        "G4:2000",
+        "H4:2001",
+        "I4:2002",
+        "J4:2003",
+        "K4:2004",
+        "L4:2005",
+        "M4:2006",
+        "N4:2007",
+        "O4:2008",
+        "P4:2009",
+        "Q4:2010",
+        "R4:2011",
+        "S4:2012",
+        "T4:2013",
+        "U4:2014",
+        "V4:2015",
+        "W4:2016",
+        "X4:2017",
+        "Y4:2018",
+        "Z4:2019",
+        "AA4:2020",
+        "AB4:2021",
+        "AC4:2022",
+        "AD4:2023",
+        "AE4:2024",
+        "AF4:2025",
+        "AG4:2026*"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "file": "Export-Country_1995-2026.xlsx",
+    "sheet": "2026",
+    "rows": 213,
+    "cols": 13,
+    "title": [
+      "A1:Georgian Exports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A209:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A211:Explanation of symbols:"
+      ],
+      [
+        "A212:              - Not applicable."
+      ],
+      [
+        "A213:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "Export-Country_1995-2026.xlsx",
+    "sheet": "1995-2025-years",
+    "rows": 267,
+    "cols": 33,
+    "title": [
+      "A1:Georgian Exports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:1995",
+        "D4:1996",
+        "E4:1997",
+        "F4:1998",
+        "G4:1999",
+        "H4:2000",
+        "I4:2001",
+        "J4:2002",
+        "K4:2003",
+        "L4:2004",
+        "M4:2005",
+        "N4:2006",
+        "O4:2007",
+        "P4:2008",
+        "Q4:2009",
+        "R4:2010",
+        "S4:2011",
+        "T4:2012",
+        "U4:2013",
+        "V4:2014",
+        "W4:2015",
+        "X4:2016",
+        "Y4:2017",
+        "Z4:2018",
+        "AA4:2019",
+        "AB4:2020",
+        "AC4:2021",
+        "AD4:2022",
+        "AE4:2023",
+        "AF4:2024",
+        "AG4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "file": "Export-Country_1995-2026.xlsx",
+    "sheet": "1995-2025-months",
+    "rows": 378,
+    "cols": 406,
+    "title": [
+      "A1:Georgian Exports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:1995",
+        "P4:1996",
+        "AC4:1997",
+        "AP4:1998",
+        "BC4:1999",
+        "BP4:2000",
+        "CC4:2001",
+        "CP4:2002",
+        "DC4:2003",
+        "DP4:2004",
+        "EC4:2005",
+        "EP4:2006",
+        "FC4:2007",
+        "FP4:2008",
+        "GC4:2009",
+        "GP4:2010",
+        "HC4:2011",
+        "HP4:2012",
+        "IC4:2013",
+        "IP4:2014",
+        "JC4:2015",
+        "JP4:2016",
+        "KC4:2017",
+        "KP4:2018",
+        "LC4:2019",
+        "LP4:2020",
+        "MC4:2021",
+        "MP4:2022",
+        "NC4:2023",
+        "NP4:2024",
+        "OC4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "file": "Export-_Country_Group-1995-2026.xlsx",
+    "sheet": "2026",
+    "rows": 37,
+    "cols": 15,
+    "title": [
+      "A1:Georgian Exports by Country Groups"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "B4:2026*"
+      ],
+      [
+        "B5:January-August",
+        "C5:January",
+        "D5:February",
+        "E5:March",
+        "F5:Q I",
+        "G5:April",
+        "H5:May",
+        "I5:June",
+        "J5:Q II",
+        "K5:July",
+        "L5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A33:            2010-2015 - 34 OECD members."
+      ],
+      [
+        "A34:            2016-2017 - 35 OECD members."
+      ],
+      [
+        "A35:            2018-2019 - 36 OECD members."
+      ],
+      [
+        "A36:            Since 2020 - 37 OECD members."
+      ],
+      [
+        "A37:            Since 2021 - 38 OECD members."
+      ]
+    ]
+  },
+  {
+    "file": "Export-_Country_Group-1995-2026.xlsx",
+    "sheet": "1995-2025-years",
+    "rows": 35,
+    "cols": 32,
+    "title": [
+      "A1:Georgian Exports by Country Groups"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "B4:1995",
+        "C4:1996",
+        "D4:1997",
+        "E4:1998",
+        "F4:1999",
+        "G4:2000",
+        "H4:2001",
+        "I4:2002",
+        "J4:2003",
+        "K4:2004",
+        "L4:2005",
+        "M4:2006",
+        "N4:2007",
+        "O4:2008",
+        "P4:2009",
+        "Q4:2010",
+        "R4:2011",
+        "S4:2012",
+        "T4:2013",
+        "U4:2014",
+        "V4:2015",
+        "W4:2016",
+        "X4:2017",
+        "Y4:2018",
+        "Z4:2019",
+        "AA4:2020",
+        "AB4:2021",
+        "AC4:2022",
+        "AD4:2023",
+        "AE4:2024",
+        "AF4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A31:            2010-2015 - 34 OECD members."
+      ],
+      [
+        "A32:            2016-2017 - 35 OECD members."
+      ],
+      [
+        "A33:            2018-2019 - 36 OECD members."
+      ],
+      [
+        "A34:            Since 2020 - 37 OECD members."
+      ],
+      [
+        "A35:            Since 2021 - 38 OECD members."
+      ]
+    ]
+  },
+  {
+    "file": "Export-_Country_Group-1995-2026.xlsx",
+    "sheet": "1995-2025-months",
+    "rows": 36,
+    "cols": 404,
+    "title": [
+      "A1:Georgian Exports by Country Groups"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "B4:1995",
+        "O4:1996",
+        "AB4:1997",
+        "AO4:1998",
+        "BB4:1999",
+        "BO4:2000",
+        "CB4:2001",
+        "CO4:2002",
+        "DB4:2003",
+        "DO4:2004",
+        "EB4:2005",
+        "EO4:2006",
+        "FB4:2007",
+        "FO4:2008",
+        "GB4:2009",
+        "GO4:2010",
+        "HB4:2011",
+        "HO4:2012",
+        "IB4:2013",
+        "IO4:2014",
+        "JB4:2015",
+        "JO4:2016",
+        "KB4:2017",
+        "KO4:2018",
+        "LB4:2019",
+        "LO4:2020",
+        "MB4:2021",
+        "MO4:2022",
+        "NB4:2023",
+        "NO4:2024",
+        "OB4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A32:            2010-2015 - 34 OECD members."
+      ],
+      [
+        "A33:            2016-2017 - 35 OECD members."
+      ],
+      [
+        "A34:            2018-2019 - 36 OECD members."
+      ],
+      [
+        "A35:            Since 2020 - 37 OECD members."
+      ],
+      [
+        "A36:            Since 2021 - 38 OECD members."
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2026",
+    "rows": 892,
+    "cols": 14,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A888:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A890:Explanation of symbols:"
+      ],
+      [
+        "A891:              - Not applicable"
+      ],
+      [
+        "A892:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2020-2025-years",
+    "rows": 1094,
+    "cols": 8,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2020",
+        "D4:2021",
+        "E4:2022",
+        "F4:2023",
+        "G4:2024",
+        "H4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A1091:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A1092:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A1093:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A1094:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2020-2025-months",
+    "rows": 1099,
+    "cols": 80,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2020",
+        "P4:2021",
+        "AC4:2022",
+        "AP4:2023",
+        "BC4:2024",
+        "BP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1095:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1097:Explanation of symbols:"
+      ],
+      [
+        "A1098:              - Not applicable"
+      ],
+      [
+        "A1099:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2015-2019-years",
+    "rows": 1054,
+    "cols": 7,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2015",
+        "D4:2016",
+        "E4:2017",
+        "F4:2018",
+        "G4:2019"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1050:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1052:Explanation of symbols:"
+      ],
+      [
+        "A1053:              - Not applicable"
+      ],
+      [
+        "A1054:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2015-2019-months",
+    "rows": 1055,
+    "cols": 67,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2015",
+        "P4:2016",
+        "AC4:2017",
+        "AP4:2018",
+        "BC4:2019"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1051:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1053:Explanation of symbols:"
+      ],
+      [
+        "A1054:              - Not applicable"
+      ],
+      [
+        "A1055:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-2000-2014.xlsx",
+    "sheet": "2000-2014-years",
+    "rows": 1125,
+    "cols": 18,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2000",
+        "D4:2001",
+        "E4:2002",
+        "F4:2003",
+        "G4:2004",
+        "H4:2005",
+        "I4:2006",
+        "J4:2007",
+        "K4:2008",
+        "L4:2009",
+        "M4:2010",
+        "N4:2011",
+        "O4:2012",
+        "P4:2013",
+        "Q4:2014"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A1122:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A1123:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A1124:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A1125:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-2000-2014.xlsx",
+    "sheet": "2000-2014-months",
+    "rows": 1126,
+    "cols": 198,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2000",
+        "P4:2001",
+        "AC4:2002",
+        "AP4:2003",
+        "BC4:2004",
+        "BP4:2005",
+        "CC4:2006",
+        "CP4:2007",
+        "DC4:2008",
+        "DP4:2009",
+        "EC4:2010",
+        "EP4:2011",
+        "FC4:2012",
+        "FP4:2013",
+        "GC4:2014"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A1123:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A1124:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A1125:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A1126:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-1995-1999.xlsx",
+    "sheet": "1995-1999-years",
+    "rows": 1963,
+    "cols": 14,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of Position",
+        "C4:1995",
+        "D4:1996",
+        "E4:1997",
+        "F4:1998",
+        "G4:1999"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "file": "Export-Product-by-4-digit-1995-1999.xlsx",
+    "sheet": "1995-1999-months",
+    "rows": 865,
+    "cols": 68,
+    "title": [
+      "A1:Georgian Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of Position",
+        "C4:1995",
+        "P4:1996",
+        "AC4:1997",
+        "AP4:1998",
+        "BC4:1999"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A861:                \"SAKTRANSGASMRETSVI\", JSC."
+      ],
+      [],
+      [
+        "A863:Explanation of symbols:"
+      ],
+      [
+        "A864:              - Not applicable"
+      ],
+      [
+        "A865:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Export-BEC_2000-2026.xlsx",
+    "sheet": "2026",
+    "rows": 25,
+    "cols": 13,
+    "title": [
+      "A1:Georgian Exports by Broad Economic Categories (BEC) "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Categories",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A21:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A22:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A23:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A24:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      []
+    ]
+  },
+  {
+    "file": "Export-BEC_2000-2026.xlsx",
+    "sheet": "BEC-2000-2025-years",
+    "rows": 22,
+    "cols": 28,
+    "title": [
+      "A1:Georgian Exports by Broad Economic Categories (BEC) "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Categories",
+        "C4:2000",
+        "D4:2001",
+        "E4:2002",
+        "F4:2003",
+        "G4:2004",
+        "H4:2005",
+        "I4:2006",
+        "J4:2007",
+        "K4:2008",
+        "L4:2009",
+        "M4:2010",
+        "N4:2011",
+        "O4:2012",
+        "P4:2013",
+        "Q4:2014",
+        "R4:2015",
+        "S4:2016",
+        "T4:2017",
+        "U4:2018",
+        "V4:2019",
+        "W4:2020",
+        "X4:2021",
+        "Y4:2022",
+        "Z4:2023",
+        "AA4:2024",
+        "AB4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A19:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A20:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A21:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A22:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Export-BEC_2000-2026.xlsx",
+    "sheet": "BEC-2000-2025-months",
+    "rows": 23,
+    "cols": 340,
+    "title": [
+      "A1:Georgian Exports by Broad Economic Categories (BEC) "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Categories",
+        "C4:2000",
+        "P4:2001",
+        "AC4:2002",
+        "AP4:2003",
+        "BC4:2004",
+        "BP4:2005",
+        "CC4:2006",
+        "CP4:2007",
+        "DC4:2008",
+        "DP4:2009",
+        "EC4:2010",
+        "EP4:2011",
+        "FC4:2012",
+        "FP4:2013",
+        "GC4:2014",
+        "GP4:2015",
+        "HC4:2016",
+        "HP4:2017",
+        "IC4:2018",
+        "IP4:2019",
+        "JC4:2020",
+        "JP4:2021",
+        "KC4:2022",
+        "KP4:2023",
+        "LC4:2024",
+        "LP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A20:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A21:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A22:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A23:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Export-SITC_2000-2026.xlsx",
+    "sheet": "2026",
+    "rows": 31,
+    "cols": 14,
+    "title": [
+      "A1:Georgian Exports by Standard International Trade Classification (SITC) section "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code ",
+        "B4:Name of sections",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A27:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A29:Explanation of symbols:"
+      ],
+      [
+        "A30:              - Not applicable."
+      ],
+      [
+        "A31:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "Export-SITC_2000-2026.xlsx",
+    "sheet": "SITC-2000-2025-years",
+    "rows": 29,
+    "cols": 28,
+    "title": [
+      "A1:Georgian Exports by Standard International Trade Classification (SITC) section "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code ",
+        "B4:Name of sections",
+        "C4:2000",
+        "D4:2001",
+        "E4:2002",
+        "F4:2003",
+        "G4:2004",
+        "H4:2005",
+        "I4:2006",
+        "J4:2007",
+        "K4:2008",
+        "L4:2009",
+        "M4:2010",
+        "N4:2011",
+        "O4:2012",
+        "P4:2013",
+        "Q4:2014",
+        "R4:2015",
+        "S4:2016",
+        "T4:2017",
+        "U4:2018",
+        "V4:2019",
+        "W4:2020",
+        "X4:2021",
+        "Y4:2022",
+        "Z4:2023",
+        "AA4:2024",
+        "AB4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A25:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A27:Explanation of symbols:"
+      ],
+      [
+        "A28:              - Not applicable."
+      ],
+      [
+        "A29:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "Export-SITC_2000-2026.xlsx",
+    "sheet": "SITC-2000-2025-months",
+    "rows": 30,
+    "cols": 340,
+    "title": [
+      "A1:Georgian Exports by Standard International Trade Classification (SITC) section "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code ",
+        "B4:Name of sections",
+        "C4:2000",
+        "P4:2001",
+        "AC4:2002",
+        "AP4:2003",
+        "BC4:2004",
+        "BP4:2005",
+        "CC4:2006",
+        "CP4:2007",
+        "DC4:2008",
+        "DP4:2009",
+        "EC4:2010",
+        "EP4:2011",
+        "FC4:2012",
+        "FP4:2013",
+        "GC4:2014",
+        "GP4:2015",
+        "HC4:2016",
+        "HP4:2017",
+        "IC4:2018",
+        "IP4:2019",
+        "JC4:2020",
+        "JP4:2021",
+        "KC4:2022",
+        "KP4:2023",
+        "LC4:2024",
+        "LP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A26:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A28:Explanation of symbols:"
+      ],
+      [
+        "A29:              - Not applicable."
+      ],
+      [
+        "A30:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "export-by-regions-and-SITC-4-digital.xlsx",
+    "sheet": "Export",
+    "rows": 4810,
+    "cols": 25,
+    "title": [
+      "A1:Georgian exports by regions and Standard International Trade Classification (SITC) subgroups"
+    ],
+    "unit": [
+      "A3:Thsd. USD dollars"
+    ],
+    "period_headers": [
+      [
+        "A4:Region",
+        "B4:Code of sub-group",
+        "C4:Name of sub-group",
+        "D4: 2022 Q I",
+        "E4: 2022 Q II",
+        "F4: 2022 Q III",
+        "G4: 2022 Q IV",
+        "H4:2022",
+        "I4: 2023 Q I",
+        "J4: 2023 Q II",
+        "K4: 2023 Q III",
+        "L4: 2023 Q IV",
+        "M4:2023",
+        "N4: 2024 Q I",
+        "O4: 2024 Q II",
+        "P4: 2024 Q III",
+        "Q4: 2024 Q IV",
+        "R4:2024",
+        "S4: 2025 Q I",
+        "T4: 2025 Q II",
+        "U4: 2025 Q III",
+        "V4: 2025 Q IV",
+        "W4:2025",
+        "X4: 2026* Q I",
+        "Y4: 2026* Q II"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [
+        "A4808:Explanation of symbols:"
+      ],
+      [
+        "A4809:              - Not applicable."
+      ],
+      [
+        "A4810:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "Import-Country-1995-2026.xlsx",
+    "sheet": "2026",
+    "rows": 230,
+    "cols": 13,
+    "title": [
+      "A1:Georgian Imports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A226:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A228:Explanation of symbols:"
+      ],
+      [
+        "A229:              - Not applicable."
+      ],
+      [
+        "A230:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "Import-Country-1995-2026.xlsx",
+    "sheet": "1995-2025-years",
+    "rows": 232,
+    "cols": 33,
+    "title": [
+      "A1:Georgian Imports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:1995",
+        "D4:1996",
+        "E4:1997",
+        "F4:1998",
+        "G4:1999",
+        "H4:2000",
+        "I4:2001",
+        "J4:2002",
+        "K4:2003",
+        "L4:2004",
+        "M4:2005",
+        "N4:2006",
+        "O4:2007",
+        "P4:2008",
+        "Q4:2009",
+        "R4:2010",
+        "S4:2011",
+        "T4:2012",
+        "U4:2013",
+        "V4:2014",
+        "W4:2015",
+        "X4:2016",
+        "Y4:2017",
+        "Z4:2018",
+        "AA4:2019",
+        "AB4:2020",
+        "AC4:2021",
+        "AD4:2022",
+        "AE4:2023",
+        "AF4:2024",
+        "AG4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A228:              - Not applicable."
+      ],
+      [
+        "A229:              0.0  Negligible magnitude."
+      ],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "file": "Import-Country-1995-2026.xlsx",
+    "sheet": "1995-2025-months",
+    "rows": 230,
+    "cols": 405,
+    "title": [
+      "A1:Georgian Imports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:1995",
+        "P4:1996",
+        "AC4:1997",
+        "AP4:1998",
+        "BC4:1999",
+        "BP4:2000",
+        "CC4:2001",
+        "CP4:2002",
+        "DC4:2003",
+        "DP4:2004",
+        "EC4:2005",
+        "EP4:2006",
+        "FC4:2007",
+        "FP4:2008",
+        "GC4:2009",
+        "GP4:2010",
+        "HC4:2011",
+        "HP4:2012",
+        "IC4:2013",
+        "IP4:2014",
+        "JC4:2015",
+        "JP4:2016",
+        "KC4:2017",
+        "KP4:2018",
+        "LC4:2019",
+        "LP4:2020",
+        "MC4:2021",
+        "MP4:2022",
+        "NC4:2023",
+        "NP4:2024",
+        "OC4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A226:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A228:Explanation of symbols:"
+      ],
+      [
+        "A229:              - Not applicable."
+      ],
+      [
+        "A230:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "Import_Country_Group-1995-2026.xlsx",
+    "sheet": "2026",
+    "rows": 37,
+    "cols": 12,
+    "title": [
+      "A1:Georgian Imports by Country Groups"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "B4:2026*"
+      ],
+      [
+        "B5:January-August",
+        "C5:January",
+        "D5:February",
+        "E5:March",
+        "F5:Q I",
+        "G5:April",
+        "H5:May",
+        "I5:June",
+        "J5:Q II",
+        "K5:July",
+        "L5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A33:            2010-2015 - 34 OECD members."
+      ],
+      [
+        "A34:            2016-2017 - 35 OECD members."
+      ],
+      [
+        "A35:            2018-2019 - 36 OECD members."
+      ],
+      [
+        "A36:            Since 2020 - 37 OECD members."
+      ],
+      [
+        "A37:            Since 2021 - 38 OECD members."
+      ]
+    ]
+  },
+  {
+    "file": "Import_Country_Group-1995-2026.xlsx",
+    "sheet": "1995-2025-years",
+    "rows": 35,
+    "cols": 32,
+    "title": [
+      "A1:Georgian Imports by Country Groups"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "B4:1995",
+        "C4:1996",
+        "D4:1997",
+        "E4:1998",
+        "F4:1999",
+        "G4:2000",
+        "H4:2001",
+        "I4:2002",
+        "J4:2003",
+        "K4:2004",
+        "L4:2005",
+        "M4:2006",
+        "N4:2007",
+        "O4:2008",
+        "P4:2009",
+        "Q4:2010",
+        "R4:2011",
+        "S4:2012",
+        "T4:2013",
+        "U4:2014",
+        "V4:2015",
+        "W4:2016",
+        "X4:2017",
+        "Y4:2018",
+        "Z4:2019",
+        "AA4:2020",
+        "AB4:2021",
+        "AC4:2022",
+        "AD4:2023",
+        "AE4:2024",
+        "AF4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A31:            2010-2015 - 34 OECD members."
+      ],
+      [
+        "A32:            2016-2017 - 35 OECD members."
+      ],
+      [
+        "A33:            2018-2019 - 36 OECD members."
+      ],
+      [
+        "A34:            Since 2020 - 37 OECD members."
+      ],
+      [
+        "A35:            Since 2021 - 38 OECD members."
+      ]
+    ]
+  },
+  {
+    "file": "Import_Country_Group-1995-2026.xlsx",
+    "sheet": "1995-2025-months",
+    "rows": 36,
+    "cols": 404,
+    "title": [
+      "A1:Georgian Imports by Country Groups"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "B4:1995",
+        "O4:1996",
+        "AB4:1997",
+        "AO4:1998",
+        "BB4:1999",
+        "BO4:2000",
+        "CB4:2001",
+        "CO4:2002",
+        "DB4:2003",
+        "DO4:2004",
+        "EB4:2005",
+        "EO4:2006",
+        "FB4:2007",
+        "FO4:2008",
+        "GB4:2009",
+        "GO4:2010",
+        "HB4:2011",
+        "HO4:2012",
+        "IB4:2013",
+        "IO4:2014",
+        "JB4:2015",
+        "JO4:2016",
+        "KB4:2017",
+        "KO4:2018",
+        "LB4:2019",
+        "LO4:2020",
+        "MB4:2021",
+        "MO4:2022",
+        "NB4:2023",
+        "NO4:2024",
+        "OB4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A32:            2010-2015 - 34 OECD members."
+      ],
+      [
+        "A33:            2016-2017 - 35 OECD members."
+      ],
+      [
+        "A34:            2018-2019 - 36 OECD members."
+      ],
+      [
+        "A35:            Since 2020 - 37 OECD members."
+      ],
+      [
+        "A36:            Since 2021 - 38 OECD members."
+      ]
+    ]
+  },
+  {
+    "file": "Import-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2026",
+    "rows": 1151,
+    "cols": 13,
+    "title": [
+      "A1:Georgian Imports by Commodity Position "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1147:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1149:Explanation of symbols:"
+      ],
+      [
+        "A1150:              - Not applicable"
+      ],
+      [
+        "A1151:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2020-2025-years",
+    "rows": 1204,
+    "cols": 8,
+    "title": [
+      "A1:Georgian Imports by Commodity Position "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2020",
+        "D4:2021",
+        "E4:2022",
+        "F4:2023",
+        "G4:2024",
+        "H4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1200:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1202:Explanation of symbols:"
+      ],
+      [
+        "A1203:              - Not applicable"
+      ],
+      [
+        "A1204:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2020-2025-months",
+    "rows": 1205,
+    "cols": 80,
+    "title": [
+      "A1:Georgian Imports by Commodity Position "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2020",
+        "P4:2021",
+        "AC4:2022",
+        "AP4:2023",
+        "BC4:2024",
+        "BP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1201:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1203:Explanation of symbols:"
+      ],
+      [
+        "A1204:              - Not applicable"
+      ],
+      [
+        "A1205:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2015-2019-years",
+    "rows": 1205,
+    "cols": 7,
+    "title": [
+      "A1:Georgian Imports by Commodity Position "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2015",
+        "D4:2016",
+        "E4:2017",
+        "F4:2018",
+        "G4:2019"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1201:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1203:Explanation of symbols:"
+      ],
+      [
+        "A1204:              - Not applicable"
+      ],
+      [
+        "A1205:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-Product-by-4-digit-2015-2026.xlsx",
+    "sheet": "2015-2019-months",
+    "rows": 1206,
+    "cols": 67,
+    "title": [
+      "A1:Georgian Imports by Commodity Position "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2015",
+        "P4:2016",
+        "AC4:2017",
+        "AP4:2018",
+        "BC4:2019"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1202:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1204:Explanation of symbols:"
+      ],
+      [
+        "A1205:              - Not applicable"
+      ],
+      [
+        "A1206:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-Product-by-4-digit-2000-2014.xlsx",
+    "sheet": "2000-2014-years",
+    "rows": 1253,
+    "cols": 18,
+    "title": [
+      "A1:Georgian Imports by Commodity Position "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2000",
+        "D4:2001",
+        "E4:2002",
+        "F4:2003",
+        "G4:2004",
+        "H4:2005",
+        "I4:2006",
+        "J4:2007",
+        "K4:2008",
+        "L4:2009",
+        "M4:2010",
+        "N4:2011",
+        "O4:2012",
+        "P4:2013",
+        "Q4:2014"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1249:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1251:Explanation of symbols:"
+      ],
+      [
+        "A1252:              - Not applicable"
+      ],
+      [
+        "A1253:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-Product-by-4-digit-2000-2014.xlsx",
+    "sheet": "2000-2014-months",
+    "rows": 1254,
+    "cols": 198,
+    "title": [
+      "A1:Georgian Imports by Commodity Position "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2000",
+        "P4:2001",
+        "AC4:2002",
+        "AP4:2003",
+        "BC4:2004",
+        "BP4:2005",
+        "CC4:2006",
+        "CP4:2007",
+        "DC4:2008",
+        "DP4:2009",
+        "EC4:2010",
+        "EP4:2011",
+        "FC4:2012",
+        "FP4:2013",
+        "GC4:2014"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1250:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A1252:Explanation of symbols:"
+      ],
+      [
+        "A1253:              - Not applicable"
+      ],
+      [
+        "A1254:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-products--1995-1999_eng.xlsx",
+    "sheet": "Import_products-1995-1999-years",
+    "rows": 1126,
+    "cols": 7,
+    "title": [
+      "A1:Georgian Imports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of Position",
+        "C4:1995",
+        "D4:1996",
+        "E4:1997",
+        "F4:1998",
+        "G4:1999"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1122:                \"SAKTRANSGASMRETSVI\", JSC."
+      ],
+      [],
+      [
+        "A1124:Explanation of symbols:"
+      ],
+      [
+        "A1125:              - Not applicable"
+      ],
+      [
+        "A1126:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-products--1995-1999_eng.xlsx",
+    "sheet": "Import_products 1995-1999-month",
+    "rows": 1127,
+    "cols": 67,
+    "title": [
+      "A1:Georgian Imports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of Position",
+        "C4:1995",
+        "P4:1996",
+        "AC4:1997",
+        "AP4:1998",
+        "BC4:1999"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A1123:                \"SAKTRANSGASMRETSVI\", JSC."
+      ],
+      [],
+      [
+        "A1125:Explanation of symbols:"
+      ],
+      [
+        "A1126:              - Not applicable"
+      ],
+      [
+        "A1127:                0.0   Negligible magnitude"
+      ]
+    ]
+  },
+  {
+    "file": "Import-BEC-2000-2026.xlsx",
+    "sheet": "2026",
+    "rows": 24,
+    "cols": 13,
+    "title": [
+      "A1:Georgian Imports by Broad Economic Categories (BEC) "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Categories",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A21:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A22:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A23:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A24:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Import-BEC-2000-2026.xlsx",
+    "sheet": "BEC-2000-2025-years",
+    "rows": 22,
+    "cols": 28,
+    "title": [
+      "A1:Georgian Imports by Broad Economic Categories (BEC) "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Categories",
+        "C4:2000",
+        "D4:2001",
+        "E4:2002",
+        "F4:2003",
+        "G4:2004",
+        "H4:2005",
+        "I4:2006",
+        "J4:2007",
+        "K4:2008",
+        "L4:2009",
+        "M4:2010",
+        "N4:2011",
+        "O4:2012",
+        "P4:2013",
+        "Q4:2014",
+        "R4:2015",
+        "S4:2016",
+        "T4:2017",
+        "U4:2018",
+        "V4:2019",
+        "W4:2020",
+        "X4:2021",
+        "Y4:2022",
+        "Z4:2023",
+        "AA4:2024",
+        "AB4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A19:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A20:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A21:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A22:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Import-BEC-2000-2026.xlsx",
+    "sheet": "BEC-2000-2025-months",
+    "rows": 23,
+    "cols": 340,
+    "title": [
+      "A1:Georgian Imports by Broad Economic Categories (BEC) "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Categories",
+        "C4:2000",
+        "P4:2001",
+        "AC4:2002",
+        "AP4:2003",
+        "BC4:2004",
+        "BP4:2005",
+        "CC4:2006",
+        "CP4:2007",
+        "DC4:2008",
+        "DP4:2009",
+        "EC4:2010",
+        "EP4:2011",
+        "FC4:2012",
+        "FP4:2013",
+        "GC4:2014",
+        "GP4:2015",
+        "HC4:2016",
+        "HP4:2017",
+        "IC4:2018",
+        "IP4:2019",
+        "JC4:2020",
+        "JP4:2021",
+        "KC4:2022",
+        "KP4:2023",
+        "LC4:2024",
+        "LP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A20:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A21:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A22:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A23:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Import-SITC_2000-2026.xlsx",
+    "sheet": "2026",
+    "rows": 27,
+    "cols": 14,
+    "title": [
+      "A1:Georgian Imports by Standard International Trade Classification (SITC) section "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code ",
+        "B4:Name of section",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A24:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A25:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A26:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A27:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Import-SITC_2000-2026.xlsx",
+    "sheet": "SITC-2000-2025-years",
+    "rows": 25,
+    "cols": 29,
+    "title": [
+      "A1:Georgian Imports by Standard International Trade Classification (SITC) section "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code ",
+        "B4:Name of section",
+        "C4:2000",
+        "D4:2001",
+        "E4:2002",
+        "F4:2003",
+        "G4:2004",
+        "H4:2005",
+        "I4:2006",
+        "J4:2007",
+        "K4:2008",
+        "L4:2009",
+        "M4:2010",
+        "N4:2011",
+        "O4:2012",
+        "P4:2013",
+        "Q4:2014",
+        "R4:2015",
+        "S4:2016",
+        "T4:2017",
+        "U4:2018",
+        "V4:2019",
+        "W4:2020",
+        "X4:2021",
+        "Y4:2022",
+        "Z4:2023",
+        "AA4:2024",
+        "AB4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [
+        "A22:Sources: LEPL Revenue Service of the Ministry of Finance of Georgia; "
+      ],
+      [
+        "A23:                 Georgian State Electrosystem, JSC;"
+      ],
+      [
+        "A24:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A25:                 Georgian Gas Transportation Company, LTD. "
+      ]
+    ]
+  },
+  {
+    "file": "Import-SITC_2000-2026.xlsx",
+    "sheet": "SITC-2000-2025-months",
+    "rows": 46,
+    "cols": 340,
+    "title": [
+      "A1:Georgian Imports by Standard International Trade Classification (SITC) section "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code ",
+        "B4:Name of section",
+        "C4:2000",
+        "P4:2001",
+        "AC4:2002",
+        "AP4:2003",
+        "BC4:2004",
+        "BP4:2005",
+        "CC4:2006",
+        "CP4:2007",
+        "DC4:2008",
+        "DP4:2009",
+        "EC4:2010",
+        "EP4:2011",
+        "FC4:2012",
+        "FP4:2013",
+        "GC4:2014",
+        "GP4:2015",
+        "HC4:2016",
+        "HP4:2017",
+        "IC4:2018",
+        "IP4:2019",
+        "JC4:2020",
+        "JP4:2021",
+        "KC4:2022",
+        "KP4:2023",
+        "LC4:2024",
+        "LP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "file": "import-by-regions-and-SITC-4-digital.xlsx",
+    "sheet": "Import",
+    "rows": 8276,
+    "cols": 25,
+    "title": [
+      "A1:Georgian imports by regions and Standard International Trade Classification (SITC) subgroups"
+    ],
+    "unit": [
+      "A3:Thsd. USD dollars"
+    ],
+    "period_headers": [
+      [
+        "A4:Region",
+        "B4:Code of sub-group",
+        "C4:Name of sub-group",
+        "D4: 2022 Q I",
+        "E4: 2022 Q II",
+        "F4: 2022 Q III",
+        "G4: 2022 Q IV",
+        "H4:2022",
+        "I4: 2023 Q I",
+        "J4: 2023 Q II",
+        "K4: 2023 Q III",
+        "L4: 2023 Q IV",
+        "M4:2023",
+        "N4: 2024 Q I",
+        "O4: 2024 Q II",
+        "P4: 2024 Q III",
+        "Q4: 2024 Q IV",
+        "R4:2024",
+        "S4: 2025 Q I",
+        "T4: 2025 Q II",
+        "U4: 2025 Q III",
+        "V4: 2025 Q IV",
+        "W4:2025",
+        "X4: 2026* Q I",
+        "Y4: 2026* Q II"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [
+        "A8274:Explanation of symbols:"
+      ],
+      [
+        "A8275:              - Not applicable."
+      ],
+      [
+        "A8276:              0.0  Negligible magnitude."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Export-Country_2014-2026.xlsx",
+    "sheet": "2026",
+    "rows": 214,
+    "cols": 13,
+    "title": [
+      "A1:Georgian Domestic Exports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A210:Explanation of symbols:"
+      ],
+      [
+        "A211:              - Not applicable."
+      ],
+      [
+        "A212:              0.0  Negligible magnitude."
+      ],
+      [],
+      [
+        "A214:Note: Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Export-Country_2014-2026.xlsx",
+    "sheet": "2014-2025-years",
+    "rows": 251,
+    "cols": 14,
+    "title": [
+      "A1:Georgian Domestic Exports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:2014",
+        "D4:2015",
+        "E4:2016",
+        "F4:2017",
+        "G4:2018",
+        "H4:2019",
+        "I4:2020",
+        "J4:2021",
+        "K4:2022",
+        "L4:2023",
+        "M4:2024",
+        "N4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  {
+    "file": "Domestic-Export-Country_2014-2026.xlsx",
+    "sheet": "2014-2025-months",
+    "rows": 213,
+    "cols": 158,
+    "title": [
+      "A1:Georgian Domestic Exports by Countries "
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Countries",
+        "C4:2014",
+        "P4:2015",
+        "AC4:2016",
+        "AP4:2017",
+        "BC4:2018",
+        "BP4:2019",
+        "CC4:2020",
+        "CP4:2021",
+        "DC4:2022",
+        "DP4:2023",
+        "EC4:2024",
+        "EP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A209:Explanation of symbols:"
+      ],
+      [
+        "A210:              - Not applicable."
+      ],
+      [
+        "A211:              0.0  Negligible magnitude."
+      ],
+      [],
+      [
+        "A213:Note: Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Exports_by-4-digit-2014-2026.xlsx",
+    "sheet": "2026",
+    "rows": 120,
+    "cols": 13,
+    "title": [
+      "A1:Georgian Domestic Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2026*"
+      ],
+      [
+        "C5:January-August",
+        "D5:January",
+        "E5:February",
+        "F5:March",
+        "G5:Q I",
+        "H5:April",
+        "I5:May",
+        "J5:June",
+        "K5:Q II",
+        "L5:July",
+        "M5:August"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A116:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A117:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A119:Note:"
+      ],
+      [
+        "A120:Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Exports_by-4-digit-2014-2026.xlsx",
+    "sheet": "2020-2025-years",
+    "rows": 118,
+    "cols": 8,
+    "title": [
+      "A1:Georgian Domestic Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2020",
+        "D4:2021",
+        "E4:2022",
+        "F4:2023",
+        "G4:2024",
+        "H4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A114:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A115:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A117:Note:"
+      ],
+      [
+        "A118:Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Exports_by-4-digit-2014-2026.xlsx",
+    "sheet": "2020-2025-months",
+    "rows": 119,
+    "cols": 81,
+    "title": [
+      "A1:Georgian Domestic Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2020",
+        "P4:2021",
+        "AC4:2022",
+        "AP4:2023",
+        "BC4:2024",
+        "BP4:2025"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A115:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A116:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A118:Note:"
+      ],
+      [
+        "A119:Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Exports_by-4-digit-2014-2026.xlsx",
+    "sheet": "2015-2019-years",
+    "rows": 118,
+    "cols": 7,
+    "title": [
+      "A1:Georgian Domestic Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2015",
+        "D4:2016",
+        "E4:2017",
+        "F4:2018",
+        "G4:2019"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A114:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A115:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A117:Note:"
+      ],
+      [
+        "A118:Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Exports_by-4-digit-2014-2026.xlsx",
+    "sheet": "2015-2019-months",
+    "rows": 119,
+    "cols": 68,
+    "title": [
+      "A1:Georgian Domestic Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2015",
+        "P4:2016",
+        "AC4:2017",
+        "AP4:2018",
+        "BC4:2019"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A115:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A116:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A118:Note:"
+      ],
+      [
+        "A119:Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Exports_by-4-digit-2014-2026.xlsx",
+    "sheet": "2014 year",
+    "rows": 115,
+    "cols": 3,
+    "title": [
+      "A1:Georgian Domestic Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2014"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A111:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A112:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A114:Note:"
+      ],
+      [
+        "A115:Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  },
+  {
+    "file": "Domestic-Exports_by-4-digit-2014-2026.xlsx",
+    "sheet": "2014 months",
+    "rows": 116,
+    "cols": 16,
+    "title": [
+      "A1:Georgian Domestic Exports by Commodity Positions"
+    ],
+    "unit": [
+      "A3:(Thsd. USD)"
+    ],
+    "period_headers": [
+      [
+        "A4:Code",
+        "B4:Name of position",
+        "C4:2014"
+      ]
+    ],
+    "last_rows_notes": [
+      [
+        "A112:                 Electricity System Commercial Operator, JSC;"
+      ],
+      [
+        "A113:                 Georgian Gas Transportation Company, LTD. "
+      ],
+      [],
+      [
+        "A115:Note:"
+      ],
+      [
+        "A116:Domestic exports include exports of goods produced in the country, as well as imported from abroad, the value of which has significantly changed or increased as a result of domestic processing."
+      ]
+    ]
+  }
+]

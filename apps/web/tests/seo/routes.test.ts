@@ -49,11 +49,12 @@ describe("indexable Fiscal.ge routes", () => {
     // Regional economies add a bilingual index, eleven bilingual detail pages
     // and one bilingual methodology page; inflation categories and products
     // add bilingual identities, and the inflation cities page and its six city
-    // pages add seven more bilingual pairs (the Georgia page plus one per city);
-    // the demography methodology adds one more, and the demography hub and
+    // pages add seven more bilingual pairs (the Georgia page plus one per city).
+    // The four unemployment data pages add four bilingual pairs behind their hub.
+    // The demography methodology adds one more, and the demography hub and
     // Population page add two more bilingual pairs; the 75 Population place
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
-    expect(urls).toHaveLength(398);
+    expect(urls).toHaveLength(432);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

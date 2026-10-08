@@ -2,7 +2,7 @@
 
 Collected on **3 October 2026**. The user approved annual figures only.
 
-This package establishes the data foundation for Fiscal.ge's unemployment statistics. It preserves seven official Geostat workbooks, their source page and current survey metadata. The core dataset covers **2010–2025**; the approved education and long-term unemployment additions cover **2020–2025**. Product integration and public data publication remain separate work.
+This package establishes the data foundation for Fiscal.ge's unemployment statistics. It preserves seven official Geostat workbooks, their source page and current survey metadata. The core dataset covers **2010–2025**; the approved education and long-term unemployment additions cover **2020–2025**. The 2026-10-04 approved explorer integration promotes these three primary files unchanged into `data/imports/`, reuses the existing charts/tables/Excel writer and adds a private parity-checked serving mirror. Local verification is recorded in the explorer spec and plan. GitHub publication, live database migration/import and production deployment remain separate delivery operations; unemployment MCP and central dataset publications are excluded.
 
 ## What is ready
 
@@ -96,7 +96,7 @@ The current metadata reports a **2025 national unemployment-rate 95% confidence 
 
 Count reconciliations allow at most **0.000001 thousand persons (0.001 person)**; rate reconciliations allow **0.000001 percentage points**. These small allowances account for stored calculation precision. No values are altered to force a reconciliation.
 
-### Supporting platform checks
+### Supporting platform checks before explorer integration
 
 The final local release checks on **4 October 2026** pass: `npm run check` includes style, type, data and translation checks, with **2,738 passing tests and seven skipped tests**; `npm run build` also passes. The earlier image/font timeouts cleared on an unchanged retry with normal network access. No application source changes were needed. The independent research comparison matches all 7,073 Excel cells, and all 13 research tests pass. Required GitHub checks and review remain mandatory before merging.
 

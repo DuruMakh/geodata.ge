@@ -1,0 +1,310 @@
+﻿check,source,period,expected,actual,tolerance_thousand_usd,passed
+file_fingerprint,geostat_trade_page_overview,,1859dd37fb567cb91dc3ea3033992ee76eaa899726c0f6dbe7ee5115ac1922d0,1859dd37fb567cb91dc3ea3033992ee76eaa899726c0f6dbe7ee5115ac1922d0,0,True
+file_size,geostat_trade_page_overview,,72748,72748,0,True
+file_fingerprint,geostat_trade_page_exports,,89be0688f8ff26889c5d0eae1cf290e73cfa1e35236f0f46bf68d37809ad562e,89be0688f8ff26889c5d0eae1cf290e73cfa1e35236f0f46bf68d37809ad562e,0,True
+file_size,geostat_trade_page_exports,,102045,102045,0,True
+file_fingerprint,geostat_trade_page_imports,,37114361e06eeb5fc2a7cd2010ec0789ab68781c4ccbcc4a53f60d6ba8198732,37114361e06eeb5fc2a7cd2010ec0789ab68781c4ccbcc4a53f60d6ba8198732,0,True
+file_size,geostat_trade_page_imports,,102113,102113,0,True
+file_fingerprint,geostat_trade_page_domestic-exports,,b185723e7d938f342fdef2dc804531998dbc07a338b0ea23a3e3f64635d247a6,b185723e7d938f342fdef2dc804531998dbc07a338b0ea23a3e3f64635d247a6,0,True
+file_size,geostat_trade_page_domestic-exports,,66908,66908,0,True
+file_fingerprint,geostat_trade_ftrade-1995-2026,,8eaaa8bf93e3d68d647f7b34857049b6e672924cb4dbf71573db1f173d2cd4ce,8eaaa8bf93e3d68d647f7b34857049b6e672924cb4dbf71573db1f173d2cd4ce,0,True
+file_size,geostat_trade_ftrade-1995-2026,,25876,25876,0,True
+workbook_structure,geostat_trade_ftrade-1995-2026,,,,0,True
+file_fingerprint,geostat_trade_export-country-1995-2026,,c22b55a0bca80182b2c89d322885bad352bd6c84c0166e838cb8ea3dce574354,c22b55a0bca80182b2c89d322885bad352bd6c84c0166e838cb8ea3dce574354,0,True
+file_size,geostat_trade_export-country-1995-2026,,697176,697176,0,True
+workbook_structure,geostat_trade_export-country-1995-2026,,,,0,True
+file_fingerprint,geostat_trade_export--country-group-1995-2026,,9d7885dca0caf452f7f8af92c39ac212d1cd5e15e0703c9843fd7378773079ba,9d7885dca0caf452f7f8af92c39ac212d1cd5e15e0703c9843fd7378773079ba,0,True
+file_size,geostat_trade_export--country-group-1995-2026,,61517,61517,0,True
+workbook_structure,geostat_trade_export--country-group-1995-2026,,,,0,True
+file_fingerprint,geostat_trade_export-product-by-4-digit-2015-2026,,75393acdfc5c16b864b9637d0aba2f6c70684c718d71c7924175b4cfae41e7bb,75393acdfc5c16b864b9637d0aba2f6c70684c718d71c7924175b4cfae41e7bb,0,True
+file_size,geostat_trade_export-product-by-4-digit-2015-2026,,1804827,1804827,0,True
+workbook_structure,geostat_trade_export-product-by-4-digit-2015-2026,,,,0,True
+file_fingerprint,geostat_trade_export-product-by-4-digit-2000-2014,,65a8294ac8fffc980f1124c675ef45469c40943b3d2d79b177bdf82877cdfe42,65a8294ac8fffc980f1124c675ef45469c40943b3d2d79b177bdf82877cdfe42,0,True
+file_size,geostat_trade_export-product-by-4-digit-2000-2014,,1680096,1680096,0,True
+workbook_structure,geostat_trade_export-product-by-4-digit-2000-2014,,,,0,True
+file_fingerprint,geostat_trade_export-product-by-4-digit-1995-1999,,4944f508b9eb334eca8667202dde49d5270bb6e74580c6df7c5c0067a942ef9a,4944f508b9eb334eca8667202dde49d5270bb6e74580c6df7c5c0067a942ef9a,0,True
+file_size,geostat_trade_export-product-by-4-digit-1995-1999,,391057,391057,0,True
+workbook_structure,geostat_trade_export-product-by-4-digit-1995-1999,,,,0,True
+file_fingerprint,geostat_trade_export-bec-2000-2026,,06328bbed108365194fab97679ef2ec147c4de8c0ffa956f9b1d665e515cab30,06328bbed108365194fab97679ef2ec147c4de8c0ffa956f9b1d665e515cab30,0,True
+file_size,geostat_trade_export-bec-2000-2026,,69554,69554,0,True
+workbook_structure,geostat_trade_export-bec-2000-2026,,,,0,True
+file_fingerprint,geostat_trade_export-sitc-2000-2026,,71ba53f3c2e55cfb9bf08262582eb23d42e3752c04f4ac2e2c7c8cf90551bb12,71ba53f3c2e55cfb9bf08262582eb23d42e3752c04f4ac2e2c7c8cf90551bb12,0,True
+file_size,geostat_trade_export-sitc-2000-2026,,84104,84104,0,True
+workbook_structure,geostat_trade_export-sitc-2000-2026,,,,0,True
+file_fingerprint,geostat_trade_export-by-regions-and-sitc-4-digital,,c379a1583e24b691502690d63beb90519eb28168cccb92e323472db6ff4dee05,c379a1583e24b691502690d63beb90519eb28168cccb92e323472db6ff4dee05,0,True
+file_size,geostat_trade_export-by-regions-and-sitc-4-digital,,997295,997295,0,True
+workbook_structure,geostat_trade_export-by-regions-and-sitc-4-digital,,,,0,True
+file_fingerprint,geostat_trade_import-country-1995-2026,,08a6d4ad3fdd1036b387f56e303cdcec49f4864384e4e27b8495bc83d938cb9c,08a6d4ad3fdd1036b387f56e303cdcec49f4864384e4e27b8495bc83d938cb9c,0,True
+file_size,geostat_trade_import-country-1995-2026,,787198,787198,0,True
+workbook_structure,geostat_trade_import-country-1995-2026,,,,0,True
+file_fingerprint,geostat_trade_import-country-group-1995-2026,,e184b990a9b97a1092dfa0a0541a572a7dfdcde132983a27ec691fe9a69de5ee,e184b990a9b97a1092dfa0a0541a572a7dfdcde132983a27ec691fe9a69de5ee,0,True
+file_size,geostat_trade_import-country-group-1995-2026,,68134,68134,0,True
+workbook_structure,geostat_trade_import-country-group-1995-2026,,,,0,True
+file_fingerprint,geostat_trade_import-product-by-4-digit-2015-2026,,0a1df285438baa36c9f35523735d75358a7c829477cf8ac6dc17211769c34f1d,0a1df285438baa36c9f35523735d75358a7c829477cf8ac6dc17211769c34f1d,0,True
+file_size,geostat_trade_import-product-by-4-digit-2015-2026,,2704183,2704183,0,True
+workbook_structure,geostat_trade_import-product-by-4-digit-2015-2026,,,,0,True
+file_fingerprint,geostat_trade_import-product-by-4-digit-2000-2014,,661ab79a4390d040c886463e7dabb63c7cda2d688c745d52b40a8c0981a50c56,661ab79a4390d040c886463e7dabb63c7cda2d688c745d52b40a8c0981a50c56,0,True
+file_size,geostat_trade_import-product-by-4-digit-2000-2014,,2903638,2903638,0,True
+workbook_structure,geostat_trade_import-product-by-4-digit-2000-2014,,,,0,True
+file_fingerprint,geostat_trade_import-products--1995-1999-eng,,c46b8d735761ed5d7835194ae53d5125e4f47b99cd828138a6c71dd722ca1206,c46b8d735761ed5d7835194ae53d5125e4f47b99cd828138a6c71dd722ca1206,0,True
+file_size,geostat_trade_import-products--1995-1999-eng,,632150,632150,0,True
+workbook_structure,geostat_trade_import-products--1995-1999-eng,,,,0,True
+file_fingerprint,geostat_trade_import-bec-2000-2026,,de22fc331f67306855d32cbc31481d90b117d17ac8ae4b4b360a853643571ec4,de22fc331f67306855d32cbc31481d90b117d17ac8ae4b4b360a853643571ec4,0,True
+file_size,geostat_trade_import-bec-2000-2026,,69500,69500,0,True
+workbook_structure,geostat_trade_import-bec-2000-2026,,,,0,True
+file_fingerprint,geostat_trade_import-sitc-2000-2026,,bba9b1a1893287e17a1b3b623ec6b618ff86cb0839dd2ed437f02e97e2793508,bba9b1a1893287e17a1b3b623ec6b618ff86cb0839dd2ed437f02e97e2793508,0,True
+file_size,geostat_trade_import-sitc-2000-2026,,85006,85006,0,True
+workbook_structure,geostat_trade_import-sitc-2000-2026,,,,0,True
+file_fingerprint,geostat_trade_import-by-regions-and-sitc-4-digital,,478ef0d53402e7a30bd5b18102537e7550d60fc57e909d266ec889f50ab269ad,478ef0d53402e7a30bd5b18102537e7550d60fc57e909d266ec889f50ab269ad,0,True
+file_size,geostat_trade_import-by-regions-and-sitc-4-digital,,2313502,2313502,0,True
+workbook_structure,geostat_trade_import-by-regions-and-sitc-4-digital,,,,0,True
+file_fingerprint,geostat_trade_domestic-export-country-2014-2026,,c4591642eb78303086d4e1538aed31615e8b612b74b203bbbfcda98f826d972c,c4591642eb78303086d4e1538aed31615e8b612b74b203bbbfcda98f826d972c,0,True
+file_size,geostat_trade_domestic-export-country-2014-2026,,307463,307463,0,True
+workbook_structure,geostat_trade_domestic-export-country-2014-2026,,,,0,True
+file_fingerprint,geostat_trade_domestic-exports-by-4-digit-2014-2026,,512d7a9511a0312b3c184b57e05862e414f737d663d1b02cb1941df435248679,512d7a9511a0312b3c184b57e05862e414f737d663d1b02cb1941df435248679,0,True
+file_size,geostat_trade_domestic-exports-by-4-digit-2014-2026,,271984,271984,0,True
+workbook_structure,geostat_trade_domestic-exports-by-4-digit-2014-2026,,,,0,True
+file_fingerprint,geostat_trade_page_methodology,,d4d824764366fd66f2279988fc58221dd5be9b35e90bc7359dbc22a90adc9fae,d4d824764366fd66f2279988fc58221dd5be9b35e90bc7359dbc22a90adc9fae,0,True
+file_size,geostat_trade_page_methodology,,66326,66326,0,True
+file_fingerprint,geostat_trade_methodology,,8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4,8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4,0,True
+file_size,geostat_trade_methodology,,431592,431592,0,True
+file_fingerprint,geostat_trade_page_metadata,,4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114,4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114,0,True
+file_size,geostat_trade_page_metadata,,63209,63209,0,True
+file_fingerprint,geostat_trade_metadata,,6cbf2a212436713c6e8bf0680ab38b68e7ff409d8f1aae8d8f908ae5992add1a,6cbf2a212436713c6e8bf0680ab38b68e7ff409d8f1aae8d8f908ae5992add1a,0,True
+file_size,geostat_trade_metadata,,111733,111733,0,True
+file_fingerprint,geostat_trade_page_services,,e670ab745a251f224c105263396f0c360a3893ebf7e7000da75a198841e9259b,e670ab745a251f224c105263396f0c360a3893ebf7e7000da75a198841e9259b,0,True
+file_size,geostat_trade_page_services,,74642,74642,0,True
+file_fingerprint,geostat_trade_export-product-by-6-digit-2020-2026,,a28f9a6afd08eec0df65b0f2bc9e7b0c12d590fcf979a5edf1e2dc20e316a921,a28f9a6afd08eec0df65b0f2bc9e7b0c12d590fcf979a5edf1e2dc20e316a921,0,True
+file_size,geostat_trade_export-product-by-6-digit-2020-2026,,3202799,3202799,0,True
+workbook_structure,geostat_trade_export-product-by-6-digit-2020-2026,,,,0,True
+file_fingerprint,geostat_trade_export-product-by-6-digit-2015-2019,,72ca7309a8841afe5083a080033b0ed56f1414c5891b3e395dfc6a48340f1263,72ca7309a8841afe5083a080033b0ed56f1414c5891b3e395dfc6a48340f1263,0,True
+file_size,geostat_trade_export-product-by-6-digit-2015-2019,,2077114,2077114,0,True
+workbook_structure,geostat_trade_export-product-by-6-digit-2015-2019,,,,0,True
+file_fingerprint,geostat_trade_export-product-by-6-digit-2000-2014,,cf958ba57501fa4ad7c35f2a7d16c5928e8940987eaadbdc2371f1681a0cfb48,cf958ba57501fa4ad7c35f2a7d16c5928e8940987eaadbdc2371f1681a0cfb48,0,True
+file_size,geostat_trade_export-product-by-6-digit-2000-2014,,4188305,4188305,0,True
+workbook_structure,geostat_trade_export-product-by-6-digit-2000-2014,,,,0,True
+file_fingerprint,geostat_trade_import-product-by-6-digit-2020-2026,,c79b115c3e6e59c4d4fee80f3c5232d2645881022d67547cfb297c6afaf23286,c79b115c3e6e59c4d4fee80f3c5232d2645881022d67547cfb297c6afaf23286,0,True
+file_size,geostat_trade_import-product-by-6-digit-2020-2026,,5905685,5905685,0,True
+workbook_structure,geostat_trade_import-product-by-6-digit-2020-2026,,,,0,True
+file_fingerprint,geostat_trade_import-product-by-6-digit-2015-2019,,aa3a67bac49300fa42e19ca798589bf8e31e187a27dc8b8ed23e674378d3e359,aa3a67bac49300fa42e19ca798589bf8e31e187a27dc8b8ed23e674378d3e359,0,True
+file_size,geostat_trade_import-product-by-6-digit-2015-2019,,4195619,4195619,0,True
+workbook_structure,geostat_trade_import-product-by-6-digit-2015-2019,,,,0,True
+file_fingerprint,geostat_trade_import-product-by-6-digit-2000-2014,,b6d768bd78791752715f2628e571a8c3820618ede7cb0b27ed7498925d3bfa26,b6d768bd78791752715f2628e571a8c3820618ede7cb0b27ed7498925d3bfa26,0,True
+file_size,geostat_trade_import-product-by-6-digit-2000-2014,,10011223,10011223,0,True
+workbook_structure,geostat_trade_import-product-by-6-digit-2000-2014,,,,0,True
+file_fingerprint,geostat_services_georgian-exports-of-services-by-countries,,f34b544286ef73baf0a045b5273aa916eae5515e680c9361cfbae6294c1e1e9f,f34b544286ef73baf0a045b5273aa916eae5515e680c9361cfbae6294c1e1e9f,0,True
+file_size,geostat_services_georgian-exports-of-services-by-countries,,25417,25417,0,True
+workbook_structure,geostat_services_georgian-exports-of-services-by-countries,,,,0,True
+file_fingerprint,geostat_services_georgian-exports-of-services-by-types-and-countries,,1ce08913def0d64724f964a38f61f87a83efbe071733c3fc4737b7f108423048,1ce08913def0d64724f964a38f61f87a83efbe071733c3fc4737b7f108423048,0,True
+file_size,geostat_services_georgian-exports-of-services-by-types-and-countries,,68819,68819,0,True
+workbook_structure,geostat_services_georgian-exports-of-services-by-types-and-countries,,,,0,True
+file_fingerprint,geostat_services_georgian-exports-of-services-by-types,,091845ddd121d21e43332cfcdf69008ec3d9444fae279fbe3c6002ba0d75fda3,091845ddd121d21e43332cfcdf69008ec3d9444fae279fbe3c6002ba0d75fda3,0,True
+file_size,geostat_services_georgian-exports-of-services-by-types,,13817,13817,0,True
+workbook_structure,geostat_services_georgian-exports-of-services-by-types,,,,0,True
+file_fingerprint,geostat_services_georgian-imports-of-services-by-countries,,06a2ce5527af858c2e9670354ef26fd549a255a9d02b37a3656aeb8cf621af50,06a2ce5527af858c2e9670354ef26fd549a255a9d02b37a3656aeb8cf621af50,0,True
+file_size,geostat_services_georgian-imports-of-services-by-countries,,30672,30672,0,True
+workbook_structure,geostat_services_georgian-imports-of-services-by-countries,,,,0,True
+file_fingerprint,geostat_services_georgian-imports-of-services-by-types-and-countries,,2aaf2824bb7231a2dbeb9253bd93a95b664b91699c16765f4465cb17c861318d,2aaf2824bb7231a2dbeb9253bd93a95b664b91699c16765f4465cb17c861318d,0,True
+file_size,geostat_services_georgian-imports-of-services-by-types-and-countries,,71831,71831,0,True
+workbook_structure,geostat_services_georgian-imports-of-services-by-types-and-countries,,,,0,True
+file_fingerprint,geostat_services_georgian-imports-of-services-by-types,,100b9a901dffd1db6604aac7c0b46094e8e46ac425c2090d2d9e18e1141a01d6,100b9a901dffd1db6604aac7c0b46094e8e46ac425c2090d2d9e18e1141a01d6,0,True
+file_size,geostat_services_georgian-imports-of-services-by-types,,13030,13030,0,True
+workbook_structure,geostat_services_georgian-imports-of-services-by-types,,,,0,True
+file_fingerprint,geostat_services_metadata_2025,,cefc7fa285640ef5a7200619c7d54a50d5b21f467c7a27e3113ff6af419dbb27,cefc7fa285640ef5a7200619c7d54a50d5b21f467c7a27e3113ff6af419dbb27,0,True
+file_size,geostat_services_metadata_2025,,96228,96228,0,True
+file_fingerprint,nbg_trade_page_statistics,,079e82143d3f38234acdc586df2e4fa569796f6f0d09a23cb5996cd1407502f4,079e82143d3f38234acdc586df2e4fa569796f6f0d09a23cb5996cd1407502f4,0,True
+file_size,nbg_trade_page_statistics,,340047,340047,0,True
+file_fingerprint,nbg_trade_page_publications,,5627c2b06c1c8bbf833aada1fcb52ce74e3feb0a54778eef391520759c4020e1,5627c2b06c1c8bbf833aada1fcb52ce74e3feb0a54778eef391520759c4020e1,0,True
+file_size,nbg_trade_page_publications,,350642,350642,0,True
+file_fingerprint,nbg_external_sector_metadata,,46d5964429eb23f7606f4a8bdb871ea2e91b70ce7eaf1a22b9936432f750b7df,46d5964429eb23f7606f4a8bdb871ea2e91b70ce7eaf1a22b9936432f750b7df,0,True
+file_size,nbg_external_sector_metadata,,871671,871671,0,True
+file_fingerprint,nbg_bop_2024_reference,,7cf0e24fc77af310f787bbf084226ae6aa69986eee6c052be4ca58fda055f253,7cf0e24fc77af310f787bbf084226ae6aa69986eee6c052be4ca58fda055f253,0,True
+file_size,nbg_bop_2024_reference,,1352730,1352730,0,True
+hs6_unique_codes,Export-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,,3836,3836,0,True
+hs6_detail_sum,Export-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2020,3340635.707415983,3340635.7074159742,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2021,4242456.417032549,4242456.417032556,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2022,5582502.216696999,5582502.2166970065,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2023,6085879.620548833,6085879.620548835,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2024,6561882.251207531,6561882.251207527,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2025,7287805.027574287,7287805.02757429,0.001,True
+hs6_unique_codes,Export-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,,3443,3443,0,True
+hs6_detail_sum,Export-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2015,2204182.6374688493,2204182.63746885,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2016,2117136.4400444506,2117136.440044451,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2017,2745667.083255651,2745667.083255665,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2018,3379656.9176440183,3379656.917644023,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2019,3797041.2085034405,3797041.2085034363,0.001,True
+hs6_unique_codes,Export-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,,3225,3225,0,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2009,1133630.22623494,1133630.2262349399,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2010,1677306.8984732542,1677306.8984732549,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2011,2186421.2088432936,2186421.208843298,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2012,2376635.3682062225,2376635.368206225,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2013,2910314.5398167083,2910314.5398167125,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2014,2861045.178670869,2861045.178670867,0.001,True
+hs6_unique_codes,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,,3186,3186,0,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2000,323938.26658999996,323938.26659,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2001,317150.88233,317150.88233,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2002,345736.0681851,345736.0681851,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2003,461310.03813000006,461310.03813,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2004,646902.96254,646902.96254,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2005,865455.633340758,865455.633340758,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2006,936374.6269958387,936374.6269958388,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2007,1232110.4700131086,1232110.4700131093,0.001,True
+hs6_detail_sum,Export-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2008,1495345.238109363,1495345.2381093635,0.001,True
+hs6_unique_codes,Import-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,,5047,5047,0,True
+hs6_detail_sum,Import-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2020,8048758.483040132,8048758.48304014,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2021,10099041.319938742,10099041.319938714,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2022,13539713.872844065,13539713.872844066,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2023,15615270.126514211,15615270.126514189,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2024,16916834.84571027,16916834.845710248,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2020-2026.xlsx:2020-2025-years,2025,18648513.307186723,18648513.307186715,0.001,True
+hs6_unique_codes,Import-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,,4833,4833,0,True
+hs6_detail_sum,Import-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2015,7304152.715614747,7304152.715614736,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2016,7341698.114489391,7341698.114489387,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2017,8057082.21057365,8057082.2105736565,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2018,9361247.035886237,9361247.03588626,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2015-2019.xlsx:2015-2019-years,2019,9517967.520382706,9517967.520382678,0.001,True
+hs6_unique_codes,Import-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,,4776,4776,0,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2009,4475724.508792169,4475724.508792159,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2010,5235964.55871194,5235964.558711927,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2011,7072259.779462376,7072259.779462369,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2012,8056379.015907257,8056379.015907249,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2013,8022546.3978869375,8022546.3978869375,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2009-2014-years,2014,8601814.354546987,8601814.35454699,0.001,True
+hs6_unique_codes,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,,4950,4950,0,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2000,709509.126318081,709509.1263180815,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2001,752010.9116117001,752010.9116117,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2002,794691.6034099997,794691.60341,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2003,1139039.15935,1139039.1593499999,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2004,1844342.9294279865,1844342.929427985,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2005,2487548.3459062506,2487548.3459062506,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2006,3674832.445449234,3674832.445449236,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2007,5212150.246316156,5212150.246316158,0.001,True
+hs6_detail_sum,Import-Product-by-6-digit-2000-2014.xlsx:2000-2008-years,2008,6301540.343010234,6301540.343010236,0.001,True
+services_type_inventory,Georgian-Exports-of-services-by-types.xlsx,,12,12,0,True
+services_type_sum,Georgian-Exports-of-services-by-types.xlsx,2020,1581909.0034100004,1581909.0034100004,0.001,True
+services_country_total,Georgian-Exports-of-services-by-countries.xlsx,2020,1581909.0034100004,1581909.0034100006,0.001,True
+services_type_sum,Georgian-Exports-of-services-by-types.xlsx,2021,2550384.0570700024,2550384.057070002,0.001,True
+services_country_total,Georgian-Exports-of-services-by-countries.xlsx,2021,2550384.0570700024,2550384.05707,0.001,True
+services_type_sum,Georgian-Exports-of-services-by-types.xlsx,2022,5705111.931738601,5705111.931738601,0.001,True
+services_country_total,Georgian-Exports-of-services-by-countries.xlsx,2022,5705111.931738601,5705111.931738597,0.001,True
+services_type_sum,Georgian-Exports-of-services-by-types.xlsx,2023,7061808.375239996,7061808.375239997,0.001,True
+services_country_total,Georgian-Exports-of-services-by-countries.xlsx,2023,7061808.375239996,7061808.375240005,0.001,True
+services_type_sum,Georgian-Exports-of-services-by-types.xlsx,2024,7706284.984759998,7706284.98476,0.001,True
+services_country_total,Georgian-Exports-of-services-by-countries.xlsx,2024,7706284.984759998,7706284.984760003,0.001,True
+services_type_inventory,Georgian-Imports-of-services-by-types.xlsx,,12,12,0,True
+services_type_sum,Georgian-Imports-of-services-by-types.xlsx,2020,1455905.2866499992,1455905.2866499997,0.001,True
+services_country_total,Georgian-Imports-of-services-by-countries.xlsx,2020,1455905.2866499992,1455905.28665,0.001,True
+services_type_sum,Georgian-Imports-of-services-by-types.xlsx,2021,1822270.1460600016,1822270.1460600016,0.001,True
+services_country_total,Georgian-Imports-of-services-by-countries.xlsx,2021,1822270.1460600016,1822270.1460599995,0.001,True
+services_type_sum,Georgian-Imports-of-services-by-types.xlsx,2022,3028876.2826000005,3028876.282600001,0.001,True
+services_country_total,Georgian-Imports-of-services-by-countries.xlsx,2022,3028876.2826000005,3028876.2825999996,0.001,True
+services_type_sum,Georgian-Imports-of-services-by-types.xlsx,2023,3618913.9011500007,3618913.9011500017,0.001,True
+services_country_total,Georgian-Imports-of-services-by-countries.xlsx,2023,3618913.9011500007,3618913.9011499994,0.001,True
+services_type_sum,Georgian-Imports-of-services-by-types.xlsx,2024,3814814.4939099983,3814814.4939099983,0.001,True
+services_country_total,Georgian-Imports-of-services-by-countries.xlsx,2024,3814814.4939099983,3814814.49391,0.001,True
+region_inventory_with_unknown,export-by-regions-and-SITC-4-digital.xlsx,,12,12,0,True
+regional_annual_totals_sum,export-by-regions-and-SITC-4-digital.xlsx,2022,5582502.21669701,5582502.216697007,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2022,2267051.5200787885,2267051.5200787876,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2022,313823.82649043517,313823.82649043493,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Guria, total",2022,44757.78466798705,44757.78466798707,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2022,229541.97313914503,229541.97313914506,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2022,176635.04895688104,176635.04895688096,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2022,77612.46922526823,77612.46922526833,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2022,7143.490150943173,7143.490150943173,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2022,1113877.3851749517,1113877.3851749515,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2022,111610.580803822,111610.58080382211,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2022,808061.2019252344,808061.2019252342,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2022,50649.57046611577,50649.57046611581,0.001,True
+regional_unknown_product_detail_not_published,"export-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2022,381737.3656174354,,,
+regional_annual_totals_sum,export-by-regions-and-SITC-4-digital.xlsx,2023,6085879.620548846,6085879.620548837,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2023,2745400.051287795,2745400.051287796,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2023,273205.7437211832,273205.7437211829,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Guria, total",2023,47916.63071242087,47916.630712420854,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2023,188483.64050078916,188483.64050078907,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2023,205334.74654310688,205334.74654310683,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2023,101601.8533526439,101601.85335264387,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2023,6981.791847395726,6981.791847395724,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2023,621367.6949015711,621367.6949015708,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2023,135413.74839941598,135413.74839941598,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2023,720266.6414846625,720266.641484663,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2023,68657.16840095159,68657.1684009516,0.001,True
+regional_unknown_product_detail_not_published,"export-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2023,971249.9093969008,,,
+regional_annual_totals_sum,export-by-regions-and-SITC-4-digital.xlsx,2024,6561882.251207461,6561882.2512075305,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2024,2840684.3908262956,2840684.3908262937,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2024,310189.3674691722,310189.3674691723,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Guria, total",2024,44207.07567603889,44207.07567603889,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2024,192496.93516043155,192496.93516043155,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2024,227413.61407470162,227413.61407470144,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2024,104661.22194066634,104661.22194066628,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2024,7114.169446606492,7114.169446606492,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2024,493869.8910064429,493869.891006443,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2024,185078.81247655742,185078.81247655742,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2024,852385.2035843505,852385.2035843506,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2024,70852.36849943292,70852.36849943292,0.001,True
+regional_unknown_product_detail_not_published,"export-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2024,1232929.2010468345,,,
+regional_annual_totals_sum,export-by-regions-and-SITC-4-digital.xlsx,2025,7287805.027574349,7287805.027574286,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2025,3057251.5036708224,3057251.5036708238,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2025,301950.088999858,301950.0889998582,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Guria, total",2025,51420.07987870118,51420.07987870115,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2025,194583.58142060964,194583.58142060973,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2025,278061.04070457694,278061.040704577,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2025,96110.54412359055,96110.54412359059,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2025,14498.506937845521,14498.506937845521,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2025,536032.7127538626,536032.7127538626,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2025,215120.51551185807,215120.51551185804,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2025,1003930.2544074476,1003930.2544074478,0.001,True
+regional_annual_product_sum,"export-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2025,61248.60262283062,61248.60262283064,0.001,True
+regional_unknown_product_detail_not_published,"export-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2025,1477597.5965422827,,,
+region_inventory_with_unknown,import-by-regions-and-SITC-4-digital.xlsx,,12,12,0,True
+regional_annual_totals_sum,import-by-regions-and-SITC-4-digital.xlsx,2022,13539713.872844027,13539713.872844068,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2022,8953630.531914039,8953630.531914039,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2022,820396.3486812242,820396.3486812245,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Guria, total",2022,37838.188899060886,37838.18889906088,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2022,404047.1965998386,404047.1965998381,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2022,172171.64794114546,172171.64794114555,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2022,208316.46882487924,208316.46882487932,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2022,6042.127200815383,6042.127200815382,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2022,1068017.9977273552,1068017.997727355,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2022,61451.56201227768,61451.56201227773,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2022,608511.9374789207,608511.9374789206,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2022,162045.20753240562,162045.2075324058,0.001,True
+regional_unknown_product_detail_not_published,"import-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2022,1037244.6580321067,,,
+regional_annual_totals_sum,import-by-regions-and-SITC-4-digital.xlsx,2023,15615270.126513682,15615270.126514172,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2023,10802417.123894647,10802417.123894654,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2023,873936.3823616428,873936.3823616434,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Guria, total",2023,59497.62752637365,59497.62752637361,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2023,422396.72515746794,422396.7251574682,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2023,209356.37885948093,209356.37885948087,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2023,239118.26874429686,239118.26874429698,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2023,6290.7653498946775,6290.7653498946775,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2023,506409.8833237529,506409.88332375296,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2023,82059.48877911185,82059.48877911181,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2023,694515.4517144278,694515.4517144276,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2023,183900.8370000464,183900.83700004642,0.001,True
+regional_unknown_product_detail_not_published,"import-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2023,1535371.1938030291,,,
+regional_annual_totals_sum,import-by-regions-and-SITC-4-digital.xlsx,2024,16916834.8457103,16916834.845710237,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2024,11773607.526803391,11773607.526803393,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2024,910458.1409136028,910458.1409136041,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Guria, total",2024,59881.58885422357,59881.588854223584,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2024,452200.12769421167,452200.1276942115,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2024,215611.60672677346,215611.60672677352,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2024,272944.81961669424,272944.81961669435,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2024,7029.8140019034045,7029.814001903403,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2024,383444.4156039951,383444.41560399486,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2024,117031.94068979178,117031.94068979175,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2024,780580.4298313742,780580.4298313747,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2024,175541.31356857298,175541.3135685731,0.001,True
+regional_unknown_product_detail_not_published,"import-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2024,1768503.1214057035,,,
+regional_annual_totals_sum,import-by-regions-and-SITC-4-digital.xlsx,2025,18648513.307186797,18648513.307186726,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Tbilisi, total",2025,13032143.96484597,13032143.964845972,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Adjara, total",2025,944776.8176024621,944776.8176024618,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Guria, total",2025,63402.836989678726,63402.836989678646,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Imereti, total",2025,508492.2604440379,508492.26044403773,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kakheti, total",2025,232417.24052716518,232417.240527165,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Mtskheta-Mtianeti, total",2025,265048.7419402488,265048.7419402491,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Racha-Lechkhumi and Kvemo Svaneti, total",2025,14819.735770858593,14819.735770858595,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samegrelo-Zemo Svaneti, total",2025,452073.22575304,452073.22575304005,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Samtskhe-Javakheti, total",2025,112680.05511806895,112680.05511806888,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Kvemo Kartli, total ",2025,833962.926073233,833962.926073233,0.001,True
+regional_annual_product_sum,"import-by-regions-and-SITC-4-digital.xlsx:Shida Kartli, total",2025,195280.65441245766,195280.65441245763,0.001,True
+regional_unknown_product_detail_not_published,"import-by-regions-and-SITC-4-digital.xlsx:Unknown, total",2025,1993414.8477095054,,,

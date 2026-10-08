@@ -41,7 +41,7 @@ export async function renderMethodologyPage(locale: Locale) {
     <>
       <JsonLd
         // Demography has no Dataset markup yet (spec section 10); the catalog names only pages that carry it.
-        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.filter((entry) => entry.id !== "demography").map((entry) => entry.href), locale, [
+        data={dataCatalogJsonLd(resolveSiteUrl(), liveEntries.filter(entry => entry.id !== "unemployment" && entry.id !== "demography").map(entry => entry.href), locale, [
           "/explorer/economy/gdp",
           "/explorer/expenditure",
           "/explorer/revenue",

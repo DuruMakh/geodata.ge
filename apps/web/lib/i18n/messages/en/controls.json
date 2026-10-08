@@ -22,7 +22,6 @@
   "controls.excelWorking": "Preparing Excel…",
   "controls.download": "Download",
   "controls.excelError": "The file could not be prepared — please try again.",
-  "controls.horizontalScroll": "Scroll horizontally to see more data",
   "controls.chart": "Line",
   "controls.table": "Table",
   "controls.viewMode": "View mode",

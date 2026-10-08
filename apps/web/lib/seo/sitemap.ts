@@ -6,6 +6,7 @@ import { loadServedProductData } from "../data/inflation/importProducts";
 import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
+import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
 import {
@@ -22,6 +23,8 @@ import { resolveSiteUrl } from "../siteUrl";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
 import { loadPageRevisions } from "../i18n/page-revisions.server";
 import { pageHref } from "../i18n/routes";
+import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
+import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
@@ -33,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: demographyFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: demographyFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -43,6 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedRegionalEconomyData(),
     loadServedGdpOverviewData(),
     loadServedEconomicSectorsData(),
+    loadServedUnemploymentData(),
     loadServedDemographyData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -52,6 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // inflation or debt refresh moves theirs. They used to carry the budget date.
   const gdpModified = new Date(gdpOverviewFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const sectorsModified = new Date(sectorFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
+  const unemploymentModified = new Date(unemploymentFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const economyModified = gdpModified > sectorsModified ? gdpModified : sectorsModified;
   const demographyModified = new Date(demographyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const lastReviewedAt = sourceDocuments
@@ -91,6 +96,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/economy`, lastModified: economyModified },
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified: sectorsModified },
+    { url: `${siteUrl}/explorer/unemployment`, lastModified: unemploymentModified },
+    ...UNEMPLOYMENT_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: unemploymentModified })),
+    ...regions.map(region => ({ url: `${siteUrl}${unemploymentRegionHref(region.id)}`, lastModified: new Date(unemploymentFacts.filter(fact => fact.dimension === "region" && fact.groupId === region.id).map(fact => fact.lastReviewedAt).sort().at(-1)!) })),
     { url: `${siteUrl}/explorer/economy/regions`, lastModified: regionalModified },
     ...regions.map((region) => ({
       url: `${siteUrl}/explorer/economy/regions/${region.id.replace("region.", "")}`,

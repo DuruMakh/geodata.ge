@@ -111,13 +111,37 @@ export type RegionalEconomyMapModel = {
   legendMaxGel: number;
 };
 
-function quantileBucket(values: number[]) {
+export function quantileBucket(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right);
   const breaks = [1, 2, 3, 4, 5].map((index) => sorted[Math.floor((index / 6) * sorted.length)]!);
   return (value: number) => {
     let bucket = 0;
     while (bucket < breaks.length && value >= breaks[bucket]!) bucket += 1;
     return bucket;
+  };
+}
+
+export type RegionMapModel = {
+  viewBox: string;
+  firstYear: number;
+  year: number;
+  regions: Array<{ regionId: string; nameKa: string; value: number; rank: number; bucket: number; pathD: string }>;
+  occupiedAreas: RegionalEconomyMapModel["occupiedAreas"];
+  legendMin: number;
+  legendMax: number;
+};
+
+export function regionalMapGeometry() {
+  const project = createProjection();
+  const pathByRegion = new Map<string, string>();
+  for (const geoRegion of GEORGIA_GEO.regions) {
+    const regionId = GEO_ISO_TO_REGION_ID[geoRegion.iso as keyof typeof GEO_ISO_TO_REGION_ID];
+    if (regionId) pathByRegion.set(regionId, ringPath(geoRegion.ring, project));
+  }
+  return {
+    viewBox: `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`,
+    pathByRegion,
+    occupiedAreas: occupiedFeatures.map(feature => ({ key: feature.properties.key, pathD: occupiedPath(feature, project) })),
   };
 }
 
@@ -140,12 +164,7 @@ export function buildRegionalEconomyMapModel({
     latestByRegion.set(fact.regionId, fact.value);
   }
 
-  const project = createProjection();
-  const pathByRegion = new Map<string, string>();
-  for (const geoRegion of GEORGIA_GEO.regions) {
-    const regionId = GEO_ISO_TO_REGION_ID[geoRegion.iso as keyof typeof GEO_ISO_TO_REGION_ID];
-    if (regionId) pathByRegion.set(regionId, ringPath(geoRegion.ring, project));
-  }
+  const { viewBox, pathByRegion, occupiedAreas } = regionalMapGeometry();
 
   const regionRows = regions.map((region) => {
     const totalGdpGel = latestByRegion.get(region.id);
@@ -178,14 +197,11 @@ export function buildRegionalEconomyMapModel({
   if (pathByRegion.size !== regions.length) throw new Error("Regional map geometry contains an unknown region");
 
   return {
-    viewBox: `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`,
+    viewBox,
     firstYear,
     year,
     regions: ranked,
-    occupiedAreas: occupiedFeatures.map((feature) => ({
-      key: feature.properties.key,
-      pathD: occupiedPath(feature, project),
-    })),
+    occupiedAreas,
     legendMinGel: Math.min(...regionRows.map((region) => region.totalGdpGel)),
     legendMaxGel: Math.max(...regionRows.map((region) => region.totalGdpGel)),
   };

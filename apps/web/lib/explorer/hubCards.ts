@@ -147,7 +147,7 @@ export function buildHubCards(
     },
     {
       index: "04",
-      title: translated("common.analysis", BUDGET_SECTIONS.analysis.label),
+      title: translated("common.singleYear", "ერთი წლის სურათი"),
       description: translated("hub.analysisDescription", "ერთი წლის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."),
       href: BUDGET_SECTIONS.analysis.href,
       comingSoon: BUDGET_SECTIONS.analysis.href === null,

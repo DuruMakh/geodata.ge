@@ -1036,20 +1036,20 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   expect(consoleProblems).toEqual([]);
 });
 
-test("mobile chart and table explain their contained horizontal scroll", async ({ page }) => {
+test("mobile chart and table keep contained horizontal scroll", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chart = page.getByTestId("chart-frame");
-  await expect(page.getByTestId("chart-scroll-hint")).toBeVisible();
+  await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await expect(chart).toHaveAttribute("tabindex", "0");
   await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი");
   expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
 
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
-  await expect(page.getByTestId("table-scroll-hint")).toBeVisible();
+  await expect(page.getByTestId("table-scroll-hint")).toHaveCount(0);
   await expect(table).toHaveAttribute("tabindex", "0");
   await expect(table).toHaveAttribute("aria-label", "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი");
   expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);

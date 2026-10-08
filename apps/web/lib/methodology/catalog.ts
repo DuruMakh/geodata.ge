@@ -8,6 +8,8 @@ import { DEMOGRAPHY_METHODOLOGY } from "./content/demography";
 import { DEMOGRAPHY_METHODOLOGY as EN_DEMOGRAPHY } from "./content/en/demography";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
+import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
+import { UNEMPLOYMENT_METHODOLOGY_CONTENT as EN_UNEMPLOYMENT } from "./content/en/unemployment";
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { Locale } from "../i18n/types";
 import { DEBT_METHODOLOGY_CONTENT as EN_DEBT } from "./content/en/debt";
@@ -39,12 +41,14 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
   inflation: INFLATION_METHODOLOGY_CONTENT,
+  unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
 
 const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
   "economic-sectors": EN_SECTORS,
   "regional-economies": EN_REGIONAL_ECONOMIES,
+  unemployment: EN_UNEMPLOYMENT,
   expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP, inflation: EN_INFLATION,
   demography: EN_DEMOGRAPHY,
 };

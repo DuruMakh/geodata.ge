@@ -25,6 +25,7 @@ Repository precedence: `Project_Definition.md` section 2 owns scope; `DESIGN.md`
 
 - Inspect relevant files, patterns, tests, and call sites before editing. State important assumptions and tradeoffs; prefer the simplest correct solution. Ask only when unresolved uncertainty materially changes the outcome or risks doing the wrong work.
 - Explain plans, choices, and results in plain language for a non-developer. Resolve implementation details independently when the codebase provides the answer.
+- The user may ask questions or give tasks in Georgian. Conduct work in English and use English for all communication by default, including questions, plans, progress updates, explanations, and final answers. Respond in Georgian only when the user explicitly requests it.
 - Implement only the requested scope. Avoid speculative abstractions, configuration, and handling for impossible cases. Preserve required data validation, source checks, unmapped-row handling, and planned/actual rules.
 - Match existing style. Do not refactor, reformat, rename, or remove unrelated code. Remove only imports, variables, functions, and files made unnecessary by your changes; report unrelated issues separately. Every changed line must serve the request.
 - Define observable success criteria. For multi-step work, give a short plan pairing each step with its verification; skip formal planning for trivial changes. Reproduce bugs, verify invalid cases for validation changes, and compare behavior before and after refactoring.

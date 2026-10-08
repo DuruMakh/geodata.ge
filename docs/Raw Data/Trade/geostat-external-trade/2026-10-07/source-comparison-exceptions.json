@@ -1,0 +1,704 @@
+{
+  "groups": {
+    "tools": {
+      "codes": [
+        "8467",
+        "8508"
+      ],
+      "explanation": "Older electromechanical-tool headings and newer hand-tool headings use different allocations; combined native subtotals agree. No historic HS edition is imputed."
+    },
+    "clays_minerals": {
+      "codes": [
+        "2507",
+        "2530"
+      ],
+      "explanation": "Geostat source tables allocate matching amounts between kaolin/clay and mineral headings differently. Exact cause is not declared; do not join or recode the native series."
+    },
+    "knitted_fabrics": {
+      "codes": [
+        "6002",
+        "6003",
+        "6004",
+        "6005",
+        "6006"
+      ],
+      "explanation": "Legacy and newer knitted-fabric headings have different native subdivisions; combined source subtotals agree. No harmonization is inferred."
+    },
+    "leather": {
+      "codes": [
+        "4108",
+        "4109",
+        "4110",
+        "4111",
+        "4114",
+        "4115"
+      ],
+      "explanation": "Legacy and newer leather headings have different native subdivisions; combined source subtotals agree. WCO documents renumbering across HS revisions."
+    },
+    "mixed_goods_gases": {
+      "codes": [
+        "2711",
+        "7700"
+      ],
+      "explanation": "Petroleum-gas and publisher-defined Mixed goods subtotals are allocated differently between the HS4/HS6 sources in 2015-2019. Preserve the original labels and withhold prefix equivalence; no commodity identity is guessed."
+    }
+  },
+  "cases": [
+    {
+      "flow": "export",
+      "year": "2000",
+      "item_id": "8467",
+      "difference_usd": "-16316.7399999999989000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C917\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2448\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2449\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2450\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2451\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2452\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2453\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2454\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2455\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2456\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2457\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2000",
+      "item_id": "8508",
+      "difference_usd": "16316.74000000000211000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C945\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2592\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2593\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2594\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2595\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2001",
+      "item_id": "6002",
+      "difference_usd": "1965.0300000000001000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D587\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1287\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1288\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "export",
+      "year": "2001",
+      "item_id": "6005",
+      "difference_usd": "-1965.0300000000001000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D589\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1290\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1291\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "export",
+      "year": "2001",
+      "item_id": "8467",
+      "difference_usd": "-589.91999999999986000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D917\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2448\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2449\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2450\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2451\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2452\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2453\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2454\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2455\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2456\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2457\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2001",
+      "item_id": "8508",
+      "difference_usd": "589.92000000000003000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D945\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2592\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2593\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2594\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2595\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2002",
+      "item_id": "2507",
+      "difference_usd": "400.75000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E190\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D454\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "export",
+      "year": "2002",
+      "item_id": "2530",
+      "difference_usd": "-400.74999999998000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E210\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D491\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D492\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "export",
+      "year": "2002",
+      "item_id": "8467",
+      "difference_usd": "-149.79000000000005000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E917\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2448\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2449\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2450\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2451\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2452\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2453\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2454\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2455\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2456\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2457\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2002",
+      "item_id": "8508",
+      "difference_usd": "149.790000000000004000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E945\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2592\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2593\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2594\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2595\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2003",
+      "item_id": "2507",
+      "difference_usd": "227528.86000000001000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F190\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E454\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "export",
+      "year": "2003",
+      "item_id": "2530",
+      "difference_usd": "-227528.859999999991000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F210\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E491\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E492\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "export",
+      "year": "2003",
+      "item_id": "6002",
+      "difference_usd": "8057.8299999999992000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F587\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1287\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1288\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "export",
+      "year": "2003",
+      "item_id": "6006",
+      "difference_usd": "-8057.8299999999992000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F590\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1292\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1293\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1294\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1295\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1296\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1297\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "export",
+      "year": "2003",
+      "item_id": "8467",
+      "difference_usd": "-1990.03999999999949000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F917\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2448\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2449\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2450\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2451\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2452\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2453\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2454\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2455\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2456\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2457\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2003",
+      "item_id": "8508",
+      "difference_usd": "1990.04000000000000000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F945\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2592\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2593\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2594\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2595\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2004",
+      "item_id": "2507",
+      "difference_usd": "162038.20999999999000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G190\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F454\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "export",
+      "year": "2004",
+      "item_id": "2530",
+      "difference_usd": "-162038.20999999996000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G210\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F491\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F492\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "export",
+      "year": "2004",
+      "item_id": "6002",
+      "difference_usd": "72546.999999999997000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G587\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1287\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1288\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "export",
+      "year": "2004",
+      "item_id": "6006",
+      "difference_usd": "-72546.999999999997000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G590\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1292\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1293\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1294\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1295\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1296\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1297\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "export",
+      "year": "2004",
+      "item_id": "8467",
+      "difference_usd": "-661.9099999999910000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G917\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2448\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2449\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2450\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2451\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2452\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2453\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2454\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2455\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2456\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2457\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2004",
+      "item_id": "8508",
+      "difference_usd": "661.910000000000059000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G945\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2592\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2593\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2594\"],[\"geostat_trade_export-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2595\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "export",
+      "year": "2015",
+      "item_id": "2711",
+      "difference_usd": "-18902078.999999997000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"C216\"],[\"geostat_trade_export-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C606\"],[\"geostat_trade_export-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C607\"],[\"geostat_trade_export-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C608\"],[\"geostat_trade_export-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C609\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "export",
+      "year": "2015",
+      "item_id": "7700",
+      "difference_usd": "18902078.9999999986000",
+      "source_refs": "[[\"geostat_trade_export-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"C746\"],[\"geostat_trade_export-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C2253\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "4114",
+      "difference_usd": "-17083.25000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C496\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B1814\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B1815\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "4115",
+      "difference_usd": "-66167.22000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C497\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B1816\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B1817\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "6002",
+      "difference_usd": "66431.89999999999770000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C677\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2536\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2537\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2538\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2539\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2540\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2541\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2542\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2543\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2544\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2545\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2546\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2547\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2548\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "6003",
+      "difference_usd": "-1725.1600000000002000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C678\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2549\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2550\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2551\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2552\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "6004",
+      "difference_usd": "-2896.0499999999998000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C679\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2553\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2554\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "6005",
+      "difference_usd": "-26090.470000000003000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C680\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2555\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2556\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2557\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2558\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2559\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2560\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2561\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2562\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2563\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2564\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2565\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2566\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "6006",
+      "difference_usd": "-35720.220000000005000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C681\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2567\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2568\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2569\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2570\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2571\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2572\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2573\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2574\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2575\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2576\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2577\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2578\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2579\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B2580\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "8467",
+      "difference_usd": "-305095.28999999998026000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C1034\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4039\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4040\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4041\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4042\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4043\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4044\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4045\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4046\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4047\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4048\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2000",
+      "item_id": "8508",
+      "difference_usd": "305095.2899999999501000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"C1062\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4205\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4206\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4207\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"B4208\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "2507",
+      "difference_usd": "2850.00",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D208\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C707\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "2530",
+      "difference_usd": "-2849.9999999999995000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D230\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C759\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C760\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C761\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "4114",
+      "difference_usd": "-126699.63000000001000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D496\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1814\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1815\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "4115",
+      "difference_usd": "-60640.2000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D497\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1816\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C1817\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "6002",
+      "difference_usd": "63140.79999999999698000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D677\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2536\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2537\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2538\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2539\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2540\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2541\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2542\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2543\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2544\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2545\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2546\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2547\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2548\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "6003",
+      "difference_usd": "-3705.81000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D678\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2549\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2550\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2551\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2552\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "6005",
+      "difference_usd": "-41815.32000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D680\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2555\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2556\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2557\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2558\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2559\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2560\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2561\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2562\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2563\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2564\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2565\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2566\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "6006",
+      "difference_usd": "-17619.670000000003000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D681\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2567\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2568\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2569\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2570\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2571\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2572\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2573\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2574\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2575\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2576\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2577\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2578\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2579\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C2580\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "8467",
+      "difference_usd": "-133445.5300000000496000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D1034\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4039\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4040\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4041\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4042\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4043\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4044\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4045\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4046\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4047\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4048\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2001",
+      "item_id": "8508",
+      "difference_usd": "133445.530000000001000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"D1062\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4205\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4206\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4207\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"C4208\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "2507",
+      "difference_usd": "22000.46000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E208\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D707\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "2530",
+      "difference_usd": "-22000.460000000012000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E230\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D759\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D760\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D761\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "4115",
+      "difference_usd": "-59492.919999999998000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E497\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D1816\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D1817\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "6002",
+      "difference_usd": "187188.27999999998872000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E677\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2536\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2537\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2538\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2539\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2540\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2541\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2542\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2543\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2544\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2545\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2546\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2547\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2548\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "6003",
+      "difference_usd": "-320.47000000000003000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E678\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2549\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2550\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2551\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2552\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "6004",
+      "difference_usd": "-1682.96000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E679\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2553\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2554\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "6005",
+      "difference_usd": "-11120.760000000001000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E680\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2555\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2556\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2557\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2558\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2559\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2560\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2561\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2562\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2563\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2564\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2565\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2566\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "6006",
+      "difference_usd": "-174064.09000000002000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E681\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2567\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2568\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2569\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2570\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2571\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2572\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2573\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2574\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2575\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2576\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2577\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2578\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2579\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D2580\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "8467",
+      "difference_usd": "-150077.98000000002149000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E1034\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4039\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4040\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4041\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4042\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4043\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4044\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4045\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4046\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4047\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4048\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2002",
+      "item_id": "8508",
+      "difference_usd": "150077.979999999988000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"E1062\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4205\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4206\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4207\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"D4208\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "2507",
+      "difference_usd": "1246.99000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F208\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E707\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "2530",
+      "difference_usd": "-1246.989999999998000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F230\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E759\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E760\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E761\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "4115",
+      "difference_usd": "-115713.77000000001000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F497\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1816\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E1817\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "6002",
+      "difference_usd": "358957.40999999998499000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F677\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2536\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2537\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2538\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2539\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2540\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2541\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2542\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2543\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2544\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2545\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2546\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2547\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2548\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "6003",
+      "difference_usd": "-370.10999999999999000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F678\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2549\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2550\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2551\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2552\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "6005",
+      "difference_usd": "-26468.019999999999000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F680\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2555\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2556\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2557\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2558\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2559\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2560\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2561\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2562\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2563\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2564\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2565\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2566\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "6006",
+      "difference_usd": "-332119.28000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F681\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2567\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2568\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2569\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2570\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2571\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2572\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2573\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2574\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2575\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2576\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2577\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2578\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2579\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E2580\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "8467",
+      "difference_usd": "-216648.2399999998179000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F1034\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4039\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4040\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4041\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4042\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4043\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4044\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4045\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4046\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4047\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4048\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2003",
+      "item_id": "8508",
+      "difference_usd": "216648.240000000005000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"F1062\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4205\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4206\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4207\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"E4208\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "2507",
+      "difference_usd": "2603.8299999999999000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G208\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F707\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "2530",
+      "difference_usd": "-2603.829999999991000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G230\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F759\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F760\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F761\"]]",
+      "group_id": "clays_minerals"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "4114",
+      "difference_usd": "-8712.2200000000003000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G496\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1814\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1815\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "4115",
+      "difference_usd": "-420041.9099999998000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G497\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1816\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F1817\"]]",
+      "group_id": "leather"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "6002",
+      "difference_usd": "1213746.090000000241309000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G677\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2536\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2537\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2538\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2539\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2540\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2541\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2542\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2543\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2544\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2545\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2546\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2547\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2548\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "6004",
+      "difference_usd": "-88.059999999999999000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G679\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2553\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2554\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "6005",
+      "difference_usd": "-69343.150000000023000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G680\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2555\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2556\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2557\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2558\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2559\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2560\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2561\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2562\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2563\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2564\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2565\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2566\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "6006",
+      "difference_usd": "-1144314.8799999999000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G681\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2567\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2568\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2569\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2570\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2571\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2572\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2573\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2574\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2575\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2576\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2577\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2578\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2579\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F2580\"]]",
+      "group_id": "knitted_fabrics"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "8467",
+      "difference_usd": "-374904.509999999456000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G1034\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4039\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4040\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4041\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4042\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4043\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4044\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4045\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4046\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4047\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4048\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2004",
+      "item_id": "8508",
+      "difference_usd": "374904.510000000009000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2000-2014\",\"2000-2014-years\",\"G1062\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4205\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4206\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4207\"],[\"geostat_trade_import-product-by-6-digit-2000-2014\",\"2000-2008-years\",\"F4208\"]]",
+      "group_id": "tools"
+    },
+    {
+      "flow": "import",
+      "year": "2015",
+      "item_id": "2711",
+      "difference_usd": "-409497940.00000004648402000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"C247\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C908\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C909\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C910\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C911\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C912\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2015",
+      "item_id": "7700",
+      "difference_usd": "409497939.999999928000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"C876\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"C3458\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2016",
+      "item_id": "2711",
+      "difference_usd": "-310383645.9999999447389000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"D247\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"D908\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"D909\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"D910\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"D911\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"D912\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2016",
+      "item_id": "7700",
+      "difference_usd": "310383645.999999984000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"D876\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"D3458\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2017",
+      "item_id": "2711",
+      "difference_usd": "-300956709.0000000344884000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"E247\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"E908\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"E909\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"E910\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"E911\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"E912\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2017",
+      "item_id": "7700",
+      "difference_usd": "300956708.999999959000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"E876\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"E3458\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2018",
+      "item_id": "2711",
+      "difference_usd": "-281373461.999999981964000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"F247\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"F908\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"F909\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"F910\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"F911\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"F912\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2018",
+      "item_id": "7700",
+      "difference_usd": "281373462.00000003000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"F876\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"F3458\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2019",
+      "item_id": "2711",
+      "difference_usd": "-315108441.000000010264000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"G247\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"G908\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"G909\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"G910\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"G911\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"G912\"]]",
+      "group_id": "mixed_goods_gases"
+    },
+    {
+      "flow": "import",
+      "year": "2019",
+      "item_id": "7700",
+      "difference_usd": "315108441.0000000162000",
+      "source_refs": "[[\"geostat_trade_import-product-by-4-digit-2015-2026\",\"2015-2019-years\",\"G876\"],[\"geostat_trade_import-product-by-6-digit-2015-2019\",\"2015-2019-years\",\"G3458\"]]",
+      "group_id": "mixed_goods_gases"
+    }
+  ]
+}

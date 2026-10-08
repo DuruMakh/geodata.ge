@@ -63,6 +63,7 @@ const DATASET_SOURCE_NOTES = {
   "economic-sectors": "common.geostatSourceNote",
   "regional-economies": "common.geostatSourceNote",
   inflation: "common.inflationSourceNote",
+  unemployment: "common.geostatSourceNote",
   demography: "common.geostatSourceNote",
 } as const;
 
@@ -75,6 +76,9 @@ const DATASET_DOWNLOADS = {
   "economic-sectors": "/downloads/data/economic-sectors.csv",
   "regional-economies": "/downloads/data/regional-economies.csv",
   inflation: "/downloads/data/inflation-cpi-national.csv",
+  unemployment: null,
+  // Demography has no bulk files and no MCP entry yet (spec section 10).
+  demography: null,
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -91,6 +95,8 @@ const DATASET_JSON_DOWNLOADS = {
   municipalities: [{ href: "/downloads/data/municipal-expenditure.json", labelKey: "methodology.jsonMunicipalities" }],
   gdp: [],
   inflation: [],
+  unemployment: [],
+  demography: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
     { href: "/downloads/data/government-debt-rates.json", labelKey: "methodology.jsonRates" },
@@ -112,6 +118,8 @@ const DATASET_JSON_DISTRIBUTIONS = {
   debt: ["/downloads/data/government-debt.json"],
   gdp: [],
   inflation: [],
+  unemployment: [],
+  demography: [],
 } as const;
 
 export async function methodologyArticleMetadata(locale: Locale, { params }: MethodologyDatasetPageProps): Promise<Metadata> {
@@ -150,32 +158,37 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   ]);
   const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts, debtData.facts, archiveSummaries[dataset]);
   const publicRows = projectPublicSources(rows, locale, catalogue.documents);
-  // Demography has no bulk files, no Dataset markup and no MCP entry yet (spec section 10): it keeps the
-  // breadcrumb and the archived originals, and nothing that points at a file that does not exist.
-  const downloadable = dataset === "demography" ? null : dataset;
 
   return (
     <>
-      {downloadable === null ? null : (
+      {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
+      {dataset === "demography" ? null : (
       <JsonLd
-        data={downloadable === "inflation" ? {
+        data={dataset === "unemployment" ? {
+          "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
+          url: `${resolveSiteUrl()}${pageHref("/methodology/unemployment", locale)}`,
+          temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
+          spatialCoverage: { "@type": "Place", name: seoMessage(locale, "seo.country") },
+          creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
+          publisher: { "@id": `${resolveSiteUrl()}/#organization` },
+        } : dataset === "inflation" ? {
           "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,
           url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
           inLanguage:["ka","en"], dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:seoMessage(locale,"seo.country")},
           creator:{"@id":`${resolveSiteUrl()}/#organization`}, publisher:{"@id":`${resolveSiteUrl()}/#organization`},
           includedInDataCatalog:catalogReference(resolveSiteUrl(),locale), license:"https://creativecommons.org/licenses/by/4.0/",
-          distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}${DATASET_DOWNLOADS[downloadable]}`}
+          distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}${DATASET_DOWNLOADS[dataset]}`}
         } : datasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: locale === "en" ? `/en/methodology/${dataset}` : `/methodology/${dataset}`,
-          datasetId: DATASET_SCHEMA_IDS[downloadable],
+          datasetId: DATASET_SCHEMA_IDS[dataset],
           name: content.title,
           description: content.summary,
           firstYear: coverage.firstYear,
           lastYear: coverage.lastYear,
           dateModified: content.reviewedAt,
-          downloadPath: DATASET_DOWNLOADS[downloadable],
-          jsonDownloadPaths: DATASET_JSON_DISTRIBUTIONS[downloadable],
+          downloadPath: DATASET_DOWNLOADS[dataset],
+          jsonDownloadPaths: DATASET_JSON_DISTRIBUTIONS[dataset],
         })}
         testId="dataset-json-ld"
       />
@@ -187,8 +200,8 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
         coverage={coverage}
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
-        processedDataHref={downloadable === null ? undefined : DATASET_DOWNLOADS[downloadable]}
-        processedDataJsonLinks={downloadable === null ? [] : DATASET_JSON_DOWNLOADS[downloadable].map(link => ({ href: link.href, label: message(messages, link.labelKey) }))}
+        processedDataHref={DATASET_DOWNLOADS[dataset]}
+        processedDataJsonLinks={DATASET_JSON_DOWNLOADS[dataset].map(link => ({ href: link.href, label: message(messages, link.labelKey) }))}
         breadcrumbItems={[
           { name: message(messages, "common.home"), path: pageHref("/", locale) },
           { name: message(messages, "common.methodology"), path: pageHref("/methodology", locale) },

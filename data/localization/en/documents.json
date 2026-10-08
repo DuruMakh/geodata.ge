@@ -3367,5 +3367,140 @@
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-03" },
     "attribution": null,
     "documentLanguage": "en"
+  },
+  "geostat_lfs_annual_total": {
+    "title": {
+      "text": "Labour Force Indicators",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_annual_sex": {
+    "title": {
+      "text": "Labour Force Indicators by Sex",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_annual_settlement": {
+    "title": {
+      "text": "Labour Force Indicators by Urban-Rural Areas",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_annual_age": {
+    "title": {
+      "text": "Labour Force Indicators by Age Groups",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_annual_region": {
+    "title": {
+      "text": "Labour Force Indicators by Regions",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_metadata_2026": {
+    "title": {
+      "text": "Labour Force Survey metadata, updated 20 May 2026",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_source_page": {
+    "title": {
+      "text": "Employment and Unemployment source page, English",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_annual_education": {
+    "title": {
+      "text": "Labour Force Indicators by educational attainment level",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_annual_long_term": {
+    "title": {
+      "text": "Number of long-term unemployed and long-term unemployment rate",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-04"
+    },
+    "documentLanguage": "en"
   }
 }
