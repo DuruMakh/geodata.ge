@@ -1,6 +1,6 @@
 # Trading Partners Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a bilingual Trading partners page where readers compare countries and country groups over time, see the end-year ranking and download their selected figures.
 
@@ -10,7 +10,7 @@
 
 **Spec:** [Approved Trading partners design](../specs/2026-10-08-trade-partners-design.md), approved on 2026-10-08 when the user said "approve".
 
-**Status:** Plan proposed for review and execution-method selection. Existing isolated checkout: `C:/Users/Mylaptop/.codex/worktrees/c66f/Geodata.ge`, branch `codex/trade-partners`. The design commit is `26c7fbd9`; no product implementation is included in this planning stage.
+**Status:** Approved for inline implementation on 2026-10-08; publishing is outside this local implementation authorization. Existing isolated checkout: `C:/Users/Mylaptop/.codex/worktrees/c66f/Geodata.ge`, branch `codex/trade-partners`. The design commit is `26c7fbd9`; Implementation progress is recorded in the task checkboxes below.
 
 ## Global Constraints
 
@@ -36,9 +36,9 @@
 
 ## Execution entry
 
-- [ ] Recheck worktree/branch and preserve unrelated changes. Reuse this isolated checkout; do not create another one without a need.
-- [ ] Confirm Node 24 and lockfile freshness. This checkout currently lacks installed Next.js guides: restore locked dependencies with `npm ci` in `apps/web` only when execution is approved and installation is needed. Read the relevant bundled Next.js app-router, metadata and static-rendering guides before product code.
-- [ ] Read the spec, `DESIGN.md`, `CLAUDE.md` and `docs/data-methodology/trade-annual.md`. Read current Supabase guidance/changelog for the private mirror; repository Prisma/import rules take precedence over generic direct-SQL workflows.
+- [x] Recheck worktree/branch and preserve unrelated changes. Reuse this isolated checkout; do not create another one without a need.
+- [x] Confirm Node 24 and lockfile freshness. This checkout currently lacks installed Next.js guides: restore locked dependencies with `npm ci` in `apps/web` only when execution is approved and installation is needed. Read the relevant bundled Next.js app-router, metadata and static-rendering guides before product code.
+- [x] Read the spec, `DESIGN.md`, `CLAUDE.md` and `docs/data-methodology/trade-annual.md`. Read current Supabase guidance/changelog for the private mirror; repository Prisma/import rules take precedence over generic direct-SQL workflows.
 
 ## Task 1: Verified source package and reviewed partner catalogue
 
@@ -58,7 +58,7 @@ This step produces the reviewed files the page will use, preserving missing and 
 - Export `prepareTradePartnersData(repositoryRoot: string, mode: "write" | "check"): Promise<void>`, `validateTradePartnersData(data: TradePartnersData, report: TradePartnersAcceptance): void`, `tradePartnerFactKey(fact: Pick<TradePartnerFact, "entityId" | "indicatorId" | "year">): string`.
 - Tests export `createTradePartnersPackageFixture(): Promise<string>` for a temporary copy of the required frozen inputs, plus `tradePartnerEntities(): TradePartnerEntity[]`, `tradePartnerFacts(): TradePartnerFact[]`, `tradePartnerNationalFacts(): TradeOverviewFact[]` for later tasks. Model fixtures use Russia export/import 150/300, EU 400/200, OECD 800/100 and a missing-counterpart historical partner; national export/import are 1000/2000 for 2025.
 
-- [ ] Write source preparation/validation regressions before implementation. Pin the captured accepted primary catalogue and output counts:
+- [x] Write source preparation/validation regressions before implementation. Pin the captured accepted primary catalogue and output counts:
 
 ```ts
 expect(report).toMatchObject({
@@ -70,10 +70,10 @@ expect(facts).toHaveLength(22992);
 ```
 
 Also reject changed workbook hashes, omitted source identities/years, duplicate keys, wrong roles/units, altered source cell/format/value, stale artefact hashes and an invented numeric zero. Check leading-zero code `031`, Serbia and Montenegro `891`, Netherlands Antilles `530`, blanks/dashes and a true zero; a missing flow produces no numerical derivation. Tests copy only required research inputs and the four originals into their temporary package, never rewrite the real capture.
-- [ ] Run `npx vitest run tests/data/tradePartners/prepareTradePartners.test.ts tests/data/tradePartners/validation.test.ts`; confirm the new behavior fails before product implementation.
-- [ ] Implement the four-source subset preparer using `readVerifiedPackageFile`, source layouts/coverage/observation inventory, raw XLSX decimal tokens and Decimal precision 50, following Overview without refactoring its preparer. Bind `geostat_trade_export-country-1995-2026`, `geostat_trade_import-country-1995-2026`, `geostat_trade_export--country-group-1995-2026`, `geostat_trade_import-country-group-1995-2026` to their exact captured annual cells and thousand-USD units. Include country detail roles and only `group.eu/group.cis/group.bsec/group.oecd/group.guam`; source totals and country-section subtotals remain controls. Require both numerical counterparts for derived rows, exports-before-imports references and no derived native value. Reconcile using the package's declared comparisons/tolerances, preserving overlapping groups and the two services holds. Serialize deterministic BOM CSV, the acceptance report and catalogue fingerprint with review date `2026-10-08`.
-- [ ] Add reviewed Georgian labels in the catalogue and English `{ text, reviewedAt }` companions for all 217 native identities; register those IDs in the existing translation inventory. Preserve the original English source labels in fact metadata. Add `data:prepare-trade-partners` (`--write`) and `data:check-trade-partners` (`--check`) and append the latter to `data:validate`. Run the focused tests, both data commands and `npm run i18n:check`; require reproducible unchanged bytes and the exact counts above.
-- [ ] Commit task-owned files: `feat: prepare reviewed annual trade partners`.
+- [x] Run `npx vitest run tests/data/tradePartners/prepareTradePartners.test.ts tests/data/tradePartners/validation.test.ts`; confirm the new behavior fails before product implementation.
+- [x] Implement the four-source subset preparer using `readVerifiedPackageFile`, source layouts/coverage/observation inventory, raw XLSX decimal tokens and Decimal precision 50, following Overview without refactoring its preparer. Bind `geostat_trade_export-country-1995-2026`, `geostat_trade_import-country-1995-2026`, `geostat_trade_export--country-group-1995-2026`, `geostat_trade_import-country-group-1995-2026` to their exact captured annual cells and thousand-USD units. Include country detail roles and only `group.eu/group.cis/group.bsec/group.oecd/group.guam`; source totals and country-section subtotals remain controls. Require both numerical counterparts for derived rows, exports-before-imports references and no derived native value. Reconcile using the package's declared comparisons/tolerances, preserving overlapping groups and the two services holds. Serialize deterministic BOM CSV, the acceptance report and catalogue fingerprint with review date `2026-10-08`.
+- [x] Add reviewed Georgian labels in the catalogue and English `{ text, reviewedAt }` companions for all 217 native identities; register those IDs in the existing translation inventory. Preserve the original English source labels in fact metadata. Add `data:prepare-trade-partners` (`--write`) and `data:check-trade-partners` (`--check`) and append the latter to `data:validate`. Run the focused tests, both data commands and `npm run i18n:check`; require reproducible unchanged bytes and the exact counts above.
+- [x] Commit task-owned files: `feat: prepare reviewed annual trade partners`.
 
 ## Task 2: Static loading and exact private-mirror parity
 

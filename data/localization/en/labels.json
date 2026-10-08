@@ -1302,5 +1302,873 @@
   "unemployment": {
     "text": "Unemployment",
     "reviewedAt": "2026-10-04"
+  },
+  "partner.1995-2025.004": {
+    "text": "Afghanistan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.008": {
+    "text": "Albania",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.012": {
+    "text": "Algeria",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.020": {
+    "text": "Andorra",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.024": {
+    "text": "Angola",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.028": {
+    "text": "Antigua and Barbuda",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.031": {
+    "text": "Azerbaijan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.032": {
+    "text": "Argentina",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.036": {
+    "text": "Australia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.040": {
+    "text": "Austria",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.044": {
+    "text": "Bahamas",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.048": {
+    "text": "Bahrain",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.050": {
+    "text": "Bangladesh",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.051": {
+    "text": "Armenia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.052": {
+    "text": "Barbados",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.056": {
+    "text": "Belgium",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.060": {
+    "text": "Bermuda",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.064": {
+    "text": "Bhutan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.068": {
+    "text": "Bolivia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.070": {
+    "text": "Bosnia and Herzegovina",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.072": {
+    "text": "Botswana",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.076": {
+    "text": "Brazil",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.084": {
+    "text": "Belize",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.086": {
+    "text": "British Indian Ocean Territory",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.092": {
+    "text": "Virgin Islands, British",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.096": {
+    "text": "Brunei Darussalam",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.100": {
+    "text": "Bulgaria",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.104": {
+    "text": "Myanmar",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.108": {
+    "text": "Burundi",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.112": {
+    "text": "Belarus",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.116": {
+    "text": "Cambodia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.120": {
+    "text": "Cameroon",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.124": {
+    "text": "Canada",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.132": {
+    "text": "Cape Verde",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.136": {
+    "text": "Cayman Islands",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.140": {
+    "text": "Central African Republic",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.144": {
+    "text": "Sri Lanka",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.148": {
+    "text": "Chad",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.152": {
+    "text": "Chile",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.156": {
+    "text": "China",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.158": {
+    "text": "Taiwan, Province of China",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.162": {
+    "text": "Christmas Island",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.170": {
+    "text": "Colombia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.178": {
+    "text": "Congo",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.180": {
+    "text": "Congo DR",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.188": {
+    "text": "Costa Rica",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.191": {
+    "text": "Croatia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.192": {
+    "text": "Cuba",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.196": {
+    "text": "Cyprus",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.203": {
+    "text": "Czech Republic",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.204": {
+    "text": "Benin",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.208": {
+    "text": "Denmark",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.212": {
+    "text": "Dominica",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.214": {
+    "text": "Dominican Republic",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.218": {
+    "text": "Ecuador",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.222": {
+    "text": "EL Salvador",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.226": {
+    "text": "Equatorial Guinea",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.231": {
+    "text": "Ethiopia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.233": {
+    "text": "Estonia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.234": {
+    "text": "Faroe Islands",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.238": {
+    "text": "Falkland Islands (Malvinas)",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.242": {
+    "text": "Fiji",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.246": {
+    "text": "Finland",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.250": {
+    "text": "France",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.254": {
+    "text": "French Guiana",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.258": {
+    "text": "French Polynesia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.260": {
+    "text": "French Southern Territories",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.262": {
+    "text": "Djibouti",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.266": {
+    "text": "Gabon",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.270": {
+    "text": "Gambia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.275": {
+    "text": "State of Palestine",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.276": {
+    "text": "Germany",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.288": {
+    "text": "Ghana",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.292": {
+    "text": "Gibraltar",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.300": {
+    "text": "Greece",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.304": {
+    "text": "Greenland",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.308": {
+    "text": "Grenada",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.312": {
+    "text": "Guadeloupe",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.320": {
+    "text": "Guatemala",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.324": {
+    "text": "Guinea",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.328": {
+    "text": "Guyana",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.332": {
+    "text": "Haiti",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.336": {
+    "text": "Holy See (Vatican City State)",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.340": {
+    "text": "Honduras",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.344": {
+    "text": "Hong Kong, SAR of China",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.348": {
+    "text": "Hungary",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.352": {
+    "text": "Iceland",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.356": {
+    "text": "India",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.360": {
+    "text": "Indonesia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.364": {
+    "text": "Iran",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.368": {
+    "text": "Iraq",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.372": {
+    "text": "Ireland",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.376": {
+    "text": "Israel",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.380": {
+    "text": "Italy",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.384": {
+    "text": "Cote d'ivoire",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.388": {
+    "text": "Jamaica",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.392": {
+    "text": "Japan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.398": {
+    "text": "Kazakhstan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.400": {
+    "text": "Jordan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.404": {
+    "text": "Kenya",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.408": {
+    "text": "Korea, Democratic People's Republic of",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.410": {
+    "text": "Korea, Republic of",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.414": {
+    "text": "Kuwait",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.417": {
+    "text": "Kyrgyzstan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.418": {
+    "text": "Lao",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.422": {
+    "text": "Lebanon",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.426": {
+    "text": "Lesotho",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.428": {
+    "text": "Latvia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.430": {
+    "text": "Liberia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.434": {
+    "text": "Libya",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.438": {
+    "text": "Liechtenstein",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.440": {
+    "text": "Lithuania (Lietuva)",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.442": {
+    "text": "Luxembourg",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.446": {
+    "text": "Macau",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.450": {
+    "text": "Madagascar",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.454": {
+    "text": "Malawi",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.458": {
+    "text": "Malaysia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.462": {
+    "text": "Maldives",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.466": {
+    "text": "Mali",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.470": {
+    "text": "Malta",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.474": {
+    "text": "Martinique",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.478": {
+    "text": "Mauritania",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.480": {
+    "text": "Mauritius",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.484": {
+    "text": "Mexico",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.492": {
+    "text": "Monaco",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.496": {
+    "text": "Mongolia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.498": {
+    "text": "Moldova",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.499": {
+    "text": "Montenegro",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.504": {
+    "text": "Morocco",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.508": {
+    "text": "Mozambique",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.512": {
+    "text": "Oman",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.516": {
+    "text": "Namibia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.520": {
+    "text": "Nauru",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.524": {
+    "text": "Nepal",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.528": {
+    "text": "Netherlands",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.530": {
+    "text": "Netherlands Antilles",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.534": {
+    "text": "Sint Maarten (Dutch part)",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.554": {
+    "text": "New Zealand",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.558": {
+    "text": "Nicaragua",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.562": {
+    "text": "Niger",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.566": {
+    "text": "Nigeria",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.570": {
+    "text": "Niue",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.578": {
+    "text": "Norway",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.580": {
+    "text": "Northern Mariana Islands",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.584": {
+    "text": "Marshall Islands",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.586": {
+    "text": "Pakistan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.591": {
+    "text": "Panama",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.600": {
+    "text": "Paraguay",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.604": {
+    "text": "Peru",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.608": {
+    "text": "Philippines",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.612": {
+    "text": "Pitcairn",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.616": {
+    "text": "Poland",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.620": {
+    "text": "Portugal",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.624": {
+    "text": "Guinea-Bissau",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.626": {
+    "text": "Timor-LESTE",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.630": {
+    "text": "Puerto Rico",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.634": {
+    "text": "Qatar",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.638": {
+    "text": "Reunion",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.642": {
+    "text": "Romania",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.643": {
+    "text": "Russia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.646": {
+    "text": "Rwanda",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.654": {
+    "text": "Saint Helena",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.660": {
+    "text": "Anguilla",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.670": {
+    "text": "Saint Vincent and the Grenadines",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.674": {
+    "text": "San Marino",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.682": {
+    "text": "Saudi Arabia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.686": {
+    "text": "Senegal",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.688": {
+    "text": "Serbia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.690": {
+    "text": "Seychelles",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.694": {
+    "text": "Sierra Leone",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.702": {
+    "text": "Singapore",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.703": {
+    "text": "Slovakia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.704": {
+    "text": "Viet Nam",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.705": {
+    "text": "Slovenia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.706": {
+    "text": "Somalia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.710": {
+    "text": "South Africa",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.716": {
+    "text": "Zimbabwe",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.724": {
+    "text": "Spain",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.729": {
+    "text": "Sudan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.732": {
+    "text": "Western Sahara",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.740": {
+    "text": "Suriname",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.748": {
+    "text": "Swaziland",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.752": {
+    "text": "Sweden",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.756": {
+    "text": "Switzerland",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.760": {
+    "text": "Syrian",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.762": {
+    "text": "Tajikistan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.764": {
+    "text": "Thailand",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.768": {
+    "text": "Togo",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.776": {
+    "text": "Tonga",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.780": {
+    "text": "Trinidad and Tobago",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.784": {
+    "text": "United Arab Emirates",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.788": {
+    "text": "Tunisia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.792": {
+    "text": "Türkiye",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.795": {
+    "text": "Turkmenistan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.796": {
+    "text": "Turks and Caicos Islands",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.798": {
+    "text": "Tuvalu",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.800": {
+    "text": "Uganda",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.804": {
+    "text": "Ukraine",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.807": {
+    "text": "North Macedonia",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.818": {
+    "text": "Egypt",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.826": {
+    "text": "United Kingdom",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.831": {
+    "text": "Guernsey",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.834": {
+    "text": "Tanzania",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.840": {
+    "text": "United States",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.850": {
+    "text": "Virgin Islands, U.S",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.854": {
+    "text": "Burkina Faso",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.858": {
+    "text": "Uruguay",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.860": {
+    "text": "Uzbekistan",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.862": {
+    "text": "Venezuela",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.887": {
+    "text": "Yemen",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.891": {
+    "text": "Serbia and Montenegro",
+    "reviewedAt": "2026-10-08"
+  },
+  "partner.1995-2025.894": {
+    "text": "Zambia",
+    "reviewedAt": "2026-10-08"
+  },
+  "group.bsec": {
+    "text": "Black Sea Economic Cooperation (BSEC)",
+    "reviewedAt": "2026-10-08"
+  },
+  "group.cis": {
+    "text": "Commonwealth of Independent States (CIS)",
+    "reviewedAt": "2026-10-08"
+  },
+  "group.eu": {
+    "text": "European Union (EU)",
+    "reviewedAt": "2026-10-08"
+  },
+  "group.guam": {
+    "text": "GUAM",
+    "reviewedAt": "2026-10-08"
+  },
+  "group.oecd": {
+    "text": "Organisation for Economic Co-operation and Development (OECD)",
+    "reviewedAt": "2026-10-08"
   }
 }

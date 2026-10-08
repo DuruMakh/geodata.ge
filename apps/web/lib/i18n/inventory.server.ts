@@ -11,6 +11,7 @@ import { LIVE_METHODOLOGY_IDS } from "../methodology/types";
 import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
+import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 
@@ -52,6 +53,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
     labelIds: sortedUnique([
       ...sectorRegistry.map(row => row.id), "economic-sectors",
       ...unemploymentRegistry.map(row => row.id), "unemployment",
+      ...tradePartnerRegistry.map(row => row.id),
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),
       "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia", "snapshot.other",
