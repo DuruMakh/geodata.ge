@@ -114,7 +114,7 @@ This step defines the behavior independently of page styling, including mixed se
 - Export `TradePartnerRankingRow = { entityId: string; kind: TradePartnerKind; label: string; valueUsd: number | null; shareOfNational: number | null; rank: number | null; color: string }` and `TradePartnersModel = { years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[]; valuesByEntity: Record<string, Record<number, number | null>>; activeEntities: TradePartnerEntity[]; offTabSelected: TradePartnerEntity[]; ranking: TradePartnerRankingRow[]; missingRanking: TradePartnerRankingRow[]; selectedCount: number; totalCount: number }`.
 - Export `buildTradePartnersModel(data: ClientTradePartnersData, state: TradePartnersState, presentation: Presentation): TradePartnersModel` and `tradePartnerColor(id: string): string`. Use the existing editorial palette with deterministic ID assignment; total is `INK`. Labels come from `publicLabel` and the reviewed catalogue, with group identity clear.
 
-- [ ] Write model/state regressions using Task 1's fixtures and Task 2's conversion. Assert the exact default and URL round-trip:
+- [x] Write model/state regressions using Task 1's fixtures and Task 2's conversion. Assert the exact default and URL round-trip:
 
 ```ts
 expect(parseTradePartnersHash("", data)).toMatchObject({
@@ -126,10 +126,10 @@ expect(setTradePartnersTab(saved, "countries").selectedIds).toEqual(saved.select
 ```
 
 Pin explicit empty/unknown/duplicate IDs, partial/reversed/out-of-coverage years and all-catalogue bulk selection. For the fixture, EU turnover is 600 and its share is `600 / 3000 = 0.2`; EU exports share is `400 / 1000 = 0.4`, irrespective of selected countries or groups. Balance shares are null. Missing counterparts stay null, zero remains zero, balance ranks use absolute magnitude, and unavailable rows receive no rank. Tiny signed values keep the existing `<0.01`/`>−0.01` floor behavior when a billion unit with two decimals would round them away.
-- [ ] Run `npx vitest run tests/explorer/tradePartnersState.test.ts tests/explorer/tradePartners.test.ts`; confirm failures before implementing.
-- [ ] Implement the pure state/model functions. Hash keys are `measure`, `tab`, `view`, `sel` and the existing annual-range keys; an explicit empty selection never restores the total. Derive coverage only from the accepted partner facts and map the national reference by matching year/indicator. Keep the shared ID universe, count and stable colors unchanged when tabs/search/measure change. Build active-tab ranking independently of selected IDs; tie-break by localized label then ID. Use the existing `resolveRange`, `refitRange`, `unitFor`, `formatInUnit` and `publicLabel`, not new global formatting or state frameworks.
-- [ ] Rerun the two focused files; require the arithmetic, denominator, missingness, stability and round-trip assertions above to pass. Confirm the full frozen catalogue yields 218 shared choices including Georgia total, without hardcoding that count in product code.
-- [ ] Commit: `feat: model mixed trade partner comparisons and rankings`.
+- [x] Run `npx vitest run tests/explorer/tradePartnersState.test.ts tests/explorer/tradePartners.test.ts`; confirm failures before implementing.
+- [x] Implement the pure state/model functions. Hash keys are `measure`, `tab`, `view`, `sel` and the existing annual-range keys; an explicit empty selection never restores the total. Derive coverage only from the accepted partner facts and map the national reference by matching year/indicator. Keep the shared ID universe, count and stable colors unchanged when tabs/search/measure change. Build active-tab ranking independently of selected IDs; tie-break by localized label then ID. Use the existing `resolveRange`, `refitRange`, `unitFor`, `formatInUnit` and `publicLabel`, not new global formatting or state frameworks.
+- [x] Rerun the two focused files; require the arithmetic, denominator, missingness, stability and round-trip assertions above to pass. Confirm the full frozen catalogue yields 218 shared choices including Georgia total, without hardcoding that count in product code.
+- [x] Commit: `feat: model mixed trade partner comparisons and rankings`.
 
 ## Task 4: Native Excel export for the shared selection
 
