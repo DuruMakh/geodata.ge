@@ -49,6 +49,7 @@ Year ranges in the UI always derive from loaded facts. Current reviewed coverage
 - General-government balance: **1995–2031** (1995–2025 actual; 2026–2031 IMF projection), published directly as percent of GDP and nominal GEL.
 - Regional economies: **2010–2024**, 11 regions, Total regional GDP plus 20 NACE Rev. 2 activities, with current-price GEL and share of the selected region's market-price GDP only.
 - Unemployment: comparable core annual observations **2010–2025**; education and long-term **2020–2025**. Historical age bands and combined regions remain distinct, with source-derived coverage and missing-year gaps.
+- Demography: population on 1 January, Georgia **2004–2026** and the 11 regions and 64 municipalities **2015–2026**; density (persons per km²), Georgia **2014–2026** and the 11 regions **2015–2026**, none for municipalities. The 2024 census re-bases 1 January 2025, so no change is computed across it. Served at `/explorer/demography/population` (§29).
 - Government Debt, GDP overview, national economic sectors and inflation: coverage is stated in `Project_Definition.md` §2 and §2C and in each dataset's methodology page.
 - All current budget facts are `basis = actual`. Planned-value affordances (the `გეგმა` tag) stay specified and must activate automatically if planned budget facts ever load; debt and deficit projections use the separate `პროგნოზი` treatment.
 
