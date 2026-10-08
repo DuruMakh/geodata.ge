@@ -3,28 +3,31 @@ import { createHash } from "node:crypto";
 import { expectReadableText } from "./color-contrast";
 import { TEST_BASE_URL } from "./test-base-url";
 
+// The badge shows on paper in one place today: the three cards of the Demography hub whose pages are not published. The
+// methodology hub's future-dataset list and the sidebar's teaser list are both empty. The badge has no fill of its own,
+// so it is measured against the card it sits on (--tile), not against the page.
 for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
-  test(`coming-soon badges are readable on paper and ink at ${viewport.width}px`, async ({ page }) => {
+  test(`coming-soon badges on the Demography hub are readable on their cards at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
-    await page.goto(`${TEST_BASE_URL}/methodology`);
-    const badges = page.getByTestId("methodology-future-row").getByText("მალე", { exact: true });
-    await expect(badges).toHaveCount(0);
+    await page.goto(`${TEST_BASE_URL}/explorer/demography`);
+    const badges = page.getByTestId("demography-hub").getByText("მალე", { exact: true });
+    await expect(badges).toHaveCount(3);
     for (const badge of await badges.all()) {
-      await expectReadableText(badge, page.locator("body"));
-    }
-
-    if (viewport.width >= 900) {
-      await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-      const sidebar = page.getByTestId("data-sidebar");
-      await expect(sidebar).toBeVisible();
-      const inkBadges = sidebar.getByText("მალე", { exact: true });
-      await expect(inkBadges).toHaveCount(0);
-      for (const badge of await inkBadges.all()) {
-        await expectReadableText(badge, sidebar);
-      }
+      await expectReadableText(badge, badge.locator("xpath=ancestor::*[@data-testid='hub-card']"));
     }
   });
 }
+
+test("the data sidebar shows no coming-soon teaser badge", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
+  const sidebar = page.getByTestId("data-sidebar");
+  await expect(sidebar).toBeVisible();
+  await expect(
+    sidebar.getByText("მალე", { exact: true }),
+    "a teaser badge is back in the sidebar: measure it here with expectReadableText(badge, sidebar), as the paper test does for its cards",
+  ).toHaveCount(0);
+});
 
 async function expectVisibleFocusOutline(locator: Locator) {
   await locator.focus();
