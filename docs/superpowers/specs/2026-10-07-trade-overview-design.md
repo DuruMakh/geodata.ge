@@ -1,7 +1,7 @@
 # Trade hub and national goods overview
 
 Date: 2026-10-07
-Status: Approved in this conversation on 2026-10-08, when the user said "continue" after the written-design review request. The Trade hub, Overview-first scope and checkbox comparison are confirmed. The implementation plan is the next review; publishing and live database operations remain separate.
+Status: Approved on 2026-10-08 and implemented with local verification and an independent review. The Trade hub, Overview-first scope and checkbox comparison are complete. Publishing and live database operations remain separate.
 
 ## 1. Intended result
 
