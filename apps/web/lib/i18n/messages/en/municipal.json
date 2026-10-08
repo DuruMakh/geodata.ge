@@ -33,6 +33,7 @@
   "municipal.table": "Table",
   "municipal.shareMeasure": "Share of total budget, %",
   "municipal.amountMeasure": "Total budget · mln GEL",
+  "municipal.amountMeasureShort": "mln GEL",
   "municipal.shareToggle": "% Share",
   "municipal.shareOfBudget": "Share of total budget",
   "municipal.noSelection": "No series is selected. Choose one from the Series panel.",

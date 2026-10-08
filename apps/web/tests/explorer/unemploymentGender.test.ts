@@ -9,11 +9,12 @@ let facts: ClientUnemploymentObservation[];
 beforeAll(async () => { facts = (await loadServedUnemploymentData()).facts; });
 const parse = (hash: string) => parseUnemploymentHash(hash, facts, UNEMPLOYMENT_GROUPS, "gender");
 
-test("gender defaults to the national rate with the existing indicators beneath Men and Women", () => {
+test("gender opens on the national rate with Men and Women, the other indicators beneath them", () => {
   const state = parse("");
   const model = buildUnemploymentModel(facts, UNEMPLOYMENT_GROUPS, state);
   const definitions: UnemploymentSeriesDefinition[] = model.definitions;
-  expect(state.selectedIds).toEqual(["georgia:unemployment_rate"]);
+  expect(state.selectedIds).toEqual(["georgia:unemployment_rate", "men:unemployment_rate", "women:unemployment_rate"]);
+  expect(model.series.map(series => series.id)).toEqual(state.selectedIds);
   expect(model.series[0].vals.at(-1)).toBeCloseTo(13.9, 1);
   expect(definitions.filter(group => !group.parentId).map(group => group.id)).toEqual(["georgia:unemployment_rate", "men:unemployment_rate", "women:unemployment_rate"]);
   for (const groupId of ["men", "women"]) {

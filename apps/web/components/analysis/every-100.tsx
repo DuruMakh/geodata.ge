@@ -54,7 +54,7 @@ export function Every100Gel({ items }: Every100Props) {
                 className="grid grid-cols-[20px_minmax(0,1fr)_auto] items-center gap-2.5 border-t border-[var(--hairline-soft)] py-1.5"
               >
                 <SwatchBar color={item.color} />
-                <span className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-[var(--ink)]">
+                <span className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-[var(--ink)] max-[768px]:whitespace-normal">
                   {labelFor(item)}
                 </span>
                 <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{item.gelFrom100} {message(messages, "analysis.gelUnit")}</span>

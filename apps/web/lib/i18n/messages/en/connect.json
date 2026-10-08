@@ -22,11 +22,12 @@
   "connect.codexStep2": "Choose Add server and enter a name.",
   "connect.codexStep3": "Set Type to Streamable HTTP.",
   "connect.codexStep4": "Paste the address above into the URL field, save and restart the connection. Fiscal.ge needs no bearer token or extra headers.",
-  "connect.clientDocumentation": "Official setup guide",
+  "connect.clientDocumentation": "{client} official setup guide",
   "connect.chatPrompt": "Answer my question using Fiscal.ge’s published data:",
   "connect.notServed1": "Quarterly and monthly data for any dataset other than inflation",
   "connect.notServed2": "Individual capital projects and procurement",
   "connect.notServed3": "Current in-year execution",
+  "connect.notServed4": "Unemployment data, which for now is on the website pages only",
   "connect.heading": "Connect your AI assistant",
   "connect.introduction": "Fiscal.ge’s verified data on Georgia, available in your AI assistant.",
   "connect.address": "Connection address",
@@ -75,5 +76,7 @@
   "connect.exampleInflationBatumi": "How did Batumi's annual inflation rate change from {fromPeriod} to {toPeriod}, in percentage points?",
   "connect.exampleProductAnnual": "Which current-basket products had the highest annual price increases in {period}?",
   "connect.exampleProductCumulative": "How much did the price of {product} change cumulatively from {fromPeriod} through {toPeriod}, relative to {basePeriod}, the December before the first year? Use complete monthly inputs and state that Fiscal.ge calculates this change.",
-  "connect.gdpCoverage": "GDP, annual real growth and nominal GDP per person — {range} (individual series have shorter coverage; current GEL/USD and constant 2015 USD are distinct)."
+  "connect.gdpCoverage": "GDP, annual real growth and nominal GDP per person — {range} (individual series have shorter coverage; current GEL/USD and constant 2015 USD are distinct).",
+  "connect.moreExamples": "More examples",
+  "connect.developerDetails": "Files and tool parameters for developers"
 }

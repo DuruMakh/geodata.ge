@@ -68,5 +68,11 @@
   "landing.heroMillion": "mln",
   "landing.heroThousand": "k",
   "landing.metaTitle": "Georgia’s budget, debt and deficit | Fiscal.ge",
-  "landing.metaDescription": "Verified data on Georgia’s state and municipal budgets, government debt and deficit, with methodology and downloadable Excel files."
+  "landing.metaDescription": "Verified data on Georgia’s state and municipal budgets, government debt and deficit, with methodology and downloadable Excel files.",
+  "landing.datasetsLabel": "Datasets",
+  "landing.datasetBudgetMeasure": "Spending",
+  "landing.datasetEconomyMeasure": "Nominal GDP",
+  "landing.datasetInflationMeasure": "Annual inflation",
+  "landing.datasetTradeMeasure": "Total trade",
+  "landing.datasetUnemploymentMeasure": "Unemployment rate"
 }

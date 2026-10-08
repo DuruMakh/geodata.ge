@@ -9,7 +9,7 @@ export function ComingSoonBadge({ surface = "ink" }: { surface?: "ink" | "paper"
   const { messages } = useI18n();
   return (
     <span
-      className={`flex-none rounded-[2px] border border-[#6C6860] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[9px] ${surface === "paper" ? "text-[var(--muted)]" : "text-[var(--ink-fg-faint)]"}`}
+      className={`flex-none rounded-[2px] border border-[#6C6860] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9px] ${surface === "paper" ? "text-[var(--muted)]" : "text-[var(--ink-fg-faint)]"}`}
     >
       {message(messages, "common.comingSoon")}
     </span>

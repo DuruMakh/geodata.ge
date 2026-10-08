@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ClientGeneralGovernmentBalanceFact } from "../../lib/explorer/clientData";
 import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
@@ -28,6 +29,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 type DeficitExplorerProps = {
@@ -85,10 +87,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
       ? formatShare(latestActual.generalGovernmentBalancePctGdp / 100)
       : formatAmount(latestActual.generalGovernmentBalanceGel, locale)
     : "—";
-  const coverage = [
-    years.length > 0 ? `${min}–${max}` : "",
-    lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "",
-  ].filter(Boolean).join(" · ");
+  const coverage = coverageLabel(messages, locale, years.length > 0 ? min : undefined, years.length > 0 ? max : undefined, lastUpdatedAt || undefined);
 
   useEffect(() => {
     if (parsedRef.current) return;
@@ -159,9 +158,11 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                 ]}
               />
               <div className="flex items-center gap-3.5">
-                <span data-testid="deficit-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {percentage ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
-                </span>
+                {percentage ? null : (
+                  <span data-testid="deficit-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                    {message(messages, "format.bnGel")}
+                  </span>
+                )}
                 <MeasurePill label={message(messages, "main.percentGdp")} pressed={percentage} onChange={setPercentage} />
               </div>
             </div>
@@ -198,6 +199,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={chartMode === "line"} share={percentage} unit={unit} />
 
             <RangeStrip
               years={years}
@@ -236,7 +238,8 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
           <SeriesSelector
             query={query}
             onQueryChange={setQuery}
-            searchPlaceholder={message(messages, "controls.searchSeries")}
+            searchPlaceholder={message(messages, "controls.search")}
+            searchable={false}
             selectedCount={selected ? 1 : 0}
             totalCount={1}
             hasSelection={selected}

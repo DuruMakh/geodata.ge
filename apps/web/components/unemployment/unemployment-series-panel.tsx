@@ -20,7 +20,7 @@ export function UnemploymentSeriesPanel({ definitions, referenceId, selectedIds,
   const unit = { divisor: 1, decimals: 1, label: message(messages, "unemployment.thousandPersons") };
   return <SeriesAside label={message(messages, "controls.series")}>
     <p className="mb-3 text-[11px] text-[var(--muted)]">{endYear} · {unemploymentIsRate(indicator) ? "%" : unit.label}</p>
-    <SeriesSelector controls={controls} query={query} onQueryChange={onQueryChange} searchPlaceholder={message(messages, "unemployment.search")}
+    <SeriesSelector controls={controls} query={query} onQueryChange={onQueryChange} searchPlaceholder={message(messages, "controls.search")}
       selectedCount={selectedIds.length} totalCount={definitions.length} hasSelection={selectedIds.length > 0} allSelected={definitions.every(group => selectedIds.includes(group.id))}
       onToggleAll={() => onSelectionChange(selectedIds.length ? [] : definitions.map(group => group.id))} hasVisibleMatches={definitions.some(matches)}>
       {visible.map(group => <SeriesSelectorRow key={group.id} id={group.id} label={locale === "en" ? group.labelEn : group.labelKa} color={unemploymentGroupColor(group)}

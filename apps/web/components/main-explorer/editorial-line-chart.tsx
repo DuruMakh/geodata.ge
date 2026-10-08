@@ -2,14 +2,29 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import { useState } from "react";
-import { buildDotLattice } from "../../lib/explorer/dotLattice";
+import { buildDotLattice, type DotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
-import { decimalsFor, niceMax } from "../../lib/explorer/chartScale";
+import {
+  AXIS_LABEL_GAP,
+  axisLabelWidth,
+  axisLeftPaddingFor,
+  decimalsFor,
+  fitAxisLabels,
+  niceScale,
+  periodAnchors,
+} from "../../lib/explorer/chartScale";
 import { CHART_AXIS_LABEL, CHART_LATTICE } from "../../lib/explorer/colors";
-import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
-import { ChartScrollFrame, ChartTooltip } from "./chart-frame";
+import {
+  ChartScrollFrame,
+  ChartTooltip,
+  DESKTOP_ONLY,
+  MOBILE_ONLY,
+  MOBILE_PREVIEW_WIDTH,
+  mobileChartHeight,
+  useChartLayout,
+  useChartPointer,
+} from "./chart-frame";
 
 // Bespoke SVG line chart per DESIGN.md §8.3: chart sits directly on paper, dot
 // lattice for the grid, ink baseline at zero, mono axis labels, hover crosshair + tooltip.
@@ -33,7 +48,6 @@ type EditorialLineChartProps = {
   unit: ValueUnit;
   shareLabel: string;
   preliminaryLabel?: string;
-  axisLeftPadding?: number;
   formatTooltipValue?: (value: number) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
@@ -43,13 +57,21 @@ type EditorialLineChartProps = {
 
 const W = 920;
 const H = 320;
-// A little wider than the reference prototype's 62 so 8-character axis labels
-// ("7.5 მლრდ") never clip at the viewBox edge.
+// The house minimum (DESIGN.md §8.3). Wider labels ("50.0 მლრდ", "10,000 მლნ")
+// widen it through axisLeftPaddingFor, or their first digit clips at the viewBox edge.
 const PAD_L = 74;
 const PAD_R = 30;
 const PAD_T = 16;
 const PAD_B = 26;
 const DOT_R = 0.7;
+const FONT = 11;
+// The phone drawing (one unit per CSS pixel): tick labels carry numbers only and
+// the unit is printed once above the axis, so the labels leave the plot its width.
+const MOBILE_PAD_L = 30;
+const MOBILE_PAD_R = 12;
+const MOBILE_PAD_T = 26;
+const LATTICE_ID = "chart-dot-lattice";
+const MIN_LATTICE_PITCH = 12;
 
 export type TooltipRow = { id: string; label: string; color: string; value: number; preliminary?: boolean };
 
@@ -76,24 +98,40 @@ export function buildTooltipRows(
   return { rows: present.slice(0, cap), hidden: Math.max(0, present.length - cap) };
 }
 
+/** Phone lattices keep the 12px floor by joining whole periods into one column. */
+export function coarsenLattice(lattice: DotLattice | null): DotLattice | null {
+  if (lattice === null || lattice.colPitch >= MIN_LATTICE_PITCH) return lattice;
+  return { ...lattice, colPitch: lattice.colPitch * Math.ceil(MIN_LATTICE_PITCH / lattice.colPitch - 1e-9) };
+}
+
+type Plot = {
+  mobile: boolean;
+  width: number;
+  height: number;
+  padLeft: number;
+  padRight: number;
+  padTop: number;
+  axisLabels: string[];
+  labelIndices: Set<number>;
+  lattice: DotLattice | null;
+  x: (index: number) => number;
+  y: (value: number) => number;
+};
+
 export function EditorialLineChart({
   years,
   series,
   share,
   unit,
   shareLabel,
-  axisLeftPadding = PAD_L,
   periodsPerYear = 1,
   formatPeriod,
   preliminaryLabel,
   formatTooltipValue,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
-  const [hoverRaw, setHover] = useState<number | null>(null);
+  const { ref: layoutRef, mobileWidth } = useChartLayout();
   const n = years.length;
-  // The hover index survives range shrinks (no pointer event fires), so clamp it
-  // instead of trusting it — a stale index would render a ghost tooltip.
-  const hover = hoverRaw !== null && hoverRaw < n ? hoverRaw : null;
 
   // The domain must cover negative values (e.g. revenue.other_taxes 2019-2020):
   // both bounds snap to one shared gridline step so 0 always sits on a line.
@@ -107,19 +145,12 @@ export function EditorialLineChart({
     }
   }
   if (maxValue <= 0 && minValue >= 0) maxValue = 1;
-  const posSpan = maxValue > 0 ? niceMax(maxValue) : 0;
-  const negSpan = minValue < 0 ? niceMax(-minValue) : 0;
-  const rawStep = Math.max(posSpan, negSpan) / 4;
+  // An amount axis never prints finer than its unit's last decimal, so the
+  // gridline step is a whole multiple of that quantum; a share axis has none.
   const amountQuantum = unit.divisor / 10 ** unit.decimals;
-  const step = share
-    ? rawStep
-    : Math.max(amountQuantum, Math.ceil(rawStep / amountQuantum - 1e-9) * amountQuantum);
-  const top = posSpan > 0 ? Math.ceil(posSpan / step - 1e-9) * step : 0;
-  const bottom = negSpan > 0 ? -Math.ceil(negSpan / step - 1e-9) * step : 0;
+  const { top, bottom, step } = niceScale(minValue, maxValue, share ? 0 : amountQuantum);
   const span = top - bottom;
 
-  const x = (index: number) => axisLeftPadding + (n <= 1 ? (W - axisLeftPadding - PAD_R) / 2 : (index * (W - axisLeftPadding - PAD_R)) / (n - 1));
-  const y = (value: number) => PAD_T + ((top - value) / span) * (H - PAD_T - PAD_B);
   // Axis precision follows the gridline STEP, not the unit's data-derived
   // decimals. The unit carries enough precision for the smallest value in the
   // table (which is what sets amountQuantum above, so a small series still gets
@@ -127,54 +158,117 @@ export function EditorialLineChart({
   // borrowing those decimals would render a 12.5 gridline as "12.50".
   const shareDigits = decimalsFor(step, 2);
   const axisUnit = { ...unit, decimals: decimalsFor(step / unit.divisor, 4) };
-  const formatAxis = (value: number) =>
+  const formatAxis = (value: number, withUnit: boolean) =>
     (share
       ? `${value.toFixed(shareDigits)}%`
-      : `${formatInUnit(value, axisUnit)} ${unit.label}`
+      : withUnit
+        ? `${formatInUnit(value, axisUnit)} ${unit.label}`
+        : formatInUnit(value, axisUnit)
     ).replace("-", "−");
+  // The phone drawing prints the amount unit once, above the axis.
+  const unitCaption = share || unit.label.trim() === "" ? null : unit.label;
 
   const formatValue = (value: number | null) =>
     formatTooltipValue && value !== null ? formatTooltipValue(value) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
+  const axisPeriod = (index: number) => (formatPeriod ? formatPeriod(years[index]!, "axis") : String(years[index]));
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
-  const labelIndices = new Set(periodLabelIndices(years, periodsPerYear));
 
-  const lattice = buildDotLattice({
-    plotWidth: W - axisLeftPadding - PAD_R,
-    plotHeight: H - PAD_T - PAD_B,
-    yearCount: n,
-    gridStepCount: Math.round(span / step),
-    periodsPerYear,
-    firstPeriod: years[0],
-  });
+  const buildPlot = (mobile: boolean, width: number): Plot => {
+    const height = mobile ? mobileChartHeight(width, 0.72, 220, 320) : H;
+    const padRight = mobile ? MOBILE_PAD_R : PAD_R;
+    const padTop = mobile && unitCaption !== null ? MOBILE_PAD_T : PAD_T;
+    const axisLabels = gridLines.map((value) => formatAxis(value, !mobile));
+    const padLeft = axisLeftPaddingFor(axisLabels, mobile ? MOBILE_PAD_L : PAD_L);
+    const plotWidth = width - padLeft - padRight;
+    const x = (index: number) => padLeft + (n <= 1 ? plotWidth / 2 : (index * plotWidth) / (n - 1));
+    const y = (value: number) => padTop + ((top - value) / span) * (height - padTop - PAD_B);
+    const labelIndices = new Set(
+      mobile
+        ? fitAxisLabels(n, periodAnchors(years, periodsPerYear), (index) => {
+            const labelWidth = axisLabelWidth(axisPeriod(index), FONT);
+            if (index === 0) return [x(index) - 4, x(index) - 4 + labelWidth];
+            if (index === n - 1) return [x(index) + 4 - labelWidth, x(index) + 4];
+            return [x(index) - labelWidth / 2, x(index) + labelWidth / 2];
+          })
+        : periodLabelIndices(years, periodsPerYear),
+    );
+    const lattice = buildDotLattice({
+      plotWidth,
+      plotHeight: height - padTop - PAD_B,
+      yearCount: n,
+      gridStepCount: Math.round(span / step),
+      periodsPerYear,
+      firstPeriod: years[0],
+    });
+    return { mobile, width, height, padLeft, padRight, padTop, axisLabels, labelIndices, lattice: mobile ? coarsenLattice(lattice) : lattice, x, y };
+  };
 
-  function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const index = nearestPeriodIndex((event.clientX - rect.left) / rect.width, n, W, axisLeftPadding, PAD_R);
-    if (index !== hoverRaw) setHover(index);
-  }
+  const desktop = buildPlot(false, W);
+  // Before the browser has measured (server render, hydration) both drawings
+  // exist and CSS shows one; afterwards only the one that fits is rendered.
+  const phone = mobileWidth === null ? null : buildPlot(true, mobileWidth ?? MOBILE_PREVIEW_WIDTH);
+  const measured = mobileWidth !== undefined;
+  const active = mobileWidth === null || mobileWidth === undefined ? desktop : phone!;
 
-  const hoverX = hover === null ? null : (x(hover) / W) * 100;
+  const { svgRef, hover, pinned, handlers } = useChartPointer(n, active.width, active.padLeft, active.padRight);
+
+  const axisText = (plot: Plot, value: number, index: number) => (
+    <text key={`axis-${index}`} x={plot.padLeft - AXIS_LABEL_GAP} y={plot.y(value) + 3} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
+      {plot.axisLabels[index]}
+    </text>
+  );
+  // The sticky copy stops above the year labels, so it never covers the first one.
+  // Only a desktop drawing that overflows its frame shows it; phones fit.
+  const stickyAxis = {
+    widthPercent: (desktop.padLeft / W) * 100,
+    node: (
+      <svg viewBox={`0 0 ${desktop.padLeft} ${H - PAD_B + 6}`} className="block h-auto w-full">
+        {gridLines.map((value, index) => axisText(desktop, value, index))}
+        <line x1={desktop.padLeft - 0.5} x2={desktop.padLeft - 0.5} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
+      </svg>
+    ),
+  };
+  const scrollKey = `${years[0]}-${years[n - 1]}-${series.map((line) => line.id).join(",")}`;
+
   const tooltip = hover === null ? null : buildTooltipRows(series, hover);
+  const readout =
+    hover !== null && tooltip !== null ? (
+      <ChartTooltip
+        leftPercent={(active.x(hover) / active.width) * 100}
+        pinned={pinned}
+        header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
+        headerRight={share ? shareLabel : null}
+        rows={tooltip.rows}
+        hidden={tooltip.hidden}
+        formatValue={formatValue}
+        preliminaryLabel={preliminaryLabel}
+        variant={active.mobile ? "panel" : "float"}
+      />
+    ) : null;
 
-  return (
-    <ChartScrollFrame>
+  const renderSvg = (plot: Plot, className: string) => {
+    const { width, height, padLeft, padRight, padTop, x, y, lattice, labelIndices } = plot;
+    const latticeId = plot.mobile ? `${LATTICE_ID}-mobile` : LATTICE_ID;
+    return (
       <svg
-        viewBox={`0 0 ${W} ${H}`}
+        key={plot.mobile ? "mobile" : "desktop"}
+        ref={plot === active ? svgRef : undefined}
+        data-geometry={plot.mobile ? "mobile" : "desktop"}
+        viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label={message(messages, "controls.chartTrend")}
-        className="block h-auto w-full"
-        onPointerMove={handlePointerMove}
-        onPointerLeave={() => setHover(null)}
+        className={`h-auto w-full ${className}`}
+        {...handlers}
       >
         {lattice ? (
           <>
             <defs>
               <pattern
-                id="chart-dot-lattice"
+                id={latticeId}
                 patternUnits="userSpaceOnUse"
-                x={axisLeftPadding + lattice.colOffset - lattice.colPitch / 2}
-                y={PAD_T - lattice.rowPitch / 2}
+                x={padLeft + lattice.colOffset - lattice.colPitch / 2}
+                y={padTop - lattice.rowPitch / 2}
                 width={lattice.colPitch}
                 height={lattice.rowPitch}
               >
@@ -187,14 +281,19 @@ export function EditorialLineChart({
                 rows draw as half dots (quarters at the corners). */}
             <rect
               data-testid="chart-dot-lattice"
-              x={axisLeftPadding - DOT_R}
-              y={PAD_T - DOT_R}
-              width={W - axisLeftPadding - PAD_R + DOT_R * 2}
-              height={H - PAD_T - PAD_B + DOT_R * 2}
-              fill="url(#chart-dot-lattice)"
+              x={padLeft - DOT_R}
+              y={padTop - DOT_R}
+              width={width - padLeft - padRight + DOT_R * 2}
+              height={height - padTop - PAD_B + DOT_R * 2}
+              fill={`url(#${latticeId})`}
               opacity={0.6}
             />
           </>
+        ) : null}
+        {plot.mobile && unitCaption !== null ? (
+          <text data-unit-caption x={0} y={FONT} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor="start" style={{ fontFamily: "var(--font-numeric)" }}>
+            {unitCaption}
+          </text>
         ) : null}
         {gridLines.map((value, index) => (
           <g key={`grid-${index}`}>
@@ -204,20 +303,18 @@ export function EditorialLineChart({
                 or the axis labels would have nothing to sit against. */}
             {value === 0 || lattice === null ? (
               <line
-                x1={axisLeftPadding}
-                x2={W - PAD_R}
+                x1={padLeft}
+                x2={width - padRight}
                 y1={y(value)}
                 y2={y(value)}
                 stroke={value === 0 ? "#1E1B16" : "#E7DECF"}
                 strokeWidth={1}
               />
             ) : null}
-            <text x={axisLeftPadding - 10} y={y(value) + 3} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
-              {formatAxis(value)}
-            </text>
+            {axisText(plot, value, index)}
           </g>
         ))}
-        <line x1={axisLeftPadding} x2={axisLeftPadding} y1={PAD_T} y2={H - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
+        <line x1={padLeft} x2={padLeft} y1={padTop} y2={height - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
         {years.map((year, index) => {
           if (!labelIndices.has(index)) return null;
           const isLast = index === n - 1;
@@ -225,13 +322,13 @@ export function EditorialLineChart({
           const tx = index === 0 ? x(index) - 4 : isLast ? x(index) + 4 : x(index);
 
           return (
-            <text key={`year-${year}`} x={tx} y={H - 8} fontSize={11} fill={CHART_AXIS_LABEL} textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
-              {formatPeriod ? formatPeriod(year, "axis") : year}
+            <text key={`year-${year}`} x={tx} y={height - 8} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor={anchor} style={{ fontFamily: "var(--font-numeric)" }}>
+              {axisPeriod(index)}
             </text>
           );
         })}
-        {hover !== null ? (
-          <line x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={H - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
+        {hover !== null && plot === active ? (
+          <line x1={x(hover)} x2={x(hover)} y1={padTop - 6} y2={height - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
         {series.map((line) => {
           // Interior data gaps (e.g. programs with no 2015 facts) split the path
@@ -320,24 +417,35 @@ export function EditorialLineChart({
                 .map(([px, py, index]) => (
                   <circle key={`planned-${index}`} cx={px} cy={py} r={3} fill="#F7F2E9" stroke={line.color} strokeWidth={1.5} />
                 ))}
-              {hover !== null && line.vals[hover] !== null && line.vals[hover] !== undefined ? (
+              {hover !== null && plot === active && line.vals[hover] !== null && line.vals[hover] !== undefined ? (
                 <circle cx={x(hover)} cy={y(line.vals[hover] as number)} r={3.5} fill="#F7F2E9" stroke={line.color} strokeWidth={2} />
               ) : null}
             </g>
           );
         })}
       </svg>
-      {hover !== null && hoverX !== null && tooltip !== null ? (
-        <ChartTooltip
-          leftPercent={hoverX}
-          header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
-          headerRight={share ? shareLabel : null}
-          rows={tooltip.rows}
-          hidden={tooltip.hidden}
-          formatValue={formatValue}
-          preliminaryLabel={preliminaryLabel}
-        />
-      ) : null}
-    </ChartScrollFrame>
+    );
+  };
+
+  return (
+    <div ref={layoutRef}>
+      <ChartScrollFrame
+        scrollKey={scrollKey}
+        fit={active.mobile}
+        yAxis={active.mobile ? undefined : stickyAxis}
+        overlay={!active.mobile && pinned !== null ? readout : null}
+      >
+        {measured ? (
+          renderSvg(active, "block")
+        ) : (
+          <>
+            {renderSvg(desktop, `block ${DESKTOP_ONLY}`)}
+            {renderSvg(phone!, MOBILE_ONLY)}
+          </>
+        )}
+        {!active.mobile && pinned === null ? readout : null}
+      </ChartScrollFrame>
+      {active.mobile ? readout : null}
+    </div>
   );
 }

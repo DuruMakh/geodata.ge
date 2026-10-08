@@ -69,10 +69,6 @@ export function tabCoverage(index: InflationIndex, tab: InflationTab): { min: nu
   return periodBounds(INFLATION_SERIES.map((key) => seriesValues(index, key, tab)), "Inflation data has no periods");
 }
 
-export function overallCoverage(index: InflationIndex): { min: number; max: number } {
-  return periodBounds([...index.values.values()], "Inflation data has no periods");
-}
-
 export function resolveInflationRange(state: InflationState, index: InflationIndex): ResolvedPeriodRange {
   return resolveRange(state.range, tabCoverage(index, state.tab));
 }

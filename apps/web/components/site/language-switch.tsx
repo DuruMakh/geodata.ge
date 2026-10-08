@@ -53,7 +53,7 @@ export function LanguageSwitch({ compact = false, abbreviatedOnMobile = false }:
   );
 
   return (
-    <div data-testid="language-switch" role="group" aria-label={message(messages, "common.language")} className={`inline-flex items-center gap-1 font-[family-name:var(--font-ui)] text-[11px] ${abbreviatedOnMobile ? "[&_a]:min-h-11 min-[900px]:[&_a]:min-h-8" : ""}`}>
+    <div data-testid="language-switch" role="group" aria-label={message(messages, "common.language")} className={`inline-flex items-center gap-1 font-[family-name:var(--font-ui)] text-[11px] ${abbreviatedOnMobile ? "[&_a]:min-h-11 [&_a]:min-w-11 [&_a]:justify-center min-[900px]:[&_a]:min-h-8 min-[900px]:[&_a]:min-w-0" : ""}`}>
       {compact ? otherLanguage : (
         <>
           {locale === "ka" ? <span lang="ka" aria-current="true" className="px-1 font-semibold">{displayLabel("ka")}</span> : otherLanguage}

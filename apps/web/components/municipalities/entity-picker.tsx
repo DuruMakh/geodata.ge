@@ -247,8 +247,8 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                 countryOptionId(baseId) === activeOptionId ? "border-l-[var(--ink)]" : "border-l-transparent"
               } ${country.id === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
             >
-              <span className="truncate text-[12px] font-semibold">{publicLabel(locale, country.id, country.nameKa, englishLabels)}</span>
-              <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+              <span className="min-w-0 break-words text-[12px] font-semibold">{publicLabel(locale, country.id, country.nameKa, englishLabels)}</span>
+              <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--muted)]">
                 {message(messages, "municipal.pickerCountry", { amount: formatAmount(country.valueGel, locale), count: country.budgetCount })}
               </span>
             </Link>
@@ -273,7 +273,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                   } ${group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
                 >
                   <span className="truncate text-[12px] font-semibold">{publicLabel(locale, group.regionId, group.nameKa, englishLabels)}</span>
-                  <span className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">
+                  <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--muted)]">
                     {formatAmount(group.valueGel, locale)} · {group.members.length}
                   </span>
                 </Link>
@@ -297,7 +297,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId }: Entit
                       } ${member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
                     >
                       <span className="truncate text-[13px]">{publicLabel(locale, member.code, member.nameKa, englishLabels)}</span>
-                      <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">
+                      <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
                         {formatAmount(member.valueGel, locale)}
                       </span>
                     </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
@@ -16,6 +17,9 @@ import {
   toggleAllCityLines,
   toggleCityLine,
   unpackCityFacts,
+  cityValues,
+  GEORGIA_LINE_ID,
+  HEADLINE_ID,
   type CityState,
   type CityView,
   type PackedCitySeries,
@@ -23,7 +27,9 @@ import {
 import { cityLineLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
 import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
-import { periodLabel } from "../../lib/explorer/inflationLabels";
+import { formatInflationValue, periodLabel } from "../../lib/explorer/inflationLabels";
+import { latestEntry } from "../../lib/explorer/latestValue";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
@@ -33,6 +39,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -77,6 +84,8 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
 
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);
+  // The place's own total: Georgia on the Georgia page, the city on a city page.
+  const latest = latestEntry(cityValues(index, view.kind === "city" ? view.cityId : GEORGIA_LINE_ID, HEADLINE_ID, "yoy_pct"));
   const periods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
   const lines = buildCityLines(index, view, state, range);
@@ -101,9 +110,12 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
           citiesCrumb,
           ...(view.kind === "city" ? [{ label: cityLineLabel(messages, view.cityId) }] : []),
         ]}
-        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <InflationCityHeading view={view} />
+      {latest ? (
+        <LatestValueLine testId="inflation-city-latest" measure={t("tab.yoy")} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, "yoy")} />
+      ) : null}
       <p data-testid="inflation-city-unit" className="mb-4 text-[13px] text-[var(--muted)]">
         {t("categoryUnit.yoy")}
       </p>
@@ -141,11 +153,13 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} />
             <RangeStrip
               years={periods}
               range={range}
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
+              formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
               onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
@@ -156,7 +170,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
             <p data-testid="inflation-city-central-prices" className="text-xs text-[var(--muted)]">
               {t("cityCentralPricesNote")}
             </p>
-            <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
+            <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
               {t("methodology")}
             </Link>
           </div>

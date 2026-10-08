@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -19,6 +20,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -95,7 +97,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
         { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
         { label: t("productsHeading") },
       ]}
-      coverage={`${minYear} – ${periodLabel(messages, index.latestPeriod, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+      coverage={coverageLabel(messages, locale, minYear, periodLabel(messages, index.latestPeriod, "short"), lastReviewedAt)}
     />
     <ExplorerHeading>{t("productsHeading")}</ExplorerHeading>
     <p className="mb-4 text-[13px] text-[var(--muted)]">{t("productsUnit")}</p>
@@ -141,6 +143,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
           </div> : <div className="mt-5"><Callout testId="no-selection-callout">
             {state.selected.length === 0 ? message(messages, "main.noSelection") : t("productsNoCompleteSeries")}
           </Callout></div>}
+          <ChartSelectionAids series={chartSeries} chartShown share unit={PCT_UNIT} />
           {omitted.length > 0 ? <div data-testid="product-chart-omissions" className="mt-3 border-l-2 border-[var(--accent)] pl-3 text-[11px] leading-relaxed text-[var(--muted)]">
             <p className="font-semibold text-[var(--ink)]">{t("productsChartOmitted")}</p>
             <ul className="mt-1 list-disc pl-4">
@@ -159,7 +162,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
         <div className="mt-[18px] space-y-2">
           <SourceNote testId="source-label">{t("productsSource")} {message(messages, "main.lastUpdated", { date: displayDate })}</SourceNote>
           <p className="text-xs text-[var(--muted)]">{t("productsDerivedNote")}</p>
-          <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
+          <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
             {t("methodology")}
           </Link>
         </div>

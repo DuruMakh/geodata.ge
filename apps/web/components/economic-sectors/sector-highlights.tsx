@@ -10,9 +10,10 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
 import { Overline, SectionTitle, SourceNote } from "../ui/editorial";
+import { withLari } from "../ui/lari";
 import { Sparkline } from "../ui/sparkline";
 import { sectorColor } from "../../lib/explorer/economicSectors";
-import { KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
+import { KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
 
 export function SectorHighlights({ facts, registry, year }: {
   facts: ClientSectorObservation[]; registry: SectorDefinition[]; year: number;
@@ -47,14 +48,14 @@ export function SectorHighlights({ facts, registry, year }: {
     <section data-testid="sector-highlights" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SectionTitle>{t("highlights")}</SectionTitle>
-        <p className="text-[12.5px] text-[var(--muted)]"><Message messages={messages} id="sectors.rowYear" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{year}</span> }} /></p>
+        <p className="text-[0.78125rem] text-[var(--muted)]"><Message messages={messages} id="sectors.rowYear" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{year}</span> }} /></p>
       </div>
       <div data-testid="sector-kpi-layout" className={KPI_GRID_CLASS}>
         <div data-testid="sector-highlight-largest" className="min-w-0 @min-[1100px]:pr-11">
           <Overline>{t("largest")}</Overline>
           <p data-testid="sector-hero-value" className="mt-3.5 font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]">
             {amount.num}
-            {amount.unit ? <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-base font-medium tracking-normal text-[var(--body)]">{amount.unit}</span> : null}
+            {amount.unit ? <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-base font-medium tracking-normal text-[var(--body)]">{withLari(amount.unit)}</span> : null}
           </p>
           <div className="mt-7 max-w-[480px]">
             {model.largestShare != null ? (
@@ -62,10 +63,10 @@ export function SectorHighlights({ facts, registry, year }: {
                 <div aria-hidden="true" className="flex h-[3px] bg-[var(--hairline-soft)]">
                   <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${Math.max(0, Math.min(100, model.largestShare))}%` }} />
                 </div>
-                <p className="mt-2 font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{percentage(model.largestShare)} {t("ofGdp")}</p>
+                <p className="mt-2 font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">{percentage(model.largestShare)} {t("ofGdp")}</p>
               </>
             ) : null}
-            <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
+            <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
           </div>
         </div>
         <div data-testid="sector-side-kpis" className={SIDE_KPI_LIST_CLASS}>
@@ -74,7 +75,7 @@ export function SectorHighlights({ facts, registry, year }: {
             <Overline>{card.label}</Overline>
             <div className="mt-[7px] flex items-baseline justify-between gap-4">
               <p className={SIDE_KPI_VALUE_CLASS} style={{ color: card.color }}>{card.value}</p>
-              <p title={card.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${card.available ? "overflow-hidden text-ellipsis whitespace-nowrap" : "leading-relaxed"}`}>{card.detail}</p>
+              <p title={card.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${card.available ? KPI_DETAIL_CLIP_CLASS : "leading-relaxed"}`}>{card.detail}</p>
             </div>
             <Sparkline values={card.trend} color={card.trendColor} />
           </div>

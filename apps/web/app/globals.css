@@ -118,6 +118,15 @@ summary:focus-visible {
   outline-offset: -2px;
 }
 
+/* Phones show two lists under a multi-line chart: the legend with each line's
+   latest value (D4c) and, after a tap, the readout for the tapped period (D1).
+   Both name every line with its swatch, so while a readout is open it replaces
+   the legend; closing the readout brings the legend back. The legend sits in the
+   element right after the chart's own wrapper on every explorer page. */
+:has([data-placement="panel"]) + * [data-testid="chart-phone-legend"] {
+  display: none;
+}
+
 [data-municipality-map-target]:focus,
 [data-municipality-map-target]:focus-visible {
   outline: none;

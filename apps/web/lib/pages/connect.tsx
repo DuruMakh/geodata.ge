@@ -146,6 +146,9 @@ const NOT_SERVED = [
   "connect.notServed1",
   "connect.notServed2",
   "connect.notServed3",
+  // The unemployment explorer is approved for people only; the query service does
+  // not serve it (lib/factQuery/buildSnapshot.ts).
+  "connect.notServed4",
 ] as const;
 
 export async function renderConnectPage(locale: Locale) {
@@ -158,6 +161,15 @@ export async function renderConnectPage(locale: Locale) {
     { id: "inflation-batumi", key: "connect.exampleInflationBatumi", values: { fromPeriod: inflation.batumiFrom, toPeriod: inflation.batumiTo } },
     { id: "products-annual", key: "connect.exampleProductAnnual", values: { period: products.annualLatest } },
     { id: "products-cumulative", key: "connect.exampleProductCumulative", values: { product: locale === "en" ? products.labelEn : products.labelKa, fromPeriod: products.startPeriod, toPeriod: products.endPeriod, basePeriod: products.basePeriod } },
+  ];
+  const examples: { id: string; key: string; values?: TemplateValues }[] = [
+    { id: "national", key: "connect.exampleNational" },
+    inflationExamples[0],
+    { id: "regional", key: "connect.exampleRegional" },
+    { id: "municipal", key: "connect.exampleMunicipal" },
+    { id: "debt", key: "connect.exampleDebt" },
+    { id: "deficit", key: "connect.exampleDeficit" },
+    ...inflationExamples.slice(1),
   ];
   const endpoint = `${resolveSiteUrl()}/mcp`;
 
@@ -172,7 +184,7 @@ export async function renderConnectPage(locale: Locale) {
             <h1 className="max-w-[860px] font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] min-[768px]:text-[52px]">
               {message(messages, "connect.heading")}
             </h1>
-            <p data-testid="connect-intro" className="mt-5 max-w-[760px] text-[16px] leading-[1.7] text-[var(--body)]">
+            <p data-testid="connect-intro" className="mt-5 max-w-[760px] text-[1rem] leading-[1.7] text-[var(--body)]">
               {message(messages, "connect.introduction")}
             </p>
           </header>
@@ -184,19 +196,19 @@ export async function renderConnectPage(locale: Locale) {
               to find out. Read-only is stated in the technical note at the
               foot of the page instead. */}
           <section className="mt-10 bg-[var(--tint)] px-6 py-7 min-[768px]:px-8 min-[768px]:py-8">
-            <h2 className="font-[family-name:var(--font-display)] text-[15px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+            <h2 className="font-[family-name:var(--font-display)] text-[0.9375rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
               {message(messages, "connect.address")}
             </h2>
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <code
                 data-testid="connect-endpoint"
-                className="break-all font-[family-name:var(--font-numeric)] text-[16px] font-semibold min-[768px]:text-[21px]"
+                className="break-all font-[family-name:var(--font-numeric)] text-[1rem] font-semibold min-[768px]:text-[21px]"
               >
                 {endpoint}
               </code>
               <CopyEndpoint endpoint={endpoint} copyLabel={message(messages, "connect.copyEndpoint")} copiedLabel={message(messages, "connect.copiedEndpoint")} copyText={message(messages, "connect.copy")} copiedText={message(messages, "connect.copied")} />
             </div>
-            <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[12.5px] text-[var(--body)]">
+            <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[0.78125rem] text-[var(--body)]">
               <li>{message(messages, "connect.free")}</li>
               <li>{message(messages, "connect.noAccount")}</li>
             </ul>
@@ -207,9 +219,9 @@ export async function renderConnectPage(locale: Locale) {
             <div className="mt-6 grid gap-8 min-[900px]:grid-cols-2 min-[900px]:gap-12">
               {CLIENTS.map((client) => (
                 <div key={client.name} data-testid="connect-client">
-                  <h3 className="font-[family-name:var(--font-display)] text-[17px] font-semibold">{client.name}</h3>
-                  <p className="mt-1 text-[12px] text-[var(--muted)]">{message(messages, client.note)}</p>
-                  <ol className="mt-3 grid gap-2 text-[13.5px] leading-[1.7] text-[var(--body)]">
+                  <h3 className="font-[family-name:var(--font-display)] text-[1.0625rem] font-semibold">{client.name}</h3>
+                  <p className="mt-1 text-[0.75rem] text-[var(--muted)]">{message(messages, client.note)}</p>
+                  <ol className="mt-3 grid gap-2 text-[0.84375rem] leading-[1.7] text-[var(--body)]">
                     {client.steps.map((step, index) => (
                       <li key={step} className="flex gap-3">
                         <span className="font-[family-name:var(--font-numeric)] text-[var(--muted)]">{index + 1}</span>
@@ -217,11 +229,11 @@ export async function renderConnectPage(locale: Locale) {
                       </li>
                     ))}
                   </ol>
-                  <a className="mt-3 inline-block text-[12px] underline" href={client.documentation}>{message(messages, "connect.clientDocumentation")}</a>
+                  <a className="mt-1 inline-flex min-h-11 items-center text-[0.75rem] underline" href={client.documentation}>{message(messages, "connect.clientDocumentation", { client: client.name })}</a>
                 </div>
               ))}
             </div>
-            <p className="mt-8 max-w-[820px] text-[13px] leading-[1.8] text-[var(--muted)]">
+            <p className="mt-8 max-w-[820px] text-[0.8125rem] leading-[1.8] text-[var(--muted)]">
               {message(messages, "connect.otherClients")}
             </p>
           </section>
@@ -231,13 +243,13 @@ export async function renderConnectPage(locale: Locale) {
             <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">
               {message(messages, "connect.withoutConnection")}
             </h2>
-            <p className="mt-4 max-w-[820px] text-[13.5px] leading-[1.8] text-[var(--body)]">
+            <p className="mt-4 max-w-[820px] text-[0.84375rem] leading-[1.8] text-[var(--body)]">
               {message(messages, "connect.webSearchPrompt")}
             </p>
             <div className="mt-4 flex flex-wrap items-start gap-4">
               <p
                 data-testid="connect-prompt"
-                className="max-w-[640px] bg-[var(--tint)] px-4 py-3 text-[14px] font-semibold leading-[1.75]"
+                className="max-w-[640px] bg-[var(--tint)] px-4 py-3 text-[0.875rem] font-semibold leading-[1.75]"
               >
                 {message(messages, "connect.quotedPrompt", { prompt: message(messages, CHAT_PROMPT) })}
               </p>
@@ -250,19 +262,26 @@ export async function renderConnectPage(locale: Locale) {
                 copiedLabel={message(messages, "connect.copiedPrompt")}
               />
             </div>
-            <p className="mt-4 max-w-[820px] text-[13px] leading-[1.8] text-[var(--muted)]">
+            <p className="mt-4 max-w-[820px] text-[0.8125rem] leading-[1.8] text-[var(--muted)]">
               {message(messages, "connect.webSearchNote")}
             </p>
           </section>
 
           <section className="mt-10 border-t border-[var(--ink)] pt-5" data-testid="connect-bilingual">
             <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">{message(messages, "connect.bilingualHeading")}</h2>
-            <p className="mt-4 max-w-[820px] text-[13.5px] leading-[1.8] text-[var(--body)]">{message(messages, "connect.bilingualText")}</p>
-            <h3 className="mt-5 text-[14px] font-semibold">{message(messages, "connect.examplesHeading")}</h3>
-            <ul className="mt-3 grid max-w-[820px] list-disc gap-2 pl-5 text-[13.5px] leading-[1.8] text-[var(--body)]">
-              {["connect.exampleNational", "connect.exampleMunicipal", "connect.exampleRegional", "connect.exampleDebt", "connect.exampleDeficit"].map(key => <li key={key}>{message(messages, key)}</li>)}
-              {inflationExamples.map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
+            <p className="mt-4 max-w-[820px] text-[0.84375rem] leading-[1.8] text-[var(--body)]">{message(messages, "connect.bilingualText")}</p>
+            <h3 className="mt-5 text-[0.875rem] font-semibold">{message(messages, "connect.examplesHeading")}</h3>
+            {/* Three questions up front, one per kind of data; the rest wait behind
+                a toggle so a phone reader is not handed ten at once. */}
+            <ul className="mt-3 grid max-w-[820px] list-disc gap-2 pl-5 text-[0.84375rem] leading-[1.8] text-[var(--body)]">
+              {examples.slice(0, 3).map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
             </ul>
+            <details data-testid="connect-more-examples" className="mt-1 max-w-[820px]">
+              <summary className="inline-flex min-h-11 cursor-pointer items-center text-[0.8125rem] font-semibold text-[var(--accent)]">{message(messages, "connect.moreExamples")}</summary>
+              <ul className="mt-1 grid list-disc gap-2 pl-5 text-[0.84375rem] leading-[1.8] text-[var(--body)]">
+                {examples.slice(3).map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
+              </ul>
+            </details>
           </section>
 
           {/* Spec 12.3: naming what is NOT served is what stops someone asking
@@ -272,8 +291,8 @@ export async function renderConnectPage(locale: Locale) {
             <h2 className="font-[family-name:var(--font-display)] text-[23px] font-semibold">{message(messages, "connect.coverage")}</h2>
             <div className="mt-5 grid gap-8 min-[900px]:grid-cols-2">
               <div data-testid="connect-coverage-served">
-                <h3 className="text-[14px] font-semibold">{message(messages, "connect.available")}</h3>
-                <ul className="mt-2 grid gap-1.5 text-[13px] leading-[1.8] text-[var(--body)]">
+                <h3 className="text-[0.875rem] font-semibold">{message(messages, "connect.available")}</h3>
+                <ul className="mt-2 grid gap-1.5 text-[0.8125rem] leading-[1.8] text-[var(--body)]">
                   {/* "ნაერთი ბიუჯეტის შემოსულობები", not "სახელმწიფო ბიუჯეტის
                       შემოსავლები": revenue is consolidated budget receipts while
                       expenditure is state-budget expenditure. Two different accounting
@@ -305,19 +324,24 @@ export async function renderConnectPage(locale: Locale) {
                   <li data-testid="connect-city-coverage">{message(messages, "connect.cityCoverage", { count: inflation.cityCount, range: inflation.cityRange })}</li>
                   <li data-testid="connect-product-coverage">{message(messages, "connect.productCoverage", { count: products.count, range: products.range })}</li>
                 </ul>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-sector-discovery">
+                {/* Tool and field names (query_inflation, yoy_pct, entityIds...) answer a
+                    developer's question; DESIGN.md §24 says the page is not written for
+                    one, so they and the raw files sit behind a toggle. */}
+                <details data-testid="connect-developer-details" className="mt-3">
+                  <summary className="inline-flex min-h-11 cursor-pointer items-center text-[0.78125rem] font-semibold text-[var(--muted)]">{message(messages, "connect.developerDetails")}</summary>
+                <p className="mt-1 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-sector-discovery">
                   {message(messages, "connect.sectorQuery")} {" "}
                   <a className="underline" href="/downloads/data/economic-sectors.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/economic-sectors.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/economic-sectors", locale)}>{message(messages, "connect.sectorMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-regional-discovery">
+                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-regional-discovery">
                   {message(messages, "connect.regionalQuery")} {" "}
                   <a className="underline" href="/downloads/data/regional-economies.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/regional-economies.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/regional-economies", locale)}>{message(messages, "connect.regionalMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-inflation-discovery">
+                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-inflation-discovery">
                   {message(messages, "connect.inflationQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-national.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-categories.csv">CSV</a>{" · "}
@@ -326,24 +350,25 @@ export async function renderConnectPage(locale: Locale) {
                   <a className="underline" href="/downloads/data/inflation-cities.json">{message(messages, "connect.inflationCitiesMetadata")}</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[13px] leading-[1.8] text-[var(--body)]" data-testid="connect-product-discovery">
+                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-product-discovery">
                   {message(messages, "connect.productQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-products.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-products.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
+                </details>
               </div>
               <div data-testid="connect-coverage-excluded">
-                <h3 className="text-[14px] font-semibold">{message(messages, "connect.notIncluded")}</h3>
-                <ul className="mt-2 grid gap-1.5 text-[13px] leading-[1.8] text-[var(--body)]">
+                <h3 className="text-[0.875rem] font-semibold">{message(messages, "connect.notIncluded")}</h3>
+                <ul className="mt-2 grid gap-1.5 text-[0.8125rem] leading-[1.8] text-[var(--body)]">
                   {NOT_SERVED.map((item) => (
                     <li key={item}>{message(messages, item)}</li>
                   ))}
                 </ul>
-                <p className="mt-3 text-[12.5px] leading-relaxed text-[var(--muted)]">
+                <p className="mt-3 text-[0.78125rem] leading-relaxed text-[var(--muted)]">
                   {message(messages, "connect.excludedCodes", { codes: excludedCodes.join(", ") })}
                 </p>
-                <p className="mt-3 text-[12.5px] leading-relaxed text-[var(--muted)]">
+                <p className="mt-3 text-[0.78125rem] leading-relaxed text-[var(--muted)]">
                   {message(messages, "connect.unsupported")}
                 </p>
               </div>
@@ -355,10 +380,10 @@ export async function renderConnectPage(locale: Locale) {
               giving it equal weight to the connection steps made the page
               look harder than it is. */}
           <section className="mt-12 border-t border-[var(--hairline)] pt-4" data-testid="connect-technical">
-            <p className="max-w-[900px] text-[12px] leading-[1.9] text-[var(--muted)]">
+            <p className="max-w-[900px] text-[0.75rem] leading-[1.9] text-[var(--muted)]">
               {message(messages, "connect.technical")}
             </p>
-            <p className="mt-3 max-w-[900px] text-[12px] leading-[1.9] text-[var(--muted)]">{message(messages, "connect.languageContract")}</p>
+            <p className="mt-3 max-w-[900px] text-[0.75rem] leading-[1.9] text-[var(--muted)]">{message(messages, "connect.languageContract")}</p>
           </section>
         </main>
         <SiteFooter locale={locale} updatedAt={model.updatedAt} />

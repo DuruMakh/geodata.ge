@@ -45,7 +45,7 @@
   "analysis.every100Cell": "{name}: {amount} ₾ / {share}%",
   "analysis.every100Item": "{name} — {amount} ₾",
   "analysis.radar": "ბიუჯეტის რადარი",
-  "analysis.radarNote": "წილები · ზედა კატეგორიები · მხოლოდ ვიზუალური",
+  "analysis.radarNote": "წილები · ზედა კატეგორიები · ზუსტი მნიშვნელობები — რეიტინგში ქვემოთ",
   "analysis.budgetField": "ბიუჯეტის ველი",
   "analysis.budgetFieldNote": "x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა",
   "analysis.budgetFieldEmpty": "წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.",

@@ -9,7 +9,7 @@ import { formatDisplayDate } from "../../lib/explorer/format";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
 import { Indicators } from "./indicators";
@@ -17,6 +17,7 @@ import { RangeStrip } from "./range-strip";
 import { SeriesPanel } from "./series-panel";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import type { ResolvedRange } from "./use-explorer-state";
 
 // Multi-year explorer per DESIGN.md §8: mode/grouping tabs and the measure pill over
@@ -122,6 +123,15 @@ export function ExplorerView({
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={chartMode} data-measure={share ? "share_of_gdp" : "nominal"} className="border-t border-[var(--ink)] pt-4">
+            {/* Stacked under the chart, the aside's grouping tabs would sit a long scroll away
+                from what they change, so below 1100px they lead the chart panel instead
+                (owner decision D4, 2026-10-07). Same state and URL key `g`. */}
+            {showGrouping ? (
+              <div data-testid="chart-grouping" className="mb-3.5 flex gap-[18px] border-b border-[var(--row-border)] pb-3 @min-[1100px]:hidden">
+                <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
+                <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
+              </div>
+            ) : null}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <SegmentedTabs<ChartMode>
                 ariaLabel={message(messages, "controls.viewMode")}
@@ -133,9 +143,9 @@ export function ExplorerView({
                 ]}
               />
               <div className="flex items-center gap-3.5">
-                <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {message(messages, share ? "main.percentGdp" : "format.bnGel")}
-                </span>
+                {share ? null : (
+                  <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{message(messages, "format.bnGel")}</span>
+                )}
                 <MeasurePill label={message(messages, "main.percentGdp")} pressed={share} onChange={onShareChange} />
               </div>
             </div>
@@ -168,6 +178,7 @@ export function ExplorerView({
                 <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={message(messages, "main.shareGdp")} />
               </div>
             )}
+            <ChartSelectionAids series={series} chartShown={chartMode === "line"} share={share} unit={unit} />
 
             <RangeStrip years={scopeYears} range={range} onChange={onRangeChange} />
           </section>

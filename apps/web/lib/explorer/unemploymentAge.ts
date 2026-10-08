@@ -2,6 +2,17 @@ import type { ClientUnemploymentObservation, UnemploymentGroupDefinition, Unempl
 
 export const UNEMPLOYMENT_AGE_FIRST_YEAR = 2020;
 
+/**
+ * The heatmap's colour step for a value: six equal-width bins from zero to the
+ * maximum, drawn with the maps' six-step terracotta ramp (paper tint up to the
+ * accent). The darkest bin is the full accent and carries paper text; the
+ * lighter five keep ink text. Both pairings stay above 4.5:1.
+ */
+export function unemploymentAgeHeatmapBin(value: number, maximum: number, steps: number): number {
+  if (!(maximum > 0) || value <= 0) return 0;
+  return Math.min(steps - 1, Math.floor((value / maximum) * steps));
+}
+
 export function buildUnemploymentAgeHeatmap(facts: readonly ClientUnemploymentObservation[], registry: readonly UnemploymentGroupDefinition[], indicator: UnemploymentIndicator, years: readonly number[]) {
   const observations = facts.filter(fact => fact.dimension === "age" && fact.year >= UNEMPLOYMENT_AGE_FIRST_YEAR && fact.indicatorId === indicator);
   const ids = new Set(observations.map(fact => fact.groupId));

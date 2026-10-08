@@ -13,9 +13,19 @@ export const UNEMPLOYMENT_BREAKDOWNS: UnemploymentBreakdown[] = ["national", "se
 function fit(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): UnemploymentState {
   return { ...state, range: refitRange(state.range, unemploymentCoverage(facts, state), { collapseToAll: false }) };
 }
-function defaultSelection(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): string[] {
-  return [state.breakdown === "age" ? unemploymentScopeFacts(facts, state)[0].groupId : unemploymentReferenceId(state)];
+// The Age page opens on a comparison (owner decision D9, 2026-10-07): the
+// youngest published group beside the first prime-age group (lower bound 25).
+function defaultAgeSelection(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): string[] {
+  const groups = [...new Set(unemploymentScopeFacts(facts, state).map(fact => fact.groupId))];
+  const lowerBound = (id: string) => Number(/^age\.(\d+)/.exec(id)?.[1] ?? NaN);
+  const primeAge = groups.filter(id => lowerBound(id) >= 25).sort((a, b) => lowerBound(a) - lowerBound(b))[0];
+  return primeAge && primeAge !== groups[0] ? [groups[0], primeAge] : [groups[0]];
 }
+function defaultSelection(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): string[] {
+  return state.breakdown === "age" ? defaultAgeSelection(state, facts) : [unemploymentReferenceId(state)];
+}
+// The Gender page opens on Men and Women beside the national reference (D9).
+const GENDER_DEFAULT_SELECTION = ["georgia:unemployment_rate", "men:unemployment_rate", "women:unemployment_rate"];
 export function changeUnemploymentBreakdown(state: UnemploymentState, breakdown: UnemploymentBreakdown, facts: readonly ClientUnemploymentObservation[]): UnemploymentState {
   const indicators = state.overview ? unemploymentOverviewIndicators(breakdown) : unemploymentIndicators(breakdown);
   const next = { ...state, breakdown, indicator: state.overview ? indicators[0] : indicators.includes(state.indicator) ? state.indicator : indicators[0] };
@@ -44,7 +54,10 @@ export function parseUnemploymentHash(hash: string, facts: readonly ClientUnempl
   const sex = p.get("sex");
   const state: UnemploymentState = { indicator, breakdown, educationSex: sex === "women" || sex === "men" ? sex : "total", mode: p.get("view") === "table" ? "table" : "line", range: parseYearRangeKeys(p), selectedIds: [], ...(section === "overview" ? { overview: true as const } : {}), ...(section === "regions" ? { regional: true as const, ...(regionId ? { regionId } : {}) } : {}) };
   if (unemploymentUsesIndicatorSeries(state)) {
-    const requested = p.has("sel") ? p.get("sel")!.split(",").map(id => id.includes(":") ? id : `${id}:${indicator}`) : [`${regionId ?? "georgia"}:${indicator}`];
+    // Only a link with neither a selection nor an indicator gets the Gender
+    // comparison; former single-indicator links keep their national reference.
+    const requested = p.has("sel") ? p.get("sel")!.split(",").map(id => id.includes(":") ? id : `${id}:${indicator}`)
+      : breakdown === "sex" && !p.has("indicator") ? GENDER_DEFAULT_SELECTION : [`${regionId ?? "georgia"}:${indicator}`];
     const next = changeUnemploymentOverviewSelection(state, requested, facts, registry);
     if (breakdown === "sex" && !next.selectedIds.length && requested.includes(`georgia:${indicator}`)) return changeUnemploymentOverviewSelection(state, [unemploymentReferenceId(state)], facts, registry);
     return next;

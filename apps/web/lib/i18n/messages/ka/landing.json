@@ -68,5 +68,11 @@
   "landing.heroMillion": "მლნ",
   "landing.heroThousand": "ათ.",
   "landing.metaTitle": "საქართველოს ბიუჯეტი, ვალი და დეფიციტი | Fiscal.ge",
-  "landing.metaDescription": "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და დეფიციტის გადამოწმებული მონაცემები, მეთოდოლოგია და ჩამოსატვირთი Excel ფაილები."
+  "landing.metaDescription": "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და დეფიციტის გადამოწმებული მონაცემები, მეთოდოლოგია და ჩამოსატვირთი Excel ფაილები.",
+  "landing.datasetsLabel": "მონაცემთა ნაკრებები",
+  "landing.datasetBudgetMeasure": "ხარჯები",
+  "landing.datasetEconomyMeasure": "ნომინალური მშპ",
+  "landing.datasetInflationMeasure": "წლიური ინფლაცია",
+  "landing.datasetTradeMeasure": "საგარეო სავაჭრო ბრუნვა",
+  "landing.datasetUnemploymentMeasure": "უმუშევრობის დონე"
 }

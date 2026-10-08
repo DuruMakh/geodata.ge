@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { StackedColumnChart, type StackedColumnChartProps } from "../../components/main-explorer/stacked-column-chart";
-import { renderGeorgianMarkup } from "../helpers/render-localized";
+import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props: StackedColumnChartProps = {
   periods: [24157, 24158],
@@ -25,11 +25,12 @@ function segmentY(html: string, id: string): number {
 describe("StackedColumnChart", () => {
   it("preserves monthly calendar boundaries by default", () => {
     const months = Array.from({ length: 36 }, (_, i) => 24288 + i);
-    const monthly = renderGeorgianMarkup(<StackedColumnChart {...props} periods={months} formatPeriod={period => `month.${period}`} />);
+    const monthly = chartGeometry(renderGeorgianMarkup(<StackedColumnChart {...props} periods={months} formatPeriod={period => `month.${period}`} />), "desktop");
     expect(monthly.match(/>month\.\d+<\/text>/g)).toHaveLength(3);
   });
   it("draws one rect per segment and period", () => {
-    expect(markup.match(/data-segment="/g)).toHaveLength(4);
+    expect(chartGeometry(markup, "desktop").match(/data-segment="/g)).toHaveLength(4);
+    expect(chartGeometry(markup, "mobile").match(/data-segment="/g)).toHaveLength(4);
   });
 
   it("puts negative segments below the zero line", () => {
@@ -69,6 +70,95 @@ describe("StackedColumnChart", () => {
     expect(markup).toContain('data-testid="stack-chart-frame"');
     expect(markup).toMatch(/<svg[^>]*tabindex="0"/);
     expect(markup).toMatch(/<svg[^>]*aria-describedby="[^"]+"/);
+  });
+
+  // The first column was centred on the plot's left edge and drawn over the
+  // y-axis labels ("250(" for 2500); the axis printed 5000 where lists say 5,000.
+  it("keeps every column inside the plot and groups axis thousands", () => {
+    const years = Array.from({ length: 16 }, (_, index) => 2010 + index);
+    const wide = renderGeorgianMarkup(
+      <StackedColumnChart
+        {...props}
+        periods={years}
+        segments={[
+          { id: "employed", label: "Employed", color: "#1F6E56", values: years.map(() => 1300) },
+          { id: "outside", label: "Outside", color: "#8A7B64", values: years.map(() => 1850) },
+        ]}
+        overlay={null}
+      />,
+    );
+    const rects = [...chartGeometry(wide, "desktop").matchAll(/<rect[^>]*data-segment="[^"]+"[^>]*>/g)].map((match) => ({
+      x: Number(/\bx="([-\d.]+)"/.exec(match[0])?.[1]),
+      width: Number(/\bwidth="([-\d.]+)"/.exec(match[0])?.[1]),
+    }));
+    expect(rects.length).toBe(32);
+    expect(Math.min(...rects.map((rect) => rect.x))).toBeGreaterThanOrEqual(74);
+    expect(Math.max(...rects.map((rect) => rect.x + rect.width))).toBeLessThanOrEqual(920 - 30);
+
+    const axis = [...wide.matchAll(/<text[^>]*text-anchor="end"[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
+    expect(axis).toContain("3,500");
+    expect(axis).not.toContain("3500");
+  });
+
+  // D1: the phone drawing fits the frame (340 units before measuring, one per
+  // pixel) with its columns inside the plot and a thinned, collision-free axis.
+  it("draws a phone geometry that keeps columns inside and labels the first and latest period", () => {
+    const years = Array.from({ length: 16 }, (_, index) => 2010 + index);
+    const wide = renderGeorgianMarkup(
+      <StackedColumnChart
+        {...props}
+        periods={years}
+        segments={[{ id: "employed", label: "Employed", color: "#1F6E56", values: years.map(() => 1300) }]}
+        overlay={null}
+      />,
+    );
+    const phone = chartGeometry(wide, "mobile");
+    expect(phone).toMatch(/viewBox="0 0 340 \d+"/);
+    expect(chartGeometry(wide, "desktop")).toContain('viewBox="0 0 920 320"');
+    const rects = [...phone.matchAll(/<rect[^>]*data-segment="[^"]+"[^>]*>/g)].map((match) => ({
+      x: Number(/\bx="([-\d.]+)"/.exec(match[0])?.[1]),
+      width: Number(/\bwidth="([-\d.]+)"/.exec(match[0])?.[1]),
+    }));
+    expect(rects.length).toBe(16);
+    expect(Math.max(...rects.map((rect) => rect.x + rect.width))).toBeLessThanOrEqual(340 - 12);
+    const labels = [...phone.matchAll(/<text x="([\d.]+)"[^>]*text-anchor="start"[^>]*>(\d{4})<\/text>/g)].map((match) => ({
+      x: Number(match[1]),
+      text: match[2]!,
+    }));
+    expect(labels[0]!.text).toBe("2010");
+    expect(labels.at(-1)!.text).toBe("2025");
+    expect(labels.length).toBeLessThan(16);
+    // Four-digit mono labels are 26.4 units wide; consecutive ones never touch.
+    for (let index = 1; index < labels.length; index += 1) expect(labels[index]!.x - labels[index - 1]!.x).toBeGreaterThan(26.4);
+    expect(labels.at(-1)!.x + 26.4).toBeLessThanOrEqual(340);
+  });
+
+  // Annual periods (unemployment) were laid out as months: 2016 was the only
+  // "January" (2016 % 12 === 0), so labels fell back to every third year and the
+  // lattice had one dot column per year instead of the two that line charts use.
+  it("lays annual periods out as years: year-rule labels and two lattice columns per year", () => {
+    const years = Array.from({ length: 16 }, (_, index) => 2010 + index);
+    const render = (periodsPerYear?: number) =>
+      chartGeometry(
+        renderGeorgianMarkup(
+          <StackedColumnChart
+            {...props}
+            periods={years}
+            periodsPerYear={periodsPerYear}
+            segments={[{ id: "employed", label: "Employed", color: "#1F6E56", values: years.map(() => 1300) }]}
+            overlay={null}
+          />,
+        ),
+        "desktop",
+      );
+    const annual = render(1);
+    const labels = [...annual.matchAll(/<text[^>]*text-anchor="middle"[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+    expect(labels).toEqual(["2010", "2012", "2014", "2016", "2018", "2020", "2022", "2025"]);
+    const pitch = (svg: string) => Number(/<pattern[^>]*\bwidth="([\d.]+)"/.exec(svg)?.[1]);
+    const yearPitch = (920 - 74 - 30) * (15 / 16) / 15;
+    expect(pitch(annual)).toBeCloseTo(yearPitch / 2, 1);
+    // Monthly is the default (inflation contributions) and keeps its calendar lattice.
+    expect(pitch(render(undefined))).toBeCloseTo(yearPitch, 1);
   });
 
   it("ends the headline overlay in a dot", () => {

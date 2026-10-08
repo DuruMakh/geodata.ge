@@ -27,6 +27,8 @@ for (const prefix of ["", "/en"]) {
     await expect(page.getByTestId("connect-product-coverage")).toContainText(products.periods.join("–"));
     const productCatalogue = await (await page.request.get(`${BASE_URL}/downloads/data/inflation-products.json`)).json();
     await expect(page.getByTestId("connect-product-coverage")).toContainText(String(productCatalogue.catalogue.series.length));
+    // Only three examples show up front; the rest open behind the toggle.
+    await page.getByTestId("connect-more-examples").locator("summary").click();
     for (const id of ["inflation-national", "inflation-cities", "inflation-batumi", "products-annual", "products-cumulative"]) await expect(page.getByTestId(`connect-example-${id}`)).toBeVisible();
     await expect(page.getByTestId("connect-example-inflation-batumi")).toContainText(prefix ? "percentage points" : "პროცენტული პუნქტ");
     await expect(page.getByTestId("connect-example-products-cumulative")).toContainText(prefix ? "December" : "დეკემბ");
