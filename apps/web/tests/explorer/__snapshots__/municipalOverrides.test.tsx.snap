@@ -10,17 +10,17 @@ exports[`EntityPicker overrides > without them its markup is the Budget picker's
 </div>
 <div id="_R_0_-listbox" role="listbox" aria-label="Results for Georgia, municipalities and regions" class="max-h-[340px] overflow-y-auto">
 <a id="_R_0_-country" role="option" aria-selected="false" tabindex="-1" data-testid="picker-country" class="grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] border-l-transparent text-[var(--ink)]" href="/en/explorer/municipalities/georgia">
-<span class="truncate text-[12px] font-semibold">Georgia</span>
-<span class="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">3.94 mln GEL · 64 municipal budgets</span>
+<span class="min-w-0 break-words text-[12px] font-semibold">Georgia</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--muted)]">3.94 mln GEL · 64 municipal budgets</span>
 </a>
 <div>
 <a id="_R_0_-region-region.adjara" role="option" aria-selected="false" tabindex="-1" data-testid="picker-region" class="grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] border-l-transparent text-[var(--ink)]" href="/en/explorer/municipalities/region/adjara">
 <span class="truncate text-[12px] font-semibold">Adjara</span>
-<span class="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--muted)]">0.41 mln GEL · 1</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--muted)]">0.41 mln GEL · 1</span>
 </a>
 <a id="_R_0_-muni-06" role="option" aria-selected="false" aria-current="page" tabindex="-1" data-testid="picker-municipality" class="grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:bg-[var(--tint)] hover:text-[var(--accent)] border-l-transparent font-semibold text-[var(--accent)]" href="/en/explorer/municipalities/batumi">
 <span class="truncate text-[13px]">Batumi</span>
-<span class="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">0.25 mln GEL</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">0.25 mln GEL</span>
 </a>
 </div>
 </div>
@@ -46,24 +46,28 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </defs>
 </svg>
 </div>
-<div data-testid="municipality-map-legend" class="mt-2 flex flex-wrap items-center gap-3.5 border-t border-[var(--hairline-soft)] pt-2.5">
-<span class="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">min</span>
-<span class="flex flex-none">
-<span aria-hidden="true" class="h-[9px] w-8" style="background-color:#F3EBDB">
+<div aria-live="polite">
+</div>
+<div data-testid="municipality-map-legend" class="mt-2 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 border-t border-[var(--hairline-soft)] pt-2.5">
+<span data-testid="municipality-map-legend-scale" class="flex min-w-0 items-center gap-3.5">
+<span class="font-[family-name:var(--font-numeric)] text-[11px] whitespace-nowrap text-[var(--faint)] min-[768px]:text-[10px]">min</span>
+<span class="flex min-w-12 flex-[0_1_192px]">
+<span aria-hidden="true" class="h-[9px] flex-1" style="background-color:#F3EBDB">
 </span>
-<span aria-hidden="true" class="h-[9px] w-8" style="background-color:#E9D6C6">
+<span aria-hidden="true" class="h-[9px] flex-1" style="background-color:#E9D6C6">
 </span>
-<span aria-hidden="true" class="h-[9px] w-8" style="background-color:#DEBBA6">
+<span aria-hidden="true" class="h-[9px] flex-1" style="background-color:#DEBBA6">
 </span>
-<span aria-hidden="true" class="h-[9px] w-8" style="background-color:#D19A80">
+<span aria-hidden="true" class="h-[9px] flex-1" style="background-color:#D19A80">
 </span>
-<span aria-hidden="true" class="h-[9px] w-8" style="background-color:#C4735A">
+<span aria-hidden="true" class="h-[9px] flex-1" style="background-color:#C4735A">
 </span>
-<span aria-hidden="true" class="h-[9px] w-8" style="background-color:#B3402A">
+<span aria-hidden="true" class="h-[9px] flex-1" style="background-color:#B3402A">
 </span>
 </span>
-<span class="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">max</span>
-<span class="text-[10px] text-[var(--faint)]">per resident</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] whitespace-nowrap text-[var(--faint)] min-[768px]:text-[10px]">max</span>
+</span>
+<span class="text-[11px] text-[var(--faint)] min-[768px]:text-[10px]">per resident</span>
 <span class="inline-flex items-center gap-1.5">
 <span aria-hidden="true" class="h-2.5 w-2.5 rounded-full border border-[var(--tile)] bg-[var(--positive)]">
 </span>
@@ -89,25 +93,25 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </div>
 </div>
 <div class="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
-<div class="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-1 border-b-2 border-[var(--ink)] pb-2">
-<span class="flex items-baseline gap-3.5">
-<button type="button" data-testid="level-muni" aria-pressed="true" class="-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[12.5px] transition-colors duration-150 font-semibold text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4">Municipalities</button>
+<div class="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
+<span class="flex min-w-0 flex-wrap items-baseline gap-x-3.5">
+<button type="button" data-testid="level-muni" aria-pressed="true" class="-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[0.78125rem] transition-colors duration-150 font-semibold text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4">Municipalities</button>
 <span aria-hidden="true" class="h-[13px] w-px bg-[var(--control)]">
 </span>
-<button type="button" data-testid="level-region" aria-pressed="false" class="-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[12.5px] transition-colors duration-150 font-medium text-[var(--muted)] hover:text-[var(--ink)]">Regions</button>
+<button type="button" data-testid="level-region" aria-pressed="false" class="-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[0.78125rem] transition-colors duration-150 font-medium text-[var(--muted)] hover:text-[var(--ink)]">Regions</button>
 </span>
-<span class="ml-auto font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">GEL</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">GEL</span>
 </div>
 <div class="flex items-center gap-2 pt-3 pb-1">
-<input data-testid="municipal-search" placeholder="Search" aria-label="Search" class="h-[38px] min-w-0 flex-1 rounded-[3px] border border-[var(--control)] bg-[var(--tile)] px-[11px] text-[13px] text-[var(--ink)] outline-none focus:border-[var(--ink)]" value=""/>
-<span data-testid="row-count" class="font-[family-name:var(--font-numeric)] text-[10.5px] whitespace-nowrap text-[var(--faint)]">2</span>
+<input data-testid="municipal-search" type="search" enterKeyHint="search" placeholder="Search" aria-label="Search" class="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]" value=""/>
+<span data-testid="row-count" class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--faint)]">2</span>
 </div>
-<div data-testid="municipal-list-muni" class="mt-1.5 max-h-[620px] overflow-y-auto">
+<div data-testid="municipal-list-muni" class="mt-1.5 @min-[768px]:max-h-[620px] @min-[768px]:overflow-y-auto">
 <a data-testid="municipal-list-row" data-municipality-row-code="04" class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/tbilisi">
-<span class="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">01</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">01</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Tbilisi</span>
-<span class="block truncate text-[10.5px] text-[var(--faint)]">Tbilisi</span>
+<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">Tbilisi</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:100.0%">
 </span>
@@ -115,15 +119,15 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </span>
 <span class="min-w-0 text-right font-[family-name:var(--font-numeric)]">
 <span data-testid="municipal-row-primary-amount" class="block text-[11.5px]">1.37 mln GEL</span>
-<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">1,141 per resident</span>
+<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,141 per resident</span>
 </span>
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>
 <a data-testid="municipal-list-row" data-municipality-row-code="06" class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/batumi">
-<span class="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">02</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">02</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Batumi</span>
-<span class="block truncate text-[10.5px] text-[var(--faint)]">Adjara</span>
+<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">Adjara</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:18.0%">
 </span>
@@ -131,17 +135,17 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </span>
 <span class="min-w-0 text-right font-[family-name:var(--font-numeric)]">
 <span data-testid="municipal-row-primary-amount" class="block text-[11.5px]">0.25 mln GEL</span>
-<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">1,368 per resident</span>
+<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,368 per resident</span>
 </span>
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>
 </div>
-<div data-testid="municipal-list-region" hidden="" class="mt-1.5 max-h-[620px] overflow-y-auto">
+<div data-testid="municipal-list-region" hidden="" class="mt-1.5 @min-[768px]:max-h-[620px] @min-[768px]:overflow-y-auto">
 <a class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/georgia">
-<span class="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">—</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">—</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Georgia</span>
-<span class="block truncate text-[10.5px] text-[var(--faint)]">69 municipal budgets</span>
+<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">69 municipal budgets</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:100.0%">
 </span>
@@ -153,10 +157,10 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>
 <a class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/region/adjara">
-<span class="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">01</span>
+<span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">01</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Adjara</span>
-<span class="block truncate text-[10.5px] text-[var(--faint)]">1 municipality</span>
+<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">1 municipality</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:10.5%">
 </span>
@@ -164,7 +168,7 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </span>
 <span class="min-w-0 text-right font-[family-name:var(--font-numeric)]">
 <span data-testid="municipal-row-primary-amount" class="block text-[11.5px]">0.41 mln GEL</span>
-<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[10px] leading-[1.25] text-[var(--muted)]">1,148 per resident</span>
+<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,148 per resident</span>
 </span>
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>
@@ -179,15 +183,19 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 exports[`the place-page shell pieces > EntityHeading's markup is the Budget heading's, without and with previous/next (snapshots) > with previous/next 1`] = `
 "<div class="mt-[22px] flex flex-col gap-4 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:justify-between min-[768px]:gap-5">
 <div class="min-w-0 min-[768px]:flex-1">
-<h1 class="mb-2 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">Population — <button type="button" data-testid="entity-picker-trigger" aria-expanded="false" aria-haspopup="dialog" class="group inline-block max-w-full truncate align-bottom cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)] min-[768px]:overflow-visible min-[768px]:whitespace-normal">Batumi<span aria-hidden="true" class="ml-1 inline-block h-0 w-0 border-x-[4px] border-x-transparent border-t-[5px] border-t-current">
+<h1 class="mb-2 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">Population — <button type="button" data-testid="entity-picker-trigger" aria-expanded="false" aria-haspopup="dialog" class="group inline-block max-w-full align-bottom break-words cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">Batumi<span aria-hidden="true" class="ml-1 inline-block h-0 w-0 border-x-[4px] border-x-transparent border-t-[5px] border-t-current">
 </span>
 </button>
 </h1>
 <div class="text-[12.5px] text-[var(--muted)]">Adjara · Rank 2 of 64</div>
 </div>
 <span data-testid="municipal-entity-navigation" class="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
-<a href="/a" class="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">← Kobuleti</a>
-<a href="/b" class="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">Keda →</a>
+<a href="/a" class="flex min-h-11 min-w-0 items-center font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
+<span class="min-w-0 truncate">← Kobuleti</span>
+</a>
+<a href="/b" class="flex min-h-11 min-w-0 items-center justify-end text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
+<span class="min-w-0 truncate">Keda →</span>
+</a>
 </span>
 </div>"
 `;
@@ -195,7 +203,7 @@ exports[`the place-page shell pieces > EntityHeading's markup is the Budget head
 exports[`the place-page shell pieces > EntityHeading's markup is the Budget heading's, without and with previous/next (snapshots) > without previous/next 1`] = `
 "<div class="mt-[22px] flex flex-col gap-4 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:justify-between min-[768px]:gap-5">
 <div class="min-w-0 min-[768px]:flex-1">
-<h1 class="mb-2 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">Population — <button type="button" data-testid="entity-picker-trigger" aria-expanded="false" aria-haspopup="dialog" class="group inline-block max-w-full truncate align-bottom cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)] min-[768px]:overflow-visible min-[768px]:whitespace-normal">Batumi<span aria-hidden="true" class="ml-1 inline-block h-0 w-0 border-x-[4px] border-x-transparent border-t-[5px] border-t-current">
+<h1 class="mb-2 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">Population — <button type="button" data-testid="entity-picker-trigger" aria-expanded="false" aria-haspopup="dialog" class="group inline-block max-w-full align-bottom break-words cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">Batumi<span aria-hidden="true" class="ml-1 inline-block h-0 w-0 border-x-[4px] border-x-transparent border-t-[5px] border-t-current">
 </span>
 </button>
 </h1>
@@ -217,7 +225,7 @@ exports[`the place-page shell pieces > EntityMemberList's markup is the Budget r
 
 exports[`the place-page shell pieces > EntityWorkspaceShell's markup is the Budget place page's two columns (snapshot) 1`] = `
 "<div data-testid="x-workspace" class="mt-7 grid items-start gap-10 border-t border-[var(--ink)] pt-5 @min-[1100px]:grid-cols-[minmax(0,1fr)_340px]">
-<div class="min-w-0">
+<div data-chart-panel="true" class="min-w-0">
 <p>main</p>
 </div>
 <aside class="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">

@@ -22,9 +22,9 @@ import type { Presentation } from "../../lib/i18n/types";
 
 // What this file proves about the Budget pages. Without overrides the shared parts must render what they rendered
 // before the Population pages existed. That identity (byte for byte) was established once, when the parts were
-// moved out of the Budget components, against the markup of the commit before the move. The one accepted
-// difference is the list-header row of the index (commit 86f0c314: it wraps, and the unit label sits at the right).
-// What keeps it true from here on is the committed snapshots below: the markup of the five parts WITHOUT
+// moved out of the Budget components, against the markup of the commit before the move. The list-header row of the
+// index (commit 86f0c314: it wraps, and the unit label sits at the right) differs only with a unit label override since
+// the second merge with main, so the Budget index matches main's markup exactly. What keeps it true from here on is the committed snapshots below: the markup of the five parts WITHOUT
 // overrides, from fixture data, with the map left empty. A drift shows as a line diff; update a snapshot only
 // for a Budget change you mean to make.
 let municipalities: Municipality[];
