@@ -141,6 +141,7 @@ test("sitemap publishes exactly the live methodology routes", async ({ page }) =
     "/methodology/regional-economies",
     "/methodology/inflation",
     "/methodology/unemployment",
+    "/methodology/trade",
   ]);
 });
 

@@ -454,7 +454,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
     expect(navigation?.status()).toBe(200);
     await expect(page).toHaveTitle("Fiscal.ge / XML sitemap");
     await expect(page.getByRole("heading", { name: "Public pages" })).toHaveCount(1);
-    await expect(page.locator(".sitemap-row")).toHaveCount(276);
+    await expect(page.locator(".sitemap-row")).toHaveCount(282);
     await expectNoPageOverflow(page);
 
     if (viewport.width < 720) {
