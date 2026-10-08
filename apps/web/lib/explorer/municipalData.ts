@@ -657,9 +657,14 @@ export type EntityPickerGroupModel = {
   members: Array<{ code: string; nameKa: string; valueGel: number }>;
 };
 
-/** Picker groups: regions in value order, each with its members in value order. */
-export function buildPickerGroups(input: MunicipalListInput): EntityPickerGroupModel[] {
-  const { municipalities, regions } = buildMunicipalListRows(input);
+/** Picker groups from index rows: the regions as given, each with the municipality rows of that region in row order. */
+export function pickerGroupsFromRows({
+  municipalities,
+  regions,
+}: {
+  municipalities: MunicipalListRow[];
+  regions: MunicipalListRow[];
+}): EntityPickerGroupModel[] {
   const membersByRegion = new Map<string, Array<{ code: string; nameKa: string; valueGel: number }>>();
 
   for (const row of municipalities) {
@@ -675,4 +680,9 @@ export function buildPickerGroups(input: MunicipalListInput): EntityPickerGroupM
     valueGel: region.valueGel,
     members: membersByRegion.get(region.id) ?? [],
   }));
+}
+
+/** Picker groups: regions in value order, each with its members in value order. */
+export function buildPickerGroups(input: MunicipalListInput): EntityPickerGroupModel[] {
+  return pickerGroupsFromRows(buildMunicipalListRows(input));
 }

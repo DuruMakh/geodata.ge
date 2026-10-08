@@ -8,7 +8,7 @@ import type { Presentation } from "../../lib/i18n/types";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { publicLabel } from "../../lib/i18n/labels";
 import { workbookMessage } from "../../lib/i18n/workbook";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
 import {
   buildComparisonRows,
@@ -35,7 +35,9 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
-import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup } from "./entity-picker";
+import { EntityHeading, type EntityNavigation } from "./entity-heading";
+import type { EntityPickerCountry, EntityPickerGroup } from "./entity-picker";
+import { EntityWorkspaceShell } from "./entity-workspace-shell";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 import { useAppReady } from "../explorer-shell/use-app-ready";
@@ -49,8 +51,6 @@ export type MunicipalMetricContext =
       rankOutOf: number;
     }
   | { kind: "country"; budgetCount: number };
-
-type MunicipalNavigation = { prev: { label: string; href: string }; next: { label: string; href: string } };
 
 type MunicipalExplorerBaseProps = {
   presentation: Presentation;
@@ -82,7 +82,7 @@ type MunicipalExplorerBaseProps = {
 
 export type MunicipalExplorerProps = MunicipalExplorerBaseProps &
   (
-    | { metrics: Extract<MunicipalMetricContext, { kind: "ranked" }>; navigation: MunicipalNavigation }
+    | { metrics: Extract<MunicipalMetricContext, { kind: "ranked" }>; navigation: EntityNavigation }
     | { metrics: Extract<MunicipalMetricContext, { kind: "country" }>; navigation?: never }
   );
 
@@ -95,7 +95,6 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
   const { locale, messages, englishLabels } = i18n;
   const { functions, functionFacts, totalFacts } = props;
   const { metrics, navigation } = props;
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   const allYears = useMemo(
     () => Array.from(new Set(totalFacts.map((row) => row.year))).sort((a, b) => a - b),
@@ -252,160 +251,104 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
     };
   }
 
-  useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setPickerOpen(true);
-      }
-    }
-
-    window.addEventListener("keydown", onKey);
-
-    return () => {
-      window.removeEventListener("keydown", onKey);
-    };
-  }, []);
   useAppReady();
 
   return (
     <>
-      <div className="mt-[22px] flex flex-col gap-4 min-[768px]:flex-row min-[768px]:items-baseline min-[768px]:justify-between min-[768px]:gap-5">
-        <div className="min-w-0 min-[768px]:flex-1">
-          {/* The popover is a SIBLING of the heading, not a child: a role="dialog"
-              and a fixed overlay nested inside an h1 is announced as part of the
-              heading and is fragile to position. */}
-          <h1 className="mb-2 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">
-            {props.title}{" "}
-            <button
-              type="button"
-              data-testid="entity-picker-trigger"
-              aria-expanded={pickerOpen}
-              aria-haspopup="dialog"
-              onClick={() => setPickerOpen((current) => !current)}
-              className="group inline-block max-w-full align-bottom break-words cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]"
-            >
-              {props.triggerLabel}
-              <span
-                aria-hidden="true"
-                className={`ml-1 inline-block h-0 w-0 border-x-[4px] border-x-transparent ${
-                  pickerOpen ? "border-b-[5px] border-b-current" : "border-t-[5px] border-t-current"
-                }`}
-              />
-            </button>
-          </h1>
-          <EntityPicker
-            open={pickerOpen}
-            onClose={() => setPickerOpen(false)}
-            country={props.pickerCountry}
-            groups={props.pickerGroups}
-            activeId={props.entityId}
-          />
-          <div className="text-[12.5px] text-[var(--muted)]">{props.metaLine}</div>
-        </div>
-        {navigation ? (
-          <span
-            data-testid="municipal-entity-navigation"
-            className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink"
-          >
-            {/* Plain <a> on purpose (full page load); 44px-tall targets below 768px,
-                matching EntityNeighbourLinks on the other detail pages. */}
-            <a href={navigation.prev.href} className="flex min-h-11 min-w-0 items-center font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
-              <span className="min-w-0 truncate">← {navigation.prev.label}</span>
-            </a>
-            <a href={navigation.next.href} className="flex min-h-11 min-w-0 items-center justify-end text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
-              <span className="min-w-0 truncate">{navigation.next.label} →</span>
-            </a>
-          </span>
-        ) : null}
-      </div>
+      <EntityHeading
+        title={props.title}
+        triggerLabel={props.triggerLabel}
+        metaLine={props.metaLine}
+        entityId={props.entityId}
+        navigation={navigation}
+        pickerCountry={props.pickerCountry}
+        pickerGroups={props.pickerGroups}
+      />
 
-      <div
-        data-testid="municipal-workspace"
-        className="mt-7 grid items-start gap-10 border-t border-[var(--ink)] pt-5 @min-[1100px]:grid-cols-[minmax(0,1fr)_340px]"
-      >
-        <div data-chart-panel className="min-w-0">
-          <div
-            data-testid="municipal-chart-controls"
-            className="mb-[18px] flex flex-wrap items-center justify-between gap-x-5 gap-y-3"
-          >
-            <span className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 [&_button]:min-h-9">
-              <SegmentedTabs<ChartMode>
-                ariaLabel={message(messages, "municipal.viewMode")}
-                value={state.chartMode}
-                onChange={state.setChartMode}
-                options={[
-                  { value: "line", label: message(messages, "municipal.line"), testId: "municipal-mode-line" },
-                  { value: "table", label: message(messages, "municipal.table"), testId: "municipal-mode-table" },
-                ]}
-              />
-              {/* Phones keep the pill on this row: the caption shortens to the unit, and
-                  in share mode the pressed "% წილი" pill names the unit itself. */}
-              <span data-testid="municipal-measure-label" className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
-                <span className="max-[768px]:hidden">{message(messages, state.share ? "municipal.shareMeasure" : "municipal.amountMeasure")}</span>
-                {state.share ? null : <span className="hidden max-[768px]:inline">{message(messages, "municipal.amountMeasureShort")}</span>}
+      <EntityWorkspaceShell
+        testId="municipal-workspace"
+        main={
+          <>
+            <div
+              data-testid="municipal-chart-controls"
+              className="mb-[18px] flex flex-wrap items-center justify-between gap-x-5 gap-y-3"
+            >
+              <span className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 [&_button]:min-h-9">
+                <SegmentedTabs<ChartMode>
+                  ariaLabel={message(messages, "municipal.viewMode")}
+                  value={state.chartMode}
+                  onChange={state.setChartMode}
+                  options={[
+                    { value: "line", label: message(messages, "municipal.line"), testId: "municipal-mode-line" },
+                    { value: "table", label: message(messages, "municipal.table"), testId: "municipal-mode-table" },
+                  ]}
+                />
+                {/* Phones keep the pill on this row: the caption shortens to the unit, and
+                    in share mode the pressed "% წილი" pill names the unit itself. */}
+                <span data-testid="municipal-measure-label" className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
+                  <span className="max-[768px]:hidden">{message(messages, state.share ? "municipal.shareMeasure" : "municipal.amountMeasure")}</span>
+                  {state.share ? null : <span className="hidden max-[768px]:inline">{message(messages, "municipal.amountMeasureShort")}</span>}
+                </span>
               </span>
-            </span>
-            <button
-              type="button"
-              data-testid="municipal-share-toggle"
-              aria-pressed={state.share}
-              onClick={() => state.setShare(!state.share)}
-              className={`inline-flex min-h-9 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border px-3 text-[11.5px] ${
-                state.share
-                  ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] before:mr-1 before:content-['✓'_/_'']"
-                  : "border-[var(--control)] text-[var(--muted)]"
-              }`}
-            >
-              {message(messages, "municipal.shareToggle")}
-            </button>
-          </div>
-
-          {state.chartMode === "line" && noSelection ? (
-            <div className="mt-5">
-              <Callout testId="no-selection-callout">{message(messages, "municipal.noSelection")}</Callout>
+              <button
+                type="button"
+                data-testid="municipal-share-toggle"
+                aria-pressed={state.share}
+                onClick={() => state.setShare(!state.share)}
+                className={`inline-flex min-h-9 shrink-0 cursor-pointer items-center whitespace-nowrap rounded-full border px-3 text-[11.5px] ${
+                  state.share
+                    ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] before:mr-1 before:content-['✓'_/_'']"
+                    : "border-[var(--control)] text-[var(--muted)]"
+                }`}
+              >
+                {message(messages, "municipal.shareToggle")}
+              </button>
             </div>
-          ) : state.chartMode === "line" ? (
-            <EditorialLineChart years={years} series={series} share={state.share} unit={unit} shareLabel={message(messages, "municipal.shareOfBudget")} />
-          ) : (
-            <ExplorerTable
-              caption={message(messages, state.share ? "municipal.tableCaptionShare" : "municipal.tableCaptionAmount", { name: props.triggerLabel, start: state.range.start, end: state.range.end })}
-              rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
-              totalRow={model.totalRow}
-              showTotal={state.selectedIds.includes(model.totalRow.itemId)}
-              years={years}
-              firstColumnLabel={message(messages, "municipal.function")}
-              unit={unit}
-              share={state.share}
-              shareColumnLabel={message(messages, "municipal.share")}
-              shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
-            />
-          )}
-          <ChartSelectionAids series={series} chartShown={state.chartMode === "line"} share={state.share} unit={unit} />
 
-          {/* allYears, never model.years — the strip must offer the full span
-              even when the selection has narrowed it. The strip draws its own rule. */}
-          <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
+            {state.chartMode === "line" && noSelection ? (
+              <div className="mt-5">
+                <Callout testId="no-selection-callout">{message(messages, "municipal.noSelection")}</Callout>
+              </div>
+            ) : state.chartMode === "line" ? (
+              <EditorialLineChart years={years} series={series} share={state.share} unit={unit} shareLabel={message(messages, "municipal.shareOfBudget")} />
+            ) : (
+              <ExplorerTable
+                caption={message(messages, state.share ? "municipal.tableCaptionShare" : "municipal.tableCaptionAmount", { name: props.triggerLabel, start: state.range.start, end: state.range.end })}
+                rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
+                totalRow={model.totalRow}
+                showTotal={state.selectedIds.includes(model.totalRow.itemId)}
+                years={years}
+                firstColumnLabel={message(messages, "municipal.function")}
+                unit={unit}
+                share={state.share}
+                shareColumnLabel={message(messages, "municipal.share")}
+                shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
+              />
+            )}
+            <ChartSelectionAids series={series} chartShown={state.chartMode === "line"} share={state.share} unit={unit} />
 
-          <div className="mt-5 max-w-[640px]">
-            <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
-          </div>
+            {/* allYears, never model.years — the strip must offer the full span
+                even when the selection has narrowed it. The strip draws its own rule. */}
+            <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
 
-          {props.summary ? (
-            <p
-              data-testid="municipal-entity-summary"
-              className="mt-5 max-w-[740px] border-l-2 border-[var(--accent)] bg-[var(--tint)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--body)]"
-            >
-              {props.summary}
-            </p>
-          ) : null}
+            <div className="mt-5 max-w-[640px]">
+              <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
+            </div>
 
-          {props.children}
+            {props.summary ? (
+              <p
+                data-testid="municipal-entity-summary"
+                className="mt-5 max-w-[740px] border-l-2 border-[var(--accent)] bg-[var(--tint)] px-4 py-3 text-[13px] leading-[1.65] text-[var(--body)]"
+              >
+                {props.summary}
+              </p>
+            ) : null}
 
-        </div>
-
-        <aside className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
-          <div className="sticky top-5">
+            {props.children}
+          </>
+        }
+        aside={
+          <>
             <SeriesSelector
               query={seriesQuery}
               onQueryChange={setSeriesQuery}
@@ -442,9 +385,9 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
             >
               {message(messages, "municipal.allMunicipalities")}
             </Link>
-          </div>
-        </aside>
-      </div>
+          </>
+        }
+      />
 
       {/* All three derive from the RANGE model, so they move together with
           the chart instead of describing a span the user is not looking at. */}

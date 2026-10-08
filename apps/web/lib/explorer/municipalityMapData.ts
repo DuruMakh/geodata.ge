@@ -10,6 +10,8 @@ export type MunicipalityMapShape = {
   totalBudgetGel: number;
   budgetPerResidentGel: number;
   bucket: number;
+  /** What a page that plots something other than the budget says for this place in its map target's accessible name and touch preview. */
+  display?: string;
 };
 
 export type MunicipalityMapMarker = {
@@ -19,6 +21,8 @@ export type MunicipalityMapMarker = {
   y: number;
   totalBudgetGel: number;
   budgetPerResidentGel: number;
+  /** What a page that plots something other than the budget says for this place in its map target's accessible name and touch preview. */
+  display?: string;
 };
 
 export type MunicipalityMapOccupiedArea = {
@@ -169,40 +173,24 @@ function quantileBucket(values: number[]): (value: number) => number {
   };
 }
 
-export function buildMunicipalityMapModel({
-  municipalities,
-  municipalityRows,
-}: {
-  municipalities: Municipality[];
-  municipalityRows: MunicipalListRow[];
-}): MunicipalityMapModel {
+type MapValue = { totalBudgetGel: number; budgetPerResidentGel: number; display?: string };
+
+function registryNames(municipalities: readonly Municipality[]): Map<string, string> {
   const namesByCode = new Map<string, string>();
   for (const municipality of municipalities) {
     if (namesByCode.has(municipality.code)) throw new Error(`Duplicate municipality registry code ${municipality.code}`);
     namesByCode.set(municipality.code, municipality.displayNameKa);
   }
+  return namesByCode;
+}
 
-  const valuesByCode = new Map<string, { totalBudgetGel: number; budgetPerResidentGel: number }>();
-  for (const row of municipalityRows) {
-    if (row.kind !== "municipality") throw new Error(`Expected municipality row for ${row.id}`);
-    if (!namesByCode.has(row.id)) throw new Error(`Unknown municipality row code ${row.id}`);
-    if (valuesByCode.has(row.id)) throw new Error(`Duplicate municipality row code ${row.id}`);
-    if (!Number.isFinite(row.valueGel) || row.valueGel <= 0) {
-      throw new Error(`Invalid total budget for municipality ${row.id}`);
-    }
-    if (
-      row.budgetPerResidentGel === null ||
-      !Number.isFinite(row.budgetPerResidentGel) ||
-      row.budgetPerResidentGel <= 0
-    ) {
-      throw new Error(`Invalid budget per resident for municipality ${row.id}`);
-    }
-    valuesByCode.set(row.id, {
-      totalBudgetGel: row.valueGel,
-      budgetPerResidentGel: row.budgetPerResidentGel,
-    });
-  }
+const displayOf = (value: MapValue) => (value.display === undefined ? {} : { display: value.display });
 
+/** Joins one value per municipality to its shape or marker and equal-count bucket; every municipality map is built here. */
+function assembleMunicipalityMapModel(
+  namesByCode: ReadonlyMap<string, string>,
+  valuesByCode: ReadonlyMap<string, MapValue>,
+): MunicipalityMapModel {
   const mapCodes = new Set([
     ...MUNICIPALITY_MAP_ARTIFACT.municipalityPaths.map((shape) => shape.code),
     ...MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => marker.code),
@@ -212,7 +200,7 @@ export function buildMunicipalityMapModel({
     if (!valuesByCode.has(code)) throw new Error(`Missing latest-year official total for municipality ${code}`);
   }
 
-  const valueFor = (code: string): { totalBudgetGel: number; budgetPerResidentGel: number } => {
+  const valueFor = (code: string): MapValue => {
     const value = valuesByCode.get(code);
     if (value === undefined) throw new Error(`Missing latest-year official total for municipality ${code}`);
     return value;
@@ -247,6 +235,7 @@ export function buildMunicipalityMapModel({
       totalBudgetGel: valueFor(shape.code).totalBudgetGel,
       budgetPerResidentGel: valueFor(shape.code).budgetPerResidentGel,
       bucket: bucketOf(valueFor(shape.code).budgetPerResidentGel),
+      ...displayOf(valueFor(shape.code)),
     })),
     markers: MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => ({
       code: marker.code,
@@ -255,10 +244,70 @@ export function buildMunicipalityMapModel({
       y: marker.y,
       totalBudgetGel: valueFor(marker.code).totalBudgetGel,
       budgetPerResidentGel: valueFor(marker.code).budgetPerResidentGel,
+      ...displayOf(valueFor(marker.code)),
     })),
     occupiedAreas: MUNICIPALITY_MAP_ARTIFACT.occupiedAreas.map((area) => ({ key: area.key })),
     touchTargets,
     legendMinPerResidentGel: Math.min(...polygonValues),
     legendMaxPerResidentGel: Math.max(...polygonValues),
   };
+}
+
+export function buildMunicipalityMapModel({
+  municipalities,
+  municipalityRows,
+}: {
+  municipalities: Municipality[];
+  municipalityRows: MunicipalListRow[];
+}): MunicipalityMapModel {
+  const namesByCode = registryNames(municipalities);
+
+  const valuesByCode = new Map<string, MapValue>();
+  for (const row of municipalityRows) {
+    if (row.kind !== "municipality") throw new Error(`Expected municipality row for ${row.id}`);
+    if (!namesByCode.has(row.id)) throw new Error(`Unknown municipality row code ${row.id}`);
+    if (valuesByCode.has(row.id)) throw new Error(`Duplicate municipality row code ${row.id}`);
+    if (!Number.isFinite(row.valueGel) || row.valueGel <= 0) {
+      throw new Error(`Invalid total budget for municipality ${row.id}`);
+    }
+    if (
+      row.budgetPerResidentGel === null ||
+      !Number.isFinite(row.budgetPerResidentGel) ||
+      row.budgetPerResidentGel <= 0
+    ) {
+      throw new Error(`Invalid budget per resident for municipality ${row.id}`);
+    }
+    valuesByCode.set(row.id, {
+      totalBudgetGel: row.valueGel,
+      budgetPerResidentGel: row.budgetPerResidentGel,
+    });
+  }
+
+  return assembleMunicipalityMapModel(namesByCode, valuesByCode);
+}
+
+/**
+ * A municipality map of any one positive value per municipality (population). The number goes in the
+ * existing numeric fields and `display` is the text each map target's accessible name and touch preview carry.
+ */
+export function buildMunicipalityValueMapModel({
+  municipalities,
+  values,
+  display,
+}: {
+  municipalities: Municipality[];
+  values: ReadonlyMap<string, number>;
+  display: (code: string, value: number) => string;
+}): MunicipalityMapModel {
+  const namesByCode = registryNames(municipalities);
+  const valuesByCode = new Map<string, MapValue>();
+  for (const [code, value] of values) {
+    if (!namesByCode.has(code)) throw new Error(`Unknown municipality value code ${code}`);
+    if (!Number.isFinite(value) || value <= 0) throw new Error(`Invalid map value for municipality ${code}`);
+    valuesByCode.set(code, { totalBudgetGel: value, budgetPerResidentGel: value, display: display(code, value) });
+  }
+  for (const code of namesByCode.keys()) {
+    if (!valuesByCode.has(code)) throw new Error(`Missing map value for municipality ${code}`);
+  }
+  return assembleMunicipalityMapModel(namesByCode, valuesByCode);
 }

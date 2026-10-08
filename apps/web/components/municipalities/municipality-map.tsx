@@ -20,6 +20,10 @@ type MunicipalityMapProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel"
   activeCode: string | null;
   onActiveCodeChange: (code: string | null) => void;
   onOpenMunicipality: (code: string) => void;
+  /** Replaces the per-resident budget wording; each place's own value text is `display` on the model. */
+  wording?: { groupAria: string; legendCaption: string };
+  /** Where the touch preview's link opens, by code; the Budget municipality page by default. */
+  hrefForCode?: (code: string) => string;
 };
 
 function isActivationKey(key: string): boolean {
@@ -40,9 +44,14 @@ export function MunicipalityMap({
   activeCode,
   onActiveCodeChange,
   onOpenMunicipality,
+  wording,
+  hrefForCode,
 }: MunicipalityMapProps) {
   const { locale, messages, englishLabels } = useI18n();
-  const accessibleName = (code: string, nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number) => message(messages, "municipal.mapEntityAria", { name: publicLabel(locale, code, nameKa, englishLabels), perResident: formatPerResidentGel(budgetPerResidentGel, locale), total: formatAmount(totalBudgetGel, locale) });
+  const accessibleName = (code: string, nameKa: string, budgetPerResidentGel: number, totalBudgetGel: number, display?: string) =>
+    display !== undefined
+      ? `${publicLabel(locale, code, nameKa, englishLabels)}, ${display}`
+      : message(messages, "municipal.mapEntityAria", { name: publicLabel(locale, code, nameKa, englishLabels), perResident: formatPerResidentGel(budgetPerResidentGel, locale), total: formatAmount(totalBudgetGel, locale) });
   const svgRef = useRef<SVGSVGElement>(null);
   const [pointerCode, setPointerCode] = useState<string | null>(null);
   const [focusCode, setFocusCode] = useState<string | null>(null);
@@ -143,7 +152,7 @@ export function MunicipalityMap({
           ref={svgRef}
           viewBox={viewBox}
           role="group"
-          aria-label={message(messages, "municipal.mapAria", { year: MUNICIPAL_PER_RESIDENT_YEAR })}
+          aria-label={wording?.groupAria ?? message(messages, "municipal.mapAria", { year: MUNICIPAL_PER_RESIDENT_YEAR })}
           className="block h-auto w-full"
           onPointerDown={preview.onPointerDown}
         >
@@ -205,7 +214,7 @@ export function MunicipalityMap({
                   strokeLinejoin="round"
                   tabIndex={targetIndex === rovingIndex ? 0 : -1}
                   role="link"
-                  aria-label={accessibleName(shape.code, shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel)}
+                  aria-label={accessibleName(shape.code, shape.nameKa, shape.budgetPerResidentGel, shape.totalBudgetGel, shape.display)}
                   className="cursor-pointer"
                   onMouseEnter={() => activatePointerTarget(shape.code)}
                   onMouseLeave={clearPointerTarget}
@@ -237,7 +246,7 @@ export function MunicipalityMap({
                 vectorEffect="non-scaling-stroke"
                 tabIndex={targetIndex === rovingIndex ? 0 : -1}
                 role="link"
-                aria-label={accessibleName(marker.code, marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel)}
+                aria-label={accessibleName(marker.code, marker.nameKa, marker.budgetPerResidentGel, marker.totalBudgetGel, marker.display)}
                 className="cursor-pointer"
                 onMouseEnter={() => activatePointerTarget(marker.code)}
                 onMouseLeave={clearPointerTarget}
@@ -291,16 +300,16 @@ export function MunicipalityMap({
       <div aria-live="polite">
         {previewTarget ? (
           <Link
-            href={pageHref(municipalityHrefForCode(previewTarget.code), locale)}
+            href={pageHref((hrefForCode ?? municipalityHrefForCode)(previewTarget.code), locale)}
             data-testid="map-touch-preview"
             className="mt-2 flex min-h-11 items-center justify-between gap-3 border-t border-[var(--hairline-soft)] text-[13px] text-[var(--ink)]"
           >
             <span className="min-w-0">
               <span className="font-semibold">{publicLabel(locale, previewTarget.code, previewTarget.nameKa, englishLabels)}</span>
               {" · "}
-              <span className="font-[family-name:var(--font-numeric)]">{formatPerResidentGel(previewTarget.budgetPerResidentGel, locale)}</span>
+              <span className="font-[family-name:var(--font-numeric)]">{previewTarget.display ?? formatPerResidentGel(previewTarget.budgetPerResidentGel, locale)}</span>
               {" "}
-              {message(messages, "municipal.perResident")}
+              {wording?.legendCaption ?? message(messages, "municipal.perResident")}
             </span>
             <span aria-hidden className="text-[var(--accent)]">→</span>
           </Link>
@@ -319,7 +328,7 @@ export function MunicipalityMap({
           </span>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] whitespace-nowrap text-[var(--faint)] min-[768px]:text-[10px]">{legendMax}</span>
         </span>
-        <span className="text-[11px] text-[var(--faint)] min-[768px]:text-[10px]">{message(messages, "municipal.perResident")}</span>
+        <span className="text-[11px] text-[var(--faint)] min-[768px]:text-[10px]">{wording?.legendCaption ?? message(messages, "municipal.perResident")}</span>
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-[var(--tile)] bg-[var(--positive)]" />
           <span className="text-[11px] text-[var(--faint)]">{message(messages, "municipal.cities")}</span>

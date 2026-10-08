@@ -10,6 +10,10 @@ for (const path of ["", "/en"].flatMap((prefix) => [
   // Their opening comparison (Men and Women; two age groups) is a default, not state.
   `${prefix}/explorer/unemployment/gender`,
   `${prefix}/explorer/unemployment/age`,
+  `${prefix}/explorer/demography/population`,
+  `${prefix}/explorer/demography/population/georgia`,
+  `${prefix}/explorer/demography/population/region/adjara`,
+  `${prefix}/explorer/demography/population/batumi`,
 ])) {
   test(`opening ${path} leaves the URL without a hash`, async ({ page }) => {
     await page.goto(path);

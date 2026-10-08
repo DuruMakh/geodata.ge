@@ -1,6 +1,7 @@
 {
   "format.bn": "მლრდ",
   "format.mln": "მლნ",
+  "format.thousands": "ათ.",
   "format.bnGel": "მლრდ ₾",
   "format.mlnGel": "მლნ ₾",
   "format.gel": "₾"

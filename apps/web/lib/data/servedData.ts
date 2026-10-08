@@ -11,6 +11,7 @@ import { resetGeneralGovernmentBalanceCacheForTests } from "./generalGovernmentB
 import { resetGovernmentDebtCacheForTests } from "./governmentDebt/importGovernmentDebtFacts";
 import { resetInflationCacheForTests } from "./inflation/importInflation";
 import { resetRegionalEconomyCacheForTests } from "./regionalEconomies/importRegionalEconomies";
+import { resetDemographyCacheForTests } from "./demography/importDemography";
 import { resolveServedDataSource, type ServedDataSource } from "./servedDataSource";
 import { loadSourceDocuments, type SourceDocumentRow } from "./sources";
 import type {
@@ -63,6 +64,8 @@ export const SERVED_DATA_FILES = {
   economicSectorFacts: "../../data/imports/economic-sectors-annual.csv",
   tradeOverviewFacts: "../../data/imports/trade-overview-annual.csv",
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
+  demographyPopulationFacts: "../../data/imports/demography-population-annual.csv",
+  demographyDensityFacts: "../../data/imports/demography-density-annual.csv",
   inflationCpiFacts: "../../data/imports/cpi-national-monthly.csv",
   inflationTargets: "../../data/imports/nbg-inflation-target.csv",
   inflationCategoryFacts: "../../data/imports/cpi-categories-monthly.csv",
@@ -93,6 +96,7 @@ export const SERVED_DATA_FILES = {
 export { loadServedGovernmentDebtData } from "./governmentDebt/importGovernmentDebtFacts";
 export { loadServedGeneralGovernmentBalanceData } from "./generalGovernmentBalance/importGeneralGovernmentBalance";
 export { loadServedRegionalEconomyData } from "./regionalEconomies/importRegionalEconomies";
+export { loadServedDemographyData } from "./demography/importDemography";
 
 // Both live in servedDataSource.ts so the loaders re-exported above can read
 // the mode without importing this module back.
@@ -457,6 +461,7 @@ export function resetServedDataCacheForTests(): void {
   resetGdpOverviewCacheForTests();
   resetEconomicSectorsCacheForTests();
   resetRegionalEconomyCacheForTests();
+  resetDemographyCacheForTests();
   resetInflationCacheForTests();
 }
 

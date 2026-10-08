@@ -7,6 +7,9 @@ import { BreadcrumbTrail } from "../seo/breadcrumb-json-ld";
 import { ComingSoonBadge } from "../ui/coming-soon-badge";
 import { OpenDocumentVisual } from "./document-visuals";
 
+// Keys of `methodology.{key}` labels shown as non-clickable `მალე` rows.
+const FUTURE_DATASET_KEYS: readonly string[] = [];
+
 export function MethodologyHub({
   messages,
   liveEntries,
@@ -74,13 +77,15 @@ export function MethodologyHub({
         </div>
       </section>
 
+      {/* Every named dataset is live today; with no future entry the section is left out rather than shown empty. */}
+      {FUTURE_DATASET_KEYS.length > 0 ? (
       <section aria-labelledby="future-title" className="border-t border-[var(--hairline)] py-12 min-[768px]:py-16">
         <h2 id="future-title" className="font-[family-name:var(--font-display)] text-[22px] font-semibold">{message(messages, "methodology.futureTitle")}</h2>
         <p className="mt-3 max-w-[650px] text-[0.8125rem] leading-relaxed text-[var(--muted)]">
           {message(messages, "methodology.futureSummary")}
         </p>
         <div className="mt-7 grid gap-x-10 min-[640px]:grid-cols-2">
-          {["demography"].map((key) => (
+          {FUTURE_DATASET_KEYS.map((key) => (
             <div
               key={key}
               data-testid="methodology-future-row"
@@ -92,6 +97,7 @@ export function MethodologyHub({
           ))}
         </div>
       </section>
+      ) : null}
     </main>
   );
 }

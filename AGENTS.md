@@ -31,6 +31,14 @@ Repository precedence: `Project_Definition.md` section 2 owns scope; `DESIGN.md`
 - Define observable success criteria. For multi-step work, give a short plan pairing each step with its verification; skip formal planning for trivial changes. Reproduce bugs, verify invalid cases for validation changes, and compare behavior before and after refactoring.
 - Verify outcomes before claiming completion. During editing, run the narrowest relevant check; run the full completion gate once. Never repeat a passing gate unless its inputs changed. `CLAUDE.md` owns commands and completion requirements.
 
+## Reuse First
+
+Reuse what the repository already has; do not build parallel versions. Before adding anything, find the closest existing component, helper, registry, page or pipeline and follow it.
+
+- Use it as is. If it almost fits, make a small additive change (for example an optional prop) whose default leaves current output and tests unchanged. Do not fork, copy, or write a sibling.
+- A new component or abstraction is the exception: name the existing ones considered and why none can be extended.
+- Every spec and plan lists what is reused as is, what gets a small addition, and what is genuinely new. Duplicating existing code is a defect.
+
 ## Project Snapshot
 
 Fiscal.ge (repository and Vercel project name: GeoData.ge) is an implemented Georgian-first explorer of reviewed Georgian public-finance and economy data, not a broad public-data catalog. Georgian keeps the established URLs; English mirrors them under `/en`. Route families under `/explorer` are budget (expenditure, revenue, municipalities, single-year analysis, debt, deficit), economy (GDP, sectors, regions) and inflation (overview, categories, cities); alongside them sit `/methodology`, `/connect`, `/about` and the read-only `/mcp`. `Project_Definition.md` section 2 owns the authoritative list.

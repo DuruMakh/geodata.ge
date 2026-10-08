@@ -28,6 +28,7 @@ import type { SectorObservation } from "../data/economicSectors/types";
 import type { UnemploymentObservation } from "../data/unemployment/types";
 import { TRADE_OVERVIEW_DOCUMENT_ID, type TradeOverviewFact } from "../data/tradeOverview/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
+import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
 // same shapes as the CSV loaders. Used with the pooled singleton by the
@@ -549,6 +550,38 @@ export async function loadRegionalEconomyFactsFromMirror(
     sourceId: row.sourceDocumentId,
     sourceLocator: row.sourceLocator,
     lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export async function loadDemographyFactsFromMirror(
+  db: MirrorClient,
+): Promise<DemographyObservation[]> {
+  const rows = await db.demographyFact.findMany({
+    orderBy: [
+      { seriesId: "asc" },
+      { geographyId: "asc" },
+      { year: "asc" },
+      { sex: "asc" },
+      { ageGroup: "asc" },
+      { citizenshipId: "asc" },
+      { settlement: "asc" },
+    ],
+  });
+  return rows.map((row) => ({
+    seriesId: row.seriesId,
+    geographyId: row.geographyId,
+    year: row.year,
+    value: row.value.toFixed(),
+    unit: row.unit,
+    estimateBasis: row.estimateBasis as DemographyObservation["estimateBasis"],
+    status: row.status as DemographyObservation["status"],
+    sourceId: row.sourceDocumentId,
+    sourceLocator: row.sourceLocator,
+    lastReviewedAt: isoDate(row.lastReviewedAt),
+    ...(row.sex ? { sex: row.sex as Sex } : {}),
+    ...(row.ageGroup ? { ageGroup: row.ageGroup } : {}),
+    ...(row.citizenshipId ? { citizenshipId: row.citizenshipId } : {}),
+    ...(row.settlement ? { settlement: row.settlement as Settlement } : {}),
   }));
 }
 

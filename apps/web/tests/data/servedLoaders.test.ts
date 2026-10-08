@@ -4,6 +4,7 @@ import { loadServedGeneralGovernmentBalanceData } from "../../lib/data/generalGo
 import { loadServedGdpOverviewData, loadServedGdpOverviewRows } from "../../lib/data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData, loadServedEconomicSectorsRows } from "../../lib/data/economicSectors/importEconomicSectors";
 import { loadServedRegionalEconomyData, loadServedRegionalEconomyRows } from "../../lib/data/regionalEconomies/importRegionalEconomies";
+import { loadServedDemographyData, loadServedDemographyRows } from "../../lib/data/demography/importDemography";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
 import { resetServedDataCacheForTests } from "../../lib/data/servedData";
 
@@ -16,6 +17,7 @@ const loaders = {
   gdp: loadServedGdpOverviewData,
   sectors: loadServedEconomicSectorsData,
   regional: loadServedRegionalEconomyData,
+  demography: loadServedDemographyData,
   inflation: loadServedInflationData,
   // The three the snapshot reads before the numeric projection. Their row memo
   // sits behind the numbers memo, so a reset that clears only the numbers still
@@ -24,6 +26,7 @@ const loaders = {
   gdpRows: loadServedGdpOverviewRows,
   sectorRows: loadServedEconomicSectorsRows,
   regionalRows: loadServedRegionalEconomyRows,
+  demographyRows: loadServedDemographyRows,
 } as const;
 
 // Every other file in tests/data pins the mode. Without this the file reads

@@ -36,11 +36,11 @@ for (const [section, breakdown] of [["overview", "national"], ["age", "age"], ["
   expect(metadata.alternates?.canonical).toEqual(expect.stringContaining(`${locale === "en" ? "/en" : ""}/explorer/unemployment/${section}`));
   expect(metadata.alternates?.languages).toMatchObject({ ka: expect.stringContaining(`/explorer/unemployment/${section}`), en: expect.stringContaining(`/en/explorer/unemployment/${section}`) });
 });
-test("navigation activates unemployment and leaves demography as a marker", async () => {
+test("navigation activates unemployment and leaves demography closed", async () => {
   const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={await getMessages("en", ["common", "controls"])}><DataSidebar /></I18nProvider>);
   expect(markup).toMatch(/<a[^>]+data-testid="unemployment-link"[^>]+aria-current="page"/);
   expect(markup).toContain('href="/en/explorer/unemployment"');
-  expect(markup).not.toContain('href="/en/explorer/demography"');
+  expect(markup).not.toContain('data-testid="demography-population-link"');
   expect(markup).not.toContain('href="/en/explorer/expenditure"');
   const budgetLink = /<a[^>]+href="\/en\/explorer"[^>]*>/.exec(markup)![0];
   expect(budgetLink).not.toContain("border-[var(--accent)]");

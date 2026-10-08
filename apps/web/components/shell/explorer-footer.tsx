@@ -13,6 +13,7 @@ export function ExplorerFooter({locale}:{locale:Locale}) {
   const {pathname}=splitLanguagePath(usePathname());
   const economy=pathname==='/explorer/economy'||pathname.startsWith('/explorer/economy/');
   const inflation=pathname==='/explorer/inflation'||pathname.startsWith('/explorer/inflation/');
+  const demography=pathname==='/explorer/demography'||pathname.startsWith('/explorer/demography/');
   let noteKey='common.budgetSourceNote';
   if (pathname==='/explorer') noteKey='common.budgetHubSourceNote';
   else if (pathname==='/explorer/deficit') noteKey='common.deficitSourceNote';
@@ -20,6 +21,7 @@ export function ExplorerFooter({locale}:{locale:Locale}) {
   else if (pathname==='/explorer/trade'||pathname.startsWith('/explorer/trade/')) noteKey='common.geostatSourceNote';
   else if (pathname==='/explorer/inflation/categories'||pathname==='/explorer/inflation/products') noteKey='common.geostatSourceNote';
   else if (inflation) noteKey='common.inflationSourceNote';
+  else if (demography) noteKey='common.geostatSourceNote';
   else if (pathname==='/explorer/economy/sectors'||pathname==='/explorer/economy/regions'||pathname.startsWith('/explorer/economy/regions/')) noteKey='common.geostatSourceNote';
   else if (economy) noteKey='common.economySourceNote';
   else if (['/explorer/expenditure','/explorer/revenue','/explorer/debt','/explorer/municipalities'].includes(pathname)) noteKey='common.budgetStatisticsSourceNote';

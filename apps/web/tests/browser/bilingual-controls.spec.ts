@@ -34,5 +34,5 @@ test("English mobile shared controls and coming-soon labels are readable", async
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await page.getByTestId("sidebar-toggle").click();
-  await expect(page.getByTestId("data-sidebar").getByText("Coming soon", { exact: true })).toHaveCount(1);
+  await expect(page.getByTestId("data-sidebar").getByText("Coming soon", { exact: true })).toHaveCount(0);
 });

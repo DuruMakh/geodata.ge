@@ -56,5 +56,7 @@
   "common.updated": "Updated {date}",
   "common.trade": "Trade",
   "common.tradeOverview": "Overview",
-  "common.dataTrade": "DATA · TRADE"
+  "common.dataTrade": "DATA · TRADE",
+  "common.dataDemography": "Data · Demography",
+  "common.demographyPopulation": "Population"
 }

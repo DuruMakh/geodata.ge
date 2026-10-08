@@ -99,7 +99,7 @@ test("language switch keeps the state", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-mom")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("the sidebar lists four datasets and the hub links all four live sections", async ({ page }) => {
+test("the sidebar lists six datasets and the hub links all four live sections", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/explorer/inflation");
   await expect(page.getByTestId("inflation-link")).toHaveAttribute("aria-current", "page");
@@ -112,7 +112,7 @@ test("the sidebar lists four datasets and the hub links all four live sections",
   await page.getByTestId("inflation-hub").getByRole("link").first().click();
   await ready(page);
   await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(1);
+  await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(0);
 });
 
 test("the methodology Dataset is the node the catalog references", async ({ page }) => {

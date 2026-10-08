@@ -1247,6 +1247,7 @@ const readPayloadOccurrences = (page: Page) =>
       priceBases: count("priceBasis"),
       accountingStandards: count("accountingStandard"),
       calculations: count("calculation"),
+      estimateBases: count("estimateBasis"),
       reviewDates: count("lastReviewedAt"),
     };
   });
@@ -1262,12 +1263,17 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
     "/explorer/economy/regions/imereti",
     "/explorer/inflation/overview",
     "/explorer/inflation/categories",
+    "/explorer/demography",
+    "/explorer/demography/population",
+    "/explorer/demography/population/georgia",
+    "/explorer/demography/population/region/adjara",
+    "/explorer/demography/population/batumi",
   ]) {
     await page.goto(`${TEST_BASE_URL}${route}`);
-    // The economy hub and the regions index are link maps with no client
-    // explorer, so they never raise the app-ready flag; their payload is in the
-    // served HTML regardless.
-    if (!["/explorer/economy", "/explorer/economy/regions"].includes(route))
+    // The economy and demography hubs and the regions index are link maps with
+    // no client explorer, so they never raise the app-ready flag; their payload
+    // is in the served HTML regardless.
+    if (!["/explorer/economy", "/explorer/economy/regions", "/explorer/demography"].includes(route))
       await expectAppReady(page);
     const occurrences = await readPayloadOccurrences(page);
 
@@ -1280,6 +1286,7 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
         valuations: occurrences.valuations,
         priceBases: occurrences.priceBases,
         calculations: occurrences.calculations,
+        estimateBases: occurrences.estimateBases,
       },
       route,
     ).toEqual({
@@ -1288,6 +1295,7 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
       valuations: 0,
       priceBases: 0,
       calculations: 0,
+      estimateBases: 0,
     });
 
     // The debt page also carries the budget explorer's national GDP rows, whose

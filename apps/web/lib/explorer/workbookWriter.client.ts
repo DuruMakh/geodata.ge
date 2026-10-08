@@ -12,6 +12,8 @@ const INK_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor:
 const TITLE_FILL = { type: "pattern" as const, pattern: "solid" as const, fgColor: { argb: "FFF1EADC" } };
 const INK_COLOR = { argb: "FF1E1B16" };
 const PAPER_COLOR = { argb: "FFF7F2E9" };
+// Two lines of 15 points, the line height `sourceRowHeight` uses.
+const TWO_LINE_HEADER_HEIGHT = 30;
 
 function columnLetter(column: number): string {
   let remaining = column;
@@ -143,13 +145,16 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     ? [readable.headerLabels.category, ...readable.headerLabels.columns]
     : [workbookMessage(locale, "workbook.category"), ...readable.years];
   const headers = [...leading, ...(readable.showChangeColumn === false ? [] : [changeHeader])];
+  // Opt-in: Excel cuts a right-aligned header that overruns its column at the start, so a label that long wraps instead.
+  const wrapHeaders = readable.headerLabels?.wrap === true;
   headers.forEach((header, index) => {
     const cell = worksheet.getCell(3, index + 1);
     cell.value = header;
     cell.fill = INK_FILL;
     cell.font = { bold: true, color: PAPER_COLOR };
-    cell.alignment = { horizontal: index === 0 ? "left" : "right", vertical: "middle" };
+    cell.alignment = { horizontal: index === 0 ? "left" : "right", vertical: "middle", ...(wrapHeaders ? { wrapText: true } : {}) };
   });
+  if (wrapHeaders) worksheet.getRow(3).height = TWO_LINE_HEADER_HEIGHT;
 
   readable.rows.forEach((row, index) => writeReadableRow(worksheet, index + 4, row, readable.years, isPercentage, locale, readable.showChangeColumn !== false, readable.amountDecimals, readable.numberFormat));
 
@@ -227,7 +232,7 @@ function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel[
   const widths = [10, 28, 42, 18, 12, 16];
   analysis.headers.forEach((_, index) => {
     const column = index + 1;
-    worksheet.getColumn(column).width = widths[index] ?? 18;
+    worksheet.getColumn(column).width = analysis.columnWidths?.[index] ?? widths[index] ?? 18;
     const header = worksheet.getCell(1, column);
     header.alignment = { vertical: "top", wrapText: true };
     if (column === 2 || column === 3) {

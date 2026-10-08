@@ -24,7 +24,7 @@ Not in this stage: pages, routes, charts, Excel, MCP, publications or any sideba
 User-approved on 2026-10-01:
 
 1. Include families A–D. The census snapshot, projections and budget-linked indicators wait for their own approval.
-2. The 2025 census break is shown as Geostat published it, marked as a break. No rescaling, no splicing, no second estimate line, and no growth or rate computed across the break.
+2. The 1 January 2025 census re-base is shown as Geostat published it, marked as a break. No rescaling, no splicing, no second estimate line, and no growth or rate computed across the break.
 3. Depth: Georgia from 2004; regions and municipalities from 2015.
 4. Collection is by direct inspection of Geostat's published tables, from an environment that can reach them.
 

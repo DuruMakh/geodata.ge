@@ -111,6 +111,18 @@ export type ValueUnit = { divisor: number; label: string; decimals: number };
 export const UNIT_BN: ValueUnit = { divisor: BILLION, label: "მლრდ", decimals: 1 };
 export const UNIT_MLN: ValueUnit = { divisor: MILLION, label: "მლნ", decimals: 0 };
 
+/** Population: whole persons in cells, tooltips and Excel; density at the one decimal Geostat publishes. */
+export const UNIT_PERSONS: ValueUnit = { divisor: 1, label: "", decimals: 0 };
+export const UNIT_DENSITY: ValueUnit = { divisor: 1, label: "", decimals: 1 };
+
+/**
+ * The chart-axis unit for persons: thousands, labelled in the page language. One decimal keeps the
+ * axis quantum at 100 persons, so a small municipality still gets round gridlines.
+ */
+export function thousandsUnit(locale: Locale): ValueUnit {
+  return { divisor: 1_000, label: formatMessages[locale]["format.thousands"], decimals: 1 };
+}
+
 /**
  * The fewest decimals (0..cap) that keep every non-zero value in `values`
  * distinguishable from zero once scaled into `base`.
