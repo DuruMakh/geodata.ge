@@ -17,6 +17,7 @@ import { buildTooltipRows } from "./editorial-line-chart";
 export type StackSegment = { id: string; label: string; color: string; values: Array<number | null> };
 export type StackedColumnChartProps = {
   periods: number[];
+  periodsPerYear?: number;
   segments: StackSegment[];
   overlay: { label: string; values: Array<number | null> } | null;
   formatPeriod: (period: number) => string;
@@ -44,6 +45,7 @@ const MAX_BAR_WIDTH = 28;
 
 export function StackedColumnChart({
   periods,
+  periodsPerYear = 12,
   segments,
   overlay,
   formatPeriod,
@@ -100,10 +102,10 @@ export function StackedColumnChart({
     plotHeight,
     yearCount: count,
     gridStepCount: gridSteps,
-    periodsPerYear: 12,
+    periodsPerYear,
     firstPeriod: periods[0],
   });
-  const labelIndices = new Set(periodLabelIndices(periods, 12));
+  const labelIndices = new Set(periodLabelIndices(periods, periodsPerYear));
 
   // The move-to goes on the first point that exists, not on index 0: an overlay
   // starting later than the columns would otherwise open the path with "L".

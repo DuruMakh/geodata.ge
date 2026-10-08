@@ -18,6 +18,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(toggle("trade.turnover")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 4");
     await expect(page.getByTestId("trade-summary")).toHaveAttribute("data-end-year", "2025");
+    await expect(page.getByTestId("trade-balance-context").getByRole("img").getByText("1995", { exact: true })).toHaveCount(1);
+    await expect(page.getByTestId("trade-balance-context").getByRole("img").getByText("2025", { exact: true })).toHaveCount(1);
     await expect(page.getByTestId("trade-summary").locator('[data-indicator="trade.balance"]')).toContainText("−11.4");
     const ticks = page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]');
     expect(Math.min(...await ticks.evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x)))).toBeGreaterThanOrEqual(0);

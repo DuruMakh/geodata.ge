@@ -148,6 +148,18 @@ Overview and Gender retain their national unemployment-rate default; regional pa
 
 This extension adds the private Prisma serving mirror and transactional import support, seven original workbooks, source-page capture and survey metadata. The navigation amendment changes no reviewed data or database structure. It adds no unemployment MCP tools, central machine-readable dataset publications, quarterly data, forecasts, NEET, municipal unemployment, age-group detail routes, new chart library or advanced visualization beyond the approved age heatmap. Publishing and live database migration/import remain separate delivery operations. Authority: `docs/superpowers/specs/2026-10-04-unemployment-reuse-explorer-design.md`; methodology: `docs/data-methodology/unemployment-annual.md`.
 
+## 2E. Approved Trade hub and national goods Overview
+
+Approved on 2026-10-08: a Trade hub at `/explorer/trade` with one working Overview card at `/explorer/trade/overview`, mirrored under `/en`. Trade follows Unemployment in the sidebar; Demography remains a marker. The research foundation above remains separate from this bounded serving extension.
+
+The Overview serves annual national goods totals for 1995–2025: Total trade (exports + imports), Exports, Imports and Trade balance (exports − imports), all in nominal USD. Only Total trade is initially selected and remains removable. Any checkbox combination is valid. Reuse the existing line chart, table, annual range controls, searchable selector and three-sheet Excel export. URL state and language changes preserve years, mode and explicitly empty selections.
+
+Four summary figures use the active end year independently of checkbox selection. A single signed balance bar chart uses the active years and remains visible in table mode and with an empty main selection. Missing observations remain missing; no percentage-growth, GDP-share, inflation adjustment or currency conversion is added.
+
+Promote only the 62 national export/import observations and 62 reviewed turnover/balance derivations into canonical CSVs and the private parity-checked database mirror. Preserve exact source decimals, FOB exports, CIF imports and unspecified publication status. Total exports include re-exports; separate re-export, services, country, product, regional, partial-2026 and forecast comparisons are outside this page. The wider research package's two services acceptance holds remain unresolved. Publish only the original national goods workbook and the two approved methodology/metadata captures through the existing source archive. No Trade MCP tool, central bulk dataset publication or new public API is included.
+
+Scope: `docs/superpowers/specs/2026-10-07-trade-overview-design.md`. Data rules: `docs/data-methodology/trade-annual.md`. Publishing and live database migration/import remain separate authorized operations.
+
 ## 3. Target Users
 
 Primary users:

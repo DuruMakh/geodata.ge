@@ -17,3 +17,12 @@ test.each(["en", "ka"] as const)("renders %s four ordered checkboxes with one ch
   expect(html).toContain('data-end-year="2025"');
   expect(html).not.toMatch(/GEL|₾|GDP/);
 });
+
+test("the annual balance context labels its first and last years", async () => {
+  const facts = tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) }));
+  facts.push({ ...facts[0], year: 1995 });
+  const html = renderToStaticMarkup(<I18nProvider locale="en" englishLabels={{}} messages={await getMessages("en", ["trade", "controls", "format", "main"])}><TradeOverview facts={facts} sources={[]} lastReviewedAt="2026-10-08" siteOrigin="https://fiscal.ge" /></I18nProvider>);
+  const context = html.slice(html.indexOf('data-testid="trade-balance-context"'));
+  expect(context).toContain(">1995</text>");
+  expect(context).toContain(">2025</text>");
+});

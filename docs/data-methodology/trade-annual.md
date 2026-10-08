@@ -57,7 +57,9 @@ The preparation checks the original national workbook's SHA-256, stored XML deci
 
 The scoped report records `national_goods_overview` acceptance separately from the wider research package. The two UK services holds remain unchanged and do not become accepted comparisons. A hold affecting the selected national goods observations blocks this subset. The original research files are never rewritten by the serving preparer.
 
-Historical records use actual basis to distinguish observed trade from forecasts. Their source publication status remains unspecified; a complete annual period is not labelled final. Exports retain FOB valuation, imports retain CIF valuation, and both remain nominal USD. The public page adds no services, re-exports, partial 2026 periods, GDP ratios or inflation adjustment.
+Historical records use actual basis to distinguish observed trade from forecasts. Their source publication status remains unspecified; a complete annual period is not labelled final. Exports retain FOB valuation, imports retain CIF valuation, and both remain nominal USD. Total exports include re-exports; the public page adds no separate re-export series, services, partial 2026 periods, GDP ratios or inflation adjustment.
+
+The exact native source identity `geostat_trade_ftrade-1995-2026` remains in the facts and cell references. Its database source document uses the existing stable-ID convention, `source.geostat_trade_ftrade_1995_2026`. The native filename remains `FTrade_1995-2026.xlsx`; the public archive URL uses lowercase `ftrade_1995-2026.xlsx`, as required by the archive registry. The private mirror stores amounts as Decimal(40,20), retains native text and nullable derived metadata, and checks every canonical field before the import transaction commits.
 
 Run `npm run data:prepare-trade-overview` to regenerate the two serving artifacts and `npm run data:check-trade-overview` to reproduce their exact bytes without writing. Serving reads only these small artifacts; it does not import the raw workbook reader.
 
