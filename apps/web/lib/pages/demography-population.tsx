@@ -58,14 +58,17 @@ export async function loadPopulationBasics(locale: Locale) {
   return { facts, clientFacts: facts.map(projectDemographyObservation), municipal, presentation, places };
 }
 
-/** The source line of the index and of every place page: the source text for the years shown, then the link to the methodology page. Inline content only. */
+/**
+ * The source line of the index and of every place page: the source text for the years shown, then the link to the methodology page,
+ * closed by a full stop so that the "Boundaries: ..." the index appends starts a new sentence. Inline content only.
+ */
 export function populationSourceNote({ locale, messages }: Presentation, start: number, end: number) {
   return (
     <>
       {message(messages, "demography.source", { start, end })}{" "}
       <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
         {message(messages, "common.methodology")}
-      </Link>
+      </Link>.
     </>
   );
 }

@@ -18,6 +18,9 @@ import {
 } from "../../lib/pages/demography-population";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
+// The methodology link closes the source sentence with a full stop, so the Boundaries credit the index appends starts a new one.
+// Written without either language's words, so it holds for both.
+const SENTENCE_CLOSED_BEFORE_BOUNDARIES = /\/methodology\/demography"[^>]*>[^<]+<\/a>\. [^<]+<a href="https:\/\/www\.openstreetmap\.org\/copyright"/;
 const original = process.env.NEXT_PUBLIC_SITE_URL;
 beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
@@ -108,6 +111,7 @@ describe("population index page", () => {
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
     expect(html).toContain('href="/en/methodology/demography"');
+    expect(html).toMatch(SENTENCE_CLOSED_BEFORE_BOUNDARIES);
     expect(html).not.toMatch(GEORGIAN);
   });
 
@@ -118,6 +122,7 @@ describe("population index page", () => {
     expect(html).toContain("64 მუნიციპალიტეტი");
     expect(html).toContain('href="/explorer/demography/population/batumi"');
     expect(html).toContain('href="/methodology/demography"');
+    expect(html).toMatch(SENTENCE_CLOSED_BEFORE_BOUNDARIES);
     expect(html).not.toMatch(/₾|მშპ|ერთ მოსახლეზე/);
   });
 

@@ -95,6 +95,12 @@ describe("place pages", () => {
       expect(html).toContain('href="/en/methodology/demography"');
     }
   });
+
+  it("ends its source line with the methodology link and a full stop, as the index does before its Boundaries credit", async () => {
+    for (const locale of ["en", "ka"] as const) {
+      expect(await page({ kind: "municipality", slug: "khulo" }, locale), locale).toMatch(/\/methodology\/demography"[^>]*>[^<]+<\/a>\.<\/p>/);
+    }
+  });
 });
 
 // The rule in docs/data-methodology/demography.md: a page that shows a density says which area it uses for Tbilisi.
