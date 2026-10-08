@@ -183,10 +183,11 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           <table data-testid="comparison-table" className="w-full min-w-[560px] table-fixed border-collapse @max-[768px]:min-w-0">
             <caption className="sr-only">{message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}</caption>
             <colgroup>
-              {/* On a 360px phone (320px column) the signed change (+3,962.3) needs a little more than 70px. */}
-              <col className="w-[44%] @max-[340px]:w-[38%]" />
+              {/* Phones: the ცვლილება header needs ~76px on every platform, so the name column narrows
+                  (12px names, tighter swatch gap) and leaves the two amounts (6,134.2) their room. */}
+              <col className="w-[44%] @max-[768px]:w-[40%] @max-[340px]:w-[33%]" />
               <col />
-              <col className="@max-[768px]:w-[70px] @max-[340px]:w-[78px]" />
+              <col className="@max-[768px]:w-[76px] @max-[340px]:w-[80px]" />
               <col />
             </colgroup>
             <thead>
@@ -207,10 +208,10 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
                   key={row.label}
                   className={`border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)] ${row.isTotal ? "bg-[var(--tint)]" : ""}`}
                 >
-                  <td className="py-2.5 pr-3" title={row.label}>
-                    <span className="inline-flex min-w-0 items-start gap-[9px]">
+                  <td className="py-2.5 pr-3 @max-[768px]:pr-2" title={row.label}>
+                    <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
                       <SwatchBar color={row.color} className="mt-[7px]" />
-                      <span className="text-[0.78125rem] leading-[1.4] text-[var(--ink)]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
+                      <span className="min-w-0 break-words text-[0.78125rem] leading-[1.4] text-[var(--ink)] @max-[768px]:text-[0.75rem]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
                         {row.label}
                       </span>
                     </span>

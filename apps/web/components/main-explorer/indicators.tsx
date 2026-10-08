@@ -230,7 +230,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           <colgroup>
             <col className="w-[44%]" />
             <col />
-            <col className="@max-[768px]:w-[70px]" />
+            <col className="@max-[768px]:w-[76px]" />
             <col />
           </colgroup>
           <thead>

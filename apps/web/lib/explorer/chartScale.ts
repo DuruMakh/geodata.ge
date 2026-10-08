@@ -91,11 +91,13 @@ export const AXIS_LABEL_GAP = 10;
 /**
  * Left padding that keeps every right-aligned y label inside the viewBox (DESIGN.md
  * §8.3: labels never clip). Never below `minimum`, so short axes keep the house layout.
+ * The 8-unit cushion absorbs glyph-width differences between platforms' font rendering
+ * (Linux Chromium draws some labels ~1 unit wider than the estimate).
  */
 export function axisLeftPaddingFor(labels: readonly string[], minimum: number, fontSize = 11): number {
   let widest = 0;
   for (const label of labels) widest = Math.max(widest, axisLabelWidth(label, fontSize));
-  return Math.max(minimum, Math.ceil(widest + AXIS_LABEL_GAP + 4));
+  return Math.max(minimum, Math.ceil(widest + AXIS_LABEL_GAP + 8));
 }
 
 /**
