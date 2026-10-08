@@ -35,7 +35,7 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   forecastLabel?: string;
   preliminaryYears?: number[];
   preliminaryLabel?: string;
-  /** Years re-based by the publisher: a 2px rule is drawn left of the column and `breakLabel` is printed on its header. */
+  /** Years re-based by the publisher: a 2px rule is drawn left of the column and `breakLabel` is printed on its header. In the year-rows layout the rule runs under the year's row, between it and the year before, and the label sits in the row's header. */
   breakYears?: number[];
   breakLabel?: string;
   /** Each row's `kaLabel` already holds its label in the page language, with no catalogue entry to look up. */
@@ -105,7 +105,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   const lastIndex = years.length - 1;
   const breakSet = new Set((breakYears ?? []).filter((year) => years.indexOf(year) > 0));
   const breakStyle = (year: number) => (breakSet.has(year) ? { borderLeft: "2px solid var(--ink)" } : undefined);
-  // On phones the label drops under the year at 11px, as the status marks do.
+  // The label rides on its year's header in both layouts; on phones it drops under the year at 11px, as the status marks do.
   const breakMark = (year: number) =>
     breakLabel && breakSet.has(year) ? <sup className={`${STATUS_MARK_CLASS} normal-case tracking-normal`}>{breakLabel}</sup> : null;
   const cellValue = (row: Row, year: number): string => {
@@ -213,9 +213,16 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                 </tr>
               ))}
               {years.map((year, index) => ({ year, latest: index === lastIndex })).reverse().map(({ year, latest }) => (
-                <tr key={year} data-year={year} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
+                <tr
+                  key={year}
+                  data-year={year}
+                  className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]"
+                  // Newest first, so the rule under a break year's row is the one between it and the year before.
+                  style={breakSet.has(year) ? { borderBottom: "2px solid var(--ink)" } : undefined}
+                >
                   <th scope="row" className="pr-2 text-left font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold text-[var(--ink)]" style={cellPad}>
                     {year}
+                    {breakMark(year)}
                   </th>
                   {seriesRows.map((row) => (
                     <td
