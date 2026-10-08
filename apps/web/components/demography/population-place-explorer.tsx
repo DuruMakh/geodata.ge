@@ -131,7 +131,7 @@ export function PopulationPlaceExplorer({
                     { value: "table", label: message(messages, "municipal.table"), testId: "population-mode-table" },
                   ]}
                 />
-                <span className="min-w-0 font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]">{t("unitLine")}</span>
+                <span className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{t("unitLine")}</span>
               </div>
               {!hasSelection ? (
                 <div className="mt-5"><Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout></div>
@@ -239,7 +239,7 @@ export function PopulationPlaceExplorer({
             <Link
               href={pageHref(backHref, locale)}
               data-testid="population-back-link"
-              className="mt-3.5 block text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
+              className="mt-1.5 flex min-h-11 items-center text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
             >
               {t("backToIndex")}
             </Link>

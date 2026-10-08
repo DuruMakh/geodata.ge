@@ -26,13 +26,13 @@ export function PopulationHighlightsSection({
     <section data-testid="population-highlights" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <SectionTitle>{t("highlights")}</SectionTitle>
-        <p className="text-[12.5px] text-[var(--muted)]">{t("rowYear", { year: highlights.year })}</p>
+        <p className="text-[0.78125rem] text-[var(--muted)]">{t("rowYear", { year: highlights.year })}</p>
       </div>
       <div className={KPI_GRID_CLASS}>
         <HeroKpi label={kpis.heroLabel} value={kpis.heroValue}>
-          <p className="font-[family-name:var(--font-numeric)] text-[12px] text-[var(--muted)]">{kpis.heroBasis}</p>
-          {kpis.shareLine ? <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">{kpis.shareLine}</p> : null}
-          {kpis.unavailable ? <p className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">{kpis.unavailable}</p> : null}
+          <p className="font-[family-name:var(--font-numeric)] text-[0.75rem] text-[var(--muted)]">{kpis.heroBasis}</p>
+          {kpis.shareLine ? <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">{kpis.shareLine}</p> : null}
+          {kpis.unavailable ? <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">{kpis.unavailable}</p> : null}
           <Sparkline values={highlights.trend} color={placeColor(highlights.place)} />
         </HeroKpi>
         <SideKpiList kpis={kpis.side} />
