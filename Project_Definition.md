@@ -148,9 +148,9 @@ Overview and Gender retain their national unemployment-rate default; regional pa
 
 This extension adds the private Prisma serving mirror and transactional import support, seven original workbooks, source-page capture and survey metadata. The navigation amendment changes no reviewed data or database structure. It adds no unemployment MCP tools, central machine-readable dataset publications, quarterly data, forecasts, NEET, municipal unemployment, age-group detail routes, new chart library or advanced visualization beyond the approved age heatmap. Publishing and live database migration/import remain separate delivery operations. Authority: `docs/superpowers/specs/2026-10-04-unemployment-reuse-explorer-design.md`; methodology: `docs/data-methodology/unemployment-annual.md`.
 
-## 2E. Approved Trade hub and national goods Overview
+## 2E. Approved Trade hub, national goods Overview and Trading partners
 
-Approved on 2026-10-08: a Trade hub at `/explorer/trade` with one working Overview card at `/explorer/trade/overview`, mirrored under `/en`. Trade follows Unemployment in the sidebar; Demography remains a marker. The research foundation above remains separate from this bounded serving extension.
+Approved on 2026-10-08: a Trade hub at `/explorer/trade` with Overview at `/explorer/trade/overview` and Trading partners at `/explorer/trade/partners`, mirrored under `/en`. Trade follows Unemployment in the sidebar; Demography remains a marker. The research foundation above remains separate from these bounded serving extensions.
 
 The Overview serves annual national goods totals for 1995–2025: Total trade (exports + imports), Exports, Imports and Trade balance (exports − imports), all in nominal USD. Only Total trade is initially selected and remains removable. Any checkbox combination is valid. Reuse the existing line chart, table, annual range controls, searchable selector and three-sheet Excel export. URL state and language changes preserve years, mode and explicitly empty selections.
 
@@ -159,6 +159,10 @@ Four summary figures use the active end year independently of checkbox selection
 Promote only the 62 national export/import observations and 62 reviewed turnover/balance derivations into canonical CSVs and the private parity-checked database mirror. Preserve exact source decimals, FOB exports, CIF imports and unspecified publication status. Total exports include re-exports; separate re-export, services, country, product, regional, partial-2026 and forecast comparisons are outside this page. The wider research package's two services acceptance holds remain unresolved. Publish only the original national goods workbook and the two approved methodology/metadata captures through the existing source archive. No Trade MCP tool, central bulk dataset publication or new public API is included.
 
 Scope: `docs/superpowers/specs/2026-10-07-trade-overview-design.md`. Data rules: `docs/data-methodology/trade-annual.md`. Publishing and live database migration/import remain separate authorized operations.
+
+Trading partners adds the approved trends-first comparison of 212 reviewed country identities and five overlapping published country groups (EU, CIS, BSEC, OECD and GUAM), with a removable national reference reused from Overview. One measure is active at a time: Total trade, Exports, Imports or Balance. Countries and Country groups browse one unlimited shared selection; URL state, table and Excel retain mixed and explicitly empty selections. Clear and Select all always cover the full catalogue. The end-year ranking is independent of selected lines: top ten numerical countries initially with complete/unavailable coverage on expansion, or all five groups. Amount shares use the same-year matching national total; Balance has no share and ranks by absolute magnitude. Groups are never summed or reconstructed from present-day membership.
+
+Promote only 12,462 reviewed country/group source observations and 10,530 valid turnover/balance derivations into the separate partner serving package and private mirror. Preserve missingness, true zero, historical identities, exact decimals and native source references. Publish the four original country/group workbooks alongside Overview's sources. No country detail page, map, services, domestic-export/re-export metric, growth, partial-year series, currency conversion, forecast, MCP or bulk-publication extension is added. Approved spec: `docs/superpowers/specs/2026-10-08-trade-partners-design.md`.
 
 ## 3. Target Users
 

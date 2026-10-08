@@ -51,13 +51,15 @@ describe("indexable Fiscal.ge routes", () => {
     // add bilingual identities, and the inflation cities page and its six city
     // pages add seven more bilingual pairs (the Georgia page plus one per city).
     // The four unemployment data pages add four bilingual pairs behind their hub.
-    expect(urls).toHaveLength(282);
+    expect(urls).toHaveLength(284);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
     expect(urls).toContain("https://fiscal.ge/connect");
     expect(urls).toContain("https://fiscal.ge/explorer/debt");
     expect(urls).toContain("https://fiscal.ge/explorer/deficit");
+    expect(urls).toContain("https://fiscal.ge/explorer/trade/partners");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/trade/partners");
     expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
     expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");
