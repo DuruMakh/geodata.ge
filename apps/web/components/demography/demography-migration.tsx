@@ -81,7 +81,8 @@ export function MigrationExplorer({
   const indicators = buildMigrationIndicators(facts, state);
   const groupLabel = (group: MigrationGroup) => t(`group.${group}`);
   const direction = (id: MigrationDirection) => t(DIRECTION_KEYS[id]);
-  const matches = (group: MigrationGroup) => matchesLabelQuery(query, [groupLabel(group)]);
+  // The stable id is a second label so Latin names (russia, turkey, ...) also find a group on the Georgian page.
+  const matches = (group: MigrationGroup) => matchesLabelQuery(query, [groupLabel(group), group]);
   const netLabel = t(model.allSelected ? "netLabel" : "netSelectedLabel");
   const scaled = (values: Record<number, number | null>, sign: 1 | -1) =>
     model.years.map((year) => (values[year] === null || values[year] === undefined ? null : (sign * values[year]!) / CHART_SCALE));
