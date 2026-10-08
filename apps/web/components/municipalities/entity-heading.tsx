@@ -49,7 +49,7 @@ export function EntityHeading({ title, triggerLabel, metaLine, entityId, navigat
             aria-expanded={pickerOpen}
             aria-haspopup="dialog"
             onClick={() => setPickerOpen((current) => !current)}
-            className="group inline-block max-w-full truncate align-bottom cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)] min-[768px]:overflow-visible min-[768px]:whitespace-normal"
+            className="group inline-block max-w-full align-bottom break-words cursor-pointer border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] font-[family-name:var(--font-display)] text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]"
           >
             {triggerLabel}
             <span
@@ -75,11 +75,13 @@ export function EntityHeading({ title, triggerLabel, metaLine, entityId, navigat
           data-testid="municipal-entity-navigation"
           className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink"
         >
-          <a href={navigation.prev.href} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            ← {navigation.prev.label}
+          {/* Plain <a> on purpose (full page load); 44px-tall targets below 768px,
+              matching EntityNeighbourLinks on the other detail pages. */}
+          <a href={navigation.prev.href} className="flex min-h-11 min-w-0 items-center font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
+            <span className="min-w-0 truncate">← {navigation.prev.label}</span>
           </a>
-          <a href={navigation.next.href} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            {navigation.next.label} →
+          <a href={navigation.next.href} className="flex min-h-11 min-w-0 items-center justify-end text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
+            <span className="min-w-0 truncate">{navigation.next.label} →</span>
           </a>
         </span>
       ) : null}

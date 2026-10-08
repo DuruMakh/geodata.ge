@@ -23,6 +23,7 @@ import {
   loadGdpOverviewFactsFromMirror,
   loadEconomicSectorFactsFromMirror,
   loadUnemploymentFactsFromMirror,
+  loadTradeOverviewFactsFromMirror,
   loadRegionalEconomyFactsFromMirror,
   loadDemographyFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
@@ -115,6 +116,9 @@ export async function loadEconomicSectorFactsFromDb() {
 }
 export async function loadUnemploymentFactsFromDb() {
   return loadUnemploymentFactsFromMirror(prisma);
+}
+export async function loadTradeOverviewFactsFromDb() {
+  return loadTradeOverviewFactsFromMirror(prisma);
 }
 export async function loadRegionalEconomyFactsFromDb() {
   return loadRegionalEconomyFactsFromMirror(prisma);

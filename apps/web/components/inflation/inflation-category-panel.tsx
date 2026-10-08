@@ -80,6 +80,17 @@ export function InflationCategoryPanel({
         allSelected={selectedDivisions === divisionCount && selectedSubgroups === 0}
         onToggleAll={onToggleAll}
         hasVisibleMatches={visible.length > 0}
+        // The two row values were named for screen readers only; sighted readers saw
+        // "33.6%  +1.7" with nothing saying which number is which.
+        listHeader={
+          <p
+            data-testid="category-value-columns"
+            className="border-b border-[var(--row-border)] pr-1.5 pb-1.5 text-right text-[11px] min-[768px]:text-[10.5px] leading-snug text-[var(--muted)]"
+          >
+            {message(messages, "inflation.basketShare")} · {message(messages, `inflation.categoryTab.${state.tab}`)}
+            {state.tab === "contrib" ? `, ${message(messages, "inflation.pp")}` : null}
+          </p>
+        }
       >
         {visible.map((row) => (
           <SeriesSelectorRow

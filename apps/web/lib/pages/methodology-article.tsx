@@ -64,6 +64,7 @@ const DATASET_SOURCE_NOTES = {
   "regional-economies": "common.geostatSourceNote",
   inflation: "common.inflationSourceNote",
   unemployment: "common.geostatSourceNote",
+  trade: "common.geostatSourceNote",
   demography: "common.geostatSourceNote",
 } as const;
 
@@ -77,6 +78,7 @@ const DATASET_DOWNLOADS = {
   "regional-economies": "/downloads/data/regional-economies.csv",
   inflation: "/downloads/data/inflation-cpi-national.csv",
   unemployment: null,
+  trade: null,
   // Demography has no bulk files and no MCP entry yet (spec section 10).
   demography: null,
 } as const;
@@ -96,6 +98,7 @@ const DATASET_JSON_DOWNLOADS = {
   gdp: [],
   inflation: [],
   unemployment: [],
+  trade: [],
   demography: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
@@ -119,6 +122,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   gdp: [],
   inflation: [],
   unemployment: [],
+  trade: [],
   demography: [],
 } as const;
 
@@ -164,9 +168,9 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
       {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
       {dataset === "demography" ? null : (
       <JsonLd
-        data={dataset === "unemployment" ? {
+        data={dataset === "unemployment" || dataset === "trade" ? {
           "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
-          url: `${resolveSiteUrl()}${pageHref("/methodology/unemployment", locale)}`,
+          url: `${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`, locale)}`,
           temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
           spatialCoverage: { "@type": "Place", name: seoMessage(locale, "seo.country") },
           creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },

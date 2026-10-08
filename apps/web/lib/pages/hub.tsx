@@ -11,6 +11,7 @@ import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect"
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
 import { buildHubCards } from "../explorer/hubCards";
+import { coverageLabel } from "../explorer/coverageLabel";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { fiscalMetadata } from "../seo/metadata";
 
@@ -44,12 +45,7 @@ export async function renderHubPage(locale: Locale) {
   ].sort().at(-1) ?? "";
   const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts, presentation);
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
-  const coverage = [
-    years.length > 0 ? `${years[0]}–${years.at(-1)}` : "",
-    lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "",
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const coverage = coverageLabel(messages, locale, years[0], years.at(-1), lastUpdatedAt || undefined);
 
   return (
     <main

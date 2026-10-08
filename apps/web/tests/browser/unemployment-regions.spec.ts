@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 import { REGIONAL_ECONOMY_REGIONS as UNEMPLOYMENT_REGIONS } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) test(`region map opens separate pages ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
@@ -43,7 +44,7 @@ test("regional hover, bilingual search and keyboard links stay coordinated", asy
   await expect(page.locator("[data-region-map-target]").first()).toBeFocused();
   await page.locator("[data-region-map-target]").first().press("End");
   await expect(page.locator("[data-region-map-target]").last()).toBeFocused();
-  await page.getByRole("textbox", { name: "Search regions", exact: true }).fill("გურია");
+  await page.getByRole("searchbox", { name: "Search regions", exact: true }).fill("გურია");
   await expect(page.getByTestId("regional-list-row")).toHaveCount(1);
   await expect(page.getByTestId("regional-list-row")).toContainText("Guria");
   await target.focus(); await target.press("Enter");
@@ -81,10 +82,11 @@ for (const prefix of ["", "/en"]) test(`regional indicators, units and workbook 
   await toggle("unemployed").click();
   await page.getByTestId("series-search").fill(prefix ? "Unemployed" : "უმუშევარი");
   await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
-  await expect(page.getByTestId("series-status")).toContainText("7 / 7");
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(7);
+  // §7.7: the bulk action covers the five top-level people counts; hired and self-employed sit under employed.
+  await expect(page.getByTestId("series-status")).toContainText("5 / 5");
+  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(5);
   const saved = page.url(); await page.reload(); expect(page.url()).toBe(saved);
-  await expect(page.getByTestId("series-status")).toContainText("7 / 7");
+  await expect(page.getByTestId("series-status")).toContainText("5 / 5");
 });
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regional employed children preserve source coverage and Excel values ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
@@ -101,15 +103,17 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regiona
   await toggle("hired").click(); await toggle("self_employed").click();
   await expect(toggle("unemployment_rate")).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
-  await expect(page.getByTestId("series-status")).toContainText("3 / 7");
+  // Employed is the one top-level row; its two ticked children are reported beside the count (§7.7).
+  await expect(page.getByTestId("series-status")).toContainText("1 / 5");
+  await expect(page.getByTestId("series-status")).toContainText(prefix ? "Subcategories 2" : "ქვეკატეგორიები 2");
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");
   await page.screenshot({ path: info.outputPath(`regional-employment-${width}.png`), fullPage: true });
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
-  await expect(table.locator("tbody tr")).toHaveCount(3);
-  const hired = table.locator("tbody tr").filter({ hasText: prefix ? "Hired employees" : "დაქირავებული" });
-  await expect(hired.locator("td").nth(10)).toHaveText("—");
-  await expect(hired.locator("td").last()).toHaveText("361.2");
+  await expect.poll(() => tableSeriesCount(table)).toBe(3);
+  const hired = await tableSeriesValues(table, prefix ? "Hired employees" : "დაქირავებული");
+  expect(hired[9]).toBe("—");
+  expect(hired.at(-1)).toBe("361.2");
   const saved = page.url(); await page.reload(); expect(page.url()).toBe(saved);
   await expect(toggle("hired")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");

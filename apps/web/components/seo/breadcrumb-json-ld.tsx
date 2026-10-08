@@ -35,7 +35,7 @@ export function BreadcrumbTrail({
                 <Link
                   data-breadcrumb-label
                   href={item.path}
-                  className="max-[768px]:inline-flex max-[768px]:min-h-6 max-[768px]:items-center underline underline-offset-4 hover:text-[var(--accent)]"
+                  className="max-[768px]:inline-flex max-[768px]:min-h-11 max-[768px]:items-center underline underline-offset-4 hover:text-[var(--accent)]"
                 >
                   {item.name}
                 </Link>

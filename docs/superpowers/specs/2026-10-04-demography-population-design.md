@@ -131,7 +131,7 @@ URL-hash state follows DESIGN.md §6.3: restored on load, loading never writes t
 
 **A pure extraction.** In `lib/explorer/municipalData.ts` the last step of `buildPickerGroups` (the regions with their municipality rows under them, built from the index rows) is now the exported `pickerGroupsFromRows`, and `buildPickerGroups` calls it; what the Budget pages get is unchanged. The Population index builds its picker groups with it, from its own rows.
 
-**Already built and kept:** chart `breaks`, table `breakYears`/`breakLabel`, `RangeStrip` marker with `labelSide`, `format.ts` persons units, the serving path, the workbook model, the hub card, sidebar group, methodology page, `buildMunicipalityValueMapModel`, `rankByEndValue`.
+**Already built and kept:** chart `breaks`, table `breakYears`/`breakLabel`, `RangeStrip` marker (its label now placed by the strip's own shift, which replaced `labelSide` in the second merge with `main`), `format.ts` persons units, the serving path, the workbook model, the hub card, sidebar group, methodology page, `buildMunicipalityValueMapModel`, `rankByEndValue`.
 
 **Removed, made unnecessary:** the `RegionalEconomyMap` and `regionalEconomyMap.ts` additions (back to the merge-base), `population-explorer.tsx`, `population-series-panel.tsx`, `use-population-state.ts`, and the state, hash and level functions of `demographyPopulation.ts`.
 

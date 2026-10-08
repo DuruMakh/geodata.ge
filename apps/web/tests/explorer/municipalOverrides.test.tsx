@@ -72,6 +72,7 @@ const index = (overrides?: Parameters<typeof MunicipalitiesIndex>[0]["overrides"
       shapes={map.shapes}
       markers={map.markers}
       occupiedAreas={map.occupiedAreas}
+      touchTargets={map.touchTargets}
       legendMin="min"
       legendMax="max"
       municipalities={rows}
@@ -89,6 +90,7 @@ const budgetIndex = () =>
       shapes={[]}
       markers={[]}
       occupiedAreas={[]}
+      touchTargets={[]}
       legendMin="min"
       legendMax="max"
       municipalities={budgetRows}

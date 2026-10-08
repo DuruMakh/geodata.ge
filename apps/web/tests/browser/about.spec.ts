@@ -44,7 +44,8 @@ for (const viewport of [
     const header = page.getByTestId("about-header");
     if (viewport.width < 900) await header.getByRole("button", { name: "მენიუ" }).click();
     await expect(header.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute("href", "/");
-    await expect(header.getByRole("link", { name: "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
+    // Below 900px the ☰ panel lists the four datasets under a მონაცემები label (owner decision D3).
+    await expect(header.getByRole("link", { name: viewport.width < 900 ? "ბიუჯეტი" : "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
     await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
     await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("aria-current", "page");
 

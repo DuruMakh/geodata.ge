@@ -135,16 +135,19 @@ test("the hub card and the sidebar both reach the page", async ({ page }) => {
   await expect(page).toHaveURL(/\/explorer\/inflation\/overview/);
 });
 
-test("the contribution chart scrolls on phones, hovers without moving the page and answers the keyboard", async ({ page }) => {
+test("the contribution chart fits phones, hovers without moving the page and answers the keyboard", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 1000 });
   await page.goto(`/en${CATEGORIES}`);
   await ready(page);
   const frame = page.getByTestId("stack-chart-frame");
-  expect(await frame.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  // D1 (2026-10-07): phones draw the columns at the frame's width instead of scrolling.
+  expect(await frame.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await expect(frame.locator("svg")).toHaveAttribute("data-geometry", "mobile");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
   await page.setViewportSize({ width: 1440, height: 1000 });
   const svg = frame.locator("svg");
+  await expect(svg).toHaveAttribute("data-geometry", "desktop");
   const box = (await svg.boundingBox())!;
   const strip = page.getByTestId("year-range-strip");
   const before = (await strip.boundingBox())!.y;

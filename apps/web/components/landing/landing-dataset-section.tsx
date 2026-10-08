@@ -3,6 +3,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
+import { withLari } from "../ui/lari";
 import type { LandingBasisStatus, LandingDatasetSummary } from "../../lib/landing/landingData";
 
 const STATUS_LABEL: Record<LandingBasisStatus, string> = {
@@ -52,22 +53,22 @@ export function LandingDatasetSection({
       <div
         data-testid="landing-dataset-index"
         aria-hidden="true"
-        className="font-[family-name:var(--font-numeric)] text-[12px] text-[var(--accent)]"
+        className="font-[family-name:var(--font-numeric)] text-[0.75rem] text-[var(--accent)]"
       >
         {index}
       </div>
       <div data-testid="landing-dataset-copy" className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)]">{overline}</p>
+        <p className="text-[0.6875rem] min-[768px]:text-[10px] font-semibold uppercase tracking-[0.09em] text-[var(--muted)]">{overline}</p>
         <h2
           id={headingId}
           className="mt-2.5 text-balance font-[family-name:var(--font-display)] text-[26px] font-semibold leading-[1.16] tracking-[-0.015em]"
         >
           {heading}
         </h2>
-        <p className="mt-4 max-w-[470px] text-[13px] leading-[1.75] text-[var(--body)]">{description}</p>
+        <p className="mt-4 max-w-[470px] text-[0.8125rem] leading-[1.75] text-[var(--body)]">{description}</p>
         <Link
           href={pageHref(href, locale)}
-          className="mt-4 inline-flex text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
+          className="mt-1 inline-flex min-h-11 items-center text-[0.78125rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222]"
         >
           {linkLabel}
         </Link>
@@ -78,25 +79,26 @@ export function LandingDatasetSection({
           className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 border-y-2 border-[var(--ink)] py-4"
         >
           <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{totalLabel}</p>
+            <p className="text-[0.6875rem] min-[768px]:text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{totalLabel}</p>
             <p className="mt-2 font-[family-name:var(--font-display)] text-[clamp(24px,5vw,42px)] font-semibold leading-none tracking-[-0.02em]">
               {formatAmount(summary.totalGel, locale)}
             </p>
           </div>
           <div className="text-right">
-            <span className="block text-[9px] uppercase tracking-[0.06em] text-[var(--faint)]">{message(messages, "landing.latestYear")}</span>
+            <span className="block text-[0.6875rem] min-[768px]:text-[9px] uppercase tracking-[0.06em] text-[var(--faint)]">{message(messages, "landing.latestYear")}</span>
             <strong className="mt-1 block font-[family-name:var(--font-numeric)] text-[18px]">{summary.latestYear}</strong>
-            <span className="mt-1 block text-[10px] text-[var(--muted)]">{message(messages, STATUS_LABEL[summary.basis])}</span>
+            <span className="mt-1 block text-[0.6875rem] min-[768px]:text-[10px] text-[var(--muted)]">{message(messages, STATUS_LABEL[summary.basis])}</span>
           </div>
         </div>
         <div className="min-w-0 overflow-hidden">
           <table
-            className="mt-3 w-full table-fixed text-[11px] max-[380px]:text-[10px]"
+            className="mt-3 w-full table-fixed text-[0.6875rem]"
           >
             <caption className="sr-only">{message(messages, "landing.tableCaption", { heading, year: summary.latestYear })}</caption>
             <colgroup>
-              <col className="w-[52%]" />
-              <col className="w-[30%]" />
+              {/* The amount column holds "10.2 მლრდ ₾" at the 11px phone floor down to 360px. */}
+              <col className="w-[48%]" />
+              <col className="w-[34%]" />
               <col className="w-[18%]" />
             </colgroup>
             <thead className="text-[var(--muted)]">
@@ -119,7 +121,7 @@ export function LandingDatasetSection({
                     {row.label}
                   </th>
                   <td className="whitespace-nowrap px-1 py-2.5 text-right font-[family-name:var(--font-numeric)]">
-                    {formatAmount(row.amountGel, locale)}
+                    {withLari(formatAmount(row.amountGel, locale))}
                   </td>
                   <td className="whitespace-nowrap py-2.5 pl-1 text-right font-[family-name:var(--font-numeric)]">
                     {formatShare(row.share)}

@@ -12,7 +12,8 @@ for (const locale of ["ka", "en"] as const) {
       await page.goto(`${prefix}${CITIES}`);
       await ready(page);
       await expect(page.getByTestId("inflation-city-tabs")).toHaveCount(0);
-      await expect(page.locator("select")).toHaveCount(0);
+      // No measure select; the range strip's month/year pickers are the only selects.
+      await expect(page.locator("select:not([data-testid='year-range-strip'] select)")).toHaveCount(0);
       await expect(page.getByTestId("series-row")).toHaveCount(7);
       await expect(page.getByTestId("series-status")).toContainText("7 / 7");
       expect(await noOverflow(page)).toBe(true);
@@ -122,7 +123,7 @@ test("Zugdidi's annual series starts late and is never filled", async ({ page })
 
   await page.goto(`/en${CITIES}/zugdidi`);
   await ready(page);
-  await expect(page.getByTestId("explorer-header")).toContainText("Dec 2016 –");
+  await expect(page.getByTestId("explorer-header")).toContainText("Dec 2016–");
 });
 
 test("an old link with the retired tab and category keys still opens", async ({ page }) => {

@@ -62,6 +62,7 @@ describe("MunicipalityMap population wording", () => {
           shapes={withText ? model.shapes : model.shapes.map(({ display: _display, ...shape }) => shape)}
           markers={withText ? model.markers : model.markers.map(({ display: _display, ...marker }) => marker)}
           occupiedAreas={model.occupiedAreas}
+          touchTargets={model.touchTargets}
           legendMin="min text"
           legendMax="max text"
           activeCode={null}

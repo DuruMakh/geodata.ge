@@ -1,13 +1,13 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { cityLineLabel, cityPlaceLabel } from "../../lib/explorer/inflationCityLabels";
 import { cityPageHref, neighbourCities, type CityView } from "../../lib/explorer/inflationCityRoutes";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
+import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { CityPicker } from "./city-picker";
 
 // `ინფლაცია ქალაქებში — {place} ▾`, as region and municipality pages open. City
@@ -38,14 +38,11 @@ export function InflationCityHeading({ view }: { view: CityView }) {
         <CityPicker open={pickerOpen} onClose={() => setPickerOpen(false)} view={view} />
       </div>
       {neighbours ? (
-        <span data-testid="city-entity-navigation" className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
-          <Link href={pageHref(cityPageHref(neighbours.previous), locale)} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            ← {cityLineLabel(messages, neighbours.previous)}
-          </Link>
-          <Link href={pageHref(cityPageHref(neighbours.next), locale)} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            {cityLineLabel(messages, neighbours.next)} →
-          </Link>
-        </span>
+        <EntityNeighbourLinks
+          testId="city-entity-navigation"
+          previous={{ href: pageHref(cityPageHref(neighbours.previous), locale), label: cityLineLabel(messages, neighbours.previous) }}
+          next={{ href: pageHref(cityPageHref(neighbours.next), locale), label: cityLineLabel(messages, neighbours.next) }}
+        />
       ) : null}
     </div>
   );

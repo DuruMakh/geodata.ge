@@ -76,7 +76,9 @@ async function expectSidebarWidth(page: Page, width: number) {
 }
 
 async function expectLineChartRendered(page: Page) {
-  const line = page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']").first();
+  // Before hydration the frame holds a desktop and a phone drawing and CSS shows
+  // one (D1), so read the visible drawing.
+  const line = page.getByTestId("chart-frame").locator("svg:visible path[stroke-linejoin='round']").first();
 
   await expect(line).toBeVisible();
 
@@ -274,10 +276,12 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   const seriesPanel = page.getByTestId("series-selector");
   await expect(chartPanel.getByTestId("chart-mode-line")).toHaveAttribute("aria-pressed", "true");
   await expect(chartPanel.getByTestId("chart-mode-table")).toBeVisible();
-  // The grouping switch lives in the series panel, not in the chart controls row.
-  await expect(seriesPanel.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
-  await expect(seriesPanel.getByTestId("grouping-ministries")).toBeVisible();
-  await expect(seriesPanel.getByTestId("grouping-ministries")).toHaveText("სამინისტროები");
+  // Stacked (this 1280px viewport leaves a column under 1100px), the grouping switch leads
+  // the chart panel; the series panel's copy is for the two-column layout only (owner decision D4).
+  await expect(chartPanel.getByTestId("grouping-fields")).toHaveAttribute("aria-pressed", "true");
+  await expect(chartPanel.getByTestId("grouping-ministries")).toBeVisible();
+  await expect(chartPanel.getByTestId("grouping-ministries")).toHaveText("სამინისტროები");
+  await expect(seriesPanel.getByTestId("aside-grouping-ministries")).toBeHidden();
   await expect(seriesPanel.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toBeVisible();
   await expect(page.getByTestId("year-range-strip")).toContainText("დიაპაზონი");
@@ -293,7 +297,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await chartPanel.getByTestId("chart-mode-line").click();
   await expect(page.getByTestId("chart-frame")).toBeVisible();
 
-  await seriesPanel.getByTestId("grouping-ministries").click();
+  await chartPanel.getByTestId("grouping-ministries").click();
   await expect(seriesPanel.getByTestId("series-search")).toHaveAttribute("placeholder", "ძებნა");
 
   await chartPanel.getByTestId("measure-share-toggle").click();
@@ -457,7 +461,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   ]);
   expect(JSON.stringify(functionalExport.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues())).not.toContain("1500000000");
 
-  await fields.getByTestId("grouping-ministries").click();
+  await page.getByTestId("grouping-ministries").click();
   await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
   await fields.getByTestId("series-toggle-all").click();
   await fields.getByTestId("series-toggle-all").click();
@@ -913,7 +917,9 @@ test("budget field identifies a circle with its category and amount on hover and
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toContainText("სოციალური დაცვა");
   await expect(tooltip).toContainText("7.2 მლრდ ₾");
-  await expect(tooltip).not.toContainText(/წილი|ზრდა/);
+  // D1 (2026-10-07): the readout also states the growth its y position encodes.
+  await expect(tooltip).toContainText(/ცვლილება \+?−?\d+\.\d%/);
+  await expect(tooltip).not.toContainText(/წილი/);
 
   await page.getByRole("heading", { name: "ბიუჯეტის ველი" }).hover();
   await expect(tooltip).toHaveCount(0);
@@ -953,16 +959,17 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
       clientWidth: element.clientWidth,
       scrollWidth: element.scrollWidth,
     }));
-    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
+    // Phones: one horizontally scrolling row (DESIGN §12), opened on the active year.
+    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
 
     const boxes = await yearButtons.evaluateAll((buttons) =>
       buttons.map((button) => {
         const box = button.getBoundingClientRect();
-        return { left: box.left, right: box.right, top: box.top, width: box.width };
+        return { left: box.left, right: box.right, top: box.top, width: box.width, height: box.height };
       }),
     );
-    expect(boxes.every((box) => box.width >= 36)).toBe(true);
-    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBeGreaterThan(1);
+    expect(boxes.every((box) => box.width >= 36 && box.height >= 36)).toBe(true);
+    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBe(1);
 
     const activeBox = await activeYear.boundingBox();
     const selectorBox = await selector.boundingBox();
@@ -1036,20 +1043,32 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
   expect(consoleProblems).toEqual([]);
 });
 
-test("mobile chart and table keep contained horizontal scroll", async ({ page }) => {
+test("mobile chart fits its frame and the table keeps contained horizontal scroll", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
+  // D1 (2026-10-07): phones draw the chart at the frame's width, so it no
+  // longer scrolls; the frame keeps its focusable, named region.
   const chart = page.getByTestId("chart-frame");
   await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await expect(chart).toHaveAttribute("tabindex", "0");
-  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი");
-  expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  // The name mentions sideways scrolling only where the frame scrolls.
+  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი");
+  expect(await chart.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
 
+  // The default total alone lists its years as rows (owner decision D5): nothing scrolls sideways.
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
   await expect(page.getByTestId("table-scroll-hint")).toHaveCount(0);
+  await expect(table).toHaveAttribute("data-layout", "rows");
+  expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(false);
+
+  // Four series keep the year columns, a contained, keyboard-scrollable region.
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#g=fields&m=table&sel=expenditure.total,spending.social_protection,spending.education,spending.health`);
+  await page.reload();
+  await expectAppReady(page);
+  await expect(table).toHaveAttribute("data-layout", "columns");
   await expect(table).toHaveAttribute("tabindex", "0");
   await expect(table).toHaveAttribute("aria-label", "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი");
   expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
@@ -1057,25 +1076,29 @@ test("mobile chart and table keep contained horizontal scroll", async ({ page })
   await expectNoPageOverflow(page);
 });
 
-test("mobile chart accepts a horizontal touch drag", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test("a chart frame that still overflows accepts a horizontal touch drag", async ({ page }) => {
+  // Phones fit the chart (D1); at 768px the desktop drawing's 720px minimum
+  // still overflows its frame, so that is where the scroller has to work.
+  await page.setViewportSize({ width: 768, height: 1024 });
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
   const chart = page.getByTestId("chart-frame");
   expect(await chart.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-  expect(await chart.evaluate((element) => element.scrollLeft)).toBe(0);
+  // An overflowing frame opens on the latest data, so the drag goes back in time.
+  const maxScroll = await chart.evaluate((element) => element.scrollWidth - element.clientWidth);
+  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThanOrEqual(maxScroll - 1);
 
   const box = await chart.boundingBox();
   expect(box).not.toBeNull();
 
   const cdp = await page.context().newCDPSession(page);
   const y = box!.y + Math.min(100, box!.height / 2);
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: box!.x + box!.width - 32, y }] });
-  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: box!.x + 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: box!.x + 32, y }] });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: box!.x + box!.width - 32, y }] });
   await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
 
-  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeLessThan(maxScroll - 1);
 });
 
 test("captures editorial desktop and mobile screenshots", async ({ page }) => {
@@ -1141,7 +1164,10 @@ test("chart draws a dot lattice instead of horizontal gridlines", async ({ page 
     };
   });
 
-  const PAD_L = 74;
+  // The left padding grows to fit the widest y label, so read the plot's left
+  // edge from the y-axis hairline instead of assuming the 74-unit minimum.
+  const PAD_L = Number(await chart.locator('svg line[stroke="#D9CFBE"]').first().getAttribute("x1"));
+  expect(PAD_L).toBeGreaterThanOrEqual(74);
   const PAD_T = 16;
   expect(geometry.patternX + geometry.circleCx).toBeCloseTo(PAD_L, 5);
   expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);

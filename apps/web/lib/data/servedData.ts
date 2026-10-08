@@ -62,6 +62,7 @@ import {
 export const SERVED_DATA_FILES = {
   gdpOverviewFacts: "../../data/imports/gdp-overview-annual.csv",
   economicSectorFacts: "../../data/imports/economic-sectors-annual.csv",
+  tradeOverviewFacts: "../../data/imports/trade-overview-annual.csv",
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
   demographyPopulationFacts: "../../data/imports/demography-population-annual.csv",
   demographyDensityFacts: "../../data/imports/demography-density-annual.csv",

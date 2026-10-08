@@ -49,6 +49,22 @@ NBG's 2024 report publishes services exports/imports of 7,706.3/3,814.8 million 
 
 ## Preparation, evidence and verification
 
+### National goods Overview serving subset
+
+The Trade hub and Overview design was approved on 2026-10-08. The first public page uses only the 62 national goods export/import observations and 62 reviewed balance/turnover derivations for 1995-2025. Its canonical serving file is `data/imports/trade-overview-annual.csv`; its scoped evidence is `data/reports/trade-overview-validation.json`.
+
+The preparation checks the original national workbook's SHA-256, stored XML decimal tokens, million-USD header, annual year columns, flow rows, source labels and each cell's number format. Exact decimal arithmetic verifies the USD conversion and both derivation identities. Source references retain their export-before-import order. No native value is rounded during preparation or database copying; browser charts and native Excel numeric cells use the usual JavaScript/Excel number representation and explicit readable USD units.
+
+The scoped report records `national_goods_overview` acceptance separately from the wider research package. The two UK services holds remain unchanged and do not become accepted comparisons. A hold affecting the selected national goods observations blocks this subset. The original research files are never rewritten by the serving preparer.
+
+Historical records use actual basis to distinguish observed trade from forecasts. Their source publication status remains unspecified; a complete annual period is not labelled final. Exports retain FOB valuation, imports retain CIF valuation, and both remain nominal USD. Total exports include re-exports; the public page adds no separate re-export series, services, partial 2026 periods, GDP ratios or inflation adjustment.
+
+The exact native source identity `geostat_trade_ftrade-1995-2026` remains in the facts and cell references. Its database source document uses the existing stable-ID convention, `source.geostat_trade_ftrade_1995_2026`. The native filename remains `FTrade_1995-2026.xlsx`; the public archive URL uses lowercase `ftrade_1995-2026.xlsx`, as required by the archive registry. The private mirror stores amounts as Decimal(40,20), retains native text and nullable derived metadata, and checks every canonical field before the import transaction commits.
+
+The two captured HTML originals are published unchanged as plain-text `.html.txt` downloads. This keeps encoded versions of their addresses from executing the captured scripts under Fiscal.ge's origin. The normal download addresses also carry attachment and sandbox/network-blocking headers. Original filenames, media-type metadata, bytes and fingerprints remain preserved; executable `.html` copies are not published.
+
+Run `npm run data:prepare-trade-overview` to regenerate the two serving artifacts and `npm run data:check-trade-overview` to reproduce their exact bytes without writing. Serving reads only these small artifacts; it does not import the raw workbook reader.
+
 `prepare.py --write` creates deterministic family CSVs, source-observation chunks, the three allowed derivations (national goods balance/turnover and reviewed re-exports), coverage, reconciliation and validation reports. Large product/source chunks follow published blocks and, if necessary, complete-year boundaries. CSVs use UTF-8 BOM, LF records and fixed columns. `--check` reproduces their exact bytes without writes. This proves reproduction, not source acceptance. `--acceptance` exits nonzero while the source holds remain.
 
 `verify_independent.py` separately reads every approved range through openpyxl without importing the normalizer readers or helpers. It checks complete source key-set equality, frozen metadata/count fingerprints, original workbook unit headers, every prepared source and primary cell, labels, codes, formats, missingness and derivation references. Native/USD identities must be exact; independent reader conversion noise is limited to USD 0.001. The reconciliation tolerance remains USD 1, and is not widened to pass comparisons.
@@ -70,4 +86,4 @@ $tradePackage = 'docs/Raw Data/Trade/geostat-external-trade/2026-10-07'
 & $tradePython -X utf8 "$tradePackage/test_prepare.py"
 ```
 
-The source-acceptance command intentionally returns exit code 2 for the two unresolved comparisons. Focused tests pin omitted years/zero rows/blocks, duplicate keys, lost leading zeroes, invented zeroes, unit/value changes, source corruption, stale artifacts and reports, source remainders and known holds. Repository completion also requires `npm run check` and `npm run build` in `apps/web`; there are no UI changes requiring browser tests.
+The source-acceptance command intentionally returns exit code 2 for the two unresolved comparisons. Focused tests pin omitted years/zero rows/blocks, duplicate keys, lost leading zeroes, invented zeroes, unit/value changes, source corruption, stale artifacts and reports, source remainders and known holds. Repository completion also requires `npm run check` and `npm run build` in `apps/web`. Research-only preparation has no UI boundary; the approved Trade Overview additionally requires `npm run test:browser`.

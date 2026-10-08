@@ -87,7 +87,8 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
   // revenue.other_taxes 2019-2020) stay visible in the ranking table instead.
   // Lay out over the drawn items' own sum so the tiles exactly fill the area.
   const drawn = items.filter((item) => item.amountGel > 0);
-  const rects = squarify(drawn, drawn.reduce((sum, item) => sum + item.amountGel, 0));
+  const drawnTotal = drawn.reduce((sum, item) => sum + item.amountGel, 0);
+  const rects = squarify(drawn, drawnTotal);
   const tinyLegend = drawn.filter((item) => item.shareOfTotal < 0.033);
 
   return (
@@ -96,7 +97,38 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
       <p className="mb-4 text-xs text-[var(--muted)]">
         <Message messages={messages} id="analysis.treemapNote" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{yearLabel}</span> }} />
       </p>
-      <div data-testid="snapshot-structure-grid" className="relative w-full" style={{ aspectRatio: `${AREA_W} / ${AREA_H}` }}>
+      {/* Phones (<768px): one 100% stacked bar plus a full-width list of the same
+          items in the same order. At 350px wide the treemap's tiles are too small
+          to name (DESIGN.md §9.3, mobile amendment approved 2026-10-07). */}
+      <div data-testid="snapshot-structure-mobile" className="min-[768px]:hidden">
+        <div data-testid="snapshot-structure-bar" aria-hidden className="flex h-4 w-full gap-px">
+          {drawn.map((item) => (
+            <span key={item.itemId} className="block h-full min-w-0" style={{ width: `${(item.amountGel / drawnTotal) * 100}%`, backgroundColor: item.color }} />
+          ))}
+        </div>
+        <table className="mt-3 w-full border-collapse text-left">
+          <caption className="sr-only">{`${title}, ${yearLabel}`}</caption>
+          <tbody>
+            {drawn.map((item) => (
+              <tr key={item.itemId} data-testid="snapshot-structure-row" className="border-t border-[var(--hairline-soft)] align-top">
+                <th scope="row" className="py-2 pr-2.5 font-normal">
+                  <span className="flex min-w-0 items-start gap-2.5">
+                    <SwatchBar color={item.color} className="mt-[8px]" />
+                    <span className="min-w-0 text-[12.5px] font-medium leading-[1.4] text-[var(--ink)]">{labelFor(item)}</span>
+                  </span>
+                </th>
+                <td className="py-2 pr-2.5 text-right font-[family-name:var(--font-numeric)] text-[12px] font-semibold whitespace-nowrap text-[var(--ink)]">
+                  {formatShare(item.shareOfTotal)}
+                </td>
+                <td className="py-2 text-right font-[family-name:var(--font-numeric)] text-[11px] whitespace-nowrap text-[var(--muted)]">
+                  {formatAmount(item.amountGel, locale)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div data-testid="snapshot-structure-grid" className="relative hidden w-full min-[768px]:block" style={{ aspectRatio: `${AREA_W} / ${AREA_H}` }}>
         {rects.map(({ item, x, y, w, h }) => {
           const big = item.shareOfTotal >= 0.08;
           const mid = item.shareOfTotal >= 0.033;
@@ -107,7 +139,7 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
               key={item.itemId}
               data-testid="snapshot-structure-card"
               title={`${labelFor(item)} — ${formatShare(item.shareOfTotal)} · ${formatAmount(item.amountGel, locale)}`}
-              className="absolute flex min-w-0 flex-col justify-between overflow-hidden border border-[var(--hairline)] bg-[var(--tile)] px-[11px] py-[9px] transition-colors duration-100 hover:bg-[var(--tint)]"
+              className="absolute min-w-0 overflow-hidden border border-[var(--hairline)] bg-[var(--tile)] transition-colors duration-100 hover:bg-[var(--tint)]"
               style={{
                 left: `${(x / AREA_W) * 100}%`,
                 top: `${(y / AREA_H) * 100}%`,
@@ -116,32 +148,37 @@ export function StructureTreemap({ items, title, yearLabel }: StructureTreemapPr
                 borderTop: `3px solid ${item.color}`,
               }}
             >
-              {small ? (
-                <span
-                  className="font-[family-name:var(--font-display)] font-semibold leading-none tracking-[-0.01em]"
-                  style={{ fontSize: big ? 22 : mid ? 16 : 12 }}
-                >
-                  {formatShare(item.shareOfTotal)}
+              {/* Padding lives on this inner box. With border-box sizing a padded tile
+                  can never be narrower than its padding, so the thinnest tiles grew
+                  past the treemap's right edge; the outer tile now clips this box. */}
+              <div className="flex h-full flex-col justify-between px-[11px] py-[9px]">
+                {small ? (
+                  <span
+                    className="font-[family-name:var(--font-display)] font-semibold leading-none tracking-[-0.01em]"
+                    style={{ fontSize: big ? 22 : mid ? 16 : 12 }}
+                  >
+                    {formatShare(item.shareOfTotal)}
+                  </span>
+                ) : null}
+                <span className="min-w-0">
+                  {mid ? (
+                    <span className="block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-[var(--ink)]">
+                      {labelFor(item)}
+                    </span>
+                  ) : null}
+                  {big ? (
+                    <span className="mt-[3px] block font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                      {formatAmount(item.amountGel, locale)}
+                    </span>
+                  ) : null}
                 </span>
-              ) : null}
-              <span className="min-w-0">
-                {mid ? (
-                  <span className="block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-medium text-[var(--ink)]">
-                    {labelFor(item)}
-                  </span>
-                ) : null}
-                {big ? (
-                  <span className="mt-[3px] block font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                    {formatAmount(item.amountGel, locale)}
-                  </span>
-                ) : null}
-              </span>
+              </div>
             </div>
           );
         })}
       </div>
       {tinyLegend.length > 0 ? (
-        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+        <div className="mt-3 hidden flex-wrap gap-x-5 gap-y-2 min-[768px]:flex">
           {tinyLegend.map((item) => (
             <span key={item.itemId} className="inline-flex items-center gap-[7px] text-[11.5px] text-[var(--body)]">
               <SwatchBar color={item.color} className="!w-3" />

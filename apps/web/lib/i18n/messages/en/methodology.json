@@ -33,6 +33,8 @@
   "methodology.archiveCount": "{count} unchanged original sources",
   "methodology.archiveDownload": "Complete archive · ZIP ↓",
   "methodology.archiveSearch": "Search original sources",
+  "methodology.searchPlaceholder": "Search",
+  "methodology.contentsJump": "Contents ↑",
   "methodology.yearFilter": "Filter by year",
   "methodology.allYears": "All",
   "methodology.yearRange": "{first}–{last}",

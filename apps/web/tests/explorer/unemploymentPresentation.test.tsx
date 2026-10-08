@@ -22,8 +22,11 @@ test.each(["ka", "en"] as const)("renders the existing workspace, two chart type
   expect(heading).toContain(messages["unemployment.page.overview.title"]);
   expect(heading).toContain(messages["unemployment.page.overview.summary"]);
   expect(heading).not.toContain(messages["unemployment.surveyEstimate"]);
-  expect(markup.match(/role="img"/g)).toHaveLength(2);
-  expect(markup.match(/<path[^>]+stroke="#1E1B16"/g)).toHaveLength(1);
+  // Before the browser measures, each chart renders its desktop and its phone drawing (D1).
+  expect(markup.match(/<svg[^>]*data-geometry="desktop"[^>]*role="img"/g)).toHaveLength(2);
+  expect(markup.match(/<svg[^>]*data-geometry="mobile"[^>]*role="img"/g)).toHaveLength(2);
+  expect(markup.match(/role="img"/g)).toHaveLength(4);
+  expect(markup.match(/<path[^>]+stroke="#1E1B16"/g)).toHaveLength(2);
   expect(markup).toContain("13.9%");
   expect(markup).toContain("2010–2025");
   expect(markup).toContain('data-testid="unemployment-excel-download"');

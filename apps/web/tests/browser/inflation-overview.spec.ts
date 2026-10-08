@@ -27,7 +27,8 @@ test("tabs switch units, series and the target together", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-yoy")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("inflation-unit")).toHaveText("Percent · change on the same month of the previous year");
   await expect(page.getByTestId("chart-series-target-dashed")).toHaveCount(1);
-  await expect(page.getByTestId("inflation-headline")).toHaveCount(0);
+  // Owner decision D2 (2026-10-07): the latest value now sits under the title.
+  await expect(page.getByTestId("inflation-latest")).toHaveText(/^Annual inflation · \S+ \d{4}: −?\d+\.\d%$/);
 
   await page.getByTestId("inflation-tab-index").click();
   await expect(page.getByTestId("inflation-unit")).toHaveText("Index · 2010 average = 100");

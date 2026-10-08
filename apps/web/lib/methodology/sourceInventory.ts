@@ -53,6 +53,7 @@ const inventoryRules = {
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
   unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
+  trade: [{ root: "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official", include: (candidatePath: string) => ["FTrade_1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html"].includes(path.posix.basename(candidatePath)) }],
 } satisfies Record<MethodologyDatasetId, readonly InventoryRule[]>;
 
 function dirname(candidatePath: string) {

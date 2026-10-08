@@ -143,6 +143,7 @@ export async function renderDemographyPopulationPage(locale: Locale) {
           shapes={index.map.shapes}
           markers={index.map.markers}
           occupiedAreas={index.map.occupiedAreas}
+          touchTargets={index.map.touchTargets}
           legendMin={formatInUnit(index.map.legendMinPerResidentGel, UNIT_PERSONS)}
           legendMax={formatInUnit(index.map.legendMaxPerResidentGel, UNIT_PERSONS)}
           municipalities={index.municipalities}

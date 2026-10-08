@@ -1,5 +1,6 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useMemo } from "react";
 import { buildDebtWorkbookExportModel } from "../../lib/explorer/debtWorkbook";
 import { message } from "../../lib/i18n/messages";
@@ -33,6 +34,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 
 type DebtRange = { start: number; end: number; min: number; max: number };
 
@@ -113,10 +115,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   const preliminaryGdpYears = props.family === "stock"
     ? model.years.filter((year) => props.gdpFacts.some((fact) => fact.year === year && fact.status === "preliminary"))
     : [];
-  const coverage = [
-    familyYears.length > 0 ? `${familyYears[0]}–${familyYears.at(-1)}` : "",
-    props.lastUpdatedAt ? message(messages, "main.updated", { date: locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt }) : "",
-  ].filter(Boolean).join(" · ");
+  const coverage = coverageLabel(messages, locale, familyYears[0], familyYears.at(-1), props.lastUpdatedAt || undefined);
   const forecastYears = model.forecastStartYear === null
     ? []
     : model.years.filter((year) => year >= model.forecastStartYear!);
@@ -176,9 +175,11 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 ]}
               />
               <div className="flex items-center gap-3.5">
-                <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
-                  {props.family === "rate" ? "%" : props.shareOfGdp ? message(messages, "main.percentGdp") : message(messages, "format.bnGel")}
-                </span>
+                {props.family === "stock" && props.shareOfGdp ? null : (
+                  <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+                    {props.family === "rate" ? "%" : message(messages, "format.bnGel")}
+                  </span>
+                )}
                 {props.family === "stock" ? (
                   <MeasurePill label={message(messages, "main.percentGdp")} pressed={props.shareOfGdp} onChange={props.onShareChange} />
                 ) : null}
@@ -225,6 +226,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={props.chartMode === "line"} share={isPercent} unit={unit} />
 
             <RangeStrip
               years={familyYears}

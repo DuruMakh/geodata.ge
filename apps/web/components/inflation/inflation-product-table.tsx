@@ -11,6 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { SectionTitle } from "../ui/editorial";
 import { InflationProductArt } from "./inflation-product-art";
 import { filteredProductIds } from "./inflation-product-panel";
+import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 
 const BATCH_SIZE = 40;
 
@@ -46,11 +47,12 @@ export function InflationProductTable({ index, state, onToggle }: {
       <SectionTitle>{t("productsBrowseHeading")}</SectionTitle>
       <input
         data-testid="product-list-search"
+        {...SEARCH_FIELD_PROPS}
         value={query}
         onChange={(event) => { setQuery(event.target.value); setShown(Math.min(BATCH_SIZE, index.products.length)); }}
-        placeholder={t("productsSearch")}
+        placeholder={message(messages, "controls.search")}
         aria-label={t("productsSearch")}
-        className="h-[34px] w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
+        className="h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus-visible:border-[var(--accent)] min-[768px]:w-[280px]"
       />
     </div>
     {ids.length === 0 ? <p data-testid="product-list-empty" className="mt-6 text-[13px] text-[var(--muted)]">{t("productsNoMatches")}</p> : <div className="mt-[18px]">
@@ -61,22 +63,26 @@ export function InflationProductTable({ index, state, onToggle }: {
         aria-label={message(messages, "controls.tableScrollable")}
         className="max-w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        <table className="w-full min-w-[560px] table-fixed border-collapse">
+        {/* Short column headers with the periods in the visible caption: on a phone the name and
+            both rate columns fit without a horizontal swipe (DESIGN.md §25.2). */}
+        <table className="w-full table-fixed border-collapse min-[768px]:min-w-[560px]">
           <colgroup>
-            <col className="w-[185px] min-[768px]:w-[45%]" />
-            <col className="w-[160px] min-[768px]:w-[25%]" />
-            <col className="w-[215px] min-[768px]:w-[30%]" />
+            <col className="min-[768px]:w-[45%]" />
+            {/* Phones: rate columns sized to their headers (tracking normal, 6px padding) and the
+                names at 12px, so the longest product word fits whole at 390px (no mid-word break). */}
+            <col className="w-[85px] min-[768px]:w-[25%]" />
+            <col className="w-[56px] min-[768px]:w-[30%]" />
           </colgroup>
-          <caption className="sr-only">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
+          <caption data-testid="product-table-caption" className="pb-2 text-left text-[12px] leading-[1.5] text-[var(--muted)]">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
           <thead><tr>
             <th scope="col" className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] py-2 pr-3 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)]">
               {t("productsProductColumn")}
             </th>
-            <th scope="col" className="border-b-2 border-[var(--ink)] px-2 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsCumulativeColumn", { start: state.range.startYear, end: endLabel })}
+            <th scope="col" className="border-b-2 border-[var(--ink)] px-1.5 py-2 text-right text-[11px] font-semibold uppercase tracking-normal text-[var(--muted)] min-[768px]:px-2 min-[768px]:tracking-[0.06em]">
+              {t("productsCumulativeColumn")}
             </th>
-            <th scope="col" className="border-b-2 border-[var(--ink)] py-2 pl-3 text-right text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-              {t("productsAnnualColumn", { period: latestLabel })}
+            <th scope="col" className="border-b-2 border-[var(--ink)] py-2 pl-1.5 text-right text-[11px] font-semibold uppercase tracking-normal text-[var(--muted)] min-[768px]:pl-3 min-[768px]:tracking-[0.06em]">
+              {t("productsAnnualColumn")}
             </th>
           </tr></thead>
           <tbody>
@@ -91,7 +97,7 @@ export function InflationProductTable({ index, state, onToggle }: {
                 cumulative.reason === "missing_month" && cumulative.missingPeriod !== null ?
                   t("productsMissingMonth", { period: periodKey(cumulative.missingPeriod) }) : null;
               return <tr key={id} data-product-id={id} className={`border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)] ${selected ? "bg-[var(--tint)]" : ""}`}>
-                <td className={`sticky left-0 z-[1] py-2 pr-3 shadow-[1px_0_0_var(--hairline-soft)] ${selected ? "bg-[var(--tint)]" : "bg-[var(--paper)]"}`}>
+                <td className={`sticky left-0 z-[1] py-2 pr-2 min-[768px]:pr-3 shadow-[1px_0_0_var(--hairline-soft)] ${selected ? "bg-[var(--tint)]" : "bg-[var(--paper)]"}`}>
                   <button
                     type="button"
                     data-testid="product-row-toggle"
@@ -102,7 +108,7 @@ export function InflationProductTable({ index, state, onToggle }: {
                   >
                     <InflationProductArt productId={id} />
                     <span className="min-w-0">
-                      <span className="block break-words text-[12.5px] font-medium text-[var(--ink)]">{primary}</span>
+                      <span className="block break-words text-[12px] font-medium text-[var(--ink)] min-[768px]:text-[12.5px]">{primary}</span>
                       <span
                         className="block break-words text-[11px] text-[var(--muted)]"
                         data-original-language="product"
@@ -112,11 +118,11 @@ export function InflationProductTable({ index, state, onToggle }: {
                     </span>
                   </button>
                 </td>
-                <td className="px-3 py-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold whitespace-nowrap text-[var(--ink)]">
+                <td className="px-1.5 py-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold whitespace-nowrap text-[var(--ink)] min-[768px]:px-3">
                   {cumulative.value === null ? MISSING : formatShare(cumulative.value / 100, true)}
-                  {missing ? <span className="block max-w-[230px] whitespace-normal text-[10px] leading-snug text-[var(--muted)]">{missing}</span> : null}
+                  {missing ? <span className="block max-w-[230px] whitespace-normal text-[11px] min-[768px]:text-[10px] leading-snug text-[var(--muted)]">{missing}</span> : null}
                 </td>
-                <td className="py-2 pl-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]">
+                <td className="py-2 pl-1.5 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)] min-[768px]:pl-3">
                   {annual === null ? MISSING : formatShare(annual / 100, true)}
                 </td>
               </tr>;
@@ -129,7 +135,7 @@ export function InflationProductTable({ index, state, onToggle }: {
       type="button"
       data-testid="product-more"
       onClick={() => setShown((current) => nextProductCount(current, matches.length))}
-      className="mt-5 cursor-pointer border-b border-[var(--accent)] pb-0.5 text-[12.5px] font-semibold text-[var(--ink)] hover:text-[var(--accent)]"
-    >{t("productsMore")}</button> : null}
+      className="mt-3 inline-flex min-h-11 cursor-pointer items-center text-[12.5px] font-semibold text-[var(--ink)] hover:text-[var(--accent)]"
+    ><span className="border-b border-[var(--accent)] pb-0.5">{t("productsMore")}</span></button> : null}
   </section>;
 }

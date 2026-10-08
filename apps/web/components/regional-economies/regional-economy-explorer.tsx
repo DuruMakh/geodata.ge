@@ -1,7 +1,6 @@
 "use client";
 
 import { ChartPie, ChevronDown } from "lucide-react";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
@@ -20,6 +19,8 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -81,14 +82,11 @@ export function RegionalEconomyExplorer({
           </button>
         </h1>
         <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions} activeRegionId={region.id} />
-        <span data-testid="regional-entity-navigation" className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
-          <Link href={pageHref(regionalEconomyHref(previousRegion.id), locale)} className="block min-w-0 truncate font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            ← {publicLabel(locale, previousRegion.id, previousRegion.kaLabel, englishLabels)}
-          </Link>
-          <Link href={pageHref(regionalEconomyHref(nextRegion.id), locale)} className="block min-w-0 truncate text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)]">
-            {publicLabel(locale, nextRegion.id, nextRegion.kaLabel, englishLabels)} →
-          </Link>
-        </span>
+        <EntityNeighbourLinks
+          testId="regional-entity-navigation"
+          previous={{ href: pageHref(regionalEconomyHref(previousRegion.id), locale), label: publicLabel(locale, previousRegion.id, previousRegion.kaLabel, englishLabels) }}
+          next={{ href: pageHref(regionalEconomyHref(nextRegion.id), locale), label: publicLabel(locale, nextRegion.id, nextRegion.kaLabel, englishLabels) }}
+        />
       </div>
       <p data-testid="regional-headline" className="mb-2 text-[13px] text-[var(--body)]">
         {t("total")} · {model.headline?.year ?? "—"}: <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{share ? formatShare(model.headline ? model.headline.value / 100 : null) : formatAmount(model.headline?.value, locale)}</span>
@@ -115,6 +113,7 @@ export function RegionalEconomyExplorer({
               : !model.hasData ? <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
               : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={measureLabel} formatTooltipValue={share ? undefined : (value) => formatAmount(value, locale)} /></div>
               : <ExplorerTable caption={`${regionLabel} · ${share ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`} rows={model.rows.filter((row) => row.itemId !== REGIONAL_GDP_TOTAL)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels years={model.years} firstColumnLabel={t("sector")} unit={unit} share={share} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
+            <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={share} unit={unit} formatValue={share ? undefined : (value) => formatAmount(value, locale)} />
             <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
           </section>
           <div className="mt-[18px]"><SourceNote testId="regional-source-label">{t("source")} {model.range.start}–{model.range.end}</SourceNote></div>

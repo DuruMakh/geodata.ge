@@ -171,7 +171,7 @@ export function PopulationPlaceExplorer({
                 <RangeStrip
                   years={allYears}
                   range={state.range}
-                  marker={{ year: CENSUS_STEP.toYear, label: breakLabel, labelSide: "auto" }}
+                  marker={{ year: CENSUS_STEP.toYear, label: breakLabel }}
                   onChange={state.setRange}
                 />
               </div>

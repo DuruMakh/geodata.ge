@@ -141,8 +141,10 @@ test("the complete list is reachable in descending cumulative order", async ({ p
   const list = page.getByTestId("product-table");
   await expect(list.locator("tbody tr")).toHaveCount(40);
   const headers = await list.locator("thead th").allTextContents();
-  expect(headers[1]).toContain("Cumulative change");
-  expect(headers[2]).toContain("Latest 12-month change");
+  expect(headers[1]).toBe("Cumulative");
+  expect(headers[2]).toBe("Annual");
+  // The periods moved from the headers into the visible caption.
+  await expect(page.getByTestId("product-table-caption")).toContainText(/2015–\S+ 2016/);
   for (let shown = 80; shown <= 320; shown += 40) {
     await page.getByTestId("product-more").click();
     await expect(list.locator("tbody tr")).toHaveCount(Math.min(shown, 305));

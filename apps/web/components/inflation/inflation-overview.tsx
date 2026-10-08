@@ -1,15 +1,18 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import type { ClientCpiFact } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
-import { periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
+import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
+import { latestEntry } from "../../lib/explorer/latestValue";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
   DEFAULT_INFLATION_STATE, INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
-  overallCoverage, parseInflationHash, rangeFromPatch, resolveInflationRange, serializeInflationHash, toggleSelection,
+  parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection,
   type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
 import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -29,6 +32,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation overview (spec §6): the GDP overview's centred tabs over the Budget
@@ -74,7 +78,11 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const coverage = overallCoverage(index);
+  // The eyebrow states the active tab's span — the same months the chart and range strip offer
+  // (the index series starts years before the annual and monthly change series).
+  const coverage = { min: range.min, max: range.max };
+  // The headline CPI's latest published month on the active tab.
+  const latest = latestEntry(index.values.get(seriesGroup("cpi", state.tab)));
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
   const hasSeries = lines.some((line) => line.key !== "target");
   const chartSeries: ChartSeries[] = lines.map((line) => ({
@@ -102,19 +110,21 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
           { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
           { label: t("heading") },
         ]}
-        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
+      {latest ? (
+        <LatestValueLine testId="inflation-latest" measure={t(`tab.${state.tab}`)} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, state.tab)} />
+      ) : null}
       <p data-testid="inflation-unit" className="mb-4 text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
 
       <div
         data-testid="inflation-tabs"
         role="group"
         aria-label={t("tabs")}
-        className="mb-3 overflow-x-auto py-2"
-        onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
+        className="mb-3 py-2"
       >
-        <div className="mx-auto flex w-max gap-7 px-1">
+        <div className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
           {INFLATION_TABS.map((tab) => (
             <TextTab key={tab} testId={`inflation-tab-${tab}`} label={t(`tab.${tab}`)} active={state.tab === tab} onClick={() => selectTab(tab)} />
           ))}
@@ -155,11 +165,13 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "line"} share={state.tab !== "index"} unit={INDEX_UNIT} />
             <RangeStrip
               years={tabPeriods}
               range={range}
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
+              formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
               onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
@@ -167,7 +179,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
             <SourceNote testId="source-label">
               {t("source")} {message(messages, "main.lastUpdated", { date: displayDate })}
             </SourceNote>
-            <Link href={pageHref("/methodology/inflation", locale)} className="text-xs text-[var(--muted)] underline underline-offset-4">
+            <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
               {t("methodology")}
             </Link>
           </div>

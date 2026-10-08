@@ -25,6 +25,13 @@ const nextConfig: NextConfig = {
         source: "/downloads/methodology/:dataset/files/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, follow" }],
       },
+      ...["external_trade_methodology.html.txt", "metadata-en.html.txt"].map(filename => ({
+        source: `/downloads/methodology/trade/files/${filename}`,
+        headers: [
+          { key: "Content-Disposition", value: "attachment" },
+          { key: "Content-Security-Policy", value: "sandbox; default-src 'none'" },
+        ],
+      })),
       {
         source: "/(.*)",
         headers: [

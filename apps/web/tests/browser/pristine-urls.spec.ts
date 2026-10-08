@@ -7,6 +7,9 @@ for (const path of ["", "/en"].flatMap((prefix) => [
   `${prefix}/explorer/inflation/overview`,
   `${prefix}/explorer/inflation/categories`,
   `${prefix}/explorer/economy/sectors`,
+  // Their opening comparison (Men and Women; two age groups) is a default, not state.
+  `${prefix}/explorer/unemployment/gender`,
+  `${prefix}/explorer/unemployment/age`,
   `${prefix}/explorer/demography/population`,
   `${prefix}/explorer/demography/population/georgia`,
   `${prefix}/explorer/demography/population/region/adjara`,

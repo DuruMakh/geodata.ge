@@ -42,6 +42,8 @@ export type AmountParts = { num: string; unit: string };
 /** Split amount into number and localized unit, choosing magnitude from the value. */
 export function formatAmountParts(value: number | null | undefined, signed = false, locale: Locale = "ka"): AmountParts {
   if (value === null || value === undefined) return { num: MISSING, unit: "" };
+  // An unfunded line is plain zero lari, unsigned — never "0.00 მლნ ₾".
+  if (value === 0) return { num: "0", unit: formatMessages[locale]["format.gel"] };
   const sign = signed ? (value >= 0 ? "+" : "−") : value < 0 ? "−" : "";
   const abs = Math.abs(value);
   if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 1), unit: formatMessages[locale]["format.bnGel"] };
@@ -80,16 +82,22 @@ export function formatPerResidentGel(value: number | null | undefined, locale: L
 /** Percentage from a fraction, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
 export function formatShare(fraction: number | null | undefined, signed = false, decimals = 1): string {
   if (fraction === null || fraction === undefined || !Number.isFinite(fraction)) return MISSING;
-  const value = fraction * 100;
-  const prefix = signed && value > 0 ? "+" : "";
-  return (prefix + value.toFixed(decimals) + "%").replace("-", "−");
+  return formatSignedFixed(fraction * 100, signed, decimals) + "%";
+}
+
+// toFixed decides rounding and the sign (as it always has); the digits get the
+// same en-US grouping as every other figure, so a mover reads "+4,565.1%".
+function formatSignedFixed(value: number, signed: boolean, decimals: number): string {
+  const rounded = value.toFixed(decimals);
+  const negative = rounded.startsWith("-");
+  const prefix = negative ? "−" : signed && value > 0 ? "+" : "";
+  return prefix + fixed(Math.abs(Number(rounded)), decimals);
 }
 
 /** Percentage-point difference, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
 export function formatPoints(points: number | null | undefined, signed = false, decimals = 1): string {
   if (points === null || points === undefined || !Number.isFinite(points)) return MISSING;
-  const prefix = signed && points > 0 ? "+" : "";
-  return (prefix + points.toFixed(decimals)).replace("-", "−");
+  return formatSignedFixed(points, signed, decimals);
 }
 
 /**
