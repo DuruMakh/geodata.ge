@@ -1,7 +1,7 @@
 # Trading partners: countries and country groups
 
 Date: 2026-10-08
-Status: Proposed written design, awaiting user review. The user chose Trends first and agreed to include country groups. Their subsequent "yes great continue" is interpreted as accepting mixed country/group comparisons; that interpretation is explicit here for review. Implementation and publishing have not been approved through this document.
+Status: Approved on 2026-10-08 when the user said "approve". The approved design includes Trends first, country groups and mixed country/group comparisons. Implementation follows written-plan review and execution-method selection. Publishing and live database operations remain separate.
 
 ## 1. Intended result
 
@@ -16,7 +16,7 @@ Decisions already accepted in conversation:
 - Total trade, Exports, Imports and Balance as separate measure choices.
 - Existing line chart, table, annual range, searchable checkboxes and Excel export.
 
-This document proposes the remaining defaults and exact behavior for review.
+The detailed defaults and behavior below are part of the approved design.
 
 ## 2. Pages and navigation
 
@@ -90,7 +90,7 @@ The ranking uses the active end year and measure independently of selected chart
 - The ranking remains present in main-table mode and with no selected series. Changing end year, measure or browsing tab updates it; changing checkboxes does not.
 - The complete country ranking is accessible with ordinary page scrolling. Reuse the editorial ranking style and responsive rows rather than adding a chart library or a separate scrolling panel.
 
-The top-ten expansion is a proposed readability default for a catalogue containing more than two hundred identities. It limits the initial display, not coverage, selection or export.
+The top-ten expansion is the approved readability default for a catalogue containing more than two hundred identities. It limits the initial display, not coverage, selection or export.
 
 ## 6. Meaning of country groups and partners
 
@@ -163,4 +163,4 @@ During implementation, amend `Project_Definition.md` section 2E for the accepted
 
 ## 10. Next stage
 
-The user reviews this written design, including mixed comparison, global bulk actions, the national-only initial selection and the top-ten ranking expansion. After written-design approval, prepare the implementation plan for review and execution-method selection. Conversational approval of the layout permits this design document, not product implementation, live database changes or publishing.
+This written design was approved, including mixed comparison, global bulk actions, the national-only initial selection and the top-ten ranking expansion. Prepare the implementation plan for review and execution-method selection. Written-design approval permits that planning stage; live database operations and publishing remain separate delivery decisions.
