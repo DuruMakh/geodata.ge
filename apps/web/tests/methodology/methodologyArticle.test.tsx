@@ -152,7 +152,8 @@ describe("methodology without bulk files", () => {
 
   it("lists demography on the hub but keeps it out of the data catalog, which names only Dataset nodes", async () => {
     const { renderMethodologyPage } = await import("../../lib/pages/methodology");
-    // The hub renders the client-side ComingSoonBadge, which needs the provider the real locale layout supplies.
+    // The hub's coming-next list is empty, so no client-side ComingSoonBadge renders now; the provider stays for the day a
+    // future-dataset row returns, because the real locale layout supplies one.
     const messages = await getMessages("en", ["common", "methodology"]);
     const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={messages}>{await renderMethodologyPage("en")}</I18nProvider>);
     const catalog = markup.match(/<script data-testid="catalog-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!;
