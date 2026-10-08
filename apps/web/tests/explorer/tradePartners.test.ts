@@ -51,6 +51,20 @@ test("balance orders deficits and surpluses by magnitude and resolves ties by la
   const ties = { ...data, facts: data.facts.map(f => ({ ...f, valueUsd: 0 })) };
   expect(build(ties, { ...initial, tab: "groups" }, presentation).ranking.map(r => r.entityId)).toEqual(["group.eu", "group.oecd"]);
 });
+test("available choices follow the active end-year values, signed magnitude, missing-last and label ties", async () => {
+  const { buildTradePartnersModel: build, DEFAULT_TRADE_PARTNERS_STATE: initial } = await modules();
+  const ids = (model: ReturnType<typeof build>) => model.activeEntities.map(entity => entity.id);
+  expect(ids(build(data, { ...initial, tab: "groups", measure: "trade.exports" }, presentation))).toEqual(["group.oecd", "group.eu"]);
+  expect(ids(build(data, { ...initial, tab: "groups", measure: "trade.imports" }, presentation))).toEqual(["group.eu", "group.oecd"]);
+  const priorYear = { ...data, facts: data.facts.map(f => f.entityId === "group.eu" && f.year === 2024 && f.indicatorId === "trade.exports" ? { ...f, valueUsd: 900 } : f) };
+  expect(ids(build(priorYear, { ...initial, tab: "groups", measure: "trade.exports", range: { kind: "manual", start: 2024, end: 2024 } }, presentation))).toEqual(["group.eu", "group.oecd"]);
+  const signed = { ...data, facts: data.facts.map(f => f.entityId === "group.eu" && f.indicatorId === "trade.balance" ? { ...f, valueUsd: -800 } : f) };
+  expect(ids(build(signed, { ...initial, tab: "groups", measure: "trade.balance" }, presentation))).toEqual(["group.eu", "group.oecd"]);
+  const ties = { ...data, entities: [...data.entities].reverse(), facts: data.facts.map(f => ({ ...f, valueUsd: 0 })) };
+  expect(ids(build(ties, { ...initial, tab: "groups" }, presentation))).toEqual(["group.eu", "group.oecd"]);
+  const reordered = { ...data, entities: [...data.entities].reverse() };
+  expect(ids(build(reordered, initial, presentation))).toEqual(["partner.1995-2025.643", "partner.1995-2025.530"]);
+});
 test("tiny signed amounts in a billion unit remain visibly nonzero", async () => {
   const { buildTradePartnersModel: build, DEFAULT_TRADE_PARTNERS_STATE: initial } = await modules();
   const tiny = { ...data, facts: data.facts.map(f => f.indicatorId === "trade.balance" ? { ...f, valueUsd: f.entityId === "group.eu" ? 1 : -1 } : f), nationalFacts: data.nationalFacts.map(f => ({ ...f, valueUsd: f.indicatorId === "trade.balance" ? -2e9 : f.valueUsd })) };

@@ -40,5 +40,7 @@ export function buildTradePartnersModel(data: ClientTradePartnersData, state: Tr
   const labelOrder = (a: TradePartnerRankingRow, b: TradePartnerRankingRow) => a.label.localeCompare(b.label, presentation.locale) || a.entityId.localeCompare(b.entityId, "en");
   const ranking = rows.filter(row => row.valueUsd !== null).sort((a, b) => (state.measure === "trade.balance" ? Math.abs(b.valueUsd!) - Math.abs(a.valueUsd!) : b.valueUsd! - a.valueUsd!) || labelOrder(a, b)).map((row, index) => ({ ...row, rank: index + 1 }));
   const missingRanking = rows.filter(row => row.valueUsd === null).sort(labelOrder);
+  const order = new Map([...ranking, ...missingRanking].map((row, index) => [row.entityId, index]));
+  activeEntities.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
   return { years, range, unit, selectedIds, valuesByEntity, activeEntities, offTabSelected, ranking, missingRanking, selectedCount: selectedIds.length, totalCount: ids.length };
 }

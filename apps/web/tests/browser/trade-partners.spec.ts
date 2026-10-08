@@ -14,6 +14,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 218");
     await expect(toggle(page, "goods.total")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-list").getByTestId("series-row").nth(1)).toHaveAttribute("data-series-id", "partner.1995-2025.792");
     await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(10);
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: info.outputPath(`partners-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
