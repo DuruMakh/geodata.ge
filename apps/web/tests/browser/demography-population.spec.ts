@@ -283,6 +283,37 @@ test.describe("phone layouts at 390px", () => {
   }
 });
 
+// Owner decision D7: on a touch phone the first tap on the map previews a place in a strip under it and the second opens its page.
+// The Population index gives the map persons and the Population page (`hrefForCode`), so the strip must not fall back to the Budget page's
+// per-resident wording and link. A second tap on the shape goes through the index's own addresses, so the strip's link is tapped too.
+test.describe("index map on a touch phone", () => {
+  test.use({ isMobile: true, hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test("the first tap previews Khulo in persons and both ways of opening it go to its Population page", async ({ page }) => {
+    await page.goto("/en/explorer/demography/population");
+    await ready(page);
+    const shape = page.getByTestId("municipality-shape-11");
+    const strip = page.getByTestId("map-touch-preview");
+
+    await shape.tap();
+    await expect(strip).toBeVisible();
+    await expect(strip).toContainText(/^Khulo · 16,098 persons/);
+    await expect(strip).not.toContainText(/GEL|₾/);
+    await expect(strip).toHaveAttribute("href", "/en/explorer/demography/population/khulo");
+    expect(new URL(page.url()).pathname, "the first tap only previews").toBe("/en/explorer/demography/population");
+
+    await shape.tap();
+    await expect(page).toHaveURL(/\/en\/explorer\/demography\/population\/khulo$/);
+
+    await page.goto("/en/explorer/demography/population");
+    await ready(page);
+    await shape.tap();
+    await strip.tap();
+    await expect(page).toHaveURL(/\/en\/explorer\/demography\/population\/khulo$/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Khulo");
+  });
+});
+
 test("the Excel download of a place page has three sheets and numeric population", async ({ page }, testInfo) => {
   await page.goto("/en/explorer/demography/population/batumi");
   await ready(page);
