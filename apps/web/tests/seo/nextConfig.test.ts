@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import nextConfig from "../../next.config";
 
-it.each(["external_trade_methodology.html", "metadata-en.html"])("isolates the captured Trade HTML original %s", async filename => {
+it.each(["external_trade_methodology.html.txt", "metadata-en.html.txt"])("isolates the captured Trade HTML original %s", async filename => {
   const headers = await nextConfig.headers?.();
   const rule = headers?.find(rule => rule.source === `/downloads/methodology/trade/files/${filename}`);
   expect(rule).toBeDefined();

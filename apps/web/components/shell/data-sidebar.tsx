@@ -299,6 +299,10 @@ export function DataSidebar() {
               {message(messages, "common.trade")}
             </Link>
             {tradeActive ? <Link href={pageHref("/explorer/trade/overview", locale)} data-testid="trade-overview-link" aria-current={tradeOverviewActive ? "page" : undefined}
+              onNavigate={(event) => {
+                if (tradeOverviewActive) event.preventDefault();
+                setSheetOpen(false);
+              }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${tradeOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeOverview")}

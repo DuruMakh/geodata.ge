@@ -130,7 +130,29 @@ Documentation checked while planning: [Prisma v7 schema reference](https://www.p
 - npm run check passed: lint, typecheck, 3,073 unit tests (seven pre-existing intentional skips), all data checks and translation completeness (315 labels, 141 page identities). National goods acceptance remains 124 observations; the wider research package retains its two services holds.
 - npm run build and postbuild checks passed; 291 routes prerendered, only existing /mcp dynamic. Trade trace contains no raw research/preparation paths.
 - Full browser run exercised 734 scenarios: 732 passed, two old sitemap expectations were corrected, then both passed with npm run test:browser -- --last-failed. No product input changed for that rerun. All 11 Trade scenarios passed, including both languages at three viewport widths, empty state/history/keyboard, annual labels, XLSX values/status/source hashes and safe HTML source downloads.
-- One independent whole-branch review found no Critical or Minor issues and one Important issue: captured HTML could execute under the site origin. Exact-file attachment and sandbox/network-blocking headers fixed it; unit checks and real HTTP/download/hash/no-tracker browser checks passed.
+- One independent whole-branch review found no Critical or Minor issues and one Important issue: captured HTML could execute under the site origin. Exact-file attachment and sandbox/network-blocking headers protected the literal addresses; their unit and literal download checks passed. The requested follow-up review below found and closed an encoded-address bypass.
 - Rulings: retain native hyphenated source identity but use the existing underscore convention for its registered source document; use lowercase public filenames with original bytes unchanged; keep Trade outside the AI/bulk snapshot; add only an optional annual chart frequency while preserving monthly defaults.
 - Actual PostgreSQL migration, round-trip import and rollback were not rehearsed: no disposable target was available. SQL was generated offline; mapping and parity tests are not real-database proof. No live migration/import, push, PR, merge or deployment was performed.
 - Screenshots are preserved in output/playwright/trade-overview. The local preview is served at http://localhost:3185/explorer/trade/overview and /en/explorer/trade/overview.
+
+## Requested follow-up code review — 2026-10-08
+
+- Fresh independent review covered f164741e through 093832c2. It found no Critical issues, two Important issues and no functional Minor issues: encoded archive addresses bypassed the HTML headers, and clicking the active Overview link removed the saved view from the URL.
+- The two original HTML byte captures now use `.html.txt` public filenames. Their official filenames, original media-type metadata and SHA-256 fingerprints remain unchanged. Archive regeneration removes the executable `.html` copies. Old literal and encoded addresses return 404; encoded replacement addresses serve the original bytes as plain text with `nosniff`. Normal replacement addresses additionally retain attachment and sandbox/network-blocking headers.
+- The Trade sidebar cancels navigation when Overview is already active and closes the mobile navigation sheet. Other dataset links and hub-to-Overview navigation retain their existing behavior.
+- Five new regressions failed before the fixes. After the rebuild, all 16 Trade browser scenarios passed, including both languages, desktop and phone navigation, reload, language switching, empty selection and encoded source aliases. Focused archive/header unit checks passed 10/10.
+- The reviewer rechecked the pending changes and independently verified the replacement MIME types, exact hashes, removed old aliases and generated file inventory. Both findings are closed, with no remaining Critical, Important or Minor code issue.
+- `npm run check` passed on the final product inputs: lint, typecheck, 3,073 unit tests, seven intentional skips, all data checks and translation completeness. The rebuilt production artifact and every postbuild check passed.
+- [x] Final full browser suite exercised 739 scenarios: 738 passed, and the one existing municipality redirect hash assertion passed its isolated rerun without changed product inputs. The failure observed the correct Batumi route and 2016–2021 range after normal default mode/series parameters had already been added; the unchanged test expects the earlier raw hash. All 16 Trade scenarios passed in both focused and full runs. Full-run and rerun evidence is retained separately.
+
+Executor rulings on behaviors the reviewer declined to judge:
+
+- Actual PostgreSQL migration, decimal round-trip, rollback and effective role restrictions remain required release evidence; local mapping tests do not prove them.
+- Production deployment identity, routes and headers remain separate release evidence. This review did not publish or modify a live database.
+- Future Geostat revisions remain outside the approved frozen capture.
+- Services conflicts and additional Trade breakdowns remain outside the approved Overview scope.
+- Native Microsoft Excel rendering, additional browser engines and real screen-reader operation remain acknowledged limits of the available local checks; no claim is made that they were exercised.
+- A controlled performance comparison was not part of this review; no performance improvement is claimed.
+- The cosmetic migration whitespace warning was corrected and the full diff passes `git diff --check`.
+
+Fresh logs are retained in `output/playwright/trade-overview/requested-review-*.log`.

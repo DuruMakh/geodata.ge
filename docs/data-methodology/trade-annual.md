@@ -61,7 +61,7 @@ Historical records use actual basis to distinguish observed trade from forecasts
 
 The exact native source identity `geostat_trade_ftrade-1995-2026` remains in the facts and cell references. Its database source document uses the existing stable-ID convention, `source.geostat_trade_ftrade_1995_2026`. The native filename remains `FTrade_1995-2026.xlsx`; the public archive URL uses lowercase `ftrade_1995-2026.xlsx`, as required by the archive registry. The private mirror stores amounts as Decimal(40,20), retains native text and nullable derived metadata, and checks every canonical field before the import transaction commits.
 
-The two captured HTML originals are served as file attachments with a sandboxed, network-blocking content policy. Their original bytes and fingerprints are preserved without executing the captured website's scripts under Fiscal.ge's origin.
+The two captured HTML originals are published unchanged as plain-text `.html.txt` downloads. This keeps encoded versions of their addresses from executing the captured scripts under Fiscal.ge's origin. The normal download addresses also carry attachment and sandbox/network-blocking headers. Original filenames, media-type metadata, bytes and fingerprints remain preserved; executable `.html` copies are not published.
 
 Run `npm run data:prepare-trade-overview` to regenerate the two serving artifacts and `npm run data:check-trade-overview` to reproduce their exact bytes without writing. Serving reads only these small artifacts; it does not import the raw workbook reader.
 

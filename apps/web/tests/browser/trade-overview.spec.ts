@@ -110,8 +110,8 @@ test("the two HTML originals download without executing archived website scripts
   const trackingRequests: string[] = [];
   page.on("request", req => { if (/googletagmanager|google-analytics|recaptcha/.test(req.url())) trackingRequests.push(req.url()); });
   for (const [filename, hash] of [
-    ["external_trade_methodology.html", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
-    ["metadata-en.html", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
+    ["external_trade_methodology.html.txt", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
+    ["metadata-en.html.txt", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
   ]) {
     const href = `/downloads/methodology/trade/files/${filename}`;
     const response = await request.get(href);
@@ -127,4 +127,65 @@ test("the two HTML originals download without executing archived website scripts
     await expect(page).toHaveURL(/\/en\/methodology\/trade$/);
   }
   expect(trackingRequests).toEqual([]);
+});
+
+for (const { prefix, width, selection } of [
+  { prefix: "", width: 1440, selection: "trade.exports,trade.balance" },
+  { prefix: "/en", width: 1440, selection: "trade.exports,trade.balance" },
+  { prefix: "", width: 390, selection: "" },
+  { prefix: "/en", width: 390, selection: "" },
+]) {
+  test('active Overview navigation preserves the saved view ' + (prefix || "ka") + ' at ' + width + 'px', async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(prefix + "/explorer/trade/overview#view=table&sel=" + selection + "&start=2023&end=2024");
+    const expectView = async () => {
+      await expect(page.getByTestId("series-status")).toContainText(selection ? "2 / 4" : "0 / 4");
+      await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+      await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2023");
+      await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuenow", "2024");
+    };
+    await expectView();
+    const before = page.url();
+    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    await page.getByTestId("trade-overview-link").click();
+    await expect(page).toHaveURL(before);
+    if (width < 900) await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+    await page.reload();
+    await expectView();
+    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp((prefix ? "" : "/en") + "/explorer/trade/overview#"));
+    await expectView();
+    expect(new URLSearchParams(new URL(page.url()).hash.slice(1)).get("sel")).toBe(selection);
+  });
+}
+
+test("encoded HTML source aliases cannot execute from the site origin", async ({ request }) => {
+  for (const href of [
+    "/downloads/methodology/trade/files/external_trade_methodology.html",
+    "/downloads/methodology/trade/files/metadata-en.html",
+    "/downloads/methodology/trade/files/%65xternal_trade_methodology.html",
+    "/downloads/methodology/%74rade/files/external_trade_methodology.html",
+    "/downloads/methodology/trade/%66iles/metadata-en.html",
+    "/downloads/methodology/trade/files/metadata-en%2ehtml",
+    "/downloads/methodology/trade/files/metadata-en%2e%68%74%6d%6c",
+  ]) {
+    const response = await request.get(href);
+    expect(response.status(), href).toBe(404);
+  }
+  for (const [href, hash] of [
+    ["/downloads/methodology/trade/files/%65xternal_trade_methodology.html.txt", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
+    ["/downloads/methodology/%74rade/files/external_trade_methodology.html.txt", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
+    ["/%64ownloads/methodology/trade/files/external_trade_methodology.html.txt", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
+    ["/downloads/%6dethodology/trade/files/metadata-en.html.txt", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
+    ["/downloads/methodology/trade/%66iles/metadata-en.html.txt", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
+    ["/downloads/methodology/trade/files/metadata-en%2ehtml%2etxt", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
+    ["/downloads/methodology/trade/files/metadata-en.html.%74%78%74", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
+  ]) {
+    const response = await request.get(href);
+    expect(response.status(), href).toBe(200);
+    expect(response.headers()["content-type"], href).toMatch(/^text\/plain\b/);
+    expect(response.headers()["x-content-type-options"], href).toBe("nosniff");
+    expect(createHash("sha256").update(await response.body()).digest("hex"), href).toBe(hash);
+  }
 });
