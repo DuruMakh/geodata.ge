@@ -17,7 +17,7 @@ describe("sidebar demography group", () => {
     expect(markup).toContain('data-testid="demography-population-link" aria-current="page"');
     expect(markup).not.toContain('data-testid="demography-age-sex-link"');
     expect(markup).toContain("Unemployment");
-    expect((markup.match(/Coming soon/g) ?? []).length).toBe(1);
+    expect((markup.match(/Coming soon/g) ?? []).length).toBe(0);
   });
 
   it("keeps the Population link current on every place page, in both languages", async () => {
