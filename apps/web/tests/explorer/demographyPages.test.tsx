@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src: "/definitions.svg" } }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathname: () => "/" }));
 
+import { SERIES } from "../../lib/data/demography/series";
 import { populationHrefById } from "../../lib/explorer/demographyPlaceRoutes";
 import { buildPopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
 import {
@@ -48,6 +49,12 @@ describe("demography hub page", () => {
 const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
 
 describe("population index page", () => {
+  it("hands the Population pages only population and density rows", async () => {
+    const { facts, clientFacts } = await loadPopulationBasics("en");
+    expect(facts).toHaveLength(1_068);
+    expect(new Set(clientFacts.map((fact) => fact.seriesId))).toEqual(new Set([SERIES.populationTotal, SERIES.populationDensity]));
+  });
+
   it("is the Budget index layout with population: map, four key figures, 64 and 12 rows, links to place pages, no button row", async () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="municipal-index-workspace"');
