@@ -49,8 +49,8 @@ for (const { path, label } of [
     }
     const backHome = page.getByTestId("sidebar-back-home");
     expect((await backHome.boundingBox())?.width ?? 0).toBeGreaterThan(300);
-    const teaserOpacity = await page.getByTestId("teaser-demography").evaluate((element) => Number(getComputedStyle(element).opacity));
-    expect(teaserOpacity).toBeLessThan(1);
+    // Demography is a live dataset link now (its 44px row is measured above), so no reduced-emphasis teaser row is left.
+    await expect(panel.locator("[data-testid^=teaser-]")).toHaveCount(0);
 
     await page.keyboard.press("Escape");
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
