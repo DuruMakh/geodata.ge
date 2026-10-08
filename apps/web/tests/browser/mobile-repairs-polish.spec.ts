@@ -133,15 +133,19 @@ test.describe("phone", () => {
     expect(geometry.right).toBeLessThanOrEqual(390);
   });
 
-  test("product names never break inside a word at 390px", async ({ page }) => {
+  test("product names break inside a word only when the word is wider than its column at 390px", async ({ page }) => {
     for (const path of ["/explorer/inflation/products", "/en/explorer/inflation/products"]) {
       await page.goto(path);
       await ready(page);
       await page.evaluate(() => document.fonts.ready);
       const result = await page.getByTestId("product-table").evaluate((table) => {
         const broken: string[] = [];
-        for (const span of table.querySelectorAll("[data-testid='product-row-toggle'] span.block")) {
+        const canvas = document.createElement("canvas").getContext("2d")!;
+        for (const span of table.querySelectorAll<HTMLElement>("[data-testid='product-row-toggle'] span.block")) {
           const node = span.firstChild;
+          // A single word wider than the whole name column has to break somewhere:
+          // Georgian has no browser hyphenation (e.g. ელექტროგაყვანილობის at 390px).
+          canvas.font = getComputedStyle(span).font;
           if (!node || node.nodeType !== Node.TEXT_NODE) continue;
           let index = 0;
           for (const word of node.textContent!.split(/(\s+)/)) {
@@ -149,7 +153,8 @@ test.describe("phone", () => {
               const range = document.createRange();
               range.setStart(node, index);
               range.setEnd(node, index + word.length);
-              if (new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size > 1) broken.push(word);
+              const fits = canvas.measureText(word).width <= span.clientWidth;
+              if (fits && new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size > 1) broken.push(word);
             }
             index += word.length;
           }
