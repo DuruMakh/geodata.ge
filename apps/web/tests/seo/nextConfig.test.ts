@@ -1,6 +1,14 @@
 import { expect, it } from "vitest";
 import nextConfig from "../../next.config";
 
+it.each(["external_trade_methodology.html", "metadata-en.html"])("isolates the captured Trade HTML original %s", async filename => {
+  const headers = await nextConfig.headers?.();
+  const rule = headers?.find(rule => rule.source === `/downloads/methodology/trade/files/${filename}`);
+  expect(rule).toBeDefined();
+  expect(rule?.headers).toContainEqual({ key: "Content-Disposition", value: "attachment" });
+  expect(rule?.headers).toContainEqual({ key: "Content-Security-Policy", value: "sandbox; default-src 'none'" });
+});
+
 it("noindexes only third-party methodology source originals", async () => {
   const headers = await nextConfig.headers?.();
 

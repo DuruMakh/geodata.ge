@@ -61,6 +61,8 @@ Historical records use actual basis to distinguish observed trade from forecasts
 
 The exact native source identity `geostat_trade_ftrade-1995-2026` remains in the facts and cell references. Its database source document uses the existing stable-ID convention, `source.geostat_trade_ftrade_1995_2026`. The native filename remains `FTrade_1995-2026.xlsx`; the public archive URL uses lowercase `ftrade_1995-2026.xlsx`, as required by the archive registry. The private mirror stores amounts as Decimal(40,20), retains native text and nullable derived metadata, and checks every canonical field before the import transaction commits.
 
+The two captured HTML originals are served as file attachments with a sandboxed, network-blocking content policy. Their original bytes and fingerprints are preserved without executing the captured website's scripts under Fiscal.ge's origin.
+
 Run `npm run data:prepare-trade-overview` to regenerate the two serving artifacts and `npm run data:check-trade-overview` to reproduce their exact bytes without writing. Serving reads only these small artifacts; it does not import the raw workbook reader.
 
 `prepare.py --write` creates deterministic family CSVs, source-observation chunks, the three allowed derivations (national goods balance/turnover and reviewed re-exports), coverage, reconciliation and validation reports. Large product/source chunks follow published blocks and, if necessary, complete-year boundaries. CSVs use UTF-8 BOM, LF records and fixed columns. `--check` reproduces their exact bytes without writes. This proves reproduction, not source acceptance. `--acceptance` exits nonzero while the source holds remain.
@@ -84,4 +86,4 @@ $tradePackage = 'docs/Raw Data/Trade/geostat-external-trade/2026-10-07'
 & $tradePython -X utf8 "$tradePackage/test_prepare.py"
 ```
 
-The source-acceptance command intentionally returns exit code 2 for the two unresolved comparisons. Focused tests pin omitted years/zero rows/blocks, duplicate keys, lost leading zeroes, invented zeroes, unit/value changes, source corruption, stale artifacts and reports, source remainders and known holds. Repository completion also requires `npm run check` and `npm run build` in `apps/web`; there are no UI changes requiring browser tests.
+The source-acceptance command intentionally returns exit code 2 for the two unresolved comparisons. Focused tests pin omitted years/zero rows/blocks, duplicate keys, lost leading zeroes, invented zeroes, unit/value changes, source corruption, stale artifacts and reports, source remainders and known holds. Repository completion also requires `npm run check` and `npm run build` in `apps/web`. Research-only preparation has no UI boundary; the approved Trade Overview additionally requires `npm run test:browser`.

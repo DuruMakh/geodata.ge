@@ -104,3 +104,27 @@ for (const prefix of ["", "/en"]) {
     expect(await readFile(path.resolve(process.cwd(), "../../data/reports/trade-overview-validation.json"), "utf8")).toContain('"status": "passed"');
   });
 }
+
+test("the two HTML originals download without executing archived website scripts", async ({ page, request }) => {
+  await page.goto("/en/methodology/trade");
+  const trackingRequests: string[] = [];
+  page.on("request", req => { if (/googletagmanager|google-analytics|recaptcha/.test(req.url())) trackingRequests.push(req.url()); });
+  for (const [filename, hash] of [
+    ["external_trade_methodology.html", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
+    ["metadata-en.html", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
+  ]) {
+    const href = `/downloads/methodology/trade/files/${filename}`;
+    const response = await request.get(href);
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-disposition"]).toBe("attachment");
+    expect(response.headers()["content-security-policy"]).toBe("sandbox; default-src 'none'");
+    expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(hash);
+    const downloaded = page.waitForEvent("download");
+    await page.locator(`a[href="${href}"]`).click();
+    const download = await downloaded;
+    expect(download.suggestedFilename()).toBe(filename);
+    expect(createHash("sha256").update(await readFile((await download.path())!)).digest("hex")).toBe(hash);
+    await expect(page).toHaveURL(/\/en\/methodology\/trade$/);
+  }
+  expect(trackingRequests).toEqual([]);
+});
