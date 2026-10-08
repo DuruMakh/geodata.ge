@@ -17,6 +17,7 @@ import { getPresentation } from "../../lib/i18n/presentation.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 import type { Locale, Presentation } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
+import { chartGeometry } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
 let facts: ClientDemographyObservation[];
@@ -90,9 +91,8 @@ describe("place page body: Georgia", () => {
     expect(html()).toContain('role="img"');
     expect(tagOf(html(), "population-mode-line")).toContain('aria-pressed="true"');
     // One break in each drawing: before the browser measures, the markup holds the desktop and the phone drawing.
-    for (const geometry of ["desktop", "mobile"]) {
-      const svg = new RegExp(`<svg[^>]*data-geometry="${geometry}"[^]*?</svg>`).exec(html())?.[0] ?? "";
-      expect(count(svg, /data-testid="chart-break"/g), geometry).toBe(1);
+    for (const geometry of ["desktop", "mobile"] as const) {
+      expect(count(chartGeometry(html(), geometry), /data-testid="chart-break"/g), geometry).toBe(1);
     }
     expect(count(html(), /Census re-base/g)).toBeGreaterThanOrEqual(2);
     expect(html()).toContain("226,000");

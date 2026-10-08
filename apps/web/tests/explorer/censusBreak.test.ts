@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { EditorialLineChart } from "../../components/main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../../components/main-explorer/explorer-table";
 import { UNIT_PERSONS } from "../../lib/explorer/format";
-import { renderGeorgianMarkup } from "../helpers/render-localized";
+import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 
 const COLOR = "#B3402A";
 const chart = (years: number[], vals: (number | null)[], breaks?: Array<{ year: number; label: string }>) =>
@@ -18,7 +18,7 @@ const chart = (years: number[], vals: (number | null)[], breaks?: Array<{ year: 
 const pathOf = (html: string) => new RegExp(`<path d="([^"]+)" fill="none" stroke="${COLOR}"`).exec(html)![1]!;
 const count = (text: string, token: RegExp) => (text.match(token) ?? []).length;
 // Before the browser measures, the markup holds the desktop and the phone drawing (CSS shows one); each must keep the gap.
-const drawings = (html: string) => [...html.matchAll(/<svg[^>]*data-geometry="(desktop|mobile)"[^]*?<\/svg>/g)].map((match) => ({ geometry: match[1]!, svg: match[0] }));
+const GEOMETRIES = ["desktop", "mobile"] as const;
 
 describe("EditorialLineChart break", () => {
   const years = [2023, 2024, 2025, 2026];
@@ -32,8 +32,8 @@ describe("EditorialLineChart break", () => {
 
   it("never joins the year before a break to the break year, in the desktop and the phone drawing", () => {
     const html = chart(years, vals, [{ year: 2025, label: "Census re-base" }]);
-    expect(drawings(html).map((drawing) => drawing.geometry)).toEqual(["desktop", "mobile"]);
-    for (const { geometry, svg } of drawings(html)) {
+    for (const geometry of GEOMETRIES) {
+      const svg = chartGeometry(html, geometry);
       expect(count(pathOf(svg), /M/g), geometry).toBe(2);
       expect(count(pathOf(svg), /L/g), geometry).toBe(2);
     }
@@ -41,7 +41,8 @@ describe("EditorialLineChart break", () => {
 
   it("marks the gap with one labelled dashed rule in each drawing", () => {
     const html = chart(years, vals, [{ year: 2025, label: "Census re-base" }]);
-    for (const { geometry, svg } of drawings(html)) {
+    for (const geometry of GEOMETRIES) {
+      const svg = chartGeometry(html, geometry);
       expect(count(svg, /data-testid="chart-break"/g), geometry).toBe(1);
       expect(svg, geometry).toContain("Census re-base");
       expect(svg, geometry).toMatch(/data-testid="chart-break"[^]*?stroke-dasharray="4 3"/);
