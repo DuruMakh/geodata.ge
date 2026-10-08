@@ -61,6 +61,7 @@ import {
 export const SERVED_DATA_FILES = {
   gdpOverviewFacts: "../../data/imports/gdp-overview-annual.csv",
   economicSectorFacts: "../../data/imports/economic-sectors-annual.csv",
+  tradeOverviewFacts: "../../data/imports/trade-overview-annual.csv",
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
   inflationCpiFacts: "../../data/imports/cpi-national-monthly.csv",
   inflationTargets: "../../data/imports/nbg-inflation-target.csv",
