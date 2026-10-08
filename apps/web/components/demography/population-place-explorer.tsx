@@ -16,6 +16,7 @@ import { matchesLabelQuery } from "../../lib/i18n/search";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -167,14 +168,15 @@ export function PopulationPlaceExplorer({
                   shareValueForYear={() => null}
                 />
               )}
-              <div className="mt-6 border-t border-[var(--hairline-soft)] pt-4">
-                <RangeStrip
-                  years={allYears}
-                  range={state.range}
-                  marker={{ year: CENSUS_STEP.toYear, label: breakLabel }}
-                  onChange={state.setRange}
-                />
-              </div>
+              <ChartSelectionAids
+                series={model.series}
+                chartShown={state.chartMode === "line"}
+                share={false}
+                unit={thousandsUnit(locale)}
+                formatValue={(value) => formatInUnit(value, UNIT_PERSONS)}
+              />
+              {/* The strip draws its own rule. */}
+              <RangeStrip years={allYears} range={state.range} marker={{ year: CENSUS_STEP.toYear, label: breakLabel }} onChange={state.setRange} />
             </section>
             <div className="mt-5 max-w-[640px]">
               <SourceNote testId="population-source-note">{sourceNote}</SourceNote>
