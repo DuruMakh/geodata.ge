@@ -77,6 +77,8 @@ test("the hover readout lists all twelve rows as arrows: arrivals by size, then 
 });
 
 // The float readout is clipped to the plot's height, so twelve rows must fit it at every width that draws it.
+// Headroom is thinnest at 900px (about 5px, measured 2026-10-09): one more readout line (a note, a "+N" line, a longer
+// overlay label) would clip there, so keep this list and re-measure before adding one.
 for (const width of [769, 820, 900, 1000, 1021, 1100, 1280, 1400, 1440]) {
   test(`the twelve-row hover readout is not clipped at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -96,6 +98,23 @@ for (const width of [769, 820, 900, 1000, 1021, 1100, 1280, 1400, 1440]) {
     expect(await tooltip.evaluate((element) => element.scrollHeight <= element.clientHeight + 1)).toBe(true);
   });
 }
+
+test("the Georgian readout with five groups fits on the last year, where it flips left and its header wraps", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 900 });
+  await page.goto(`${PATH}#sel=citizenship.georgia,citizenship.turkey,citizenship.azerbaijan,citizenship.ukraine,citizenship.all_other_computed`);
+  await ready(page);
+  const chart = page.getByTestId("chart-panel").locator('svg[role="img"]').first();
+  await chart.focus();
+  await page.keyboard.press("End");
+  const tooltip = page.getByTestId("stack-chart-tooltip");
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText("2025");
+  await expect(tooltip.locator("svg")).toHaveCount(10);
+  const box = (await tooltip.boundingBox())!;
+  const last = (await tooltip.locator(":scope > div").last().boundingBox())!;
+  expect(last.y + last.height).toBeLessThanOrEqual(box.y + box.height + 0.5);
+  expect(await tooltip.evaluate((element) => element.scrollHeight <= element.clientHeight + 1)).toBe(true);
+});
 
 test("a single-year range prints that year and drops the range-start details", async ({ page }) => {
   await page.goto(`/en${PATH}#start=2023&end=2023`);
