@@ -63,3 +63,16 @@ test("rejects source corruption and catalogue code reassignment", async () => {
   await writeFile(catalogueFile, JSON.stringify(catalogue));
   await expect(run(other, "write")).rejects.toThrow(/identity|catalogue|code/i);
 }, 30_000);
+
+test.each(["prepared-validation.json", "unresolved-source-issues.json"])("rejects an unresolved goods hold in %s before emitting acceptance", async name => {
+  const run = await prepare();
+  for (const family of ["goods_countries", "goods_country_groups", "goods_national"]) {
+    const directory = await createTradePartnersPackageFixture(), file = path.join(directory, TRADE_RESEARCH, name);
+    const report = JSON.parse(await readFile(file, "utf8"));
+    const issues = name === "prepared-validation.json" ? report.unresolved_source_issues : report.issues;
+    issues.push({ family, year: "2025", status: "fail", item_id: "partner.1995-2025.643" });
+    await writeFile(file, JSON.stringify(report));
+    await expect(run(directory, "write")).rejects.toThrow(/source acceptance hold/i);
+    await expect(readFile(path.join(directory, "data/reports/trade-partners-validation.json"))).rejects.toMatchObject({ code: "ENOENT" });
+  }
+}, 90_000);

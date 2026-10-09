@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { SSF } from "xlsx";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
@@ -96,4 +97,15 @@ test("mixed Excel download contains the exact selected figures and all four unto
   }
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("1995/2025"); expect(dataset).not.toHaveProperty("distribution");
+});
+
+test("Qatar's downloaded Summary keeps its small 2025 turnover visibly nonzero", async ({ page }) => {
+  await page.goto("/en/explorer/trade/partners#sel=partner.1995-2025.634&measure=trade.turnover&start=2025&end=2025");
+  await expect(page.getByTestId("series-status")).toContainText("1 / 218");
+  const pending = page.waitForEvent("download"); await page.getByTestId("trade-partners-excel-download").click();
+  const download = await pending, excel = new ExcelJS.Workbook(); await excel.xlsx.readFile((await download.path())!);
+  const amount = excel.worksheets[0].getCell("B4");
+  expect(amount.value).toBeCloseTo(4_736_258.239671868 / 1_000_000_000, 14);
+  expect(Number(SSF.format(amount.numFmt, amount.value))).toBeGreaterThan(0);
+  expect(excel.worksheets[1].getCell("D2").value).toBeCloseTo(4_736_258.239671868, 6);
 });

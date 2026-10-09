@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import { SSF } from "xlsx";
 import { expect, test } from "vitest";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
@@ -52,4 +53,24 @@ test("missing workbook amounts stay blank while tiny signed amounts remain numer
   const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
   expect(excel.worksheets[1].getCell("D2").value).toBe(0.000001);
   expect(excel.worksheets[1].getCell("D3").value).toBeNull();
+});
+
+test.each(["en", "ka"] as const)("%s Summary keeps small positive and negative amounts visibly nonzero, zero and blanks distinct", async locale => {
+  const build = await builder(), p = await presentation(locale);
+  for (const divisor of [1_000_000_000, 1_000_000]) {
+    const small = { ...data,
+      nationalFacts: data.nationalFacts.map(f => f.indicatorId === "trade.balance" ? { ...f, valueUsd: 2 * divisor } : f),
+      facts: data.facts.map(f => f.indicatorId === "trade.balance" ? { ...f, valueUsd: f.entityId.endsWith(".643") ? 4_736_258.239671868 : f.entityId === "group.eu" ? -42.03 : 0 } : f),
+    };
+    const model = build({ data: small, state: { ...DEFAULT_TRADE_PARTNERS_STATE, measure: "trade.balance", selectedIds: ["partner.1995-2025.643", "group.eu", "group.oecd", "partner.1995-2025.530"], range: { kind: "manual", start: 2025, end: 2025 } }, sources, siteOrigin: "https://fiscal.ge" }, p);
+    const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+    const summary = excel.worksheets[0];
+    const cells = [4, 6, 7, 5].map(row => summary.getCell(`B${row}`));
+    expect(cells.map(cell => cell.value)).toEqual([4_736_258.239671868 / divisor, -42.03 / divisor, 0, null]);
+    const displayed = (index: number) => Number(SSF.format(cells[index].numFmt, cells[index].value).replace("−", "-").replaceAll(",", ""));
+    expect(displayed(0)).toBeGreaterThan(0);
+    expect(displayed(1)).toBeLessThan(0);
+    expect(displayed(2)).toBe(0);
+    expect(cells[1].numFmt).not.toContain("Red");
+  }
 });

@@ -40,4 +40,33 @@ The approved trends-first page combines countries and published country groups i
 8. Production deployment and live Partners routes were outside the publishing authorization. Risk if incorrect: confusing a local preview with a release; no push, PR, merge, live migration/import or deployment is claimed.
 9. The two services discrepancies remain outside the separately accepted goods subset. Risk if incorrect: accepting unreconciled services figures; the frozen holds and scoped reports remain explicit.
 
-No Minor findings were deferred. The final review was not repeated after the verified fix.
+No Minor findings were deferred from that first review. The separately requested review and focused fix follow-up are recorded below.
+
+## Requested review including the unit-label amendment
+
+The user invoked `superpowers:requesting-code-review` after asking for numeric chart ticks and the current Million/Billion scale beneath the heading. A fresh independent reviewer inspected `83fec8bd81a247785e201b1ee2cc91aa98152eee` through `41d10f865d3196883d44770ba5c646407631479e`, plus the uncommitted unit-label changes, without session history or checkout mutation.
+
+The review found no Critical or Minor issues and two Important issues:
+
+1. The Excel Summary's fixed two-decimal format displayed Qatar's USD 4,736,258.239671868 turnover in 2025 as `0.00` billion. The same problem affected 68 of 150 positive country turnover values. The fix retains the page's scale and numeric cells, deriving enough shared decimal places from the exported values to keep every nonzero amount visible. Number formats also quote the Unicode minus literal, following [Microsoft's custom-format guidance](https://support.microsoft.com/en-us/excel/review-guidelines-for-customizing-a-number-format).
+2. A new accepted-year goods hold could still produce passed partner acceptance and be counted as outside scope. The fix rejects applicable country, country-group and national goods holds in either the research validation report or the source-issues file before emitting acceptance. The current two services holds remain excluded; no current trade value was found incorrect.
+
+Both findings were reproduced with failing regressions before implementation. The same reviewer then checked the targeted fixes without repeating the full review and confirmed both resolved. Reopened actual-data workbooks in both languages display Qatar as `0.005` billion when exported alone and `0.0047363` in the complete country export. All 150 nonzero 2025 country turnovers remain visibly nonzero, with 30 true zeros and 32 blanks distinct. Repeating the applicable-hold reproduction through each issue file now rejects before any output.
+
+Fresh verification after the fixes:
+
+- All 19 checks in the changed preparation and workbook suites passed, including both issue records, all three accepted goods families, both languages and million/billion workbook scales, small signed amounts, true zero and blanks. The review's earlier 50 focused checks are separate evidence and are not added to this count.
+- All 12 Trading partners browser checks passed against the refreshed production build, including an actual Qatar download, mixed exports, original-source bytes, language/history settings and phone/tablet/desktop layouts.
+- Changed-file lint, full type checking and whitespace checks passed. The full static build and postbuild publication/hash checks passed.
+- `data:check-trade-partners` reproduced the existing 22,992 observations and acceptance report exactly. Canonical data, original source files and the two services holds are unchanged.
+- The user preview was rebuilt, restarted on port 3116 and reloaded with its existing saved view. Overview's chart was separately checked to retain its USD tick labels.
+
+Coordinator rulings on every declined boundary:
+
+1. Actual database migration, rollback, persisted decimals and public-role restrictions: accepted as a separate unexecuted rehearsal. Risk is a database integration or permission defect; runtime evidence is required before claiming database readiness.
+2. Required CI, merge, deployment and production URLs: accepted as separate release operations outside this request. Risk is confusing local review with publication; none is claimed here.
+3. Fresh build/browser verification and device performance: the build and affected browser checks are now complete. Full-suite reruns and dedicated performance measurements were not repeated; historical gate evidence above remains distinct from these focused results. Risk is an unrelated interaction not freshly exercised; required release checks still apply.
+4. Services resolution, future captures, partial 2026, new measures, maps, detail pages and MCP expansion: accepted as outside the approved scope. Risk is broadening acceptance or product scope without review; these remain excluded.
+5. Native Excel visual rendering: accepted as unexecuted. Actual workbook bytes were generated, reopened and their display formats checked, including the downloaded file; no installed-Excel visual session is claimed.
+
+Final review assessment: both Important findings resolved; no remaining Critical, Important or Minor findings. At review completion, the unit amendment and review fixes were local and uncommitted on `codex/trade-partners`; release operations and database rehearsal were still separate.

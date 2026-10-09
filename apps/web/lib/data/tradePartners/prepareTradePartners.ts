@@ -14,6 +14,7 @@ import { tradePartnersEnglishLabels, validateTradePartnersData } from "./validat
 const D = Decimal.clone({ precision: 50 }), RESEARCH = "docs/Raw Data/Trade/geostat-external-trade/2026-10-07", REVIEWED_AT = "2026-10-08";
 type Row = Record<string, string>;
 type Source = { source_id: string; local_file: string; sha256: string; bytes: number };
+type SourceIssue = { family: string; year: string };
 type LayoutRow = { row_index: number; role: string; item_id: string; dimensions: Record<string, string>; label_cells: { cell: string; value: string; format: string }[]; code_cells: { cell: string; value: string; format: string; stored_value: string }[] };
 type Layout = { family: string; flow: "export" | "import"; source_id: string; source_sheet: string; source_unit: string; year_columns: Record<string, string>; rows: LayoutRow[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
@@ -29,8 +30,8 @@ export async function prepareTradePartnersData(repositoryRoot: string, mode: "wr
   const inventory = await json<{ full_manifest_sha256: string; layout_sha256: string; blocks: { source_id: string; source_sheet: string; source_block: string; year: string; source_key_count: number; identity_count: number; key_sha256: string; status_counts: Record<string, number> }[] }>("expected-observation-inventory.json");
   if (inventory.full_manifest_sha256 !== inputSha256["full-source-manifest.json"] || inventory.layout_sha256 !== inputSha256["source-layouts.json"]) throw new Error("Trade source inventory fingerprint mismatch");
   const coverage = await csv("coverage.csv"); await read("identity-review.csv");
-  const researchReport = await json<{ status: string; unresolved_source_issues: unknown[] }>("prepared-validation.json");
-  const holds = await json<{ issues: unknown[] }>("unresolved-source-issues.json");
+  const researchReport = await json<{ status: string; unresolved_source_issues: SourceIssue[] }>("prepared-validation.json");
+  const holds = await json<{ issues: SourceIssue[] }>("unresolved-source-issues.json");
   const reconciliation = await csv("prepared-reconciliation.csv");
   const countryRows = await csv("goods-countries-annual.csv"), groupRows = await csv("goods-country-groups-annual.csv");
   const catalogueBytes = await fs.readFile(path.join(repositoryRoot, "data/taxonomy/trade-partners.json"));
@@ -45,6 +46,7 @@ export async function prepareTradePartnersData(repositoryRoot: string, mode: "wr
   if (entities.length !== 217 || expectedEntities.size !== entities.length || entities.some(e => { const row = expectedEntities.get(e.id); return !row || e.kind !== (row.role === "detail" ? "country" : "group") || e.sourceCode !== (row.role === "detail" ? row.partner_code : null); })) throw new Error("Trade catalogue/source identity or code mismatch");
   const facts: TradePartnerFact[] = [], sourceSha256: Record<string, string> = {};
   const years = Array.from({ length: 31 }, (_, index) => 1995 + index);
+  if ([...researchReport.unresolved_source_issues, ...holds.issues].some(issue => ["goods_countries", "goods_country_groups", "goods_national"].includes(issue.family) && years.includes(Number(issue.year)))) throw new Error("Trade partner source acceptance hold requires resolution");
   for (const kind of ["country", "group"] as const) for (const flow of ["export", "import"] as const) {
     const sourceId = TRADE_PARTNER_SOURCES[kind][flow], family = kind === "country" ? "goods_countries" : "goods_country_groups";
     const matchingSources = sources.filter(s => s.source_id === sourceId), matchingLayouts = layouts.filter(l => l.family === family && l.flow === flow);
