@@ -61,3 +61,6 @@ export type DemographyObservation = {
   citizenshipId?: string;
   settlement?: Settlement;
 };
+
+/** A served observation as server code receives it: the exact decimal text projected to a number. */
+export type ServedDemographyObservation = Omit<DemographyObservation, "value"> & { value: number };

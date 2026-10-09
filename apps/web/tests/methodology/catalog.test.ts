@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation", "unemployment", "trade"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation", "unemployment", "trade", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -349,6 +349,7 @@ describe("methodology catalog", () => {
       inflation: { fileCount: 14, totalBytes: 100, latestRetrievedAt: "2026-09-11", validated: true, minYear: 2000, maxYear: 2026 },
       unemployment: { fileCount: 9, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2010, maxYear: 2025 },
       trade: { fileCount: 3, totalBytes: 520677, latestRetrievedAt: "2026-10-07", validated: true, minYear: 1995, maxYear: 2025 },
+      demography: { fileCount: 2, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2004, maxYear: 2026 },
       debt: { fileCount: 10, totalBytes: 400, latestRetrievedAt: "2026-09-01", validated: true },
     };
 
@@ -403,6 +404,7 @@ describe("methodology catalog", () => {
       },
       { id: "unemployment", title: METHODOLOGY_CONTENT.unemployment.title, summary: METHODOLOGY_CONTENT.unemployment.summary, href: "/methodology/unemployment", coverage: { firstYear: 2010, lastYear: 2025 }, originalFileCount: 9, reviewedAt: METHODOLOGY_CONTENT.unemployment.reviewedAt },
       { id: "trade", title: METHODOLOGY_CONTENT.trade.title, summary: METHODOLOGY_CONTENT.trade.summary, href: "/methodology/trade", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT.trade.reviewedAt },
+      { id: "demography", title: METHODOLOGY_CONTENT.demography.title, summary: METHODOLOGY_CONTENT.demography.summary, href: "/methodology/demography", coverage: { firstYear: 2004, lastYear: 2026 }, originalFileCount: 2, reviewedAt: METHODOLOGY_CONTENT.demography.reviewedAt },
     ]);
   });
 
@@ -417,6 +419,7 @@ describe("methodology catalog", () => {
       inflation: { fileCount: 14, totalBytes: 100, latestRetrievedAt: "2026-09-11", validated: true, minYear: 2000, maxYear: 2026 },
       unemployment: { fileCount: 9, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2010, maxYear: 2025 },
       trade: { fileCount: 3, totalBytes: 520677, latestRetrievedAt: "2026-10-07", validated: true, minYear: 1995, maxYear: 2025 },
+      demography: { fileCount: 2, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2004, maxYear: 2026 },
       debt: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true },
     } satisfies Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary>;
 

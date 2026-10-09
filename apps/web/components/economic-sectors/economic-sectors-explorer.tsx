@@ -28,6 +28,7 @@ import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
@@ -210,6 +211,7 @@ export function EconomicSectorsExplorer({
                 }
               />
             )}
+            <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={percent ? undefined : value => formatAmount(value, locale)} />
             <RangeStrip
               years={model.availableYears}
               range={model.range}

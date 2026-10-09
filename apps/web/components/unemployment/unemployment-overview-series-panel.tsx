@@ -19,6 +19,16 @@ export function UnemploymentOverviewSeriesPanel({ definitions, referenceId, stat
 }) {
   const presentation = useI18n(), { messages } = presentation;
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  // Ticking a series in the other unit replaces the selection (state rule); say so at the
+  // top of the list rather than letting the earlier ticks vanish silently (owner decision D4).
+  const [unitFlip, setUnitFlip] = useState<"toCount" | "toRate" | null>(null);
+  const toggle = (row: Row) => {
+    const adding = !state.selectedIds.includes(row.seriesId);
+    const rowIsRate = unemploymentIsRate(row.definition.indicatorId);
+    const flips = adding && state.selectedIds.length > 0 && rowIsRate !== unemploymentIsRate(state.indicator);
+    setUnitFlip(flips ? (rowIsRate ? "toRate" : "toCount") : null);
+    onSelectionChange(adding ? [...state.selectedIds, row.seriesId] : state.selectedIds.filter(id => id !== row.seriesId));
+  };
   const t = (key: string) => message(messages, `unemployment.${key}`);
   const unit = { divisor: 1, decimals: 1, label: t("thousandPersons") };
   const rows: Row[] = definitions.filter(definition => state.breakdown !== "long_term" || definition.groupId !== "georgia").map(definition => ({ id: definition.id, seriesId: definition.id, label: unemploymentSeriesLabel(definition, state, presentation, true), definition, parentId: definition.parentId }));
@@ -28,7 +38,15 @@ export function UnemploymentOverviewSeriesPanel({ definitions, referenceId, stat
   const children = (id: string) => rows.filter(row => row.parentId === id);
   const descendants = (id: string): Row[] => children(id).flatMap(row => [row, ...descendants(row.id)]);
   const matches = (row: Row) => matchesLabelQuery(query, [row.label, row.definition.labelKa, row.definition.labelEn, unemploymentSeriesLabel(row.definition, state, presentation)]);
-  const compatible = definitions.filter(definition => unemploymentIsRate(definition.indicatorId) === unemploymentIsRate(state.indicator));
+  // §7.7: the denominator and the bulk action cover the top-level rows of the active unit; a ticked
+  // row inside a collapsed group is counted on its own, so the status never understates the chart.
+  // Where every row of the active unit sits under a caret (the people counts on the sex and
+  // settlement breakdowns), those rows are the list the reader works with, so they are the scope.
+  const compatibleRows = rows.filter(row => unemploymentIsRate(row.definition.indicatorId) === unemploymentIsRate(state.indicator));
+  const topLevelOnly = compatibleRows.filter(row => !row.parentId);
+  const topLevel = topLevelOnly.length > 0 ? topLevelOnly : compatibleRows;
+  const selectedTop = topLevel.filter(row => state.selectedIds.includes(row.seriesId)).length;
+  const selectedNested = state.selectedIds.length - selectedTop;
   function renderRow(row: Row, depth = 0): ReactNode {
     const nested = children(row.id), below = descendants(row.id);
     if (row.seriesId !== referenceId && !matches(row) && !below.some(matches)) return null;
@@ -40,15 +58,17 @@ export function UnemploymentOverviewSeriesPanel({ definitions, referenceId, stat
         selected={state.selectedIds.includes(row.seriesId)} level={row.seriesId === referenceId && !row.parentId ? "total" : "item"} parentId={row.parentId} isChild={Boolean(row.parentId)} childLabelSize="standard" wrapLabel
         showCaretColumn hasChildren={nested.length > 0} expanded={open} expansionLabel={message(messages, "unemployment.subcategoriesFor", { label: row.label })}
         onToggleExpanded={() => setExpanded(previous => ({ ...previous, [row.id]: !open }))}
-        onToggle={() => onSelectionChange(state.selectedIds.includes(row.seriesId) ? state.selectedIds.filter(id => id !== row.seriesId) : [...state.selectedIds, row.seriesId])} />
+        onToggle={() => toggle(row)} />
       {open ? nested.map(child => renderRow(child, depth + 1)) : null}
     </div>;
   }
   return <SeriesAside label={message(messages, "controls.series")}>
     <p className="mb-3 text-[11px] text-[var(--muted)]">{endYear} · {unemploymentIsRate(state.indicator) ? "%" : unit.label}</p>
-    <SeriesSelector query={query} onQueryChange={onQueryChange} searchPlaceholder={t("searchIndicators")} selectedCount={state.selectedIds.length} totalCount={compatible.length}
-      hasSelection={state.selectedIds.length > 0} allSelected={compatible.every(definition => state.selectedIds.includes(definition.id))}
-      onToggleAll={() => onSelectionChange(state.selectedIds.length ? [] : compatible.map(definition => definition.id))} hasVisibleMatches={rows.some(matches)}>
+    <SeriesSelector query={query} onQueryChange={onQueryChange} searchPlaceholder={message(messages, "controls.search")} selectedCount={selectedTop} totalCount={topLevel.length}
+      supplementalSelected={selectedNested > 0 ? { label: t("nestedSelected"), count: selectedNested } : undefined}
+      hasSelection={state.selectedIds.length > 0} allSelected={topLevel.every(row => state.selectedIds.includes(row.seriesId))}
+      onToggleAll={() => { setUnitFlip(null); onSelectionChange(state.selectedIds.length ? [] : topLevel.map(row => row.seriesId)); }} hasVisibleMatches={rows.some(matches)}
+      listHeader={<div role="status">{unitFlip ? <p data-testid="unemployment-unit-notice" className="mb-2 border-l-2 border-[var(--accent)] bg-[var(--tint)] px-2.5 py-1.5 text-[11.5px] leading-snug text-[var(--ink)]">{t(unitFlip === "toCount" ? "unitFlipToCount" : "unitFlipToRate")}</p> : null}</div>}>
       {rows.filter(row => !row.parentId).map(row => renderRow(row))}
     </SeriesSelector>
     <p className="mt-3 text-[11px] leading-relaxed text-[var(--muted)]">{t("unitSelectionNote")}</p>

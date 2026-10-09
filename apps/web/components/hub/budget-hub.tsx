@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { HubCardModel } from "../../lib/explorer/hubCards";
+import { withLari } from "../ui/lari";
 import { Sparkline } from "../ui/sparkline";
 import type { Locale } from "../../lib/i18n/types";
 import { getCommonMessages } from "../../lib/i18n/common.server";
@@ -13,9 +14,9 @@ function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
   return (
     <>
       <div className="flex items-baseline justify-between">
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--accent)]">{card.index}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--accent)]">{card.index}</span>
         {card.comingSoon ? (
-          <span className="rounded-[2px] border border-[var(--control)] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[9px] text-[var(--muted)]">
+          <span className="rounded-[2px] border border-[var(--control)] px-1.5 py-px font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9px] text-[var(--muted)]">
             {message(getCommonMessages(locale), "common.comingSoon")}
           </span>
         ) : (
@@ -33,10 +34,14 @@ function CardBody({ card, locale }: { card: HubCardModel; locale: Locale }) {
       </h2>
       <p className="text-[11.5px] leading-normal text-[var(--muted)]">{card.description}</p>
       {card.series && card.seriesColor ? (
-        <Sparkline values={card.series} color={card.seriesColor} width={200} height={34} />
-      ) : null}
+        <Sparkline values={card.series} color={card.seriesColor} width={200} height={34} fluidOnMobile />
+      ) : (
+        // A card without a graphic keeps the graphic's band, so every card in a
+        // hub has the same rhythm and the footers line up.
+        <div aria-hidden data-testid="hub-card-graphic-space" className="mt-1.5 h-[34px]" />
+      )}
       {card.footer ? (
-        <p className="font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">{card.footer}</p>
+        <p className="mt-auto font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--faint)]">{withLari(card.footer)}</p>
       ) : null}
     </>
   );

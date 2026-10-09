@@ -6,15 +6,17 @@ for (const prefix of ["", "/en"]) {
   test(`long sector names leave mobile table values readable ${prefix || "ka"}`, async ({ page }, info) => {
     await page.setViewportSize({ width: 390, height: 900 });
     await page.goto(`${prefix}/explorer/economy/sectors#view=table&start=2025&end=2025&sel=sector.g`);
+    // One series on a phone lists its years as rows (owner decision D5): the long name
+    // wraps in the column header and the value sits under it, with no sideways scroll.
     const region = page.getByTestId("explorer-table");
-    await expect(region.locator("tbody tr")).toHaveCount(1);
-    await region.evaluate(el => { el.scrollLeft = el.scrollWidth; });
-    const cells = region.locator("tbody tr td");
-    const label = (await cells.nth(0).boundingBox())!;
-    const value = (await cells.nth(1).boundingBox())!;
-    expect(label.width).toBeLessThanOrEqual(190);
-    expect(value.x).toBeGreaterThanOrEqual(label.x + label.width - 1);
-    expect(await cells.nth(1).evaluate(el => {
+    await expect(region).toHaveAttribute("data-layout", "rows");
+    await expect(region.locator("thead th[data-series-id]")).toHaveCount(1);
+    expect(await region.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const header = region.locator("thead th[data-series-id]");
+    expect(await header.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+    const value = region.locator("tbody tr[data-year] td").first();
+    await value.scrollIntoViewIfNeeded();
+    expect(await value.evaluate(el => {
       const r = el.getBoundingClientRect();
       return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
     })).toBe(true);

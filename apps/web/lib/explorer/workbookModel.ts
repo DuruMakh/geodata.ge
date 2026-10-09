@@ -71,13 +71,18 @@ export type WorkbookExportModel = {
     showChangeColumn?: boolean;
     years: number[];
     rows: WorkbookReadableRow[];
-    /** Header text when the readable columns are not calendar years (e.g. months). */
-    headerLabels?: { category: string; columns: string[] };
+    /**
+     * Header text when the readable columns are not calendar years (e.g. months). `wrap` lets the header row run to two
+     * lines, for a label longer than its column; without it the header stays on one line at the default height.
+     */
+    headerLabels?: { category: string; columns: string[]; wrap?: boolean };
     /** Replaces the signed red default for values whose sign is neither good nor bad. */
     numberFormat?: string;
   };
   analysis: {
     numericFormats?: Record<number,string>;
+    /** Data-sheet column widths in characters, from the first column; a column without one keeps the writer's default. */
+    columnWidths?: number[];
     headers: string[];
     rows: Array<Array<string | number | null>>;
   };

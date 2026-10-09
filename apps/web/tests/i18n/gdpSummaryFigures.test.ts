@@ -29,10 +29,13 @@ const yearsOf = (series: Series): number[] => [...series.keys()].sort((left, rig
 const changePct = (series: Series, from: number, to: number) => (at(series, to) / at(series, from) - 1) * 100;
 const cagrPct = (series: Series, from: number, to: number) => ((at(series, to) / at(series, from)) ** (1 / (to - from)) - 1) * 100;
 
-function num(value: number, decimals: number, locale: Locale): string {
+// One number format in both languages (DESIGN §11): comma thousands, decimal point.
+// The Georgian prose used to quote "104,6" and "28 235" while every chart, table
+// and KPI printed "104.6" and "28,235".
+function num(value: number, decimals: number, _locale: Locale): string {
   const [integer, fraction] = Math.abs(value).toFixed(decimals).split(".");
-  const grouped = integer!.replace(/\B(?=(\d{3})+(?!\d))/g, locale === "en" ? "," : " ");
-  return fraction ? `${grouped}${locale === "en" ? "." : ","}${fraction}` : grouped;
+  const grouped = integer!.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return fraction ? `${grouped}.${fraction}` : grouped;
 }
 
 function claimsFor(locale: Locale): Array<{ key: string; figures: string[] }> {
@@ -104,10 +107,8 @@ function claimsFor(locale: Locale): Array<{ key: string; figures: string[] }> {
   ];
 }
 
-const tokenPattern = {
-  en: /(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)%?/g,
-  ka: /(?:\d{1,3}(?: \d{3})+(?:,\d+)?|\d+(?:,\d+)?)%?/g,
-} as const;
+const figurePattern = /(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)%?/g;
+const tokenPattern = { en: figurePattern, ka: figurePattern } as const;
 
 function assertSummaryFigures(messages: Messages, locale: Locale): void {
   const claims = claimsFor(locale);
@@ -156,7 +157,7 @@ describe.each(["ka", "en"] as const)("GDP summary figures: %s", (locale) => {
   it("rejects swapped valid years and values", () => {
     const messages = messagesByLocale.get(locale)!;
     const original = messages["gdp.growthSummary.recent"]!;
-    const [currentValue, previousValue] = locale === "en" ? ["7.5%", "9.7%"] : ["7,5%", "9,7%"];
+    const [currentValue, previousValue] = ["7.5%", "9.7%"];
     const swappedValues = original
       .replace(currentValue, "__CURRENT__")
       .replace(previousValue, currentValue)

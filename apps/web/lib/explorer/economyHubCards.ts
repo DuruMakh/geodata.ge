@@ -9,7 +9,7 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import type { HubCardModel } from "./hubCards";
 import { INK } from "./colors";
-import { formatAmount, formatInUnit, formatShare, UNIT_BN } from "./format";
+import { formatAmount, formatShare } from "./format";
 import { buildSectorHighlights } from "./sectorHighlights";
 export function buildEconomyHubCards(
   facts: ServedGdpObservation[],
@@ -50,7 +50,9 @@ export function buildEconomyHubCards(
       comingSoon: false,
       series: real.map((f) => f.value),
       seriesColor: INK,
-      footer: `${real.at(-1)!.year}: ${formatInUnit(real.at(-1)!.value, UNIT_BN)} ${t("bn")} (${t("constant")}) · ${t("real")}: ${real[0].year}–${real.at(-1)!.year} · ${t("nominal")}: ${nominal[0].year}–${nominal.at(-1)!.year}`,
+      // One figure, the economy's size as the landing states it, instead of a
+      // three-line run of constant-dollar values and coverage ranges.
+      footer: `${nominal.at(-1)!.year} · ${t("nominal")} ${formatAmount(nominal.at(-1)!.value, p.locale)}`,
     },
     {
       index: "02",

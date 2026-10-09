@@ -233,7 +233,7 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
 
   expect(response.status()).toBe(404);
   expect(response.headers()["content-type"]?.toLowerCase()).toContain("text/html");
-  for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+  for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]) {
     expect(html).toContain(`href=\"${href}\"`);
   }
 
@@ -260,8 +260,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    await expect(links).toHaveCount(5);
-    for (const href of ["/", "/explorer", "/methodology", "/sitemap.xml", "/llms.txt"]) {
+    await expect(links).toHaveCount(7);
+    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/trade", "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
     await expectNoPageOverflow(page);
@@ -437,7 +437,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
-  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(284);
+  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(440);
   expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/partners</loc>");
   expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/partners</loc>");
 
@@ -456,7 +456,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
     expect(navigation?.status()).toBe(200);
     await expect(page).toHaveTitle("Fiscal.ge / XML sitemap");
     await expect(page.getByRole("heading", { name: "Public pages" })).toHaveCount(1);
-    await expect(page.locator(".sitemap-row")).toHaveCount(284);
+    await expect(page.locator(".sitemap-row")).toHaveCount(440);
     await expectNoPageOverflow(page);
 
     if (viewport.width < 720) {
@@ -508,8 +508,10 @@ test("municipality index server-renders the existing country and region tab link
 test("municipality breadcrumbs include the region in visible and structured hierarchy", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer/municipalities/chiatura`);
 
+  // Only the trail on screen: below 768px a separate back-link replaces it.
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"] a, nav[aria-label="Breadcrumb"] [aria-current="page"]')
+    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
   const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
@@ -530,7 +532,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
     "იმერეთი",
     "ჭიათურა",
   ]);
-  await expect(page.locator('nav[aria-label="Breadcrumb"] a', { hasText: "იმერეთი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "იმერეთი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/imereti",
   );
@@ -547,7 +549,8 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
     "თბილისი",
   ];
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"] a, nav[aria-label="Breadcrumb"] [aria-current="page"]')
+    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
   const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
@@ -556,7 +559,7 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
 
   expect(visibleLabels).toEqual(expectedLabels);
   expect(structuredLabels).toEqual(expectedLabels);
-  await expect(page.locator('nav[aria-label="Breadcrumb"] a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/tbilisi",
   );

@@ -28,7 +28,7 @@ export function SectionNav() {
           return (
             <li
               key={id}
-              className="flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] text-[var(--ink-fg-muted)]"
+              className="flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] text-[var(--ink-fg-muted)]"
             >
               {/* Same padding and transparent ▸ spacer the link rows carry, so
                   this row's label sits on their column (DESIGN.md §6.7). */}
@@ -53,7 +53,7 @@ export function SectionNav() {
               href={pageHref(section.href, locale)}
               data-testid={`section-link-${section.href.split("/").at(-1)}`}
               aria-current={active ? "page" : undefined}
-              className={`flex items-baseline gap-2 py-[5px] pr-2 pl-2 text-[12px] no-underline transition-colors duration-150 ${
+              className={`flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${
                 active
                   ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]"
                   : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"

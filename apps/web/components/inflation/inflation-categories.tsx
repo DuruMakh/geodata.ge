@@ -1,10 +1,11 @@
 "use client";
 
+import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { formatDisplayDate, formatPoints } from "../../lib/explorer/format";
 
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import {
@@ -47,13 +48,17 @@ import { InflationCategoryTable } from "./inflation-category-table";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
+import { latestEntry } from "../../lib/explorer/latestValue";
+import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
-// headline. No headline value line under the H1 — DESIGN.md §25 carries the unit
-// line alone on both overviews, and this page follows the same family.
+// headline. Under the H1 the published national headline's latest month on the
+// active rate (owner decision D2, 2026-10-07), then the unit line.
 
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
@@ -62,12 +67,14 @@ export type InflationCategoriesProps = {
   facts: PackedCategorySeries[];
   weights: ClientBasketWeightRow[];
   headline: Array<{ period: number; value: number }>;
+  /** The national monthly change, for the latest-value line on the monthly tab only. */
+  headlineMom: Array<{ period: number; value: number }>;
   lastReviewedAt: string;
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };
 
-export function InflationCategories({ facts, weights, headline, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
+export function InflationCategories({ facts, weights, headline, headlineMom, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
@@ -99,12 +106,16 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
   const lines = buildCategoryLines(index, state, range);
   const hasSeries = state.tab === "contrib" ? stack.segments.length > 0 : lines.lines.length > 0;
 
+  // The contribution tab decomposes the annual rate, so it states the annual headline.
+  const latestTab = state.tab === "mom" ? "mom" : "yoy";
+  const latest = latestEntry(new Map((latestTab === "mom" ? headlineMom : headline).map((row) => [row.period, row.value])));
+
   // The unit line names the published headline the stack closes on.
   const latestHeadline = [...stack.headline].reverse().find((value) => value !== null) ?? null;
   const unitLine =
     state.tab === "contrib"
       ? // Two decimals, unrounded: displayedValue() would turn a published 5.65 into 5.70.
-        t("categoryUnit.contrib", { headline: latestHeadline === null ? "—" : latestHeadline.toFixed(2) })
+        t("categoryUnit.contrib", { headline: formatPoints(latestHeadline, false, 2) })
       : t(`categoryUnit.${state.tab}`);
 
   function selectTab(tab: CategoryTab) {
@@ -136,9 +147,12 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
           { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
           { label: t("categoriesHeading") },
         ]}
-        coverage={`${periodLabel(messages, coverage.min, "short")} – ${periodLabel(messages, coverage.max, "short")} · ${message(messages, "main.updated", { date: displayDate })}`}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
       />
       <ExplorerHeading>{t("categoriesHeading")}</ExplorerHeading>
+      {latest ? (
+        <LatestValueLine testId="inflation-category-latest" measure={t(`categoryTab.${latestTab}`)} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, latestTab)} />
+      ) : null}
       <p data-testid="inflation-category-unit" className="mb-4 text-[13px] text-[var(--muted)]">
         {unitLine}
       </p>
@@ -147,10 +161,9 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
         data-testid="inflation-category-tabs"
         role="group"
         aria-label={t("tabs")}
-        className="mb-3 overflow-x-auto py-2"
-        onFocusCapture={(event) => event.target.scrollIntoView({ block: "nearest", inline: "nearest" })}
+        className="mb-3 py-2"
       >
-        <div className="mx-auto flex w-max gap-7 px-1">
+        <div className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
           {CATEGORY_TABS.map((tab) => (
             <TextTab
               key={tab}
@@ -202,6 +215,7 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
               <div className="mt-5">
                 <StackedColumnChart
                   periods={stack.periods}
+                  periodsPerYear={12}
                   segments={[
                     ...stack.segments.map((segment) => ({
                       id: segment.categoryId,
@@ -241,11 +255,13 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
                 />
               </div>
             )}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} />
             <RangeStrip
               years={tabPeriods}
               range={range}
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
+              formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
               onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
@@ -260,7 +276,7 @@ export function InflationCategories({ facts, weights, headline, lastReviewedAt, 
             ) : null}
             <Link
               href={pageHref("/methodology/inflation", locale)}
-              className="text-xs text-[var(--muted)] underline underline-offset-4"
+              className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4"
             >
               {t("methodology")}
             </Link>

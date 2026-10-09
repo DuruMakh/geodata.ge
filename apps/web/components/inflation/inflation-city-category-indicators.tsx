@@ -52,7 +52,7 @@ export function InflationCityCategoryIndicators({ index, cityId }: { index: City
       <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         {latest.total ? (
           <HeroKpi label={`${t("categoryTab.yoy")} · ${periodLabel(messages, latest.period, "long")}`} value={pct(latest.total.value)}>
-            <p data-testid="inflation-city-category-hero" className="mt-4 text-[12.5px] leading-relaxed text-[var(--body)]">
+            <p data-testid="inflation-city-category-hero" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
               {t("cityHeroDetail", {
                 city,
                 value: pct(latest.total.value),

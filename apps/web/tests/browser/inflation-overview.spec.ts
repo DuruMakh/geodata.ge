@@ -27,7 +27,8 @@ test("tabs switch units, series and the target together", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-yoy")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("inflation-unit")).toHaveText("Percent · change on the same month of the previous year");
   await expect(page.getByTestId("chart-series-target-dashed")).toHaveCount(1);
-  await expect(page.getByTestId("inflation-headline")).toHaveCount(0);
+  // Owner decision D2 (2026-10-07): the latest value now sits under the title.
+  await expect(page.getByTestId("inflation-latest")).toHaveText(/^Annual inflation · \S+ \d{4}: −?\d+\.\d%$/);
 
   await page.getByTestId("inflation-tab-index").click();
   await expect(page.getByTestId("inflation-unit")).toHaveText("Index · 2010 average = 100");
@@ -98,7 +99,7 @@ test("language switch keeps the state", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-mom")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("the sidebar lists four datasets and the hub links all four live sections", async ({ page }) => {
+test("the sidebar lists six datasets and the hub links all four live sections", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/explorer/inflation");
   await expect(page.getByTestId("inflation-link")).toHaveAttribute("aria-current", "page");
@@ -111,7 +112,7 @@ test("the sidebar lists four datasets and the hub links all four live sections",
   await page.getByTestId("inflation-hub").getByRole("link").first().click();
   await ready(page);
   await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(1);
+  await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(0);
 });
 
 test("the methodology Dataset is the node the catalog references", async ({ page }) => {

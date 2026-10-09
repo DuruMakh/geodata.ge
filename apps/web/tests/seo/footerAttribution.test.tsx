@@ -22,6 +22,8 @@ describe("dataset footer attribution", () => {
     ["/en/explorer/inflation/categories", "Geostat", "National Bank"],
     ["/en/explorer/inflation/products", "Geostat", "National Bank"],
     ["/en/explorer/unemployment", "Geostat", "Ministry of Finance"],
+    ["/en/explorer/demography", "Geostat", "World Bank"],
+    ["/en/explorer/demography/population", "Geostat", "Ministry of Finance"],
   ])("uses the sources for %s without an unrelated site-wide date", async (pathname, source, unrelatedSource) => {
     route.pathname = pathname;
     const footer = footerText(renderToStaticMarkup(await renderExplorerLayout("en", null)));

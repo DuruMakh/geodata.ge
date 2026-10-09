@@ -641,8 +641,9 @@ test.describe("municipality page", () => {
     // The column sits between the 2015 and 2025 level columns in the same
     // typographic style, so direction has to survive without colour: grayscale,
     // print and colourblind readers otherwise read three levels in a row.
+    // An exact zero change has no direction and reads "0 ₾" (D11 zero format).
     const texts = await changes.allInnerTexts();
-    expect(texts.filter((text) => /^[+−]/.test(text.trim()))).toHaveLength(texts.length);
+    expect(texts.filter((text) => /^[+−]/.test(text.trim()) || text.trim() === "0 ₾")).toHaveLength(texts.length);
   });
 
   test("keeps a sign on a real municipal change below the display threshold", async ({ page }) => {
@@ -1037,8 +1038,10 @@ test.describe("municipality page", () => {
       tableWidth: container.querySelector("table")!.getBoundingClientRect().width,
     }));
 
-    expect(sizes.tableWidth).toBeGreaterThanOrEqual(560);
-    expect(sizes.containerScrollWidth).toBeGreaterThan(sizes.containerClientWidth);
+    // Below 768px the comparison fits the column, like the national one (§8.7):
+    // the change and latest-year columns must not hide behind a sideways scroll.
+    expect(sizes.tableWidth).toBeLessThanOrEqual(sizes.containerClientWidth);
+    expect(sizes.containerScrollWidth).toBe(sizes.containerClientWidth);
     expect(sizes.pageScrollWidth).toBe(sizes.pageClientWidth);
 
     const boxes = await table.locator("tbody tr").first().locator("td").evaluateAll((cells) => cells.slice(1).map((cell) => {

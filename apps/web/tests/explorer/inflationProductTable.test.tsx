@@ -65,7 +65,7 @@ describe("complete ranked product list", () => {
     );
     const recent = render(2025);
     const headers = recent.slice(recent.indexOf("<thead>"), recent.indexOf("</thead>"));
-    expect(headers.indexOf("დაგროვილი ცვლილება")).toBeLessThan(headers.indexOf("ბოლო 12 თვის ცვლილება"));
+    expect(headers.indexOf("დაგროვილი")).toBeLessThan(headers.indexOf("წლიური"));
     const rowIds = (html: string) => [...html.matchAll(/<tr data-product-id="([^"]+)"/g)].map((match) => match[1]);
     expect(rowIds(recent)).toEqual(["cpi.product.p0002", "cpi.product.p0001", "cpi.product.p0003"]);
     expect(rowIds(render(2024))).toEqual(["cpi.product.p0001", "cpi.product.p0002", "cpi.product.p0003"]);

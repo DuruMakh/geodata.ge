@@ -8,7 +8,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 
 // The Georgia page lists seven places; a city page, its total and 12 divisions.
 // Search never scopes the bulk action or the denominator (AGENTS.md UI contract).
@@ -40,6 +40,7 @@ export function InflationCityPanel({
         query={query}
         onQueryChange={setQuery}
         searchPlaceholder={message(messages, "controls.search")}
+        searchable={lineIds.length > SEARCHABLE_MIN_ROWS}
         selectedCount={state.selected.length}
         totalCount={lineIds.length}
         hasSelection={state.selected.length > 0}

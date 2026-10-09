@@ -1,6 +1,7 @@
 {
   "format.bn": "bn",
   "format.mln": "mln",
+  "format.thousands": "k",
   "format.bnGel": "bn GEL",
   "format.mlnGel": "mln GEL",
   "format.gel": "GEL"

@@ -21,7 +21,7 @@ import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
-import { formatDisplayDate } from "../explorer/format";
+import { coverageLabel } from "../explorer/coverageLabel";
 import { resolveSiteUrl } from "../siteUrl";
 import { buildUnemploymentHubCards } from "../explorer/unemploymentHubCards";
 import { unemploymentIndicators } from "../data/unemployment/types";
@@ -40,7 +40,7 @@ export async function renderUnemploymentHub(locale: Locale) {
   return <I18nProvider {...presentation}>
     <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref("/explorer/unemployment", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage="" />
+      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage={coverageLabel(presentation.messages, locale, Math.min(...facts.map(f => f.year)), Math.max(...facts.map(f => f.year)), facts.map(f => f.lastReviewedAt).sort().at(-1))} />
       <ExplorerHeading>{title}</ExplorerHeading>
       <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "unemployment.hubSummary")}</p>
       <BudgetHub cards={buildUnemploymentHubCards(facts, presentation)} locale={locale} testId="unemployment-hub" />
@@ -74,7 +74,7 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   const title = region ? message(presentation.messages, "unemployment.regionTitle", { region: regionName }) : message(presentation.messages, `unemployment.page.${section}.title`), firstYear = Math.min(...facts.map(f => f.year)), lastYear = Math.max(...facts.map(f => f.year));
   const description = region ? message(presentation.messages, "unemployment.regionSummary", { region: regionName }) : message(presentation.messages, `unemployment.page.${section}.summary`);
   const lastReviewedAt = facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: message(presentation.messages, "unemployment.title"), href: pageHref("/explorer/unemployment", locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: message(presentation.messages, "unemployment.title"), href: pageHref("/explorer/unemployment", locale) }, { label: region ? regionName : title }];
   if (region) crumbs.splice(3, 0, { label: message(presentation.messages, "unemployment.page.regions.title"), href: pageHref("/explorer/unemployment/regions", locale) });
   const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, publishedValue, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, publishedValue, sourceId })), registry: UNEMPLOYMENT_GROUPS, sources, lastReviewedAt, siteOrigin: origin };
   return <I18nProvider {...presentation}>
@@ -89,7 +89,7 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: crumbs[2].label, path: pageHref("/explorer/unemployment", locale) }, ...(region ? [{ name: message(presentation.messages, "unemployment.page.regions.title"), path: pageHref("/explorer/unemployment/regions", locale) }] : []), { name: title, path: pageHref(sectionPath, locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${firstYear}–${lastYear} · ${message(presentation.messages, "main.updated", { date: locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt })}`} />
+      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {section === "regions" && !regionId ? <UnemploymentRegionsIndex model={buildUnemploymentRegionMapModel(facts)} explorer={explorer} /> : <UnemploymentExplorer key={regionId ?? section} {...explorer} />}
     </ExplorerPage>
   </I18nProvider>;

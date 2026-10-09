@@ -116,8 +116,9 @@ describe("Government Debt route composition", () => {
     expect(markup).toContain('aria-label="ვალის გადახდა — ქვესერიების ჩაკეცვა"');
     expect(markup).toContain('aria-label="საპროცენტო განაკვეთი — ქვესერიების ჩაკეცვა"');
     expect(markup).not.toContain('aria-label="ქვეპროგრამები"');
-    expect(seriesRow(markup, "debt.stock.domestic")).toContain("text-[12px]");
-    expect(seriesRow(markup, "debt.stock.domestic")).not.toContain("text-[11.5px]");
+    // Series rows size in rem (D8, the reader's text-size setting applies): 0.75rem = 12px, 0.71875rem = 11.5px.
+    expect(seriesRow(markup, "debt.stock.domestic")).toContain("text-[0.75rem]");
+    expect(seriesRow(markup, "debt.stock.domestic")).not.toContain("text-[0.71875rem]");
     expect((markup.match(/data-testid="chart-frame"/g) ?? [])).toHaveLength(1);
     expect(markup).not.toContain('data-testid="explorer-table"');
     expect(markup).not.toContain('data-testid="site-footer"');
@@ -226,12 +227,14 @@ describe("Government Debt route composition", () => {
       lastUpdatedAt: reviewedAt,
     }));
 
-    expect(seriesRow(markup, "debt.service.total")).toContain("4.4 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.total")).not.toContain("3.7 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.principal")).toContain("2.7 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.principal")).not.toContain("2.9 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.interest")).toContain("1.6 მლრდ ₾");
-    expect(seriesRow(markup, "debt.service.interest")).not.toContain("832 მლნ ₾");
+    // Row values read as text: the ₾ sits in its own sans span (withLari).
+    const rowText = (id: DebtSeriesId) => seriesRow(markup, id).replace(/<[^>]*>/g, "");
+    expect(rowText("debt.service.total")).toContain("4.4 მლრდ ₾");
+    expect(rowText("debt.service.total")).not.toContain("3.7 მლრდ ₾");
+    expect(rowText("debt.service.principal")).toContain("2.7 მლრდ ₾");
+    expect(rowText("debt.service.principal")).not.toContain("2.9 მლრდ ₾");
+    expect(rowText("debt.service.interest")).toContain("1.6 მლრდ ₾");
+    expect(rowText("debt.service.interest")).not.toContain("832 მლნ ₾");
     expect(seriesRow(markup, "debt.rate.domestic")).toContain("8.8% · 2024");
     expect(seriesRow(markup, "debt.rate.external")).toContain("3.1% · 2024");
   });

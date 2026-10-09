@@ -1,0 +1,188 @@
+import { expect, test } from "@playwright/test";
+import { expectReadableText } from "./color-contrast";
+
+// Mobile repairs (2026-10-07 review): page-level layout on phones.
+test.use({ isMobile: true, hasTouch: true });
+
+for (const path of ["/methodology", "/en/methodology"]) {
+  test(`${path} headline fits a 360px phone`, async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await page.goto(path);
+    const heading = page.getByRole("heading", { level: 1 });
+    await expect(heading).toBeVisible();
+    expect(await heading.evaluate((element) => getComputedStyle(element).fontSize)).toBe("30px");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
+    expect(await heading.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  });
+}
+
+const tabStrips = [
+  { path: "/explorer/economy/gdp", strip: "gdp-indicators" },
+  { path: "/explorer/inflation/overview", strip: "inflation-tabs" },
+  { path: "/explorer/inflation/categories", strip: "inflation-category-tabs" },
+  { path: "/en/explorer/inflation/categories", strip: "inflation-category-tabs" },
+  { path: "/en/explorer/economy/gdp", strip: "gdp-indicators" },
+];
+
+for (const { path, strip } of tabStrips) {
+  test(`${path} shows every tab, the active one included, at 390px`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    const group = page.getByTestId(strip);
+    await expect(group.locator("button[aria-pressed=true]")).toHaveCount(1);
+    const layout = await group.evaluate((element) => ({
+      scrolls: element.scrollWidth > element.clientWidth,
+      tabs: [...element.querySelectorAll("button")].map((button) => {
+        const box = button.getBoundingClientRect();
+        return { left: box.left, right: box.right };
+      }),
+    }));
+    expect(layout.scrolls).toBe(false);
+    expect(layout.tabs.length).toBeGreaterThanOrEqual(3);
+    for (const tab of layout.tabs) {
+      expect(tab.left).toBeGreaterThanOrEqual(0);
+      expect(tab.right).toBeLessThanOrEqual(390);
+    }
+  });
+}
+
+for (const locale of ["ka", "en"] as const) {
+  test(`${locale} inflation category rows: labelled, readable values and a 24px subgroup target`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/categories`);
+    const columns = page.getByTestId("category-value-columns");
+    await expect(columns).toBeVisible();
+    await expect(columns).toContainText(locale === "en" ? "Basket share" : "წილი კალათაში");
+    await expect(columns).toContainText(locale === "en" ? "pp" : "პპ");
+
+    const rows = page.getByTestId("series-row");
+    const selectedRow = rows.filter({ has: page.locator("[aria-pressed=true]") }).first();
+    const meta = selectedRow.locator("[data-testid=series-row-toggle] > span:has(> .sr-only)").first();
+    expect(await meta.evaluate((element) => getComputedStyle(element).opacity)).toBe("1");
+    await expectReadableText(meta, selectedRow);
+    const unselected = rows.filter({ has: page.locator("[data-testid=series-row-toggle][aria-pressed=false]") }).first();
+    if (await unselected.count()) await expectReadableText(unselected.locator("[data-testid=series-row-toggle] > span:has(> .sr-only)").first(), page.locator("body"));
+
+    const caret = page.locator("[data-testid=series-row] button[aria-expanded]").first();
+    await caret.scrollIntoViewIfNeeded();
+    const hit = await caret.evaluate((button) => {
+      const box = button.getBoundingClientRect();
+      const target = document.elementFromPoint(box.left + 24.5, box.top + box.height / 2);
+      return { width: Math.round(box.width), hitsCaret: target === button || button.contains(target) };
+    });
+    expect(hit).toEqual({ width: 22, hitsCaret: true });
+  });
+}
+
+for (const path of ["/explorer/deficit", "/explorer/debt#f=service&m=line&sel=debt.service.total", "/en/explorer/deficit"]) {
+  for (const width of [360, 390]) {
+    test(`forecast marker label stays clear of the range chips at ${width}px: ${path}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(path);
+      const strip = page.getByTestId("year-range-strip");
+      await strip.scrollIntoViewIfNeeded();
+      const label = page.getByTestId("range-marker").locator("span");
+      await expect(label).toBeVisible();
+      const layout = await strip.evaluate((element) => {
+        const marker = element.querySelector("[data-testid=range-marker] span")!.getBoundingClientRect();
+        const frame = element.getBoundingClientRect();
+        const overlaps = [...element.querySelectorAll("button[aria-pressed]")].filter((chip) => {
+          const box = chip.getBoundingClientRect();
+          return box.left < marker.right && box.right > marker.left && box.top < marker.bottom && box.bottom > marker.top;
+        }).length;
+        return { overlaps, inside: marker.left >= frame.left - 0.5 && marker.right <= frame.right + 0.5 };
+      });
+      expect(layout).toEqual({ overlaps: 0, inside: true });
+    });
+  }
+}
+
+const unclipped = [
+  { path: "/explorer/revenue", selector: "[data-testid=period-movers] span.font-medium" },
+  { path: "/explorer/expenditure", selector: "[data-testid=side-kpi] p[title]" },
+  { path: "/explorer/municipalities/batumi", selector: "[data-testid=period-movers] span.font-medium" },
+  { path: "/explorer/economy/sectors", selector: "[data-testid=sector-side-kpis] p[title]" },
+  { path: "/explorer/municipalities/georgia", selector: "[data-testid=entity-picker-trigger]" },
+];
+
+for (const { path, selector } of unclipped) {
+  test(`names wrap instead of ending in an ellipsis at 390px: ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    const targets = page.locator(selector);
+    await expect(targets.first()).toBeAttached();
+    const clipped = await targets.evaluateAll((elements) =>
+      elements.filter((element) => element.scrollWidth > element.clientWidth + 1).map((element) => element.textContent),
+    );
+    expect(clipped).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  });
+}
+
+test("the wrapping Georgia heading stays inside a 320px phone", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.goto("/explorer/municipalities/georgia");
+  const trigger = page.getByTestId("entity-picker-trigger");
+  await expect(trigger).toBeVisible();
+  expect(await trigger.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+});
+
+test("the Georgia picker's first option shows its full name at 390px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/explorer/municipalities/batumi");
+  await page.getByTestId("entity-picker-trigger").click();
+  const country = page.getByTestId("picker-country").locator("span").first();
+  await expect(country).toBeVisible();
+  expect(await country.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+});
+
+for (const { path, field } of [
+  { path: "/explorer/expenditure", field: "series-search" },
+  { path: "/explorer/municipalities", field: "municipal-search" },
+  { path: "/explorer/inflation/products", field: "product-list-search" },
+]) {
+  test(`search field rises above the keyboard on focus at 390px: ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    const search = page.getByTestId(field);
+    await expect(search).toHaveAttribute("type", "search");
+    await expect(search).toHaveAttribute("enterkeyhint", "search");
+    // 16px or more, so iOS does not zoom the page on focus.
+    expect(parseFloat(await search.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
+    await search.scrollIntoViewIfNeeded();
+    await search.tap();
+    await expect(search).toBeFocused();
+    await expect.poll(() => search.evaluate((element) => Math.round(element.getBoundingClientRect().top))).toBeLessThanOrEqual(40);
+  });
+}
+
+for (const locale of ["ka", "en"] as const) {
+  test(`${locale} /connect lists unemployment among the data the endpoint does not serve`, async ({ page }) => {
+    await page.goto(`${locale === "en" ? "/en" : ""}/connect`);
+    await expect(page.getByTestId("connect-coverage-excluded")).toContainText(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
+  });
+}
+
+for (const path of ["/explorer/expenditure", "/explorer/unemployment/overview", "/en/explorer/inflation/overview"]) {
+  test(`explorer menu rows are at least 36px tall below 900px: ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(path);
+    await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
+    const panel = page.locator("#data-sidebar-navigation");
+    await expect(panel).toBeVisible();
+    const short = await panel.locator("a, li").evaluateAll((rows) =>
+      rows.filter((row) => row.getBoundingClientRect().height > 0 && row.getBoundingClientRect().height < 36 && !row.closest("[role=group]") && !row.querySelector("a"))
+        .map((row) => `${row.textContent?.trim()} ${Math.round(row.getBoundingClientRect().height)}`),
+    );
+    expect(short).toEqual([]);
+  });
+}
+
+test("the unemployment dataset row keeps the menu rhythm below 900px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/explorer/unemployment/overview");
+  await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
+  const marginTop = await page.locator("#data-sidebar-navigation nav > a[href$=\"/explorer/unemployment\"]").evaluate((link) => getComputedStyle(link).marginTop);
+  expect(marginTop).toBe("0px");
+});

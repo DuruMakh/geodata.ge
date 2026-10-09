@@ -22,7 +22,10 @@ function block(html: string, testId: string): string {
 describe("InflationCities — Georgia page", () => {
   it("has no tab row, no select and no monthly measure", () => {
     expect(markup).not.toContain('data-testid="inflation-city-tabs"');
-    expect(markup).not.toContain("<select");
+    // The only selects are the range strip's month/year pickers (no measure select).
+    const selects = [...markup.matchAll(/<select[^>]*aria-label="([^"]+)"/g)].map((match) => match[1]);
+    expect(selects).toEqual(["საწყისი თვე", "საწყისი წელი", "საბოლოო თვე", "საბოლოო წელი"]);
+    expect(markup.match(/<select/g)).toHaveLength(4);
     expect(markup).not.toContain("თვიური ინფლაცია");
   });
 

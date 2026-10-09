@@ -20,6 +20,9 @@ type RangeStripProps = {
   periodsPerYear?: number;
   /** Readout, end and slider text for a period value. Omit to print the value. */
   formatPeriod?: (period: number) => string;
+  /** Monthly strips: short month name (1–12). With it, the readout's month and year
+   *  open native selects, so an exact month is one tap away on a phone. */
+  formatMonth?: (month: number) => string;
 };
 
 type Handle = "start" | "end";
@@ -56,7 +59,17 @@ export function stepRangeHandle(key: string, handle: Handle, range: ResolvedRang
   return delta === "home" ? start : delta === "end" ? max : clamp(end + delta, start, max);
 }
 
-export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1, formatPeriod }: RangeStripProps) {
+/** The available period nearest to (year, sub-period), kept inside [lo, hi] (both available periods). */
+export function nearestPeriod(periods: readonly number[], year: number, sub: number, periodsPerYear: number, lo: number, hi: number): number {
+  const target = Math.min(Math.max(year * periodsPerYear + sub, lo), hi);
+  let best = lo;
+  for (const period of periods) {
+    if (period >= lo && period <= hi && Math.abs(period - target) < Math.abs(best - target)) best = period;
+  }
+  return best;
+}
+
+export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1, formatPeriod, formatMonth }: RangeStripProps) {
   const { messages } = useI18n();
   const format = formatPeriod ?? String;
   const monthly = periodsPerYear > 1;
@@ -150,7 +163,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
   }
 
   const handleClass =
-    "absolute -top-1 size-[30px] -translate-x-1/2 cursor-pointer rounded-full border-0 bg-transparent p-0 before:absolute before:top-1/2 before:left-1/2 before:size-[15px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border-2 before:border-[var(--accent)] before:bg-[var(--paper)] before:shadow-[0_1px_3px_rgba(30,27,22,0.15)] before:content-['']";
+    "absolute -top-1 size-[30px] -translate-x-1/2 max-[768px]:-top-[11px] max-[768px]:h-11 max-[768px]:w-8 cursor-pointer rounded-full border-0 bg-transparent p-0 before:absolute before:top-1/2 before:left-1/2 before:size-[15px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border-2 before:border-[var(--accent)] before:bg-[var(--paper)] before:shadow-[0_1px_3px_rgba(30,27,22,0.15)] before:content-['']";
 
   return (
     <div data-testid="year-range-strip" className="mt-[22px] border-t border-[var(--hairline)] pt-4">
@@ -158,7 +171,17 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
         <span className="text-xs text-[var(--muted)]">
           {message(messages, "controls.range")}{" "}
           <span className="font-[family-name:var(--font-numeric)] text-xs font-medium text-[var(--ink)]">
-            {format(start)}–{format(end)}
+            {monthly && formatMonth ? (
+              <>
+                <PeriodPicker handle="start" value={start} lo={min} hi={end} periods={years} periodsPerYear={periodsPerYear} formatMonth={formatMonth} onChange={onChange} />
+                –
+                <PeriodPicker handle="end" value={end} lo={start} hi={max} periods={years} periodsPerYear={periodsPerYear} formatMonth={formatMonth} onChange={onChange} />
+              </>
+            ) : (
+              <>
+                {format(start)}–{format(end)}
+              </>
+            )}
           </span>
         </span>
         <div className="flex gap-3.5">
@@ -171,7 +194,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
                 type="button"
                 aria-pressed={active}
                 onClick={() => onChange({ start: chip.start, end: max })}
-                className={`-mx-1.5 -my-[7px] cursor-pointer px-1.5 py-[7px] font-[family-name:var(--font-numeric)] text-[11px] ${
+                className={`-mx-1.5 -my-[7px] min-w-8 cursor-pointer px-1.5 py-[7px] text-center font-[family-name:var(--font-numeric)] text-[11px] ${
                   active
                     ? "font-semibold text-[var(--ink)] underline decoration-[var(--accent)] underline-offset-4"
                     : "font-normal text-[var(--muted)] hover:text-[var(--ink)]"
@@ -191,7 +214,12 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
         onPointerCancel={endDrag}
         role="group"
         aria-label={message(messages, monthly ? "controls.monthRange" : "controls.yearRange")}
-        className="relative mt-3 h-6 cursor-pointer touch-none"
+        // A marker label sits above the rail; the extra top margin keeps it clear of
+        // the range chips, which it overlapped on phones. Below 768px the rail is
+        // inset 8px so a handle at rest stays out of the edge-swipe (back) zone; the
+        // handles' invisible hit area grows to 44px tall (32px wide, so it stays out of
+        // that zone too) around the same 15px dot.
+        className={`relative ${visibleMarker ? "mt-7" : "mt-3"} h-6 cursor-pointer touch-none max-[768px]:mx-2`}
       >
         <div className="absolute inset-x-0 top-2.5 h-[3px] bg-[var(--hairline-soft)]" />
         <div
@@ -204,7 +232,12 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
             className="pointer-events-none absolute top-0 bottom-0 z-[1] w-px bg-[var(--accent)]"
             style={{ left: pct(visibleMarker.year) }}
           >
-            <span className="absolute -top-4 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[9px] font-medium text-[var(--accent)]">
+            {/* Shifted by its own width in proportion to the marker position, so a marker
+                near either end keeps its label inside the strip. */}
+            <span
+              className="absolute -top-4 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] font-medium text-[var(--accent)] min-[768px]:text-[9px]"
+              style={{ transform: `translateX(-${pct(visibleMarker.year)})` }}
+            >
               {visibleMarker.label}
             </span>
           </div>
@@ -239,9 +272,75 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
         />
       </div>
       <div className="mt-1.5 flex justify-between">
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{format(min)}</span>
-        <span className="font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--muted)]">{format(max)}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)] min-[768px]:text-[10.5px]">{format(min)}</span>
+        <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)] min-[768px]:text-[10.5px]">{format(max)}</span>
       </div>
     </div>
+  );
+}
+
+type PeriodPickerProps = {
+  handle: Handle;
+  value: number;
+  lo: number;
+  hi: number;
+  periods: readonly number[];
+  periodsPerYear: number;
+  formatMonth: (month: number) => string;
+  onChange: (patch: { start?: number; end?: number }) => void;
+};
+
+// The readout's month and year, each covered by a transparent native select: the
+// visible text is unchanged, a tap opens the platform picker. A choice outside the
+// other handle's bound snaps to the nearest available period inside it.
+function PeriodPicker({ handle, value, lo, hi, periods, periodsPerYear, formatMonth, onChange }: PeriodPickerProps) {
+  const { messages } = useI18n();
+  const year = Math.floor(value / periodsPerYear);
+  const sub = value % periodsPerYear;
+  const firstYear = Math.floor(lo / periodsPerYear);
+  const lastYear = Math.floor(hi / periodsPerYear);
+  const yearOptions = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
+  const pick = (nextYear: number, nextSub: number) => {
+    const next = nearestPeriod(periods, nextYear, nextSub, periodsPerYear, lo, hi);
+    if (next !== value) onChange(handle === "start" ? { start: next } : { end: next });
+  };
+  // The select reaches 14px above and below the token, so a finger gets a ~44px-tall target.
+  const selectClass = "absolute -inset-x-1 -inset-y-3.5 cursor-pointer appearance-none opacity-0";
+  const tokenClass =
+    "relative inline-block underline decoration-[var(--faint)] decoration-dotted underline-offset-[3px] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--accent)]";
+
+  return (
+    <span data-testid={`range-${handle}-picker`}>
+      <span className={tokenClass}>
+        <span aria-hidden="true">{formatMonth(sub + 1)}</span>
+        <select
+          aria-label={message(messages, handle === "start" ? "controls.startMonth" : "controls.endMonth")}
+          value={sub}
+          onChange={(event) => pick(year, Number(event.target.value))}
+          className={selectClass}
+        >
+          {Array.from({ length: periodsPerYear }, (_, index) => (
+            <option key={index} value={index} disabled={year * periodsPerYear + index < lo || year * periodsPerYear + index > hi}>
+              {formatMonth(index + 1)}
+            </option>
+          ))}
+        </select>
+      </span>{" "}
+      <span className={tokenClass}>
+        <span aria-hidden="true">{year}</span>
+        <select
+          aria-label={message(messages, handle === "start" ? "controls.startYear" : "controls.endYear")}
+          value={year}
+          onChange={(event) => pick(Number(event.target.value), sub)}
+          className={selectClass}
+        >
+          {yearOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </span>
+    </span>
   );
 }

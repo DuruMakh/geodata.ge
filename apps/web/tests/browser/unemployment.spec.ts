@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { tableSeriesCount } from "./explorer-table";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -36,8 +37,9 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.goto(`${prefix}/explorer/unemployment/regions#breakdown=region`);
     await page.getByTestId("chart-mode-table").click();
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
-    await expect(page.getByTestId("series-status")).toContainText("28 / 28");
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(28);
+    // §7.7: the bulk action selects the 14 top-level regional rates, not the rates under their carets.
+    await expect(page.getByTestId("series-status")).toContainText("14 / 14");
+    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(14);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });
@@ -54,7 +56,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await page.getByTestId("series-toggle-all").click();
       await page.locator(`[data-series-id="georgia:${indicator}"] [data-testid="series-row-toggle"]`).click();
       await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
-      const labels = page.getByTestId("chart-panel").getByRole("img").locator('text[text-anchor="end"]').filter({ hasText: unitLabel });
+      // Phones (D1) print the unit once above the axis and plain numbers on the ticks.
+      const chart = page.getByTestId("chart-panel").getByRole("img");
+      if (width < 768) await expect(chart.locator("text[data-unit-caption]")).toHaveText(unitLabel);
+      const labels = chart.locator('text[text-anchor="end"]').filter({ hasText: width < 768 ? /^[\d,.]+$/ : unitLabel });
       await expect(labels.first()).toBeVisible();
       const leftEdges = await labels.evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x));
       expect(leftEdges.length).toBeGreaterThan(0);
@@ -66,7 +71,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 test("national tabs keep valid metrics, coverage and reference selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment/overview"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const title = await page.getByRole("heading", { level: 1 }).textContent();
-  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p").first();
+  // The page summary; the latest-value line above it (owner decision D2) follows the tab.
+  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p:not([data-testid])").first();
   const description = await subtitle.textContent();
   for (const breakdown of ["national", "settlement", "education", "long_term"]) {
     await page.getByTestId(`unemployment-tab-${breakdown}`).click();
@@ -106,7 +112,15 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("series-row-toggle")).toHaveCount(3);
     await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
     await expect(row("georgia:unemployment_rate")).toContainText("13.9%");
-    await expect(page.getByTestId("series-status")).toContainText("1 / 7");
+    // The page opens on its comparison: Men and Women beside the national line.
+    await expect(toggle("men:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
+    await expect(toggle("women:unemployment_rate")).toHaveAttribute("aria-pressed", "true");
+    // §7.7: the denominator is the three top-level rows; rates under a caret are counted on their own.
+    await expect(page.getByTestId("series-status")).toContainText("3 / 3");
+    expect(new URL(page.url()).hash).toBe("");
+    await toggle("men:unemployment_rate").click();
+    await toggle("women:unemployment_rate").click();
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
     for (const group of ["men", "women"]) {
       const expand = row(`${group}:unemployment_rate`).locator("button[aria-expanded]");
       await expand.focus(); await expand.press("Space");
@@ -116,7 +130,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     }
     await toggle("women:employment_rate").click();
     await toggle("men:participation_rate").click();
-    await expect(page.getByTestId("series-status")).toContainText("3 / 7");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
+    await expect(page.getByTestId("series-status")).toContainText(prefix ? "Subcategories 2" : "ქვეკატეგორიები 2");
     await toggle("women:unemployed").click();
     await toggle("men:employed").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
@@ -125,17 +140,17 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(toggle("men:participation_rate")).toHaveAttribute("aria-pressed", "false");
     await page.getByTestId("chart-mode-table").click();
     await page.getByTestId("range-start-handle").focus(); await page.getByTestId("range-start-handle").press("End");
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(2);
+    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(2);
     await expect(page.getByTestId("explorer-table")).toContainText("79.4");
     await expect(page.getByTestId("explorer-table")).toContainText("770.2");
     await page.screenshot({ path: info.outputPath(`unemployment-gender-expanded-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("series-search").fill("participation");
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("10 / 10");
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(10);
+    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(10);
     await page.getByTestId("series-search").fill("");
     await toggle("women:unemployment_rate").click();
-    await expect(page.getByTestId("series-status")).toContainText("1 / 7");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
     await expect(page.getByTestId("explorer-table")).toContainText("11.4%");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -180,7 +195,7 @@ for (const [breakdown, group, query] of [["settlement", "urban", "Urban"], ["edu
 
 test("search does not limit age selection and the national stack survives empty overview selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment/age"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 11");
+  await expect(page.getByTestId("series-status")).toContainText("2 / 11");
   await page.getByTestId("series-search").fill("15-19");
   await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("no-selection-callout")).toBeVisible();
   await expect(page.getByTestId("unemployment-composition")).toHaveCount(0);
@@ -204,7 +219,7 @@ test("history and language links preserve unit-safe indicator selections and the
   await page.getByRole("link", { name: "ქართული", exact: true }).click();
   await expect(page).toHaveURL(/\/explorer\/unemployment\/overview#.*sel=georgia%3Aemployed/);
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 7");
+  await expect(page.getByTestId("series-status")).toContainText("1 / 5");
   await expect(page.getByTestId("year-range-strip")).toContainText("2021–2024");
   await page.reload();
   await expect(page.locator('[data-series-id="georgia:employed"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
@@ -238,7 +253,9 @@ for (const prefix of ["", "/en"]) test(`overview checkboxes never mix rates and 
   await expect(toggle("georgia:participation_rate")).toHaveAttribute("aria-pressed", "false");
   await row("georgia:employed").locator("button[aria-expanded]").click();
   await toggle("georgia:self_employed").click(); await toggle("georgia:hired").click();
-  await expect(page.getByTestId("series-status")).toContainText("3 / 7");
+  // §7.7: five top-level people counts; the two rows under employed are reported beside them.
+  await expect(page.getByTestId("series-status")).toContainText("1 / 5");
+  await expect(page.getByTestId("series-status")).toContainText(prefix ? "Subcategories 2" : "ქვეკატეგორიები 2");
   await expect(row("georgia:self_employed")).toContainText("426.3");
   await expect(row("georgia:hired")).toContainText("961.1");
   await toggle("georgia:unemployment_rate").click();
@@ -247,12 +264,12 @@ for (const prefix of ["", "/en"]) test(`overview checkboxes never mix rates and 
   await toggle("georgia:hired").click();
   await page.getByTestId("series-search").fill("self");
   await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
-  await expect(page.getByTestId("series-status")).toContainText("7 / 7");
+  await expect(page.getByTestId("series-status")).toContainText("5 / 5");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
   await page.getByTestId("series-search").fill("");
   await expect(toggle("georgia:unemployment_rate")).toHaveAttribute("aria-pressed", "false");
   await page.getByTestId("chart-mode-table").click();
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(7);
+  await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(5);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.goto(`${prefix}/explorer/unemployment/overview#sel=georgia:self_employed,georgia:hired&start=2025&end=2025&view=table`);
   await expect(page.getByTestId("explorer-table")).toContainText("426.3");
@@ -278,7 +295,8 @@ test("settlement parents select their rates and employment subcategories select 
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "thousand_persons");
   await row("rural:unemployment_rate").getByTestId("series-row-toggle").click();
   await expect(row("urban:hired").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 5");
+  // §7.7: Georgia, Urban and Rural rates are the top-level rows.
+  await expect(page.getByTestId("series-status")).toContainText("1 / 3");
   await page.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toContainText("Rural · Unemployment rate");
 });
@@ -306,15 +324,17 @@ for (const prefix of ["", "/en"]) test(`long-term metric parents select Georgia 
   await count.getByTestId("series-row-toggle").click(); await count.locator("button[aria-expanded]").click();
   await row("men:long_term_unemployed").getByTestId("series-row-toggle").click();
   await row("women:long_term_unemployed").getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("series-status")).toContainText("3 / 3");
+  // §7.7: one top-level people count (Georgia), with Men and Women under its caret.
+  await expect(page.getByTestId("series-status")).toContainText("1 / 1");
+  await expect(page.getByTestId("series-status")).toContainText(prefix ? "Subcategories 2" : "ქვეკატეგორიები 2");
   await expect(rate.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
   await page.getByTestId("chart-mode-table").click();
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(3);
+  await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(3);
   await row("metric.long_term_unemployed_share").getByTestId("series-row-toggle").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
   await expect(count.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
   await rate.getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(2);
+  await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(2);
   await expect(page.getByTestId("explorer-table")).toContainText(prefix ? "% of all unemployed" : "ყველა უმუშევრის %");
   await expect(page.getByTestId("explorer-table")).toContainText(prefix ? "% of labour force" : "შრომის ძალის %");
 });

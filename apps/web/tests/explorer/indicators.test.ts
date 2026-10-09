@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compoundAnnualGrowth, rankPeriodDeltas } from "../../lib/explorer/indicators";
+import { compoundAnnualGrowth, isGrowthRankable, rankPeriodDeltas } from "../../lib/explorer/indicators";
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
 import type { ExplorerTableRow } from "../../lib/explorer/types";
 
@@ -167,5 +167,24 @@ describe("rankPeriodDeltas", () => {
     rankPeriodDeltas(rows, 2020, 2025);
 
     expect(rows.map((row) => row.itemId)).toEqual(["a", "b"]);
+  });
+});
+
+describe("isGrowthRankable (D11)", () => {
+  it("keeps the reviewed residual bucket out of growth rankings", () => {
+    expect(isGrowthRankable("spending.other_unclassified", 1_000)).toBe(false);
+    expect(isGrowthRankable("spending.health", 1_000)).toBe(true);
+  });
+
+  it("keeps a row that is exactly zero in the end year out, but not a missing or negative one", () => {
+    expect(isGrowthRankable("municipal.defence", 0)).toBe(false);
+    expect(isGrowthRankable("municipal.defence", 1)).toBe(true);
+    expect(isGrowthRankable("municipal.defence", null)).toBe(true);
+    expect(isGrowthRankable("revenue.other_taxes", -5)).toBe(true);
+  });
+
+  it("does not treat official 'other' categories as residual buckets", () => {
+    expect(isGrowthRankable("revenue.other_revenue", 10)).toBe(true);
+    expect(isGrowthRankable("revenue.other_taxes", 10)).toBe(true);
   });
 });

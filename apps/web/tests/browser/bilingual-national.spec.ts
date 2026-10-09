@@ -75,7 +75,10 @@ test("a selected programme keeps its plotted values through switching, back navi
   await programme.getByTestId("series-row-toggle").click();
   await expect.poll(() => new URLSearchParams(new URL(page.url()).hash.slice(1)).get("sel")).toContain(programmeId!);
   const hash = new URL(page.url()).hash;
-  const paths = () => page.getByTestId("chart-frame").locator("svg path").evaluateAll(elements => elements.map(element => element.getAttribute("d")));
+  // Compare the plotted heights (values) only: the y-axis padding fits each language's
+  // labels ("bn" vs "მლრდ"), so a language switch may shift every point sideways.
+  const paths = () => page.getByTestId("chart-frame").locator("svg path").evaluateAll(elements => elements.map(element =>
+    (element.getAttribute("d")?.match(/-?\d+(?:\.\d+)?/g) ?? []).filter((_, index) => index % 2 === 1).join(",")));
   const before = await paths();
   expect(before.length).toBeGreaterThan(0);
   await page.getByTestId("language-switch").getByRole("link", { name: "ქართული", exact: true }).click();

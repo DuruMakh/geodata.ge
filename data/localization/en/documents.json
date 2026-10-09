@@ -3344,6 +3344,18 @@
     "attribution": null,
     "documentLanguage": "en"
   },
+  "source.geostat_municipal_population": {
+    "title": {
+      "text": "Population as of 1 January by regions and self-governed units",
+      "reviewedAt": "2026-10-04"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-04"
+    },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
   "source.geostat_demography_density": {
     "title": { "text": "Density by regions (number of population per 1 sq.km)", "reviewedAt": "2026-10-03" },
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-03" },

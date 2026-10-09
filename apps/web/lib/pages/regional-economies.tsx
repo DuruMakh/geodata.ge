@@ -20,6 +20,7 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
+import { coverageLabel } from "../explorer/coverageLabel";
 
 export async function regionalEconomiesPageMetadata(locale: Locale) {
   const presentation = await getPresentation(locale, ["regionalEconomies"], []);
@@ -85,7 +86,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
         }),
       })} />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={`${model.firstYear}–${model.year} · ${message(presentation.messages, "regionalEconomies.currentPrices")}`} />
+        <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, model.firstYear, model.year, reviewedAt)} />
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{description}</p>
         <RegionalEconomiesIndex model={model} sourceNote={message(presentation.messages, "regionalEconomies.sourceNote")} />

@@ -13,7 +13,9 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(selector).toHaveAccessibleName(prefix ? "Indicator" : "მაჩვენებელი");
     await expect(page.locator('[data-series-id="georgia"]')).toHaveCount(0);
     await expect(page.locator('[data-series-id="age.15_24"]')).toHaveCount(0);
-    await expect(page.getByTestId("series-status")).toContainText("1 / 11");
+    // The page opens on a comparison: the youngest group beside a prime-age group.
+    await expect(page.getByTestId("series-status")).toContainText("2 / 11");
+    for (const id of ["age.15_19", "age.25_29"]) await expect(page.locator(`[data-series-id="${id}"] [data-testid="series-row-toggle"]`)).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
     await expect(heatmap.locator("tbody tr")).toHaveCount(11);
     await expect(page.getByTestId("age-heatmap-scroll-hint")).toHaveCount(0);
@@ -65,5 +67,6 @@ test("historic age links normalize to 2020 onward and remove the country selecti
   await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
   await expect(page.getByTestId("series-status")).toContainText("1 / 11");
   await expect(page.locator('[data-series-id="age.20_24"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
+  // Owner decision D2 (2026-10-07): the latest value now sits under the title.
+  await expect(page.getByTestId("unemployment-latest")).toContainText(/ · \d{4}: /);
 });

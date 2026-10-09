@@ -3,6 +3,7 @@ import ExcelJS from "exceljs";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { tableSeriesCount } from "./explorer-table";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Trade hub and Overview compare four indicators ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
@@ -28,7 +29,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("4 / 4");
     await toggle("trade.turnover").click();
     await page.getByTestId("chart-mode-table").click();
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(3);
+    // Phones list years as rows (owner decision D5), so count series in either layout.
+    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(3);
     await expect(page.getByTestId("trade-balance-context")).toBeVisible();
     await page.getByTestId("series-search").fill(prefix ? "Exports" : "ექსპორტი");
     await page.getByTestId("series-toggle-all").click();

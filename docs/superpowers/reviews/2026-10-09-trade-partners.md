@@ -70,3 +70,11 @@ Coordinator rulings on every declined boundary:
 5. Native Excel visual rendering: accepted as unexecuted. Actual workbook bytes were generated, reopened and their display formats checked, including the downloaded file; no installed-Excel visual session is claimed.
 
 Final review assessment: both Important findings resolved; no remaining Critical, Important or Minor findings. At review completion, the unit amendment and review fixes were local and uncommitted on `codex/trade-partners`; release operations and database rehearsal were still separate.
+
+## Integration for authorized publication
+
+After the user authorized push, merge and synchronization, current main was integrated from `a7b24bd83d6c54a0e45c607bf357edce1aaad9d1`. Its responsive chart, phone table/navigation and Demography work remain intact. Conflicts preserve both navigation sections, both source loaders and both route/revision inventories. The chart adds only the optional unit-label setting to main's existing responsive implementation; the new sidebar child follows main's phone touch-target and menu-closing behavior. The combined inventory has 220 bilingual pairs and 440 sitemap URLs.
+
+The same independent reviewer checked these integration changes against current main and found no new actionable defect, no changed existing translation/revision entry and no lost Demography design content. Unrelated incoming changes were not reviewed again; build/browser, CI, database, deployment and synchronization still require their own evidence.
+
+Fresh `npm run check` passed on the integrated code: full lint/type checks, 3,406 unit tests with 11 intentional skips across 403 passing files and one skipped file, complete data validation and translation checks. The Prisma client was regenerated for the combined schema. The initial pre-integration check was stopped after discovering the newer main and is not counted as a passing gate.

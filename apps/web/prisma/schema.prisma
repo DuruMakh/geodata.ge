@@ -85,6 +85,7 @@ model SourceDocument {
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
   regionalEconomyFacts RegionalEconomyFact[]
+  demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
   inflationCategoryFacts InflationCategoryFact[]
@@ -120,6 +121,7 @@ model ImportRun {
   tradePartnerEntities TradePartnerEntity[]
   tradePartnerFacts TradePartnerFact[]
   regionalEconomyFacts RegionalEconomyFact[]
+  demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
   inflationTargets  InflationTarget[]
   inflationCategoryFacts InflationCategoryFact[]
@@ -562,6 +564,31 @@ model TradeOverviewFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, year])
+}
+
+// Mirror of the served data/imports/demography-*.csv files: one flat observation table in the
+// shape the data stage already uses. A dimension a file does not have is the empty string, so
+// every part of the key is non-null.
+model DemographyFact {
+  seriesId         String
+  geographyId      String
+  year             Int
+  sex              String
+  ageGroup         String
+  citizenshipId    String
+  settlement       String
+  value            Decimal        @db.Decimal(40, 20)
+  unit             String
+  estimateBasis    String
+  status           String
+  sourceLocator    String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([seriesId, geographyId, year, sex, ageGroup, citizenshipId, settlement])
 }
 
 model InflationCpiFact {
