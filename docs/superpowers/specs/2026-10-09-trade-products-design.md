@@ -1,7 +1,7 @@
 # Trade Products: chart first, catalogue in a popup
 
 Date: 2026-10-09
-Status: The visual direction and full 1995–2025 coverage were approved in conversation. This written design is pending review. No Products serving package, application page or production release has been implemented by this document.
+Status: Written design approved on 2026-10-09 when the user said "continue" after its review request. The implementation plan is the next review stage. No Products serving package, application page or production release has been implemented by this document.
 
 ## 1. Intended result and accepted decisions
 
@@ -191,4 +191,4 @@ During implementation, update `Project_Definition.md` §2E for this bounded Prod
 
 ## 12. Review boundary
 
-This design now contains the approved chart-first direction and the user's explicit full-history choice. Review this written design before creating the implementation plan. Written-spec approval permits planning; implementation follows the plan review and execution-method choice. Publishing and live database operations remain separate release decisions.
+This approved design contains the chart-first direction and the user's explicit full-history choice. Written-spec approval permits planning; implementation follows the plan review and execution-method choice. Publishing and live database operations remain separate release decisions.
