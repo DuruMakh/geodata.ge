@@ -112,5 +112,10 @@
   "demography.sideDepartures": "Departures",
   "demography.sideForeignShare": "Foreign citizens' share of arrivals",
   "demography.migrationIndicatorsNote": "The indicators describe the last year of the period for the chosen sex and all citizenships. Foreign citizens are all arrivals except citizens of Georgia.",
-  "demography.migrationSource": "Source: Geostat — immigrants and emigrants by sex and citizenship, and net migration, {start}–{end} (Ministry of Internal Affairs border records). \"Other countries\", the net migration of selected groups and the foreign citizens' share are computed by Fiscal.ge."
+  "demography.migrationSource": "Source: Geostat — immigrants and emigrants by sex and citizenship, and net migration, {start}–{end} (Ministry of Internal Affairs border records). \"Other countries\", the net migration of selected groups and the foreign citizens' share are computed by Fiscal.ge.",
+  "demography.vitalBirths": "Births",
+  "demography.vitalDeaths": "Deaths",
+  "demography.vitalNatural": "Natural increase",
+  "demography.vitalWorkbookTitle": "Births and deaths",
+  "demography.vitalBasis": "Registered events"
 }
