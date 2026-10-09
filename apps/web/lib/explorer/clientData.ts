@@ -5,6 +5,7 @@ import type {
   ClientGdpObservation,
   ClientGovernmentDebtFact,
   ClientInflationTargetRow,
+  ClientMigrationFact,
   ClientRegionalEconomyObservation,
   ClientSectorObservation,
   ServedAdminFact,
@@ -152,6 +153,16 @@ export function projectDemographyObservation(
     geographyId: fact.geographyId,
     seriesId: fact.seriesId,
     year: fact.year,
+    value: fact.value,
+  };
+}
+
+export function projectMigrationObservation(fact: ServedDemographyObservation): ClientMigrationFact {
+  return {
+    seriesId: fact.seriesId,
+    year: fact.year,
+    sex: fact.sex ?? "total",
+    citizenshipId: fact.citizenshipId ?? "citizenship.total",
     value: fact.value,
   };
 }

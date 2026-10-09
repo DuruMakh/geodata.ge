@@ -68,6 +68,7 @@ exports[`buildInflationCategoryWorkbookExportModel > builds a stable model for a
   "filename": "fiscal-inflation-categories-contrib-2026-08-2026-08.xlsx",
   "locale": "ka",
   "readable": {
+    "fitSubtitle": true,
     "headerLabels": {
       "category": "სერია — წელი",
       "columns": [

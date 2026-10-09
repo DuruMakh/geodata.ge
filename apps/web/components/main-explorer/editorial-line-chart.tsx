@@ -76,7 +76,17 @@ const MOBILE_PAD_T = 26;
 const LATTICE_ID = "chart-dot-lattice";
 const MIN_LATTICE_PITCH = 12;
 
-export type TooltipRow = { id: string; label: string; color: string; value: number; preliminary?: boolean };
+export type TooltipRow = {
+  id: string;
+  label: string;
+  color: string;
+  value: number;
+  preliminary?: boolean;
+  /** Draws a coloured arrow in place of the colour bar: "up" for a gain, "down" for a loss. */
+  marker?: "up" | "down";
+  /** The full name read to screen readers when `label` is a shortened visible one. */
+  srLabel?: string;
+};
 
 // Series selection is unlimited (AGENTS.md UI contract), so the hover readout
 // cannot be one row per series: at 63 it measured 1327px against a 334px chart,

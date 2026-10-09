@@ -25,9 +25,14 @@ describe.skipIf(!connectionString)("demography mirror integrity", () => {
   beforeEach(async () => { await client.query("BEGIN"); });
   afterEach(async () => { await client.query("ROLLBACK"); });
 
-  it("mirrors both served files", async () => {
+  it("mirrors the three served files", async () => {
     const { rows } = await client.query('SELECT "seriesId", count(*)::int AS n FROM "DemographyFact" GROUP BY 1 ORDER BY 1');
     expect(rows).toEqual([
+      { seriesId: "demography.emigrants", n: 630 },
+      { seriesId: "demography.emigrants_by_citizenship_group", n: 252 },
+      { seriesId: "demography.immigrants", n: 630 },
+      { seriesId: "demography.immigrants_by_citizenship_group", n: 252 },
+      { seriesId: "demography.net_migration", n: 14 },
       { seriesId: "demography.population_density", n: 145 },
       { seriesId: "demography.population_total", n: 923 },
     ]);

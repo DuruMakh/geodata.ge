@@ -5,7 +5,7 @@ import {
   loadDemographyFacts,
   SERVED_DEMOGRAPHY_FILES,
 } from "../../../lib/data/demography/importDemography";
-import { populationEstimateBasis, SERIES } from "../../../lib/data/demography/series";
+import { FAMILIES, populationEstimateBasis, SERIES } from "../../../lib/data/demography/series";
 import type { DemographyObservation } from "../../../lib/data/demography/types";
 import { SERVED_DATA_FILES } from "../../../lib/data/servedData";
 import { loadSourceDocuments } from "../../../lib/data/sources";
@@ -20,10 +20,11 @@ beforeAll(async () => {
 });
 
 describe("demography loader", () => {
-  test("serves the two files SERVED_DATA_FILES names", () => {
+  test("serves the files SERVED_DATA_FILES names", () => {
     expect([...SERVED_DEMOGRAPHY_FILES]).toEqual([
       SERVED_DATA_FILES.demographyPopulationFacts,
       SERVED_DATA_FILES.demographyDensityFacts,
+      SERVED_DATA_FILES.demographyMigrationFacts,
     ]);
   });
 
@@ -50,8 +51,11 @@ describe("demography loader", () => {
     expect(valueOf("country.georgia", 2014, SERIES.populationDensity)).toBe("65");
   });
 
-  test("every row's basis is the lineage of its year", () => {
-    expect(facts.every((row) => row.estimateBasis === populationEstimateBasis(row.year))).toBe(true);
+  test("every row's basis is the one its series and year require", () => {
+    const migration = new Set<string>(FAMILIES.migration);
+    expect(facts.filter((row) => !migration.has(row.seriesId)).every((row) => row.estimateBasis === populationEstimateBasis(row.year))).toBe(true);
+    expect(facts.filter((row) => migration.has(row.seriesId)).every((row) => row.estimateBasis === "border_police")).toBe(true);
+    expect(facts.filter((row) => migration.has(row.seriesId))).toHaveLength(1_778);
   });
 
   test("the 11 regions and, separately, the 64 municipalities sum to Georgia in every year they cover", () => {
@@ -80,6 +84,8 @@ describe("demography loader", () => {
     const registered = new Set(sources.map((source) => source.sourceId));
     expect([...new Set(facts.map((row) => row.sourceId))].sort()).toEqual([
       "source.geostat_demography_density",
+      "source.geostat_demography_migration_citizenship",
+      "source.geostat_demography_net_migration",
       "source.geostat_municipal_population",
     ]);
     expect(facts.every((row) => registered.has(row.sourceId))).toBe(true);
@@ -115,8 +121,13 @@ describe("demography parity", () => {
   test("rejects a basis that disagrees with the year, a missing row and a duplicate row", () => {
     const wrongBasis = structuredClone(facts);
     wrongBasis[0] = { ...wrongBasis[0], estimateBasis: "census_based" };
-    expect(() => assertDemographyParity(facts, wrongBasis)).toThrow(/lineage/);
+    expect(() => assertDemographyParity(facts, wrongBasis)).toThrow(/basis/);
     expect(() => assertDemographyParity(facts, facts.slice(1))).toThrow(/Demography parity failed/);
     expect(() => assertDemographyParity(facts, [...facts, facts[0]])).toThrow();
+  });
+
+  test("a migration row with a population basis is rejected", () => {
+    const row = facts.find((fact) => fact.seriesId === SERIES.netMigration)!;
+    expect(() => assertDemographyParity(facts, facts.map((fact) => (fact === row ? { ...fact, estimateBasis: "pre_census" as const } : fact)))).toThrow(/basis/);
   });
 });

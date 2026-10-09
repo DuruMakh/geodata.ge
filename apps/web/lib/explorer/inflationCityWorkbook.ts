@@ -67,6 +67,7 @@ export function buildInflationCityWorkbookExportModel(input: {
     readable: {
       title: `${t("citiesHeading")} · ${cityPlaceLabel(messages, view)}`,
       subtitle: `${subtitle} · ${t("cityCentralPricesNote")}`,
+      fitSubtitle: true,
       unitLabel: t("categoryWorkbookUnit.yoy"),
       numberFormat: "0.0%",
       showChangeColumn: false,

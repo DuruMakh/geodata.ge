@@ -4,6 +4,7 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
+import { SOURCE_ID } from "../data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { loadServedMunicipalData } from "../data/servedData";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
@@ -74,6 +75,8 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
   ]);
   const place = places.find((candidate) => candidate.id === placeIdFor(route));
   if (!place) notFound();
+  // Only the two Population originals go to the browser; the loader returns the whole demography manifest.
+  const populationSources = sources.filter((source) => source.sourceId === SOURCE_ID.populationUnits || source.sourceId === SOURCE_ID.density);
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const years = placeYears(clientFacts, place);
@@ -162,7 +165,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
           }}
           sourceNote={populationSourceNote(presentation, first, last)}
           densityNote={densityNote}
-          sources={sources}
+          sources={populationSources}
           siteOrigin={resolveSiteUrl()}
           workbookScope={workbookScopeFor(route)}
           backHref={POPULATION_PATH}

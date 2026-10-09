@@ -78,6 +78,11 @@ export type WorkbookExportModel = {
     headerLabels?: { category: string; columns: string[]; wrap?: boolean };
     /** Replaces the signed red default for values whose sign is neither good nor bad. */
     numberFormat?: string;
+    /**
+     * Opt-in for a subtitle that carries a note: its row gets a height that fits the text, because Excel does not grow a
+     * merged row on its own and would show the first line only. Without it the row keeps Excel's default height.
+     */
+    fitSubtitle?: boolean;
   };
   analysis: {
     numericFormats?: Record<number,string>;
