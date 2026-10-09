@@ -25,6 +25,8 @@ describe("demography loader", () => {
       SERVED_DATA_FILES.demographyPopulationFacts,
       SERVED_DATA_FILES.demographyDensityFacts,
       SERVED_DATA_FILES.demographyMigrationFacts,
+      SERVED_DATA_FILES.demographyVitalFacts,
+      SERVED_DATA_FILES.demographyFertilityFacts,
     ]);
   });
 
@@ -53,9 +55,29 @@ describe("demography loader", () => {
 
   test("every row's basis is the one its series and year require", () => {
     const migration = new Set<string>(FAMILIES.migration);
-    expect(facts.filter((row) => !migration.has(row.seriesId)).every((row) => row.estimateBasis === populationEstimateBasis(row.year))).toBe(true);
+    const registered = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility]);
+    const lineage = facts.filter((row) => !migration.has(row.seriesId) && !registered.has(row.seriesId));
+    expect(lineage.every((row) => row.estimateBasis === populationEstimateBasis(row.year))).toBe(true);
     expect(facts.filter((row) => migration.has(row.seriesId)).every((row) => row.estimateBasis === "border_police")).toBe(true);
     expect(facts.filter((row) => migration.has(row.seriesId))).toHaveLength(1_778);
+    expect(facts.filter((row) => registered.has(row.seriesId)).every((row) => row.estimateBasis === "registered")).toBe(true);
+    expect(facts.filter((row) => FAMILIES.vital.includes(row.seriesId as never))).toHaveLength(2_595);
+    expect(facts.filter((row) => row.seriesId === SERIES.ageSpecificFertilityRate)).toHaveLength(84);
+  });
+
+  test("births minus deaths equal natural increase in every row, and the age rates add up to the total fertility rate", () => {
+    const keyed = (seriesId: string) => new Map(facts.filter((row) => row.seriesId === seriesId).map((row) => [`${row.geographyId}|${row.year}`, Number(row.value)]));
+    const births = keyed(SERIES.liveBirths);
+    const deaths = keyed(SERIES.deaths);
+    const natural = keyed(SERIES.naturalIncrease);
+    expect(births.size).toBe(837);
+    for (const [key, value] of births) expect(value - deaths.get(key)!, key).toBe(natural.get(key));
+    for (const year of [2014, 2020, 2025]) {
+      const rates = facts.filter((row) => row.seriesId === SERIES.ageSpecificFertilityRate && row.year === year);
+      expect(rates).toHaveLength(7);
+      const tfr = Number(valueOf("country.georgia", year, SERIES.totalFertilityRate));
+      expect(Math.abs((5 * rates.reduce((sum, row) => sum + Number(row.value), 0)) / 1000 - tfr)).toBeLessThan(0.005);
+    }
   });
 
   test("the 11 regions and, separately, the 64 municipalities sum to Georgia in every year they cover", () => {
@@ -83,8 +105,16 @@ describe("demography loader", () => {
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     const registered = new Set(sources.map((source) => source.sourceId));
     expect([...new Set(facts.map((row) => row.sourceId))].sort()).toEqual([
+      "source.geostat_demography_births",
+      "source.geostat_demography_crude_birth_rate",
+      "source.geostat_demography_crude_death_rate",
+      "source.geostat_demography_deaths",
       "source.geostat_demography_density",
+      "source.geostat_demography_fertility",
+      "source.geostat_demography_infant_mortality",
+      "source.geostat_demography_life_expectancy",
       "source.geostat_demography_migration_citizenship",
+      "source.geostat_demography_natural_increase",
       "source.geostat_demography_net_migration",
       "source.geostat_municipal_population",
     ]);
