@@ -12,6 +12,7 @@
   "demography.birthsDeathsTitle": "Births, deaths and fertility",
   "demography.birthsDeathsDescription": "Births, deaths, the birth rate and life expectancy.",
   "demography.cardFooter": "{year}: {persons} people · {first}–{last}",
+  "demography.migrationCardFooter": "{year}: net migration {net} · {first}–{last}",
   "demography.unitLine": "persons, on 1 January",
   "demography.unitShort": "persons",
   "demography.coverage": "{first}–{last} · as of 1 January",

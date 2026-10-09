@@ -12,6 +12,7 @@
   "demography.birthsDeathsTitle": "შობადობა და სიკვდილიანობა",
   "demography.birthsDeathsDescription": "დაბადებები, გარდაცვალებები, შობადობის კოეფიციენტი და სიცოცხლის ხანგრძლივობა.",
   "demography.cardFooter": "{year}: {persons} ადამიანი · {first}–{last}",
+  "demography.migrationCardFooter": "{year}: წმინდა მიგრაცია {net} · {first}–{last}",
   "demography.unitLine": "ადამიანი, 1 იანვარს",
   "demography.unitShort": "ადამიანი",
   "demography.coverage": "{first}–{last} · 1 იანვრის მდგომარეობით",

@@ -11,7 +11,7 @@ export const MIGRATION_PATH = "/explorer/demography/migration";
 export const DEMOGRAPHY_PAGES = [
   { id: "population", path: POPULATION_PATH, live: true, titleKey: "populationTitle", descriptionKey: "populationDescription", labelKey: "common.demographyPopulation" },
   { id: "age-sex", path: "/explorer/demography/age-sex", live: false, titleKey: "ageSexTitle", descriptionKey: "ageSexDescription", labelKey: "common.demographyAgeSex" },
-  { id: "migration", path: MIGRATION_PATH, live: false, titleKey: "migrationTitle", descriptionKey: "migrationDescription", labelKey: "common.demographyMigration" },
+  { id: "migration", path: MIGRATION_PATH, live: true, titleKey: "migrationTitle", descriptionKey: "migrationDescription", labelKey: "common.demographyMigration" },
   { id: "births-deaths", path: "/explorer/demography/births-deaths", live: false, titleKey: "birthsDeathsTitle", descriptionKey: "birthsDeathsDescription", labelKey: "common.demographyBirthsDeaths" },
 ] as const;
 

@@ -11,6 +11,7 @@ import {
   demographyPageMetadata,
   renderDemographyPage,
 } from "../../lib/pages/demography";
+import { demographyMigrationPageMetadata, renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
 import {
   demographyPopulationPageMetadata,
   loadPopulationBasics,
@@ -31,8 +32,9 @@ describe("demography hub page", () => {
     const html = renderToStaticMarkup(await renderDemographyPage("en"));
     expect(html).toContain('data-testid="demography-hub"');
     expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(3);
+    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(2);
     expect(html).toContain('href="/en/explorer/demography/population"');
+    expect(html).toContain('href="/en/explorer/demography/migration"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
@@ -137,6 +139,25 @@ describe("population index page", () => {
     const metadata = await demographyPopulationPageMetadata("ka");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/population");
     expect(String(metadata.title)).toContain("მოსახლეობა");
+  });
+});
+
+describe("migration page", () => {
+  it("renders the heading, coverage, breadcrumb and the explorer, with no dataset markup", async () => {
+    const html = renderToStaticMarkup(await renderDemographyMigrationPage("en"));
+    expect(html).toContain(">Migration</h1>");
+    expect(html).toContain("2012–2025 · annual");
+    expect(html).toContain("persons per year");
+    expect(html).toContain('data-testid="migration-explorer"');
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('"@type":"Dataset"');
+    expect(html).toContain('href="/en/methodology/demography"');
+  });
+
+  it("has its own canonical address and title", async () => {
+    const metadata = await demographyMigrationPageMetadata("ka");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/migration");
+    expect(String(metadata.title)).toBe("მიგრაცია — დემოგრაფია | Fiscal.ge");
   });
 });
 

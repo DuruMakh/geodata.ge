@@ -55,7 +55,8 @@ describe("indexable Fiscal.ge routes", () => {
     // The demography methodology adds one more, and the demography hub and
     // Population page add two more bilingual pairs; the 75 Population place
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
-    expect(urls).toHaveLength(438);
+    // The Migration page adds one more bilingual pair.
+    expect(urls).toHaveLength(440);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

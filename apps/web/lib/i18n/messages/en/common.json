@@ -58,5 +58,6 @@
   "common.tradeOverview": "Overview",
   "common.dataTrade": "DATA · TRADE",
   "common.dataDemography": "Data · Demography",
-  "common.demographyPopulation": "Population"
+  "common.demographyPopulation": "Population",
+  "common.demographyMigration": "Migration"
 }

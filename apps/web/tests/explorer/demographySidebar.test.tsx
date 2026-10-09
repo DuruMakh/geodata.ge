@@ -20,6 +20,13 @@ describe("sidebar demography group", () => {
     expect((markup.match(/Coming soon/g) ?? []).length).toBe(0);
   });
 
+  it("marks the Migration link current on the Migration page and leaves Population unmarked", async () => {
+    const markup = await render("/en/explorer/demography/migration");
+    expect(markup).toContain('data-testid="demography-migration-link" aria-current="page"');
+    expect(markup).toContain('data-testid="demography-population-link"');
+    expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
+  });
+
   it("keeps the Population link current on every place page, in both languages", async () => {
     for (const [pathname, locale] of [
       ["/explorer/demography/population/georgia", "ka"],

@@ -23,6 +23,8 @@ export function buildDemographyHubCards(
   const last = georgia.at(-1);
   const span = first && last ? Array.from({ length: last.year - first.year + 1 }, (_, index) => first.year + index) : [];
   const trend = sparkValues(span, (year) => georgia.find((fact) => fact.year === year)?.value ?? null);
+  const net = facts.filter((fact) => fact.seriesId === SERIES.netMigration).sort((left, right) => left.year - right.year);
+  const signed = (value: number) => `${value > 0 ? "+" : ""}${formatInUnit(value, UNIT_PERSONS)}`;
   return DEMOGRAPHY_PAGES.map((page, index) => {
     const card = {
       index: String(index + 1).padStart(2, "0"),
@@ -31,6 +33,15 @@ export function buildDemographyHubCards(
       href: page.live ? page.path : null,
       comingSoon: !page.live,
     };
+    if (page.id === "migration" && page.live && net.length) {
+      const [firstNet, lastNet] = [net[0]!, net.at(-1)!];
+      return {
+        ...card,
+        series: net.map((fact) => fact.value),
+        seriesColor: INK,
+        footer: t("migrationCardFooter", { year: lastNet.year, net: signed(lastNet.value), first: firstNet.year, last: lastNet.year }),
+      };
+    }
     if (page.id !== "population" || !first || !last) return { ...card, series: null, seriesColor: null, footer: null };
     return {
       ...card,
