@@ -28,7 +28,7 @@ Excluded: infant mortality and the crude birth and death rates (they stay in the
 | `age_specific_fertility_rate`: seven mother's-age groups | Georgia | 2014–2025 | 84 |
 | `life_expectancy_total`, `_male`, `_female` | Georgia | 2014–2025 | 12 each |
 
-Total newly served: 2,643 rows, read from the reviewed files `data/imports/demography-vital-annual.csv` and `demography-fertility-age-annual.csv`. Nothing new is fetched from Geostat; no source is added.
+The pages show 2,643 rows, read from the reviewed files `data/imports/demography-vital-annual.csv` and `demography-fertility-age-annual.csv`. The loader serves whole files (it rejects a file holding an unserved series), as it does for Migration's, so both files are mirrored whole: 2,679 rows, of which the infant mortality rate and the crude birth and death rates (36 rows) are mirrored and archived but not shown. Nothing new is fetched from Geostat; no source is added. The methodology archive gains the eight Geostat originals behind the mirrored series (tables 09, 15, 16, 19, 24, 25, 28, 29).
 
 - Events are counted when registered in the reference year; Georgian citizens registered abroad are included. Every row has `estimate_basis = registered`. Vital events start in 2014, where Geostat moves from retro-projected to registered data.
 - **Census break.** Birth and death counts and natural increase are unaffected and carry no marker. The total fertility rate, the age-specific rates and life expectancy use population denominators: they are marked at 2025 like the Population chart.
@@ -47,7 +47,7 @@ Total newly served: 2,643 rows, read from the reviewed files `data/imports/demog
 
 ## 3. The place-page section
 
-On every Population place page, below the population part's key figures and above the region pages' member list (`EntityMemberList`). The population part is unchanged.
+On every Population place page, after the population part's key figures, at the end of the page. The population part, including the region pages' member list (`EntityMemberList`, which sits inside it), is unchanged.
 
 - **Anchor and heading.** A section with `id="births-deaths"`, a `SectionTitle` `დაბადებები და გარდაცვალებები` (draft; distinct from the national page title), and one line: "Births and deaths registered in {place}, {first}–{last}".
 - **Chart.** `StackedColumnChart` as the Migration page uses it: annual columns, births above zero, deaths below (signed in the chart only), natural increase as the ink overlay line, the readout listing births then deaths with the net in its header. Colours: births `vital.births`, deaths `vital.deaths` (§6). All loaded years always (11, or 12 for Georgia): no `RangeStrip`.
@@ -81,14 +81,14 @@ A `SectionTitle` `ნაყოფიერება`, then:
 
 ### 4.3 Life expectancy
 
-A `SectionTitle` `სიცოცხლის ხანგრძლივობა`, then `EditorialLineChart` with three lines, total (ink), men and women, all shown with no selector, years to one decimal, `breaks=[2025]`; a chart/table switch; an Excel download of the three series by year with the life-tables original.
+A `SectionTitle` `სიცოცხლის ხანგრძლივობა`, then `EditorialLineChart` with three lines, total (ink), men and women, all shown with no selector, years to one decimal, `breaks=[2025]`; a chart/table switch; an Excel download of the three series by year with the life-expectancy original (table 28).
 
 ## 5. Behind the pages
 
-- **Serving.** The importer's served set (`SERVED_SERIES` in `importDemography.ts`) and `servedData.ts` gain the two files' served series; `DemographyFact` grows by 2,643 rows (Migration's total plus 2,643; the import log must show equal `csv` and `db` counts). No schema change, so no database migration. Any served-row validation that assumes a basis per family accepts `registered` for these series.
+- **Serving.** The importer's served set (`SERVED_SERIES` in `importDemography.ts`) and `servedData.ts` gain the two files' served series; `DemographyFact` grows by 2,679 rows (Migration's total plus 2,679; the import log must show equal `csv` and `db` counts). No schema change, so no database migration. Any served-row validation that assumes a basis per family accepts `registered` for these series.
 - **Loaders.** Each page filters the served rows to what it shows, following Migration's filter in `loadPopulationBasics`: the population part keeps population and density; the place section takes one place's vital rows; the national page takes the national series and the latest year's counts for every place.
 - **Reuse, as is:** `StackedColumnChart` with Migration's readout props, `EditorialLineChart`, `ExplorerTable`, `SegmentedTabs`, `HeroKpi`, `SideKpiList`, `SectionTitle`, `SourceNote`, `ExcelDownloadButton`, the workbook model and writer, `MunicipalitiesIndex` and both maps, `EntityMemberList`, the place routes and slugs.
-- **Small additions:** `MunicipalitiesIndex` / `EntityPicker` `valueFormat` gains a plain whole-number option for the ratio; the index model builder (`buildPopulationIndexModel`) takes the value per place as an optional input, defaulting to population so the Population index is unchanged; `colors.ts` gains `vital.births` and `vital.deaths`.
+- **Small additions:** the `ranked` helper in `demographyPopulationIndex.ts` is exported so the births index ranks its rows the same way; `colors.ts` gains `vital.births` and `vital.deaths`. `MunicipalitiesIndex` needs no change: its existing `"persons"` value format prints the ratio as a whole number. `buildPopulationIndexModel` stays as it is, because it is wired to density checks; the births index builds its map with the same `buildMunicipalityValueMapModel` it uses.
 - **Genuinely new, thin:** the place section component, the national page and its route files (`app/(ka)/...` and `(en)` mirror), and models and workbooks for vital events, fertility and life expectancy under `lib/explorer/`. No new chart.
 - **Discovery and docs, updated in the same change:** `DEMOGRAPHY_PAGES` `births-deaths` → `live: true` (hub card with a sparkline of births, sidebar), sitemap and `bilingual-complete` counts (+2 routes), `llms.txt`, methodology page and `docs/data-methodology/demography.md` (served series and originals), `DESIGN.md` (the place section, the national page, the two tokens), `Project_Definition.md` section 2.
 - **Georgian text** is drafted by the assistant and listed for the owner's review before merge, as for Population and Migration.
@@ -99,12 +99,13 @@ Added to `DESIGN.md` §4.2 and `colors.ts`; both clear 3:1 on `paper`:
 
 - `vital.births` `#1F6E56` (5.50:1)
 - `vital.deaths` `#8C5A32` (5.20:1)
+- `sex.male` `#3D5A98` (6.05:1) and `sex.female` `#C26E4C` (3.35:1), the values the section spec §7 reserved for the Age and sex page, added now for the life-expectancy lines so that page reuses them.
 
 The map keeps the Population map's scale; no new ramp.
 
 ## 7. Numbers
 
-Counts are exact. Rates print as published: two decimals for the total fertility rate, one elsewhere. The ratio and the 53-of-64 count are computed from served counts only and ranked on unrounded values, ties broken by code. Missing stays missing; nothing is interpolated or subtracted across 2024 and 2025.
+Counts are exact. Rates print as published: two decimals for the total fertility rate, one elsewhere. The ratio and the 53-of-64 count are computed from served counts only and ranked on unrounded values with the shared `ranked` helper (equal values keep registry order). Missing stays missing; nothing is interpolated or subtracted across 2024 and 2025.
 
 ## 8. Accessibility and responsive
 
@@ -112,7 +113,7 @@ Each chart is a named `role="img"` whose table is its text equivalent. Births an
 
 ## 9. Tests and acceptance
 
-- **Unit:** the anchors and identities in §2; ratio and streak for Georgia, a region (Imereti), a municipality, and a place where births lead (Tbilisi, Adjara); the 53/32/30 counts; zero-deaths guard; the place section's payload holds only one place; workbook models; the index builder's default leaves the Population index output identical.
+- **Unit:** the anchors and identities in §2; ratio and streak for Georgia, a region (Imereti), a municipality, and a place where births lead (Tbilisi, Adjara); the 53/32/30 counts; zero-deaths guard; the place section's payload holds only one place; workbook models; the Population index and place pages' existing tests pass unchanged apart from the new section.
 - **Browser, both languages:** the section on Georgia's, a region's and a municipality's page; chart/table switch; a national list row opens the place page at `#births-deaths`; the national page's three blocks and the fertility break note; downloads; 390px without sideways scroll.
 - **Pinned counts** that move: sitemap, `bilingual-complete`, sidebar coming-soon badges, `llms.txt` target list, methodology lists, payload-guard routes.
 - **Acceptance:** anchors agree across the place section, the national list, key figures and workbooks; existing pages unchanged apart from the new section; `npm run check`, `npm run build` and the full browser suite on a production build pass once at the end; one PR.
