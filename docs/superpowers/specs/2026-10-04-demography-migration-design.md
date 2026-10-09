@@ -1,7 +1,7 @@
 # Demography: Migration page — specification
 
 Date: 2026-10-04, revised 2026-10-09 against the live Population section (PR #159, release `a7b24bd8`).
-Status: Owner-approved design (2026-10-09). Part of `2026-10-04-demography-section-design.md` (read first: serving §4, tokens §7, labels §9). Implementation Plan 3, built before Plan 2 by the owner's choice; Plan 1 (Population) is live, so this page builds on main.
+Status: Owner-approved design (2026-10-09). Part of `2026-10-04-demography-section-design.md` (read first: serving §4, tokens §7, labels §9). Implementation Plan 3, built before Plan 2 by the owner's choice; Plan 1 (Population) is live, so this page builds on main. Implemented on `claude/demographic-data-next-steps-ec11b1` (plan `docs/superpowers/plans/2026-10-09-demography-migration.md`).
 Scope: `/explorer/demography/migration` and `/en/explorer/demography/migration`.
 
 ## 0. What changed in the 2026-10-09 revision
@@ -45,8 +45,8 @@ The Trade / Unemployment page shell: `ExplorerPage` → `PageHeader` (coverage `
 
 - **Toolbar.** The chart/table switch on the left, labelled `სვეტები / ცხრილი` ("Columns / Table") as on the inflation categories page; on the right a joined `SegmentedTabs` `ყველა / მამაკაცები / ქალები`, the control the unemployment page uses. The filter applies to the chart, table, indicators and export.
 - **Chart.** `StackedColumnChart` with `periodsPerYear={1}`, unchanged. Arrivals are positive segments, one per selected group, in the `citizenship.*` colours (section spec §7); departures are the same groups and colours as negative segments, so they stack below zero. Segment labels `შემოსვლა · რუსეთი` and `გასვლა · რუსეთი`. The overlay is the net migration of the selected groups and sex, the existing ink line with an end dot; with all six groups selected it equals Geostat's published net and is labelled `წმინდა მიგრაცია`, otherwise `წმინდა მიგრაცია (არჩეული ჯგუფები)`. The tooltip, caption and axis are the chart's existing ones; the axis covers the selected series only.
-- **Series aside.** The existing series selector with six rows in fixed order: Georgia, Russia, Turkey, Azerbaijan, Ukraine, the computed remainder. Each row: swatch, name, end-year arrivals as the value and end-year departures as the meta. `გასუფთავება` / `ყველას მონიშვნა` and `სერიები {selected} / 6`. Search matches Georgian and English names. **Default: all six selected**, a documented departure from "only the total starts selected" like the inflation categories and cities pages (the chart shows parts of a whole). With none selected the existing empty-selection `Callout` shows.
-- **Table.** `ExplorerTable` for one direction at a time, chosen with `SegmentedTabs` `შემოსვლა / გასვლა / წმინდა`: rows are the selected groups plus a total row (`ჯამი` when all six are selected, `არჩეულთა ჯამი` otherwise), years as columns, departures as positive counts. The net tab shows one signed row per selected group and the net total.
+- **Series aside.** The existing series selector with six rows in fixed order: Georgia, Russia, Turkey, Azerbaijan, Ukraine, the computed remainder. Each row: swatch, name, end-year departures as the value and end-year arrivals as the labelled meta (the shared row renders meta first, so the row reads "arrivals / departures"). `გასუფთავება` / `ყველას მონიშვნა` and `სერიები {selected} / 6`. Search matches Georgian and English names. **Default: all six selected**, a documented departure from "only the total starts selected" like the inflation categories and cities pages (the chart shows parts of a whole). With none selected the existing empty-selection `Callout` shows.
+- **Table.** `ExplorerTable` for one direction at a time, chosen with `SegmentedTabs` `შემოსვლა / გასვლა / წმინდა`: rows are the selected groups plus a total row (`ჯამი` when all six are selected, `არჩეულთა ჯამი` otherwise), years as columns, departures as positive counts. The net tab shows one row per selected group and the net total; the shared table formatting prints negatives with `−` and positives unsigned (the hero and the chart readout carry an explicit `+`).
 - **Range.** `RangeStrip` over 2012–2025, full range by default, the usual chips. No marker.
 
 ## 5. Key indicators
@@ -68,7 +68,7 @@ Hash keys: `view` (`line|table`), `start`, `end`, `sel` (group IDs; absent means
 
 ## 7. Excel
 
-One download for the active range, groups and sex filter, built with the existing workbook model. Readable sheet: rows grouped under `შემოსვლა` and `გასვლა` with a total row each, then a `წმინდა მიგრაცია` row; years as columns. Data sheet: `წელი`, `მიმართულება`, `მოქალაქეობის ჯგუფი`, `სქესი`, `ადამიანი`. Sources sheet: the migration-by-citizenship and net-migration originals with compressed year ranges, and one line stating how the computed group is built. Search never narrows an export.
+One download for the active range, groups and sex filter, built with the existing workbook model. Readable sheet: rows grouped under `შემოსვლა` and `გასვლა` with a total row each, then a `წმინდა მიგრაცია` row; years as columns. Data sheet: `წელი`, `მიმართულება`, `მოქალაქეობის ჯგუფი`, `სქესი`, `ადამიანი`. Sources sheet: the migration-by-citizenship and net-migration originals with compressed year ranges, and, because the Sources sheet has no free-text line, the definition of the computed group in the Summary subtitle. Search never narrows an export.
 
 ## 8. What is reused, extended and new
 
@@ -93,3 +93,10 @@ Acceptance: the anchors agree across chart caption, table, indicators and workbo
 3. Foreign citizens' share of arrivals is the third side indicator — owner, 2026-10-09.
 4. Five named countries only; the remainder stays one computed group — owner, 2026-10-03.
 5. Departures signed in the chart only — assistant default, 2026-10-09 (plain counts would need an optional overlay formatter on the chart).
+6. Series search matches the group names in both languages (`migrationSearchLabels`), as Population, Debt and Deficit do — assistant ruling, 2026-10-09.
+7. Each aside row shows end-year arrivals as the labelled meta and departures as the value, because the shared row renders meta before value — assistant ruling, 2026-10-09.
+8. The Net tab prints negatives with `−` and positives unsigned (shared `ExplorerTable` formatting, which may not change); the hero and chart readout carry `+` — assistant ruling, 2026-10-09.
+9. The workbook cites both originals (tables 31 and 33) and the computed group's definition sits in the Summary subtitle — assistant ruling, 2026-10-09.
+10. `lib/methodology/sourceInventory.ts` accepts the exact basenames of tables 31 and 33 in the 2026-10 folder so the methodology archive can hold the two originals — assistant ruling, 2026-10-09.
+11. The methodology key fact Frequency reads "Annual" (population is 1 January, migration full-year) — assistant ruling, 2026-10-09.
+12. A sidebar label `common.demographyMigration` (`მიგრაცია` / `Migration`) was added — assistant ruling, 2026-10-09.
