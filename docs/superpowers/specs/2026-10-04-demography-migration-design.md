@@ -64,11 +64,11 @@ No sentence names a cause or an event. A net of exactly zero reads "as many arri
 
 ## 6. State
 
-Hash keys: `view` (`line|table`), `start`, `end`, `sel` (group IDs; absent means all six, explicit empty stays empty), `sex` (`total|male|female`), `dir` (`arrivals|departures|net`). Unknown values are rejected, duplicates removed, ranges clamped. Ordinary changes replace the history entry; language switch keeps the state.
+Hash keys: `view` (`line|table`), `start`, `end` (the shared year-range keys; the default address also carries `range=all`), `sel` (group IDs; absent means all six, explicit empty stays empty), `sex` (`total|male|female`), `dir` (`arrivals|departures|net`). Unknown values are rejected, duplicates removed, ranges clamped. Ordinary changes replace the history entry; language switch keeps the state.
 
 ## 7. Excel
 
-One download for the active range, groups and sex filter, built with the existing workbook model. Readable sheet: rows grouped under `შემოსვლა` and `გასვლა` with a total row each, then a `წმინდა მიგრაცია` row; years as columns. Data sheet: `წელი`, `მიმართულება`, `მოქალაქეობის ჯგუფი`, `სქესი`, `ადამიანი`. Sources sheet: the migration-by-citizenship and net-migration originals with compressed year ranges, and, because the Sources sheet has no free-text line, the definition of the computed group in the Summary subtitle. Search never narrows an export.
+One download for the active range, groups and sex filter, built with the existing workbook model. Readable sheet: rows grouped under `შემოსვლა` and `გასვლა` with a total row each, then a `წმინდა მიგრაცია` row; years as columns. Data sheet: `წელი`, `მიმართულება`, `მოქალაქეობა`, `სქესი`, `ადამიანი`. Sources sheet: the migration-by-citizenship and net-migration originals with compressed year ranges, and, because the Sources sheet has no free-text line, the definition of the computed group in the Summary subtitle. Search never narrows an export.
 
 ## 8. What is reused, extended and new
 

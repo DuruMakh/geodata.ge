@@ -5,6 +5,7 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
+import { SOURCE_ID } from "../data/demography/series";
 import { projectMigrationObservation } from "../explorer/clientData";
 import { MIGRATION_SERIES, migrationCoverage, migrationSearchLabels } from "../explorer/demographyMigration";
 import { DEMOGRAPHY_HUB_PATH, MIGRATION_PATH } from "../explorer/demographyRoutes";
@@ -37,6 +38,8 @@ export async function renderDemographyMigrationPage(locale: Locale) {
     getMessages("en", ["demography"]),
   ]);
   const { messages } = presentation;
+  // Only the two migration originals go to the browser; the loader returns the whole demography manifest.
+  const migrationSources = sources.filter((source) => source.sourceId === SOURCE_ID.migrationCitizenship || source.sourceId === SOURCE_ID.netMigration);
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   // Only the three series the page reads go to the browser (518 rows), never the whole mirrored file.
   const facts = served.filter((fact) => MIGRATION_SERIES.includes(fact.seriesId)).map(projectMigrationObservation);
@@ -71,7 +74,7 @@ export async function renderDemographyMigrationPage(locale: Locale) {
         <p className="mb-[30px] text-[13px] text-[var(--body)]">{t("migrationUnitLine")}</p>
         <MigrationExplorer
           facts={facts}
-          sources={sources}
+          sources={migrationSources}
           siteOrigin={resolveSiteUrl()}
           sourceNote={sourceNote}
           searchLabels={migrationSearchLabels(kaMessages, enMessages)}

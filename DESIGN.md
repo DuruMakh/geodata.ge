@@ -235,6 +235,17 @@ on the budget side, so a category keeps one colour across the whole site:
 | `municipal.recreation_culture` | `#9C3D5E` | `spending.culture` |
 | `municipal.general_public_services` | `#5B5347` | `spending.general_public_services` |
 
+Demography migration citizenship groups (`citizenship.*`) are fixed series tokens in `lib/explorer/colors.ts`, held to the 3:1 graphical-object floor like every other series. The computed remainder wears the shared "other" colour and is never labelled a country.
+
+| Group | Token | Contrast on `paper` |
+|---|---|---|
+| `citizenship.georgia` | `#3D5A98` | 6.05:1 |
+| `citizenship.russian_federation` | `#C26E4C` | 3.35:1 |
+| `citizenship.turkey` | `#1F6E56` | 5.50:1 |
+| `citizenship.azerbaijan` | `#A5822B` | 3.23:1 |
+| `citizenship.ukraine` | `#7A4E8C` | 5.71:1 |
+| `citizenship.all_other_computed` | `#94856D` (`OTHER_COLOR`) | 3.23:1 |
+
 Rules:
 
 - Never assign `accent` meaning beyond "active/negative" in UI chrome; as a series color it belongs only to the categories listed above.
@@ -1118,7 +1129,7 @@ The native three-sheet Excel workbook follows selected indicators and years, wit
 
 ## 29. Demography surfaces
 
-The sidebar's sixth dataset link, `დემოგრაფია`, opens a hub at `/explorer/demography`: the shared hub cards numbered 01–04, where a page that is not yet published is a non-clickable `მალე` card. The Population card carries Georgia's series as a sparkline broken at the census re-base.
+The sidebar's sixth dataset link, `დემოგრაფია`, opens a hub at `/explorer/demography`: the shared hub cards numbered 01–04, where a page that is not yet published is a non-clickable `მალე` card. The Population card carries Georgia's series as a sparkline broken at the census re-base; the Migration card carries a net-migration sparkline (not broken, since migration counts do not break at the re-base) and the footer `{year}: წმინდა მიგრაცია {net} · {first}–{last}`.
 
 **Population** is the Budget municipalities page set (§20) showing persons instead of money: an index at `/explorer/demography/population` and one page for Georgia (`/georgia`), for each of the 11 regions (`/region/{id}`) and for each of the 63 municipalities other than Tbilisi (`/{slug}`, the Budget slugs). It introduces no new surface type. The index is `MunicipalitiesIndex`; a place page's heading, two-column shell and a region's list of municipalities are `EntityHeading`, `EntityWorkspaceShell` and `EntityMemberList`, moved out of the Budget place pages and shared with them; inside them sit the editorial line chart, table, range strip, series panel, hero and side KPIs and Excel action. Tbilisi is one place, `region.tbilisi`, with one page: its row in the municipality list, its polygon and city dot on the map and its municipality row in the picker all open `/region/tbilisi`, and the municipality previous/next ring skips it. The 75 place pages are a closed set (an unknown id or slug is a 404) and each exists under `/en`. The sidebar's Population entry stays current on the index and on every page under it. Density has no chart, map or toggle anywhere in the set: it is a second line under Georgia's and each region's persons on the index, one of the index's four key figures (the densest region's), a key figure on each region's page (Georgia's page shows the densest region's) and a column in Excel.
 
@@ -1142,7 +1153,7 @@ The sidebar's sixth dataset link, `დემოგრაფია`, opens a hub 
 
 ### 29.1 Migration
 
-One page, `/explorer/demography/migration` (under `/en` in English), with no place pages: every migration row belongs to Georgia. It is the Trade / Unemployment page shell (`ExplorerPage`, `PageHeader` with coverage `{first}–{last} · წლიური`, serif H1 `მიგრაცია`, unit line `ადამიანი წელიწადში`, the workspace, `ძირითადი ინდიკატორები`, `SourceNote`) with no buttons above the workspace. It adds no surface type and no colour token.
+One page, `/explorer/demography/migration` (under `/en` in English), with no place pages: every migration row belongs to Georgia. It is the Trade / Unemployment page shell (`ExplorerPage`, `PageHeader` with coverage `{first}–{last} · წლიური`, serif H1 `მიგრაცია`, unit line `ადამიანი წელიწადში`, the workspace, `ძირითადი ინდიკატორები`, `SourceNote`) with no buttons above the workspace. It adds no surface type; its one addition to the colour system is the six `citizenship.*` series tokens of §4.2.
 
 **Chart.** The shared `StackedColumnChart` with `periodsPerYear={1}`: for each of the six citizenship groups arrivals are a positive segment and departures a negative one, in the group's §7 colour, so the bars rise above and fall below a zero line. Values are drawn in thousands (axis `ათასი ადამიანი`) and every printed value, in the tooltip, caption and segment label (`შემოსვლა · რუსეთი`, `გასვლა · რუსეთი`), is in whole persons; departures print with `−` because the chart has one value formatter. The overlay is the net migration of the selected groups and sex, the ink line with an end dot, labelled `წმინდა მიგრაცია` when all six groups are selected (it then equals Geostat's published net) and `წმინდა მიგრაცია (არჩეული ჯგუფები)` otherwise; the hero and the chart readout print its sign explicitly (`+`, `−`). Migration counts do not break at the 1 January 2025 census re-base, so there is no census marker, break or dashed rule on this page, and no sentence names a cause or an event.
 
@@ -1150,4 +1161,6 @@ One page, `/explorer/demography/migration` (under `/en` in English), with no pla
 
 **Table.** `ExplorerTable` for one direction at a time, chosen with `SegmentedTabs` `შემოსვლა / გასვლა / წმინდა`: the selected groups plus a total row (`ჯამი` with all six selected, `არჩეულთა ჯამი` otherwise), years as columns; departures are positive counts. On the Net tab the shared table formatting prints negatives with `−` and positives without a sign.
 
-**Key indicators.** For the end year of the range and the sex filter, not affected by the group selection: a hero with the net of the end year (signed, a neutral sentence, and the cumulative net over the range), and three side figures with sparklines: arrivals, departures and foreign citizens' share of arrivals (the total minus the Georgia group, one decimal, computed by Fiscal.ge). Its state is the hash keys `view`, `start`, `end`, `sel`, `sex` and `dir`, restored after load with every change replacing the history entry (§6.3). Bounded decisions: `docs/superpowers/specs/2026-10-04-demography-migration-design.md`.
+**Key indicators.** For the end year of the range and the sex filter, not affected by the group selection: a hero with the net of the end year (signed, a neutral sentence, and the cumulative net over the range), and three side figures with sparklines: arrivals, departures and foreign citizens' share of arrivals (the total minus the Georgia group, one decimal, computed by Fiscal.ge). Its state is the hash keys `view`, `start`, `end`, `sel`, `sex` and `dir`, restored after load with every change replacing the history entry (§6.3); `start` and `end` are the shared year-range keys, and the default address also carries `range=all`.
+
+**Workbook.** One `ჩამოტვირთვა` download for the active range, group selection and sex filter, in the three-sheet model of §15, citing both Geostat originals (tables 31 and 33); the definition of the computed group sits in the Summary subtitle, because the Sources sheet has no free-text line. Bounded decisions: `docs/superpowers/specs/2026-10-04-demography-migration-design.md`.

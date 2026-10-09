@@ -2,7 +2,7 @@ import { SERIES } from "../data/demography/series";
 import { message } from "../i18n/messages";
 import type { Messages } from "../i18n/types";
 import type { ClientMigrationFact } from "../servedRows";
-import { OTHER_COLOR } from "./colors";
+import { SERIES_COLORS } from "./colors";
 import { refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
@@ -24,15 +24,10 @@ export const MIGRATION_GROUPS = [
 ] as const;
 export type MigrationGroup = (typeof MIGRATION_GROUPS)[number];
 
-/** Section spec §7: one stable colour per group, the computed remainder in the shared "other" colour. */
-export const MIGRATION_COLORS: Record<MigrationGroup, string> = {
-  "citizenship.georgia": "#3D5A98",
-  "citizenship.russian_federation": "#C26E4C",
-  "citizenship.turkey": "#1F6E56",
-  "citizenship.azerbaijan": "#A5822B",
-  "citizenship.ukraine": "#7A4E8C",
-  "citizenship.all_other_computed": OTHER_COLOR,
-};
+/** Section spec §7: one stable colour per group, held in the shared `SERIES_COLORS` registry. */
+export const MIGRATION_COLORS: Record<MigrationGroup, string> = Object.fromEntries(
+  MIGRATION_GROUPS.map((group) => [group, SERIES_COLORS[group]!]),
+) as Record<MigrationGroup, string>;
 
 export const MIGRATION_SEXES = ["total", "male", "female"] as const;
 export type MigrationSex = (typeof MIGRATION_SEXES)[number];
