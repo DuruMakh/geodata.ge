@@ -86,4 +86,33 @@ describe("shared chart frame", () => {
     expect(markup).toContain("+3");
     expect(markup).toContain("translateX(calc(-100% - 12px))");
   });
+
+  it("draws a coloured arrow instead of the colour bar for a row with a marker, and keeps the full name for screen readers", () => {
+    const rows = [
+      { id: "in", label: "Russia", srLabel: "Arrivals · Russia", marker: "up" as const, color: "#B3402A", value: 5 },
+      { id: "out", label: "Russia", srLabel: "Departures · Russia", marker: "down" as const, color: "#4A707A", value: 3 },
+    ];
+    for (const variant of ["float", "panel"] as const) {
+      const markup = renderGeorgianMarkup(
+        <ChartTooltip variant={variant} leftPercent={10} header="2016" rows={rows} hidden={0} formatValue={(value) => String(value)} />,
+      );
+      expect(markup.match(/<svg/g)).toHaveLength(2);
+      expect(markup).toContain("lucide-arrow-up");
+      expect(markup).toContain("lucide-arrow-down");
+      expect(markup).toContain("color:#B3402A");
+      expect(markup).not.toContain("background-color");
+      expect(markup).toContain('<span class="sr-only">Arrivals · Russia</span>');
+      expect(markup).toContain('<span class="sr-only">Departures · Russia</span>');
+    }
+  });
+
+  it("renders a row without a marker as a colour bar with no screen-reader duplicate", () => {
+    const markup = renderGeorgianMarkup(
+      <ChartTooltip leftPercent={10} header="2026-08" rows={[{ id: "a", label: "Food", color: "#B3402A", value: 1.2 }]} hidden={0} formatValue={(value) => value.toFixed(1)} />,
+    );
+    expect(markup).toContain("background-color:#B3402A");
+    expect(markup).not.toContain("<svg");
+    expect(markup).not.toContain("sr-only");
+    expect(markup).not.toContain("aria-hidden=\"true\"><");
+  });
 });

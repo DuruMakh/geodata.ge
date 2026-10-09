@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { StackedColumnChart, type StackedColumnChartProps } from "../../components/main-explorer/stacked-column-chart";
+import { buildStackReadout, StackedColumnChart, type StackedColumnChartProps } from "../../components/main-explorer/stacked-column-chart";
 import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props: StackedColumnChartProps = {
@@ -168,5 +168,53 @@ describe("StackedColumnChart", () => {
   it("has no per-bar hover rectangles and no in-flow readout", () => {
     expect(markup).not.toContain('fill="transparent"');
     expect(markup).not.toContain("mt-2 font-mono");
+  });
+
+  describe("readout rows", () => {
+    const segment = (id: string, value: number, extra: object = {}) => ({ id, label: id, color: "#000", values: [value], ...extra });
+    // Six gains and six losses, interleaved so neither the input nor the signed order is the answer.
+    const segments = [
+      segment("in:a", 5, { readoutLabel: "A", marker: "up" }),
+      segment("out:a", -50, { readoutLabel: "A", marker: "down" }),
+      segment("in:b", 40, { readoutLabel: "B", marker: "up" }),
+      segment("out:b", -4, { readoutLabel: "B", marker: "down" }),
+      segment("in:c", 30, { readoutLabel: "C", marker: "up" }),
+      segment("out:c", -30, { readoutLabel: "C", marker: "down" }),
+      segment("in:d", 3, { readoutLabel: "D", marker: "up" }),
+      segment("out:d", -40, { readoutLabel: "D", marker: "down" }),
+      segment("in:e", 20, { readoutLabel: "E", marker: "up" }),
+      segment("out:e", -2, { readoutLabel: "E", marker: "down" }),
+      segment("in:f", 10, { readoutLabel: "F", marker: "up" }),
+      segment("out:f", -20, { readoutLabel: "F", marker: "down" }),
+    ];
+
+    it("keeps today's order and cap by default: ranked by signed value, ten rows, the rest counted", () => {
+      const { rows, hidden } = buildStackReadout(segments, 0, "value", 10);
+      expect(rows.map((row) => row.id)).toEqual(["in:b", "in:c", "in:e", "in:f", "in:a", "in:d", "out:e", "out:b", "out:f", "out:c"]);
+      expect(hidden).toBe(2);
+      // Without the optional fields nothing extra reaches the row.
+      const plain = buildStackReadout([segment("x", 1)], 0, "value", 10).rows[0]!;
+      expect(Object.keys(plain).sort()).toEqual(["color", "id", "label", "value"]);
+    });
+
+    it("lists every gain by size, then every loss by size, when asked, and hides nothing at a cap of twelve", () => {
+      const { rows, hidden } = buildStackReadout(segments, 0, "sign-then-magnitude", 12);
+      expect(rows.map((row) => row.id)).toEqual(["in:b", "in:c", "in:e", "in:f", "in:a", "in:d", "out:a", "out:d", "out:c", "out:f", "out:b", "out:e"]);
+      expect(hidden).toBe(0);
+    });
+
+    it("carries the short name, the marker and the full name for screen readers", () => {
+      const row = buildStackReadout(segments, 0, "sign-then-magnitude", 12).rows[0]!;
+      expect(row).toMatchObject({ label: "B", marker: "up", srLabel: "in:b" });
+    });
+  });
+
+  it("prints the overlay line of the caption with formatOverlayValue and the segments with formatValue", () => {
+    const html = renderGeorgianMarkup(<StackedColumnChart {...props} formatValue={(value) => `u${Math.abs(value)}`} formatOverlayValue={(value) => `s${value}`} />);
+    expect(html).toContain("Headline: s1");
+    expect(html).toContain("Food: u1.2");
+    expect(html).toContain("Communication: u0.2");
+    // The default keeps one formatter for both.
+    expect(markup).toContain("Headline: 1.0");
   });
 });
