@@ -1089,5 +1089,21 @@
       "reviewedAt": "2026-10-08"
     },
     "derivation": null
+  },
+  "source.geostat_trade_export_country_1995_2026": {
+    "name": { "text": "Goods exports by country in 1995–2026", "reviewedAt": "2026-10-08" },
+    "derivation": null
+  },
+  "source.geostat_trade_import_country_1995_2026": {
+    "name": { "text": "Goods imports by country in 1995–2026", "reviewedAt": "2026-10-08" },
+    "derivation": null
+  },
+  "source.geostat_trade_export__country_group_1995_2026": {
+    "name": { "text": "Goods exports by country group in 1995–2026", "reviewedAt": "2026-10-08" },
+    "derivation": null
+  },
+  "source.geostat_trade_import_country_group_1995_2026": {
+    "name": { "text": "Goods imports by country group in 1995–2026", "reviewedAt": "2026-10-08" },
+    "derivation": null
   }
 }

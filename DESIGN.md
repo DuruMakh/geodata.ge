@@ -347,6 +347,7 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/unemployment/gender                           Women/men comparisons (§27)
 /explorer/trade                       საგარეო ვაჭრობა   Trade hub (§28)
 /explorer/trade/overview                                National goods overview (§28)
+/explorer/trade/partners                                Trading partners (§28.1)
 /explorer/demography                  დემოგრაფია        Demography hub (§29)
 /explorer/demography/population                         Population on 1 January: index — municipality map, key figures, ranked list (§29)
 /explorer/demography/population/georgia                 Georgia page (§29)
@@ -1119,7 +1120,7 @@ The national context below the workspace appears only on the national overview's
 
 ## 28. Trade hub and national goods Overview
 
-Approved on 2026-10-08; scope owner: `Project_Definition.md` §2E. Both routes and their English mirrors reuse the editorial shell. The hub has one working Overview card, with a data-derived turnover sparkline and coverage. Trade follows Unemployment in the sidebar; its Overview child appears only in the active Trade context. Demography follows it (§29).
+Approved on 2026-10-08; scope owner: `Project_Definition.md` §2E. All Trade routes and their English mirrors reuse the editorial shell. The hub has Overview and Trading partners cards, with data-derived coverage and national turnover context. Trade follows Unemployment in the sidebar; Overview and Trading partners children appear only in the active Trade context. Demography follows it (§29).
 
 The Overview workspace reuses the existing line chart, table, annual range strip, series aside and Excel button. Four checkbox rows remain in this order: `საგარეო სავაჭრო ბრუნვა` / Total trade (ink), `ექსპორტი` / Exports (editorial green), `იმპორტი` / Imports (editorial blue), `სავაჭრო სალდო` / Trade balance (editorial muted brown). Only turnover is selected initially and it is removable. Search never narrows bulk selection or the denominator of four. Default mode is line and the range derives from all loaded annual observations.
 
@@ -1127,7 +1128,13 @@ Choose one million/billion USD display scale from all four indicators over the a
 
 Below the workspace, four end-year figures remain independent of selection; an absent end-year observation is a dash. Below them, reuse the signed column chart for one balance series, with no overlay, over the same years. It remains present in main-table and empty-selection modes. Explain that negative means imports exceed exports and positive means exports exceed imports; avoid favorable/unfavorable color judgments. Both charts, summaries and table declare USD units.
 
-The native three-sheet Excel workbook follows selected indicators and years, with USD amount headings, neutral signed formatting, actual-record basis, unspecified publication status, both formulas and original-source links. The public methodology explains nominal USD and FOB/CIF valuation. Sources, language alternates, breadcrumbs and coverage match the accepted national goods subset. No new chart primitive, Trade section or additional indicator is implied. Bounded spec: `docs/superpowers/specs/2026-10-07-trade-overview-design.md`.
+The native three-sheet Excel workbook follows selected indicators and years, with USD amount headings, neutral signed formatting, actual-record basis, unspecified publication status, both formulas and original-source links. The public methodology explains nominal USD and FOB/CIF valuation. Sources, language alternates, breadcrumbs and coverage match the accepted national goods subset. Bounded Overview spec: `docs/superpowers/specs/2026-10-07-trade-overview-design.md`.
+
+### 28.1 Trading partners
+
+Approved 2026-10-08: trends first, one active Total trade / Exports / Imports / Balance measure, existing line/table/range workspace and series aside. The text beneath the heading declares nominal US dollars with the active Million/Billion scale in parentheses; line-chart amount ticks show numbers only. Only Georgia total is selected initially, first and removable; years and catalogue counts derive from accepted facts. Countries and Country groups are text browsing tabs above local search. They share one unlimited selection: selected opposite-tab rows remain visible and removable before the active choices, and global Clear / Select all, counts, table, URL and Excel include both kinds. Search resets on browsing-tab changes and does not rebuild the chart. Reuse the editorial palette with stable identity-based assignment and independently readable labels.
+
+The end-year ranking below the workspace ignores checkbox selection and selector search. Show ten numerical countries first and allow the complete catalogue, with unavailable observations unranked; show all five groups. Each row has a horizontal amount bar, readable USD value and same-year national share for turnover/exports/imports. Balance bars use a neutral centered zero axis, rank by absolute magnitude and have no share column. Groups overlap: show the note when browsing or selecting groups, with no pie, stacked composition or summed group total. Missing amounts stay gaps/dashes/blank Excel cells; published zero remains zero. Preserve selected measure, both kinds, years, mode and empty state through reload, language changes, history and active sidebar clicks. Scope and details: `docs/superpowers/specs/2026-10-08-trade-partners-design.md`.
 
 ## 29. Demography surfaces
 

@@ -11,7 +11,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
     const card = page.getByTestId("trade-hub").getByTestId("hub-card");
-    await expect(card).toHaveCount(1); await card.click();
+    await expect(card).toHaveCount(2); await card.first().click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/overview$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await page.evaluate(() => document.fonts.ready);
@@ -99,7 +99,7 @@ for (const prefix of ["", "/en"]) {
     await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
     await page.getByTestId("source-label").getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/trade$`));
-    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(3);
+    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(7);
     const json = JSON.parse(await page.getByTestId("dataset-json-ld").textContent() ?? "{}");
     expect(json.temporalCoverage).toBe("1995/2025");
     expect(json).not.toHaveProperty("distribution");

@@ -3547,5 +3547,65 @@
       "reviewedAt": "2026-10-08"
     },
     "documentLanguage": "en"
+  },
+  "geostat_trade_export-country-1995-2026": {
+    "title": {
+      "text": "Goods exports by country in 1995–2026",
+      "reviewedAt": "2026-10-08"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-08"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-08"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_import-country-1995-2026": {
+    "title": {
+      "text": "Goods imports by country in 1995–2026",
+      "reviewedAt": "2026-10-08"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-08"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-08"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_export--country-group-1995-2026": {
+    "title": {
+      "text": "Goods exports by country group in 1995–2026",
+      "reviewedAt": "2026-10-08"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-08"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-08"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_import-country-group-1995-2026": {
+    "title": {
+      "text": "Goods imports by country group in 1995–2026",
+      "reviewedAt": "2026-10-08"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-08"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-08"
+    },
+    "documentLanguage": "en"
   }
 }
