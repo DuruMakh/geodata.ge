@@ -165,6 +165,7 @@ export function MigrationExplorer({
                   formatOverlayValue={(value) => signedPersons(Math.round(value * CHART_SCALE))}
                   readoutOrder="sign-then-magnitude"
                   readoutRowCap={MIGRATION_GROUPS.length * 2}
+                  compactReadout
                   ariaLabel={t("chartAria", { start: model.range.start, end })}
                 />
               </div>

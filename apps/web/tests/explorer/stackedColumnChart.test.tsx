@@ -203,6 +203,18 @@ describe("StackedColumnChart", () => {
       expect(hidden).toBe(0);
     });
 
+    it("files a departure of zero (-0) with the departures, by marker or by sign", () => {
+      const withZero = [
+        segment("in:a", 5, { marker: "up" }),
+        segment("out:a", -0, { marker: "down" }),
+        segment("out:b", -3, { marker: "down" }),
+        segment("in:b", 0, { marker: "up" }),
+      ];
+      expect(buildStackReadout(withZero, 0, "sign-then-magnitude", 12).rows.map((row) => row.id)).toEqual(["in:a", "in:b", "out:b", "out:a"]);
+      const unmarked = [segment("in", 2), segment("out", -0), segment("out2", -1)];
+      expect(buildStackReadout(unmarked, 0, "sign-then-magnitude", 12).rows.map((row) => row.id)).toEqual(["in", "out2", "out"]);
+    });
+
     it("carries the short name, the marker and the full name for screen readers", () => {
       const row = buildStackReadout(segments, 0, "sign-then-magnitude", 12).rows[0]!;
       expect(row).toMatchObject({ label: "B", marker: "up", srLabel: "in:b" });

@@ -47,6 +47,8 @@ export type StackedColumnChartProps = {
   readoutOrder?: StackReadoutOrder;
   /** Most rows the readout lists; the rest are counted. Defaults to the shared tooltip cap. */
   readoutRowCap?: number;
+  /** Tightens the float readout's rows so a dozen of them fit the plot's height. */
+  compactReadout?: boolean;
   ariaLabel: string;
   /** Periods per calendar year on the x axis: 12 for months (default), 1 for years. */
   periodsPerYear?: number;
@@ -105,8 +107,13 @@ export function buildStackReadout(
   let rows = ranked.rows;
   let hidden = ranked.hidden;
   if (order === "sign-then-magnitude") {
-    const gains = rows.filter((row) => row.value >= 0);
-    const losses = rows.filter((row) => row.value < 0).sort((a, b) => a.value - b.value);
+    // A segment's marker decides its side when it has one: a departure of zero is -0 on the chart, and -0 >= 0.
+    const isLoss = (row: TooltipRow) => {
+      const marker = byId.get(row.id)!.marker;
+      return marker === undefined ? row.value < 0 || Object.is(row.value, -0) : marker === "down";
+    };
+    const gains = rows.filter((row) => !isLoss(row)).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+    const losses = rows.filter(isLoss).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
     const ordered = [...gains, ...losses];
     rows = ordered.slice(0, cap);
     hidden = Math.max(0, ordered.length - cap);
@@ -133,6 +140,7 @@ export function StackedColumnChart({
   formatOverlayValue = formatValue,
   readoutOrder = "value",
   readoutRowCap = TOOLTIP_ROW_CAP,
+  compactReadout = false,
   ariaLabel,
   periodsPerYear = 12,
 }: StackedColumnChartProps) {
@@ -281,6 +289,7 @@ export function StackedColumnChart({
         hidden={tooltip.hidden}
         formatValue={formatValue}
         variant={active.mobile ? "panel" : "float"}
+        compact={compactReadout}
       />
     ) : null;
 

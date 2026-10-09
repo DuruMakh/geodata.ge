@@ -64,16 +64,38 @@ test("the hover readout lists all twelve rows as arrows: arrivals by size, then 
   const tooltip = page.getByTestId("stack-chart-tooltip");
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toContainText("2016");
+  await expect(tooltip).toContainText("−8,060");
   await expect(tooltip).toContainText("64,705");
   await expect(tooltip.locator("svg")).toHaveCount(12);
   await expect(tooltip.locator("svg.lucide-arrow-up")).toHaveCount(6);
   await expect(tooltip.locator("svg.lucide-arrow-down")).toHaveCount(6);
-  // Numbers are unsigned and no row is folded into a "+N" line.
-  await expect(tooltip).not.toContainText("+");
+  // Every row is listed: no "+N other" line (the English wording of controls.other is "other").
+  await expect(tooltip).not.toContainText(/\+\d+\s*other/i);
   // Arrivals come first, both groups of rows largest first.
   const order = await tooltip.locator("svg").evaluateAll((icons) => icons.map((icon) => (icon.classList.contains("lucide-arrow-up") ? "up" : "down")));
   expect(order).toEqual(["up", "up", "up", "up", "up", "up", "down", "down", "down", "down", "down", "down"]);
 });
+
+// The float readout is clipped to the plot's height, so twelve rows must fit it at every width that draws it.
+for (const width of [769, 820, 900, 1000, 1021, 1100, 1280, 1400, 1440]) {
+  test(`the twelve-row hover readout is not clipped at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(`/en${PATH}`);
+    await ready(page);
+    const chart = page.getByTestId("chart-panel").locator('svg[role="img"]').first();
+    await chart.focus();
+    await page.keyboard.press("Home");
+    for (let step = 0; step < 4; step += 1) await page.keyboard.press("ArrowRight");
+    const tooltip = page.getByTestId("stack-chart-tooltip");
+    await expect(tooltip).toBeVisible();
+    const box = await tooltip.boundingBox();
+    const rows = tooltip.locator(":scope > div");
+    const last = await rows.last().boundingBox();
+    expect(box && last).toBeTruthy();
+    expect(last!.y + last!.height, `last row bottom ${last!.y + last!.height} vs tooltip bottom ${box!.y + box!.height}`).toBeLessThanOrEqual(box!.y + box!.height + 0.5);
+    expect(await tooltip.evaluate((element) => element.scrollHeight <= element.clientHeight + 1)).toBe(true);
+  });
+}
 
 test("a single-year range prints that year and drops the range-start details", async ({ page }) => {
   await page.goto(`/en${PATH}#start=2023&end=2023`);
