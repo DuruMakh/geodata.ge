@@ -24,14 +24,34 @@ for (const [locale, prefix, heading, coverage, net] of [
   });
 }
 
-test("removing Russia relabels the net line and writes the selection to the address", async ({ page }) => {
+test("removing Russia relabels the net line, removes its bars and writes the selection to the address", async ({ page }) => {
   await page.goto(`/en${PATH}`);
   await ready(page);
+  const segments = (id: string) => page.locator(`rect[data-segment="${id}"]`);
+  await expect.poll(() => segments("arrivals:citizenship.russian_federation").count()).toBeGreaterThan(0);
+  await expect.poll(() => segments("departures:citizenship.russian_federation").count()).toBeGreaterThan(0);
   const russia = page.locator('[data-testid="series-row"][data-series-id="citizenship.russian_federation"] [data-testid="series-row-toggle"]');
   await russia.click();
   await expect(russia).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByTestId("chart-panel")).toContainText("Net migration (selected groups)");
+  await expect(segments("arrivals:citizenship.russian_federation")).toHaveCount(0);
+  await expect(segments("departures:citizenship.russian_federation")).toHaveCount(0);
+  expect(await segments("arrivals:citizenship.georgia").count()).toBeGreaterThan(0);
+  expect(await segments("departures:citizenship.georgia").count()).toBeGreaterThan(0);
   await expect(page).toHaveURL(/sel=citizenship\.georgia%2Ccitizenship\.turkey/);
+});
+
+test("moving the range end changes the period of the key figures and the address", async ({ page }) => {
+  await page.goto(`/en${PATH}`);
+  await ready(page);
+  const highlights = page.getByTestId("migration-highlights");
+  await expect(highlights).toHaveAttribute("data-end-year", "2025");
+  const endHandle = page.getByTestId("range-end-handle");
+  await endHandle.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(endHandle).toHaveAttribute("aria-valuenow", "2024");
+  await expect(highlights).toHaveAttribute("data-end-year", "2024");
+  await expect(page).toHaveURL(/end=2024/);
 });
 
 test("the series search matches the group in either language", async ({ page }) => {
@@ -50,9 +70,16 @@ test("the series search matches the group in either language", async ({ page }) 
 test("the sex tabs change the chart, the table and the key figures", async ({ page }) => {
   await page.goto(`/en${PATH}`);
   await ready(page);
+  const overlay = page.getByTestId("chart-panel").locator("path[data-overlay]").first();
+  const totalNet = await overlay.getAttribute("d");
   await page.getByTestId("migration-sex-female").click();
   await expect(page.getByTestId("migration-highlights")).toContainText("+7,516");
   await expect(page).toHaveURL(/sex=female/);
+  await expect(overlay).not.toHaveAttribute("d", totalNet!);
+  await page.getByTestId("chart-mode-table").click();
+  const totalRow = page.getByTestId("explorer-table").locator("tbody tr").last();
+  await expect(totalRow).toContainText("Total");
+  await expect(totalRow).not.toContainText("205,857");
 });
 
 test("the table shows arrivals, departures and net with a total row", async ({ page }) => {
@@ -60,6 +87,9 @@ test("the table shows arrivals, departures and net with a total row", async ({ p
   await ready(page);
   await page.getByTestId("chart-mode-table").click();
   await expect(page.getByRole("table")).toContainText("205,857");
+  const totalRow = page.getByTestId("explorer-table").locator("tbody tr").last();
+  await expect(totalRow).toContainText("Total");
+  await expect(totalRow).toContainText("205,857");
   await page.getByTestId("migration-direction-departures").click();
   await expect(page.getByRole("table")).toContainText("245,064");
   await page.getByTestId("migration-direction-net").click();
