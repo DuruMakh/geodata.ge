@@ -161,3 +161,12 @@ export type ClientDemographyObservation = {
   year: number;
   value: number;
 };
+
+/** A migration row as the Migration page receives it: one direction, sex and citizenship group in one year, in persons. */
+export type ClientMigrationFact = {
+  seriesId: string;
+  year: number;
+  sex: "total" | "male" | "female";
+  citizenshipId: string;
+  value: number;
+};

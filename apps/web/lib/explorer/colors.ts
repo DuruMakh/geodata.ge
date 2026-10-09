@@ -3,6 +3,8 @@
 // radar, budget field, ranking.
 
 export const INK = "#1E1B16";
+// Declared before SERIES_COLORS because the computed citizenship remainder reuses it.
+export const OTHER_COLOR = "#94856D";
 
 export const SERIES_COLORS: Record<string, string> = {
   "expenditure.total": INK,
@@ -115,6 +117,15 @@ export const SERIES_COLORS: Record<string, string> = {
   "sector.r": "#9C3D5E",
   "sector.s": "#588E54",
   "sector.t": "#26958A",
+
+  // Migration citizenship groups (demography section spec 2026-10-04 §7). The
+  // computed remainder is never a country and wears the shared "other" colour.
+  "citizenship.georgia": "#3D5A98",
+  "citizenship.russian_federation": "#C26E4C",
+  "citizenship.turkey": "#1F6E56",
+  "citizenship.azerbaijan": "#A5822B",
+  "citizenship.ukraine": "#7A4E8C",
+  "citizenship.all_other_computed": OTHER_COLOR,
 };
 
 // Open-ended top-level sets cycle through the editorial palette by position so
@@ -137,7 +148,6 @@ export const EDITORIAL_PALETTE = [
   "#94856D",
 ];
 
-export const OTHER_COLOR = "#94856D";
 export const POSITIVE = "#1F6E56";
 export const NEGATIVE = "#B3402A";
 export const ACCENT = "#B3402A";

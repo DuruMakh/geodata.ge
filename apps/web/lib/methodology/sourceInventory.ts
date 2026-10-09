@@ -46,7 +46,7 @@ const inventoryRules = {
   ],
   demography: [
     { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "01-population-by-self-governed-unit.xlsx" },
-    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "03-density-by-regions.xlsx" },
+    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => ["03-density-by-regions.xlsx", "31-net-migration.xlsx", "33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx"].includes(path.posix.basename(candidatePath)) },
   ],
   inflation: [{ root: "docs/Raw Data/Inflation", include: (candidatePath: string) => [".xlsx", ".pdf"].includes(path.posix.extname(candidatePath).toLowerCase()) }],
   debt: [

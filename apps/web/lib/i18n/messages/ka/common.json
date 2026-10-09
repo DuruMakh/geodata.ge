@@ -59,5 +59,6 @@
   "common.dataTrade": "მონაცემები · საგარეო ვაჭრობა",
   "common.tradePartners": "სავაჭრო პარტნიორები",
   "common.dataDemography": "მონაცემები · დემოგრაფია",
-  "common.demographyPopulation": "მოსახლეობა"
+  "common.demographyPopulation": "მოსახლეობა",
+  "common.demographyMigration": "მიგრაცია"
 }
