@@ -13,7 +13,7 @@ export const DEMOGRAPHY_PAGES = [
   { id: "population", path: POPULATION_PATH, live: true, titleKey: "populationTitle", descriptionKey: "populationDescription", labelKey: "common.demographyPopulation" },
   { id: "age-sex", path: "/explorer/demography/age-sex", live: false, titleKey: "ageSexTitle", descriptionKey: "ageSexDescription", labelKey: "common.demographyAgeSex" },
   { id: "migration", path: MIGRATION_PATH, live: true, titleKey: "migrationTitle", descriptionKey: "migrationDescription", labelKey: "common.demographyMigration" },
-  { id: "births-deaths", path: BIRTHS_DEATHS_PATH, live: false, titleKey: "birthsDeathsTitle", descriptionKey: "birthsDeathsDescription", labelKey: "common.demographyBirthsDeaths" },
+  { id: "births-deaths", path: BIRTHS_DEATHS_PATH, live: true, titleKey: "birthsDeathsTitle", descriptionKey: "birthsDeathsDescription", labelKey: "common.demographyBirthsDeaths" },
 ] as const;
 
 export const LIVE_DEMOGRAPHY_PAGES = DEMOGRAPHY_PAGES.filter((page) => page.live);

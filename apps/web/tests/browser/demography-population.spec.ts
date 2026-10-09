@@ -43,12 +43,13 @@ for (const [locale, prefix, heading, coverage] of [
     expect(population.before, "buttons before the map, against the Budget index").toBe((await buttonsAroundMap(page)).before);
   });
 
-  test(`${locale}: the hub lists four pages and links the two live ones`, async ({ page }) => {
+  test(`${locale}: the hub lists four pages and links the three live ones`, async ({ page }) => {
     await page.goto(`${prefix}/explorer/demography`);
     await expect(page.getByTestId("demography-hub").getByTestId("hub-card")).toHaveCount(4);
-    await expect(page.getByTestId("demography-hub").locator("a")).toHaveCount(2);
+    await expect(page.getByTestId("demography-hub").locator("a")).toHaveCount(3);
     await expect(page.getByTestId("demography-hub").locator("a").nth(0)).toHaveAttribute("href", `${prefix}/explorer/demography/population`);
     await expect(page.getByTestId("demography-hub").locator("a").nth(1)).toHaveAttribute("href", `${prefix}/explorer/demography/migration`);
+    await expect(page.getByTestId("demography-hub").locator("a").nth(2)).toHaveAttribute("href", `${prefix}/explorer/demography/births-deaths`);
     await expect(page.getByTestId("demography-link")).toHaveAttribute("aria-current", "page");
   });
 }

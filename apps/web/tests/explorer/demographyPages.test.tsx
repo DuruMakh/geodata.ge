@@ -12,6 +12,7 @@ import {
   renderDemographyPage,
 } from "../../lib/pages/demography";
 import { demographyMigrationPageMetadata, renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
+import { demographyBirthsDeathsPageMetadata, renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
 import {
   demographyPopulationPageMetadata,
   loadPopulationBasics,
@@ -32,9 +33,10 @@ describe("demography hub page", () => {
     const html = renderToStaticMarkup(await renderDemographyPage("en"));
     expect(html).toContain('data-testid="demography-hub"');
     expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(2);
+    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(1);
     expect(html).toContain('href="/en/explorer/demography/population"');
     expect(html).toContain('href="/en/explorer/demography/migration"');
+    expect(html).toContain('href="/en/explorer/demography/births-deaths"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
@@ -167,6 +169,29 @@ describe("migration page", () => {
     const metadata = await demographyMigrationPageMetadata("ka");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/migration");
     expect(String(metadata.title)).toBe("მიგრაცია — დემოგრაფია | Fiscal.ge");
+  });
+});
+
+describe("births and deaths page", () => {
+  it("renders the places block, fertility and life expectancy, with no dataset markup", async () => {
+    const html = renderToStaticMarkup(await renderDemographyBirthsDeathsPage("en"));
+    expect(html).toContain(">Births, deaths and fertility</h1>");
+    expect(html).toContain("2014–2025 · annual");
+    expect(html).toContain("Births per 100 deaths, 2025");
+    expect(html).toContain("53 of 64");
+    expect(html).toContain('href="/en/explorer/demography/population/batumi#births-deaths"');
+    expect(html).toContain('href="/en/explorer/demography/population/region/tbilisi#births-deaths"');
+    expect(html).toContain('data-testid="fertility-section"');
+    expect(html).toContain('data-testid="life-section"');
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('"@type":"Dataset"');
+    expect(html).not.toMatch(GEORGIAN);
+  });
+
+  it("has its own canonical address and title", async () => {
+    const metadata = await demographyBirthsDeathsPageMetadata("ka");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/births-deaths");
+    expect(String(metadata.title)).toBe("შობადობა და სიკვდილიანობა — დემოგრაფია | Fiscal.ge");
   });
 });
 
