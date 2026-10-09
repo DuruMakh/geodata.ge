@@ -9,7 +9,7 @@ import { SHEET_NAMES, withAbsoluteUrls, workbookFilename, type WorkbookExportMod
 type Input = { facts: readonly ClientNationalFact[]; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string };
 type Line = { label: string; unit: string; values: Record<number, number | null> };
 
-function nationalWorkbook(input: Input, presentation: Presentation, spec: { slug: string; titleKey: string; sourceId: string; lines: Line[]; decimals: number }): WorkbookExportModel {
+function nationalWorkbook(input: Input, presentation: Presentation, spec: { slug: string; titleKey: string; sourceId: string; lines: Line[]; decimals: number; format: string; numberFormat?: string }): WorkbookExportModel {
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `demography.${key}`);
   const w = (key: Parameters<typeof workbookMessage>[1]) => workbookMessage(locale, key);
@@ -37,6 +37,7 @@ function nationalWorkbook(input: Input, presentation: Presentation, spec: { slug
       subtitle: `${first}–${last}`,
       unitLabel: "",
       amountDecimals: spec.decimals,
+      ...(spec.numberFormat ? { numberFormat: spec.numberFormat } : {}),
       showChangeColumn: false,
       years,
       // The re-base year says so in its column header: these rates use population denominators.
@@ -48,7 +49,7 @@ function nationalWorkbook(input: Input, presentation: Presentation, spec: { slug
       rows: spec.lines.flatMap((line) =>
         years.map((year) => [line.label, year, line.values[year] ?? null, line.unit, t("vitalBasis"), w(line.values[year] === null ? "workbook.unavailable" : "workbook.published")]),
       ),
-      numericFormats: { 3: spec.decimals === 2 ? "0.00" : "0.0" },
+      numericFormats: { 3: spec.format },
     },
     sources: withAbsoluteUrls(originals, input.siteOrigin),
   };
@@ -62,6 +63,9 @@ export function buildFertilityWorkbookExportModel(input: Input, presentation: Pr
     titleKey: "fertilityWorkbookTitle",
     sourceId: SOURCE_ID.fertility,
     decimals: 2,
+    // The total rate prints as 2.31 and the age rates as 51.5, each as Geostat publishes it.
+    format: "0.0#",
+    numberFormat: "0.0#",
     lines: [
       { label: `${t("tfrLabel")} (${tfrUnit})`, unit: tfrUnit, values: seriesByYear(input.facts, SERIES.totalFertilityRate) },
       ...AGE_GROUPS.map((group) => ({
@@ -80,6 +84,7 @@ export function buildLifeWorkbookExportModel(input: Input, presentation: Present
     titleKey: "lifeWorkbookTitle",
     sourceId: SOURCE_ID.lifeExpectancy,
     decimals: 1,
+    format: "0.0",
     lines: LIFE_SERIES.map((line) => ({ label: t(line.key), unit: t("lifeUnit"), values: seriesByYear(input.facts, line.seriesId) })),
   });
 }

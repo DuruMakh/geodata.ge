@@ -45,6 +45,8 @@ describe("national workbooks", () => {
     expect(model.readable.rows[0]!.label).toBe("Total fertility rate (children per woman)");
     expect(model.readable.rows[1]!.label).toBe("Under 20 (births per 1,000 women)");
     expect(model.analysis.rows).toHaveLength(12 * 8);
+    expect(model.readable.numberFormat).toBe("0.0#");
+    expect(model.analysis.numericFormats?.[3]).toBe("0.0#");
   });
 
   it("life expectancy: three rows by year", async () => {
