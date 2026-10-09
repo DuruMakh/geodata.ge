@@ -38,7 +38,7 @@ describe("migration workbook", () => {
     expect(model.readable.rows[0]!.valuesByYear).toEqual({ 2022: 179_778, 2023: 205_857 });
     expect(model.readable.rows[7]!.valuesByYear).toEqual({ 2022: 125_269, 2023: 245_064 });
     expect(model.readable.rows.at(-1)!.valuesByYear).toEqual({ 2022: 54_509, 2023: -39_207 });
-    expect(model.readable.subtitle).toContain("All other citizenships");
+    expect(model.readable.subtitle).toContain("Other countries");
     expect(model.analysis.headers).toEqual(["Year", "Direction", "Citizenship", "Sex", "Persons"]);
     expect(model.analysis.rows).toHaveLength(2 * 2 * 6);
     expect(model.analysis.rows[0]).toEqual([2022, "Arrivals", "Georgia", "All", expect.any(Number)]);

@@ -69,7 +69,7 @@
   "demography.basisHeader": "Basis",
   "demography.unitPersons": "persons, 1 January",
   "demography.migrationWorkbookTitle": "Migration by citizenship",
-  "demography.migrationGroupsNote": "\"All other citizenships\" is every other citizenship, stateless persons, not stated and Geostat's own Other, added up by Fiscal.ge",
+  "demography.migrationGroupsNote": "\"Other countries\" is every other citizenship, stateless persons, not stated and Geostat's own Other, added up by Fiscal.ge",
   "demography.directionHeader": "Direction",
   "demography.citizenshipHeader": "Citizenship",
   "demography.sexHeader": "Sex",
@@ -87,7 +87,7 @@
   "demography.group.citizenship.turkey": "Turkey",
   "demography.group.citizenship.azerbaijan": "Azerbaijan",
   "demography.group.citizenship.ukraine": "Ukraine",
-  "demography.group.citizenship.all_other_computed": "All other citizenships (computed)",
+  "demography.group.citizenship.all_other_computed": "Other countries",
   "demography.migrationMetaTitle": "Migration — Demography",
   "demography.migrationLead": "How many people moved to and left Georgia each year, by citizenship.",
   "demography.migrationCoverage": "{first}–{last} · annual",
@@ -112,5 +112,5 @@
   "demography.sideDepartures": "Departures",
   "demography.sideForeignShare": "Foreign citizens' share of arrivals",
   "demography.migrationIndicatorsNote": "The indicators describe the last year of the period for the chosen sex and all citizenships. Foreign citizens are all arrivals except citizens of Georgia.",
-  "demography.migrationSource": "Source: Geostat — immigrants and emigrants by sex and citizenship, and net migration, {start}–{end} (Ministry of Internal Affairs border records). \"All other citizenships\", the net migration of selected groups and the foreign citizens' share are computed by Fiscal.ge."
+  "demography.migrationSource": "Source: Geostat — immigrants and emigrants by sex and citizenship, and net migration, {start}–{end} (Ministry of Internal Affairs border records). \"Other countries\", the net migration of selected groups and the foreign citizens' share are computed by Fiscal.ge."
 }

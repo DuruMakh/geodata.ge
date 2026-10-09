@@ -42,7 +42,7 @@ describe("MigrationExplorer", () => {
     expect((html.match(/data-testid="series-row"/g) ?? []).length).toBe(6);
     expect(html).toContain("Arrivals · Russia");
     expect(html).toContain("Departures · Russia");
-    expect(html).toContain("All other citizenships (computed)");
+    expect(html).toContain("Other countries");
     expect(html).toContain("Net migration:");
     expect(html).not.toContain("Net migration (selected groups)");
     expect(html).toContain('data-testid="migration-sex-total"');
@@ -104,9 +104,10 @@ describe("MigrationExplorer", () => {
     const labels = searchLabels["citizenship.russian_federation"];
     expect(matchesLabelQuery("russia", labels)).toBe(true);
     expect(matchesLabelQuery("რუსეთი", labels)).toBe(true);
-    // "citizenship" is only a word in the remainder's own name ("All other citizenships"), never in a country's.
+    // The shared id prefix is never searched; "other" finds only the remainder ("Other countries").
     for (const group of MIGRATION_GROUPS) {
-      expect(matchesLabelQuery("citizenship", searchLabels[group])).toBe(group === "citizenship.all_other_computed");
+      expect(matchesLabelQuery("citizenship", searchLabels[group])).toBe(false);
+      expect(matchesLabelQuery("other", searchLabels[group])).toBe(group === "citizenship.all_other_computed");
     }
   });
 });

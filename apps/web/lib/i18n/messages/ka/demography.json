@@ -69,7 +69,7 @@
   "demography.basisHeader": "შეფასების საფუძველი",
   "demography.unitPersons": "ადამიანი, 1 იანვარს",
   "demography.migrationWorkbookTitle": "მიგრაცია მოქალაქეობის მიხედვით",
-  "demography.migrationGroupsNote": "„სხვა მოქალაქეობები“ — ყველა დანარჩენი მოქალაქეობა, მოქალაქეობის არმქონე პირები, მოქალაქეობა მითითებული არ არის და საქსტატის „სხვა“, შეჯამებული Fiscal.ge-ის მიერ",
+  "demography.migrationGroupsNote": "„სხვა ქვეყნები“ — ყველა დანარჩენი მოქალაქეობა, მოქალაქეობის არმქონე პირები, მოქალაქეობა მითითებული არ არის და საქსტატის „სხვა“, შეჯამებული Fiscal.ge-ის მიერ",
   "demography.directionHeader": "მიმართულება",
   "demography.citizenshipHeader": "მოქალაქეობა",
   "demography.sexHeader": "სქესი",
@@ -87,7 +87,7 @@
   "demography.group.citizenship.turkey": "თურქეთი",
   "demography.group.citizenship.azerbaijan": "აზერბაიჯანი",
   "demography.group.citizenship.ukraine": "უკრაინა",
-  "demography.group.citizenship.all_other_computed": "სხვა მოქალაქეობები (გამოთვლილი)",
+  "demography.group.citizenship.all_other_computed": "სხვა ქვეყნები",
   "demography.migrationMetaTitle": "მიგრაცია — დემოგრაფია",
   "demography.migrationLead": "რამდენი ადამიანი შემოვიდა საქართველოში და გავიდა ქვეყნიდან ყოველ წელს, მოქალაქეობის მიხედვით.",
   "demography.migrationCoverage": "{first}–{last} · წლიური",
@@ -112,5 +112,5 @@
   "demography.sideDepartures": "გასული",
   "demography.sideForeignShare": "უცხო მოქალაქეების წილი შემოსულებში",
   "demography.migrationIndicatorsNote": "ინდიკატორები აჩვენებს პერიოდის ბოლო წელს, არჩეული სქესისთვის და ყველა მოქალაქეობისთვის. უცხო მოქალაქეები = ყველა შემოსული, საქართველოს მოქალაქეების გარდა.",
-  "demography.migrationSource": "წყარო: საქსტატი — იმიგრანტები და ემიგრანტები სქესისა და მოქალაქეობის მიხედვით და მიგრაციის სალდო, {start}–{end} (შსს-ის სასაზღვრო მონაცემები). „სხვა მოქალაქეობები“, არჩეული ჯგუფების წმინდა მიგრაცია და უცხო მოქალაქეების წილი გამოთვლილია Fiscal.ge-ის მიერ."
+  "demography.migrationSource": "წყარო: საქსტატი — იმიგრანტები და ემიგრანტები სქესისა და მოქალაქეობის მიხედვით და მიგრაციის სალდო, {start}–{end} (შსს-ის სასაზღვრო მონაცემები). „სხვა ქვეყნები“, არჩეული ჯგუფების წმინდა მიგრაცია და უცხო მოქალაქეების წილი გამოთვლილია Fiscal.ge-ის მიერ."
 }

@@ -108,6 +108,6 @@ describe("migration hash", () => {
   it("lists each group's Georgian and English names for search", async () => {
     const labels = migrationSearchLabels(await getMessages("ka", ["demography"]), await getMessages("en", ["demography"]));
     expect(labels["citizenship.russian_federation"]).toEqual(["რუსეთი", "Russia"]);
-    expect(labels["citizenship.all_other_computed"][1]).toBe("All other citizenships (computed)");
+    expect(labels["citizenship.all_other_computed"][1]).toBe("Other countries");
   });
 });
