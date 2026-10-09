@@ -54,6 +54,35 @@ test("moving the range end changes the period of the key figures and the address
   await expect(page).toHaveURL(/end=2024/);
 });
 
+test("the hover readout lists all twelve rows as arrows: arrivals by size, then departures by size", async ({ page }) => {
+  await page.goto(`/en${PATH}`);
+  await ready(page);
+  const chart = page.getByTestId("chart-panel").locator('svg[role="img"]').first();
+  await chart.focus();
+  await page.keyboard.press("Home");
+  for (let step = 0; step < 4; step += 1) await page.keyboard.press("ArrowRight");
+  const tooltip = page.getByTestId("stack-chart-tooltip");
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText("2016");
+  await expect(tooltip).toContainText("64,705");
+  await expect(tooltip.locator("svg")).toHaveCount(12);
+  await expect(tooltip.locator("svg.lucide-arrow-up")).toHaveCount(6);
+  await expect(tooltip.locator("svg.lucide-arrow-down")).toHaveCount(6);
+  // Numbers are unsigned and no row is folded into a "+N" line.
+  await expect(tooltip).not.toContainText("+");
+  // Arrivals come first, both groups of rows largest first.
+  const order = await tooltip.locator("svg").evaluateAll((icons) => icons.map((icon) => (icon.classList.contains("lucide-arrow-up") ? "up" : "down")));
+  expect(order).toEqual(["up", "up", "up", "up", "up", "up", "down", "down", "down", "down", "down", "down"]);
+});
+
+test("a single-year range prints that year and drops the range-start details", async ({ page }) => {
+  await page.goto(`/en${PATH}#start=2023&end=2023`);
+  await ready(page);
+  const highlights = page.getByTestId("migration-highlights");
+  await expect(highlights).toContainText("Selected period: 2023");
+  await expect(highlights).not.toContainText("2023: ");
+});
+
 test("the series search matches the group in either language", async ({ page }) => {
   for (const [path, query] of [
     [PATH, "russia"],

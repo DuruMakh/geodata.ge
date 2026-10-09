@@ -147,7 +147,8 @@ describe("migration page", () => {
     const html = renderToStaticMarkup(await renderDemographyMigrationPage("en"));
     expect(html).toContain(">Migration</h1>");
     expect(html).toContain("2012–2025 · annual");
-    expect(html).toContain("persons per year");
+    expect(html).toContain("How many people moved to and left Georgia each year, by citizenship.");
+    expect(html).not.toContain("persons per year");
     expect(html).toContain('data-testid="migration-explorer"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('"@type":"Dataset"');

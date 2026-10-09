@@ -60,6 +60,33 @@ describe("MigrationExplorer", () => {
     expect((html.match(/data-testid="side-kpi"/g) ?? []).length).toBe(3);
   });
 
+  it("offers the sex filter as three icon buttons named All, Men and Women", () => {
+    const html = render("en");
+    for (const [sex, name, icon] of [["total", "All", "lucide-users"], ["male", "Men", "lucide-mars"], ["female", "Women", "lucide-venus"]] as const) {
+      const start = html.indexOf(`data-testid="migration-sex-${sex}"`);
+      const button = html.slice(html.lastIndexOf("<button", start), html.indexOf("</button>", start));
+      expect(button, sex).toContain(`aria-label="${name}"`);
+      expect(button, sex).toContain(icon);
+      expect(button, sex).not.toContain(`>${name}<`);
+    }
+  });
+
+  it("lays the key figures out like the other pages: the period at the right, a split bar, the range-start figures", () => {
+    const html = render("en");
+    const highlights = /<section data-testid="migration-highlights"[\s\S]*<\/section>/.exec(html)?.[0] ?? "";
+    expect(highlights).toMatch(/Selected period: <span[^>]*>2012–2025<\/span>/);
+    // Arrivals and departures of 2025 as one two-part bar: 131,501 / (131,501 + 114,374).
+    expect(highlights).toContain("width:53.5%");
+    expect(highlights).toContain("width:46.5%");
+    expect(highlights).toContain("lucide-arrow-up");
+    expect(highlights).toContain("lucide-arrow-down");
+    // The neutral sentence and the cumulative figure share one paragraph.
+    expect(highlights).toMatch(/More people arrived than left\.\s*2012–2025 in total: −26,795/);
+    expect(highlights).toContain("2012: 69,063");
+    expect(highlights).toContain("2012: 90,584");
+    expect(highlights).not.toContain(">2025</p>");
+  });
+
   it("has no Georgian in the English render and no cause words", () => {
     const html = render("en");
     expect(html.replace(/<script[\s\S]*?<\/script>/g, "")).not.toMatch(GEORGIAN);

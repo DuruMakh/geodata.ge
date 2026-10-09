@@ -89,7 +89,7 @@
   "demography.group.citizenship.ukraine": "Ukraine",
   "demography.group.citizenship.all_other_computed": "All other citizenships (computed)",
   "demography.migrationMetaTitle": "Migration — Demography",
-  "demography.migrationUnitLine": "persons per year",
+  "demography.migrationLead": "How many people moved to and left Georgia each year, by citizenship.",
   "demography.migrationCoverage": "{first}–{last} · annual",
   "demography.columns": "Columns",
   "demography.sexAria": "Sex",

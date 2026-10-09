@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowDown, ArrowUp, Mars, Users, Venus } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   buildMigrationIndicators,
@@ -18,10 +19,11 @@ import {
   type MigrationState,
 } from "../../lib/explorer/demographyMigration";
 import { buildMigrationWorkbookExportModel } from "../../lib/explorer/demographyMigrationWorkbook";
-import { INK } from "../../lib/explorer/colors";
+import { INK, NEGATIVE } from "../../lib/explorer/colors";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import { Message } from "../../lib/i18n/message";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
@@ -40,6 +42,11 @@ import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 const SEX_KEYS = { total: "sexTotal", male: "sexMale", female: "sexFemale" } as const;
+const SEX_ICONS = {
+  total: <Users aria-hidden="true" size={18} strokeWidth={1.5} />,
+  male: <Mars aria-hidden="true" size={18} strokeWidth={1.5} />,
+  female: <Venus aria-hidden="true" size={18} strokeWidth={1.5} />,
+} as const;
 const DIRECTION_KEYS = { arrivals: "dirArrivals", departures: "dirDepartures", net: "dirNet" } as const;
 /** The chart draws thousands, so its axis stays short; every printed value is converted back to whole persons. */
 const CHART_SCALE = 1_000;
@@ -47,6 +54,7 @@ const CHART_SCALE = 1_000;
 const persons = (value: number | null | undefined) => formatInUnit(value, UNIT_PERSONS);
 const signedPersons = (value: number | null | undefined) =>
   value === null || value === undefined ? persons(value) : `${value > 0 ? "+" : ""}${persons(value)}`;
+const KPI_META_CLASS = "font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]";
 
 export function MigrationExplorer({
   facts,
@@ -94,6 +102,9 @@ export function MigrationExplorer({
     model.selectedIds.map((group) => ({
       id: `${id}:${group}`,
       label: t("segment", { direction: direction(id), group: groupLabel(group) }),
+      // The readout names the country only; its arrow says the direction.
+      readoutLabel: groupLabel(group),
+      marker: (id === "arrivals" ? "up" : "down") as "up" | "down",
       color: MIGRATION_COLORS[group],
       values: scaled(model.byDirection[id][group], id === "arrivals" ? 1 : -1),
     })),
@@ -109,6 +120,12 @@ export function MigrationExplorer({
     : null;
   const end = model.range.end;
   const net = indicators.net;
+  const { start } = model.range;
+  const singleYear = start === end;
+  // Arrivals and departures of the end year as one two-part bar, like the budget gauge.
+  const flow = indicators.arrivals === null || indicators.departures === null ? 0 : indicators.arrivals + indicators.departures;
+  const arrivalsShare = flow > 0 ? indicators.arrivals! / flow : null;
+  const startDetail = (value: string) => (singleYear ? "" : `${start}: ${value}`);
   const heroSentence = net === null ? null : t(net > 0 ? "heroMoreArrived" : net < 0 ? "heroMoreLeft" : "heroBalanced");
 
   return (
@@ -130,7 +147,7 @@ export function MigrationExplorer({
                 ariaLabel={t("sexAria")}
                 value={state.sex}
                 onChange={(sex: MigrationSex) => update((s) => ({ ...s, sex }))}
-                options={MIGRATION_SEXES.map((sex) => ({ value: sex, label: t(SEX_KEYS[sex]), testId: `migration-sex-${sex}` }))}
+                options={MIGRATION_SEXES.map((sex) => ({ value: sex, label: t(SEX_KEYS[sex]), icon: SEX_ICONS[sex], testId: `migration-sex-${sex}` }))}
               />
             </div>
             {!model.selectedIds.length ? (
@@ -144,7 +161,10 @@ export function MigrationExplorer({
                   segments={segments}
                   overlay={{ label: netLabel, values: scaled(model.totals.net, 1) }}
                   formatPeriod={String}
-                  formatValue={(value) => signedPersons(Math.round(value * CHART_SCALE))}
+                  formatValue={(value) => persons(Math.abs(Math.round(value * CHART_SCALE)))}
+                  formatOverlayValue={(value) => signedPersons(Math.round(value * CHART_SCALE))}
+                  readoutOrder="sign-then-magnitude"
+                  readoutRowCap={MIGRATION_GROUPS.length * 2}
                   ariaLabel={t("chartAria", { start: model.range.start, end })}
                 />
               </div>
@@ -227,19 +247,48 @@ export function MigrationExplorer({
         </SeriesAside>
       </ExplorerWorkspace>
       <section data-testid="migration-highlights" data-end-year={indicators.year} className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
-        <SectionTitle>{t("highlights")}</SectionTitle>
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <SectionTitle>{t("highlights")}</SectionTitle>
+          <p className="text-[0.78125rem] text-[var(--muted)]">
+            <Message
+              messages={messages}
+              id="main.selectedPeriod"
+              values={{ years: <span className="font-[family-name:var(--font-numeric)]">{singleYear ? start : `${start}–${end}`}</span> }}
+            />
+          </p>
+        </div>
         <div className={KPI_GRID_CLASS}>
-          <HeroKpi label={t("heroNetLabel", { year: indicators.year })} value={signedPersons(net)}>
-            {heroSentence ? <p className="text-[0.78125rem] leading-relaxed text-[var(--body)]">{heroSentence}</p> : null}
-            <p className="mt-2 font-[family-name:var(--font-numeric)] text-[0.75rem] text-[var(--muted)]">
-              {t("heroCumulative", { start: model.range.start, end, value: signedPersons(indicators.cumulativeNet) })}
+          <HeroKpi label={t("heroNetLabel", { year: indicators.year })} value={signedPersons(net)} valueColor={net !== null && net < 0 ? NEGATIVE : "var(--ink)"}>
+            {arrivalsShare === null ? null : (
+              <>
+                <div className="flex h-[3px] bg-[var(--hairline-soft)]">
+                  <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${(arrivalsShare * 100).toFixed(1)}%` }} />
+                  <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - arrivalsShare) * 100).toFixed(1)}%` }} />
+                </div>
+                <div className="mt-2 flex justify-between gap-4">
+                  <p className={`inline-flex items-center gap-1 ${KPI_META_CLASS}`}>
+                    <ArrowUp aria-hidden size={12} strokeWidth={2} />
+                    <span className="sr-only">{t("sideArrivals")}</span>
+                    {persons(indicators.arrivals)}
+                  </p>
+                  <p className={`inline-flex items-center gap-1 ${KPI_META_CLASS}`}>
+                    <ArrowDown aria-hidden size={12} strokeWidth={2} />
+                    <span className="sr-only">{t("sideDepartures")}</span>
+                    {persons(indicators.departures)}
+                  </p>
+                </div>
+              </>
+            )}
+            <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
+              {heroSentence ? `${heroSentence} ` : ""}
+              {t("heroCumulative", { start, end, value: signedPersons(indicators.cumulativeNet) })}
             </p>
           </HeroKpi>
           <SideKpiList
             kpis={[
-              { label: t("sideArrivals"), value: persons(indicators.arrivals), unit: "", color: INK, detail: String(indicators.year), spark: { values: indicators.sparks.arrivals, color: INK } },
-              { label: t("sideDepartures"), value: persons(indicators.departures), unit: "", color: INK, detail: String(indicators.year), spark: { values: indicators.sparks.departures, color: INK } },
-              { label: t("sideForeignShare"), value: formatShare(indicators.foreignShare), unit: "", color: INK, detail: String(indicators.year), spark: { values: indicators.sparks.foreignShare, color: INK } },
+              { label: t("sideArrivals"), value: persons(indicators.arrivals), unit: "", color: INK, detail: startDetail(persons(indicators.sparks.arrivals[0])), spark: { values: indicators.sparks.arrivals, color: INK } },
+              { label: t("sideDepartures"), value: persons(indicators.departures), unit: "", color: INK, detail: startDetail(persons(indicators.sparks.departures[0])), spark: { values: indicators.sparks.departures, color: INK } },
+              { label: t("sideForeignShare"), value: formatShare(indicators.foreignShare), unit: "", color: INK, detail: startDetail(formatShare(indicators.sparks.foreignShare[0] ?? null)), spark: { values: indicators.sparks.foreignShare, color: INK } },
             ]}
           />
         </div>

@@ -89,7 +89,7 @@
   "demography.group.citizenship.ukraine": "უკრაინა",
   "demography.group.citizenship.all_other_computed": "სხვა მოქალაქეობები (გამოთვლილი)",
   "demography.migrationMetaTitle": "მიგრაცია — დემოგრაფია",
-  "demography.migrationUnitLine": "ადამიანი წელიწადში",
+  "demography.migrationLead": "რამდენი ადამიანი შემოვიდა საქართველოში და გავიდა ქვეყნიდან ყოველ წელს, მოქალაქეობის მიხედვით.",
   "demography.migrationCoverage": "{first}–{last} · წლიური",
   "demography.columns": "სვეტები",
   "demography.sexAria": "სქესი",

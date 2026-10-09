@@ -71,7 +71,7 @@ export async function renderDemographyMigrationPage(locale: Locale) {
       <ExplorerPage testId="explorer-shell">
         <PageHeader crumbs={crumbs} coverage={t("migrationCoverage", { first, last })} />
         <ExplorerHeading>{title}</ExplorerHeading>
-        <p className="mb-[30px] text-[13px] text-[var(--body)]">{t("migrationUnitLine")}</p>
+        <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("migrationLead")}</p>
         <MigrationExplorer
           facts={facts}
           sources={migrationSources}
