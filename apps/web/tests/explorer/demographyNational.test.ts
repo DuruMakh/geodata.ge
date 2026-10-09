@@ -5,6 +5,7 @@ import { projectNationalObservation } from "../../lib/explorer/clientData";
 import { AGE_GROUPS, ageCurves, NATIONAL_SERIES, nationalYears, seriesByYear } from "../../lib/explorer/demographyNational";
 import { buildFertilityWorkbookExportModel, buildLifeWorkbookExportModel } from "../../lib/explorer/demographyNationalWorkbook";
 import { getPresentation } from "../../lib/i18n/presentation.server";
+import { loadPopulationSources } from "../../lib/pages/demography-population";
 import type { ClientNationalFact } from "../../lib/servedRows";
 
 let facts: ClientNationalFact[];
@@ -55,5 +56,16 @@ describe("national workbooks", () => {
     expect(model.readable.rows.map((row) => row.label)).toEqual(["Total", "Men", "Women"]);
     expect(model.readable.rows[0]!.valuesByYear[2025]).toBe(76);
     expect(model.analysis.rows).toHaveLength(36);
+  });
+
+  it("cite exactly their own archived original, with real sources", async () => {
+    const presentation = await getPresentation("en", ["demography", "workbook"], []);
+    const sources = await loadPopulationSources("en");
+    const fertility = buildFertilityWorkbookExportModel({ facts, sources, siteOrigin: "https://fiscal.ge" }, presentation);
+    const life = buildLifeWorkbookExportModel({ facts, sources, siteOrigin: "https://fiscal.ge" }, presentation);
+    expect(fertility.sources).toHaveLength(1);
+    expect(fertility.sources[0]!.downloadHref).toContain("16-age-specific-fertility-rates-and-total-fertility-rate.xlsx");
+    expect(life.sources).toHaveLength(1);
+    expect(life.sources[0]!.downloadHref).toContain("28-life-expectancy-at-births-by-sex.xlsx");
   });
 });

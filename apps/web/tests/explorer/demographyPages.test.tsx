@@ -197,17 +197,25 @@ describe("births and deaths page", () => {
 
 // The four Geostat originals listed in data/methodology/source-archives/demography.csv.
 const REVIEWED_SOURCE_IDS = [
+  "source.geostat_demography_births",
+  "source.geostat_demography_crude_birth_rate",
+  "source.geostat_demography_crude_death_rate",
+  "source.geostat_demography_deaths",
   "source.geostat_demography_density",
+  "source.geostat_demography_fertility",
+  "source.geostat_demography_infant_mortality",
+  "source.geostat_demography_life_expectancy",
   "source.geostat_demography_migration_citizenship",
+  "source.geostat_demography_natural_increase",
   "source.geostat_demography_net_migration",
   "source.geostat_municipal_population",
 ];
 
 describe("population sources", () => {
-  it("are the four reviewed demography sources in either language, each downloadable from the demography files", async () => {
+  it("are the twelve reviewed demography sources in either language, each downloadable from the demography files", async () => {
     for (const locale of ["en", "ka"] as const) {
       const sources = await loadPopulationSources(locale);
-      expect(sources, locale).toHaveLength(4);
+      expect(sources, locale).toHaveLength(12);
       expect(sources.map((source) => source.sourceId).sort(), locale).toEqual(REVIEWED_SOURCE_IDS);
       for (const source of sources) expect(source.downloadHref, locale).toMatch(/^\/downloads\/methodology\/demography\/files\/[^/]+$/);
     }

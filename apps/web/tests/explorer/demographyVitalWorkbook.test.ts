@@ -30,7 +30,8 @@ describe("births and deaths workbook", () => {
     expect(model.analysis.rows).toHaveLength(11);
     expect(model.analysis.rows.at(-1)!.slice(2, 6)).toEqual([2025, 2_630, 1_779, 851]);
     const cited = input.sources.filter((source) => [SOURCE_ID.births, SOURCE_ID.deaths, SOURCE_ID.naturalIncrease].includes(source.sourceId as never));
-    expect(model.sources).toHaveLength(cited.length);
-    expect(model.sources.every((source) => source.downloadHref.startsWith("https://fiscal.ge/"))).toBe(true);
+    expect(cited).toHaveLength(3);
+    expect(model.sources).toHaveLength(3);
+    expect(model.sources.every((source) => source.absoluteUrl.startsWith("https://fiscal.ge/"))).toBe(true);
   });
 });
