@@ -39,23 +39,23 @@ The mirror holds the whole `demography-migration-annual.csv` (1,778 rows, all `c
 
 ## 3. Page anatomy
 
-The Trade / Unemployment page shell: `ExplorerPage` → `PageHeader` (coverage `2012–2025`, derived from the facts) → `ExplorerHeading` `მიგრაცია` → unit line `ადამიანი წელიწადში` (persons per year) → `ExplorerWorkspace` → `ძირითადი ინდიკატორები` → `SourceNote`. No buttons above the workspace.
+The Trade / Unemployment page shell: `ExplorerPage` → `PageHeader` (coverage `2012–2025`, derived from the facts) → `ExplorerHeading` `მიგრაცია` → a lead sentence in Trade's summary style, `რამდენი ადამიანი შემოვიდა საქართველოში და გავიდა ქვეყნიდან ყოველ წელს, მოქალაქეობის მიხედვით.` ("How many people moved to and left Georgia each year, by citizenship."; the chart's own `ათასი ადამიანი` label stays) → `ExplorerWorkspace` → `ძირითადი ინდიკატორები` → `SourceNote`. No buttons above the workspace.
 
 ## 4. Workspace
 
-- **Toolbar.** The chart/table switch on the left, labelled `სვეტები / ცხრილი` ("Columns / Table") as on the inflation categories page; on the right a joined `SegmentedTabs` `ყველა / მამაკაცები / ქალები`, the control the unemployment page uses. The filter applies to the chart, table, indicators and export.
-- **Chart.** `StackedColumnChart` with `periodsPerYear={1}`, unchanged. Arrivals are positive segments, one per selected group, in the `citizenship.*` colours (section spec §7); departures are the same groups and colours as negative segments, so they stack below zero. Segment labels `შემოსვლა · რუსეთი` and `გასვლა · რუსეთი`. The overlay is the net migration of the selected groups and sex, the existing ink line with an end dot; with all six groups selected it equals Geostat's published net and is labelled `წმინდა მიგრაცია`, otherwise `წმინდა მიგრაცია (არჩეული ჯგუფები)`. The tooltip, caption and axis are the chart's existing ones; the axis covers the selected series only.
+- **Toolbar.** The chart/table switch on the left, labelled `სვეტები / ცხრილი` ("Columns / Table") as on the inflation categories page; on the right a joined `SegmentedTabs` of three icons (Lucide `Users`, `Mars`, `Venus`, the economic-sectors pattern) whose accessible names and tooltips are `ყველა / მამაკაცები / ქალები`. The filter applies to the chart, table, indicators and export.
+- **Chart.** `StackedColumnChart` with `periodsPerYear={1}`, unchanged. Arrivals are positive segments, one per selected group, in the `citizenship.*` colours (section spec §7); departures are the same groups and colours as negative segments, so they stack below zero. Segment labels `შემოსვლა · რუსეთი` and `გასვლა · რუსეთი` stay in the caption and for screen readers. The hover readout lists every row (twelve at most, no hidden count) as a coloured arrow (up for arrivals, down for departures), the group name and the number without a sign: all arrivals by size, then all departures by size. This needs only optional additions to the shared chart (segment `readoutLabel` / `marker`, `readoutOrder`, `readoutRowCap`, `formatOverlayValue`, and a row `marker` / `srLabel` in the tooltip), with defaults that leave other pages unchanged. The overlay is the net migration of the selected groups and sex, the existing ink line with an end dot; with all six groups selected it equals Geostat's published net and is labelled `წმინდა მიგრაცია`, otherwise `წმინდა მიგრაცია (არჩეული ჯგუფები)`. The caption and axis are the chart's existing ones; the axis covers the selected series only.
 - **Series aside.** The existing series selector with six rows in fixed order: Georgia, Russia, Turkey, Azerbaijan, Ukraine, the computed remainder. Each row: swatch, name, end-year departures as the value and end-year arrivals as the labelled meta (the shared row renders meta first, so the row reads "arrivals / departures"). `გასუფთავება` / `ყველას მონიშვნა` and `სერიები {selected} / 6`. Search matches Georgian and English names. **Default: all six selected**, a documented departure from "only the total starts selected" like the inflation categories and cities pages (the chart shows parts of a whole). With none selected the existing empty-selection `Callout` shows.
 - **Table.** `ExplorerTable` for one direction at a time, chosen with `SegmentedTabs` `შემოსვლა / გასვლა / წმინდა`: rows are the selected groups plus a total row (`ჯამი` when all six are selected, `არჩეულთა ჯამი` otherwise), years as columns, departures as positive counts. The net tab shows one row per selected group and the net total; the shared table formatting prints negatives with `−` and positives unsigned (the hero and the chart readout carry an explicit `+`).
 - **Range.** `RangeStrip` over 2012–2025, full range by default, the usual chips. No marker.
 
 ## 5. Key indicators
 
-For the end year of the active range and the active sex filter; not affected by the group selection.
+For the end year of the active range and the active sex filter; not affected by the group selection. The layout follows the budget indicators: the title left and `არჩეული პერიოდი: {start}–{end}` right; the hero carries a 3px two-part bar of arrivals and departures with the two figures under it (up and down arrows); each side figure's detail is `{start}: {value at the range start}`, empty when start equals end.
 
 | Block | Content |
 | --- | --- |
-| Hero | Net migration of the end year, signed, with a neutral sentence ("more people arrived than left" or "more left than arrived") and the cumulative net migration over the active range (the sum of the yearly nets) |
+| Hero | Net migration of the end year, signed (red when negative), with the arrivals / departures bar and, in one paragraph, a neutral sentence ("more people arrived than left" or "more left than arrived") and the cumulative net migration over the active range (the sum of the yearly nets) |
 | Side 1 | Arrivals in the end year, with a sparkline over the range |
 | Side 2 | Departures in the end year, with a sparkline |
 | Side 3 | Foreign citizens as a share of arrivals in the end year (one decimal), with a sparkline of that share |
@@ -72,8 +72,8 @@ One download for the active range, groups and sex filter, built with the existin
 
 ## 8. What is reused, extended and new
 
-- **Reused as is:** `StackedColumnChart`, `ExplorerTable`, `RangeStrip`, `SegmentedTabs`, the series selector, `HeroKpi` / `SideKpiList` with sparklines, `ExplorerWorkspace`, `SourceNote`, `Callout`, `ExcelDownloadButton` and the workbook model, the Trade/Population hash-state pattern, `DemographyFact` and its migration.
-- **Small additions:** `importDemography.ts` and `servedData.ts` add `demography-migration-annual.csv`; the hub card, sidebar link, sitemap, `llms.txt`, i18n inventory and page revisions add the route; the `demography` message scope gains the migration keys; the demography methodology page gains a migration section and its two source originals; `DESIGN.md` gains the page's section.
+- **Reused as is:** `ExplorerTable`, `RangeStrip`, `SegmentedTabs`, the series selector, `HeroKpi` / `SideKpiList` with sparklines, `ExplorerWorkspace`, `SourceNote`, `Callout`, `ExcelDownloadButton` and the workbook model, the Trade/Population hash-state pattern, `DemographyFact` and its migration.
+- **Small additions:** optional readout props on `StackedColumnChart` and `ChartTooltip` (arrow marker, screen-reader name, row order and cap, overlay formatter); `importDemography.ts` and `servedData.ts` add `demography-migration-annual.csv`; the hub card, sidebar link, sitemap, `llms.txt`, i18n inventory and page revisions add the route; the `demography` message scope gains the migration keys; the demography methodology page gains a migration section and its two source originals; `DESIGN.md` gains the page's section.
 - **New:** the two route files, `lib/pages/demography-migration.tsx`, `lib/explorer/demographyMigration.ts` (model, hash, indicators), `demographyMigrationWorkbook.ts`, and one client component `components/demography/demography-migration.tsx`. No new shared component.
 
 ## 9. Accessibility and responsive
@@ -100,3 +100,4 @@ Acceptance: the anchors agree across chart caption, table, indicators and workbo
 10. `lib/methodology/sourceInventory.ts` accepts the exact basenames of tables 31 and 33 in the 2026-10 folder so the methodology archive can hold the two originals — assistant ruling, 2026-10-09.
 11. The methodology key fact Frequency reads "Annual" (population is 1 January, migration full-year) — assistant ruling, 2026-10-09.
 12. A sidebar label `common.demographyMigration` (`მიგრაცია` / `Migration`) was added — assistant ruling, 2026-10-09.
+13. Readout as arrows, sex filter as three icons, a lead sentence instead of the unit line, and the budget-style key-figure layout — owner, 2026-10-09 (approved from a mockup). This replaces decision 5's signed departures in the readout; only the overlay keeps its sign.
