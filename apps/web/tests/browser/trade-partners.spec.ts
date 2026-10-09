@@ -4,6 +4,7 @@ import { SSF } from "xlsx";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
+import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
@@ -46,7 +47,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade/partners#sel=partner.1995-2025.643,group.eu&view=table&tab=countries&measure=trade.exports&start=2023&end=2025`);
     await expect(page.getByTestId("series-status")).toContainText("2 / 218");
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(2);
+    const table = page.getByTestId("explorer-table");
+    expect(await tableSeriesCount(table)).toBe(2);
+    expect(await tableSeriesValues(table, prefix ? "Russia" : "რუსეთი")).toHaveLength(3);
+    expect(await tableSeriesValues(table, prefix ? "European Union" : "ევროკავშირი")).toHaveLength(3);
     await page.getByTestId("trade-partners-tab-groups").click();
     await expect(page.getByTestId("trade-partners-off-tab")).toContainText(prefix ? "Russia" : "რუსეთი");
     const end = page.getByTestId("range-end-handle"); await end.focus(); await end.press("ArrowLeft");

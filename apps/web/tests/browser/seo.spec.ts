@@ -416,8 +416,10 @@ test("legacy municipality codes redirect directly to their canonical slugs and k
 
   await page.goto(`${BASE_URL}/explorer/municipalities/06#r=2016-2021`);
   await expect(page).toHaveURL((url) =>
-    url.pathname === "/explorer/municipalities/batumi" && url.hash === "#r=2016-2021",
+    url.pathname === "/explorer/municipalities/batumi" && new URLSearchParams(url.hash.slice(1)).get("r") === "2016-2021",
   );
+  await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2016");
+  await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuenow", "2021");
   expect((await request.get(`${BASE_URL}/explorer/municipalities/unknown`)).status()).toBe(404);
 });
 
