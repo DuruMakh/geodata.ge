@@ -117,5 +117,16 @@
   "demography.vitalDeaths": "Deaths",
   "demography.vitalNatural": "Natural increase",
   "demography.vitalWorkbookTitle": "Births and deaths",
-  "demography.vitalBasis": "Registered events"
+  "demography.vitalBasis": "Registered events",
+  "demography.vitalTitle": "Births and deaths",
+  "demography.vitalLead": "Births and deaths registered in {place}, {first}–{last}.",
+  "demography.vitalChartAria": "Births above and deaths below the zero line, with natural increase, {place}, {first}–{last}",
+  "demography.vitalTableCaption": "Births, deaths and natural increase, {place}, {first}–{last}",
+  "demography.vitalHeroLabel": "Natural increase, {year}",
+  "demography.vitalRatio": "Births per 100 deaths",
+  "demography.vitalDeathsSince": "Deaths have outnumbered births every year since {year}.",
+  "demography.vitalBirthsAhead": "Births outnumbered deaths in {year}.",
+  "demography.vitalEven": "Births and deaths were equal in {year}.",
+  "demography.vitalSource": "Source: Geostat, live births and deaths by region and self-governed unit, {first}–{last}. Counts are registered events and do not change at the census re-base.",
+  "demography.vitalCompare": "Compare all places, and see fertility and life expectancy →"
 }

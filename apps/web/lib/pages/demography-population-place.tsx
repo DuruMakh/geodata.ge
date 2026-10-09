@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
+import { VitalSection } from "../../components/demography/vital-section";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
+import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { loadServedMunicipalData } from "../data/servedData";
@@ -18,7 +20,8 @@ import {
 } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel, placeYears } from "../explorer/demographyPopulation";
 import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
-import { DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
+import { BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
+import { vitalFactsForPlace } from "../explorer/demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { pickerGroupsFromRows } from "../explorer/municipalData";
 import { municipalRankLabel } from "../explorer/municipalLabels";
@@ -69,14 +72,20 @@ export async function populationPlaceMetadata(route: PopulationPlaceRoute, local
 }
 
 export async function renderPopulationPlacePage(route: PopulationPlaceRoute, locale: Locale) {
-  const [{ facts, clientFacts, municipal, presentation, places }, sources] = await Promise.all([
+  const [{ facts, clientFacts, municipal, presentation, places }, sources, served] = await Promise.all([
     loadPopulationBasics(locale),
     loadPopulationSources(locale),
+    loadServedDemographyData(),
   ]);
   const place = places.find((candidate) => candidate.id === placeIdFor(route));
   if (!place) notFound();
   // Only the two Population originals go to the browser; the loader returns the whole demography manifest.
   const populationSources = sources.filter((source) => source.sourceId === SOURCE_ID.populationUnits || source.sourceId === SOURCE_ID.density);
+  // The section's three originals; the population part keeps its own two.
+  const vitalSources = sources.filter((source) =>
+    source.sourceId === SOURCE_ID.births || source.sourceId === SOURCE_ID.deaths || source.sourceId === SOURCE_ID.naturalIncrease);
+  // Only this place's births, deaths and natural increase go to the browser.
+  const vitalFacts = vitalFactsForPlace(served.facts, place.id);
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const years = placeYears(clientFacts, place);
@@ -172,6 +181,14 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
         >
           {memberRows.length > 0 ? <EntityMemberList heading={message(messages, "municipal.regionMembers")} rows={memberRows} /> : null}
         </PopulationPlaceExplorer>
+        <VitalSection
+          place={place}
+          facts={vitalFacts}
+          sources={vitalSources}
+          siteOrigin={resolveSiteUrl()}
+          workbookScope={workbookScopeFor(route)}
+          nationalHref={BIRTHS_DEATHS_PATH}
+        />
       </ExplorerPage>
     </I18nProvider>
   );

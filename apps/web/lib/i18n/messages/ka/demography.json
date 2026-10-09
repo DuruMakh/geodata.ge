@@ -117,5 +117,16 @@
   "demography.vitalDeaths": "გარდაცვალებები",
   "demography.vitalNatural": "ბუნებრივი მატება",
   "demography.vitalWorkbookTitle": "დაბადებები და გარდაცვალებები",
-  "demography.vitalBasis": "რეგისტრირებული მოვლენები"
+  "demography.vitalBasis": "რეგისტრირებული მოვლენები",
+  "demography.vitalTitle": "დაბადებები და გარდაცვალებები",
+  "demography.vitalLead": "{place}: რეგისტრირებული დაბადებები და გარდაცვალებები, {first}–{last}.",
+  "demography.vitalChartAria": "დაბადებები ნულოვანი ხაზის ზემოთ, გარდაცვალებები ქვემოთ და ბუნებრივი მატება, {place}, {first}–{last}",
+  "demography.vitalTableCaption": "დაბადებები, გარდაცვალებები და ბუნებრივი მატება, {place}, {first}–{last}",
+  "demography.vitalHeroLabel": "ბუნებრივი მატება, {year}",
+  "demography.vitalRatio": "დაბადება 100 გარდაცვალებაზე",
+  "demography.vitalDeathsSince": "{year} წლიდან ყოველ წელს გარდაცვალებათა რიცხვი დაბადებათა რიცხვს აღემატება.",
+  "demography.vitalBirthsAhead": "{year} წელს დაბადებათა რიცხვი გარდაცვალებათა რიცხვს აღემატებოდა.",
+  "demography.vitalEven": "{year} წელს დაბადებათა და გარდაცვალებათა რიცხვი თანაბარი იყო.",
+  "demography.vitalSource": "წყარო: საქსტატი, ცოცხლად დაბადებულთა და გარდაცვლილთა რაოდენობა რეგიონებისა და თვითმმართველი ერთეულების მიხედვით, {first}–{last}. რიცხვები რეგისტრირებულ მოვლენებს ასახავს და აღწერით გადათვლისას არ იცვლება.",
+  "demography.vitalCompare": "ყველა ადგილის შედარება, ნაყოფიერება და სიცოცხლის ხანგრძლივობა →"
 }
