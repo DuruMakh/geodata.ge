@@ -154,6 +154,14 @@ describe("migration page", () => {
     expect(html).toContain('href="/en/methodology/demography"');
   });
 
+  it("has no Georgian in the English page or its metadata", async () => {
+    const html = renderToStaticMarkup(await renderDemographyMigrationPage("en"));
+    expect(html).not.toMatch(GEORGIAN);
+    const metadata = await demographyMigrationPageMetadata("en");
+    expect(String(metadata.title)).not.toMatch(GEORGIAN);
+    expect(String(metadata.description)).not.toMatch(GEORGIAN);
+  });
+
   it("has its own canonical address and title", async () => {
     const metadata = await demographyMigrationPageMetadata("ka");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/migration");
@@ -161,14 +169,19 @@ describe("migration page", () => {
   });
 });
 
-// The two Geostat originals listed in data/methodology/source-archives/demography.csv.
-const REVIEWED_SOURCE_IDS = ["source.geostat_demography_density", "source.geostat_municipal_population"];
+// The four Geostat originals listed in data/methodology/source-archives/demography.csv.
+const REVIEWED_SOURCE_IDS = [
+  "source.geostat_demography_density",
+  "source.geostat_demography_migration_citizenship",
+  "source.geostat_demography_net_migration",
+  "source.geostat_municipal_population",
+];
 
 describe("population sources", () => {
-  it("are the two reviewed demography sources in either language, each downloadable from the demography files", async () => {
+  it("are the four reviewed demography sources in either language, each downloadable from the demography files", async () => {
     for (const locale of ["en", "ka"] as const) {
       const sources = await loadPopulationSources(locale);
-      expect(sources, locale).toHaveLength(2);
+      expect(sources, locale).toHaveLength(4);
       expect(sources.map((source) => source.sourceId).sort(), locale).toEqual(REVIEWED_SOURCE_IDS);
       for (const source of sources) expect(source.downloadHref, locale).toMatch(/^\/downloads\/methodology\/demography\/files\/[^/]+$/);
     }

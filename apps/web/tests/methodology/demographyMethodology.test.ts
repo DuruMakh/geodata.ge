@@ -47,14 +47,16 @@ describe("demography methodology", () => {
     }
   });
 
-  it("archives exactly the two Geostat originals it serves, with their recorded hashes", async () => {
+  it("archives exactly the four Geostat originals it serves, with their recorded hashes", async () => {
     const rows = await loadReviewedSourceManifest(root, "demography");
     expect(rows.map((row) => [row.source_id, row.byte_size, row.sha256])).toEqual([
       ["source.geostat_demography_density", 13_917, "77d29d84cb7530f4fb6294f17a768e220f02636d77debfc438509b5c17ac28b8"],
       ["source.geostat_municipal_population", 34_994, "8bd7a1b56e756e8d6bc92192095795b204b23fd18274aaff39b78c0b0a487a57"],
+      ["source.geostat_demography_migration_citizenship", 25_694, "6b7fc1d8714e3acacaa5167b8e7c424a3ddb2a13f9c60a95cbd700cd83bb20a0"],
+      ["source.geostat_demography_net_migration", 11_440, "05aedd93e72ba63ab12b13feec8c46d6ce8870dadef3ece94fc7b87f65fa2196"],
     ]);
     expect(rows.every((row) => row.downloadHref.startsWith("/downloads/methodology/demography/files/"))).toBe(true);
-    expect(rows.map((row) => [row.years[0], row.years.at(-1)])).toEqual([[2014, 2026], [2004, 2026]]);
+    expect(rows.map((row) => [row.years[0], row.years.at(-1)])).toEqual([[2014, 2026], [2004, 2026], [2012, 2025], [2012, 2025]]);
   });
 
   it("keeps the UTF-8 BOM on its Georgian archive manifest, as AGENTS.md requires of Georgian methodology manifests", async () => {
@@ -68,6 +70,8 @@ describe("demography methodology", () => {
     expect(projectPublicSources(rows, "en", catalogue.documents).map((row) => row.title)).toEqual([
       "Density by regions (number of population per 1 sq.km)",
       "Population as of 1 January by regions and self-governed units",
+      "Number of immigrants and emigrants by sex and citizenship",
+      "Net migration (number and rate)",
     ]);
   });
 });

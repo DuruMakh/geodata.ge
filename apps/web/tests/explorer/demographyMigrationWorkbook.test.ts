@@ -3,6 +3,7 @@ import { loadServedDemographyData } from "../../lib/data/demography/importDemogr
 import { projectMigrationObservation } from "../../lib/explorer/clientData";
 import { DEFAULT_MIGRATION_STATE, MIGRATION_SERIES } from "../../lib/explorer/demographyMigration";
 import { buildMigrationWorkbookExportModel } from "../../lib/explorer/demographyMigrationWorkbook";
+import { loadPopulationSources } from "../../lib/pages/demography-population";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { Locale, Presentation } from "../../lib/i18n/types";
 import type { ClientMigrationFact } from "../../lib/servedRows";
@@ -51,5 +52,15 @@ describe("migration workbook", () => {
     expect(model.readable.rows).toHaveLength(5);
     expect(model.readable.rows.at(-1)!.label).toBe("წმინდა მიგრაცია (არჩეული ჯგუფები)");
     expect(model.analysis.rows.every((row) => row[3] === "ქალები")).toBe(true);
+  });
+});
+
+describe("migration workbook sources", () => {
+  it("cites both Geostat migration originals from the reviewed manifest, over the whole period", async () => {
+    const reviewed = await loadPopulationSources("en");
+    const model = buildMigrationWorkbookExportModel({ facts, state: DEFAULT_MIGRATION_STATE, sources: reviewed, siteOrigin: "https://fiscal.ge" }, presentations.en);
+    expect(model.sources).toHaveLength(2);
+    for (const source of model.sources) expect(source.years).toEqual([2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
+    expect(JSON.stringify(model.sources)).not.toMatch(GEORGIAN);
   });
 });
