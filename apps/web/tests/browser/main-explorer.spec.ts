@@ -1268,6 +1268,7 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
     "/explorer/demography/population/georgia",
     "/explorer/demography/population/region/adjara",
     "/explorer/demography/population/batumi",
+    "/explorer/demography/births-deaths",
   ]) {
     await page.goto(`${TEST_BASE_URL}${route}`);
     // The economy and demography hubs and the regions index are link maps with
