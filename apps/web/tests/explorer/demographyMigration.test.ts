@@ -8,10 +8,12 @@ import {
   MIGRATION_GROUPS,
   MIGRATION_SERIES,
   migrationCoverage,
+  migrationSearchLabels,
   parseMigrationHash,
   serializeMigrationHash,
   type MigrationState,
 } from "../../lib/explorer/demographyMigration";
+import { getMessages } from "../../lib/i18n/messages.server";
 import type { ClientMigrationFact } from "../../lib/servedRows";
 
 let facts: ClientMigrationFact[];
@@ -101,5 +103,11 @@ describe("migration hash", () => {
     expect(parseMigrationHash("#sel=citizenship.ukraine,citizenship.ukraine,citizenship.mars", facts).selectedIds).toEqual(["citizenship.ukraine"]);
     expect(parseMigrationHash("#sel=", facts).selectedIds).toEqual([]);
     expect(parseMigrationHash("#start=1990&end=2018", facts).range).toEqual({ kind: "manual", start: 2012, end: 2018 });
+  });
+
+  it("lists each group's Georgian and English names for search", async () => {
+    const labels = migrationSearchLabels(await getMessages("ka", ["demography"]), await getMessages("en", ["demography"]));
+    expect(labels["citizenship.russian_federation"]).toEqual(["რუსეთი", "Russia"]);
+    expect(labels["citizenship.all_other_computed"][1]).toBe("All other citizenships (computed)");
   });
 });

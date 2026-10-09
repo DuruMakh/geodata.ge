@@ -53,12 +53,15 @@ export function MigrationExplorer({
   sources,
   siteOrigin,
   sourceNote,
+  searchLabels,
 }: {
   facts: ClientMigrationFact[];
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
   /** Inline content only: it renders inside the source note's paragraph. */
   sourceNote: ReactNode;
+  /** Georgian and English names per group (`migrationSearchLabels`), so search matches either language. */
+  searchLabels: Record<MigrationGroup, string[]>;
 }) {
   const presentation = useI18n();
   const { messages } = presentation;
@@ -81,8 +84,8 @@ export function MigrationExplorer({
   const indicators = buildMigrationIndicators(facts, state);
   const groupLabel = (group: MigrationGroup) => t(`group.${group}`);
   const direction = (id: MigrationDirection) => t(DIRECTION_KEYS[id]);
-  // The stable id is a second label so Latin names (russia, turkey, ...) also find a group on the Georgian page.
-  const matches = (group: MigrationGroup) => matchesLabelQuery(query, [groupLabel(group), group]);
+  // Search covers both languages' names, whichever page is open.
+  const matches = (group: MigrationGroup) => matchesLabelQuery(query, [groupLabel(group), ...searchLabels[group]]);
   const netLabel = t(model.allSelected ? "netLabel" : "netSelectedLabel");
   const scaled = (values: Record<number, number | null>, sign: 1 | -1) =>
     model.years.map((year) => (values[year] === null || values[year] === undefined ? null : (sign * values[year]!) / CHART_SCALE));

@@ -1,4 +1,6 @@
 import { SERIES } from "../data/demography/series";
+import { message } from "../i18n/messages";
+import type { Messages } from "../i18n/types";
 import type { ClientMigrationFact } from "../servedRows";
 import { OTHER_COLOR } from "./colors";
 import { refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
@@ -174,4 +176,11 @@ export function buildMigrationIndicators(facts: readonly ClientMigrationFact[], 
       foreignShare: all.years.map(share),
     },
   };
+}
+
+/** Each group's Georgian and English names, so the search field finds a group by either language on either page. */
+export function migrationSearchLabels(ka: Messages, en: Messages): Record<MigrationGroup, string[]> {
+  return Object.fromEntries(
+    MIGRATION_GROUPS.map((group) => [group, [message(ka, `demography.group.${group}`), message(en, `demography.group.${group}`)]]),
+  ) as Record<MigrationGroup, string[]>;
 }

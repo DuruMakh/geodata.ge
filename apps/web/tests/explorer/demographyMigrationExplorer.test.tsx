@@ -6,7 +6,8 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathnam
 import { MigrationExplorer } from "../../components/demography/demography-migration";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import { projectMigrationObservation } from "../../lib/explorer/clientData";
-import { MIGRATION_GROUPS, MIGRATION_SERIES } from "../../lib/explorer/demographyMigration";
+import { MIGRATION_GROUPS, MIGRATION_SERIES, migrationSearchLabels } from "../../lib/explorer/demographyMigration";
+import { getMessages } from "../../lib/i18n/messages.server";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
@@ -16,10 +17,12 @@ import type { ClientMigrationFact } from "../../lib/servedRows";
 const GEORGIAN = /\p{Script=Georgian}/u;
 let facts: ClientMigrationFact[];
 const presentations = {} as Record<Locale, Presentation>;
+let searchLabels: ReturnType<typeof migrationSearchLabels>;
 
 beforeAll(async () => {
   const { facts: served } = await loadServedDemographyData();
   facts = served.filter((fact) => MIGRATION_SERIES.includes(fact.seriesId)).map(projectMigrationObservation);
+  searchLabels = migrationSearchLabels(await getMessages("ka", ["demography"]), await getMessages("en", ["demography"]));
   for (const locale of ["ka", "en"] as const) {
     presentations[locale] = await getPresentation(locale, ["demography", "common", "controls", "format", "main", "workbook"], []);
   }
@@ -28,7 +31,7 @@ beforeAll(async () => {
 const render = (locale: Locale) =>
   renderToStaticMarkup(
     <I18nProvider {...presentations[locale]}>
-      <MigrationExplorer facts={facts} sources={[]} siteOrigin="https://fiscal.ge" sourceNote="Source." />
+      <MigrationExplorer facts={facts} sources={[]} siteOrigin="https://fiscal.ge" sourceNote="Source." searchLabels={searchLabels} />
     </I18nProvider>,
   );
 
@@ -69,11 +72,14 @@ describe("MigrationExplorer", () => {
     expect(html).toContain("წმინდა მიგრაცია · 2025");
   });
 
-  // The component filters with [label, group id]. Server rendering starts with an empty query, so it cannot exercise
-  // the filter; this pins the reason the id is passed: a Georgian label alone never matches a Latin name.
-  it("finds a group by its Latin name on the Georgian page only through the stable id", () => {
-    expect(matchesLabelQuery("russia", ["რუსეთი"])).toBe(false);
-    expect(matchesLabelQuery("russia", ["რუსეთი", "citizenship.russian_federation"])).toBe(true);
-    expect(MIGRATION_GROUPS.filter((group) => matchesLabelQuery("other", ["", group]))).toEqual(["citizenship.all_other_computed"]);
+  // Server rendering starts with an empty query, so the filter itself is pinned through the labels it is given.
+  it("finds a group by its Georgian or English name and never by the shared id prefix", () => {
+    const labels = searchLabels["citizenship.russian_federation"];
+    expect(matchesLabelQuery("russia", labels)).toBe(true);
+    expect(matchesLabelQuery("რუსეთი", labels)).toBe(true);
+    // "citizenship" is only a word in the remainder's own name ("All other citizenships"), never in a country's.
+    for (const group of MIGRATION_GROUPS) {
+      expect(matchesLabelQuery("citizenship", searchLabels[group])).toBe(group === "citizenship.all_other_computed");
+    }
   });
 });
