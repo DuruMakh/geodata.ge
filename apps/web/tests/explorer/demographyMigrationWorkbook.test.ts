@@ -1,8 +1,10 @@
+import ExcelJS from "exceljs";
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import { projectMigrationObservation } from "../../lib/explorer/clientData";
 import { DEFAULT_MIGRATION_STATE, MIGRATION_SERIES } from "../../lib/explorer/demographyMigration";
 import { buildMigrationWorkbookExportModel } from "../../lib/explorer/demographyMigrationWorkbook";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { loadPopulationSources } from "../../lib/pages/demography-population";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { Locale, Presentation } from "../../lib/i18n/types";
@@ -62,5 +64,19 @@ describe("migration workbook sources", () => {
     expect(model.sources).toHaveLength(2);
     for (const source of model.sources) expect(source.years).toEqual([2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
     expect(JSON.stringify(model.sources)).not.toMatch(GEORGIAN);
+  });
+});
+
+describe("migration workbook subtitle", () => {
+  it("gives a short range's Summary subtitle room for the computed group's definition in both languages", async () => {
+    const state = { ...DEFAULT_MIGRATION_STATE, range: { kind: "manual" as const, start: 2022, end: 2023 } };
+    for (const locale of ["ka", "en"] as const) {
+      const model = buildMigrationWorkbookExportModel({ facts, state, sources, siteOrigin: "https://fiscal.ge" }, presentations[locale]);
+      expect(model.readable.fitSubtitle, locale).toBe(true);
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(await createWorkbookBuffer(model));
+      // Two years fill the minimum four columns (100 characters); the subtitle runs past that, so one line would cut it.
+      expect(workbook.worksheets[0]!.getRow(2).height, locale).toBeGreaterThanOrEqual(30);
+    }
   });
 });

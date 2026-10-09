@@ -62,6 +62,8 @@ export function buildMigrationWorkbookExportModel(
       years: model.years,
       // Net migration is signed; its sign is neither good nor bad, so it is not shown in red.
       numberFormat: "#,##0;−#,##0",
+      // The subtitle carries the computed group's definition, which a short range would otherwise cut off.
+      fitSubtitle: true,
       rows,
     },
     analysis: {

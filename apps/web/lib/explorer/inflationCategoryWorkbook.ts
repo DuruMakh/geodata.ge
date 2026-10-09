@@ -123,6 +123,7 @@ export function buildInflationCategoryWorkbookExportModel(input: {
       title: t(`categoryTab.${state.tab}`),
       // A derived measure says so on the sheet, not only on the page.
       subtitle: contribution ? `${subtitle} · ${t("categoryContributionNote")}` : subtitle,
+      ...(contribution ? { fitSubtitle: true } : {}),
       unitLabel: t(`categoryWorkbookUnit.${state.tab}`),
       numberFormat: contribution ? "+0.0;−0.0;0.0" : "0.0%",
       showChangeColumn: false,

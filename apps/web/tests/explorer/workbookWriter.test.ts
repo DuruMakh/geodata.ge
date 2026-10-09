@@ -278,6 +278,26 @@ describe("createWorkbookBuffer", () => {
     expect(longHeight).toBeGreaterThanOrEqual(30);
   });
 
+  it("leaves the subtitle row at Excel's default height unless the model asks to fit it", async () => {
+    const workbook = await loadWorkbook({
+      ...approvedModelFixture,
+      readable: { ...approvedModelFixture.readable, subtitle: "ა ".repeat(200) },
+    });
+    expect(workbook.getWorksheet("მარტივი ცხრილი")!.getRow(2).height).toBeUndefined();
+  });
+
+  it("gives a fitted subtitle one 15-point line per estimated line of text", async () => {
+    // The label column, three years and the change column: 46 + 4 × 18 = 118 characters across the merged cell.
+    const fitted = (subtitle: string) =>
+      loadWorkbook({ ...approvedModelFixture, readable: { ...approvedModelFixture.readable, subtitle, fitSubtitle: true } })
+        .then((workbook) => workbook.getWorksheet("მარტივი ცხრილი")!.getRow(2).height);
+    expect(await fitted("2022–2023 · All · Persons")).toBe(15);
+    expect(await fitted("x".repeat(150))).toBe(30);
+    // Georgian letters run wider than Excel's column unit, so 100 of them already need a second line.
+    expect(await fitted("x".repeat(100))).toBe(15);
+    expect(await fitted("ა".repeat(100))).toBe(30);
+  });
+
   it("compresses continuous and discontinuous source years into readable ranges", async () => {
     const workbook = await loadWorkbook({
       ...approvedModelFixture,
