@@ -9,6 +9,7 @@ const EXCLUSIVE_TEST = "tests/data/municipalGeometry/dataValidateGeometry.test.t
 // one another can push their checks past the timeout even with four workers, so they share one
 // worker isolated from the ordinary parallel group's CPU and memory load.
 const HEAVY_TESTS = [
+  "tests/data/tradePartners/prepareTradePartners.test.ts",
   "tests/data/inflation/prepareProducts.test.ts",
   "tests/data/adminSpending/olderMinistryYears.test.ts",
   "tests/data/governmentDebt/governmentDebtPackage.test.ts",

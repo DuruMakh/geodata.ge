@@ -1,0 +1,1304 @@
+[
+  {
+    "id": "partner.1995-2025.004",
+    "kind": "country",
+    "sourceCode": "004",
+    "labelKa": "ავღანეთი"
+  },
+  {
+    "id": "partner.1995-2025.008",
+    "kind": "country",
+    "sourceCode": "008",
+    "labelKa": "ალბანეთი"
+  },
+  {
+    "id": "partner.1995-2025.012",
+    "kind": "country",
+    "sourceCode": "012",
+    "labelKa": "ალჟირი"
+  },
+  {
+    "id": "partner.1995-2025.020",
+    "kind": "country",
+    "sourceCode": "020",
+    "labelKa": "ანდორა"
+  },
+  {
+    "id": "partner.1995-2025.024",
+    "kind": "country",
+    "sourceCode": "024",
+    "labelKa": "ანგოლა"
+  },
+  {
+    "id": "partner.1995-2025.028",
+    "kind": "country",
+    "sourceCode": "028",
+    "labelKa": "ანტიგუა და ბარბუდა"
+  },
+  {
+    "id": "partner.1995-2025.031",
+    "kind": "country",
+    "sourceCode": "031",
+    "labelKa": "აზერბაიჯანი"
+  },
+  {
+    "id": "partner.1995-2025.032",
+    "kind": "country",
+    "sourceCode": "032",
+    "labelKa": "არგენტინა"
+  },
+  {
+    "id": "partner.1995-2025.036",
+    "kind": "country",
+    "sourceCode": "036",
+    "labelKa": "ავსტრალია"
+  },
+  {
+    "id": "partner.1995-2025.040",
+    "kind": "country",
+    "sourceCode": "040",
+    "labelKa": "ავსტრია"
+  },
+  {
+    "id": "partner.1995-2025.044",
+    "kind": "country",
+    "sourceCode": "044",
+    "labelKa": "ბაჰამის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.048",
+    "kind": "country",
+    "sourceCode": "048",
+    "labelKa": "ბაჰრეინი"
+  },
+  {
+    "id": "partner.1995-2025.050",
+    "kind": "country",
+    "sourceCode": "050",
+    "labelKa": "ბანგლადეში"
+  },
+  {
+    "id": "partner.1995-2025.051",
+    "kind": "country",
+    "sourceCode": "051",
+    "labelKa": "სომხეთი"
+  },
+  {
+    "id": "partner.1995-2025.052",
+    "kind": "country",
+    "sourceCode": "052",
+    "labelKa": "ბარბადოსი"
+  },
+  {
+    "id": "partner.1995-2025.056",
+    "kind": "country",
+    "sourceCode": "056",
+    "labelKa": "ბელგია"
+  },
+  {
+    "id": "partner.1995-2025.060",
+    "kind": "country",
+    "sourceCode": "060",
+    "labelKa": "ბერმუდა"
+  },
+  {
+    "id": "partner.1995-2025.064",
+    "kind": "country",
+    "sourceCode": "064",
+    "labelKa": "ბუტანი"
+  },
+  {
+    "id": "partner.1995-2025.068",
+    "kind": "country",
+    "sourceCode": "068",
+    "labelKa": "ბოლივია"
+  },
+  {
+    "id": "partner.1995-2025.070",
+    "kind": "country",
+    "sourceCode": "070",
+    "labelKa": "ბოსნია და ჰერცეგოვინა"
+  },
+  {
+    "id": "partner.1995-2025.072",
+    "kind": "country",
+    "sourceCode": "072",
+    "labelKa": "ბოტსვანა"
+  },
+  {
+    "id": "partner.1995-2025.076",
+    "kind": "country",
+    "sourceCode": "076",
+    "labelKa": "ბრაზილია"
+  },
+  {
+    "id": "partner.1995-2025.084",
+    "kind": "country",
+    "sourceCode": "084",
+    "labelKa": "ბელიზი"
+  },
+  {
+    "id": "partner.1995-2025.086",
+    "kind": "country",
+    "sourceCode": "086",
+    "labelKa": "ბრიტანეთის ტერიტორია ინდოეთის ოკეანეში"
+  },
+  {
+    "id": "partner.1995-2025.092",
+    "kind": "country",
+    "sourceCode": "092",
+    "labelKa": "ბრიტანეთის ვირჯინის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.096",
+    "kind": "country",
+    "sourceCode": "096",
+    "labelKa": "ბრუნეი"
+  },
+  {
+    "id": "partner.1995-2025.100",
+    "kind": "country",
+    "sourceCode": "100",
+    "labelKa": "ბულგარეთი"
+  },
+  {
+    "id": "partner.1995-2025.104",
+    "kind": "country",
+    "sourceCode": "104",
+    "labelKa": "მიანმარი (ბირმა)"
+  },
+  {
+    "id": "partner.1995-2025.108",
+    "kind": "country",
+    "sourceCode": "108",
+    "labelKa": "ბურუნდი"
+  },
+  {
+    "id": "partner.1995-2025.112",
+    "kind": "country",
+    "sourceCode": "112",
+    "labelKa": "ბელარუსი"
+  },
+  {
+    "id": "partner.1995-2025.116",
+    "kind": "country",
+    "sourceCode": "116",
+    "labelKa": "კამბოჯა"
+  },
+  {
+    "id": "partner.1995-2025.120",
+    "kind": "country",
+    "sourceCode": "120",
+    "labelKa": "კამერუნი"
+  },
+  {
+    "id": "partner.1995-2025.124",
+    "kind": "country",
+    "sourceCode": "124",
+    "labelKa": "კანადა"
+  },
+  {
+    "id": "partner.1995-2025.132",
+    "kind": "country",
+    "sourceCode": "132",
+    "labelKa": "კაბო-ვერდე"
+  },
+  {
+    "id": "partner.1995-2025.136",
+    "kind": "country",
+    "sourceCode": "136",
+    "labelKa": "კაიმანის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.140",
+    "kind": "country",
+    "sourceCode": "140",
+    "labelKa": "ცენტრალური აფრიკის რესპუბლიკა"
+  },
+  {
+    "id": "partner.1995-2025.144",
+    "kind": "country",
+    "sourceCode": "144",
+    "labelKa": "შრი-ლანკა"
+  },
+  {
+    "id": "partner.1995-2025.148",
+    "kind": "country",
+    "sourceCode": "148",
+    "labelKa": "ჩადი"
+  },
+  {
+    "id": "partner.1995-2025.152",
+    "kind": "country",
+    "sourceCode": "152",
+    "labelKa": "ჩილე"
+  },
+  {
+    "id": "partner.1995-2025.156",
+    "kind": "country",
+    "sourceCode": "156",
+    "labelKa": "ჩინეთი"
+  },
+  {
+    "id": "partner.1995-2025.158",
+    "kind": "country",
+    "sourceCode": "158",
+    "labelKa": "ტაივანი"
+  },
+  {
+    "id": "partner.1995-2025.162",
+    "kind": "country",
+    "sourceCode": "162",
+    "labelKa": "შობის კუნძული"
+  },
+  {
+    "id": "partner.1995-2025.170",
+    "kind": "country",
+    "sourceCode": "170",
+    "labelKa": "კოლუმბია"
+  },
+  {
+    "id": "partner.1995-2025.178",
+    "kind": "country",
+    "sourceCode": "178",
+    "labelKa": "კონგო - ბრაზავილი"
+  },
+  {
+    "id": "partner.1995-2025.180",
+    "kind": "country",
+    "sourceCode": "180",
+    "labelKa": "კონგო - კინშასა"
+  },
+  {
+    "id": "partner.1995-2025.188",
+    "kind": "country",
+    "sourceCode": "188",
+    "labelKa": "კოსტა-რიკა"
+  },
+  {
+    "id": "partner.1995-2025.191",
+    "kind": "country",
+    "sourceCode": "191",
+    "labelKa": "ხორვატია"
+  },
+  {
+    "id": "partner.1995-2025.192",
+    "kind": "country",
+    "sourceCode": "192",
+    "labelKa": "კუბა"
+  },
+  {
+    "id": "partner.1995-2025.196",
+    "kind": "country",
+    "sourceCode": "196",
+    "labelKa": "კვიპროსი"
+  },
+  {
+    "id": "partner.1995-2025.203",
+    "kind": "country",
+    "sourceCode": "203",
+    "labelKa": "ჩეხეთი"
+  },
+  {
+    "id": "partner.1995-2025.204",
+    "kind": "country",
+    "sourceCode": "204",
+    "labelKa": "ბენინი"
+  },
+  {
+    "id": "partner.1995-2025.208",
+    "kind": "country",
+    "sourceCode": "208",
+    "labelKa": "დანია"
+  },
+  {
+    "id": "partner.1995-2025.212",
+    "kind": "country",
+    "sourceCode": "212",
+    "labelKa": "დომინიკა"
+  },
+  {
+    "id": "partner.1995-2025.214",
+    "kind": "country",
+    "sourceCode": "214",
+    "labelKa": "დომინიკელთა რესპუბლიკა"
+  },
+  {
+    "id": "partner.1995-2025.218",
+    "kind": "country",
+    "sourceCode": "218",
+    "labelKa": "ეკვადორი"
+  },
+  {
+    "id": "partner.1995-2025.222",
+    "kind": "country",
+    "sourceCode": "222",
+    "labelKa": "სალვადორი"
+  },
+  {
+    "id": "partner.1995-2025.226",
+    "kind": "country",
+    "sourceCode": "226",
+    "labelKa": "ეკვატორული გვინეა"
+  },
+  {
+    "id": "partner.1995-2025.231",
+    "kind": "country",
+    "sourceCode": "231",
+    "labelKa": "ეთიოპია"
+  },
+  {
+    "id": "partner.1995-2025.233",
+    "kind": "country",
+    "sourceCode": "233",
+    "labelKa": "ესტონეთი"
+  },
+  {
+    "id": "partner.1995-2025.234",
+    "kind": "country",
+    "sourceCode": "234",
+    "labelKa": "ფარერის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.238",
+    "kind": "country",
+    "sourceCode": "238",
+    "labelKa": "ფოლკლენდის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.242",
+    "kind": "country",
+    "sourceCode": "242",
+    "labelKa": "ფიჯი"
+  },
+  {
+    "id": "partner.1995-2025.246",
+    "kind": "country",
+    "sourceCode": "246",
+    "labelKa": "ფინეთი"
+  },
+  {
+    "id": "partner.1995-2025.250",
+    "kind": "country",
+    "sourceCode": "250",
+    "labelKa": "საფრანგეთი"
+  },
+  {
+    "id": "partner.1995-2025.254",
+    "kind": "country",
+    "sourceCode": "254",
+    "labelKa": "საფრანგეთის გვიანა"
+  },
+  {
+    "id": "partner.1995-2025.258",
+    "kind": "country",
+    "sourceCode": "258",
+    "labelKa": "საფრანგეთის პოლინეზია"
+  },
+  {
+    "id": "partner.1995-2025.260",
+    "kind": "country",
+    "sourceCode": "260",
+    "labelKa": "ფრანგული სამხრეთის ტერიტორიები"
+  },
+  {
+    "id": "partner.1995-2025.262",
+    "kind": "country",
+    "sourceCode": "262",
+    "labelKa": "ჯიბუტი"
+  },
+  {
+    "id": "partner.1995-2025.266",
+    "kind": "country",
+    "sourceCode": "266",
+    "labelKa": "გაბონი"
+  },
+  {
+    "id": "partner.1995-2025.270",
+    "kind": "country",
+    "sourceCode": "270",
+    "labelKa": "გამბია"
+  },
+  {
+    "id": "partner.1995-2025.275",
+    "kind": "country",
+    "sourceCode": "275",
+    "labelKa": "პალესტინის ტერიტორიები"
+  },
+  {
+    "id": "partner.1995-2025.276",
+    "kind": "country",
+    "sourceCode": "276",
+    "labelKa": "გერმანია"
+  },
+  {
+    "id": "partner.1995-2025.288",
+    "kind": "country",
+    "sourceCode": "288",
+    "labelKa": "განა"
+  },
+  {
+    "id": "partner.1995-2025.292",
+    "kind": "country",
+    "sourceCode": "292",
+    "labelKa": "გიბრალტარი"
+  },
+  {
+    "id": "partner.1995-2025.300",
+    "kind": "country",
+    "sourceCode": "300",
+    "labelKa": "საბერძნეთი"
+  },
+  {
+    "id": "partner.1995-2025.304",
+    "kind": "country",
+    "sourceCode": "304",
+    "labelKa": "გრენლანდია"
+  },
+  {
+    "id": "partner.1995-2025.308",
+    "kind": "country",
+    "sourceCode": "308",
+    "labelKa": "გრენადა"
+  },
+  {
+    "id": "partner.1995-2025.312",
+    "kind": "country",
+    "sourceCode": "312",
+    "labelKa": "გვადელუპა"
+  },
+  {
+    "id": "partner.1995-2025.320",
+    "kind": "country",
+    "sourceCode": "320",
+    "labelKa": "გვატემალა"
+  },
+  {
+    "id": "partner.1995-2025.324",
+    "kind": "country",
+    "sourceCode": "324",
+    "labelKa": "გვინეა"
+  },
+  {
+    "id": "partner.1995-2025.328",
+    "kind": "country",
+    "sourceCode": "328",
+    "labelKa": "გაიანა"
+  },
+  {
+    "id": "partner.1995-2025.332",
+    "kind": "country",
+    "sourceCode": "332",
+    "labelKa": "ჰაიტი"
+  },
+  {
+    "id": "partner.1995-2025.336",
+    "kind": "country",
+    "sourceCode": "336",
+    "labelKa": "ქალაქი ვატიკანი"
+  },
+  {
+    "id": "partner.1995-2025.340",
+    "kind": "country",
+    "sourceCode": "340",
+    "labelKa": "ჰონდურასი"
+  },
+  {
+    "id": "partner.1995-2025.344",
+    "kind": "country",
+    "sourceCode": "344",
+    "labelKa": "ჰონკონგის სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი"
+  },
+  {
+    "id": "partner.1995-2025.348",
+    "kind": "country",
+    "sourceCode": "348",
+    "labelKa": "უნგრეთი"
+  },
+  {
+    "id": "partner.1995-2025.352",
+    "kind": "country",
+    "sourceCode": "352",
+    "labelKa": "ისლანდია"
+  },
+  {
+    "id": "partner.1995-2025.356",
+    "kind": "country",
+    "sourceCode": "356",
+    "labelKa": "ინდოეთი"
+  },
+  {
+    "id": "partner.1995-2025.360",
+    "kind": "country",
+    "sourceCode": "360",
+    "labelKa": "ინდონეზია"
+  },
+  {
+    "id": "partner.1995-2025.364",
+    "kind": "country",
+    "sourceCode": "364",
+    "labelKa": "ირანი"
+  },
+  {
+    "id": "partner.1995-2025.368",
+    "kind": "country",
+    "sourceCode": "368",
+    "labelKa": "ერაყი"
+  },
+  {
+    "id": "partner.1995-2025.372",
+    "kind": "country",
+    "sourceCode": "372",
+    "labelKa": "ირლანდია"
+  },
+  {
+    "id": "partner.1995-2025.376",
+    "kind": "country",
+    "sourceCode": "376",
+    "labelKa": "ისრაელი"
+  },
+  {
+    "id": "partner.1995-2025.380",
+    "kind": "country",
+    "sourceCode": "380",
+    "labelKa": "იტალია"
+  },
+  {
+    "id": "partner.1995-2025.384",
+    "kind": "country",
+    "sourceCode": "384",
+    "labelKa": "კოტ-დივუარი"
+  },
+  {
+    "id": "partner.1995-2025.388",
+    "kind": "country",
+    "sourceCode": "388",
+    "labelKa": "იამაიკა"
+  },
+  {
+    "id": "partner.1995-2025.392",
+    "kind": "country",
+    "sourceCode": "392",
+    "labelKa": "იაპონია"
+  },
+  {
+    "id": "partner.1995-2025.398",
+    "kind": "country",
+    "sourceCode": "398",
+    "labelKa": "ყაზახეთი"
+  },
+  {
+    "id": "partner.1995-2025.400",
+    "kind": "country",
+    "sourceCode": "400",
+    "labelKa": "იორდანია"
+  },
+  {
+    "id": "partner.1995-2025.404",
+    "kind": "country",
+    "sourceCode": "404",
+    "labelKa": "კენია"
+  },
+  {
+    "id": "partner.1995-2025.408",
+    "kind": "country",
+    "sourceCode": "408",
+    "labelKa": "ჩრდილოეთ კორეა"
+  },
+  {
+    "id": "partner.1995-2025.410",
+    "kind": "country",
+    "sourceCode": "410",
+    "labelKa": "სამხრეთ კორეა"
+  },
+  {
+    "id": "partner.1995-2025.414",
+    "kind": "country",
+    "sourceCode": "414",
+    "labelKa": "ქუვეითი"
+  },
+  {
+    "id": "partner.1995-2025.417",
+    "kind": "country",
+    "sourceCode": "417",
+    "labelKa": "ყირგიზეთი"
+  },
+  {
+    "id": "partner.1995-2025.418",
+    "kind": "country",
+    "sourceCode": "418",
+    "labelKa": "ლაოსი"
+  },
+  {
+    "id": "partner.1995-2025.422",
+    "kind": "country",
+    "sourceCode": "422",
+    "labelKa": "ლიბანი"
+  },
+  {
+    "id": "partner.1995-2025.426",
+    "kind": "country",
+    "sourceCode": "426",
+    "labelKa": "ლესოთო"
+  },
+  {
+    "id": "partner.1995-2025.428",
+    "kind": "country",
+    "sourceCode": "428",
+    "labelKa": "ლატვია"
+  },
+  {
+    "id": "partner.1995-2025.430",
+    "kind": "country",
+    "sourceCode": "430",
+    "labelKa": "ლიბერია"
+  },
+  {
+    "id": "partner.1995-2025.434",
+    "kind": "country",
+    "sourceCode": "434",
+    "labelKa": "ლიბია"
+  },
+  {
+    "id": "partner.1995-2025.438",
+    "kind": "country",
+    "sourceCode": "438",
+    "labelKa": "ლიხტენშტაინი"
+  },
+  {
+    "id": "partner.1995-2025.440",
+    "kind": "country",
+    "sourceCode": "440",
+    "labelKa": "ლიეტუვა"
+  },
+  {
+    "id": "partner.1995-2025.442",
+    "kind": "country",
+    "sourceCode": "442",
+    "labelKa": "ლუქსემბურგი"
+  },
+  {
+    "id": "partner.1995-2025.446",
+    "kind": "country",
+    "sourceCode": "446",
+    "labelKa": "მაკაოს სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი"
+  },
+  {
+    "id": "partner.1995-2025.450",
+    "kind": "country",
+    "sourceCode": "450",
+    "labelKa": "მადაგასკარი"
+  },
+  {
+    "id": "partner.1995-2025.454",
+    "kind": "country",
+    "sourceCode": "454",
+    "labelKa": "მალავი"
+  },
+  {
+    "id": "partner.1995-2025.458",
+    "kind": "country",
+    "sourceCode": "458",
+    "labelKa": "მალაიზია"
+  },
+  {
+    "id": "partner.1995-2025.462",
+    "kind": "country",
+    "sourceCode": "462",
+    "labelKa": "მალდივები"
+  },
+  {
+    "id": "partner.1995-2025.466",
+    "kind": "country",
+    "sourceCode": "466",
+    "labelKa": "მალი"
+  },
+  {
+    "id": "partner.1995-2025.470",
+    "kind": "country",
+    "sourceCode": "470",
+    "labelKa": "მალტა"
+  },
+  {
+    "id": "partner.1995-2025.474",
+    "kind": "country",
+    "sourceCode": "474",
+    "labelKa": "მარტინიკა"
+  },
+  {
+    "id": "partner.1995-2025.478",
+    "kind": "country",
+    "sourceCode": "478",
+    "labelKa": "მავრიტანია"
+  },
+  {
+    "id": "partner.1995-2025.480",
+    "kind": "country",
+    "sourceCode": "480",
+    "labelKa": "მავრიკი"
+  },
+  {
+    "id": "partner.1995-2025.484",
+    "kind": "country",
+    "sourceCode": "484",
+    "labelKa": "მექსიკა"
+  },
+  {
+    "id": "partner.1995-2025.492",
+    "kind": "country",
+    "sourceCode": "492",
+    "labelKa": "მონაკო"
+  },
+  {
+    "id": "partner.1995-2025.496",
+    "kind": "country",
+    "sourceCode": "496",
+    "labelKa": "მონღოლეთი"
+  },
+  {
+    "id": "partner.1995-2025.498",
+    "kind": "country",
+    "sourceCode": "498",
+    "labelKa": "მოლდოვა"
+  },
+  {
+    "id": "partner.1995-2025.499",
+    "kind": "country",
+    "sourceCode": "499",
+    "labelKa": "მონტენეგრო"
+  },
+  {
+    "id": "partner.1995-2025.504",
+    "kind": "country",
+    "sourceCode": "504",
+    "labelKa": "მაროკო"
+  },
+  {
+    "id": "partner.1995-2025.508",
+    "kind": "country",
+    "sourceCode": "508",
+    "labelKa": "მოზამბიკი"
+  },
+  {
+    "id": "partner.1995-2025.512",
+    "kind": "country",
+    "sourceCode": "512",
+    "labelKa": "ომანი"
+  },
+  {
+    "id": "partner.1995-2025.516",
+    "kind": "country",
+    "sourceCode": "516",
+    "labelKa": "ნამიბია"
+  },
+  {
+    "id": "partner.1995-2025.520",
+    "kind": "country",
+    "sourceCode": "520",
+    "labelKa": "ნაურუ"
+  },
+  {
+    "id": "partner.1995-2025.524",
+    "kind": "country",
+    "sourceCode": "524",
+    "labelKa": "ნეპალი"
+  },
+  {
+    "id": "partner.1995-2025.528",
+    "kind": "country",
+    "sourceCode": "528",
+    "labelKa": "ნიდერლანდები"
+  },
+  {
+    "id": "partner.1995-2025.530",
+    "kind": "country",
+    "sourceCode": "530",
+    "labelKa": "ნიდერლანდების ანტილის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.534",
+    "kind": "country",
+    "sourceCode": "534",
+    "labelKa": "სინტ-მარტენი (ნიდერლანდების ნაწილი)"
+  },
+  {
+    "id": "partner.1995-2025.554",
+    "kind": "country",
+    "sourceCode": "554",
+    "labelKa": "ახალი ზელანდია"
+  },
+  {
+    "id": "partner.1995-2025.558",
+    "kind": "country",
+    "sourceCode": "558",
+    "labelKa": "ნიკარაგუა"
+  },
+  {
+    "id": "partner.1995-2025.562",
+    "kind": "country",
+    "sourceCode": "562",
+    "labelKa": "ნიგერი"
+  },
+  {
+    "id": "partner.1995-2025.566",
+    "kind": "country",
+    "sourceCode": "566",
+    "labelKa": "ნიგერია"
+  },
+  {
+    "id": "partner.1995-2025.570",
+    "kind": "country",
+    "sourceCode": "570",
+    "labelKa": "ნიუე"
+  },
+  {
+    "id": "partner.1995-2025.578",
+    "kind": "country",
+    "sourceCode": "578",
+    "labelKa": "ნორვეგია"
+  },
+  {
+    "id": "partner.1995-2025.580",
+    "kind": "country",
+    "sourceCode": "580",
+    "labelKa": "ჩრდილოეთ მარიანას კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.584",
+    "kind": "country",
+    "sourceCode": "584",
+    "labelKa": "მარშალის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.586",
+    "kind": "country",
+    "sourceCode": "586",
+    "labelKa": "პაკისტანი"
+  },
+  {
+    "id": "partner.1995-2025.591",
+    "kind": "country",
+    "sourceCode": "591",
+    "labelKa": "პანამა"
+  },
+  {
+    "id": "partner.1995-2025.600",
+    "kind": "country",
+    "sourceCode": "600",
+    "labelKa": "პარაგვაი"
+  },
+  {
+    "id": "partner.1995-2025.604",
+    "kind": "country",
+    "sourceCode": "604",
+    "labelKa": "პერუ"
+  },
+  {
+    "id": "partner.1995-2025.608",
+    "kind": "country",
+    "sourceCode": "608",
+    "labelKa": "ფილიპინები"
+  },
+  {
+    "id": "partner.1995-2025.612",
+    "kind": "country",
+    "sourceCode": "612",
+    "labelKa": "პიტკერნის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.616",
+    "kind": "country",
+    "sourceCode": "616",
+    "labelKa": "პოლონეთი"
+  },
+  {
+    "id": "partner.1995-2025.620",
+    "kind": "country",
+    "sourceCode": "620",
+    "labelKa": "პორტუგალია"
+  },
+  {
+    "id": "partner.1995-2025.624",
+    "kind": "country",
+    "sourceCode": "624",
+    "labelKa": "გვინეა-ბისაუ"
+  },
+  {
+    "id": "partner.1995-2025.626",
+    "kind": "country",
+    "sourceCode": "626",
+    "labelKa": "ტიმორ-ლესტე"
+  },
+  {
+    "id": "partner.1995-2025.630",
+    "kind": "country",
+    "sourceCode": "630",
+    "labelKa": "პუერტო-რიკო"
+  },
+  {
+    "id": "partner.1995-2025.634",
+    "kind": "country",
+    "sourceCode": "634",
+    "labelKa": "კატარი"
+  },
+  {
+    "id": "partner.1995-2025.638",
+    "kind": "country",
+    "sourceCode": "638",
+    "labelKa": "რეუნიონი"
+  },
+  {
+    "id": "partner.1995-2025.642",
+    "kind": "country",
+    "sourceCode": "642",
+    "labelKa": "რუმინეთი"
+  },
+  {
+    "id": "partner.1995-2025.643",
+    "kind": "country",
+    "sourceCode": "643",
+    "labelKa": "რუსეთი"
+  },
+  {
+    "id": "partner.1995-2025.646",
+    "kind": "country",
+    "sourceCode": "646",
+    "labelKa": "რუანდა"
+  },
+  {
+    "id": "partner.1995-2025.654",
+    "kind": "country",
+    "sourceCode": "654",
+    "labelKa": "წმინდა ელენეს კუნძული"
+  },
+  {
+    "id": "partner.1995-2025.660",
+    "kind": "country",
+    "sourceCode": "660",
+    "labelKa": "ანგილია"
+  },
+  {
+    "id": "partner.1995-2025.670",
+    "kind": "country",
+    "sourceCode": "670",
+    "labelKa": "სენტ-ვინსენტი და გრენადინები"
+  },
+  {
+    "id": "partner.1995-2025.674",
+    "kind": "country",
+    "sourceCode": "674",
+    "labelKa": "სან-მარინო"
+  },
+  {
+    "id": "partner.1995-2025.682",
+    "kind": "country",
+    "sourceCode": "682",
+    "labelKa": "საუდის არაბეთი"
+  },
+  {
+    "id": "partner.1995-2025.686",
+    "kind": "country",
+    "sourceCode": "686",
+    "labelKa": "სენეგალი"
+  },
+  {
+    "id": "partner.1995-2025.688",
+    "kind": "country",
+    "sourceCode": "688",
+    "labelKa": "სერბეთი"
+  },
+  {
+    "id": "partner.1995-2025.690",
+    "kind": "country",
+    "sourceCode": "690",
+    "labelKa": "სეიშელის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.694",
+    "kind": "country",
+    "sourceCode": "694",
+    "labelKa": "სიერა-ლეონე"
+  },
+  {
+    "id": "partner.1995-2025.702",
+    "kind": "country",
+    "sourceCode": "702",
+    "labelKa": "სინგაპური"
+  },
+  {
+    "id": "partner.1995-2025.703",
+    "kind": "country",
+    "sourceCode": "703",
+    "labelKa": "სლოვაკეთი"
+  },
+  {
+    "id": "partner.1995-2025.704",
+    "kind": "country",
+    "sourceCode": "704",
+    "labelKa": "ვიეტნამი"
+  },
+  {
+    "id": "partner.1995-2025.705",
+    "kind": "country",
+    "sourceCode": "705",
+    "labelKa": "სლოვენია"
+  },
+  {
+    "id": "partner.1995-2025.706",
+    "kind": "country",
+    "sourceCode": "706",
+    "labelKa": "სომალი"
+  },
+  {
+    "id": "partner.1995-2025.710",
+    "kind": "country",
+    "sourceCode": "710",
+    "labelKa": "სამხრეთ აფრიკის რესპუბლიკა"
+  },
+  {
+    "id": "partner.1995-2025.716",
+    "kind": "country",
+    "sourceCode": "716",
+    "labelKa": "ზიმბაბვე"
+  },
+  {
+    "id": "partner.1995-2025.724",
+    "kind": "country",
+    "sourceCode": "724",
+    "labelKa": "ესპანეთი"
+  },
+  {
+    "id": "partner.1995-2025.729",
+    "kind": "country",
+    "sourceCode": "729",
+    "labelKa": "სუდანი"
+  },
+  {
+    "id": "partner.1995-2025.732",
+    "kind": "country",
+    "sourceCode": "732",
+    "labelKa": "დასავლეთ საჰარა"
+  },
+  {
+    "id": "partner.1995-2025.740",
+    "kind": "country",
+    "sourceCode": "740",
+    "labelKa": "სურინამი"
+  },
+  {
+    "id": "partner.1995-2025.748",
+    "kind": "country",
+    "sourceCode": "748",
+    "labelKa": "სვაზილენდი (ესვატინი)"
+  },
+  {
+    "id": "partner.1995-2025.752",
+    "kind": "country",
+    "sourceCode": "752",
+    "labelKa": "შვედეთი"
+  },
+  {
+    "id": "partner.1995-2025.756",
+    "kind": "country",
+    "sourceCode": "756",
+    "labelKa": "შვეიცარია"
+  },
+  {
+    "id": "partner.1995-2025.760",
+    "kind": "country",
+    "sourceCode": "760",
+    "labelKa": "სირია"
+  },
+  {
+    "id": "partner.1995-2025.762",
+    "kind": "country",
+    "sourceCode": "762",
+    "labelKa": "ტაჯიკეთი"
+  },
+  {
+    "id": "partner.1995-2025.764",
+    "kind": "country",
+    "sourceCode": "764",
+    "labelKa": "ტაილანდი"
+  },
+  {
+    "id": "partner.1995-2025.768",
+    "kind": "country",
+    "sourceCode": "768",
+    "labelKa": "ტოგო"
+  },
+  {
+    "id": "partner.1995-2025.776",
+    "kind": "country",
+    "sourceCode": "776",
+    "labelKa": "ტონგა"
+  },
+  {
+    "id": "partner.1995-2025.780",
+    "kind": "country",
+    "sourceCode": "780",
+    "labelKa": "ტრინიდადი და ტობაგო"
+  },
+  {
+    "id": "partner.1995-2025.784",
+    "kind": "country",
+    "sourceCode": "784",
+    "labelKa": "არაბთა გაერთიანებული საამიროები"
+  },
+  {
+    "id": "partner.1995-2025.788",
+    "kind": "country",
+    "sourceCode": "788",
+    "labelKa": "ტუნისი"
+  },
+  {
+    "id": "partner.1995-2025.792",
+    "kind": "country",
+    "sourceCode": "792",
+    "labelKa": "თურქეთი"
+  },
+  {
+    "id": "partner.1995-2025.795",
+    "kind": "country",
+    "sourceCode": "795",
+    "labelKa": "თურქმენეთი"
+  },
+  {
+    "id": "partner.1995-2025.796",
+    "kind": "country",
+    "sourceCode": "796",
+    "labelKa": "თერქს-ქაიქოსის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.798",
+    "kind": "country",
+    "sourceCode": "798",
+    "labelKa": "ტუვალუ"
+  },
+  {
+    "id": "partner.1995-2025.800",
+    "kind": "country",
+    "sourceCode": "800",
+    "labelKa": "უგანდა"
+  },
+  {
+    "id": "partner.1995-2025.804",
+    "kind": "country",
+    "sourceCode": "804",
+    "labelKa": "უკრაინა"
+  },
+  {
+    "id": "partner.1995-2025.807",
+    "kind": "country",
+    "sourceCode": "807",
+    "labelKa": "ჩრდილოეთ მაკედონია"
+  },
+  {
+    "id": "partner.1995-2025.818",
+    "kind": "country",
+    "sourceCode": "818",
+    "labelKa": "ეგვიპტე"
+  },
+  {
+    "id": "partner.1995-2025.826",
+    "kind": "country",
+    "sourceCode": "826",
+    "labelKa": "გაერთიანებული სამეფო"
+  },
+  {
+    "id": "partner.1995-2025.831",
+    "kind": "country",
+    "sourceCode": "831",
+    "labelKa": "გერნსი"
+  },
+  {
+    "id": "partner.1995-2025.834",
+    "kind": "country",
+    "sourceCode": "834",
+    "labelKa": "ტანზანია"
+  },
+  {
+    "id": "partner.1995-2025.840",
+    "kind": "country",
+    "sourceCode": "840",
+    "labelKa": "ამერიკის შეერთებული შტატები"
+  },
+  {
+    "id": "partner.1995-2025.850",
+    "kind": "country",
+    "sourceCode": "850",
+    "labelKa": "აშშ-ის ვირჯინის კუნძულები"
+  },
+  {
+    "id": "partner.1995-2025.854",
+    "kind": "country",
+    "sourceCode": "854",
+    "labelKa": "ბურკინა-ფასო"
+  },
+  {
+    "id": "partner.1995-2025.858",
+    "kind": "country",
+    "sourceCode": "858",
+    "labelKa": "ურუგვაი"
+  },
+  {
+    "id": "partner.1995-2025.860",
+    "kind": "country",
+    "sourceCode": "860",
+    "labelKa": "უზბეკეთი"
+  },
+  {
+    "id": "partner.1995-2025.862",
+    "kind": "country",
+    "sourceCode": "862",
+    "labelKa": "ვენესუელა"
+  },
+  {
+    "id": "partner.1995-2025.887",
+    "kind": "country",
+    "sourceCode": "887",
+    "labelKa": "იემენი"
+  },
+  {
+    "id": "partner.1995-2025.891",
+    "kind": "country",
+    "sourceCode": "891",
+    "labelKa": "სერბეთი და მონტენეგრო"
+  },
+  {
+    "id": "partner.1995-2025.894",
+    "kind": "country",
+    "sourceCode": "894",
+    "labelKa": "ზამბია"
+  },
+  {
+    "id": "group.bsec",
+    "kind": "group",
+    "sourceCode": null,
+    "labelKa": "შავი ზღვის ეკონომიკური თანამშრომლობა (BSEC)"
+  },
+  {
+    "id": "group.cis",
+    "kind": "group",
+    "sourceCode": null,
+    "labelKa": "დამოუკიდებელ სახელმწიფოთა თანამეგობრობა (CIS)"
+  },
+  {
+    "id": "group.eu",
+    "kind": "group",
+    "sourceCode": null,
+    "labelKa": "ევროკავშირი (EU)"
+  },
+  {
+    "id": "group.guam",
+    "kind": "group",
+    "sourceCode": null,
+    "labelKa": "სუამი (GUAM)"
+  },
+  {
+    "id": "group.oecd",
+    "kind": "group",
+    "sourceCode": null,
+    "labelKa": "ეკონომიკური თანამშრომლობისა და განვითარების ორგანიზაცია (OECD)"
+  }
+]

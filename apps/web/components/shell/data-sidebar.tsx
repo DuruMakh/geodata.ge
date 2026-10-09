@@ -37,6 +37,7 @@ export function DataSidebar() {
   const unemploymentActive = pathname.includes("/explorer/unemployment");
   const tradeActive = pathname.includes("/explorer/trade");
   const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
+  const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
   const demographyActive = pathname.includes("/explorer/demography");
   const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !tradeActive && !demographyActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
@@ -329,6 +330,15 @@ export function DataSidebar() {
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeOverview")}
+            </Link> : null}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/partners", locale)} data-testid="trade-partners-link" aria-current={tradePartnersActive ? "page" : undefined}
+              onNavigate={(event) => {
+                if (tradePartnersActive) event.preventDefault();
+                setSheetOpen(false);
+              }}
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradePartnersActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradePartnersActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+              {message(messages, "common.tradePartners")}
             </Link> : null}
             <Link
               href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}

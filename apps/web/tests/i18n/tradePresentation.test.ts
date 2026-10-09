@@ -12,12 +12,13 @@ test("Trade has complete matching messages and explicit USD and publication word
   expect(en["trade.publicationUnspecified"]).toBe("Unspecified");
   expect(ka["trade.indicator.trade.turnover"]).toBe("საგარეო სავაჭრო ბრუნვა");
 });
-test("Trade registers both pages and only three translated original documents", async () => {
+test("Trade registers Overview, Partners and seven translated original documents", async () => {
   const root = path.resolve(process.cwd(), "../..");
   const [manifest, catalogue, paths] = await Promise.all([loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root), listPublicPagePaths()]);
-  expect(manifest).toHaveLength(3);
-  expect(manifest.map(row => path.basename(row.repository_source_path)).sort()).toEqual(["FTrade_1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html"]);
+  expect(manifest).toHaveLength(7);
+  expect(manifest.map(row => path.basename(row.repository_source_path)).sort()).toEqual(["Export-Country_1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "FTrade_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html"].sort());
   for (const source of manifest) expect(catalogue.documents[source.source_id].title.text).toBeTruthy();
   expect(paths).toContain("/explorer/trade"); expect(paths).toContain("/explorer/trade/overview"); expect(paths).toContain("/methodology/trade");
+  expect(paths).toContain("/explorer/trade/partners");
   expect(getMethodologyContent("trade", "en").title).toBe("External trade in goods");
 });

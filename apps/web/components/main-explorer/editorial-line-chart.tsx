@@ -48,6 +48,7 @@ type EditorialLineChartProps = {
   unit: ValueUnit;
   shareLabel: string;
   preliminaryLabel?: string;
+  showAxisUnit?: boolean;
   formatTooltipValue?: (value: number) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
@@ -126,6 +127,7 @@ export function EditorialLineChart({
   share,
   unit,
   shareLabel,
+  showAxisUnit = true,
   periodsPerYear = 1,
   formatPeriod,
   preliminaryLabel,
@@ -164,7 +166,7 @@ export function EditorialLineChart({
   const formatAxis = (value: number, withUnit: boolean) =>
     (share
       ? `${value.toFixed(shareDigits)}%`
-      : withUnit
+      : withUnit && showAxisUnit
         ? `${formatInUnit(value, axisUnit)} ${unit.label}`
         : formatInUnit(value, axisUnit)
     ).replace("-", "−");
