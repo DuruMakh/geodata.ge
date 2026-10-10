@@ -17,18 +17,21 @@ let facts: ClientWagesFact[];
 beforeAll(async () => { facts = (await loadWagesFacts()).map(toClientWagesFact); });
 
 test("each page starts with only its reference selected and coverage taken from the facts", () => {
-  expect(defaultWagesState("overview", facts)).toEqual({ mode: "line", range: { kind: "all" }, view: "overview", selectedIds: ["average"] });
+  expect(defaultWagesState("overview", facts)).toEqual({ mode: "line", range: { kind: "all" }, view: "main", selectedIds: ["average"] });
   const adjara = facts.filter(f => f.dimension !== "region" || f.groupId === "region.adjara");
   expect(defaultWagesState("regions", adjara).selectedIds).toEqual(["region.adjara"]);
   expect(wagesViewSeries("regions", "main", adjara).map(s => [s.id, s.reference])).toEqual([["region.adjara", true], ["average", false]]);
   expect(wagesCoverage("regions", "main", adjara)).toMatchObject({ min: 2010, max: 2025 });
   expect(defaultWagesState("industries", facts)).toMatchObject({ view: "georgia", selectedIds: ["total"] });
-  expect(wagesCoverage("overview", "overview", facts)).toMatchObject({ min: 1995, max: 2025 });
-  expect(wagesCoverage("overview", "sex", facts).min).toBe(1999);
-  expect(wagesCoverage("overview", "ownership", facts).min).toBe(2000);
+  expect(wagesCoverage("overview", "main", facts)).toMatchObject({ min: 1995, max: 2025 });
   expect(wagesCoverage("industries", "georgia", facts)).toMatchObject({ min: 2014, max: 2025 });
   expect(wagesCoverage("industries", "median", facts)).toMatchObject({ min: 2018, max: 2025 });
-  expect(wagesViewSeries("overview", "sex", facts).map(s => s.id)).toEqual(["average", "women", "men"]);
+  // Women, men, public and non-public sit under the average; the median is its own row.
+  expect(wagesViewSeries("overview", "main", facts).map(s => [s.id, s.parentId])).toEqual([["average", undefined], ["women", "average"], ["men", "average"], ["public", "average"], ["non_public", "average"], ["median", undefined]]);
+  const model = buildWagesModel("overview", facts, { ...defaultWagesState("overview", facts), selectedIds: ["average", "women"] });
+  expect(model.years[0]).toBe(1995);
+  expect(model.selected.find(s => s.id === "women")!.valuesByYear[1998]).toBeNull();
+  expect(model.selected.find(s => s.id === "women")!.valuesByYear[1999]).not.toBeNull();
 });
 
 test("industries list only the sections a group publishes, and public mining shows as unavailable", () => {
@@ -51,8 +54,9 @@ test("URL state round-trips views, years and an explicitly empty selection", () 
   const hash = serializeWagesHash(empty, "regions");
   expect(hash).not.toContain("tab=");
   expect(parseWagesHash(hash, "regions", facts).selectedIds).toEqual([]);
-  expect(parseWagesHash("tab=business_sector", "overview", facts).view).toBe("overview");
-  expect(parseWagesHash("tab=unknown&sel=average,median", "overview", facts)).toMatchObject({ view: "overview", selectedIds: ["average", "median"] });
+  // Links from when the overview had tabs still open the one list with their ticks kept.
+  expect(parseWagesHash("tab=sex&sel=average,women,men", "overview", facts)).toMatchObject({ view: "main", selectedIds: ["average", "women", "men"] });
+  expect(serializeWagesHash(defaultWagesState("overview", facts), "overview")).not.toContain("tab=");
   const switched = changeWagesView({ ...defaultWagesState("industries", facts), range: { kind: "manual", start: 2014, end: 2016 } }, "industries", "median", facts);
   expect(switched).toMatchObject({ view: "median", selectedIds: ["total"], range: { kind: "all" } });
 });

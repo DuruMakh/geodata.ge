@@ -19,7 +19,7 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
   const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
   const numberFormat = model.decimals ? "#,##0.0" : "#,##0";
   const status = (fact: ClientWagesFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
-  const view = state.view === "main" ? "" : ` · ${t(section === "overview" ? `tab.${state.view}` : `group.${state.view}`)}`;
+  const view = state.view === "main" ? "" : ` · ${t(`group.${state.view}`)}`;
   return {
     locale, filename: workbookFilename(`wages-${section}${state.view === "main" ? "" : `-${state.view}`}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {

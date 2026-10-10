@@ -14,7 +14,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     for (const section of ["overview", "industries", "regions"]) {
       await page.goto(`${prefix}/explorer/wages/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-      await expect(page.getByTestId("wages-nominal-note")).toBeVisible();
+      await expect(page.getByTestId("wages-nominal-note")).toHaveCount(section === "overview" ? 0 : 1);
       if (section !== "regions") await expect(page.getByTestId("series-status")).toContainText("1 /");
       await page.screenshot({ path: info.outputPath(`wages-${section}-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -33,18 +33,16 @@ test("overview defaults to the Georgia average with the 2025 figures from Geosta
   await page.locator(pressed("median")).click();
   await page.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).toContainText("1,531");
-  await page.getByTestId("wages-tab-ownership").click();
-  await expect(page.locator(pressed("public"))).toHaveAttribute("aria-pressed", "false");
-  await expect(page.locator(pressed("average"))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
-  await expect(page.getByTestId("wages-tab-business_sector")).toHaveCount(0);
-  await page.getByTestId("wages-tab-sex").click();
-  await expect(page.locator(pressed("women"))).toHaveAttribute("aria-pressed", "false");
-  await expect(page.locator(pressed("men"))).toBeVisible();
-  await expect(page.getByTestId("year-range-strip")).toContainText("1999–2025");
-  await page.goBack();
-  await page.goBack();
-  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-view", "overview");
+  // Women, men, public and non-public open under the average; there are no tabs.
+  await expect(page.locator('[data-testid^="wages-tab-"]')).toHaveCount(0);
+  await expect(page.locator(pressed("women"))).toHaveCount(0);
+  await page.locator('[data-series-id="average"] [aria-expanded]').click();
+  for (const id of ["women", "men", "public", "non_public"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "false");
+  await page.locator(pressed("women")).click();
+  await expect(page.getByTestId("year-range-strip")).toContainText("1995–2025");
+  await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(3);
+  await page.goto("/en/explorer/wages/overview#tab=ownership&sel=average,public");
+  await expect(page.locator(pressed("public"))).toHaveAttribute("aria-pressed", "true");
 });
 
 test("industries group, heatmap, table and workbook agree", async ({ page }) => {

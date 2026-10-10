@@ -10,15 +10,13 @@ export const WAGES_SECTIONS = [
 ] as const;
 export type WagesSectionId = typeof WAGES_SECTIONS[number]["id"];
 export const wagesRegionHref = (regionId: string): `/${string}` => `/explorer/wages/regions/${regionId.replace(/^region\./, "")}`;
-export const WAGES_OVERVIEW_TABS = ["overview", "ownership", "sex"] as const;
-export type WagesOverviewTab = typeof WAGES_OVERVIEW_TABS[number];
 /** Whose wages the Industries page shows; "median" is Georgia's median, the rest are averages. */
 export const WAGES_INDUSTRY_GROUPS = ["georgia", "women", "men", "public", "non_public", "business", "non_business", "median"] as const;
 export type WagesIndustryGroup = typeof WAGES_INDUSTRY_GROUPS[number];
-/** The selectable views of one page: Overview's tabs or Industries' groups; the other pages have one. */
-export type WagesView = WagesOverviewTab | WagesIndustryGroup | "main";
+/** The selectable views of one page: Industries' groups; the other pages have one. */
+export type WagesView = WagesIndustryGroup | "main";
 
-export type WagesSeriesDefinition = { id: string; indicatorId: WagesIndicator; dimension: WagesDimension; groupId: string; sectorId: string; reference: boolean };
+export type WagesSeriesDefinition = { id: string; indicatorId: WagesIndicator; dimension: WagesDimension; groupId: string; sectorId: string; reference: boolean; parentId?: string };
 const AVERAGE: WagesIndicator = "average_monthly_nominal_earnings";
 const MEDIAN: WagesIndicator = "median_monthly_earnings";
 const georgiaAverage: WagesSeriesDefinition = { id: "average", indicatorId: AVERAGE, dimension: "national", groupId: "georgia", sectorId: "total", reference: true };
@@ -26,7 +24,7 @@ const groupTotal = (dimension: WagesDimension, groupId: string): WagesSeriesDefi
 const DIMENSION_OF_GROUP: Record<Exclude<WagesIndustryGroup, "median">, WagesDimension> = { georgia: "national", women: "sex", men: "sex", public: "ownership", non_public: "ownership", business: "business_sector", non_business: "business_sector" };
 
 export function wagesViews(section: WagesSectionId): readonly WagesView[] {
-  return section === "overview" ? WAGES_OVERVIEW_TABS : section === "industries" ? WAGES_INDUSTRY_GROUPS : ["main"];
+  return section === "industries" ? WAGES_INDUSTRY_GROUPS : ["main"];
 }
 
 /**
@@ -36,9 +34,12 @@ export function wagesViews(section: WagesSectionId): readonly WagesView[] {
  * is offered and shows dashes.
  */
 export function wagesViewSeries(section: WagesSectionId, view: WagesView, facts: readonly ClientWagesFact[]): WagesSeriesDefinition[] {
-  if (section === "overview" && view === "overview") return [georgiaAverage, { id: "median", indicatorId: MEDIAN, dimension: "national", groupId: "georgia", sectorId: "total", reference: false }];
-  if (section === "overview" && view === "ownership") return [georgiaAverage, groupTotal("ownership", "public"), groupTotal("ownership", "non_public")];
-  if (section === "overview") return [georgiaAverage, groupTotal("sex", "women"), groupTotal("sex", "men")];
+  // Overview: women, men, public and non-public are subcategories of the average; the median stands alone.
+  if (section === "overview") return [
+    georgiaAverage,
+    ...([["sex", "women"], ["sex", "men"], ["ownership", "public"], ["ownership", "non_public"]] as const).map(([dimension, groupId]) => ({ ...groupTotal(dimension, groupId), parentId: georgiaAverage.id })),
+    { id: "median", indicatorId: MEDIAN, dimension: "national", groupId: "georgia", sectorId: "total", reference: false },
+  ];
   // A region page receives only its own region's facts: the region leads, with the Georgia average beside it.
   if (section === "regions") {
     const region = WAGES_REGIONS.find(id => facts.some(f => f.dimension === "region" && f.groupId === id))!;
@@ -68,12 +69,12 @@ function seriesYears(series: readonly WagesSeriesDefinition[], facts: readonly C
 /**
  * A view's years: every year its compared groups have a published value. The Georgia
  * average or a group's all-activities total does not stretch a comparison back to years
- * before its groups were published; only the Overview tab, where the average is itself
+ * before its groups were published; only the Overview, where the average is itself
  * the main measure, takes its years, and a region page takes its region's years.
  */
 export function wagesCoverage(section: WagesSectionId, view: WagesView, facts: readonly ClientWagesFact[]) {
   const series = wagesViewSeries(section, view, facts);
-  const compared = section === "overview" && view === "overview" ? series : section === "regions" ? series.filter(s => s.dimension === "region") : series.filter(s => !s.reference);
+  const compared = section === "overview" ? series : section === "regions" ? series.filter(s => s.dimension === "region") : series.filter(s => !s.reference);
   const years = seriesYears(compared, facts);
   if (!years.length) throw new Error(`No wages years for ${section}:${view}`);
   return { min: years[0], max: years.at(-1)!, years };
@@ -106,7 +107,7 @@ export function serializeWagesHash(state: WagesState, section: WagesSectionId): 
   return p.toString();
 }
 
-/** Switching tab or group keeps mode and years, and selects the new view's reference. */
+/** Switching group keeps mode and years, and selects the new view's reference. */
 export function changeWagesView(state: WagesState, section: WagesSectionId, view: WagesView, facts: readonly ClientWagesFact[]): WagesState {
   return { ...state, view, selectedIds: [wagesViewSeries(section, view, facts)[0].id], range: refitRange(state.range, wagesCoverage(section, view, facts), { collapseToAll: true }) };
 }
