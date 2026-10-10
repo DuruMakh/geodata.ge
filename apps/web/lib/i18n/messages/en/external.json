@@ -21,7 +21,7 @@
   "external.account.title": "Current account",
   "external.account.summary": "Georgia's balance of payments with the rest of the world.",
   "external.money.summary": "Annual money transfers into and out of Georgia by country, with NBG's estimate of personal transfers, in nominal US dollars.",
-  "external.money.intro": "See how much money reaches Georgia through transfer services each year, where it comes from and how much leaves. Compare it with NBG's official estimate of personal transfers; the two measure different things and are never subtracted.",
+  "external.money.intro": "Annual money transfers to and from Georgia by country, in nominal US dollars.",
   "external.money.measure": "Direction",
   "external.money.browse": "Browse series",
   "external.money.series": "Series",
