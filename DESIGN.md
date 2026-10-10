@@ -28,7 +28,7 @@ Superseded and must not appear in production:
 
 Fiscal.ge is a Georgian-first explorer of reviewed annual budget, economy and demography data plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), the annual unemployment explorer, the Trade hub (national goods overview), the Demography hub (Population), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
+Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), the annual unemployment explorer, the Wages hub (§31), the Trade hub (national goods overview), the Demography hub (Population), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
 Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
@@ -324,7 +324,7 @@ No screen card, no outer container. Content sits directly on paper.
 
 ### 6.2 Information Architecture
 
-The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy, Inflation, Unemployment, Trade and Demography hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
+The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy, Inflation, Unemployment, Wages, Trade and Demography hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
 
 ```text
 /explorer                              budget hub — the six sections as cards
@@ -354,6 +354,11 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/unemployment/regions/[id]                     Region indicators and trends (§27)
 /explorer/unemployment/age                              Age-group comparisons (§27)
 /explorer/unemployment/gender                           Women/men comparisons (§27)
+/explorer/wages                       ხელფასები         Wages hub (§31)
+/explorer/wages/overview                                Average wage with women/men and public/non-public subcategories, and the median (§31)
+/explorer/wages/industries                              Wages by economic activity for a chosen group (§31)
+/explorer/wages/regions                                 Region map and ranked list (§31)
+/explorer/wages/regions/[id]                            11 region wage pages (§31)
 /explorer/trade                       საგარეო ვაჭრობა   Trade hub (§28)
 /explorer/trade/overview                                National goods overview (§28)
 /explorer/trade/partners                                Trading partners (§28.1)
@@ -447,8 +452,8 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- Seven dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `უმუშევრობა` → `/explorer/unemployment`, `საგარეო ვაჭრობა` → `/explorer/trade`, `საგარეო ნაკადები` → `/explorer/external`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
-- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Inflation's overview / categories / cities, Unemployment's national overview / regions / age groups / gender, Trade's Overview, External flows' Money from abroad / Foreign investment, or Demography's published pages (Population, which stays current on its place pages too), all in the section-row style below.
+- Eight dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `უმუშევრობა` → `/explorer/unemployment`, `ხელფასები` → `/explorer/wages`, `საგარეო ვაჭრობა` → `/explorer/trade`, `საგარეო ნაკადები` → `/explorer/external`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
+- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Inflation's overview / categories / cities, Unemployment's national overview / regions / age groups / gender, Wages' overview / industries / regions, Trade's Overview, External flows' Money from abroad / Foreign investment, or Demography's published pages (Population, which stays current on its place pages too), all in the section-row style below.
 - Teaser datasets (none today) — an `ink-fg-muted` label with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`), rendered at reduced emphasis (opacity 0.6) so it never reads as a live row. Markers only: not links, not focusable, no route, no data. With none, the sidebar renders no teaser list at all.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a). `ChevronsLeft`/`ChevronsRight` are desktop-only; below 900px the toggle is the Lucide `Menu` / `X` pair (accessible name `მენიუ` / `Menu`, 44×44, no border).
@@ -458,7 +463,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 **Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
 
 - The toggle stays in place at the top, icon flipped to `ChevronsRight`.
-- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Inflation / Unemployment / Trade / Demography equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
+- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Inflation / Unemployment / Wages / Trade / Demography equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
 - Beneath it, the compact language switch; at the foot, a Lucide `House` icon is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip. The collapsed rail remains logo-free.
 - **Sections are not reachable while collapsed** — the list is unmounted, not hidden. A 52px rail cannot carry Georgian section names, and reducing them to invented initials would trade one extra click for three ambiguous glyphs. Collapse is a reading posture: it hands the width back to the data and keeps only orientation and escape.
 
@@ -872,6 +877,7 @@ Do:
 - Keep the Excel button visible and bound to the active range and selection.
 - Show source/update context on every analytical view.
 - Derive every year range from loaded data.
+- Under a page's H1 show only one small one-line text (the latest-value line, or the hub's lead line). No summary paragraph, nominal/inflation note or other explanatory text goes between the heading and the workspace; disclosures belong in the source note, below-chart notes, methodology and Excel (owner rule, 2026-10-10, first applied to Wages; existing pages are unchanged until the owner asks).
 
 Do not:
 
@@ -965,7 +971,7 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. Approved preview: `design-shotgun/methodology-portal-2026-08-11/variant-d.html` (Editorial Fieldbook).
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, Government Debt, GDP, national economic sectors, regional economies, inflation, unemployment, trade, and demography. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, Government Debt, GDP, national economic sectors, regional economies, inflation, unemployment, wages, trade, and demography. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards; below 768px each row's arrow shares the title line. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Below 1100px, where the contents list is not sticky, a small `სარჩევი ↑` / `Contents ↑` link — a bordered paper button with no shadow — stays at the bottom of the screen while the article scrolls and jumps back to the list. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only; none is listed today.
 
@@ -1215,3 +1221,15 @@ Coverage marks reuse existing chart and table support rather than new components
 ### 30.1 Foreign investment
 
 Approved on 2026-10-10 (`docs/superpowers/specs/2026-10-10-foreign-investment-design.md`). The page reuses the Money from abroad layout: one short line under the heading, then three centred text tabs `ქვეყნებით` / By country (initial), `დარგებით` / By sector and `რეგიონებით` / By region, then the trends workspace, then the end-year ranking. There is no summary-figures block and no note under the chart; the only line under it is the source note citing Geostat. Each tab's series list starts with the FDI total (selected initially, removable); By country follows it with the range end year's top 10 countries and `სხვა ქვეყნები` / Other countries (the total less those ten), By sector and By region with every sector or region. Switching tabs resets the selection to the total and fits the range strip to that tab's years. The ranking is the shared external ranking: million USD and share of the total; a negative value keeps its minus sign and share and draws an empty bar. Missing years (the six regions before 2016) are gaps, dashes and blank Excel cells. The page footer and methodology cite Geostat.
+
+## 31. Wages surfaces
+
+The Wages hub at `/explorer/wages` reuses the budget hub cards: Wages overview, Industries and Regions, in that order, with coverage from served facts. Only the overview card carries a sparkline (the Georgia average) and a latest figure; the others show their own coverage. The sidebar lists the same three pages under `ხელფასები`, after Unemployment.
+
+All three pages reuse the Unemployment workspace: the latest-value line for the Georgia average, the editorial line chart, table, RangeStrip, right-hand series panel and three-sheet Excel action. Every series is GEL per month, so there is no unit switch and any selection shares one axis; averages show one decimal and the median whole lari, as Geostat prints them. Under the H1 is only the latest-value line (§17): no summary or nominal note; the gross, not-inflation-adjusted basis is stated in the methodology and the Excel subtitle. Missing years are gaps and dashes, never zero.
+
+- **Wages overview** has no tabs (owner amendment, 2026-10-10). Its series list puts Women, Men, Public and Non-public under the Georgia average as caret-expanded subcategories, reusing the Unemployment overview's nested rows, and the Median as its own row; the selection count covers the two top-level rows and nested ticks are counted separately. The Georgia average is the default, removable reference and the chart keeps its 1995 start, so later groups begin as gaps; the source note names the median's tax-record source. No pay gap is drawn.
+- **Industries** has the compact native dropdown from the unemployment age page for the group (All employees, Women, Men, Public, Non-public, Business, Non-business, Median). The list is the group's all-activities total, selected by default, and each section that group publishes. The Business and Non-business groups carry a one-line definition of the non-business group. Below the workspace, the unemployment age heatmap shows every listed section by year for the group and active years, independently of the chart selection; long section names wrap in its row header.
+- **Regions** reuses the eleven-region map and ranked list, coloured by the latest average wage, with the occupied-territory overlays, and nothing below them; a map or list region opens its own page (owner amendment, 2026-10-10). A region page follows the Unemployment region page: `ხელფასები — {region}` heading with the region picker and previous/next links, the region's average wage selected by default and the Georgia average as a removable second line, the region's own years, Excel and the head-office caveat.
+
+URL state (Industries group, chart/table, years and selection, including an empty one) survives reloads and language switches. The authoritative scope is `Project_Definition.md` §2G; bounded decisions are in `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`.

@@ -11,6 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { UNEMPLOYMENT_SECTIONS } from "../../lib/explorer/unemploymentSections";
+import { WAGES_SECTIONS } from "../../lib/explorer/wages";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
@@ -35,6 +36,7 @@ export function DataSidebar() {
   const economyActive = pathname.includes("/explorer/economy");
   const inflationActive = pathname.includes("/explorer/inflation");
   const unemploymentActive = pathname.includes("/explorer/unemployment");
+  const wagesActive = pathname.includes("/explorer/wages");
   const tradeActive = pathname.includes("/explorer/trade");
   const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
   const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
@@ -43,7 +45,7 @@ export function DataSidebar() {
   const foreignInvestmentActive = pathname.endsWith("/explorer/external/foreign-investment");
   const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
   const demographyActive = pathname.includes("/explorer/demography");
-  const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !tradeActive && !externalActive && !demographyActive;
+  const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !wagesActive && !tradeActive && !externalActive && !demographyActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
   const regionsActive = pathname.includes("/explorer/economy/regions");
@@ -195,7 +197,7 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : wagesActive ? "common.dataWages" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
@@ -317,6 +319,22 @@ export function DataSidebar() {
             {unemploymentActive ? UNEMPLOYMENT_SECTIONS.map(section => {
               const active = pathname.endsWith(section.href) || section.id === "regions" && pathname.includes(`${section.href}/`);
               return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`unemployment-${section.id}-link`} aria-current={active ? "page" : undefined}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, section.labelKey)}
+              </Link>;
+            }) : null}
+            <Link href={pageHref("/explorer/wages", locale)} data-testid="wages-link" aria-current={pathname.endsWith("/explorer/wages") ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${wagesActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.wages")}
+            </Link>
+            {wagesActive ? WAGES_SECTIONS.map(section => {
+              const active = pathname.endsWith(section.href);
+              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`wages-${section.id}-link`} aria-current={active ? "page" : undefined}
+                onNavigate={(event) => {
+                  if (active) event.preventDefault();
+                  setSheetOpen(false);
+                }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
                 {message(messages, section.labelKey)}

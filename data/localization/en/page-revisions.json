@@ -225,5 +225,21 @@
   "/explorer/external": "2026-10-10",
   "/explorer/external/money-from-abroad": "2026-10-10",
   "/explorer/external/foreign-investment": "2026-10-10",
-  "/methodology/external-flows": "2026-10-10"
+  "/methodology/external-flows": "2026-10-10",
+  "/explorer/wages": "2026-10-10",
+  "/explorer/wages/overview": "2026-10-10",
+  "/explorer/wages/industries": "2026-10-10",
+  "/explorer/wages/regions": "2026-10-10",
+  "/explorer/wages/regions/tbilisi": "2026-10-10",
+  "/explorer/wages/regions/adjara": "2026-10-10",
+  "/explorer/wages/regions/guria": "2026-10-10",
+  "/explorer/wages/regions/imereti": "2026-10-10",
+  "/explorer/wages/regions/kakheti": "2026-10-10",
+  "/explorer/wages/regions/mtskheta_mtianeti": "2026-10-10",
+  "/explorer/wages/regions/racha_lechkhumi_kvemo_svaneti": "2026-10-10",
+  "/explorer/wages/regions/samegrelo_zemo_svaneti": "2026-10-10",
+  "/explorer/wages/regions/samtskhe_javakheti": "2026-10-10",
+  "/explorer/wages/regions/kvemo_kartli": "2026-10-10",
+  "/explorer/wages/regions/shida_kartli": "2026-10-10",
+  "/methodology/wages": "2026-10-10"
 }

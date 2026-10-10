@@ -68,5 +68,10 @@
   "common.dataDemography": "მონაცემები · დემოგრაფია",
   "common.demographyPopulation": "მოსახლეობა",
   "common.demographyMigration": "მიგრაცია",
-  "common.demographyBirthsDeaths": "შობადობა და სიკვდილიანობა"
+  "common.demographyBirthsDeaths": "შობადობა და სიკვდილიანობა",
+  "common.wages": "ხელფასები",
+  "common.wagesOverview": "ხელფასების მიმოხილვა",
+  "common.wagesIndustries": "საქმიანობები",
+  "common.wagesRegions": "რეგიონები",
+  "common.dataWages": "მონაცემები · ხელფასები"
 }

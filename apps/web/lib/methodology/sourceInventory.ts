@@ -53,6 +53,7 @@ const inventoryRules = {
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
   unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
+  wages: [{ root: "docs/Raw Data/Wages/geostat-earnings-annual/official", include: () => true }],
   trade: [{ root: "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official", include: (candidatePath: string) => ["FTrade_1995-2026.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-1995-1999.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-products--1995-1999_eng.xlsx", "Export-Country_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html"].includes(path.posix.basename(candidatePath)) }],
   "external-flows": [
     { root: "docs/Raw Data/External/2026-10-10/official/nbg", include: (candidatePath: string) => ["REMC_money-transfers-by-countries-eng.xlsx", "BOP-6_bopbpm6eng.xlsx", "external-sector-methodology-eng-bpm6updated.pdf"].includes(path.posix.basename(candidatePath)) },

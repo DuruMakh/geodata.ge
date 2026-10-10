@@ -2,6 +2,7 @@ import type { Locale, Messages, MessageScope } from "./types";
 
 const dictionaries = {
   ka: {
+    wages: () => import("./messages/ka/wages.json"),
     trade: () => import("./messages/ka/trade.json"),
     unemployment: () => import("./messages/ka/unemployment.json"),
     sectors: () => import("./messages/ka/sectors.json"),
@@ -27,6 +28,7 @@ const dictionaries = {
     external: () => import("./messages/ka/external.json"),
   },
   en: {
+    wages: () => import("./messages/en/wages.json"),
     trade: () => import("./messages/en/trade.json"),
     unemployment: () => import("./messages/en/unemployment.json"),
     sectors: () => import("./messages/en/sectors.json"),

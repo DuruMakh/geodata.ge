@@ -68,5 +68,10 @@
   "common.dataDemography": "Data · Demography",
   "common.demographyPopulation": "Population",
   "common.demographyMigration": "Migration",
-  "common.demographyBirthsDeaths": "Births and deaths"
+  "common.demographyBirthsDeaths": "Births and deaths",
+  "common.wages": "Wages",
+  "common.wagesOverview": "Wages overview",
+  "common.wagesIndustries": "Industries",
+  "common.wagesRegions": "Regions",
+  "common.dataWages": "Data · Wages"
 }

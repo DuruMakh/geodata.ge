@@ -85,3 +85,7 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "external.scope","external-flows","docs/data-methodology/external-flows-annual.md","Money from abroad serving subset","external.scope","geodata_decision","2026-10-10"
 "external.transfers_not_remittances","external-flows","docs/data-methodology/external-flows-annual.md","Money from abroad serving subset","external.transfers_not_remittances","geodata_decision","2026-10-10"
 "external.coverage","external-flows","docs/data-methodology/external-flows-annual.md","Money from abroad serving subset","external.coverage","geodata_decision","2026-10-10"
+"wages.scope","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.scope","geodata_decision","2026-10-10"
+"wages.measures","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.measures","geodata_decision","2026-10-10"
+"wages.nominal","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.nominal","geodata_decision","2026-10-10"
+"wages.groups","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.groups","geodata_decision","2026-10-10"

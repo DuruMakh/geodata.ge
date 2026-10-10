@@ -170,3 +170,10 @@ source.geostat_fdi_by_quarters,პირდაპირი უცხოური
 source.geostat_fdi_by_countries,პირდაპირი უცხოური ინვესტიციები ქვეყნების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-countries.xlsx,2026-10-10
 source.geostat_fdi_by_sectors,პირდაპირი უცხოური ინვესტიციები ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-sectors-NACE-2.xlsx,2026-10-10
 source.geostat_fdi_by_regions,პირდაპირი უცხოური ინვესტიციები რეგიონების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng_regions.xlsx,2026-10-10
+source.geostat_earnings_annual_headline,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი,docs/Raw Data/Wages/geostat-earnings-annual/official/01-earnings-annual.xlsx,2026-10-10
+source.geostat_earnings_annual_activity,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/02-earnings-by-activity-annual.xlsx,2026-10-10
+source.geostat_earnings_annual_sex,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი ეკონომიკური საქმიანობის სახეებისა და სქესის მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/03-earnings-by-sex-annual.xlsx,2026-10-10
+source.geostat_earnings_annual_business_sector,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი ბიზნეს და არაბიზნეს სექტორში ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/06-earnings-by-business-sector-annual.xlsx,2026-10-10
+source.geostat_earnings_annual_ownership,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი საჯარო და არასაჯარო სექტორში ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/10-earnings-by-ownership-annual.xlsx,2026-10-10
+source.geostat_earnings_annual_region,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი რეგიონების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/13-earnings-by-region-annual.xlsx,2026-10-10
+source.geostat_earnings_annual_median,დაქირავებულთა მედიანური ხელფასი ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/median-monthly-earnings.xlsx,2026-10-10
