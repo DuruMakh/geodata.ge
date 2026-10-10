@@ -8,10 +8,10 @@ import { I18nProvider } from "../../lib/i18n/provider";
 import { loadPopulationBasics } from "../../lib/pages/demography-population";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
-let render: (placeId: string, locale?: "ka" | "en") => Promise<string>;
+let render: (placeId: string, locale?: "ka" | "en", firstYear?: number) => Promise<string>;
 beforeAll(async () => {
   const { facts } = await loadServedDemographyData();
-  render = async (placeId, locale = "en") => {
+  render = async (placeId, locale = "en", firstYear = 2004) => {
     const [{ places }, presentation] = await Promise.all([
       loadPopulationBasics(locale),
       getPresentation(locale, ["demography", "common", "controls", "format", "main", "workbook", "municipal"], []),
@@ -19,7 +19,7 @@ beforeAll(async () => {
     const place = places.find((candidate) => candidate.id === placeId)!;
     return renderToStaticMarkup(
       <I18nProvider {...presentation}>
-        <AgeSexSection place={place} facts={censusAgeFactsForPlace(facts, placeId)} sources={[]} siteOrigin="https://fiscal.ge" workbookScope="x" nationalHref="/explorer/demography/age-sex" />
+        <AgeSexSection place={place} firstYear={firstYear} facts={censusAgeFactsForPlace(facts, placeId)} sources={[]} siteOrigin="https://fiscal.ge" workbookScope="x" nationalHref="/explorer/demography/age-sex" />
       </I18nProvider>,
     );
   };
@@ -39,6 +39,10 @@ describe("age and sex census section", () => {
     expect(html).toContain('href="/en/explorer/demography/age-sex"');
     expect(html).toContain("Georgia’s pyramid for every year since 2004");
     expect(html).not.toMatch(GEORGIAN);
+  });
+
+  it("names the first year it is given, not a fixed coverage year", async () => {
+    expect(await render("country.georgia", "en", 2010)).toContain("every year since 2010");
   });
 
   it("a region: Imereti's counts and shares, and the link that compares the regions", async () => {

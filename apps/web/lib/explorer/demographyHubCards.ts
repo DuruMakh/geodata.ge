@@ -36,6 +36,7 @@ export function buildDemographyHubCards(
     if (fact.ageGroup === "band_65_plus") year.old += fact.value;
     bandsByYear.set(fact.year, year);
   }
+  const shareByYear = new Map([...bandsByYear].map(([year, bands]) => [year, (bands.old / bands.all) * 100]));
   const oldShares = [...bandsByYear].sort(([left], [right]) => left - right).map(([year, bands]) => ({ year, share: (bands.old / bands.all) * 100 }));
   const signed = (value: number) => `${value > 0 ? "+" : ""}${formatInUnit(value, UNIT_PERSONS)}`;
   return DEMOGRAPHY_PAGES.map((page, index) => {
@@ -59,7 +60,8 @@ export function buildDemographyHubCards(
       const [firstShare, lastShare] = [oldShares[0]!, oldShares.at(-1)!];
       return {
         ...card,
-        series: oldShares.map((entry) => entry.share),
+        // A gap, not a join, across the 2025 census re-base (DESIGN.md section 29).
+        series: sparkValues(oldShares.map((entry) => entry.year), (year) => shareByYear.get(year) ?? null),
         seriesColor: INK,
         footer: t("ageSexCardFooter", { year: lastShare.year, share: formatShare(lastShare.share / 100), first: firstShare.year, last: lastShare.year }),
       };

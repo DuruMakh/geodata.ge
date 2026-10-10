@@ -16,6 +16,8 @@ import { SwatchBar } from "../ui/editorial";
 const MALE = SERIES_COLORS["sex.male"]!;
 const FEMALE = SERIES_COLORS["sex.female"]!;
 const MONO = { fontFamily: "var(--font-numeric)" };
+/** Room kept between the header row and the first bar. */
+const HEADER_GAP = 6;
 /** Room kept between two tick labels on one side. */
 const TICK_GAP = 8;
 
@@ -155,8 +157,8 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
       />
     );
 
-  const sideHeader = (label: string, color: string, count: number) => (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[var(--ink)]">
+  const sideHeader = (side: "male" | "female", label: string, color: string, count: number) => (
+    <span data-testid={`pyramid-header-${side}`} className={`${side === "female" ? "ml-auto " : ""}inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] font-medium text-[var(--ink)]`}>
       <SwatchBar color={color} />
       {label}
       <span className="font-[family-name:var(--font-numeric)]">{measure === "share" ? formatShare(count / pyramid.total) : persons(count)}</span>
@@ -186,11 +188,12 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
         </div>
       ) : null}
       <div ref={frame} className="relative">
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between" style={{ height: PYRAMID.header, paddingInline: PYRAMID.pad }}>
-          {sideHeader(t("sexMale"), MALE, pyramid.male)}
-          {sideHeader(t("sexFemale"), FEMALE, pyramid.female)}
+        {/* In flow, so two long Georgian labels wrap onto two lines at 320px instead of overlapping; the drawing below is cropped to its plot. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1" style={{ paddingInline: PYRAMID.pad }}>
+          {sideHeader("male", t("sexMale"), MALE, pyramid.male)}
+          {sideHeader("female", t("sexFemale"), FEMALE, pyramid.female)}
         </div>
-        <svg viewBox={`0 0 ${width} ${height}`} role="group" aria-label={ariaLabel} className="block h-auto w-full">
+        <svg viewBox={`0 ${PYRAMID.header - HEADER_GAP} ${width} ${height - PYRAMID.header + HEADER_GAP}`} role="group" aria-label={ariaLabel} className="block h-auto w-full">
           <rect x={0} y={layout.oldBandY} width={width} height={layout.oldBandHeight} fill="var(--tint)" aria-hidden />
           <text x={PYRAMID.pad} y={layout.oldBandY + 15} fontSize={11} fill="var(--muted)" style={MONO} aria-hidden>
             {t("oldBand", { share: formatShare(bandShares(pyramid).old / 100) })}
@@ -245,8 +248,8 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
           })}
           {layout.outline === null ? null : (
             <g aria-hidden fill="none" stroke={INK} strokeWidth={1.5}>
-              <path data-testid="pyramid-outline" d={layout.outline.left} />
-              <path data-testid="pyramid-outline" d={layout.outline.right} />
+              <path data-testid="pyramid-outline-left" d={layout.outline.left} />
+              <path data-testid="pyramid-outline-right" d={layout.outline.right} />
             </g>
           )}
         </svg>

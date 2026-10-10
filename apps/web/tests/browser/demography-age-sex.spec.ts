@@ -49,7 +49,7 @@ test.describe("the Age and sex page", () => {
     await expectAppReady(page);
     await page.getByTestId("age-sex-compare-toggle").click();
     await expect(page.getByTestId("pyramid-legend")).toContainText("2004");
-    await expect(page.getByTestId("pyramid-outline").first()).toBeAttached();
+    await expect(page.getByTestId("pyramid-outline-left")).toBeAttached();
     await expect(page.getByTestId("age-sex-compare-note")).toHaveCount(0);
     await expect(page.getByTestId("age-sex-measure-persons")).not.toHaveAttribute("aria-disabled", "true");
 
@@ -101,6 +101,31 @@ test.describe("the Age and sex page", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("ასაკი და სქესი");
     await expect(page.getByTestId("age-sex-heatmap")).toBeVisible();
   });
+});
+
+test.describe("the pyramid header on a phone", () => {
+  for (const width of [320, 390]) {
+    test(`the Georgian pyramid keeps its sex labels apart at ${width}px, in persons with a comparison`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`${TEST_BASE_URL}/explorer/demography/age-sex#year=2004&cmp=2010&measure=persons`);
+      await expectAppReady(page);
+      const figure = page.getByTestId("age-sex-pyramid-figure");
+      await expect(figure).toBeVisible();
+      const male = await figure.getByTestId("pyramid-header-male").boundingBox();
+      const female = await figure.getByTestId("pyramid-header-female").boundingBox();
+      expect(male).not.toBeNull();
+      expect(female).not.toBeNull();
+      const apart = male!.x + male!.width <= female!.x || female!.x + female!.width <= male!.x || male!.y + male!.height <= female!.y || female!.y + female!.height <= male!.y;
+      expect(apart).toBe(true);
+      // Neither label may run past the drawing's frame, which a phone's clipping would hide.
+      const frame = (await figure.boundingBox())!;
+      for (const box of [male!, female!]) {
+        expect(box.x).toBeGreaterThanOrEqual(frame.x - 0.5);
+        expect(box.x + box.width).toBeLessThanOrEqual(frame.x + frame.width + 0.5);
+      }
+      expect(await hasNoSidewaysScroll(page)).toBe(true);
+    });
+  }
 });
 
 test.describe("the Age and sex block on a place page", () => {

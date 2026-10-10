@@ -60,7 +60,9 @@ describe("demography hub cards", () => {
     const { facts } = await loadServedDemographyData();
     const presentation = await getPresentation("en", ["demography"], []);
     const card = buildDemographyHubCards(facts, presentation)[1]!;
-    expect(card.series).toHaveLength(23);
+    // 23 years plus the gap that keeps the line from joining 2024 to 2025 across the census re-base.
+    expect(card.series).toHaveLength(24);
+    expect(card.series!.filter((value) => value === null)).toHaveLength(1);
     expect(card.series![0]).toBeCloseTo(14.07, 2);
     expect(card.series!.at(-1)).toBeCloseTo(18.08, 2);
     expect(card.seriesColor).toBe(INK);

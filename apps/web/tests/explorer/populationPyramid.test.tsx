@@ -35,7 +35,7 @@ describe("population pyramid", () => {
     expect(html).toContain('aria-label="0–4: men 106,170, women 97,930, total 204,100 (5.2%)"');
     expect(html).toContain("65+ · 18.1%");
     expect(count(html, /tabindex="0"/g)).toBe(1);
-    expect(html).not.toContain('data-testid="pyramid-outline"');
+    expect(html).not.toContain('data-testid="pyramid-outline');
     expect(html).toContain("Men");
     expect(html).toContain("Women");
     expect(html).not.toMatch(GEORGIAN);
@@ -43,7 +43,8 @@ describe("population pyramid", () => {
 
   it("with a comparison year, draws its outline and names both years", () => {
     const html = wrap(<PopulationPyramid pyramid={now} year={2026} compare={{ pyramid: then, year: 2004 }} measure="share" ariaLabel="Georgia" testId="pyramid" />);
-    expect(count(html, /data-testid="pyramid-outline"/g)).toBe(2);
+    expect(count(html, /data-testid="pyramid-outline-left"/g)).toBe(1);
+    expect(count(html, /data-testid="pyramid-outline-right"/g)).toBe(1);
     expect(html).toMatch(/data-testid="pyramid-legend"[\s\S]*2026[\s\S]*2004/);
     expect(html).not.toMatch(GEORGIAN);
   });

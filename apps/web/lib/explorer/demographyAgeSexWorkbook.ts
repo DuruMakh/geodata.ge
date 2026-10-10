@@ -10,6 +10,7 @@ import {
   annualPyramid,
   bandSeries,
   censusPyramid,
+  crossesBreak,
   heatmapRows,
   shareOf,
   type Pyramid,
@@ -122,7 +123,8 @@ export function buildPyramidWorkbookExportModel(input: Input & { year: number; c
   const years = input.compare === null ? [input.year] : [input.year, input.compare];
   return pyramidWorkbook(presentation, {
     title: t("pyramidWorkbookTitle"),
-    subtitle: `${years.join(" · ")} · ${t("unitPersons")}`,
+    // Counts are not comparable across the 2025 re-base, so the readable sheet says so beside the years.
+    subtitle: `${years.join(" · ")} · ${t("unitPersons")}${input.compare !== null && crossesBreak(input.year, input.compare) ? ` · ${t("breakLabel")}` : ""}`,
     unitLabel: t("unitPersons"),
     stem: `demography-age-sex-georgia-${years.join("-")}`,
     parts: years.map((year) => ({ pyramid: annualPyramid(input.facts, year), year, basis: annualBasis(year) })),

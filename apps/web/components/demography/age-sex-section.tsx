@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { COVERAGE } from "../../lib/data/demography/series";
 import { INK } from "../../lib/explorer/colors";
 import { bandShares, censusPyramid, urbanShare, type AgeMeasure } from "../../lib/explorer/demographyAgeSex";
 import { buildCensusPlaceWorkbookExportModel } from "../../lib/explorer/demographyAgeSexWorkbook";
@@ -30,6 +29,7 @@ const SETTLEMENTS = [
 /** One place's 2024 census pyramid by settlement: the block Georgia's and every region's Population page ends with. A municipality has no census age rows, so it gets nothing. */
 export function AgeSexSection({
   place,
+  firstYear,
   facts,
   sources,
   siteOrigin,
@@ -37,6 +37,8 @@ export function AgeSexSection({
   nationalHref,
 }: {
   place: DemographyPlace;
+  /** The first year of the annual age series, named by the link to every year. */
+  firstYear: number;
   /** This place's census rows only (`censusAgeFactsForPlace`). */
   facts: ClientAgeFact[];
   sources: (WorkbookPublicSource & { sourceId: string })[];
@@ -55,7 +57,6 @@ export function AgeSexSection({
   if (whole === null || pyramid === null) return null;
   const name = placeLabel(place, locale);
   const date = t("censusDate");
-  const first = COVERAGE.populationFrom;
   const isGeorgia = place.id === GEORGIA_PLACE_ID;
 
   return (
@@ -108,7 +109,7 @@ export function AgeSexSection({
         data-testid="age-sex-national-link"
         className="mt-6 flex min-h-11 items-center text-[13px] text-[var(--ink)] underline underline-offset-2"
       >
-        {t(isGeorgia ? "ageSexGeorgiaLink" : "ageSexNationalLink", { first })}
+        {t(isGeorgia ? "ageSexGeorgiaLink" : "ageSexNationalLink", { first: firstYear })}
       </Link>
     </section>
   );

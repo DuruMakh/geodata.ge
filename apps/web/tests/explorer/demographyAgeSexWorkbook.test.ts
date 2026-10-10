@@ -103,6 +103,14 @@ describe.each(["en", "ka"] as const)("the age and sex workbooks (%s)", (locale) 
     expect(basisOf(2025)).toContain(presentation().messages["demography.breakLabel" as never] as string);
   });
 
+  it("pyramid: the subtitle carries the re-base label only when the two years straddle it", () => {
+    const label = presentation().messages["demography.breakLabel" as never] as string;
+    const across = buildPyramidWorkbookExportModel({ ...input(), year: 2026, compare: 2004 }, presentation());
+    const within = buildPyramidWorkbookExportModel({ ...input(), year: 2010, compare: 2004 }, presentation());
+    expect(across.readable.subtitle).toContain(label);
+    expect(within.readable.subtitle).not.toContain(label);
+  });
+
   it("bands: a column per year and three rows in percent, the break year flagged", () => {
     const model = buildBandsWorkbookExportModel(input(), presentation());
     const years = ageYears(annual);

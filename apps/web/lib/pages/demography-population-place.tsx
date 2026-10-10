@@ -10,7 +10,7 @@ import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { loadServedMunicipalData } from "../data/servedData";
-import { censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
+import { ageYears, annualAgeFacts, censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
 import {
   POPULATION_PATH,
@@ -193,6 +193,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
         />
         <AgeSexSection
           place={place}
+          firstYear={ageYears(annualAgeFacts(served.facts))[0]!}
           facts={censusAgeFactsForPlace(served.facts, place.id)}
           sources={sources.filter((source) => source.sourceId === SOURCE_ID.censusAge)}
           siteOrigin={resolveSiteUrl()}
