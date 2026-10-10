@@ -28,6 +28,7 @@ export function buildCurrentAccountWorkbookModel(input: { facts: readonly Client
   exportModel.readable.amountDecimals = decimals;
   exportModel.readable.numberFormat = `${format};"−"${format}`;
   exportModel.analysis.headers[3] = t("workbook.amount");
-  exportModel.analysis.numericFormats = { 4: '#,##0.###############;"−"#,##0.###############' };
+  const exact = '#,##0.###############;"−"#,##0.###############';
+  exportModel.analysis.numericFormats = percent ? { 4: exact, [exportModel.analysis.headers.length]: exact } : { 4: exact };
   return exportModel;
 }

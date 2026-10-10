@@ -43,6 +43,7 @@ test("Money out exports only the selected debit series, and % of GDP exports per
   expect(share.readable.unitLabel).toBe("% of GDP");
   expect(share.readable.rows[0].valuesByYear[2025]!).toBeCloseTo(-2.944769, 5);
   expect(share.analysis.headers.at(-1)).toBe("% of GDP");
+  expect(share.analysis.numericFormats?.[share.analysis.headers.length]).toContain('"−"');
   expect(share.analysis.rows[0][3] as number).toBeCloseTo(-1123241112.31, 1);
   const empty = run({ facts: all, gdp, sources, siteOrigin: "https://fiscal.ge", state: state({ tab: "in", selectedIds: [] }) }, p);
   expect(empty.readable.rows).toEqual([]); expect(empty.sources).toEqual([]);

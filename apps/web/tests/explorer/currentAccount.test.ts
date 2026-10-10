@@ -53,3 +53,11 @@ test("only selected series that exist are kept, in the page order", async () => 
   const { buildCurrentAccountModel: build, facts } = await modules();
   expect(build(facts, gdp, { ...initial, tab: "in", selectedIds: ["ca.services", "ca.balance"] }, presentation).selectedIds).toEqual(["ca.balance", "ca.services"]);
 });
+
+test("% of GDP matches the research package's current-account shares in every year", async () => {
+  const { buildCurrentAccountModel: build, facts } = await modules();
+  const model = build(facts, gdp, { ...initial, unit: "gdp" }, presentation);
+  const shares = (parse(readFileSync(path.resolve(process.cwd(), "../../docs/Raw Data/External/2026-10-10/shares-of-gdp-annual.csv")), { columns: true, bom: true }) as Record<string, string>[]).filter(row => row.indicator_id === "current_account_balance");
+  expect(shares).toHaveLength(26);
+  for (const row of shares) expect(Math.abs(model.valuesById["ca.balance"][Number(row.year)]! - Number(row.share_of_gdp_percent))).toBeLessThan(1e-6);
+});
