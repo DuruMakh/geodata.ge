@@ -183,6 +183,9 @@ describe("births and deaths page", () => {
     expect(html).toContain('href="/en/explorer/demography/population/region/tbilisi#births-deaths"');
     expect(html).toContain('data-testid="fertility-section"');
     expect(html).toContain('data-testid="life-section"');
+    expect(html).toContain('aria-label="Total fertility rate, Georgia, 2014–2025"');
+    expect(html).toContain('aria-label="Births per 1,000 women by mother&#x27;s age, one line per year, 2014–2025"');
+    expect(html).toContain('aria-label="Life expectancy at birth, total, men and women, Georgia, 2014–2025"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('"@type":"Dataset"');
     expect(html).not.toMatch(GEORGIAN);

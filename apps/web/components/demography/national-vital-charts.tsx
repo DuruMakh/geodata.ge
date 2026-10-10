@@ -99,6 +99,7 @@ export function NationalVitalCharts({
               shareLabel=""
               formatTooltipValue={(value) => formatInUnit(value, UNIT_RATE_2)}
               breaks={breaks}
+              ariaLabel={t("tfrChartAria", { first, last })}
             />
           ) : (
             <ExplorerTable
@@ -150,6 +151,7 @@ export function NationalVitalCharts({
                 shareLabel=""
                 formatTooltipValue={rate1}
                 formatPeriod={(position) => ageLabel(position)}
+                ariaLabel={t("asfrChartName", { first: curves.years[0]!, last: curves.years.at(-1)! })}
               />
             </>
           ) : (
@@ -192,6 +194,7 @@ export function NationalVitalCharts({
               shareLabel=""
               formatTooltipValue={rate1}
               breaks={breaks}
+              ariaLabel={t("lifeChartAria", { first, last })}
             />
           ) : (
             <ExplorerTable

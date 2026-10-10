@@ -145,6 +145,7 @@
   "demography.ageHeader": "Mother's age",
   "demography.otherYears": "Other years",
   "demography.asfrNote": "The youngest and oldest groups (under 20, 45–54) are as Geostat publishes them. Rates use the population of women as the denominator, so from 2025 they rest on the 2024 census.",
+  "demography.asfrChartName": "Births per 1,000 women by mother's age, one line per year, {first}–{last}",
   "demography.lifeTitle": "Life expectancy at birth",
   "demography.lifeTotal": "Total",
   "demography.lifeMale": "Men",
