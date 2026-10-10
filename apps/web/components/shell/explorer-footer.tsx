@@ -19,6 +19,7 @@ export function ExplorerFooter({locale}:{locale:Locale}) {
   else if (pathname==='/explorer/deficit') noteKey='common.deficitSourceNote';
   else if (pathname==='/explorer/unemployment'||pathname.startsWith('/explorer/unemployment/')) noteKey='common.geostatSourceNote';
   else if (pathname==='/explorer/trade'||pathname.startsWith('/explorer/trade/')) noteKey='common.geostatSourceNote';
+  else if (pathname==='/explorer/wages'||pathname.startsWith('/explorer/wages/')) noteKey='common.geostatSourceNote';
   else if (pathname==='/explorer/inflation/categories'||pathname==='/explorer/inflation/products') noteKey='common.geostatSourceNote';
   else if (inflation) noteKey='common.inflationSourceNote';
   else if (demography) noteKey='common.geostatSourceNote';

@@ -60,5 +60,11 @@
   "common.tradePartners": "Trading partners",
   "common.dataDemography": "Data · Demography",
   "common.demographyPopulation": "Population",
-  "common.demographyMigration": "Migration"
+  "common.demographyMigration": "Migration",
+  "common.wages": "Wages",
+  "common.wagesOverview": "Wages overview",
+  "common.wagesIndustries": "Industries",
+  "common.wagesRegions": "Regions",
+  "common.wagesGender": "Gender",
+  "common.dataWages": "Data · Wages"
 }

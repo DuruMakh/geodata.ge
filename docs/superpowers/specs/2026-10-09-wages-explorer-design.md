@@ -1,7 +1,7 @@
 # Wages hub — explorer design
 
 Date: 2026-10-09
-Status: Draft for the owner's review. Nothing here is implemented until the owner approves it in writing.
+Status: Approved by the owner on 2026-10-10.
 
 ## 1. Intended result
 

@@ -1,5 +1,5 @@
 export type Locale = "ka" | "en";
-export const MESSAGE_SCOPES = ["trade", "unemployment", "sectors", "regionalEconomies", "gdp", "common", "format", "controls", "main", "workbook", "methodology", "analysis", "municipal", "debt", "deficit", "landing", "hub", "about", "connect", "seo", "inflation", "demography"] as const;
+export const MESSAGE_SCOPES = ["wages", "trade", "unemployment", "sectors", "regionalEconomies", "gdp", "common", "format", "controls", "main", "workbook", "methodology", "analysis", "municipal", "debt", "deficit", "landing", "hub", "about", "connect", "seo", "inflation", "demography"] as const;
 export type MessageScope = (typeof MESSAGE_SCOPES)[number];
 export type Messages = Readonly<Record<string, string>>;
 export type TemplateValues = Readonly<Record<string, string | number>>;

@@ -6,6 +6,8 @@ import { INFLATION_METHODOLOGY_CONTENT } from "./content/inflation";
 import { INFLATION_METHODOLOGY_CONTENT as EN_INFLATION } from "./content/en/inflation";
 import { DEMOGRAPHY_METHODOLOGY } from "./content/demography";
 import { DEMOGRAPHY_METHODOLOGY as EN_DEMOGRAPHY } from "./content/en/demography";
+import { WAGES_METHODOLOGY_CONTENT } from "./content/wages";
+import { WAGES_METHODOLOGY_CONTENT as EN_WAGES } from "./content/en/wages";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
@@ -44,6 +46,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
   inflation: INFLATION_METHODOLOGY_CONTENT,
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
+  wages: WAGES_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
@@ -55,6 +58,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   trade: EN_TRADE,
   expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP, inflation: EN_INFLATION,
   demography: EN_DEMOGRAPHY,
+  wages: EN_WAGES,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {

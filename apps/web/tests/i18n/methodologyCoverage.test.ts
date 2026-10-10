@@ -25,7 +25,7 @@ function groups(content: MethodologyContent) {
 describe("complete methodology translations", () => {
   it("publishes the bilingual Regional economies methodology with its accounting boundaries", () => {
     expect(LIVE_METHODOLOGY_IDS).toContain("regional-economies");
-    expect(LIVE_METHODOLOGY_IDS).toHaveLength(11);
+    expect(LIVE_METHODOLOGY_IDS).toHaveLength(12);
     for (const locale of ["ka", "en"] as const) {
       const content = getMethodologyContent("regional-economies" as never, locale);
       const prose = [content.summary, content.disclosure, ...content.sections.flatMap((section) => section.paragraphs)].join(" ");

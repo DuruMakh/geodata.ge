@@ -60,5 +60,11 @@
   "common.tradePartners": "სავაჭრო პარტნიორები",
   "common.dataDemography": "მონაცემები · დემოგრაფია",
   "common.demographyPopulation": "მოსახლეობა",
-  "common.demographyMigration": "მიგრაცია"
+  "common.demographyMigration": "მიგრაცია",
+  "common.wages": "ხელფასები",
+  "common.wagesOverview": "ხელფასების მიმოხილვა",
+  "common.wagesIndustries": "საქმიანობები",
+  "common.wagesRegions": "რეგიონები",
+  "common.wagesGender": "სქესი",
+  "common.dataWages": "მონაცემები · ხელფასები"
 }
