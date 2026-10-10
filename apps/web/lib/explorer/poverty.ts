@@ -78,9 +78,13 @@ export function serializePovertyHash(state: PovertyState, section: PovertySectio
   return p.toString();
 }
 
-/** Switching tab keeps mode and years (clamped to the tab's coverage), and selects the new tab's reference. */
+/**
+ * Switching tab keeps mode and years (clamped to the tab's coverage), and selects the new tab's reference.
+ * A chosen range is never collapsed to "all", so 2004–2024 picked on International lines stays 2004–2024
+ * on a tab that runs to 2025.
+ */
 export function changePovertyView(state: PovertyState, section: PovertySectionId, view: PovertyView, facts: readonly ClientPovertyFact[]): PovertyState {
-  return { ...state, view, selectedIds: [povertyViewSeries(section, view)[0].id], range: refitRange(state.range, povertyCoverage(section, view, facts), { collapseToAll: true }) };
+  return { ...state, view, selectedIds: [povertyViewSeries(section, view)[0].id], range: refitRange(state.range, povertyCoverage(section, view, facts), { collapseToAll: false }) };
 }
 
 export type PovertySeriesModel = PovertySeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null };

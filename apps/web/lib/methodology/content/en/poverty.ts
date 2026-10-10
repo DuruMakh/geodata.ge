@@ -81,7 +81,7 @@ export const POVERTY_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "validation",
       "title": "How are the figures checked?",
       "paragraphs": [
-        "491 published values are served. Each is re-read from its original Geostat workbook cell, and the original files are checked against their recorded fingerprints. The checks require every rate to lie within 0–100% and every Gini coefficient within 0–1, Georgia’s rate to lie between its groups’ rates, the 40% line never to exceed the 60% line, the international lines to stay in order, and the 2016–2025 poverty-line rates and the 2025 Gini coefficient to match Geostat’s page and release. Pages show the values at Geostat’s published precision: one decimal for percents and two for Gini coefficients."
+        "491 published values are served. Each is re-read from its original Geostat workbook cell, and the original files are checked against their recorded fingerprints. The checks require every rate to lie within 0–100% and every Gini coefficient within 0–1, Georgia’s rate to lie between its groups’ rates, the 40% line never to exceed the 60% line, the international lines to stay in order, and the 2016–2025 poverty-line rates and the 2025 Gini coefficient to match Geostat’s page. Pages show the values at Geostat’s published precision: one decimal for percents and two for Gini coefficients."
       ]
     },
     {

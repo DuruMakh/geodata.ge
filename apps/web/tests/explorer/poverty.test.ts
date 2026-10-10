@@ -44,6 +44,9 @@ test("switching to international clamps a range ending 2025 to 2024, and switchi
   expect(international).toMatchObject({ view: "international", range: { kind: "manual", start: 2010, end: 2024 }, selectedIds: ["poverty.international_300|georgia"] });
   const back = changePovertyView(international, "rates", "absolute", facts);
   expect(back).toMatchObject({ view: "absolute", range: { kind: "manual", start: 2010, end: 2024 }, selectedIds: ["poverty.absolute|georgia"] });
+  // The full International range is kept, not widened, when switching back.
+  const full = changePovertyView({ ...start, range: { kind: "manual", start: 2004, end: 2024 } }, "rates", "international", facts);
+  expect(changePovertyView(full, "rates", "absolute", facts).range).toEqual({ kind: "manual", start: 2004, end: 2024 });
 });
 
 test("the hash round-trips, drops another tab's series and keeps an explicit empty selection", () => {

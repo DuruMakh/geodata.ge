@@ -30,6 +30,8 @@ test("rates default to Georgia's poverty line and tabs keep the clamped years", 
   await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
   await page.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("Georgia");
+  await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("7.1%");
+  await expect(page.getByTestId("explorer-table")).not.toContainText("710");
   await page.getByTestId("poverty-tab-international").click();
   await expect(page.locator(pressed("poverty.international_300|georgia"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2004–2024");
