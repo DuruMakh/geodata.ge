@@ -43,7 +43,7 @@ export async function renderPovertyHub(locale: Locale) {
 
 export async function povertyPageMetadata(locale: Locale, section: PovertySectionId) {
   const messages = await getMessages(locale, ["poverty"]);
-  return fiscalMetadata({ locale, path: POVERTY_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `poverty.page.${section}.title`), description: message(messages, `poverty.page.${section}.summary`) });
+  return fiscalMetadata({ locale, path: POVERTY_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `poverty.page.${section}.metaTitle`), description: message(messages, `poverty.page.${section}.summary`) });
 }
 
 /** Display names for every series a poverty page can show, in the page's language. */
