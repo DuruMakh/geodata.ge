@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 7,
+  "source_observations": 3941,
+  "unavailable_cells": 151,
+  "workbook_numeric_cells": 4132,
+  "year_heading_cells": 191,
+  "stored_values_matched": 3941,
+  "published_values_matched_format_rendering": 3941,
+  "unavailable_tokens_matched": 151,
+  "year_label_and_id_context_matched": 4092,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "omitted_row_detected": true,
+    "omitted_year_like_value_detected": true,
+    "moved_cell_detected": true,
+    "shifted_year_detected": true,
+    "swapped_sections_detected": true,
+    "swapped_regions_detected": true,
+    "swapped_sexes_detected": true,
+    "unlisted_unavailable_detected": true
+  },
+  "failures": []
+}

@@ -1,0 +1,54 @@
+﻿check_id,source_id,printed_page,statement,measure,indicator_id,dimension,group_id,other_group_id,sector_id,year,published_value
+total_level,geostat_earnings_release_2025,1,Average monthly nominal earnings amounted to 2 165.2 GEL,level,average_monthly_nominal_earnings,national,georgia,,total,2025,2165.2
+total_change_gel,geostat_earnings_release_2025,1,Increased by 194.5 GEL compared to 2024,change_gel,average_monthly_nominal_earnings,national,georgia,,total,2025,194.5
+total_change_pct,geostat_earnings_release_2025,1,Increased by 9.9 percent compared to 2024,change_pct,average_monthly_nominal_earnings,national,georgia,,total,2025,9.9
+financial_level,geostat_earnings_release_2025,2,Financial and Insurance Activities – 4 123.6 GEL,level,average_monthly_nominal_earnings,national,georgia,,sector.k,2025,4123.6
+financial_change_pct,geostat_earnings_release_2025,2,Financial and Insurance Activities increased by 12.1 percent,change_pct,average_monthly_nominal_earnings,national,georgia,,sector.k,2025,12.1
+financial_rank,geostat_earnings_release_2025,2,Highest average monthly earnings: Financial and Insurance Activities listed first,rank_desc,average_monthly_nominal_earnings,national,georgia,,sector.k,2025,1
+ict_level,geostat_earnings_release_2025,2,Information and Communication – 4 042.6 GEL,level,average_monthly_nominal_earnings,national,georgia,,sector.j,2025,4042.6
+ict_change_pct,geostat_earnings_release_2025,2,Information and Communication increased by 3.0 percent,change_pct,average_monthly_nominal_earnings,national,georgia,,sector.j,2025,3.0
+ict_rank,geostat_earnings_release_2025,2,Highest average monthly earnings: Information and Communication listed second,rank_desc,average_monthly_nominal_earnings,national,georgia,,sector.j,2025,2
+construction_level,geostat_earnings_release_2025,2,Construction – 3 026.1 GEL,level,average_monthly_nominal_earnings,national,georgia,,sector.f,2025,3026.1
+construction_change_pct,geostat_earnings_release_2025,2,Construction increased by 13.5 percent,change_pct,average_monthly_nominal_earnings,national,georgia,,sector.f,2025,13.5
+construction_rank,geostat_earnings_release_2025,2,Highest average monthly earnings: Construction listed third,rank_desc,average_monthly_nominal_earnings,national,georgia,,sector.f,2025,3
+women_level,geostat_earnings_release_2025,3,The average monthly earnings of women amounted to 1 743.4 GEL,level,average_monthly_nominal_earnings,sex,women,,total,2025,1743.4
+men_level,geostat_earnings_release_2025,3,Those of men amounted to 2 586.5 GEL,level,average_monthly_nominal_earnings,sex,men,,total,2025,2586.5
+women_change_gel,geostat_earnings_release_2025,3,Women's earnings increased by 151.8 GEL,change_gel,average_monthly_nominal_earnings,sex,women,,total,2025,151.8
+women_change_pct,geostat_earnings_release_2025,3,Women's earnings increased by 9.5%,change_pct,average_monthly_nominal_earnings,sex,women,,total,2025,9.5
+men_change_gel,geostat_earnings_release_2025,3,Men's earnings increased by 245.9 GEL,change_gel,average_monthly_nominal_earnings,sex,men,,total,2025,245.9
+men_change_pct,geostat_earnings_release_2025,3,Men's earnings increased by 10.5%,change_pct,average_monthly_nominal_earnings,sex,men,,total,2025,10.5
+public_change_pct,geostat_earnings_release_2025,4,Average monthly earnings increased by 12.8 percent in the public sector,change_pct,average_monthly_nominal_earnings,ownership,public,,total,2025,12.8
+non_public_change_pct,geostat_earnings_release_2025,4,And by 8.7 percent in the non-public sector,change_pct,average_monthly_nominal_earnings,ownership,non_public,,total,2025,8.7
+public_level,geostat_earnings_release_2025,4,Public sector amounting to 1 895.4 GEL,level,average_monthly_nominal_earnings,ownership,public,,total,2025,1895.4
+non_public_level,geostat_earnings_release_2025,4,Non-public sector amounting to 2 301.0 GEL,level,average_monthly_nominal_earnings,ownership,non_public,,total,2025,2301.0
+public_gap_gel,geostat_earnings_release_2025,4,Public sector earnings were 405.6 GEL lower than in the non-public sector,gap_gel,average_monthly_nominal_earnings,ownership,public,non_public,total,2025,405.6
+public_gap_pct,geostat_earnings_release_2025,4,Public sector earnings were 17.6% lower than in the non-public sector,gap_pct,average_monthly_nominal_earnings,ownership,public,non_public,total,2025,17.6
+business_change_gel,geostat_earnings_release_2025,5,Business sector earnings increased by 173.9 GEL,change_gel,average_monthly_nominal_earnings,business_sector,business,,total,2025,173.9
+business_change_pct,geostat_earnings_release_2025,5,Business sector earnings increased by 8.6%,change_pct,average_monthly_nominal_earnings,business_sector,business,,total,2025,8.6
+business_level,geostat_earnings_release_2025,5,Business sector amounted to 2 198.4 GEL,level,average_monthly_nominal_earnings,business_sector,business,,total,2025,2198.4
+business_ict_level,geostat_earnings_release_2025,5,Business sector Information and Communication 4 097.1 GEL,level,average_monthly_nominal_earnings,business_sector,business,,sector.j,2025,4097.1
+business_ict_change_pct,geostat_earnings_release_2025,5,Business sector Information and Communication increased by 2.2 percent,change_pct,average_monthly_nominal_earnings,business_sector,business,,sector.j,2025,2.2
+business_ict_rank,geostat_earnings_release_2025,5,Highest business sector earnings: Information and Communication listed first,rank_desc,average_monthly_nominal_earnings,business_sector,business,,sector.j,2025,1
+business_professional_level,geostat_earnings_release_2025,5,"Business sector Professional, Scientific and Technical Activities 3 340.7 GEL",level,average_monthly_nominal_earnings,business_sector,business,,sector.m,2025,3340.7
+business_professional_change_pct,geostat_earnings_release_2025,5,"Business sector Professional, Scientific and Technical Activities increased by 6.1 percent",change_pct,average_monthly_nominal_earnings,business_sector,business,,sector.m,2025,6.1
+business_professional_rank,geostat_earnings_release_2025,5,"Highest business sector earnings: Professional, Scientific and Technical Activities listed second",rank_desc,average_monthly_nominal_earnings,business_sector,business,,sector.m,2025,2
+non_business_change_gel,geostat_earnings_release_2025,6,Non-business and financial sector earnings are 233.7 GEL higher than in the previous year,change_gel,average_monthly_nominal_earnings,business_sector,non_business,,total,2025,233.7
+non_business_change_pct,geostat_earnings_release_2025,6,Non-business and financial sector earnings are 12.5% higher than in the previous year,change_pct,average_monthly_nominal_earnings,business_sector,non_business,,total,2025,12.5
+non_business_level,geostat_earnings_release_2025,6,Non-business and financial sector amount to 2 100.5 GEL,level,average_monthly_nominal_earnings,business_sector,non_business,,total,2025,2100.5
+tbilisi_rank,geostat_earnings_release_2025,7,Average monthly earnings were highest in Tbilisi and Mtskheta-Mtianeti (named first; order is an interpretation),rank_desc,average_monthly_nominal_earnings,region,region.tbilisi,,total,2025,1
+mtskheta_mtianeti_rank,geostat_earnings_release_2025,7,Average monthly earnings were highest in Tbilisi and Mtskheta-Mtianeti (named second; order is an interpretation),rank_desc,average_monthly_nominal_earnings,region,region.mtskheta_mtianeti,,total,2025,2
+median_level,geostat_median_release_2025,1,Median earnings amounted to 1 531 GEL,level,median_monthly_earnings,national,georgia,,total,2025,1531
+median_change_pct,geostat_median_release_2025,1,Median earnings increased by 14.9 percent compared to the previous year,change_pct,median_monthly_earnings,national,georgia,,total,2025,14.9
+median_below_mean_pct,geostat_median_release_2025,1,Median earnings were 29.3 percent lower than the average monthly earnings,below_mean_pct,median_monthly_earnings,national,georgia,,total,2025,29.3
+median_public_admin_level,geostat_median_release_2025,1,Public administration and defence; compulsory social security – 2 501 GEL,level,median_monthly_earnings,national,georgia,,sector.o,2025,2501
+median_public_admin_rank,geostat_median_release_2025,1,Highest median earnings: public administration listed first,rank_desc,median_monthly_earnings,national,georgia,,sector.o,2025,1
+median_construction_level,geostat_median_release_2025,1,Construction – 2 328 GEL,level,median_monthly_earnings,national,georgia,,sector.f,2025,2328
+median_construction_rank,geostat_median_release_2025,1,Highest median earnings: construction listed second,rank_desc,median_monthly_earnings,national,georgia,,sector.f,2025,2
+median_mining_level,geostat_median_release_2025,1,Mining and quarrying – 2 264 GEL,level,median_monthly_earnings,national,georgia,,sector.b,2025,2264
+median_mining_rank,geostat_median_release_2025,1,Highest median earnings: mining listed third,rank_desc,median_monthly_earnings,national,georgia,,sector.b,2025,3
+median_ict_level,geostat_median_release_2025,1,Information and communication – 2 250 GEL,level,median_monthly_earnings,national,georgia,,sector.j,2025,2250
+median_ict_rank,geostat_median_release_2025,1,Highest median earnings: information and communication listed fourth,rank_desc,median_monthly_earnings,national,georgia,,sector.j,2025,4
+median_financial_level,geostat_median_release_2025,1,Financial and insurance activities – 2 211 GEL,level,median_monthly_earnings,national,georgia,,sector.k,2025,2211
+median_financial_rank,geostat_median_release_2025,1,Highest median earnings: financial and insurance listed fifth,rank_desc,median_monthly_earnings,national,georgia,,sector.k,2025,5
+median_below_mean_all_sectors,geostat_median_release_2025,3,"According to 2025 data, the median earnings are lower than the average monthly earnings in all sectors",sectors_not_below_mean,median_monthly_earnings,national,georgia,,total,2025,0
+metadata_non_business_2023,geostat_earnings_metadata_2026,5,"Average monthly nominal earnings of non-business sector employees, 2023: 1649.6 GEL (section 13.2)",level,average_monthly_nominal_earnings,business_sector,non_business,,total,2023,1649.6

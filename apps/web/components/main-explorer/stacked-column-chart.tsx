@@ -17,20 +17,38 @@ import {
   useChartLayout,
   useChartPointer,
 } from "./chart-frame";
-import { buildTooltipRows, coarsenLattice } from "./editorial-line-chart";
+import { buildTooltipRows, coarsenLattice, TOOLTIP_ROW_CAP, type TooltipRow } from "./editorial-line-chart";
 
 // Bespoke SVG stacked column chart per DESIGN.md §8.3, the only form in which
 // "the parts add up to the published whole" is visible. Positive segments stack
 // up from a drawn zero line, negative segments down, and the published headline
 // runs over the stack as an ink line ending in a dot. No chart library.
 
-export type StackSegment = { id: string; label: string; color: string; values: Array<number | null> };
+export type StackSegment = {
+  id: string;
+  label: string;
+  color: string;
+  values: Array<number | null>;
+  /** The name the hover readout prints when it differs from `label` (which stays the caption's). */
+  readoutLabel?: string;
+  /** Draws an arrow in the segment's colour in the readout instead of the colour bar. */
+  marker?: "up" | "down";
+};
+export type StackReadoutOrder = "value" | "sign-then-magnitude";
 export type StackedColumnChartProps = {
   periods: number[];
   segments: StackSegment[];
   overlay: { label: string; values: Array<number | null> } | null;
   formatPeriod: (period: number) => string;
   formatValue: (value: number) => string;
+  /** Formats the overlay in the readout header and the caption; defaults to `formatValue`. */
+  formatOverlayValue?: (value: number) => string;
+  /** "value" (default) ranks rows by signed value; "sign-then-magnitude" lists non-negative rows by size, then negative ones by size. */
+  readoutOrder?: StackReadoutOrder;
+  /** Most rows the readout lists; the rest are counted. Defaults to the shared tooltip cap. */
+  readoutRowCap?: number;
+  /** Tightens the float readout's rows so a dozen of them fit the plot's height. */
+  compactReadout?: boolean;
   ariaLabel: string;
   /** Periods per calendar year on the x axis: 12 for months (default), 1 for years. */
   periodsPerYear?: number;
@@ -73,12 +91,56 @@ type Plot = {
   y: (value: number) => number;
 };
 
+/** The readout at one period: ranked and capped, each row carrying its segment's optional marker and short name. */
+export function buildStackReadout(
+  segments: StackSegment[],
+  hover: number,
+  order: StackReadoutOrder = "value",
+  cap: number = TOOLTIP_ROW_CAP,
+): { rows: TooltipRow[]; hidden: number } {
+  const byId = new Map(segments.map((segment) => [segment.id, segment]));
+  const ranked = buildTooltipRows(
+    segments.map((segment) => ({ id: segment.id, label: segment.label, color: segment.color, vals: segment.values, planned: [] })),
+    hover,
+    order === "value" ? cap : Number.POSITIVE_INFINITY,
+  );
+  let rows = ranked.rows;
+  let hidden = ranked.hidden;
+  if (order === "sign-then-magnitude") {
+    // A segment's marker decides its side when it has one: a departure of zero is -0 on the chart, and -0 >= 0.
+    const isLoss = (row: TooltipRow) => {
+      const marker = byId.get(row.id)!.marker;
+      return marker === undefined ? row.value < 0 || Object.is(row.value, -0) : marker === "down";
+    };
+    const gains = rows.filter((row) => !isLoss(row)).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+    const losses = rows.filter(isLoss).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+    const ordered = [...gains, ...losses];
+    rows = ordered.slice(0, cap);
+    hidden = Math.max(0, ordered.length - cap);
+  }
+  return {
+    rows: rows.map((row) => {
+      const segment = byId.get(row.id)!;
+      return {
+        ...row,
+        ...(segment.readoutLabel === undefined ? {} : { label: segment.readoutLabel, srLabel: segment.label }),
+        ...(segment.marker === undefined ? {} : { marker: segment.marker }),
+      };
+    }),
+    hidden,
+  };
+}
+
 export function StackedColumnChart({
   periods,
   segments,
   overlay,
   formatPeriod,
   formatValue,
+  formatOverlayValue = formatValue,
+  readoutOrder = "value",
+  readoutRowCap = TOOLTIP_ROW_CAP,
+  compactReadout = false,
   ariaLabel,
   periodsPerYear = 12,
 }: StackedColumnChartProps) {
@@ -187,13 +249,7 @@ export function StackedColumnChart({
   const overlayLastValue = overlay === null || overlayLast < 0 ? null : overlay.values[overlayLast] ?? null;
 
   // The same bounded readout as the line chart: rows ranked by value, capped, remainder named.
-  const tooltip =
-    hover === null
-      ? null
-      : buildTooltipRows(
-          segments.map((segment) => ({ id: segment.id, label: segment.label, color: segment.color, vals: segment.values, planned: [] })),
-          hover,
-        );
+  const tooltip = hover === null ? null : buildStackReadout(segments, hover, readoutOrder, readoutRowCap);
   const overlayAtHover = hover === null || overlay === null ? null : overlay.values[hover] ?? null;
 
   const axisText = (plot: Plot, value: number) => (
@@ -228,11 +284,12 @@ export function StackedColumnChart({
         pinned={pinned}
         leftPercent={(active.x(hover) / active.width) * 100}
         header={formatPeriod(periods[hover]!)}
-        headerRight={overlay !== null && overlayAtHover !== null ? `${overlay.label} ${formatValue(overlayAtHover)}` : null}
+        headerRight={overlay !== null && overlayAtHover !== null ? `${overlay.label} ${formatOverlayValue(overlayAtHover)}` : null}
         rows={tooltip.rows}
         hidden={tooltip.hidden}
         formatValue={formatValue}
         variant={active.mobile ? "panel" : "float"}
+        compact={compactReadout}
       />
     ) : null;
 
@@ -406,7 +463,7 @@ export function StackedColumnChart({
               {overlay.label}:{" "}
               {(() => {
                 const last = [...overlay.values].reverse().find((value) => value !== null && value !== undefined);
-                return last === null || last === undefined ? "—" : formatValue(last);
+                return last === null || last === undefined ? "—" : formatOverlayValue(last);
               })()}
             </li>
           )}

@@ -9,6 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -248,6 +249,23 @@ export function useChartPointer(count: number, width: number, padLeft: number, p
   };
 }
 
+/** A row's leading mark: the colour bar, or an arrow in the row's colour when the row has a `marker`. */
+function RowMark({ row, swatchClassName }: { row: TooltipRow; swatchClassName: string }) {
+  if (row.marker === undefined) return <SwatchBar color={row.color} className={swatchClassName} />;
+  const Arrow = row.marker === "up" ? ArrowUp : ArrowDown;
+  return <Arrow aria-hidden size={13} strokeWidth={2} className="shrink-0" style={{ color: row.color }} />;
+}
+
+/** The visible name, hidden from assistive technology when `srLabel` supplies the full one. */
+function RowLabel({ row, className }: { row: TooltipRow; className: string }) {
+  return (
+    <>
+      <span className={className} aria-hidden={row.srLabel === undefined ? undefined : true}>{row.label}</span>
+      {row.srLabel === undefined ? null : <span className="sr-only">{row.srLabel}</span>}
+    </>
+  );
+}
+
 /**
  * The bounded hover readout (DESIGN.md §8.3): absolutely positioned, so it never
  * moves the page. A pinned (tapped) readout sits in a top corner of the frame's
@@ -264,6 +282,7 @@ export function ChartTooltip({
   preliminaryLabel,
   testId = "chart-tooltip",
   variant = "float",
+  compact = false,
 }: {
   leftPercent: number;
   pinned?: PinnedSide | null;
@@ -276,6 +295,8 @@ export function ChartTooltip({
   testId?: string;
   /** "panel": the phone readout, in flow under the chart so it never covers the plot. */
   variant?: "float" | "panel";
+  /** Float readout only: no row gap and a 14px line, for a readout of a dozen rows that must fit the plot's height. */
+  compact?: boolean;
 }) {
   const { messages } = useI18n();
   if (variant === "panel") {
@@ -292,8 +313,8 @@ export function ChartTooltip({
         {rows.map((row) => (
           <div key={row.id} className="flex items-center justify-between gap-3">
             <span className="inline-flex min-w-0 items-center gap-1.5 text-[12px] font-medium text-[var(--body)]">
-              <SwatchBar color={row.color} className="!w-3 shrink-0" />
-              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{row.label}</span>
+              <RowMark row={row} swatchClassName="!w-3 shrink-0" />
+              <RowLabel row={row} className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" />
             </span>
             <span className="shrink-0 font-[family-name:var(--font-numeric)] text-[12px] text-[var(--ink)]">
               {formatValue(row.value)}
@@ -311,7 +332,7 @@ export function ChartTooltip({
     <div
       data-testid={testId}
       data-pinned={pinned ?? undefined}
-      className="pointer-events-none absolute top-0 z-[2] flex max-h-full min-w-[200px] flex-col gap-1 overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]"
+      className={`pointer-events-none absolute top-0 z-[2] flex max-h-full min-w-[200px] flex-col ${compact ? "gap-0" : "gap-1"} overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]`}
       style={
         pinned === null
           ? {
@@ -326,10 +347,10 @@ export function ChartTooltip({
         {headerRight ? <span>{headerRight}</span> : null}
       </div>
       {rows.map((row) => (
-        <div key={row.id} className="flex items-center justify-between gap-2">
+        <div key={row.id} className={`flex items-center justify-between gap-2${compact ? " leading-[14px]" : ""}`}>
           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--body)]">
-            <SwatchBar color={row.color} className="!w-3" />
-            <span className="max-w-[190px] overflow-hidden text-ellipsis whitespace-nowrap">{row.label}</span>
+            <RowMark row={row} swatchClassName="!w-3" />
+            <RowLabel row={row} className="max-w-[190px] overflow-hidden text-ellipsis whitespace-nowrap" />
           </span>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
             {formatValue(row.value)}

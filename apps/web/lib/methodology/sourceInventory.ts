@@ -46,7 +46,7 @@ const inventoryRules = {
   ],
   demography: [
     { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "01-population-by-self-governed-unit.xlsx" },
-    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "03-density-by-regions.xlsx" },
+    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => ["03-density-by-regions.xlsx", "09-number-of-live-births-by-self-governed-units.xlsx", "15-crude-birth-rate.xlsx", "16-age-specific-fertility-rates-and-total-fertility-rate.xlsx", "19-number-of-deaths-by-self-governed-units.xlsx", "24-crude-death-rate.xlsx", "25-infant-mortality-rate-by-sex.xlsx", "28-life-expectancy-at-births-by-sex.xlsx", "29-Natural-increase-by-regions-and-self-governed-units.xlsx", "31-net-migration.xlsx", "33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx"].includes(path.posix.basename(candidatePath)) },
   ],
   inflation: [{ root: "docs/Raw Data/Inflation", include: (candidatePath: string) => [".xlsx", ".pdf"].includes(path.posix.extname(candidatePath).toLowerCase()) }],
   debt: [

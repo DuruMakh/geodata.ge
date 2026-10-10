@@ -5,6 +5,8 @@ import type {
   ClientGdpObservation,
   ClientGovernmentDebtFact,
   ClientInflationTargetRow,
+  ClientMigrationFact,
+  ClientNationalFact,
   ClientRegionalEconomyObservation,
   ClientSectorObservation,
   ServedAdminFact,
@@ -154,6 +156,20 @@ export function projectDemographyObservation(
     year: fact.year,
     value: fact.value,
   };
+}
+
+export function projectMigrationObservation(fact: ServedDemographyObservation): ClientMigrationFact {
+  return {
+    seriesId: fact.seriesId,
+    year: fact.year,
+    sex: fact.sex ?? "total",
+    citizenshipId: fact.citizenshipId ?? "citizenship.total",
+    value: fact.value,
+  };
+}
+
+export function projectNationalObservation(fact: ServedDemographyObservation): ClientNationalFact {
+  return { seriesId: fact.seriesId, year: fact.year, ageGroup: fact.ageGroup ?? "", value: fact.value };
 }
 
 /** Inflation: one publication per series and measure. */

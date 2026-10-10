@@ -56,6 +56,8 @@ type EditorialLineChartProps = {
   formatPeriod?: (period: number, kind: "axis" | "tooltip") => string;
   /** Annual charts only. No line joins the year before one of these years to it; a dashed rule and the short label mark the gap. */
   breaks?: ReadonlyArray<{ year: number; label: string }>;
+  /** The chart's accessible name; the generic trend label by default. */
+  ariaLabel?: string;
 };
 
 const W = 920;
@@ -76,7 +78,17 @@ const MOBILE_PAD_T = 26;
 const LATTICE_ID = "chart-dot-lattice";
 const MIN_LATTICE_PITCH = 12;
 
-export type TooltipRow = { id: string; label: string; color: string; value: number; preliminary?: boolean };
+export type TooltipRow = {
+  id: string;
+  label: string;
+  color: string;
+  value: number;
+  preliminary?: boolean;
+  /** Draws a coloured arrow in place of the colour bar: "up" for a gain, "down" for a loss. */
+  marker?: "up" | "down";
+  /** The full name read to screen readers when `label` is a shortened visible one. */
+  srLabel?: string;
+};
 
 // Series selection is unlimited (AGENTS.md UI contract), so the hover readout
 // cannot be one row per series: at 63 it measured 1327px against a 334px chart,
@@ -133,6 +145,7 @@ export function EditorialLineChart({
   preliminaryLabel,
   formatTooltipValue,
   breaks,
+  ariaLabel,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
   const { ref: layoutRef, mobileWidth } = useChartLayout();
@@ -267,7 +280,7 @@ export function EditorialLineChart({
         data-geometry={plot.mobile ? "mobile" : "desktop"}
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={message(messages, "controls.chartTrend")}
+        aria-label={ariaLabel ?? message(messages, "controls.chartTrend")}
         className={`h-auto w-full ${className}`}
         {...handlers}
       >

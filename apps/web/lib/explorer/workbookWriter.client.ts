@@ -45,6 +45,19 @@ function sourceRowHeight(title: string, organization: string): number {
   return Math.max(24, lines * 15);
 }
 
+// Readable-sheet column widths, in Excel's character units: the label column, then every value column.
+const READABLE_LABEL_WIDTH = 46;
+const READABLE_VALUE_WIDTH = 18;
+// Georgian letters run wider than Excel's character unit; the demography workbooks size their columns with the same weight.
+const GEORGIAN_WIDTH = 1.2;
+
+/** Lines a wrapped text needs across `width` characters, counting Georgian letters as wider. An estimate, not a measurement. */
+function wrappedLineCount(text: string, width: number): number {
+  let units = 0;
+  for (const character of text) units += /\p{Script=Georgian}/u.test(character) ? GEORGIAN_WIDTH : 1;
+  return Math.max(1, Math.ceil(units / width));
+}
+
 function formatYearRanges(years: number[]): string {
   const sorted = [...new Set(years)].sort((left, right) => left - right);
   const ranges: string[] = [];
@@ -137,6 +150,10 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
     titleCell.font = { bold: true, size: 16, color: INK_COLOR };
   }
   worksheet.getCell("A2").alignment = { vertical: "middle", wrapText: true };
+  if (readable.fitSubtitle) {
+    const mergedWidth = READABLE_LABEL_WIDTH + READABLE_VALUE_WIDTH * (lastColumn - 1);
+    worksheet.getRow(2).height = wrappedLineCount(readable.subtitle, mergedWidth) * 15;
+  }
 
   const changeHeader = readable.years.length > 0
     ? workbookMessage(locale, "workbook.changeRange", { startYear: readable.years[0], endYear: readable.years.at(-1)! })
@@ -161,8 +178,8 @@ function writeReadableSheet(worksheet: Worksheet, readable: WorkbookExportModel[
   const noteRow = readable.rows.length + 4;
   worksheet.getCell(noteRow, 1).value = workbookMessage(locale, "workbook.unit", { unit: readable.unitLabel });
 
-  worksheet.getColumn(1).width = 46;
-  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = 18;
+  worksheet.getColumn(1).width = READABLE_LABEL_WIDTH;
+  for (let column = 2; column <= lastColumn; column += 1) worksheet.getColumn(column).width = READABLE_VALUE_WIDTH;
 }
 
 function writeSourcesSheet(

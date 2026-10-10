@@ -161,3 +161,15 @@ export type ClientDemographyObservation = {
   year: number;
   value: number;
 };
+
+/** A migration row as the Migration page receives it: one direction, sex and citizenship group in one year, in persons. */
+export type ClientMigrationFact = {
+  seriesId: string;
+  year: number;
+  sex: "total" | "male" | "female";
+  citizenshipId: string;
+  value: number;
+};
+
+/** A national rate as the browser receives it: the fertility and life-expectancy series, with the mother's age group where it has one ("" otherwise). */
+export type ClientNationalFact = { seriesId: string; year: number; ageGroup: string; value: number };

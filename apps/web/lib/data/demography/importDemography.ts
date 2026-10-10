@@ -4,8 +4,8 @@ import Decimal from "decimal.js";
 import { assertSameServedRows, demographyFactParityKey } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { parseCanonicalDemographyRows } from "./canonicalRows";
-import { populationEstimateBasis, SERIES } from "./series";
-import type { DemographyObservation, ServedDemographyObservation } from "./types";
+import { FAMILIES, populationEstimateBasis, SERIES } from "./series";
+import type { DemographyObservation, EstimateBasis, ServedDemographyObservation } from "./types";
 
 // The files this release serves. SERVED_DATA_FILES names the same paths (a test keeps the two
 // equal); they are spelled here too because servedData.ts imports this module, and importing it
@@ -13,21 +13,34 @@ import type { DemographyObservation, ServedDemographyObservation } from "./types
 export const SERVED_DEMOGRAPHY_FILES = [
   "../../data/imports/demography-population-annual.csv",
   "../../data/imports/demography-density-annual.csv",
+  "../../data/imports/demography-migration-annual.csv",
+  "../../data/imports/demography-vital-annual.csv",
+  "../../data/imports/demography-fertility-age-annual.csv",
 ] as const;
 
-const SERVED_SERIES = new Set<string>([SERIES.populationTotal, SERIES.populationDensity]);
+// The migration, vital-events and fertility files are mirrored whole, as the import mirrors files as they are.
+// Pages read only the series they show; the infant mortality rate and the crude rates are mirrored, not shown.
+const MIGRATION_SERIES = new Set<string>(FAMILIES.migration);
+const REGISTERED_SERIES = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility]);
+const SERVED_SERIES = new Set<string>([SERIES.populationTotal, SERIES.populationDensity, ...MIGRATION_SERIES, ...REGISTERED_SERIES]);
+
+/** Population and density follow the lineage of their year; migration is border-police data and vital events are registered events in every year. */
+function expectedBasis(fact: DemographyObservation): EstimateBasis {
+  if (MIGRATION_SERIES.has(fact.seriesId)) return "border_police";
+  if (REGISTERED_SERIES.has(fact.seriesId)) return "registered";
+  return populationEstimateBasis(fact.year);
+}
 
 // Everything the loader can check without the Geostat workbooks: the series are served ones, no
-// key repeats, and every row's basis is the lineage of its year (foundation section 4).
+// key repeats, and every row's basis is the one its series and year require (foundation section 4).
 function validateServedDemography(facts: readonly DemographyObservation[]): void {
   if (facts.length === 0) throw new Error("Demography facts are empty");
   const keys = new Set<string>();
   for (const fact of facts) {
     if (!SERVED_SERIES.has(fact.seriesId)) throw new Error(`Demography series is not served: ${fact.seriesId}`);
-    if (fact.estimateBasis !== populationEstimateBasis(fact.year)) {
-      throw new Error(
-        `Demography basis ${fact.estimateBasis} disagrees with the lineage of ${fact.year} for ${fact.seriesId}|${fact.geographyId}`,
-      );
+    const expected = expectedBasis(fact);
+    if (fact.estimateBasis !== expected) {
+      throw new Error(`Demography basis ${fact.estimateBasis} is not ${expected} in ${fact.year} for ${fact.seriesId}|${fact.geographyId}`);
     }
     const key = demographyFactParityKey(fact);
     if (keys.has(key)) throw new Error(`Duplicate demography row ${key}`);

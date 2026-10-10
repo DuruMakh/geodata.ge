@@ -25,11 +25,27 @@ describe.skipIf(!connectionString)("demography mirror integrity", () => {
   beforeEach(async () => { await client.query("BEGIN"); });
   afterEach(async () => { await client.query("ROLLBACK"); });
 
-  it("mirrors both served files", async () => {
+  it("mirrors the served files", async () => {
     const { rows } = await client.query('SELECT "seriesId", count(*)::int AS n FROM "DemographyFact" GROUP BY 1 ORDER BY 1');
     expect(rows).toEqual([
+      { seriesId: "demography.age_specific_fertility_rate", n: 84 },
+      { seriesId: "demography.crude_birth_rate", n: 12 },
+      { seriesId: "demography.crude_death_rate", n: 12 },
+      { seriesId: "demography.deaths", n: 837 },
+      { seriesId: "demography.emigrants", n: 630 },
+      { seriesId: "demography.emigrants_by_citizenship_group", n: 252 },
+      { seriesId: "demography.immigrants", n: 630 },
+      { seriesId: "demography.immigrants_by_citizenship_group", n: 252 },
+      { seriesId: "demography.infant_mortality_rate", n: 12 },
+      { seriesId: "demography.life_expectancy_female", n: 12 },
+      { seriesId: "demography.life_expectancy_male", n: 12 },
+      { seriesId: "demography.life_expectancy_total", n: 12 },
+      { seriesId: "demography.live_births", n: 837 },
+      { seriesId: "demography.natural_increase", n: 837 },
+      { seriesId: "demography.net_migration", n: 14 },
       { seriesId: "demography.population_density", n: 145 },
       { seriesId: "demography.population_total", n: 923 },
+      { seriesId: "demography.total_fertility_rate", n: 12 },
     ]);
   });
 

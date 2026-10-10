@@ -4,12 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src: "/definitions.svg" } }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathname: () => "/" }));
 
+import { SERIES } from "../../lib/data/demography/series";
 import { populationHrefById } from "../../lib/explorer/demographyPlaceRoutes";
 import { buildPopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
 import {
   demographyPageMetadata,
   renderDemographyPage,
 } from "../../lib/pages/demography";
+import { demographyMigrationPageMetadata, renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
+import { demographyBirthsDeathsPageMetadata, renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
 import {
   demographyPopulationPageMetadata,
   loadPopulationBasics,
@@ -30,8 +33,10 @@ describe("demography hub page", () => {
     const html = renderToStaticMarkup(await renderDemographyPage("en"));
     expect(html).toContain('data-testid="demography-hub"');
     expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(3);
+    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(1);
     expect(html).toContain('href="/en/explorer/demography/population"');
+    expect(html).toContain('href="/en/explorer/demography/migration"');
+    expect(html).toContain('href="/en/explorer/demography/births-deaths"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
@@ -48,6 +53,12 @@ describe("demography hub page", () => {
 const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
 
 describe("population index page", () => {
+  it("hands the Population pages only population and density rows", async () => {
+    const { facts, clientFacts } = await loadPopulationBasics("en");
+    expect(facts).toHaveLength(1_068);
+    expect(new Set(clientFacts.map((fact) => fact.seriesId))).toEqual(new Set([SERIES.populationTotal, SERIES.populationDensity]));
+  });
+
   it("is the Budget index layout with population: map, four key figures, 64 and 12 rows, links to place pages, no button row", async () => {
     const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="municipal-index-workspace"');
@@ -133,14 +144,81 @@ describe("population index page", () => {
   });
 });
 
-// The two Geostat originals listed in data/methodology/source-archives/demography.csv.
-const REVIEWED_SOURCE_IDS = ["source.geostat_demography_density", "source.geostat_municipal_population"];
+describe("migration page", () => {
+  it("renders the heading, coverage, breadcrumb and the explorer, with no dataset markup", async () => {
+    const html = renderToStaticMarkup(await renderDemographyMigrationPage("en"));
+    expect(html).toContain(">Migration</h1>");
+    expect(html).toContain("2012–2025 · annual");
+    expect(html).toContain("How many people moved to and left Georgia each year, by citizenship.");
+    expect(html).not.toContain("persons per year");
+    expect(html).toContain('data-testid="migration-explorer"');
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('"@type":"Dataset"');
+    expect(html).toContain('href="/en/methodology/demography"');
+  });
+
+  it("has no Georgian in the English page or its metadata", async () => {
+    const html = renderToStaticMarkup(await renderDemographyMigrationPage("en"));
+    expect(html).not.toMatch(GEORGIAN);
+    const metadata = await demographyMigrationPageMetadata("en");
+    expect(String(metadata.title)).not.toMatch(GEORGIAN);
+    expect(String(metadata.description)).not.toMatch(GEORGIAN);
+  });
+
+  it("has its own canonical address and title", async () => {
+    const metadata = await demographyMigrationPageMetadata("ka");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/migration");
+    expect(String(metadata.title)).toBe("მიგრაცია — დემოგრაფია | Fiscal.ge");
+  });
+});
+
+describe("births and deaths page", () => {
+  it("renders the places block, fertility and life expectancy, with no dataset markup", async () => {
+    const html = renderToStaticMarkup(await renderDemographyBirthsDeathsPage("en"));
+    expect(html).toContain(">Births, deaths and fertility</h1>");
+    expect(html).toContain("2014–2025 · annual");
+    expect(html).toContain("Births per 100 deaths, 2025");
+    expect(html).toContain("53 of 64");
+    expect(html).toContain('href="/en/explorer/demography/population/batumi#births-deaths"');
+    expect(html).toContain('href="/en/explorer/demography/population/region/tbilisi#births-deaths"');
+    expect(html).toContain('data-testid="fertility-section"');
+    expect(html).toContain('data-testid="life-section"');
+    expect(html).toContain('aria-label="Total fertility rate, Georgia, 2014–2025"');
+    expect(html).toContain('aria-label="Births per 1,000 women by mother&#x27;s age, one line per year, 2014–2025"');
+    expect(html).toContain('aria-label="Life expectancy at birth, total, men and women, Georgia, 2014–2025"');
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('"@type":"Dataset"');
+    expect(html).not.toMatch(GEORGIAN);
+  });
+
+  it("has its own canonical address and title", async () => {
+    const metadata = await demographyBirthsDeathsPageMetadata("ka");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/births-deaths");
+    expect(String(metadata.title)).toBe("შობადობა და სიკვდილიანობა — დემოგრაფია | Fiscal.ge");
+  });
+});
+
+// The twelve Geostat originals listed in data/methodology/source-archives/demography.csv.
+const REVIEWED_SOURCE_IDS = [
+  "source.geostat_demography_births",
+  "source.geostat_demography_crude_birth_rate",
+  "source.geostat_demography_crude_death_rate",
+  "source.geostat_demography_deaths",
+  "source.geostat_demography_density",
+  "source.geostat_demography_fertility",
+  "source.geostat_demography_infant_mortality",
+  "source.geostat_demography_life_expectancy",
+  "source.geostat_demography_migration_citizenship",
+  "source.geostat_demography_natural_increase",
+  "source.geostat_demography_net_migration",
+  "source.geostat_municipal_population",
+];
 
 describe("population sources", () => {
-  it("are the two reviewed demography sources in either language, each downloadable from the demography files", async () => {
+  it("are the twelve reviewed demography sources in either language, each downloadable from the demography files", async () => {
     for (const locale of ["en", "ka"] as const) {
       const sources = await loadPopulationSources(locale);
-      expect(sources, locale).toHaveLength(2);
+      expect(sources, locale).toHaveLength(12);
       expect(sources.map((source) => source.sourceId).sort(), locale).toEqual(REVIEWED_SOURCE_IDS);
       for (const source of sources) expect(source.downloadHref, locale).toMatch(/^\/downloads\/methodology\/demography\/files\/[^/]+$/);
     }
