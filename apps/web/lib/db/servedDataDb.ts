@@ -24,7 +24,11 @@ import {
   loadEconomicSectorFactsFromMirror,
   loadUnemploymentFactsFromMirror,
   loadTradeOverviewFactsFromMirror,
+  loadWagesFactsFromMirror,
   loadTradePartnersDataFromMirror,
+  loadMoneyTransfersDataFromMirror,
+  loadForeignInvestmentDataFromMirror,
+  loadCurrentAccountFactsFromMirror,
   loadTradeProductsDataFromMirror,
   loadTradeDomesticDataFromMirror,
   loadRegionalEconomyFactsFromMirror,
@@ -124,8 +128,24 @@ export async function loadTradeOverviewFactsFromDb() {
   return loadTradeOverviewFactsFromMirror(prisma);
 }
 
+export async function loadWagesFactsFromDb() {
+  return loadWagesFactsFromMirror(prisma);
+}
+
 export async function loadTradePartnersDataFromDb() {
   return loadTradePartnersDataFromMirror(prisma);
+}
+
+export async function loadMoneyTransfersDataFromDb() {
+  return loadMoneyTransfersDataFromMirror(prisma);
+}
+
+export async function loadForeignInvestmentDataFromDb() {
+  return loadForeignInvestmentDataFromMirror(prisma);
+}
+
+export async function loadCurrentAccountFactsFromDb() {
+  return loadCurrentAccountFactsFromMirror(prisma);
 }
 export async function loadTradeProductsDataFromDb() {
   return loadTradeProductsDataFromMirror(prisma);

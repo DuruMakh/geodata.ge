@@ -1,0 +1,1082 @@
+﻿check,family,dimension,year,flow,item_id,expected_usd,actual_usd,difference_usd,tolerance_usd,result,note
+money_transfers.countries_sum_to_total,money_transfers,country,2000,inflow,total,63269343.0000000008000,63269343.0000000001644000,-6.356000E-10,435.00000000118980000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2000,inflow,total,63269343.000000001000,63269343.0000000008000,-2.000E-10,632.69343000000001000,reported,"REMM D5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2000,outflow,total,10398643.00000000002000,10398642.99999999985193000,-1.6807000E-10,1534.500000000255405000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2000,outflow,total,10398643.000,10398643.00000000002000,2.000E-11,103.98643000,reported,"REMM E5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2001,inflow,total,69559234.9999999995000,69559234.9999999995818000,8.18000E-11,465.50000000172450000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2001,inflow,total,69559235.000000015000,69559234.9999999995000,-1.55000E-8,695.59235000000015000,reported,"REMM F5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2001,outflow,total,11470892.00000000023000,11470892.00000000014522000,-8.478000E-11,2167.000000000291155000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2001,outflow,total,11470892.000,11470892.00000000023000,2.3000E-10,114.70892000,reported,"REMM G5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2002,inflow,total,96501000,96501000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2002,inflow,total,96501013.999999996000,96501000,-13.999999996000,6000.0000000005000,reported,"REMM H5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2002,outflow,total,16866000,16866000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2002,outflow,total,16865798.000000003000,16866000,201.999999997000,6000.0000000005000,reported,"REMM I5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2003,inflow,total,196635000,196635000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2003,inflow,total,196633555.99999998000,196635000,1444.00000002000,6000.000000005000,reported,"REMM J5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2003,outflow,total,30818000,30818000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2003,outflow,total,30818830.999999998000,30818000,-830.999999998000,6000.0000000005000,reported,"REMM K5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2004,inflow,total,259123000,259123000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2004,inflow,total,259123000,259123000,0,6500.0,reported,"REMM L5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2004,outflow,total,46438000,46438000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2004,outflow,total,46438000,46438000,0,6500.0,reported,"REMM M5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2005,inflow,total,403134000,403134000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2005,inflow,total,403134000,403134000,0,6500.0,reported,"REMM N5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2005,outflow,total,87709000,87709000,0,120000.0,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2005,outflow,total,87709000,87709000,0,6500.0,reported,"REMM O5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2006,inflow,total,553249528.227536908000,553249528.22753693276724000,2.476724000E-8,20007.120050011458255000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2006,inflow,total,553249528.22753694000,553249528.227536908000,-3.2000E-8,5532.4952822753694000,reported,"REMM P5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2006,outflow,total,132764310.0329594706000,132764310.0329594713914000,7.914000E-10,20519.32055000877210000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2006,outflow,total,132764310.03295945000,132764310.0329594706000,2.06000E-8,1327.6431003295945000,reported,"REMM Q5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2007,inflow,total,866155663.49559011000,866155998.0248119916434000,334.5292218816434000,50118.50000001089325000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2007,inflow,total,866155663.4955901000,866155663.49559011000,1.000E-8,8661.556634955901000,reported,"REMM R5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2007,outflow,total,110749916.206133701000,110749720.7894235074745000,-195.4167101935255000,53269.50000000157860000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2007,outflow,total,110749916.2061337000,110749916.206133701000,1.000E-9,5500.0000000505000,reported,"REMM S5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2008,inflow,total,1002121923.148395813000,1002121923.148395652932913000,-1.60067087000E-7,975999.9351000892694130000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2008,inflow,total,1002121923.1483958000,1002121923.148395813000,1.3000E-8,10021.219231483958000,reported,"REMM T5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2008,outflow,total,84254224.5586519621000,84254224.558651948102787000,-1.3997213000E-8,1029335.5400550041074995000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2008,outflow,total,84254224.558651957000,84254224.5586519621000,5.1000E-9,842.54224558651957000,reported,"REMM U5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2009,inflow,total,841775723.460814641000,841775723.460814690627225000,4.9627225000E-8,901191.4600516038354150000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2009,inflow,total,841774973.46081457000,841775723.460814641000,750.000000071000,8417.7497346081457000,reported,"REMM V5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2009,outflow,total,75133126.6657659599000,75133126.665765958091658001000,-1.808341999000E-9,970354.9800550104408085005000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2009,outflow,total,75133126.665765958000,75133126.6657659599000,1.9000E-9,751.33126665765958000,reported,"REMM W5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2010,inflow,total,1052226650.329073902000,1052226650.329074087374063000,1.85374063000E-7,771918.8850052285320585000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2010,inflow,total,1052226650.3290739000,1052226650.329073902000,2.000E-9,10522.266503290739000,reported,"REMM X5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2010,outflow,total,103344777.2030070121000,103344777.203007008681526000,-3.418474000E-9,928597.6755501152596155000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2010,outflow,total,103344777.20300703000,103344777.2030070121000,-1.79000E-8,1033.4477720300703000,reported,"REMM Y5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2011,inflow,total,1268127290.657476487000,1268127290.657476594900894000,1.07900894000E-7,688660.7749011518482530000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2011,inflow,total,1268127290.6574765000,1268127290.657476487000,-1.3000E-8,12681.272906574765000,reported,"REMM Z5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2011,outflow,total,100255389.8068193830000,100255389.806819373253119000,-9.746881000E-9,911430.0672005694796560000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2011,outflow,total,100255389.80681938000,100255389.8068193830000,3.0000E-9,1002.5538980681938000,reported,"REMM AA5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2012,inflow,total,1334520849.000000173000,1334520848.999999989136739000,-1.83863261000E-7,706485.5000000561879145000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2012,inflow,total,1334522000,1334520849.000000173000,-1150.999999827000,13345.22000,reported,"REMM AB5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2012,outflow,total,108302373.0000000030000,108302373.000000000070943000,-2.929057000E-9,890859.5000000032410360000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2012,outflow,total,108303000,108302373.0000000030000,-626.9999999970000,1083.03000,reported,"REMM AC5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2013,inflow,total,1477051119.000000328000,1477051118.999999985452427000,-3.42547573000E-7,688695.0000000679123560000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2013,inflow,total,1477050000,1477051119.000000328000,1119.000000328000,14770.50000,reported,"REMM AD5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2013,outflow,total,155207944.0000000069000,155207943.999999998862139000,-8.037861000E-9,847304.0000000164502595000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2013,outflow,total,155209000,155207944.0000000069000,-1055.9999999931000,1552.09000,reported,"REMM AE5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2014,inflow,total,1440404160.000000397000,1440404160.000000002269019000,-3.94730981000E-7,719878.5000001056647790000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2014,inflow,total,1440405000,1440404160.000000397000,-839.999999603000,14404.05000,reported,"REMM AF5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2014,outflow,total,178358171.000000014000,178358171.0000000000828001000,-1.39171999000E-8,838203.50000000691897255000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2014,outflow,total,178358000,178358171.000000014000,171.000000014000,1783.58000,reported,"REMM AG5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2015,inflow,total,1079964178.999999974000,1079964179.000000001021651000,2.7021651000E-8,670278.5000000266358970000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2015,inflow,total,1079965000,1079964178.999999974000,-821.000000026000,10799.65000,reported,"REMM AH5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2015,outflow,total,170842675.999999995000,170842675.999999998312643000,3.312643000E-9,841451.5000000120514085000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2015,outflow,total,170841000,170842675.999999995000,1675.999999995000,1708.41000,reported,"REMM AI5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2016,inflow,total,1153391192.000000215000,1153391191.999999995992832000,-2.19007168000E-7,593636.0000000442972840000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2016,inflow,total,1153392000,1153391192.000000215000,-807.999999785000,11533.92000,reported,"REMM AJ5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2016,outflow,total,194138651.000000012000,194138651.0000000011173732000,-1.08826268000E-8,765897.50000000680181955000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2016,outflow,total,194138000,194138651.000000012000,651.000000012000,1941.38000,reported,"REMM AK5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2017,inflow,total,1387249984.000000001000,1387249984.0000000093733083000,8.3733083000E-9,559353.00000005212236705000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2017,inflow,total,1387250000,1387249984.000000001000,-15.999999999000,13872.50000,reported,"REMM AL5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2017,outflow,total,209889601.999999954000,209889601.999999998943646000,4.4943646000E-8,755100.0000000074735145000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2017,outflow,total,209889000,209889601.999999954000,601.999999954000,2098.89000,reported,"REMM AM5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2018,inflow,total,1579664897.99999957000,1579664897.999999998128726000,4.28128726000E-7,526147.0000000796100555000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2018,inflow,total,1579667000,1579664897.99999957000,-2102.00000043000,15796.67000,reported,"REMM AN5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2018,outflow,total,229745730.999999972000,229745730.9999999995116192000,2.75116192000E-8,709095.50000000827600005000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2018,outflow,total,229746000,229745730.999999972000,-269.000000028000,2297.46000,reported,"REMM AO5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2019,inflow,total,1733317687.00000043000,1733317687.000000006735190000,-4.23264810000E-7,509639.5000001674643650000,pass,70 countries have blank months; blanks count as absent.
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2019,inflow,total,1733317310.0000003000,1733317687.00000043000,377.00000013000,17333.173100000003000,reported,"REMM AP5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2019,outflow,total,237424640.000000020000,237424639.999999998918858000,-2.1081142000E-8,691012.0000000085461630000,pass,70 countries have blank months; blanks count as absent.
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2019,outflow,total,237424196.00000008000,237424640.000000020000,443.999999940000,2374.2419600000008000,reported,"REMM AQ5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2020,inflow,total,1885981934.999999826000,1885981935.000000008413697000,1.82413697000E-7,535921.5000001108630785000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2020,inflow,total,1885981935.0000001000,1885981934.999999826000,-2.74000E-7,18859.819350000001000,reported,"REMM AR5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2020,outflow,total,246864214.9999999451000,246864214.999999999353429000,5.4253429000E-8,783994.0000000079964705000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2020,outflow,total,246864187.99999997000,246864214.9999999451000,26.9999999751000,2468.6418799999997000,reported,"REMM AS5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2021,inflow,total,2349563731.00224094000,2349563731.002241018899912000,7.8899912000E-8,583028.7100937240278155000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2021,inflow,total,2349563732.0022411000,2349563731.00224094000,-1.00000016000,23495.637320022411000,reported,"REMM AT5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2021,outflow,total,316864527.691002020000,316864527.691002000769246000,-1.9230754000E-8,748353.6200300098283430000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2021,outflow,total,316864529.69100198000,316864527.691002020000,-1.999999960000,3168.6452969100198000,reported,"REMM AU5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2022,inflow,total,4372408960.95485183000,4372408960.954851965013036000,1.35013036000E-7,539158.1452441720459890000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2022,inflow,total,4372408960.9548524000,4372408960.95485183000,-5.7000E-7,43724.089609548524000,reported,"REMM AV5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2022,outflow,total,343482082.851238040000,343482082.8512379944725992000,-4.55274008000E-8,679432.27523501149820610000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2022,outflow,total,343482082.85123797000,343482082.851238040000,7.0000E-8,3434.8208285123797000,reported,"REMM AW5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2023,inflow,total,4146593340.12042371000,4146593340.1204240068813703000,2.968813703000E-7,573066.90519271007475255000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2023,inflow,total,4146593640.1204239000,4146593340.12042371000,-300.00000019000,41465.936401204239000,reported,"REMM AX5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2023,outflow,total,356509790.833982002000,356509790.833981998452662000,-3.547338000E-9,650635.1552830193294055000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2023,outflow,total,356509790.83398212000,356509790.833982002000,-1.18000E-7,3565.0979083398212000,reported,"REMM AY5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2024,inflow,total,3361548714.97636299000,3361548714.976362923655384000,-6.6344616000E-8,593372.1447306485719890000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2024,inflow,total,,3361548714.97636299000,,,not_published,REMM has no column for this year; REMC monthly sum only.
+money_transfers.countries_sum_to_total,money_transfers,country,2024,outflow,total,378006246.276547921000,378006246.276548003751562000,8.2751562000E-8,681951.8275085106573585000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2024,outflow,total,,378006246.276547921000,,,not_published,REMM has no column for this year; REMC monthly sum only.
+money_transfers.countries_sum_to_total,money_transfers,country,2025,inflow,total,3648970331.49660854000,3648970331.4966088972549553000,3.572549553000E-7,528070.98135771532962510000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2025,inflow,total,3648970331.4927197000,3648970331.49660854000,0.00388884000,36489.703314927197000,reported,"REMM AZ5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+money_transfers.countries_sum_to_total,money_transfers,country,2025,outflow,total,420452894.728295021000,420452894.7282949972749216000,-2.37250784000E-8,646287.10112801659111260000,pass,
+money_transfers.monthly_sum_matches_remm_annual_total,money_transfers,total,2025,outflow,total,420452894.72861611000,420452894.728295021000,-0.000321089000,4204.5289472861611000,reported,"REMM BA5: a second NBG table, used only as a check; small differences are reported, a missing month would fail."
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,current_account,-175899687.6000001000000,-175899687.60000011000000,-1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,goods_and_services,-463092788.24999991000000,-463092788.2499999000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,goods,-535033627.24999986000000,-535033627.24999988000000,-2.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,services,71940838.99999998000000,71940838.999999983000000,3.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,primary_income,37391809.02000001000000,37391809.020000011000000,1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,secondary_income,249801291.630000011000000,249801291.63000001000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,capital_account,14389615.729999999000000,14389615.729999999000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,compensation_of_employees,124873579.220000001000000,124873579.22000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,personal_transfers,60036680.7499999938000000,60036680.750000002000000,8.2000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2000,net,workers_remittances,61524283.8099999939000000,61524283.81000000,6.1000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2000,net,direct_investment,-128067895.3399999901000000,-128067895.33999998000000,1.01000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2000,net,portfolio_investment,-2747885.0000000001000000,-2747885.0000000001000000,0E-16,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2000,net,financial_derivatives,0,0,0,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2000,net,other_investment,-8223533.549999996000000,-8223533.5499999955000000,5.000000E-10,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2000,net,current_account,-175899687.60000011000000,-175899687.599999879000000,2.31000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2000,net,goods_and_services,-463092788.2499999000000,-463092788.249999897000000,3.000000E-9,1,pass,
+bop.net_lending,bop,bop_bpm6,2000,net,net_lending_borrowing,-161510071.870000111000000,-161510071.87000005000000,6.1000000E-8,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2000,net,financial_account,-155964512.81999995000000,-155964512.8199999766000000,-2.66000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2000,net,net_errors_and_omissions,5545559.05000010000000,5545559.0500000476000000,-5.24000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2000,liabilities,direct_investment_liabilities,131466678.33999999000000,131466678.33999999000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2000,liabilities,direct_investment_liabilities,131466678.33999999000000,131466678.340000004000000,1.4000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,current_account,-197094537.5600000000000,-197094537.55999994000000,6.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,goods_and_services,-445748145.37999988000000,-445748145.37999987000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,goods,-516702117.55999996000000,-516702117.56000003000000,-7.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,services,70953972.17999994000000,70953972.179999937000000,-3.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,primary_income,20088548.39999998000000,20088548.399999979000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,secondary_income,228565059.42000003000000,228565059.42000004000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,capital_account,16640114.329999999000000,16640114.329999999000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,compensation_of_employees,126842959.990000022000000,126842959.99000001000000,-1.2000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,personal_transfers,71960420.439999997000000,71960420.440000007000000,1.0000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2001,net,workers_remittances,73601416.6999999971000000,73601416.700000001000000,3.9000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2001,net,direct_investment,-105779435.4899999899000000,-105779435.48999998000000,9.9000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2001,net,portfolio_investment,8104.9999999999178000000,8104.9999999999178000000,0E-19,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2001,net,financial_derivatives,0,0,0,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2001,net,other_investment,-114959878.219999978000000,-114959878.21999998000000,-2.000000E-9,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2001,net,current_account,-197094537.55999994000000,-197094537.559999851000000,8.9000000E-8,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2001,net,goods_and_services,-445748145.37999987000000,-445748145.380000093000000,-2.23000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2001,net,net_lending_borrowing,-180454423.229999941000000,-180454423.22999992000000,2.1000000E-8,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2001,net,financial_account,-169358610.10999997000000,-169358610.1099999570822000000,1.29178000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2001,net,net_errors_and_omissions,11095813.11999995000000,11095813.119999935000000,-1.5000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2001,liabilities,direct_investment_liabilities,109871635.48999999000000,109871635.48999999000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2001,liabilities,direct_investment_liabilities,109871635.48999999000000,109871635.489999996000000,6.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,current_account,-216912821.5200001000000,-216912821.52000008000000,2.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,goods_and_services,-443707082.69000015000000,-443707082.69000011000000,4.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,goods,-496517092.29999995000000,-496517092.29999994000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,services,52810009.61000001000000,52810009.610000009000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,primary_income,10363032.75000000,10363032.750000002000000,2.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,secondary_income,216431228.420000003000000,216431228.42000000,-3.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,capital_account,23130762.079999997000000,23130762.079999997000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,compensation_of_employees,136230415.569999988000000,136230415.56999999000000,2.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,personal_transfers,71186898.5700000039000000,71186898.570000011000000,7.1000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2002,net,workers_remittances,72596102.6300000039000000,72596102.630000004000000,1.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2002,net,direct_investment,-156119460.4599999997000000,-156119460.46000000,-3.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2002,net,portfolio_investment,-1000.000,-1000.000,0.000,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2002,net,financial_derivatives,0,0,0,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2002,net,other_investment,-56824209.49000000,-56824209.490000001000000,-1.000000E-9,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2002,net,current_account,-216912821.52000008000000,-216912821.520000108000000,-2.8000000E-8,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2002,net,goods_and_services,-443707082.69000011000000,-443707082.689999931000000,1.79000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2002,net,net_lending_borrowing,-193782059.440000083000000,-193782059.43999993000000,1.53000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2002,net,financial_account,-181214238.19999998000000,-181214238.200000000000000,-2.0000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2002,net,net_errors_and_omissions,12567821.23999995000000,12567821.239999915000000,-3.5000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2002,liabilities,direct_investment_liabilities,160398660.46000000,160398660.46000000,0E-8,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2002,liabilities,direct_investment_liabilities,160398660.46000000,160398660.459999999000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,current_account,-382208826.0599999000000,-382208826.05999986000000,4.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,goods_and_services,-573281400.0600002000000,-573281400.06000012000000,8.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,goods,-658890972.29000001000000,-658890972.29000004000000,-3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,services,85609572.22999997000000,85609572.229999969000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,primary_income,9519962.58000000000000,9519962.5799999978000000,-2.2000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,secondary_income,181552611.419999995000000,181552611.42000001000000,1.5000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,capital_account,24411894.539999999000000,24411894.539999999000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,compensation_of_employees,152394930.759999989000000,152394930.75999999000000,1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,personal_transfers,73894222.0100000015000000,73894222.009999993000000,-8.5000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2003,net,workers_remittances,58809888.8999999984000000,58809888.900000004000000,5.6000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2003,net,direct_investment,-330805341.6200000099000000,-330805341.62000004000000,-3.01000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2003,net,portfolio_investment,-609596.439999999902000000,-609596.43999999991000000,-8.000000E-12,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2003,net,financial_derivatives,0,0,0,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2003,net,other_investment,-11243034.920000000000000,-11243034.919999999000000,1.000000E-9,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2003,net,current_account,-382208826.05999986000000,-382208826.0600001122000000,-2.522000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2003,net,goods_and_services,-573281400.06000012000000,-573281400.060000071000000,4.9000000E-8,1,pass,
+bop.net_lending,bop,bop_bpm6,2003,net,net_lending_borrowing,-357796931.519999861000000,-357796931.5200001000000,-2.39000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2003,net,financial_account,-361161709.22000009000000,-361161709.22000003791000000,5.209000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2003,net,net_errors_and_omissions,-3364777.69999999000000,-3364777.699999884000000,1.06000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2003,liabilities,direct_investment_liabilities,334891041.62000001000000,334891041.62000001000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2003,liabilities,direct_investment_liabilities,334891041.62000001000000,334891041.619999966000000,-4.4000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,current_account,-356204277.3899998000000,-356204277.38999979000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,goods_and_services,-846057003.4800000000000,-846057003.48000005000000,-5.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,goods,-930818240.0000000000000,-930818240.00000006000000,-6.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,services,84761236.52000001000000,84761236.520000011000000,1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,primary_income,73605461.45000001000000,73605461.450000007000000,-3.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,secondary_income,416247264.640000028000000,416247264.64000003000000,2.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,capital_account,41214850.869999999000000,41214850.869999999000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,compensation_of_employees,221309798.01000002000000,221309798.01000001000000,-1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,personal_transfers,113411023.4499999898000000,113411023.45000000,1.02000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2004,net,workers_remittances,56564342.6399999912000000,56564342.64000000,8.8000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2004,net,direct_investment,-482758940.0099999916000000,-482758940.01000000,-8.4000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2004,net,portfolio_investment,13626683.130000001000000,13626683.130000002000000,1.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2004,net,financial_derivatives,0,0,0,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2004,net,other_investment,-8447817.885999985000000,-8447817.8859999851000000,-1.000000E-10,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2004,net,current_account,-356204277.38999979000000,-356204277.390000013000000,-2.23000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2004,net,goods_and_services,-846057003.48000005000000,-846057003.480000049000000,1.000000E-9,1,pass,
+bop.net_lending,bop,bop_bpm6,2004,net,net_lending_borrowing,-314989426.519999791000000,-314989426.52000005000000,-2.59000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2004,net,financial_account,-299701020.45599998000000,-299701020.4559999731000000,6.9000000E-9,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2004,net,net_errors_and_omissions,15288406.06400007000000,15288406.06400005000000,-2.000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2004,liabilities,direct_investment_liabilities,492732940.00999999000000,492732940.00999999000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2004,liabilities,direct_investment_liabilities,492732940.00999999000000,492732940.009999968000000,-2.2000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,current_account,-695658032.2299997000000,-695658032.22999966000000,4.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,goods_and_services,-1115393322.2100000000000,-1115393322.21000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,goods,-1217505609.8500001000000,-1217505609.8500002000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,services,102112287.64000020000000,102112287.6400002000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,primary_income,60697658.74000004000000,60697658.740000037000000,-3.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,secondary_income,359037631.239999957000000,359037631.23999994000000,-1.7000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,capital_account,56478213.390000001000000,56478213.390000001000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,compensation_of_employees,229247855.959999992000000,229247855.95999998000000,-1.2000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,personal_transfers,189650190.2400000095000000,189650190.24000000,-9.5000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2005,net,workers_remittances,86187540.2099999986000000,86187540.210000009000000,1.04000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2005,net,direct_investment,-542229625.340000029000000,-542229625.33999998000000,4.9000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2005,net,portfolio_investment,-15484794.409999999000000,-15484794.409999999000000,0E-15,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2005,net,financial_derivatives,0,0,0,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2005,net,other_investment,-165516143.520000006000000,-165516143.52000001000000,-4.000000E-9,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2005,net,current_account,-695658032.22999966000000,-695658032.230000023000000,-3.63000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2005,net,goods_and_services,-1115393322.21000000,-1115393322.2100000000000,0E-13,1,pass,
+bop.net_lending,bop,bop_bpm6,2005,net,net_lending_borrowing,-639179818.839999659000000,-639179818.83999971000000,-5.1000000E-8,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2005,net,financial_account,-612660433.94999997000000,-612660433.949999999000000,-2.9000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2005,net,net_errors_and_omissions,26519384.88999974000000,26519384.889999742000000,2.000000E-9,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2005,liabilities,direct_investment_liabilities,453107292.01000004000000,453107292.01000004000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2005,liabilities,direct_investment_liabilities,453107292.01000004000000,453107292.009999991000000,-4.9000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,current_account,-1191302771.3800002000000,-1191302771.3800002000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,goods_and_services,-1876372880.5400001000000,-1876372880.5400001000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,goods,-2056533596.0600001000000,-2056533596.06000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,services,180160715.52000006000000,180160715.52000005000000,-1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,primary_income,161126688.40999998000000,161126688.40999999000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,secondary_income,523943420.75000005000000,523943420.75000009000000,4.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,capital_account,155092463.88000003000000,155092463.88000003000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,compensation_of_employees,295113172.130000012000000,295113172.12999995000000,-6.2000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,personal_transfers,305494339.7800000298000000,305494339.77999996000000,-6.98000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2006,net,workers_remittances,149139405.8599999799000000,149139405.86000001000000,3.01000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2006,net,direct_investment,-1184560923.7600001000000,-1184560923.7600002000000,-1.000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2006,net,portfolio_investment,-140250388.11000003000000,-140250388.11000002000000,1.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2006,net,financial_derivatives,0,0,0,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2006,net,other_investment,-210631810.960000049000000,-210631810.96000005000000,-1.000000E-9,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2006,net,current_account,-1191302771.3800002000000,-1191302771.38000002000000,1.8000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2006,net,goods_and_services,-1876372880.5400001000000,-1876372880.53999995000000,1.5000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2006,net,net_lending_borrowing,-1036210307.50000017000000,-1036210307.4999998000000,3.7000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2006,net,financial_account,-1096805983.3900004000000,-1096805983.39000027000000,1.3000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2006,net,net_errors_and_omissions,-60595675.8900006000000,-60595675.890000365000000,2.35000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2006,liabilities,direct_investment_liabilities,1171394522.2500001000000,1171394522.2500001000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2006,liabilities,direct_investment_liabilities,1171394522.2500001000000,1171394522.25000004000000,-6.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,current_account,-1992056360.8200000000000,-1992056360.82000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,goods_and_services,-2716420112.7299998000000,-2716420112.7299998000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,goods,-2888752033.6500001000000,-2888752033.6500002000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,services,172331920.92000009000000,172331920.92000013000000,4.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,primary_income,35909997.48000001000000,35909997.480000015000000,5.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,secondary_income,688453754.429999976000000,688453754.43000000,2.4000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,capital_account,83395806.030000003000000,83395806.030000003000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,compensation_of_employees,379233879.140000011000000,379233879.14000000,-1.1000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,personal_transfers,472132403.6399999703000000,472132403.64000001000000,3.97000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2007,net,workers_remittances,243332139.1999999701000000,243332139.2000000,2.99000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2007,net,direct_investment,-1690826793.3199998000000,-1690826793.3199998000000,0E-13,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2007,net,portfolio_investment,-21052517.699999997000000,-21052517.699999996000000,1.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2007,net,financial_derivatives,-1066792.63999999999000000,-1066792.6400000001000000,-1.1000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2007,net,other_investment,-610070996.66600013000000,-610070996.66600016000000,-3.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2007,net,current_account,-1992056360.82000000,-1992056360.819999785000000,2.15000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2007,net,goods_and_services,-2716420112.7299998000000,-2716420112.73000007000000,-2.7000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2007,net,net_lending_borrowing,-1908660554.789999997000000,-1908660554.7899994000000,5.97000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2007,net,financial_account,-1945989962.6159997000000,-1945989962.6159999261000000,-2.261000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2007,net,net_errors_and_omissions,-37329407.8260003000000,-37329407.826000477000000,-1.77000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2007,liabilities,direct_investment_liabilities,1892093991.0999998000000,1892093991.0999998000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2007,liabilities,direct_investment_liabilities,1892093991.0999998000000,1892093991.099999833000000,3.3000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,current_account,-2811210944.1699995000000,-2811210944.1699995000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,goods_and_services,-3812210232.4399998000000,-3812210232.4399998000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,goods,-3836878229.2299993000000,-3836878229.2299993000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,services,24667996.79000000,24667996.789999961000000,-3.9000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,primary_income,-59363763.79999990000000,-59363763.799999901000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,secondary_income,1060363052.069999794000000,1060363052.0699999000000,1.06000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,capital_account,106620766.22000001000000,106620766.22000001000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,compensation_of_employees,374572971.760000003000000,374572971.75999997000000,-3.3000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,personal_transfers,639468424.7000000302000000,639468424.70000001000000,-2.02000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2008,net,workers_remittances,302685486.4499999802000000,302685486.44999998000000,-2.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2008,net,direct_investment,-1428631125.74000000,-1428631125.74000000,0E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2008,net,portfolio_investment,-623193765.7199999672000000,-623193765.71999999000000,-2.28000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2008,net,financial_derivatives,-7778836.6399999991000000,-7778836.6399999997000000,-6.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2008,net,other_investment,-839026929.53999988000000,-839026929.53999986000000,2.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2008,net,current_account,-2811210944.1699995000000,-2811210944.169999801000000,-3.01000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2008,net,goods_and_services,-3812210232.4399998000000,-3812210232.439999339000000,4.61000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2008,net,net_lending_borrowing,-2704590177.94999949000000,-2704590177.9499991000000,3.9000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2008,net,financial_account,-2767925515.6999998000000,-2767925515.6999998197000000,-1.97000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2008,net,net_errors_and_omissions,-63335337.7500007000000,-63335337.750000519000000,1.81000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2008,liabilities,direct_investment_liabilities,1602232455.97000000,1602232455.97000000,0E-8,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2008,liabilities,direct_investment_liabilities,1602232455.97000000,1602232455.970000193000000,1.93000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,current_account,-1141145836.0699989000000,-1141145836.0699989000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,goods_and_services,-2065071548.0999989000000,-2065071548.0999988000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,goods,-2416733688.4199990000000,-2416733688.419999000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,services,351662140.31999991000000,351662140.31999993000000,2.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,primary_income,-43578111.97000001000000,-43578111.970000009000000,1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,secondary_income,967503823.999999901000000,967503823.9999999000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,capital_account,177606451.33000000,177606451.33000000,0E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,compensation_of_employees,361497346.429999968000000,361497346.42999999000000,2.2000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,personal_transfers,716513297.6499999403000000,716513297.65000003000000,8.97000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2009,net,workers_remittances,315842685.2600000299000000,315842685.26000000,-2.99000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2009,net,direct_investment,-685300808.059999979000000,-685300808.06000001000000,-3.1000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2009,net,portfolio_investment,-10543114.74000000,-10543114.74000000,0E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2009,net,financial_derivatives,-567354.88999999976000000,-567354.88999999972000000,4.000000E-11,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2009,net,other_investment,-851624639.53999992000000,-851624639.53999986000000,6.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2009,net,current_account,-1141145836.0699989000000,-1141145836.069998909000000,-9.000000E-9,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2009,net,goods_and_services,-2065071548.0999988000000,-2065071548.09999907000000,-2.7000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2009,net,net_lending_borrowing,-963539384.7399989000000,-963539384.73999972000000,-8.2000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2009,net,financial_account,-931608913.87999993000000,-931608913.87999980972000000,1.2028000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2009,net,net_errors_and_omissions,31930470.85999979000000,31930470.859999872000000,8.2000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2009,liabilities,direct_investment_liabilities,660800885.26999998000000,660800885.26999998000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2009,liabilities,direct_investment_liabilities,660800885.26999998000000,660800885.270000049000000,6.9000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,current_account,-1198803819.4800001000000,-1198803819.4800001000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,goods_and_services,-2079760021.3999994000000,-2079760021.3999995000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,goods,-2628089550.0399997000000,-2628089550.0399997000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,services,548329528.6400002000000,548329528.64000026000000,6.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,primary_income,-217518243.87000011000000,-217518243.87000011000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,secondary_income,1098474445.789999901000000,1098474445.7899999000000,-1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,capital_account,198280747.72000002000000,198280747.72000002000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,compensation_of_employees,332476044.61000000,332476044.61000003000000,3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,personal_transfers,796327539.4700001099000000,796327539.47000003000000,-7.99000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2010,net,workers_remittances,415281056.1200000199000000,415281056.12000002000000,1.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2010,net,direct_investment,-730489603.66000008000000,-730489603.66000006000000,2.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2010,net,portfolio_investment,-250504891.42999996003000000,-250504891.42999996000000,3.000000E-11,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2010,net,financial_derivatives,-790086.52999999994000000,-790086.52999999995000000,-1.000000E-11,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2010,net,other_investment,-290655871.66000000000000,-290655871.66000000,0E-14,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2010,net,current_account,-1198803819.4800001000000,-1198803819.47999971000000,3.9000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2010,net,goods_and_services,-2079760021.3999995000000,-2079760021.39999944000000,6.000000E-8,1,pass,
+bop.net_lending,bop,bop_bpm6,2010,net,net_lending_borrowing,-1000523071.76000008000000,-1000523071.7599998000000,2.8000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2010,net,financial_account,-1064471833.91000000,-1064471833.91000004995000000,-4.995000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2010,net,net_errors_and_omissions,-63948762.1500002000000,-63948762.150000107000000,9.3000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2010,liabilities,direct_investment_liabilities,920915812.73000008000000,920915812.73000008000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2010,liabilities,direct_investment_liabilities,920915812.73000008000000,920915812.72999991000000,-1.7000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,current_account,-1843079773.5199985000000,-1843079773.5199985000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,goods_and_services,-2745905483.8299999000000,-2745905483.8299999000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,goods,-3499614501.7699991000000,-3499614501.7699992000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,services,753709017.9400002000000,753709017.94000019000000,-1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,primary_income,-425847080.10000011000000,-425847080.10000008000000,3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,secondary_income,1328672790.41000022000000,1328672790.4100003000000,8.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,capital_account,145816474.39000000,145816474.39000000,0E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,compensation_of_employees,440337472.629999984000000,440337472.63000004000000,5.6000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,personal_transfers,1030136503.6800000998000000,1030136503.68000000,-9.98000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2011,net,workers_remittances,616896777.00000003994000000,616896777.00000004000000,6.000000E-11,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2011,net,direct_investment,-987355065.54000000,-987355065.54000006000000,-6.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2011,net,portfolio_investment,-133357892.200000020028000000,-133357892.20000001000000,1.0028000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2011,net,financial_derivatives,-5125009.6999999998000000,-5125009.6999999997000000,1.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2011,net,other_investment,-1182501900.78000012000000,-1182501900.7800001000000,2.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2011,net,current_account,-1843079773.5199985000000,-1843079773.51999968000000,-0.00000118000000,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2011,net,goods_and_services,-2745905483.8299999000000,-2745905483.82999901000000,8.9000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2011,net,net_lending_borrowing,-1697263299.1299985000000,-1697263299.1299993000000,-8.000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2011,net,financial_account,-1735925331.8100004000000,-1735925331.8100001897000000,2.103000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2011,net,net_errors_and_omissions,-38662032.6800011000000,-38662032.680001062000000,3.8000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2011,liabilities,direct_investment_liabilities,1170087549.5000000,1170087549.5000000,0E-7,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2011,liabilities,direct_investment_liabilities,1170087549.5000000,1170087549.50000005000000,5.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,current_account,-1882741233.8500001000000,-1882741233.8499998000000,3.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,goods_and_services,-3117974693.2599992000000,-3117974693.2599992000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,goods,-4226108805.1500001000000,-4226108805.1500001000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,services,1108134111.8900002000000,1108134111.8900002000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,primary_income,-172357905.1699999000000,-172357905.16999987000000,3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,secondary_income,1407591364.58000001000000,1407591364.5800001000000,9.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,capital_account,131597681.02999999000000,131597681.02999999000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,compensation_of_employees,567519119.240000036000000,567519119.24000001000000,-2.6000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,personal_transfers,1115863613.0499998995000000,1115863613.0499999000000,5.000000E-10,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2012,net,workers_remittances,711798820.51999992006000000,711798820.51999994000000,1.994000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2012,net,direct_investment,-751274688.89999989000000,-751274688.89999989000000,0E-14,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2012,net,portfolio_investment,-848258080.550000059000000,-848258080.55000005000000,9.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2012,net,financial_derivatives,-5403528.1900000016000000,-5403528.1900000012000000,4.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2012,net,other_investment,-308207956.58000003000000,-308207956.58000003000000,0E-14,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2012,net,current_account,-1882741233.8499998000000,-1882741233.84999897000000,8.3000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2012,net,goods_and_services,-3117974693.2599992000000,-3117974693.2599999000000,-7.000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2012,net,net_lending_borrowing,-1751143552.81999981000000,-1751143552.8199995000000,3.1000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2012,net,financial_account,-1874858226.05000000,-1874858226.0499999772000000,2.28000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2012,net,net_errors_and_omissions,-123714673.2300005000000,-123714673.23000064000000,-1.4000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2012,liabilities,direct_investment_liabilities,968196197.62999992000000,968196197.62999992000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2012,liabilities,direct_investment_liabilities,968196197.62999992000000,968196197.630000011000000,9.1000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,current_account,-955492553.1949978000000,-955492553.19499753000000,2.7000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,goods_and_services,-2089933391.9449992000000,-2089933391.9449991000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,goods,-3506245786.5199994000000,-3506245786.5199995000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,services,1416312394.5750006000000,1416312394.5750006000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,primary_income,-317056104.36999991000000,-317056104.36999996000000,-5.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,secondary_income,1451496943.12000019000000,1451496943.1200002000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,capital_account,132544509.74000002000000,132544509.74000002000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,compensation_of_employees,630556742.960000053000000,630556742.95999995000000,-1.03000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,personal_transfers,1227013621.63000000,1227013621.6299998000000,-2.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2013,net,workers_remittances,785509221.43000005999000000,785509221.42999991000000,-1.4999000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2013,net,direct_investment,-919270053.34000001000000,-919270053.34000000,1.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2013,net,portfolio_investment,36596080.5599999435000000,36596080.559999947000000,3.5000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2013,net,financial_derivatives,2435017.8399999995000000,2435017.8399999995000000,0E-16,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2013,net,other_investment,45642351.97000005000000,45642351.97000005000000,0E-14,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2013,net,current_account,-955492553.19499753000000,-955492553.19499886000000,-0.00000133000000,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2013,net,goods_and_services,-2089933391.9449991000000,-2089933391.9449989000000,2.000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2013,net,net_lending_borrowing,-822948043.45499751000000,-822948043.45499961000000,-0.00000210000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2013,net,financial_account,-879573525.83000011000000,-879573525.8300000335000000,7.65000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2013,net,net_errors_and_omissions,-56625482.37500050000000,-56625482.37500036000000,1.4000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2013,liabilities,direct_investment_liabilities,1046562195.15000000,1046562195.15000000,0E-8,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2013,liabilities,direct_investment_liabilities,1046562195.15000000,1046562195.14999996000000,-4.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,current_account,-1784183121.5200022000000,-1784183121.5200018000000,4.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,goods_and_services,-2979689101.2300015000000,-2979689101.2300011000000,4.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,goods,-4285641962.7499999000000,-4285641962.7499999000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,services,1305952861.5199995000000,1305952861.5199995000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,primary_income,-229814236.1999998000000,-229814236.19999987000000,-7.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,secondary_income,1425320215.91000000,1425320215.9100001000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,capital_account,106183060.34000000,106183060.34000000,0E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,compensation_of_employees,662816114.360000072000000,662816114.35999991000000,-1.62000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,personal_transfers,1237527699.189999999000000,1237527699.19000000,1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2014,net,workers_remittances,760640684.00999999996000000,760640684.01000009000000,9.004000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2014,net,direct_investment,-1430328331.62999993000000,-1430328331.6299999000000,3.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2014,net,portfolio_investment,-209372135.699999971000000,-209372135.69999997000000,1.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2014,net,financial_derivatives,-8169765.2999999989000000,-8169765.2999999981000000,8.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2014,net,other_investment,-106975872.29999999000000,-106975872.29999999000000,0E-14,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2014,net,current_account,-1784183121.5200018000000,-1784183121.52000087000000,9.3000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2014,net,goods_and_services,-2979689101.2300011000000,-2979689101.2300004000000,7.000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2014,net,net_lending_borrowing,-1678000061.1800018000000,-1678000061.1800015000000,3.000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2014,net,financial_account,-1787058101.0599999000000,-1787058101.0599998181000000,8.19000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2014,net,net_errors_and_omissions,-109058039.8799984000000,-109058039.87999855000000,-1.5000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2014,liabilities,direct_investment_liabilities,1836879042.8299999000000,1836879042.8299999000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2014,liabilities,direct_investment_liabilities,1836879042.8299999000000,1836879042.83000001000000,1.1000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,current_account,-1767043741.7900011000000,-1767043741.7900011000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,goods_and_services,-2547799840.0000015000000,-2547799840.0000015000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,goods,-3951941699.8700012000000,-3951941699.8700012000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,services,1404141859.87000000,1404141859.87000000,0E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,primary_income,-338797233.71999989000000,-338797233.71999989000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,secondary_income,1119553331.93000001000000,1119553331.93000000,-1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,capital_account,58332699.299999994000000,58332699.299999994000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,compensation_of_employees,488336349.330000005000000,488336349.32999996000000,-4.5000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,personal_transfers,874542538.8200000505000000,874542538.82000000,-5.05000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2015,net,workers_remittances,587250244.85000004000000,587250244.84999994000000,-1.0000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2015,net,direct_investment,-1419607447.19999988000000,-1419607447.1999998000000,8.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2015,net,portfolio_investment,153555618.040000027000000,153555618.04000001000000,-1.7000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2015,net,financial_derivatives,1762710.79000000,1762710.7899999999000000,-1.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2015,net,other_investment,-418512743.27999986000000,-418512743.27999988000000,-2.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2015,net,current_account,-1767043741.7900011000000,-1767043741.79000139000000,-2.9000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2015,net,goods_and_services,-2547799840.0000015000000,-2547799840.0000012000000,3.000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2015,net,net_lending_borrowing,-1708711042.490001106000000,-1708711042.4899997000000,0.000001406000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2015,net,financial_account,-1782414017.7499994000000,-1782414017.7499996061000000,-2.061000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2015,net,net_errors_and_omissions,-73702975.2599997000000,-73702975.260000073000000,-3.73000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2015,liabilities,direct_investment_liabilities,1735307118.6299999000000,1735307118.6299999000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2015,liabilities,direct_investment_liabilities,1735307118.6299999000000,1735307118.630000002000000,1.02000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,current_account,-1890680430.2000021000000,-1890680430.2000019000000,2.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,goods_and_services,-2310734036.0300004000000,-2310734036.0300004000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,goods,-3882529720.1799999000000,-3882529720.1799999000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,services,1571795684.1500002000000,1571795684.1500002000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,primary_income,-701022555.78999992000000,-701022555.78999996000000,-4.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,secondary_income,1121076161.6200001000000,1121076161.62000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,capital_account,55975071.200000002000000,55975071.200000002000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,compensation_of_employees,557845727.229999969000000,557845727.22999997000000,1.000000E-9,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,personal_transfers,862447104.1400000295000000,862447104.13999996000000,-6.95000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2016,net,workers_remittances,578111598.11999999998000000,578111598.12000005000000,5.002000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2016,net,direct_investment,-1246836683.38999977000000,-1246836683.3899997000000,7.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2016,net,portfolio_investment,-41467763.36000006000000,-41467763.360000063000000,-3.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2016,net,financial_derivatives,3988668.019999998000000,3988668.0199999986000000,6.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2016,net,other_investment,-784673406.27999984000000,-784673406.27999988000000,-4.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2016,net,current_account,-1890680430.2000019000000,-1890680430.20000036000000,0.00000154000000,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2016,net,goods_and_services,-2310734036.0300004000000,-2310734036.0299997000000,7.000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2016,net,net_lending_borrowing,-1834705359.000001898000000,-1834705358.9999989000000,0.000002998000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2016,net,financial_account,-1825551599.1699997000000,-1825551599.1699995344000000,1.656000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2016,net,net_errors_and_omissions,9153759.8299992000000,9153759.82999916000000,-4.000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2016,liabilities,direct_investment_liabilities,1659824033.3699998000000,1659824033.3699998000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2016,liabilities,direct_investment_liabilities,1659824033.3699998000000,1659824033.37000012000000,3.2000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,current_account,-1309818958.789999000000,-1309818958.7899997000000,-7.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,goods_and_services,-1784877513.4600000000000,-1784877513.46000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,goods,-3809199319.4000001000000,-3809199319.4000001000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,services,2024321805.9400001000000,2024321805.9400001000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,primary_income,-798017439.0999998000000,-798017439.09999982000000,-2.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,secondary_income,1273075993.76999982000000,1273075993.77000000,1.8000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,capital_account,83053132.559999995000000,83053132.559999995000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,compensation_of_employees,622679372.93000012000000,622679372.93000000,-1.2000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,personal_transfers,1049111525.6699998997000000,1049111525.67000000,1.003000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2017,net,workers_remittances,749688667.55000008001000000,749688667.5500001000000,1.999000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2017,net,direct_investment,-1721098982.64999968000000,-1721098982.6499997000000,-2.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2017,net,portfolio_investment,75886376.50999993000000,75886376.509999934000000,4.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2017,net,financial_derivatives,484749.9200000005000000,484749.9200000005000000,0E-16,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2017,net,other_investment,136630485.63999984000000,136630485.63999985000000,1.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2017,net,current_account,-1309818958.7899997000000,-1309818958.78999982000000,-1.2000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2017,net,goods_and_services,-1784877513.46000000,-1784877513.4600000000000,0E-13,1,pass,
+bop.net_lending,bop,bop_bpm6,2017,net,net_lending_borrowing,-1226765826.229999705000000,-1226765826.2300017000000,-0.000001995000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2017,net,financial_account,-1266051634.1499997000000,-1266051634.1499998555000000,-1.555000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2017,net,net_errors_and_omissions,-39285807.9199980000000,-39285807.919998163000000,-1.63000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2017,liabilities,direct_investment_liabilities,1930381394.7599997000000,1930381394.7599997000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2017,liabilities,direct_investment_liabilities,1930381394.7599997000000,1930381394.76000001000000,3.1000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,current_account,-1192193541.500003000000,-1192193541.5000025000000,5.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,goods_and_services,-1871976601.560002000000,-1871976601.5600017000000,3.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,goods,-4115776441.4700005000000,-4115776441.4700005000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,services,2243799839.9099997000000,2243799839.9099997000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,primary_income,-684000516.6300000000000,-684000516.62999999000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,secondary_income,1363783576.68999998000000,1363783576.69000000,2.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,capital_account,76057770.559999994000000,76057770.559999994000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,compensation_of_employees,697334525.88000000000000,697334525.88000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,personal_transfers,1185804343.1699998999000000,1185804343.1699998000000,-9.99000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2018,net,workers_remittances,864379502.4999999901000000,864379502.49999994000000,-5.01000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2018,net,direct_investment,-1010417427.87000011000000,-1010417427.8700001000000,1.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2018,net,portfolio_investment,47642764.28999992000000,47642764.289999917000000,-3.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2018,net,financial_derivatives,1244636.9299999986000000,1244636.9299999986000000,0E-16,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2018,net,other_investment,-567530520.780000129000000,-567530520.78000007000000,5.9000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2018,net,current_account,-1192193541.5000025000000,-1192193541.50000169000000,8.1000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2018,net,goods_and_services,-1871976601.5600017000000,-1871976601.5600008000000,9.000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2018,net,net_lending_borrowing,-1116135770.940002506000000,-1116135770.940002000000,5.06000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2018,net,financial_account,-1250584604.3700003000000,-1250584604.3700002344000000,6.56000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2018,net,net_errors_and_omissions,-134448833.4299983000000,-134448833.42999816000000,1.4000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2018,liabilities,direct_investment_liabilities,1304024907.7000001000000,1304024907.7000001000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2018,liabilities,direct_investment_liabilities,1304024907.7000001000000,1304024907.7000001168000000,1.68000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,current_account,-1057197564.680000000000,-1057197564.6800001000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,goods_and_services,-1615848784.4800001000000,-1615848784.4800002000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,goods,-3791697580.0200007000000,-3791697580.0200007000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,services,2175848795.5399996000000,2175848795.5399996000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,primary_income,-817576471.2600003000000,-817576471.26000029000000,1.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,secondary_income,1376227691.0599998000000,1376227691.0599999000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,capital_account,47050041.989999997000000,47050041.989999997000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,compensation_of_employees,806600878.17999985000000,806600878.18000000,1.5000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,personal_transfers,1281726804.4000001005000000,1281726804.3999998000000,-3.005000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2019,net,workers_remittances,915223795.6199999901000000,915223795.61999992000000,-7.01000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2019,net,direct_investment,-1086260689.8799999000000,-1086260689.88000000,-1.000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2019,net,portfolio_investment,-829172801.060000001000000,-829172801.05999998000000,2.1000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2019,net,financial_derivatives,-3724753.720000003000000,-3724753.7200000025000000,5.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2019,net,other_investment,633507643.11000001000000,633507643.11000000,-1.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2019,net,current_account,-1057197564.6800001000000,-1057197564.68000059000000,-4.9000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2019,net,goods_and_services,-1615848784.4800002000000,-1615848784.4800011000000,-9.000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2019,net,net_lending_borrowing,-1010147522.690000103000000,-1010147522.6899988000000,0.000001303000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2019,net,financial_account,-1083347227.2899999000000,-1083347227.2900000425000000,-1.425000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2019,net,net_errors_and_omissions,-73199704.6000011000000,-73199704.600001098000000,2.000000E-9,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2019,liabilities,direct_investment_liabilities,1397879177.2899999000000,1397879177.2899999000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2019,liabilities,direct_investment_liabilities,1397879177.2899999000000,1397879177.29000006000000,1.6000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,current_account,-1988915924.4400014000000,-1988915924.4400016000000,-2.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,goods_and_services,-3038992200.1000005000000,-3038992200.1000004000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,goods,-3164995916.8599998000000,-3164995916.8599999000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,services,126003716.7599996000000,126003716.75999963000000,3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,primary_income,-759575279.4700002000000,-759575279.47000017000000,3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,secondary_income,1809651555.130000011000000,1809651555.1299999000000,-1.11000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,capital_account,41052787.770000002000000,41052787.770000002000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,compensation_of_employees,488195301.93000003000000,488195301.93000003000000,0E-14,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,personal_transfers,1544568469.2500000997000000,1544568469.2499999000000,-1.997000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2020,net,workers_remittances,1166922927.2299999000000,1166922927.2299999000000,0E-13,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2020,net,direct_investment,-573290728.159999905000000,-573290728.15999984000000,6.5000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2020,net,portfolio_investment,-74626152.390000065000000,-74626152.390000073000000,-8.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2020,net,financial_derivatives,-27167066.779999995000000,-27167066.779999995000000,0E-15,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2020,net,other_investment,-1670276899.690000055000000,-1670276899.6899999000000,1.55000000E-7,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2020,net,current_account,-1988915924.4400016000000,-1988915924.44000067000000,9.3000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2020,net,goods_and_services,-3038992200.1000004000000,-3038992200.10000027000000,1.3000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2020,net,net_lending_borrowing,-1947863136.670001598000000,-1947863136.6699992000000,0.000002398000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2020,net,financial_account,-2039870974.4399998000000,-2039870974.439999808000000,-8.000000E-9,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2020,net,net_errors_and_omissions,-92007837.7700006000000,-92007837.770001004000000,-4.04000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2020,liabilities,direct_investment_liabilities,557173503.18999991000000,557173503.18999991000000,0E-14,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2020,liabilities,direct_investment_liabilities,557173503.18999991000000,557173503.1900000452000000,1.352000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,current_account,-1943604045.870001000000,-1943604045.8700008000000,2.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,goods_and_services,-3061436274.9400004000000,-3061436274.9400007000000,-3.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,goods,-3789550185.9200003000000,-3789550185.9200003000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,services,728113910.9800001000000,728113910.98000013000000,3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,primary_income,-1185874100.5400000000000,-1185874100.54000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,secondary_income,2303706329.6100003000000,2303706329.6100005000000,2.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,capital_account,40138089.239999999000000,40138089.239999999000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,compensation_of_employees,462588816.910000035000000,462588816.90999999000000,-4.5000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,personal_transfers,2075010531.1200000005000000,2075010531.12000000,-5.000000E-10,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2021,net,workers_remittances,1607267550.0100000003000000,1607267550.0099999000000,-1.003000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2021,net,direct_investment,-971653404.36000012000000,-971653404.36000008000000,4.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2021,net,portfolio_investment,311114006.900000062000000,311114006.90000005000000,-1.2000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2021,net,financial_derivatives,-773192.529999999000000,-773192.52999999932000000,-3.2000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2021,net,other_investment,-1742073036.149999998000000,-1742073036.15000000,-2.000000E-9,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2021,net,current_account,-1943604045.8700008000000,-1943604045.8700002000000,6.000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2021,net,goods_and_services,-3061436274.9400007000000,-3061436274.94000017000000,5.3000000E-7,1,pass,
+bop.net_lending,bop,bop_bpm6,2021,net,net_lending_borrowing,-1903465956.630000801000000,-1903465956.6299988000000,0.000002001000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2021,net,financial_account,-1950764935.3400002000000,-1950764935.33999999932000000,2.0068000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2021,net,net_errors_and_omissions,-47298978.7100014000000,-47298978.710000938000000,4.62000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2021,liabilities,direct_investment_liabilities,1318980865.0800001000000,1318980865.0800001000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2021,liabilities,direct_investment_liabilities,1318980865.0800001000000,1318980865.07999994000000,-1.6000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,current_account,-1107585602.450003000000,-1107585602.4500026000000,4.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,goods_and_services,-2423783520.320001000000,-2423783520.3200011000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,goods,-5100019169.4700004000000,-5100019169.4700006000000,-2.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,services,2676235649.1499995000000,2676235649.1499995000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,primary_income,-1737004829.9800005000000,-1737004829.9800005000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,secondary_income,3053202747.85000028000000,3053202747.8500004000000,1.2000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,capital_account,40893742.920000001000000,40893742.920000001000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,compensation_of_employees,671033185.22000007000000,671033185.21999995000000,-1.2000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,personal_transfers,2892330153.3900003000000,2892330153.3900003000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2022,net,workers_remittances,2334538749.4400002001000000,2334538749.4400002000000,-1.000000E-10,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2022,net,direct_investment,-1926705051.50999997000000,-1926705051.51000000,-3.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2022,net,portfolio_investment,1607875824.2499998000000,1607875824.2499998000000,0E-13,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2022,net,financial_derivatives,-3249484.80000000000000,-3249484.8000000047000000,-4.7000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2022,net,other_investment,-1525736484.85999975000000,-1525736484.8599998000000,-5.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2022,net,current_account,-1107585602.4500026000000,-1107585602.4500012000000,0.0000014000000,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2022,net,goods_and_services,-2423783520.3200011000000,-2423783520.3200011000000,0E-13,1,pass,
+bop.net_lending,bop,bop_bpm6,2022,net,net_lending_borrowing,-1066691859.530002599000000,-1066691859.5299994000000,0.000003199000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2022,net,financial_account,-1082556013.2999999000000,-1082556013.3000000747000000,-1.747000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2022,net,net_errors_and_omissions,-15864153.7700005000000,-15864153.77000057000000,-7.000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2022,liabilities,direct_investment_liabilities,2291876527.42000000,2291876527.42000000,0E-8,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2022,liabilities,direct_investment_liabilities,2291876527.42000000,2291876527.42000009000000,9.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,current_account,-1713585102.789999000000,-1713585102.7899989000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,goods_and_services,-2634910217.979999000000,-2634910217.9799993000000,-3.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,goods,-6077804691.1199999000000,-6077804691.1199999000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,services,3442894473.1400006000000,3442894473.1400006000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,primary_income,-2407487611.3999999000000,-2407487611.3999999000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,secondary_income,3328812726.59000012000000,3328812726.5900002000000,8.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,capital_account,38759527.129999995000000,38759527.129999995000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,compensation_of_employees,742903532.73000002000000,742903532.73000005000000,3.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,personal_transfers,3133941020.0700000014000000,3133941020.0700004000000,3.986000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2023,net,workers_remittances,2436030594.1100003000000,2436030594.11000000,-3.000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2023,net,direct_investment,-1780863064.2000004000000,-1780863064.2000005000000,-1.000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2023,net,portfolio_investment,731293336.14000007000000,731293336.14000006000000,-1.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2023,net,financial_derivatives,48393913.39000001000000,48393913.390000009000000,-1.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2023,net,other_investment,-783173406.4300000000000,-783173406.43000000,0E-13,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2023,net,current_account,-1713585102.7899989000000,-1713585102.7899990000000,-1.000000E-7,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2023,net,goods_and_services,-2634910217.9799993000000,-2634910217.9799993000000,0E-13,1,pass,
+bop.net_lending,bop,bop_bpm6,2023,net,net_lending_borrowing,-1674825575.659998905000000,-1674825575.6599988000000,1.05000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2023,net,financial_account,-1737514960.4100004000000,-1737514960.410000423000000,-2.3000000E-8,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2023,net,net_errors_and_omissions,-62689384.7500016000000,-62689384.75000121000000,3.9000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2023,liabilities,direct_investment_liabilities,2262479271.2300004000000,2262479271.2300004000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2023,liabilities,direct_investment_liabilities,2262479271.2300004000000,2262479271.23000016000000,-2.4000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,current_account,-1758942526.339994000000,-1758942526.3399935000000,5.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,goods_and_services,-2608964684.919997000000,-2608964684.9199962000000,8.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,goods,-6563278985.1699978000000,-6563278985.1699981000000,-3.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,services,3954314300.2500001000000,3954314300.2500001000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,primary_income,-2522588191.8499995000000,-2522588191.8499995000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,secondary_income,3372610350.43000009000000,3372610350.4299999000000,-1.9000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,capital_account,28000124.589999999000000,28000124.589999999000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,compensation_of_employees,561164027.29000015000000,561164027.29000004000000,-1.1000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,personal_transfers,3184528628.980000299000000,3184528628.9799997000000,-5.99000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2024,net,workers_remittances,2186455827.7399998000000,2186455827.7400001000000,3.000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2024,net,direct_investment,-1164816709.42999986000000,-1164816709.4299997000000,1.6000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2024,net,portfolio_investment,1091621483.64000034000000,1091621483.6400004000000,6.000000E-8,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2024,net,financial_derivatives,33544583.149999987000000,33544583.149999987000000,0E-15,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2024,net,other_investment,-1084090604.36000002000000,-1084090604.36000000,2.000000E-8,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2024,net,current_account,-1758942526.3399935000000,-1758942526.3399958000000,-0.0000023000000,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2024,net,goods_and_services,-2608964684.9199962000000,-2608964684.9199980000000,-0.0000018000000,1,pass,
+bop.net_lending,bop,bop_bpm6,2024,net,net_lending_borrowing,-1730942401.749993501000000,-1730942401.7499998000000,-0.000006299000000,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2024,net,financial_account,-1742838194.7199991000000,-1742838194.719999093000000,7.000000E-9,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2024,net,net_errors_and_omissions,-11895792.9699993000000,-11895792.970000169000000,-8.69000000E-7,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2024,liabilities,direct_investment_liabilities,1631976220.8299999000000,1631976220.8299999000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2024,liabilities,direct_investment_liabilities,1631976220.8299999000000,1631976220.82999997000000,7.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,current_account,-1123241112.310003000000,-1123241112.3100028000000,2.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,goods_and_services,-2104928492.290001000000,-2104928492.2900006000000,4.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,goods,-6814278592.3100018000000,-6814278592.3100018000000,0E-13,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,services,4709350100.0199999000000,4709350100.0199994000000,-5.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,primary_income,-2581889133.2399998000000,-2581889133.2399999000000,-1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,secondary_income,3563576513.2200003000000,3563576513.2200004000000,1.000000E-7,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,capital_account,24406314.840000004000000,24406314.840000004000000,0E-15,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,compensation_of_employees,525459079.55000001000000,525459079.55000007000000,6.000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,personal_transfers,3398633610.750000199000000,3398633610.7500001000000,-9.9000000E-8,1,pass,
+bop.net_is_credit_minus_debit,bop,bop_bpm6,2025,net,workers_remittances,2330747968.3499999001000000,2330747968.3499996000000,-3.001000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2025,net,direct_investment,-1600960793.1199997000000,-1600960793.1199998000000,-1.000000E-7,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2025,net,portfolio_investment,-44061136.90999979000000,-44061136.909999789000000,1.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2025,net,financial_derivatives,78216377.61000004000000,78216377.610000038000000,-2.000000E-9,1,pass,
+bop.net_is_assets_minus_liabilities,bop,bop_bpm6,2025,net,other_investment,-738016879.59000014000000,-738016879.59000014000000,0E-14,1,pass,
+bop.current_account_parts,bop,bop_bpm6,2025,net,current_account,-1123241112.3100028000000,-1123241112.3100001000000,0.0000027000000,1,pass,
+bop.goods_and_services_parts,bop,bop_bpm6,2025,net,goods_and_services,-2104928492.2900006000000,-2104928492.2900024000000,-0.0000018000000,1,pass,
+bop.net_lending,bop,bop_bpm6,2025,net,net_lending_borrowing,-1098834797.470002796000000,-1098834797.4700018000000,9.96000000E-7,1,pass,
+bop.financial_account_parts,bop,bop_bpm6,2025,net,financial_account,-1097055481.2399996000000,-1097055481.239999491000000,1.09000000E-7,1,pass,
+bop.errors_and_omissions,bop,bop_bpm6,2025,net,net_errors_and_omissions,1779316.2300022000000,1779316.2300021095000000,-9.05000000E-8,1,pass,
+bop.direct_investment_liabilities_detail,bop,bop_bpm6,2025,liabilities,direct_investment_liabilities,1874420525.3699997000000,1874420525.3699997000000,0E-13,1,pass,
+bop.direct_investment_liabilities_components,bop,bop_bpm6,2025,liabilities,direct_investment_liabilities,1874420525.3699997000000,1874420525.36999999000000,2.9000000E-7,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,1997,inflow,total,242586000.00000001000000,242585999.999999984000000,-2.6000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,1998,inflow,total,265331769.51288954000000,265331769.512889543000000,3.000000E-9,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,1999,inflow,total,82206999.999999994000000,82206999.999999993000000,-1.000000E-9,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2000,inflow,total,131231878.34000001000000,131231878.339999994000000,-1.6000000E-8,500.0000000065000000,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2001,inflow,total,109839835.48999996000000,109839835.489999956000000,-4.000000E-9,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2002,inflow,total,160211960.45999997000000,160211960.459999990000000,2.0000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2003,inflow,total,334567841.62000002000000,334567841.619999986000000,-3.4000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2004,inflow,total,492329440.01000004000000,492329440.01000003000000,-1.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2005,inflow,total,452752292.02572302000000,452752292.021625484000000,-0.004097536000000,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2006,inflow,total,1171179522.2615217000000,1171179522.26152175000000,5.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2007,inflow,total,1764720822.3127691000000,1764720822.31303325000000,0.00026415000000,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2008,inflow,total,1575243239.6460854000000,1575243239.64889540000000,0.00281000000000,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2009,inflow,total,666774603.20820001000000,666774603.20920502000000,0.00100501000000,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2010,inflow,total,865637671.99475069000000,865637671.99475075000000,6.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2011,inflow,total,1133971145.8444451000000,1133971145.84444507000000,-3.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2012,inflow,total,1048227045.4333175000000,1048227045.43331759000000,9.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2013,inflow,total,1039174152.4845618000000,1039174152.48456183000000,3.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2014,inflow,total,1836979976.5033397000000,1836979976.50333927000000,-4.3000000E-7,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2015,inflow,total,1728758130.1636671000000,1728758130.16366714000000,4.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2016,inflow,total,1654009529.8000001000000,1654009529.79999989000000,-2.1000000E-7,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2017,inflow,total,1990526440.7000000,1990526440.70000019000000,1.9000000E-7,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2018,inflow,total,1350608164.4999999000000,1350608164.49999988000000,-2.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2019,inflow,total,1367795347.9000005000000,1367795347.90000056000000,6.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2020,inflow,total,596151415.10000012000000,596151415.10000006000000,-6.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2021,inflow,total,1293639916.8000000,1293639916.80000003000000,3.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2022,inflow,total,2258335256.6999997000000,2258335256.70000001000000,3.1000000E-7,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2023,inflow,total,2069879160.9000000,2069879160.89999993000000,-7.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2024,inflow,total,1592727285.4000000,1592727285.40000006000000,6.000000E-8,1,pass,
+fdi_flows.quarters_sum_to_annual_total,fdi_flows,total,2025,inflow,total,1900386201.0000003000000,1900386201.00000008000000,-2.2000000E-7,1,pass,
+fdi_flows.country.children,fdi_flows,country,1996,inflow,total,3753450.00,3753450.00,0.00,10.000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1996,inflow,group_cis,3753450.00,3753450.00,0.00,10.000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1997,inflow,total,242586000,242586000.000496995000,0.000496995000,500.0000000060000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1997,inflow,group_eu27,20808371.148097001000,20808371.148097001101000,1.01000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1997,inflow,group_cis,27726582.800000004000,27726582.800000001000,-3.000E-9,5.0005000010000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1997,inflow,group_other,194051046.05239999000,194051046.0523999976000,7.6000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1998,inflow,total,265331769.51288909000,265331769.514111017000,0.001221927000,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1998,inflow,group_eu27,23068815.474471001000,23068815.474471000898000,-1.02000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1998,inflow,group_cis,37949760.506000006000,37949760.506000000000,-6.000E-9,5.0000000015000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1998,inflow,group_other,204313193.53364001000,204313193.5336400011000,-8.9000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1999,inflow,total,82207000,82206999.99975399721000,-0.00024600279000,500.000000000555000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1999,inflow,group_eu27,3525273.5459660003000,3525273.545965999857000,-4.43000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1999,inflow,group_cis,525240.17427999991000,525240.17427999987000,-4.000E-11,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,1999,inflow,group_other,78156486.279507997000,78156486.279507999759000,2.759000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2000,inflow,total,131231878.34734132000,131231878.3480330037000,0.0006916837000,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2000,inflow,group_eu27,36726839.923300002000,36726839.9233000015000,-5.000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2000,inflow,group_cis,6088078.2707609997000,6088078.270760999803000,1.03000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2000,inflow,group_other,88416960.153972002000,88416960.153971999289000,-2.711000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2001,inflow,total,109839835.48835485000,109839835.4878890111000,-0.0004658389000,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2001,inflow,group_eu27,63421349.613050006000,63421349.61304999791000,-8.09000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2001,inflow,group_cis,5036347.4362910001000,5036347.436290999899000,-2.01000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2001,inflow,group_other,41382138.438548005000,41382138.438548001994000,-3.006000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2002,inflow,total,160211960.45411445000,160211960.45424799836000,0.00013354836000,1,pass,
+fdi_flows.country.children,fdi_flows,country,2002,inflow,group_eu27,40469434.941817999000,40469434.941817999492000,4.92000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2002,inflow,group_cis,4775675.3436499994000,4775675.343649999197000,-2.03000E-10,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2002,inflow,group_other,113890456.77878000,113890456.778780009885000,9.885000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2003,inflow,total,334567841.61955194000,334567841.61955200505000,6.505000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2003,inflow,group_eu27,58063057.715761992000,58063057.71576199914000,7.14000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2003,inflow,group_cis,71167425.013350003000,71167425.01334999609000,-6.91000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2003,inflow,group_other,203247807.09044001000,203247807.090439993519000,-1.6481000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2004,inflow,total,492329440.02333604000,492329440.02333600000000,-4.000000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2004,inflow,group_eu27,107226112.02455602000,107226112.024555999874000,-2.0126000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2004,inflow,group_cis,111605225.29947000,111605225.29946999599000,-4.01000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2004,inflow,group_other,272453081.46930998000,272453081.469309992667000,1.2667000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2005,inflow,total,452752292.02572303000,452752292.02572300959000,-2.041000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2005,inflow,group_eu27,112299119.81215401000,112299119.812153999297000,-1.0703000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2005,inflow,group_cis,107360330.23937000,107360330.23937000583000,5.83000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2005,inflow,group_other,229484920.994199000,229484920.994198990508000,-9.492000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2006,inflow,total,1171179522.2615218000,1171179522.25844741899000,-0.00307438101000,1,pass,
+fdi_flows.country.children,fdi_flows,country,2006,inflow,group_eu27,293777760.63871989000,293777760.63871999012000,1.0012000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2006,inflow,group_cis,265672116.09400006000,265672116.09400003103000,-2.897000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2006,inflow,group_other,597422507.85658718000,597422507.856587203771000,2.3771000E-8,550.0155550567815000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2007,inflow,total,1764720822.312769000,1764720822.31276887000,-1.3000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2007,inflow,group_eu27,906023011.53893967000,906023011.538939496020000,-1.73980000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2007,inflow,group_cis,160051827.33065222000,160051827.330652210701000,-9.299000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2007,inflow,group_other,685579877.90004048000,685579877.9000404210213000,-5.89787000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2008,inflow,total,1575243239.6460853000,1575243239.646085277000,-2.3000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2008,inflow,group_eu27,335559116.03409139000,335559116.034091410752000,2.0752000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2008,inflow,group_cis,121004670.23595281000,121004670.235952819800003000,9.800003000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2008,inflow,group_other,1095028500.2559097000,1095028500.2559098802048000,1.802048000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2009,inflow,total,666774603.20819996000,666774603.2081999777000,1.77000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2009,inflow,group_eu27,156548734.27735997000,156548734.277360000824000,3.0824000E-8,5.1500000073625000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2009,inflow,group_cis,8342596.6175200047000,8342596.6175200025213000,-2.1787000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2009,inflow,group_other,460077264.61332000,460077264.613319989026000,-1.0974000E-8,5.8000050082625000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2010,inflow,total,865637671.99475074000,865637671.994750724000,-1.6000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2010,inflow,group_eu27,189533715.27237177000,189533715.27237175992585000,-1.007415000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2010,inflow,group_cis,133845783.58034999000,133845783.580349996020000,6.020000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2010,inflow,group_other,497072131.44202897000,497072131.442029034427000,6.4427000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2011,inflow,total,1133971145.8444451000,1133971145.844445205000,1.05000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2011,inflow,group_eu27,435161382.05832941000,435161382.0583293919949000,-1.80051000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2011,inflow,group_cis,150330511.80855001000,150330511.808550007699000,-2.301000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2011,inflow,group_other,453582747.57756578000,453582747.577565741492000,-3.8508000E-8,50.2500050114155000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2012,inflow,total,1048227045.4333174000,1048227045.433317431000,3.1000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2012,inflow,group_eu27,370060669.99702679000,370060669.997026870874000,8.0874000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2012,inflow,group_cis,98578496.602097934000,98578496.6020979304996000,-3.5004000E-9,1,pass,
+fdi_flows.country.children,fdi_flows,country,2012,inflow,group_other,516133152.33419271000,516133152.334192729099000,1.9099000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2013,inflow,total,1039174152.4845618000,1039174152.484561828000,2.8000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2013,inflow,group_eu27,369928682.57056299000,369928682.570563048678000,5.8678000E-8,5.0500000634710000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2013,inflow,group_cis,144429535.356849000,144429535.356848972876000,-2.7124000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2013,inflow,group_other,470135098.24026463000,470135098.240264631396000,1.396000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2014,inflow,total,1836979976.5033396000,1836979976.50333941000,-1.9000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2014,inflow,group_eu27,727114377.75024481000,727114377.750244759821000,-5.0179000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2014,inflow,group_cis,457690346.57630068000,457690346.576300676594000,-3.406000E-9,1,pass,
+fdi_flows.country.children,fdi_flows,country,2014,inflow,group_other,758155631.33409363000,758155631.334093465631000,-1.64369000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2015,inflow,total,1728758129.8636673000,1728758129.8636669487000,-3.513000E-7,1,pass,
+fdi_flows.country.children,fdi_flows,country,2015,inflow,group_eu27,417150402.50707715000,417150402.5070771155322000,-3.44678000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2015,inflow,group_cis,634028053.99543501000,634028053.995435027855000,1.7855000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2015,inflow,group_other,631057110.56974798000,631057110.56974799244629000,1.244629000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2016,inflow,total,1654009529.8000001000,1654009529.8000000986000,-1.4000E-9,1,pass,
+fdi_flows.country.children,fdi_flows,country,2016,inflow,group_eu27,327829199.89999995000,327829199.89999984559000,-1.0441000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2016,inflow,group_cis,610469215.60000011000,610469215.600000083053000,-2.6947000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2016,inflow,group_other,677287742.30000004000,677287742.2999999810248000,-5.89752000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2017,inflow,total,1990526440.6999999000,1990526440.7000000099000,1.099000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2017,inflow,group_eu27,566765067.40000006000,566765067.40000002919000,-3.081000E-8,5.150000017985000,pass,
+fdi_flows.country.children,fdi_flows,country,2017,inflow,group_cis,520626549.10000006000,520626549.100000160268000,1.00268000E-7,1,pass,
+fdi_flows.country.children,fdi_flows,country,2017,inflow,group_other,900618734.29999989000,900618734.30000003923679000,1.4923679000E-7,1,pass,
+fdi_flows.country.children,fdi_flows,country,2018,inflow,total,1350608164.5000,1350608164.4999999411000,-5.89000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2018,inflow,group_eu27,419497398.90000009000,419497398.900000039982000,-5.0018000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2018,inflow,group_cis,304403057.80000007000,304403057.800000043999000,-2.6001000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2018,inflow,group_other,625080236.69999978000,625080236.699999929436000,1.49436000E-7,5.7500000142260000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2019,inflow,total,1367795347.8999997000,1367795347.8999996395000,-6.05000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2019,inflow,group_eu27,303502168.49999985000,303502168.49999993391000,8.391000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2019,inflow,group_cis,155128802.70000003000,155128802.700000019194000,-1.0806000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2019,inflow,group_other,902280627.39999976000,902280627.399999875665000,1.15665000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2020,inflow,total,596151415.1000001000,596151415.1000001703000,7.03000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2020,inflow,group_eu27,347959284.3000,347959284.3000000033797000,3.3797000E-9,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2020,inflow,group_cis,57389198.800000013000,57389198.800000012793000,-2.07000E-10,1,pass,
+fdi_flows.country.children,fdi_flows,country,2020,inflow,group_other,189344886.90000016000,189344886.9000000746140000,-8.53860000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2021,inflow,total,1293639916.8000,1293639916.7999999815000,-1.85000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2021,inflow,group_eu27,392453502.60000012000,392453502.6000000432764000,-7.67236000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2021,inflow,group_cis,108955271.59999998000,108955271.59999999133000,1.133000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2021,inflow,group_other,788541264.59999988000,788541264.59999989425831000,1.425831000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2022,inflow,total,2258335256.6999998000,2258335256.7000000593000,2.593000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2022,inflow,group_eu27,861610149.50000017000,861610149.49999999473000,-1.7527000E-7,1,pass,
+fdi_flows.country.children,fdi_flows,country,2022,inflow,group_cis,179619498.59999999000,179619498.59999997796000,-1.204000E-8,1,pass,
+fdi_flows.country.children,fdi_flows,country,2022,inflow,group_other,1215775170.9999999000,1215775170.999999747657000,-1.52343000E-7,1.0500000652720000,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2023,inflow,total,2069879160.8999998000,2069879160.900000115000,3.15000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2023,inflow,group_eu27,691542214.50000012000,691542214.500000012766000,-1.07234000E-7,1,pass,
+fdi_flows.country.children,fdi_flows,country,2023,inflow,group_cis,318277808.59999999000,318277808.59999998767000,-2.33000E-9,1,pass,
+fdi_flows.country.children,fdi_flows,country,2023,inflow,group_other,1139352647.5000,1139352647.5000002117525000,2.117525000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2024,inflow,total,1592727285.3999999000,1592727285.399999949000,4.9000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2024,inflow,group_eu27,437893582.29999989000,437893582.300000009629000,1.19629000E-7,1,pass,
+fdi_flows.country.children,fdi_flows,country,2024,inflow,group_cis,243270635.40000003000,243270635.40000002666000,-3.34000E-9,1,pass,
+fdi_flows.country.children,fdi_flows,country,2024,inflow,group_other,904983593.80000003000,904983593.800000004497000,-2.5503000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2025,inflow,total,1900386200.9999999000,1900386200.99999986000,-4.000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.country.children,fdi_flows,country,2025,inflow,group_eu27,602855182.59999994000,602855182.60000004198000,1.0198000E-7,5.100000021365000,pass,
+fdi_flows.country.children,fdi_flows,country,2025,inflow,group_cis,420896650.20000003000,420896650.20000003812000,8.12000E-9,1,pass,
+fdi_flows.country.children,fdi_flows,country,2025,inflow,group_other,873201313.79999989000,873201313.799999920362000,3.0362000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_flows.sector.children,fdi_flows,sector,2016,inflow,total,1654009529.8000001000,1654009529.7999997991000,-3.009000E-7,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2017,inflow,total,1990526440.6999999000,1990526440.7000000103000,1.103000E-7,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2018,inflow,total,1350608164.5000004000,1350608164.5000001901000,-2.099000E-7,5.05000007915000,pass,
+fdi_flows.sector.children,fdi_flows,sector,2019,inflow,total,1367795347.9000002000,1367795347.9000001187000,-8.13000E-8,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2020,inflow,total,596151415.09999998000,596151415.09999998883000,8.83000E-9,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2021,inflow,total,1293639916.8000002000,1293639916.79999999381000,-2.0619000E-7,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2022,inflow,total,2258335256.6999998000,2258335256.7000002193000,4.193000E-7,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2023,inflow,total,2069879160.9000002000,2069879160.90000024972000,4.972000E-8,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2024,inflow,total,1592727285.3999999000,1592727285.39999975442000,-1.4558000E-7,1,pass,
+fdi_flows.sector.children,fdi_flows,sector,2025,inflow,total,1900386201.0000001000,1900386200.9999999625000,-1.375000E-7,1,pass,
+fdi_flows.component.children,fdi_flows,component,2013,inflow,total,1039174155.0845617000,1039174155.08456173000,3.000E-8,1,pass,
+fdi_flows.component.children,fdi_flows,component,2014,inflow,total,1836979977.1033388000,1836979977.10333836000,-4.4000E-7,1,pass,
+fdi_flows.component.children,fdi_flows,component,2015,inflow,total,1728758130.1636673000,1728758130.16366806000,7.6000E-7,1,pass,
+fdi_flows.component.children,fdi_flows,component,2016,inflow,total,1654009529.8000001000,1654009529.80000012000,2.000E-8,1,pass,
+fdi_flows.component.children,fdi_flows,component,2017,inflow,total,1990526440.6999997000,1990526440.69999959000,-1.1000E-7,1,pass,
+fdi_flows.component.children,fdi_flows,component,2018,inflow,total,1350608164.5000,1350608164.499999935000,-6.5000E-8,1,pass,
+fdi_flows.component.children,fdi_flows,component,2019,inflow,total,1367795300.0,1367795299.99999996000,-4.000E-8,100.000000010000,pass,
+fdi_flows.component.children,fdi_flows,component,2020,inflow,total,596151415.1000001000,596151415.100000118000,1.8000E-8,1,pass,
+fdi_flows.component.children,fdi_flows,component,2021,inflow,total,1293639916.7999998000,1293639916.79999975000,-5.000E-8,1,pass,
+fdi_flows.component.children,fdi_flows,component,2022,inflow,total,2258335256.6999989000,2258335256.69999864000,-2.6000E-7,1,pass,
+fdi_flows.component.children,fdi_flows,component,2023,inflow,total,2069879160.9000023000,2069879160.90000187000,-4.3000E-7,1,pass,
+fdi_flows.component.children,fdi_flows,component,2024,inflow,total,1592727285.4000009000,1592727285.40000082000,-8.000E-8,1,pass,
+fdi_flows.component.children,fdi_flows,component,2025,inflow,total,1900386200.9999987000,1900386200.99999857000,-1.3000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2009,inflow,total,666774602.88751172000,666774602.88751169889000,-2.111000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2010,inflow,total,865637670.9822244000,865637670.9822243715000,-2.85000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2011,inflow,total,1133971142.9444451000,1133971142.9444449960000,-1.040000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2012,inflow,total,1048227045.4333187000,1048227045.433318591000,-1.09000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2013,inflow,total,1039174152.484562000,1039174152.48456202492000,2.492000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2014,inflow,total,1836979976.5033391000,1836979976.503339151000,5.1000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2015,inflow,total,1728758129.8636671000,1728758129.863666806000,-2.94000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2016,inflow,total,1654009529.7999985000,1654009529.7999987477000,2.477000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2016,inflow,samegrelo_zemo_svaneti_and_guria,35640611.399999449000,35640611.39999944495000,-4.05000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2016,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,27309939.200000001000,27309939.2000000001000,-9.000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2016,inflow,shida_kartli_and_mtskheta_mtianeti,3161972.6999999993000,3161972.6999999991000,-2.000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2017,inflow,total,1990526440.6999999000,1990526440.6999996726000,-2.274000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2017,inflow,samegrelo_zemo_svaneti_and_guria,56266437.699999988000,56266437.6999999901000,2.1000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2017,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,63967241.000000009000,63967241.0000000125000,3.5000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2017,inflow,shida_kartli_and_mtskheta_mtianeti,6960331.9999999976000,6960331.9999999976000,0E-13,1,pass,
+fdi_flows.region.children,fdi_flows,region,2018,inflow,total,1350608164.5000,1350608164.4999999989000,-1.1000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2018,inflow,samegrelo_zemo_svaneti_and_guria,-8595714.0000000327000,-8595714.00000003245000,2.5000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2018,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,27999763.099999993000,27999763.0999999939000,9.000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2018,inflow,shida_kartli_and_mtskheta_mtianeti,49651686.800000003000,49651686.800000003000,0E-12,1,pass,
+fdi_flows.region.children,fdi_flows,region,2019,inflow,total,1367795347.9000004000,1367795347.9000006334000,2.334000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2019,inflow,samegrelo_zemo_svaneti_and_guria,47512156.699999992000,47512156.6999999898000,-2.2000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2019,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,47699264.4000,47699264.3999999887000,-1.13000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2019,inflow,shida_kartli_and_mtskheta_mtianeti,14770173.099999996000,14770173.0999999929000,-3.1000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2020,inflow,total,596151415.09999929000,596151415.0999993001000,1.01000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2020,inflow,samegrelo_zemo_svaneti_and_guria,31618155.300000017000,31618155.300000016011000,-9.89000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2020,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,-217878.6000000041000,-217878.6000000041000,0E-13,1,pass,
+fdi_flows.region.children,fdi_flows,region,2020,inflow,shida_kartli_and_mtskheta_mtianeti,39525701.800000003000,39525701.799999999000,-4.000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2021,inflow,total,1293639916.8000002000,1293639916.8000000839000,-1.161000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2021,inflow,samegrelo_zemo_svaneti_and_guria,-3404650.9999999871000,-3404650.99999998514000,1.96000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2021,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,7222177.2000000019000,7222177.20000000205000,1.5000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2021,inflow,shida_kartli_and_mtskheta_mtianeti,45835423.999999999000,45835423.999999996000,-3.000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2022,inflow,total,2258335256.6999993000,2258335256.6999993336000,3.36000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2022,inflow,samegrelo_zemo_svaneti_and_guria,35019760.799999996000,35019760.7999999936000,-2.4000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2022,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,21927963.09999999000,21927963.09999998901000,-9.9000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2022,inflow,shida_kartli_and_mtskheta_mtianeti,48237587.399999982000,48237587.399999984000,2.000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2023,inflow,total,2069879160.9000005000,2069879160.900000626000,1.26000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2023,inflow,samegrelo_zemo_svaneti_and_guria,60513301.900000006000,60513301.9000000041000,-1.9000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2023,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,63529992.099999989000,63529992.09999999000,1.000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2023,inflow,shida_kartli_and_mtskheta_mtianeti,60054259.899999997000,60054259.900000004000,7.000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2024,inflow,total,1592727285.4000006000,1592727285.4000005945000,-5.5000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2024,inflow,samegrelo_zemo_svaneti_and_guria,34942214.900000006000,34942214.9000000044000,-1.6000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2024,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,-28927919.800000003000,-28927919.8000000019000,1.1000E-9,1,pass,
+fdi_flows.region.children,fdi_flows,region,2024,inflow,shida_kartli_and_mtskheta_mtianeti,133449929.79999998000,133449929.799999998000,1.8000E-8,1,pass,
+fdi_flows.region.children,fdi_flows,region,2025,inflow,total,1900386200.9999999000,1900386200.9999996759000,-2.241000E-7,1,pass,
+fdi_flows.region.children,fdi_flows,region,2025,inflow,samegrelo_zemo_svaneti_and_guria,63709069.800000019000,63709069.800000019000,0E-12,1,pass,
+fdi_flows.region.children,fdi_flows,region,2025,inflow,imereti_racha_lechkhumi_and_kvemo_svaneti,-64169467.799999999000,-64169467.799999998006000,9.94000E-10,1,pass,
+fdi_flows.region.children,fdi_flows,region,2025,inflow,shida_kartli_and_mtskheta_mtianeti,165105296.000,165105296.000000026000,2.6000E-8,1,pass,
+fdi_position.country.children,fdi_position,country,2015,position_end_of_year,total,13771693384.500002000,13771693384.499999153000,-0.000002847000,1,pass,
+fdi_position.country.children,fdi_position,country,2015,position_end_of_year,group_eu27,4747886819.1999989000,4747886819.19999987796000,9.7796000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_position.country.children,fdi_position,country,2015,position_end_of_year,group_cis,3213120490.5000003000,3213120490.5000001543701000,-1.456299000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2015,position_end_of_year,group_other,5460618149.7000,5460618149.69999964236000,-3.5764000E-7,1.700000086685000,pass,"Not-applicable children count as absent, not zero."
+fdi_position.country.children,fdi_position,country,2016,position_end_of_year,total,15188348418.500002000,15188348418.499997271000,-0.000004729000,1,pass,
+fdi_position.country.children,fdi_position,country,2016,position_end_of_year,group_eu27,4804563784.0999998000,4804563784.10000003608000,2.3608000E-7,1,pass,"Not-applicable children count as absent, not zero."
+fdi_position.country.children,fdi_position,country,2016,position_end_of_year,group_cis,3819445831.5999988000,3819445831.599998825892000,2.5892000E-8,1,pass,
+fdi_position.country.children,fdi_position,country,2016,position_end_of_year,group_other,6306455370.2999987000,6306455370.299998772318000,7.2318000E-8,1,pass,"Not-applicable children count as absent, not zero."
+fdi_position.country.children,fdi_position,country,2017,position_end_of_year,total,18024308641.600005000,18024308641.599999821000,-0.000005179000,1,pass,
+fdi_position.country.children,fdi_position,country,2017,position_end_of_year,group_eu27,5378880976.5000008000,5378880976.50000087811000,7.811000E-8,1,pass,
+fdi_position.country.children,fdi_position,country,2017,position_end_of_year,group_cis,4494693802.9999975000,4494693802.999998359606000,8.59606000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2017,position_end_of_year,group_other,7888509850.0000015000,7888509850.000000195643000,-0.000001304357000,1,pass,
+fdi_position.country.children,fdi_position,country,2018,position_end_of_year,total,18424511136.300001000,18424511136.300000041000,-9.59000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2018,position_end_of_year,group_eu27,5702600979.3000007000,5702600979.2999997494000,-9.506000E-7,5.00000018585000,pass,
+fdi_position.country.children,fdi_position,country,2018,position_end_of_year,group_cis,4672584765.9000,4672584765.89999887551000,-0.00000112449000,1,pass,
+fdi_position.country.children,fdi_position,country,2018,position_end_of_year,group_other,7788176717.4999993000,7788176717.499999990439000,6.90439000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2019,position_end_of_year,total,19467160451.800007000,19467160451.800002791000,-0.000004209000,1,pass,
+fdi_position.country.children,fdi_position,country,2019,position_end_of_year,group_eu27,6127227735.5000004000,6127227735.5000009565000,5.565000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2019,position_end_of_year,group_cis,4804943403.1000026000,4804943403.10000280824000,2.0824000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2019,position_end_of_year,group_other,8271754732.5999998000,8271754732.600000163561000,3.63561000E-7,5.0000002163565000,pass,
+fdi_position.country.children,fdi_position,country,2020,position_end_of_year,total,18750028646.999996000,18750028646.999997591000,0.000001591000,1,pass,
+fdi_position.country.children,fdi_position,country,2020,position_end_of_year,group_eu27,5865010185.2000002000,5865010185.2000001022000,-9.78000E-8,1,pass,
+fdi_position.country.children,fdi_position,country,2020,position_end_of_year,group_cis,4783859472.199996000,4783859472.19999514708000,-8.5292000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2020,position_end_of_year,group_other,7919942329.2000014000,7919942329.200000391147000,-0.000001008853000,1,pass,
+fdi_position.country.children,fdi_position,country,2021,position_end_of_year,total,19576789352.199998000,19576789352.199994091000,-0.000003909000,1,pass,
+fdi_position.country.children,fdi_position,country,2021,position_end_of_year,group_eu27,6078997214.1999984000,6078997214.1999997231000,0.0000013231000,1,pass,
+fdi_position.country.children,fdi_position,country,2021,position_end_of_year,group_cis,4853858277.3999972000,4853858277.39999883523000,0.00000163523000,1,pass,
+fdi_position.country.children,fdi_position,country,2021,position_end_of_year,group_other,8454270149.9999985000,8454270149.999997910066000,-5.89934000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2022,position_end_of_year,total,22621796182.69999000,22621796182.700001401000,0.000011401000,1,pass,
+fdi_position.country.children,fdi_position,country,2022,position_end_of_year,group_eu27,6973530372.8000,6973530372.7999992487000,-7.513000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2022,position_end_of_year,group_cis,5104478868.2000004000,5104478868.19999966216000,-7.3784000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2022,position_end_of_year,group_other,10339358571.600001000,10339358571.59999960490000,-0.00000139510000,1,pass,
+fdi_position.country.children,fdi_position,country,2023,position_end_of_year,total,24852684807.799999000,24852684807.800004411000,0.000005411000,1,pass,
+fdi_position.country.children,fdi_position,country,2023,position_end_of_year,group_eu27,6670174817.6000016000,6670174817.6000003596000,-0.0000012404000,1,pass,
+fdi_position.country.children,fdi_position,country,2023,position_end_of_year,group_cis,6272091189.2000008000,6272091189.2000000184000,-7.816000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2023,position_end_of_year,group_other,11781285288.300002000,11781285288.30000169454000,-3.0546000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2024,position_end_of_year,total,24754549913.299996000,24754549913.299998401000,0.000002401000,1,pass,
+fdi_position.country.children,fdi_position,country,2024,position_end_of_year,group_eu27,6144785278.5999998000,6144785278.6000002892000,4.892000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2024,position_end_of_year,group_cis,6408727997.5999976000,6408727997.5999977784000,1.784000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2024,position_end_of_year,group_other,12070356023.400001000,12070356023.39999958904000,-0.00000141096000,1,pass,
+fdi_position.country.children,fdi_position,country,2025,position_end_of_year,total,27926909685.600005000,27926909685.600004911000,-8.9000E-8,1,pass,
+fdi_position.country.children,fdi_position,country,2025,position_end_of_year,group_eu27,7067326237.4999998000,7067326237.5000001085000,3.085000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2025,position_end_of_year,group_cis,6954686839.8000011000,6954686839.8000005319000,-5.681000E-7,1,pass,
+fdi_position.country.children,fdi_position,country,2025,position_end_of_year,group_other,13765809927.400004000,13765809927.40000232245000,-0.00000167755000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2015,position_end_of_year,total,13771693384.500001000,13771693384.500000943000,-5.7000E-8,1,pass,
+fdi_position.sector.children,fdi_position,sector,2016,position_end_of_year,total,15188348418.499999000,15188348418.500003456000,0.000004456000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2017,position_end_of_year,total,18024308641.600005000,18024308641.59999874000,-0.00000626000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2018,position_end_of_year,total,18424511136.300005000,18424511136.300002223000,-0.000002777000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2019,position_end_of_year,total,19467160451.799992000,19467160451.799995787000,0.000003787000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2020,position_end_of_year,total,18750028647.000004000,18750028646.99999882000,-0.00000518000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2021,position_end_of_year,total,19576789352.200001000,19576789352.199999328000,-0.000001672000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2022,position_end_of_year,total,22621796182.700001000,22621796182.699996047000,-0.000004953000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2023,position_end_of_year,total,24852684807.800002000,24852684807.800004452000,0.000002452000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2024,position_end_of_year,total,24754549913.300004000,24754549913.300005452000,0.000001452000,1,pass,
+fdi_position.sector.children,fdi_position,sector,2025,position_end_of_year,total,27926909685.599994000,27926909685.59998974000,-0.00000426000,1,pass,
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,1996,inflow,total,3753450.00000,3753450.00,0.00000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,1997,inflow,total,242586000.00000001000000,242586000,-1.000000E-8,500.000000005000000,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,1998,inflow,total,265331769.51288954000000,265331769.51288909000,-4.5000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,1999,inflow,total,82206999.999999994000000,82207000,6.000000E-9,500.0000000005000000,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2000,inflow,total,131231878.34000001000000,131231878.34734132000,0.00734131000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2001,inflow,total,109839835.48999996000000,109839835.48835485000,-0.00164511000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2002,inflow,total,160211960.45999997000000,160211960.45411445000,-0.00588552000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2003,inflow,total,334567841.62000002000000,334567841.61955194000,-0.00044808000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2004,inflow,total,492329440.01000004000000,492329440.02333604000,0.01333600000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2005,inflow,total,452752292.02572302000000,452752292.02572303000,1.000000E-8,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2006,inflow,total,1171179522.2615217000000,1171179522.2615218000,1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2007,inflow,total,1764720822.3127691000000,1764720822.312769000,-1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2008,inflow,total,1575243239.6460854000000,1575243239.6460853000,-1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2009,inflow,total,666774603.20820001000000,666774603.20819996000,-5.000000E-8,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2009,inflow,total,666774603.20820001000000,666774602.88751172000,-0.32068829000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2010,inflow,total,865637671.99475069000000,865637671.99475074000,5.000000E-8,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2010,inflow,total,865637671.99475069000000,865637670.9822244000,-1.01252629000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2011,inflow,total,1133971145.8444451000000,1133971145.8444451000,0E-13,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2011,inflow,total,1133971145.8444451000000,1133971142.9444451000,-2.9000000000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2012,inflow,total,1048227045.4333175000000,1048227045.4333174000,-1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2012,inflow,total,1048227045.4333175000000,1048227045.4333187000,0.0000012000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2013,inflow,total,1039174152.4845618000000,1039174155.0845617000,2.5999999000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2013,inflow,total,1039174152.4845618000000,1039174152.4845618000,0E-13,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2013,inflow,total,1039174152.4845618000000,1039174152.484562000,2.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2014,inflow,total,1836979976.5033397000000,1836979977.1033388000,0.5999991000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2014,inflow,total,1836979976.5033397000000,1836979976.5033396000,-1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2014,inflow,total,1836979976.5033397000000,1836979976.5033391000,-6.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2015,inflow,total,1728758130.1636671000000,1728758130.1636673000,2.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2015,inflow,total,1728758130.1636671000000,1728758129.8636673000,-0.2999998000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2015,inflow,total,1728758130.1636671000000,1728758129.8636671000,-0.3000000000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2016,inflow,total,1654009529.8000001000000,1654009529.8000001000,0E-13,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2016,inflow,total,1654009529.8000001000000,1654009529.8000001000,0E-13,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2016,inflow,total,1654009529.8000001000000,1654009529.7999985000,-0.0000016000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2016,inflow,total,1654009529.8000001000000,1654009529.8000001000,0E-13,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2017,inflow,total,1990526440.7000000,1990526440.6999997000,-3.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2017,inflow,total,1990526440.7000000,1990526440.6999999000,-1.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2017,inflow,total,1990526440.7000000,1990526440.6999999000,-1.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2017,inflow,total,1990526440.7000000,1990526440.6999999000,-1.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2018,inflow,total,1350608164.4999999000000,1350608164.5000,1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2018,inflow,total,1350608164.4999999000000,1350608164.5000,1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2018,inflow,total,1350608164.4999999000000,1350608164.5000,1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2018,inflow,total,1350608164.4999999000000,1350608164.5000004000,5.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2019,inflow,total,1367795347.9000005000000,1367795300.0,-47.9000005000000,50.00000005000000,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2019,inflow,total,1367795347.9000005000000,1367795347.8999997000,-8.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2019,inflow,total,1367795347.9000005000000,1367795347.9000004000,-1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2019,inflow,total,1367795347.9000005000000,1367795347.9000002000,-3.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2020,inflow,total,596151415.10000012000000,596151415.1000001000,-2.000000E-8,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2020,inflow,total,596151415.10000012000000,596151415.1000001000,-2.000000E-8,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2020,inflow,total,596151415.10000012000000,596151415.09999929000,-8.3000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2020,inflow,total,596151415.10000012000000,596151415.09999998000,-1.4000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2021,inflow,total,1293639916.8000000,1293639916.7999998000,-2.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2021,inflow,total,1293639916.8000000,1293639916.8000,0E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2021,inflow,total,1293639916.8000000,1293639916.8000002000,2.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2021,inflow,total,1293639916.8000000,1293639916.8000002000,2.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2022,inflow,total,2258335256.6999997000000,2258335256.6999989000,-8.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2022,inflow,total,2258335256.6999997000000,2258335256.6999998000,1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2022,inflow,total,2258335256.6999997000000,2258335256.6999993000,-4.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2022,inflow,total,2258335256.6999997000000,2258335256.6999998000,1.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2023,inflow,total,2069879160.9000000,2069879160.9000023000,0.0000023000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2023,inflow,total,2069879160.9000000,2069879160.8999998000,-2.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2023,inflow,total,2069879160.9000000,2069879160.9000005000,5.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2023,inflow,total,2069879160.9000000,2069879160.9000002000,2.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2024,inflow,total,1592727285.4000000,1592727285.4000009000,9.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2024,inflow,total,1592727285.4000000,1592727285.3999999000,-1.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2024,inflow,total,1592727285.4000000,1592727285.4000006000,6.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2024,inflow,total,1592727285.4000000,1592727285.3999999000,-1.000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,component,2025,inflow,total,1900386201.0000003000000,1900386200.9999987000,-0.0000016000000,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,country,2025,inflow,total,1900386201.0000003000000,1900386200.9999999000,-4.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,region,2025,inflow,total,1900386201.0000003000000,1900386200.9999999000,-4.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_flows.table_total_matches_annual_total,fdi_flows,sector,2025,inflow,total,1900386201.0000003000000,1900386201.0000001000,-2.000000E-7,50,pass,Geostat footnote: totals and sums can differ through rounding (display unit 0.1 thousand USD).
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2015,position_end_of_year,total,13771693384.500002000,13771693384.500001000,-0.000001000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2016,position_end_of_year,total,15188348418.500002000,15188348418.499999000,-0.000003000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2017,position_end_of_year,total,18024308641.600005000,18024308641.600005000,0E-9,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2018,position_end_of_year,total,18424511136.300001000,18424511136.300005000,0.000004000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2019,position_end_of_year,total,19467160451.800007000,19467160451.799992000,-0.000015000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2020,position_end_of_year,total,18750028646.999996000,18750028647.000004000,0.000008000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2021,position_end_of_year,total,19576789352.199998000,19576789352.200001000,0.000003000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2022,position_end_of_year,total,22621796182.69999000,22621796182.700001000,0.000011000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2023,position_end_of_year,total,24852684807.799999000,24852684807.800002000,0.000003000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2024,position_end_of_year,total,24754549913.299996000,24754549913.300004000,0.000008000,1,pass,
+fdi_position.country_total_matches_sector_total,fdi_position,sector,2025,position_end_of_year,total,27926909685.600005000,27926909685.599994000,-0.000011000,1,pass,
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2000,net,balance,-128067895.3399999901000000,-128067895.33999998000000,1.01000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2000,net,liabilities,131466678.33999999000000,131466678.33999999000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2000,inflow,total,131466678.33999999000000,131231878.34000001000000,-234799.99999998000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2001,net,balance,-105779435.4899999899000000,-105779435.48999998000000,9.9000000E-9,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2001,net,liabilities,109871635.48999999000000,109871635.48999999000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2001,inflow,total,109871635.48999999000000,109839835.48999996000000,-31800.00000003000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2002,net,balance,-156119460.4599999997000000,-156119460.46000000,-3.000000E-10,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2002,net,liabilities,160398660.46000000,160398660.46000000,0E-8,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2002,inflow,total,160398660.46000000,160211960.45999997000000,-186700.00000003000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2003,net,balance,-330805341.6200000099000000,-330805341.62000004000000,-3.01000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2003,net,liabilities,334891041.62000001000000,334891041.62000001000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2003,inflow,total,334891041.62000001000000,334567841.62000002000000,-323199.99999999000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2004,net,balance,-482758940.0099999916000000,-482758940.01000000,-8.4000000E-9,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2004,net,liabilities,492732940.00999999000000,492732940.00999999000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2004,inflow,total,492732940.00999999000000,492329440.01000004000000,-403499.99999995000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2005,net,balance,-542229625.340000029000000,-542229625.33999998000000,4.9000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2005,net,liabilities,453107292.01000004000000,453107292.01000004000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2005,inflow,total,453107292.01000004000000,452752292.02572302000000,-354999.98427702000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2006,net,balance,-1184560923.7600001000000,-1184560923.7600002000000,-1.000000E-7,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2006,net,liabilities,1171394522.2500001000000,1171394522.2500001000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2006,inflow,total,1171394522.2500001000000,1171179522.2615217000000,-214999.9884784000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2007,net,balance,-1690826793.3199998000000,-1690826793.3199998000000,0E-13,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2007,net,liabilities,1892093991.0999998000000,1892093991.0999998000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2007,inflow,total,1892093991.0999998000000,1764720822.3127691000000,-127373168.7872307000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2008,net,balance,-1428631125.74000000,-1428631125.74000000,0E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2008,net,liabilities,1602232455.97000000,1602232455.97000000,0E-8,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2008,inflow,total,1602232455.97000000,1575243239.6460854000000,-26989216.3239146000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2009,net,balance,-685300808.059999979000000,-685300808.06000001000000,-3.1000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2009,net,liabilities,660800885.26999998000000,660800885.26999998000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2009,inflow,total,660800885.26999998000000,666774603.20820001000000,5973717.93820003000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2010,net,balance,-730489603.66000008000000,-730489603.66000006000000,2.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2010,net,liabilities,920915812.73000008000000,920915812.73000008000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2010,inflow,total,920915812.73000008000000,865637671.99475069000000,-55278140.73524939000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2011,net,balance,-987355065.54000000,-987355065.54000006000000,-6.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2011,net,liabilities,1170087549.5000000,1170087549.5000000,0E-7,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2011,inflow,total,1170087549.5000000,1133971145.8444451000000,-36116403.6555549000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2012,net,balance,-751274688.89999989000000,-751274688.89999989000000,0E-14,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2012,net,liabilities,968196197.62999992000000,968196197.62999992000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2012,inflow,total,968196197.62999992000000,1048227045.4333175000000,80030847.80331758000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2013,net,balance,-919270053.34000001000000,-919270053.34000000,1.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2013,net,liabilities,1046562195.15000000,1046562195.15000000,0E-8,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2013,inflow,total,1046562195.15000000,1039174152.4845618000000,-7388042.6654382000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2014,net,balance,-1430328331.62999993000000,-1430328331.6299999000000,3.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2014,net,liabilities,1836879042.8299999000000,1836879042.8299999000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2014,inflow,total,1836879042.8299999000000,1836979976.5033397000000,100933.6733398000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2015,net,balance,-1419607447.19999988000000,-1419607447.1999998000000,8.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2015,net,liabilities,1735307118.6299999000000,1735307118.6299999000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2015,inflow,total,1735307118.6299999000000,1728758130.1636671000000,-6548988.4663328000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2016,net,balance,-1246836683.38999977000000,-1246836683.3899997000000,7.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2016,net,liabilities,1659824033.3699998000000,1659824033.3699998000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2016,inflow,total,1659824033.3699998000000,1654009529.8000001000000,-5814503.5699997000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2017,net,balance,-1721098982.64999968000000,-1721098982.6499997000000,-2.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2017,net,liabilities,1930381394.7599997000000,1930381394.7599997000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2017,inflow,total,1930381394.7599997000000,1990526440.7000000,60145045.9400003000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2018,net,balance,-1010417427.87000011000000,-1010417427.8700001000000,1.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2018,net,liabilities,1304024907.7000001000000,1304024907.7000001000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2018,inflow,total,1304024907.7000001000000,1350608164.4999999000000,46583256.7999998000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2019,net,balance,-1086260689.8799999000000,-1086260689.88000000,-1.000000E-7,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2019,net,liabilities,1397879177.2899999000000,1397879177.2899999000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2019,inflow,total,1397879177.2899999000000,1367795347.9000005000000,-30083829.3899994000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2020,net,balance,-573290728.159999905000000,-573290728.15999984000000,6.5000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2020,net,liabilities,557173503.18999991000000,557173503.18999991000000,0E-14,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2020,inflow,total,557173503.18999991000000,596151415.10000012000000,38977911.91000021000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2021,net,balance,-971653404.36000012000000,-971653404.36000008000000,4.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2021,net,liabilities,1318980865.0800001000000,1318980865.0800001000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2021,inflow,total,1318980865.0800001000000,1293639916.8000000,-25340948.2800001000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2022,net,balance,-1926705051.50999997000000,-1926705051.51000000,-3.000000E-8,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2022,net,liabilities,2291876527.42000000,2291876527.42000000,0E-8,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2022,inflow,total,2291876527.42000000,2258335256.6999997000000,-33541270.7200003000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2023,net,balance,-1780863064.2000004000000,-1780863064.2000005000000,-1.000000E-7,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2023,net,liabilities,2262479271.2300004000000,2262479271.2300004000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2023,inflow,total,2262479271.2300004000000,2069879160.9000000,-192600110.3300004000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2024,net,balance,-1164816709.42999986000000,-1164816709.4299997000000,1.6000000E-7,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2024,net,liabilities,1631976220.8299999000000,1631976220.8299999000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2024,inflow,total,1631976220.8299999000000,1592727285.4000000,-39248935.4299999000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."
+fdi_flows.bpm6_balance_is_assets_minus_liabilities,fdi_flows,bpm6,2025,net,balance,-1600960793.1199997000000,-1600960793.1199998000000,-1.000000E-7,1,pass,
+fdi_flows.bpm6_liabilities_match_nbg_bop,fdi_flows,bpm6,2025,net,liabilities,1874420525.3699997000000,1874420525.3699997000000,0E-13,1,pass,Same compiler (NBG); a difference would mean the two files are different vintages.
+fdi.geostat_total_vs_nbg_liabilities,fdi_flows,total,2025,inflow,total,1874420525.3699997000000,1900386201.0000003000000,25965675.6300006000000,,reported,"Geostat FDI total against NBG BoP direct-investment liabilities; reported, never forced to agree."

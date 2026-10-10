@@ -2,6 +2,7 @@ import type { Locale, Messages, MessageScope } from "./types";
 
 const dictionaries = {
   ka: {
+    wages: () => import("./messages/ka/wages.json"),
     trade: () => import("./messages/ka/trade.json"),
     unemployment: () => import("./messages/ka/unemployment.json"),
     sectors: () => import("./messages/ka/sectors.json"),
@@ -24,8 +25,10 @@ const dictionaries = {
     seo: () => import("./messages/ka/seo.json"),
     inflation: () => import("./messages/ka/inflation.json"),
     demography: () => import("./messages/ka/demography.json"),
+    external: () => import("./messages/ka/external.json"),
   },
   en: {
+    wages: () => import("./messages/en/wages.json"),
     trade: () => import("./messages/en/trade.json"),
     unemployment: () => import("./messages/en/unemployment.json"),
     sectors: () => import("./messages/en/sectors.json"),
@@ -48,6 +51,7 @@ const dictionaries = {
     seo: () => import("./messages/en/seo.json"),
     inflation: () => import("./messages/en/inflation.json"),
     demography: () => import("./messages/en/demography.json"),
+    external: () => import("./messages/en/external.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 

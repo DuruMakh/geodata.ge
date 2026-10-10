@@ -6,12 +6,16 @@ import { INFLATION_METHODOLOGY_CONTENT } from "./content/inflation";
 import { INFLATION_METHODOLOGY_CONTENT as EN_INFLATION } from "./content/en/inflation";
 import { DEMOGRAPHY_METHODOLOGY } from "./content/demography";
 import { DEMOGRAPHY_METHODOLOGY as EN_DEMOGRAPHY } from "./content/en/demography";
+import { WAGES_METHODOLOGY_CONTENT } from "./content/wages";
+import { WAGES_METHODOLOGY_CONTENT as EN_WAGES } from "./content/en/wages";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT as EN_UNEMPLOYMENT } from "./content/en/unemployment";
 import { TRADE_METHODOLOGY_CONTENT } from "./content/trade";
 import { TRADE_METHODOLOGY_CONTENT as EN_TRADE } from "./content/en/trade";
+import { EXTERNAL_FLOWS_METHODOLOGY_CONTENT } from "./content/external-flows";
+import { EXTERNAL_FLOWS_METHODOLOGY_CONTENT as EN_EXTERNAL_FLOWS } from "./content/en/external-flows";
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { Locale } from "../i18n/types";
 import { DEBT_METHODOLOGY_CONTENT as EN_DEBT } from "./content/en/debt";
@@ -44,7 +48,9 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
   inflation: INFLATION_METHODOLOGY_CONTENT,
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
+  wages: WAGES_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
+  "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
 
@@ -53,8 +59,10 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   "regional-economies": EN_REGIONAL_ECONOMIES,
   unemployment: EN_UNEMPLOYMENT,
   trade: EN_TRADE,
+  "external-flows": EN_EXTERNAL_FLOWS,
   expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP, inflation: EN_INFLATION,
   demography: EN_DEMOGRAPHY,
+  wages: EN_WAGES,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {

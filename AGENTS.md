@@ -68,6 +68,7 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 - Production follows the warm editorial system in `DESIGN.md` v4.1. Do not revive the superseded Apple Light/Night, dark, neon, or terminal directions without explicit approval.
 - Functional UI icons use Lucide (`lucide-react`), with sizing, accessibility and exceptions owned by `DESIGN.md` §7.2a. Do not introduce a second icon family or replace brand assets/data visualizations with UI icons.
 - Derive year ranges and defaults from loaded facts; do not hardcode coverage.
+- Under a page heading add only the one-line latest-value (or lead) line; no summary paragraphs or notes there (`DESIGN.md` §17).
 - Preserve readable Georgian text, accessible chart labels, distinguishable stable category colors, and data comprehension.
 - Only the applicable total is selected by default; it remains first, selectable, and removable.
 - Series selection is unlimited. Optional grouping tabs precede search; the next row places `გასუფთავება` / `ყველას მონიშვნა` on the left. Ordinary scopes show `სერიები {selected} / {all}` on the right; ministries show `ძირითადი {selected} / {all} · პროგრამები {selectedPrograms}` so a selected program is never hidden by the top-level bulk count. Search never scopes the bulk action or denominator.

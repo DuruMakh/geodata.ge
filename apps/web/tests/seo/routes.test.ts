@@ -57,8 +57,10 @@ describe("indexable Fiscal.ge routes", () => {
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
     // Trading partners and Products each add one further bilingual pair.
     // The Migration page adds one more bilingual pair, and so does the Births, deaths and fertility page.
+    // Wages adds its hub, three pages, 11 region pages and methodology page: 16 bilingual pairs.
+    // External flows adds its hub, Money from abroad and its methodology, each in both languages.
     // Domestic exports adds one further bilingual pair.
-    expect(urls).toHaveLength(448);
+    expect(urls).toHaveLength(490);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -67,10 +69,20 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/deficit");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/partners");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/partners");
+    for (const page of ["", "/overview", "/industries", "/regions"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/wages${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/wages${page}`);
+    }
+    expect(urls).toContain("https://fiscal.ge/en/methodology/wages");
+    expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/domestic-exports");
+    for (const route of ["/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account", "/methodology/external-flows"]) {
+      expect(urls).toContain(`https://fiscal.ge${route}`);
+      expect(urls).toContain(`https://fiscal.ge/en${route}`);
+    }
     expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
     expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");
