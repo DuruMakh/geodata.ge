@@ -47,7 +47,7 @@ test.each(["en", "ka"] as const)("%s exports all committed historical series bey
 test("retains an old version's original source even when the selected years have no observations", async () => {
   const build = await builder(), p = await presentation("en"), data = productData();
   data.entities[0] = { ...data.entities[0], id: "goods.hs4.1995-1999.8703", sourceBlock: "1995-1999" };
-  p.englishLabels[data.entities[0].id] = "Motor cars";
+  p.englishLabels = { ...p.englishLabels, [data.entities[0].id]: "Motor cars" };
   const state = { ...DEFAULT_TRADE_PRODUCTS_STATE, selectedIds: [data.entities[0].id], range: { kind: "manual" as const, start: 2025, end: 2025 } };
   const model = build({ data, state, sources, siteOrigin: "https://fiscal.ge" }, p);
   expect(model.analysis.rows.map(row => row[3])).toEqual([null]);
