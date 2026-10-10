@@ -1,0 +1,14 @@
+{
+  "external.money.title": "ფული საზღვარგარეთიდან",
+  "external.measure.received": "შემოსული",
+  "external.measure.sent": "გასული",
+  "external.unit.million": "მლნ აშშ დოლარი",
+  "external.unit.billion": "მლრდ აშშ დოლარი",
+  "external.tab.georgia": "საქართველო",
+  "external.tab.countries": "ქვეყნები",
+  "external.workbook.amount": "თანხა (აშშ დოლარი)",
+  "external.workbook.months": "ასახული თვეები",
+  "external.workbook.partialNote": "12-ზე ნაკლები თვით მონიშნული მნიშვნელობები მხოლოდ ეროვნული ბანკის მიერ გამოქვეყნებულ თვეებს მოიცავს.",
+  "external.workbook.breakNote": "მიკროსაფინანსო ორგანიზაციები 2010 წლის იანვრიდან არის ასახული.",
+  "external.workbook.estimateNote": "პირადი ტრანსფერები ეროვნული ბანკის საგადამხდელო ბალანსის შეფასებაა და არა გზავნილების დათვლა."
+}

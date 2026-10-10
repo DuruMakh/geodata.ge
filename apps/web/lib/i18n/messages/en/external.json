@@ -1,0 +1,14 @@
+{
+  "external.money.title": "Money from abroad",
+  "external.measure.received": "Received",
+  "external.measure.sent": "Sent",
+  "external.unit.million": "million USD",
+  "external.unit.billion": "billion USD",
+  "external.tab.georgia": "Georgia",
+  "external.tab.countries": "Countries",
+  "external.workbook.amount": "Amount (USD)",
+  "external.workbook.months": "Months reported",
+  "external.workbook.partialNote": "Values marked with fewer than 12 months reported cover only the months NBG published.",
+  "external.workbook.breakNote": "Microfinance organizations are included from January 2010.",
+  "external.workbook.estimateNote": "Personal transfers are NBG's balance-of-payments estimate, not a count of transfers."
+}
