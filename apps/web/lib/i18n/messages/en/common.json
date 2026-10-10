@@ -73,5 +73,8 @@
   "common.wagesOverview": "Wages overview",
   "common.wagesIndustries": "Industries",
   "common.wagesRegions": "Regions",
+  "common.poverty": "Poverty and inequality",
+  "common.povertyRates": "Poverty",
+  "common.povertyInequality": "Inequality",
   "common.dataWages": "Data · Wages"
 }
