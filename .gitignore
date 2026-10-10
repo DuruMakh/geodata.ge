@@ -36,6 +36,7 @@ data/reports/*.json
 !data/reports/demography-validation.json
 !data/reports/trade-partners-validation.json
 !data/reports/wages-validation.json
+!data/reports/poverty-validation.json
 data/reports/*.txt
 
 # local-only planning/source/prototype material
