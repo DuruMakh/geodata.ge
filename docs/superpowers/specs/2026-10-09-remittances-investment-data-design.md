@@ -2,7 +2,7 @@
 
 Date: 2026-10-09
 
-Status: Draft for review. Nothing in this document is approved. It proposes a reviewed annual data foundation first, the same way Trade started (`2026-10-07-trade-data-design.md`), and sketches the pages that could follow. No source has been captured yet; every coverage year marked "confirm at intake" must be checked against the downloaded file before it is relied on.
+Status: Draft for review. On 2026-10-10 Duru chose to continue with the recommended options in §8 (all three families together, with shares of GDP); the specification as a whole is not yet approved. It proposes a reviewed annual data foundation first, the same way Trade started (`2026-10-07-trade-data-design.md`), and sketches the pages that could follow. No source has been captured yet; every coverage year marked "confirm at intake" must be checked against the downloaded file before it is relied on.
 
 ## 1. Outcome
 
