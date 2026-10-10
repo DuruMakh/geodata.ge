@@ -24,14 +24,14 @@ export function buildTradeProductsWorkbookModel(input: { data: ClientTradeProduc
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: TRADE_PRODUCT_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
-      return { id, kind: id === TRADE_PRODUCT_TOTAL_ID ? "total" : "item", label: entity ? tradeProductLabel(entity, presentation) : t("partners.total"), parentLabel: t(`indicator.${input.state.measure}`), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };
+      return { id, kind: id === TRADE_PRODUCT_TOTAL_ID ? "total" : "item", label: entity ? tradeProductLabel(entity, presentation, !input.data.sourceBlock) : t("partners.total"), parentLabel: t(`indicator.${input.state.measure}`), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };
     }), sources, siteOrigin: input.siteOrigin,
   });
   exportModel.sources = withAbsoluteUrls(mergeSourcesByHref(sources, source => {
     const active = source.years.filter(year => model.years.includes(year));
     return active.length ? active : source.years;
   }), input.siteOrigin);
-  exportModel.readable.subtitle = `${t(`indicator.${input.state.measure}`)} · ${model.range.start}–${model.range.end} · ${model.unit.label} · ${t("products.historicalNote")} · ${t("products.workbookNote")}`;
+  exportModel.readable.subtitle = `${t(`indicator.${input.state.measure}`)} · ${model.range.start}–${model.range.end} · ${model.unit.label}${input.data.sourceBlock ? "" : ` · ${t("products.historicalNote")}`} · ${t("products.workbookNote")}`;
   const values = model.selectedIds.flatMap(id => model.years.map(year => model.valuesByEntity[id][year])).filter((value): value is number => value !== null);
   const amountDecimals = Math.max(model.unit.decimals, unitFor(values, model.unit, 15).decimals);
   const amountFormat = "#,##0." + "0".repeat(amountDecimals);

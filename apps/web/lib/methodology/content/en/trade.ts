@@ -82,11 +82,11 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
     {
       "id": "products",
       "kind": "classification",
-      "title": "Products and historical definitions",
+      "title": "Products from 2020",
       "paragraphs": [
-        "Products cover all reviewed annual four-digit (HS4) observations from 1995–2025. The source blocks 1995–1999, 2000–2014, 2015–2019 and 2020–2025 remain separate identities, even when codes or names match. The captured sources do not establish an official HS edition or a safe bridge between periods. Each displayed product includes its code and source period.",
+        "The Products page covers reviewed annual four-digit (HS4) exports and imports from 2020–2025. It shows 1,192 products once each, with their four-digit codes. The national reference, chart, table, ranking and downloads use the same period. Earlier product definitions remain preserved separately in the reviewed data and original archives; they are not joined to the current series.",
         "The eight browsing categories are navigation aids, not official aggregates; no category totals are invented. Georgian names and search aliases preserve the meaning of the historical source names. Blanks, dashes, absent flows and years outside a source block remain missing. Published numerical zero and negative values retain their signs.",
-        "Products offer exports and imports separately. End-year shares use the matching national goods total. Ranking excludes missing values from numbered ranks; historical versions without an end-year amount remain available for comparison."
+        "Products offer exports and imports separately. End-year shares use the matching national goods total. Ranking excludes missing values from numbered ranks; products without an end-year amount remain available for selection."
       ]
     },
     {
@@ -96,7 +96,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "paragraphs": [
         "The accepted Overview subset contains 62 original export/import observations and 62 derived totals/balances. Every year has all four indicators. Checks compare the original file fingerprint, exact source cell values, units, year/flow references and both formulas. Exact source decimals are retained; displayed figures use a common rounded USD scale. Missing values are shown as gaps or dashes.",
         "The accepted partner subset adds 212 country identities and five groups: 12,462 source observations and 10,530 derived amounts. Separate checks verify all four originals, exact cells, roles, units, source codes, missingness, formulas and declared reconciliations against the matching national totals. Groups are never summed. The two UK services source discrepancies remain unresolved outside this accepted goods subset.",
-        "The Products subset adds 4,768 period-qualified identities and 69,624 detail observations. Six original workbooks and every canonical source cell are checked; 62 native total controls reconcile against national totals within USD 1. Exact source decimals and native cell references are retained in the reviewed data. No historical blocks are joined."
+        "The complete reviewed product archive retains 4,768 period-qualified identities and 69,624 detail observations. Six original workbooks and every canonical source cell are checked; 62 native total controls reconcile against national totals within USD 1. Exact source decimals and native cell references are retained. The public Products page selects only the 2020–2025 source block from this accepted package. No historical blocks are joined."
       ]
     },
     {
@@ -104,7 +104,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "Thirteen frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Version-qualified product names, actual basis, unspecified publication status and applicable original-source links are retained, including a selected old version with no observations in the chosen years. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
+        "Thirteen frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
       ]
     }
   ],

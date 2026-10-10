@@ -41,7 +41,15 @@ test("Products metadata and page publish the reviewed bilingual dataset coverage
   expect(en.alternates?.canonical).toContain("/en/explorer/trade/products");
   expect(en.alternates?.languages).toHaveProperty("ka");
   const html = renderToStaticMarkup(await renderTradeProductsPage("en"));
-  expect(html).toContain('"temporalCoverage":"1995/2025"');
+  expect(html).toContain('"temporalCoverage":"2020/2025"');
   expect(html).toContain('"dateModified":"2026-10-09"');
   expect(html).toContain('"inLanguage":["ka","en"]');
+  expect(html).not.toContain("Historical product versions are separate");
+});
+
+test("the Trade hub shows Products coverage from 2020 while retaining full partner coverage", async () => {
+  const { renderTradeHub } = await import("../../lib/pages/trade");
+  const html = renderToStaticMarkup(await renderTradeHub("en"));
+  expect(html).toContain("2020–2025");
+  expect(html).toContain("1995–2025");
 });

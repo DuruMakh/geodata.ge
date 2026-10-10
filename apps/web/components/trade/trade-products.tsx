@@ -31,7 +31,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const { state, selectionReset, update } = useTradeProductsState(data);
   const model = useMemo(() => buildTradeProductsModel(data, state, presentation), [data, state, presentation]);
   const entities = useMemo(() => new Map(data.entities.map(entity => [entity.id, entity])), [data]);
-  const labels = useMemo(() => new Map([[TRADE_PRODUCT_TOTAL_ID, message(messages, "trade.partners.total")], ...data.entities.map(entity => [entity.id, tradeProductLabel(entity, presentation)] as const)]), [data, presentation, messages]);
+  const labels = useMemo(() => new Map([[TRADE_PRODUCT_TOTAL_ID, message(messages, "trade.partners.total")], ...data.entities.map(entity => [entity.id, tradeProductLabel(entity, presentation, !data.sourceBlock)] as const)]), [data, presentation, messages]);
   const [picker, setPicker] = useState<{ view: "categories" | "selected"; opener: HTMLElement } | null>(null);
   const [paging, setPaging] = useState<{ selection: readonly string[]; page: number }>({ selection: [], page: 0 });
   useEffect(() => {
@@ -70,14 +70,14 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
         {model.selectedIds.slice(0, 4).map((id, index) => {
           const entity = entities.get(id), name = entity ? publicLabel(locale, id, entity.labelKa, englishLabels) : labels.get(id)!;
           return <button key={id} type="button" data-testid="trade-products-selected-label" data-series-id={id} title={labels.get(id)} aria-label={`${t("remove")} ${labels.get(id)}`} onClick={() => update(previous => ({ ...previous, selectedIds: previous.selectedIds.filter(value => value !== id) }), true)} className={`${index >= 2 ? "hidden min-[768px]:flex" : "flex"} h-9 max-w-[230px] cursor-pointer items-center gap-1.5 border border-[var(--control)] px-2 min-[768px]:h-7 hover:bg-[var(--tint)]`}>
-            <SwatchBar color={tradeProductColor(id)} /><span className="min-w-0 truncate">{name}</span>{entity ? <span className="shrink-0 whitespace-nowrap text-[10px] text-[var(--muted)]">{entity.code} · {entity.sourceBlock.replace("-", "–")}</span> : null}<X size={12} className="shrink-0" aria-hidden />
+            <SwatchBar color={tradeProductColor(id)} /><span className="min-w-0 truncate">{name}</span>{entity ? <span className="shrink-0 whitespace-nowrap text-[10px] text-[var(--muted)]">{entity.code}{data.sourceBlock ? "" : ` · ${entity.sourceBlock.replace("-", "–")}`}</span> : null}<X size={12} className="shrink-0" aria-hidden />
           </button>;
         })}
         {model.selectedCount > 2 ? <button type="button" data-testid="trade-products-more" onClick={event => setPicker({ view: "selected", opener: event.currentTarget })} className={`${model.selectedCount <= 4 ? "min-[768px]:hidden" : ""} h-9 cursor-pointer px-1 text-[var(--accent)] min-[768px]:h-7`}><span className="min-[768px]:hidden">+{model.selectedCount - 2}</span><span className="hidden min-[768px]:inline">+{model.selectedCount - 4}</span> {t("more")}</button> : null}
       </div>
       <RangeStrip years={data.years.filter(year => year >= model.range.min && year <= model.range.max)} range={model.range} onChange={patch => update(previous => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
     </section>
-    <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{t("historicalNote")} {t("definitions")}</p></div>
+    <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{data.sourceBlock ? "" : `${t("historicalNote")} `}{t("definitions")}</p></div>
     <TradePartnersRanking key={`${state.measure}:${model.range.end}`} model={model} tab="products" measure={state.measure} pageSize={25} />
     {picker ? <TradeProductsPicker data={data} model={model} selectedIds={state.selectedIds} initialView={picker.view} returnFocusTo={picker.opener} onApply={selectedIds => update(previous => ({ ...previous, selectedIds }), true)} onClose={() => setPicker(null)} /> : null}
   </div>;

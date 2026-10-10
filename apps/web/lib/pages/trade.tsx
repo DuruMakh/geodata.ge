@@ -31,6 +31,8 @@ import { projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
+const PRODUCT_SOURCE_BLOCK = "2020-2025";
+
 export async function tradeHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["trade"]);
   return fiscalMetadata({ locale, path: "/explorer/trade", title: message(messages, "trade.metaTitle"), description: message(messages, "trade.metaDescription") });
@@ -50,27 +52,27 @@ export async function renderTradeHub(locale: Locale) {
       <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage="" />
       <ExplorerHeading>{title}</ExplorerHeading>
       <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "trade.hubSummary")}</p>
-      <BudgetHub cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "")))} locale={locale} testId="trade-hub" />
+      <BudgetHub cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)))} locale={locale} testId="trade-hub" />
     </ExplorerPage>
   </I18nProvider>;
 }
 export async function tradeProductsMetadata(locale: Locale) {
   const [products, messages] = await Promise.all([loadServedTradeProductsData(), getMessages(locale, ["trade"])]);
-  const { min, max } = tradeProductsCoverage(toClientTradeProductsData(products, [], ""));
+  const { min, max } = tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK));
   return fiscalMetadata({ locale, path: "/explorer/trade/products", title: message(messages, "trade.products.metaTitle"), description: `${message(messages, "trade.products.summary")} ${min}–${max}.` });
 }
 
 export async function renderTradeProductsPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [products, national, fingerprint] = await Promise.all([loadServedTradeProductsData(), loadServedTradeOverviewData(), loadTradeProductCatalogueFingerprint()]);
+  const [products, national, fingerprint] = await Promise.all([loadServedTradeProductsData(), loadServedTradeOverviewData(), loadTradeProductCatalogueFingerprint(PRODUCT_SOURCE_BLOCK)]);
+  const data = toClientTradeProductsData(products, national.facts, fingerprint, PRODUCT_SOURCE_BLOCK), { min, max } = tradeProductsCoverage(data);
   const [presentation, manifest, catalogue] = await Promise.all([
-    getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], products.entities.map(entity => entity.id)),
+    getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], data.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
   ]);
-  const data = toClientTradeProductsData(products, national.facts, fingerprint), { min, max } = tradeProductsCoverage(data);
-  const sourceIds = new Set<string>(Object.values(TRADE_PRODUCT_SOURCES).flatMap(sources => Object.values(sources))); sourceIds.add(TRADE_OVERVIEW_SOURCE);
+  const sourceIds = new Set<string>(Object.values(TRADE_PRODUCT_SOURCES[PRODUCT_SOURCE_BLOCK])); sourceIds.add(TRADE_OVERVIEW_SOURCE);
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
-  const lastReviewedAt = [...products.facts, ...national.facts].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
+  const lastReviewedAt = [...products.facts.filter(fact => fact.sourceBlock === PRODUCT_SOURCE_BLOCK), ...national.facts.filter(fact => data.years.includes(fact.year))].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: t("products.title") }];
   return <I18nProvider {...presentation}>

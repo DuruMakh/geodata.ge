@@ -8,11 +8,11 @@ import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
 import type { ClientTradeOverviewFact, TradeOverviewFact } from "../tradeOverview/types";
 import { readTradeProductCatalogue } from "./catalogue";
-import { tradeProductFactKey, type TradeProductEntity, type TradeProductFact, type TradeProductsData, type TradeProductsAcceptance } from "./types";
+import { tradeProductFactKey, type TradeProductEntity, type TradeProductFact, type TradeProductSourceBlock, type TradeProductsData, type TradeProductsAcceptance } from "./types";
 import { tradeProductsEnglishLabels, validateTradeProductsData } from "./validation";
 
 export type ClientTradeProductFact = [entityIndex: number, year: number, measureIndex: 0 | 1, valueUsd: number | null];
-export type ClientTradeProductsData = { entities: TradeProductEntity[]; years: number[]; facts: ClientTradeProductFact[]; nationalFacts: ClientTradeOverviewFact[]; catalogueFingerprint: string };
+export type ClientTradeProductsData = { entities: TradeProductEntity[]; years: number[]; facts: ClientTradeProductFact[]; nationalFacts: ClientTradeOverviewFact[]; catalogueFingerprint: string; sourceBlock?: TradeProductSourceBlock };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 export async function loadTradeProductsData(): Promise<TradeProductsData> {
@@ -37,8 +37,9 @@ export async function loadTradeProductsData(): Promise<TradeProductsData> {
 export async function loadTradeProductEntities(): Promise<TradeProductEntity[]> {
   return (await loadServedTradeProductsData()).entities;
 }
-export async function loadTradeProductCatalogueFingerprint(): Promise<string> {
-  return hash(await readFile(path.resolve(/* turbopackIgnore: true */ process.cwd(), "../../data/imports/trade-products-catalogue.csv")));
+export async function loadTradeProductCatalogueFingerprint(sourceBlock?: TradeProductSourceBlock): Promise<string> {
+  const fingerprint = hash(await readFile(path.resolve(/* turbopackIgnore: true */ process.cwd(), "../../data/imports/trade-products-catalogue.csv")));
+  return sourceBlock ? hash(`${fingerprint}:${sourceBlock}`) : fingerprint;
 }
 export function assertTradeProductsParity(csv: TradeProductsData, mirror: TradeProductsData): void {
   assertSameServedRows("Trade product catalogue", csv.entities, mirror.entities, entity => entity.id);
@@ -55,8 +56,10 @@ export function loadServedTradeProductsData(): Promise<TradeProductsData> {
   })();
   return servedPromise;
 }
-export function toClientTradeProductsData(data: TradeProductsData, nationalFacts: readonly TradeOverviewFact[], catalogueFingerprint: string): ClientTradeProductsData {
-  const entities = [...data.entities].sort((a, b) => a.sourceBlock.localeCompare(b.sourceBlock, "en") || a.code.localeCompare(b.code, "en"));
+export function toClientTradeProductsData(data: TradeProductsData, nationalFacts: readonly TradeOverviewFact[], catalogueFingerprint: string, sourceBlock?: TradeProductSourceBlock): ClientTradeProductsData {
+  const entities = data.entities.filter(entity => !sourceBlock || entity.sourceBlock === sourceBlock).sort((a, b) => a.sourceBlock.localeCompare(b.sourceBlock, "en") || a.code.localeCompare(b.code, "en"));
   const indices = new Map(entities.map((entity, index) => [entity.id, index]));
-  return { entities, years: [...new Set(data.facts.map(fact => fact.year))].sort((a, b) => a - b), facts: data.facts.map(fact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), nationalFacts: nationalFacts.map(toClientTradeOverviewFact), catalogueFingerprint };
+  const facts = sourceBlock ? data.facts.filter(fact => indices.has(fact.entityId)) : data.facts;
+  const years = [...new Set(facts.map(fact => fact.year))].sort((a, b) => a - b);
+  return { entities, years, facts: facts.map(fact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), nationalFacts: nationalFacts.filter(fact => !sourceBlock || years.includes(fact.year)).map(toClientTradeOverviewFact), catalogueFingerprint, ...(sourceBlock ? { sourceBlock } : {}) };
 }

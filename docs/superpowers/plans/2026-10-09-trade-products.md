@@ -1,5 +1,7 @@
 # Trade Products Implementation Plan
 
+**Later owner amendment (2026-10-10):** This completed plan records the original full-history implementation. The current public Products page uses only the accepted 2020–2025 block, while the complete reviewed history remains preserved. The current amendment in the approved Products design and `Project_Definition.md` §2E own this narrower public scope; completed historical UI steps below are execution history.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the bilingual Products explorer with an immediately visible chart and a searchable category popup covering separate historical product versions from 1995–2025.

@@ -1,7 +1,17 @@
 # Trade Products: chart first, catalogue in a popup
 
 Date: 2026-10-09
-Status: Written design approved on 2026-10-09 when the user said "continue" after its review request. The implementation plan is the next review stage. No Products serving package, application page or production release has been implemented by this document.
+Status: Implemented locally. The owner approved the current-period simplification below on 2026-10-10. Publishing and live database operations remain separate delivery steps.
+
+## Current approved scope amendment — 2026-10-10
+
+The owner requested that Products show only data from 2020 onward to remove repeated historical entries. Use the accepted 2020–2025 native source block, including 2020. Its 1,192 products appear once each. Restrict the national reference, chart, table, search, category counts, ranking, hub card, metadata and Excel to this period. Derive displayed years from the projected facts. Retain the chart-first layout, compact selected labels and staged category/search popup.
+
+Use product names and four-digit codes without repeated source-period suffixes. Keep missing values, zeros, signs, global selection and paging behavior unchanged. Scope the saved-selection fingerprint to the current catalogue; older full-history tokens use the existing explicit reset behavior rather than reinterpreting their bits.
+
+Preserve the complete reviewed 1995–2025 package, its 4,768 historical identities and 69,624 observations, all six original product workbooks, the full private mirror and validation evidence. Filtering happens after acceptance and before client indexing and label projection. Do not delete, join or rewrite historical records. Public Excel uses all selected current products and selected current years; original-source files may retain their wider published coverage.
+
+The numbered sections below retain the original approved implementation record. This amendment supersedes their public full-history scope and repeated-period display requirements; their source preservation, precision, missingness, accessibility and static-serving requirements continue to apply.
 
 ## 1. Intended result and accepted decisions
 

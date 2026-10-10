@@ -9,8 +9,8 @@ import { tradePartnerColor } from "./tradePartners";
 import { TRADE_PRODUCT_TOTAL_ID, tradeProductsBulkSelection, tradeProductsCoverage, type TradeProductsState } from "./tradeProductsState";
 
 export const tradeProductColor = tradePartnerColor;
-export function tradeProductLabel(entity: TradeProductEntity, presentation: Presentation): string {
-  return `${publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels)} · ${entity.code} · ${entity.sourceBlock.replace("-", "–")}`;
+export function tradeProductLabel(entity: TradeProductEntity, presentation: Presentation, includeSourceBlock = true): string {
+  return `${publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels)} · ${entity.code}${includeSourceBlock ? ` · ${entity.sourceBlock.replace("-", "–")}` : ""}`;
 }
 export type TradeProductRankingRow = { entityId: string; label: string; valueUsd: number | null; shareOfNational: number | null; rank: number | null; color: string };
 export type TradeProductsModel = { years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[]; valuesByEntity: Record<string, Record<number, number | null>>; ranking: TradeProductRankingRow[]; missingRanking: TradeProductRankingRow[]; selectedCount: number; totalCount: number };
@@ -31,7 +31,7 @@ export function buildTradeProductsModel(data: ClientTradeProductsData, state: Tr
   const national = valuesByEntity[TRADE_PRODUCT_TOTAL_ID][range.end];
   const rows: TradeProductRankingRow[] = data.entities.map(entity => {
     const valueUsd = valuesByEntity[entity.id][range.end];
-    return { entityId: entity.id, label: tradeProductLabel(entity, presentation), valueUsd, shareOfNational: valueUsd !== null && national !== null && national > 0 ? valueUsd / national : null, rank: null, color: tradeProductColor(entity.id) };
+    return { entityId: entity.id, label: tradeProductLabel(entity, presentation, !data.sourceBlock), valueUsd, shareOfNational: valueUsd !== null && national !== null && national > 0 ? valueUsd / national : null, rank: null, color: tradeProductColor(entity.id) };
   });
   const labelOrder = (a: TradeProductRankingRow, b: TradeProductRankingRow) => a.label.localeCompare(b.label, presentation.locale) || a.entityId.localeCompare(b.entityId, "en");
   const ranking = rows.filter(row => row.valueUsd !== null).sort((a, b) => b.valueUsd! - a.valueUsd! || labelOrder(a, b)).map((row, index) => ({ ...row, rank: index + 1 }));
