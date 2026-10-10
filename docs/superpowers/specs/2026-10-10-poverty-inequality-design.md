@@ -1,7 +1,7 @@
 # Poverty and inequality hub
 
 Date: 2026-10-10
-Status: Draft for Duru's review. Duru picked Poverty as the next hub, chose **Poverty + inequality** as its scope, and approved the page layout on 2026-10-10 (decision cards in the "Next hub ideas" thread). This document covers both the data foundation and the pages, because the data is small: four Geostat workbooks and 491 served values.
+Status: Approved by Duru on 2026-10-10 (decision card "Approve the Poverty and inequality design document?"). Duru picked Poverty as the next hub, chose **Poverty + inequality** as its scope, and approved the page layout on 2026-10-10 (decision cards in the "Next hub ideas" thread). This document covers both the data foundation and the pages, because the data is small: four Geostat workbooks and 491 served values.
 
 ## 1. Intended result
 
