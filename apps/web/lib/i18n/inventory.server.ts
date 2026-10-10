@@ -15,6 +15,7 @@ import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
 import moneyTransferRegistry from "../../../../data/taxonomy/money-transfer-countries.json";
+import foreignInvestmentRegistry from "../../../../data/taxonomy/foreign-investment.json";
 import { readTradeProductCatalogue } from "../data/tradeProducts/catalogue";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
@@ -27,7 +28,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
     "/explorer/unemployment",
-    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/external", "/explorer/external/money-from-abroad",
+    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
@@ -61,6 +62,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
       ...moneyTransferRegistry.map(row => row.id),
+      ...foreignInvestmentRegistry.map(row => row.id),
       ...tradeProducts.map(row => row.id),
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),

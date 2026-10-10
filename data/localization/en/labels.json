@@ -22258,5 +22258,433 @@
   "transfer.zimbabwe": {
     "text": "Zimbabwe",
     "reviewedAt": "2026-10-10"
+  },
+  "fdi.total": {
+    "text": "Foreign direct investment, total",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_031": {
+    "text": "Azerbaijan",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_032": {
+    "text": "Argentina",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_036": {
+    "text": "Australia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_040": {
+    "text": "Austria",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_044": {
+    "text": "Bahamas",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_051": {
+    "text": "Armenia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_056": {
+    "text": "Belgium",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_084": {
+    "text": "Belize",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_092": {
+    "text": "Virgin Islands, British",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_100": {
+    "text": "Bulgaria",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_112": {
+    "text": "Belarus",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_124": {
+    "text": "Canada",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_136": {
+    "text": "Cayman Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_156": {
+    "text": "China",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_191": {
+    "text": "Croatia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_196": {
+    "text": "Cyprus",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_203": {
+    "text": "Czech Republic",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_208": {
+    "text": "Denmark",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_233": {
+    "text": "Estonia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_246": {
+    "text": "Finland",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_250": {
+    "text": "France",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_276": {
+    "text": "Germany",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_292": {
+    "text": "Gibraltar",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_300": {
+    "text": "Greece",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_344": {
+    "text": "Hong Kong, SAR of China",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_348": {
+    "text": "Hungary",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_352": {
+    "text": "Iceland",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_356": {
+    "text": "India",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_364": {
+    "text": "Iran",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_368": {
+    "text": "Iraq",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_372": {
+    "text": "Ireland",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_376": {
+    "text": "Israel",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_380": {
+    "text": "Italy",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_392": {
+    "text": "Japan",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_398": {
+    "text": "Kazakhstan",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_400": {
+    "text": "Jordan",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_410": {
+    "text": "Korea, Republic of",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_417": {
+    "text": "Kyrgyzstan",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_422": {
+    "text": "Lebanon",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_428": {
+    "text": "Latvia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_434": {
+    "text": "Libya",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_438": {
+    "text": "Liechtenstein",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_440": {
+    "text": "Lithuania (Lietuva)",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_442": {
+    "text": "Luxembourg",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_470": {
+    "text": "Malta",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_480": {
+    "text": "Mauritius",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_498": {
+    "text": "Moldova",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_528": {
+    "text": "Netherlands",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_578": {
+    "text": "Norway",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_584": {
+    "text": "Marshall Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_591": {
+    "text": "Panama",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_608": {
+    "text": "Philippines",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_616": {
+    "text": "Poland",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_620": {
+    "text": "Portugal",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_634": {
+    "text": "Qatar",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_642": {
+    "text": "Romania",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_643": {
+    "text": "Russia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_659": {
+    "text": "Saint Kitts and Nevis",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_682": {
+    "text": "Saudi Arabia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_690": {
+    "text": "Seychelles",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_703": {
+    "text": "Slovakia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_705": {
+    "text": "Slovenia",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_724": {
+    "text": "Spain",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_752": {
+    "text": "Sweden",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_756": {
+    "text": "Switzerland",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_760": {
+    "text": "Syrian",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_784": {
+    "text": "United Arab Emirates",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_792": {
+    "text": "Türkiye",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_795": {
+    "text": "Turkmenistan",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_804": {
+    "text": "Ukraine",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_818": {
+    "text": "Egypt",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_826": {
+    "text": "United Kingdom",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_840": {
+    "text": "United States",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.m49_860": {
+    "text": "Uzbekistan",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.unknown": {
+    "text": "Unknown",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.international_organizations": {
+    "text": "International organizations",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.country.other_remainder": {
+    "text": "Other countries (Geostat remainder)",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.a": {
+    "text": "Agriculture, forestry and fishing",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.b": {
+    "text": "Mining and quarrying",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.c": {
+    "text": "Manufacturing",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.d": {
+    "text": "Electricity, gas, steam and air conditioning supply",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.e": {
+    "text": "Water supply; sewerage, waste management and remediation activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.f": {
+    "text": "Construction",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.g": {
+    "text": "Wholesale and retail trade; repair of motor vehicles and motorcycles",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.h": {
+    "text": "Transportation and storage",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.i": {
+    "text": "Accommodation and food service activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.j": {
+    "text": "Information and communication",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.k": {
+    "text": "Financial and insurance activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.l": {
+    "text": "Real estate activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.m": {
+    "text": "Professional, scientific and technical activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.n": {
+    "text": "Administrative and support service activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.p": {
+    "text": "Education",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.q": {
+    "text": "Human health and social work activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.r": {
+    "text": "Arts, entertainment and recreation",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.sector.s": {
+    "text": "Other service activities",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.tbilisi": {
+    "text": "Tbilisi",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.adjara": {
+    "text": "Adjara",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.guria": {
+    "text": "Guria",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.imereti": {
+    "text": "Imereti",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.kakheti": {
+    "text": "Kakheti",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.mtskheta_mtianeti": {
+    "text": "Mtskheta-Mtianeti",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.racha_lechkhumi_kvemo_svaneti": {
+    "text": "Racha-Lechkhumi and Kvemo Svaneti",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.samegrelo_zemo_svaneti": {
+    "text": "Samegrelo-Zemo Svaneti",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.samtskhe_javakheti": {
+    "text": "Samtskhe-Javakheti",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.kvemo_kartli": {
+    "text": "Kvemo Kartli",
+    "reviewedAt": "2026-10-10"
+  },
+  "fdi.region.shida_kartli": {
+    "text": "Shida Kartli",
+    "reviewedAt": "2026-10-10"
   }
 }
