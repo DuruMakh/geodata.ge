@@ -2,7 +2,7 @@
 
 Date: 2026-10-09
 
-Status: Draft for review. On 2026-10-10 Duru chose to continue with the recommended options in §8 (all three families together, with shares of GDP); the specification as a whole is not yet approved. It proposes a reviewed annual data foundation first, the same way Trade started (`2026-10-07-trade-data-design.md`), and sketches the pages that could follow. No source has been captured yet; every coverage year marked "confirm at intake" must be checked against the downloaded file before it is relied on.
+Status: Draft for review. On 2026-10-10 Duru chose to continue with the recommended options in §8 (all three families together, with shares of GDP); the specification as a whole is not yet approved. It proposes a reviewed annual data foundation first, the same way Trade started (`2026-10-07-trade-data-design.md`), and sketches the pages that could follow. The official sources were captured on 2026-10-10 (§5); coverage in §3 is read from those files.
 
 ## 1. Outcome
 
@@ -29,10 +29,10 @@ The three flows are among the largest numbers in Georgia's economy and are widel
 
 | Family | Publisher | Content | Expected annual coverage |
 | --- | --- | --- | --- |
-| Money transfers | NBG (tables REMC, REMM, REMCY) | Inflows and outflows through money transfer operators, total and by country | Start year: confirm at intake; microfinance organizations included from January 2010 (coverage break) |
-| Balance of payments, summary | NBG (table BoP, BPM6) | Current account and its parts: goods, services, primary income, secondary income (with personal transfers and workers' remittances), capital account, financial account by functional category | 2000 onwards on BPM6 (NBG recalculated 2000–2013); earlier BPM5 years are not mixed in |
-| FDI flows | Geostat | Total by year (from quarters), by country, by economic sector (NACE Rev.2), by component (equity, reinvestment of earnings, debt instruments), by region | Quarterly file covers 1996–2026; country, sector and component start years: confirm at intake |
-| FDI position (stock) | Geostat | End-of-year position by country and by sector, integrated format | Start year: confirm at intake (integrated format compiled since March 2018) |
+| Money transfers | NBG (tables REMC, REMM, REMS) | Inflows and outflows through fast money transfer systems, total, by country and by transfer system | REMC by country: monthly 2000-01 to 2026-08 in four period sheets (2000–2007, 2008–2009, 2010–2011, 2012–2026). REMM totals: 1999-07 to 2026-08, but the file has no 2024 column, so 2024 comes from REMC, whose 2024 inflow (USD 3,361.5 million) matches NBG's 2024 publication. REMS by system: 2008-01 to 2026-08. Microfinance organizations included from January 2010 (marked `2010*` in REMM; coverage break). Complete years: 2000–2025 |
+| Balance of payments, summary | NBG (table BoP, BPM6) | Current account and its parts: goods, services, primary income, secondary income (with personal transfers and workers' remittances), capital account, financial account by functional category | BOP-6 workbook: 2000Q1–2026Q2 on BPM6 (NBG recalculated 2000–2013); complete years 2000–2025. Earlier BPM5 years are not mixed in |
+| FDI flows | Geostat | Total by year (from quarters), by country, by economic sector (NACE Rev.2), by component (equity, reinvestment of earnings, debt instruments), by region | Total by quarters and by country: 1996–2026Q2. Regions: 2009Q1. Components: 2013Q1. Sectors (NACE Rev.2): 2016Q1. Separate BPM6 table: 2000Q1–2026Q2. Each breakdown keeps its own start year; complete years end in 2025 |
+| FDI position (stock) | Geostat | End-of-year position by country and by sector, integrated format | By country: end-2015 to 30 June 2026. By sector: 2000 to 30 June 2026. Integrated format compiled since March 2018 |
 
 Collect complete official workbooks without editing them. They contain monthly or quarterly values and preliminary 2026 figures; those stay archived as evidence. Prepared observations are complete calendar years only, and no 2026 annual estimate is produced. Sub-annual data stays out because v1 allows no sub-annual data other than monthly inflation (`AGENTS.md`); a monthly money-transfer page would need its own explicit approval.
 
@@ -56,15 +56,15 @@ These are the points a reader and the methodology page must get right.
 
 Primary sources:
 
-- NBG [statistics data](https://nbg.gov.ge/en/statistics/statistics-data) (static Excel tables BoP, REMC, REMM, REMCY) and [advance release calendar](https://nbg.gov.ge/en/statistics/data-distribution): BoP quarterly; money transfers monthly, around the 15th.
+- NBG [statistics data](https://nbg.gov.ge/en/statistics/statistics-data) (static Excel tables BOP-6, IIP-6, REMC, REMM, REMS; there is no REMCY table) and [advance release calendar](https://nbg.gov.ge/en/statistics/data-distribution). The file list comes from NBG's statistics API, whose update fields give the cadence: BOP-6 and IIP-6 updated 30 September 2026, next 30 December 2026; money-transfer tables updated 15 September 2026, next 15 October 2026.
 - NBG [Balance of Payments of Georgia](https://nbg.gov.ge/en/publications/balance-of-payments) annual publications, for definitions and matching-year checks.
-- Geostat [Foreign Direct Investments](https://www.geostat.ge/en/modules/categories/191/foreign-direct-investments): eleven Excel tables (by countries, sectors NACE Rev.2, sources, regions, components, size, age, quarters 1996–2026, position by countries and sectors, BPM6), quarterly releases.
+- Geostat [Foreign Direct Investments](https://www.geostat.ge/en/modules/categories/191/foreign-direct-investments): eleven Excel tables (by countries, sectors NACE Rev.2, sources, regions, components, size, age, quarters 1996–2026, position by countries and sectors, BPM6), quarterly releases. Size, age and information-source tables are archived but not prepared.
 
 Already archived and reusable: NBG's external-sector methodology (`external-sector-eng-bpm6updated.pdf`) and the 2024 BoP publication (`bop-2024-eng.pdf`) in `docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/`. Reference them from the new package rather than copying them.
 
-The new package would live in `docs/Raw Data/External/` with the same manifest fields as Trade: original and resolved URL, publisher, UTC retrieval time, file name, SHA-256, byte size and content type.
+Captured package: `docs/Raw Data/External/2026-10-10/official/` — 28 unedited files (Geostat FDI workbooks, pages and methodology; NBG BOP-6, IIP-6, REMC, REMM, REMS, methodology, pages and the statistics-API response), with `full-source-manifest.json` (original and resolved URL, publisher, UTC retrieval time, file name, SHA-256, byte size, content type; every checksum re-verified), `workbook-coverage.json` and a README. IIP-6 is archived for reference only; §3 keeps the investment position limited to FDI.
 
-Intake constraint: the cloud workspace used for this draft cannot reach `nbg.gov.ge` or `geostat.ge` (the network policy refuses both). The capture has to run on a machine that can, as the Trade capture did, or after those two hosts are allowed. NBG's statistics page loads its file list with JavaScript, so the exact NBG workbook URLs are recorded at capture time.
+The cloud workspace cannot reach `nbg.gov.ge` or `geostat.ge`, so the capture ran on Duru's computer, as Trade's did. Future refreshes need the same route or an allowed network.
 
 ## 6. Prepared package, validation and reuse
 
@@ -92,11 +92,13 @@ Sketch only, to show the destination. Each page gets its own spec, reusing the e
 3. **Money transfers** — inflows, outflows and net, with a country comparison like Trade's partners page, and personal transfers from the BoP as a separate, clearly labelled line.
 4. **Foreign investment** — total, components, top countries and sectors, and the end-of-year position.
 
-## 8. Decisions for Duru
+## 8. Decisions made
 
-1. **Scope of the first stage.** All three families together (recommended: they share one publisher calendar and the current account needs the other two for context), or money transfers alone first.
-2. **Shares of GDP.** Show current account, transfers and FDI as a percentage of GDP using the existing GDP series (recommended: it is how NBG and Geostat headline them), or USD only like Trade.
-3. **Where capture runs.** On your computer, as Trade was captured, or after allowing `nbg.gov.ge` and `geostat.ge` in the cloud workspace's network settings.
+Recorded on 2026-10-10:
+
+1. **Scope of the first stage:** all three families together.
+2. **Shares of GDP:** yes, using the existing nominal GDP series; the share is a derivation recorded with both input references.
+3. **Where capture runs:** on Duru's computer, as for Trade.
 
 ## 9. Acceptance and workflow
 
