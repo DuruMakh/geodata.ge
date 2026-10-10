@@ -195,7 +195,7 @@ describe("births and deaths page", () => {
   });
 });
 
-// The four Geostat originals listed in data/methodology/source-archives/demography.csv.
+// The twelve Geostat originals listed in data/methodology/source-archives/demography.csv.
 const REVIEWED_SOURCE_IDS = [
   "source.geostat_demography_births",
   "source.geostat_demography_crude_birth_rate",
