@@ -1105,5 +1105,47 @@
   "source.geostat_trade_import_country_group_1995_2026": {
     "name": { "text": "Goods imports by country group in 1995–2026", "reviewedAt": "2026-10-08" },
     "derivation": null
+  },
+  "source.geostat_trade_export_product_by_4_digit_1995_1999": {
+    "name": {
+      "text": "Geostat goods exports by four-digit product codes, 1995–1999",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_import_products__1995_1999_eng": {
+    "name": {
+      "text": "Geostat goods imports by four-digit product codes, 1995–1999",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_export_product_by_4_digit_2000_2014": {
+    "name": {
+      "text": "Geostat goods exports by four-digit product codes, 2000–2014",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_import_product_by_4_digit_2000_2014": {
+    "name": {
+      "text": "Geostat goods imports by four-digit product codes, 2000–2014",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_export_product_by_4_digit_2015_2026": {
+    "name": {
+      "text": "Geostat goods exports by four-digit product codes, 2015–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_import_product_by_4_digit_2015_2026": {
+    "name": {
+      "text": "Geostat goods imports by four-digit product codes, 2015–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
   }
 }

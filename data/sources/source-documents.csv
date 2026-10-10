@@ -158,3 +158,9 @@ source.geostat_trade_export_country_1995_2026,საქონლის ექს
 source.geostat_trade_import_country_1995_2026,საქონლის იმპორტი ქვეყნების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import-Country-1995-2026.xlsx,2026-10-08
 source.geostat_trade_export__country_group_1995_2026,საქონლის ექსპორტი ქვეყნების ჯგუფების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Export-_Country_Group-1995-2026.xlsx,2026-10-08
 source.geostat_trade_import_country_group_1995_2026,საქონლის იმპორტი ქვეყნების ჯგუფების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import_Country_Group-1995-2026.xlsx,2026-10-08
+source.geostat_trade_export_product_by_4_digit_1995_1999,"საქსტატი — საქონლის ექსპორტი ოთხნიშნა კოდებით, 1995–1999",https://www.geostat.ge/media/78910/Export-Product-by-4-digit-1995-1999.xlsx,2026-10-10
+source.geostat_trade_import_products__1995_1999_eng,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 1995–1999",https://www.geostat.ge/media/78946/Import-products--1995-1999_eng.xlsx,2026-10-10
+source.geostat_trade_export_product_by_4_digit_2000_2014,"საქსტატი — საქონლის ექსპორტი ოთხნიშნა კოდებით, 2000–2014",https://www.geostat.ge/media/78909/Export-Product-by-4-digit-2000-2014.xlsx,2026-10-10
+source.geostat_trade_import_product_by_4_digit_2000_2014,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 2000–2014",https://www.geostat.ge/media/78945/Import-Product-by-4-digit-2000-2014.xlsx,2026-10-10
+source.geostat_trade_export_product_by_4_digit_2015_2026,"საქსტატი — საქონლის ექსპორტი ოთხნიშნა კოდებით, 2015–2025",https://www.geostat.ge/media/82858/Export-Product-by-4-digit-2015-2026.xlsx,2026-10-10
+source.geostat_trade_import_product_by_4_digit_2015_2026,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 2015–2025",https://www.geostat.ge/media/82884/Import-Product-by-4-digit-2015-2026.xlsx,2026-10-10

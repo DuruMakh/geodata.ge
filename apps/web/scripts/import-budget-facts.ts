@@ -6,6 +6,8 @@ import { loadTradeOverviewFacts, assertTradeOverviewParity } from "../lib/data/t
 import { TRADE_OVERVIEW_DOCUMENT_ID } from "../lib/data/tradeOverview/types";
 import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tradePartners/importTradePartners";
 import { TRADE_PARTNER_DOCUMENT_IDS } from "../lib/data/tradePartners/types";
+import { loadTradeProductsData, assertTradeProductsParity } from "../lib/data/tradeProducts/importTradeProducts";
+import { TRADE_PRODUCT_DOCUMENT_IDS } from "../lib/data/tradeProducts/types";
 import {
   assertRegionalEconomyParity,
   loadRegionalEconomyFacts,
@@ -32,6 +34,9 @@ import {
   tradePartnerEntityMirrorCreateRows,
   tradePartnerFactMirrorCreateRows,
   loadTradePartnersDataFromMirror,
+  tradeProductEntityMirrorCreateRows,
+  tradeProductFactMirrorCreateRows,
+  loadTradeProductsDataFromMirror,
   loadInflationBasketWeightsFromMirror,
   loadInflationCategoryFactsFromMirror,
   loadInflationCityFactsFromMirror,
@@ -273,6 +278,8 @@ async function main() {
   assertSubset("Trade Overview source IDs", [TRADE_OVERVIEW_DOCUMENT_ID], sourceIds);
   const tradePartners = await loadTradePartnersData();
   assertSubset("Trade partner source IDs", Object.values(TRADE_PARTNER_DOCUMENT_IDS), sourceIds);
+  const tradeProducts = await loadTradeProductsData();
+  assertSubset("Trade product source IDs", Object.values(TRADE_PRODUCT_DOCUMENT_IDS), sourceIds);
   const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
   assertSubset("Regional economy source IDs", regionalEconomyFacts.map((fact) => fact.sourceId), sourceIds);
   const demographyFacts = await loadDemographyFacts([
@@ -454,6 +461,8 @@ async function main() {
         await tx.tradeOverviewFact.deleteMany();
         await tx.tradePartnerFact.deleteMany();
         await tx.tradePartnerEntity.deleteMany();
+        await tx.tradeProductFact.deleteMany();
+        await tx.tradeProductEntity.deleteMany();
         await tx.regionalEconomyFact.deleteMany();
         await tx.demographyFact.deleteMany();
         await tx.inflationCpiFact.deleteMany();
@@ -731,6 +740,13 @@ async function main() {
         await tx.tradePartnerFact.createMany({ data: tradePartnerFactMirrorCreateRows(tradePartners.facts, run.id) });
         const mirrorTradePartners = await loadTradePartnersDataFromMirror(tx);
         assertTradePartnersParity(tradePartners, mirrorTradePartners);
+        await tx.tradeProductEntity.createMany({ data: tradeProductEntityMirrorCreateRows(tradeProducts.entities, run.id) });
+        const productRows = tradeProductFactMirrorCreateRows(tradeProducts.facts, run.id);
+        for (let start = 0; start < productRows.length; start += 1000) {
+          await tx.tradeProductFact.createMany({ data: productRows.slice(start, start + 1000) });
+        }
+        const mirrorTradeProducts = await loadTradeProductsDataFromMirror(tx);
+        assertTradeProductsParity(tradeProducts, mirrorTradeProducts);
         await tx.regionalEconomyFact.createMany({
           data: regionalEconomyFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
             ...fact,
@@ -1025,6 +1041,8 @@ async function main() {
             { table: "TradeOverviewFact", csvRows: tradeOverviewFacts.length, dbRows: mirrorTradeOverviewFacts.length },
             { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
             { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },
+            { table: "TradeProductEntity", csvRows: tradeProducts.entities.length, dbRows: mirrorTradeProducts.entities.length },
+            { table: "TradeProductFact", csvRows: tradeProducts.facts.length, dbRows: mirrorTradeProducts.facts.length },
             { table: "RegionalEconomyFact", csvRows: regionalEconomyFacts.length, dbRows: mirrorRegionalEconomyFacts.length },
             { table: "DemographyFact", csvRows: demographyFacts.length, dbRows: mirrorDemographyFacts.length },
             { table: "InflationCpiFact", csvRows: inflationCpiFacts.length, dbRows: mirrorInflation.facts.length },
@@ -1117,7 +1135,8 @@ async function main() {
       },
       // maxWait: opening the transaction needs a round-trip to the pooler,
       // which can take several seconds from far-away regions.
-      { maxWait: 30_000, timeout: 120_000 },
+      // The complete mirror and parity reads need a bounded five-minute window.
+      { maxWait: 30_000, timeout: 300_000 },
     );
 
     await writeParityReport(importRunId, report, parity);
