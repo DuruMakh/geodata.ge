@@ -1,9 +1,12 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
-import type { PovertyAcceptance, PovertyFact } from "./types";
-import { validatePovertyFacts } from "./validation";
+import { assertSameServedRows } from "../servedDataParity";
+import { resolveServedDataSource } from "../servedDataSource";
+import { povertyFactKey, type ClientPovertyFact, type PovertyAcceptance, type PovertyFact } from "./types";
+import { povertyDisplayDecimals, validatePovertyFacts } from "./validation";
 
 const REQUIRED = ["year", "indicator_id", "group_id", "value", "published_value", "unit", "basis", "value_status", "source_id", "source_sheet", "source_cell", "source_number_format", "last_reviewed_at"];
 
@@ -24,4 +27,32 @@ export async function loadPovertyFacts(): Promise<PovertyFact[]> {
   validatePovertyFacts(facts);
   if (facts.length !== report.observations) throw new Error("Poverty acceptance count mismatch");
   return facts;
+}
+
+export function assertPovertyParity(csv: readonly PovertyFact[], mirror: readonly PovertyFact[]): void {
+  validatePovertyFacts(csv);
+  validatePovertyFacts(mirror);
+  const normalized = (facts: readonly PovertyFact[]) => facts.map(f => ({ ...f, value: new Decimal(f.value).toFixed(), publishedValue: new Decimal(f.publishedValue).toFixed() }));
+  assertSameServedRows("Poverty", normalized(csv), normalized(mirror), povertyFactKey);
+}
+
+let servedPromise: Promise<{ facts: PovertyFact[] }> | null = null;
+export function loadServedPovertyData(): Promise<{ facts: PovertyFact[] }> {
+  servedPromise ??= (async () => {
+    let facts = await loadPovertyFacts();
+    if (resolveServedDataSource() === "db") {
+      const { loadPovertyFactsFromDb } = await import("../../db/servedDataDb");
+      const mirror = await loadPovertyFactsFromDb();
+      assertPovertyParity(facts, mirror);
+      facts = mirror;
+    }
+    return { facts };
+  })();
+  return servedPromise;
+}
+
+/** Client values are the figures Geostat prints (published precision); exact stored values stay server-side. */
+export function toClientPovertyFact(fact: PovertyFact): ClientPovertyFact {
+  const { year, indicatorId, groupId, sourceId } = fact;
+  return { year, indicatorId, groupId, sourceId, value: Number(fact.publishedValue), decimals: povertyDisplayDecimals(fact.sourceNumberFormat) };
 }

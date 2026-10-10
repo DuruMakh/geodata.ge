@@ -6,6 +6,8 @@ import { loadTradeOverviewFacts, assertTradeOverviewParity } from "../lib/data/t
 import { TRADE_OVERVIEW_DOCUMENT_ID } from "../lib/data/tradeOverview/types";
 import { loadWagesFacts, assertWagesParity } from "../lib/data/wages/importWages";
 import { wagesSourceDocumentId } from "../lib/data/wages/types";
+import { loadPovertyFacts, assertPovertyParity } from "../lib/data/poverty/importPoverty";
+import { povertySourceDocumentId } from "../lib/data/poverty/types";
 import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tradePartners/importTradePartners";
 import { TRADE_PARTNER_DOCUMENT_IDS } from "../lib/data/tradePartners/types";
 import { loadMoneyTransfersData, assertMoneyTransfersParity } from "../lib/data/externalFlows/importMoneyTransfers";
@@ -38,6 +40,8 @@ import {
   tradeOverviewMirrorCreateRows,
   loadWagesFactsFromMirror,
   wagesMirrorCreateRows,
+  loadPovertyFactsFromMirror,
+  povertyMirrorCreateRows,
   tradePartnerEntityMirrorCreateRows,
   tradePartnerFactMirrorCreateRows,
   loadTradePartnersDataFromMirror,
@@ -291,6 +295,8 @@ async function main() {
   assertSubset("Trade Overview source IDs", [TRADE_OVERVIEW_DOCUMENT_ID], sourceIds);
   const wagesFacts = await loadWagesFacts();
   assertSubset("Wages source IDs", wagesFacts.map(f => wagesSourceDocumentId(f.sourceId)), sourceIds);
+  const povertyFacts = await loadPovertyFacts();
+  assertSubset("Poverty source IDs", povertyFacts.map(f => povertySourceDocumentId(f.sourceId)), sourceIds);
   const tradePartners = await loadTradePartnersData();
   assertSubset("Trade partner source IDs", Object.values(TRADE_PARTNER_DOCUMENT_IDS), sourceIds);
   const moneyTransfers = await loadMoneyTransfersData();
@@ -479,6 +485,7 @@ async function main() {
         await tx.unemploymentFact.deleteMany();
         await tx.tradeOverviewFact.deleteMany();
         await tx.wagesFact.deleteMany();
+        await tx.povertyFact.deleteMany();
         await tx.tradePartnerFact.deleteMany();
         await tx.tradePartnerEntity.deleteMany();
         await tx.moneyTransferFact.deleteMany();
@@ -763,6 +770,9 @@ async function main() {
         await tx.wagesFact.createMany({ data: wagesMirrorCreateRows(wagesFacts, run.id) });
         const mirrorWagesFacts = await loadWagesFactsFromMirror(tx);
         assertWagesParity(wagesFacts, mirrorWagesFacts);
+        await tx.povertyFact.createMany({ data: povertyMirrorCreateRows(povertyFacts, run.id) });
+        const mirrorPovertyFacts = await loadPovertyFactsFromMirror(tx);
+        assertPovertyParity(povertyFacts, mirrorPovertyFacts);
         await tx.tradePartnerEntity.createMany({ data: tradePartnerEntityMirrorCreateRows(tradePartners.entities, run.id) });
         await tx.tradePartnerFact.createMany({ data: tradePartnerFactMirrorCreateRows(tradePartners.facts, run.id) });
         const mirrorTradePartners = await loadTradePartnersDataFromMirror(tx);
@@ -1075,6 +1085,7 @@ async function main() {
             { table: "UnemploymentFact", csvRows: unemploymentFacts.length, dbRows: mirrorUnemploymentFacts.length },
             { table: "TradeOverviewFact", csvRows: tradeOverviewFacts.length, dbRows: mirrorTradeOverviewFacts.length },
             { table: "WagesFact", csvRows: wagesFacts.length, dbRows: mirrorWagesFacts.length },
+            { table: "PovertyFact", csvRows: povertyFacts.length, dbRows: mirrorPovertyFacts.length },
             { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
             { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },
             { table: "MoneyTransferEntity", csvRows: moneyTransfers.entities.length, dbRows: mirrorMoneyTransfers.entities.length },

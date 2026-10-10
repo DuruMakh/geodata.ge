@@ -48,7 +48,7 @@ export function validatePovertyFacts(facts: readonly PovertyFact[]): void {
     try { value = new D(fact.value); } catch { throw new Error(`Invalid poverty value: ${key}`); }
     if (!value.isFinite() || value.lt(0) || value.gt(unit === "index" ? 1 : 100) || value.decimalPlaces() > 20) throw new Error(`Poverty value outside its range or database precision: ${key}`);
     const decimals = povertyDisplayDecimals(fact.sourceNumberFormat);
-    if (value.toDecimalPlaces(decimals).toFixed(decimals) !== fact.publishedValue) throw new Error(`Poverty published value does not match its stored value: ${key}`);
+    if (!value.toDecimalPlaces(decimals).eq(fact.publishedValue)) throw new Error(`Poverty published value does not match its stored value: ${key}`);
     values.set(key, value);
   }
   const missing = [...expected].filter(key => !values.has(key));

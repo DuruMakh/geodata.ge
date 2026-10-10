@@ -1,7 +1,9 @@
 import path from "node:path";
 import Decimal from "decimal.js";
 import { expect, test } from "vitest";
-import { loadPovertyFacts } from "../../../lib/data/poverty/importPoverty";
+import { loadPovertyFactsFromMirror, povertyMirrorCreateRows } from "../../../lib/db/mirrorRows";
+import { assertPovertyParity, loadPovertyFacts, toClientPovertyFact } from "../../../lib/data/poverty/importPoverty";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { preparePovertyData } from "../../../lib/data/poverty/preparePoverty";
 import { validatePovertyFacts } from "../../../lib/data/poverty/validation";
 import type { PovertyFact } from "../../../lib/data/poverty/types";
@@ -40,4 +42,32 @@ test.each([
   const facts = (await loadPovertyFacts()).map(f => ({ ...f }));
   mutate(facts);
   expect(() => validatePovertyFacts(facts)).toThrow(error);
+});
+
+test("client facts carry the published figure and its display precision", async () => {
+  const facts = await loadPovertyFacts();
+  expect(toClientPovertyFact(find(facts, "poverty.absolute", "georgia", 2025))).toMatchObject({ value: 7.1, decimals: 1 });
+  expect(toClientPovertyFact(find(facts, "gini.total_income", "georgia", 2025))).toMatchObject({ value: 0.34, decimals: 2 });
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadPovertyFacts();
+  const padded = facts.map(f => ({ ...f, publishedValue: f === facts[0] ? `${f.publishedValue}0` : f.publishedValue }));
+  expect(() => assertPovertyParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  expect(() => assertPovertyParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[5].value = new Decimal(changed[5].value).plus("0.00000001").toFixed();
+  expect(() => assertPovertyParity(facts, changed)).toThrow();
+  expect(() => assertPovertyParity(facts, facts.slice(1))).toThrow();
+});
+
+test("the database mirror round-trips exact decimals and source relations", async () => {
+  const facts = await loadPovertyFacts();
+  const rows = povertyMirrorCreateRows(facts, "poverty-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ povertyFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "povertyFact">;
+  const mirror = await loadPovertyFactsFromMirror(db(rows));
+  expect(() => assertPovertyParity(facts, mirror)).not.toThrow();
+  expect(rows[0].importRunId).toBe("poverty-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadPovertyFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
 });

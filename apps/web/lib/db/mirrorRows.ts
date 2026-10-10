@@ -32,6 +32,7 @@ import { FOREIGN_INVESTMENT_SOURCES, MONEY_TRANSFER_SOURCES, type ForeignInvestm
 import { TRADE_PRODUCT_DOCUMENT_IDS, type TradeProductEntity, type TradeProductFact, type TradeProductsData } from "../data/tradeProducts/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
+import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -597,6 +598,24 @@ export async function loadWagesFactsFromMirror(db: Pick<MirrorClient, "wagesFact
     return {
       year: row.year, indicatorId: row.indicatorId as WagesFact["indicatorId"], dimension: row.dimension as WagesFact["dimension"], groupId: row.groupId, sectorId: row.sectorId as WagesFact["sectorId"],
       value: row.value?.toFixed() ?? null, publishedValue: row.publishedValue?.toFixed() ?? null, unit: row.unit as "gel", basis: row.basis as "actual", valueStatus: row.valueStatus as WagesFact["valueStatus"],
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function povertyMirrorCreateRows(facts: readonly PovertyFact[], importRunId: string): Prisma.PovertyFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: povertySourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadPovertyFactsFromMirror(db: Pick<MirrorClient, "povertyFact">): Promise<PovertyFact[]> {
+  const rows = await db.povertyFact.findMany({ orderBy: [{ indicatorId: "asc" }, { groupId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== povertySourceDocumentId(row.sourceId)) throw new Error("Poverty source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as PovertyFact["indicatorId"], groupId: row.groupId as PovertyFact["groupId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as PovertyFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
