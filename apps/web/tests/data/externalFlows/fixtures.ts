@@ -71,6 +71,7 @@ export function foreignInvestmentEntities(): ForeignInvestmentEntity[] {
     { id: "fdi.country.unknown", dimension: "country", kind: "unallocated", labelKa: "უცნობი" },
     { id: "fdi.sector.k", dimension: "sector", kind: "sector", labelKa: "საფინანსო და სადაზღვევო საქმიანობა" },
     { id: "fdi.region.guria", dimension: "region", kind: "region", labelKa: "გურია" },
+    { id: "fdi.region.tbilisi", dimension: "region", kind: "region", labelKa: "თბილისი" },
   ];
 }
 
@@ -84,5 +85,7 @@ export function foreignInvestmentFacts(): ForeignInvestmentFact[] {
     fact("fdi.sector.k", 2016, "300", "source.geostat_fdi_by_sectors"),
     fact("fdi.region.guria", 2015, null, "source.geostat_fdi_by_regions", "not_applicable"),
     fact("fdi.region.guria", 2016, "2", "source.geostat_fdi_by_regions"),
+    fact("fdi.region.tbilisi", 2015, "50", "source.geostat_fdi_by_regions"),
+    fact("fdi.region.tbilisi", 2016, "60", "source.geostat_fdi_by_regions"),
   ];
 }
