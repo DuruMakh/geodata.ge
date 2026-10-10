@@ -16,7 +16,8 @@ import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
-import { WAGES_SECTIONS } from "../explorer/wages";
+import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
+import { WAGES_REGIONS } from "../data/wages/types";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -28,7 +29,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/unemployment",
     "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
-    "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href),
+    "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),

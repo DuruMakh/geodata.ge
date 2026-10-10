@@ -348,7 +348,8 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/wages                       ხელფასები         Wages hub (§30)
 /explorer/wages/overview                                Average and median wage, public/non-public and women/men tabs (§30)
 /explorer/wages/industries                              Wages by economic activity for a chosen group (§30)
-/explorer/wages/regions                                 Region map, ranked list and comparison (§30)
+/explorer/wages/regions                                 Region map and ranked list (§30)
+/explorer/wages/regions/[id]                            11 region wage pages (§30)
 /explorer/trade                       საგარეო ვაჭრობა   Trade hub (§28)
 /explorer/trade/overview                                National goods overview (§28)
 /explorer/trade/partners                                Trading partners (§28.1)
@@ -1186,6 +1187,6 @@ All three pages reuse the Unemployment workspace: the latest-value line for the 
 
 - **Wages overview** has the Unemployment overview's centred text tabs: Overview (Average and Median wage; the median note names its tax-record source), Public / non-public and Women / men (owner amendment, 2026-10-10: it replaces both the Business / non-business tab and a separate Gender page). The Georgia average is the default, removable reference on every tab; no pay gap is drawn.
 - **Industries** has the compact native dropdown from the unemployment age page for the group (All employees, Women, Men, Public, Non-public, Business, Non-business, Median). The list is the group's all-activities total, selected by default, and each section that group publishes. The Business and Non-business groups carry a one-line definition of the non-business group. Below the workspace, the unemployment age heatmap shows every listed section by year for the group and active years, independently of the chart selection; long section names wrap in its row header.
-- **Regions** reuses the eleven-region map and ranked list, coloured by the latest average wage, with the occupied-territory overlays. A map or list region opens the comparison below with that region selected beside the Georgia average, instead of a detail page. A note gives the head-office caveat.
+- **Regions** reuses the eleven-region map and ranked list, coloured by the latest average wage, with the occupied-territory overlays, and nothing below them; a map or list region opens its own page (owner amendment, 2026-10-10). A region page follows the Unemployment region page: `ხელფასები — {region}` heading with the region picker and previous/next links, the region's average wage selected by default and the Georgia average as a removable second line, the region's own years, Excel and the head-office caveat.
 
 URL state (tab or group, chart/table, years and selection, including an empty one) survives reloads and language switches. The authoritative scope is `Project_Definition.md` §2F; bounded decisions are in `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`.

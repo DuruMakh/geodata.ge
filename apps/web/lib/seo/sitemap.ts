@@ -9,7 +9,8 @@ import { loadServedEconomicSectorsData } from "../data/economicSectors/importEco
 import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
 import { loadServedTradeOverviewData } from "../data/tradeOverview/importTradeOverview";
 import { loadServedWagesData } from "../data/wages/importWages";
-import { WAGES_SECTIONS } from "../explorer/wages";
+import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
+import { WAGES_REGIONS } from "../data/wages/types";
 import { loadServedTradePartnersData } from "../data/tradePartners/importTradePartners";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
@@ -109,6 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/unemployment`, lastModified: unemploymentModified },
     { url: `${siteUrl}/explorer/wages`, lastModified: wagesModified },
     ...WAGES_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: wagesModified })),
+    ...WAGES_REGIONS.map(id => ({ url: `${siteUrl}${wagesRegionHref(id)}`, lastModified: wagesModified })),
     { url: `${siteUrl}/explorer/trade`, lastModified: tradeModified },
     { url: `${siteUrl}/explorer/trade/overview`, lastModified: tradeModified },
     { url: `${siteUrl}/explorer/trade/partners`, lastModified: tradePartnersModified },

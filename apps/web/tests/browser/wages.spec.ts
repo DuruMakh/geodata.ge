@@ -15,7 +15,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await page.goto(`${prefix}/explorer/wages/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
       await expect(page.getByTestId("wages-nominal-note")).toBeVisible();
-      await expect(page.getByTestId("series-status")).toContainText("1 /");
+      if (section !== "regions") await expect(page.getByTestId("series-status")).toContainText("1 /");
       await page.screenshot({ path: info.outputPath(`wages-${section}-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
@@ -69,15 +69,22 @@ test("industries group, heatmap, table and workbook agree", async ({ page }) => 
   await expect(page.getByTestId("year-range-strip")).toContainText("2024–2025");
 });
 
-test("a region on the map opens the comparison with that region selected", async ({ page }) => {
+test("the regions index opens each region's own page", async ({ page }) => {
   await page.goto("/en/explorer/wages/regions");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("wages-regions-index").locator('a[href*="region.adjara"]').first()).toBeVisible();
-  await page.getByTestId("wages-regions-index").locator('a[href*="region.adjara"]').last().click();
+  await expect(page.getByTestId("chart-panel")).toHaveCount(0);
+  const index = page.getByTestId("wages-regions-index");
+  await expect(index.getByTestId("regional-list-row")).toHaveCount(11);
+  await index.locator('[data-testid="regional-list-row"][data-region-id="region.adjara"]').click();
+  await expect(page).toHaveURL(/\/en\/explorer\/wages\/regions\/adjara$/);
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.locator("h1")).toContainText("Adjara");
   await expect(page.locator(pressed("region.adjara"))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(pressed("average"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(pressed("average"))).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");
-  await page.getByTestId("wages-regions-index").locator('[data-testid="regional-list-row"][data-region-id="region.guria"]').click();
-  await expect(page.locator(pressed("region.guria"))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(pressed("region.adjara"))).toHaveAttribute("aria-pressed", "false");
+  await page.getByTestId("wages-region-navigation").getByRole("link").last().click();
+  await expect(page).toHaveURL(/\/en\/explorer\/wages\/regions\/guria$/);
+  await page.goto("/explorer/wages/regions");
+  await page.getByTestId("wages-region-map").locator('a[data-region-id="region.imereti"]').click({ force: true });
+  await expect(page).toHaveURL(/\/explorer\/wages\/regions\/imereti$/);
 });

@@ -81,7 +81,7 @@ The pages show the published value: one decimal for averages and whole lari for 
 
 - **Wages overview** compares the Georgia average with the median, with public/non-public employers and with women and men; no pay gap is calculated. The median comes from tax records and the average from enterprise surveys; the page says so.
 - **Industries** shows the 19 sections for a chosen group (all employees, women, men, public, non-public, business, non-business, or the median). A section a group's table does not publish is not offered for that group.
-- **Regions** maps and compares the 11 regions. Some enterprises are counted at their head office, so a region's figure can reflect where firms are registered.
+- **Regions** maps and ranks the 11 regions, and each region has its own page beside the Georgia average. Some enterprises are counted at their head office, so a region's figure can reflect where firms are registered.
 
 Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, empty cells for missing values, each value's status and validated links to the archived Geostat workbooks. Internal cell references are not exported.
 

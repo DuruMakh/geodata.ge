@@ -57,8 +57,8 @@ describe("indexable Fiscal.ge routes", () => {
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
     // Trading partners adds one further bilingual pair.
     // The Migration page adds one more bilingual pair.
-    // Wages adds its hub, three pages and methodology page: five bilingual pairs.
-    expect(urls).toHaveLength(452);
+    // Wages adds its hub, three pages, 11 region pages and methodology page: 16 bilingual pairs.
+    expect(urls).toHaveLength(474);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -72,6 +72,7 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/wages${page}`);
     }
     expect(urls).toContain("https://fiscal.ge/en/methodology/wages");
+    expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
     expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");

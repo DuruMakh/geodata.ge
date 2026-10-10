@@ -18,15 +18,16 @@ beforeAll(async () => { facts = (await loadWagesFacts()).map(toClientWagesFact);
 
 test("each page starts with only its reference selected and coverage taken from the facts", () => {
   expect(defaultWagesState("overview", facts)).toEqual({ mode: "line", range: { kind: "all" }, view: "overview", selectedIds: ["average"] });
-  expect(defaultWagesState("regions", facts).selectedIds).toEqual(["average"]);
+  const adjara = facts.filter(f => f.dimension !== "region" || f.groupId === "region.adjara");
+  expect(defaultWagesState("regions", adjara).selectedIds).toEqual(["region.adjara"]);
+  expect(wagesViewSeries("regions", "main", adjara).map(s => [s.id, s.reference])).toEqual([["region.adjara", true], ["average", false]]);
+  expect(wagesCoverage("regions", "main", adjara)).toMatchObject({ min: 2010, max: 2025 });
   expect(defaultWagesState("industries", facts)).toMatchObject({ view: "georgia", selectedIds: ["total"] });
   expect(wagesCoverage("overview", "overview", facts)).toMatchObject({ min: 1995, max: 2025 });
   expect(wagesCoverage("overview", "sex", facts).min).toBe(1999);
-  expect(wagesCoverage("regions", "main", facts).min).toBe(2010);
   expect(wagesCoverage("overview", "ownership", facts).min).toBe(2000);
   expect(wagesCoverage("industries", "georgia", facts)).toMatchObject({ min: 2014, max: 2025 });
   expect(wagesCoverage("industries", "median", facts)).toMatchObject({ min: 2018, max: 2025 });
-  expect(wagesViewSeries("regions", "main", facts)).toHaveLength(12);
   expect(wagesViewSeries("overview", "sex", facts).map(s => s.id)).toEqual(["average", "women", "men"]);
 });
 

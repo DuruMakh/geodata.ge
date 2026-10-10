@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
-import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesViews, type WagesSectionId, type WagesState, type WagesView } from "../../lib/explorer/wages";
+import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesRegionHref, wagesViews, type WagesSectionId, type WagesState, type WagesView } from "../../lib/explorer/wages";
 import { buildWagesWorkbookExportModel } from "../../lib/explorer/wagesWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -23,6 +25,8 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionIndex } from "../regional-economies/regional-economies-index";
+import { RegionPicker } from "../regional-economies/region-picker";
+import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
 import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
 
@@ -36,15 +40,6 @@ function useWagesState(section: WagesSectionId, facts: ClientWagesFact[]) {
     restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
     return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
   }, [section, facts]);
-  // A region link on this page changes only the hash, which client navigation does not announce:
-  // once the address shows the link's hash, apply it. A first tap that only previews a region never does.
-  const followLink = useCallback((hash: string) => {
-    const apply = (frames: number) => {
-      if (window.location.hash === hash) { const next = parseWagesHash(hash, section, facts); current.current = next; setState(next); }
-      else if (frames) window.requestAnimationFrame(() => apply(frames - 1));
-    };
-    window.requestAnimationFrame(() => apply(60));
-  }, [section, facts]);
   useAppReady();
   const update = useCallback((change: (previous: WagesState) => WagesState, push = false) => {
     const next = change(current.current); current.current = next;
@@ -55,18 +50,50 @@ function useWagesState(section: WagesSectionId, facts: ClientWagesFact[]) {
     }
     setState(next);
   }, [section]);
-  return { state, update, followLink };
+  return { state, update };
+}
+
+/** The Regions index: the map and ranked list only; each region opens its own page. */
+export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMapModel; national: { year: number; value: number } }) {
+  const { messages } = useI18n();
+  const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
+  const amount = (value: number) => `${formatInUnit(value, { divisor: 1, label: t("unit"), decimals: 1 })} ${t("unit")}`;
+  useAppReady();
+  return <div data-testid="wages-regions" className="@container">
+    <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
+    <LatestValueLine testId="wages-latest" measure={t("series.average")} period={national.year} value={amount(national.value)} />
+    <p className="mb-2 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("page.regions.summary")}</p>
+    <p data-testid="wages-nominal-note" className="mb-5 max-w-[800px] text-[12px] leading-relaxed text-[var(--muted)]">{t("nominalNote")}</p>
+    <div data-testid="wages-regions-index">
+      <RegionIndex model={regionMap} sourceNote={t("sourceNote")} metric={{
+        hrefForRegion: wagesRegionHref, formatValue: amount,
+        mapAria: t("regionMapAria", { year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: amount(value), year }),
+        legend: t("series.average"), testId: "wages-region-map",
+      }} summary={[
+        { label: message(messages, "regionalEconomies.regionCount"), value: String(regionMap.regions.length), detail: `${t("series.average")} · ${regionMap.year}` },
+        { label: t("series.average"), value: amount(national.value), detail: String(national.year) },
+        { label: message(messages, "regionalEconomies.period"), value: `${regionMap.firstYear}–${regionMap.year}`, detail: t("annual") },
+      ]} />
+      <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p>
+    </div>
+  </div>;
 }
 
 export type WagesExplorerProps = {
   section: WagesSectionId; facts: ClientWagesFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
-  lastReviewedAt: string; siteOrigin: string; regionMap?: RegionMapModel;
+  lastReviewedAt: string; siteOrigin: string;
+  /** Region pages: the region and the regions offered by the picker and previous/next links. */
+  regionId?: string; regions?: readonly MunicipalRegion[];
 };
 
-export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin, regionMap }: WagesExplorerProps) {
+export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin, regionId, regions }: WagesExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
-  const { state, update, followLink } = useWagesState(section, facts);
+  const { state, update } = useWagesState(section, facts);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const regionName = regionId ? labels[regionId] : "";
+  const ordered = regions ?? [], regionIndex = ordered.findIndex(region => region.id === regionId);
+  const neighbours = regionIndex < 0 ? null : { previous: ordered[(regionIndex - 1 + ordered.length) % ordered.length]!, next: ordered[(regionIndex + 1) % ordered.length]! };
   const [query, setQuery] = useState("");
   const model = buildWagesModel(section, facts, state);
   const unit: ValueUnit = { divisor: 1, label: t("unit"), decimals: model.decimals };
@@ -77,31 +104,32 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const total = rows.find(row => row.itemId === reference.id) ?? null;
   const allIds = model.series.map(series => series.id);
-  const national = facts.filter(f => f.indicatorId === "average_monthly_nominal_earnings" && f.dimension === "national" && f.sectorId === "total" && f.value !== null).sort((a, b) => a.year - b.year).at(-1)!;
+  // The latest-value line states the page's own place: Georgia, or the region.
+  const latest = facts.filter(f => f.indicatorId === "average_monthly_nominal_earnings" && f.dimension === (regionId ? "region" : "national") && f.sectorId === "total" && f.value !== null).sort((a, b) => a.year - b.year).at(-1)!;
+  const title = regionId ? t("regionTitle", { region: regionName }) : t(`page.${section}.title`);
   const changeView = (view: WagesView) => { if (view === state.view) return; setQuery(""); update(s => changeWagesView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="wages-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-    await downloadWorkbook(buildWagesWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin }, presentation));
+    await downloadWorkbook(buildWagesWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
   }} />;
   const heatmap = section === "industries" ? buildWagesHeatmap(model) : null;
-  const regionAverage = (value: number) => `${formatInUnit(value, { ...unit, decimals: 1 })} ${unit.label}`;
   return <div data-testid={`wages-${section}`} className="@container">
-    <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>
-    <LatestValueLine testId="wages-latest" measure={t("series.average")} period={national.year} value={`${format(national.value, 1)} ${unit.label}`} />
-    <p className="mb-2 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t(`page.${section}.summary`)}</p>
+    {regionId ? <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
+      <div className="relative min-w-0 min-[768px]:flex-1">
+        <ExplorerHeading>{t("regionHeadingLead")}{" "}
+          <button type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
+            {regionName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
+          </button>
+        </ExplorerHeading>
+        <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={ordered} activeRegionId={regionId} hrefForRegion={wagesRegionHref} indexHref="/explorer/wages/regions" />
+      </div>
+      {neighbours ? <EntityNeighbourLinks testId="wages-region-navigation" className="mb-3"
+        previous={{ href: pageHref(wagesRegionHref(neighbours.previous.id), locale), label: labels[neighbours.previous.id] }}
+        next={{ href: pageHref(wagesRegionHref(neighbours.next.id), locale), label: labels[neighbours.next.id] }} /> : null}
+    </div> : <ExplorerHeading>{title}</ExplorerHeading>}
+    <LatestValueLine testId="wages-latest" measure={regionId ? `${t("series.average")} · ${regionName}` : t("series.average")} period={latest.year} value={`${format(latest.value, 1)} ${unit.label}`} />
+    <p className="mb-2 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{regionId ? t("regionSummary", { region: regionName }) : t(`page.${section}.summary`)}</p>
     <p data-testid="wages-nominal-note" className="mb-5 max-w-[800px] text-[12px] leading-relaxed text-[var(--muted)]">{t("nominalNote")}</p>
-    {regionMap ? <div data-testid="wages-regions-index" className="mb-10" onClickCapture={event => { const link = (event.target as Element).closest("a"); if (link?.hash) followLink(link.hash); }}>
-      <RegionIndex model={regionMap} sourceNote={t("sourceNote")} metric={{
-        hrefForRegion: id => `/explorer/wages/regions#view=line&sel=average,${id}&range=all`, formatValue: regionAverage,
-        mapAria: t("regionMapAria", { year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: regionAverage(value), year }),
-        legend: t("series.average"), testId: "wages-region-map",
-      }} summary={[
-        { label: message(messages, "regionalEconomies.regionCount"), value: String(regionMap.regions.length), detail: `${t("series.average")} · ${regionMap.year}` },
-        { label: t("series.average"), value: regionAverage(national.value!), detail: String(national.year) },
-        { label: message(messages, "regionalEconomies.period"), value: `${regionMap.firstYear}–${regionMap.year}`, detail: t("annual") },
-      ]} />
-      <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p>
-    </div> : null}
     {section === "overview" ? <div data-testid="wages-tabs" role="group" aria-label={t("tabsLabel")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
       {wagesViews(section).map(view => <TextTab key={view} label={t(`tab.${view}`)} active={state.view === view} testId={`wages-tab-${view}`} onClick={() => changeView(view)} />)}
     </div> : null}
@@ -117,13 +145,14 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
             </label> : <span className="text-[11px] text-[var(--muted)]">{t("unitMonthly")}</span>}
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={false} unit={unit} shareLabel={t(`page.${section}.title`)} formatTooltipValue={valueLabel} /></div>
-            : <ExplorerTable caption={`${t(`page.${section}.title`)} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={false} unit={unit} shareLabel={title} formatTooltipValue={valueLabel} /></div>
+            : <ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <RangeStrip years={wagesCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildWagesModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || (section === "overview" && state.view === "overview") ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
           <Link href={pageHref("/methodology/wages", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
+        {regionId ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p> : null}
         {state.view === "business" || state.view === "non_business" ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("nonBusinessNote")}</p> : null}
       </div>
       <SeriesAside label={message(messages, "controls.series")}>

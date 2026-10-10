@@ -5,7 +5,7 @@ import { workbookMessage } from "../i18n/workbook";
 import { buildWagesModel, type WagesSectionId, type WagesState } from "./wages";
 import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
-export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; facts: readonly ClientWagesFact[]; state: WagesState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string }, presentation: Presentation): WorkbookExportModel {
+export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; facts: readonly ClientWagesFact[]; state: WagesState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
   const { section, facts, state, labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `wages.${key}`);
   const model = buildWagesModel(section, facts, state);
@@ -23,7 +23,7 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
   return {
     locale, filename: workbookFilename(`wages-${section}${state.view === "main" ? "" : `-${state.view}`}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: `${t(`page.${section}.title`)}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${t("unitMonthly")} · ${t("nominalNote")}`,
+      title: `${input.title ?? t(`page.${section}.title`)}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${t("unitMonthly")} · ${t("nominalNote")}`,
       unitLabel: t("unit"), amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
       rows: model.selected.map(series => ({ kind: series.reference ? "total" : "item", parentLabel: null, label: labels[series.id], change: null,
         valuesByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year]])),
