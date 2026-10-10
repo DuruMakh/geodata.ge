@@ -105,17 +105,6 @@ export function urbanShare(facts: readonly ClientAgeFact[]): number {
   return shareOf(censusPyramid(facts, "urban").total, censusPyramid(facts, "total").total);
 }
 
-export function bandSeries(facts: readonly ClientAgeFact[], years: readonly number[]): Record<"young" | "working" | "old", Record<number, number>> {
-  const series: Record<"young" | "working" | "old", Record<number, number>> = { young: {}, working: {}, old: {} };
-  for (const year of years) {
-    const shares = bandShares(annualPyramid(facts, year));
-    series.young[year] = shares.young;
-    series.working[year] = shares.working;
-    series.old[year] = shares.old;
-  }
-  return series;
-}
-
 /** Rows from 85+ at the top down to 0-4; each value is the group's share of that year's total, in percent. */
 export function heatmapRows(facts: readonly ClientAgeFact[], years: readonly number[]): { rows: { id: AgeSexGroup; label: string; values: number[] }[]; maximum: number } {
   const pyramids = years.map((year) => annualPyramid(facts, year));
@@ -135,7 +124,6 @@ export type AgeSexState = {
   compare: number | null;
   measure: AgeMeasure;
   pyramidMode: ChartMode;
-  bandsMode: ChartMode;
 };
 
 /** True when exactly one of the two years is on the census side of the 2025 re-base. */
@@ -167,7 +155,6 @@ export function parseAgeSexHash(hash: string, years: readonly number[]): AgeSexS
     compare: compare === year ? null : compare,
     measure: pick(["share", "persons"], params.get("measure"), "share"),
     pyramidMode: pick(["line", "table"], params.get("pyramid"), "line"),
-    bandsMode: pick(["line", "table"], params.get("bands"), "line"),
   };
 }
 
@@ -177,6 +164,5 @@ export function serializeAgeSexHash(state: AgeSexState, years: readonly number[]
   if (state.compare !== null) params.set("cmp", String(state.compare));
   if (state.measure === "persons") params.set("measure", "persons");
   if (state.pyramidMode === "table") params.set("pyramid", "table");
-  if (state.bandsMode === "table") params.set("bands", "table");
   return params.toString();
 }

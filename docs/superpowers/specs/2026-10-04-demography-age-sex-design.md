@@ -2,6 +2,8 @@
 
 Date: 2026-10-04, rewritten 2026-10-10 against the built Population, Migration and Births pages.
 Status: Owner approved the layout (mockup of 2026-10-10, real figures) and the design summary; this file awaits the owner's review before the plan.
+> **Owner change 2026-10-11 (after the live preview):** the national page opens with Georgia's pyramid, the age-by-year heat map follows, and the regions move to the bottom as a *regional glance* that is not clickable (no links, no arrows, no tab stops, no touch strip; hover highlighting and the list search stay). The "age groups over time" part is removed entirely: its chart, table view, Excel download, `bands` hash key and messages. §1, §3, §3.1, §3.3, §7, §9 and the tests below are adjusted to match.
+
 Supersedes: the 2026-10-04 version, which assumed the withdrawn click-to-select map block. Foundation rules still come from `2026-10-04-demography-section-design.md` (census break §5, tokens §7).
 
 ## 1. Outcome and scope
@@ -10,7 +12,7 @@ The work answers: how old are Georgia's people and how has that changed since 20
 
 It follows the Births pattern (owner, 2026-10-10):
 
-- **One national page** `/explorer/demography/age-sex` (and `/en/...`), scrolling through four parts: regions by share aged 65+, Georgia's pyramid by year, the age groups over time, the age-by-year heat map.
+- **One national page** `/explorer/demography/age-sex` (and `/en/...`), scrolling through three parts: Georgia's pyramid by year, the age-by-year heat map, and (at the bottom, not clickable) the regions by share aged 65+.
 - **An "Age and sex" block** at the end of the Georgia page and the 11 region pages of Population (`#age-sex`), showing that place's census 2024 pyramid.
 
 Municipality pages get no block: no municipal age rows are served (the data stage reads and validates them only).
@@ -37,11 +39,11 @@ Both files are already canonical and validated. This work adds them to the serve
 
 ## 3. National page
 
-`ExplorerPage` → `PageHeader` (coverage `2004–2026`) → `ExplorerHeading` `ასაკი და სქესი` → one lead sentence → four parts, each under a `SectionTitle`, each with its own chart/table switch, source note and Excel action. No top-level tabs.
+`ExplorerPage` → `PageHeader` (coverage `2004–2026`) → `ExplorerHeading` `ასაკი და სქესი` → one lead sentence → three parts in this order (pyramid, heat map, regional glance), each under a `SectionTitle`; the pyramid and the heat map have a source note and an Excel action, the pyramid its chart/table switch. No top-level tabs.
 
-### 3.1 Regions by share aged 65+
+### 3.1 Regions by share aged 65+ (regional glance, last)
 
-`RegionIndex` (Unemployment → Regions), as it is: the region map shaded by the census share aged 65+, the searchable ranked list, three summary figures — Georgia's share, the oldest region and the youngest region. `metric.hrefForRegion` points to the region's Population page with `#age-sex`. The model is built like `buildUnemploymentRegionMapModel` (`regionalMapGeometry`, `quantileBucket`, ranked descending, ties by `sortOrder`). The page loads the `regionalEconomies` message scope for the index's fixed words. The map's legend and aria wording name the census date. Table view: the ranked list already is the text form, so this part has no switch.
+`RegionIndex` (Unemployment → Regions), as it is: the region map shaded by the census share aged 65+, the searchable ranked list, three summary figures — Georgia's share, the oldest region and the youngest region. On this page only, `metric.hrefForRegion` is left out (it is now optional): the map shapes are plain groups and the list rows plain rows, with no link, no arrow, no touch preview and no tab stop; hover highlighting and the search remain. Unemployment → Regions and Regional economies keep their links unchanged (their markup is pinned by `tests/explorer/regionIndexLinks.test.tsx`). The part moves to the foot of the page. The model is built like `buildUnemploymentRegionMapModel` (`regionalMapGeometry`, `quantileBucket`, ranked descending, ties by `sortOrder`). The page loads the `regionalEconomies` message scope for the index's fixed words. The map's legend and aria wording name the census date. Table view: the ranked list already is the text form, so this part has no switch.
 
 ### 3.2 Georgia's pyramid by year
 
@@ -59,9 +61,9 @@ Both files are already canonical and validated. This work adds them to the serve
 - **Table view.** The 18 groups plus a total row: men, women, total, share. When the comparison is on, the comparison year's columns are added.
 - **Default.** The latest loaded year, `%`, comparison off.
 
-### 3.3 Age groups over time
+### 3.3 Age groups over time (removed 2026-10-11)
 
-`EditorialLineChart` of the 0–14 and 65+ shares, 2004–2026, with `breaks=[2025]`. The 15–64 share is not drawn: at about 65% it would flatten the other two lines. Its latest value is printed in the caption. The table view lists all three bands for every year, with the break row (`breakYears`).
+The owner removed this part after the preview: the 0–14 and 65+ line chart, its table view, its Excel download, the `bands` hash key and the messages. The pyramid's summary line still prints the three band shares for the chosen year, and the heat map shows every group by year.
 
 ### 3.4 Age by year (heat map)
 
@@ -128,7 +130,7 @@ Rows are the interactive unit. Each has an aria-label such as `25–29: მა�
 
 ## 7. State
 
-The national page keeps `year`, `compare` (absent = off), `measure` (`share|persons`) and each part's `mode` in the hash. Updates use replace, not push (`useReplaceHash`, as on inflation cities). Rules:
+The national page keeps `year`, `compare` (absent = off), `measure` (`share|persons`) and the pyramid's `mode` in the hash. A `bands` key from the removed part is ignored. Updates use replace, not push (`useReplaceHash`, as on inflation cities). Rules:
 
 - Unknown values are rejected.
 - Years are clamped to loaded facts.
@@ -151,7 +153,6 @@ Every workbook keeps basis and source hyperlinks and has no internal columns. Ge
 | Download | Readable sheet | Data sheet | Source | Notes |
 | --- | --- | --- | --- | --- |
 | National pyramid | 18 rows: men, women, total for the year (plus the comparison year's columns when on); shares are in the data sheet, because a readable sheet has one number format | year, sex, age group, persons, share, basis | the annual age-by-sex original | |
-| Age groups over time | | bands × years | the annual age-by-sex original | |
 | Heat map | groups × years, shares | year, group, persons, share, basis | the annual age-by-sex original | |
 | Place block | the 18 groups for the place and settlement: men, women, total (shares in the data sheet) | | the census original | census date in the subtitle |
 
@@ -178,12 +179,12 @@ Every workbook keeps basis and source hyperlinks and has no internal columns. Ge
 - Payload: only this place's census rows reach the place page; no internal fields reach the browser.
 
 **Browser (both languages):**
-- The national page's four parts.
+- The national page's three parts in order (pyramid, heat map, regional glance).
 - Year buttons and keys.
 - Comparison within one side of the break, and across it (note shown, `%` forced, no difference).
 - The table twins.
 - The heat map's break rule and label, and Unemployment's heat map unchanged.
-- A region row link landing on `#age-sex`.
+- The regional glance has no links (no `a` in its map or list).
 - The place block's settlement and measure switches.
 - No block on a municipality page.
 - The downloads.

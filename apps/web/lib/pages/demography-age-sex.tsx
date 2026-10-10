@@ -68,8 +68,8 @@ export async function renderDemographyAgeSexPage(locale: Locale) {
         <PageHeader crumbs={crumbs} coverage={t("ageSexCoverage", { first, last })} />
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("ageSexLead", { first })}</p>
-        <AgeSexRegions model={model} georgiaShare={georgiaOldShare(served)} sourceNote={t("regionsSource")} />
         <AgeSexExplorer facts={facts} sources={sources.filter((source) => source.sourceId === SOURCE_ID.ageSex)} siteOrigin={resolveSiteUrl()} />
+        <AgeSexRegions model={model} georgiaShare={georgiaOldShare(served)} sourceNote={t("regionsSource")} />
       </ExplorerPage>
     </I18nProvider>
   );

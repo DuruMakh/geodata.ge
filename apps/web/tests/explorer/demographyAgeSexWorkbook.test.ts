@@ -1,10 +1,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import { SOURCE_ID } from "../../lib/data/demography/series";
-import { annualAgeFacts, ageYears, bandSeries, censusAgeFactsForPlace } from "../../lib/explorer/demographyAgeSex";
+import { annualAgeFacts, censusAgeFactsForPlace } from "../../lib/explorer/demographyAgeSex";
 import {
   buildAgeYearWorkbookExportModel,
-  buildBandsWorkbookExportModel,
   buildCensusPlaceWorkbookExportModel,
   buildPyramidWorkbookExportModel,
 } from "../../lib/explorer/demographyAgeSexWorkbook";
@@ -109,26 +108,6 @@ describe.each(["en", "ka"] as const)("the age and sex workbooks (%s)", (locale) 
     const within = buildPyramidWorkbookExportModel({ ...input(), year: 2010, compare: 2004 }, presentation());
     expect(across.readable.subtitle).toContain(label);
     expect(within.readable.subtitle).not.toContain(label);
-  });
-
-  it("bands: a column per year and three rows in percent, the break year flagged", () => {
-    const model = buildBandsWorkbookExportModel(input(), presentation());
-    const years = ageYears(annual);
-    expect(model.readable.years).toEqual(years);
-    expect(model.readable.years).toHaveLength(23);
-    expect(model.readable.rows).toHaveLength(3);
-    expect(model.readable.amountDecimals).toBe(1);
-    const expected = bandSeries(annual, years);
-    expect(model.readable.rows[2]!.valuesByYear[2026]).toBeCloseTo(expected.old[2026]!, 6);
-    expect(model.readable.rows[2]!.valuesByYear[2026]).toBeCloseTo(18.079, 3);
-    const columns = model.readable.headerLabels!.columns;
-    expect(columns[years.indexOf(2025)]).toContain(presentation().messages["demography.breakLabel" as never] as string);
-    expect(columns[years.indexOf(2024)]).toBe("2024");
-    expect(model.analysis.rows).toHaveLength(69);
-    expect(model.analysis.headers).toHaveLength(4);
-    expect(model.filename).toContain("demography-age-groups-2004-2026");
-    expect(sourceIds(model)).toEqual([`Title of ${SOURCE_ID.ageSex}`]);
-    noInternalColumns(model);
   });
 
   it("age by year: 18 group rows with the oldest first, as percents", () => {

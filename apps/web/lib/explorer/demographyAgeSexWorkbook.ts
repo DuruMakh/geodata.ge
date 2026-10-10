@@ -8,7 +8,6 @@ import {
   ageGroupLabel,
   ageYears,
   annualPyramid,
-  bandSeries,
   censusPyramid,
   crossesBreak,
   heatmapRows,
@@ -185,27 +184,6 @@ function percentByYearWorkbook(
     analysis: { headers: spec.headers, rows: spec.dataRows, numericFormats: spec.numericFormats, columnWidths: spec.columnWidths },
     sources: ownSources(input, SOURCE_ID.ageSex, spec.years),
   };
-}
-
-export function buildBandsWorkbookExportModel(input: Input, presentation: Presentation): WorkbookExportModel {
-  const { t, w, annualBasis } = helpers(presentation);
-  const years = ageYears(input.facts);
-  const series = bandSeries(input.facts, years);
-  const lines = [
-    { label: t("bandYoung"), values: series.young },
-    { label: t("bandWorking"), values: series.working },
-    { label: t("bandOld"), values: series.old },
-  ];
-  return percentByYearWorkbook(input, presentation, {
-    title: t("bandsWorkbookTitle"),
-    stem: "demography-age-groups",
-    years,
-    lines,
-    headers: [t("ageGroupHeader"), w("workbook.year"), t("shareHeader"), t("basisHeader")],
-    dataRows: lines.flatMap((line) => years.map((year) => [line.label, year, line.values[year]!, annualBasis(year)])),
-    numericFormats: { 3: "0.0" },
-    columnWidths: [24, 8, 10, 56],
-  });
 }
 
 export function buildAgeYearWorkbookExportModel(input: Input, presentation: Presentation): WorkbookExportModel {

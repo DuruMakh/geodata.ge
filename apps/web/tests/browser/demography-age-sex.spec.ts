@@ -10,13 +10,18 @@ const hasNoSidewaysScroll = (page: Page) => page.evaluate(() => document.documen
 const percentTicks = (page: Page) => page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /^\d+(\.\d+)?%$/ });
 
 test.describe("the Age and sex page", () => {
-  test("renders its four parts, with 2026 pressed in a row of 23 years", async ({ page }) => {
+  test("renders its three parts in order, with 2026 pressed in a row of 23 years", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Age and sex");
-    for (const id of ["age-sex-regions", "age-sex-pyramid", "age-sex-bands", "age-sex-heatmap"]) {
+    for (const id of ["age-sex-pyramid", "age-sex-heatmap", "age-sex-regions"]) {
       await expect(page.getByTestId(id)).toBeVisible();
     }
+    await expect(page.getByTestId("age-sex-bands")).toHaveCount(0);
+    // Pyramid first, the heat map second, the regional glance last.
+    const tops = await Promise.all(["age-sex-pyramid", "age-sex-heatmap", "age-sex-regions"].map(async (id) => (await page.getByTestId(id).boundingBox())!.y));
+    expect(tops[0]).toBeLessThan(tops[1]!);
+    expect(tops[1]).toBeLessThan(tops[2]!);
     const years = page.getByTestId("age-sex-year-row").getByRole("button");
     await expect(years).toHaveCount(23);
     await expect(years.filter({ hasText: /^2026$/ })).toHaveAttribute("aria-pressed", "true");
@@ -75,24 +80,39 @@ test.describe("the Age and sex page", () => {
     await expect(page.getByTestId("age-sex-pyramid-figure")).toHaveCount(0);
   });
 
-  test("the age groups chart and the heat map both carry the re-base label", async ({ page }) => {
+  test("the heat map carries the re-base label", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
-    await expect(page.getByTestId("age-sex-bands-panel")).toContainText("Census re-base");
     await expect(page.getByTestId("age-sex-heatmap").getByRole("columnheader", { name: /^2025.*Census re-base/ })).toBeVisible();
-    await page.getByTestId("age-sex-bands-mode-table").click();
-    await expect(page.getByTestId("age-sex-bands-panel").getByRole("table")).toContainText("Census re-base");
   });
 
-  test("a region in the list opens its own page at the Age and sex block", async ({ page }) => {
+  test("an old link to the removed age-groups table is ignored", async ({ page }) => {
+    await page.goto(`${NATIONAL}#bands=table`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("age-sex-bands")).toHaveCount(0);
+  });
+
+  test("the regional glance has no links, no tab stops and no arrows, but still ranks and searches", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
-    const first = page.getByTestId("regional-list-row").first();
-    await expect(first).toContainText("Racha-Lechkhumi");
-    await expect(first).toContainText("31.2%");
-    await first.click();
-    await expect(page).toHaveURL(/\/en\/explorer\/demography\/population\/region\/racha_lechkhumi_kvemo_svaneti#age-sex$/);
-    await expect(page.getByTestId("age-sex-section")).toBeInViewport();
+    const glance = page.getByTestId("age-sex-regions");
+    await glance.scrollIntoViewIfNeeded();
+    const map = page.getByTestId("age-sex-region-map");
+    await expect(map.locator("a")).toHaveCount(0);
+    await expect(map.locator('[tabindex]:not(svg)')).toHaveCount(0);
+    await expect(map.locator('[data-region-id]')).toHaveCount(11);
+    const rows = page.getByTestId("regional-list-row");
+    await expect(rows).toHaveCount(11);
+    await expect(rows.first()).toContainText("Racha-Lechkhumi");
+    await expect(rows.first()).toContainText("31.2%");
+    await expect(glance.locator('a[href*="/explorer/demography/"]')).toHaveCount(0);
+    await expect(rows.first()).not.toContainText("→");
+    // Hovering a row highlights its region on the map.
+    await rows.nth(2).hover();
+    await expect(map.locator(`[data-region-id="${await rows.nth(2).getAttribute("data-region-id")}"]`)).toHaveAttribute("data-active", "true");
+    // The search still narrows the list.
+    await glance.locator("input").fill("Imereti");
+    await expect(rows).toHaveCount(1);
   });
 
   test("the Georgian page renders", async ({ page }) => {

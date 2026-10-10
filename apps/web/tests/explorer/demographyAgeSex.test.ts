@@ -8,7 +8,6 @@ import {
   ageYears,
   annualAgeFacts,
   annualPyramid,
-  bandSeries,
   bandShares,
   censusAgeFactsForPlace,
   censusPyramid,
@@ -80,16 +79,16 @@ describe("the annual pyramid", () => {
   });
 
   it("matches the published age-band rows in every year", () => {
-    const series = bandSeries(annual, years);
     const bands = { band_0_14: "young", band_15_64: "working", band_65_plus: "old" } as const;
     const published = served.filter((fact) => fact.seriesId === SERIES.populationAgeBand && fact.geographyId === "country.georgia" && fact.sex === "total");
     expect(published.length).toBeGreaterThan(0);
     for (const year of years) {
+      const shares = bandShares(annualPyramid(annual, year));
       const rows = published.filter((fact) => fact.year === year);
       const total = rows.reduce((sum, fact) => sum + fact.value, 0);
       for (const row of rows) {
         const key = bands[row.ageGroup as keyof typeof bands];
-        expect(Math.abs(series[key][year]! - (row.value / total) * 100)).toBeLessThan(1e-9);
+        expect(Math.abs(shares[key] - (row.value / total) * 100)).toBeLessThan(1e-9);
       }
     }
   });
@@ -129,7 +128,7 @@ describe("the heat map", () => {
 
 describe("the hash", () => {
   it("defaults to the latest year", () => {
-    expect(parseAgeSexHash("", years)).toEqual({ year: 2026, compare: null, measure: "share", pyramidMode: "line", bandsMode: "line" });
+    expect(parseAgeSexHash("", years)).toEqual({ year: 2026, compare: null, measure: "share", pyramidMode: "line" });
   });
 
   it("drops an unknown year, an unknown comparison and a comparison with itself", () => {
@@ -153,7 +152,8 @@ describe("the hash", () => {
   it("round-trips and serializes the default state to nothing", () => {
     const hash = "year=2010&cmp=2004&measure=persons&pyramid=table";
     expect(serializeAgeSexHash(parseAgeSexHash(`#${hash}`, years), years)).toBe(hash);
-    expect(serializeAgeSexHash(parseAgeSexHash("#bands=table", years), years)).toBe("bands=table");
+    // The age-groups-over-time part is gone: an old link that asks for its table is ignored.
+    expect(serializeAgeSexHash(parseAgeSexHash("#bands=table", years), years)).toBe("");
     expect(serializeAgeSexHash(parseAgeSexHash("", years), years)).toBe("");
   });
 });

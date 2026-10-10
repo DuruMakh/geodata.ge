@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CENSUS_STEP } from "../../lib/data/demography/series";
-import { ACCENT, INK, SERIES_COLORS } from "../../lib/explorer/colors";
 import {
   ageYears,
   annualPyramid,
-  bandSeries,
   bandShares,
   crossesBreak,
   effectiveMeasure,
@@ -20,7 +18,6 @@ import {
 } from "../../lib/explorer/demographyAgeSex";
 import {
   buildAgeYearWorkbookExportModel,
-  buildBandsWorkbookExportModel,
   buildPyramidWorkbookExportModel,
 } from "../../lib/explorer/demographyAgeSexWorkbook";
 import { formatInUnit, formatShare, UNIT_DENSITY } from "../../lib/explorer/format";
@@ -32,19 +29,16 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
-import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
-import { ExplorerTable } from "../main-explorer/explorer-table";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
 import { YearButtonRow } from "../ui/year-button-row";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
 import { Download, ModeTabs } from "./national-vital-charts";
 import { PopulationPyramid, PyramidTable } from "./population-pyramid";
 
-const YOUNG_COLOR = SERIES_COLORS["sex.male"]!;
 const SECTION_CLASS = "mt-16 border-t-2 border-[var(--ink)] pt-[22px]";
 const percent = (value: number | null) => formatShare(value === null ? null : value / 100);
 
-/** Georgia's age structure on 1 January of every year: the pyramid, the age groups over time and the age-by-year heat map. */
+/** Georgia's age structure on 1 January of every year: the pyramid and the age-by-year heat map. */
 export function AgeSexExplorer({
   facts,
   sources,
@@ -96,16 +90,6 @@ export function AgeSexExplorer({
   // A comparison opens on the first year, or on the latest when the first is the year shown.
   const defaultCompare = state.year === first ? last : first;
   const chooseYear = (year: number) => update({ year, compare: state.compare === year ? null : state.compare });
-
-  // Age groups over time
-  const bands = useMemo(() => bandSeries(facts, years), [facts, years]);
-  const flat = (record: Record<number, number>) => years.map((year) => record[year] ?? null);
-  const none = years.map(() => false);
-  const bandRows = [
-    { itemId: "band_0_14", kaLabel: t("bandYoung"), color: YOUNG_COLOR, valuesByYear: bands.young },
-    { itemId: "band_15_64", kaLabel: t("bandWorking"), color: INK, valuesByYear: bands.working },
-    { itemId: "band_65_plus", kaLabel: t("bandOld"), color: ACCENT, valuesByYear: bands.old },
-  ];
 
   // Heat map
   const heat = useMemo(() => heatmapRows(facts, years), [facts, years]);
@@ -185,55 +169,6 @@ export function AgeSexExplorer({
           testId="age-sex-pyramid-excel-download"
           build={() => buildPyramidWorkbookExportModel({ facts, sources, siteOrigin, year: state.year, compare: state.compare }, presentation)}
         />
-      </section>
-
-      <section data-testid="age-sex-bands" className={SECTION_CLASS}>
-        <SectionTitle>{t("bandsTitle")}</SectionTitle>
-        <div className="mt-5">
-          <ModeTabs value={state.bandsMode} onChange={(bandsMode) => update({ bandsMode })} testId="age-sex-bands" />
-        </div>
-        <div className="mt-5" data-testid="age-sex-bands-panel" data-mode={state.bandsMode}>
-          {state.bandsMode === "line" ? (
-            <EditorialLineChart
-              years={years}
-              series={[
-                { id: "band_0_14", label: t("bandYoung"), color: YOUNG_COLOR, vals: flat(bands.young), planned: none },
-                { id: "band_65_plus", label: t("bandOld"), color: ACCENT, vals: flat(bands.old), planned: none },
-              ]}
-              share
-              unit={UNIT_DENSITY}
-              shareLabel={t("unitShare")}
-              formatTooltipValue={(value) => percent(value)}
-              breaks={[{ year: CENSUS_STEP.toYear, label: breakLabel }]}
-              ariaLabel={t("bandsAria", { first, last })}
-            />
-          ) : (
-            <ExplorerTable
-              caption={t("bandsAria", { first, last })}
-              rows={bandRows}
-              totalRow={null}
-              showTotal={false}
-              wrapRowLabels
-              rowLabelsLocalized
-              years={years}
-              firstColumnLabel={t("ageGroupHeader")}
-              unit={UNIT_DENSITY}
-              share
-              showChangeColumn={false}
-              breakYears={[CENSUS_STEP.toYear]}
-              breakLabel={breakLabel}
-              shareValueForYear={(row, year) => {
-                const value = row.valuesByYear[year];
-                return value === null || value === undefined ? null : value / 100;
-              }}
-            />
-          )}
-        </div>
-        <p data-testid="age-sex-bands-caption" className="mt-3 text-[12px] text-[var(--body)]">
-          {t("bandsCaption", { share: percent(bands.working[last] ?? null), year: last })}
-        </p>
-        <div className="mt-[18px] max-w-[740px]"><SourceNote testId="age-sex-bands-source">{source}</SourceNote></div>
-        <Download testId="age-sex-bands-excel-download" build={() => buildBandsWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
 
       <section data-testid="age-sex-heatmap" className={SECTION_CLASS}>

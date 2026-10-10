@@ -1,6 +1,5 @@
 "use client";
 
-import { populationPlaceHref } from "../../lib/explorer/demographyPlaceRoutes";
 import { formatShare } from "../../lib/explorer/format";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -12,7 +11,7 @@ import { SectionTitle } from "../ui/editorial";
 
 const percent = (value: number) => formatShare(value / 100);
 
-/** The regions by census share aged 65+: the Unemployment regions index as it is, each row opening the region's age-and-sex block. */
+/** The regions by census share aged 65+, as a glance: the regions index without its links (the regions' own pages hold the detail). */
 export function AgeSexRegions({ model, georgiaShare, sourceNote }: { model: RegionMapModel; georgiaShare: number; sourceNote: string }) {
   const { locale, messages, englishLabels } = useI18n();
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
@@ -27,7 +26,6 @@ export function AgeSexRegions({ model, georgiaShare, sourceNote }: { model: Regi
           model={model}
           sourceNote={sourceNote}
           metric={{
-            hrefForRegion: (id) => `${populationPlaceHref(id)}#age-sex`,
             formatValue: percent,
             mapAria: t("regionMapAria"),
             entityAria: (regionName, value) => t("regionEntityAria", { name: regionName, share: percent(value) }),

@@ -5,7 +5,7 @@ vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathname: () => "/" }));
 
 import { SERIES } from "../../lib/data/demography/series";
-import { populationHrefById, populationPlaceHref } from "../../lib/explorer/demographyPlaceRoutes";
+import { populationHrefById } from "../../lib/explorer/demographyPlaceRoutes";
 import { buildPopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
 import {
   demographyPageMetadata,
@@ -201,21 +201,27 @@ describe("births and deaths page", () => {
 });
 
 describe("age and sex page", () => {
-  it("renders the regions, the pyramid, the age groups and the heat map, with no dataset markup or Georgian in English", async () => {
+  it("renders the pyramid, the heat map and a regional glance, in that order, with no dataset markup or Georgian in English", async () => {
     const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
     expect(html).toContain(">Age and sex</h1>");
     expect(html).toContain("2004–2026 · annual, and the 2024 census");
-    expect(html).toContain(`href="/en${populationPlaceHref("region.racha_lechkhumi_kvemo_svaneti")}#age-sex"`);
-    expect(html).toContain('href="/en/explorer/demography/population/region/racha_lechkhumi_kvemo_svaneti#age-sex"');
     expect(html).toContain("31.2%");
     expect(html).toContain("13.1%");
-    expect(html).toContain('data-testid="age-sex-pyramid"');
-    expect(html).toContain('data-testid="age-sex-bands"');
-    expect(html).toContain('data-testid="age-sex-heatmap"');
+    const at = (testId: string) => html.indexOf(`data-testid="${testId}"`);
+    expect(at("age-sex-pyramid")).toBeGreaterThan(-1);
+    expect(at("age-sex-pyramid")).toBeLessThan(at("age-sex-heatmap"));
+    expect(at("age-sex-heatmap")).toBeLessThan(at("age-sex-region-map"));
+    expect(html).not.toContain('data-testid="age-sex-bands"');
     expect(html).toContain('href="/en/methodology/demography"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('"@type":"Dataset"');
     expect(html).not.toMatch(GEORGIAN);
+  });
+
+  it("shows the regional glance without a single link to a region page", async () => {
+    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    expect(html).not.toContain('#age-sex"');
+    expect(html).not.toContain("/explorer/demography/population/region/");
   });
 
   it("has no Georgian in the English metadata, and its own canonical address and title", async () => {
