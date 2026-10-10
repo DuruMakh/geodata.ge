@@ -65,13 +65,14 @@ Both files are already canonical and validated. This work adds them to the serve
 
 ### 3.4 Age by year (heat map)
 
-- **Layout.** Rows are the 18 groups (85+ at the top). Columns are 2004–2026. Colour is each group's share of that year's population.
-- **Break.** A gap and a dashed rule separate 2024 from 2025, with the short break label above. A caption says the 2025 re-base moved some groups' shares.
-- **Colour.** The five `GRID_TINTS` with `binFor` and `legendLabels`. The bin edges are the 20th, 40th, 60th and 80th percentiles of all loaded cells, computed from the data, never typed.
-- **Interaction.** The cells are one named group with one tab stop. Arrow keys move; Home and End go to the ends of a row. The tooltip (`ChartTooltip`) shows year, group, persons, share and "born about {year − upper}–{year − lower}" (for 85+: "born before {year − 85}").
-- **Reading note.** One neutral sentence: diagonal bands are people born in the same years moving up the chart.
-- **Size.** Real pixels with a 12px minimum cell. It fits 390px without scrolling.
-- **Table view.** `MonthGridTable` as inflation uses it: years newest first as rows, the 18 groups as columns of shares, the same tints and legend. If the table cannot take 18 columns or a break rule as it stands, it gains an optional column count and break year, and its default output stays unchanged.
+Owner decision, 2026-10-10, during planning: reuse the Unemployment → Age heat map instead of a new compact figure.
+
+- **Component.** The coloured table of `UnemploymentAgeHeatmap`. Its table and legend are lifted into a shared `HeatmapTable`, which both pages use; Unemployment's output stays byte-identical. Rows are the 18 groups (85+ at the top), columns are 2004–2026, and each cell prints and is coloured by that group's share of the year's population.
+- **Colour.** The six `MAP_RAMP` steps with `unemploymentAgeHeatmapBin` (equal-width bins from zero to the largest share), as on Unemployment.
+- **Scrolling.** It scrolls sideways where it is wider than its column, and opens on the newest years, as Unemployment does.
+- **Break.** An optional `breakYear` on `HeatmapTable` draws ExplorerTable's 2px ink rule left of the 2025 column and prints the short break label on its header. A caption says the 2025 re-base moved some groups' shares.
+- **Reading note.** One neutral sentence: diagonals running up and to the right are people born in the same years, growing older.
+- **No chart/table switch.** The table is its own text form. No tooltip and no "born about" text: the number is in the cell.
 
 ## 4. Place block (Georgia and the 11 regions)
 
@@ -94,20 +95,19 @@ Both files are already canonical and validated. This work adds them to the serve
 - `SectionTitle`, `SegmentedTabs`, `TextTab`, `SourceNote`, `Callout`.
 - `ExcelDownloadButton` and the workbook model.
 - `ExplorerPage`, `PageHeader`, `BreadcrumbJsonLd`.
-- `GRID_TINTS`, `binFor`, `legendLabels`.
+- `MAP_RAMP` and `unemploymentAgeHeatmapBin`.
 - The Population place page and its loaders.
 - The `sex.male` and `sex.female` colour tokens.
 
 **Small additive changes; default output unchanged:**
 - The year-button row in `components/analysis/analysis-view.tsx` is lifted into a shared `YearButtonRow`, with an optional per-year tag (the "planned" tag there, the census tag here). Analysis must render exactly as before, and its browser specs prove it.
-- `MonthGridTable` gets an optional column count and break year, only if needed (§3.4).
+- The table and legend of `UnemploymentAgeHeatmap` are lifted into a shared `HeatmapTable` (`components/main-explorer/heatmap-table.tsx`) with an optional `breakYear`; Unemployment renders exactly as before (§3.4).
 - Demography loader, validation and served-file lists gain the two files; `servedRows` gains a client projection for age rows.
 - `DEMOGRAPHY_PAGES` flips `age-sex` to live, and the hub card gains a figure (Georgia's 65+ share, latest year).
 - Sitemap, `llms.txt`, sidebar, methodology demography content (structure and census families, the computed 0–4) and the release-check runbook.
 
 **Genuinely new:**
 - `PopulationPyramid`, drawn from a pure `pyramidLayout.ts` (scale, ticks, rows, outline path). Nothing existing draws mirrored horizontal bars.
-- `AgeYearHeatMap`, drawn from a pure `ageYearMatrix.ts` (matrix, bins, birth-year text). `MonthGridTable` is a table, not a figure with a break gap and two-dimensional keyboard movement.
 - `lib/explorer/demographyAgeSex.ts`: groups, the 0–4 sum, shares, sex ratio, hash state, the region model.
 - `demographyAgeSexWorkbook.ts`.
 - `components/demography/age-sex-explorer.tsx` (national parts 3.2–3.4) and `age-sex-section.tsx` (place block).
@@ -150,17 +150,17 @@ Every workbook keeps basis and source hyperlinks and has no internal columns. Ge
 
 | Download | Readable sheet | Data sheet | Source | Notes |
 | --- | --- | --- | --- | --- |
-| National pyramid | 18 rows: men, women, total, share for the year (plus the comparison year's columns when on) | year, sex, age group, persons, share, basis | the annual age-by-sex original | |
+| National pyramid | 18 rows: men, women, total for the year (plus the comparison year's columns when on); shares are in the data sheet, because a readable sheet has one number format | year, sex, age group, persons, share, basis | the annual age-by-sex original | |
 | Age groups over time | | bands × years | the annual age-by-sex original | |
 | Heat map | groups × years, shares | year, group, persons, share, basis | the annual age-by-sex original | |
-| Place block | the 18 groups for the place and settlement | | the census original | census date in the subtitle |
+| Place block | the 18 groups for the place and settlement: men, women, total (shares in the data sheet) | | the census original | census date in the subtitle |
 
 ## 10. Accessibility and responsive
 
 - Every figure is `role="img"` or a named group, and has a table twin.
 - Focus is the 2px accent ring.
 - Sex is carried by position and labels, not only colour.
-- Pyramids fit 320px, and the heat map fits 390px, with no horizontal page overflow.
+- Pyramids fit 320px without scrolling; the heat map scrolls inside its own frame, as on Unemployment; no horizontal page overflow.
 - Nothing animates.
 - Checked at 390, 768, 1100 and 1440px in both languages.
 
@@ -170,7 +170,7 @@ Every workbook keeps basis and source hyperlinks and has no internal columns. Ge
 - The 0–4 sum; groups add to totals; bands equal group sums.
 - Shares and the sex ratio.
 - Pyramid geometry: symmetry, shared scale, ticks, outline path, row order.
-- Heat-map bins and birth-year text.
+- The heat-map rows (18 groups, shares adding to 100 in every year).
 - Hash round-trip, rejection and the break rules.
 - The region model's order and the §2 anchors.
 - Workbook models.
@@ -182,7 +182,7 @@ Every workbook keeps basis and source hyperlinks and has no internal columns. Ge
 - Year buttons and keys.
 - Comparison within one side of the break, and across it (note shown, `%` forced, no difference).
 - The table twins.
-- The heat-map keyboard and tooltip.
+- The heat map's break rule and label, and Unemployment's heat map unchanged.
 - A region row link landing on `#age-sex`.
 - The place block's settlement and measure switches.
 - No block on a municipality page.
@@ -208,7 +208,7 @@ Ripple counts are re-derived during the plan, not guessed here: the sitemap (+2)
 | 3 | Comparison outline off by default | assistant default, accepted with the design |
 | 4 | 15–64 not drawn on the over-time chart | assistant default, accepted with the design |
 | 5 | Comparison across the break allowed, with the note and forced `%` | |
-| 6 | Heat map shows shares and uses words, not lines, for birth cohorts | |
+| 6 | Heat map reuses Unemployment's coloured table, showing shares | owner, during planning |
 | 7 | Region order by 65+ share, descending | |
 | 8 | No auto-play | |
 
