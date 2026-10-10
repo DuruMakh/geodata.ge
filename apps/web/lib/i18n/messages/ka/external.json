@@ -25,7 +25,6 @@
   "external.money.partial": "არასრ.",
   "external.money.partialNote": "არასრ.: 2019 წლის ზოგი თვე ეროვნული ბანკის წყაროში ცარიელია.",
   "external.money.rankingTitle": "ფულადი გზავნილები ქვეყნების მიხედვით · {measure} · {year}",
-  "external.money.rank": "#",
   "external.money.country": "ქვეყანა",
   "external.money.share": "წილი ჯამში",
   "external.money.shareNote": "წილი გამოითვლება იმავე წლისა და მიმართულების ყველა ქვეყნის გზავნილების ჯამიდან.",

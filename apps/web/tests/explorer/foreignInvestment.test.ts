@@ -53,3 +53,13 @@ test("the ranking follows the range end year and skips items without a value tha
   expect(model.ranking.map(r => r.entityId)).not.toContain("fdi.region.guria");
   expect(model.ranking.every(r => r.valueUsd !== null)).toBe(true);
 });
+
+test("every series a tab lists, and its ranking bar, has a colour no other series on that tab shares", async () => {
+  const { buildForeignInvestmentModel: build, data } = await modules();
+  const states = [...["sector", "region"].map(dimension => ({ ...initial, dimension })), ...Array.from({ length: 30 }, (_, i) => ({ ...initial, range: { kind: "manual", start: 1996, end: 1996 + i } }))] as (typeof initial)[];
+  for (const state of states) {
+    const model = build(data, state, presentation), colors = model.series.map(s => s.color);
+    expect(new Set(colors).size, `${state.dimension} ${JSON.stringify(state.range)}`).toBe(colors.length);
+    for (const row of [...model.ranking, ...(model.other ? [model.other] : [])]) expect(row.color).toBe(model.series.find(s => s.id === row.entityId)!.color);
+  }
+});

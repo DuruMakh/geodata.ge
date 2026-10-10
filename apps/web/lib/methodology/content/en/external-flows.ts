@@ -95,6 +95,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "classification",
       "title": "Geostat's and NBG's investment figures",
       "paragraphs": [
+        "Foreign direct investment is investment by a foreign investor who holds 10% or more of the shares or voting rights in an enterprise in Georgia, together with every later transaction between the two, such as reinvested earnings and loans.",
         "Geostat compiles foreign direct investment from its survey of enterprises, with NBG data on financial corporations and ministry privatization data. NBG's balance of payments shows direct investment on the BPM6 asset and liability basis. The two totals differ every year, by up to USD 192.6 million in 2023. Foreign investment uses Geostat's figure only and never mixes the two."
       ]
     },

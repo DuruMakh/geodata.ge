@@ -25,7 +25,6 @@
   "external.money.partial": "partial",
   "external.money.partialNote": "Partial: some 2019 months are blank in NBG's source.",
   "external.money.rankingTitle": "Money transfers by country · {measure} · {year}",
-  "external.money.rank": "#",
   "external.money.country": "Country",
   "external.money.share": "Share of all countries",
   "external.money.shareNote": "Shares use the all-country money-transfer total for the same year and direction.",

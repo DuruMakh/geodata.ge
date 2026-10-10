@@ -465,7 +465,7 @@
     "id": "fdi.country.other_remainder",
     "dimension": "country",
     "kind": "remainder",
-    "labelKa": "სხვა ქვეყნები (Geostat-ის ნაშთი)"
+    "labelKa": "სხვა ქვეყნები (საქსტატის ნაშთი)"
   },
   {
     "id": "fdi.sector.a",
