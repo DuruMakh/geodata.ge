@@ -75,5 +75,9 @@
   "common.wagesOverview": "ხელფასების მიმოხილვა",
   "common.wagesIndustries": "საქმიანობები",
   "common.wagesRegions": "რეგიონები",
-  "common.dataWages": "მონაცემები · ხელფასები"
+  "common.poverty": "სიღარიბე და უთანასწორობა",
+  "common.povertyRates": "სიღარიბე",
+  "common.povertyInequality": "უთანასწორობა",
+  "common.dataWages": "მონაცემები · ხელფასები",
+  "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა"
 }

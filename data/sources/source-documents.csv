@@ -179,3 +179,10 @@ source.geostat_earnings_annual_business_sector,დაქირავებულ
 source.geostat_earnings_annual_ownership,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი საჯარო და არასაჯარო სექტორში ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/10-earnings-by-ownership-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_region,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი რეგიონების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/13-earnings-by-region-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_median,დაქირავებულთა მედიანური ხელფასი ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/median-monthly-earnings.xlsx,2026-10-10
+source.geostat_poverty_absolute,აბსოლუტური სიღარიბის ზღვარს ქვემოთ მყოფი მოსახლეობის წილი,docs/Raw Data/Poverty/geostat-poverty-annual/official/302-absolute-poverty.xlsx,2026-10-10
+source.geostat_poverty_relative,ფარდობითი სიღარიბის ზღვარს ქვემოთ მყოფი მოსახლეობის წილი,docs/Raw Data/Poverty/geostat-poverty-annual/official/301-relative-poverty.xlsx,2026-10-10
+source.geostat_poverty_international,საერთაშორისო სიღარიბის ზღვრებს ქვემოთ მყოფი მოსახლეობის წილი (2021 წლის PPP),docs/Raw Data/Poverty/geostat-poverty-annual/official/304-international-poverty-2021ppp.xlsx,2026-10-10
+source.geostat_gini,ჯინის კოეფიციენტები,docs/Raw Data/Poverty/geostat-poverty-annual/official/303-gini-coefficients.xlsx,2026-10-10
+source.geostat_poverty_source_page,სიღარიბისა და ჯინის კოეფიციენტების წყაროს გვერდი,docs/Raw Data/Poverty/geostat-poverty-annual/official/poverty-page-2026-10-10.html,2026-10-10
+source.geostat_poverty_metadata_2026,სიღარიბისა და ჯინის კოეფიციენტების მეტამონაცემები,docs/Raw Data/Poverty/geostat-poverty-annual/official/poverty-metadata-2026.pdf,2026-10-10
+source.geostat_hies_metadata_2026,შინამეურნეობების შემოსავლებისა და ხარჯების კვლევის მეტამონაცემები,docs/Raw Data/Poverty/geostat-poverty-annual/official/hies-metadata-2026.pdf,2026-10-10

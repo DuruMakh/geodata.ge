@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 4,
+  "observations": 491,
+  "workbook_formatted_numeric_cells": 554,
+  "stored_values_matched": 491,
+  "published_values_matched_format_rendering": 491,
+  "year_and_label_context_matched": 491,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "swapped_groups_detected": true,
+    "swapped_relative_lines_detected": true
+  },
+  "failures": []
+}

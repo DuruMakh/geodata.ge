@@ -85,6 +85,7 @@ model SourceDocument {
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
   wagesFacts WagesFact[]
+  povertyFacts PovertyFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
   currentAccountFacts CurrentAccountFact[]
@@ -127,6 +128,7 @@ model ImportRun {
   tradePartnerEntities TradePartnerEntity[]
   tradePartnerFacts TradePartnerFact[]
   wagesFacts WagesFact[]
+  povertyFacts PovertyFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentEntities ForeignInvestmentEntity[]
@@ -775,6 +777,30 @@ model WagesFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, dimension, groupId, sectorId, year])
+}
+
+// Mirror of data/imports/poverty-annual.csv: Geostat's annual poverty rates and
+// Gini coefficients, exact stored decimals with their published rounding.
+model PovertyFact {
+  year               Int
+  indicatorId        String
+  groupId            String
+  value              Decimal        @db.Decimal(30, 20)
+  publishedValue     Decimal        @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, groupId, year])
 }
 
 // Mirror of the served data/imports/demography-*.csv files: one flat observation table in the
