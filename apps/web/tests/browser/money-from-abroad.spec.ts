@@ -24,6 +24,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     const ranking = page.getByTestId("money-from-abroad-ranking-row");
     await expect(ranking).toHaveCount(10);
     await expect(ranking.first()).toHaveAttribute("data-entity-id", "transfer.united_states_of_america");
+    await expect(ranking.first()).toContainText("682.9");
     await expect(page.getByTestId("money-from-abroad-remainder-row")).toHaveCount(1);
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: info.outputPath(`money-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });

@@ -48,7 +48,8 @@ export function loadServedMoneyTransfersData(): Promise<MoneyTransfersData> {
     const { loadMoneyTransfersDataFromDb } = await import("../../db/servedDataDb");
     const mirror = await loadMoneyTransfersDataFromDb();
     assertMoneyTransfersParity(csv, mirror);
-    return mirror;
+    // Parity ignores order; the mirror returns entities by id, so serve the reviewed catalogue order (total first).
+    return { entities: csv.entities, facts: mirror.facts };
   })();
   return servedPromise;
 }

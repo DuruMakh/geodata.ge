@@ -62,3 +62,14 @@ test("parity compares the entire catalogue and exact values regardless of row or
     { ...csv, facts: csv.facts.slice(1) },
   ]) expect(() => assertMoneyTransfersParity(csv, change)).toThrow(/does not match|parity/i);
 });
+
+test("database mode keeps the reviewed catalogue order, so the all-country total stays first", async () => {
+  const csv = await (await loader()).loadMoneyTransfersData();
+  vi.stubEnv("GEODATA_DATA_SOURCE", "db");
+  // The mirror returns entities ordered by id, as its findMany does.
+  vi.doMock("../../../lib/db/servedDataDb", () => ({ loadMoneyTransfersDataFromDb: async () => ({ entities: [...csv.entities].sort((a, b) => a.id.localeCompare(b.id, "en")), facts: csv.facts }) }));
+  vi.resetModules();
+  const served = await (await loader()).loadServedMoneyTransfersData();
+  expect(served.entities.map(entity => entity.id)).toEqual(csv.entities.map(entity => entity.id));
+  expect(served.entities[0].id).toBe("transfer.total");
+});

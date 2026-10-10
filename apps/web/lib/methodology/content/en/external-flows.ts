@@ -41,7 +41,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "scope",
       "title": "What does the page cover?",
       "paragraphs": [
-        "NBG's money transfers through fast transfer systems, 2000–2025: total inflow and outflow and every published country. Each annual value is the sum of the twelve published months. Personal transfers from the balance of payments (credit and debit) are added alongside. Monthly data, 2026 months, transfers by system, foreign direct investment and the current account are excluded."
+        "NBG's money transfers through fast transfer systems, 2000–2025: total inflow and outflow and every published country. Each annual value is the sum of the published months. Personal transfers from the balance of payments (credit and debit) are added alongside. Monthly data, 2026 months, transfers by system, foreign direct investment and the current account are excluded."
       ]
     },
     {
@@ -67,7 +67,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "title": "Coverage limits",
       "paragraphs": [
         "For 2000–2007 NBG publishes 18 major countries plus Other countries; full country lists start in 2008. Earlier values for other countries are missing and are not filled with zero.",
-        "In 2019 February is blank in the source for about 70 smaller countries. Their 2019 value is the sum of the 11 published months and is marked in the table, the chart and Excel.",
+        "In 2019 some months are blank in the source for about 70 smaller countries, mostly February alone. Their 2019 value is the sum of the published months: 11 in most cases, 5 to 9 in a few. It is marked as partial in the chart and the table, and the ranking and Excel show the number of months.",
         "From January 2010 the data include microfinance organizations. The break is marked on the chart and is not adjusted."
       ]
     },
@@ -102,7 +102,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "external",
       "title": "What does the page cover?",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "NBG's money transfers through fast transfer systems, 2000–2025: total inflow and outflow and every published country. Each annual value is the sum of the twelve published months. Personal transfers from the balance of payments (credit and debit) are added alongside. Monthly data, 2026 months, transfers by system, foreign direct investment and the current account are excluded.",
+      "summary": "NBG's money transfers through fast transfer systems, 2000–2025: total inflow and outflow and every published country. Each annual value is the sum of the published months. Personal transfers from the balance of payments (credit and debit) are added alongside. Monthly data, 2026 months, transfers by system, foreign direct investment and the current account are excluded.",
       "detail": [],
       "canonicalDecisionIds": [
         "external.scope"
@@ -124,7 +124,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "external",
       "title": "Coverage limits",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "For 2000–2007 NBG publishes 18 major countries plus Other countries; full country lists start in 2008. Earlier values for other countries are missing and are not filled with zero. In 2019 February is blank in the source for about 70 smaller countries. Their 2019 value is the sum of the 11 published months and is marked in the table, the chart and Excel. From January 2010 the data include microfinance organizations. The break is marked on the chart and is not adjusted.",
+      "summary": "For 2000–2007 NBG publishes 18 major countries plus Other countries; full country lists start in 2008. Earlier values for other countries are missing and are not filled with zero. In 2019 some months are blank in the source for about 70 smaller countries, mostly February alone. Their 2019 value is the sum of the published months: 11 in most cases, 5 to 9 in a few. It is marked as partial in the chart and the table, and the ranking and Excel show the number of months. From January 2010 the data include microfinance organizations. The break is marked on the chart and is not adjusted.",
       "detail": [],
       "canonicalDecisionIds": [
         "external.coverage"

@@ -31,7 +31,7 @@ export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: 
   const years = Array.from({ length: range.end - range.start + 1 }, (_, index) => range.start + index);
   const ids = moneyTransfersBulkSelection(data), selectedIds = ids.filter(id => state.selectedIds.includes(id));
   const cell = (measure: string) => new Map(data.facts.filter(f => f.measure === measure).map(f => [`${f.entityId}:${f.year}`, f]));
-  const cells = cell(state.measure);
+  const byMeasure = { received: cell("received"), sent: cell("sent") }, cells = byMeasure[state.measure];
   const valuesByEntity = Object.fromEntries(ids.map(id => [id, Object.fromEntries(years.map(year => [year, cells.get(`${id}:${year}`)?.valueUsd ?? null]))]));
   const partialMonths: Record<string, Record<number, number>> = {};
   for (const fact of cells.values()) if (fact.valueStatus === "partial_months" && years.includes(fact.year)) (partialMonths[fact.entityId] ??= {})[fact.year] = fact.monthsReported!;
@@ -58,7 +58,7 @@ export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: 
   const order = new Map([...ranking, ...countries.filter(r => r.valueUsd === null).sort(labelOrder)].map((r, index) => [r.entityId, index]));
   const activeEntities = data.entities.filter(onTab);
   if (state.tab === "countries") activeEntities.sort((a, b) => (order.get(a.id) ?? Infinity) - (order.get(b.id) ?? Infinity));
-  const end = (measure: string, id: string) => cell(measure).get(`${id}:${range.end}`)?.valueUsd ?? null;
+  const end = (measure: keyof typeof byMeasure, id: string) => byMeasure[measure].get(`${id}:${range.end}`)?.valueUsd ?? null;
   const received = end("received", MONEY_TRANSFER_TOTAL_ID), gdp = data.nominalGdpUsd[range.end];
   const figures = { year: range.end, received, sent: end("sent", MONEY_TRANSFER_TOTAL_ID), estimate: end("received", PERSONAL_TRANSFERS_ID), receivedShareOfGdp: received !== null && gdp ? received / gdp : null };
   return { years, range, unit, selectedIds, valuesByEntity, partialMonths, activeEntities, offTabSelected, ranking, missingRanking, remainders, figures, selectedCount: selectedIds.length, totalCount: ids.length };

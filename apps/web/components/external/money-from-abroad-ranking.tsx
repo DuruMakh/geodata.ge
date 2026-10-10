@@ -10,6 +10,8 @@ import { SectionTitle } from "../ui/editorial";
 export function MoneyFromAbroadRanking({ model, measure }: { model: MoneyTransfersModel; measure: MoneyTransferMeasure }) {
   const [expanded, setExpanded] = useState(false);
   const { messages } = useI18n();
+  // Country amounts read in millions (USD 683 million), whatever scale the chart above uses.
+  const unit = { divisor: 1_000_000, decimals: 1, label: message(messages, "external.unit.million") };
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
   const rows = expanded ? model.ranking : model.ranking.slice(0, 10);
   const title = t("rankingTitle", { measure: message(messages, `external.measure.${measure}`), year: model.range.end });
@@ -20,16 +22,16 @@ export function MoneyFromAbroadRanking({ model, measure }: { model: MoneyTransfe
     <th scope="row" className="py-3 pr-3 text-left align-top text-[12px] font-medium leading-relaxed text-[var(--ink)]">{item.label}
       {kind === "ranking" ? <div aria-hidden className="relative mt-2 h-1.5 bg-[var(--tint)]"><span className="absolute top-0 left-0 h-full" style={{ backgroundColor: item.color, width: `${item.valueUsd! / max * 100}%` }} /></div> : null}
     </th>
-    <td className="py-3 text-right align-top font-[family-name:var(--font-numeric)] text-[12px] whitespace-nowrap text-[var(--ink)]">{formatInUnit(item.valueUsd, model.unit)}{item.monthsReported !== null ? <span data-testid="money-from-abroad-partial" className="block text-[10px] text-[var(--muted)]">{t("months", { count: item.monthsReported })}</span> : null}</td>
+    <td className="py-3 text-right align-top font-[family-name:var(--font-numeric)] text-[12px] whitespace-nowrap text-[var(--ink)]">{formatInUnit(item.valueUsd, unit)}{item.monthsReported !== null ? <span data-testid="money-from-abroad-partial" className="block text-[10px] text-[var(--muted)]">{t("months", { count: item.monthsReported })}</span> : null}</td>
     <td className="py-3 pl-3 text-right align-top font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{formatShare(item.share)}</td>
   </tr>;
   return <section data-testid="money-from-abroad-ranking" data-end-year={model.range.end} data-measure={measure} className="mt-10 border-t-2 border-[var(--ink)] pt-5">
     <SectionTitle>{title}</SectionTitle>
-    <p className="mt-2 text-[11px] text-[var(--muted)]">{model.unit.label} · {t("shareNote")}</p>
+    <p className="mt-2 text-[11px] text-[var(--muted)]">{unit.label} · {t("shareNote")}</p>
     <table className="mt-5 w-full table-fixed border-collapse">
-      <caption className="sr-only">{title} · {model.unit.label}</caption>
+      <caption className="sr-only">{title} · {unit.label}</caption>
       <colgroup><col className="w-[6%]" /><col className="w-[49%]" /><col className="w-[30%] min-[640px]:w-[23%]" /><col className="w-[15%] min-[640px]:w-[22%]" /></colgroup>
-      <thead><tr className="border-b border-[var(--ink)] text-[10px] text-[var(--muted)]"><th className="py-2 text-left font-normal">{t("rank")}</th><th className="py-2 text-left font-normal">{t("country")}</th><th className="py-2 text-right font-normal">{model.unit.label}</th><th className="py-2 pl-3 text-right font-normal leading-tight [overflow-wrap:anywhere]">{t("share")}</th></tr></thead>
+      <thead><tr className="border-b border-[var(--ink)] text-[10px] text-[var(--muted)]"><th className="py-2 text-left font-normal">{t("rank")}</th><th className="py-2 text-left font-normal">{t("country")}</th><th className="py-2 text-right font-normal">{unit.label}</th><th className="py-2 pl-3 text-right font-normal leading-tight [overflow-wrap:anywhere]">{t("share")}</th></tr></thead>
       <tbody>
         {rows.map(item => row(item, "ranking"))}
         {model.remainders.length ? <>{heading(t("remainders"))}{model.remainders.map(item => row(item, "remainder"))}</> : null}
