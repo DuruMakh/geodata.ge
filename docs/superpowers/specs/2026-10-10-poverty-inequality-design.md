@@ -148,7 +148,7 @@ During implementation, also update `Project_Definition.md` section 2 (a new appr
 
 ## 11. Coordination
 
-The Wages pages (PR #166) are not merged yet, and this design reuses their layout and sits after them in the sidebar. Implementation starts from `main` once Wages has merged. If Wages is still open when the build starts, the branch merges `main` in later and resolves the shared files: sidebar, sitemap, methodology catalogue, mirror files and browser-test page counts. The Current account page, built in parallel, touches some of the same files.
+The Wages pages (PR #166), whose layout this design reuses, are merged to `main`, and this branch starts from that `main`. The Current account page (PR #172) touches some of the same files: sidebar, sitemap, methodology catalogue, mirror files and browser-test page counts. When it merges, this branch merges `main` in and resolves them.
 
 ## 12. Decision for Duru
 
