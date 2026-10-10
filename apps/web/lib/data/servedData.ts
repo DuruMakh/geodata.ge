@@ -69,6 +69,7 @@ export const SERVED_DATA_FILES = {
   moneyTransferFacts: "../../data/imports/money-transfers-annual.csv",
   foreignInvestmentEntities: "../../data/taxonomy/foreign-investment.json",
   foreignInvestmentFacts: "../../data/imports/foreign-investment-annual.csv",
+  currentAccountFacts: "../../data/imports/current-account-annual.csv",
   tradeProductEntities: "../../data/imports/trade-products-catalogue.csv",
   tradeProductFacts: "../../data/imports/trade-products-annual.csv",
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",

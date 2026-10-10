@@ -50,3 +50,22 @@ export type ForeignInvestmentAcceptance = {
 export function foreignInvestmentFactKey(fact: Pick<ForeignInvestmentFact, "entityId" | "year">): string {
   return `${fact.entityId}:${fact.year}`;
 }
+
+export const CURRENT_ACCOUNT_SERIES = ["ca.balance", "ca.goods", "ca.services", "ca.primary_income", "ca.secondary_income"] as const;
+export type CurrentAccountSeriesId = (typeof CURRENT_ACCOUNT_SERIES)[number];
+export const CURRENT_ACCOUNT_PARTS: readonly CurrentAccountSeriesId[] = CURRENT_ACCOUNT_SERIES.slice(1);
+export const CURRENT_ACCOUNT_FLOWS = ["credit", "debit", "net"] as const;
+export type CurrentAccountFlow = (typeof CURRENT_ACCOUNT_FLOWS)[number];
+export const CURRENT_ACCOUNT_SOURCE = "source.nbg_balance_of_payments_bpm6";
+export const CURRENT_ACCOUNT_YEARS = { first: 2000, last: 2025 } as const;
+export type CurrentAccountFact = {
+  seriesId: CurrentAccountSeriesId; year: number; flow: CurrentAccountFlow; valueUsd: string; unit: "usd"; basis: "actual";
+  sourceId: string; sourceSheet: string; sourceCells: string; sourceUnit: "million_usd"; vintage: string; lastReviewedAt: string;
+};
+export type CurrentAccountAcceptance = {
+  status: "passed"; scope: "annual_current_account"; years: number[]; observations: number;
+  inputSha256: Record<string, string>; canonicalSha256: string; reviewedAt: string;
+};
+export function currentAccountFactKey(fact: Pick<CurrentAccountFact, "seriesId" | "flow" | "year">): string {
+  return `${fact.seriesId}:${fact.flow}:${fact.year}`;
+}

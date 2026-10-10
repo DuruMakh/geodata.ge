@@ -9,7 +9,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 
 type PanelModel = Pick<MoneyTransfersModel, "series" | "selectedIds" | "valuesByEntity" | "range" | "unit" | "selectedCount" | "totalCount">;
-/** Also serves Foreign investment, which passes its own total id and search placeholder. */
+/** Also serves Foreign investment and Current account, which pass its own total id and search placeholder. */
 export function MoneyFromAbroadSeriesPanel({ model, onSelectionChange, downloadAction, totalId = MONEY_TRANSFER_TOTAL_ID, searchPlaceholder }: { model: PanelModel; onSelectionChange: (ids: string[]) => void; downloadAction: ReactNode; totalId?: string; searchPlaceholder?: string }) {
   const [query, setQuery] = useState("");
   const { messages } = useI18n();

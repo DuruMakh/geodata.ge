@@ -11,6 +11,9 @@ const directories: string[] = [];
 export function createMoneyTransfersPackageFixture(): Promise<string> {
   return createPackageFixture([...researchFiles.map(file => path.join(EXTERNAL_RESEARCH, file)), "data/taxonomy/money-transfer-countries.json", "data/localization/en/labels.json"]);
 }
+export function createCurrentAccountPackageFixture(): Promise<string> {
+  return createPackageFixture(["artifact-manifest.csv", "bop-annual.csv", "prepared-validation.json", "prepared-reconciliation.csv", "independent-verification.json"].map(file => path.join(EXTERNAL_RESEARCH, file)));
+}
 export function createForeignInvestmentPackageFixture(): Promise<string> {
   return createPackageFixture([...["artifact-manifest.csv", "fdi-flows-annual.csv", "prepared-validation.json", "prepared-reconciliation.csv", "independent-verification.json"].map(file => path.join(EXTERNAL_RESEARCH, file)), "data/taxonomy/foreign-investment.json", "data/localization/en/labels.json"]);
 }
