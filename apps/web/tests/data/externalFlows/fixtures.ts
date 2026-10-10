@@ -1,6 +1,6 @@
 import { cp, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import path from "node:path";
-import type { MoneyTransferEntity, MoneyTransferFact, MoneyTransfersAcceptance } from "../../../lib/data/externalFlows/types";
+import type { ForeignInvestmentAcceptance, ForeignInvestmentEntity, ForeignInvestmentFact, MoneyTransferEntity, MoneyTransferFact, MoneyTransfersAcceptance } from "../../../lib/data/externalFlows/types";
 
 export const EXTERNAL_RESEARCH = "docs/Raw Data/External/2026-10-10";
 const root = path.resolve(process.cwd(), "../..");
@@ -8,11 +8,18 @@ const scratch = path.join(root, ".superpowers/sdd/2026-10-10-money-from-abroad")
 const researchFiles = ["artifact-manifest.csv", "money-transfers-annual.csv", "bop-annual.csv", "prepared-validation.json", "prepared-reconciliation.csv", "independent-verification.json", "money-transfer-country-identities.csv"];
 const directories: string[] = [];
 
-export async function createMoneyTransfersPackageFixture(): Promise<string> {
+export function createMoneyTransfersPackageFixture(): Promise<string> {
+  return createPackageFixture([...researchFiles.map(file => path.join(EXTERNAL_RESEARCH, file)), "data/taxonomy/money-transfer-countries.json", "data/localization/en/labels.json"]);
+}
+export function createForeignInvestmentPackageFixture(): Promise<string> {
+  return createPackageFixture([...["artifact-manifest.csv", "fdi-flows-annual.csv", "prepared-validation.json", "prepared-reconciliation.csv", "independent-verification.json"].map(file => path.join(EXTERNAL_RESEARCH, file)), "data/taxonomy/foreign-investment.json", "data/localization/en/labels.json"]);
+}
+
+async function createPackageFixture(files: string[]): Promise<string> {
   await mkdir(scratch, { recursive: true });
   const directory = await mkdtemp(path.join(scratch, "fixture-"));
   directories.push(directory);
-  for (const name of [...researchFiles.map(file => path.join(EXTERNAL_RESEARCH, file)), "data/taxonomy/money-transfer-countries.json", "data/localization/en/labels.json"]) {
+  for (const name of files) {
     await mkdir(path.dirname(path.join(directory, name)), { recursive: true });
     await cp(path.join(root, name), path.join(directory, name));
   }
@@ -50,5 +57,32 @@ export function moneyTransferFacts(): MoneyTransferFact[] {
     transfer("transfer.sudan", 2019, "received", "400", "partial_months", 11), transfer("transfer.sudan", 2019, "sent", null, "blank", 0),
     transfer("transfer.other_countries", 2007, "received", "50"),
     { ...base, entityId: "bop.personal_transfers", year: 2019, measure: "received", valueUsd: "900", valueStatus: "numeric", monthsReported: null, sourceId: "source.nbg_balance_of_payments_bpm6", sourceSheet: "BOP–BPM6", sourceCells: "AE417", sourceUnit: "million_usd", vintage: "2026-09-30" },
+  ];
+}
+
+export async function readForeignInvestmentReport(directory: string): Promise<ForeignInvestmentAcceptance> {
+  return JSON.parse(await readFile(path.join(directory, "data/reports/foreign-investment-validation.json"), "utf8"));
+}
+
+export function foreignInvestmentEntities(): ForeignInvestmentEntity[] {
+  return [
+    { id: "fdi.total", dimension: null, kind: "total", labelKa: "პირდაპირი უცხოური ინვესტიციები, სულ" },
+    { id: "fdi.country.m49_826", dimension: "country", kind: "country", labelKa: "გაერთიანებული სამეფო" },
+    { id: "fdi.country.unknown", dimension: "country", kind: "unallocated", labelKa: "უცნობი" },
+    { id: "fdi.sector.k", dimension: "sector", kind: "sector", labelKa: "საფინანსო და სადაზღვევო საქმიანობა" },
+    { id: "fdi.region.guria", dimension: "region", kind: "region", labelKa: "გურია" },
+  ];
+}
+
+const fdiBase = { unit: "usd", basis: "actual", vintage: "2026-08-17", lastReviewedAt: "2026-10-10", sourceUnit: "thousand_usd", sourceSheet: "Sheet1", sourceCells: "B5" } as const;
+export function foreignInvestmentFacts(): ForeignInvestmentFact[] {
+  const fact = (entityId: string, year: number, valueUsd: string | null, sourceId: string, valueStatus: ForeignInvestmentFact["valueStatus"] = "numeric"): ForeignInvestmentFact => ({ ...fdiBase, entityId, year, valueUsd, valueStatus, sourceId });
+  return [
+    { ...fact("fdi.total", 2015, "1000", "source.geostat_fdi_by_quarters"), sourceUnit: "million_usd", vintage: "2026-09-08" },
+    fact("fdi.country.m49_826", 2015, "-120.5", "source.geostat_fdi_by_countries"),
+    fact("fdi.country.unknown", 2015, null, "source.geostat_fdi_by_countries", "not_applicable"),
+    fact("fdi.sector.k", 2016, "300", "source.geostat_fdi_by_sectors"),
+    fact("fdi.region.guria", 2015, null, "source.geostat_fdi_by_regions", "not_applicable"),
+    fact("fdi.region.guria", 2016, "2", "source.geostat_fdi_by_regions"),
   ];
 }
