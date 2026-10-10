@@ -76,5 +76,6 @@
   "common.poverty": "Poverty and inequality",
   "common.povertyRates": "Poverty",
   "common.povertyInequality": "Inequality",
-  "common.dataWages": "Data · Wages"
+  "common.dataWages": "Data · Wages",
+  "common.dataPoverty": "Data · Poverty and inequality"
 }

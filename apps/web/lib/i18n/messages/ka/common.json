@@ -76,5 +76,6 @@
   "common.poverty": "სიღარიბე და უთანასწორობა",
   "common.povertyRates": "სიღარიბე",
   "common.povertyInequality": "უთანასწორობა",
-  "common.dataWages": "მონაცემები · ხელფასები"
+  "common.dataWages": "მონაცემები · ხელფასები",
+  "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა"
 }
