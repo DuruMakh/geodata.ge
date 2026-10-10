@@ -8,7 +8,7 @@ export function useMoneyFromAbroadState(data: ClientMoneyTransfersData) {
   return useHashState(data, parseMoneyTransfersHash, serializeMoneyTransfersHash);
 }
 
-/** A page view kept in the URL hash; Foreign investment uses it with its own parse and serialize. */
+/** A page view kept in the URL hash; Foreign investment and Current account use it with its own parse and serialize. */
 export function useHashState<D, S>(data: D, parse: (hash: string, data: D) => S, serialize: (state: S) => string) {
   const [state, setState] = useState(() => parse("", data));
   const current = useRef(state);
