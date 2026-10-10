@@ -47,6 +47,12 @@ describe("births and deaths section", () => {
     expect(await render("17")).toContain("Births and deaths were equal in 2025.");
   });
 
+  it("a one-year streak names the year, not 'every year since'", async () => {
+    const html = await render("07");
+    expect(html).toContain("Deaths outnumbered births in 2025.");
+    expect(html).not.toContain("every year since 2025");
+  });
+
   it("renders in Georgian", async () => {
     const html = await render("country.georgia", "ka");
     expect(html).toContain("დაბადებები და გარდაცვალებები");

@@ -154,7 +154,7 @@ export function NationalVitalCharts({
             </>
           ) : (
             <ExplorerTable
-              caption={t("asfrChartAria", { first: curves.years[0]!, last: curves.years.at(-1)! })}
+              caption={`${t("asfrLabel")}, ${curves.years[0]!}–${curves.years.at(-1)!}`}
               rows={AGE_GROUPS.map((group) => ({
                 itemId: group,
                 kaLabel: t(`ageGroup.${group}`),

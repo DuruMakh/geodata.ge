@@ -10,7 +10,7 @@
   "demography.migrationTitle": "მიგრაცია",
   "demography.migrationDescription": "შემოსული და გასული მიგრანტები მოქალაქეობის მიხედვით.",
   "demography.birthsDeathsTitle": "შობადობა და სიკვდილიანობა",
-  "demography.birthsDeathsDescription": "დაბადებები, გარდაცვალებები, შობადობის კოეფიციენტი და სიცოცხლის ხანგრძლივობა.",
+  "demography.birthsDeathsDescription": "დაბადებები, გარდაცვალებები, ნაყოფიერება და სიცოცხლის ხანგრძლივობა.",
   "demography.cardFooter": "{year}: {persons} ადამიანი · {first}–{last}",
   "demography.migrationCardFooter": "{year}: წმინდა მიგრაცია {net} · {first}–{last}",
   "demography.unitLine": "ადამიანი, 1 იანვარს",
@@ -125,6 +125,7 @@
   "demography.vitalHeroLabel": "ბუნებრივი მატება, {year}",
   "demography.vitalRatio": "დაბადება 100 გარდაცვალებაზე",
   "demography.vitalDeathsSince": "{year} წლიდან ყოველ წელს გარდაცვალებათა რიცხვი დაბადებათა რიცხვს აღემატება.",
+  "demography.vitalDeathsAhead": "{year} წელს გარდაცვალებათა რიცხვი დაბადებათა რიცხვს აღემატებოდა.",
   "demography.vitalBirthsAhead": "{year} წელს დაბადებათა რიცხვი გარდაცვალებათა რიცხვს აღემატებოდა.",
   "demography.vitalEven": "{year} წელს დაბადებათა და გარდაცვალებათა რიცხვი თანაბარი იყო.",
   "demography.vitalSource": "წყარო: საქსტატი, ცოცხლად დაბადებულთა და გარდაცვლილთა რაოდენობა რეგიონებისა და თვითმმართველი ერთეულების მიხედვით, {first}–{last}. რიცხვები რეგისტრირებულ მოვლენებს ასახავს და აღწერით გადათვლისას არ იცვლება.",
@@ -171,7 +172,6 @@
   "demography.birthsSource": "წყარო: საქსტატი, ცოცხლად დაბადებულთა და გარდაცვლილთა რაოდენობა რეგიონებისა და თვითმმართველი ერთეულების მიხედვით, {first}–{last}.",
   "demography.nationalSource": "წყარო: საქსტატი, ნაყოფიერების კოეფიციენტები და სიცოცხლის მოსალოდნელი ხანგრძლივობა დაბადებისას, საქართველო, {first}–{last}.",
   "demography.tfrChartAria": "შობადობის ჯამობრივი კოეფიციენტი, საქართველო, {first}–{last}",
-  "demography.asfrChartAria": "დაბადებები 1,000 ქალზე დედის ასაკის მიხედვით, თითო ხაზი თითო წელზე, {first} და {last} ფერადად",
   "demography.lifeChartAria": "სიცოცხლის მოსალოდნელი ხანგრძლივობა დაბადებისას, სულ, მამაკაცები და ქალები, საქართველო, {first}–{last}",
   "demography.birthsCardFooter": "{year}: {births} დაბადება · {first}–{last}"
 }

@@ -10,7 +10,7 @@
   "demography.migrationTitle": "Migration",
   "demography.migrationDescription": "Immigrants and emigrants by citizenship.",
   "demography.birthsDeathsTitle": "Births, deaths and fertility",
-  "demography.birthsDeathsDescription": "Births, deaths, the birth rate and life expectancy.",
+  "demography.birthsDeathsDescription": "Births, deaths, fertility and life expectancy.",
   "demography.cardFooter": "{year}: {persons} people · {first}–{last}",
   "demography.migrationCardFooter": "{year}: net migration {net} · {first}–{last}",
   "demography.unitLine": "persons, on 1 January",
@@ -125,6 +125,7 @@
   "demography.vitalHeroLabel": "Natural increase, {year}",
   "demography.vitalRatio": "Births per 100 deaths",
   "demography.vitalDeathsSince": "Deaths have outnumbered births every year since {year}.",
+  "demography.vitalDeathsAhead": "Deaths outnumbered births in {year}.",
   "demography.vitalBirthsAhead": "Births outnumbered deaths in {year}.",
   "demography.vitalEven": "Births and deaths were equal in {year}.",
   "demography.vitalSource": "Source: Geostat, live births and deaths by region and self-governed unit, {first}–{last}. Counts are registered events and do not change at the census re-base.",
@@ -171,7 +172,6 @@
   "demography.birthsSource": "Source: Geostat, live births and deaths by region and self-governed unit, {first}–{last}.",
   "demography.nationalSource": "Source: Geostat, fertility rates and life expectancy at birth, Georgia, {first}–{last}.",
   "demography.tfrChartAria": "Total fertility rate, Georgia, {first}–{last}",
-  "demography.asfrChartAria": "Births per 1,000 women by mother's age, one line per year, {first} and {last} in colour",
   "demography.lifeChartAria": "Life expectancy at birth, total, men and women, Georgia, {first}–{last}",
   "demography.birthsCardFooter": "{year}: {births} births · {first}–{last}"
 }

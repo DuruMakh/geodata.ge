@@ -55,7 +55,7 @@ export function VitalSection({
   const values = (record: Record<number, number | null>, sign: 1 | -1) => model.years.map((year) => (record[year] === null ? null : sign * record[year]!));
   const streakSentence =
     streak.kind === "deaths-ahead"
-      ? t("vitalDeathsSince", { year: streak.since })
+      ? t(streak.since === latest.year ? "vitalDeathsAhead" : "vitalDeathsSince", { year: streak.since })
       : t(streak.kind === "even" ? "vitalEven" : "vitalBirthsAhead", { year: streak.year });
 
   return (
@@ -100,7 +100,7 @@ export function VitalSection({
               wrapRowLabels
               rowLabelsLocalized
               years={model.years}
-              firstColumnLabel={t("placeHeader")}
+              firstColumnLabel={t("seriesHeader")}
               unit={UNIT_PERSONS}
               share={false}
               showChangeColumn={false}
