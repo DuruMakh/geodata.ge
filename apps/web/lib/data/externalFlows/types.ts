@@ -24,3 +24,29 @@ export type MoneyTransfersAcceptance = {
 export function moneyTransferFactKey(fact: Pick<MoneyTransferFact, "entityId" | "measure" | "year">): string {
   return `${fact.entityId}:${fact.measure}:${fact.year}`;
 }
+
+export type ForeignInvestmentDimension = "country" | "sector" | "region";
+export const FOREIGN_INVESTMENT_DIMENSIONS: readonly ForeignInvestmentDimension[] = ["country", "sector", "region"];
+export type ForeignInvestmentEntity = { id: string; dimension: ForeignInvestmentDimension | null; kind: "total" | "country" | "unallocated" | "remainder" | "sector" | "region"; labelKa: string };
+export const FOREIGN_INVESTMENT_TOTAL_ID = "fdi.total";
+export const FOREIGN_INVESTMENT_SOURCES = {
+  total: "source.geostat_fdi_by_quarters",
+  country: "source.geostat_fdi_by_countries",
+  sector: "source.geostat_fdi_by_sectors",
+  region: "source.geostat_fdi_by_regions",
+} as const;
+/** Each breakdown keeps Geostat's own first year; complete years end in 2025. */
+export const FOREIGN_INVESTMENT_YEARS = { total: 1996, country: 1996, sector: 2016, region: 2009, last: 2025 } as const;
+export type ForeignInvestmentFact = {
+  entityId: string; year: number; valueUsd: string | null; unit: "usd"; basis: "actual"; valueStatus: "numeric" | "not_applicable";
+  sourceId: string; sourceSheet: string; sourceCells: string; sourceUnit: "thousand_usd" | "million_usd"; vintage: string; lastReviewedAt: string;
+};
+export type ForeignInvestmentData = { entities: ForeignInvestmentEntity[]; facts: ForeignInvestmentFact[] };
+export type ForeignInvestmentAcceptance = {
+  status: "passed"; scope: "annual_foreign_direct_investment"; years: Record<"total" | ForeignInvestmentDimension, number[]>;
+  entities: Record<ForeignInvestmentDimension, number>; observations: number; valueStatusCounts: { numeric: number; not_applicable: number };
+  inputSha256: Record<string, string>; canonicalSha256: string; catalogueSha256: string; englishLabelsSha256: string; reviewedAt: string;
+};
+export function foreignInvestmentFactKey(fact: Pick<ForeignInvestmentFact, "entityId" | "year">): string {
+  return `${fact.entityId}:${fact.year}`;
+}

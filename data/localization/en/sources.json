@@ -1162,6 +1162,34 @@
     },
     "derivation": null
   },
+  "source.geostat_fdi_by_quarters": {
+    "name": {
+      "text": "Foreign direct investment by quarter",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_fdi_by_countries": {
+    "name": {
+      "text": "Foreign direct investment by country",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_fdi_by_sectors": {
+    "name": {
+      "text": "Foreign direct investment by economic activity (NACE Rev.2)",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_fdi_by_regions": {
+    "name": {
+      "text": "Foreign direct investment by region",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
   "source.geostat_earnings_annual_headline": {
     "name": { "text": "Average monthly nominal earnings of employees", "reviewedAt": "2026-10-10" },
     "derivation": null

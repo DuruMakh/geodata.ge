@@ -1,0 +1,644 @@
+[
+  {
+    "id": "fdi.total",
+    "dimension": null,
+    "kind": "total",
+    "labelKa": "პირდაპირი უცხოური ინვესტიციები, სულ"
+  },
+  {
+    "id": "fdi.country.m49_031",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "აზერბაიჯანი"
+  },
+  {
+    "id": "fdi.country.m49_032",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "არგენტინა"
+  },
+  {
+    "id": "fdi.country.m49_036",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ავსტრალია"
+  },
+  {
+    "id": "fdi.country.m49_040",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ავსტრია"
+  },
+  {
+    "id": "fdi.country.m49_044",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ბაჰამის კუნძულები"
+  },
+  {
+    "id": "fdi.country.m49_051",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "სომხეთი"
+  },
+  {
+    "id": "fdi.country.m49_056",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ბელგია"
+  },
+  {
+    "id": "fdi.country.m49_084",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ბელიზი"
+  },
+  {
+    "id": "fdi.country.m49_092",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ბრიტანეთის ვირჯინის კუნძულები"
+  },
+  {
+    "id": "fdi.country.m49_100",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ბულგარეთი"
+  },
+  {
+    "id": "fdi.country.m49_112",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ბელარუსი"
+  },
+  {
+    "id": "fdi.country.m49_124",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "კანადა"
+  },
+  {
+    "id": "fdi.country.m49_136",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "კაიმანის კუნძულები"
+  },
+  {
+    "id": "fdi.country.m49_156",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ჩინეთი"
+  },
+  {
+    "id": "fdi.country.m49_191",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ხორვატია"
+  },
+  {
+    "id": "fdi.country.m49_196",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "კვიპროსი"
+  },
+  {
+    "id": "fdi.country.m49_203",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ჩეხეთი"
+  },
+  {
+    "id": "fdi.country.m49_208",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "დანია"
+  },
+  {
+    "id": "fdi.country.m49_233",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ესტონეთი"
+  },
+  {
+    "id": "fdi.country.m49_246",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ფინეთი"
+  },
+  {
+    "id": "fdi.country.m49_250",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "საფრანგეთი"
+  },
+  {
+    "id": "fdi.country.m49_276",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "გერმანია"
+  },
+  {
+    "id": "fdi.country.m49_292",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "გიბრალტარი"
+  },
+  {
+    "id": "fdi.country.m49_300",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "საბერძნეთი"
+  },
+  {
+    "id": "fdi.country.m49_344",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ჰონკონგის სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი"
+  },
+  {
+    "id": "fdi.country.m49_348",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "უნგრეთი"
+  },
+  {
+    "id": "fdi.country.m49_352",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ისლანდია"
+  },
+  {
+    "id": "fdi.country.m49_356",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ინდოეთი"
+  },
+  {
+    "id": "fdi.country.m49_364",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ირანი"
+  },
+  {
+    "id": "fdi.country.m49_368",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ერაყი"
+  },
+  {
+    "id": "fdi.country.m49_372",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ირლანდია"
+  },
+  {
+    "id": "fdi.country.m49_376",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ისრაელი"
+  },
+  {
+    "id": "fdi.country.m49_380",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "იტალია"
+  },
+  {
+    "id": "fdi.country.m49_392",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "იაპონია"
+  },
+  {
+    "id": "fdi.country.m49_398",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ყაზახეთი"
+  },
+  {
+    "id": "fdi.country.m49_400",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "იორდანია"
+  },
+  {
+    "id": "fdi.country.m49_410",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "სამხრეთ კორეა"
+  },
+  {
+    "id": "fdi.country.m49_417",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ყირგიზეთი"
+  },
+  {
+    "id": "fdi.country.m49_422",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ლიბანი"
+  },
+  {
+    "id": "fdi.country.m49_428",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ლატვია"
+  },
+  {
+    "id": "fdi.country.m49_434",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ლიბია"
+  },
+  {
+    "id": "fdi.country.m49_438",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ლიხტენშტაინი"
+  },
+  {
+    "id": "fdi.country.m49_440",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ლიეტუვა"
+  },
+  {
+    "id": "fdi.country.m49_442",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ლუქსემბურგი"
+  },
+  {
+    "id": "fdi.country.m49_470",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "მალტა"
+  },
+  {
+    "id": "fdi.country.m49_480",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "მავრიკი"
+  },
+  {
+    "id": "fdi.country.m49_498",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "მოლდოვა"
+  },
+  {
+    "id": "fdi.country.m49_528",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ნიდერლანდები"
+  },
+  {
+    "id": "fdi.country.m49_578",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ნორვეგია"
+  },
+  {
+    "id": "fdi.country.m49_584",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "მარშალის კუნძულები"
+  },
+  {
+    "id": "fdi.country.m49_591",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "პანამა"
+  },
+  {
+    "id": "fdi.country.m49_608",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ფილიპინები"
+  },
+  {
+    "id": "fdi.country.m49_616",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "პოლონეთი"
+  },
+  {
+    "id": "fdi.country.m49_620",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "პორტუგალია"
+  },
+  {
+    "id": "fdi.country.m49_634",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "კატარი"
+  },
+  {
+    "id": "fdi.country.m49_642",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "რუმინეთი"
+  },
+  {
+    "id": "fdi.country.m49_643",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "რუსეთი"
+  },
+  {
+    "id": "fdi.country.m49_659",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "სენტ-კიტსი და ნევისი"
+  },
+  {
+    "id": "fdi.country.m49_682",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "საუდის არაბეთი"
+  },
+  {
+    "id": "fdi.country.m49_690",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "სეიშელის კუნძულები"
+  },
+  {
+    "id": "fdi.country.m49_703",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "სლოვაკეთი"
+  },
+  {
+    "id": "fdi.country.m49_705",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "სლოვენია"
+  },
+  {
+    "id": "fdi.country.m49_724",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ესპანეთი"
+  },
+  {
+    "id": "fdi.country.m49_752",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "შვედეთი"
+  },
+  {
+    "id": "fdi.country.m49_756",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "შვეიცარია"
+  },
+  {
+    "id": "fdi.country.m49_760",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "სირია"
+  },
+  {
+    "id": "fdi.country.m49_784",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "არაბთა გაერთიანებული საამიროები"
+  },
+  {
+    "id": "fdi.country.m49_792",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "თურქეთი"
+  },
+  {
+    "id": "fdi.country.m49_795",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "თურქმენეთი"
+  },
+  {
+    "id": "fdi.country.m49_804",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "უკრაინა"
+  },
+  {
+    "id": "fdi.country.m49_818",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ეგვიპტე"
+  },
+  {
+    "id": "fdi.country.m49_826",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "გაერთიანებული სამეფო"
+  },
+  {
+    "id": "fdi.country.m49_840",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "ამერიკის შეერთებული შტატები"
+  },
+  {
+    "id": "fdi.country.m49_860",
+    "dimension": "country",
+    "kind": "country",
+    "labelKa": "უზბეკეთი"
+  },
+  {
+    "id": "fdi.country.unknown",
+    "dimension": "country",
+    "kind": "unallocated",
+    "labelKa": "უცნობი"
+  },
+  {
+    "id": "fdi.country.international_organizations",
+    "dimension": "country",
+    "kind": "unallocated",
+    "labelKa": "საერთაშორისო ორგანიზაციები"
+  },
+  {
+    "id": "fdi.country.other_remainder",
+    "dimension": "country",
+    "kind": "remainder",
+    "labelKa": "სხვა ქვეყნები (საქსტატის ნაშთი)"
+  },
+  {
+    "id": "fdi.sector.a",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "სოფლის, სატყეო და თევზის მეურნეობა"
+  },
+  {
+    "id": "fdi.sector.b",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "სამთომოპოვებითი მრეწველობა"
+  },
+  {
+    "id": "fdi.sector.c",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "დამამუშავებელი მრეწველობა"
+  },
+  {
+    "id": "fdi.sector.d",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "ელექტროენერგიის, აირის, ორთქლის და კონდიცირებული ჰაერის მიწოდება"
+  },
+  {
+    "id": "fdi.sector.e",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "წყალმომარაგება; კანალიზაცია, ნარჩენების მართვა და დაბინძურებისაგან გასუფთავების საქმიანობები"
+  },
+  {
+    "id": "fdi.sector.f",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "მშენებლობა"
+  },
+  {
+    "id": "fdi.sector.g",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "საბითუმო და საცალო ვაჭრობა; ავტომობილების და მოტოციკლების რემონტი"
+  },
+  {
+    "id": "fdi.sector.h",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "ტრანსპორტი და დასაწყობება"
+  },
+  {
+    "id": "fdi.sector.i",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "განთავსების საშუალებებით უზრუნველყოფის და საკვების მიწოდების საქმიანობები"
+  },
+  {
+    "id": "fdi.sector.j",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "ინფორმაცია და კომუნიკაცია"
+  },
+  {
+    "id": "fdi.sector.k",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "საფინანსო და სადაზღვევო საქმიანობები"
+  },
+  {
+    "id": "fdi.sector.l",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "უძრავ ქონებასთან დაკავშირებული საქმიანობები"
+  },
+  {
+    "id": "fdi.sector.m",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "პროფესიული, სამეცნიერო და ტექნიკური საქმიანობები"
+  },
+  {
+    "id": "fdi.sector.n",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "ადმინისტრაციული და დამხმარე მომსახურების საქმიანობები"
+  },
+  {
+    "id": "fdi.sector.p",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "განათლება"
+  },
+  {
+    "id": "fdi.sector.q",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "ჯანდაცვა და სოციალური მომსახურების საქმიანობები"
+  },
+  {
+    "id": "fdi.sector.r",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "ხელოვნება, გართობა და დასვენება"
+  },
+  {
+    "id": "fdi.sector.s",
+    "dimension": "sector",
+    "kind": "sector",
+    "labelKa": "სხვა სახის მომსახურება"
+  },
+  {
+    "id": "fdi.region.tbilisi",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "თბილისი"
+  },
+  {
+    "id": "fdi.region.adjara",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "აჭარა"
+  },
+  {
+    "id": "fdi.region.guria",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "გურია"
+  },
+  {
+    "id": "fdi.region.imereti",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "იმერეთი"
+  },
+  {
+    "id": "fdi.region.kakheti",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "კახეთი"
+  },
+  {
+    "id": "fdi.region.mtskheta_mtianeti",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "მცხეთა-მთიანეთი"
+  },
+  {
+    "id": "fdi.region.racha_lechkhumi_kvemo_svaneti",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "რაჭა-ლეჩხუმი და ქვემო სვანეთი"
+  },
+  {
+    "id": "fdi.region.samegrelo_zemo_svaneti",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "სამეგრელო-ზემო სვანეთი"
+  },
+  {
+    "id": "fdi.region.samtskhe_javakheti",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "სამცხე-ჯავახეთი"
+  },
+  {
+    "id": "fdi.region.kvemo_kartli",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "ქვემო ქართლი"
+  },
+  {
+    "id": "fdi.region.shida_kartli",
+    "dimension": "region",
+    "kind": "region",
+    "labelKa": "შიდა ქართლი"
+  }
+]

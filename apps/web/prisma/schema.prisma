@@ -86,6 +86,7 @@ model SourceDocument {
   tradePartnerFacts TradePartnerFact[]
   wagesFacts WagesFact[]
   moneyTransferFacts MoneyTransferFact[]
+  foreignInvestmentFacts ForeignInvestmentFact[]
   tradeProductFacts TradeProductFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
@@ -126,6 +127,8 @@ model ImportRun {
   wagesFacts WagesFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
+  foreignInvestmentEntities ForeignInvestmentEntity[]
+  foreignInvestmentFacts ForeignInvestmentFact[]
   tradeProductEntities TradeProductEntity[]
   tradeProductFacts TradeProductFact[]
   regionalEconomyFacts RegionalEconomyFact[]
@@ -581,6 +584,38 @@ model MoneyTransferFact {
   importRun        ImportRun? @relation(fields: [importRunId], references: [id])
 
   @@id([entityId, measure, year])
+}
+
+model ForeignInvestmentEntity {
+  id          String  @id
+  dimension   String?
+  kind        String
+  labelKa     String
+  importRunId String?
+  importRun   ImportRun? @relation(fields: [importRunId], references: [id])
+  facts       ForeignInvestmentFact[]
+}
+
+model ForeignInvestmentFact {
+  entityId         String
+  entity           ForeignInvestmentEntity @relation(fields: [entityId], references: [id])
+  year             Int
+  valueUsd         Decimal? @db.Decimal(40, 20)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCells      String
+  sourceUnit       String
+  vintage          String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime @db.Date
+  importRunId      String?
+  importRun        ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([entityId, year])
 }
 
 model TradeProductEntity {

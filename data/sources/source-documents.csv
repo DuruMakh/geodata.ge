@@ -166,6 +166,10 @@ source.geostat_trade_export_product_by_4_digit_2015_2026,"საქსტატ�
 source.geostat_trade_import_product_by_4_digit_2015_2026,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 2015–2025",https://www.geostat.ge/media/82884/Import-Product-by-4-digit-2015-2026.xlsx,2026-10-10
 source.nbg_money_transfers_by_countries,ფულადი გზავნილები ქვეყნების მიხედვით,docs/Raw Data/External/2026-10-10/official/nbg/REMC_money-transfers-by-countries-eng.xlsx,2026-10-10
 source.nbg_balance_of_payments_bpm6,საქართველოს საგადამხდელო ბალანსი (BPM6),docs/Raw Data/External/2026-10-10/official/nbg/BOP-6_bopbpm6eng.xlsx,2026-10-10
+source.geostat_fdi_by_quarters,პირდაპირი უცხოური ინვესტიციები კვარტლების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng_by_Quarters.xlsx,2026-10-10
+source.geostat_fdi_by_countries,პირდაპირი უცხოური ინვესტიციები ქვეყნების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-countries.xlsx,2026-10-10
+source.geostat_fdi_by_sectors,პირდაპირი უცხოური ინვესტიციები ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-sectors-NACE-2.xlsx,2026-10-10
+source.geostat_fdi_by_regions,პირდაპირი უცხოური ინვესტიციები რეგიონების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng_regions.xlsx,2026-10-10
 source.geostat_earnings_annual_headline,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი,docs/Raw Data/Wages/geostat-earnings-annual/official/01-earnings-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_activity,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/02-earnings-by-activity-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_sex,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი ეკონომიკური საქმიანობის სახეებისა და სქესის მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/03-earnings-by-sex-annual.xlsx,2026-10-10

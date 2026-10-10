@@ -3,8 +3,8 @@ import type { MethodologyContent } from "../../types";
 export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
   "id": "external-flows",
   "slug": "external-flows",
-  "title": "Money from abroad",
-  "summary": "Money transfers into and out of Georgia by country, annually in nominal USD.",
+  "title": "External flows",
+  "summary": "Money transfers and foreign direct investment, Georgia, annually in nominal USD.",
   "reviewedAt": "2026-10-10",
   "archiveManifestId": "external-flows",
   "coverageSource": {
@@ -13,7 +13,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
   "canonicalDocuments": [
     "docs/data-methodology/external-flows-annual.md"
   ],
-  "disclosure": "The page uses a reviewed annual subset of the external-flows research package: money transfers by country and the balance-of-payments personal transfers. Monthly data, 2026, foreign direct investment and the current account are outside this page.",
+  "disclosure": "The External flows pages use reviewed annual subsets of the external-flows research package: money transfers by country with the balance-of-payments personal transfers (Money from abroad), and Geostat's foreign direct investment by country, sector and region (Foreign investment). Monthly and quarterly data, 2026 and the current account are outside these pages.",
   "keyFacts": [
     {
       "label": "Coverage",
@@ -41,7 +41,8 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "scope",
       "title": "What does the page cover?",
       "paragraphs": [
-        "NBG's money transfers through fast transfer systems, 2000–2025: total inflow and outflow and every published country. Each annual value is the sum of the published months. Personal transfers from the balance of payments (credit and debit) are added alongside. Monthly data, 2026 months, transfers by system, foreign direct investment and the current account are excluded."
+        "NBG's money transfers through fast transfer systems, 2000–2025: total inflow and outflow and every published country. Each annual value is the sum of the published months. Personal transfers from the balance of payments (credit and debit) are added alongside. Monthly data, 2026 months, transfers by system, foreign direct investment and the current account are excluded.",
+        "Foreign investment shows Geostat's annual foreign direct investment into Georgia: the total for 1996–2025, by country for 1996–2025, by economic sector (NACE Rev.2 sections) for 2016–2025 and by region for 2009–2025. The investment stock, the split into equity, reinvested earnings and debt, and NBG's balance-of-payments direct-investment lines are not on the page."
       ]
     },
     {
@@ -76,7 +77,8 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "limitations",
       "title": "Vintages and revisions",
       "paragraphs": [
-        "The money-transfer table is the 15 September 2026 release and the balance of payments the 30 September 2026 release. NBG revises past years regularly, so figures quoted from earlier releases can differ."
+        "The money-transfer table is the 15 September 2026 release and the balance of payments the 30 September 2026 release. NBG revises past years regularly, so figures quoted from earlier releases can differ.",
+        "Geostat's annual FDI tables are the 17 August 2026 release and the quarterly totals the 8 September 2026 release. Geostat's annual release may adjust the previous five years."
       ]
     },
     {
@@ -84,7 +86,27 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "validation",
       "title": "How are the figures checked?",
       "paragraphs": [
-        "The accepted subset holds 9,312 money-transfer observations (14 blank and 140 partial-month values) and 52 personal-transfer observations. Preparation checks the research package's file fingerprints and its independent verification, compares each year's countries with the total, and rejects an omitted year, a duplicate, a blank turned into zero and a partial-month value without its month count."
+        "The accepted subset holds 9,312 money-transfer observations (14 blank and 140 partial-month values) and 52 personal-transfer observations. Preparation checks the research package's file fingerprints and its independent verification, compares each year's countries with the total, and rejects an omitted year, a duplicate, a blank turned into zero and a partial-month value without its month count.",
+        "Foreign investment holds 2,707 observations. Preparation checks the same fingerprints and independent verification, requires every year of every country, sector and region, and checks that each breakdown adds up to Geostat's annual total within the package's recorded rounding tolerance (regions from 2016). Geostat's '-' stays missing and is never turned into zero."
+      ]
+    },
+    {
+      "id": "fdi-sources",
+      "kind": "classification",
+      "title": "Geostat's and NBG's investment figures",
+      "paragraphs": [
+        "Foreign direct investment is investment by a foreign investor who holds 10% or more of the shares or voting rights in an enterprise in Georgia, together with every later transaction between the two, such as reinvested earnings and loans.",
+        "Geostat compiles foreign direct investment from its survey of enterprises, with NBG data on financial corporations and ministry privatization data. NBG's balance of payments shows direct investment on the BPM6 asset and liability basis. The two totals differ every year, by up to USD 192.6 million in 2023. Foreign investment uses Geostat's figure only and never mixes the two."
+      ]
+    },
+    {
+      "id": "fdi-breakdowns",
+      "kind": "classification",
+      "title": "Countries, sectors and regions",
+      "paragraphs": [
+        "Country means the direct investor's country, not the ultimate owner's, so holding locations such as Malta or the Netherlands can rank high. The country tab lists the end year's top 10 countries and one Other countries series: the total less those ten, which also holds Unknown, International organizations and Geostat's remainder.",
+        "Geostat allocates investment by enterprises' actual addresses and assigns the whole financial sector to Tbilisi. Guria, Samegrelo-Zemo Svaneti, Imereti, Racha-Lechkhumi and Kvemo Svaneti, Shida Kartli and Mtskheta-Mtianeti are published separately only from 2016; their earlier years are missing, so regions do not add up to the total before 2016.",
+        "Values can be negative when investors withdraw capital, make losses or repay loans. Negative values are kept, drawn below zero and shown with their sign in the ranking."
       ]
     },
     {
@@ -92,7 +114,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "Three unedited NBG files retrieved on 10 October 2026 are available: money transfers by country, the balance of payments (BPM6) and the external-sector statistics methodology. Excel follows the chosen direction, years and all selected series."
+        "Three unedited NBG files retrieved on 10 October 2026 are available: money transfers by country, the balance of payments (BPM6) and the external-sector statistics methodology. Five Geostat files retrieved the same day cover foreign direct investment: the quarterly totals, the country, sector and region tables and Geostat's metadata. Excel follows the chosen direction or breakdown, years and all selected series."
       ]
     }
   ],
