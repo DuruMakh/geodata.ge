@@ -13,6 +13,11 @@ every run. The database is never edited directly and never becomes a second
 editing surface — if the database and the CSVs ever disagree, the CSVs win and
 the import is re-run.
 
+The complete replacement and its parity checks share a five-minute transaction
+limit; opening that transaction has a separate 30-second wait limit. Exceeding
+either limit fails the import. Validation and exact row parity remain inside the
+same all-or-nothing transaction, and a failure preserves the previous mirror.
+
 ## What the import loads
 
 Unemployment uses the existing single import transaction. Source IDs retain their original research identity in each observation; the source-register relation adds the required `source.` prefix. The importer validates all observations and registered references before opening the transaction, deletes unemployment children before source parents, creates rows with the active run ID and reloads them through the serving mapper. Exact field/value parity must pass before commit. Both numeric fields use Decimal(40,20), and displayed values preserve one-decimal precision. The private table has row-level security enabled and grants no access to `anon` or `authenticated`. Local verification covers schema generation, mapping and rejection of missing/mismatched rows; applying the migration and importing a live mirror requires delivery authorization.
