@@ -11,6 +11,7 @@ import { loadServedTradeOverviewData } from "../data/tradeOverview/importTradeOv
 import { loadServedTradePartnersData } from "../data/tradePartners/importTradePartners";
 import { loadServedMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
 import { loadServedForeignInvestmentData } from "../data/externalFlows/importForeignInvestment";
+import { loadServedCurrentAccountFacts } from "../data/externalFlows/importCurrentAccount";
 import { loadServedTradeProductsData } from "../data/tradeProducts/importTradeProducts";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
@@ -41,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: foreignInvestmentFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: foreignInvestmentFacts }, currentAccountFacts] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -58,6 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedDemographyData(),
     loadServedTradeProductsData(),
     loadServedForeignInvestmentData(),
+    loadServedCurrentAccountFacts(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -71,7 +73,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tradePartnersModified = new Date(tradePartnerFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const moneyTransfersModified = new Date(moneyTransferFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const foreignInvestmentModified = new Date(foreignInvestmentFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
-  const externalModified = moneyTransfersModified > foreignInvestmentModified ? moneyTransfersModified : foreignInvestmentModified;
+  const currentAccountModified = new Date(currentAccountFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  const externalModified = new Date(Math.max(moneyTransfersModified.getTime(), foreignInvestmentModified.getTime(), currentAccountModified.getTime()));
   const tradeProductsModified = new Date(tradeProductFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const economyModified = gdpModified > sectorsModified ? gdpModified : sectorsModified;
   const demographyModified = new Date(demographyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -119,6 +122,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/external`, lastModified: externalModified },
     { url: `${siteUrl}/explorer/external/money-from-abroad`, lastModified: moneyTransfersModified },
     { url: `${siteUrl}/explorer/external/foreign-investment`, lastModified: foreignInvestmentModified },
+    { url: `${siteUrl}/explorer/external/current-account`, lastModified: currentAccountModified },
     { url: `${siteUrl}/explorer/trade/products`, lastModified: tradeProductsModified },
     ...UNEMPLOYMENT_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: unemploymentModified })),
     ...regions.map(region => ({ url: `${siteUrl}${unemploymentRegionHref(region.id)}`, lastModified: new Date(unemploymentFacts.filter(fact => fact.dimension === "region" && fact.groupId === region.id).map(fact => fact.lastReviewedAt).sort().at(-1)!) })),

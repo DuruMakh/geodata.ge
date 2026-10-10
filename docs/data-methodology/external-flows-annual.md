@@ -92,3 +92,16 @@ The approved 2026-10-10 Foreign investment design (`docs/superpowers/specs/2026-
 - **Geostat only.** NBG's direct-investment liabilities differ every year and are not served or mixed in.
 
 The private mirror stores `ForeignInvestmentEntity` and `ForeignInvestmentFact` (key entity, year; nullable `Decimal(40,20)`), with RLS on and public grants revoked, and is compared field by field inside the existing import transaction. The methodology archive publishes Geostat's annual (quarterly table), country, sector and region workbooks and its FDI metadata note. Publishing, live migration and live import remain separate authorized operations.
+
+## Current account serving subset
+
+The approved 2026-10-10 Current account design (`docs/superpowers/specs/2026-10-10-current-account-design.md`) serves only the `current_account`, `goods`, `services`, `primary_income` and `secondary_income` rows of `bop-annual.csv` (NBG BPM6, vintage 2026-09-30), credit, debit and net, for 2000–2025. The services split, capital and financial accounts, quarters and 2026 stay in the research package.
+
+`npm run data:prepare-current-account` reads `bop-annual.csv`, `prepared-validation.json` and `prepared-reconciliation.csv` after proving them against `artifact-manifest.csv` and a passing `independent-verification.json`, and requires each year's passing package controls. Validation rejects a missing or extra series, flow or year, a duplicate, a value that does not keep its published decimals, net that differs from credit minus debit by more than 1 USD, and a year whose four parts do not add up to the current account for credit, debit and net within 1 USD. It writes `data/imports/current-account-annual.csv` (UTF-8 with BOM, 390 rows: five series `ca.balance`, `ca.goods`, `ca.services`, `ca.primary_income`, `ca.secondary_income` × three flows × 26 years) and `data/reports/current-account-validation.json`. `npm run data:check-current-account` reproduces both byte for byte and runs in `data:validate`.
+
+- **% of GDP** is computed at build time from the served `nominal_usd` GDP series; preliminary GDP years are named on the page.
+- **Negative values** are kept as published and drawn below zero.
+- **Goods** differ from the Trade pages (change of ownership vs border crossing; FOB vs CIF); the methodology page explains this with the 2025 figures.
+- **Secondary income** contains the balance-of-payments personal transfers; it is not added to Money from abroad.
+
+The private mirror stores `CurrentAccountFact` (key series, flow, year; `Decimal(40,20)`), with RLS on and public grants revoked, and is compared field by field inside the existing import transaction. The methodology archive's BPM6 workbook and external-sector methodology note, already published for Money from abroad, are the page's sources. Publishing, live migration and live import remain separate authorized operations.

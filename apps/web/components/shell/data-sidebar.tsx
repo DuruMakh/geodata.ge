@@ -41,6 +41,7 @@ export function DataSidebar() {
   const externalActive = pathname.includes("/explorer/external");
   const moneyFromAbroadActive = pathname.endsWith("/explorer/external/money-from-abroad");
   const foreignInvestmentActive = pathname.endsWith("/explorer/external/foreign-investment");
+  const currentAccountActive = pathname.endsWith("/explorer/external/current-account");
   const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
   const demographyActive = pathname.includes("/explorer/demography");
   const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !tradeActive && !externalActive && !demographyActive;
@@ -374,6 +375,15 @@ export function DataSidebar() {
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${foreignInvestmentActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${foreignInvestmentActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.foreignInvestment")}
+            </Link> : null}
+            {externalActive ? <Link href={pageHref("/explorer/external/current-account", locale)} data-testid="current-account-link" aria-current={currentAccountActive ? "page" : undefined}
+              onNavigate={(event) => {
+                if (currentAccountActive) event.preventDefault();
+                setSheetOpen(false);
+              }}
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${currentAccountActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${currentAccountActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+              {message(messages, "common.currentAccount")}
             </Link> : null}
             <Link
               href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}
