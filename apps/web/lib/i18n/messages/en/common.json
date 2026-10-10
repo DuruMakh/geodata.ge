@@ -60,5 +60,6 @@
   "common.tradePartners": "Trading partners",
   "common.dataDemography": "Data · Demography",
   "common.demographyPopulation": "Population",
-  "common.demographyMigration": "Migration"
+  "common.demographyMigration": "Migration",
+  "common.demographyBirthsDeaths": "Births and deaths"
 }

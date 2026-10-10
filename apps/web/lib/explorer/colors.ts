@@ -126,6 +126,12 @@ export const SERIES_COLORS: Record<string, string> = {
   "citizenship.azerbaijan": "#A5822B",
   "citizenship.ukraine": "#7A4E8C",
   "citizenship.all_other_computed": OTHER_COLOR,
+
+  // Vital events (births-deaths spec §6) and the sexes (section spec §7, reserved for Age and sex, first used by life expectancy).
+  "vital.births": "#1F6E56",
+  "vital.deaths": "#8C5A32",
+  "sex.male": "#3D5A98",
+  "sex.female": "#C26E4C",
 };
 
 // Open-ended top-level sets cycle through the editorial palette by position so

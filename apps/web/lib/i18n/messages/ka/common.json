@@ -60,5 +60,6 @@
   "common.tradePartners": "სავაჭრო პარტნიორები",
   "common.dataDemography": "მონაცემები · დემოგრაფია",
   "common.demographyPopulation": "მოსახლეობა",
-  "common.demographyMigration": "მიგრაცია"
+  "common.demographyMigration": "მიგრაცია",
+  "common.demographyBirthsDeaths": "შობადობა და სიკვდილიანობა"
 }

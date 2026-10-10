@@ -15,14 +15,14 @@ import {
 beforeEach(resetDemographyCacheForTests);
 
 test("serving reads the reviewed CSVs without the Geostat workbook readers", async () => {
-  expect(await loadDemographyFacts()).toHaveLength(2_846);
+  expect(await loadDemographyFacts()).toHaveLength(5_525);
 });
 
 test("serving projects exact decimals to numbers only after validation", async () => {
   vi.stubEnv("GEODATA_DATA_SOURCE", "csv");
   try {
     const served = await loadServedDemographyData();
-    expect(served.facts).toHaveLength(2_846);
+    expect(served.facts).toHaveLength(5_525);
     expect(served.facts.every((row) => typeof row.value === "number")).toBe(true);
   } finally {
     vi.unstubAllEnvs();

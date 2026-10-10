@@ -14,15 +14,21 @@ export const SERVED_DEMOGRAPHY_FILES = [
   "../../data/imports/demography-population-annual.csv",
   "../../data/imports/demography-density-annual.csv",
   "../../data/imports/demography-migration-annual.csv",
+  "../../data/imports/demography-vital-annual.csv",
+  "../../data/imports/demography-fertility-age-annual.csv",
 ] as const;
 
-// The migration file is mirrored whole (all five migration series), as the import mirrors files as they are.
+// The migration, vital-events and fertility files are mirrored whole, as the import mirrors files as they are.
+// Pages read only the series they show; the infant mortality rate and the crude rates are mirrored, not shown.
 const MIGRATION_SERIES = new Set<string>(FAMILIES.migration);
-const SERVED_SERIES = new Set<string>([SERIES.populationTotal, SERIES.populationDensity, ...MIGRATION_SERIES]);
+const REGISTERED_SERIES = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility]);
+const SERVED_SERIES = new Set<string>([SERIES.populationTotal, SERIES.populationDensity, ...MIGRATION_SERIES, ...REGISTERED_SERIES]);
 
-/** Population and density follow the lineage of their year; migration is border-police data in every year. */
+/** Population and density follow the lineage of their year; migration is border-police data and vital events are registered events in every year. */
 function expectedBasis(fact: DemographyObservation): EstimateBasis {
-  return MIGRATION_SERIES.has(fact.seriesId) ? "border_police" : populationEstimateBasis(fact.year);
+  if (MIGRATION_SERIES.has(fact.seriesId)) return "border_police";
+  if (REGISTERED_SERIES.has(fact.seriesId)) return "registered";
+  return populationEstimateBasis(fact.year);
 }
 
 // Everything the loader can check without the Geostat workbooks: the series are served ones, no

@@ -27,6 +27,12 @@ describe("sidebar demography group", () => {
     expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
   });
 
+  it("marks the Births, deaths and fertility link current on its page", async () => {
+    const markup = await render("/en/explorer/demography/births-deaths");
+    expect(markup).toContain('data-testid="demography-births-deaths-link" aria-current="page"');
+    expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
+  });
+
   it("keeps the Population link current on every place page, in both languages", async () => {
     for (const [pathname, locale] of [
       ["/explorer/demography/population/georgia", "ka"],
