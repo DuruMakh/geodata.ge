@@ -39,3 +39,13 @@ test("signed balance ranking has a neutral zero axis, values and no share column
   expect(html).toContain('data-testid="trade-partners-zero-axis"');
   expect(html).toContain("Trade balance"); expect(html).toContain("2025");
 });
+
+test.each(["en", "ka"] as const)("domestic country ranking uses a scope-appropriate share explanation in %s", async locale => {
+  const { TradePartnersRanking } = await import("../../components/trade/trade-partners-ranking");
+  const presentation = await p(locale), model = buildTradePartnersModel(data, DEFAULT_TRADE_PARTNERS_STATE, presentation);
+  for (const measure of ["trade.domestic_exports", "trade.reexports"] as const) {
+    const html = renderToStaticMarkup(<I18nProvider {...presentation}><TradePartnersRanking model={model} tab="countries" measure={measure} /></I18nProvider>);
+    expect(html).not.toContain(presentation.messages["trade.partners.shareNote"]);
+    expect(html).toContain(presentation.messages["trade.products.shareNote"]);
+  }
+});

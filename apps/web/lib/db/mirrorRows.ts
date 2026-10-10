@@ -29,6 +29,7 @@ import type { UnemploymentObservation } from "../data/unemployment/types";
 import { TRADE_OVERVIEW_DOCUMENT_ID, type TradeOverviewFact } from "../data/tradeOverview/types";
 import { TRADE_PARTNER_DOCUMENT_IDS, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData } from "../data/tradePartners/types";
 import { TRADE_PRODUCT_DOCUMENT_IDS, type TradeProductEntity, type TradeProductFact, type TradeProductsData } from "../data/tradeProducts/types";
+import { TRADE_DOMESTIC_DOCUMENT_IDS, type TradeDomesticEntity, type TradeDomesticFact, type TradeDomesticData } from "../data/tradeDomestic/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
@@ -538,6 +539,22 @@ export async function loadTradeOverviewFactsFromMirror(db: Pick<MirrorClient, "t
       sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
+}
+
+export function tradeDomesticEntityMirrorCreateRows(entities: readonly TradeDomesticEntity[], importRunId: string): Prisma.TradeDomesticEntityCreateManyInput[] {
+  return entities.map(entity => ({ ...entity, importRunId }));
+}
+export function tradeDomesticFactMirrorCreateRows(facts: readonly TradeDomesticFact[], importRunId: string): Prisma.TradeDomesticFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({ ...fact, sourceDocumentId: TRADE_DOMESTIC_DOCUMENT_IDS[fact.sourceId], lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId }));
+}
+export async function loadTradeDomesticDataFromMirror(db: Pick<MirrorClient, "tradeDomesticEntity" | "tradeDomesticFact">): Promise<TradeDomesticData> {
+  const [entityRows, factRows] = await Promise.all([db.tradeDomesticEntity.findMany({ orderBy: { id: "asc" } }), db.tradeDomesticFact.findMany({ orderBy: [{ entityId: "asc" }, { year: "asc" }, { indicatorId: "asc" }] })]);
+  const entities = entityRows.map(({ id, kind, code, labelKa, labelEn, sourceBlock, categoryId, aliasesKa, aliasesEn }) => ({ id, kind: kind as TradeDomesticEntity["kind"], code, labelKa, labelEn, sourceBlock, categoryId: categoryId as TradeDomesticEntity["categoryId"], aliasesKa, aliasesEn }));
+  const facts = factRows.map(row => {
+    if (!TRADE_DOMESTIC_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_DOMESTIC_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId) throw new Error("Domestic export source relation mismatch");
+    return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradeDomesticFact["indicatorId"], valueUsd: row.valueUsd.toFixed(), unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as "numeric", publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradeDomesticFact["role"], sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock, lastReviewedAt: isoDate(row.lastReviewedAt) };
+  });
+  return { entities, facts };
 }
 
 export function unemploymentMirrorCreateRows(facts: readonly UnemploymentObservation[], importRunId: string): Prisma.UnemploymentFactCreateManyInput[] {

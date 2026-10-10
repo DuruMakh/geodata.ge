@@ -39,6 +39,7 @@ export function DataSidebar() {
   const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
   const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
   const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
+  const tradeDomesticActive = pathname.endsWith("/explorer/trade/domestic-exports");
   const demographyActive = pathname.includes("/explorer/demography");
   const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !tradeActive && !demographyActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
@@ -349,6 +350,12 @@ export function DataSidebar() {
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeProductsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeProducts")}
+            </Link> : null}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/domestic-exports", locale)} data-testid="trade-domestic-link" aria-current={tradeDomesticActive ? "page" : undefined}
+              onNavigate={(event) => { if (tradeDomesticActive) event.preventDefault(); setSheetOpen(false); }}
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeDomesticActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeDomesticActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+              {message(messages, "common.tradeDomestic")}
             </Link> : null}
             <Link
               href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}

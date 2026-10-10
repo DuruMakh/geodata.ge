@@ -6,12 +6,12 @@ import { parse } from "csv-parse/sync";
 import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
-import type { ClientTradeOverviewFact, TradeOverviewFact } from "../tradeOverview/types";
+import type { ClientTradeOverviewFact, TradeOverviewFact, TradeChartIndicator } from "../tradeOverview/types";
 import { tradePartnerFactKey, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData, type TradePartnersAcceptance } from "./types";
 import { tradePartnersEnglishLabels, validateTradePartnersData } from "./validation";
 
-export type ClientTradePartnerFact = Pick<TradePartnerFact, "entityId" | "year" | "indicatorId" | "sourceId" | "basis" | "publicationStatus" | "lastReviewedAt"> & { valueUsd: number | null };
-export type ClientTradePartnersData = { entities: TradePartnerEntity[]; facts: ClientTradePartnerFact[]; nationalFacts: ClientTradeOverviewFact[] };
+export type ClientTradePartnerFact = Pick<TradePartnerFact, "entityId" | "year" | "sourceId" | "basis" | "publicationStatus" | "lastReviewedAt"> & { indicatorId: TradeChartIndicator; valueUsd: number | null };
+export type ClientTradePartnersData = { entities: TradePartnerEntity[]; facts: ClientTradePartnerFact[]; nationalFacts: ClientTradeOverviewFact[]; measures?: readonly TradeChartIndicator[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 export async function loadTradePartnersData(): Promise<TradePartnersData> {

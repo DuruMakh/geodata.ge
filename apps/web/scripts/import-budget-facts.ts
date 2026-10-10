@@ -8,6 +8,8 @@ import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tr
 import { TRADE_PARTNER_DOCUMENT_IDS } from "../lib/data/tradePartners/types";
 import { loadTradeProductsData, assertTradeProductsParity } from "../lib/data/tradeProducts/importTradeProducts";
 import { TRADE_PRODUCT_DOCUMENT_IDS } from "../lib/data/tradeProducts/types";
+import { loadTradeDomesticData, assertTradeDomesticParity } from "../lib/data/tradeDomestic/importTradeDomestic";
+import { TRADE_DOMESTIC_DOCUMENT_IDS } from "../lib/data/tradeDomestic/types";
 import {
   assertRegionalEconomyParity,
   loadRegionalEconomyFacts,
@@ -37,6 +39,9 @@ import {
   tradeProductEntityMirrorCreateRows,
   tradeProductFactMirrorCreateRows,
   loadTradeProductsDataFromMirror,
+  tradeDomesticEntityMirrorCreateRows,
+  tradeDomesticFactMirrorCreateRows,
+  loadTradeDomesticDataFromMirror,
   loadInflationBasketWeightsFromMirror,
   loadInflationCategoryFactsFromMirror,
   loadInflationCityFactsFromMirror,
@@ -280,6 +285,8 @@ async function main() {
   assertSubset("Trade partner source IDs", Object.values(TRADE_PARTNER_DOCUMENT_IDS), sourceIds);
   const tradeProducts = await loadTradeProductsData();
   assertSubset("Trade product source IDs", Object.values(TRADE_PRODUCT_DOCUMENT_IDS), sourceIds);
+  const tradeDomestic = await loadTradeDomesticData();
+  assertSubset("Domestic export source IDs", Object.values(TRADE_DOMESTIC_DOCUMENT_IDS), sourceIds);
   const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
   assertSubset("Regional economy source IDs", regionalEconomyFacts.map((fact) => fact.sourceId), sourceIds);
   const demographyFacts = await loadDemographyFacts([
@@ -463,6 +470,8 @@ async function main() {
         await tx.tradePartnerEntity.deleteMany();
         await tx.tradeProductFact.deleteMany();
         await tx.tradeProductEntity.deleteMany();
+        await tx.tradeDomesticFact.deleteMany();
+        await tx.tradeDomesticEntity.deleteMany();
         await tx.regionalEconomyFact.deleteMany();
         await tx.demographyFact.deleteMany();
         await tx.inflationCpiFact.deleteMany();
@@ -747,6 +756,11 @@ async function main() {
         }
         const mirrorTradeProducts = await loadTradeProductsDataFromMirror(tx);
         assertTradeProductsParity(tradeProducts, mirrorTradeProducts);
+        await tx.tradeDomesticEntity.createMany({ data: tradeDomesticEntityMirrorCreateRows(tradeDomestic.entities, run.id) });
+        const domesticRows = tradeDomesticFactMirrorCreateRows(tradeDomestic.facts, run.id);
+        for (let start = 0; start < domesticRows.length; start += 1000) await tx.tradeDomesticFact.createMany({ data: domesticRows.slice(start, start + 1000) });
+        const mirrorTradeDomestic = await loadTradeDomesticDataFromMirror(tx);
+        assertTradeDomesticParity(tradeDomestic, mirrorTradeDomestic);
         await tx.regionalEconomyFact.createMany({
           data: regionalEconomyFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
             ...fact,
@@ -1043,6 +1057,8 @@ async function main() {
             { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },
             { table: "TradeProductEntity", csvRows: tradeProducts.entities.length, dbRows: mirrorTradeProducts.entities.length },
             { table: "TradeProductFact", csvRows: tradeProducts.facts.length, dbRows: mirrorTradeProducts.facts.length },
+            { table: "TradeDomesticEntity", csvRows: tradeDomestic.entities.length, dbRows: mirrorTradeDomestic.entities.length },
+            { table: "TradeDomesticFact", csvRows: tradeDomestic.facts.length, dbRows: mirrorTradeDomestic.facts.length },
             { table: "RegionalEconomyFact", csvRows: regionalEconomyFacts.length, dbRows: mirrorRegionalEconomyFacts.length },
             { table: "DemographyFact", csvRows: demographyFacts.length, dbRows: mirrorDemographyFacts.length },
             { table: "InflationCpiFact", csvRows: inflationCpiFacts.length, dbRows: mirrorInflation.facts.length },
