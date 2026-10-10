@@ -62,8 +62,6 @@ export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMa
   return <div data-testid="wages-regions" className="@container">
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="wages-latest" measure={t("series.average")} period={national.year} value={amount(national.value)} />
-    <p className="mb-2 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("page.regions.summary")}</p>
-    <p data-testid="wages-nominal-note" className="mb-5 max-w-[800px] text-[12px] leading-relaxed text-[var(--muted)]">{t("nominalNote")}</p>
     <div data-testid="wages-regions-index">
       <RegionIndex model={regionMap} sourceNote={t("sourceNote")} metric={{
         hrefForRegion: wagesRegionHref, formatValue: amount,
@@ -145,10 +143,6 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
         next={{ href: pageHref(wagesRegionHref(neighbours.next.id), locale), label: labels[neighbours.next.id] }} /> : null}
     </div> : <ExplorerHeading>{title}</ExplorerHeading>}
     <LatestValueLine testId="wages-latest" measure={regionId ? `${t("series.average")} · ${regionName}` : t("series.average")} period={latest.year} value={`${format(latest.value, 1)} ${unit.label}`} />
-    {section === "overview" ? null : <>
-      <p className="mb-2 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{regionId ? t("regionSummary", { region: regionName }) : t(`page.${section}.summary`)}</p>
-      <p data-testid="wages-nominal-note" className="mb-5 max-w-[800px] text-[12px] leading-relaxed text-[var(--muted)]">{t("nominalNote")}</p>
-    </>}
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-view={state.view} data-unit="gel" className="border-t border-[var(--ink)] pt-4">
