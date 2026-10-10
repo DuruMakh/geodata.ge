@@ -1,6 +1,12 @@
+import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadPovertyFacts, toClientPovertyFact } from "../../lib/data/poverty/importPoverty";
 import type { ClientPovertyFact } from "../../lib/data/poverty/types";
+import { buildPovertyHubCards } from "../../lib/explorer/povertyHubCards";
+import { buildPovertyWorkbookExportModel } from "../../lib/explorer/povertyWorkbook";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Locale, Presentation } from "../../lib/i18n/types";
 import { buildPovertyModel, changePovertyView, defaultPovertyState, parsePovertyHash, povertyCoverage, povertyViewSeries, serializePovertyHash } from "../../lib/explorer/poverty";
 
 let facts: ClientPovertyFact[];
@@ -60,4 +66,47 @@ test("the model carries published values and the view's precision", () => {
   const inequality = buildPovertyModel("inequality", facts, defaultPovertyState("inequality"));
   expect(inequality.selected[0].endValue).toBe(0.34);
   expect(inequality.decimals).toBe(2);
+});
+
+const SOURCES = ["geostat_poverty_absolute", "geostat_poverty_relative", "geostat_poverty_international", "geostat_gini"].map(sourceId => ({
+  sourceId, years: Array.from({ length: 22 }, (_, i) => 2004 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-10",
+  downloadHref: `/downloads/methodology/poverty/files/${sourceId}.xlsx` as const,
+}));
+const presentationFor = async (locale: Locale): Promise<Presentation> => ({ locale, englishLabels: {}, messages: await getMessages(locale, ["poverty", "workbook", "format", "common"]) });
+
+test.each(["ka", "en"] as const)("the %s International workbook keeps the selected lines, years and only their source", async (locale: Locale) => {
+  const ids = ["poverty.international_300|georgia", "poverty.international_420|georgia", "poverty.international_830|georgia"];
+  const model = buildPovertyWorkbookExportModel({
+    section: "rates", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: Object.fromEntries(ids.map(id => [id, id])),
+    state: { mode: "table", view: "international", range: { kind: "manual", start: 2020, end: 2024 }, selectedIds: ids },
+  }, await presentationFor(locale));
+  expect(model.filename).toMatch(/^fiscal-poverty-rates-international-2020-2024/);
+  expect(model.readable.years).toEqual([2020, 2021, 2022, 2023, 2024]);
+  expect(model.readable.rows).toHaveLength(3);
+  expect(model.readable.numberFormat).toBe("0.0");
+  expect(model.analysis.rows).toHaveLength(15);
+  expect(model.analysis.headers.join(" ")).not.toMatch(/source_cell|sheet|source_id/i);
+  expect(model.sources.map(source => source.title)).toEqual(["geostat_poverty_international"]);
+  expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/poverty/files/geostat_poverty_international.xlsx");
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  expect(excel.worksheets).toHaveLength(3);
+});
+
+test("the inequality workbook keeps two decimals", async () => {
+  const model = buildPovertyWorkbookExportModel({
+    section: "inequality", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { "gini.total_income|georgia": "Total income" },
+    state: { ...defaultPovertyState("inequality"), range: { kind: "manual", start: 2024, end: 2025 } },
+  }, await presentationFor("en"));
+  expect(model.filename).toMatch(/^fiscal-poverty-inequality-2024-2025/);
+  expect(model.readable.numberFormat).toBe("0.00");
+  expect(model.analysis.numericFormats).toEqual({ 2: "0.00" });
+  expect(model.analysis.rows.at(-1)!.slice(0, 3)).toEqual([2025, "Total income", 0.34]);
+  expect(model.sources.map(source => source.title)).toEqual(["geostat_gini"]);
+});
+
+test("the hub has two cards with national sparklines and their latest values", async () => {
+  const cards = buildPovertyHubCards(facts, await presentationFor("en"));
+  expect(cards.map(card => card.href)).toEqual(["/explorer/poverty/rates", "/explorer/poverty/inequality"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 7.1% · 2004–2025", "2025 · 0.34 · 2006–2025"]);
+  expect(cards.map(card => card.series?.length)).toEqual([22, 20]);
 });
