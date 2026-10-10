@@ -1,4 +1,5 @@
 import type {
+  ClientAgeFact,
   ClientBasketWeightRow,
   ClientCpiFact,
   ClientDemographyObservation,
@@ -170,6 +171,17 @@ export function projectMigrationObservation(fact: ServedDemographyObservation): 
 
 export function projectNationalObservation(fact: ServedDemographyObservation): ClientNationalFact {
   return { seriesId: fact.seriesId, year: fact.year, ageGroup: fact.ageGroup ?? "", value: fact.value };
+}
+
+/** The age-and-sex rows are filtered to men and women before projection, so a missing sex is not a case. */
+export function projectAgeObservation(fact: ServedDemographyObservation): ClientAgeFact {
+  return {
+    year: fact.year,
+    sex: fact.sex as ClientAgeFact["sex"],
+    ageGroup: fact.ageGroup ?? "",
+    settlement: fact.settlement ?? "total",
+    value: fact.value,
+  };
 }
 
 /** Inflation: one publication per series and measure. */
