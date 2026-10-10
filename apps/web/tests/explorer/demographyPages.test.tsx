@@ -212,6 +212,7 @@ describe("age and sex page", () => {
     expect(html).toContain('data-testid="age-sex-pyramid"');
     expect(html).toContain('data-testid="age-sex-bands"');
     expect(html).toContain('data-testid="age-sex-heatmap"');
+    expect(html).toContain('href="/en/methodology/demography"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('"@type":"Dataset"');
     expect(html).not.toMatch(GEORGIAN);
@@ -227,8 +228,9 @@ describe("age and sex page", () => {
   });
 });
 
-// The twelve Geostat originals listed in data/methodology/source-archives/demography.csv.
+// The fourteen Geostat originals listed in data/methodology/source-archives/demography.csv.
 const REVIEWED_SOURCE_IDS = [
+  "source.geostat_census2024_population_by_age_settlement",
   "source.geostat_demography_births",
   "source.geostat_demography_crude_birth_rate",
   "source.geostat_demography_crude_death_rate",
@@ -240,14 +242,15 @@ const REVIEWED_SOURCE_IDS = [
   "source.geostat_demography_migration_citizenship",
   "source.geostat_demography_natural_increase",
   "source.geostat_demography_net_migration",
+  "source.geostat_demography_population_age_sex",
   "source.geostat_municipal_population",
 ];
 
 describe("population sources", () => {
-  it("are the twelve reviewed demography sources in either language, each downloadable from the demography files", async () => {
+  it("are the fourteen reviewed demography sources in either language, each downloadable from the demography files", async () => {
     for (const locale of ["en", "ka"] as const) {
       const sources = await loadPopulationSources(locale);
-      expect(sources, locale).toHaveLength(12);
+      expect(sources, locale).toHaveLength(14);
       expect(sources.map((source) => source.sourceId).sort(), locale).toEqual(REVIEWED_SOURCE_IDS);
       for (const source of sources) expect(source.downloadHref, locale).toMatch(/^\/downloads\/methodology\/demography\/files\/[^/]+$/);
     }

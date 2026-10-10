@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CENSUS_STEP } from "../../lib/data/demography/series";
 import { ACCENT, INK, SERIES_COLORS } from "../../lib/explorer/colors";
@@ -26,6 +27,7 @@ import { formatInUnit, formatShare, UNIT_DENSITY } from "../../lib/explorer/form
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
+import { pageHref } from "../../lib/i18n/routes";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
 import { useAppReady } from "../explorer-shell/use-app-ready";
@@ -53,7 +55,7 @@ export function AgeSexExplorer({
   siteOrigin: string;
 }) {
   const presentation = useI18n();
-  const { messages } = presentation;
+  const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const years = useMemo(() => ageYears(facts), [facts]);
   const [state, setState] = useState<AgeSexState>(() => parseAgeSexHash("", years));
@@ -72,7 +74,15 @@ export function AgeSexExplorer({
   const update = (patch: Partial<AgeSexState>) => setState((previous) => ({ ...previous, ...patch }));
   const breakLabel = t("breakLabel");
   const breakTag = (year: number) => (year === CENSUS_STEP.toYear ? breakLabel : null);
-  const source = t("annualSource", { first, last });
+  const source = (
+    <>
+      {t("annualSource", { first, last })}{" "}
+      <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
+        {message(messages, "common.methodology")}
+      </Link>
+      .
+    </>
+  );
 
   // Pyramid
   const pyramid = useMemo(() => annualPyramid(facts, state.year), [facts, state.year]);
