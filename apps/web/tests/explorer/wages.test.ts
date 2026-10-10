@@ -18,18 +18,16 @@ beforeAll(async () => { facts = (await loadWagesFacts()).map(toClientWagesFact);
 
 test("each page starts with only its reference selected and coverage taken from the facts", () => {
   expect(defaultWagesState("overview", facts)).toEqual({ mode: "line", range: { kind: "all" }, view: "overview", selectedIds: ["average"] });
-  expect(defaultWagesState("gender", facts).selectedIds).toEqual(["average"]);
   expect(defaultWagesState("regions", facts).selectedIds).toEqual(["average"]);
   expect(defaultWagesState("industries", facts)).toMatchObject({ view: "georgia", selectedIds: ["total"] });
   expect(wagesCoverage("overview", "overview", facts)).toMatchObject({ min: 1995, max: 2025 });
-  expect(wagesCoverage("gender", "main", facts).min).toBe(1999);
+  expect(wagesCoverage("overview", "sex", facts).min).toBe(1999);
   expect(wagesCoverage("regions", "main", facts).min).toBe(2010);
   expect(wagesCoverage("overview", "ownership", facts).min).toBe(2000);
-  expect(wagesCoverage("overview", "business_sector", facts).min).toBe(2006);
   expect(wagesCoverage("industries", "georgia", facts)).toMatchObject({ min: 2014, max: 2025 });
   expect(wagesCoverage("industries", "median", facts)).toMatchObject({ min: 2018, max: 2025 });
   expect(wagesViewSeries("regions", "main", facts)).toHaveLength(12);
-  expect(wagesViewSeries("gender", "main", facts).map(s => s.id)).toEqual(["average", "women", "men"]);
+  expect(wagesViewSeries("overview", "sex", facts).map(s => s.id)).toEqual(["average", "women", "men"]);
 });
 
 test("industries list only the sections a group publishes, and public mining shows as unavailable", () => {
@@ -48,10 +46,11 @@ test("industries list only the sections a group publishes, and public mining sho
 test("URL state round-trips views, years and an explicitly empty selection", () => {
   const state: WagesState = { mode: "table", range: { kind: "manual", start: 2016, end: 2020 }, view: "women", selectedIds: ["total", "sector.p"] };
   expect(parseWagesHash(serializeWagesHash(state, "industries"), "industries", facts)).toEqual(state);
-  const empty = { ...defaultWagesState("gender", facts), selectedIds: [] };
-  const hash = serializeWagesHash(empty, "gender");
+  const empty = { ...defaultWagesState("regions", facts), selectedIds: [] };
+  const hash = serializeWagesHash(empty, "regions");
   expect(hash).not.toContain("tab=");
-  expect(parseWagesHash(hash, "gender", facts).selectedIds).toEqual([]);
+  expect(parseWagesHash(hash, "regions", facts).selectedIds).toEqual([]);
+  expect(parseWagesHash("tab=business_sector", "overview", facts).view).toBe("overview");
   expect(parseWagesHash("tab=unknown&sel=average,median", "overview", facts)).toMatchObject({ view: "overview", selectedIds: ["average", "median"] });
   const switched = changeWagesView({ ...defaultWagesState("industries", facts), range: { kind: "manual", start: 2014, end: 2016 } }, "industries", "median", facts);
   expect(switched).toMatchObject({ view: "median", selectedIds: ["total"], range: { kind: "all" } });
@@ -64,10 +63,10 @@ test("the median keeps whole lari and the 2025 headline matches Geostat's releas
   expect(model.series.find(s => s.id === "median")!.valuesByYear[2017]).toBeNull();
 });
 
-test("the hub has four cards in order with a national sparkline only on the overview", async () => {
+test("the hub has three cards in order with a national sparkline only on the overview", async () => {
   const presentation: Presentation = { locale: "en", englishLabels: {}, messages: await getMessages("en", ["wages", "common"]) };
   const cards = buildWagesHubCards(facts, presentation);
-  expect(cards.map(card => card.href)).toEqual(["/explorer/wages/overview", "/explorer/wages/industries", "/explorer/wages/regions", "/explorer/wages/gender"]);
+  expect(cards.map(card => card.href)).toEqual(["/explorer/wages/overview", "/explorer/wages/industries", "/explorer/wages/regions"]);
   expect(cards[0].series).toHaveLength(31);
   expect(cards[0].footer).toContain("2025");
   expect(cards.slice(1).every(card => card.series === null)).toBe(true);

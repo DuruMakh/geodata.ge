@@ -9,9 +9,9 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/wages`);
     const hub = page.getByTestId("wages-hub");
-    await expect(hub.locator("a")).toHaveCount(4);
+    await expect(hub.locator("a")).toHaveCount(3);
     await expect(hub.locator("a").first()).toHaveAttribute("href", `${prefix}/explorer/wages/overview`);
-    for (const section of ["overview", "industries", "regions", "gender"]) {
+    for (const section of ["overview", "industries", "regions"]) {
       await page.goto(`${prefix}/explorer/wages/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
       await expect(page.getByTestId("wages-nominal-note")).toBeVisible();
@@ -37,6 +37,12 @@ test("overview defaults to the Georgia average with the 2025 figures from Geosta
   await expect(page.locator(pressed("public"))).toHaveAttribute("aria-pressed", "false");
   await expect(page.locator(pressed("average"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  await expect(page.getByTestId("wages-tab-business_sector")).toHaveCount(0);
+  await page.getByTestId("wages-tab-sex").click();
+  await expect(page.locator(pressed("women"))).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(pressed("men"))).toBeVisible();
+  await expect(page.getByTestId("year-range-strip")).toContainText("1999–2025");
+  await page.goBack();
   await page.goBack();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-view", "overview");
 });

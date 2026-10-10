@@ -124,7 +124,7 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || (section === "overview" && state.view === "overview") ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
           <Link href={pageHref("/methodology/wages", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
-        {section === "overview" && state.view === "business_sector" ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("nonBusinessNote")}</p> : null}
+        {state.view === "business" || state.view === "non_business" ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("nonBusinessNote")}</p> : null}
       </div>
       <SeriesAside label={message(messages, "controls.series")}>
         <p className="mb-3 text-[11px] text-[var(--muted)]">{model.range.end} · {t("unitMonthly")}</p>

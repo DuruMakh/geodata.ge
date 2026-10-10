@@ -1,7 +1,7 @@
 # Wages hub — explorer design
 
 Date: 2026-10-09
-Status: Approved by the owner on 2026-10-10.
+Status: Approved by the owner on 2026-10-10. Amended the same day by the owner: the Wages overview's Business / non-business tab is removed and Women / men takes its place, replacing the separate Gender page and card. Business and non-business remain groups on Industries.
 
 ## 1. Intended result
 

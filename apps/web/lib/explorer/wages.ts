@@ -7,10 +7,9 @@ export const WAGES_SECTIONS = [
   { id: "overview", href: "/explorer/wages/overview", labelKey: "common.wagesOverview" },
   { id: "industries", href: "/explorer/wages/industries", labelKey: "common.wagesIndustries" },
   { id: "regions", href: "/explorer/wages/regions", labelKey: "common.wagesRegions" },
-  { id: "gender", href: "/explorer/wages/gender", labelKey: "common.wagesGender" },
 ] as const;
 export type WagesSectionId = typeof WAGES_SECTIONS[number]["id"];
-export const WAGES_OVERVIEW_TABS = ["overview", "ownership", "business_sector"] as const;
+export const WAGES_OVERVIEW_TABS = ["overview", "ownership", "sex"] as const;
 export type WagesOverviewTab = typeof WAGES_OVERVIEW_TABS[number];
 /** Whose wages the Industries page shows; "median" is Georgia's median, the rest are averages. */
 export const WAGES_INDUSTRY_GROUPS = ["georgia", "women", "men", "public", "non_public", "business", "non_business", "median"] as const;
@@ -38,8 +37,7 @@ export function wagesViews(section: WagesSectionId): readonly WagesView[] {
 export function wagesViewSeries(section: WagesSectionId, view: WagesView, facts: readonly ClientWagesFact[]): WagesSeriesDefinition[] {
   if (section === "overview" && view === "overview") return [georgiaAverage, { id: "median", indicatorId: MEDIAN, dimension: "national", groupId: "georgia", sectorId: "total", reference: false }];
   if (section === "overview" && view === "ownership") return [georgiaAverage, groupTotal("ownership", "public"), groupTotal("ownership", "non_public")];
-  if (section === "overview") return [georgiaAverage, groupTotal("business_sector", "business"), groupTotal("business_sector", "non_business")];
-  if (section === "gender") return [georgiaAverage, groupTotal("sex", "women"), groupTotal("sex", "men")];
+  if (section === "overview") return [georgiaAverage, groupTotal("sex", "women"), groupTotal("sex", "men")];
   if (section === "regions") return [georgiaAverage, ...WAGES_REGIONS.map(id => groupTotal("region", id))];
   const group = view as WagesIndustryGroup;
   const indicatorId = group === "median" ? MEDIAN : AVERAGE;

@@ -71,7 +71,7 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId) {
   ]);
   const allFacts = data.facts.map(toClientWagesFact);
   // Each page receives only the observations its views can show.
-  const dimensions = { overview: ["national", "ownership", "business_sector"], industries: ["national", "sex", "ownership", "business_sector"], regions: ["national", "region"], gender: ["national", "sex"] }[section];
+  const dimensions = { overview: ["national", "ownership", "sex"], industries: ["national", "sex", "ownership", "business_sector"], regions: ["national", "region"] }[section];
   const facts = allFacts.filter(f => dimensions.includes(f.dimension) && (section === "industries" || f.sectorId === "total" && (section === "overview" || f.indicatorId === "average_monthly_nominal_earnings")));
   const years = [...new Set(wagesViews(section).flatMap(view => wagesCoverage(section, view, facts).years))];
   const firstYear = Math.min(...years), lastYear = Math.max(...years);

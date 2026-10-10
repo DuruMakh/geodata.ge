@@ -79,10 +79,9 @@ Each row keeps the exact stored decimal (`value`), the value as Geostat prints i
 
 The pages show the published value: one decimal for averages and whole lari for the median, as Geostat prints them. Every figure is gross monthly earnings in nominal lari; a note on each page says the figures are not adjusted for inflation. No real wages, growth rates, pay-gap ratios or other derived figures are computed. Missing years are gaps and dashes, never zero, and public-sector mining shows as unavailable.
 
-- **Wages overview** compares the Georgia average with the median, and with public/non-public and business/non-business employers. The median comes from tax records and the average from enterprise surveys; the page says so.
+- **Wages overview** compares the Georgia average with the median, with public/non-public employers and with women and men; no pay gap is calculated. The median comes from tax records and the average from enterprise surveys; the page says so.
 - **Industries** shows the 19 sections for a chosen group (all employees, women, men, public, non-public, business, non-business, or the median). A section a group's table does not publish is not offered for that group.
 - **Regions** maps and compares the 11 regions. Some enterprises are counted at their head office, so a region's figure can reflect where firms are registered.
-- **Gender** compares women and men with the Georgia average. No pay gap is calculated.
 
 Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, empty cells for missing values, each value's status and validated links to the archived Geostat workbooks. Internal cell references are not exported.
 
