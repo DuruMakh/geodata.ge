@@ -6,11 +6,11 @@ import { toClientMoneyTransfersData } from "../../lib/data/externalFlows/importM
 import { buildMoneyTransfersModel } from "../../lib/explorer/moneyTransfers";
 import { DEFAULT_MONEY_TRANSFERS_STATE } from "../../lib/explorer/moneyTransfersState";
 import { moneyTransferEntities, moneyTransferFacts } from "../data/externalFlows/fixtures";
-const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() }, { 2019: 10_000 });
+const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() });
 const englishLabels = { "transfer.total": "Money transfers, all countries", "bop.personal_transfers": "Personal transfers (official estimate)", "transfer.italy": "Italy", "transfer.sudan": "Sudan", "transfer.other_countries": "Other Countries" };
 async function p(locale: "en" | "ka") { return { locale, englishLabels, messages: await getMessages(locale, ["external", "controls", "main", "format", "common"]) }; }
 
-test.each(["en", "ka"] as const)("renders %s defaults: Received, the all-country total only, four figures and the ranking", async locale => {
+test.each(["en", "ka"] as const)("renders %s defaults: Received, the all-country total only and the ranking", async locale => {
   const { MoneyFromAbroad } = await import("../../components/external/money-from-abroad");
   const presentation = await p(locale);
   const html = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroad data={data} sources={[]} lastReviewedAt="2026-10-10" siteOrigin="https://fiscal.ge" /></I18nProvider>);
@@ -18,20 +18,9 @@ test.each(["en", "ka"] as const)("renders %s defaults: Received, the all-country
   expect(selection.match(/aria-pressed="true"/g)).toHaveLength(1);
   expect(selection).toContain('data-series-id="transfer.total"');
   expect(html).toContain('data-measure="received"');
-  expect(html.match(/data-testid="money-from-abroad-figure"/g)).toHaveLength(4);
+  expect(html).not.toContain("money-from-abroad-figure");
   expect(html).toContain('data-testid="money-from-abroad-ranking"');
   expect(html).not.toMatch(/GEL|₾/);
-});
-
-test("figures show the end year, a dash for a missing value and the share of GDP", async () => {
-  const { MoneyFromAbroadFigures } = await import("../../components/external/money-from-abroad");
-  const presentation = await p("en"), model = buildMoneyTransfersModel(data, DEFAULT_MONEY_TRANSFERS_STATE, presentation);
-  const html = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroadFigures figures={model.figures} /></I18nProvider>);
-  expect(html).toContain("2019");
-  expect(html).toContain("10.0%");
-  expect(html).toContain("Personal transfers received (official estimate)");
-  const sentHtml = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroadFigures figures={{ ...model.figures, sent: null }} /></I18nProvider>);
-  expect(sentHtml).toContain("—");
 });
 
 test("the ranking marks partial months, lists remainders unranked and hides unavailable countries until expanded", async () => {

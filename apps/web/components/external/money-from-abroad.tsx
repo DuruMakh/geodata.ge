@@ -2,11 +2,11 @@
 import Link from "next/link";
 import type { ClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
 import { MONEY_TRANSFER_MEASURES, MONEY_TRANSFER_TOTAL_ID, PERSONAL_TRANSFERS_ID } from "../../lib/data/externalFlows/types";
-import { buildMoneyTransfersModel, moneyTransferColor, type MoneyTransferFigures } from "../../lib/explorer/moneyTransfers";
+import { buildMoneyTransfersModel, moneyTransferColor } from "../../lib/explorer/moneyTransfers";
 import { moneyTransfersCoverage, setMoneyTransfersTab } from "../../lib/explorer/moneyTransfersState";
 import { buildMoneyTransfersWorkbookModel } from "../../lib/explorer/moneyTransfersWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import { formatDisplayDate, formatInUnit, formatShare } from "../../lib/explorer/format";
+import { formatDisplayDate, formatInUnit } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
@@ -17,38 +17,15 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
-import { KPI_UNIT_CLASS, SIDE_KPI_VALUE_CLASS } from "../main-explorer/kpi-blocks";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { Callout, Overline, SectionTitle, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
 import { useMoneyFromAbroadState } from "./use-money-from-abroad-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 import { MoneyFromAbroadRanking } from "./money-from-abroad-ranking";
 
 /** NBG adds microfinance organizations to the transfer statistics from January 2010 (spec section 4). */
 const MICROFINANCE_BREAK_YEAR = 2010;
-const FIGURE_UNIT = { divisor: 1_000_000, decimals: 1 } as const;
-
-export function MoneyFromAbroadFigures({ figures }: { figures: MoneyTransferFigures }) {
-  const { messages } = useI18n();
-  const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
-  const unit = { ...FIGURE_UNIT, label: message(messages, "external.unit.million") };
-  const items = [
-    { id: "received", value: formatInUnit(figures.received, unit), unit: figures.received === null ? "" : unit.label },
-    { id: "sent", value: formatInUnit(figures.sent, unit), unit: figures.sent === null ? "" : unit.label },
-    { id: "estimate", value: formatInUnit(figures.estimate, unit), unit: figures.estimate === null ? "" : unit.label },
-    { id: "share", value: formatShare(figures.receivedShareOfGdp), unit: "" },
-  ];
-  return <section data-testid="money-from-abroad-figures" data-year={figures.year} className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
-    <SectionTitle>{t("figuresTitle", { year: figures.year })}</SectionTitle>
-    <div className="mt-[22px] grid gap-x-8 gap-y-5 min-[640px]:grid-cols-2 min-[1100px]:grid-cols-4">
-      {items.map(item => <div key={item.id} data-testid="money-from-abroad-figure" data-figure={item.id} className="min-w-0 border-t border-[var(--hairline-soft)] pt-3.5">
-        <Overline>{t(`figure.${item.id}`)}</Overline>
-        <p className={`mt-[7px] ${SIDE_KPI_VALUE_CLASS}`}>{item.value}{item.unit ? <span className={KPI_UNIT_CLASS}>{item.unit}</span> : null}</p>
-      </div>)}
-    </div>
-  </section>;
-}
 
 export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientMoneyTransfersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
@@ -87,7 +64,6 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
       </div>
       <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setMoneyTransfersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
-    <MoneyFromAbroadFigures figures={model.figures} />
     <MoneyFromAbroadRanking key={`${state.measure}:${model.range.end}`} model={model} measure={state.measure} />
   </div>;
 }

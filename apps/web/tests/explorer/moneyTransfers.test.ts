@@ -1,11 +1,8 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { parse } from "csv-parse/sync";
 import { expect, test } from "vitest";
 import type { Presentation } from "../../lib/i18n/types";
 import { toClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
 import { moneyTransferEntities, moneyTransferFacts } from "../data/externalFlows/fixtures";
-const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() }, { 2019: 10000 });
+const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() });
 const presentation: Presentation = { locale: "en", messages: { "external.unit.million": "million USD", "external.unit.billion": "billion USD" }, englishLabels: { "transfer.total": "Money transfers, all countries", "bop.personal_transfers": "Personal transfers (official estimate)", "transfer.italy": "Italy", "transfer.sudan": "Sudan", "transfer.other_countries": "Other Countries" } };
 const modules = async () => ({ ...await import("../../lib/explorer/moneyTransfersState"), ...await import("../../lib/explorer/moneyTransfers") });
 
@@ -46,23 +43,4 @@ test("the ranking divides by that year's all-country total and leaves remainders
   expect(sent.missingRanking.map(r => r.entityId)).toEqual(["transfer.other_countries", "transfer.sudan"]);
   const early = build(data, { ...initial, range: { kind: "manual" as const, start: 2007, end: 2007 } }, presentation);
   expect(early.remainders.map(r => [r.entityId, r.valueUsd, r.share])).toEqual([["transfer.other_countries", 50, null]]);
-});
-
-test("figures describe the end year whatever is selected, with the GDP share of transfers received", async () => {
-  const { buildMoneyTransfersModel: build, DEFAULT_MONEY_TRANSFERS_STATE: initial } = await modules();
-  expect(build(data, { ...initial, selectedIds: [], measure: "sent" }, presentation).figures).toEqual({ year: 2019, received: 1000, sent: 100, estimate: 900, receivedShareOfGdp: 0.1 });
-  expect(build(data, { ...initial, range: { kind: "manual" as const, start: 2007, end: 2007 } }, presentation).figures).toEqual({ year: 2007, received: null, sent: null, estimate: null, receivedShareOfGdp: null });
-});
-
-test("the served 2025 share of GDP matches the research package", async () => {
-  const { loadMoneyTransfersData } = await import("../../lib/data/externalFlows/importMoneyTransfers");
-  const { loadGdpOverviewFacts } = await import("../../lib/data/gdpOverview/importGdpOverview");
-  const { buildMoneyTransfersModel: build, DEFAULT_MONEY_TRANSFERS_STATE: initial } = await modules();
-  const gdp = Object.fromEntries((await loadGdpOverviewFacts()).filter(f => f.seriesId === "nominal_usd").map(f => [f.year, Number(f.value)]));
-  const served = toClientMoneyTransfersData(await loadMoneyTransfersData(), gdp);
-  const research = parse(readFileSync(path.resolve(process.cwd(), "../../docs/Raw Data/External/2026-10-10/shares-of-gdp-annual.csv")), { columns: true, bom: true }) as Record<string, string>[];
-  for (const row of research.filter(r => r.indicator_id === "money_transfers_inflow")) {
-    const share = build(served, { ...initial, range: { kind: "manual" as const, start: Number(row.year), end: Number(row.year) } }, { ...presentation, locale: "ka" }).figures.receivedShareOfGdp;
-    expect(share! * 100).toBeCloseTo(Number(row.share_of_gdp_percent), 9);
-  }
 });

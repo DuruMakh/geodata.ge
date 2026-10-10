@@ -18,7 +18,7 @@ test("serves every reviewed entity and fact with a null-preserving thin client p
   const { loadMoneyTransfersData, toClientMoneyTransfersData } = await loader();
   const data = await loadMoneyTransfersData();
   expect(data.entities).toHaveLength(254); expect(data.facts).toHaveLength(9364);
-  const client = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() }, { 2019: 10000 });
+  const client = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() });
   expect(client.facts.find(f => f.valueStatus === "blank")?.valueUsd).toBeNull();
   expect(client.facts.find(f => f.valueStatus === "partial_months")).toMatchObject({ valueUsd: 400, monthsReported: 11 });
   expect(client.facts[0]).not.toHaveProperty("sourceCells");

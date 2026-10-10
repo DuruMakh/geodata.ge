@@ -76,7 +76,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "limitations",
       "title": "Vintages and revisions",
       "paragraphs": [
-        "The money-transfer table is the 15 September 2026 release and the balance of payments the 30 September 2026 release. NBG revises past years regularly, so figures quoted from earlier releases can differ. The share of GDP uses the nominal GDP in USD already published on Fiscal.ge."
+        "The money-transfer table is the 15 September 2026 release and the balance of payments the 30 September 2026 release. NBG revises past years regularly, so figures quoted from earlier releases can differ."
       ]
     },
     {

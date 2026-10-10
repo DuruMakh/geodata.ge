@@ -7,7 +7,7 @@ import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { DEFAULT_MONEY_TRANSFERS_STATE } from "../../lib/explorer/moneyTransfersState";
 import { moneyTransferEntities, moneyTransferFacts } from "../data/externalFlows/fixtures";
-const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() }, { 2019: 10000 });
+const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() });
 const names = ["remc_money-transfers-by-countries-eng.xlsx", "bop-6_bopbpm6eng.xlsx"];
 const sources: WorkbookPublicSource[] = names.map(name => ({ years: [2007, 2019], title: name, organization: "NBG", downloadHref: `/downloads/methodology/external-flows/files/${name}`, retrievedAt: "2026-10-10" }));
 const englishLabels = { "transfer.total": "Money transfers, all countries", "bop.personal_transfers": "Personal transfers (official estimate)", "transfer.italy": "Italy", "transfer.sudan": "Sudan", "transfer.other_countries": "Other Countries" };

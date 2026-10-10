@@ -19,8 +19,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(toggle(page, "transfer.total")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "received");
     await expect(page.getByTestId("chart-break")).toHaveCount(1);
-    await expect(page.getByTestId("money-from-abroad-figures")).toHaveAttribute("data-year", "2025");
-    await expect(page.getByTestId("money-from-abroad-figure").nth(3)).toContainText("9.6%");
     const ranking = page.getByTestId("money-from-abroad-ranking-row");
     await expect(ranking).toHaveCount(10);
     await expect(ranking.first()).toHaveAttribute("data-entity-id", "transfer.united_states_of_america");

@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { toClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
 import { moneyTransferEntities, moneyTransferFacts } from "../data/externalFlows/fixtures";
-const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() }, { 2019: 10000 });
+const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() });
 const state = () => import("../../lib/explorer/moneyTransfersState");
 
 test("defaults to transfers received, the Georgia tab, a line chart and the all-country total only", async () => {

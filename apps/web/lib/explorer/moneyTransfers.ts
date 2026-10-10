@@ -1,5 +1,5 @@
 import type { ClientMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
-import { MONEY_TRANSFER_TOTAL_ID, PERSONAL_TRANSFERS_ID, type MoneyTransferEntity } from "../data/externalFlows/types";
+import { MONEY_TRANSFER_TOTAL_ID, type MoneyTransferEntity } from "../data/externalFlows/types";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
@@ -16,16 +16,15 @@ export function moneyTransferColor(id: string): string {
   return palette[hash % palette.length];
 }
 export type MoneyTransferRankingRow = { entityId: string; label: string; valueUsd: number | null; share: number | null; rank: number | null; monthsReported: number | null; color: string };
-export type MoneyTransferFigures = { year: number; received: number | null; sent: number | null; estimate: number | null; receivedShareOfGdp: number | null };
 export type MoneyTransfersModel = {
   years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[];
   valuesByEntity: Record<string, Record<number, number | null>>; partialMonths: Record<string, Record<number, number>>;
   activeEntities: MoneyTransferEntity[]; offTabSelected: MoneyTransferEntity[];
   ranking: MoneyTransferRankingRow[]; missingRanking: MoneyTransferRankingRow[]; remainders: MoneyTransferRankingRow[];
-  figures: MoneyTransferFigures; selectedCount: number; totalCount: number;
+  selectedCount: number; totalCount: number;
 };
 
-/** One measure (received or sent) drives every line, the ranking and the table; the four figures always show the end year. */
+/** One measure (received or sent) drives every line, the ranking and the table. */
 export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: MoneyTransfersState, presentation: Presentation): MoneyTransfersModel {
   const range = resolveRange(state.range, moneyTransfersCoverage(data));
   const years = Array.from({ length: range.end - range.start + 1 }, (_, index) => range.start + index);
@@ -58,8 +57,5 @@ export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: 
   const order = new Map([...ranking, ...countries.filter(r => r.valueUsd === null).sort(labelOrder)].map((r, index) => [r.entityId, index]));
   const activeEntities = data.entities.filter(onTab);
   if (state.tab === "countries") activeEntities.sort((a, b) => (order.get(a.id) ?? Infinity) - (order.get(b.id) ?? Infinity));
-  const end = (measure: keyof typeof byMeasure, id: string) => byMeasure[measure].get(`${id}:${range.end}`)?.valueUsd ?? null;
-  const received = end("received", MONEY_TRANSFER_TOTAL_ID), gdp = data.nominalGdpUsd[range.end];
-  const figures = { year: range.end, received, sent: end("sent", MONEY_TRANSFER_TOTAL_ID), estimate: end("received", PERSONAL_TRANSFERS_ID), receivedShareOfGdp: received !== null && gdp ? received / gdp : null };
-  return { years, range, unit, selectedIds, valuesByEntity, partialMonths, activeEntities, offTabSelected, ranking, missingRanking, remainders, figures, selectedCount: selectedIds.length, totalCount: ids.length };
+  return { years, range, unit, selectedIds, valuesByEntity, partialMonths, activeEntities, offTabSelected, ranking, missingRanking, remainders, selectedCount: selectedIds.length, totalCount: ids.length };
 }

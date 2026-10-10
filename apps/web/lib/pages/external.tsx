@@ -8,7 +8,6 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedMoneyTransfersData, toClientMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
 import { MONEY_TRANSFER_SOURCES } from "../data/externalFlows/types";
-import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { buildExternalHubCards } from "../explorer/externalHubCards";
 import { moneyTransfersCoverage } from "../explorer/moneyTransfersState";
 import { formatDisplayDate } from "../explorer/format";
@@ -25,9 +24,8 @@ import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
 async function loadClientMoneyTransfers() {
-  const [data, gdp] = await Promise.all([loadServedMoneyTransfersData(), loadServedGdpOverviewData()]);
-  const nominalGdpUsd = Object.fromEntries(gdp.facts.filter(fact => fact.seriesId === "nominal_usd").map(fact => [fact.year, fact.value]));
-  return { data, client: toClientMoneyTransfersData(data, nominalGdpUsd) };
+  const data = await loadServedMoneyTransfersData();
+  return { data, client: toClientMoneyTransfersData(data) };
 }
 
 export async function externalHubMetadata(locale: Locale) {
