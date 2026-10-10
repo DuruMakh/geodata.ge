@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Wages/geostat-earnings-annual/`, collected on 2026-10-09, the publication day of Geostat's 2025 annual earnings. The research captures are immutable. Nothing is promoted to `data/imports/`, served by the explorer, published through MCP or included in central machine-readable publications; those steps need a separately approved design.
+This methodology governs the research package at `docs/Raw Data/Wages/geostat-earnings-annual/`, collected on 2026-10-09, the publication day of Geostat's 2025 annual earnings. The research captures are immutable. The 1,917 primary values and the 12 unavailable cells are served on the Wages pages under the approved design `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`; see [Serving on the Wages pages](#serving-on-the-wages-pages). Nothing is published through MCP or included in central machine-readable publications.
 
 The user approved annual data only, with these breakdowns: Georgia, economic activity, sex, public/non-public ownership, business/non-business sector, region and median earnings. Quarterly earnings, real (inflation-adjusted) wages, and the occupation, labour-cost and adjusted gender-pay-gap tables are excluded. Real wages are deferred by the user's decision. They would be a derived calculation against the CPI dataset and need their own review.
 
@@ -70,6 +70,21 @@ Extraction itself stops on a blank cell, unknown label or heading, non-numeric v
 Sixteen regression tests (`python -B -m unittest discover -s . -p "test_*.py"`) prove rejection of: omitted cells, sections, years or workbooks; a lost or duplicated unavailable marker; a changed repeated total; a broken single-sector identity; swaps involving a section absent from a table and swaps within one table (sections, regions, sexes); an activity mapping that disagrees with the published section letters; a duplicate primary or orphaned control; a changed source-page value; a total outside its parts; wrong release figures; an altered or missing capture; an unmapped label; and an unexpected number format, stray number or uninventoried worksheet.
 
 `node verify_independent.mjs` re-reads every workbook with SheetJS and its own separately written section, region and group tables. It matches all 3,941 stored values, SheetJS's rendering of each cell's number format against `published_value`, all 151 unavailable markers in both directions, and, for all 4,092 cells, the year heading, printed labels and derived IDs. Nine negative controls confirm it detects an altered value, an omitted row, an omitted year-like value, a moved cell, a shifted year, swapped sections, regions or sexes, and an unlisted unavailable marker. Its recorded run is `independent-validation.json`.
+
+## Serving on the Wages pages
+
+`npm run data:prepare-wages -- --write` re-reads the package's 12 verified captures and `earnings-annual.csv`, keeps only primary rows (1995 onwards, lari, NACE Rev.2 from 2014) and writes `data/imports/wages-annual.csv` (UTF-8 with BOM) and `data/reports/wages-validation.json`. The canonical file holds 1,929 rows: the 1,917 published values and the 12 public-sector mining cells Geostat marks unavailable, kept with an empty value and `value_status = unavailable`. Legacy rouble/coupon years, NACE Rev.1.1 sections and control rows stay in the research package. `npm run data:check-wages` (part of `data:validate`) rebuilds both files in memory and fails on any difference, so an altered value, a missing, duplicate or extra observation, an extra indicator, a lost unavailable cell, a NACE Rev.1.1 row or a published value that is not the stored value rounded half-up to its cell's format is rejected.
+
+Each row keeps the exact stored decimal (`value`), the value as Geostat prints it (`published_value`) and the cell's number format, `unit = gel`, `basis = actual`, `value_status` (`survey_estimate` for Geostat's enterprise surveys, `administrative` for the Revenue Service median) and its workbook, sheet and cell. Industries reuse the existing `sector.a`–`sector.s` IDs and regions the existing `region.*` IDs. The Prisma mirror table `WagesFact` is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
+
+The pages show the published value: one decimal for averages and whole lari for the median, as Geostat prints them. Every figure is gross monthly earnings in nominal lari; a note on each page says the figures are not adjusted for inflation. No real wages, growth rates, pay-gap ratios or other derived figures are computed. Missing years are gaps and dashes, never zero, and public-sector mining shows as unavailable.
+
+- **Wages overview** compares the Georgia average with the median, and with public/non-public and business/non-business employers. The median comes from tax records and the average from enterprise surveys; the page says so.
+- **Industries** shows the 19 sections for a chosen group (all employees, women, men, public, non-public, business, non-business, or the median). A section a group's table does not publish is not offered for that group.
+- **Regions** maps and compares the 11 regions. Some enterprises are counted at their head office, so a region's figure can reflect where firms are registered.
+- **Gender** compares women and men with the Georgia average. No pay gap is calculated.
+
+Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, empty cells for missing values, each value's status and validated links to the archived Geostat workbooks. Internal cell references are not exported.
 
 ## Statistical limitations and future use
 

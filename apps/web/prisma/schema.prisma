@@ -84,6 +84,7 @@ model SourceDocument {
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
+  wagesFacts WagesFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
@@ -120,6 +121,7 @@ model ImportRun {
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerEntities TradePartnerEntity[]
   tradePartnerFacts TradePartnerFact[]
+  wagesFacts WagesFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
@@ -564,6 +566,32 @@ model TradeOverviewFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/wages-annual.csv. An unavailable source cell keeps
+// null values and its "unavailable" status; it is never filled.
+model WagesFact {
+  year               Int
+  indicatorId        String
+  dimension          String
+  groupId            String
+  sectorId           String
+  value              Decimal?       @db.Decimal(30, 20)
+  publishedValue     Decimal?       @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String?
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, dimension, groupId, sectorId, year])
 }
 
 // Mirror of the served data/imports/demography-*.csv files: one flat observation table in the

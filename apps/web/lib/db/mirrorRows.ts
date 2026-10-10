@@ -29,6 +29,7 @@ import type { UnemploymentObservation } from "../data/unemployment/types";
 import { TRADE_OVERVIEW_DOCUMENT_ID, type TradeOverviewFact } from "../data/tradeOverview/types";
 import { TRADE_PARTNER_DOCUMENT_IDS, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData } from "../data/tradePartners/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
+import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -517,6 +518,24 @@ export async function loadTradeOverviewFactsFromMirror(db: Pick<MirrorClient, "t
       year: row.year, indicatorId: row.indicatorId as TradeOverviewFact["indicatorId"], valueUsd: row.valueUsd.toFixed(),
       unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as "numeric", publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradeOverviewFact["role"],
       sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function wagesMirrorCreateRows(facts: readonly WagesFact[], importRunId: string): Prisma.WagesFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: wagesSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadWagesFactsFromMirror(db: Pick<MirrorClient, "wagesFact">): Promise<WagesFact[]> {
+  const rows = await db.wagesFact.findMany({ orderBy: [{ indicatorId: "asc" }, { dimension: "asc" }, { groupId: "asc" }, { sectorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== wagesSourceDocumentId(row.sourceId)) throw new Error("Wages source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as WagesFact["indicatorId"], dimension: row.dimension as WagesFact["dimension"], groupId: row.groupId, sectorId: row.sectorId as WagesFact["sectorId"],
+      value: row.value?.toFixed() ?? null, publishedValue: row.publishedValue?.toFixed() ?? null, unit: row.unit as "gel", basis: row.basis as "actual", valueStatus: row.valueStatus as WagesFact["valueStatus"],
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

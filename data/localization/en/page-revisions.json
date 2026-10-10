@@ -219,5 +219,11 @@
   "/explorer/demography/population/ambrolauri": "2026-10-07",
   "/explorer/demography/population/lentekhi": "2026-10-07",
   "/explorer/demography/population/oni": "2026-10-07",
-  "/explorer/demography/population/tsageri": "2026-10-07"
+  "/explorer/demography/population/tsageri": "2026-10-07",
+  "/explorer/wages": "2026-10-10",
+  "/explorer/wages/overview": "2026-10-10",
+  "/explorer/wages/industries": "2026-10-10",
+  "/explorer/wages/regions": "2026-10-10",
+  "/explorer/wages/gender": "2026-10-10",
+  "/methodology/wages": "2026-10-10"
 }

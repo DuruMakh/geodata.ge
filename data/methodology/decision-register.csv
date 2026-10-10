@@ -82,3 +82,7 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "trade.formulas","trade","docs/data-methodology/trade-annual.md","National goods Overview serving subset","trade.formulas","geodata_decision","2026-10-08"
 "trade.valuation","trade","docs/data-methodology/trade-annual.md","National goods Overview serving subset","trade.valuation","geodata_decision","2026-10-08"
 "trade.publication","trade","docs/data-methodology/trade-annual.md","National goods Overview serving subset","trade.publication","geodata_decision","2026-10-08"
+"wages.scope","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.scope","geodata_decision","2026-10-10"
+"wages.measures","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.measures","geodata_decision","2026-10-10"
+"wages.nominal","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.nominal","geodata_decision","2026-10-10"
+"wages.groups","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.groups","geodata_decision","2026-10-10"
