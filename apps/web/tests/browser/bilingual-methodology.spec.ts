@@ -42,7 +42,7 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/en/methodology");
     const rows = page.getByTestId("methodology-live-row");
-    await expect(rows).toHaveCount(12);
+    await expect(rows).toHaveCount(13);
     expect(await rows.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation", "unemployment", "wages", "trade", "external-flows", "demography"].map(id => `/en/methodology/${id}`));
     await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
     await expect(page.getByTestId("methodology-future-row").getByText("Coming soon", { exact: true })).toHaveCount(0);
