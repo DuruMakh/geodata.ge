@@ -1217,5 +1217,33 @@
   "source.geostat_earnings_annual_median": {
     "name": { "text": "Median earnings of employees by economic activity", "reviewedAt": "2026-10-10" },
     "derivation": null
+  },
+  "source.geostat_poverty_absolute": {
+    "name": { "text": "Share of population under the absolute poverty line", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_poverty_relative": {
+    "name": { "text": "Share of population under the relative poverty line", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_poverty_international": {
+    "name": { "text": "Share of population under the international poverty lines (2021 PPP)", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_gini": {
+    "name": { "text": "Gini coefficients", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_poverty_source_page": {
+    "name": { "text": "Poverty and Gini coefficients source page", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_poverty_metadata_2026": {
+    "name": { "text": "Metadata for poverty indicators and Gini coefficients", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_hies_metadata_2026": {
+    "name": { "text": "Metadata for the Households Incomes and Expenditures Survey", "reviewedAt": "2026-10-10" },
+    "derivation": null
   }
 }
