@@ -9,7 +9,7 @@ import { moneyTransferFactKey, type MoneyTransferEntity, type MoneyTransferFact,
 import { moneyTransfersEnglishLabels, validateMoneyTransfersData } from "./validation";
 
 export type ClientMoneyTransferFact = Pick<MoneyTransferFact, "entityId" | "year" | "measure" | "valueStatus" | "monthsReported" | "sourceId" | "vintage"> & { valueUsd: number | null };
-export type ClientMoneyTransfersData = { entities: MoneyTransferEntity[]; facts: ClientMoneyTransferFact[] };
+export type ClientMoneyTransfersData = { entities: MoneyTransferEntity[]; facts: ClientMoneyTransferFact[]; nominalGdpUsd: Record<number, number> };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 export async function loadMoneyTransfersData(): Promise<MoneyTransfersData> {
@@ -53,6 +53,7 @@ export function loadServedMoneyTransfersData(): Promise<MoneyTransfersData> {
   return servedPromise;
 }
 
-export function toClientMoneyTransfersData(data: MoneyTransfersData): ClientMoneyTransfersData {
-  return { entities: data.entities, facts: data.facts.map(({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd }) => ({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd: valueUsd === null ? null : Number(valueUsd) })) };
+/** `nominalGdpUsd` is the served nominal GDP in USD by year, used only for the share-of-GDP figure. */
+export function toClientMoneyTransfersData(data: MoneyTransfersData, nominalGdpUsd: Record<number, number>): ClientMoneyTransfersData {
+  return { entities: data.entities, nominalGdpUsd, facts: data.facts.map(({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd }) => ({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd: valueUsd === null ? null : Number(valueUsd) })) };
 }
