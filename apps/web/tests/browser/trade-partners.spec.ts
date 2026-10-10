@@ -11,7 +11,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Partners defaults, full ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/trade`);
-    const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(2); await cards.nth(1).click();
+    const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(3); await cards.nth(1).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/partners$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 218");

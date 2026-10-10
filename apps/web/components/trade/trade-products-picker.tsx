@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import type { ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { TRADE_PRODUCT_CATEGORIES, type TradeProductCategoryId } from "../../lib/data/tradeProducts/types";
@@ -20,7 +20,7 @@ export function TradeProductsPicker({ data, model, selectedIds, initialView, ret
   const [view, setView] = useState<TradeProductsBrowseView>(initialView), [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState<TradeProductCategoryId | null>(null), [page, setPage] = useState(0);
   const selected = new Set(draft);
-  const results = useMemo(() => findTradeProducts({ data, model, presentation, view, categoryId, query, selectedIds: draft, page }), [data, model, presentation, view, categoryId, query, draft, page]);
+  const results = findTradeProducts({ data, model, presentation, view, categoryId, query, selectedIds: draft, page });
   const showCategories = view === "categories" && !categoryId && !query.trim();
   useEffect(() => {
     const element = dialog.current!, body = document.body;

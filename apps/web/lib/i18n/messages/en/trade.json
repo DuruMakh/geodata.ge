@@ -2,7 +2,7 @@
   "trade.hubTitle": "Trade",
   "trade.title": "Trade overview",
   "trade.summary": "Compare Georgia’s annual exports, imports, total trade and trade balance in nominal US dollars. Goods only.",
-  "trade.hubSummary": "Explore Georgia’s annual goods trade through national totals, partner countries and country groups.",
+  "trade.hubSummary": "Explore Georgia’s annual goods trade through national totals, trading partners and products.",
   "trade.metaTitle": "External trade in goods",
   "trade.metaDescription": "Explore Georgia’s annual goods exports, imports, total trade and trade balance in USD.",
   "trade.indicator.trade.turnover": "Total trade",
@@ -80,5 +80,17 @@
   "trade.products.category.metals_stone_glass": "Metals, stone and glass",
   "trade.products.category.machinery_electronics": "Machinery and electronics",
   "trade.products.category.vehicles_transport": "Vehicles and transport",
-  "trade.products.category.other_products": "Other products"
+  "trade.products.category.other_products": "Other products",
+  "trade.products.summary": "Compare annual goods exports and imports by product in nominal US dollars.",
+  "trade.products.measure": "Trade flow",
+  "trade.products.series": "Product · code · source period",
+  "trade.products.remove": "Remove",
+  "trade.products.more": "more",
+  "trade.products.emptySelection": "Add products to start a comparison. The leading products remain below.",
+  "trade.products.selectionReset": "This saved product selection is unavailable or outdated. Georgia total has been restored; add products to start a new comparison.",
+  "trade.products.tablePages": "Selected product table pages",
+  "trade.products.rankingPages": "Leading product pages",
+  "trade.products.rankingTitle": "Leading products · {measure} · {year}",
+  "trade.products.showAll": "Show all products",
+  "trade.products.definitions": "Exports include re-exports and use FOB values; imports use CIF values. Missing observations remain gaps or dashes. Publication status: unspecified."
 }

@@ -2,7 +2,7 @@
   "trade.hubTitle": "საგარეო ვაჭრობა",
   "trade.title": "საგარეო ვაჭრობის მიმოხილვა",
   "trade.summary": "შეადარეთ საქართველოს საქონლის წლიური ექსპორტი, იმპორტი, სავაჭრო ბრუნვა და სალდო ნომინალურ აშშ დოლარებში.",
-  "trade.hubSummary": "შეისწავლეთ საქართველოს საქონლით წლიური ვაჭრობა ეროვნული ჯამების, პარტნიორი ქვეყნებისა და ქვეყნების ჯგუფების მიხედვით.",
+  "trade.hubSummary": "შეისწავლეთ საქართველოს საქონლით წლიური ვაჭრობა ეროვნული ჯამების, სავაჭრო პარტნიორებისა და პროდუქტების მიხედვით.",
   "trade.metaTitle": "საქონლით საგარეო ვაჭრობა",
   "trade.metaDescription": "საქართველოს საქონლის წლიური ექსპორტი, იმპორტი, სავაჭრო ბრუნვა და სალდო აშშ დოლარებში.",
   "trade.indicator.trade.turnover": "საგარეო სავაჭრო ბრუნვა",
@@ -80,5 +80,17 @@
   "trade.products.category.metals_stone_glass": "ლითონები, ქვა და მინა",
   "trade.products.category.machinery_electronics": "მანქანა-დანადგარები და ელექტრონიკა",
   "trade.products.category.vehicles_transport": "ავტომობილები და ტრანსპორტი",
-  "trade.products.category.other_products": "სხვა პროდუქტები"
+  "trade.products.category.other_products": "სხვა პროდუქტები",
+  "trade.products.summary": "შეადარეთ საქონლის წლიური ექსპორტი და იმპორტი პროდუქტების მიხედვით ნომინალურ აშშ დოლარებში.",
+  "trade.products.measure": "სავაჭრო ნაკადი",
+  "trade.products.series": "პროდუქტი · კოდი · წყაროს პერიოდი",
+  "trade.products.remove": "წაშლა",
+  "trade.products.more": "სხვა",
+  "trade.products.emptySelection": "შედარების დასაწყებად დაამატეთ პროდუქტები. წამყვანი პროდუქტები ქვემოთ რჩება.",
+  "trade.products.selectionReset": "შენახული პროდუქტების არჩევანი მიუწვდომელი ან მოძველებულია. აღდგა საქართველოს ჯამი; ახალი შედარებისთვის დაამატეთ პროდუქტები.",
+  "trade.products.tablePages": "მონიშნული პროდუქტების ცხრილის გვერდები",
+  "trade.products.rankingPages": "წამყვანი პროდუქტების გვერდები",
+  "trade.products.rankingTitle": "წამყვანი პროდუქტები · {measure} · {year}",
+  "trade.products.showAll": "ყველა პროდუქტის ჩვენება",
+  "trade.products.definitions": "ექსპორტი მოიცავს რეექსპორტს და შეფასებულია FOB-ით; იმპორტი — CIF-ით. გამოტოვებული დაკვირვება წყვეტით ან ტირეთი ჩანს. გამოქვეყნების სტატუსი: დაუზუსტებელი."
 }
