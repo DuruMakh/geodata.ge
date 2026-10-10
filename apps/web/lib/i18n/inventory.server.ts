@@ -14,6 +14,7 @@ import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
+import { readTradeProductCatalogue } from "../data/tradeProducts/catalogue";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
@@ -27,7 +28,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
     "/explorer/unemployment",
-    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners",
+    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
     "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
     ...regions.map(region => unemploymentRegionHref(region.id)),
@@ -46,9 +47,9 @@ export async function listPublicPagePaths(): Promise<string[]> {
 }
 
 export async function loadTranslationInventory(): Promise<TranslationInventory> {
-  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, tradeDocuments, wagesDocuments, pagePaths] = await Promise.all([
+  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, tradeDocuments, wagesDocuments, pagePaths, tradeProducts] = await Promise.all([
     loadServedExplorerData(), loadServedMunicipalData(), loadManifestDocuments(),
-    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "trade"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "wages"), listPublicPagePaths(),
+    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "trade"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "wages"), listPublicPagePaths(), readTradeProductCatalogue(path.resolve(process.cwd(), "../..")),
   ]);
   const sources = resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments: documents });
   const programmeHistory = explorer.adminFacts.filter((fact) => fact.level === "major_program").map((fact) => {
@@ -61,6 +62,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...sectorRegistry.map(row => row.id), "economic-sectors",
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
+      ...tradeProducts.map(row => row.id),
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),
       "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia", "snapshot.other",

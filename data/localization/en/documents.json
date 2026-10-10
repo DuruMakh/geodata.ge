@@ -3608,6 +3608,96 @@
     },
     "documentLanguage": "en"
   },
+  "geostat_trade_export-product-by-4-digit-2015-2026": {
+    "title": {
+      "text": "Goods exports by four-digit product code, 2015–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_export-product-by-4-digit-2000-2014": {
+    "title": {
+      "text": "Goods exports by four-digit product code, 2000–2014",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_export-product-by-4-digit-1995-1999": {
+    "title": {
+      "text": "Goods exports by four-digit product code, 1995–1999",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_import-product-by-4-digit-2015-2026": {
+    "title": {
+      "text": "Goods imports by four-digit product code, 2015–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_import-product-by-4-digit-2000-2014": {
+    "title": {
+      "text": "Goods imports by four-digit product code, 2000–2014",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_import-products--1995-1999-eng": {
+    "title": {
+      "text": "Goods imports by four-digit product code, 1995–1999",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
   "geostat_earnings_annual_headline": {
     "title": { "text": "Average monthly nominal earnings of employees", "reviewedAt": "2026-10-10" },
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },

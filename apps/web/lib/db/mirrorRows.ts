@@ -28,6 +28,7 @@ import type { SectorObservation } from "../data/economicSectors/types";
 import type { UnemploymentObservation } from "../data/unemployment/types";
 import { TRADE_OVERVIEW_DOCUMENT_ID, type TradeOverviewFact } from "../data/tradeOverview/types";
 import { TRADE_PARTNER_DOCUMENT_IDS, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData } from "../data/tradePartners/types";
+import { TRADE_PRODUCT_DOCUMENT_IDS, type TradeProductEntity, type TradeProductFact, type TradeProductsData } from "../data/tradeProducts/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
@@ -506,6 +507,24 @@ export async function loadTradePartnersDataFromMirror(db: Pick<MirrorClient, "tr
   const facts = factRows.map(row => {
     if (!TRADE_PARTNER_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_PARTNER_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId) throw new Error("Trade partner source relation mismatch");
     return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradePartnerFact["indicatorId"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as TradePartnerFact["valueStatus"], publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradePartnerFact["role"], sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock, lastReviewedAt: isoDate(row.lastReviewedAt) };
+  });
+  return { entities, facts };
+}
+
+export function tradeProductEntityMirrorCreateRows(entities: readonly TradeProductEntity[], importRunId: string): Prisma.TradeProductEntityCreateManyInput[] {
+  return entities.map(entity => ({ ...entity, importRunId }));
+}
+export function tradeProductFactMirrorCreateRows(facts: readonly TradeProductFact[], importRunId: string): Prisma.TradeProductFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({ ...fact, sourceDocumentId: TRADE_PRODUCT_DOCUMENT_IDS[fact.sourceId], lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId }));
+}
+export async function loadTradeProductsDataFromMirror(db: Pick<MirrorClient, "tradeProductEntity" | "tradeProductFact">): Promise<TradeProductsData> {
+  const [entityRows, factRows] = await Promise.all([
+    db.tradeProductEntity.findMany({ orderBy: { id: "asc" } }), db.tradeProductFact.findMany({ orderBy: [{ entityId: "asc" }, { year: "asc" }, { indicatorId: "asc" }] }),
+  ]);
+  const entities = entityRows.map(({ id, sourceBlock, code, labelKa, sourceLabelEn, categoryId, aliasesKa, aliasesEn }) => ({ id, sourceBlock: sourceBlock as TradeProductEntity["sourceBlock"], code, labelKa, sourceLabelEn, categoryId: categoryId as TradeProductEntity["categoryId"], aliasesKa, aliasesEn }));
+  const facts = factRows.map(row => {
+    if (!TRADE_PRODUCT_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_PRODUCT_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId) throw new Error("Trade product source relation mismatch");
+    return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradeProductFact["indicatorId"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as TradeProductFact["valueStatus"], publicationStatus: row.publicationStatus as "unspecified", role: row.role as "detail", sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock as TradeProductFact["sourceBlock"], lastReviewedAt: isoDate(row.lastReviewedAt) };
   });
   return { entities, facts };
 }

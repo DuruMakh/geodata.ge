@@ -140,4 +140,9 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
     // The hub shows both, so it moves when either refreshes.
     expect(dates.get(`${SITE}/explorer/economy`)).toBe([gdp!, sectors!].sort().at(-1));
   });
+  it("includes both Products routes with their own review date", async () => {
+    const dates = await sitemapDates();
+    expect(dates.get(`${SITE}/explorer/trade/products`)).toBe("2026-10-09");
+    expect(dates.get(`${SITE}/en/explorer/trade/products`)).toBe("2026-10-10");
+  });
 });
