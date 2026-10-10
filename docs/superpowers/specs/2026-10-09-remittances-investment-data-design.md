@@ -2,7 +2,7 @@
 
 Date: 2026-10-09
 
-Status: Draft for review. On 2026-10-10 Duru chose to continue with the recommended options in §8 (all three families together, with shares of GDP); the specification as a whole is not yet approved. It proposes a reviewed annual data foundation first, the same way Trade started (`2026-10-07-trade-data-design.md`), and sketches the pages that could follow. The official sources were captured on 2026-10-10 (§5); coverage in §3 is read from those files.
+Status: Approved by Duru on 2026-10-10 with the recommended options in §8 (all three families together, with shares of GDP). The research package is prepared in `docs/Raw Data/External/2026-10-10/`; methodology `docs/data-methodology/external-flows-annual.md`. It proposes a reviewed annual data foundation first, the same way Trade started (`2026-10-07-trade-data-design.md`), and sketches the pages that could follow. The official sources were captured on 2026-10-10 (§5); coverage in §3 is read from those files.
 
 ## 1. Outcome
 
@@ -14,7 +14,7 @@ Give Fiscal.ge readers a reviewed, source-preserving view of the money that flow
 
 These complete the picture Trade leaves open on purpose: the Trade foundation states that "remittances, investment income and the current-account balance are outside it" (`2026-10-07-trade-data-design.md` §2).
 
-This first stage, if approved, delivers data, source evidence, methodology and validation only. Pages, navigation, charts, downloads, MCP tools, serving-database imports and deployment are separate decisions, exactly as for Trade.
+This first stage delivers data, source evidence, methodology and validation only. Pages, navigation, charts, downloads, MCP tools, serving-database imports and deployment are separate decisions, exactly as for Trade.
 
 ## 2. Why this hub is worth building next
 
@@ -25,11 +25,13 @@ The three flows are among the largest numbers in Georgia's economy and are widel
 - FDI into Georgia was USD 1,569.3 million in 2024 by Geostat's August 2025 release, and USD 1,900.4 million for 2025 by Geostat's 8 September 2026 release (2025 is now "adjusted"; 2026 quarters are preliminary).
 - The current account deficit was USD 1,008.4 million in 2025, 2.6% of GDP, which NBG calls the lowest on record (NBG release, 31 March 2026). It was about USD 1.8 billion in 2024.
 
+These are the figures as first released. Both publishers revise them: in the captured 30 September 2026 BoP file the 2025 deficit is USD 1,123.2 million, and Geostat's 2024 FDI is now USD 1,592.7 million. The package always carries the vintage of each value.
+
 ## 3. Proposed collection scope
 
 | Family | Publisher | Content | Expected annual coverage |
 | --- | --- | --- | --- |
-| Money transfers | NBG (tables REMC, REMM, REMS) | Inflows and outflows through fast money transfer systems, total, by country and by transfer system | REMC by country: monthly 2000-01 to 2026-08 in four period sheets (2000–2007, 2008–2009, 2010–2011, 2012–2026). REMM totals: 1999-07 to 2026-08, but the file has no 2024 column, so 2024 comes from REMC, whose 2024 inflow (USD 3,361.5 million) matches NBG's 2024 publication. REMS by system: 2008-01 to 2026-08. Microfinance organizations included from January 2010 (marked `2010*` in REMM; coverage break). Complete years: 2000–2025 |
+| Money transfers | NBG (tables REMC, REMM, REMS) | Inflows and outflows through fast money transfer systems, total and by country (REMC prepared; REMM used as a check; REMS by transfer system archived only) | REMC by country: monthly 2000-01 to 2026-08 in four period sheets (2000–2007, 2008–2009, 2010–2011, 2012–2026). REMM totals: 1999-07 to 2026-08, but the file has no 2024 column, so 2024 comes from REMC, whose 2024 inflow (USD 3,361.5 million) matches NBG's 2024 publication. REMS by system: 2008-01 to 2026-08. Microfinance organizations included from January 2010 (marked `2010*` in REMM; coverage break). Complete years: 2000–2025 |
 | Balance of payments, summary | NBG (table BoP, BPM6) | Current account and its parts: goods, services, primary income, secondary income (with personal transfers and workers' remittances), capital account, financial account by functional category | BOP-6 workbook: 2000Q1–2026Q2 on BPM6 (NBG recalculated 2000–2013); complete years 2000–2025. Earlier BPM5 years are not mixed in |
 | FDI flows | Geostat | Total by year (from quarters), by country, by economic sector (NACE Rev.2), by component (equity, reinvestment of earnings, debt instruments), by region | Total by quarters and by country: 1996–2026Q2. Regions: 2009Q1. Components: 2013Q1. Sectors (NACE Rev.2): 2016Q1. Separate BPM6 table: 2000Q1–2026Q2. Each breakdown keeps its own start year; complete years end in 2025 |
 | FDI position (stock) | Geostat | End-of-year position by country and by sector, integrated format | By country: end-2015 to 30 June 2026. By sector: 2000 to 30 June 2026. Integrated format compiled since March 2018 |
@@ -49,7 +51,7 @@ These are the points a reader and the methodology page must get right.
 5. **Reinvested earnings can dominate and debt can be negative.** In 2024, NBG's FDI liabilities were USD 521.8 million equity, USD 1,346.4 million reinvested earnings and −USD 265.2 million other capital. Negative values are real, not errors, and must not be dropped or shown as zero.
 6. **BPM6 signs.** Current and capital account credits and debits are both positive; the balance is credit minus debit. In the financial account, positive means an increase in assets or liabilities. Preserve published signs exactly and document them.
 7. **BoP goods are not Trade goods.** BoP goods are recorded on change of ownership with exports and imports both FOB; Trade records border crossings with CIF imports. The two totals will not match and must not be reconciled into each other.
-8. **Countries.** Money transfers are by the country the transfer came from or went to, not the sender's citizenship. FDI by country is the immediate investor's country; offshore and holding-company locations (for example Malta or the Netherlands) appear as investors. Keep publisher country labels and codes; no ultimate-owner reallocation.
+8. **Countries.** Money transfers are by the country the transfer came from or went to, not the sender's citizenship. FDI by country names the investing non-resident's country; holding locations (for example Malta or the Netherlands) appear among the largest investors. Keep publisher country labels and codes; no ultimate-owner reallocation.
 9. **Units and currency.** BoP and FDI are in USD. Preserve million or thousand units as published; no GEL conversion in this stage.
 
 ## 5. Sources and intake
@@ -68,17 +70,17 @@ The cloud workspace cannot reach `nbg.gov.ge` or `geostat.ge`, so the capture ra
 
 ## 6. Prepared package, validation and reuse
 
-Reuse as is: the Trade research-package pattern — a package-local `prepare.py` with `--write` and `--check`, exact decimals, `source-observations/`, `artifact-manifest.csv`, `coverage.csv`, UTF-8-with-BOM CSVs, and an independent `verify_independent.py` over `openpyxl`; the source-archive and methodology-page components; the nominal GDP series (`docs/data-methodology/national-nominal-gdp.md`) if shares of GDP are approved.
+Reuse as is: the Trade research-package pattern — a package-local `prepare.py` with `--write` and `--check`, exact decimals, `source-observations/`, `artifact-manifest.csv`, UTF-8-with-BOM CSVs (as built, every source cell lives in the family CSVs, so no separate `source-observations/` or `coverage.csv`), and an independent `verify_independent.py` over `openpyxl`; the Trade package's stored-decimal XLSX reader (`archive.py`, loaded by path); the source-archive and methodology-page components; the nominal GDP series (`docs/data-methodology/national-nominal-gdp.md`) if shares of GDP are approved.
 
 Small additions: a publication-vintage column, because these sources revise every year in a way Trade's do not.
 
-Genuinely new: the research CSVs (`money-transfers-annual.csv`, `bop-annual.csv`, `fdi-flows-annual.csv`, `fdi-position-annual.csv`) and the methodology `docs/data-methodology/external-flows-annual.md`.
+Genuinely new: the research CSVs (`money-transfers-annual.csv`, `bop-annual.csv`, `fdi-flows-annual.csv`, `fdi-position-annual.csv`, `shares-of-gdp-annual.csv`), the reviewed `money-transfer-country-identities.csv` and the methodology `docs/data-methodology/external-flows-annual.md`.
 
-Reconcile, within USD 0.1 million unless a source shows otherwise:
+Reconcile (as built: within USD 1, or within the stored rounding of the compared values when coarser; see the methodology):
 
 - Money-transfer countries with the inflow and outflow totals, keeping any unallocated remainder explicit.
 - BoP current account with goods + services + primary income + secondary income, and personal transfers within secondary income.
-- Geostat FDI by country, by sector, by component and by region each with the same-year total; quarters with the annual total.
+- Geostat FDI by country, by sector, by component and by region each with the same-year total; quarters with the annual total. Money-transfer monthly sums with NBG's published annual totals (REMM) where it has them.
 - NBG and Geostat FDI compared per year and reported as a difference with vintages, never forced to agree.
 
 Focused failure tests reject an omitted year, a lost country or sector, a duplicate key, a sign flip, an invented zero, a changed source fingerprint and any 2026 value entering an annual file.

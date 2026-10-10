@@ -1,0 +1,73 @@
+{
+  "checks": {
+    "fail": 0,
+    "not_published": 2,
+    "pass": 1003,
+    "reported": 76
+  },
+  "failed_checks": [],
+  "input_sha256": {
+    "data/imports/gdp-overview-annual.csv": "02f2f9b0a2517bf54aee19899219eea84ee9860b116eba8a437af9c2fe447a1a",
+    "money-transfer-country-identities.csv": "91b529258538c31a0b7079f6a76903f06b540ecdad7cfd8698e5692a063f2b7c",
+    "official/full-source-manifest.json": "b5651bf663195c0d9070c6595b1bde3ffa12ecc813171ecccdb9a7c0f0c07860"
+  },
+  "observations": 14851,
+  "status_counts": {
+    "bop.bop_bpm6": {
+      "numeric": 1404
+    },
+    "fdi_flows.bpm6": {
+      "numeric": 78
+    },
+    "fdi_flows.component": {
+      "numeric": 52
+    },
+    "fdi_flows.country": {
+      "not_applicable": 733,
+      "numeric": 1697
+    },
+    "fdi_flows.region": {
+      "not_applicable": 42,
+      "numeric": 213
+    },
+    "fdi_flows.sector": {
+      "numeric": 190
+    },
+    "fdi_flows.total": {
+      "numeric": 30
+    },
+    "fdi_position.country": {
+      "not_applicable": 5,
+      "numeric": 886
+    },
+    "fdi_position.sector": {
+      "numeric": 209
+    },
+    "money_transfers.country": {
+      "blank": 14,
+      "numeric": 9106,
+      "partial_months": 140
+    },
+    "money_transfers.total": {
+      "numeric": 52
+    }
+  },
+  "years": {
+    "bop": [
+      2000,
+      2025
+    ],
+    "fdi_flows": [
+      1996,
+      2025
+    ],
+    "fdi_position": [
+      2015,
+      2025
+    ],
+    "money_transfers": [
+      2000,
+      2025
+    ]
+  }
+}
