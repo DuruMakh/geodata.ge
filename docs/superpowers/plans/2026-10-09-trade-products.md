@@ -163,7 +163,7 @@ expect(decodeTradeProductsSelection(token, { ...data, catalogueFingerprint: "b".
 - `buildTradeProductsWorkbookModel(input: { data: ClientTradeProductsData; state: TradeProductsState; sources: readonly WorkbookPublicSource[]; siteOrigin: string }, presentation: Presentation): WorkbookExportModel` reuses `buildWorkbookExportModel` and the existing writer.
 - Source projection uses Task 2 block/flow IDs and existing validated public source links; national selection also includes the existing FTrade source.
 
-- [ ] Write failures for a workbook spanning two versions of one code, unavailable amounts, true zero, negative amount and a selection beyond 25 visible rows. Assert three established sheets, every selected identity/year, USD headings, version-qualified names, actual basis, unspecified publication status, source hyperlinks and the historical-definition note. No percentage/growth/internal-cell columns appear.
+- [x] Write failures for a workbook spanning two versions of one code, unavailable amounts, true zero, negative amount and a selection beyond 25 visible rows. Assert three established sheets, every selected identity/year, USD headings, version-qualified names, actual basis, unspecified publication status, source hyperlinks and the historical-definition note. No percentage/growth/internal-cell columns appear.
 
 Name the workbook test `exports all committed historical series beyond the table page`; use 30 selected fixture identities and three selected years, and inspect the generated native workbook with the existing writer test helpers:
 
@@ -176,10 +176,10 @@ expect(model.readable.subtitle).toContain("2019–2021");
 
 Here `actualLabel` is the existing localized workbook basis label. Also assert both block-qualified 8703 labels, blank missing-value cells and all selected original-source links using the established workbook model fields.
 
-- [ ] Write source tests requiring the exact six original hashes, lowercase archive paths and all existing Trade originals unchanged. Run `npx vitest run tests/explorer/tradeProductsWorkbook.test.ts tests/methodology/tradeProductSources.test.ts`; require failure before implementation.
-- [ ] Implement the workbook adapter using committed model rows and existing precision/format conventions. Select original sources by each selected entity's block and active flow, even for an old version without end-year data; never use table/picker page rows as export input. Register the six original files from spec §9 through the archive whitelist/manifest and reviewed bilingual source registry, preserving bytes and native IDs.
-- [ ] Extend bilingual Trade methodology with full HS4 coverage, separate versions, navigation-only categories, nominal USD/FOB/CIF, exact source retention and absence/zero rules. Regenerate archives with `npm run data:prepare-methodology-archives`, check with `npm run data:check-methodology-archives`, then run focused archive/workbook tests, `npm run i18n:check` and `npx vitest run tests/factQuery/reference.test.ts`. The unchanged Trade MCP/data scope must still pass.
-- [ ] Commit as `feat: add source-faithful product workbooks and archives`.
+- [x] Write source tests requiring the exact six original hashes, lowercase archive paths and all existing Trade originals unchanged. Run `npx vitest run tests/explorer/tradeProductsWorkbook.test.ts tests/methodology/tradeProductSources.test.ts`; require failure before implementation.
+- [x] Implement the workbook adapter using committed model rows and existing precision/format conventions. Select original sources by each selected entity's block and active flow, even for an old version without end-year data; never use table/picker page rows as export input. Register the six original files from spec §9 through the archive whitelist/manifest and reviewed bilingual source registry, preserving bytes and native IDs.
+- [x] Extend bilingual Trade methodology with full HS4 coverage, separate versions, navigation-only categories, nominal USD/FOB/CIF, exact source retention and absence/zero rules. Regenerate archives with `npm run data:prepare-methodology-archives`, check with `npm run data:check-methodology-archives`, then run focused archive/workbook tests, `npm run i18n:check` and `npx vitest run tests/factQuery/reference.test.ts`. The unchanged Trade MCP/data scope must still pass.
+- [x] Commit as `feat: add source-faithful product workbooks and archives`.
 
 ## Task 5: Staged product selection inside the accessible popup
 
