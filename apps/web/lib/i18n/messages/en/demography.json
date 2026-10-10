@@ -192,5 +192,17 @@
   "demography.bandYoung": "Aged 0–14",
   "demography.bandWorking": "Aged 15–64",
   "demography.bandOld": "Aged 65 and over",
-  "demography.unitShare": "% of the population"
+  "demography.unitShare": "% of the population",
+  "demography.ageSexCensusHeading": "Age and sex · census, 14 November 2024",
+  "demography.measureLabel": "Measure",
+  "demography.measurePersons": "People",
+  "demography.pyramidMode": "Pyramid",
+  "demography.pyramidAria": "Population pyramid, {place}, {date}: men on the left, women on the right, ages 0–4 at the bottom to 85+ at the top",
+  "demography.pyramidTableCaption": "Population by age and sex, {place}, {date}",
+  "demography.kpiOld": "Aged 65 and over",
+  "demography.kpiCounted": "People counted",
+  "demography.kpiUrban": "Living in cities",
+  "demography.censusSource": "Source: Geostat, 2024 census, population by region, age, urban and rural settlement and sex, counted on 14 November 2024.",
+  "demography.ageSexNationalLink": "Compare the regions and see Georgia’s pyramid for every year",
+  "demography.ageSexGeorgiaLink": "Georgia’s pyramid for every year since {first}"
 }

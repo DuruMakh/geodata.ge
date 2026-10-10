@@ -192,5 +192,17 @@
   "demography.bandYoung": "0–14 წლის",
   "demography.bandWorking": "15–64 წლის",
   "demography.bandOld": "65 წლის და უფროსი",
-  "demography.unitShare": "% მოსახლეობისგან"
+  "demography.unitShare": "% მოსახლეობისგან",
+  "demography.ageSexCensusHeading": "ასაკი და სქესი · აღწერა, 2024 წლის 14 ნოემბერი",
+  "demography.measureLabel": "საზომი",
+  "demography.measurePersons": "ადამიანი",
+  "demography.pyramidMode": "პირამიდა",
+  "demography.pyramidAria": "მოსახლეობის პირამიდა, {place}, {date}: მამაკაცები მარცხნივ, ქალები მარჯვნივ, ქვემოთ 0–4, ზემოთ 85+",
+  "demography.pyramidTableCaption": "მოსახლეობა ასაკისა და სქესის მიხედვით, {place}, {date}",
+  "demography.kpiOld": "65 წლის და უფროსი",
+  "demography.kpiCounted": "აღწერილი მოსახლეობა",
+  "demography.kpiUrban": "ქალაქის მოსახლეობა",
+  "demography.censusSource": "წყარო: საქსტატი, 2024 წლის აღწერა, მოსახლეობა რეგიონების, ასაკის, ქალაქ-სოფლისა და სქესის მიხედვით, 2024 წლის 14 ნოემბრის მდგომარეობით.",
+  "demography.ageSexNationalLink": "რეგიონების შედარება და საქართველოს პირამიდა ყოველი წლისთვის",
+  "demography.ageSexGeorgiaLink": "საქართველოს პირამიდა ყოველი წლისთვის, {first} წლიდან"
 }

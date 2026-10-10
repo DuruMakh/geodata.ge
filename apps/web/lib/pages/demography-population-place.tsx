@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { AgeSexSection } from "../../components/demography/age-sex-section";
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
 import { VitalSection } from "../../components/demography/vital-section";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
@@ -9,6 +10,7 @@ import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { loadServedMunicipalData } from "../data/servedData";
+import { censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
 import {
   POPULATION_PATH,
@@ -20,7 +22,7 @@ import {
 } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel, placeYears } from "../explorer/demographyPopulation";
 import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
-import { BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
+import { AGE_SEX_PATH, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { vitalFactsForPlace } from "../explorer/demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { pickerGroupsFromRows } from "../explorer/municipalData";
@@ -188,6 +190,14 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
           siteOrigin={resolveSiteUrl()}
           workbookScope={workbookScopeFor(route)}
           nationalHref={BIRTHS_DEATHS_PATH}
+        />
+        <AgeSexSection
+          place={place}
+          facts={censusAgeFactsForPlace(served.facts, place.id)}
+          sources={sources.filter((source) => source.sourceId === SOURCE_ID.censusAge)}
+          siteOrigin={resolveSiteUrl()}
+          workbookScope={workbookScopeFor(route)}
+          nationalHref={AGE_SEX_PATH}
         />
       </ExplorerPage>
     </I18nProvider>
