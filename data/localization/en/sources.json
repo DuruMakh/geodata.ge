@@ -1218,6 +1218,20 @@
     "name": { "text": "Median earnings of employees by economic activity", "reviewedAt": "2026-10-10" },
     "derivation": null
   },
+  "source.geostat_trade_domestic_export_country_2014_2026": {
+    "name": {
+      "text": "Domestic exports by country in 2014–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_domestic_exports_by_4_digit_2014_2026": {
+    "name": {
+      "text": "Domestic exports by four-digit product in 2014–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "derivation": null
+  },
   "source.geostat_poverty_absolute": {
     "name": { "text": "Share of population under the absolute poverty line", "reviewedAt": "2026-10-10" },
     "derivation": null

@@ -1,6 +1,6 @@
 "use client";
 import { Fragment, useState } from "react";
-import type { TradeOverviewIndicator } from "../../lib/data/tradeOverview/types";
+import type { TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import type { TradePartnersModel } from "../../lib/explorer/tradePartners";
 import type { TradeProductRankingRow } from "../../lib/explorer/tradeProducts";
 import type { TradePartnersTab } from "../../lib/explorer/tradePartnersState";
@@ -9,7 +9,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SectionTitle } from "../ui/editorial";
 
-export function TradePartnersRanking({ model, tab, measure, pageSize }: { model: Pick<TradePartnersModel, "range" | "unit"> & { ranking: readonly TradeProductRankingRow[]; missingRanking: readonly TradeProductRankingRow[] }; tab: TradePartnersTab | "products"; measure: TradeOverviewIndicator; pageSize?: number }) {
+export function TradePartnersRanking({ model, tab, measure, pageSize }: { model: Pick<TradePartnersModel, "range" | "unit"> & { ranking: readonly TradeProductRankingRow[]; missingRanking: readonly TradeProductRankingRow[] }; tab: TradePartnersTab | "products"; measure: TradeChartIndicator; pageSize?: number }) {
   const [expanded, setExpanded] = useState(false);
   const [page, setPage] = useState(0);
   const { messages } = useI18n();
@@ -34,7 +34,7 @@ export function TradePartnersRanking({ model, tab, measure, pageSize }: { model:
   </tr>;
   return <section data-testid="trade-partners-ranking" data-end-year={model.range.end} data-has-share={String(!balance)} className="mt-10 border-t-2 border-[var(--ink)] pt-5">
     <SectionTitle>{title}</SectionTitle>
-    <p className="mt-2 text-[11px] text-[var(--muted)]">{model.unit.label} · {tab === "products" ? p("shareNote") : t(balance ? "balanceRankingNote" : "shareNote")}</p>
+    <p className="mt-2 text-[11px] text-[var(--muted)]">{model.unit.label} · {tab === "products" || measure === "trade.domestic_exports" || measure === "trade.reexports" ? p("shareNote") : t(balance ? "balanceRankingNote" : "shareNote")}</p>
     <table className="mt-5 w-full table-fixed border-collapse">
       <caption className="sr-only">{title} · {model.unit.label}</caption>
       <colgroup><col className="w-[6%]" /><col style={{ width: balance ? "64%" : "49%" }} /><col className="w-[30%] min-[640px]:w-[23%]" />{!balance ? <col className="w-[15%] min-[640px]:w-[22%]" /> : null}</colgroup>

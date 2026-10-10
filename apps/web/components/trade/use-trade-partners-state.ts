@@ -15,12 +15,13 @@ export function useTradePartnersState(data: ClientTradePartnersData) {
   useAppReady();
   const update = useCallback((change: (previous: TradePartnersState) => TradePartnersState, push = false) => {
     const next = change(current.current); current.current = next;
-    const hash = `#${serializeTradePartnersHash(next)}`;
+    const hash = `#${serializeTradePartnersHash(next, data)}`;
     if (window.location.hash !== hash) {
       try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
       catch { /* Embedded contexts may deny History access; the view still updates. */ }
     }
     setState(next);
-  }, []);
+    if (data.measures) window.dispatchEvent(new Event("trade-domestic-state"));
+  }, [data]);
   return { state, update };
 }

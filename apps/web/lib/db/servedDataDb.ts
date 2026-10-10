@@ -31,6 +31,7 @@ import {
   loadForeignInvestmentDataFromMirror,
   loadCurrentAccountFactsFromMirror,
   loadTradeProductsDataFromMirror,
+  loadTradeDomesticDataFromMirror,
   loadRegionalEconomyFactsFromMirror,
   loadDemographyFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
@@ -153,6 +154,9 @@ export async function loadCurrentAccountFactsFromDb() {
 }
 export async function loadTradeProductsDataFromDb() {
   return loadTradeProductsDataFromMirror(prisma);
+}
+export async function loadTradeDomesticDataFromDb() {
+  return loadTradeDomesticDataFromMirror(prisma);
 }
 export async function loadRegionalEconomyFactsFromDb() {
   return loadRegionalEconomyFactsFromMirror(prisma);

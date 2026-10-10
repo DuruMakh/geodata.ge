@@ -23,6 +23,7 @@ export function useTradeProductsState(data: ClientTradeProductsData) {
       catch { /* Embedded contexts may deny History access; the comparison still updates. */ }
     }
     setRestored(next);
+    if (data.measures) window.dispatchEvent(new Event("trade-domestic-state"));
   }, [data]);
   return { state: restored, selectionReset: restored.selectionReset, update };
 }

@@ -11,15 +11,21 @@ export function buildTradePartnersWorkbookModel(input: { data: ClientTradePartne
   const model = buildTradePartnersModel(input.data, input.state, presentation);
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
   const entities = new Map(input.data.entities.map(entity => [entity.id, entity]));
+  const domestic = Boolean(input.data.measures);
   const filenames = new Set<string>();
   for (const id of model.selectedIds) {
+    if (domestic) {
+      filenames.add("domestic-export-country-2014-2026.xlsx");
+      if (input.state.measure === "trade.reexports") filenames.add(id === TRADE_PARTNER_TOTAL_ID ? "ftrade_1995-2026.xlsx" : "export-country-1995-2026.xlsx");
+      continue;
+    }
     if (id === TRADE_PARTNER_TOTAL_ID) { filenames.add("ftrade_1995-2026.xlsx"); continue; }
     const kind = entities.get(id)!.kind, suffix = kind === "country" ? "country" : "country-group";
     if (input.state.measure !== "trade.imports") filenames.add(`export-${suffix}-1995-2026.xlsx`);
     if (input.state.measure !== "trade.exports") filenames.add(`import-${suffix}-1995-2026.xlsx`);
   }
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: "trade-partners", title: t("partners.title"), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
+    locale: presentation.locale, filenameBase: domestic ? "trade-domestic-countries" : "trade-partners", title: t(domestic ? "domestic.countriesTitle" : "partners.title"), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: TRADE_PARTNER_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
@@ -27,7 +33,8 @@ export function buildTradePartnersWorkbookModel(input: { data: ClientTradePartne
     }), sources: input.sources.filter(source => filenames.has(source.downloadHref.split("/").at(-1)!)), siteOrigin: input.siteOrigin,
   });
   const groupNote = model.selectedIds.some(id => entities.get(id)?.kind === "group") ? ` · ${t("partners.groupOverlap")}` : "";
-  exportModel.readable.subtitle = `${t(`indicator.${input.state.measure}`)} · ${model.range.start}–${model.range.end} · ${model.unit.label} · ${t("workbook.formulas")}${groupNote}`;
+  exportModel.readable.subtitle = `${t(`indicator.${input.state.measure}`)} · ${model.range.start}–${model.range.end} · ${model.unit.label} · ${t(domestic ? "domestic.workbookNote" : "workbook.formulas")}${groupNote}`;
+  if (domestic) exportModel.readable.fitSubtitle = true;
   const values = model.selectedIds.flatMap(id => model.years.map(year => model.valuesByEntity[id][year])).filter((value): value is number => value !== null);
   const amountDecimals = Math.max(model.unit.decimals, unitFor(values, model.unit, 15).decimals);
   const amountFormat = "#,##0." + "0".repeat(amountDecimals);

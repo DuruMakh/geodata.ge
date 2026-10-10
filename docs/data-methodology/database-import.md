@@ -318,3 +318,7 @@ Verify instead by either:
 
 Production is unaffected by all of this: deploys run `prisma migrate deploy`,
 which never uses a shadow database, so P3006 is not in the production path.
+
+## Domestic exports mirror
+
+The domestic-export extension adds `TradeDomesticEntity` (287 rows) and `TradeDomesticFact` (5,076 rows) from the accepted domestic catalogue and CSV. Migration `20261010120000_trade_domestic_exports` adds only these tables, their entity/source/import relations, RLS and revoked public-role grants. It was generated offline by comparing the previous and current Prisma schemas; it does not assume live-database state. The existing import transaction clears the new facts before entities and source documents, imports facts in 1,000-row batches, and compares every field before committing. The serving reader repeats CSV/database parity checks. No live import or migration is part of local page implementation; an authorized release applies them through the existing Actions pipeline.

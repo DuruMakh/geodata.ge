@@ -3890,6 +3890,36 @@
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
     "documentLanguage": "en"
   },
+  "geostat_trade_domestic-export-country-2014-2026": {
+    "title": {
+      "text": "Domestic exports by country, 2014–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_domestic-exports-by-4-digit-2014-2026": {
+    "title": {
+      "text": "Domestic exports by four-digit product, 2014–2025",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
   "geostat_poverty_absolute": {
     "title": { "text": "Share of population under the absolute poverty line", "reviewedAt": "2026-10-10" },
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },

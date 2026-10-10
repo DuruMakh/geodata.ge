@@ -26,6 +26,7 @@ import { TradeProductsPicker } from "./trade-products-picker";
 import { useTradeProductsState } from "./use-trade-products-state";
 
 export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientTradeProductsData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+  const domestic = Boolean(data.measures);
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `trade.products.${key}`);
   const { state, selectionReset, update } = useTradeProductsState(data);
@@ -46,10 +47,9 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const total = rows.find(row => row.itemId === TRADE_PRODUCT_TOTAL_ID) ?? null;
   const chart = useMemo(() => <EditorialLineChart years={model.years} series={model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) }))} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={value => `${formatInUnit(value, model.unit)} ${model.unit.label}`} />, [model, labels, measureLabel]);
   return <div data-testid="trade-products" className="@container">
-    <ExplorerHeading>{t("title")}</ExplorerHeading>
-    <p className="mb-4 text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p>
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <div role="group" aria-label={t("measure")} className="flex items-center gap-5">{TRADE_PRODUCT_MEASURES.map(id => <TextTab key={id} label={message(messages, `trade.indicator.${id}`)} active={state.measure === id} onClick={() => update(previous => ({ ...previous, measure: id }), true)} testId={`trade-products-measure-${id}`} />)}</div>
+    {!domestic ? <><ExplorerHeading>{t("title")}</ExplorerHeading><p className="mb-4 text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p></> : null}
+    <div className={`mb-4 flex flex-wrap items-center ${domestic ? "justify-end" : "justify-between"} gap-3`}>
+      {!domestic ? <div role="group" aria-label={t("measure")} className="flex items-center gap-5">{TRADE_PRODUCT_MEASURES.map(id => <TextTab key={id} label={message(messages, `trade.indicator.${id}`)} active={state.measure === id} onClick={() => update(previous => ({ ...previous, measure: id }), true)} testId={`trade-products-measure-${id}`} />)}</div> : null}
       <button type="button" data-testid="trade-products-add" onClick={event => setPicker({ view: "categories", opener: event.currentTarget })} className="flex min-h-11 cursor-pointer items-center gap-2 border border-[var(--control)] px-3 text-[0.8125rem] font-medium hover:bg-[var(--tint)]"><Plus size={16} aria-hidden />{t("add")}</button>
     </div>
     {selectionReset ? <p role="status" data-testid="trade-products-selection-reset" className="mb-3 text-xs text-[var(--accent)]">{t("selectionReset")}</p> : null}
@@ -77,7 +77,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
       </div>
       <RangeStrip years={data.years.filter(year => year >= model.range.min && year <= model.range.max)} range={model.range} onChange={patch => update(previous => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
     </section>
-    <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{data.sourceBlock ? "" : `${t("historicalNote")} `}{t("definitions")}</p></div>
+    <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.productDefinitions") : `${data.sourceBlock ? "" : `${t("historicalNote")} `}${t("definitions")}`}</p></div>
     <TradePartnersRanking key={`${state.measure}:${model.range.end}`} model={model} tab="products" measure={state.measure} pageSize={25} />
     {picker ? <TradeProductsPicker data={data} model={model} selectedIds={state.selectedIds} initialView={picker.view} returnFocusTo={picker.opener} onApply={selectedIds => update(previous => ({ ...previous, selectedIds }), true)} onClose={() => setPicker(null)} /> : null}
   </div>;
