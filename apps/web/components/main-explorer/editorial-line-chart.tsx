@@ -39,6 +39,8 @@ export type ChartSeries = {
   forecastFromYear?: number;
   /** Reference lines (the NBG target) draw dashed and without an end dot. */
   dashed?: boolean;
+  /** A series the chart's breaks do not apply to keeps its line joined across them. */
+  continuousAcrossBreaks?: boolean;
 };
 
 type EditorialLineChartProps = {
@@ -373,7 +375,7 @@ export function EditorialLineChart({
               if (run.length > 0) segments.push(run);
               run = [];
             } else {
-              if (breakIndices.has(index) && run.length > 0) {
+              if (!line.continuousAcrossBreaks && breakIndices.has(index) && run.length > 0) {
                 segments.push(run);
                 run = [];
               }

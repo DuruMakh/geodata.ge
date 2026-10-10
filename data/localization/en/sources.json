@@ -1105,5 +1105,13 @@
   "source.geostat_trade_import_country_group_1995_2026": {
     "name": { "text": "Goods imports by country group in 1995–2026", "reviewedAt": "2026-10-08" },
     "derivation": null
+  },
+  "source.nbg_money_transfers_by_countries": {
+    "name": { "text": "Money transfers by country", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.nbg_balance_of_payments_bpm6": {
+    "name": { "text": "Balance of payments of Georgia (BPM6)", "reviewedAt": "2026-10-10" },
+    "derivation": null
   }
 }

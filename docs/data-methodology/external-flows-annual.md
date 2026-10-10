@@ -1,6 +1,6 @@
 # Annual external flows research foundation: money transfers, FDI and the current account
 
-Approved scope: 2026-10-10. This is a research package. Pages, downloads, MCP tools and serving-database imports need a separate approved design.
+Approved scope: 2026-10-10. This began as a research package. The 2026-10-10 Money from abroad design promotes one subset to a public page (see the last section); everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
 
 ## Source capture and coverage
 
@@ -66,3 +66,15 @@ All checks are in `prepared-reconciliation.csv`. A check passes within USD 1, or
   They also pin blank and not-applicable handling, partial months, leading zeros, unit conversion and the 2024 REMM gap.
 
 Reproduction commands are in the package README.
+
+## Money from abroad serving subset
+
+The approved 2026-10-10 Money from abroad design (`docs/superpowers/specs/2026-10-10-money-from-abroad-design.md`) serves only the annual 2000–2025 money-transfer rows and the balance-of-payments personal-transfer credit and debit rows. FDI, the current account, workers' remittances, compensation of employees, transfer systems, monthly values and 2026 stay in the research package.
+
+`npm run data:prepare-money-transfers` reads the package's prepared CSVs, not the workbooks, and first proves the copy: every input must match its SHA-256 and row count in `artifact-manifest.csv`, and `independent-verification.json` must report a pass with the same hashes. It then checks the reviewed catalogue `data/taxonomy/money-transfer-countries.json` against `money-transfer-country-identities.csv` and every year's countries and remainders against the total. It writes `data/imports/money-transfers-annual.csv` (UTF-8 with BOM, 9,364 rows: 9,312 transfer observations with 14 blank and 140 partial-month values, plus 52 personal-transfer observations) and `data/reports/money-transfers-validation.json`. `npm run data:check-money-transfers` reproduces both byte for byte without writing and runs in `data:validate`.
+
+- **Scope.** One measure applies at a time: Received (transfer inflow, personal-transfer credit) or Sent (transfer outflow, personal-transfer debit). Values are nominal USD at exact stored decimals.
+- **Transfers are not remittances.** Money transfers and the personal-transfer estimate are shown side by side, labelled, and never subtracted, summed or reconciled.
+- **Coverage.** The catalogue keeps 249 countries and three separate remainders: Other Countries (2000–2007), Areas not elsewhere specified (2008–2011) and Other Territories (2012–2025). Countries absent before 2008 stay missing, never zero. A 2019 value with blank months keeps `partial_months` and its month count and is marked in the chart, table and Excel. The January 2010 inclusion of microfinance organizations is marked as a break, not adjusted. The ranking divides by that year's all-country total for the same direction and lists remainders last, unranked. The share of GDP uses the served nominal GDP in USD for the same year.
+
+Serving reads only the accepted CSV, catalogue and report. The private mirror stores `MoneyTransferEntity` and `MoneyTransferFact` (key entity, measure, year; nullable `Decimal(40,20)`), with RLS on and public grants revoked, and is compared field by field inside the existing import transaction. The methodology archive publishes NBG's money-transfers-by-country workbook, the BPM6 balance-of-payments workbook and the external-sector methodology note. NBG's money-transfers web page is not archived: the captured copy is an empty page shell. Publishing, live migration and live import remain separate authorized operations.

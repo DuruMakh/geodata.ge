@@ -57,7 +57,7 @@ describe("indexable Fiscal.ge routes", () => {
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
     // Trading partners adds one further bilingual pair.
     // The Migration page adds one more bilingual pair.
-    expect(urls).toHaveLength(442);
+    expect(urls).toHaveLength(448);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -66,6 +66,10 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/deficit");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/partners");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/partners");
+    for (const route of ["/explorer/external", "/explorer/external/money-from-abroad", "/methodology/external-flows"]) {
+      expect(urls).toContain(`https://fiscal.ge${route}`);
+      expect(urls).toContain(`https://fiscal.ge/en${route}`);
+    }
     expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
     expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");

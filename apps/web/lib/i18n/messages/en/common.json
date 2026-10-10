@@ -2,6 +2,7 @@
   "common.economicSectors": "Sectors",
   "common.regionalEconomies": "Regional economies",
   "common.geostatSourceNote": "Data: Geostat.",
+  "common.nbgSourceNote": "Data: National Bank of Georgia.",
   "common.budgetSourceNote": "Data: Ministry of Finance of Georgia.",
   "common.budgetStatisticsSourceNote": "Data: Ministry of Finance of Georgia and Geostat.",
   "common.budgetHubSourceNote": "Data: Ministry of Finance of Georgia and IMF World Economic Outlook.",
@@ -58,6 +59,9 @@
   "common.tradeOverview": "Overview",
   "common.dataTrade": "DATA · TRADE",
   "common.tradePartners": "Trading partners",
+  "common.external": "External flows",
+  "common.dataExternal": "DATA · EXTERNAL FLOWS",
+  "common.moneyFromAbroad": "Money from abroad",
   "common.dataDemography": "Data · Demography",
   "common.demographyPopulation": "Population",
   "common.demographyMigration": "Migration"

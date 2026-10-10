@@ -2,6 +2,7 @@
   "common.economicSectors": "სექტორები",
   "common.regionalEconomies": "რეგიონების ეკონომიკა",
   "common.geostatSourceNote": "მონაცემები: საქსტატი.",
+  "common.nbgSourceNote": "მონაცემები: საქართველოს ეროვნული ბანკი.",
   "common.budgetSourceNote": "მონაცემები: საქართველოს ფინანსთა სამინისტრო.",
   "common.budgetStatisticsSourceNote": "მონაცემები: საქართველოს ფინანსთა სამინისტრო და საქსტატი.",
   "common.budgetHubSourceNote": "მონაცემები: საქართველოს ფინანსთა სამინისტრო და საერთაშორისო სავალუტო ფონდის მსოფლიო ეკონომიკური მიმოხილვა (IMF WEO).",
@@ -58,6 +59,9 @@
   "common.tradeOverview": "მიმოხილვა",
   "common.dataTrade": "მონაცემები · საგარეო ვაჭრობა",
   "common.tradePartners": "სავაჭრო პარტნიორები",
+  "common.external": "საგარეო ნაკადები",
+  "common.dataExternal": "მონაცემები · საგარეო ნაკადები",
+  "common.moneyFromAbroad": "ფული საზღვარგარეთიდან",
   "common.dataDemography": "მონაცემები · დემოგრაფია",
   "common.demographyPopulation": "მოსახლეობა",
   "common.demographyMigration": "მიგრაცია"
