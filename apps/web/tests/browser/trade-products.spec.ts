@@ -35,6 +35,7 @@ for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
     await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuenow", "2025");
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "1995");
     await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-page.png`), fullPage: true });
+    await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-preview.png`) });
     const chartElement = await plot.locator("svg").elementHandle();
     await opener.click(); await expect(picker).toBeVisible();
     expect((await plot.boundingBox())!.y).toBeCloseTo(before!.y, 0);
@@ -68,6 +69,27 @@ for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
 }
 
 for (const prefix of ["", "/en"]) {
+  test(`keeps Close and Compare within the visual viewport above a phone keyboard ${prefix || "ka"}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${prefix}/explorer/trade/products`);
+    await page.getByTestId("trade-products-add").click();
+    await page.getByTestId("series-search").focus();
+    await page.evaluate(() => {
+      const viewport = window.visualViewport!;
+      Object.defineProperties(viewport, { height: { configurable: true, get: () => 460 }, offsetTop: { configurable: true, get: () => 80 } });
+      viewport.dispatchEvent(new Event("resize"));
+    });
+    const bounds = await page.getByTestId("trade-products-picker").boundingBox();
+    expect(bounds!.y).toBeGreaterThanOrEqual(80);
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(540);
+    const compare = await page.getByTestId("trade-products-compare").boundingBox();
+    expect(compare!.y + compare!.height).toBeLessThanOrEqual(540);
+    await page.getByTestId("series-search").fill("8703");
+    await productToggle(page, "goods.hs4.2020-2025.8703").click();
+    await page.getByTestId("trade-products-compare").click();
+    await expect(page.getByTestId("trade-products-picker")).toHaveCount(0);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
+  });
   test(`historical comparisons retain gaps, navigation, empty selection and language ${prefix || "ka"}`, async ({ page }) => {
     await page.setViewportSize({ width: prefix ? 1366 : 390, height: 844 });
     const ids = ["goods.hs4.2015-2019.8703", "goods.hs4.2020-2025.8703"];

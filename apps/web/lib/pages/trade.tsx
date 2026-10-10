@@ -57,7 +57,7 @@ export async function renderTradeHub(locale: Locale) {
 export async function tradeProductsMetadata(locale: Locale) {
   const [products, messages] = await Promise.all([loadServedTradeProductsData(), getMessages(locale, ["trade"])]);
   const { min, max } = tradeProductsCoverage(toClientTradeProductsData(products, [], ""));
-  return fiscalMetadata({ locale, path: "/explorer/trade/products", title: message(messages, "trade.products.title"), description: `${message(messages, "trade.products.summary")} ${min}–${max}.` });
+  return fiscalMetadata({ locale, path: "/explorer/trade/products", title: message(messages, "trade.products.metaTitle"), description: `${message(messages, "trade.products.summary")} ${min}–${max}.` });
 }
 
 export async function renderTradeProductsPage(locale: Locale) {

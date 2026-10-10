@@ -55,6 +55,7 @@
   "trade.partners.unavailable": "No value published for this year",
   "trade.partners.noRanking": "No numerical values are available for the chosen year and measure.",
   "trade.products.title": "Products",
+  "trade.products.metaTitle": "Trade products",
   "trade.products.historicalNote": "Historical product versions are separate and are not joined across source periods.",
   "trade.products.workbookNote": "Missing amounts stay blank; published numerical zero stays zero. All selected series are included.",
   "trade.products.add": "Add products",

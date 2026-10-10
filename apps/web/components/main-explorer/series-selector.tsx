@@ -160,7 +160,7 @@ export function SeriesSelector({
         // chart (owner decision D4, 2026-10-07) the list flows with the page, so a finger
         // swipe never gets caught inside it.
         // overflow-y clip keeps the last caret's downward hit extension inside the list.
-        className={`flex flex-col overflow-y-clip${listLayout === "aside" ? " @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto" : ""}`}
+        className={listLayout === "aside" ? "flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto" : "flex flex-col overflow-y-clip"}
       >
         {children}
       </div>

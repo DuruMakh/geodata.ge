@@ -29,8 +29,21 @@ export function TradeProductsPicker({ data, model, selectedIds, initialView, ret
     const scrollbar = window.innerWidth - document.documentElement.clientWidth;
     body.style.overflow = "hidden";
     if (scrollbar > 0) body.style.paddingRight = `${parseFloat(getComputedStyle(body).paddingRight) + scrollbar}px`;
+    const viewport = window.visualViewport;
+    const fitViewport = () => {
+      if (!viewport || window.innerWidth >= 768) {
+        for (const property of ["height", "max-height", "top", "bottom", "margin-top", "margin-bottom"]) element.style.removeProperty(property);
+        return;
+      }
+      Object.assign(element.style, { height: `${viewport.height - 16}px`, maxHeight: `${viewport.height - 16}px`, top: `${viewport.offsetTop + 8}px`, bottom: "auto", marginTop: "0", marginBottom: "0" });
+    };
+    fitViewport();
+    viewport?.addEventListener("resize", fitViewport); viewport?.addEventListener("scroll", fitViewport);
+    window.addEventListener("resize", fitViewport);
     element.showModal(); close.current?.focus({ preventScroll: true });
     return () => {
+      viewport?.removeEventListener("resize", fitViewport); viewport?.removeEventListener("scroll", fitViewport);
+      window.removeEventListener("resize", fitViewport);
       element.close(); body.style.overflow = previousOverflow; body.style.paddingRight = previousPadding;
       window.scrollTo(x, y); returnFocusTo?.focus({ preventScroll: true });
     };

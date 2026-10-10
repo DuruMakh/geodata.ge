@@ -37,6 +37,7 @@ test("product ranking keeps negative values on a signed axis and retains nationa
 test("Products metadata and page publish the reviewed bilingual dataset coverage", async () => {
   const { tradeProductsMetadata, renderTradeProductsPage } = await import("../../lib/pages/trade");
   const en = await tradeProductsMetadata("en");
+  expect(en.title).toBe("Trade products");
   expect(en.alternates?.canonical).toContain("/en/explorer/trade/products");
   expect(en.alternates?.languages).toHaveProperty("ka");
   const html = renderToStaticMarkup(await renderTradeProductsPage("en"));
