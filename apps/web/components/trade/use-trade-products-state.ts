@@ -1,7 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
-import { parseTradeProductsHash, serializeTradeProductsHash, type TradeProductsState } from "../../lib/explorer/tradeProductsState";
+import { parseTradeProductsHash, serializeTradeProductsHash, tradeProductsCoverage, type TradeProductsState } from "../../lib/explorer/tradeProductsState";
+import { refitRange } from "../../lib/explorer/periodRange";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 
 export function useTradeProductsState(data: ClientTradeProductsData) {
@@ -14,7 +15,8 @@ export function useTradeProductsState(data: ClientTradeProductsData) {
   }, [data]);
   useAppReady();
   const update = useCallback((change: (previous: TradeProductsState) => TradeProductsState, push = false) => {
-    const next = { ...change(current.current), selectionReset: false }; current.current = next;
+    const changed = change(current.current);
+    const next = { ...changed, range: refitRange(changed.range, tradeProductsCoverage(data, changed), { collapseToAll: true }), selectionReset: false }; current.current = next;
     const hash = `#${serializeTradeProductsHash(next, data)}`;
     if (window.location.hash !== hash) {
       try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }

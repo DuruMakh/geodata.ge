@@ -14,6 +14,15 @@ async function presentation(locale: "en" | "ka") {
   return { ...p, messages: { ...p.messages, ...await getMessages(locale, ["trade", "workbook"]) } };
 }
 
+test("exports only the selected product's observed span while retaining its historical identity", async () => {
+  const build = await builder(), p = await presentation("en"), data = productData();
+  const model = build({ data, state: { ...DEFAULT_TRADE_PRODUCTS_STATE, selectedIds: ["goods.hs4.2020-2025.8703"] }, sources, siteOrigin: "https://fiscal.ge" }, p);
+  expect(model.readable.subtitle).toContain("2024–2025");
+  expect(model.analysis.rows).toHaveLength(2);
+  expect(model.analysis.rows.map(row => row[3])).toEqual([200, 200]);
+  expect(model.readable.rows[0].label).toContain("8703 · 2020–2025");
+});
+
 test.each(["en", "ka"] as const)("%s exports all committed historical series beyond the table page", async locale => {
   const build = await builder(), p = await presentation(locale), data = productData();
   const base = data.entities[0];
@@ -47,13 +56,14 @@ test.each(["en", "ka"] as const)("%s exports all committed historical series bey
 test("retains an old version's original source even when the selected years have no observations", async () => {
   const build = await builder(), p = await presentation("en"), data = productData();
   data.entities[0] = { ...data.entities[0], id: "goods.hs4.1995-1999.8703", sourceBlock: "1995-1999" };
+  data.years = [1995, 2024, 2025]; data.facts = data.facts.map(fact => fact[0] === 0 ? [fact[0], 1995, fact[2], fact[3]] : fact);
   p.englishLabels = { ...p.englishLabels, [data.entities[0].id]: "Motor cars" };
-  const state = { ...DEFAULT_TRADE_PRODUCTS_STATE, selectedIds: [data.entities[0].id], range: { kind: "manual" as const, start: 2025, end: 2025 } };
+  const state = { ...DEFAULT_TRADE_PRODUCTS_STATE, selectedIds: ["goods.total", data.entities[0].id], range: { kind: "manual" as const, start: 2025, end: 2025 } };
   const model = build({ data, state, sources, siteOrigin: "https://fiscal.ge" }, p);
-  expect(model.analysis.rows.map(row => row[3])).toEqual([null]);
-  expect(model.sources.map(source => source.title)).toEqual(["export-product-by-4-digit-1995-1999.xlsx"]);
-  expect(model.sources[0].years).toEqual([1995, 1996, 1997, 1998, 1999]);
-  const imports = build({ data, state: { ...state, measure: "trade.imports", selectedIds: ["goods.total", ...state.selectedIds] }, sources, siteOrigin: "https://fiscal.ge" }, p);
+  expect(model.analysis.rows.map(row => row[3])).toEqual([1000, null]);
+  expect(model.sources.map(source => source.title)).toEqual(["ftrade_1995-2026.xlsx", "export-product-by-4-digit-1995-1999.xlsx"]);
+  expect(model.sources[1].years).toEqual([1995, 1996, 1997, 1998, 1999]);
+  const imports = build({ data, state: { ...state, measure: "trade.imports" }, sources, siteOrigin: "https://fiscal.ge" }, p);
   expect(imports.sources.map(source => source.title)).toEqual(["ftrade_1995-2026.xlsx", "import-products--1995-1999_eng.xlsx"]);
   expect(build({ data, state: { ...state, selectedIds: [] }, sources, siteOrigin: "https://fiscal.ge" }, p).sources).toEqual([]);
 });

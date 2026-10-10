@@ -35,6 +35,15 @@ test("restores flow, empty selection, table and clamped years from the hash", as
   const { parseTradeProductsHash: parse, serializeTradeProductsHash: serialize } = await stateModule();
   const data = productData(), saved = { mode: "table" as const, measure: "trade.imports" as const, range: { kind: "manual" as const, start: 2024, end: 2025 }, selectedIds: [] };
   expect(parse(serialize(saved, data), data)).toEqual({ ...saved, selectionReset: false });
-  expect(parse("#measure=trade.balance&start=1800&end=2024", data)).toMatchObject({ measure: "trade.exports", range: { kind: "manual", start: 2019, end: 2024 } });
+  expect(parse("#measure=trade.balance&start=1800&end=2024", data)).toMatchObject({ measure: "trade.exports", range: { kind: "manual", start: 2024, end: 2024 } });
   expect(parse("#sel=broken", data)).toMatchObject({ selectedIds: ["goods.total"], selectionReset: true });
+});
+
+test("restores saved years against selected product coverage rather than the entire catalogue", async () => {
+  const { parseTradeProductsHash: parse, serializeTradeProductsHash: serialize } = await stateModule();
+  const data = productData(), selectedIds = ["goods.hs4.2020-2025.8703"];
+  const saved = { mode: "line" as const, measure: "trade.exports" as const, range: { kind: "manual" as const, start: 1995, end: 2025 }, selectedIds };
+  expect(parse(serialize(saved, data), data)).toMatchObject({ selectedIds, range: { kind: "all" } });
+  expect(parse(serialize({ ...saved, range: { kind: "manual", start: 1995, end: 2024 } }, data), data)).toMatchObject({ selectedIds, range: { kind: "manual", start: 2024, end: 2024 } });
+  expect(parse(serialize({ ...saved, range: { kind: "manual", start: 2025, end: 2025 } }, data), data)).toMatchObject({ selectedIds, range: { kind: "manual", start: 2025, end: 2025 } });
 });

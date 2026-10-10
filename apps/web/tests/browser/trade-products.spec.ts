@@ -21,6 +21,74 @@ const productToggle = (page: Page, id: string) => page.getByTestId("trade-produc
 const hash = (ids: string[], extra = "") => `#measure=trade.exports&view=line&sel=${encodeTradeProductsSelection(ids, catalogue)}${extra}`;
 
 for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
+  test(`keeps selected product labels compact ${prefix || "ka"} ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 768 });
+    const ids = ["2204", "2603", "7108", "8403", "8703"].map(code => `goods.hs4.2020-2025.${code}`);
+    await page.goto(`${prefix}/explorer/trade/products${hash(ids)}`);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "5");
+    await page.evaluate(() => document.fonts.ready);
+    const labels = page.locator('[data-testid="trade-products-selected-label"]:visible');
+    await expect(labels).toHaveCount(width === 390 ? 2 : 4);
+    for (const label of await labels.all()) {
+      const bounds = await label.boundingBox();
+      expect(bounds!.height).toBeLessThanOrEqual(width === 390 ? 38 : 30);
+      expect(bounds!.width).toBeLessThanOrEqual(240);
+      await expect(label).toContainText("2020–2025");
+    }
+    const selection = await page.getByTestId("trade-products-selection").boundingBox();
+    expect(selection!.height).toBeLessThanOrEqual(width === 390 ? 80 : 30);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.getByTestId("trade-products-selection").screenshot({ path: path.join(output, `compact-${prefix ? "en" : "ka"}-${width}.png`) });
+  });
+}
+
+for (const prefix of ["", "/en"]) {
+  test(`fits chart years when adding and removing historical products or the total ${prefix || "ka"}`, async ({ page }) => {
+    const wine = "goods.hs4.2020-2025.2204", oldWine = "goods.hs4.1995-1999.2204";
+    await page.goto(`${prefix}/explorer/trade/products${hash([wine])}`);
+    const start = page.getByTestId("range-start-handle"), end = page.getByTestId("range-end-handle");
+    await expect(start).toHaveAttribute("aria-valuemin", "2020");
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await expect(end).toHaveAttribute("aria-valuemax", "2025");
+    await expect(page.getByTestId("trade-products-plot").locator("svg text").filter({ hasText: /^1995$/ })).toHaveCount(0);
+    await page.getByTestId("trade-products-add").click();
+    await page.getByTestId("series-search").fill("2204");
+    await expect(page.getByTestId("trade-product-result")).toHaveCount(4);
+    await productToggle(page, oldWine).click(); await page.getByTestId("trade-products-compare").click();
+    await expect(start).toHaveAttribute("aria-valuenow", "1995");
+    await page.locator(`[data-testid="trade-products-selected-label"][data-series-id="${oldWine}"]`).click();
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.getByTestId("trade-products-add").click(); await productToggle(page, "goods.total").click();
+    await page.getByTestId("trade-products-compare").click();
+    await expect(start).toHaveAttribute("aria-valuenow", "1995");
+    await page.locator('[data-testid="trade-products-selected-label"][data-series-id="goods.total"]').click();
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.reload(); await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.getByTestId("trade-products-measure-trade.imports").click();
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await end.focus(); await end.press("ArrowLeft"); await end.press("ArrowLeft");
+    await expect(end).toHaveAttribute("aria-valuenow", "2023");
+    await page.reload(); await expect(end).toHaveAttribute("aria-valuenow", "2023");
+  });
+}
+
+for (const prefix of ["", "/en"]) {
+  test(`keeps an import-only product in its historical period when switched to Exports ${prefix || "ka"}`, async ({ page }) => {
+    const id = "goods.hs4.2020-2025.9008";
+    await page.goto(`${prefix}/explorer/trade/products${hash([id]).replace("measure=trade.exports", "measure=trade.imports")}`);
+    const start = page.getByTestId("range-start-handle"), end = page.getByTestId("range-end-handle");
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.getByTestId("trade-products-measure-trade.exports").click();
+    await expect(start).toHaveAttribute("aria-valuemin", "2020");
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await expect(end).toHaveAttribute("aria-valuemax", "2025");
+    await page.getByTestId("chart-mode-table").click();
+    expect(await tableSeriesValues(page.getByTestId("explorer-table"), "9008 · 2020–2025")).toEqual(["—", "—", "—", "—", "—", "—"]);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1");
+  });
+}
+
+for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
   test(`opens the finder over the visible chart and cancels its draft ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: width === 390 ? 844 : 768 });

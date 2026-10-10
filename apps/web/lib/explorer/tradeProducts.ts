@@ -16,7 +16,7 @@ export type TradeProductRankingRow = { entityId: string; label: string; valueUsd
 export type TradeProductsModel = { years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[]; valuesByEntity: Record<string, Record<number, number | null>>; ranking: TradeProductRankingRow[]; missingRanking: TradeProductRankingRow[]; selectedCount: number; totalCount: number };
 
 export function buildTradeProductsModel(data: ClientTradeProductsData, state: TradeProductsState, presentation: Presentation): TradeProductsModel {
-  const range = resolveRange(state.range, tradeProductsCoverage(data)), years = Array.from({ length: range.end - range.start + 1 }, (_, index) => range.start + index);
+  const range = resolveRange(state.range, tradeProductsCoverage(data, state)), years = Array.from({ length: range.end - range.start + 1 }, (_, index) => range.start + index);
   const ids = tradeProductsBulkSelection(data), selected = new Set(state.selectedIds), selectedIds = ids.filter(id => selected.has(id));
   const valuesByEntity: TradeProductsModel["valuesByEntity"] = Object.fromEntries(ids.map(id => [id, Object.fromEntries(years.map(year => [year, null]))]));
   const measureIndex = state.measure === "trade.exports" ? 0 : 1;
