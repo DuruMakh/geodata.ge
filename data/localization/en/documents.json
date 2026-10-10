@@ -3817,5 +3817,77 @@
       "reviewedAt": "2026-10-10"
     },
     "documentLanguage": "en"
+  },
+  "geostat_earnings_annual_headline": {
+    "title": { "text": "Average monthly nominal earnings of employees", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_annual_activity": {
+    "title": { "text": "Average monthly nominal earnings of employees by economic activity", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_annual_sex": {
+    "title": { "text": "Average monthly nominal earnings of employees by economic activity and sex", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_annual_business_sector": {
+    "title": { "text": "Average monthly nominal earnings of employees in business and non-business sector by economic activity", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_annual_ownership": {
+    "title": { "text": "Average monthly nominal earnings of employees in public and non-public sector by economic activity", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_annual_region": {
+    "title": { "text": "Average monthly nominal earnings by regions", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_annual_median": {
+    "title": { "text": "Median earnings of employees by economic activity", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_wages_source_page": {
+    "title": { "text": "Wages (English source page)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_release_2025": {
+    "title": { "text": "Average Monthly Nominal Earnings of Employees - 2025 (news release, 9 October 2026)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_median_release_2025": {
+    "title": { "text": "Median Earnings by Economic Activities - 2025 (news release, 9 October 2026)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_earnings_metadata_2026": {
+    "title": { "text": "Metadata: Average Monthly Earnings of Employees in Non-Business Sector (certified 16 June 2026)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_median_metadata_2026": {
+    "title": { "text": "Metadata: Median Earnings (certified 9 October 2026)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
   }
 }

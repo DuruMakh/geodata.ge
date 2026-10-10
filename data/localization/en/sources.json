@@ -1189,5 +1189,33 @@
       "reviewedAt": "2026-10-10"
     },
     "derivation": null
+  },
+  "source.geostat_earnings_annual_headline": {
+    "name": { "text": "Average monthly nominal earnings of employees", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_earnings_annual_activity": {
+    "name": { "text": "Average monthly nominal earnings of employees by economic activity", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_earnings_annual_sex": {
+    "name": { "text": "Average monthly nominal earnings of employees by economic activity and sex", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_earnings_annual_business_sector": {
+    "name": { "text": "Average monthly nominal earnings of employees in business and non-business sector by economic activity", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_earnings_annual_ownership": {
+    "name": { "text": "Average monthly nominal earnings of employees in public and non-public sector by economic activity", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_earnings_annual_region": {
+    "name": { "text": "Average monthly nominal earnings by regions", "reviewedAt": "2026-10-10" },
+    "derivation": null
+  },
+  "source.geostat_earnings_annual_median": {
+    "name": { "text": "Median earnings of employees by economic activity", "reviewedAt": "2026-10-10" },
+    "derivation": null
   }
 }

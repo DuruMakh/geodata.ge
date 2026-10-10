@@ -14,4 +14,5 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   unemployment: "2026-10-04",
   "external-flows": "2026-10-10",
   demography: "2026-10-04",
+  wages: "2026-10-10",
 };

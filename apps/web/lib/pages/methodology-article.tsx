@@ -67,6 +67,7 @@ const DATASET_SOURCE_NOTES = {
   trade: "common.geostatSourceNote",
   "external-flows": "common.nbgSourceNote",
   demography: "common.geostatSourceNote",
+  wages: "common.geostatSourceNote",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -83,6 +84,7 @@ const DATASET_DOWNLOADS = {
   "external-flows": null,
   // Demography has no bulk files and no MCP entry yet (spec section 10).
   demography: null,
+  wages: null,
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -103,6 +105,7 @@ const DATASET_JSON_DOWNLOADS = {
   trade: [],
   "external-flows": [],
   demography: [],
+  wages: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
     { href: "/downloads/data/government-debt-rates.json", labelKey: "methodology.jsonRates" },
@@ -128,6 +131,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   trade: [],
   "external-flows": [],
   demography: [],
+  wages: [],
 } as const;
 
 export async function methodologyArticleMetadata(locale: Locale, { params }: MethodologyDatasetPageProps): Promise<Metadata> {
@@ -172,7 +176,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
       {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
       {dataset === "demography" ? null : (
       <JsonLd
-        data={dataset === "unemployment" || dataset === "trade" || dataset === "external-flows" ? {
+        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" || dataset === "external-flows" ? {
           "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
           url: `${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`, locale)}`,
           temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
