@@ -32,12 +32,8 @@
   "external.money.bulkScope": "Clear and Select all apply to every series in both tabs.",
   "external.money.emptySelection": "Select series to compare their trends. The figures and the ranking stay visible below.",
   "external.money.partial": "partial",
-  "external.money.partialNote": "Partial: some months are blank in NBG's source (2019 for about 70 smaller countries), so the value covers only the published months.",
+  "external.money.partialNote": "Partial: some 2019 months are blank in NBG's source.",
   "external.money.breakLabel": "MFOs added",
-  "external.money.breakNote": "From January 2010 the data include microfinance organizations; the series is not adjusted for this.",
-  "external.money.countryNote": "Country is where a transfer came from or went to, not the sender's citizenship. Transfers include money sent by non-residents, which is why transfers from Russia peaked in 2022.",
-  "external.money.estimateNote": "Transfers are not the official remittance figure. Personal transfers are NBG's balance-of-payments estimate, built mainly from household surveys and bank reports.",
-  "external.money.coverageNote": "For 2000–2007 NBG lists 18 major countries plus Other countries; full country lists start in 2008.",
   "external.money.figuresTitle": "{year} at a glance",
   "external.money.figure.received": "Money transfers received",
   "external.money.figure.sent": "Money transfers sent",
@@ -53,6 +49,6 @@
   "external.money.remainders": "Not assigned to a country (not ranked)",
   "external.money.months": "{count} months",
   "external.money.noRanking": "No country values are available for the chosen year and direction.",
-  "external.sourceNote": "Source: National Bank of Georgia · annual money transfers and balance of payments · nominal USD",
+  "external.sourceNote": "Source: National Bank of Georgia · nominal USD ·",
   "external.methodology": "Methodology and sources"
 }

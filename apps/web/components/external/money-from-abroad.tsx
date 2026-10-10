@@ -6,7 +6,7 @@ import { buildMoneyTransfersModel, moneyTransferColor, type MoneyTransferFigures
 import { moneyTransfersCoverage, setMoneyTransfersTab } from "../../lib/explorer/moneyTransfersState";
 import { buildMoneyTransfersWorkbookModel } from "../../lib/explorer/moneyTransfersWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import { formatInUnit, formatShare } from "../../lib/explorer/format";
+import { formatDisplayDate, formatInUnit, formatShare } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
@@ -70,7 +70,7 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
   return <div data-testid="money-from-abroad" className="@container">
     <ExplorerHeading>{message(messages, "external.money.title")}</ExplorerHeading>
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("intro")}</p>
-    <div role="group" aria-label={t("measure")} className="mb-6 flex flex-wrap gap-x-5 gap-y-3">{MONEY_TRANSFER_MEASURES.map(measure => <TextTab key={measure} label={message(messages, `external.measure.${measure}`)} active={state.measure === measure} onClick={() => update(s => ({ ...s, measure }), true)} testId={`money-from-abroad-measure-${measure}`} />)}</div>
+    <div role="group" aria-label={t("measure")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{MONEY_TRANSFER_MEASURES.map(measure => <TextTab key={measure} label={message(messages, `external.measure.${measure}`)} active={state.measure === measure} onClick={() => update(s => ({ ...s, measure }), true)} testId={`money-from-abroad-measure-${measure}`} />)}</div>
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
@@ -80,16 +80,10 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
             : <ExplorerTable caption={`${message(messages, "external.money.title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== MONEY_TRANSFER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} preliminaryLabel={t("partial")} {...(breakShown ? { breakYears: [MICROFINANCE_BREAK_YEAR], breakLabel: t("breakLabel") } : {})} />}
           <RangeStrip years={moneyTransfersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyTransfersModel(data, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]">
-          <SourceNote testId="source-label">{message(messages, "external.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link></SourceNote>
-          <div className="mt-2 max-w-[850px] space-y-1.5 text-[11px] leading-relaxed text-[var(--muted)]">
-            {partialShown ? <p data-testid="money-from-abroad-partial-note">{t("partialNote")}</p> : null}
-            {breakShown ? <p data-testid="money-from-abroad-break-note">{t("breakNote")}</p> : null}
-            {model.range.start < 2008 ? <p>{t("coverageNote")}</p> : null}
-            <p>{t("estimateNote")}</p>
-            <p>{t("countryNote")}</p>
-          </div>
-        </div>
+        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+          <Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
+        </SourceNote></div>
+        {partialShown ? <p data-testid="money-from-abroad-partial-note" className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("partialNote")}</p> : null}
       </div>
       <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setMoneyTransfersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>

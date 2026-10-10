@@ -61,7 +61,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     expect(await tableSeriesValues(table, prefix ? "Algeria" : "ალჟირი")).toHaveLength(11);
     await expect(table).toContainText(prefix ? "partial" : "არასრ.");
     await expect(page.getByTestId("money-from-abroad-partial-note")).toBeVisible();
-    await expect(page.getByTestId("money-from-abroad-break-note")).toBeVisible();
     const before = page.url();
     if (width < 900) await page.getByTestId("sidebar-toggle").click();
     await page.getByTestId("money-from-abroad-link").click(); await expect(page).toHaveURL(before);
