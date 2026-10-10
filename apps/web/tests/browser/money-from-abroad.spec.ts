@@ -12,7 +12,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
     const cards = page.getByTestId("external-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(3);
     await expect(cards.nth(1)).toHaveAttribute("href", new RegExp(`${prefix}/explorer/external/foreign-investment$`));
-    await expect(cards.nth(2)).not.toHaveAttribute("href", /./);
+    await expect(cards.nth(2)).toHaveAttribute("href", new RegExp(`${prefix}/explorer/external/current-account$`));
     await cards.nth(0).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/money-from-abroad$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");

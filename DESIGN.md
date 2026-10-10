@@ -365,6 +365,7 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/external                    საგარეო ნაკადები   External flows hub (§30)
 /explorer/external/money-from-abroad                    Money from abroad (§30)
 /explorer/external/foreign-investment                   Foreign investment (§30.1)
+/explorer/external/current-account                      Current account (§30.2)
 /explorer/demography                  დემოგრაფია        Demography hub (§29)
 /explorer/demography/population                         Population on 1 January: index — municipality map, key figures, ranked list (§29)
 /explorer/demography/population/georgia                 Georgia page (§29)
@@ -1212,7 +1213,7 @@ Approved 2026-10-09 (`docs/superpowers/specs/2026-10-04-demography-births-deaths
 
 ## 30. External flows hub and Money from abroad
 
-Approved on 2026-10-10; scope owner: `Project_Definition.md` §2F. The sidebar's `საგარეო ნაკადები` / External flows link follows Trade and precedes Demography; its Money from abroad and Foreign investment children appear only in the active External flows context. The hub at `/explorer/external` reuses the shared hub cards: 01 Money from abroad (sparkline of transfers received, data-derived coverage), 02 Foreign investment (sparkline of the FDI total) and the non-clickable `მალე` card 03 Current account.
+Approved on 2026-10-10; scope owner: `Project_Definition.md` §2F. The sidebar's `საგარეო ნაკადები` / External flows link follows Trade and precedes Demography; its Money from abroad, Foreign investment and Current account children appear only in the active External flows context. The hub at `/explorer/external` reuses the shared hub cards: 01 Money from abroad (sparkline of transfers received, data-derived coverage), 02 Foreign investment (sparkline of the FDI total) and 03 Current account (sparkline of the current-account balance).
 
 Money from abroad follows Trading partners (§28.1): trends first, then the end-year country ranking; it has no summary-figures block. Two text tabs above the workspace choose one direction, `შემოსული` / Received (initial) or `გასული` / Sent; it applies to every line, the ranking and the table. One series list holds the all-country transfer total (first, selected initially, removable), the range end year's top 10 countries in ranking order, and `სხვა ქვეყნები` / Other countries: the total less those ten, so the list adds up to the total. There are no browsing tabs and no personal-transfers estimate. Search never scopes Clear / Select all or the count.
 
@@ -1221,6 +1222,10 @@ Coverage marks reuse existing chart and table support rather than new components
 ### 30.1 Foreign investment
 
 Approved on 2026-10-10 (`docs/superpowers/specs/2026-10-10-foreign-investment-design.md`). The page reuses the Money from abroad layout: one short line under the heading, then three centred text tabs `ქვეყნებით` / By country (initial), `დარგებით` / By sector and `რეგიონებით` / By region, then the trends workspace, then the end-year ranking. There is no summary-figures block and no note under the chart; the only line under it is the source note citing Geostat. Each tab's series list starts with the FDI total (selected initially, removable); By country follows it with the range end year's top 10 countries and `სხვა ქვეყნები` / Other countries (the total less those ten), By sector and By region with every sector or region. Switching tabs resets the selection to the total and fits the range strip to that tab's years. The ranking is the shared external ranking: million USD and share of the total; a negative value keeps its minus sign and share and draws an empty bar. Missing years (the six regions before 2016) are gaps, dashes and blank Excel cells. The page footer and methodology cite Geostat.
+
+### 30.2 Current account
+
+Approved on 2026-10-10 (`docs/superpowers/specs/2026-10-10-current-account-design.md`). One short line under the heading, then three centred text tabs `სალდო` / Balance (initial), `შემოსული` / Money in and `გასული` / Money out, then the workspace. Balance draws the reused `StackedColumnChart`: goods, services, primary income and secondary income net values stack above or below zero and the current-account balance is the ink overlay line; the aside is a read-only key (five rows with swatch and end-year value, no checkboxes) followed by Excel. Money in and Money out draw lines with the Money from abroad series panel: the total first, selected initially and removable, then the four parts; the two tabs share one selection. A `% მშპ-ში` / % of GDP measure pill switches every tab between nominal USD and percent of nominal GDP in USD; preliminary GDP years are named in the source line, as on Debt. The five series keep fixed colours on every tab: balance ink, goods `#3D5A98`, services `#1F6E56`, primary income `#A5822B`, secondary income `#7A4E8C`. There is no summary-figures block, no ranking and no note under the chart; the source line and methodology cite the National Bank of Georgia.
 
 ## 31. Wages surfaces
 
