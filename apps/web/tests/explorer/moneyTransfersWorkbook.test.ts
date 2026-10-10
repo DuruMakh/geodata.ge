@@ -34,7 +34,7 @@ test.each(["en", "ka"] as const)("native %s workbook carries the selection, USD 
 
 test("only the money-transfer original is linked; notes follow what is exported; blanks stay blank; an empty selection exports nothing", async () => {
   const p = await presentation("en"), build = await builder();
-  const sent = build({ data, sources, siteOrigin: "https://fiscal.ge", state: state({ measure: "sent", selectedIds: ["transfer.sudan"], range: { kind: "manual", start: 2019, end: 2019 } }) }, p);
+  const sent = build({ data, sources, siteOrigin: "https://fiscal.ge", state: state({ selectedIds: ["transfer.total"], range: { kind: "manual", start: 2007, end: 2007 } }) }, p);
   expect(sent.analysis.rows.map(row => row[3])).toEqual([null]);
   expect(sent.sources.map(s => s.title)).toEqual([transfersFile]);
   expect(sent.readable.subtitle).not.toContain(p.messages["external.workbook.partialNote"]);

@@ -11,8 +11,11 @@ export function moneyTransfersCoverage(data: ClientMoneyTransfersData) {
   if (!years.length) throw new Error("No money transfer source years");
   return { min: years[0], max: years.at(-1)!, years };
 }
+/** The page's own series: every other country together, beside the end year's top 10. */
+export const OTHER_COUNTRIES_ID = "transfer.others";
+/** Every id a saved view may select; the page keeps only those in its current list. */
 export function moneyTransfersBulkSelection(data: ClientMoneyTransfersData): string[] {
-  return data.entities.map(entity => entity.id);
+  return [...data.entities.map(entity => entity.id), OTHER_COUNTRIES_ID];
 }
 export function parseMoneyTransfersHash(hash: string, data: ClientMoneyTransfersData): MoneyTransfersState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));

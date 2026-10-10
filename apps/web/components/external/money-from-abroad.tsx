@@ -8,7 +8,6 @@ import { buildMoneyTransfersWorkbookModel } from "../../lib/explorer/moneyTransf
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { formatDisplayDate, formatInUnit } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
-import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { useI18n } from "../../lib/i18n/provider";
@@ -26,11 +25,10 @@ import { MoneyFromAbroadRanking } from "./money-from-abroad-ranking";
 
 
 export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientMoneyTransfersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
-  const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
+  const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string) => message(messages, `external.money.${key}`);
   const { state, update } = useMoneyFromAbroadState(data), model = buildMoneyTransfersModel(data, state, presentation);
-  const entities = new Map(data.entities.map(entity => [entity.id, entity]));
-  const label = (id: string) => publicLabel(locale, id, entities.get(id)!.labelKa, englishLabels);
+  const label = (id: string) => model.series.find(item => item.id === id)!.label;
   const measureLabel = message(messages, `external.measure.${state.measure}`);
   const partialByYear = (id: string) => Object.fromEntries(Object.keys(model.partialMonths[id] ?? {}).map(year => [Number(year), true]));
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: moneyTransferColor(id), valuesByYear: model.valuesByEntity[id], preliminaryByYear: partialByYear(id) }));
@@ -58,7 +56,7 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
         </SourceNote></div>
         {partialShown ? <p data-testid="money-from-abroad-partial-note" className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("partialNote")}</p> : null}
       </div>
-      <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel data={data} state={state} model={model} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
+      <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel model={model} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <MoneyFromAbroadRanking key={`${state.measure}:${model.range.end}`} model={model} measure={state.measure} />
   </div>;

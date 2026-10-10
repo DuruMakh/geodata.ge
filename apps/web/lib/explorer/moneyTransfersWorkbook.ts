@@ -1,6 +1,5 @@
 import type { ClientMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
 import { MONEY_TRANSFER_TOTAL_ID } from "../data/externalFlows/types";
-import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { buildMoneyTransfersModel } from "./moneyTransfers";
@@ -12,14 +11,12 @@ const TRANSFERS_FILE = "remc_money-transfers-by-countries-eng.xlsx";
 export function buildMoneyTransfersWorkbookModel(input: { data: ClientMoneyTransfersData; state: MoneyTransfersState; sources: readonly WorkbookPublicSource[]; siteOrigin: string }, presentation: Presentation): WorkbookExportModel {
   const model = buildMoneyTransfersModel(input.data, input.state, presentation);
   const t = (key: string) => message(presentation.messages, `external.${key}`);
-  const entities = new Map(input.data.entities.map(entity => [entity.id, entity]));
   const months = new Map(input.data.facts.filter(f => f.measure === input.state.measure).map(f => [`${f.entityId}:${f.year}`, f.monthsReported]));
   const exportModel = buildWorkbookExportModel({
     locale: presentation.locale, filenameBase: "money-from-abroad", title: t("money.title"), groupLabel: t(`measure.${input.state.measure}`), years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: MONEY_TRANSFER_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
-      const entity = entities.get(id)!;
-      return { id, kind: id === MONEY_TRANSFER_TOTAL_ID ? "total" : "item", label: publicLabel(presentation.locale, id, entity.labelKa, presentation.englishLabels), parentLabel: null, pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };
+      return { id, kind: id === MONEY_TRANSFER_TOTAL_ID ? "total" : "item", label: model.series.find(item => item.id === id)!.label, parentLabel: null, pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };
     }), sources: input.sources.filter(source => model.selectedCount > 0 && source.downloadHref.split("/").at(-1) === TRANSFERS_FILE), siteOrigin: input.siteOrigin,
   });
   const partial = model.selectedIds.some(id => model.partialMonths[id]);

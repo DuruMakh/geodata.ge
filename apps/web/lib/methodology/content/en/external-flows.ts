@@ -58,7 +58,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "classification",
       "title": "What does country mean?",
       "paragraphs": [
-        "Country means the country a transfer came from or went to, not the sender's citizenship. NBG spells country names differently across its period sheets; a reviewed mapping joins 28 such labels into one identity. Remainders (Other countries, Areas not elsewhere specified, Other territories) stay separate series and appear last in the ranking, unranked. Ranking shares divide by that year's all-country total for the same direction."
+        "Country means the country a transfer came from or went to, not the sender's citizenship. NBG spells country names differently across its period sheets; a reviewed mapping joins 28 such labels into one identity. The page lists the end year's top 10 countries and one Other countries series: the all-country total less those ten, which also holds the remainders (Other countries, Areas not elsewhere specified, Other territories). It appears last in the ranking, unranked. Ranking shares divide by that year's all-country total for the same direction."
       ]
     },
     {

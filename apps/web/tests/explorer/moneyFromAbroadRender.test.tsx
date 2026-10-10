@@ -26,26 +26,15 @@ test.each(["en", "ka"] as const)("renders %s defaults: Received, the all-country
   expect(html).not.toMatch(/GEL|₾/);
 });
 
-test("the ranking marks partial months, lists remainders unranked and hides unavailable countries until expanded", async () => {
+test("the ranking marks partial months and ends with Other countries, unranked, with no show-all", async () => {
   const { MoneyFromAbroadRanking } = await import("../../components/external/money-from-abroad-ranking");
   const presentation = await p("en");
   const received = buildMoneyTransfersModel(data, DEFAULT_MONEY_TRANSFERS_STATE, presentation);
   const html = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroadRanking model={received} measure="received" /></I18nProvider>);
   expect(html.indexOf('data-entity-id="transfer.italy"')).toBeLessThan(html.indexOf('data-entity-id="transfer.sudan"'));
+  expect(html.indexOf('data-entity-id="transfer.sudan"')).toBeLessThan(html.indexOf('data-testid="money-from-abroad-other-row"'));
+  expect(html).toContain("Other countries");
   expect(html).toContain("11 months");
   expect(html).toContain("60.0%");
-  const sent = buildMoneyTransfersModel(data, { ...DEFAULT_MONEY_TRANSFERS_STATE, measure: "sent" }, presentation);
-  const sentHtml = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroadRanking model={sent} measure="sent" /></I18nProvider>);
-  expect(sentHtml).not.toContain('data-entity-id="transfer.sudan"');
-  expect(sentHtml).toContain('data-testid="money-from-abroad-show-all"');
+  expect(html).not.toContain("money-from-abroad-show-all");
 });
-
-test("a 2008 range lists the 2007 remainder only when it has a value", async () => {
-  const { MoneyFromAbroadRanking } = await import("../../components/external/money-from-abroad-ranking");
-  const presentation = await p("en");
-  const model = buildMoneyTransfersModel(data, { ...DEFAULT_MONEY_TRANSFERS_STATE, range: { kind: "manual", start: 2007, end: 2007 } }, presentation);
-  const html = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroadRanking model={model} measure="received" /></I18nProvider>);
-  expect(html).toContain('data-testid="money-from-abroad-remainder-row"');
-  expect(html).toContain("Other Countries");
-});
-

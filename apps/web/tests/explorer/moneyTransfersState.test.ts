@@ -20,5 +20,5 @@ test("an explicit empty selection stays empty; unknown, duplicate and bad values
   const { parseMoneyTransfersHash, moneyTransfersBulkSelection } = await state();
   expect(parseMoneyTransfersHash("#sel=", data).selectedIds).toEqual([]);
   expect(parseMoneyTransfersHash("#sel=transfer.atlantis,transfer.italy,transfer.italy&measure=lent&tab=moon", data)).toMatchObject({ measure: "received", selectedIds: ["transfer.italy"] });
-  expect(moneyTransfersBulkSelection(data)).toEqual(["transfer.total", "transfer.italy", "transfer.sudan", "transfer.other_countries"]);
+  expect(moneyTransfersBulkSelection(data)).toEqual(["transfer.total", "transfer.italy", "transfer.sudan", "transfer.other_countries", "transfer.others"]);
 });
