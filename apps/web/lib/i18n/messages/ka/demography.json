@@ -179,5 +179,18 @@
   "demography.nationalSource": "წყარო: საქსტატი, ნაყოფიერების კოეფიციენტები და სიცოცხლის მოსალოდნელი ხანგრძლივობა დაბადებისას, საქართველო, {first}–{last}.",
   "demography.tfrChartAria": "შობადობის ჯამობრივი კოეფიციენტი, საქართველო, {first}–{last}",
   "demography.lifeChartAria": "სიცოცხლის მოსალოდნელი ხანგრძლივობა დაბადებისას, სულ, მამაკაცები და ქალები, საქართველო, {first}–{last}",
-  "demography.birthsCardFooter": "{year}: {births} დაბადება · {first}–{last}"
+  "demography.birthsCardFooter": "{year}: {births} დაბადება · {first}–{last}",
+  "demography.pyramidWorkbookTitle": "მოსახლეობა ასაკისა და სქესის მიხედვით, საქართველო",
+  "demography.bandsWorkbookTitle": "ასაკობრივი ჯგუფები, საქართველო",
+  "demography.heatWorkbookTitle": "ასაკობრივი ჯგუფების წილი, საქართველო",
+  "demography.censusWorkbookTitle": "მოსახლეობა ასაკისა და სქესის მიხედვით, {place}, აღწერა 2024",
+  "demography.censusDate": "2024 წლის 14 ნოემბერი",
+  "demography.censusBasis": "აღწერის მონაცემი",
+  "demography.settlementAll": "ყველა",
+  "demography.settlementUrban": "ქალაქი",
+  "demography.settlementRural": "სოფელი",
+  "demography.bandYoung": "0–14 წლის",
+  "demography.bandWorking": "15–64 წლის",
+  "demography.bandOld": "65 წლის და უფროსი",
+  "demography.unitShare": "% მოსახლეობისგან"
 }

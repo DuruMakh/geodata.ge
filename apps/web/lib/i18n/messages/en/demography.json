@@ -179,5 +179,18 @@
   "demography.nationalSource": "Source: Geostat, fertility rates and life expectancy at birth, Georgia, {first}–{last}.",
   "demography.tfrChartAria": "Total fertility rate, Georgia, {first}–{last}",
   "demography.lifeChartAria": "Life expectancy at birth, total, men and women, Georgia, {first}–{last}",
-  "demography.birthsCardFooter": "{year}: {births} births · {first}–{last}"
+  "demography.birthsCardFooter": "{year}: {births} births · {first}–{last}",
+  "demography.pyramidWorkbookTitle": "Population by age and sex, Georgia",
+  "demography.bandsWorkbookTitle": "Age groups, Georgia",
+  "demography.heatWorkbookTitle": "Share of each age group, Georgia",
+  "demography.censusWorkbookTitle": "Population by age and sex, {place}, census 2024",
+  "demography.censusDate": "14 November 2024",
+  "demography.censusBasis": "Census count",
+  "demography.settlementAll": "All",
+  "demography.settlementUrban": "Cities",
+  "demography.settlementRural": "Villages",
+  "demography.bandYoung": "Aged 0–14",
+  "demography.bandWorking": "Aged 15–64",
+  "demography.bandOld": "Aged 65 and over",
+  "demography.unitShare": "% of the population"
 }
