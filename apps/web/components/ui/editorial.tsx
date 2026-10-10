@@ -94,7 +94,8 @@ export function SourceNote({ children, testId }: SourceNoteProps) {
 }
 
 type SegmentedTabsProps<T extends string> = {
-  options: Array<{ value: T; label: string; icon?: ReactNode; testId?: string; ariaLabel?: string }>;
+  /** `disabled` keeps the option visible but inert (`aria-disabled`, no change on click); `title` says why. */
+  options: Array<{ value: T; label: string; icon?: ReactNode; testId?: string; ariaLabel?: string; disabled?: boolean; title?: string }>;
   value: T;
   onChange: (next: T) => void;
   ariaLabel: string;
@@ -116,15 +117,19 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
             aria-label={option.ariaLabel ?? (option.icon ? option.label : undefined)}
             data-focus-inset=""
             aria-pressed={active}
-            onClick={() => onChange(option.value)}
+            aria-disabled={option.disabled || undefined}
+            title={option.title}
+            onClick={() => {
+              if (!option.disabled) onChange(option.value);
+            }}
             // `data-focus-inset` above draws the focus ring inside the button:
             // the group clips to its rounded box, so an outward ring is cut away
             // on three sides and the survivor lands over the neighbouring tab.
             // Transition only the two properties that change — `transition-colors`
             // also animates outline-color, hiding the ring for its first 150ms.
-            className={`cursor-pointer ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
+            className={`${option.disabled ? "cursor-default" : "cursor-pointer"} ${option.icon ? "flex size-9 items-center justify-center" : "px-[13px] py-1.5"} font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] tracking-[0.04em] transition-[background-color,color] duration-150 ${
               index > 0 ? "border-l border-[var(--control)]" : ""
-            } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
+            } ${active ? "bg-[var(--ink)] text-[var(--paper)]" : option.disabled ? "bg-transparent text-[var(--faint)]" : "bg-transparent text-[var(--muted)] hover:bg-[var(--tint)] hover:text-[var(--ink)]"}`}
           >
             {option.icon ?? option.label}
           </button>

@@ -6,7 +6,7 @@ import { INK } from "./colors";
 import { GEORGIA_PLACE_ID } from "./demographyAreas";
 import { sparkValues } from "./demographyPopulation";
 import { DEMOGRAPHY_PAGES } from "./demographyRoutes";
-import { formatInUnit, UNIT_PERSONS } from "./format";
+import { formatInUnit, formatShare, UNIT_PERSONS } from "./format";
 import type { HubCardModel } from "./hubCards";
 
 // Every figure is read from the served facts at build time, so the hub can never drift from the pages
@@ -27,6 +27,16 @@ export function buildDemographyHubCards(
   const births = facts
     .filter((fact) => fact.seriesId === SERIES.liveBirths && fact.geographyId === GEORGIA_PLACE_ID)
     .sort((left, right) => left.year - right.year);
+  // Georgia's share aged 65+ on 1 January: the 65+ band over the three bands, both sexes.
+  const bandsByYear = new Map<number, { all: number; old: number }>();
+  for (const fact of facts) {
+    if (fact.seriesId !== SERIES.populationAgeBand || fact.geographyId !== GEORGIA_PLACE_ID || fact.sex !== "total") continue;
+    const year = bandsByYear.get(fact.year) ?? { all: 0, old: 0 };
+    year.all += fact.value;
+    if (fact.ageGroup === "band_65_plus") year.old += fact.value;
+    bandsByYear.set(fact.year, year);
+  }
+  const oldShares = [...bandsByYear].sort(([left], [right]) => left - right).map(([year, bands]) => ({ year, share: (bands.old / bands.all) * 100 }));
   const signed = (value: number) => `${value > 0 ? "+" : ""}${formatInUnit(value, UNIT_PERSONS)}`;
   return DEMOGRAPHY_PAGES.map((page, index) => {
     const card = {
@@ -43,6 +53,15 @@ export function buildDemographyHubCards(
         series: net.map((fact) => fact.value),
         seriesColor: INK,
         footer: t("migrationCardFooter", { year: lastNet.year, net: signed(lastNet.value), first: firstNet.year, last: lastNet.year }),
+      };
+    }
+    if (page.id === "age-sex" && page.live && oldShares.length) {
+      const [firstShare, lastShare] = [oldShares[0]!, oldShares.at(-1)!];
+      return {
+        ...card,
+        series: oldShares.map((entry) => entry.share),
+        seriesColor: INK,
+        footer: t("ageSexCardFooter", { year: lastShare.year, share: formatShare(lastShare.share / 100), first: firstShare.year, last: lastShare.year }),
       };
     }
     if (page.id === "births-deaths" && page.live && births.length) {

@@ -15,7 +15,7 @@ describe("sidebar demography group", () => {
     const markup = await render("/en/explorer/demography/population");
     expect(markup).toContain('data-testid="demography-link"');
     expect(markup).toContain('data-testid="demography-population-link" aria-current="page"');
-    expect(markup).not.toContain('data-testid="demography-age-sex-link"');
+    expect(markup).toContain('data-testid="demography-age-sex-link"');
     expect(markup).toContain("Unemployment");
     expect((markup.match(/Coming soon/g) ?? []).length).toBe(0);
   });
@@ -30,6 +30,12 @@ describe("sidebar demography group", () => {
   it("marks the Births, deaths and fertility link current on its page", async () => {
     const markup = await render("/en/explorer/demography/births-deaths");
     expect(markup).toContain('data-testid="demography-births-deaths-link" aria-current="page"');
+    expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
+  });
+
+  it("marks the Age and sex link current on its page", async () => {
+    const markup = await render("/en/explorer/demography/age-sex");
+    expect(markup).toContain('data-testid="demography-age-sex-link" aria-current="page"');
     expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
   });
 

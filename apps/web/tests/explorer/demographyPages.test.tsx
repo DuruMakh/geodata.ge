@@ -5,7 +5,7 @@ vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathname: () => "/" }));
 
 import { SERIES } from "../../lib/data/demography/series";
-import { populationHrefById } from "../../lib/explorer/demographyPlaceRoutes";
+import { populationHrefById, populationPlaceHref } from "../../lib/explorer/demographyPlaceRoutes";
 import { buildPopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
 import {
   demographyPageMetadata,
@@ -13,6 +13,7 @@ import {
 } from "../../lib/pages/demography";
 import { demographyMigrationPageMetadata, renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
 import { demographyBirthsDeathsPageMetadata, renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
+import { demographyAgeSexPageMetadata, renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
 import {
   demographyPopulationPageMetadata,
   loadPopulationBasics,
@@ -33,8 +34,9 @@ describe("demography hub page", () => {
     const html = renderToStaticMarkup(await renderDemographyPage("en"));
     expect(html).toContain('data-testid="demography-hub"');
     expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(1);
+    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(0);
     expect(html).toContain('href="/en/explorer/demography/population"');
+    expect(html).toContain('href="/en/explorer/demography/age-sex"');
     expect(html).toContain('href="/en/explorer/demography/migration"');
     expect(html).toContain('href="/en/explorer/demography/births-deaths"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
@@ -195,6 +197,33 @@ describe("births and deaths page", () => {
     const metadata = await demographyBirthsDeathsPageMetadata("ka");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/births-deaths");
     expect(String(metadata.title)).toBe("შობადობა და სიკვდილიანობა — დემოგრაფია | Fiscal.ge");
+  });
+});
+
+describe("age and sex page", () => {
+  it("renders the regions, the pyramid, the age groups and the heat map, with no dataset markup or Georgian in English", async () => {
+    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    expect(html).toContain(">Age and sex</h1>");
+    expect(html).toContain("2004–2026 · annual, and the 2024 census");
+    expect(html).toContain(`href="/en${populationPlaceHref("region.racha_lechkhumi_kvemo_svaneti")}#age-sex"`);
+    expect(html).toContain('href="/en/explorer/demography/population/region/racha_lechkhumi_kvemo_svaneti#age-sex"');
+    expect(html).toContain("31.2%");
+    expect(html).toContain("13.1%");
+    expect(html).toContain('data-testid="age-sex-pyramid"');
+    expect(html).toContain('data-testid="age-sex-bands"');
+    expect(html).toContain('data-testid="age-sex-heatmap"');
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('"@type":"Dataset"');
+    expect(html).not.toMatch(GEORGIAN);
+  });
+
+  it("has no Georgian in the English metadata, and its own canonical address and title", async () => {
+    const en = await demographyAgeSexPageMetadata("en");
+    expect(String(en.title)).not.toMatch(GEORGIAN);
+    expect(String(en.description)).not.toMatch(GEORGIAN);
+    const metadata = await demographyAgeSexPageMetadata("ka");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/age-sex");
+    expect(String(metadata.title)).toBe("ასაკი და სქესი — დემოგრაფია | Fiscal.ge");
   });
 });
 
