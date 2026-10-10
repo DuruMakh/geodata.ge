@@ -1,7 +1,7 @@
 # External flows hub and Money from abroad page
 
 Date: 2026-10-10
-Status: Draft for review. On 2026-10-10 Duru chose "Money from abroad" as the first page built on the external-flows research foundation (`docs/superpowers/specs/2026-10-09-remittances-investment-data-design.md`). Not yet approved.
+Status: Approved by Duru on 2026-10-10 ("okay continue"), with the default hub name "External flows". It is the first page built on the external-flows research foundation (`docs/superpowers/specs/2026-10-09-remittances-investment-data-design.md`).
 
 ## 1. Intended result
 
@@ -39,7 +39,7 @@ The selector has two tabs over one shared, unlimited selection, reusing the Trad
 | --- | --- | --- | --- |
 | Georgia | Money transfers, all countries | NBG transfer inflow | NBG transfer outflow |
 | Georgia | Personal transfers (official estimate) | BoP personal transfers, credit | BoP personal transfers, debit |
-| Countries | Each published country and remainder (250 identities) | Inflow from that country | Outflow to that country |
+| Countries | Each published country and remainder (252 identities) | Inflow from that country | Outflow to that country |
 
 - Initial state: Received, line chart, all loaded years (2000–2025), only "Money transfers, all countries" selected. It stays first, selectable and removable.
 - Search, Clear and Select all follow the existing contract; search never scopes the bulk action or the count.
