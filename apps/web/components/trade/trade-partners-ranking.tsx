@@ -34,7 +34,7 @@ export function TradePartnersRanking({ model, tab, measure, pageSize }: { model:
   </tr>;
   return <section data-testid="trade-partners-ranking" data-end-year={model.range.end} data-has-share={String(!balance)} className="mt-10 border-t-2 border-[var(--ink)] pt-5">
     <SectionTitle>{title}</SectionTitle>
-    <p className="mt-2 text-[11px] text-[var(--muted)]">{model.unit.label} · {t(balance ? "balanceRankingNote" : "shareNote")}</p>
+    <p className="mt-2 text-[11px] text-[var(--muted)]">{model.unit.label} · {tab === "products" ? p("shareNote") : t(balance ? "balanceRankingNote" : "shareNote")}</p>
     <table className="mt-5 w-full table-fixed border-collapse">
       <caption className="sr-only">{title} · {model.unit.label}</caption>
       <colgroup><col className="w-[6%]" /><col style={{ width: balance ? "64%" : "49%" }} /><col className="w-[30%] min-[640px]:w-[23%]" />{!balance ? <col className="w-[15%] min-[640px]:w-[22%]" /> : null}</colgroup>

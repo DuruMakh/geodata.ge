@@ -92,5 +92,6 @@
   "trade.products.rankingPages": "Leading product pages",
   "trade.products.rankingTitle": "Leading products · {measure} · {year}",
   "trade.products.showAll": "Show all products",
+  "trade.products.shareNote": "Shares use Georgia’s national total for the same year and trade flow.",
   "trade.products.definitions": "Exports include re-exports and use FOB values; imports use CIF values. Missing observations remain gaps or dashes. Publication status: unspecified."
 }

@@ -55,8 +55,8 @@ describe("indexable Fiscal.ge routes", () => {
     // The demography methodology adds one more, and the demography hub and
     // Population page add two more bilingual pairs; the 75 Population place
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
-    // Trading partners adds one further bilingual pair.
-    expect(urls).toHaveLength(440);
+    // Trading partners and Products each add one further bilingual pair.
+    expect(urls).toHaveLength(442);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -65,6 +65,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/deficit");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/partners");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/partners");
+    expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
     expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");

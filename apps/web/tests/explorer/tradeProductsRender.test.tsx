@@ -31,6 +31,7 @@ test("product ranking keeps negative values on a signed axis and retains nationa
   expect(html).toContain("8703 · 2020–2025"); expect(html).toContain("2204 · 2020–2025");
   expect(html).not.toContain("8703 · 2015–2019");
   expect(html).toContain("Leading products"); expect(html).toContain("2025");
+  expect(html).not.toContain("Country groups overlap");
 });
 
 test("Products metadata and page publish the reviewed bilingual dataset coverage", async () => {
