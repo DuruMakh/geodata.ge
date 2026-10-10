@@ -1,120 +1,215 @@
-# Demography: Age and sex page — specification
+# Demography: Age and sex — specification
 
-Date: 2026-10-04
-Status: Draft for owner review. Part of `2026-10-04-demography-section-design.md` (read first: serving §4, census break §5, tokens §7, anatomy §8). Implementation Plan 2; it needs Plan 1 shipped, or the same branch.
-Note 2026-10-07: this specification assumes Plan 1's click-to-select map block (`RegionalEconomyMap` with `onSelect` and `selectedIds`, the `საქართველო` pill, the places series list). Plan 1 now has an index and one page per place (`2026-10-04-demography-population-design.md` §3) and those map additions were removed. Re-check this page against that pattern, and decide with the owner where the census view sits, before its plan is written.
-Scope: `/explorer/demography/age-sex` and `/en/explorer/demography/age-sex`. The page adds the section's first new chart forms: a population pyramid, a grid of mini-pyramids and an age-by-year heat map.
+Date: 2026-10-04, rewritten 2026-10-10 against the built Population, Migration and Births pages.
+Status: Owner approved the layout (mockup of 2026-10-10, real figures) and the design summary; this file awaits the owner's review before the plan.
+Supersedes: the 2026-10-04 version, which assumed the withdrawn click-to-select map block. Foundation rules still come from `2026-10-04-demography-section-design.md` (census break §5, tokens §7).
 
 ## 1. Outcome and scope
 
-The page answers: how old are Georgia's people and how has that changed since 2004; how do regions differ, and cities from villages; and where do the age groups of the past sit today.
+The work answers: how old are Georgia's people and how has that changed since 2004; how do the regions differ, and cities from villages.
 
-Delivers, as three views on one page: `დროში` (over time), `აღწერა 2024` (census 2024), `ასაკი წლების მიხედვით` (age by year). New components, because nothing existing draws them: `PopulationPyramid`, `PyramidGrid`, `AgeYearHeatMap`, a year-button row and a small table for the pyramid's figures. The region map, the line chart for the age bands, the tabs, the summary line and the age-by-year table (`MonthGridTable`) are the existing components.
+It follows the Births pattern (owner, 2026-10-10):
 
-Excluded: municipal pyramids and municipal age data (read and validated by the data stage, not served); single years of age; median age and dependency ratios (validation inputs only); projections; any figure computed across the 2025 break; auto-play or any animation through the years; sex split of the age bands over time; comparing two areas on one pyramid.
+- **One national page** `/explorer/demography/age-sex` (and `/en/...`), scrolling through four parts: regions by share aged 65+, Georgia's pyramid by year, the age groups over time, the age-by-year heat map.
+- **An "Age and sex" block** at the end of the Georgia page and the 11 region pages of Population (`#age-sex`), showing that place's census 2024 pyramid.
 
-The sketch shown on 2026-10-04 marked the 65+ rows with lighter bars for the others. The specification replaces that with a labelled band behind the 65+ rows (§4), because a pale tint of the sex colours falls below the 3:1 floor on `paper`.
+Municipality pages get no block: no municipal age rows are served (the data stage reads and validates them only).
+
+Excluded: municipal ages and pyramids; single years of age; median age and dependency ratios; projections; any difference computed across the 2025 break; auto-play or animation; comparing two places on one pyramid; MCP, JSON publications and bulk downloads (as for the other demography pages); per-resident figures.
 
 ## 2. Data
 
-| Series | Geographies | Date | Rows |
-| --- | --- | --- | ---: |
-| `demography.population_by_age_sex`: 19 age groups and an all-ages total × men, women, total | Georgia | 1 January 2004–2026 | 1,380 |
-| `demography.population_age_band`: 0–14, 15–64, 65+ × three sexes | Georgia | 1 January 2004–2026 | 207 |
-| `demography.census_population_by_age`: 18 age groups × three sexes × three settlement types | Georgia and the 11 regions | 14 November 2024 | 1,944 |
-| `demography.census_population_by_settlement`: all ages × three sexes × three settlement types | Georgia, 11 regions, 64 municipalities | 14 November 2024 | 684 |
+Both files are already canonical and validated. This work adds them to the served set; there is no new source, no new reviewed row and no database schema change.
 
-- **One set of 18 age groups everywhere.** The annual table prints age 0 and ages 1–4 separately; the census prints 0–4. The page computes `0–4 = age_0 + age_1_4` in whole persons, so the pyramids, the grid and the heat map all use `0–4, 5–9, … 80–84, 85+`. The group is disclosed as computed by Fiscal.ge, like the age bands.
-- **Basis.** Annual values carry the lineage of foundation §5 R6 and are marked by the census break. The census counts are one date and are labelled "census count, 14 November 2024" (R7); they are never drawn on the annual timeline and the page says they are not annual estimates (the 1 January 2025 value is 847 persons above the census count).
-- **Anchor values the tests assert.** Census: Georgia 3,929,581 people (1,881,004 men, 2,048,577 women), urban 2,455,444, rural 1,474,137; aged 0–14 770,823, 15–64 2,466,058, 65+ 692,700 (17.6%); 65+ share of Racha-Lechkhumi and Kvemo Svaneti 31.2%, Tbilisi 14.4%, Adjara 13.1%. Annual: the age groups add to the published total in every year; the 65+ share is 14.1% (2004), 16.2% (2024), 17.6% (2025), 18.1% (2026), and the 2024-to-2025 step is the re-base, not ageing.
+| File | Series | Geographies | Date | Rows |
+| --- | --- | --- | --- | ---: |
+| `demography-structure-annual.csv` | `demography.population_by_age_sex` (19 groups incl. `age_0`, `age_1_4`, plus `total`; × male, female, total) | Georgia | 1 January 2004–2026 | 1,380 |
+| | `demography.population_age_band` (`band_0_14`, `band_15_64`, `band_65_plus` × three sexes) | Georgia | 1 January 2004–2026 | 207 |
+| `demography-census-2024-population.csv` | `demography.census_population_by_age` (18 groups × three sexes × total, urban, rural) | Georgia and 11 regions | 14 November 2024 | 1,944 |
+| | `demography.census_population_by_settlement` (all ages × three sexes × three settlements) | Georgia, 11 regions, 64 municipalities | 14 November 2024 | 684 |
 
-## 3. Page anatomy
+- **Serving.** Both files join `SERVED_DEMOGRAPHY_FILES` and `SERVED_DATA_FILES` and are mirrored whole (the loader rejects a file with unserved series, as with Births). Mirror 5,525 → 9,740 rows; the deploy log must read `DemographyFact: csv=9740 db=9740`. `DemographyFact` already has `ageGroup` and `settlement` columns. The settlement series is served but only its Georgia and region rows are shown (urban share).
+- **One set of 18 groups.** The annual table prints age 0 and 1–4 separately; the census prints 0–4. The model computes `0–4 = age_0 + age_1_4` in whole persons, so every figure uses `0–4, 5–9, …, 80–84, 85+`. The methodology discloses the sum as computed by Fiscal.ge.
+- **Basis.** Annual values carry the census-break lineage (foundation §5). Census counts are one date, labelled "census, 14 November 2024", and are never drawn on the annual timeline.
+- **Anchors the tests assert.**
+  - Census: Georgia 3,929,581 (1,881,004 men, 2,048,577 women), urban 2,455,444, rural 1,474,137; 65+ 692,700 = 17.6%. 65+ share by region: Racha-Lechkhumi and Kvemo Svaneti 31.2, Guria 24.1, Samegrelo-Zemo Svaneti 22.6, Imereti 22.0, Kakheti 21.4, Mtskheta-Mtianeti 20.3, Samtskhe-Javakheti 19.1, Shida Kartli 18.9, Kvemo Kartli 16.2, Tbilisi 14.4, Adjara 13.1. Imereti counted 510,741.
+  - Annual: the 18 groups add to the published total in every year and sex; the bands equal the sums of their groups; 65+ share 14.1% (2004), 16.2% (2024), 17.6% (2025), 18.1% (2026); 2026 has 2,053,457 women and 1,887,646 men (108.8 women per 100 men).
 
-`ExplorerPage` → `PageHeader` (coverage `2004–2026` and the census date) → `ExplorerHeading` `ასაკი და სქესი` → a unit line that follows the view → three centred `TextTab`s (the GDP overview pattern) → the view → `SourceNote`. The view, year, compare year, measure, area and settlement persist in the hash (§9).
+## 3. National page
 
-Each view has a chart/table switch in the pattern of the other explorers' line/table switch. Its labels are new (`დიაგრამა / ცხრილი`, draft), because the existing `ხაზი` ("Line") would be wrong for a pyramid or a heat map. The table is the text equivalent of the figure.
+`ExplorerPage` → `PageHeader` (coverage `2004–2026`) → `ExplorerHeading` `ასაკი და სქესი` → one lead sentence → four parts, each under a `SectionTitle`, each with its own chart/table switch, source note and Excel action. No top-level tabs.
 
-## 4. The pyramid component
+### 3.1 Regions by share aged 65+
 
-`PopulationPyramid` draws 18 rows, youngest at the bottom, men to the left and women to the right of a centre gutter that carries the age labels.
+`RegionIndex` (Unemployment → Regions), as it is: the region map shaded by the census share aged 65+, the searchable ranked list, three summary figures — Georgia's share, the oldest region and the youngest region. `metric.hrefForRegion` points to the region's Population page with `#age-sex`. The model is built like `buildUnemploymentRegionMapModel` (`regionalMapGeometry`, `quantileBucket`, ranked descending, ties by `sortOrder`). The page loads the `regionalEconomies` message scope for the index's fixed words. The map's legend and aria wording name the census date. Table view: the ranked list already is the text form, so this part has no switch.
 
-- **Real pixels, not a scaled viewBox.** The pyramid measures its container (a small `useElementWidth` hook with `ResizeObserver`) and sets the SVG viewBox to the measured width, so the 11px labels never scale below the legibility floor. It does not use `ChartScrollFrame`: a pyramid is not intentionally wide, and scrolling to see one half would defeat it. It renders at 520px on the server and before measurement, then replaces that width after mount with no transition. Minimum usable width 320px.
-- **Geometry.** Row pitch 22px, bar height 18px; gutter 44px with the age label in 11px mono centred in it; each half is `(width − gutter − 2 × 8) / 2`. A header row above the plot carries a `SwatchBar`, `მამაკაცები` and the mono total over the left half, and a `SwatchBar`, `ქალები` and its total over the right (text in ink, never the series colour; the design rules allow bar swatches only). Four vertical hairline-soft rules per side mark equal steps of a nice scale (`niceMax` from `lib/explorer/chartScale.ts`); tick labels are mono 11px under the plot (`4%`, `2%`, `0`, `2%`, `4%`, or `100 ათ.` and so on). There is no dot lattice: its pitch rule belongs to time axes.
-- **Bars.** Flat fills, `sex.male` and `sex.female`, no stroke. Values are drawn from the gutter edge outwards.
-- **Measure.** `% of residents` (default) draws each half as a percentage of the displayed population's total, so the two halves together are 100%; `persons` draws counts. The scale is shared by everything displayed together (the compare year; all tiles of the grid), so shapes are comparable.
-- **65+ band.** A `tint` rectangle behind the five 65+ rows spans the plot, with the mono label `65+ · 18.1%` right-aligned on its top edge. The share is read from the displayed data.
-- **Compare outline.** When a second pyramid is supplied, it is drawn as a stepped 1.5px `ink` outline along the outer ends of its bars on each side, no fill, over the filled bars. The legend row shows a filled swatch bar with `{year}` for the bars and an outlined bar with `{year}` for the outline.
-- **Rows are the interactive unit.** The plot is a named group of 18 row images; each has an `aria-label` such as `25–29: მამაკაცები 123,456, ქალები 130,000, სულ 253,456 (7.3%)`. One row is the tab stop (roving tabindex); ↑/↓ move, Home/End jump. Hover or focus shows the existing `ChartTooltip` (age group in the header; men, women, total rows with swatches; the share), flipping side past 60% of the width, and a 2px accent ring on the row. With the outline on, the tooltip adds the compare year's values.
-- **Compact mode** (the grid tiles): the same drawing without labels, ticks, header or tooltip, in a fixed 160px box, `role="img"` with one summary label.
+### 3.2 Georgia's pyramid by year
 
-## 5. View: over time
+- **Controls.**
+  - Year buttons 2004–2026. The 2025 button carries a census-change tag, a dashed divider before it, and a mark on the selected year.
+  - Measure `%` | `ადამიანი`.
+  - A `შედარება` switch, off by default. When on, it shows a second year row for the comparison year, defaulting to the first year (2004).
+- **Figure.** The pyramid for the selected year, at most 640px wide, centred.
+  - Men left, women right. Ages run up the centre gutter, 0–4 at the bottom.
+  - A tinted band behind the 65+ rows, labelled `65+ · {share}%`.
+  - Under the pyramid, one line: 0–14, 15–64 and 65+ shares; women per 100 men.
+- **Comparison.** The comparison year is drawn as a 1.5px ink outline over the bars, and the legend names both years.
+  - If the two years fall on opposite sides of the 2025 break, the break note shows above the figure. The measure is forced to `%`: the `ადამიანი` tab is disabled, with the reason given. No difference is computed anywhere.
+  - Within one side of the break, nothing is restricted.
+- **Table view.** The 18 groups plus a total row: men, women, total, share. When the comparison is on, the comparison year's columns are added.
+- **Default.** The latest loaded year, `%`, comparison off.
 
-Controls: a year-button row over 2004–2026 (the single-year analysis pattern, foundation §6; it marks 2025 with a divider and the `აღწერა` tag); a `შედარება` toggle that reveals a second row; and the measure tabs `%` / `ადამიანი`.
+### 3.3 Age groups over time
 
-- The figure is the pyramid for the selected year, centred, at most 640px wide. Under it a summary row prints the three age-band shares for that year, women per 100 men, and the basis text. Below that, `ასაკობრივი ჯგუფები დროში`: an `EditorialLineChart` of the three band shares (`ageband.*` colours, unit %, full 2004–2026 range) with `breaks=[2025]`. The chart shows the whole history regardless of the selected year.
-- **Comparing across the break.** Two years may be chosen on either side of 2025. The page then shows the break note above the figure, forces the measure to `%` (persons would draw the re-base's level shift of about 6% as a bulge; the `ადამიანი` tab is disabled with an explanation), omits the summary row for the compare year, and computes no difference anywhere (R4, R5). Within one side no restriction applies.
-- Table mode: for the selected year (and compare year), 18 rows plus a total row with men, women, total and share; the age-band table beside it for all years with the break rule (R2).
+`EditorialLineChart` of the 0–14 and 65+ shares, 2004–2026, with `breaks=[2025]`. The 15–64 share is not drawn: at about 65% it would flatten the other two lines. Its latest value is printed in the caption. The table view lists all three bands for every year, with the break row (`breakYears`).
 
-## 6. View: census 2024
+### 3.4 Age by year (heat map)
 
-The place is chosen on the map, as on the Population page (foundation §3.1): the existing region map (`RegionalEconomyMap`, extended in Plan 1) shaded by share aged 65+ of all residents, with the `საქართველო` pill; the census date replaces any year control, and the settlement filter below does not change this map. The 12 tiles of the grid further down are buttons too, so they are the keyboard and phone route; there is no separate list or picker. Under the map sit the settlement tabs `ყველა / ქალაქი / სოფელი` and the measure tabs. The census date is stated in the unit line and in a note (R7).
+- **Layout.** Rows are the 18 groups (85+ at the top). Columns are 2004–2026. Colour is each group's share of that year's population.
+- **Break.** A gap and a dashed rule separate 2024 from 2025, with the short break label above. A caption says the 2025 re-base moved some groups' shares.
+- **Colour.** The five `GRID_TINTS` with `binFor` and `legendLabels`. The bin edges are the 20th, 40th, 60th and 80th percentiles of all loaded cells, computed from the data, never typed.
+- **Interaction.** The cells are one named group with one tab stop. Arrow keys move; Home and End go to the ends of a row. The tooltip (`ChartTooltip`) shows year, group, persons, share and "born about {year − upper}–{year − lower}" (for 85+: "born before {year − 85}").
+- **Reading note.** One neutral sentence: diagonal bands are people born in the same years moving up the chart.
+- **Size.** Real pixels with a 12px minimum cell. It fits 390px without scrolling.
+- **Table view.** `MonthGridTable` as inflation uses it: years newest first as rows, the 18 groups as columns of shares, the same tints and legend. If the table cannot take 18 columns or a break rule as it stands, it gains an optional column count and break year, and its default output stays unchanged.
 
-- The figure is the pyramid for the chosen place and settlement. Percentages are of that subset's own total, so an urban pyramid and a rural pyramid compare as shapes.
-- **Grid.** Under it, `PyramidGrid`: 12 compact tiles, Georgia first then the 11 regions ordered by share aged 65+, descending (ties by `sortOrder`). Every tile uses the current settlement filter and one shared scale, rounded up so the widest tile fits. Each tile shows the pyramid, the area name, the people counted and `65+ {x}%`. A tile is a button; activating it sets the area above, and the chosen tile's name wears the accent underline. Columns: four from 1100px of column width, three from 768px, two below. Tiles are not cards: a top hairline and no background.
-- Table mode: the selected pyramid's 18-row table, and the regional comparison table (area, people counted, 0–14, 15–64, 65+, urban share) in the grid's order.
+## 4. Place block (Georgia and the 11 regions)
 
-## 7. View: age by year
+`AgeSexSection`, rendered on the Population place page after `VitalSection`, with `id="age-sex"`. It is shown only when the place has census age rows; municipality pages render nothing.
 
-`AgeYearHeatMap`: rows are the 18 age groups with 85+ at the top, columns are 2004–2026, and colour is **each age group's share of that year's population**. Shares, not persons, so the re-base's 6% level shift is not read as a change; the groups themselves were also re-estimated, which the next bullet addresses.
+- **Heading.** `ასაკი და სქესი · აღწერა, 14 ნოემბერი 2024`.
+- **Controls.** Settlement `ყველა | ქალაქი | სოფელი` and measure `%` | `ადამიანი`, held in component state (as `VitalSection` holds its mode). Shares are of the displayed subset's own total.
+- **Figure.** The same pyramid component as §3.2, without year buttons or comparison. Three key figures follow: people counted, share aged 65+, share living in cities. The figures are for the whole place; the share living in cities does not change with the settlement tab.
+- **Table view.** The 18 groups plus a total row: men, women, total, share.
+- **Below the figure.** A link to the national page; on Georgia's block the link reads as "every year since 2004". Then the source note and the Excel action.
+- **Payload.** Only this place's census rows go to the browser.
 
-- **Break.** A 14px gap separates the 2024 and 2025 columns, a dashed rule runs through it, and the short label (R1) sits above. Cells on both sides are coloured as published; the gap tells the reader not to compare across. A caption states that the 2025 re-base moved some age groups' shares.
-- **Colour.** The five tints the inflation month grid already uses (`GRID_TINTS`, with `binFor` and `legendLabels`), cool for the lowest share to the accent for the highest. The four bin edges are the 20th, 40th, 60th and 80th percentiles of all cells of the loaded matrix, printed to one decimal in the legend. Edges come from the data and are not typed.
-- **Real pixels.** Cell width is `(width − labels − gap) / (number of loaded years)` with a 12px minimum, row pitch 18px; age labels at the left in 11px mono, years along the bottom every second year plus the last. It does not scroll on a 390px screen.
-- **Interaction.** The cells form a named group with one tab stop; arrow keys move in two dimensions, Home/End go to the ends of a row, PageUp/PageDown move five columns. Hover or focus shows the tooltip: year, age group, persons, share, and "born about {year − upper age}–{year − lower age}" (for 85+, born before {year − 85}). The cohort cue is words, not drawn diagonals: a five-year group does not move along a straight line across annual columns.
-- **Reading note.** One neutral sentence: diagonal bands are birth cohorts moving up the chart. No interpretation of any band is printed.
-- Table mode: `MonthGridTable` as it is used for inflation, with years newest first as rows and the 18 age groups as columns of shares, tinted with the same bins and legend. It gains a column count that follows its labels and an optional break year that draws a 2px rule and label (foundation §6); there is no new table component.
+## 5. Components and reuse
 
-## 8. Components and files
+**Reused as is:**
+- `RegionIndex` and `RegionMap`, `regionalMapGeometry` and `quantileBucket`.
+- `EditorialLineChart` (with `breaks`).
+- `ExplorerTable` (with `breakYears`).
+- `ChartTooltip`.
+- `SectionTitle`, `SegmentedTabs`, `TextTab`, `SourceNote`, `Callout`.
+- `ExcelDownloadButton` and the workbook model.
+- `ExplorerPage`, `PageHeader`, `BreadcrumbJsonLd`.
+- `GRID_TINTS`, `binFor`, `legendLabels`.
+- The Population place page and its loaders.
+- The `sex.male` and `sex.female` colour tokens.
 
-New: `app/(ka)/explorer/demography/age-sex/page.tsx` and the `(en)` mirror; `lib/pages/demography-age-sex.tsx`; `lib/explorer/demographyAgeSex.ts` (groups, derived values, shares, hash, summaries), `pyramidLayout.ts` (pure geometry: scale, nice ticks, rows, outline path), `ageYearMatrix.ts` (matrix, quantile bins, birth-year text), `demographyAgeSexWorkbook.ts`; `components/demography/`: `age-sex-explorer.tsx`, `population-pyramid.tsx`, `pyramid-grid.tsx`, `age-year-heat-map.tsx`, `age-table.tsx`, `use-element-width.ts`, `use-age-sex-state.ts`, and `components/ui/year-row.tsx` (the year-button row). The maps and their additions come from Plan 1. Additive changes to the Plan 1 files for routes, sidebar nested link, sitemap, `llms.txt`, messages, methodology content for the structure and census families, `servedData.ts`, mirror loaders and the import script (files `demography-structure-annual.csv` and `demography-census-2024-population.csv`).
+**Small additive changes; default output unchanged:**
+- The year-button row in `components/analysis/analysis-view.tsx` is lifted into a shared `YearButtonRow`, with an optional per-year tag (the "planned" tag there, the census tag here). Analysis must render exactly as before, and its browser specs prove it.
+- `MonthGridTable` gets an optional column count and break year, only if needed (§3.4).
+- Demography loader, validation and served-file lists gain the two files; `servedRows` gains a client projection for age rows.
+- `DEMOGRAPHY_PAGES` flips `age-sex` to live, and the hub card gains a figure (Georgia's 65+ share, latest year).
+- Sitemap, `llms.txt`, sidebar, methodology demography content (structure and census families, the computed 0–4) and the release-check runbook.
 
-Reuse: `TextTab`, `SegmentedTabs`, `MeasurePill`, `ChartTooltip`, `EditorialLineChart` (with `breaks`), `RegionalEconomyMap` (Plan 1), `MonthGridTable` and `GRID_TINTS`, a plain summary line under the pyramid, `Callout`, `SourceNote`, `ExplorerPage`, `niceMax`, `ExcelDownloadButton`.
+**Genuinely new:**
+- `PopulationPyramid`, drawn from a pure `pyramidLayout.ts` (scale, ticks, rows, outline path). Nothing existing draws mirrored horizontal bars.
+- `AgeYearHeatMap`, drawn from a pure `ageYearMatrix.ts` (matrix, bins, birth-year text). `MonthGridTable` is a table, not a figure with a break gap and two-dimensional keyboard movement.
+- `lib/explorer/demographyAgeSex.ts`: groups, the 0–4 sum, shares, sex ratio, hash state, the region model.
+- `demographyAgeSexWorkbook.ts`.
+- `components/demography/age-sex-explorer.tsx` (national parts 3.2–3.4) and `age-sex-section.tsx` (place block).
+- `lib/pages/demography-age-sex.tsx` and the `(ka)` and `(en)` route files.
 
-Payload: the structure and census families are about 2,600 rows after projection. If the payload guard shows more than about 150 KB per locale, each key is sent as one packed number array instead of rows; the model unpacks it.
+## 6. Pyramid drawing
 
-## 9. State
+The pyramid measures its container (`ResizeObserver`) and sets the viewBox to the measured width, so 11px mono labels never scale. It renders at 520px on the server and before measurement, with a minimum of 320px and no horizontal scroll. Its geometry:
 
-Hash keys: `tab` (`time|census|heat`), `year`, `compare` (absent means off), `measure` (`share|persons`), `place` (Georgia or a region; a municipality ID is rejected here because no municipal age data is served), `settlement` (`total|urban|rural`), `mode` (`chart|table`). Defaults: `time`, the latest year (derived), no compare, `share`, `country.georgia`, `total`, chart. Unknown values are rejected; a compare year equal to the year is dropped; a compare across the break forces `share`; years and the place are clamped to loaded facts. Language switch and history keep the state.
+- Row pitch 22px, bar 18px.
+- A 44px centre gutter holds the age labels. Each half is `(width − gutter − 16) / 2`.
+- Four hairline rules per side mark a nice scale (`niceMax`). Tick labels sit under the plot.
+- A header row carries a swatch, the label and the share or total for each sex. The text is in ink, never in the series colour.
 
-## 10. Numbers
+When a comparison year is shown, both share one scale.
 
-- All persons are exact integers; `0–4` is an exact sum. Each half-percentage is `persons / displayed total × 100`; the age bands from the served rows must equal the sums of their groups (asserted).
-- Women per 100 men is `women / men × 100` to one decimal. Shares print with `formatShare`, one decimal.
-- A 65+ share, band share or sex ratio is shown for one date at a time. None is subtracted from another.
-- Quantile bins, nice scales and the outline path are pure functions with unit tests.
+Rows are the interactive unit. Each has an aria-label such as `25–29: მამაკაცები 123,456, ქალები 130,000, სულ 253,456 (7.3%)`, and one row is the tab stop. ↑/↓ move between rows, and Home/End jump to the ends. Hover or focus shows `ChartTooltip`, with the comparison year's values when it is on.
 
-## 11. Excel
+## 7. State
 
-One action per view, three sheets. Over time: readable sheet of 18 age rows with men, women, total and share for the selected year (and the compare year's columns when on); data sheet of year, sex, age group, persons, share, basis; sources the annual age-by-sex original. Census: the same shape for the selected area and settlement with the census date in the subtitle; sources the census original. Age by year: age groups as rows, years as columns, shares; data sheet year, age group, persons, share, basis. Georgian and English as elsewhere, no internal columns.
+The national page keeps `year`, `compare` (absent = off), `measure` (`share|persons`) and each part's `mode` in the hash. Updates use replace, not push (`useReplaceHash`, as on inflation cities). Rules:
 
-## 12. Accessibility and responsive
+- Unknown values are rejected.
+- Years are clamped to loaded facts.
+- A comparison year equal to the year is dropped.
+- A comparison across the break forces `share`.
 
-Every figure is `role="img"` or a named group and has its table. Focus is the 2px accent ring. Text inside figures is 11px mono at least and does not scale. Sex is carried by position, header labels and tooltips as well as colour. Pyramids fit 320px without scrolling; the grid reflows to two columns; the heat map keeps a 12px minimum cell and fits 390px. Nothing animates. Verified at 390, 768, 900, 1100 and 1440px in both languages.
+The place block keeps local state only.
 
-## 13. Tests and acceptance
+## 8. Numbers
 
-Unit: `0–4` sum; groups add to totals and bands; shares; sex ratio; layout geometry (symmetry, shared scale, tick values, outline path, row order); matrix bins and edge text; birth-year text; hash round-trip, rejection and the compare rules; workbook models; census anchors in §2; grid ordering; payload excludes internal fields.
+- Persons are exact integers. Shares are `persons / displayed total × 100`, printed with `formatShare` to one decimal.
+- Women per 100 men is `women / men × 100`, to one decimal.
+- No share, ratio or count is subtracted across the break.
+- Bins, scales and the outline path are pure functions with unit tests.
 
-Component and browser (both languages): default view; year selector and arrow keys; compare on within a side shows an outline and legend, across the break shows the note, forces `%` and shows no difference; tab switch; area and settlement change the pyramid and the grid together; tile activation sets the area; heat map gap, label, legend, keyboard movement and tooltip text; table twins; download; widths 390–1440 with no horizontal page overflow and no pyramid or heat map scrolling.
+## 9. Excel
 
-Acceptance: the §2 anchors agree across pyramid, table, summary, tooltip, workbook and heat map; no figure spans the break; existing pages unchanged; `npm run check`, `npm run build` and the browser suite pass once at the end.
+Every workbook keeps basis and source hyperlinks and has no internal columns. Georgian and English as elsewhere.
 
-## 14. Open decisions (for review, defaults recommended)
+| Download | Readable sheet | Data sheet | Source | Notes |
+| --- | --- | --- | --- | --- |
+| National pyramid | 18 rows: men, women, total, share for the year (plus the comparison year's columns when on) | year, sex, age group, persons, share, basis | the annual age-by-sex original | |
+| Age groups over time | | bands × years | the annual age-by-sex original | |
+| Heat map | groups × years, shares | year, group, persons, share, basis | the annual age-by-sex original | |
+| Place block | the 18 groups for the place and settlement | | the census original | census date in the subtitle |
 
-1. **Comparing years across the break.** Recommended: allowed with the note, forced `%`, no differences. Alternative: only same-side pairs.
-2. **Default measure `%`.** Recommended: it stays comparable across regions and across the break.
-3. **Heat map shows shares and uses words for cohorts.** Recommended. Alternative: persons, or drawn cohort staircases.
-4. **No two-area overlay in the census view**; the grid covers comparison. Recommended for a first version.
-5. **Grid order by share aged 65+**, Georgia first. Alternative: the fixed region order used elsewhere.
-6. **No auto-play.** Recommended; the design rules allow no motion beyond fades.
-7. **The census view chooses its region on the existing region map** shaded by share aged 65+ (the "ageing map"); the grid stays as the comparison and as the keyboard and phone route. Recommended, because the map exists after Plan 1 and shows the gap between Racha-Lechkhumi (31.2%) and Adjara (13.1%) at a glance. Alternative: the grid only.
+## 10. Accessibility and responsive
+
+- Every figure is `role="img"` or a named group, and has a table twin.
+- Focus is the 2px accent ring.
+- Sex is carried by position and labels, not only colour.
+- Pyramids fit 320px, and the heat map fits 390px, with no horizontal page overflow.
+- Nothing animates.
+- Checked at 390, 768, 1100 and 1440px in both languages.
+
+## 11. Tests and acceptance
+
+**Unit:**
+- The 0–4 sum; groups add to totals; bands equal group sums.
+- Shares and the sex ratio.
+- Pyramid geometry: symmetry, shared scale, ticks, outline path, row order.
+- Heat-map bins and birth-year text.
+- Hash round-trip, rejection and the break rules.
+- The region model's order and the §2 anchors.
+- Workbook models.
+- Served-file parity: the CSV and database row counts match, and the totals become 9,740.
+- Payload: only this place's census rows reach the place page; no internal fields reach the browser.
+
+**Browser (both languages):**
+- The national page's four parts.
+- Year buttons and keys.
+- Comparison within one side of the break, and across it (note shown, `%` forced, no difference).
+- The table twins.
+- The heat-map keyboard and tooltip.
+- A region row link landing on `#age-sex`.
+- The place block's settlement and measure switches.
+- No block on a municipality page.
+- The downloads.
+- Widths 390–1440.
+- The Analysis year row unchanged.
+
+Ripple counts are re-derived during the plan, not guessed here: the sitemap (+2), the bilingual identities (+1), the sidebar "coming soon" count (1 → 0), the methodology and `llms.txt` lists, and the hub card.
+
+**Acceptance:**
+- The §2 anchors agree across pyramid, table, summary, tooltip, workbook and heat map.
+- No figure spans the break with a difference.
+- Existing pages are unchanged.
+- `npm run check`, `npm run build` and the browser suite pass once at the end.
+- The methodology doc `docs/data-methodology/demography.md` and `DESIGN.md` are updated in the same change.
+
+## 12. Settled decisions
+
+| # | Decision | Decided by |
+| --- | --- | --- |
+| 1 | National page plus a block on Georgia and region pages | owner |
+| 2 | The layout as in the mockup of 2026-10-10 | owner |
+| 3 | Comparison outline off by default | assistant default, accepted with the design |
+| 4 | 15–64 not drawn on the over-time chart | assistant default, accepted with the design |
+| 5 | Comparison across the break allowed, with the note and forced `%` | |
+| 6 | Heat map shows shares and uses words, not lines, for birth cohorts | |
+| 7 | Region order by 65+ share, descending | |
+| 8 | No auto-play | |
+
+Georgian wording is drafted and reviewed by the owner at the end, as for the other pages.
