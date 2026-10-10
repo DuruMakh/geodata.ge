@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import type { ClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
-import { MONEY_TRANSFER_MEASURES, MONEY_TRANSFER_TOTAL_ID, PERSONAL_TRANSFERS_ID } from "../../lib/data/externalFlows/types";
+import { MONEY_TRANSFER_MEASURES, MONEY_TRANSFER_TOTAL_ID } from "../../lib/data/externalFlows/types";
 import { buildMoneyTransfersModel, moneyTransferColor } from "../../lib/explorer/moneyTransfers";
-import { moneyTransfersCoverage, setMoneyTransfersTab } from "../../lib/explorer/moneyTransfersState";
+import { moneyTransfersCoverage } from "../../lib/explorer/moneyTransfersState";
 import { buildMoneyTransfersWorkbookModel } from "../../lib/explorer/moneyTransfersWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { formatDisplayDate, formatInUnit } from "../../lib/explorer/format";
@@ -24,8 +24,6 @@ import { useMoneyFromAbroadState } from "./use-money-from-abroad-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 import { MoneyFromAbroadRanking } from "./money-from-abroad-ranking";
 
-/** NBG adds microfinance organizations to the transfer statistics from January 2010 (spec section 4). */
-const MICROFINANCE_BREAK_YEAR = 2010;
 
 export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientMoneyTransfersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
@@ -37,8 +35,6 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
   const partialByYear = (id: string) => Object.fromEntries(Object.keys(model.partialMonths[id] ?? {}).map(year => [Number(year), true]));
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: moneyTransferColor(id), valuesByYear: model.valuesByEntity[id], preliminaryByYear: partialByYear(id) }));
   const total = rows.find(row => row.itemId === MONEY_TRANSFER_TOTAL_ID) ?? null;
-  const transfersShown = model.selectedIds.some(id => id !== PERSONAL_TRANSFERS_ID);
-  const breakShown = transfersShown && model.years.includes(MICROFINANCE_BREAK_YEAR - 1) && model.years.includes(MICROFINANCE_BREAK_YEAR);
   const partialShown = model.selectedIds.some(id => model.partialMonths[id]);
   const downloadAction = <ExcelDownloadButton testId="money-from-abroad-excel-download" disabled={!model.selectedCount} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
@@ -53,8 +49,8 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
         <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} /><span className="text-[11px] text-[var(--muted)]">{measureLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selectedIds.map(id => ({ id, label: label(id), color: moneyTransferColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true, ...(id === PERSONAL_TRANSFERS_ID ? { continuousAcrossBreaks: true } : {}) }))} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} preliminaryLabel={t("partial")} formatTooltipValue={value => `${formatInUnit(value, model.unit)} ${model.unit.label}`} {...(transfersShown ? { breaks: [{ year: MICROFINANCE_BREAK_YEAR, label: t("breakLabel") }] } : {})} /></div>
-            : <ExplorerTable caption={`${message(messages, "external.money.title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== MONEY_TRANSFER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} preliminaryLabel={t("partial")} {...(breakShown ? { breakYears: [MICROFINANCE_BREAK_YEAR], breakLabel: t("breakLabel") } : {})} />}
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selectedIds.map(id => ({ id, label: label(id), color: moneyTransferColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true }))} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} preliminaryLabel={t("partial")} formatTooltipValue={value => `${formatInUnit(value, model.unit)} ${model.unit.label}`} /></div>
+            : <ExplorerTable caption={`${message(messages, "external.money.title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== MONEY_TRANSFER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} preliminaryLabel={t("partial")} />}
           <RangeStrip years={moneyTransfersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyTransfersModel(data, s, presentation).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
@@ -62,7 +58,7 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
         </SourceNote></div>
         {partialShown ? <p data-testid="money-from-abroad-partial-note" className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("partialNote")}</p> : null}
       </div>
-      <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setMoneyTransfersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
+      <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel data={data} state={state} model={model} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <MoneyFromAbroadRanking key={`${state.measure}:${model.range.end}`} model={model} measure={state.measure} />
   </div>;

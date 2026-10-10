@@ -7,7 +7,7 @@ import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Money from abroad defaults, Received/Sent, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Money from abroad defaults, Received/Sent, one series list, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
     const cards = page.getByTestId("external-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(3);
@@ -15,10 +15,11 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await cards.nth(0).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/money-from-abroad$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-    await expect(page.getByTestId("series-status")).toContainText("1 / 254");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 253");
     await expect(toggle(page, "transfer.total")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "received");
-    await expect(page.getByTestId("chart-break")).toHaveCount(1);
+    await expect(page.getByTestId("chart-break")).toHaveCount(0);
+    await expect(page.getByTestId("money-from-abroad-tab-countries")).toHaveCount(0);
     const ranking = page.getByTestId("money-from-abroad-ranking-row");
     await expect(ranking).toHaveCount(10);
     await expect(ranking.first()).toHaveAttribute("data-entity-id", "transfer.united_states_of_america");
@@ -31,14 +32,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("money-from-abroad-ranking")).toHaveAttribute("data-measure", "sent");
     await page.getByTestId("money-from-abroad-show-all").click();
     expect(await ranking.count() + await page.getByTestId("money-from-abroad-unavailable-row").count() + await page.getByTestId("money-from-abroad-remainder-row").count()).toBe(252);
-    await page.getByTestId("money-from-abroad-tab-countries").click();
     await toggle(page, "transfer.italy").click();
-    await page.getByTestId("money-from-abroad-tab-georgia").click();
-    await expect(page.getByTestId("money-from-abroad-off-tab")).toContainText(prefix ? "Italy" : "იტალია");
     await page.getByTestId("series-search").fill("no-matching-series-xyz");
-    await expect(toggle(page, "transfer.italy")).toBeVisible();
-    await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("0 / 254");
-    await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("254 / 254");
+    await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("0 / 253");
+    await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("253 / 253");
     await page.getByTestId("series-toggle-all").click();
     await page.getByTestId("chart-mode-table").click(); await page.reload();
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
@@ -50,10 +47,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 }
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
-  test(`A mixed table with partial 2019 values survives sidebar, reload, language and history ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`A table with partial 2019 values survives sidebar, reload, language and history ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`${prefix}/explorer/external/money-from-abroad#measure=received&tab=countries&view=table&sel=transfer.total,bop.personal_transfers,transfer.algeria&start=2009&end=2019`);
-    await expect(page.getByTestId("series-status")).toContainText("3 / 254");
+    await page.goto(`${prefix}/explorer/external/money-from-abroad#measure=received&view=table&sel=transfer.total,transfer.italy,transfer.algeria&start=2009&end=2019`);
+    await expect(page.getByTestId("series-status")).toContainText("3 / 253");
     const table = page.getByTestId("explorer-table");
     expect(await tableSeriesCount(table)).toBe(3);
     expect(await tableSeriesValues(table, prefix ? "Algeria" : "ალჟირი")).toHaveLength(11);
@@ -64,25 +61,24 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await page.getByTestId("money-from-abroad-link").click(); await expect(page).toHaveURL(before);
     if (width < 900) await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
     await page.reload();
-    await expect(page.getByTestId("series-status")).toContainText("3 / 254");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 253");
     if (width < 900) await page.getByTestId("sidebar-toggle").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
-    await expect(page.getByTestId("series-status")).toContainText("3 / 254");
-    await expect(page.getByTestId("money-from-abroad-tab-countries")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 253");
     await expect(page.getByTestId("money-from-abroad-ranking")).toHaveAttribute("data-end-year", "2019");
     await page.getByTestId("money-from-abroad-show-all").click();
     await expect(page.locator('[data-entity-id="transfer.algeria"]').getByTestId("money-from-abroad-partial")).toHaveText(prefix ? "11 თვე" : "11 months");
     await page.screenshot({ path: info.outputPath(`money-mixed-${prefix ? "ka" : "en"}-${width}.png`), fullPage: true });
     await toggle(page, "transfer.algeria").focus(); await toggle(page, "transfer.algeria").press("Space");
-    await expect(page.getByTestId("series-status")).toContainText("2 / 254");
-    await page.goBack(); await expect(page.getByTestId("series-status")).toContainText("3 / 254");
-    await page.goForward(); await expect(page.getByTestId("series-status")).toContainText("2 / 254");
+    await expect(page.getByTestId("series-status")).toContainText("2 / 253");
+    await page.goBack(); await expect(page.getByTestId("series-status")).toContainText("3 / 253");
+    await page.goForward(); await expect(page.getByTestId("series-status")).toContainText("2 / 253");
   });
 }
 
-test("Excel follows the selection and measure, marks partial months and links the two untouched NBG originals", async ({ page, request }) => {
-  await page.goto("/en/explorer/external/money-from-abroad#measure=sent&tab=georgia&view=line&sel=transfer.total,bop.personal_transfers,transfer.algeria&start=2019&end=2019");
-  await expect(page.getByTestId("series-status")).toContainText("3 / 254");
+test("Excel follows the selection and measure, marks partial months and links the untouched NBG original", async ({ page, request }) => {
+  await page.goto("/en/explorer/external/money-from-abroad#measure=sent&view=line&sel=transfer.total,transfer.italy,transfer.algeria&start=2019&end=2019");
+  await expect(page.getByTestId("series-status")).toContainText("3 / 253");
   const pending = page.waitForEvent("download"); await page.getByTestId("money-from-abroad-excel-download").click();
   const download = await pending;
   expect(download.suggestedFilename()).toBe("fiscal-money-from-abroad-2019-2019-en.xlsx");
@@ -93,7 +89,7 @@ test("Excel follows the selection and measure, marks partial months and links th
   expect(values).toContain("11");
   const rows = parse(await readFile("../../data/methodology/source-archives/external-flows.csv"), { columns: true, bom: true }) as Record<string, string>[];
   const links = excel.getWorksheet("Sources")!.getColumn(4).values.filter(value => typeof value === "object" && value !== null && "hyperlink" in value) as { hyperlink: string }[];
-  expect(links).toHaveLength(2);
+  expect(links).toHaveLength(1);
   for (const link of links) {
     const pathname = new URL(link.hyperlink).pathname, source = rows.find(row => `/${row.public_download_path}` === pathname)!;
     const response = await request.get(pathname); expect(response.ok()).toBe(true);

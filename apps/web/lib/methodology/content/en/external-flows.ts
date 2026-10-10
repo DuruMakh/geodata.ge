@@ -4,7 +4,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
   "id": "external-flows",
   "slug": "external-flows",
   "title": "Money from abroad",
-  "summary": "Money transfers into and out of Georgia by country, and NBG's estimate of personal transfers, annually in nominal USD.",
+  "summary": "Money transfers into and out of Georgia by country, annually in nominal USD.",
   "reviewedAt": "2026-10-10",
   "archiveManifestId": "external-flows",
   "coverageSource": {
@@ -50,7 +50,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "title": "Transfers are not the official remittance figure",
       "paragraphs": [
         "Money transfers cover all money sent through fast transfer systems (Western Union, MoneyGram, Zolotaia Korona and others) as reported by commercial banks and microfinance organizations. They include transfers by non-residents, which explains the rise in transfers from Russia in 2022.",
-        "Personal transfers are a balance-of-payments (BPM6) estimate built mainly from household-survey data, with bank reports as a supplement. They are the official measure of money sent home. The page shows both and never subtracts or adds one to the other."
+        "Personal transfers are a balance-of-payments (BPM6) estimate built mainly from household-survey data, with bank reports as a supplement. They are the official measure of money sent home. The page shows money transfers only, not this estimate."
       ]
     },
     {
@@ -68,7 +68,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "paragraphs": [
         "For 2000–2007 NBG publishes 18 major countries plus Other countries; full country lists start in 2008. Earlier values for other countries are missing and are not filled with zero.",
         "In 2019 some months are blank in the source for about 70 smaller countries, mostly February alone. Their 2019 value is the sum of the published months: 11 in most cases, 5 to 9 in a few. It is marked as partial in the chart and the table, and the ranking and Excel show the number of months.",
-        "From January 2010 the data include microfinance organizations. The break is marked on the chart and is not adjusted."
+        "From January 2010 the data include microfinance organizations. The values are not adjusted for this change."
       ]
     },
     {
@@ -113,7 +113,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "external",
       "title": "Transfers are not the official remittance figure",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "Money transfers cover all money sent through fast transfer systems (Western Union, MoneyGram, Zolotaia Korona and others) as reported by commercial banks and microfinance organizations. They include transfers by non-residents, which explains the rise in transfers from Russia in 2022. Personal transfers are a balance-of-payments (BPM6) estimate built mainly from household-survey data, with bank reports as a supplement. They are the official measure of money sent home. The page shows both and never subtracts or adds one to the other.",
+      "summary": "Money transfers cover all money sent through fast transfer systems (Western Union, MoneyGram, Zolotaia Korona and others) as reported by commercial banks and microfinance organizations. They include transfers by non-residents, which explains the rise in transfers from Russia in 2022. Personal transfers are a balance-of-payments (BPM6) estimate built mainly from household-survey data, with bank reports as a supplement. They are the official measure of money sent home. The page shows money transfers only, not this estimate.",
       "detail": [],
       "canonicalDecisionIds": [
         "external.transfers_not_remittances"
@@ -124,7 +124,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "external",
       "title": "Coverage limits",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "For 2000–2007 NBG publishes 18 major countries plus Other countries; full country lists start in 2008. Earlier values for other countries are missing and are not filled with zero. In 2019 some months are blank in the source for about 70 smaller countries, mostly February alone. Their 2019 value is the sum of the published months: 11 in most cases, 5 to 9 in a few. It is marked as partial in the chart and the table, and the ranking and Excel show the number of months. From January 2010 the data include microfinance organizations. The break is marked on the chart and is not adjusted.",
+      "summary": "For 2000–2007 NBG publishes 18 major countries plus Other countries; full country lists start in 2008. Earlier values for other countries are missing and are not filled with zero. In 2019 some months are blank in the source for about 70 smaller countries, mostly February alone. Their 2019 value is the sum of the published months: 11 in most cases, 5 to 9 in a few. It is marked as partial in the chart and the table, and the ranking and Excel show the number of months. From January 2010 the data include microfinance organizations. The values are not adjusted for this change.",
       "detail": [],
       "canonicalDecisionIds": [
         "external.coverage"

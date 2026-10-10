@@ -19,6 +19,9 @@ test.each(["en", "ka"] as const)("renders %s defaults: Received, the all-country
   expect(selection).toContain('data-series-id="transfer.total"');
   expect(html).toContain('data-measure="received"');
   expect(html).not.toContain("money-from-abroad-figure");
+  expect(html).not.toContain("money-from-abroad-tab-");
+  expect(html).not.toContain('data-testid="chart-break"');
+  expect(html).not.toContain("bop.personal_transfers");
   expect(html).toContain('data-testid="money-from-abroad-ranking"');
   expect(html).not.toMatch(/GEL|₾/);
 });
@@ -46,11 +49,3 @@ test("a 2008 range lists the 2007 remainder only when it has a value", async () 
   expect(html).toContain("Other Countries");
 });
 
-test.each(["georgia", "countries"] as const)("selected off-tab rows stay visible and removable while browsing %s", async tab => {
-  const { MoneyFromAbroadSeriesPanel } = await import("../../components/external/money-from-abroad-series-panel");
-  const presentation = await p("en"), state = { ...DEFAULT_MONEY_TRANSFERS_STATE, tab, selectedIds: ["transfer.total", "transfer.italy"] };
-  const model = buildMoneyTransfersModel(data, state, presentation);
-  const html = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroadSeriesPanel data={data} state={state} model={model} onTabChange={() => {}} onSelectionChange={() => {}} downloadAction={<span />} /></I18nProvider>);
-  expect(html).toContain('data-testid="money-from-abroad-off-tab"');
-  expect(html.match(/aria-pressed="true"/g)).toHaveLength(3); // two selected rows and the active tab
-});

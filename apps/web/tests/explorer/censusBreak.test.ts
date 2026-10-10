@@ -6,10 +6,10 @@ import { UNIT_PERSONS } from "../../lib/explorer/format";
 import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 
 const COLOR = "#B3402A";
-const chart = (years: number[], vals: (number | null)[], breaks?: Array<{ year: number; label: string }>, continuousAcrossBreaks?: boolean) =>
+const chart = (years: number[], vals: (number | null)[], breaks?: Array<{ year: number; label: string }>) =>
   renderGeorgianMarkup(createElement(EditorialLineChart, {
     years,
-    series: [{ id: "s", label: "S", color: COLOR, vals, planned: vals.map(() => false), ...(continuousAcrossBreaks ? { continuousAcrossBreaks } : {}) }],
+    series: [{ id: "s", label: "S", color: COLOR, vals, planned: vals.map(() => false) }],
     share: false,
     unit: { divisor: 1_000, label: "k", decimals: 0 },
     shareLabel: "%",
@@ -36,15 +36,6 @@ describe("EditorialLineChart break", () => {
       const svg = chartGeometry(html, geometry);
       expect(count(pathOf(svg), /M/g), geometry).toBe(2);
       expect(count(pathOf(svg), /L/g), geometry).toBe(2);
-    }
-  });
-
-  it("keeps a series the break does not apply to joined, while still drawing the rule", () => {
-    const html = chart(years, vals, [{ year: 2025, label: "MFOs added" }], true);
-    for (const geometry of GEOMETRIES) {
-      const svg = chartGeometry(html, geometry);
-      expect(count(pathOf(svg), /M/g), geometry).toBe(1);
-      expect(count(svg, /data-testid="chart-break"/g), geometry).toBe(1);
     }
   });
 

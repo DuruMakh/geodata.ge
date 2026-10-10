@@ -54,6 +54,8 @@ export function loadServedMoneyTransfersData(): Promise<MoneyTransfersData> {
   return servedPromise;
 }
 
+/** The page shows NBG's money transfers only; the reviewed personal-transfers estimate stays in the data but is not served to it. */
 export function toClientMoneyTransfersData(data: MoneyTransfersData): ClientMoneyTransfersData {
-  return { entities: data.entities, facts: data.facts.map(({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd }) => ({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd: valueUsd === null ? null : Number(valueUsd) })) };
+  const estimates = new Set(data.entities.filter(entity => entity.kind === "estimate").map(entity => entity.id));
+  return { entities: data.entities.filter(entity => !estimates.has(entity.id)), facts: data.facts.filter(fact => !estimates.has(fact.entityId)).map(({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd }) => ({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd: valueUsd === null ? null : Number(valueUsd) })) };
 }

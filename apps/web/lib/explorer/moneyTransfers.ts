@@ -19,7 +19,7 @@ export type MoneyTransferRankingRow = { entityId: string; label: string; valueUs
 export type MoneyTransfersModel = {
   years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[];
   valuesByEntity: Record<string, Record<number, number | null>>; partialMonths: Record<string, Record<number, number>>;
-  activeEntities: MoneyTransferEntity[]; offTabSelected: MoneyTransferEntity[];
+  activeEntities: MoneyTransferEntity[];
   ranking: MoneyTransferRankingRow[]; missingRanking: MoneyTransferRankingRow[]; remainders: MoneyTransferRankingRow[];
   selectedCount: number; totalCount: number;
 };
@@ -38,9 +38,6 @@ export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: 
   const billion = values.some(value => Math.abs(value) >= 1_000_000_000);
   const unit = unitFor(values, { divisor: billion ? 1_000_000_000 : 1_000_000, label: message(presentation.messages, billion ? "external.unit.billion" : "external.unit.million"), decimals: 1 });
   unit.decimals = Math.max(1, unit.decimals);
-  const georgia = (entity: MoneyTransferEntity) => entity.kind === "total" || entity.kind === "estimate";
-  const onTab = (entity: MoneyTransferEntity) => (state.tab === "georgia") === georgia(entity);
-  const offTabSelected = data.entities.filter(entity => !onTab(entity) && selectedIds.includes(entity.id));
   const label = (id: string, labelKa: string) => publicLabel(presentation.locale, id, labelKa, presentation.englishLabels);
   const total = valuesByEntity[MONEY_TRANSFER_TOTAL_ID][range.end];
   const row = (entity: MoneyTransferEntity): MoneyTransferRankingRow => {
@@ -53,9 +50,8 @@ export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: 
   const remainderEntities = data.entities.filter(entity => entity.kind === "remainder");
   const remainders = remainderEntities.map(row).filter(r => r.valueUsd !== null);
   const missingRanking = [...countries.filter(r => r.valueUsd === null), ...remainderEntities.map(row).filter(r => r.valueUsd === null)].sort(labelOrder);
-  // Countries tab: ranked countries, then unavailable ones, then the remainders.
-  const order = new Map([...ranking, ...countries.filter(r => r.valueUsd === null).sort(labelOrder)].map((r, index) => [r.entityId, index]));
-  const activeEntities = data.entities.filter(onTab);
-  if (state.tab === "countries") activeEntities.sort((a, b) => (order.get(a.id) ?? Infinity) - (order.get(b.id) ?? Infinity));
-  return { years, range, unit, selectedIds, valuesByEntity, partialMonths, activeEntities, offTabSelected, ranking, missingRanking, remainders, selectedCount: selectedIds.length, totalCount: ids.length };
+  // The series list: the all-country total, ranked countries, unavailable ones, then the remainders.
+  const order = new Map([MONEY_TRANSFER_TOTAL_ID, ...[...ranking, ...countries.filter(r => r.valueUsd === null).sort(labelOrder)].map(r => r.entityId)].map((id, index) => [id, index]));
+  const activeEntities = [...data.entities].sort((a, b) => (order.get(a.id) ?? Infinity) - (order.get(b.id) ?? Infinity));
+  return { years, range, unit, selectedIds, valuesByEntity, partialMonths, activeEntities, ranking, missingRanking, remainders, selectedCount: selectedIds.length, totalCount: ids.length };
 }
