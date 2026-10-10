@@ -24,7 +24,8 @@ export type PopulationIndexModel = {
   densityYear: number;
 };
 
-const ranked = (rows: Array<Omit<MunicipalListRow, "rank">>): MunicipalListRow[] =>
+/** Rows ranked highest first, numbered from 1; equal values keep their input order. Shared with the births index. */
+export const ranked = (rows: Array<Omit<MunicipalListRow, "rank">>): MunicipalListRow[] =>
   rows
     .slice()
     .sort((left, right) => right.valueGel - left.valueGel)

@@ -170,3 +170,6 @@ export type ClientMigrationFact = {
   citizenshipId: string;
   value: number;
 };
+
+/** A national rate as the browser receives it: the fertility and life-expectancy series, with the mother's age group where it has one ("" otherwise). */
+export type ClientNationalFact = { seriesId: string; year: number; ageGroup: string; value: number };

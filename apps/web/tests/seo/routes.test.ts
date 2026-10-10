@@ -56,9 +56,9 @@ describe("indexable Fiscal.ge routes", () => {
     // Population page add two more bilingual pairs; the 75 Population place
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
     // Trading partners adds one further bilingual pair.
-    // The Migration page adds one more bilingual pair.
+    // The Migration page adds one more bilingual pair, and so does the Births, deaths and fertility page.
     // Wages adds its hub, three pages, 11 region pages and methodology page: 16 bilingual pairs.
-    expect(urls).toHaveLength(474);
+    expect(urls).toHaveLength(476);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

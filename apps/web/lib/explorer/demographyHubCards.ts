@@ -24,6 +24,9 @@ export function buildDemographyHubCards(
   const span = first && last ? Array.from({ length: last.year - first.year + 1 }, (_, index) => first.year + index) : [];
   const trend = sparkValues(span, (year) => georgia.find((fact) => fact.year === year)?.value ?? null);
   const net = facts.filter((fact) => fact.seriesId === SERIES.netMigration).sort((left, right) => left.year - right.year);
+  const births = facts
+    .filter((fact) => fact.seriesId === SERIES.liveBirths && fact.geographyId === GEORGIA_PLACE_ID)
+    .sort((left, right) => left.year - right.year);
   const signed = (value: number) => `${value > 0 ? "+" : ""}${formatInUnit(value, UNIT_PERSONS)}`;
   return DEMOGRAPHY_PAGES.map((page, index) => {
     const card = {
@@ -40,6 +43,15 @@ export function buildDemographyHubCards(
         series: net.map((fact) => fact.value),
         seriesColor: INK,
         footer: t("migrationCardFooter", { year: lastNet.year, net: signed(lastNet.value), first: firstNet.year, last: lastNet.year }),
+      };
+    }
+    if (page.id === "births-deaths" && page.live && births.length) {
+      const [firstBirths, lastBirths] = [births[0]!, births.at(-1)!];
+      return {
+        ...card,
+        series: births.map((fact) => fact.value),
+        seriesColor: INK,
+        footer: t("birthsCardFooter", { year: lastBirths.year, births: formatInUnit(lastBirths.value, UNIT_PERSONS), first: firstBirths.year, last: lastBirths.year }),
       };
     }
     if (page.id !== "population" || !first || !last) return { ...card, series: null, seriesColor: null, footer: null };

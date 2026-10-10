@@ -272,3 +272,26 @@ describe("EditorialLineChart phone geometry", () => {
     expect(labels).toEqual(["2004", "2006", "2008", "2010", "2012", "2014", "2016", "2018", "2020", "2022", "2025"]);
   });
 });
+
+describe("EditorialLineChart accessible name", () => {
+  const render = (extra: { ariaLabel?: string }) =>
+    renderGeorgianMarkup(
+      createElement(EditorialLineChart, {
+        years: [2024, 2025],
+        series: [{ id: "series", label: "სერია", color: "#B3402A", vals: [1, 2], planned: [false, false] }],
+        share: false,
+        unit: UNIT_BN,
+        shareLabel: "% წილი",
+        ...extra,
+      }),
+    );
+  const imageLabels = (markup: string) => [...markup.matchAll(/<svg\b[^>]*role="img"[^>]*aria-label="([^"]*)"/g)].map((match) => match[1]);
+
+  it("keeps the generic trend label when no name is given", () => {
+    expect(imageLabels(render({}))).toEqual(["მრავალწლიანი დინამიკა", "მრავალწლიანი დინამიკა"]);
+  });
+
+  it("names every drawing with the given ariaLabel", () => {
+    expect(imageLabels(render({ ariaLabel: "X" }))).toEqual(["X", "X"]);
+  });
+});
