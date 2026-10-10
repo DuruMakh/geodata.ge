@@ -1,0 +1,58 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-10",
+  "scope": "Annual research only: absolute, relative and international poverty rates and Gini coefficients; no household income or expenditure, regions, lari poverty lines or serving",
+  "primary_observation_count": 491,
+  "observations_by_source": {
+    "geostat_gini": 120,
+    "geostat_poverty_absolute": 176,
+    "geostat_poverty_international": 63,
+    "geostat_poverty_relative": 132
+  },
+  "imputed_values": 0,
+  "reconciliation_failed_count": 0,
+  "source_checks": [
+    {
+      "source_id": "geostat_poverty_absolute",
+      "sha256": "71C94C15A4F168274FCD72A29D30F04C3762B1646ECDA095FFE86D20CC301F4B",
+      "bytes": 12679,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_poverty_relative",
+      "sha256": "519D0F66B91407B573A3B4B775943A27AA5A1BB7231EABDA8B1C326920058333",
+      "bytes": 11245,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_poverty_international",
+      "sha256": "5B4527FCB3C50DB0B14A2E1A1FFF589FAFF7EE725BF320A254105FFC9A9DD5E2",
+      "bytes": 12085,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_gini",
+      "sha256": "E579BE71CFB45157E61E7EF3540E9DF2AA5B53E197D2C2433AB2FC213F14CBAF",
+      "bytes": 12107,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_poverty_source_page",
+      "sha256": "1D898CAE40659EA6C970D4BA618735C793ADCF3E787780242ECEDC4DA95D2943",
+      "bytes": 81073,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_poverty_metadata_2026",
+      "sha256": "2832870462C21432F7D13A25B72A63AB48336BF2709BFA2F3D10D1C40A7C192F",
+      "bytes": 120916,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_hies_metadata_2026",
+      "sha256": "D7E6A378FBD7A2AA0A2EFB5C65BF08E1DDBF3E0D161668B08F9715D1FB7458EF",
+      "bytes": 128655,
+      "passed": true
+    }
+  ]
+}
