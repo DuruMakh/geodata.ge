@@ -21,7 +21,7 @@ test("the Balance tab reads net values for 2000–2025 and its parts add up to t
   expect(model.unit.label).toBe("billion USD");
   expect(model.valuesById["ca.balance"][2025]).toBeCloseTo(-1123241112.31, 1);
   for (const year of model.years) {
-    const parts = ["ca.goods", "ca.services", "ca.primary_income", "ca.secondary_income"].reduce((sum, id) => sum + model.valuesById[id][year]!, 0);
+    const parts = (["ca.goods", "ca.services", "ca.primary_income", "ca.secondary_income"] as const).reduce((sum, id) => sum + model.valuesById[id][year]!, 0);
     expect(Math.abs(parts - model.valuesById["ca.balance"][year]!)).toBeLessThan(1);
   }
   expect(model.endValues["ca.goods"]).toBeLessThan(0);
@@ -44,7 +44,7 @@ test("% of GDP divides by nominal GDP in USD, names preliminary GDP years and le
   const withoutGdp = build(facts, gdp.filter(row => row.year !== 2010), { ...initial, unit: "gdp" }, presentation);
   expect(withoutGdp.valuesById["ca.goods"][2010]).toBeNull();
   for (const year of model.years) {
-    const parts = ["ca.goods", "ca.services", "ca.primary_income", "ca.secondary_income"].reduce((sum, id) => sum + model.valuesById[id][year]!, 0);
+    const parts = (["ca.goods", "ca.services", "ca.primary_income", "ca.secondary_income"] as const).reduce((sum, id) => sum + model.valuesById[id][year]!, 0);
     expect(Math.abs(parts - model.valuesById["ca.balance"][year]!)).toBeLessThan(1e-6);
   }
 });
