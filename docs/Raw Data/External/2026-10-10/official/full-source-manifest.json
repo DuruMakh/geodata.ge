@@ -1,0 +1,331 @@
+{
+  "retrieval_date": "2026-10-10",
+  "retrieved_by": "Claude Code on the owner's Windows machine (cloud session could not reach geostat.ge / nbg.gov.ge)",
+  "nbg_file_url_pattern": "https://nbg.gov.ge/fm/<percent-encoded 'სტატისტიკა'>/external_sector/eng/<file> - paths come from GET https://nbg.gov.ge/gw/api/ct/statistics/categories/24/data",
+  "not_found": [
+    {
+      "requested": "NBG REMCY (money transfers by currency)",
+      "finding": "No REMCY code exists in any NBG statistics-data category (13 categories queried via the API, including Archive). External Sector money-transfer tables are REMC, REMM and REMS only; guessed URLs (money-transfers-by-currenc(y|ies)-eng.xlsx) return 404."
+    }
+  ],
+  "extras_beyond_brief": [
+    "FDI_Eng-sizes.xlsx and FDI_Eng-ages.xlsx (also listed on the Geostat FDI page)",
+    "NBG REMS (money transfers by systems)",
+    "NBG IIP-6 (FDI positions in BPM6 IIP)",
+    "Geostat FDI metadata PDF and FDI-relevant methodology manuals linked from the Geostat methodology page",
+    "NBG External Sector methodology PDF"
+  ],
+  "files": [
+    {
+      "original_url": "https://geostat.ge/media/82653/FDI_Eng-countries.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82653/FDI_Eng-countries.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:49Z",
+      "local_filename": "FDI_Eng-countries.xlsx",
+      "sha256": "700e1199cca77d8ad772b0e5a5c65b05966a7b8f40789205d1bf2ea386f0f0ba",
+      "bytes": 164968,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng-countries.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82654/FDI_Eng-sectors-NACE-2.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82654/FDI_Eng-sectors-NACE-2.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:49Z",
+      "local_filename": "FDI_Eng-sectors-NACE-2.xlsx",
+      "sha256": "6638bdae26ce8b4e0d91ba8b10d79d96954b77592f535f4c01a0797682a6ff1e",
+      "bytes": 38485,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng-sectors-NACE-2.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82655/FDI_Eng-sources.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82655/FDI_Eng-sources.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:49Z",
+      "local_filename": "FDI_Eng-sources.xlsx",
+      "sha256": "9da31b5b0bf5628a60cdc511d8611b8b24af8f0df13d0ddc13abdbc670d6d06c",
+      "bytes": 35130,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng-sources.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82656/FDI_Eng_regions.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82656/FDI_Eng_regions.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:50Z",
+      "local_filename": "FDI_Eng_regions.xlsx",
+      "sha256": "896c3626e4d527fa36fc4a15be8a15c09bd05a353e3cbf4beb29e084580c5192",
+      "bytes": 41773,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng_regions.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82657/FDI_Eng-components.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82657/FDI_Eng-components.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:50Z",
+      "local_filename": "FDI_Eng-components.xlsx",
+      "sha256": "4153c1715953e1c55a5c2fb8a549751ce66c0db2e49d848fa4e657d6aca52ce3",
+      "bytes": 28456,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng-components.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82660/FDI_Eng_by_Quarters.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82660/FDI_Eng_by_Quarters.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:50Z",
+      "local_filename": "FDI_Eng_by_Quarters.xlsx",
+      "sha256": "5d0454a3feca9b55ef3801f0aa5dff367630875f07986a28a1fb04d2eb1d3c70",
+      "bytes": 20183,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng_by_Quarters.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82661/FDI_Eng_stocks-countries.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82661/FDI_Eng_stocks-countries.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:50Z",
+      "local_filename": "FDI_Eng_stocks-countries.xlsx",
+      "sha256": "c089ae34c2a9059b13b89e85bfeed4a3b1005c6219ad1db7a3466198825d931c",
+      "bytes": 222441,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng_stocks-countries.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82662/FDI_Eng_stocks-sectors.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82662/FDI_Eng_stocks-sectors.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:50Z",
+      "local_filename": "FDI_Eng_stocks-sectors.xlsx",
+      "sha256": "5bf7da781c90559b0541a0bea8fd0d31f23220cb42fa2370d67230a1ce7fe9b5",
+      "bytes": 70448,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng_stocks-sectors.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/83047/FDI_Eng_bpm6.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/83047/FDI_Eng_bpm6.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:50Z",
+      "local_filename": "FDI_Eng_bpm6.xlsx",
+      "sha256": "e75222788a5cb2823bca4ae37786255122fc039b528f1ce8b6a479a954bec1b5",
+      "bytes": 25396,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng_bpm6.xlsx"
+    },
+    {
+      "original_url": "https://www.geostat.ge/en/modules/categories/191/foreign-direct-investments",
+      "resolved_url": "https://www.geostat.ge/en/modules/categories/191/foreign-direct-investments",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:08:50Z",
+      "local_filename": "geostat-fdi-category-page.html",
+      "sha256": "1161c0294531e581471aeb4e42bf9421d6b643002f4658dfea897d0e261b89f9",
+      "bytes": 98804,
+      "content_type": "text/html; charset=UTF-8",
+      "local_path": "geostat/geostat-fdi-category-page.html"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82658/FDI_Eng-sizes.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82658/FDI_Eng-sizes.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:07Z",
+      "local_filename": "FDI_Eng-sizes.xlsx",
+      "sha256": "4e9bc5c4fe315136ca5b89f2d844425b678e3f6957b5173966d938135e5769d8",
+      "bytes": 30121,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng-sizes.xlsx"
+    },
+    {
+      "original_url": "https://geostat.ge/media/82659/FDI_Eng-ages.xlsx",
+      "resolved_url": "https://www.geostat.ge/media/82659/FDI_Eng-ages.xlsx",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:07Z",
+      "local_filename": "FDI_Eng-ages.xlsx",
+      "sha256": "b9d38a41df7324d3c801d24627777e033ae9087956d3b215cdd2ab1096186603",
+      "bytes": 29514,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "geostat/FDI_Eng-ages.xlsx"
+    },
+    {
+      "original_url": "https://www.geostat.ge/en/relationsOfCategory/191/method",
+      "resolved_url": "https://www.geostat.ge/en/modules/categories/120/external-economic-relations/method",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:07Z",
+      "local_filename": "geostat-fdi-methodology-page.html",
+      "sha256": "0fd37bef62aef97ccb1a8075365f88ddcb7d017896073c198005702dabcbf2ee",
+      "bytes": 66357,
+      "content_type": "text/html; charset=UTF-8",
+      "local_path": "geostat/geostat-fdi-methodology-page.html"
+    },
+    {
+      "original_url": "https://www.geostat.ge/en/relationsOfCategory/191/meta",
+      "resolved_url": "https://www.geostat.ge/en/modules/categories/536/metadata-foreign-direct-investments/meta",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:08Z",
+      "local_filename": "geostat-fdi-metadata-page.html",
+      "sha256": "e5debc9a1a907b4b85df8763f90741de9ca934b112f3c83c33db112bca2a4818",
+      "bytes": 63120,
+      "content_type": "text/html; charset=UTF-8",
+      "local_path": "geostat/geostat-fdi-metadata-page.html"
+    },
+    {
+      "original_url": "https://geostat.ge/media/79877/1002_090626_EN.PDF",
+      "resolved_url": "https://www.geostat.ge/media/79877/1002_090626_EN.PDF",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:23Z",
+      "local_filename": "FDI_metadata_1002_090626_EN.pdf",
+      "sha256": "a459ac6795cc34449851e20ec701ae10c7a979f55896c82a0c9901ecfaeec389",
+      "bytes": 108677,
+      "content_type": "application/pdf",
+      "local_path": "geostat/FDI_metadata_1002_090626_EN.pdf"
+    },
+    {
+      "original_url": "https://geostat.ge/media/19380/BPM6.pdf",
+      "resolved_url": "https://www.geostat.ge/media/19380/BPM6.pdf",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:24Z",
+      "local_filename": "methodology_BPM6.pdf",
+      "sha256": "4731d6cf731f3272169170e9fd1a689dcccfdb08db5432b3ccd360bf6ad5973a",
+      "bytes": 3153013,
+      "content_type": "application/pdf",
+      "local_path": "geostat/methodology_BPM6.pdf"
+    },
+    {
+      "original_url": "https://geostat.ge/media/19382/The-Coordinated-Direct-Investment-Survey-Guide.pdf",
+      "resolved_url": "https://www.geostat.ge/media/19382/The-Coordinated-Direct-Investment-Survey-Guide.pdf",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:25Z",
+      "local_filename": "methodology_CDIS_Guide.pdf",
+      "sha256": "ca443844114cc791327bf9d4cda723670359cbd903d8096995fa5864c8c546d9",
+      "bytes": 476376,
+      "content_type": "application/pdf",
+      "local_path": "geostat/methodology_CDIS_Guide.pdf"
+    },
+    {
+      "original_url": "https://geostat.ge/media/19381/OECD%20benchmark%20definition%20of%20FDI.pdf",
+      "resolved_url": "https://www.geostat.ge/media/19381/OECD%20benchmark%20definition%20of%20FDI.pdf",
+      "publisher": "National Statistics Office of Georgia (Geostat)",
+      "retrieved_utc": "2026-10-10T06:09:31Z",
+      "local_filename": "methodology_OECD_benchmark_definition_of_FDI.pdf",
+      "sha256": "e8c3b40aca9e56d69bb1becba5c3ba01bc59fbc840e554652645f884761a614a",
+      "bytes": 3295204,
+      "content_type": "application/pdf",
+      "local_path": "geostat/methodology_OECD_benchmark_definition_of_FDI.pdf"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/bopbpm6eng.xlsx",
+      "resolved_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/bopbpm6eng.xlsx",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:45Z",
+      "local_filename": "BOP-6_bopbpm6eng.xlsx",
+      "sha256": "615a78af5e264935d2f57d719c28a49521ff6577b98c16f57887e3a158fe4e2b",
+      "bytes": 1031808,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "nbg/BOP-6_bopbpm6eng.xlsx"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/money-transfers-by-countries-eng.xlsx",
+      "resolved_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/money-transfers-by-countries-eng.xlsx",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "REMC_money-transfers-by-countries-eng.xlsx",
+      "sha256": "bf178d7d65b859d5779d1a4b0ea2dc5d85c4af3aac1e77686f25761881f23486",
+      "bytes": 925730,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "nbg/REMC_money-transfers-by-countries-eng.xlsx"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/money-transfers-by-months-eng.xlsx",
+      "resolved_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/money-transfers-by-months-eng.xlsx",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "REMM_money-transfers-by-months-eng.xlsx",
+      "sha256": "bb83bd37e4c58e6563a164e91128aff3f174bb583e3d2723846cf5c35b5e635b",
+      "bytes": 29543,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "nbg/REMM_money-transfers-by-months-eng.xlsx"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/money-transfers-by-systems-eng.xlsx",
+      "resolved_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/money-transfers-by-systems-eng.xlsx",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "REMS_money-transfers-by-systems-eng.xlsx",
+      "sha256": "ab89aeb6dcad5d584f6ab830af64b1ee7d4c5fbf1aa263e64e346740257b33a2",
+      "bytes": 214694,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "nbg/REMS_money-transfers-by-systems-eng.xlsx"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/iip-bpm6-eng.xlsx",
+      "resolved_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/iip-bpm6-eng.xlsx",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "IIP-6_iip-bpm6-eng.xlsx",
+      "sha256": "2c5f0f188bcc5331f45e95eb0f57dbd2ca9397b688806e88b64f9e29cd951016",
+      "bytes": 1473899,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "local_path": "nbg/IIP-6_iip-bpm6-eng.xlsx"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/external-sector-eng-bpm6updated.pdf",
+      "resolved_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/external_sector/eng/external-sector-eng-bpm6updated.pdf",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "external-sector-methodology-eng-bpm6updated.pdf",
+      "sha256": "46d5964429eb23f7606f4a8bdb871ea2e91b70ce7eaf1a22b9936432f750b7df",
+      "bytes": 871671,
+      "content_type": "application/pdf",
+      "local_path": "nbg/external-sector-methodology-eng-bpm6updated.pdf"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/en/statistics/statistics-data",
+      "resolved_url": "https://nbg.gov.ge/en/statistics/statistics-data",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "nbg-statistics-data-page.html",
+      "sha256": "079e82143d3f38234acdc586df2e4fa569796f6f0d09a23cb5996cd1407502f4",
+      "bytes": 340047,
+      "content_type": "text/html; charset=utf-8",
+      "local_path": "nbg/nbg-statistics-data-page.html"
+    },
+    {
+      "original_url": "https://nbg.gov.ge/en/page/calendar-of-statistical-data-dissemination",
+      "resolved_url": "https://nbg.gov.ge/en/page/calendar-of-statistical-data-dissemination",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "nbg-advance-release-calendar-page.html",
+      "sha256": "0afa95c39f4b4d892bbafc6c474c2db16f4e743069dbca4838b66970fb3d2be0",
+      "bytes": 340709,
+      "content_type": "text/html; charset=utf-8",
+      "local_path": "nbg/nbg-advance-release-calendar-page.html",
+      "note": "Next.js shell page; calendar body is not in the server HTML and no calendar API call was observed in a browser. See the category-24 API JSON for per-table update and next-update dates."
+    },
+    {
+      "original_url": "https://nbg.gov.ge/en/page/money-transfers",
+      "resolved_url": "https://nbg.gov.ge/en/page/money-transfers",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:46Z",
+      "local_filename": "nbg-money-transfers-page.html",
+      "sha256": "a3d1af828f4919bcc76b8d55a0bdcf98fd401e36fa1cc710130b9811d6e64b68",
+      "bytes": 340699,
+      "content_type": "text/html; charset=utf-8",
+      "local_path": "nbg/nbg-money-transfers-page.html",
+      "note": "Next.js shell page; body renders client-side (interactive report). No file links."
+    },
+    {
+      "original_url": "https://nbg.gov.ge/gw/api/ct/statistics/categories/24/data",
+      "resolved_url": "https://nbg.gov.ge/gw/api/ct/statistics/categories/24/data",
+      "publisher": "National Bank of Georgia (NBG)",
+      "retrieved_utc": "2026-10-10T06:11:54Z",
+      "local_filename": "nbg-statistics-api-category-24-external-sector.json",
+      "sha256": "8e02203540687fa7bb0419dabda41d08c16f8e03ed7cff529ca04ff9d683f43f",
+      "bytes": 4355,
+      "content_type": "application/json; charset=utf-8",
+      "local_path": "nbg/nbg-statistics-api-category-24-external-sector.json",
+      "note": "NBG statistics API listing for the External Sector category; requested with Accept-Language: en (without it the API returns []). Holds updateDate/nextUpdateDate per table, which is the de facto release calendar."
+    }
+  ]
+}

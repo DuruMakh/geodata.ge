@@ -1,0 +1,1272 @@
+[
+  {
+    "id": "transfer.total",
+    "kind": "total",
+    "labelKa": "ფულადი გზავნილები, ყველა ქვეყანა"
+  },
+  {
+    "id": "bop.personal_transfers",
+    "kind": "estimate",
+    "labelKa": "პირადი ტრანსფერები (ოფიციალური შეფასება)"
+  },
+  {
+    "id": "transfer.afghanistan",
+    "kind": "country",
+    "labelKa": "ავღანეთი"
+  },
+  {
+    "id": "transfer.aland_islands",
+    "kind": "country",
+    "labelKa": "ალანდის კუნძულები"
+  },
+  {
+    "id": "transfer.albania",
+    "kind": "country",
+    "labelKa": "ალბანეთი"
+  },
+  {
+    "id": "transfer.algeria",
+    "kind": "country",
+    "labelKa": "ალჟირი"
+  },
+  {
+    "id": "transfer.american_samoa",
+    "kind": "country",
+    "labelKa": "ამერიკის სამოა"
+  },
+  {
+    "id": "transfer.andorra",
+    "kind": "country",
+    "labelKa": "ანდორა"
+  },
+  {
+    "id": "transfer.angola",
+    "kind": "country",
+    "labelKa": "ანგოლა"
+  },
+  {
+    "id": "transfer.anguilla",
+    "kind": "country",
+    "labelKa": "ანგილია"
+  },
+  {
+    "id": "transfer.antarctica",
+    "kind": "country",
+    "labelKa": "ანტარქტიკა"
+  },
+  {
+    "id": "transfer.antigua_and_barbuda",
+    "kind": "country",
+    "labelKa": "ანტიგუა და ბარბუდა"
+  },
+  {
+    "id": "transfer.areas_not_elsewhere_specified",
+    "kind": "remainder",
+    "labelKa": "სხვაგან დაუზუსტებელი ტერიტორიები"
+  },
+  {
+    "id": "transfer.argentina",
+    "kind": "country",
+    "labelKa": "არგენტინა"
+  },
+  {
+    "id": "transfer.armenia",
+    "kind": "country",
+    "labelKa": "სომხეთი"
+  },
+  {
+    "id": "transfer.aruba",
+    "kind": "country",
+    "labelKa": "არუბა"
+  },
+  {
+    "id": "transfer.australia",
+    "kind": "country",
+    "labelKa": "ავსტრალია"
+  },
+  {
+    "id": "transfer.austria",
+    "kind": "country",
+    "labelKa": "ავსტრია"
+  },
+  {
+    "id": "transfer.azerbaijan",
+    "kind": "country",
+    "labelKa": "აზერბაიჯანი"
+  },
+  {
+    "id": "transfer.bahamas",
+    "kind": "country",
+    "labelKa": "ბაჰამის კუნძულები"
+  },
+  {
+    "id": "transfer.bahrain",
+    "kind": "country",
+    "labelKa": "ბაჰრეინი"
+  },
+  {
+    "id": "transfer.bangladesh",
+    "kind": "country",
+    "labelKa": "ბანგლადეში"
+  },
+  {
+    "id": "transfer.barbados",
+    "kind": "country",
+    "labelKa": "ბარბადოსი"
+  },
+  {
+    "id": "transfer.belarus",
+    "kind": "country",
+    "labelKa": "ბელარუსი"
+  },
+  {
+    "id": "transfer.belgium",
+    "kind": "country",
+    "labelKa": "ბელგია"
+  },
+  {
+    "id": "transfer.belize",
+    "kind": "country",
+    "labelKa": "ბელიზი"
+  },
+  {
+    "id": "transfer.benin",
+    "kind": "country",
+    "labelKa": "ბენინი"
+  },
+  {
+    "id": "transfer.bermuda",
+    "kind": "country",
+    "labelKa": "ბერმუდა"
+  },
+  {
+    "id": "transfer.bhutan",
+    "kind": "country",
+    "labelKa": "ბუტანი"
+  },
+  {
+    "id": "transfer.bolivia_plurinational_state_of",
+    "kind": "country",
+    "labelKa": "ბოლივია"
+  },
+  {
+    "id": "transfer.bonaire_sint_eustatius_and_saba",
+    "kind": "country",
+    "labelKa": "ბონაირე, სინტ-ესტატიუსი და საბა"
+  },
+  {
+    "id": "transfer.bosnia_and_herzegovina",
+    "kind": "country",
+    "labelKa": "ბოსნია და ჰერცეგოვინა"
+  },
+  {
+    "id": "transfer.botswana",
+    "kind": "country",
+    "labelKa": "ბოტსვანა"
+  },
+  {
+    "id": "transfer.bouvet_island",
+    "kind": "country",
+    "labelKa": "ბუვე"
+  },
+  {
+    "id": "transfer.brazil",
+    "kind": "country",
+    "labelKa": "ბრაზილია"
+  },
+  {
+    "id": "transfer.british_indian_ocean_territory",
+    "kind": "country",
+    "labelKa": "ბრიტანეთის ტერიტორია ინდოეთის ოკეანეში"
+  },
+  {
+    "id": "transfer.brunei_darussalam",
+    "kind": "country",
+    "labelKa": "ბრუნეი"
+  },
+  {
+    "id": "transfer.bulgaria",
+    "kind": "country",
+    "labelKa": "ბულგარეთი"
+  },
+  {
+    "id": "transfer.burkina_faso",
+    "kind": "country",
+    "labelKa": "ბურკინა-ფასო"
+  },
+  {
+    "id": "transfer.burundi",
+    "kind": "country",
+    "labelKa": "ბურუნდი"
+  },
+  {
+    "id": "transfer.cabo_verde",
+    "kind": "country",
+    "labelKa": "კაბო-ვერდე"
+  },
+  {
+    "id": "transfer.cambodia",
+    "kind": "country",
+    "labelKa": "კამბოჯა"
+  },
+  {
+    "id": "transfer.cameroon",
+    "kind": "country",
+    "labelKa": "კამერუნი"
+  },
+  {
+    "id": "transfer.canada",
+    "kind": "country",
+    "labelKa": "კანადა"
+  },
+  {
+    "id": "transfer.cayman_islands",
+    "kind": "country",
+    "labelKa": "კაიმანის კუნძულები"
+  },
+  {
+    "id": "transfer.central_african_republic",
+    "kind": "country",
+    "labelKa": "ცენტრალური აფრიკის რესპუბლიკა"
+  },
+  {
+    "id": "transfer.chad",
+    "kind": "country",
+    "labelKa": "ჩადი"
+  },
+  {
+    "id": "transfer.chile",
+    "kind": "country",
+    "labelKa": "ჩილე"
+  },
+  {
+    "id": "transfer.china",
+    "kind": "country",
+    "labelKa": "ჩინეთი"
+  },
+  {
+    "id": "transfer.christmas_island",
+    "kind": "country",
+    "labelKa": "შობის კუნძული"
+  },
+  {
+    "id": "transfer.cocos_keeling_islands",
+    "kind": "country",
+    "labelKa": "ქოქოსის (კილინგის) კუნძულები"
+  },
+  {
+    "id": "transfer.colombia",
+    "kind": "country",
+    "labelKa": "კოლუმბია"
+  },
+  {
+    "id": "transfer.comoros",
+    "kind": "country",
+    "labelKa": "კომორის კუნძულები"
+  },
+  {
+    "id": "transfer.congo",
+    "kind": "country",
+    "labelKa": "კონგო - ბრაზავილი"
+  },
+  {
+    "id": "transfer.congo_the_democratic_republic_of_the",
+    "kind": "country",
+    "labelKa": "კონგო - კინშასა"
+  },
+  {
+    "id": "transfer.cook_islands",
+    "kind": "country",
+    "labelKa": "კუკის კუნძულები"
+  },
+  {
+    "id": "transfer.costa_rica",
+    "kind": "country",
+    "labelKa": "კოსტა-რიკა"
+  },
+  {
+    "id": "transfer.cote_divoire",
+    "kind": "country",
+    "labelKa": "კოტ-დივუარი"
+  },
+  {
+    "id": "transfer.croatia",
+    "kind": "country",
+    "labelKa": "ხორვატია"
+  },
+  {
+    "id": "transfer.cuba",
+    "kind": "country",
+    "labelKa": "კუბა"
+  },
+  {
+    "id": "transfer.curacao",
+    "kind": "country",
+    "labelKa": "კიურასაო"
+  },
+  {
+    "id": "transfer.cyprus",
+    "kind": "country",
+    "labelKa": "კვიპროსი"
+  },
+  {
+    "id": "transfer.czechia",
+    "kind": "country",
+    "labelKa": "ჩეხეთი"
+  },
+  {
+    "id": "transfer.denmark",
+    "kind": "country",
+    "labelKa": "დანია"
+  },
+  {
+    "id": "transfer.djibouti",
+    "kind": "country",
+    "labelKa": "ჯიბუტი"
+  },
+  {
+    "id": "transfer.dominica",
+    "kind": "country",
+    "labelKa": "დომინიკა"
+  },
+  {
+    "id": "transfer.dominican_republic",
+    "kind": "country",
+    "labelKa": "დომინიკელთა რესპუბლიკა"
+  },
+  {
+    "id": "transfer.ecuador",
+    "kind": "country",
+    "labelKa": "ეკვადორი"
+  },
+  {
+    "id": "transfer.egypt",
+    "kind": "country",
+    "labelKa": "ეგვიპტე"
+  },
+  {
+    "id": "transfer.el_salvador",
+    "kind": "country",
+    "labelKa": "სალვადორი"
+  },
+  {
+    "id": "transfer.equatorial_guinea",
+    "kind": "country",
+    "labelKa": "ეკვატორული გვინეა"
+  },
+  {
+    "id": "transfer.eritrea",
+    "kind": "country",
+    "labelKa": "ერიტრეა"
+  },
+  {
+    "id": "transfer.estonia",
+    "kind": "country",
+    "labelKa": "ესტონეთი"
+  },
+  {
+    "id": "transfer.eswatini",
+    "kind": "country",
+    "labelKa": "სვაზილენდი (ესვატინი)"
+  },
+  {
+    "id": "transfer.ethiopia",
+    "kind": "country",
+    "labelKa": "ეთიოპია"
+  },
+  {
+    "id": "transfer.falkland_islands_malvinas",
+    "kind": "country",
+    "labelKa": "ფოლკლენდის კუნძულები"
+  },
+  {
+    "id": "transfer.faroe_islands",
+    "kind": "country",
+    "labelKa": "ფარერის კუნძულები"
+  },
+  {
+    "id": "transfer.fiji",
+    "kind": "country",
+    "labelKa": "ფიჯი"
+  },
+  {
+    "id": "transfer.finland",
+    "kind": "country",
+    "labelKa": "ფინეთი"
+  },
+  {
+    "id": "transfer.france",
+    "kind": "country",
+    "labelKa": "საფრანგეთი"
+  },
+  {
+    "id": "transfer.french_guiana",
+    "kind": "country",
+    "labelKa": "საფრანგეთის გვიანა"
+  },
+  {
+    "id": "transfer.french_polynesia",
+    "kind": "country",
+    "labelKa": "საფრანგეთის პოლინეზია"
+  },
+  {
+    "id": "transfer.french_southern_territories",
+    "kind": "country",
+    "labelKa": "ფრანგული სამხრეთის ტერიტორიები"
+  },
+  {
+    "id": "transfer.gabon",
+    "kind": "country",
+    "labelKa": "გაბონი"
+  },
+  {
+    "id": "transfer.gambia",
+    "kind": "country",
+    "labelKa": "გამბია"
+  },
+  {
+    "id": "transfer.germany",
+    "kind": "country",
+    "labelKa": "გერმანია"
+  },
+  {
+    "id": "transfer.ghana",
+    "kind": "country",
+    "labelKa": "განა"
+  },
+  {
+    "id": "transfer.gibraltar",
+    "kind": "country",
+    "labelKa": "გიბრალტარი"
+  },
+  {
+    "id": "transfer.greece",
+    "kind": "country",
+    "labelKa": "საბერძნეთი"
+  },
+  {
+    "id": "transfer.greenland",
+    "kind": "country",
+    "labelKa": "გრენლანდია"
+  },
+  {
+    "id": "transfer.grenada",
+    "kind": "country",
+    "labelKa": "გრენადა"
+  },
+  {
+    "id": "transfer.guadeloupe",
+    "kind": "country",
+    "labelKa": "გვადელუპა"
+  },
+  {
+    "id": "transfer.guam",
+    "kind": "country",
+    "labelKa": "სუამი (GUAM)"
+  },
+  {
+    "id": "transfer.guatemala",
+    "kind": "country",
+    "labelKa": "გვატემალა"
+  },
+  {
+    "id": "transfer.guernsey",
+    "kind": "country",
+    "labelKa": "გერნსი"
+  },
+  {
+    "id": "transfer.guinea",
+    "kind": "country",
+    "labelKa": "გვინეა"
+  },
+  {
+    "id": "transfer.guinea_bissau",
+    "kind": "country",
+    "labelKa": "გვინეა-ბისაუ"
+  },
+  {
+    "id": "transfer.guyana",
+    "kind": "country",
+    "labelKa": "გაიანა"
+  },
+  {
+    "id": "transfer.haiti",
+    "kind": "country",
+    "labelKa": "ჰაიტი"
+  },
+  {
+    "id": "transfer.heard_island_and_mcdonald_islands",
+    "kind": "country",
+    "labelKa": "ჰერდი და მაკდონალდის კუნძულები"
+  },
+  {
+    "id": "transfer.holy_see",
+    "kind": "country",
+    "labelKa": "ქალაქი ვატიკანი"
+  },
+  {
+    "id": "transfer.honduras",
+    "kind": "country",
+    "labelKa": "ჰონდურასი"
+  },
+  {
+    "id": "transfer.hong_kong",
+    "kind": "country",
+    "labelKa": "ჰონკონგის სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი"
+  },
+  {
+    "id": "transfer.hungary",
+    "kind": "country",
+    "labelKa": "უნგრეთი"
+  },
+  {
+    "id": "transfer.iceland",
+    "kind": "country",
+    "labelKa": "ისლანდია"
+  },
+  {
+    "id": "transfer.india",
+    "kind": "country",
+    "labelKa": "ინდოეთი"
+  },
+  {
+    "id": "transfer.indonesia",
+    "kind": "country",
+    "labelKa": "ინდონეზია"
+  },
+  {
+    "id": "transfer.iran_islamic_republic_of",
+    "kind": "country",
+    "labelKa": "ირანი"
+  },
+  {
+    "id": "transfer.iraq",
+    "kind": "country",
+    "labelKa": "ერაყი"
+  },
+  {
+    "id": "transfer.ireland",
+    "kind": "country",
+    "labelKa": "ირლანდია"
+  },
+  {
+    "id": "transfer.isle_of_man",
+    "kind": "country",
+    "labelKa": "მენის კუნძული"
+  },
+  {
+    "id": "transfer.israel",
+    "kind": "country",
+    "labelKa": "ისრაელი"
+  },
+  {
+    "id": "transfer.italy",
+    "kind": "country",
+    "labelKa": "იტალია"
+  },
+  {
+    "id": "transfer.jamaica",
+    "kind": "country",
+    "labelKa": "იამაიკა"
+  },
+  {
+    "id": "transfer.japan",
+    "kind": "country",
+    "labelKa": "იაპონია"
+  },
+  {
+    "id": "transfer.jersey",
+    "kind": "country",
+    "labelKa": "ჯერსი"
+  },
+  {
+    "id": "transfer.jordan",
+    "kind": "country",
+    "labelKa": "იორდანია"
+  },
+  {
+    "id": "transfer.kazakhstan",
+    "kind": "country",
+    "labelKa": "ყაზახეთი"
+  },
+  {
+    "id": "transfer.kenya",
+    "kind": "country",
+    "labelKa": "კენია"
+  },
+  {
+    "id": "transfer.kiribati",
+    "kind": "country",
+    "labelKa": "კირიბატი"
+  },
+  {
+    "id": "transfer.korea_democratic_peoples_republic_of",
+    "kind": "country",
+    "labelKa": "ჩრდილოეთ კორეა"
+  },
+  {
+    "id": "transfer.korea_republic_of",
+    "kind": "country",
+    "labelKa": "სამხრეთ კორეა"
+  },
+  {
+    "id": "transfer.kuwait",
+    "kind": "country",
+    "labelKa": "ქუვეითი"
+  },
+  {
+    "id": "transfer.kyrgyzstan",
+    "kind": "country",
+    "labelKa": "ყირგიზეთი"
+  },
+  {
+    "id": "transfer.lao_peoples_democratic_republic",
+    "kind": "country",
+    "labelKa": "ლაოსი"
+  },
+  {
+    "id": "transfer.latvia",
+    "kind": "country",
+    "labelKa": "ლატვია"
+  },
+  {
+    "id": "transfer.lebanon",
+    "kind": "country",
+    "labelKa": "ლიბანი"
+  },
+  {
+    "id": "transfer.lesotho",
+    "kind": "country",
+    "labelKa": "ლესოთო"
+  },
+  {
+    "id": "transfer.liberia",
+    "kind": "country",
+    "labelKa": "ლიბერია"
+  },
+  {
+    "id": "transfer.libya",
+    "kind": "country",
+    "labelKa": "ლიბია"
+  },
+  {
+    "id": "transfer.liechtenstein",
+    "kind": "country",
+    "labelKa": "ლიხტენშტაინი"
+  },
+  {
+    "id": "transfer.lithuania",
+    "kind": "country",
+    "labelKa": "ლიეტუვა"
+  },
+  {
+    "id": "transfer.luxembourg",
+    "kind": "country",
+    "labelKa": "ლუქსემბურგი"
+  },
+  {
+    "id": "transfer.macao",
+    "kind": "country",
+    "labelKa": "მაკაოს სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი"
+  },
+  {
+    "id": "transfer.madagascar",
+    "kind": "country",
+    "labelKa": "მადაგასკარი"
+  },
+  {
+    "id": "transfer.malawi",
+    "kind": "country",
+    "labelKa": "მალავი"
+  },
+  {
+    "id": "transfer.malaysia",
+    "kind": "country",
+    "labelKa": "მალაიზია"
+  },
+  {
+    "id": "transfer.maldives",
+    "kind": "country",
+    "labelKa": "მალდივები"
+  },
+  {
+    "id": "transfer.mali",
+    "kind": "country",
+    "labelKa": "მალი"
+  },
+  {
+    "id": "transfer.malta",
+    "kind": "country",
+    "labelKa": "მალტა"
+  },
+  {
+    "id": "transfer.marshall_islands",
+    "kind": "country",
+    "labelKa": "მარშალის კუნძულები"
+  },
+  {
+    "id": "transfer.martinique",
+    "kind": "country",
+    "labelKa": "მარტინიკა"
+  },
+  {
+    "id": "transfer.mauritania",
+    "kind": "country",
+    "labelKa": "მავრიტანია"
+  },
+  {
+    "id": "transfer.mauritius",
+    "kind": "country",
+    "labelKa": "მავრიკი"
+  },
+  {
+    "id": "transfer.mayotte",
+    "kind": "country",
+    "labelKa": "მაიოტა"
+  },
+  {
+    "id": "transfer.mexico",
+    "kind": "country",
+    "labelKa": "მექსიკა"
+  },
+  {
+    "id": "transfer.micronesia_federated_states_of",
+    "kind": "country",
+    "labelKa": "მიკრონეზია"
+  },
+  {
+    "id": "transfer.moldova_republic_of",
+    "kind": "country",
+    "labelKa": "მოლდოვა"
+  },
+  {
+    "id": "transfer.monaco",
+    "kind": "country",
+    "labelKa": "მონაკო"
+  },
+  {
+    "id": "transfer.mongolia",
+    "kind": "country",
+    "labelKa": "მონღოლეთი"
+  },
+  {
+    "id": "transfer.montenegro",
+    "kind": "country",
+    "labelKa": "მონტენეგრო"
+  },
+  {
+    "id": "transfer.montserrat",
+    "kind": "country",
+    "labelKa": "მონსერატი"
+  },
+  {
+    "id": "transfer.morocco",
+    "kind": "country",
+    "labelKa": "მაროკო"
+  },
+  {
+    "id": "transfer.mozambique",
+    "kind": "country",
+    "labelKa": "მოზამბიკი"
+  },
+  {
+    "id": "transfer.myanmar",
+    "kind": "country",
+    "labelKa": "მიანმარი (ბირმა)"
+  },
+  {
+    "id": "transfer.namibia",
+    "kind": "country",
+    "labelKa": "ნამიბია"
+  },
+  {
+    "id": "transfer.nauru",
+    "kind": "country",
+    "labelKa": "ნაურუ"
+  },
+  {
+    "id": "transfer.nepal",
+    "kind": "country",
+    "labelKa": "ნეპალი"
+  },
+  {
+    "id": "transfer.netherlands",
+    "kind": "country",
+    "labelKa": "ნიდერლანდები"
+  },
+  {
+    "id": "transfer.netherlands_antilles",
+    "kind": "country",
+    "labelKa": "ნიდერლანდების ანტილის კუნძულები"
+  },
+  {
+    "id": "transfer.new_caledonia",
+    "kind": "country",
+    "labelKa": "ახალი კალედონია"
+  },
+  {
+    "id": "transfer.new_zealand",
+    "kind": "country",
+    "labelKa": "ახალი ზელანდია"
+  },
+  {
+    "id": "transfer.nicaragua",
+    "kind": "country",
+    "labelKa": "ნიკარაგუა"
+  },
+  {
+    "id": "transfer.niger",
+    "kind": "country",
+    "labelKa": "ნიგერი"
+  },
+  {
+    "id": "transfer.nigeria",
+    "kind": "country",
+    "labelKa": "ნიგერია"
+  },
+  {
+    "id": "transfer.niue",
+    "kind": "country",
+    "labelKa": "ნიუე"
+  },
+  {
+    "id": "transfer.norfolk_island",
+    "kind": "country",
+    "labelKa": "ნორფოლკის კუნძული"
+  },
+  {
+    "id": "transfer.north_macedonia",
+    "kind": "country",
+    "labelKa": "ჩრდილოეთ მაკედონია"
+  },
+  {
+    "id": "transfer.northern_mariana_islands",
+    "kind": "country",
+    "labelKa": "ჩრდილოეთ მარიანას კუნძულები"
+  },
+  {
+    "id": "transfer.norway",
+    "kind": "country",
+    "labelKa": "ნორვეგია"
+  },
+  {
+    "id": "transfer.oman",
+    "kind": "country",
+    "labelKa": "ომანი"
+  },
+  {
+    "id": "transfer.other_countries",
+    "kind": "remainder",
+    "labelKa": "სხვა ქვეყნები"
+  },
+  {
+    "id": "transfer.other_territories",
+    "kind": "remainder",
+    "labelKa": "სხვა ტერიტორიები"
+  },
+  {
+    "id": "transfer.pakistan",
+    "kind": "country",
+    "labelKa": "პაკისტანი"
+  },
+  {
+    "id": "transfer.palau",
+    "kind": "country",
+    "labelKa": "პალაუ"
+  },
+  {
+    "id": "transfer.palestine_state_of",
+    "kind": "country",
+    "labelKa": "პალესტინის ტერიტორიები"
+  },
+  {
+    "id": "transfer.panama",
+    "kind": "country",
+    "labelKa": "პანამა"
+  },
+  {
+    "id": "transfer.papua_new_guinea",
+    "kind": "country",
+    "labelKa": "პაპუა-ახალი გვინეა"
+  },
+  {
+    "id": "transfer.paraguay",
+    "kind": "country",
+    "labelKa": "პარაგვაი"
+  },
+  {
+    "id": "transfer.peru",
+    "kind": "country",
+    "labelKa": "პერუ"
+  },
+  {
+    "id": "transfer.philippines",
+    "kind": "country",
+    "labelKa": "ფილიპინები"
+  },
+  {
+    "id": "transfer.pitcairn",
+    "kind": "country",
+    "labelKa": "პიტკერნის კუნძულები"
+  },
+  {
+    "id": "transfer.poland",
+    "kind": "country",
+    "labelKa": "პოლონეთი"
+  },
+  {
+    "id": "transfer.portugal",
+    "kind": "country",
+    "labelKa": "პორტუგალია"
+  },
+  {
+    "id": "transfer.puerto_rico",
+    "kind": "country",
+    "labelKa": "პუერტო-რიკო"
+  },
+  {
+    "id": "transfer.qatar",
+    "kind": "country",
+    "labelKa": "კატარი"
+  },
+  {
+    "id": "transfer.reunion",
+    "kind": "country",
+    "labelKa": "რეუნიონი"
+  },
+  {
+    "id": "transfer.romania",
+    "kind": "country",
+    "labelKa": "რუმინეთი"
+  },
+  {
+    "id": "transfer.russian_federation",
+    "kind": "country",
+    "labelKa": "რუსეთი"
+  },
+  {
+    "id": "transfer.rwanda",
+    "kind": "country",
+    "labelKa": "რუანდა"
+  },
+  {
+    "id": "transfer.saint_barthelemy",
+    "kind": "country",
+    "labelKa": "სენ-ბართელმი"
+  },
+  {
+    "id": "transfer.saint_helena_ascension_and_tristan_da_cunha",
+    "kind": "country",
+    "labelKa": "წმინდა ელენეს კუნძული"
+  },
+  {
+    "id": "transfer.saint_kitts_and_nevis",
+    "kind": "country",
+    "labelKa": "სენტ-კიტსი და ნევისი"
+  },
+  {
+    "id": "transfer.saint_lucia",
+    "kind": "country",
+    "labelKa": "სენტ-ლუსია"
+  },
+  {
+    "id": "transfer.saint_martin",
+    "kind": "country",
+    "labelKa": "სენ-მარტენი"
+  },
+  {
+    "id": "transfer.saint_pierre_and_miquelon",
+    "kind": "country",
+    "labelKa": "სენ-პიერი და მიკელონი"
+  },
+  {
+    "id": "transfer.saint_vincent_and_the_grenadines",
+    "kind": "country",
+    "labelKa": "სენტ-ვინსენტი და გრენადინები"
+  },
+  {
+    "id": "transfer.samoa",
+    "kind": "country",
+    "labelKa": "სამოა"
+  },
+  {
+    "id": "transfer.san_marino",
+    "kind": "country",
+    "labelKa": "სან-მარინო"
+  },
+  {
+    "id": "transfer.sao_tome_and_principe",
+    "kind": "country",
+    "labelKa": "სან-ტომე და პრინსიპი"
+  },
+  {
+    "id": "transfer.saudi_arabia",
+    "kind": "country",
+    "labelKa": "საუდის არაბეთი"
+  },
+  {
+    "id": "transfer.senegal",
+    "kind": "country",
+    "labelKa": "სენეგალი"
+  },
+  {
+    "id": "transfer.serbia",
+    "kind": "country",
+    "labelKa": "სერბეთი"
+  },
+  {
+    "id": "transfer.seychelles",
+    "kind": "country",
+    "labelKa": "სეიშელის კუნძულები"
+  },
+  {
+    "id": "transfer.sierra_leone",
+    "kind": "country",
+    "labelKa": "სიერა-ლეონე"
+  },
+  {
+    "id": "transfer.singapore",
+    "kind": "country",
+    "labelKa": "სინგაპური"
+  },
+  {
+    "id": "transfer.sint_maarten_dutch_part",
+    "kind": "country",
+    "labelKa": "სინტ-მარტენი (ნიდერლანდების ნაწილი)"
+  },
+  {
+    "id": "transfer.slovakia",
+    "kind": "country",
+    "labelKa": "სლოვაკეთი"
+  },
+  {
+    "id": "transfer.slovenia",
+    "kind": "country",
+    "labelKa": "სლოვენია"
+  },
+  {
+    "id": "transfer.solomon_islands",
+    "kind": "country",
+    "labelKa": "სოლომონის კუნძულები"
+  },
+  {
+    "id": "transfer.somalia",
+    "kind": "country",
+    "labelKa": "სომალი"
+  },
+  {
+    "id": "transfer.south_africa",
+    "kind": "country",
+    "labelKa": "სამხრეთ აფრიკის რესპუბლიკა"
+  },
+  {
+    "id": "transfer.south_georgia_and_the_south_sandwich_islands",
+    "kind": "country",
+    "labelKa": "სამხრეთ ჯორჯია და სამხრეთ სენდვიჩის კუნძულები"
+  },
+  {
+    "id": "transfer.south_sudan",
+    "kind": "country",
+    "labelKa": "სამხრეთ სუდანი"
+  },
+  {
+    "id": "transfer.spain",
+    "kind": "country",
+    "labelKa": "ესპანეთი"
+  },
+  {
+    "id": "transfer.sri_lanka",
+    "kind": "country",
+    "labelKa": "შრი-ლანკა"
+  },
+  {
+    "id": "transfer.sudan",
+    "kind": "country",
+    "labelKa": "სუდანი"
+  },
+  {
+    "id": "transfer.suriname",
+    "kind": "country",
+    "labelKa": "სურინამი"
+  },
+  {
+    "id": "transfer.svalbard_and_jan_mayen",
+    "kind": "country",
+    "labelKa": "შპიცბერგენი და იან-მაიენი"
+  },
+  {
+    "id": "transfer.sweden",
+    "kind": "country",
+    "labelKa": "შვედეთი"
+  },
+  {
+    "id": "transfer.switzerland",
+    "kind": "country",
+    "labelKa": "შვეიცარია"
+  },
+  {
+    "id": "transfer.syrian_arab_republic",
+    "kind": "country",
+    "labelKa": "სირია"
+  },
+  {
+    "id": "transfer.taiwan_province_of_china",
+    "kind": "country",
+    "labelKa": "ტაივანი"
+  },
+  {
+    "id": "transfer.tajikistan",
+    "kind": "country",
+    "labelKa": "ტაჯიკეთი"
+  },
+  {
+    "id": "transfer.tanzania_united_republic_of",
+    "kind": "country",
+    "labelKa": "ტანზანია"
+  },
+  {
+    "id": "transfer.thailand",
+    "kind": "country",
+    "labelKa": "ტაილანდი"
+  },
+  {
+    "id": "transfer.timor_leste",
+    "kind": "country",
+    "labelKa": "ტიმორ-ლესტე"
+  },
+  {
+    "id": "transfer.togo",
+    "kind": "country",
+    "labelKa": "ტოგო"
+  },
+  {
+    "id": "transfer.tokelau",
+    "kind": "country",
+    "labelKa": "ტოკელაუ"
+  },
+  {
+    "id": "transfer.tonga",
+    "kind": "country",
+    "labelKa": "ტონგა"
+  },
+  {
+    "id": "transfer.trinidad_and_tobago",
+    "kind": "country",
+    "labelKa": "ტრინიდადი და ტობაგო"
+  },
+  {
+    "id": "transfer.tunisia",
+    "kind": "country",
+    "labelKa": "ტუნისი"
+  },
+  {
+    "id": "transfer.turkey",
+    "kind": "country",
+    "labelKa": "თურქეთი"
+  },
+  {
+    "id": "transfer.turkmenistan",
+    "kind": "country",
+    "labelKa": "თურქმენეთი"
+  },
+  {
+    "id": "transfer.turks_and_caicos_islands",
+    "kind": "country",
+    "labelKa": "თერქს-ქაიქოსის კუნძულები"
+  },
+  {
+    "id": "transfer.tuvalu",
+    "kind": "country",
+    "labelKa": "ტუვალუ"
+  },
+  {
+    "id": "transfer.uganda",
+    "kind": "country",
+    "labelKa": "უგანდა"
+  },
+  {
+    "id": "transfer.ukraine",
+    "kind": "country",
+    "labelKa": "უკრაინა"
+  },
+  {
+    "id": "transfer.united_arab_emirates",
+    "kind": "country",
+    "labelKa": "არაბთა გაერთიანებული საამიროები"
+  },
+  {
+    "id": "transfer.united_kingdom_of_great_britain_and_northern_ireland",
+    "kind": "country",
+    "labelKa": "გაერთიანებული სამეფო"
+  },
+  {
+    "id": "transfer.united_states_minor_outlying_islands",
+    "kind": "country",
+    "labelKa": "აშშ-ის შორეული კუნძულები"
+  },
+  {
+    "id": "transfer.united_states_of_america",
+    "kind": "country",
+    "labelKa": "ამერიკის შეერთებული შტატები"
+  },
+  {
+    "id": "transfer.uruguay",
+    "kind": "country",
+    "labelKa": "ურუგვაი"
+  },
+  {
+    "id": "transfer.uzbekistan",
+    "kind": "country",
+    "labelKa": "უზბეკეთი"
+  },
+  {
+    "id": "transfer.vanuatu",
+    "kind": "country",
+    "labelKa": "ვანუატუ"
+  },
+  {
+    "id": "transfer.venezuela_bolivarian_republic_of",
+    "kind": "country",
+    "labelKa": "ვენესუელა"
+  },
+  {
+    "id": "transfer.viet_nam",
+    "kind": "country",
+    "labelKa": "ვიეტნამი"
+  },
+  {
+    "id": "transfer.virgin_islands_british",
+    "kind": "country",
+    "labelKa": "ბრიტანეთის ვირჯინის კუნძულები"
+  },
+  {
+    "id": "transfer.virgin_islands_u_s",
+    "kind": "country",
+    "labelKa": "აშშ-ის ვირჯინის კუნძულები"
+  },
+  {
+    "id": "transfer.wallis_and_futuna",
+    "kind": "country",
+    "labelKa": "უოლისი და ფუტუნა"
+  },
+  {
+    "id": "transfer.western_sahara",
+    "kind": "country",
+    "labelKa": "დასავლეთ საჰარა"
+  },
+  {
+    "id": "transfer.yemen",
+    "kind": "country",
+    "labelKa": "იემენი"
+  },
+  {
+    "id": "transfer.zambia",
+    "kind": "country",
+    "labelKa": "ზამბია"
+  },
+  {
+    "id": "transfer.zimbabwe",
+    "kind": "country",
+    "labelKa": "ზიმბაბვე"
+  }
+]

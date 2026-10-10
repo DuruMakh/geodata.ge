@@ -1,0 +1,15 @@
+{
+  "independent_keys": 14851,
+  "input_artifact_sha256": {
+    "bop-annual.csv": "6053cf2cbc4399468257ed9d505ca541a0f4d7d63a27027594dde113b7db6e76",
+    "fdi-flows-annual.csv": "3c4db49979ad46f079874a3d7162179e32a11f7100576a76a7917b6ab8e0ffab",
+    "fdi-position-annual.csv": "9c3543ced82e101f1d0c34a94ca458b601ed3c28a02208e181f27b59e17005a6",
+    "money-transfers-annual.csv": "c729a10a0ef1a313f27e7317aa4f529b32d5b9e02a336e3c5842ee9d0767b41f"
+  },
+  "missing_from_prepared": [],
+  "not_in_independent_walk": [],
+  "prepared_keys": 14851,
+  "result": "pass",
+  "value_mismatches": [],
+  "verifier_sha256": "38bf533712f46676b7600f6dacdb944e12b42dec05913a3303f8b92d8081a5be"
+}

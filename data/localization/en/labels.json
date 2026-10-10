@@ -21242,5 +21242,1021 @@
   "goods.hs4.2020-2025.9905": {
     "text": "Personal items",
     "reviewedAt": "2026-10-10"
+  },
+  "transfer.total": {
+    "text": "Money transfers, all countries",
+    "reviewedAt": "2026-10-10"
+  },
+  "bop.personal_transfers": {
+    "text": "Personal transfers (official estimate)",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.afghanistan": {
+    "text": "Afghanistan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.aland_islands": {
+    "text": "Aland Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.albania": {
+    "text": "Albania",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.algeria": {
+    "text": "Algeria",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.american_samoa": {
+    "text": "American Samoa",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.andorra": {
+    "text": "Andorra",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.angola": {
+    "text": "Angola",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.anguilla": {
+    "text": "Anguilla",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.antarctica": {
+    "text": "Antarctica",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.antigua_and_barbuda": {
+    "text": "Antigua and Barbuda",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.areas_not_elsewhere_specified": {
+    "text": "Areas not elsewhere specified",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.argentina": {
+    "text": "Argentina",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.armenia": {
+    "text": "Armenia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.aruba": {
+    "text": "Aruba",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.australia": {
+    "text": "Australia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.austria": {
+    "text": "Austria",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.azerbaijan": {
+    "text": "Azerbaijan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bahamas": {
+    "text": "Bahamas",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bahrain": {
+    "text": "Bahrain",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bangladesh": {
+    "text": "Bangladesh",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.barbados": {
+    "text": "Barbados",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.belarus": {
+    "text": "Belarus",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.belgium": {
+    "text": "Belgium",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.belize": {
+    "text": "Belize",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.benin": {
+    "text": "Benin",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bermuda": {
+    "text": "Bermuda",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bhutan": {
+    "text": "Bhutan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bolivia_plurinational_state_of": {
+    "text": "Bolivia, Plurinational State of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bonaire_sint_eustatius_and_saba": {
+    "text": "Bonaire, Sint Eustatius and Saba",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bosnia_and_herzegovina": {
+    "text": "Bosnia and Herzegovina",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.botswana": {
+    "text": "Botswana",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bouvet_island": {
+    "text": "Bouvet Island",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.brazil": {
+    "text": "Brazil",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.british_indian_ocean_territory": {
+    "text": "British Indian Ocean Territory",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.brunei_darussalam": {
+    "text": "Brunei Darussalam",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.bulgaria": {
+    "text": "Bulgaria",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.burkina_faso": {
+    "text": "Burkina Faso",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.burundi": {
+    "text": "Burundi",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cabo_verde": {
+    "text": "Cabo Verde",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cambodia": {
+    "text": "Cambodia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cameroon": {
+    "text": "Cameroon",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.canada": {
+    "text": "Canada",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cayman_islands": {
+    "text": "Cayman Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.central_african_republic": {
+    "text": "Central African Republic",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.chad": {
+    "text": "Chad",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.chile": {
+    "text": "Chile",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.china": {
+    "text": "China",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.christmas_island": {
+    "text": "Christmas Island",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cocos_keeling_islands": {
+    "text": "Cocos (Keeling) Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.colombia": {
+    "text": "Colombia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.comoros": {
+    "text": "Comoros",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.congo": {
+    "text": "Congo",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.congo_the_democratic_republic_of_the": {
+    "text": "Congo, the Democratic Republic of the",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cook_islands": {
+    "text": "Cook Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.costa_rica": {
+    "text": "Costa Rica",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cote_divoire": {
+    "text": "Côte dIvoire",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.croatia": {
+    "text": "Croatia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cuba": {
+    "text": "Cuba",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.curacao": {
+    "text": "Curaçao",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.cyprus": {
+    "text": "Cyprus",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.czechia": {
+    "text": "Czechia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.denmark": {
+    "text": "Denmark",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.djibouti": {
+    "text": "Djibouti",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.dominica": {
+    "text": "Dominica",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.dominican_republic": {
+    "text": "Dominican Republic",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.ecuador": {
+    "text": "Ecuador",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.egypt": {
+    "text": "Egypt",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.el_salvador": {
+    "text": "El Salvador",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.equatorial_guinea": {
+    "text": "Equatorial Guinea",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.eritrea": {
+    "text": "Eritrea",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.estonia": {
+    "text": "Estonia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.eswatini": {
+    "text": "Eswatini",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.ethiopia": {
+    "text": "Ethiopia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.falkland_islands_malvinas": {
+    "text": "Falkland Islands (Malvinas)",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.faroe_islands": {
+    "text": "Faroe Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.fiji": {
+    "text": "Fiji",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.finland": {
+    "text": "Finland",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.france": {
+    "text": "France",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.french_guiana": {
+    "text": "French Guiana",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.french_polynesia": {
+    "text": "French Polynesia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.french_southern_territories": {
+    "text": "French Southern Territories",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.gabon": {
+    "text": "Gabon",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.gambia": {
+    "text": "Gambia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.germany": {
+    "text": "Germany",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.ghana": {
+    "text": "Ghana",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.gibraltar": {
+    "text": "Gibraltar",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.greece": {
+    "text": "Greece",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.greenland": {
+    "text": "Greenland",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.grenada": {
+    "text": "Grenada",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.guadeloupe": {
+    "text": "Guadeloupe",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.guam": {
+    "text": "Guam",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.guatemala": {
+    "text": "Guatemala",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.guernsey": {
+    "text": "Guernsey",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.guinea": {
+    "text": "Guinea",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.guinea_bissau": {
+    "text": "Guinea-Bissau",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.guyana": {
+    "text": "Guyana",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.haiti": {
+    "text": "Haiti",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.heard_island_and_mcdonald_islands": {
+    "text": "Heard Island and McDonald Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.holy_see": {
+    "text": "Holy See",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.honduras": {
+    "text": "Honduras",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.hong_kong": {
+    "text": "Hong Kong",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.hungary": {
+    "text": "Hungary",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.iceland": {
+    "text": "Iceland",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.india": {
+    "text": "India",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.indonesia": {
+    "text": "Indonesia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.iran_islamic_republic_of": {
+    "text": "Iran, Islamic Republic of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.iraq": {
+    "text": "Iraq",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.ireland": {
+    "text": "Ireland",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.isle_of_man": {
+    "text": "Isle of Man",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.israel": {
+    "text": "Israel",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.italy": {
+    "text": "Italy",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.jamaica": {
+    "text": "Jamaica",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.japan": {
+    "text": "Japan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.jersey": {
+    "text": "Jersey",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.jordan": {
+    "text": "Jordan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.kazakhstan": {
+    "text": "Kazakhstan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.kenya": {
+    "text": "Kenya",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.kiribati": {
+    "text": "Kiribati",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.korea_democratic_peoples_republic_of": {
+    "text": "Korea, Democratic Peoples Republic of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.korea_republic_of": {
+    "text": "Korea, Republic of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.kuwait": {
+    "text": "Kuwait",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.kyrgyzstan": {
+    "text": "Kyrgyzstan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.lao_peoples_democratic_republic": {
+    "text": "Lao Peoples Democratic Republic",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.latvia": {
+    "text": "Latvia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.lebanon": {
+    "text": "Lebanon",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.lesotho": {
+    "text": "Lesotho",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.liberia": {
+    "text": "Liberia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.libya": {
+    "text": "Libya",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.liechtenstein": {
+    "text": "Liechtenstein",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.lithuania": {
+    "text": "Lithuania",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.luxembourg": {
+    "text": "Luxembourg",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.macao": {
+    "text": "Macao",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.madagascar": {
+    "text": "Madagascar",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.malawi": {
+    "text": "Malawi",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.malaysia": {
+    "text": "Malaysia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.maldives": {
+    "text": "Maldives",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.mali": {
+    "text": "Mali",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.malta": {
+    "text": "Malta",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.marshall_islands": {
+    "text": "Marshall Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.martinique": {
+    "text": "Martinique",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.mauritania": {
+    "text": "Mauritania",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.mauritius": {
+    "text": "Mauritius",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.mayotte": {
+    "text": "Mayotte",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.mexico": {
+    "text": "Mexico",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.micronesia_federated_states_of": {
+    "text": "Micronesia, Federated States of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.moldova_republic_of": {
+    "text": "Moldova, Republic of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.monaco": {
+    "text": "Monaco",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.mongolia": {
+    "text": "Mongolia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.montenegro": {
+    "text": "Montenegro",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.montserrat": {
+    "text": "Montserrat",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.morocco": {
+    "text": "Morocco",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.mozambique": {
+    "text": "Mozambique",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.myanmar": {
+    "text": "Myanmar",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.namibia": {
+    "text": "Namibia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.nauru": {
+    "text": "Nauru",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.nepal": {
+    "text": "Nepal",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.netherlands": {
+    "text": "Netherlands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.netherlands_antilles": {
+    "text": "Netherlands Antilles",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.new_caledonia": {
+    "text": "New Caledonia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.new_zealand": {
+    "text": "New Zealand",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.nicaragua": {
+    "text": "Nicaragua",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.niger": {
+    "text": "Niger",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.nigeria": {
+    "text": "Nigeria",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.niue": {
+    "text": "Niue",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.norfolk_island": {
+    "text": "Norfolk Island",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.north_macedonia": {
+    "text": "North Macedonia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.northern_mariana_islands": {
+    "text": "Northern Mariana Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.norway": {
+    "text": "Norway",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.oman": {
+    "text": "Oman",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.other_countries": {
+    "text": "Other Countries",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.other_territories": {
+    "text": "Other Territories",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.pakistan": {
+    "text": "Pakistan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.palau": {
+    "text": "Palau",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.palestine_state_of": {
+    "text": "Palestine, State of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.panama": {
+    "text": "Panama",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.papua_new_guinea": {
+    "text": "Papua New Guinea",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.paraguay": {
+    "text": "Paraguay",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.peru": {
+    "text": "Peru",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.philippines": {
+    "text": "Philippines",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.pitcairn": {
+    "text": "Pitcairn",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.poland": {
+    "text": "Poland",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.portugal": {
+    "text": "Portugal",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.puerto_rico": {
+    "text": "Puerto Rico",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.qatar": {
+    "text": "Qatar",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.reunion": {
+    "text": "Réunion",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.romania": {
+    "text": "Romania",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.russian_federation": {
+    "text": "Russian Federation",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.rwanda": {
+    "text": "Rwanda",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saint_barthelemy": {
+    "text": "Saint Barthélemy",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saint_helena_ascension_and_tristan_da_cunha": {
+    "text": "Saint Helena, Ascension and Tristan da Cunha",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saint_kitts_and_nevis": {
+    "text": "Saint Kitts and Nevis",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saint_lucia": {
+    "text": "Saint Lucia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saint_martin": {
+    "text": "Saint Martin",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saint_pierre_and_miquelon": {
+    "text": "Saint Pierre and Miquelon",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saint_vincent_and_the_grenadines": {
+    "text": "Saint Vincent and the Grenadines",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.samoa": {
+    "text": "Samoa",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.san_marino": {
+    "text": "San Marino",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.sao_tome_and_principe": {
+    "text": "Sao Tome and Principe",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.saudi_arabia": {
+    "text": "Saudi Arabia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.senegal": {
+    "text": "Senegal",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.serbia": {
+    "text": "Serbia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.seychelles": {
+    "text": "Seychelles",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.sierra_leone": {
+    "text": "Sierra Leone",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.singapore": {
+    "text": "Singapore",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.sint_maarten_dutch_part": {
+    "text": "Sint Maarten (Dutch part)",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.slovakia": {
+    "text": "Slovakia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.slovenia": {
+    "text": "Slovenia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.solomon_islands": {
+    "text": "Solomon Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.somalia": {
+    "text": "Somalia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.south_africa": {
+    "text": "South Africa",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.south_georgia_and_the_south_sandwich_islands": {
+    "text": "South Georgia and the South Sandwich Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.south_sudan": {
+    "text": "South Sudan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.spain": {
+    "text": "Spain",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.sri_lanka": {
+    "text": "Sri Lanka",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.sudan": {
+    "text": "Sudan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.suriname": {
+    "text": "Suriname",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.svalbard_and_jan_mayen": {
+    "text": "Svalbard and Jan Mayen",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.sweden": {
+    "text": "Sweden",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.switzerland": {
+    "text": "Switzerland",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.syrian_arab_republic": {
+    "text": "Syrian Arab Republic",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.taiwan_province_of_china": {
+    "text": "Taiwan, Province of China",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.tajikistan": {
+    "text": "Tajikistan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.tanzania_united_republic_of": {
+    "text": "Tanzania, United Republic of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.thailand": {
+    "text": "Thailand",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.timor_leste": {
+    "text": "Timor-Leste",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.togo": {
+    "text": "Togo",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.tokelau": {
+    "text": "Tokelau",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.tonga": {
+    "text": "Tonga",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.trinidad_and_tobago": {
+    "text": "Trinidad and Tobago",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.tunisia": {
+    "text": "Tunisia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.turkey": {
+    "text": "Turkey",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.turkmenistan": {
+    "text": "Turkmenistan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.turks_and_caicos_islands": {
+    "text": "Turks and Caicos Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.tuvalu": {
+    "text": "Tuvalu",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.uganda": {
+    "text": "Uganda",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.ukraine": {
+    "text": "Ukraine",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.united_arab_emirates": {
+    "text": "United Arab Emirates",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.united_kingdom_of_great_britain_and_northern_ireland": {
+    "text": "United Kingdom of Great Britain and Northern Ireland",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.united_states_minor_outlying_islands": {
+    "text": "United States Minor Outlying Islands",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.united_states_of_america": {
+    "text": "United States of America",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.uruguay": {
+    "text": "Uruguay",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.uzbekistan": {
+    "text": "Uzbekistan",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.vanuatu": {
+    "text": "Vanuatu",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.venezuela_bolivarian_republic_of": {
+    "text": "Venezuela, Bolivarian Republic of",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.viet_nam": {
+    "text": "Viet Nam",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.virgin_islands_british": {
+    "text": "Virgin Islands, British",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.virgin_islands_u_s": {
+    "text": "Virgin Islands, U.S.",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.wallis_and_futuna": {
+    "text": "Wallis and Futuna",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.western_sahara": {
+    "text": "Western Sahara",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.yemen": {
+    "text": "Yemen",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.zambia": {
+    "text": "Zambia",
+    "reviewedAt": "2026-10-10"
+  },
+  "transfer.zimbabwe": {
+    "text": "Zimbabwe",
+    "reviewedAt": "2026-10-10"
   }
 }

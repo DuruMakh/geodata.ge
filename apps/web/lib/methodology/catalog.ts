@@ -12,6 +12,8 @@ import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT as EN_UNEMPLOYMENT } from "./content/en/unemployment";
 import { TRADE_METHODOLOGY_CONTENT } from "./content/trade";
 import { TRADE_METHODOLOGY_CONTENT as EN_TRADE } from "./content/en/trade";
+import { EXTERNAL_FLOWS_METHODOLOGY_CONTENT } from "./content/external-flows";
+import { EXTERNAL_FLOWS_METHODOLOGY_CONTENT as EN_EXTERNAL_FLOWS } from "./content/en/external-flows";
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { Locale } from "../i18n/types";
 import { DEBT_METHODOLOGY_CONTENT as EN_DEBT } from "./content/en/debt";
@@ -45,6 +47,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   inflation: INFLATION_METHODOLOGY_CONTENT,
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
+  "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
 
@@ -53,6 +56,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   "regional-economies": EN_REGIONAL_ECONOMIES,
   unemployment: EN_UNEMPLOYMENT,
   trade: EN_TRADE,
+  "external-flows": EN_EXTERNAL_FLOWS,
   expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP, inflation: EN_INFLATION,
   demography: EN_DEMOGRAPHY,
 };

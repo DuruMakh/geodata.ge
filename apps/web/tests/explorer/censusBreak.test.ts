@@ -97,4 +97,15 @@ describe("ExplorerTable break", () => {
   it("ignores a break year that is the first column", () => {
     expect(table({ breakYears: [2024], breakLabel: "Census re-base" })).not.toContain("border-left");
   });
+
+  it("draws a hollow point on a preliminary value only when the series asks for it", () => {
+    const years = [2023, 2024, 2025, 2026], vals = [100, 200, 500, 600];
+    const render = (hollowPreliminary: boolean) => renderGeorgianMarkup(createElement(EditorialLineChart, {
+      years, share: false, unit: { divisor: 1_000, label: "k", decimals: 0 }, shareLabel: "%",
+      series: [{ id: "s", label: "S", color: COLOR, vals, planned: vals.map(() => false), preliminary: [false, true, false, false], ...(hollowPreliminary ? { hollowPreliminary } : {}) }],
+    }));
+    const hollow = (html: string) => count(chartGeometry(html, "desktop"), /<circle[^>]*fill="#F7F2E9"/g);
+    expect(hollow(render(false))).toBe(0);
+    expect(hollow(render(true))).toBe(1);
+  });
 });

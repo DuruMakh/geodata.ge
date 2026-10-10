@@ -65,6 +65,8 @@ export const SERVED_DATA_FILES = {
   tradeOverviewFacts: "../../data/imports/trade-overview-annual.csv",
   tradePartnerEntities: "../../data/taxonomy/trade-partners.json",
   tradePartnerFacts: "../../data/imports/trade-partners-annual.csv",
+  moneyTransferEntities: "../../data/taxonomy/money-transfer-countries.json",
+  moneyTransferFacts: "../../data/imports/money-transfers-annual.csv",
   tradeProductEntities: "../../data/imports/trade-products-catalogue.csv",
   tradeProductFacts: "../../data/imports/trade-products-annual.csv",
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
