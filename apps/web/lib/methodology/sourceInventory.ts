@@ -54,7 +54,10 @@ const inventoryRules = {
   ],
   unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
   trade: [{ root: "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official", include: (candidatePath: string) => ["FTrade_1995-2026.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-1995-1999.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-products--1995-1999_eng.xlsx", "Export-Country_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html"].includes(path.posix.basename(candidatePath)) }],
-  "external-flows": [{ root: "docs/Raw Data/External/2026-10-10/official/nbg", include: (candidatePath: string) => ["REMC_money-transfers-by-countries-eng.xlsx", "BOP-6_bopbpm6eng.xlsx", "external-sector-methodology-eng-bpm6updated.pdf"].includes(path.posix.basename(candidatePath)) }],
+  "external-flows": [
+    { root: "docs/Raw Data/External/2026-10-10/official/nbg", include: (candidatePath: string) => ["REMC_money-transfers-by-countries-eng.xlsx", "BOP-6_bopbpm6eng.xlsx", "external-sector-methodology-eng-bpm6updated.pdf"].includes(path.posix.basename(candidatePath)) },
+    { root: "docs/Raw Data/External/2026-10-10/official/geostat", include: (candidatePath: string) => ["FDI_Eng_by_Quarters.xlsx", "FDI_Eng-countries.xlsx", "FDI_Eng-sectors-NACE-2.xlsx", "FDI_Eng_regions.xlsx", "FDI_metadata_1002_090626_EN.pdf"].includes(path.posix.basename(candidatePath)) },
+  ],
 } satisfies Record<MethodologyDatasetId, readonly InventoryRule[]>;
 
 function dirname(candidatePath: string) {

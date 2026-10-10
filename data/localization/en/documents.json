@@ -3742,5 +3742,80 @@
       "reviewedAt": "2026-10-10"
     },
     "documentLanguage": "en"
+  },
+  "geostat_fdi_by_quarters": {
+    "title": {
+      "text": "Foreign direct investment by quarter",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_fdi_by_countries": {
+    "title": {
+      "text": "Foreign direct investment by country",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_fdi_by_sectors": {
+    "title": {
+      "text": "Foreign direct investment by economic activity (NACE Rev.2)",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_fdi_by_regions": {
+    "title": {
+      "text": "Foreign direct investment by region",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_fdi_metadata": {
+    "title": {
+      "text": "Foreign direct investment metadata",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Statistics Office of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
   }
 }

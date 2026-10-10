@@ -6,7 +6,7 @@ import type { Presentation } from "../../lib/i18n/types";
 const labels = JSON.parse(readFileSync(path.resolve(process.cwd(), "../../data/localization/en/labels.json"), "utf8")) as Record<string, { text: string }>;
 const presentation: Presentation = { locale: "en", messages: { "external.unit.million": "million USD", "external.unit.billion": "billion USD", "external.investment.otherCountries": "Other countries" }, englishLabels: Object.fromEntries(Object.entries(labels).filter(([id]) => id.startsWith("fdi.")).map(([id, label]) => [id, label.text])) };
 const modules = async () => ({ ...await import("../../lib/explorer/foreignInvestmentState"), ...await import("../../lib/explorer/foreignInvestment"), data: toClientForeignInvestmentData(await loadForeignInvestmentData()) });
-const initial = { dimension: "country", mode: "line", range: { kind: "all" }, selectedIds: ["fdi.total"] } as const;
+const initial: import("../../lib/explorer/foreignInvestmentState").ForeignInvestmentState = { dimension: "country", mode: "line", range: { kind: "all" }, selectedIds: ["fdi.total"] };
 
 test("the country tab lists the total, the end year's top 10 countries and Other countries, which add up to the total", async () => {
   const { buildForeignInvestmentModel: build, data } = await modules();

@@ -1,38 +1,12 @@
 "use client";
 import type { MoneyTransferMeasure } from "../../lib/data/externalFlows/types";
-import type { MoneyTransferRankingRow, MoneyTransfersModel } from "../../lib/explorer/moneyTransfers";
-import { formatInUnit, formatShare } from "../../lib/explorer/format";
+import type { MoneyTransfersModel } from "../../lib/explorer/moneyTransfers";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { SectionTitle } from "../ui/editorial";
+import { ExternalRanking } from "./external-ranking";
 
 export function MoneyFromAbroadRanking({ model, measure }: { model: MoneyTransfersModel; measure: MoneyTransferMeasure }) {
   const { messages } = useI18n();
-  // Country amounts read in millions (USD 683 million), whatever scale the chart above uses.
-  const unit = { divisor: 1_000_000, decimals: 1, label: message(messages, "external.unit.million") };
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
-  const title = t("rankingTitle", { measure: message(messages, `external.measure.${measure}`), year: model.range.end });
-  const max = Math.max(...model.ranking.map(row => row.valueUsd!), 1);
-  const row = (item: MoneyTransferRankingRow, kind: "ranking" | "other") => <tr key={item.entityId} data-testid={`money-from-abroad-${kind}-row`} data-entity-id={item.entityId} className="border-b border-[var(--row-border)]">
-    <td className="py-3 pr-2 align-top font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{item.rank ?? "—"}</td>
-    <th scope="row" className="py-3 pr-3 text-left align-top text-[12px] font-medium leading-relaxed text-[var(--ink)]">{item.label}
-      {kind === "ranking" ? <div aria-hidden className="relative mt-2 h-1.5 bg-[var(--tint)]"><span className="absolute top-0 left-0 h-full" style={{ backgroundColor: item.color, width: `${item.valueUsd! / max * 100}%` }} /></div> : null}
-    </th>
-    <td className="py-3 text-right align-top font-[family-name:var(--font-numeric)] text-[12px] whitespace-nowrap text-[var(--ink)]">{formatInUnit(item.valueUsd, unit)}{item.monthsReported !== null ? <span data-testid="money-from-abroad-partial" className="block text-[10px] text-[var(--muted)]">{t("months", { count: item.monthsReported })}</span> : null}</td>
-    <td className="py-3 pl-3 text-right align-top font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{formatShare(item.share)}</td>
-  </tr>;
-  return <section data-testid="money-from-abroad-ranking" data-end-year={model.range.end} data-measure={measure} className="mt-10 border-t-2 border-[var(--ink)] pt-5">
-    <SectionTitle>{title}</SectionTitle>
-    <p className="mt-2 text-[11px] text-[var(--muted)]">{unit.label} · {t("shareNote")}</p>
-    <table className="mt-5 w-full table-fixed border-collapse">
-      <caption className="sr-only">{title} · {unit.label}</caption>
-      <colgroup><col className="w-[6%]" /><col className="w-[49%]" /><col className="w-[30%] min-[640px]:w-[23%]" /><col className="w-[15%] min-[640px]:w-[22%]" /></colgroup>
-      <thead><tr className="border-b border-[var(--ink)] text-[10px] text-[var(--muted)]"><th className="py-2 text-left font-normal">{t("rank")}</th><th className="py-2 text-left font-normal">{t("country")}</th><th className="py-2 text-right font-normal">{unit.label}</th><th className="py-2 pl-3 text-right font-normal leading-tight [overflow-wrap:anywhere]">{t("share")}</th></tr></thead>
-      <tbody>
-        {model.ranking.map(item => row(item, "ranking"))}
-        {model.other ? row(model.other, "other") : null}
-      </tbody>
-    </table>
-    {!model.ranking.length ? <p className="mt-3 text-[12px] text-[var(--muted)]">{t("noRanking")}</p> : null}
-  </section>;
+  return <ExternalRanking testId="money-from-abroad" data={{ "end-year": model.range.end, measure }} title={t("rankingTitle", { measure: message(messages, `external.measure.${measure}`), year: model.range.end })} itemLabel={t("country")} shareLabel={t("share")} note={t("shareNote")} empty={t("noRanking")} rows={model.ranking} other={model.other} monthsLabel={count => t("months", { count })} />;
 }
