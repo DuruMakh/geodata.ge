@@ -3889,5 +3889,47 @@
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
     "documentLanguage": "en"
+  },
+  "geostat_poverty_absolute": {
+    "title": { "text": "Share of population under the absolute poverty line", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_poverty_relative": {
+    "title": { "text": "Relative poverty indicators", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_poverty_international": {
+    "title": { "text": "Proportion of the population living below the international poverty lines (2021 PPP)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_gini": {
+    "title": { "text": "Gini coefficients", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_poverty_source_page": {
+    "title": { "text": "Poverty and Gini Coefficients (English source page)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_poverty_metadata_2026": {
+    "title": { "text": "Metadata: absolute and relative poverty indicators and Gini coefficients (25 May 2026)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
+  },
+  "geostat_hies_metadata_2026": {
+    "title": { "text": "Metadata: Households Incomes and Expenditures Survey (25 May 2026)", "reviewedAt": "2026-10-10" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
+    "documentLanguage": "en"
   }
 }

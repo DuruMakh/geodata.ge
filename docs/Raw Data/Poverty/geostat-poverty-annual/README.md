@@ -64,5 +64,5 @@ python3 -B prepare.py --check && python3 -B -m unittest test_validation -v && no
 - The absolute workbook labels 2015 as `2015*`, with the footnote "* Base year of calculating poverty line." The year is read as 2015, and the label is kept in `source_label`.
 - Geostat's metadata says Gini coefficients are available from 1997, but the published workbook starts in 2006. Only 2006–2025 is extracted, and no earlier year is taken from another source.
 - The survey was the Integrated Household Survey before 2017 and the Households Incomes and Expenditures Survey from 2017, with a sampling frame based on the 2014 census. Geostat's metadata (section 15.2) states "Data is comparable over time."
-- In 2025, Geostat gives a 95% confidence interval of 6.3–7.9% for absolute poverty (metadata section 13.1).
+- In 2025, Geostat gives a 95% confidence interval of 6.3–7.9% for absolute poverty (metadata section 13.2).
 - The 63 lari values of the international lines are not extracted. Household income and expenditure, regional data and the subsistence minimum are outside this package.
