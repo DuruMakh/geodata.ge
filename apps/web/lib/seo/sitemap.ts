@@ -16,6 +16,7 @@ import { loadServedMoneyTransfersData } from "../data/externalFlows/importMoneyT
 import { loadServedForeignInvestmentData } from "../data/externalFlows/importForeignInvestment";
 import { loadServedCurrentAccountFacts } from "../data/externalFlows/importCurrentAccount";
 import { loadServedTradeProductsData } from "../data/tradeProducts/importTradeProducts";
+import { loadServedTradeDomesticData } from "../data/tradeDomestic/importTradeDomestic";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
 import {
@@ -45,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -61,6 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedMoneyTransfersData(),
     loadServedDemographyData(),
     loadServedTradeProductsData(),
+    loadServedTradeDomesticData(),
     loadServedForeignInvestmentData(),
     loadServedWagesData(),
     loadServedCurrentAccountFacts(),
@@ -81,6 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const currentAccountModified = new Date(currentAccountFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const externalModified = new Date(Math.max(moneyTransfersModified.getTime(), foreignInvestmentModified.getTime(), currentAccountModified.getTime()));
   const tradeProductsModified = new Date(tradeProductFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  const tradeDomesticModified = new Date(tradeDomesticFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const economyModified = gdpModified > sectorsModified ? gdpModified : sectorsModified;
   const demographyModified = new Date(demographyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const lastReviewedAt = sourceDocuments
@@ -132,6 +135,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/external/foreign-investment`, lastModified: foreignInvestmentModified },
     { url: `${siteUrl}/explorer/external/current-account`, lastModified: currentAccountModified },
     { url: `${siteUrl}/explorer/trade/products`, lastModified: tradeProductsModified },
+    { url: `${siteUrl}/explorer/trade/domestic-exports`, lastModified: tradeDomesticModified },
     ...UNEMPLOYMENT_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: unemploymentModified })),
     ...regions.map(region => ({ url: `${siteUrl}${unemploymentRegionHref(region.id)}`, lastModified: new Date(unemploymentFacts.filter(fact => fact.dimension === "region" && fact.groupId === region.id).map(fact => fact.lastReviewedAt).sort().at(-1)!) })),
     { url: `${siteUrl}/explorer/economy/regions`, lastModified: regionalModified },

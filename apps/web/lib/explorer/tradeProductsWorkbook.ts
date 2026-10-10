@@ -11,8 +11,10 @@ export function buildTradeProductsWorkbookModel(input: { data: ClientTradeProduc
   const model = buildTradeProductsModel(input.data, input.state, presentation);
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
   const entities = new Map(input.data.entities.map(entity => [entity.id, entity]));
+  const domestic = Boolean(input.data.measures);
   const filenames = new Set<string>();
   for (const id of model.selectedIds) {
+    if (domestic) { filenames.add(id === TRADE_PRODUCT_TOTAL_ID ? "domestic-export-country-2014-2026.xlsx" : "domestic-exports-by-4-digit-2014-2026.xlsx"); continue; }
     if (id === TRADE_PRODUCT_TOTAL_ID) { filenames.add("ftrade_1995-2026.xlsx"); continue; }
     const entity = entities.get(id)!;
     const sourceId = TRADE_PRODUCT_SOURCES[entity.sourceBlock][input.state.measure === "trade.exports" ? "export" : "import"];
@@ -20,7 +22,7 @@ export function buildTradeProductsWorkbookModel(input: { data: ClientTradeProduc
   }
   const sources = input.sources.filter(source => filenames.has(source.downloadHref.split("/").at(-1)!));
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: "trade-products", title: t("products.title"), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
+    locale: presentation.locale, filenameBase: domestic ? "trade-domestic-products" : "trade-products", title: t(domestic ? "domestic.productsTitle" : "products.title"), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: TRADE_PRODUCT_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
