@@ -14,6 +14,7 @@ import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
+import moneyTransferRegistry from "../../../../data/taxonomy/money-transfer-countries.json";
 import { readTradeProductCatalogue } from "../data/tradeProducts/catalogue";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
@@ -28,7 +29,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
     "/explorer/unemployment",
-    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products",
+    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/external", "/explorer/external/money-from-abroad",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
     "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
     ...regions.map(region => unemploymentRegionHref(region.id)),
@@ -47,9 +48,9 @@ export async function listPublicPagePaths(): Promise<string[]> {
 }
 
 export async function loadTranslationInventory(): Promise<TranslationInventory> {
-  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, tradeDocuments, wagesDocuments, pagePaths, tradeProducts] = await Promise.all([
+  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, tradeDocuments, wagesDocuments, externalDocuments, pagePaths, tradeProducts] = await Promise.all([
     loadServedExplorerData(), loadServedMunicipalData(), loadManifestDocuments(),
-    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "trade"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "wages"), listPublicPagePaths(), readTradeProductCatalogue(path.resolve(process.cwd(), "../..")),
+    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "trade"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "wages"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "external-flows"), listPublicPagePaths(), readTradeProductCatalogue(path.resolve(process.cwd(), "../..")),
   ]);
   const sources = resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments: documents });
   const programmeHistory = explorer.adminFacts.filter((fact) => fact.level === "major_program").map((fact) => {
@@ -62,6 +63,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...sectorRegistry.map(row => row.id), "economic-sectors",
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
+      ...moneyTransferRegistry.map(row => row.id),
       ...tradeProducts.map(row => row.id),
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),
@@ -72,7 +74,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
     ]),
     sourceIds: sortedUnique(sources.map((row) => row.sourceId)),
-    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id), ...unemploymentDocuments.map(row => row.source_id), ...tradeDocuments.map(row => row.source_id), ...wagesDocuments.map(row => row.source_id)]),
+    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id), ...unemploymentDocuments.map(row => row.source_id), ...tradeDocuments.map(row => row.source_id), ...wagesDocuments.map(row => row.source_id), ...externalDocuments.map(row => row.source_id)]),
     derivedSourceIds: sortedUnique(sources.filter((row) => row.derivation !== null).map((row) => row.sourceId)),
     attributedDocumentIds: sortedUnique([
       ...documents.filter((row) => row.attribution !== null).map((row) => row.documentId),
@@ -80,6 +82,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...unemploymentDocuments.map(row => row.source_id),
       ...tradeDocuments.map(row => row.source_id),
       ...wagesDocuments.map(row => row.source_id),
+      ...externalDocuments.map(row => row.source_id),
     ]),
     programmeHistory,
   };

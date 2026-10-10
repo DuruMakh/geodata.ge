@@ -164,6 +164,8 @@ source.geostat_trade_export_product_by_4_digit_2000_2014,"საქსტატ�
 source.geostat_trade_import_product_by_4_digit_2000_2014,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 2000–2014",https://www.geostat.ge/media/78945/Import-Product-by-4-digit-2000-2014.xlsx,2026-10-10
 source.geostat_trade_export_product_by_4_digit_2015_2026,"საქსტატი — საქონლის ექსპორტი ოთხნიშნა კოდებით, 2015–2025",https://www.geostat.ge/media/82858/Export-Product-by-4-digit-2015-2026.xlsx,2026-10-10
 source.geostat_trade_import_product_by_4_digit_2015_2026,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 2015–2025",https://www.geostat.ge/media/82884/Import-Product-by-4-digit-2015-2026.xlsx,2026-10-10
+source.nbg_money_transfers_by_countries,ფულადი გზავნილები ქვეყნების მიხედვით,docs/Raw Data/External/2026-10-10/official/nbg/REMC_money-transfers-by-countries-eng.xlsx,2026-10-10
+source.nbg_balance_of_payments_bpm6,საქართველოს საგადამხდელო ბალანსი (BPM6),docs/Raw Data/External/2026-10-10/official/nbg/BOP-6_bopbpm6eng.xlsx,2026-10-10
 source.geostat_earnings_annual_headline,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი,docs/Raw Data/Wages/geostat-earnings-annual/official/01-earnings-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_activity,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/02-earnings-by-activity-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_sex,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი ეკონომიკური საქმიანობის სახეებისა და სქესის მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/03-earnings-by-sex-annual.xlsx,2026-10-10

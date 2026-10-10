@@ -146,6 +146,7 @@ test("sitemap publishes exactly the live methodology routes", async ({ page }) =
     "/methodology/unemployment",
     "/methodology/wages",
     "/methodology/trade",
+    "/methodology/external-flows",
     "/methodology/demography",
   ]);
 });

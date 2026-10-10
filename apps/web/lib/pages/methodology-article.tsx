@@ -65,6 +65,7 @@ const DATASET_SOURCE_NOTES = {
   inflation: "common.inflationSourceNote",
   unemployment: "common.geostatSourceNote",
   trade: "common.geostatSourceNote",
+  "external-flows": "common.nbgSourceNote",
   demography: "common.geostatSourceNote",
   wages: "common.geostatSourceNote",
 } as const;
@@ -80,6 +81,7 @@ const DATASET_DOWNLOADS = {
   inflation: "/downloads/data/inflation-cpi-national.csv",
   unemployment: null,
   trade: null,
+  "external-flows": null,
   // Demography has no bulk files and no MCP entry yet (spec section 10).
   demography: null,
   wages: null,
@@ -101,6 +103,7 @@ const DATASET_JSON_DOWNLOADS = {
   inflation: [],
   unemployment: [],
   trade: [],
+  "external-flows": [],
   demography: [],
   wages: [],
   debt: [
@@ -126,6 +129,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   inflation: [],
   unemployment: [],
   trade: [],
+  "external-flows": [],
   demography: [],
   wages: [],
 } as const;
@@ -172,12 +176,12 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
       {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
       {dataset === "demography" ? null : (
       <JsonLd
-        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" ? {
+        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" || dataset === "external-flows" ? {
           "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
           url: `${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`, locale)}`,
           temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
           spatialCoverage: { "@type": "Place", name: seoMessage(locale, "seo.country") },
-          creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
+          creator: dataset === "external-flows" ? { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" } : { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
           publisher: { "@id": `${resolveSiteUrl()}/#organization` },
         } : dataset === "inflation" ? {
           "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,

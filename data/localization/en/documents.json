@@ -3698,6 +3698,51 @@
     },
     "documentLanguage": "en"
   },
+  "nbg_money_transfers_by_countries": {
+    "title": {
+      "text": "Money transfers by country",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Bank of Georgia (NBG)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Bank of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "nbg_balance_of_payments_bpm6": {
+    "title": {
+      "text": "Balance of payments of Georgia (BPM6)",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Bank of Georgia (NBG)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Bank of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
+  "nbg_external_sector_methodology": {
+    "title": {
+      "text": "External sector statistics methodology (BPM6)",
+      "reviewedAt": "2026-10-10"
+    },
+    "publisher": {
+      "text": "National Bank of Georgia (NBG)",
+      "reviewedAt": "2026-10-10"
+    },
+    "attribution": {
+      "text": "National Bank of Georgia",
+      "reviewedAt": "2026-10-10"
+    },
+    "documentLanguage": "en"
+  },
   "geostat_earnings_annual_headline": {
     "title": { "text": "Average monthly nominal earnings of employees", "reviewedAt": "2026-10-10" },
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },

@@ -1,0 +1,367 @@
+{
+  "geostat/FDI_Eng-ages.xlsx": [
+    {
+      "sheet": "FDI",
+      "rows": 32,
+      "max_column": 208,
+      "first_year": 2016,
+      "last_year": 2026,
+      "first_period_label": "2016 Q I",
+      "last_period_label": "08.09.2026"
+    },
+    {
+      "sheet": "FDI(annual)",
+      "rows": 32,
+      "max_column": 208,
+      "first_year": 2016,
+      "last_year": 2026,
+      "first_period_label": "2016",
+      "last_period_label": "17.08.2026"
+    }
+  ],
+  "geostat/FDI_Eng-components.xlsx": [
+    {
+      "sheet": "Components",
+      "rows": 33,
+      "max_column": 208,
+      "first_year": 2013,
+      "last_year": 2026,
+      "first_period_label": "2013 Q I",
+      "last_period_label": "2026* Q II"
+    },
+    {
+      "sheet": "Components (annual)",
+      "rows": 32,
+      "max_column": 28,
+      "first_year": 2013,
+      "last_year": 2025,
+      "first_period_label": "2013",
+      "last_period_label": "2025"
+    }
+  ],
+  "geostat/FDI_Eng-countries.xlsx": [
+    {
+      "sheet": "FDI",
+      "rows": 108,
+      "max_column": 208,
+      "first_year": 1996,
+      "last_year": 2026,
+      "first_period_label": "1996",
+      "last_period_label": "2026* Q II"
+    },
+    {
+      "sheet": "FDI (annual)",
+      "rows": 111,
+      "max_column": 208,
+      "first_year": 1996,
+      "last_year": 2025,
+      "first_period_label": "1996",
+      "last_period_label": "2025"
+    }
+  ],
+  "geostat/FDI_Eng-sectors-NACE-2.xlsx": [
+    {
+      "sheet": "ENG",
+      "rows": 44,
+      "max_column": 208,
+      "first_year": 2016,
+      "last_year": 2026,
+      "first_period_label": "2016 Q I",
+      "last_period_label": "2026* Q II"
+    },
+    {
+      "sheet": "ENG (annual)",
+      "rows": 44,
+      "max_column": 208,
+      "first_year": 2016,
+      "last_year": 2025,
+      "first_period_label": "2016",
+      "last_period_label": "2025"
+    }
+  ],
+  "geostat/FDI_Eng-sizes.xlsx": [
+    {
+      "sheet": "FDI",
+      "rows": 29,
+      "max_column": 208,
+      "first_year": 2016,
+      "last_year": 2026,
+      "first_period_label": "2016 Q I",
+      "last_period_label": "08.09.2026"
+    },
+    {
+      "sheet": "FDI (annual)",
+      "rows": 29,
+      "max_column": 208,
+      "first_year": 2016,
+      "last_year": 2026,
+      "first_period_label": "2016",
+      "last_period_label": "17.08.2026"
+    },
+    {
+      "sheet": "definition of size classes",
+      "rows": 4,
+      "max_column": 2,
+      "first_year": null,
+      "last_year": null,
+      "first_period_label": null,
+      "last_period_label": null
+    }
+  ],
+  "geostat/FDI_Eng-sources.xlsx": [
+    {
+      "sheet": "sources",
+      "rows": 141,
+      "max_column": 208,
+      "first_year": 2007,
+      "last_year": 2026,
+      "first_period_label": "2007 Q I",
+      "last_period_label": "08.09.2026"
+    },
+    {
+      "sheet": "sources (annual)",
+      "rows": 31,
+      "max_column": 208,
+      "first_year": 2007,
+      "last_year": 2026,
+      "first_period_label": "2007",
+      "last_period_label": "17.08.2026"
+    }
+  ],
+  "geostat/FDI_Eng_bpm6.xlsx": [
+    {
+      "sheet": "Sheet1",
+      "rows": 155,
+      "max_column": 62,
+      "first_year": 2000,
+      "last_year": 2026,
+      "first_period_label": "2000 Q I",
+      "last_period_label": "2026* Q II"
+    }
+  ],
+  "geostat/FDI_Eng_by_Quarters.xlsx": [
+    {
+      "sheet": "FDI",
+      "rows": 55,
+      "max_column": 208,
+      "first_year": 1996,
+      "last_year": 2026,
+      "first_period_label": "1996",
+      "last_period_label": "2026*"
+    }
+  ],
+  "geostat/FDI_Eng_regions.xlsx": [
+    {
+      "sheet": "ENG",
+      "rows": 41,
+      "max_column": 88,
+      "first_year": 2009,
+      "last_year": 2026,
+      "first_period_label": "2009 Q I",
+      "last_period_label": "2026* Q II"
+    },
+    {
+      "sheet": "ENG (annual)",
+      "rows": 42,
+      "max_column": 208,
+      "first_year": 2009,
+      "last_year": 2025,
+      "first_period_label": "2009",
+      "last_period_label": "2025"
+    }
+  ],
+  "geostat/FDI_Eng_stocks-countries.xlsx": [
+    {
+      "sheet": "countries-ENG",
+      "rows": 109,
+      "max_column": 213,
+      "first_year": 2015,
+      "last_year": 2026,
+      "first_period_label": "2015-12",
+      "last_period_label": "30.06.2026*"
+    }
+  ],
+  "geostat/FDI_Eng_stocks-sectors.xlsx": [
+    {
+      "sheet": "FDI Sectors",
+      "rows": 46,
+      "max_column": 213,
+      "first_year": 2000,
+      "last_year": 2026,
+      "first_period_label": "2000",
+      "last_period_label": "30.06.2026*"
+    }
+  ],
+  "nbg/BOP-6_bopbpm6eng.xlsx": [
+    {
+      "sheet": "BOP–BPM6",
+      "rows": 871,
+      "max_column": 133,
+      "first_year": 2000,
+      "last_year": 2026,
+      "first_period_label": "2000Q1",
+      "last_period_label": "2026Q2"
+    },
+    {
+      "sheet": "BOP–BPM6(short)",
+      "rows": 40,
+      "max_column": 133,
+      "first_year": 2000,
+      "last_year": 2026,
+      "first_period_label": "2000Q1",
+      "last_period_label": "2026Q2"
+    },
+    {
+      "sheet": "BOP-anlt",
+      "rows": 63,
+      "max_column": 107,
+      "first_year": 2000,
+      "last_year": 2026,
+      "first_period_label": "2000Q1",
+      "last_period_label": "2026Q2"
+    },
+    {
+      "sheet": "contact",
+      "rows": 6,
+      "max_column": 1,
+      "first_year": null,
+      "last_year": null,
+      "first_period_label": null,
+      "last_period_label": null
+    }
+  ],
+  "nbg/IIP-6_iip-bpm6-eng.xlsx": [
+    {
+      "sheet": "IIP-1 (BPM6)",
+      "rows": 1151,
+      "max_column": 108,
+      "first_year": 1999,
+      "last_year": 2026,
+      "first_period_label": "1999-12",
+      "last_period_label": "2026-06"
+    },
+    {
+      "sheet": "IIP-2 (BPM6)",
+      "rows": 1152,
+      "max_column": 532,
+      "first_year": 1999,
+      "last_year": 2026,
+      "first_period_label": "1999-12",
+      "last_period_label": "2026-06"
+    },
+    {
+      "sheet": "contact",
+      "rows": 6,
+      "max_column": 1,
+      "first_year": null,
+      "last_year": null,
+      "first_period_label": null,
+      "last_period_label": null
+    }
+  ],
+  "nbg/REMC_money-transfers-by-countries-eng.xlsx": [
+    {
+      "sheet": "MTR Note",
+      "rows": 9,
+      "max_column": 2,
+      "first_year": null,
+      "last_year": null,
+      "first_period_label": null,
+      "last_period_label": null
+    },
+    {
+      "sheet": "2012-2026 (eng) ",
+      "rows": 260,
+      "max_column": 353,
+      "first_year": 2012,
+      "last_year": 2026,
+      "first_period_label": "Money Transfers by  Countries 2012-2026 (thousand USD)",
+      "last_period_label": "2026-08"
+    },
+    {
+      "sheet": "2010-2011 (eng)",
+      "rows": 258,
+      "max_column": 49,
+      "first_year": 2010,
+      "last_year": 2011,
+      "first_period_label": "Money Transfers by Countries 2010-2011 (thousand USD)",
+      "last_period_label": "2011-12"
+    },
+    {
+      "sheet": "2008-2009(eng)",
+      "rows": 257,
+      "max_column": 57,
+      "first_year": 2008,
+      "last_year": 2009,
+      "first_period_label": "Money Transfers by Countries 2008-2009 (thousand USD)",
+      "last_period_label": "2009-12"
+    },
+    {
+      "sheet": "2000-2007(eng)",
+      "rows": 254,
+      "max_column": 193,
+      "first_year": 1981,
+      "last_year": 2035,
+      "first_period_label": "1981",
+      "last_period_label": "2035"
+    }
+  ],
+  "nbg/REMM_money-transfers-by-months-eng.xlsx": [
+    {
+      "sheet": "MTR Note",
+      "rows": 9,
+      "max_column": 2,
+      "first_year": null,
+      "last_year": null,
+      "first_period_label": null,
+      "last_period_label": null
+    },
+    {
+      "sheet": "1999-2026 E",
+      "rows": 21,
+      "max_column": 60,
+      "first_year": 1999,
+      "last_year": 2026,
+      "first_period_label": "1999",
+      "last_period_label": "2026"
+    }
+  ],
+  "nbg/REMS_money-transfers-by-systems-eng.xlsx": [
+    {
+      "sheet": "MTR Note",
+      "rows": 9,
+      "max_column": 2,
+      "first_year": null,
+      "last_year": null,
+      "first_period_label": null,
+      "last_period_label": null
+    },
+    {
+      "sheet": "MT by Systems2012-2026 (Eng)",
+      "rows": 110,
+      "max_column": 177,
+      "first_year": 2012,
+      "last_year": 2026,
+      "first_period_label": "Money Transfers by Systems 2012-2026 (thousand USD)",
+      "last_period_label": "2026-08"
+    },
+    {
+      "sheet": "MT by Systems2010-2011 (Eng)",
+      "rows": 114,
+      "max_column": 25,
+      "first_year": 2010,
+      "last_year": 2011,
+      "first_period_label": "Money Transfers by Systems 2010-2011* (thousand USD)",
+      "last_period_label": "2011-12"
+    },
+    {
+      "sheet": " MT by Systems2008-2009 (Eng)",
+      "rows": 108,
+      "max_column": 25,
+      "first_year": 2008,
+      "last_year": 2009,
+      "first_period_label": "Money Transfers by Systems 2008-2009 (USD)",
+      "last_period_label": "2009-12"
+    }
+  ]
+}

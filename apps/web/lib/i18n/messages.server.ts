@@ -25,6 +25,7 @@ const dictionaries = {
     seo: () => import("./messages/ka/seo.json"),
     inflation: () => import("./messages/ka/inflation.json"),
     demography: () => import("./messages/ka/demography.json"),
+    external: () => import("./messages/ka/external.json"),
   },
   en: {
     wages: () => import("./messages/en/wages.json"),
@@ -50,6 +51,7 @@ const dictionaries = {
     seo: () => import("./messages/en/seo.json"),
     inflation: () => import("./messages/en/inflation.json"),
     demography: () => import("./messages/en/demography.json"),
+    external: () => import("./messages/en/external.json"),
   },
 } satisfies Record<Locale, Record<MessageScope, () => Promise<{ default: Messages }>>>;
 

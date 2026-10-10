@@ -8,6 +8,8 @@ import { loadWagesFacts, assertWagesParity } from "../lib/data/wages/importWages
 import { wagesSourceDocumentId } from "../lib/data/wages/types";
 import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tradePartners/importTradePartners";
 import { TRADE_PARTNER_DOCUMENT_IDS } from "../lib/data/tradePartners/types";
+import { loadMoneyTransfersData, assertMoneyTransfersParity } from "../lib/data/externalFlows/importMoneyTransfers";
+import { MONEY_TRANSFER_SOURCES } from "../lib/data/externalFlows/types";
 import { loadTradeProductsData, assertTradeProductsParity } from "../lib/data/tradeProducts/importTradeProducts";
 import { TRADE_PRODUCT_DOCUMENT_IDS } from "../lib/data/tradeProducts/types";
 import {
@@ -38,6 +40,9 @@ import {
   tradePartnerEntityMirrorCreateRows,
   tradePartnerFactMirrorCreateRows,
   loadTradePartnersDataFromMirror,
+  moneyTransferEntityMirrorCreateRows,
+  moneyTransferFactMirrorCreateRows,
+  loadMoneyTransfersDataFromMirror,
   tradeProductEntityMirrorCreateRows,
   tradeProductFactMirrorCreateRows,
   loadTradeProductsDataFromMirror,
@@ -284,6 +289,8 @@ async function main() {
   assertSubset("Wages source IDs", wagesFacts.map(f => wagesSourceDocumentId(f.sourceId)), sourceIds);
   const tradePartners = await loadTradePartnersData();
   assertSubset("Trade partner source IDs", Object.values(TRADE_PARTNER_DOCUMENT_IDS), sourceIds);
+  const moneyTransfers = await loadMoneyTransfersData();
+  assertSubset("Money transfer source IDs", Object.values(MONEY_TRANSFER_SOURCES), sourceIds);
   const tradeProducts = await loadTradeProductsData();
   assertSubset("Trade product source IDs", Object.values(TRADE_PRODUCT_DOCUMENT_IDS), sourceIds);
   const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
@@ -468,6 +475,8 @@ async function main() {
         await tx.wagesFact.deleteMany();
         await tx.tradePartnerFact.deleteMany();
         await tx.tradePartnerEntity.deleteMany();
+        await tx.moneyTransferFact.deleteMany();
+        await tx.moneyTransferEntity.deleteMany();
         await tx.tradeProductFact.deleteMany();
         await tx.tradeProductEntity.deleteMany();
         await tx.regionalEconomyFact.deleteMany();
@@ -750,6 +759,10 @@ async function main() {
         await tx.tradePartnerFact.createMany({ data: tradePartnerFactMirrorCreateRows(tradePartners.facts, run.id) });
         const mirrorTradePartners = await loadTradePartnersDataFromMirror(tx);
         assertTradePartnersParity(tradePartners, mirrorTradePartners);
+        await tx.moneyTransferEntity.createMany({ data: moneyTransferEntityMirrorCreateRows(moneyTransfers.entities, run.id) });
+        await tx.moneyTransferFact.createMany({ data: moneyTransferFactMirrorCreateRows(moneyTransfers.facts, run.id) });
+        const mirrorMoneyTransfers = await loadMoneyTransfersDataFromMirror(tx);
+        assertMoneyTransfersParity(moneyTransfers, mirrorMoneyTransfers);
         await tx.tradeProductEntity.createMany({ data: tradeProductEntityMirrorCreateRows(tradeProducts.entities, run.id) });
         const productRows = tradeProductFactMirrorCreateRows(tradeProducts.facts, run.id);
         for (let start = 0; start < productRows.length; start += 1000) {
@@ -1052,6 +1065,8 @@ async function main() {
             { table: "WagesFact", csvRows: wagesFacts.length, dbRows: mirrorWagesFacts.length },
             { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
             { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },
+            { table: "MoneyTransferEntity", csvRows: moneyTransfers.entities.length, dbRows: mirrorMoneyTransfers.entities.length },
+            { table: "MoneyTransferFact", csvRows: moneyTransfers.facts.length, dbRows: mirrorMoneyTransfers.facts.length },
             { table: "TradeProductEntity", csvRows: tradeProducts.entities.length, dbRows: mirrorTradeProducts.entities.length },
             { table: "TradeProductFact", csvRows: tradeProducts.facts.length, dbRows: mirrorTradeProducts.facts.length },
             { table: "RegionalEconomyFact", csvRows: regionalEconomyFacts.length, dbRows: mirrorRegionalEconomyFacts.length },

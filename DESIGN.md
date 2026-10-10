@@ -28,7 +28,7 @@ Superseded and must not appear in production:
 
 Fiscal.ge is a Georgian-first explorer of reviewed annual budget, economy and demography data plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), the annual unemployment explorer, the Wages hub (§30), the Trade hub (national goods overview), the Demography hub (Population), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
+Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Inflation hub (overview, categories, cities), the annual unemployment explorer, the Wages hub (§31), the Trade hub (national goods overview), the Demography hub (Population), methodology pages, the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
 Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
@@ -354,14 +354,16 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/unemployment/regions/[id]                     Region indicators and trends (§27)
 /explorer/unemployment/age                              Age-group comparisons (§27)
 /explorer/unemployment/gender                           Women/men comparisons (§27)
-/explorer/wages                       ხელფასები         Wages hub (§30)
-/explorer/wages/overview                                Average wage with women/men and public/non-public subcategories, and the median (§30)
-/explorer/wages/industries                              Wages by economic activity for a chosen group (§30)
-/explorer/wages/regions                                 Region map and ranked list (§30)
-/explorer/wages/regions/[id]                            11 region wage pages (§30)
+/explorer/wages                       ხელფასები         Wages hub (§31)
+/explorer/wages/overview                                Average wage with women/men and public/non-public subcategories, and the median (§31)
+/explorer/wages/industries                              Wages by economic activity for a chosen group (§31)
+/explorer/wages/regions                                 Region map and ranked list (§31)
+/explorer/wages/regions/[id]                            11 region wage pages (§31)
 /explorer/trade                       საგარეო ვაჭრობა   Trade hub (§28)
 /explorer/trade/overview                                National goods overview (§28)
 /explorer/trade/partners                                Trading partners (§28.1)
+/explorer/external                    საგარეო ნაკადები   External flows hub (§30)
+/explorer/external/money-from-abroad                    Money from abroad (§30)
 /explorer/demography                  დემოგრაფია        Demography hub (§29)
 /explorer/demography/population                         Population on 1 January: index — municipality map, key figures, ranked list (§29)
 /explorer/demography/population/georgia                 Georgia page (§29)
@@ -449,8 +451,8 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- Seven dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `უმუშევრობა` → `/explorer/unemployment`, `ხელფასები` → `/explorer/wages`, `საგარეო ვაჭრობა` → `/explorer/trade`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
-- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Inflation's overview / categories / cities, Unemployment's national overview / regions / age groups / gender, Wages' overview / industries / regions, Trade's Overview, or Demography's published pages (Population, which stays current on its place pages too), all in the section-row style below.
+- Eight dataset links, in order: `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ინფლაცია` → `/explorer/inflation`, `უმუშევრობა` → `/explorer/unemployment`, `ხელფასები` → `/explorer/wages`, `საგარეო ვაჭრობა` → `/explorer/trade`, `საგარეო ნაკადები` → `/explorer/external`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
+- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Inflation's overview / categories / cities, Unemployment's national overview / regions / age groups / gender, Wages' overview / industries / regions, Trade's Overview, External flows' Money from abroad, or Demography's published pages (Population, which stays current on its place pages too), all in the section-row style below.
 - Teaser datasets (none today) — an `ink-fg-muted` label with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`), rendered at reduced emphasis (opacity 0.6) so it never reads as a live row. Markers only: not links, not focusable, no route, no data. With none, the sidebar renders no teaser list at all.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a). `ChevronsLeft`/`ChevronsRight` are desktop-only; below 900px the toggle is the Lucide `Menu` / `X` pair (accessible name `მენიუ` / `Menu`, 44×44, no border).
@@ -1207,7 +1209,15 @@ Approved 2026-10-09 (`docs/superpowers/specs/2026-10-04-demography-births-deaths
 
 **National page.** `/explorer/demography/births-deaths` (under `/en` in English) is one scrolling page with no tabs, no range or year control and no hash state of its own (the reused places list keeps its `lvl` hash), in the Migration page shell (§29.1). It has its own sidebar entry, `შობადობა და სიკვდილიანობა` (`Births and deaths` in English). It has three blocks. First the places block, which is the Population index layout (`MunicipalitiesIndex`: map, legend, four key figures, ranked list with municipality and region tabs and search) coloured and ranked by births per 100 deaths in 2025; the key figures are the births, the deaths, Georgia's births per 100 deaths and the number of municipalities with more deaths than births, and every row opens that place's page at `#births-deaths`. Then `ნაყოფიერება`: the total fertility rate as a line with the census marker, and the age-specific rates by age of the mother as one line per year, 2014 (`#3D5A98`) and 2025 (`#B3402A`) coloured and named in a legend, the other years in `#94856D`; each is a line chart with a `ხაზი / ცხრილი` switch, and one Excel download covers both fertility charts. Last `სიცოცხლის მოსალოდნელი ხანგრძლივობა დაბადებისას`: three lines, total in ink, men in `sex.male` and women in `sex.female`, with the census marker, the same `ხაზი / ცხრილი` switch and its own Excel download.
 
-## 30. Wages surfaces
+## 30. External flows hub and Money from abroad
+
+Approved on 2026-10-10; scope owner: `Project_Definition.md` §2F. The sidebar's `საგარეო ნაკადები` / External flows link follows Trade and precedes Demography; its Money from abroad child appears only in the active External flows context. The hub at `/explorer/external` reuses the shared hub cards: 01 Money from abroad (sparkline of transfers received, data-derived coverage) and non-clickable `მალე` cards 02 Foreign investment and 03 Current account.
+
+Money from abroad follows Trading partners (§28.1): trends first, then the end-year country ranking; it has no summary-figures block. Two text tabs above the workspace choose one direction, `შემოსული` / Received (initial) or `გასული` / Sent; it applies to every line, the ranking and the table. One series list holds the all-country transfer total (first, selected initially, removable), the range end year's top 10 countries in ranking order, and `სხვა ქვეყნები` / Other countries: the total less those ten, so the list adds up to the total. There are no browsing tabs and no personal-transfers estimate. Search never scopes Clear / Select all or the count.
+
+Coverage marks reuse existing chart and table support rather than new components. A partial-month value (2019) is a hollow point on the line (an optional chart-series flag, off by default), carries the chart hover's and the table's `არასრ.` / partial mark, explained in a note under the chart, and the ranking and Excel print its month count. The January 2010 microfinance change is explained in methodology only; the chart and table carry no break marker. Missing values are gaps, dashes and blank Excel cells. The ranking states amounts in million USD whatever the chart's scale; it lists the same top 10 and ends with Other countries, unranked, with its share; there is no show-all list. As on Trading partners, ranking rows do not toggle the selection. The page footer and methodology cite the National Bank of Georgia. Approved spec: `docs/superpowers/specs/2026-10-10-money-from-abroad-design.md`.
+
+## 31. Wages surfaces
 
 The Wages hub at `/explorer/wages` reuses the budget hub cards: Wages overview, Industries and Regions, in that order, with coverage from served facts. Only the overview card carries a sparkline (the Georgia average) and a latest figure; the others show their own coverage. The sidebar lists the same three pages under `ხელფასები`, after Unemployment.
 
@@ -1217,4 +1227,4 @@ All three pages reuse the Unemployment workspace: the latest-value line for the 
 - **Industries** has the compact native dropdown from the unemployment age page for the group (All employees, Women, Men, Public, Non-public, Business, Non-business, Median). The list is the group's all-activities total, selected by default, and each section that group publishes. The Business and Non-business groups carry a one-line definition of the non-business group. Below the workspace, the unemployment age heatmap shows every listed section by year for the group and active years, independently of the chart selection; long section names wrap in its row header.
 - **Regions** reuses the eleven-region map and ranked list, coloured by the latest average wage, with the occupied-territory overlays, and nothing below them; a map or list region opens its own page (owner amendment, 2026-10-10). A region page follows the Unemployment region page: `ხელფასები — {region}` heading with the region picker and previous/next links, the region's average wage selected by default and the Georgia average as a removable second line, the region's own years, Excel and the head-office caveat.
 
-URL state (Industries group, chart/table, years and selection, including an empty one) survives reloads and language switches. The authoritative scope is `Project_Definition.md` §2F; bounded decisions are in `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`.
+URL state (Industries group, chart/table, years and selection, including an empty one) survives reloads and language switches. The authoritative scope is `Project_Definition.md` §2G; bounded decisions are in `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`.

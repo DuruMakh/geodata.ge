@@ -39,6 +39,8 @@ export type ChartSeries = {
   forecastFromYear?: number;
   /** Reference lines (the NBG target) draw dashed and without an end dot. */
   dashed?: boolean;
+  /** Draws a hollow point on each `preliminary` value, so it is marked without hovering. */
+  hollowPreliminary?: boolean;
 };
 
 type EditorialLineChartProps = {
@@ -452,7 +454,7 @@ export function EditorialLineChart({
               ))}
               {line.dashed ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
               {points
-                .filter(([, , index]) => line.planned[index])
+                .filter(([, , index]) => line.planned[index] || (line.hollowPreliminary && line.preliminary?.[index]))
                 .map(([px, py, index]) => (
                   <circle key={`planned-${index}`} cx={px} cy={py} r={3} fill="#F7F2E9" stroke={line.color} strokeWidth={1.5} />
                 ))}

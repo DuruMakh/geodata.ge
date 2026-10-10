@@ -40,9 +40,11 @@ export function DataSidebar() {
   const tradeActive = pathname.includes("/explorer/trade");
   const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
   const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
+  const externalActive = pathname.includes("/explorer/external");
+  const moneyFromAbroadActive = pathname.endsWith("/explorer/external/money-from-abroad");
   const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
   const demographyActive = pathname.includes("/explorer/demography");
-  const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !wagesActive && !tradeActive && !demographyActive;
+  const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !wagesActive && !tradeActive && !externalActive && !demographyActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
   const regionsActive = pathname.includes("/explorer/economy/regions");
@@ -194,7 +196,7 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, tradeActive ? "common.dataTrade" : wagesActive ? "common.dataWages" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : wagesActive ? "common.dataWages" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
@@ -367,6 +369,19 @@ export function DataSidebar() {
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeProductsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeProducts")}
+            </Link> : null}
+            <Link href={pageHref("/explorer/external", locale)} data-testid="external-link" aria-current={pathname.endsWith("/explorer/external") ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${externalActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.external")}
+            </Link>
+            {externalActive ? <Link href={pageHref("/explorer/external/money-from-abroad", locale)} data-testid="money-from-abroad-link" aria-current={moneyFromAbroadActive ? "page" : undefined}
+              onNavigate={(event) => {
+                if (moneyFromAbroadActive) event.preventDefault();
+                setSheetOpen(false);
+              }}
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${moneyFromAbroadActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${moneyFromAbroadActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+              {message(messages, "common.moneyFromAbroad")}
             </Link> : null}
             <Link
               href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}

@@ -28,6 +28,7 @@ import type { SectorObservation } from "../data/economicSectors/types";
 import type { UnemploymentObservation } from "../data/unemployment/types";
 import { TRADE_OVERVIEW_DOCUMENT_ID, type TradeOverviewFact } from "../data/tradeOverview/types";
 import { TRADE_PARTNER_DOCUMENT_IDS, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData } from "../data/tradePartners/types";
+import { MONEY_TRANSFER_SOURCES, type MoneyTransferEntity, type MoneyTransferFact, type MoneyTransfersData } from "../data/externalFlows/types";
 import { TRADE_PRODUCT_DOCUMENT_IDS, type TradeProductEntity, type TradeProductFact, type TradeProductsData } from "../data/tradeProducts/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
@@ -507,6 +508,27 @@ export async function loadTradePartnersDataFromMirror(db: Pick<MirrorClient, "tr
   const facts = factRows.map(row => {
     if (!TRADE_PARTNER_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_PARTNER_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId) throw new Error("Trade partner source relation mismatch");
     return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradePartnerFact["indicatorId"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as TradePartnerFact["valueStatus"], publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradePartnerFact["role"], sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock, lastReviewedAt: isoDate(row.lastReviewedAt) };
+  });
+  return { entities, facts };
+}
+
+export function moneyTransferEntityMirrorCreateRows(entities: readonly MoneyTransferEntity[], importRunId: string): Prisma.MoneyTransferEntityCreateManyInput[] {
+  return entities.map(entity => ({ ...entity, importRunId }));
+}
+
+export function moneyTransferFactMirrorCreateRows(facts: readonly MoneyTransferFact[], importRunId: string): Prisma.MoneyTransferFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({ ...fact, sourceDocumentId: fact.sourceId, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId }));
+}
+
+export async function loadMoneyTransfersDataFromMirror(db: Pick<MirrorClient, "moneyTransferEntity" | "moneyTransferFact">): Promise<MoneyTransfersData> {
+  const [entityRows, factRows] = await Promise.all([
+    db.moneyTransferEntity.findMany({ orderBy: { id: "asc" } }),
+    db.moneyTransferFact.findMany({ orderBy: [{ entityId: "asc" }, { year: "asc" }, { measure: "asc" }] }),
+  ]);
+  const entities = entityRows.map(({ id, kind, labelKa }) => ({ id, kind: kind as MoneyTransferEntity["kind"], labelKa }));
+  const facts = factRows.map(row => {
+    if (!Object.values(MONEY_TRANSFER_SOURCES).some(id => id === row.sourceId) || row.sourceDocumentId !== row.sourceId) throw new Error("Money transfer source relation mismatch");
+    return { entityId: row.entityId, year: row.year, measure: row.measure as MoneyTransferFact["measure"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as MoneyTransferFact["valueStatus"], monthsReported: row.monthsReported, sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCells: row.sourceCells, sourceUnit: row.sourceUnit as MoneyTransferFact["sourceUnit"], vintage: row.vintage, lastReviewedAt: isoDate(row.lastReviewedAt) };
   });
   return { entities, facts };
 }
