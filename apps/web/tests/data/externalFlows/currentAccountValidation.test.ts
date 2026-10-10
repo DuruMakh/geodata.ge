@@ -19,12 +19,12 @@ test("accepts a complete, consistent current account", () => {
 });
 test.each([
   ["missing year", (f: CurrentAccountFact[]) => f.filter(x => x.year !== 2010)],
-  ["extra series", (f: CurrentAccountFact[]) => [...f, { ...f[0], seriesId: "ca.capital" }]],
+  ["extra series", (f: CurrentAccountFact[]) => [...f, { ...f[0], seriesId: "ca.capital" } as unknown as CurrentAccountFact]],
   ["duplicate", (f: CurrentAccountFact[]) => [...f, f[0]]],
   ["null value", (f: CurrentAccountFact[]) => f.map((x, i) => i === 0 ? { ...x, valueUsd: null as unknown as string } : x)],
   ["net not credit minus debit", (f: CurrentAccountFact[]) => f.map(x => x.seriesId === "ca.goods" && x.flow === "net" && x.year === 2005 ? { ...x, valueUsd: "-3" } : x)],
   ["parts not adding to the balance", (f: CurrentAccountFact[]) => f.map(x => x.seriesId === "ca.balance" && x.flow === "credit" && x.year === 2005 ? { ...x, valueUsd: "30" } : x).map(x => x.seriesId === "ca.balance" && x.flow === "net" && x.year === 2005 ? { ...x, valueUsd: "6" } : x)],
   ["wrong source", (f: CurrentAccountFact[]) => f.map((x, i) => i === 0 ? { ...x, sourceId: "source.other" } : x)],
 ] as const)("rejects a %s", (_name, mutate) => {
-  expect(() => validateCurrentAccountFacts(mutate(all()))).toThrow(/current account/i);
+  expect(() => validateCurrentAccountFacts(mutate(all()) as CurrentAccountFact[])).toThrow(/current account/i);
 });
