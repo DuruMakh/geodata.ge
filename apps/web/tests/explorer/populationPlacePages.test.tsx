@@ -101,6 +101,17 @@ describe("place pages", () => {
       expect(await page({ kind: "municipality", slug: "khulo" }, locale), locale).toMatch(/\/methodology\/demography"[^>]*>[^<]+<\/a>\.<\/p>/);
     }
   });
+
+  it("ends every place page with its own births and deaths section", async () => {
+    for (const route of [{ kind: "country" } as const, { kind: "region", id: "imereti" } as const, { kind: "municipality", slug: "batumi" } as const]) {
+      const html = await page(route);
+      expect(count(html, /id="births-deaths"/g)).toBe(1);
+      expect(html.indexOf('data-testid="population-highlights"')).toBeLessThan(html.indexOf('id="births-deaths"'));
+    }
+    const batumi = await page({ kind: "municipality", slug: "batumi" });
+    expect(batumi).toContain("Births and deaths registered in Batumi, 2015–2025.");
+    expect(batumi).not.toContain("Births and deaths registered in Georgia");
+  });
 });
 
 // The rule in docs/data-methodology/demography.md: a page that shows a density says which area it uses for Tbilisi.

@@ -58,6 +58,8 @@ type EditorialLineChartProps = {
   formatPeriod?: (period: number, kind: "axis" | "tooltip") => string;
   /** Annual charts only. No line joins the year before one of these years to it; a dashed rule and the short label mark the gap. */
   breaks?: ReadonlyArray<{ year: number; label: string }>;
+  /** The chart's accessible name; the generic trend label by default. */
+  ariaLabel?: string;
 };
 
 const W = 920;
@@ -145,6 +147,7 @@ export function EditorialLineChart({
   preliminaryLabel,
   formatTooltipValue,
   breaks,
+  ariaLabel,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
   const { ref: layoutRef, mobileWidth } = useChartLayout();
@@ -279,7 +282,7 @@ export function EditorialLineChart({
         data-geometry={plot.mobile ? "mobile" : "desktop"}
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={message(messages, "controls.chartTrend")}
+        aria-label={ariaLabel ?? message(messages, "controls.chartTrend")}
         className={`h-auto w-full ${className}`}
         {...handlers}
       >

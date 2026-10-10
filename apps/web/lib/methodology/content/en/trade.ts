@@ -4,8 +4,8 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
   "id": "trade",
   "slug": "trade",
   "title": "External trade in goods",
-  "summary": "Georgia’s annual goods exports, imports, total trade and trade balance nationally, by partner country and by country group in nominal USD.",
-  "reviewedAt": "2026-10-08",
+  "summary": "Georgia’s annual goods trade nationally, by partner country, country group and four-digit product code in nominal USD.",
+  "reviewedAt": "2026-10-10",
   "archiveManifestId": "trade",
   "coverageSource": {
     "kind": "archive"
@@ -13,7 +13,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
   "canonicalDocuments": [
     "docs/data-methodology/trade-annual.md"
   ],
-  "disclosure": "The Overview and Trading partners pages use separately reviewed annual goods subsets. Services, partial-year data and other trade breakdowns remain outside these pages.",
+  "disclosure": "Overview, Trading partners and Products use separately reviewed annual goods subsets. Services and partial-year data remain outside these pages.",
   "keyFacts": [
     {
       "label": "Coverage",
@@ -41,7 +41,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "scope",
       "title": "Which trade is covered?",
       "paragraphs": [
-        "Annual national totals, individual partner countries and five published country groups are covered. Total exports include re-exports. Separate re-export, product, regional and services comparisons are excluded. The incomplete 2026 column is not served."
+        "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Separate re-export, regional and services comparisons are excluded. The incomplete 2026 column is not served."
       ]
     },
     {
@@ -57,7 +57,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "classification",
       "title": "Values and comparability",
       "paragraphs": [
-        "Values are nominal US dollars, without inflation adjustment or currency conversion. National source totals use million USD; partner sources use thousand USD. Fiscal.ge converts the exact values to USD. Exports use FOB valuation at the exporting border. Imports use CIF valuation, including transport and insurance to the importing border."
+        "Values are nominal US dollars, without inflation adjustment or currency conversion. National source totals use million USD; partner and product sources use thousand USD. Fiscal.ge converts the exact values to USD. Exports use FOB valuation at the exporting border. Imports use CIF valuation, including transport and insurance to the importing border."
       ]
     },
     {
@@ -80,12 +80,23 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       ]
     },
     {
+      "id": "products",
+      "kind": "classification",
+      "title": "Products from 2020",
+      "paragraphs": [
+        "The Products page covers reviewed annual four-digit (HS4) exports and imports from 2020–2025. It shows 1,192 products once each, with their four-digit codes. The national reference, chart, table, ranking and downloads use the same period. Earlier product definitions remain preserved separately in the reviewed data and original archives; they are not joined to the current series.",
+        "The eight browsing categories are navigation aids, not official aggregates; no category totals are invented. Georgian names and search aliases preserve the meaning of the historical source names. Blanks, dashes, absent flows and years outside a source block remain missing. Published numerical zero and negative values retain their signs.",
+        "Products offer exports and imports separately. End-year shares use the matching national goods total. Ranking excludes missing values from numbered ranks; products without an end-year amount remain available for selection."
+      ]
+    },
+    {
       "id": "validation",
       "kind": "validation",
       "title": "How are the figures checked?",
       "paragraphs": [
         "The accepted Overview subset contains 62 original export/import observations and 62 derived totals/balances. Every year has all four indicators. Checks compare the original file fingerprint, exact source cell values, units, year/flow references and both formulas. Exact source decimals are retained; displayed figures use a common rounded USD scale. Missing values are shown as gaps or dashes.",
-        "The accepted partner subset adds 212 country identities and five groups: 12,462 source observations and 10,530 derived amounts. Separate checks verify all four originals, exact cells, roles, units, source codes, missingness, formulas and declared reconciliations against the matching national totals. Groups are never summed. The two UK services source discrepancies remain unresolved outside this accepted goods subset."
+        "The accepted partner subset adds 212 country identities and five groups: 12,462 source observations and 10,530 derived amounts. Separate checks verify all four originals, exact cells, roles, units, source codes, missingness, formulas and declared reconciliations against the matching national totals. Groups are never summed. The two UK services source discrepancies remain unresolved outside this accepted goods subset.",
+        "The complete reviewed product archive retains 4,768 period-qualified identities and 69,624 detail observations. Six original workbooks and every canonical source cell are checked; 62 native total controls reconcile against national totals within USD 1. Exact source decimals and native cell references are retained. The public Products page selects only the 2020–2025 source block from this accepted package. No historical blocks are joined."
       ]
     },
     {
@@ -93,7 +104,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "Seven frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. The HTML captures download as plain-text attachments. Excel follows the chosen measure, years and all selected countries/groups, including selections from the other browsing tab; applicable originals accompany the figures."
+        "Thirteen frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
       ]
     }
   ],
@@ -103,7 +114,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "trade",
       "title": "Which trade is covered?",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "Annual national totals, individual partner countries and five published country groups are covered. Total exports include re-exports. Separate re-export, product, regional and services comparisons are excluded. The incomplete 2026 column is not served.",
+      "summary": "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Separate re-export, regional and services comparisons are excluded. The incomplete 2026 column is not served.",
       "detail": [],
       "canonicalDecisionIds": [
         "trade.scope"
@@ -125,7 +136,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "trade",
       "title": "Values and comparability",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "Values are nominal US dollars, without inflation adjustment or currency conversion. National source totals use million USD; partner sources use thousand USD. Fiscal.ge converts the exact values to USD. Exports use FOB valuation at the exporting border. Imports use CIF valuation, including transport and insurance to the importing border.",
+      "summary": "Values are nominal US dollars, without inflation adjustment or currency conversion. National source totals use million USD; partner and product sources use thousand USD. Fiscal.ge converts the exact values to USD. Exports use FOB valuation at the exporting border. Imports use CIF valuation, including transport and insurance to the importing border.",
       "detail": [],
       "canonicalDecisionIds": [
         "trade.valuation"

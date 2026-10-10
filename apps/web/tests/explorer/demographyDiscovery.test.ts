@@ -7,7 +7,7 @@ import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
 import sitemap from "../../lib/seo/sitemap";
 
-const PAGES = ["/explorer/demography", "/explorer/demography/population", "/explorer/demography/migration", "/methodology/demography"] as const;
+const PAGES = ["/explorer/demography", "/explorer/demography/population", "/explorer/demography/migration", "/explorer/demography/births-deaths", "/methodology/demography"] as const;
 
 // What "indexed in both languages" means, in one place: the page is in the public inventory, has a real English
 // review date, and its Georgian and English sitemap rows name each other. The path is in every message, so a failure
@@ -67,7 +67,7 @@ describe("demography discovery", () => {
       // The served rows come from two files, population and density, reviewed on different days. The pages show
       // both, so the date is the latest over every row of both, read from the facts as the economy pages' test does.
       const latest = (rows: readonly { lastReviewedAt: string }[]) => rows.map((row) => row.lastReviewedAt).sort().at(-1);
-      for (const path of ["/explorer/demography", "/explorer/demography/population", "/explorer/demography/migration", "/explorer/demography/population/batumi"]) {
+      for (const path of ["/explorer/demography", "/explorer/demography/population", "/explorer/demography/migration", "/explorer/demography/births-deaths", "/explorer/demography/population/batumi"]) {
         const entry = entries.find((candidate) => candidate.url === `https://fiscal.ge${path}`);
         expect(new Date(entry!.lastModified!).toISOString().slice(0, 10)).toBe(latest(facts));
       }

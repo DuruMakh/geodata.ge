@@ -62,7 +62,9 @@
   "common.external": "External flows",
   "common.dataExternal": "DATA · EXTERNAL FLOWS",
   "common.moneyFromAbroad": "Money from abroad",
+  "common.tradeProducts": "Products",
   "common.dataDemography": "Data · Demography",
   "common.demographyPopulation": "Population",
-  "common.demographyMigration": "Migration"
+  "common.demographyMigration": "Migration",
+  "common.demographyBirthsDeaths": "Births and deaths"
 }

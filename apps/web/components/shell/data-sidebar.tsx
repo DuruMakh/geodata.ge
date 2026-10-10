@@ -40,6 +40,7 @@ export function DataSidebar() {
   const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
   const externalActive = pathname.includes("/explorer/external");
   const moneyFromAbroadActive = pathname.endsWith("/explorer/external/money-from-abroad");
+  const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
   const demographyActive = pathname.includes("/explorer/demography");
   const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !tradeActive && !externalActive && !demographyActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
@@ -341,6 +342,15 @@ export function DataSidebar() {
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradePartnersActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradePartnersActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradePartners")}
+            </Link> : null}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/products", locale)} data-testid="trade-products-link" aria-current={tradeProductsActive ? "page" : undefined}
+              onNavigate={(event) => {
+                if (tradeProductsActive) event.preventDefault();
+                setSheetOpen(false);
+              }}
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeProductsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+              {message(messages, "common.tradeProducts")}
             </Link> : null}
             <Link href={pageHref("/explorer/external", locale)} data-testid="external-link" aria-current={pathname.endsWith("/explorer/external") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${externalActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>

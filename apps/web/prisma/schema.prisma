@@ -85,6 +85,7 @@ model SourceDocument {
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
   moneyTransferFacts MoneyTransferFact[]
+  tradeProductFacts TradeProductFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
@@ -123,6 +124,8 @@ model ImportRun {
   tradePartnerFacts TradePartnerFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
+  tradeProductEntities TradeProductEntity[]
+  tradeProductFacts TradeProductFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
@@ -576,6 +579,47 @@ model MoneyTransferFact {
   importRun        ImportRun? @relation(fields: [importRunId], references: [id])
 
   @@id([entityId, measure, year])
+}
+
+model TradeProductEntity {
+  id            String @id
+  sourceBlock   String
+  code          String
+  labelKa       String
+  sourceLabelEn String
+  categoryId    String
+  aliasesKa     String[]
+  aliasesEn     String[]
+  importRunId   String?
+  importRun     ImportRun? @relation(fields: [importRunId], references: [id])
+  facts         TradeProductFact[]
+}
+
+model TradeProductFact {
+  entityId           String
+  entity             TradeProductEntity @relation(fields: [entityId], references: [id])
+  year               Int
+  indicatorId        String
+  valueUsd           Decimal? @db.Decimal(40, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  publicationStatus  String
+  role               String
+  sourceId           String
+  sourceRefs         String
+  sourceValue        String?
+  sourceUnit         String
+  sourceLabel        String
+  sourceNumberFormat String
+  sourceBlock        String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime @db.Date
+  importRunId        String?
+  importRun          ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([entityId, indicatorId, year])
 }
 
 model TradeOverviewFact {

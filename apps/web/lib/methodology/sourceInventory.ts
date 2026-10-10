@@ -46,14 +46,14 @@ const inventoryRules = {
   ],
   demography: [
     { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "01-population-by-self-governed-unit.xlsx" },
-    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => ["03-density-by-regions.xlsx", "31-net-migration.xlsx", "33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx"].includes(path.posix.basename(candidatePath)) },
+    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => ["03-density-by-regions.xlsx", "09-number-of-live-births-by-self-governed-units.xlsx", "15-crude-birth-rate.xlsx", "16-age-specific-fertility-rates-and-total-fertility-rate.xlsx", "19-number-of-deaths-by-self-governed-units.xlsx", "24-crude-death-rate.xlsx", "25-infant-mortality-rate-by-sex.xlsx", "28-life-expectancy-at-births-by-sex.xlsx", "29-Natural-increase-by-regions-and-self-governed-units.xlsx", "31-net-migration.xlsx", "33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx"].includes(path.posix.basename(candidatePath)) },
   ],
   inflation: [{ root: "docs/Raw Data/Inflation", include: (candidatePath: string) => [".xlsx", ".pdf"].includes(path.posix.extname(candidatePath).toLowerCase()) }],
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
   unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
-  trade: [{ root: "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official", include: (candidatePath: string) => ["FTrade_1995-2026.xlsx", "Export-Country_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html"].includes(path.posix.basename(candidatePath)) }],
+  trade: [{ root: "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official", include: (candidatePath: string) => ["FTrade_1995-2026.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-1995-1999.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-products--1995-1999_eng.xlsx", "Export-Country_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html"].includes(path.posix.basename(candidatePath)) }],
   "external-flows": [{ root: "docs/Raw Data/External/2026-10-10/official/nbg", include: (candidatePath: string) => ["REMC_money-transfers-by-countries-eng.xlsx", "BOP-6_bopbpm6eng.xlsx", "external-sector-methodology-eng-bpm6updated.pdf"].includes(path.posix.basename(candidatePath)) }],
 } satisfies Record<MethodologyDatasetId, readonly InventoryRule[]>;
 

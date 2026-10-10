@@ -62,7 +62,9 @@
   "common.external": "საგარეო ნაკადები",
   "common.dataExternal": "მონაცემები · საგარეო ნაკადები",
   "common.moneyFromAbroad": "ფული საზღვარგარეთიდან",
+  "common.tradeProducts": "პროდუქტები",
   "common.dataDemography": "მონაცემები · დემოგრაფია",
   "common.demographyPopulation": "მოსახლეობა",
-  "common.demographyMigration": "მიგრაცია"
+  "common.demographyMigration": "მიგრაცია",
+  "common.demographyBirthsDeaths": "შობადობა და სიკვდილიანობა"
 }

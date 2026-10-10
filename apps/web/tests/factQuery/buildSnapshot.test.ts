@@ -15,8 +15,8 @@ describe("buildFactQuerySnapshot", () => {
     ]);
     // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    expect(sources).toHaveLength(161);
-    expect(sources.filter(source => source.sourceId.startsWith("source.geostat_trade_"))).toHaveLength(5);
+    expect(sources).toHaveLength(167);
+    expect(sources.filter(source => source.sourceId.startsWith("source.geostat_trade_"))).toHaveLength(11);
     expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !["source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6"].includes(source.sourceId)).map(source => source.sourceId).sort());
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_trade_"))).toBe(false);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);
