@@ -84,6 +84,7 @@
   "demography.sexFemale": "ქალები",
   "demography.oldBand": "65+ · {share}",
   "demography.rowAria": "{age}: მამაკაცები {men}, ქალები {women}, სულ {total} ({share})",
+  "demography.rowAriaCompare": "{age}: მამაკაცები {men}, ქალები {women}, სულ {total} ({share}); {year}: მამაკაცები {cmpMen}, ქალები {cmpWomen}, სულ {cmpTotal} ({cmpShare})",
   "demography.ageGroupHeader": "ასაკი",
   "demography.totalHeader": "სულ",
   "demography.shareHeader": "წილი",

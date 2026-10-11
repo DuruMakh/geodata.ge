@@ -35,7 +35,8 @@ import { YearPicker } from "../ui/year-picker";
 import { Download } from "./national-vital-charts";
 import { PopulationPyramid } from "./population-pyramid";
 
-const SECTION_CLASS = "mt-16 border-t-2 border-[var(--ink)] pt-[22px]";
+/** The rule and spacing every part of the page opens with, shared with the regional glance below it. */
+export const SECTION_CLASS = "mt-16 border-t-2 border-[var(--ink)] pt-[22px]";
 const percent = (value: number | null) => formatShare(value === null ? null : value / 100);
 
 /** Georgia's age structure on 1 January of every year: the pyramid and the age-by-year heat map. */

@@ -49,6 +49,12 @@ describe("population pyramid", () => {
     expect(html).not.toMatch(GEORGIAN);
   });
 
+  it("with a comparison year, each row's label also names the comparison year", () => {
+    const html = wrap(<PopulationPyramid pyramid={now} year={2026} compare={{ pyramid: then, year: 2004 }} measure="share" ariaLabel="Georgia" testId="pyramid" />);
+    const label = html.match(/aria-label="(0–4: men[^"]*)"/)![1]!;
+    expect(label).toContain("0–4: men 106,170, women 97,930, total 204,100 (5.2%); 2004: men 116,228, women 102,534, total 218,762");
+  });
+
   it("prints persons in the header when the measure is persons", () => {
     const html = wrap(<PopulationPyramid pyramid={now} year={2026} compare={null} measure="persons" ariaLabel="Georgia" testId="pyramid" />);
     expect(html).toContain("1,887,646");
@@ -58,7 +64,7 @@ describe("population pyramid", () => {
 
 describe("pyramid table", () => {
   it("lists 85+ first, then a total row", () => {
-    const html = wrap(<PyramidTable pyramid={now} year={2026} compare={null} caption="Georgia, 2026" />);
+    const html = wrap(<PyramidTable pyramid={now} caption="Georgia, 2026" />);
     expect(html).toContain("<table");
     expect(html.indexOf(">85+<")).toBeLessThan(html.indexOf(">0–4<"));
     expect(html).toMatch(/>Total<[\s\S]*3,941,103/);
@@ -66,12 +72,5 @@ describe("pyramid table", () => {
     expect([...youngest.matchAll(/<td[^>]*>([^<]*)<\/td>/g)].map((cell) => cell[1])).toEqual(["106,170", "97,930", "204,100", "5.2%"]);
     expect(html).toContain(">Age<");
     expect(html).not.toMatch(GEORGIAN);
-  });
-
-  it("repeats the number columns under the comparison year", () => {
-    const html = wrap(<PyramidTable pyramid={now} year={2026} compare={{ pyramid: then, year: 2004 }} caption="Georgia" />);
-    expect(count(html, />Men</g)).toBe(2);
-    expect(html).toContain(">2004<");
-    expect(html).toContain("3,937,716");
   });
 });

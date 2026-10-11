@@ -40,6 +40,10 @@ test.describe("the Age and sex page", () => {
     const tops = await Promise.all(["age-sex-pyramid", "age-sex-heatmap", "age-sex-regions"].map(async (id) => (await page.getByTestId(id).boundingBox())!.y));
     expect(tops[0]).toBeLessThan(tops[1]!);
     expect(tops[1]).toBeLessThan(tops[2]!);
+    // Each part opens with the same 2px ink rule, the regional glance included.
+    for (const id of ["age-sex-pyramid", "age-sex-heatmap", "age-sex-regions"]) {
+      await expect(page.getByTestId(id)).toHaveCSS("border-top-width", "2px");
+    }
     const year = page.getByTestId("age-sex-year-select");
     await expect(year).toHaveText("2026");
     await expect(year).toHaveAttribute("aria-expanded", "false");
@@ -158,6 +162,20 @@ test.describe("the Age and sex page", () => {
     await page.keyboard.press("Escape");
     await expect(compare).toBeFocused();
     await expect(compare).toHaveText("None");
+  });
+
+  test("an open year grid is named by its trigger's aria-controls, and closes when focus moves to another control", async ({ page }) => {
+    await page.goto(NATIONAL);
+    await expectAppReady(page);
+    const trigger = page.getByTestId("age-sex-year-select");
+    await expect(trigger).not.toHaveAttribute("aria-controls", /.+/);
+    const list = await openPicker(page, "age-sex-year-select");
+    await expect(trigger).toHaveAttribute("aria-controls", (await list.getAttribute("id"))!);
+    // Focus leaving for another control closes the grid and stays there; it is not pulled back to the trigger.
+    await page.getByTestId("age-sex-compare-select").focus();
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(page.getByTestId("age-sex-compare-select")).toBeFocused();
+    await expect(trigger).not.toHaveAttribute("aria-controls", /.+/);
   });
 
   test("a grid opened by mouse shows the ring after the arrows, and a click on its footer keeps Escape working", async ({ page }) => {

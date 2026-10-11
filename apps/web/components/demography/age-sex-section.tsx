@@ -83,7 +83,7 @@ export function AgeSexSection({
         {mode === "line" ? (
           <PopulationPyramid pyramid={pyramid} compare={null} measure={measure} ariaLabel={t("pyramidAria", { place: name, date })} testId="age-sex-pyramid" />
         ) : (
-          <PyramidTable pyramid={pyramid} compare={null} caption={t("pyramidTableCaption", { place: name, date })} />
+          <PyramidTable pyramid={pyramid} caption={t("pyramidTableCaption", { place: name, date })} />
         )}
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">

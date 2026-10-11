@@ -8,6 +8,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import type { TemplateValues } from "../../lib/i18n/types";
 import { RegionIndex } from "../regional-economies/regional-economies-index";
 import { SectionTitle } from "../ui/editorial";
+import { SECTION_CLASS } from "./age-sex-explorer";
 
 const percent = (value: number) => formatShare(value / 100);
 
@@ -19,7 +20,7 @@ export function AgeSexRegions({ model, georgiaShare, sourceNote }: { model: Regi
   const oldest = model.regions[0]!;
   const youngest = model.regions.at(-1)!;
   return (
-    <section data-testid="age-sex-regions" className="@container">
+    <section data-testid="age-sex-regions" className={`@container ${SECTION_CLASS}`}>
       <SectionTitle>{t("regionsTitle")}</SectionTitle>
       <div className="mt-6">
         <RegionIndex

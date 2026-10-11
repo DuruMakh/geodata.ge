@@ -84,6 +84,7 @@
   "demography.sexFemale": "Women",
   "demography.oldBand": "65+ · {share}",
   "demography.rowAria": "{age}: men {men}, women {women}, total {total} ({share})",
+  "demography.rowAriaCompare": "{age}: men {men}, women {women}, total {total} ({share}); {year}: men {cmpMen}, women {cmpWomen}, total {cmpTotal} ({cmpShare})",
   "demography.ageGroupHeader": "Age",
   "demography.totalHeader": "Total",
   "demography.shareHeader": "Share",

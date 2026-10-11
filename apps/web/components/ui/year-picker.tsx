@@ -123,6 +123,7 @@ export function YearPicker({
           data-testid={testId}
           aria-haspopup="listbox"
           aria-expanded={open}
+          aria-controls={open ? `${baseId}-list` : undefined}
           aria-labelledby={`${labelId} ${baseId}-trigger`}
           onClick={() => (open ? close() : show())}
           className="flex w-full items-center justify-between gap-3 border-b border-[var(--control)] bg-transparent py-2 text-left text-[12px] font-normal text-[var(--ink)] max-[767px]:min-h-[44px]"
@@ -137,11 +138,17 @@ export function YearPicker({
             <div ref={panelRef} data-testid={`${testId}-panel`} onMouseDown={(event) => event.preventDefault()} className="absolute top-full left-0 z-40 mt-1 w-[248px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]">
               <div
                 ref={listRef}
+                id={`${baseId}-list`}
                 role="listbox"
                 aria-label={label}
                 tabIndex={-1}
                 aria-activedescendant={optionId(active)}
                 onKeyDown={onKeyDown}
+                // Focus that moves to some other control (not the trigger, which close() returns to) closes the panel and leaves focus where it went.
+                onBlur={(event) => {
+                  const next = event.relatedTarget;
+                  if (next instanceof Node && !panelRef.current?.contains(next) && next !== triggerRef.current) setOpen(false);
+                }}
                 className="group grid grid-cols-4 outline-none"
               >
                 {options.map((option, index) =>

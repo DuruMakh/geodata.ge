@@ -104,12 +104,23 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
 
   const rowAria = (index: number) => {
     const row = pyramid.rows[index]!;
-    return t("rowAria", {
+    const own = {
       age: ageGroupLabel(row.group),
       men: persons(row.male),
       women: persons(row.female),
       total: persons(row.male + row.female),
       share: formatShare((row.male + row.female) / pyramid.total),
+    };
+    if (compare === null) return t("rowAria", own);
+    // The national table is gone, so the comparison year is spoken here rather than left unreachable.
+    const other = compare.pyramid.rows[index]!;
+    return t("rowAriaCompare", {
+      ...own,
+      year: compare.year,
+      cmpMen: persons(other.male),
+      cmpWomen: persons(other.female),
+      cmpTotal: persons(other.male + other.female),
+      cmpShare: formatShare((other.male + other.female) / compare.pyramid.total),
     });
   };
 
@@ -261,32 +272,23 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
 }
 
 const HEAD_CELL = "border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-[9px] text-right text-[11px] font-semibold text-[var(--muted)] whitespace-nowrap";
-const GROUP_CELL = "px-3 pt-1.5 pb-1 text-right font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--muted)] whitespace-nowrap";
 const NUMBER_CELL = "px-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap text-[var(--ink)]";
 const LABEL_CELL = "sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left whitespace-nowrap shadow-[1px_0_0_var(--hairline-soft)]";
 const CELL_PAD = { paddingTop: 11, paddingBottom: 11 };
 
 /** The pyramid's table twin: persons and shares by age, oldest first, then the total. */
-export function PyramidTable({ pyramid, year, compare, caption }: {
-  pyramid: Pyramid;
-  /** Names the drawn year's columns when a comparison year sits beside them. */
-  year?: number;
-  compare: Comparison;
-  caption: string;
-}) {
+export function PyramidTable({ pyramid, caption }: { pyramid: Pyramid; caption: string }) {
   const { messages } = useI18n();
   const t = (key: string) => message(messages, `demography.${key}`);
   const headers = [t("sexMale"), t("sexFemale"), t("totalHeader"), t("shareHeader")];
-  const groups = compare === null ? [pyramid] : [pyramid, compare.pyramid];
-  const groupStart = (group: number) => (group > 0 ? { borderLeft: "1px solid var(--hairline)" } : undefined);
-  const cells = (source: Pyramid, male: number, female: number, group: number, bold: boolean) =>
+  const cells = (male: number, female: number, bold: boolean) =>
     [male, female, male + female].map((value, column) => (
-      <td key={`${group}-${column}`} className={NUMBER_CELL} style={{ ...CELL_PAD, ...(column === 0 ? groupStart(group) : undefined), fontWeight: bold ? 600 : 400 }}>
+      <td key={column} className={NUMBER_CELL} style={{ ...CELL_PAD, fontWeight: bold ? 600 : 400 }}>
         {formatInUnit(value, UNIT_PERSONS)}
       </td>
     )).concat(
-      <td key={`${group}-share`} className={NUMBER_CELL} style={{ ...CELL_PAD, fontWeight: bold ? 600 : 400 }}>
-        {formatShare((male + female) / source.total)}
+      <td key="share" className={NUMBER_CELL} style={{ ...CELL_PAD, fontWeight: bold ? 600 : 400 }}>
+        {formatShare((male + female) / pyramid.total)}
       </td>,
     );
 
@@ -296,38 +298,29 @@ export function PyramidTable({ pyramid, year, compare, caption }: {
         <table className="w-full border-collapse">
           <caption className="sr-only">{caption}</caption>
           <thead>
-            {compare === null ? null : (
-              <tr>
-                <th className={`${LABEL_CELL} pt-1.5`} />
-                <th scope="colgroup" colSpan={4} className={GROUP_CELL}>{year ?? ""}</th>
-                <th scope="colgroup" colSpan={4} className={GROUP_CELL} style={groupStart(1)}>{compare.year}</th>
-              </tr>
-            )}
             <tr>
               <th scope="col" className={`${LABEL_CELL} border-b-2 border-[var(--ink)] pt-1.5 pb-[9px] text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]`}>
                 {t("ageGroupHeader")}
               </th>
-              {groups.flatMap((_, group) =>
-                headers.map((header, column) => (
-                  <th key={`${group}-${column}`} scope="col" className={HEAD_CELL} style={column === 0 ? groupStart(group) : undefined}>{header}</th>
-                )),
-              )}
+              {headers.map((header, column) => (
+                <th key={column} scope="col" className={HEAD_CELL}>{header}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {pyramid.rows.map((row, index) => ({ row, index })).reverse().map(({ row, index }) => (
+            {[...pyramid.rows].reverse().map((row) => (
               <tr key={row.group} className="border-b border-[var(--hairline-soft)] hover:bg-[var(--tint)]">
                 <th scope="row" className={`${LABEL_CELL} font-[family-name:var(--font-numeric)] text-[12.5px] font-medium text-[var(--ink)]`} style={CELL_PAD}>
                   {ageGroupLabel(row.group)}
                 </th>
-                {groups.flatMap((source, group) => cells(source, source.rows[index]!.male, source.rows[index]!.female, group, false))}
+                {cells(row.male, row.female, false)}
               </tr>
             ))}
             <tr className="border-t-2 border-[var(--ink)]">
               <th scope="row" className={`${LABEL_CELL} text-[13px] font-semibold text-[var(--ink)]`} style={CELL_PAD}>
                 {t("totalHeader")}
               </th>
-              {groups.flatMap((source, group) => cells(source, source.male, source.female, group, true))}
+              {cells(pyramid.male, pyramid.female, true)}
             </tr>
           </tbody>
         </table>
