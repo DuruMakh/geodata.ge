@@ -43,7 +43,7 @@ Both files are already canonical and validated. This work adds them to the serve
 
 ## 3. National page
 
-`ExplorerPage` → `PageHeader` (coverage `2004–2026`) → `ExplorerHeading` `ასაკი და სქესი` → one lead sentence → three parts in this order (pyramid, heat map, regional glance), each under a `SectionTitle`; the pyramid and the heat map have a source note and an Excel action, the pyramid its chart/table switch. No top-level tabs.
+`ExplorerPage` → `PageHeader` (coverage `2004–2026`) → `ExplorerHeading` `ასაკი და სქესი` → one lead sentence → three parts in this order (pyramid, heat map, regional glance), each under a `SectionTitle`; the pyramid and the heat map have a source note and an Excel action, the national pyramid has no chart/table switch (the place block keeps its own). No top-level tabs.
 
 ### 3.1 Regions by share aged 65+ (regional glance, last)
 
@@ -53,7 +53,7 @@ Both files are already canonical and validated. This work adds them to the serve
 
 - **Controls.**
   - A `წელი` year picker listing 2004–2026 in a four-column grid, the latest selected; 2025 carries an accent `*` and the grid's footer reads `* 2025 — აღწერით გადათვლა`.
-  - A `შედარება წელთან` year picker beside it: a full-width `არცერთი` row first (default, comparison off), then every year except the one shown, 2025 marked the same way. Choosing a year turns the comparison on, `არცერთი` turns it off, and choosing as the shown year the one being compared drops the comparison. The pickers' triggers use Unemployment's underlined select look (`SELECT_CLASS`) and fill their picker; the two pickers share one fixed width side by side (so the measure tabs do not move when a value changes), full width on phones.
+  - A `შედარება წელთან` year picker beside it: a full-width `არცერთი` row first (default, comparison off), then every year except the one shown, 2025 marked the same way. Choosing a year turns the comparison on, `არცერთი` turns it off, and choosing as the shown year the one being compared drops the comparison. The pickers' triggers match Unemployment's underlined select look (`SELECT_CLASS`, which only a native select can use, so the trigger carries its own classes) and fill their picker; the two pickers share one fixed width side by side (so the measure tabs do not move when a value changes), full width on phones.
   - Measure `%` | `ადამიანი`.
 - **Figure.** The pyramid for the selected year, at most 640px wide, centred.
   - Men left, women right. Ages run up the centre gutter, 0–4 at the bottom.
@@ -118,7 +118,7 @@ Owner decision, 2026-10-10, during planning: reuse the Unemployment → Age heat
 - `demographyAgeSexWorkbook.ts`.
 - `components/demography/age-sex-explorer.tsx` (national parts 3.2–3.4) and `age-sex-section.tsx` (place block).
 - `lib/pages/demography-age-sex.tsx` and the `(ka)` and `(en)` route files.
-- `components/ui/year-picker.tsx` (`YearPicker`, owner change of 2026-10-11): `RegionPicker`, `CityPicker` and `EntityPicker` are search-first and navigate by links; none chooses a value in place, so it reuses `RegionPicker`'s panel anatomy and open/close behaviour and the `SELECT_CLASS` trigger look instead.
+- `components/ui/year-picker.tsx` (`YearPicker`, owner change of 2026-10-11): `RegionPicker`, `CityPicker` and `EntityPicker` are search-first and navigate by links; none chooses a value in place, so it reuses `RegionPicker`'s panel anatomy and open/close behaviour and a trigger that matches the `SELECT_CLASS` look with its own classes instead.
 
 ## 6. Pyramid drawing
 
