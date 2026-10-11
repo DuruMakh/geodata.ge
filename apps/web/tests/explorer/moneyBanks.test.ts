@@ -267,7 +267,8 @@ test("the % of GDP workbook exports the calculated shares and cites the GDP sour
     state: { mode: "table", view: "gdp", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ["money.m1", "money.m0"] },
   }, await presentation());
   expect(model.filename).toBe("fiscal-money-supply-gdp-2020-2025-en.xlsx");
-  expect(model.readable.unitLabel).toBe("%");
+  expect(model.readable.unitLabel).toBe("% of GDP");
+  expect(model.analysis.headers[2]).toBe("Share of GDP (%)");
   expect(model.readable.rows.map(row => Number(row.valuesByYear[2025]!.toFixed(1)))).toEqual([19.8, 5.8]);
   expect(new Set(model.analysis.rows.map(row => row[3]))).toEqual(new Set(["Calculated by Fiscal.ge"]));
   expect(model.analysis.rows).toHaveLength(12);

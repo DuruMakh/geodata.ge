@@ -163,7 +163,7 @@ About 730 served values in total. The research package also keeps the API listin
 ## 9. Sources, Excel and methodology
 
 - The NBG workbooks and methodology PDFs are published through the existing source archive (`data/methodology/source-archives/money.csv`). The methodology bundle must not pull large data files (the PR #170 rule).
-- Excel reuses the three-sheet writer (Summary, Data, Sources) in the reader's language: the active tab's selected series and years, explicit units, blank missing cells, the "calculated by fiscal.ge" status on the deposit totals and the two shares, and validated source links. It has no internal identifier or cell-reference columns.
+- Excel reuses the three-sheet writer (Summary, Data, Sources) in the reader's language: the active tab's selected series and years, explicit units, blank missing cells, the "calculated by fiscal.ge" status on the deposit totals and the two shares (and, since the preview review, on M3–M0 as % of GDP), and validated source links. It has no internal identifier or cell-reference columns.
 - `/methodology/money` explains in plain words: what M0–M3 are (NBG's definitions), what "end of year" and NBG's "annual weighted average interest rate" mean here, which banks the tables cover, how foreign-currency amounts are turned into lari, how the foreign-currency share is calculated and how it differs from NBG's ratio, the 2008 change of policy instrument, what each bank-health measure means, the two bank-health breaks (2022 file change, 2023 IFRS review), and that the pages state no causes.
 
 ## 10. Out of scope

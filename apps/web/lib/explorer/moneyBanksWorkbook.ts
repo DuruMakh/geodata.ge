@@ -28,7 +28,8 @@ export function buildMoneyBanksWorkbookExportModel(input: {
   }
   const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
   const isAmount = model.unit === "gel";
-  const unitLabel = t(isAmount ? "unitMlnGel" : "unitPercent");
+  const isGdp = state.view === "gdp";
+  const unitLabel = isGdp ? workbookMessage(locale, "workbook.percentGdp") : t(isAmount ? "unitMlnGel" : "unitPercent");
   const numberFormat = isAmount ? "#,##0.0" : "0.0";
   // The National Bank rate is the one series shown to two decimals.
   const rowFormat = (decimals: number) => !isAmount && decimals === 2 ? "0.00" : undefined;
@@ -54,11 +55,11 @@ export function buildMoneyBanksWorkbookExportModel(input: {
       }),
     },
     analysis: {
-      headers: [workbookMessage(locale, "workbook.year"), t("series"), t(`amountHeader.${model.unit}`), workbookMessage(locale, "workbook.status")],
+      headers: [workbookMessage(locale, "workbook.year"), t("series"), isGdp ? workbookMessage(locale, "workbook.gdpHeader") : t(`amountHeader.${model.unit}`), workbookMessage(locale, "workbook.status")],
       rows: cells.map(({ year, series }) => [year, labels[series.id], toExport(series.valuesByYear[year]), status(series.id, year)]),
       numericFormats: { 3: numberFormat },
       rowNumberFormats: Object.fromEntries(cells.flatMap(({ series }, index) => rowFormat(series.decimals) ? [[index, rowFormat(series.decimals)!]] : [])),
     },
-    sources: withAbsoluteUrls([...originals, ...(state.view === "gdp" ? input.gdpSources ?? [] : [])], input.siteOrigin),
+    sources: withAbsoluteUrls([...originals, ...(isGdp ? input.gdpSources ?? [] : [])], input.siteOrigin),
   };
 }
