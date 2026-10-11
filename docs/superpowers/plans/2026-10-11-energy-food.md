@@ -31,7 +31,7 @@
 1. **A self-closing blank cell before a value** (`<c r="C5" s="3"/><c r="D5"><v>12</v></c>`) must read C5 as blank and D5 as 12. Owner: Task 1 (`test_self_closing_cell`) and Task 2 (a unit test on the cell reader).
 2. **Sheets stored out of order** (`GWh&TJ` is `sheet2.xml` in the 2013 electricity workbook, and the sheet name is `GWH&TJ` in other years): rows come from the sheet named in the manifest, matched case-insensitively through the workbook rels. Owner: Tasks 1 and 2.
 3. **Negative electricity supply** (`energy.supply.electricity`, 2023) draws below zero in chart, table and Excel, and is not clipped or shown as a gap. Owner: Task 4 (model) and Task 7 (browser).
-4. **A saved link with a wind series and a range before 2016** (`#from=2013&to=2015&sel=electricity.production.wind` on Electricity): the wind series stays selected and shows as a gap, never 0. The empty-chart callout appears only when nothing is selected. Owner: Task 4.
+4. **A saved link with a wind series and a range before 2016** (`#start=2013&end=2015&sel=electricity.production.wind` on Electricity): the wind series stays selected and shows as a gap, never 0. The empty-chart callout appears only when nothing is selected. Owner: Task 4.
 5. **Language switch** keeps range, selection and chart/table mode. Owner: Task 4 and Task 7.
 
 ---
@@ -169,7 +169,7 @@ All are dated 2026-10-11.
 
 - [ ] **Step 1: Write the tests.**
   - Default states: supply → selection `["energy.supply.total"]`, coverage 2013–2024. Food → `["food.self_sufficiency.wheat"]`, 2014–2025.
-  - Electricity `#from=2013&to=2015&sel=electricity.production.wind` keeps wind selected, and its `valuesByYear` are all `null` (Review Focus 4).
+  - Electricity `#start=2013&end=2015&sel=electricity.production.wind` keeps wind selected, and its `valuesByYear` are all `null` (Review Focus 4).
   - Hash round-trip, including an explicit empty `sel=`. Unknown IDs are dropped. No hash writes `tab`, and a legacy `tab=` key is ignored.
   - `buildEnergyFoodModel` on energy-supply with `energy.supply.electricity` selected, 2023, gives a negative `energy.supply.electricity` end value (Review Focus 3).
   - End values: `energy.supply.total` 2024 is `5914.5`, `electricity.production.total` 2024 is `14234.1`, `food.self_sufficiency.wheat` 2025 is `19`.
