@@ -40,9 +40,10 @@ Fiscal.ge does no calculation of its own. Every value shown is a figure Geostat 
 
 > **Changed after the second preview, 2026-10-11 (owner decision, 21:08Z):** the page is one view, and the map picks the area. This replaces the tabs, the Compare areas tab, the area dropdown and the later Regions tab with its Georgia | Towns | Villages switch.
 > - Under the latest-value line sits the shared `RegionIndex` map and ranked list of the section total for the latest year all eleven regions have, without an overview block. Georgia is the list's first, unranked row. Clicking Georgia, or a region on the map or in the list, sets the page's area (URL `area`; Georgia is the default and is not written), marks that row, and scrolls to and focuses the chart.
-> - Below it is the chart workspace described here: Chart | Table on the left of the controls row, the measure icons on the right, the chart or table, the years, the series list with Excel, and one source line that also credits the map's geoBoundaries outlines. There is no area switch on the chart.
-> - For Georgia, the list ends with two more top-level lines, Towns and Villages: the section total for each, unticked at first, from 2006. A region's list does not have them. Changing area keeps the ticked lines the new area has and refits the years.
+> - Below it is the chart workspace described here. It opens with the chosen area's name as a small section heading (an `h2` in the style of the map list's "Regions" header), then Chart | Table on the left of the controls row, the measure icons on the right, the chart or table, the years, the series list with Excel, and one source line that also credits the map's geoBoundaries outlines. There is no area switch on the chart.
+> - For Georgia, the series list ends with two more top-level lines, Towns and Villages: the section total for each, unticked at first, from 2006, each in a colour of its own. A region's series list does not have them. Changing area keeps the ticked lines the new area has and refits the years.
 > - Old links: `tab` is ignored, and `area=settlement.urban|settlement.rural` opens Georgia.
+> - Selection: a non-empty `sel` naming nothing the area has selects the first series, and so does an area change that leaves none of the ticked lines; an empty `sel=` (or clearing every tick) still means nothing is selected.
 > - Per household / per person is an icon switch: Lucide `HouseHeart` (per household) and `User` (per person), with the full labels as accessible names and tooltips. The map follows it.
 
 Under the heading there is one short line from `LatestValueLine`: "Average monthly household income · 2025: 2,025.8 ₾". It always shows Georgia per household, whatever is selected below. Nothing else sits under the heading.
@@ -82,7 +83,7 @@ Two centred text tabs follow, styled like the Poverty tabs:
 
 The line under the heading reads "Average monthly household consumption spending · 2025: 1,438.7 ₾".
 
-It has the same two tabs (**What it's spent on | Regions**), the same area choice, per household / per person switch, years, defaults and behaviour as the Income page.
+It has the same single view as the Income page (§3 note): the area-picking map, the chart for the chosen area with **What it's spent on** as its list, Towns and Villages lines for Georgia, the per household / per person switch, years, defaults and behaviour.
 
 | Series in the list (selected first in bold) | Nested under it |
 | --- | --- |
@@ -172,7 +173,7 @@ These are mostly stated on the methodology page:
 ## 9. Verification
 
 1. The canonical file reproduces every served value from the original cells. The independent verification passes, all rules in section 6 hold, and CSV and database modes agree.
-2. Defaults, tabs, the area choice, the per household / per person switch, nesting, missing regional years and URL state behave as in sections 3–4. The 2025 values read 2,025.8 ₾ (income) and 1,438.7 ₾ (spending).
+2. Defaults, the area picked on the map or its list, Towns and Villages for Georgia, the per household / per person switch, nesting, missing regional years and URL state behave as in sections 3–4. The 2025 values read 2,025.8 ₾ (income) and 1,438.7 ₾ (spending).
 3. Chart, table and Excel agree for the same settings, and source links work.
 4. The hub shows four cards. The old Poverty addresses redirect to the new ones and keep the settings after `#`. The sidebar, breadcrumbs and sitemap use the new names.
 5. Georgian and English work at 390, 768 and 1440 pixels, with keyboard use and language switching keeping the settings.

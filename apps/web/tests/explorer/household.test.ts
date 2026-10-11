@@ -95,6 +95,22 @@ test("leaving Georgia for Guria drops the towns and villages ticks, keeps the ot
   expect(changeHouseholdArea(guria, "income", "georgia", facts).selectedIds).toEqual(["income.total", "income.remittances"]);
 });
 
+test("an area change that leaves nothing ticked falls back to the first series, while an empty selection stays empty", () => {
+  const towns: HouseholdState = { ...defaultHouseholdState("income"), selectedIds: ["settlement.urban", "settlement.rural"] };
+  expect(changeHouseholdArea(towns, "income", "region.guria", facts).selectedIds).toEqual(["income.total"]);
+  expect(changeHouseholdArea({ ...towns, selectedIds: [] }, "income", "region.guria", facts).selectedIds).toEqual([]);
+});
+
+test("towns and villages draw in colours no other line of Georgia's list uses", () => {
+  for (const section of ["income", "spending"] as const) {
+    const series = buildHouseholdModel(section, facts, defaultHouseholdState(section)).series;
+    for (const id of ["settlement.urban", "settlement.rural"]) {
+      const color = series.find(s => s.id === id)!.color;
+      expect(series.filter(s => s.color === color).map(s => s.id), `${section} ${id}`).toEqual([id]);
+    }
+  }
+});
+
 test("the hash round-trips, writes the area only for a region and keeps an explicit empty selection", () => {
   const state: HouseholdState = { mode: "table", area: "region.adjara", measure: "per_capita", range: { kind: "manual", start: 2014, end: 2020 }, selectedIds: ["income.total", "income.remittances"] };
   const hash = serializeHouseholdHash(state);

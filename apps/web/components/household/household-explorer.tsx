@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { HouseHeart, User } from "lucide-react";
-import { useCallback, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import type { ClientHouseholdFact, HouseholdArea, HouseholdMeasure } from "../../lib/data/household/types";
 import { buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
@@ -32,6 +32,17 @@ function samePageHash(event: MouseEvent<HTMLElement>): string | null {
   if (!link || link.hasAttribute("target") || link.hasAttribute("download") || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return null;
   const url = new URL(link.getAttribute("href") ?? "", window.location.href);
   return url.origin === window.location.origin && url.pathname === window.location.pathname && url.search === window.location.search && url.hash ? url.hash : null;
+}
+
+/** The area a page hash names; Georgia is the one it leaves out. */
+const areaOf = (hash: string) => new URLSearchParams(hash.replace(/^#/, "")).get("area") ?? "georgia";
+
+/** Brings the chart to the top (clear of the phone header) and gives it focus. */
+function bringIntoView(chart: HTMLElement | null) {
+  if (!chart) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  chart.focus({ preventScroll: true });
+  chart.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
 }
 
 export type HouseholdExplorerProps = {
@@ -93,25 +104,35 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
   const pagePath = HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href;
   // Georgia or a region becomes the page's area, keeping the ticked lines it has and the measure.
   const areaHref = (area: string) => `${pagePath}#${serializeHouseholdHash(changeHouseholdArea(state, section, area as HouseholdArea, facts))}`;
-  // After a pick, bring the chart to the top (clear of the phone header) and give it focus.
+  // After a pick the chart comes into view and takes focus once the new area has rendered, so it is announced with
+  // that area's name; picking the area already shown brings the chart up at once.
   const chartRef = useRef<HTMLElement>(null);
-  const showChart = () => {
-    if (!chartRef.current) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    chartRef.current.focus({ preventScroll: true });
-    chartRef.current.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
-  };
+  const pendingFocus = useRef(false);
+  useEffect(() => {
+    if (!pendingFocus.current) return;
+    pendingFocus.current = false;
+    bringIntoView(chartRef.current);
+  }, [state.area]);
+  const pick = (area: string) => { if (area === state.area) bringIntoView(chartRef.current); else pendingFocus.current = true; };
   // List rows are Next links, and Next changes a same-page hash without a hashchange event: follow them as a plain
   // hash change, so useHashState picks up the area in place. Map paths are SVG links the browser follows itself.
   const followSamePageHash = (event: MouseEvent<HTMLElement>) => {
+    if (!((event.target as Element).closest("a") instanceof HTMLAnchorElement)) return;
     const hash = samePageHash(event);
-    if (!hash || !((event.target as Element).closest("a") instanceof HTMLAnchorElement)) return;
+    if (!hash) return;
     event.preventDefault();
     window.location.hash = hash;
-    showChart();
+    pick(areaOf(hash));
   };
-  // A map path a first touch only previews has its click prevented, and the page stays on the map.
-  const followMapPath = (event: MouseEvent<HTMLElement>) => { if (!event.defaultPrevented && samePageHash(event)) showChart(); };
+  const followMapPath = (event: MouseEvent<HTMLElement>) => {
+    // A map path a first touch only previews has its click prevented, and the page stays on the map.
+    if (event.defaultPrevented) return;
+    const hash = samePageHash(event);
+    if (hash) return pick(areaOf(hash));
+    // Tbilisi's fingertip target opens its area with location.assign, which has already changed the hash unless the tap only previewed it.
+    const target = (event.target as Element).closest("[data-map-touch-target]")?.getAttribute("data-map-touch-target");
+    if (target && target !== state.area && areaOf(window.location.hash) === target) pendingFocus.current = true;
+  };
   return <div data-testid={`household-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
     <LatestValueLine testId="household-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />

@@ -95,10 +95,14 @@ function fitRange(state: HouseholdState, coverage: { min: number; max: number })
   return range.kind === "all" && state.range.kind === "manual" ? { kind: "manual", start: coverage.min, end: coverage.max } : range;
 }
 
-/** Switching area keeps the ticked lines the new area has (towns and villages are Georgia's alone); a region that starts later narrows the years. */
+/**
+ * Switching area keeps the ticked lines the new area has (towns and villages are Georgia's alone), or its first series
+ * when none of them remain; a region that starts later narrows the years.
+ */
 export function changeHouseholdArea(state: HouseholdState, section: HouseholdSectionId, area: HouseholdArea, facts: readonly ClientHouseholdFact[]): HouseholdState {
   const ids = householdViewSeries(section, area).map(series => series.id);
-  return { ...state, area, selectedIds: state.selectedIds.filter(id => ids.includes(id)), range: fitRange(state, householdCoverage(section, area, state.measure, facts)) };
+  const kept = state.selectedIds.filter(id => ids.includes(id));
+  return { ...state, area, selectedIds: kept.length || !state.selectedIds.length ? kept : [ids[0]], range: fitRange(state, householdCoverage(section, area, state.measure, facts)) };
 }
 
 export function changeHouseholdMeasure(state: HouseholdState, section: HouseholdSectionId, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]): HouseholdState {

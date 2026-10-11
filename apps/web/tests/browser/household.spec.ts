@@ -17,6 +17,8 @@ test("the living standards hub lists Income, Spending, Poverty and Inequality in
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Living standards");
 });
 
+// Records the chart's name at the moment it takes focus, which is what a screen reader announces.
+const recordFocusName = (page: Page) => page.getByTestId("chart-panel").evaluate(chart => chart.addEventListener("focus", () => { chart.setAttribute("data-focused-as", chart.getAttribute("aria-label") ?? ""); }, { once: true }));
 const row = (page: Page, id: string) => page.locator(`[data-testid="regional-list-row"][data-region-id="${id}"]`);
 
 test("income is one view: the map and list pick the area, Georgia first, and towns and villages are tickable lines", async ({ page }) => {
@@ -72,10 +74,14 @@ test("the list and the map set the area, which keeps the measure and the ticks t
   await expect(rows.first()).toContainText("630.7");
   await expect(page.getByTestId("regional-map-legend")).toContainText("₾ a month per person");
   // A list row.
+  await recordFocusName(page);
   await row(page, "region.guria").click();
+  // Focus waits for the new area, so the chart is already named for it when it takes focus.
+  await expect(page.getByTestId("chart-panel")).toBeFocused();
+  await expect(page.getByTestId("chart-panel")).toHaveAccessibleName(/Guria/);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-focused-as", /Guria/);
   await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/income#area=region\.guria&per=person/);
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "region.guria");
-  await expect(page.getByTestId("chart-panel")).toBeFocused();
   await expect(page.getByTestId("household-chosen-area")).toHaveText("Guria");
   await expect(row(page, "region.guria")).toHaveAttribute("aria-current", "true");
   await expect(rows.first()).not.toHaveAttribute("aria-current", "true");
@@ -85,9 +91,12 @@ test("the list and the map set the area, which keeps the measure and the ticks t
   await expect(page.locator(pressed("settlement.rural"))).toHaveCount(0);
   await expect(page.getByTestId("series-status")).toContainText("1 / 2");
   // A region on the map.
+  await recordFocusName(page);
   await page.getByTestId("household-region-map").locator('a[data-region-id="region.kakheti"]').click();
-  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "region.kakheti");
   await expect(page.getByTestId("chart-panel")).toBeFocused();
+  await expect(page.getByTestId("chart-panel")).toHaveAccessibleName(/Kakheti/);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-focused-as", /Kakheti/);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "region.kakheti");
   await expect(row(page, "region.kakheti")).toHaveAttribute("aria-current", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2011–2025");
   // Georgia returns, with its towns and villages lines unticked.
