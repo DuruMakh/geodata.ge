@@ -45,7 +45,7 @@ The pages keep the production editorial look and reuse the Poverty and Wages wor
 
 ## 4. Energy supply page
 
-Line under the heading: "2024: energy supply 5,915, imports 5,099 (thousand tonnes of oil equivalent)".
+Line under the heading: "Energy supply · 2024: 5,914.5 · imports 5,099.0" (thousand tonnes of oil equivalent). Energy values show to one decimal, as Geostat publishes them.
 
 **Overview | Supply by fuel | Imports by fuel**
 
@@ -60,7 +60,7 @@ Line under the heading: "2024: energy supply 5,915, imports 5,099 (thousand tonn
 
 ## 5. Electricity page
 
-Line under the heading: "2024: 14,234 GWh produced, 2,302 imported, 2,122 exported".
+Line under the heading: "Electricity production · 2024: 14,234.1 GWh · imports 2,301.8 · exports 2,121.7".
 
 **Production | Imports and exports | Use**
 
@@ -76,7 +76,7 @@ Line under the heading: "2024: 14,234 GWh produced, 2,302 imported, 2,122 export
 
 ## 6. Energy use page
 
-Line under the heading: "2024: final energy use 5,457 thousand tonnes of oil equivalent".
+Line under the heading: "Final energy use · 2024: 5,456.7" (thousand tonnes of oil equivalent).
 
 **By user | By fuel**
 
@@ -90,7 +90,7 @@ Line under the heading: "2024: final energy use 5,457 thousand tonnes of oil equ
 
 ## 7. Food self-sufficiency page
 
-Line under the heading: "2025: Georgia produced 19% of the wheat it used".
+Line under the heading: "Wheat self-sufficiency · 2025: 19%".
 
 No tabs. One line chart of the self-sufficiency ratio for 12 foods in Geostat's order: **Wheat** (selected first), maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat, and poultry nested under it), milk and milk products, and eggs.
 
@@ -124,16 +124,13 @@ Retrieved from Geostat on 2026-10-11 (English files, with Georgian files kept fo
 
 The energy efficiency workbook (`Energy-efficiency_ENG.XLS`, 2013–2024) is kept only to cross-check total energy supply and final consumption. It is not served.
 
-### Research packages
+### Research package
 
-Two packages follow the Poverty package: originals under `official/`, a source manifest (URL, retrieval date, SHA-256 and size), a `prepare.py` that transcribes every served cell with its file, sheet and cell reference, an independent verification script, a validation report and a coverage file. The originals are never edited.
-
-- `docs/Raw Data/Energy/geostat-energy-balance-annual/` (24 workbooks plus the efficiency workbook)
-- `docs/Raw Data/Food/geostat-food-balance-annual/` (1 workbook)
+One package, `docs/Raw Data/EnergyFood/geostat-energy-food-annual/`, follows the Poverty package: originals under `official/` (24 energy balance workbooks, the efficiency workbook, the food balance workbook and the page captures), a source manifest (URL, retrieval date, SHA-256 and size), a `prepare.py` that transcribes every served cell with its file, sheet and cell reference, an independent verification script, a validation report and a coverage file. The originals are never edited.
 
 ### Canonical files and checks
 
-- `npm run data:prepare-energy` writes `data/imports/energy-annual.csv`. `npm run data:prepare-food-self-sufficiency` writes `data/imports/food-self-sufficiency-annual.csv`. Each also writes a validation report under `data/reports/`. `--check` reproduces each byte for byte and runs in `data:validate`. Files are UTF-8 with BOM.
+- `npm run data:prepare-energy-food` writes `data/imports/energy-food-annual.csv` and `data/reports/energy-food-validation.json`. `npm run data:check-energy-food` reproduces both byte for byte and runs in `data:validate`. The CSV is UTF-8 with BOM.
 - Each row keeps the exact workbook value, the value as Geostat displays it, unit (`ktoe`, `gwh` or `percent`), `basis=actual`, source ID, file, sheet and cell.
 - Stable lowercase IDs, for example `energy.supply.total`, `energy.supply.natural_gas`, `energy.imports.oil_products`, `energy.use.households`, `electricity.production.hydro`, `electricity.use.losses` and `food.self_sufficiency.wheat`.
 - Validation rejects a changed value, a missing, extra or duplicate observation, a year outside coverage, an unexpected "…" cell and a changed row or column label. It also checks:
@@ -149,7 +146,7 @@ Two packages follow the Poverty package: originals under `official/`, a source m
 ### Serving
 
 - All pages stay prerendered. CSV loaders and numeric client projections follow Poverty.
-- The private Supabase mirror gets `EnergyFact` and `FoodSelfSufficiencyFact` tables in one versioned migration, with RLS on and public grants revoked. They are compared field by field in the transactional `data:import`, like `PovertyFact`. CSV and database modes must serve identical values. The live migration and import happen only on Duru's merge, through the existing release pipeline.
+- The private Supabase mirror gets one `EnergyFoodFact` table in one versioned migration, with RLS on and public grants revoked. It is compared field by field in the transactional `data:import`, like `PovertyFact`. CSV and database modes must serve identical values. The live migration and import happen only on Duru's merge, through the existing release pipeline.
 
 ## 10. Sources, Excel and methodology
 
@@ -169,7 +166,7 @@ Energy prices, monthly energy data, 2025 energy figures before Geostat publishes
 4. Georgian and English work at 390, 768 and 1440 pixels, with keyboard use and language switching keeping the settings.
 5. A live preview goes to Duru first. After Duru approves it, run `npm run check`, `npm run build` and `npm run test:browser` once, then push and open the PR.
 
-During implementation, also update `Project_Definition.md` section 2 (a new approved Energy and food item), `DESIGN.md` (the hub and four pages) and new `docs/data-methodology/energy-annual.md` and `docs/data-methodology/food-self-sufficiency-annual.md`.
+During implementation, also update `Project_Definition.md` section 2 (a new approved Energy and food item), `DESIGN.md` (the hub and four pages) and a new `docs/data-methodology/energy-food-annual.md`.
 
 ## 13. Reuse
 
@@ -182,10 +179,10 @@ During implementation, also update `Project_Definition.md` section 2 (a new appr
   - the sidebar, sitemap, methodology catalogue and source inventory get the new section
   - the import script and mirror read and compare the new tables
 - **New** (each mirrors its Poverty counterpart, as the Money and banks and Living standards hubs do). Turning the Poverty explorer into one shared, configurable explorer would avoid this repetition, but the Living standards thread is moving the Poverty files right now, so this branch does not edit them. That clean-up is a separate follow-up for Duru to decide on. The data readers locate rows and columns by their label text, not by fixed positions, and do not copy the Poverty import's spreadsheet-reading shortcut that the Money and banks review flagged:
-  - the two research packages and prepare scripts
-  - the Prisma models and migration
+  - the research package and prepare script
+  - the Prisma model and migration
   - the explorer state and model, workbook and hub-card modules, the page module, routes and messages
-  - the methodology content and the two `docs/data-methodology/` files
+  - the methodology content and `docs/data-methodology/energy-food-annual.md`
 
 ## 14. Coordination
 
