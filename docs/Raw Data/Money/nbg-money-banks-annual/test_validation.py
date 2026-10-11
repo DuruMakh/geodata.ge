@@ -105,9 +105,15 @@ class MoneyBanksPackageTests(unittest.TestCase):
             self.assertEqual(find(self.rows, indicator, 2022)['published_value'], new, indicator)
         with open(prepare.ROOT / 'money-banks-series-breaks.csv', encoding='utf-8-sig', newline='') as handle:
             breaks = list(csv.DictReader(handle))
-        self.assertEqual([row['break_id'] for row in breaks], ['fsi_method_2022'])
-        self.assertEqual(breaks[0]['applies_to'], 'banks.npl_ratio;banks.roe')
-        self.assertEqual(breaks[0]['reference_date'], '2022-12-31')
+        self.assertEqual([row['break_id'] for row in breaks], ['fsi_method_2022', 'fsi_ifrs_2023'])
+        self.assertEqual([row['applies_to'] for row in breaks],
+                         ['banks.npl_ratio;banks.roe', 'banks.npl_ratio;banks.roa;banks.roe;banks.capital_ratio;banks.tier1_ratio'])
+        self.assertEqual([row['reference_date'] for row in breaks], ['2022-01-01', '2023-01-01'])
+        for row in breaks:
+            self.assertTrue(row['reason'].strip() and row['source_note'].strip(), row['break_id'])
+            self.assertNotIn('updated IMF guide', row['reason'])
+        self.assertIn('3.10%', breaks[1]['reason'])
+        self.assertIn('reviewed starting from 2023-01', breaks[1]['source_note'])
         with self.assertRaisesRegex(ValueError, 'overlap'):
             prepare.validate(altered(self.rows, 'banks.capital_ratio', 2022, '25'))
 
