@@ -23,7 +23,7 @@ The source pages are captured as they resolved on 2026-10-11. The metadata PDF i
 ## Outputs
 
 - `household-income-spending-annual.csv`: the 10,638 primary observations, one row per indicator, area, measure and year. Columns are `year, indicator_id, area_id, measure, value, published_value, unit, basis, value_status, source_id, source_sheet, source_cell, source_label, source_number_format`.
-  - `value` is the exact `<v>` token of the cell.
+  - `value` is the positional decimal expansion of the cell's `<v>` token (numerically identical to the token, without exponent notation; the checks compare it numerically).
   - `published_value` is the number Excel displays: the token is first rounded to 15 significant digits, then half-up to the cell's format (`#,##0.0` or `0.0`, so one decimal). A stored `8.4499999999999993` shows as 8.45 and publishes as 8.5, not 8.4.
   - `unit` is `gel_month`, `basis` is `actual` and `value_status` is `survey_estimate` on every row.
   - `source_label` is the printed row label, followed by ` | ` and the Urban, Rural or region heading in the settlement and regional workbooks.

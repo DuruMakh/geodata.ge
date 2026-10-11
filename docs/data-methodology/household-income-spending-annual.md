@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Households/geostat-household-income-spending-annual/`, collected on 2026-10-11 from Geostat's "Households Incomes" and "Households Expenditures" pages. The research captures are immutable. The 10,638 primary values are served on the Income and Spending pages of the Living standards hub under the approved design `docs/superpowers/specs/2026-10-11-living-standards-design.md`; see [Serving on the Living standards pages](#serving-on-the-living-standards-pages). Nothing is published through `/mcp` or the central JSON and CSV files.
+This methodology governs the research package at `docs/Raw Data/Households/geostat-household-income-spending-annual/`, collected on 2026-10-11 from Geostat's "Households Incomes" and "Households Expenditures" pages. The research captures are immutable. The 10,638 primary values are served on the Income and Spending pages of the Living standards hub (`/explorer/living-standards/income` and `/explorer/living-standards/spending`) under the approved design `docs/superpowers/specs/2026-10-11-living-standards-design.md`; see [Serving on the Living standards pages](#serving-on-the-living-standards-pages). The dataset is not part of the MCP fact-query snapshot: nothing is published through `/mcp` or the central JSON and CSV files.
 
 The approved scope is annual data only: the average monthly household income lines (12) and spending lines (15) in GEL, per household and per person, for Georgia, towns and villages, and the regions. The whole-country totals in million GEL, the printed subtotal and grand-total lines, the "Other regions" column, shares, inflation adjustment, splits by household type and quarterly data are excluded.
 
@@ -47,7 +47,7 @@ Geostat's workbook prints "Income, total" as cash income and transfers plus non-
 
 ## Extraction and provenance
 
-`prepare.py` reads worksheet XML with Python's standard library and locates every row and block by its printed label, never by row number. It keeps each stored decimal token. Each observation records its source ID, sheet, cell, printed label and number format. `value` keeps the stored precision; `published_value` rounds the 15-significant-digit token half-up to the cell's format, so one decimal.
+`prepare.py` reads worksheet XML with Python's standard library and locates every row and block by its printed label, never by row number. Each observation records its source ID, sheet, cell, printed label and number format. `value` is the positional decimal expansion of the cell's stored `<v>` token (numerically identical to it, compared numerically, not as text). `published_value` is the number Excel displays: the token is first rounded to 15 significant digits, then half-up to the cell's format, so one decimal. A stored `8.4499999999999993` therefore publishes as 8.5, not 8.4.
 
 ## Validation and evidence
 
@@ -55,7 +55,7 @@ Geostat's workbook prints "Income, total" as cash income and transfers plus non-
 
 ## Serving on the Living standards pages
 
-`npm run data:prepare-household-income -- --write` re-reads the package and writes `data/imports/household-income-spending-annual.csv` and `data/reports/household-income-spending-validation.json`. `npm run data:check-household-income` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `HouseholdIncomeSpendingFact` is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
+`npm run data:prepare-household-income -- --write` re-reads the package's research CSV, requires its `validation-report.json` and `independent-validation.json` to have passed, and writes `data/imports/household-income-spending-annual.csv` and `data/reports/household-income-spending-validation.json`. `npm run data:check-household-income` (part of `data:validate`) rebuilds both in memory and fails on any difference; the loader re-applies the validation rules above. The Prisma mirror table `HouseholdIncomeSpendingFact` (migration `20261011090000_household_income_spending`, row security on, public grants revoked) is filled only by the transactional, parity-checked `npm run data:import`, which compares all 10,638 rows field by field; CSV and database modes serve identical rows.
 
 Each page shows the published value: one decimal, in lari a month. Missing years are gaps in the chart, dashes in the table and blank Excel cells, never zero. The pages describe the figures and state no causes. Fiscal.ge computes nothing: every value is Geostat's published average, per household or per person.
 
