@@ -10,14 +10,14 @@ import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
 import { loadMoneyBanksWorkbookSources } from "../../lib/pages/moneyBanks";
 import {
-  MONEY_BANKS_SECTIONS, buildMoneyBanksModel, changeMoneyBanksView, defaultMoneyBanksState, moneyBanksCoverage, moneyBanksViewSeries, moneyBanksViews,
+  MONEY_BANKS_SECTIONS, buildMoneyBanksModel, changeMoneyBanksView, defaultMoneyBanksState, moneyBanksCoverage, moneyBanksDefaultSelection, moneyBanksViewSeries, moneyBanksViews,
   parseMoneyBanksHash, serializeMoneyBanksHash,
 } from "../../lib/explorer/moneyBanks";
 
 let facts: ClientMoneyBanksFact[];
 beforeAll(async () => { facts = (await loadMoneyBanksFacts()).map(toClientMoneyBanksFact); });
 
-test("the four sections and their tabs", () => {
+test("the four sections and their views", () => {
   expect(MONEY_BANKS_SECTIONS.map(s => [s.id, s.href, s.labelKey])).toEqual([
     ["supply", "/explorer/money/supply", "common.moneySupply"],
     ["loans-deposits", "/explorer/money/loans-deposits", "common.moneyLoansDeposits"],
@@ -25,19 +25,23 @@ test("the four sections and their tabs", () => {
     ["bank-health", "/explorer/money/bank-health", "common.moneyBankHealth"],
   ]);
   expect(moneyBanksViews("supply")).toEqual(["amount", "gdp"]);
-  expect(moneyBanksViews("loans-deposits")).toEqual(["loans", "deposits", "fx_share"]);
+  expect(moneyBanksViews("loans-deposits")).toEqual(["amount", "fx_share"]);
   expect(moneyBanksViews("interest-rates")).toEqual(["main"]);
-  expect(moneyBanksViews("bank-health")).toEqual(["npl", "profits", "capital"]);
+  expect(moneyBanksViews("bank-health")).toEqual(["main"]);
 });
 
-test("each page starts with only its first series selected and coverage taken from the facts", () => {
+test("each page starts with its first series selected, loans and deposits with both totals, and coverage taken from the facts", () => {
   expect(defaultMoneyBanksState("supply")).toEqual({ mode: "line", range: { kind: "all" }, view: "amount", selectedIds: ["money.m3"] });
+  expect(defaultMoneyBanksState("loans-deposits")).toEqual({ mode: "line", range: { kind: "all" }, view: "amount", selectedIds: ["loans.total", "deposits.total"] });
   expect(defaultMoneyBanksState("interest-rates")).toEqual({ mode: "line", range: { kind: "all" }, view: "main", selectedIds: ["rates.policy"] });
-  expect(defaultMoneyBanksState("bank-health")).toEqual({ mode: "line", range: { kind: "all" }, view: "npl", selectedIds: ["banks.npl_ratio"] });
+  expect(defaultMoneyBanksState("bank-health")).toEqual({ mode: "line", range: { kind: "all" }, view: "main", selectedIds: ["banks.npl_ratio"] });
+  expect(moneyBanksDefaultSelection("supply", "gdp")).toEqual(["money.m3_to_gdp"]);
+  expect(moneyBanksDefaultSelection("loans-deposits", "fx_share")).toEqual(["loans.fx_share"]);
   expect(moneyBanksCoverage("supply", "amount", facts)).toMatchObject({ min: 1995, max: 2025 });
+  expect(moneyBanksCoverage("supply", "gdp", facts)).toMatchObject({ min: 1996, max: 2025 });
+  expect(moneyBanksCoverage("loans-deposits", "amount", facts)).toMatchObject({ min: 1996, max: 2025 });
   expect(moneyBanksCoverage("interest-rates", "main", facts)).toMatchObject({ min: 1996, max: 2025 });
-  expect(moneyBanksCoverage("bank-health", "npl", facts)).toMatchObject({ min: 2003, max: 2025 });
-  expect(moneyBanksCoverage("bank-health", "capital", facts)).toMatchObject({ min: 2014, max: 2025 });
+  expect(moneyBanksCoverage("bank-health", "main", facts)).toMatchObject({ min: 2001, max: 2025 });
   expect(moneyBanksCoverage("loans-deposits", "fx_share", facts)).toMatchObject({ min: 1996, max: 2025 });
 });
 
@@ -46,11 +50,9 @@ test("totals nest their lari and foreign-currency rows", () => {
     moneyBanksViewSeries(section, view).map(s => [s.id, s.reference, s.parentId]);
   expect(shape("supply", "amount").map(r => r[0])).toEqual(["money.m3", "money.m2", "money.m1", "money.m0"]);
   expect(shape("supply", "gdp").map(r => r[0])).toEqual(["money.m3_to_gdp", "money.m2_to_gdp"]);
-  expect(shape("loans-deposits", "loans")).toEqual([
+  expect(shape("loans-deposits", "amount")).toEqual([
     ["loans.total", true, undefined], ["loans.gel", false, "loans.total"], ["loans.fx", false, "loans.total"],
-  ]);
-  expect(shape("loans-deposits", "deposits")).toEqual([
-    ["deposits.total", true, undefined], ["deposits.gel", false, "deposits.total"], ["deposits.fx", false, "deposits.total"],
+    ["deposits.total", false, undefined], ["deposits.gel", false, "deposits.total"], ["deposits.fx", false, "deposits.total"],
     ["deposits.individuals", false, undefined], ["deposits.legal_entities", false, undefined],
   ]);
   expect(shape("loans-deposits", "fx_share").map(r => r[0])).toEqual(["loans.fx_share", "deposits.fx_share"]);
@@ -59,29 +61,50 @@ test("totals nest their lari and foreign-currency rows", () => {
     ["rates.loans_total", false, undefined], ["rates.loans_gel", false, "rates.loans_total"], ["rates.loans_fx", false, "rates.loans_total"],
     ["rates.deposits_total", false, undefined], ["rates.deposits_gel", false, "rates.deposits_total"], ["rates.deposits_fx", false, "rates.deposits_total"],
   ]);
-  expect(shape("bank-health", "npl").map(r => r[0])).toEqual(["banks.npl_ratio"]);
-  expect(shape("bank-health", "profits").map(r => r[0])).toEqual(["banks.roe", "banks.roa"]);
-  expect(shape("bank-health", "capital").map(r => r[0])).toEqual(["banks.capital_ratio", "banks.tier1_ratio"]);
+  expect(shape("bank-health", "main")).toEqual([
+    ["banks.npl_ratio", true, undefined], ["banks.roa", false, undefined], ["banks.roe", false, undefined],
+    ["banks.capital_ratio", false, undefined], ["banks.tier1_ratio", false, undefined],
+  ]);
 });
 
-test("switching to Capital clamps a range starting 2005 to 2014, and switching back keeps it", () => {
-  const start = { ...defaultMoneyBanksState("bank-health"), range: { kind: "manual" as const, start: 2005, end: 2025 } };
-  const capital = changeMoneyBanksView(start, "bank-health", "capital", facts);
-  expect(capital).toMatchObject({ view: "capital", range: { kind: "manual", start: 2014, end: 2025 }, selectedIds: ["banks.capital_ratio"] });
-  const back = changeMoneyBanksView(capital, "bank-health", "npl", facts);
-  expect(back).toMatchObject({ view: "npl", range: { kind: "manual", start: 2014, end: 2025 }, selectedIds: ["banks.npl_ratio"] });
+test("switching to the GDP ratios clamps a range starting 1995 to 1996, and switching back keeps it", () => {
+  const start = { ...defaultMoneyBanksState("supply"), range: { kind: "manual" as const, start: 1995, end: 2005 } };
+  const gdp = changeMoneyBanksView(start, "supply", "gdp", facts);
+  expect(gdp).toMatchObject({ view: "gdp", range: { kind: "manual", start: 1996, end: 2005 }, selectedIds: ["money.m3_to_gdp"] });
+  const back = changeMoneyBanksView(gdp, "supply", "amount", facts);
+  expect(back).toMatchObject({ view: "amount", range: { kind: "manual", start: 1996, end: 2005 }, selectedIds: ["money.m3"] });
+});
+
+test("the % of GDP pill carries M3 and M2 across, drops M1 and M0, and falls back to the default", () => {
+  const supply = (selectedIds: string[]) => ({ ...defaultMoneyBanksState("supply"), selectedIds });
+  expect(changeMoneyBanksView(supply(["money.m3", "money.m2", "money.m1", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp", "money.m2_to_gdp"]);
+  expect(changeMoneyBanksView(supply(["money.m2", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m2_to_gdp"]);
+  expect(changeMoneyBanksView(supply(["money.m1", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp"]);
+  expect(changeMoneyBanksView(supply([]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp"]);
+  const gdp = { ...defaultMoneyBanksState("supply"), view: "gdp" as const, selectedIds: ["money.m2_to_gdp"] };
+  expect(changeMoneyBanksView(gdp, "supply", "amount", facts).selectedIds).toEqual(["money.m2"]);
+  // Loans and deposits has no pairs: each tab starts from its own default.
+  const share = changeMoneyBanksView(defaultMoneyBanksState("loans-deposits"), "loans-deposits", "fx_share", facts);
+  expect(share.selectedIds).toEqual(["loans.fx_share"]);
+  expect(changeMoneyBanksView(share, "loans-deposits", "amount", facts).selectedIds).toEqual(["loans.total", "deposits.total"]);
 });
 
 test("the hash round-trips, drops another tab's series and keeps an explicit empty selection", () => {
-  const state = { mode: "table" as const, view: "deposits" as const, range: { kind: "manual" as const, start: 2005, end: 2020 }, selectedIds: ["deposits.total", "deposits.fx"] };
+  const state = { mode: "table" as const, view: "amount" as const, range: { kind: "manual" as const, start: 2005, end: 2020 }, selectedIds: ["deposits.total", "deposits.fx"] };
   const hash = serializeMoneyBanksHash(state, "loans-deposits");
+  expect(hash).toContain("tab=amount");
   expect(parseMoneyBanksHash(`#${hash}`, "loans-deposits", facts)).toEqual(state);
-  expect(parseMoneyBanksHash("#tab=npl&sel=", "bank-health", facts).selectedIds).toEqual([]);
-  expect(parseMoneyBanksHash("#tab=capital&sel=banks.roe", "bank-health", facts).selectedIds).toEqual([]);
-  expect(parseMoneyBanksHash("#tab=unknown", "bank-health", facts)).toMatchObject({ view: "npl", selectedIds: ["banks.npl_ratio"] });
-  const rates = serializeMoneyBanksHash(defaultMoneyBanksState("interest-rates"), "interest-rates");
-  expect(rates).not.toContain("tab=");
-  expect(parseMoneyBanksHash(`#${rates}`, "interest-rates", facts)).toEqual(defaultMoneyBanksState("interest-rates"));
+  const gdp = { mode: "line" as const, view: "gdp" as const, range: { kind: "all" as const }, selectedIds: ["money.m2_to_gdp"] };
+  expect(serializeMoneyBanksHash(gdp, "supply")).toContain("tab=gdp");
+  expect(parseMoneyBanksHash(`#${serializeMoneyBanksHash(gdp, "supply")}`, "supply", facts)).toEqual(gdp);
+  expect(parseMoneyBanksHash("#tab=fx_share&sel=", "loans-deposits", facts).selectedIds).toEqual([]);
+  expect(parseMoneyBanksHash("#tab=fx_share&sel=loans.total", "loans-deposits", facts).selectedIds).toEqual([]);
+  expect(parseMoneyBanksHash("#tab=unknown", "loans-deposits", facts)).toMatchObject({ view: "amount", selectedIds: ["loans.total", "deposits.total"] });
+  for (const section of ["interest-rates", "bank-health"] as const) {
+    const single = serializeMoneyBanksHash(defaultMoneyBanksState(section), section);
+    expect(single).not.toContain("tab=");
+    expect(parseMoneyBanksHash(`#${single}`, section, facts)).toEqual(defaultMoneyBanksState(section));
+  }
 });
 
 test("the model carries lari amounts, gaps, signed values and per-series precision", () => {
@@ -92,11 +115,16 @@ test("the model carries lari amounts, gaps, signed values and per-series precisi
   expect(supply.series[0].color).toBe(INK);
   expect(supply.series[1].color).not.toBe(INK);
 
-  const profits = buildMoneyBanksModel("bank-health", facts, { ...defaultMoneyBanksState("bank-health"), view: "profits" });
-  expect(profits.unit).toBe("percent");
-  expect(profits.series.find(s => s.id === "banks.roa")!.valuesByYear[2008]!).toBeLessThan(0);
+  const health = buildMoneyBanksModel("bank-health", facts, defaultMoneyBanksState("bank-health"));
+  expect(health.unit).toBe("percent");
+  expect(health.series.find(s => s.id === "banks.roa")!.valuesByYear[2008]!).toBeLessThan(0);
+  expect(health.series.find(s => s.id === "banks.capital_ratio")!.valuesByYear[2013]).toBeNull();
+  expect(health.series.find(s => s.id === "banks.capital_ratio")!.valuesByYear[2014]).not.toBeNull();
 
-  const deposits = buildMoneyBanksModel("loans-deposits", facts, { ...defaultMoneyBanksState("loans-deposits"), view: "deposits" });
+  const deposits = buildMoneyBanksModel("loans-deposits", facts, defaultMoneyBanksState("loans-deposits"));
+  expect(deposits.unit).toBe("gel");
+  expect(deposits.selected.map(s => s.id)).toEqual(["loans.total", "deposits.total"]);
+  expect(deposits.series.find(s => s.id === "deposits.total")!.color).not.toBe(INK);
   expect(deposits.series.find(s => s.id === "deposits.legal_entities")!.valuesByYear[2014]).toBeNull();
 
   const rates = buildMoneyBanksModel("interest-rates", facts, defaultMoneyBanksState("interest-rates"));
@@ -111,7 +139,7 @@ const TEST_MESSAGES = {
   "moneyBanks.series": "Series", "moneyBanks.amountHeader.gel": "Amount (million GEL)", "moneyBanks.amountHeader.percent": "Value (%)",
   "moneyBanks.page.supply.title": "Money supply", "moneyBanks.page.loans-deposits.title": "Loans and deposits", "moneyBanks.page.interest-rates.title": "Interest rates", "moneyBanks.page.bank-health.title": "Bank health",
   "moneyBanks.page.supply.summary": "supply", "moneyBanks.page.loans-deposits.summary": "loans", "moneyBanks.page.interest-rates.summary": "rates", "moneyBanks.page.bank-health.summary": "health",
-  "moneyBanks.tab.amount": "Amount", "moneyBanks.tab.deposits": "Deposits", "moneyBanks.tab.profits": "Profits", "moneyBanks.tab.npl": "Bad loans",
+  "moneyBanks.tab.amount": "Amount",
 };
 const presentation = async (): Promise<Presentation> => ({ locale: "en", englishLabels: {}, messages: { ...await getMessages("en", ["workbook", "format", "common"]), ...TEST_MESSAGES } });
 const SOURCES = ["nbg_money_aggregates", "nbg_loans_l3_5", "nbg_deposits_d3_17", "nbg_deposits_individuals_d3_23", "nbg_deposits_legal_d3_27", "nbg_policy_rate", "nbg_fsi_archive", "nbg_fsi"].map(sourceId => ({
@@ -125,10 +153,11 @@ const workbookFor = async (section: Parameters<typeof moneyBanksViews>[0], view:
     state: { mode: "table", view, range: { kind: "manual", start, end }, selectedIds },
   }, await presentation());
 
-test("the Deposits workbook exports million GEL, leaves 2010-2014 company deposits blank and cites only the deposit files", async () => {
+test("the deposits workbook exports million GEL, leaves 2010-2014 company deposits blank and cites only the deposit files", async () => {
   const ids = ["deposits.total", "deposits.gel", "deposits.fx", "deposits.individuals", "deposits.legal_entities"];
-  const model = await workbookFor("loans-deposits", "deposits", ids, 2010, 2025);
-  expect(model.filename).toBe("fiscal-money-loans-deposits-deposits-2010-2025-en.xlsx");
+  const model = await workbookFor("loans-deposits", "amount", ids, 2010, 2025);
+  expect(model.filename).toBe("fiscal-money-loans-deposits-amount-2010-2025-en.xlsx");
+  expect(model.readable.title).toBe("Loans and deposits · Amount");
   expect(model.readable.years).toHaveLength(16);
   expect(model.readable.rows).toHaveLength(5);
   expect(model.readable.unitLabel).toBe("million GEL");
@@ -171,9 +200,9 @@ test("the interest-rates workbook shows the National Bank rate to two decimals a
   expect(data.getCell(3, 2).value).toBe("rates.loans_total");
 });
 
-test("the Profits workbook keeps the 2008 loss as a negative percent", async () => {
-  const model = await workbookFor("bank-health", "profits", ["banks.roe", "banks.roa"], 2008, 2010);
-  expect(model.filename).toBe("fiscal-money-bank-health-profits-2008-2010-en.xlsx");
+test("the bank-health workbook keeps the 2008 loss as a negative percent", async () => {
+  const model = await workbookFor("bank-health", "main", ["banks.roa", "banks.roe"], 2008, 2010);
+  expect(model.filename).toBe("fiscal-money-bank-health-2008-2010-en.xlsx");
   const roa = model.readable.rows.find(row => row.label === "banks.roa")!;
   expect(roa.valuesByYear[2008]!).toBeLessThan(0);
   expect(model.analysis.rows.find(r => r[0] === 2008 && r[1] === "banks.roa")![2]!).toBeLessThan(0);
@@ -191,7 +220,7 @@ test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG w
   expect(new Set(sources.map(source => source.organization))).toEqual(new Set([locale === "en" ? "National Bank of Georgia (NBG)" : "საქართველოს ეროვნული ბანკი"]));
   const model = buildMoneyBanksWorkbookExportModel({
     section: "bank-health", facts, sources, siteOrigin: "https://fiscal.ge", labels: labelsFor(["banks.npl_ratio"]),
-    state: { mode: "table", view: "npl", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ["banks.npl_ratio"] },
+    state: { mode: "table", view: "main", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ["banks.npl_ratio"] },
   }, await presentation());
   expect(model.sources.map(source => source.absoluteUrl).sort()).toEqual(["https://fiscal.ge/downloads/methodology/money/files/fsieng-archive.xlsx", "https://fiscal.ge/downloads/methodology/money/files/fsieng.xlsx"]);
 });

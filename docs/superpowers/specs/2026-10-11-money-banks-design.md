@@ -60,6 +60,8 @@ Line under the heading: "2025: broad money (M3) 57.7 billion GEL".
 
 The GDP ratios are NBG's own published "monetization coefficients" at period end, not calculated by fiscal.ge.
 
+> Changed after preview review (Duru, 2026-10-11): no tab row; the % of GDP pill on the chart toolbar switches between the amounts and the two ratios, carrying M3 and M2 across.
+
 ## 5. Loans and deposits page
 
 Line under the heading: "2025: bank loans 72.5 billion GEL".
@@ -71,6 +73,8 @@ Line under the heading: "2025: bank loans 72.5 billion GEL".
 | Loans | **All loans**, with In lari and In foreign currency nested under it | 2002–2025 | million GEL |
 | Deposits | **All deposits**, with In lari and In foreign currency nested under it; then Deposits of people (2002–2025) and Deposits of companies and organisations (2015–2025) | 1996–2025 | million GEL |
 | Share in foreign currency | **Loans**, Deposits | Loans 2002–2025, deposits 1996–2025 | % |
+
+> Changed after preview review (Duru, 2026-10-11): two tabs: Amount (loans then deposits, with **All loans** and **All deposits** both selected) and Share in foreign currency.
 
 - Loans are NBG table L3.5 (loans granted by banks, excluding interbank loans, including overdue loans and accrued interest). Deposits are NBG table D3.17 (all deposits in banks). People are table D3.23 and companies and organisations ("legal entities") table D3.27; the two add up exactly to D3.17's total from 2015. NBG publishes each deposit table as a lari sheet and a foreign-currency sheet, so the three deposit totals (all, people, companies) are lari + foreign currency added up by fiscal.ge and marked as calculated.
 - The foreign-currency share is foreign-currency amount ÷ total amount from those same tables, calculated by fiscal.ge, so the Share tab always agrees with the Loans and Deposits tabs. NBG's own dollarization ratio counts non-bank deposits only, and table D3.17 also includes banks' deposits, so the two differ (47.7% against 48.6% at the end of 2025); the methodology page says so.
@@ -99,6 +103,8 @@ Line under the heading: "2025: bad loans 2.5% of all loans".
 | Bad loans | **Bad loans, share of all loans** | 2003–2025 |
 | Profits | **Return on equity**, Return on assets | 2001–2025 |
 | Capital | **Capital to risk-weighted assets**, Tier 1 capital to risk-weighted assets | 2014–2025 |
+
+> Changed after preview review (Duru, 2026-10-11): no tabs; one list of **bad loans**, return on assets, return on equity, capital and Tier 1 (2001–2025, capital a gap before 2014).
 
 All values are percent. They are NBG's Financial Soundness Indicators, which follow the IMF method: Q4 values from the archive file for 2001–2021 and December values from the current file for 2022–2025. "Bad loans" is NBG's "non-performing loans to total gross loans" by the IMF method (the archive's NBG-method series, which runs higher, is not served). Capital uses the Basel III series, which starts in 2014; the older Basel I series is not served.
 

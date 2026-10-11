@@ -10,13 +10,13 @@ export const MONEY_BANKS_SECTIONS = [
   { id: "bank-health", href: "/explorer/money/bank-health", labelKey: "common.moneyBankHealth" },
 ] as const;
 export type MoneyBanksSectionId = typeof MONEY_BANKS_SECTIONS[number]["id"];
-/** The tabs of a page; the interest-rates page has one view. */
-export type MoneyBanksView = "amount" | "gdp" | "loans" | "deposits" | "fx_share" | "main" | "npl" | "profits" | "capital";
+/** The views of a page: loans and deposits switch them with tabs, money supply with the % of GDP pill; interest rates and bank health have one. */
+export type MoneyBanksView = "amount" | "gdp" | "fx_share" | "main";
 const VIEWS: Record<MoneyBanksSectionId, readonly MoneyBanksView[]> = {
   "supply": ["amount", "gdp"],
-  "loans-deposits": ["loans", "deposits", "fx_share"],
+  "loans-deposits": ["amount", "fx_share"],
   "interest-rates": ["main"],
-  "bank-health": ["npl", "profits", "capital"],
+  "bank-health": ["main"],
 };
 
 export function moneyBanksViews(section: MoneyBanksSectionId): readonly MoneyBanksView[] {
@@ -31,19 +31,24 @@ const withParts = (id: MoneyBanksIndicator, reference: boolean, parts: readonly 
 const flat = (ids: readonly MoneyBanksIndicator[]) => ids.map((id, index) => top(id, index === 0));
 
 /** The series a view offers, reference first. */
-export function moneyBanksViewSeries(_section: MoneyBanksSectionId, view: MoneyBanksView): MoneyBanksSeriesDefinition[] {
+export function moneyBanksViewSeries(section: MoneyBanksSectionId, view: MoneyBanksView): MoneyBanksSeriesDefinition[] {
   switch (view) {
-    case "amount": return flat(["money.m3", "money.m2", "money.m1", "money.m0"]);
+    case "amount": return section === "supply" ? flat(["money.m3", "money.m2", "money.m1", "money.m0"])
+      : [...withParts("loans.total", true, ["loans.gel", "loans.fx"]), ...withParts("deposits.total", false, ["deposits.gel", "deposits.fx"]), top("deposits.individuals"), top("deposits.legal_entities")];
     case "gdp": return flat(["money.m3_to_gdp", "money.m2_to_gdp"]);
-    case "loans": return withParts("loans.total", true, ["loans.gel", "loans.fx"]);
-    case "deposits": return [...withParts("deposits.total", true, ["deposits.gel", "deposits.fx"]), top("deposits.individuals"), top("deposits.legal_entities")];
     case "fx_share": return flat(["loans.fx_share", "deposits.fx_share"]);
-    case "main": return [top("rates.policy", true), ...withParts("rates.loans_total", false, ["rates.loans_gel", "rates.loans_fx"]), ...withParts("rates.deposits_total", false, ["rates.deposits_gel", "rates.deposits_fx"])];
-    case "npl": return flat(["banks.npl_ratio"]);
-    case "profits": return flat(["banks.roe", "banks.roa"]);
-    case "capital": return flat(["banks.capital_ratio", "banks.tier1_ratio"]);
+    case "main": return section === "bank-health" ? flat(["banks.npl_ratio", "banks.roa", "banks.roe", "banks.capital_ratio", "banks.tier1_ratio"])
+      : [top("rates.policy", true), ...withParts("rates.loans_total", false, ["rates.loans_gel", "rates.loans_fx"]), ...withParts("rates.deposits_total", false, ["rates.deposits_gel", "rates.deposits_fx"])];
   }
 }
+
+/** A view's initial selection: its first series, except that Loans and deposits compares the two totals. */
+export function moneyBanksDefaultSelection(section: MoneyBanksSectionId, view: MoneyBanksView): string[] {
+  return section === "loans-deposits" && view === "amount" ? ["loans.total", "deposits.total"] : [moneyBanksViewSeries(section, view)[0].id];
+}
+
+/** The money-supply series NBG publishes both as an amount and as a ratio to GDP; the % of GDP pill carries them across. */
+const GDP_PAIRS: readonly (readonly [string, string])[] = [["money.m3", "money.m3_to_gdp"], ["money.m2", "money.m2_to_gdp"]];
 
 export function moneyBanksSeriesColor(series: MoneyBanksSeriesDefinition, index: number): string {
   return series.reference ? INK : colorForItem(series.id, index);
@@ -63,7 +68,7 @@ export function moneyBanksCoverage(section: MoneyBanksSectionId, view: MoneyBank
 
 export function defaultMoneyBanksState(section: MoneyBanksSectionId): MoneyBanksState {
   const view = moneyBanksViews(section)[0];
-  return { mode: "line", range: { kind: "all" }, view, selectedIds: [moneyBanksViewSeries(section, view)[0].id] };
+  return { mode: "line", range: { kind: "all" }, view, selectedIds: moneyBanksDefaultSelection(section, view) };
 }
 
 export function parseMoneyBanksHash(hash: string, section: MoneyBanksSectionId, facts: readonly ClientMoneyBanksFact[]): MoneyBanksState {
@@ -71,7 +76,7 @@ export function parseMoneyBanksHash(hash: string, section: MoneyBanksSectionId, 
   const views = moneyBanksViews(section);
   const view = views.find(item => item === p.get("tab")) ?? views[0];
   const series = moneyBanksViewSeries(section, view);
-  const requested = p.has("sel") ? p.get("sel")!.split(",") : [series[0].id];
+  const requested = p.has("sel") ? p.get("sel")!.split(",") : moneyBanksDefaultSelection(section, view);
   return {
     mode: p.get("view") === "table" ? "table" : "line", view,
     range: refitRange(parseYearRangeKeys(p), moneyBanksCoverage(section, view, facts), { collapseToAll: true }),
@@ -89,12 +94,15 @@ export function serializeMoneyBanksHash(state: MoneyBanksState, section: MoneyBa
 }
 
 /**
- * Switching tab keeps mode and years (clamped to the tab's coverage), and selects the new tab's reference.
- * A chosen range is never collapsed to "all", so 2005–2025 picked on Bad loans becomes 2014–2025 on Capital
- * and stays 2014–2025 when switching back.
+ * Switching view keeps mode and years (clamped to the view's coverage). Selected M3 and M2 carry across to and from
+ * their GDP ratios; anything else (and an empty result) falls back to the new view's default selection.
+ * A chosen range is never collapsed to "all", so 1995–2005 picked on the amounts becomes 1996–2005 on the GDP ratios
+ * and stays 1996–2005 when switching back.
  */
 export function changeMoneyBanksView(state: MoneyBanksState, section: MoneyBanksSectionId, view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[]): MoneyBanksState {
-  return { ...state, view, selectedIds: [moneyBanksViewSeries(section, view)[0].id], range: refitRange(state.range, moneyBanksCoverage(section, view, facts), { collapseToAll: false }) };
+  const carried = new Set(GDP_PAIRS.flatMap(([amount, ratio]) => state.selectedIds.includes(amount) ? [ratio] : state.selectedIds.includes(ratio) ? [amount] : []));
+  const selectedIds = moneyBanksViewSeries(section, view).map(s => s.id).filter(id => carried.has(id));
+  return { ...state, view, selectedIds: selectedIds.length ? selectedIds : moneyBanksDefaultSelection(section, view), range: refitRange(state.range, moneyBanksCoverage(section, view, facts), { collapseToAll: false }) };
 }
 
 export type MoneyBanksSeriesModel = MoneyBanksSeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null; decimals: number };

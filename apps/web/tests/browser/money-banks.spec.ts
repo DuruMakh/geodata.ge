@@ -3,6 +3,8 @@ import ExcelJS from "exceljs";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const SECTIONS = ["supply", "loans-deposits", "interest-rates", "bank-health"];
+/** The initial count of each page: its first series, or both totals on Loans and deposits. */
+const INITIAL_COUNT: Record<string, string> = { "supply": "1 / 4", "loans-deposits": "2 / 4", "interest-rates": "1 / 3", "bank-health": "1 / 5" };
 
 /** The table cell of the row labelled `label` in the `year` column (the wide, year-columns layout). */
 async function cell(page: Page, label: string, year: number) {
@@ -25,19 +27,20 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     for (const section of SECTIONS) {
       await page.goto(`${prefix}/explorer/money/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-      await expect(page.getByTestId("series-status")).toContainText("1 /");
+      await expect(page.getByTestId("series-status")).toContainText(INITIAL_COUNT[section]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     expect(errors).toEqual([]);
   });
 }
 
-test("money supply defaults to the amount tab with broad money alone", async ({ page }) => {
+test("money supply has no tabs and defaults to the amounts with broad money alone", async ({ page }) => {
   await page.goto("/explorer/money/supply");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("money-latest")).toContainText("57.7");
-  await expect(page.getByTestId("money-tabs")).toHaveClass(/justify-center/);
-  await expect(page.getByTestId("money-tab-amount")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("money-tabs")).toHaveCount(0);
+  await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("money-unit-label")).toBeVisible();
   await expect(page.getByTestId("series-status")).toContainText("1 / 4");
   await expect(page.locator(pressed("money.m3"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(1);
@@ -45,11 +48,31 @@ test("money supply defaults to the amount tab with broad money alone", async ({ 
   await expect(page.getByTestId("source-label")).toContainText("საქართველოს ეროვნული ბანკი");
 });
 
+test("the % of GDP pill shows NBG's ratios, carries M3 and M2 across and drops M1", async ({ page }) => {
+  await page.goto("/en/explorer/money/supply");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await page.locator(pressed("money.m2")).click();
+  await page.locator(pressed("money.m1")).click();
+  await page.getByTestId("measure-share-toggle").click();
+  await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
+  // The pill already says % of GDP, so the unit caption beside it goes, as on Debt.
+  await expect(page.getByTestId("money-unit-label")).toHaveCount(0);
+  await expect(page.getByTestId("series-status")).toContainText("2 / 2");
+  for (const id of ["money.m3_to_gdp", "money.m2_to_gdp"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/tab=gdp/);
+  await expect(page.getByTestId("year-range-strip")).toContainText("1996–2025");
+  await page.getByTestId("measure-share-toggle").click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "gel");
+  await expect(page.getByTestId("money-unit-label")).toBeVisible();
+  for (const id of ["money.m3", "money.m2"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(2);
+});
+
 test("company deposits before 2015 are a dash, not zero", async ({ page }) => {
   await page.goto("/en/explorer/money/loans-deposits");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await page.getByTestId("money-tab-deposits").click();
-  await expect(page.getByTestId("series-status")).toContainText("1 / 3");
+  await expect(page.getByTestId("series-status")).toContainText("2 / 4");
   await page.locator(pressed("deposits.legal_entities")).click();
   await page.getByTestId("chart-mode-table").click();
   await expect(await cell(page, "Deposits of companies", 2014)).toHaveText("—");
@@ -57,17 +80,21 @@ test("company deposits before 2015 are a dash, not zero", async ({ page }) => {
   await expect(await cell(page, "All deposits", 2014)).not.toHaveText("—");
 });
 
-test("loans nest lari and foreign currency under all loans without changing the count", async ({ page }) => {
+test("loans and deposits share one tab with both totals selected and their parts nested", async ({ page }) => {
   await page.goto("/explorer/money/loans-deposits");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 1");
-  // Three rows are read at a glance: the shared selector shows no search field below eleven.
+  await expect(page.getByTestId("money-tabs").locator('[data-testid^="money-tab-"]')).toHaveCount(2);
+  await expect(page.getByTestId("money-tab-amount")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("series-status")).toContainText("2 / 4");
+  for (const id of ["loans.total", "deposits.total"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(2);
+  // Eight rows are read at a glance: the shared selector shows no search field below eleven.
   await expect(page.getByTestId("series-search")).toHaveCount(0);
   await page.locator('[data-series-id="loans.total"] [aria-expanded]').click();
   await expect(page.locator('[data-series-id="loans.gel"]')).toContainText("ლარ");
   await page.locator(pressed("loans.gel")).click();
-  await expect(page.getByTestId("series-status")).toContainText("1 / 1");
-  await expect(page).toHaveURL(/sel=loans\.total%2Cloans\.gel|sel=loans\.total,loans\.gel/);
+  await expect(page.getByTestId("series-status")).toContainText("2 / 4");
+  await expect(page).toHaveURL(/sel=loans\.total(%2C|,)loans\.gel(%2C|,)deposits\.total(&|$)/);
 });
 
 test("the National Bank rate has no tabs, two decimals and a gap before 2008", async ({ page }) => {
@@ -80,24 +107,27 @@ test("the National Bank rate has no tabs, two decimals and a gap before 2008", a
   await expect(await cell(page, "National Bank rate", 2007)).toHaveText("—");
 });
 
-test("bank health clamps Capital to 2014 and shows the 2008 losses below zero", async ({ page }) => {
+test("bank health has one list, a dash for capital before 2014 and the 2008 losses below zero", async ({ page }) => {
   await page.goto("/en/explorer/money/bank-health");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("money-latest")).toContainText("2.5%");
-  await page.getByTestId("money-tab-capital").click();
-  await expect(page.getByTestId("year-range-strip")).toContainText("2014–2025");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 2");
-  await page.getByTestId("money-tab-profits").click();
+  await expect(page.getByTestId("money-tabs")).toHaveCount(0);
+  await expect(page.getByTestId("year-range-strip")).toContainText("2001–2025");
+  await expect(page.getByTestId("series-status")).toContainText("1 / 5");
   await page.locator(pressed("banks.roa")).click();
+  await page.locator(pressed("banks.roe")).click();
   // The axis runs below zero for the 2008 losses.
   await expect(page.getByTestId("chart-panel").locator("svg text", { hasText: /^−/ }).first()).toBeAttached();
+  await page.locator(pressed("banks.capital_ratio")).click();
   await page.getByTestId("chart-mode-table").click();
+  await expect(await cell(page, "Capital to risk-weighted assets", 2013)).toHaveText("—");
+  await expect(await cell(page, "Capital to risk-weighted assets", 2014)).not.toHaveText("—");
   await expect(await cell(page, "Return on assets", 2008)).toHaveText("−2.5%");
   await expect(await cell(page, "Return on equity", 2008)).toHaveText("−12.6%");
 });
 
 test("the Excel download keeps the 2008 loss as a negative number", async ({ page }) => {
-  await page.goto("/en/explorer/money/bank-health#tab=profits&view=table&sel=banks.roe,banks.roa&start=2008&end=2010");
+  await page.goto("/en/explorer/money/bank-health#view=table&sel=banks.roa,banks.roe&start=2008&end=2010");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const promise = page.waitForEvent("download"); await page.getByTestId("money-excel-download").click();
   const download = await promise;
@@ -109,11 +139,11 @@ test("the Excel download keeps the 2008 loss as a negative number", async ({ pag
   expect(values).toContain(-2.5);
 });
 
-const SAVED: Record<string, { hash: string; tab?: string; selected: string[]; range: string }> = {
-  "supply": { hash: "tab=gdp&view=table&sel=money.m3_to_gdp%2Cmoney.m2_to_gdp&start=2000&end=2020", tab: "gdp", selected: ["money.m3_to_gdp", "money.m2_to_gdp"], range: "2000–2020" },
+const SAVED: Record<string, { hash: string; tab?: string; gdp?: boolean; selected: string[]; range: string }> = {
+  "supply": { hash: "tab=gdp&view=table&sel=money.m3_to_gdp%2Cmoney.m2_to_gdp&start=2000&end=2020", gdp: true, selected: ["money.m3_to_gdp", "money.m2_to_gdp"], range: "2000–2020" },
   "loans-deposits": { hash: "tab=fx_share&view=table&sel=deposits.fx_share&start=2005&end=2015", tab: "fx_share", selected: ["deposits.fx_share"], range: "2005–2015" },
   "interest-rates": { hash: "view=table&sel=rates.policy%2Crates.loans_gel&start=2010&end=2020", selected: ["rates.policy", "rates.loans_gel"], range: "2010–2020" },
-  "bank-health": { hash: "tab=capital&view=table&sel=banks.tier1_ratio&start=2016&end=2024", tab: "capital", selected: ["banks.tier1_ratio"], range: "2016–2024" },
+  "bank-health": { hash: "view=table&sel=banks.tier1_ratio&start=2016&end=2024", selected: ["banks.tier1_ratio"], range: "2016–2024" },
 };
 
 for (const section of SECTIONS) {
@@ -127,6 +157,7 @@ for (const section of SECTIONS) {
     await expect(page).toHaveURL(new RegExp(`/en/explorer/money/${section}#`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     if (saved.tab) await expect(page.getByTestId(`money-tab-${saved.tab}`)).toHaveAttribute("aria-pressed", "true");
+    if (saved.gdp) await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
     await expect(page.getByTestId("year-range-strip")).toContainText(saved.range);
     for (const id of saved.selected) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");

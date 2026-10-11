@@ -14,6 +14,7 @@ import { matchesLabelQuery } from "../../lib/i18n/search";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
+import { MeasurePill } from "../explorer-shell/measure-pill";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
@@ -92,6 +93,8 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
   const latestValue = latest.unit === "gel" ? formatAmount(latest.value, locale) : `${formatInUnit(latest.value, { divisor: 1, label: "", decimals: latest.decimals })}${t("unitPercent")}`;
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
+  // Money supply switches between its amounts and NBG's GDP ratios with the % of GDP pill, not tabs.
+  const gdpPill = section === "supply";
   const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="money-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
@@ -100,7 +103,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
   return <div data-testid={`money-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
     <LatestValueLine testId="money-latest" measure={t(`latest.${section}`)} period={latest.year} value={latestValue} />
-    {moneyBanksViews(section).length > 1 ? <div data-testid="money-tabs" role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
+    {!gdpPill && moneyBanksViews(section).length > 1 ? <div data-testid="money-tabs" role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
       {moneyBanksViews(section).map(view => <TextTab key={view} label={t(`tab.${view}`)} active={state.view === view} testId={`money-tab-${view}`} onClick={() => changeView(view)} />)}
     </div> : null}
     <ExplorerWorkspace>
@@ -108,7 +111,10 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
         <section data-testid="chart-panel" data-mode={state.mode} data-view={state.view} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
-            <span className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
+            <div className="flex items-center gap-3.5">
+              {gdpPill && state.view === "gdp" ? null : <span data-testid="money-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>}
+              {gdpPill ? <MeasurePill label={message(messages, "main.percentGdp")} pressed={state.view === "gdp"} onChange={pressed => changeView(pressed ? "gdp" : "amount")} /> : null}
+            </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={percent} unit={unit} shareLabel={tabLabel} formatTooltipValue={valueLabel} /></div>

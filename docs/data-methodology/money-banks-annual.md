@@ -59,10 +59,10 @@ The pages show the published value: one decimal for percents, two for the Nation
 
 Routes are `/explorer/money` with `/supply`, `/loans-deposits`, `/interest-rates` and `/bank-health`, plus `/methodology/money`, each mirrored under `/en`. The sidebar entry sits after Inflation.
 
-- **Money supply**: Amount (M3, M2, M1, M0) and Compared with GDP.
-- **Loans and deposits**: Loans and Deposits (totals with lari and foreign currency nested under them; deposits of people and of companies and organisations) and Share in foreign currency.
+- **Money supply**: M3, M2, M1 and M0, with a % of GDP pill for NBG's M3 and M2 ratios to GDP.
+- **Loans and deposits**: Amount (loans and deposits together: totals with lari and foreign currency nested under them; deposits of people and of companies and organisations) and Share in foreign currency.
 - **Interest rates**: the National Bank rate and the loan and deposit rates.
-- **Bank health**: Bad loans, Profits and Capital.
+- **Bank health**: bad loans, return on assets and on equity, and the two capital ratios in one list.
 
 The two series breaks are explained on `/methodology/money` and no change is computed across either. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, the calculated status of the five derived series, empty cells for missing values and validated links to the archived NBG workbooks (`data/methodology/source-archives/money.csv`). Internal cell references are not exported. `/methodology/money` publishes all twenty originals; the HTML capture downloads as a `.txt` file.
 
