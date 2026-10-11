@@ -16,6 +16,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
@@ -40,6 +41,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildCurrentAccountWorkbookModel({ facts, gdp, state, sources, gdpSources, siteOrigin }, presentation));
   }} />;
+  const lineSeries = shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="current-account" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("intro")}</p>
@@ -57,7 +59,8 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
           {!shown.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : state.mode === "table" ? <ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== "ca.balance")} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
             : balance ? <div className="mt-5"><StackedColumnChart periods={model.years} periodsPerYear={1} segments={CURRENT_ACCOUNT_PARTS.map(id => ({ id, label: label(id), color: color(id), values: scaled(id) }))} overlay={{ label: label("ca.balance"), values: scaled("ca.balance") }} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} readoutOrder="sign-then-magnitude" ariaLabel={t("balanceAria")} /></div>
-              : <div className="mt-5"><EditorialLineChart years={model.years} series={shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }))} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>}
+              : <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>}
+          <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line" && !balance} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildCurrentAccountModel(facts, gdp, s, presentation).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}

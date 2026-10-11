@@ -273,3 +273,17 @@ test("global filtered selection plots and exports every current product beyond a
   await writeFile(path.join(output, "timings.json"), JSON.stringify(timings, null, 2));
   await info.attach("all-products-timings", { body: JSON.stringify(timings), contentType: "application/json" });
 });
+
+test.describe("the phone legend", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("lists two products and stays hidden above ten", async ({ page }) => {
+    const ids = catalogue.entities.slice(0, 11).map(entity => entity.id);
+    await page.goto(`/en/explorer/trade/products${hash(ids.slice(0, 2))}`);
+    await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
+    await page.goto("about:blank");
+    await page.goto(`/en/explorer/trade/products${hash(ids)}`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "11");
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+  });
+});
