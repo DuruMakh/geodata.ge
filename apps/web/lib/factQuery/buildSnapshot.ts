@@ -606,8 +606,8 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   // manifests' own source_id, unique across all four manifests — verified by
   // inspection, not just assumed).
   const sources: ResolvedSource[] = sortedBy(
-      // Unemployment, Trade, Wages, Money from abroad and Foreign investment are human explorers, outside the query/publication scope.
-      enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && source.sourceId !== "source.geostat_gini" && source.sourceId !== "source.geostat_hies_metadata_2026" && source.sourceId !== "source.nbg_money_transfers_by_countries" && source.sourceId !== "source.nbg_balance_of_payments_bpm6"), manifestDocuments }), catalogue, serviceKa),
+      // Unemployment, Trade, Wages, Poverty, Household income and spending, Money from abroad and Foreign investment are human explorers, outside the query/publication scope.
+      enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && source.sourceId !== "source.geostat_gini" && source.sourceId !== "source.geostat_hies_metadata_2026" && source.sourceId !== "source.nbg_money_transfers_by_countries" && source.sourceId !== "source.nbg_balance_of_payments_bpm6"), manifestDocuments }), catalogue, serviceKa),
     (source) => source.sourceId,
   ).map((source) => ({
     ...source,

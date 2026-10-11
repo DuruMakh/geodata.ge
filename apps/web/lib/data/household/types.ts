@@ -63,3 +63,7 @@ export function householdSourceId(indicatorId: string, areaId: string, measure: 
   const area = areaId === "georgia" ? "national" : areaId.startsWith("settlement.") ? "settlement" : "region";
   return `geostat_household_${kind}_${measure === "per_capita" ? "capita" : "household"}_${area}`;
 }
+/** The source-documents row an observation cites. */
+export function householdSourceDocumentId(sourceId: string): string {
+  return `source.${sourceId}`;
+}

@@ -2,10 +2,18 @@ import fs from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+import { loadHouseholdFactsFromMirror, householdMirrorCreateRows } from "../../../lib/db/mirrorRows";
+import { assertHouseholdParity, loadHouseholdFacts, toClientHouseholdFact } from "../../../lib/data/household/importHousehold";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { prepareHouseholdData, readSheetCellTokens } from "../../../lib/data/household/prepareHousehold";
 import { HOUSEHOLD_INDICATORS, householdSourceId, type HouseholdFact } from "../../../lib/data/household/types";
 import { expectedHouseholdKeys, householdPublishedValue, validateHouseholdFacts } from "../../../lib/data/household/validation";
+
+vi.mock("node:fs/promises", async importOriginal => {
+  const original = await importOriginal<typeof import("node:fs/promises")>();
+  return { ...original, readFile: vi.fn(original.readFile) };
+});
 
 const root = path.resolve(process.cwd(), "../..");
 const loadFacts = (): HouseholdFact[] =>
@@ -69,4 +77,59 @@ test.each([
   const facts = loadFacts();
   mutate(facts);
   expect(() => validateHouseholdFacts(facts)).toThrow(error);
+});
+
+test("the loader serves the validated canonical facts", async () => {
+  const facts = await loadHouseholdFacts();
+  expect(facts).toHaveLength(10638);
+  expect(find(facts, "income.total", "georgia", "per_household", 2025).publishedValue).toBe("2025.8");
+});
+
+test("client facts carry the published figure as a number", async () => {
+  const facts = await loadHouseholdFacts();
+  expect(toClientHouseholdFact(find(facts, "income.total", "georgia", "per_household", 2025))).toEqual({
+    year: 2025, indicatorId: "income.total", areaId: "georgia", measure: "per_household", value: 2025.8,
+  });
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadHouseholdFacts();
+  const target = find(facts, "income.total", "georgia", "per_household", 2025);
+  expect(target.publishedValue).toBe("2025.8");
+  const padded = facts.map(f => (f === target ? { ...f, publishedValue: "2025.80" } : { ...f }));
+  expect(() => assertHouseholdParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  expect(() => assertHouseholdParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[5].value = new Decimal(changed[5].value).plus("0.00000001").toFixed();
+  expect(() => assertHouseholdParity(facts, changed)).toThrow();
+  expect(() => assertHouseholdParity(facts, facts.slice(1))).toThrow();
+});
+
+test("the database mirror round-trips exact decimals and source relations", async () => {
+  const facts = await loadHouseholdFacts();
+  const rows = householdMirrorCreateRows(facts, "household-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ householdIncomeSpendingFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "householdIncomeSpendingFact">;
+  const mirror = await loadHouseholdFactsFromMirror(db(rows));
+  expect(() => assertHouseholdParity(facts, mirror)).not.toThrow();
+  expect(rows[0].importRunId).toBe("household-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadHouseholdFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test.each(["household-income-spending-annual.csv", "household-income-spending-validation.json"])("rejects a stale %s fingerprint", async filename => {
+  const { readFile } = await import("node:fs/promises");
+  const original = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
+  vi.mocked(readFile).mockImplementation((async (...args: Parameters<typeof readFile>) => {
+    const result = await original.readFile(...args);
+    if (!String(args[0]).endsWith(filename)) return result;
+    let text = result.toString();
+    if (filename.endsWith(".csv")) text = text.replace(",gel_month,", ",gel_month ,");
+    else { const report = JSON.parse(text); report.status = "requires_review"; text = JSON.stringify(report); }
+    return Buffer.isBuffer(result) ? Buffer.from(text) : text;
+  }) as typeof readFile);
+  try {
+    await expect(loadHouseholdFacts()).rejects.toThrow(/fingerprint|mismatch/i);
+  } finally {
+    vi.mocked(readFile).mockImplementation(original.readFile);
+  }
 });

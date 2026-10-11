@@ -34,6 +34,7 @@ import { TRADE_DOMESTIC_DOCUMENT_IDS, type TradeDomesticEntity, type TradeDomest
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types";
+import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -645,6 +646,24 @@ export async function loadPovertyFactsFromMirror(db: Pick<MirrorClient, "poverty
     return {
       year: row.year, indicatorId: row.indicatorId as PovertyFact["indicatorId"], groupId: row.groupId as PovertyFact["groupId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as PovertyFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function householdMirrorCreateRows(facts: readonly HouseholdFact[], importRunId: string): Prisma.HouseholdIncomeSpendingFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: householdSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadHouseholdFactsFromMirror(db: Pick<MirrorClient, "householdIncomeSpendingFact">): Promise<HouseholdFact[]> {
+  const rows = await db.householdIncomeSpendingFact.findMany({ orderBy: [{ indicatorId: "asc" }, { areaId: "asc" }, { measure: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== householdSourceDocumentId(row.sourceId)) throw new Error("Household source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as HouseholdFact["indicatorId"], areaId: row.areaId as HouseholdFact["areaId"], measure: row.measure as HouseholdFact["measure"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as "gel_month", basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
