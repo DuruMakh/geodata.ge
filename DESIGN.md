@@ -1142,7 +1142,7 @@ The national context below the workspace appears only on the national overview's
 
 ## 28. Trade hub and national goods Overview
 
-Approved on 2026-10-08, extended with Products on 2026-10-09; scope owner: `Project_Definition.md` §2E. All Trade routes and their English mirrors reuse the editorial shell. The hub has Overview, Trading partners and Products cards, with data-derived coverage and national turnover context. Trade follows Unemployment in the sidebar; these three children appear only in the active Trade context. Demography follows it (§29).
+Approved on 2026-10-08, extended with Products on 2026-10-09; scope owner: `Project_Definition.md` §2E. All Trade routes and their English mirrors reuse the editorial shell. The hub has Overview, Trading partners, Products, Domestic exports and Services trade cards, with data-derived coverage. Services uses its own turnover sparkline; the existing goods cards retain their context. Trade follows Unemployment in the sidebar; these five children appear only in the active Trade context. Demography follows it (§29).
 
 The Overview workspace reuses the existing line chart, table, annual range strip, series aside and Excel button. Four checkbox rows remain in this order: `საგარეო სავაჭრო ბრუნვა` / Total trade (ink), `ექსპორტი` / Exports (editorial green), `იმპორტი` / Imports (editorial blue), `სავაჭრო სალდო` / Trade balance (editorial muted brown). Only turnover is selected initially and it is removable. Search never narrows bulk selection or the denominator of four. Default mode is line and the range derives from all loaded annual observations.
 
@@ -1175,6 +1175,14 @@ Approved 2026-10-10: one Domestic exports page with Overview / Countries / Produ
 Derive coverage, counts and defaults from loaded observations. Saved links retain the active view, years, display mode and unlimited or explicitly empty selection through reload, history and language changes; switching views remembers the view's last comparison. Search never narrows bulk selection or export. Missing re-export counterparts remain gaps/dashes/blank Excel cells. State the domestic-value-added limitation, reviewed subtraction and selected-product/remainder limits in the existing source-note area. Keep the established editorial and mobile layouts; no new visual system is introduced.
 
 Keep one page-level tab row. Countries places its small Domestic exports / Re-exports controls below search in the series panel, following the existing municipality/region control style; never add a second measure-tab row beneath the page tabs. Products has no flow tab because Domestic exports is implicit; Add products remains above its chart.
+
+### 28.4 Services trade
+
+Approved 2026-10-11 (`docs/superpowers/specs/2026-10-11-trade-services-design.md`). The Services trade page and English mirror use one heading, one short nominal-USD lead line and one Overview / Service types text-tab row. Reuse `TradeOverview` and `TradePartners` through their explicit services dataset options, the shared Trade tab state, series panel, charts, tables, annual range controls, ranking and native Excel. The fifth hub card and active sidebar child follow Domestic exports, with services turnover and loaded coverage.
+
+Overview offers Total services trade, Services exports, Services imports and Services balance, with four independent end-year figures and the signed balance context chart. Service types starts with Total services trade and a single selector containing the removable national services total plus all twelve types; measure controls sit below search and no country/group tabs appear. Each view initially selects only its applicable total, in line mode over all loaded years. Selection is unlimited; search never scopes bulk actions, counts, ranking or Excel. The independent end-year ranking shows all twelve types; non-balance shares use the matching same-year national services total, while Balance uses absolute magnitude, signed neutral bars and no share. Scale follows the full relevant catalogue over the active range independently of checkbox selection.
+
+Saved links retain view, active measure, years, mode and explicit empty selections through reload, history, language changes and active sidebar links; switching views remembers the last comparison. Missing values remain gaps, dashes and blank workbook cells; zero stays numerical. Keep `services.total` and service-type identities separate from goods/countries. Explain resident/non-resident definitions, the unavailable 2020 maintenance/repair export, exact formulas, country holds and the distinct NBG vintage in the existing methodology. No new component family or visual system is introduced.
 
 ## 29. Demography surfaces
 

@@ -47,6 +47,7 @@ export function DataSidebar() {
   const foreignInvestmentActive = pathname.endsWith("/explorer/external/foreign-investment");
   const currentAccountActive = pathname.endsWith("/explorer/external/current-account");
   const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
+  const tradeServicesActive = pathname.endsWith("/explorer/trade/services");
   const tradeDomesticActive = pathname.endsWith("/explorer/trade/domestic-exports");
   const demographyActive = pathname.includes("/explorer/demography");
   const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !wagesActive && !povertyActive && !tradeActive && !externalActive && !demographyActive;
@@ -396,6 +397,12 @@ export function DataSidebar() {
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeDomesticActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeDomesticActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeDomestic")}
+            </Link> : null}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/services", locale)} data-testid="trade-services-link" aria-current={tradeServicesActive ? "page" : undefined}
+              onNavigate={(event) => { if (tradeServicesActive) event.preventDefault(); setSheetOpen(false); }}
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeServicesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeServicesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+              {message(messages, "common.tradeServices")}
             </Link> : null}
             <Link href={pageHref("/explorer/external", locale)} data-testid="external-link" aria-current={pathname.endsWith("/explorer/external") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${externalActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>

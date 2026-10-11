@@ -48,7 +48,7 @@
   "trade.hubTitle": "Trade",
   "trade.title": "Trade overview",
   "trade.summary": "Compare Georgia’s annual exports, imports, total trade and trade balance in nominal US dollars. Goods only.",
-  "trade.hubSummary": "Explore Georgia’s annual goods trade through national totals, trading partners, products and domestic exports.",
+  "trade.hubSummary": "Explore Georgia’s annual goods trade through national totals, trading partners, products and domestic exports, and compare services separately.",
   "trade.metaTitle": "External trade in goods",
   "trade.metaDescription": "Explore Georgia’s annual goods exports, imports, total trade and trade balance in USD.",
   "trade.indicator.trade.turnover": "Total trade",
@@ -140,5 +140,7 @@
   "trade.products.rankingTitle": "Leading products · {measure} · {year}",
   "trade.products.showAll": "Show all products",
   "trade.products.shareNote": "Shares use Georgia’s national total for the same year and trade flow.",
-  "trade.products.definitions": "Exports include re-exports and use FOB values; imports use CIF values. Missing observations remain gaps or dashes. Publication status: unspecified."
+  "trade.products.definitions": "Exports include re-exports and use FOB values; imports use CIF values. Missing observations remain gaps or dashes. Publication status: unspecified.",
+  "trade.hubMetaTitle": "External trade in goods and services",
+  "trade.hubMetaDescription": "Explore Georgia’s annual goods trade and separately reviewed services trade in nominal US dollars."
 }
