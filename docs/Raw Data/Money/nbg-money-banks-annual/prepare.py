@@ -117,8 +117,12 @@ BREAKS = [
                     'from 2023-01." Nonperforming loans to total gross loans, row 20: O20 (2022-12) 1.51%, P20 (2023-01) 3.10%.'}]
 
 
+DISPLAY = Context(prec=15, rounding=ROUND_HALF_UP)  # Excel shows a stored double to 15 significant digits.
+
+
 def published(value, places=1):
-    return str(Decimal(value).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP))
+    """Round half-up from the value as Excel displays it, so 8.4499999999999993 (shown 8.45) publishes as 8.5."""
+    return str(DISPLAY.create_decimal(value).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP))
 
 
 def column_number(letters):

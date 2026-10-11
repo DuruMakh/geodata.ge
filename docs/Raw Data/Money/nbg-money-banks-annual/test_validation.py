@@ -125,6 +125,15 @@ class MoneyBanksPackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'anchor'):
             prepare.validate(altered(self.rows, 'money.m3', 2025, '57680.3'))
 
+    def test_rounds_as_excel_displays(self):
+        # Excel stores these cells just below a .x5 boundary and shows them to 15 significant digits, as NBG prints them.
+        self.assertEqual(prepare.published('8.4499999999999993', 1), '8.5')
+        self.assertEqual(prepare.published('8.4499999999999', 1), '8.4')
+        self.assertEqual(find(self.rows, 'rates.deposits_gel', 2013)['value'], '8.4499999999999993')
+        self.assertEqual(find(self.rows, 'rates.deposits_gel', 2013)['published_value'], '8.5')
+        self.assertEqual(find(self.rows, 'rates.deposits_fx', 2003)['value'], '8.9499999999999993')
+        self.assertEqual(find(self.rows, 'rates.deposits_fx', 2003)['published_value'], '9.0')
+
     def test_exact_tokens(self):
         self.assertEqual(find(self.rows, 'money.m3', 2025)['value'], '57680.224000000002')
         self.assertEqual(find(self.rows, 'loans.total', 2025)['source_cell'][0], 'B')

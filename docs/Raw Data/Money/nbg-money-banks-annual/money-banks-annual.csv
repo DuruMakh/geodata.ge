@@ -538,7 +538,7 @@
 2000,rates.deposits_fx,11.45,11.5,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H9
 2001,rates.deposits_fx,10.029999999999999,10.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H10
 2002,rates.deposits_fx,10.02,10.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H11
-2003,rates.deposits_fx,8.9499999999999993,8.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H12
+2003,rates.deposits_fx,8.9499999999999993,9.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H12
 2004,rates.deposits_fx,7.97,8.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H13
 2005,rates.deposits_fx,6.94,6.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H14
 2006,rates.deposits_fx,7.42,7.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H15
@@ -578,7 +578,7 @@
 2010,rates.deposits_gel,8.2799999999999994,8.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E19
 2011,rates.deposits_gel,9.02,9.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E20
 2012,rates.deposits_gel,9.26,9.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E21
-2013,rates.deposits_gel,8.4499999999999993,8.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E22
+2013,rates.deposits_gel,8.4499999999999993,8.5,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E22
 2014,rates.deposits_gel,7.62,7.6,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E23
 2015,rates.deposits_gel,9.959733608928973,10.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E24
 2016,rates.deposits_gel,9.3312926939364154,9.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E25

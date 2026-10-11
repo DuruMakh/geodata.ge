@@ -32,7 +32,7 @@ All rows use `basis=actual`. `value_status` is `official` for transcribed cells 
 
 ## Identifiers
 
-Indicator IDs are stable lowercase ASCII names in the form `group.name`, with the groups `money`, `loans`, `deposits`, `rates` and `banks`; the table above lists all 28. Source IDs are `nbg_*` (ten workbooks, four methodology PDFs, five API listings and the page capture) and series-break IDs are `fsi_method_2022` and `fsi_ifrs_2023`. Georgian and English labels are display data, never identifiers. `data/imports/money-banks-annual.csv` has one row per indicator and year, with the columns `year`, `indicator_id`, `value`, `published_value`, `unit`, `basis`, `value_status`, `source_id`, `source_sheet`, `source_cell` and `last_reviewed_at`. `value` keeps the stored precision and `published_value` rounds half-up to the printed format.
+Indicator IDs are stable lowercase ASCII names in the form `group.name`, with the groups `money`, `loans`, `deposits`, `rates` and `banks`; the table above lists all 28. Source IDs are `nbg_*` (ten workbooks, four methodology PDFs, five API listings and the page capture) and series-break IDs are `fsi_method_2022` and `fsi_ifrs_2023`. Georgian and English labels are display data, never identifiers. `data/imports/money-banks-annual.csv` has one row per indicator and year, with the columns `year`, `indicator_id`, `value`, `published_value`, `unit`, `basis`, `value_status`, `source_id`, `source_sheet`, `source_cell` and `last_reviewed_at`. `value` keeps the stored precision and `published_value` rounds half-up to the printed format, using the value as Excel displays it (15 significant digits).
 
 ## Series boundaries
 

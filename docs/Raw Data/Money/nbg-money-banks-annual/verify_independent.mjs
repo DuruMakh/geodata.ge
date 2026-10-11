@@ -122,8 +122,23 @@ function spanHeading(sheet, row, column) {
   return '';
 }
 
-/** Exact decimal rounding of a stored value's printed digits, half away from zero. */
+/** A decimal token rounded half away from zero to 15 significant digits, the precision Excel displays. */
+function displayed(token) {
+  const negative = token.startsWith('-');
+  const [whole, fraction = ''] = token.replace('-', '').split('.');
+  const digits = whole + fraction;
+  const first = digits.search(/[1-9]/);
+  if (first < 0 || digits.length - first <= 15) return token;
+  const kept = digits.slice(0, first + 15);
+  let rounded = (BigInt(kept) + (Number(digits[first + 15]) >= 5 ? 1n : 0n)).toString().padStart(kept.length, '0');
+  const point = whole.length + rounded.length - kept.length;
+  rounded = rounded.padEnd(point, '0');
+  return (negative ? '-' : '') + (rounded.slice(0, point) || '0') + (rounded.length > point ? `.${rounded.slice(point)}` : '');
+}
+
+/** Exact decimal rounding, half away from zero, of a stored value as Excel displays it (8.4499999999999993 shows 8.45). */
 function roundHalfUp(token, places) {
+  token = displayed(token);
   const negative = token.startsWith('-');
   const [whole, fraction = ''] = token.replace('-', '').split('.');
   const padded = (fraction + '0'.repeat(places + 1)).slice(0, places + 1);

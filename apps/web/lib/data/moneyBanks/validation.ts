@@ -71,7 +71,8 @@ export function validateMoneyBanksFacts(facts: readonly MoneyBanksFact[]): void 
     const low = fact.unit === "gel_million" ? 0 : SIGNED.includes(fact.indicatorId) ? -100 : 0;
     if (!value.isFinite() || value.lt(low) || (fact.unit === "percent" && value.gt(100)) || value.decimalPlaces() > 30) throw new Error(`Money and banks value outside its range or database precision: ${key}`);
     const decimals = moneyBanksDisplayDecimals(fact.indicatorId);
-    if (fact.publishedValue !== value.toFixed(decimals)) throw new Error(`Money and banks published value does not match its stored value: ${key}`);
+    // Round half-up from the value as Excel displays it (15 significant digits): 8.4499999999999993 shows 8.45 and publishes 8.5.
+    if (fact.publishedValue !== value.toSignificantDigits(15).toFixed(decimals)) throw new Error(`Money and banks published value does not match its stored value: ${key}`);
     values.set(key, value);
   }
   const missing = [...expected].filter(key => !values.has(key));

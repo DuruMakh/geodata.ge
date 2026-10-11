@@ -44,6 +44,16 @@ test("serves all 730 reviewed values over the approved coverage", async () => {
   expect(Math.max(...facts.map(f => f.year))).toBe(2025);
 });
 
+test("published values round from the value as Excel displays it, as NBG prints them", async () => {
+  const facts = await loadFacts();
+  expect(find(facts, "rates.deposits_gel", 2013)).toMatchObject({ value: "8.4499999999999993", publishedValue: "8.5" });
+  expect(find(facts, "rates.deposits_fx", 2003)).toMatchObject({ value: "8.9499999999999993", publishedValue: "9.0" });
+  validateMoneyBanksFacts(facts);
+  // 8.4499999999999993 is shown as 8.45 to 15 significant digits, so 8.4 (rounding the full double) is rejected.
+  find(facts, "rates.deposits_gel", 2013).publishedValue = "8.4";
+  expect(() => validateMoneyBanksFacts(facts)).toThrow(/published value/);
+});
+
 test("the canonical file is UTF-8 with a BOM and the agreed header", async () => {
   const bytes = await fs.readFile(path.join(root, "data/imports/money-banks-annual.csv"));
   expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
