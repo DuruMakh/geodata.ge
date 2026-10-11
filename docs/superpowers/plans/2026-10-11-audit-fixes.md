@@ -497,6 +497,19 @@ The repo has no @testing-library, and Vitest runs in a `node` environment where 
 - [ ] **Step 3: Run.** Expected: PASS.
 - [ ] **Step 4: Commit:** `feat(external): mark the January 2010 microfinance break on Money from abroad`
 
+### Task 25 (Q6, approved by the owner 2026-10-11): nothing but the heading on Trade and External flows pages
+
+**Files:**
+- Modify: `components/trade/trade-overview.tsx:67`, `trade-partners.tsx:45`, `trade-products.tsx:50`, `trade-domestic-exports.tsx:40` (merged after this plan was written), `components/external/money-from-abroad.tsx:43`, `foreign-investment.tsx:40`, `current-account.tsx:45`. Delete the `<p>` under `ExplorerHeading`.
+- Delete the message keys that no longer render anywhere: the `external.*.intro` keys, and any trade key the metadata does not use. Keys that page metadata or hub cards use stay.
+- `DESIGN.md` §17: Trade and External flows now follow the rule too.
+- Test: `tests/browser/{trade-overview,trade-partners,trade-products,trade-domestic,money-from-abroad,foreign-investment,current-account}.spec.ts`
+
+- [ ] **Step 1: Failing browser test**, in each of the seven specs: `"nothing but the heading sits above the controls"`. The element after the `h1` wrapper must not be a `p` with the summary text (assert `page.locator("h1 + p")` has count 0, adapted to the heading component's markup).
+- [ ] **Step 2: Implement.** Delete the paragraphs and the unused keys. Run `npm run i18n:check`.
+- [ ] **Step 3: Run** the seven specs and `npx vitest run tests/seo`. Expected: PASS. Meta descriptions are unchanged.
+- [ ] **Step 4: Commit:** `fix(design): only the heading above the workspace on Trade and External flows pages (§17)`
+
 ### Task 24: Release gate (lead)
 
 - [ ] **Step 1:** `npm run check`. Expected: PASS (lint, typecheck, about 3,670 tests, data, i18n).
