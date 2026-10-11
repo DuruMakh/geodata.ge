@@ -58,12 +58,13 @@ const ELECTRICITY_FINAL = { total: 'finalconsumption', industry: 'industry', tra
 const FOODS = [['wheat', 'Wheat'], ['maize', 'Maize'], ['potato', 'Potato'], ['vegetables', 'Vegetables'], ['grapes', 'Grapes'], ['meat', 'Meat'],
   ['beef', 'Beef'], ['pork', 'Pork'], ['sheep_goat_meat', 'Sheep and Goat Meat'], ['poultry_meat', 'Poultry Meat'], ['milk', 'Milk and Milk Products'], ['eggs', 'Egg']];
 
-/** Excel keeps 15 significant digits; energy shows one decimal, food whole percent to 2023 and one decimal after. */
-function shown(indicator, year, value) {
+/** Excel keeps 15 significant digits. Energy shows one decimal; a food ratio follows its own cell's format ("0" whole percent, "General" as stored). */
+function shown(indicator, value, format) {
   const sig = Number(value.toPrecision(15));
-  if (indicator.startsWith('food.') && year <= 2023) {
-    if (!Number.isInteger(sig)) throw new Error(`${indicator} ${year} is not a whole number`);
-    return String(sig);
+  if (indicator.startsWith('food.')) {
+    if (format === 'General') return String(sig);
+    if (format !== '0') throw new Error(`${indicator}: unexpected number format ${format}`);
+    return String(Math.floor(sig + 0.5 + 1e-9));
   }
   const sign = sig < 0 ? -1 : 1;
   return (sign * Math.round(Math.abs(sig) * 10 + 1e-9) / 10).toFixed(1);
@@ -187,8 +188,8 @@ function verify(rows, efficiencyValues = efficiency) {
     else failures.push(`${where}: value ${row.value} != ${want.number}`);
     if (row.value_status === (want.dash ? 'no_flow' : 'published')) statuses += 1;
     else failures.push(`${where}: status ${row.value_status}`);
-    if (row.published_value === shown(want.indicator, want.year, want.number) && row.unit === want.unit && row.basis === 'actual') displays += 1;
-    else failures.push(`${where}: display ${row.published_value}/${row.unit}/${row.basis} != ${shown(want.indicator, want.year, want.number)}/${want.unit}`);
+    if (row.published_value === shown(want.indicator, want.number, want.format) && row.unit === want.unit && row.basis === 'actual') displays += 1;
+    else failures.push(`${where}: display ${row.published_value}/${row.unit}/${row.basis} != ${shown(want.indicator, want.number, want.format)}/${want.unit}`);
     if (spaced(row.source_label) === want.label && (row.source_number_format === 'unsupported' || row.source_number_format === want.format)) labelsMatched += 1;
     else failures.push(`${where}: label/format ${row.source_label} / ${row.source_number_format} != ${want.label} / ${want.format}`);
   }

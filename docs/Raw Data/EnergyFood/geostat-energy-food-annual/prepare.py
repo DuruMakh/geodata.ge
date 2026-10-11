@@ -144,7 +144,6 @@ FOODS = {'wheat': 'Wheat', 'maize': 'Maize', 'potato': 'Potato', 'vegetables': '
          'meat': 'Meat', 'beef': 'Beef', 'pork': 'Pork', 'sheep_goat_meat': 'Sheep and Goat Meat',
          'poultry_meat': 'Poultry Meat', 'milk': 'Milk and Milk Products', 'eggs': 'Egg'}
 FOOD_YEARS = range(2014, 2026)
-WHOLE_NUMBERS_THROUGH = 2023  # Geostat shows whole percent to 2023 and one decimal for 2024 and 2025.
 
 
 def _coverage():
@@ -282,16 +281,16 @@ def cell_value(cell):
     raise ValueError(f'Unexpected cell content: {cell}')
 
 
-def display(indicator_id, year, value):
-    """The value as Geostat shows it: one decimal for energy; whole percent to 2023 and one decimal after for food."""
+def display(indicator_id, year, value, number_format=None):
+    """The value as Geostat shows it. Energy shows one decimal. A food ratio follows its own cell's number format:
+    "0" shows whole percent (47.1 shows as 47) and "General" shows the stored value."""
     shown = Decimal(format(float(value), '.15g'))  # Excel keeps 15 significant digits, so 2235.4499999999998 shows as 2235.45
     if indicator_id.startswith('food.'):
-        if year <= WHOLE_NUMBERS_THROUGH:
-            if shown != shown.to_integral_value():
-                raise ValueError(f'Food ratio is not a whole number: {indicator_id}:{year}')
-            return str(int(shown))
-        if shown != shown.quantize(ONE_DECIMAL):
-            raise ValueError(f'Food ratio has more than one decimal: {indicator_id}:{year}')
+        if number_format == '0':
+            return str(int(shown.quantize(Decimal(1), rounding=ROUND_HALF_UP)))
+        if number_format == 'General':
+            return format(shown.normalize(), 'f')
+        raise ValueError(f'Unexpected food number format {number_format}: {indicator_id}:{year}')
     return str(shown.quantize(ONE_DECIMAL, rounding=ROUND_HALF_UP))
 
 
@@ -305,7 +304,7 @@ def _observation(rows, source_id, name, indicator_id, year, sheet, kind, number,
     if not NUMBER.fullmatch(token):
         raise ValueError(f'Stored value is not a plain decimal: {indicator_id}:{year}: {token}')
     rows.append({
-        'year': year, 'indicator_id': indicator_id, 'value': token, 'published_value': display(indicator_id, year, Decimal(token)),
+        'year': year, 'indicator_id': indicator_id, 'value': token, 'published_value': display(indicator_id, year, Decimal(token), cell['format']),
         'unit': _unit(indicator_id), 'basis': 'actual', 'value_status': status, 'source_id': source_id, 'source_sheet': name,
         'source_cell': cell['cell'], 'source_label': _label(sheet, kind, number, column), 'source_number_format': cell['format']})
 
@@ -425,7 +424,7 @@ def validate(rows):
             raise ValueError(f'Duplicate observation: {key}')
         keys.add(key)
         value = Decimal(row['value'])
-        if display(row['indicator_id'], row['year'], value) != row['published_value']:
+        if display(row['indicator_id'], row['year'], value, row['source_number_format']) != row['published_value']:
             raise ValueError(f'Stored and published value disagree: {key}')
         if row['unit'] != _unit(row['indicator_id']) or row['basis'] != 'actual' or row['value_status'] not in ('published', 'no_flow'):
             raise ValueError(f'Unexpected unit, basis or status: {key}')

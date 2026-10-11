@@ -23,7 +23,7 @@ def altered(rows, indicator_id, year, value):
     copied = [dict(row) for row in rows]
     row = find(copied, indicator_id, year)
     row['value'] = value
-    row['published_value'] = prepare.display(indicator_id, year, Decimal(value))
+    row['published_value'] = prepare.display(indicator_id, year, Decimal(value), row['source_number_format'])
     return copied
 
 
@@ -129,9 +129,13 @@ class EnergyFoodPackageTests(unittest.TestCase):
         self.assertEqual(find(self.rows, 'energy.imports.total', 2024)['published_value'], '5099.0')
         self.assertEqual(find(self.rows, 'energy.imports.coal', 2024)['value'], '138.69999999999999')  # the exact stored token
         self.assertEqual(find(self.rows, 'energy.imports.coal', 2024)['published_value'], '138.7')
-        self.assertEqual(find(self.rows, 'food.self_sufficiency.wheat', 2025)['published_value'], '19.0')
+        # Food ratios follow their own cell's number format ("0" or "General"), so 2024-2025 publish as whole numbers
+        self.assertEqual(find(self.rows, 'food.self_sufficiency.wheat', 2025)['published_value'], '19')
         self.assertEqual(find(self.rows, 'food.self_sufficiency.wheat', 2023)['published_value'], '22')
-        self.assertEqual(find(self.rows, 'food.self_sufficiency.eggs', 2024)['published_value'], '96.5')
+        for indicator_id, year, value, published in [('food.self_sufficiency.meat', 2024, '47.1', '47'), ('food.self_sufficiency.milk', 2025, '68.400000000000006', '68'),
+                                                     ('food.self_sufficiency.eggs', 2024, '96.5', '97')]:
+            row = find(self.rows, indicator_id, year)
+            self.assertEqual((row['value'], row['published_value'], row['source_number_format']), (value, published, '0'))
 
     def test_wind_starts_2016(self):
         wind = [row['year'] for row in self.rows if row['indicator_id'] == 'electricity.production.wind']

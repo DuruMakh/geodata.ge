@@ -21,7 +21,7 @@ Pages (all `https://www.geostat.ge/en/modules/categories/<id>`): Energy Balance 
 
 - `energy-food-annual.csv`: the 681 primary observations, one row per indicator and year. Columns: `year, indicator_id, value, published_value, unit, basis, value_status, source_id, source_sheet, source_cell, source_label, source_number_format`.
   - `value` is the cell's exact stored decimal token (for example `138.69999999999999`), or `0` for a dash.
-  - `published_value` is the value as Geostat displays it. Excel keeps 15 significant digits, so the stored value is cut to 15 digits and then rounded half-up. Energy and electricity show one decimal (`5099.0`, and `2235.45` shows as `2235.5`). Food ratios show whole percent to 2023 (`22`) and one decimal for 2024 and 2025 (`19.0`), as the design says. The build fails if a food value is not a whole number to 2023 or has more than one decimal after.
+  - `published_value` is the value as Geostat displays it. Excel keeps 15 significant digits, so the stored value is cut to 15 digits and then rounded half-up. Energy and electricity show one decimal (`5099.0`, and `2235.45` shows as `2235.5`). A food ratio follows its own cell's number format like every other row: `0` shows whole percent (meat 2024 `47.1` publishes as `47`, milk 2025 `68.4` as `68`, eggs 2024 `96.5` as `97`) and `General` shows the stored value (all whole numbers, for example `22`). The exact stored value stays in `value`. The build fails on any other food number format.
   - `unit` is `ktoe`, `gwh` or `percent`; `basis` is always `actual`; `value_status` is `published` or `no_flow`.
   - `source_label` is the row label and column heading as printed (`DOMESTIC SUPPLY | Total`).
 - `coverage.csv`: the first and last year and the count for each indicator.
