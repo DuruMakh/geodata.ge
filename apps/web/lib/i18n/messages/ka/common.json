@@ -66,6 +66,7 @@
   "common.currentAccount": "მიმდინარე ანგარიში",
   "common.moneyFromAbroad": "ფული საზღვარგარეთიდან",
   "common.tradeProducts": "პროდუქტები",
+  "common.tradeDomestic": "ადგილობრივი ექსპორტი",
   "common.dataDemography": "მონაცემები · დემოგრაფია",
   "common.demographyPopulation": "მოსახლეობა",
   "common.demographyMigration": "მიგრაცია",
@@ -74,5 +75,9 @@
   "common.wagesOverview": "ხელფასების მიმოხილვა",
   "common.wagesIndustries": "საქმიანობები",
   "common.wagesRegions": "რეგიონები",
-  "common.dataWages": "მონაცემები · ხელფასები"
+  "common.poverty": "სიღარიბე და უთანასწორობა",
+  "common.povertyRates": "სიღარიბე",
+  "common.povertyInequality": "უთანასწორობა",
+  "common.dataWages": "მონაცემები · ხელფასები",
+  "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა"
 }

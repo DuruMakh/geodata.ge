@@ -164,6 +164,8 @@ source.geostat_trade_export_product_by_4_digit_2000_2014,"საქსტატ�
 source.geostat_trade_import_product_by_4_digit_2000_2014,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 2000–2014",https://www.geostat.ge/media/78945/Import-Product-by-4-digit-2000-2014.xlsx,2026-10-10
 source.geostat_trade_export_product_by_4_digit_2015_2026,"საქსტატი — საქონლის ექსპორტი ოთხნიშნა კოდებით, 2015–2025",https://www.geostat.ge/media/82858/Export-Product-by-4-digit-2015-2026.xlsx,2026-10-10
 source.geostat_trade_import_product_by_4_digit_2015_2026,"საქსტატი — საქონლის იმპორტი ოთხნიშნა კოდებით, 2015–2025",https://www.geostat.ge/media/82884/Import-Product-by-4-digit-2015-2026.xlsx,2026-10-10
+source.geostat_trade_domestic_export_country_2014_2026,"საქსტატი — ადგილობრივი ექსპორტი ქვეყნების მიხედვით, 2014–2025",https://www.geostat.ge/media/82844/Domestic-Export-Country_2014-2026.xlsx,2026-10-10
+source.geostat_trade_domestic_exports_by_4_digit_2014_2026,"საქსტატი — ადგილობრივი ექსპორტი ოთხნიშნა პროდუქტებით, 2014–2025",https://www.geostat.ge/media/82974/Domestic-Exports_by-4-digit-2014-2026.xlsx,2026-10-10
 source.nbg_money_transfers_by_countries,ფულადი გზავნილები ქვეყნების მიხედვით,docs/Raw Data/External/2026-10-10/official/nbg/REMC_money-transfers-by-countries-eng.xlsx,2026-10-10
 source.nbg_balance_of_payments_bpm6,საქართველოს საგადამხდელო ბალანსი (BPM6),docs/Raw Data/External/2026-10-10/official/nbg/BOP-6_bopbpm6eng.xlsx,2026-10-10
 source.geostat_fdi_by_quarters,პირდაპირი უცხოური ინვესტიციები კვარტლების მიხედვით,docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng_by_Quarters.xlsx,2026-10-10
@@ -177,3 +179,10 @@ source.geostat_earnings_annual_business_sector,დაქირავებულ
 source.geostat_earnings_annual_ownership,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი საჯარო და არასაჯარო სექტორში ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/10-earnings-by-ownership-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_region,დაქირავებულთა საშუალო თვიური ნომინალური ხელფასი რეგიონების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/13-earnings-by-region-annual.xlsx,2026-10-10
 source.geostat_earnings_annual_median,დაქირავებულთა მედიანური ხელფასი ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Wages/geostat-earnings-annual/official/median-monthly-earnings.xlsx,2026-10-10
+source.geostat_poverty_absolute,აბსოლუტური სიღარიბის ზღვარს ქვემოთ მყოფი მოსახლეობის წილი,docs/Raw Data/Poverty/geostat-poverty-annual/official/302-absolute-poverty.xlsx,2026-10-10
+source.geostat_poverty_relative,ფარდობითი სიღარიბის ზღვარს ქვემოთ მყოფი მოსახლეობის წილი,docs/Raw Data/Poverty/geostat-poverty-annual/official/301-relative-poverty.xlsx,2026-10-10
+source.geostat_poverty_international,საერთაშორისო სიღარიბის ზღვრებს ქვემოთ მყოფი მოსახლეობის წილი (2021 წლის PPP),docs/Raw Data/Poverty/geostat-poverty-annual/official/304-international-poverty-2021ppp.xlsx,2026-10-10
+source.geostat_gini,ჯინის კოეფიციენტები,docs/Raw Data/Poverty/geostat-poverty-annual/official/303-gini-coefficients.xlsx,2026-10-10
+source.geostat_poverty_source_page,სიღარიბისა და ჯინის კოეფიციენტების წყაროს გვერდი,docs/Raw Data/Poverty/geostat-poverty-annual/official/poverty-page-2026-10-10.html,2026-10-10
+source.geostat_poverty_metadata_2026,სიღარიბისა და ჯინის კოეფიციენტების მეტამონაცემები,docs/Raw Data/Poverty/geostat-poverty-annual/official/poverty-metadata-2026.pdf,2026-10-10
+source.geostat_hies_metadata_2026,შინამეურნეობების შემოსავლებისა და ხარჯების კვლევის მეტამონაცემები,docs/Raw Data/Poverty/geostat-poverty-annual/official/hies-metadata-2026.pdf,2026-10-10

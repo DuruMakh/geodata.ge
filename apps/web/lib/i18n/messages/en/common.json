@@ -66,6 +66,7 @@
   "common.currentAccount": "Current account",
   "common.moneyFromAbroad": "Money from abroad",
   "common.tradeProducts": "Products",
+  "common.tradeDomestic": "Domestic exports",
   "common.dataDemography": "Data · Demography",
   "common.demographyPopulation": "Population",
   "common.demographyMigration": "Migration",
@@ -74,5 +75,9 @@
   "common.wagesOverview": "Wages overview",
   "common.wagesIndustries": "Industries",
   "common.wagesRegions": "Regions",
-  "common.dataWages": "Data · Wages"
+  "common.poverty": "Poverty and inequality",
+  "common.povertyRates": "Poverty",
+  "common.povertyInequality": "Inequality",
+  "common.dataWages": "Data · Wages",
+  "common.dataPoverty": "Data · Poverty and inequality"
 }

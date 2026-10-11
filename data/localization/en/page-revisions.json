@@ -242,5 +242,10 @@
   "/explorer/wages/regions/samtskhe_javakheti": "2026-10-10",
   "/explorer/wages/regions/kvemo_kartli": "2026-10-10",
   "/explorer/wages/regions/shida_kartli": "2026-10-10",
-  "/methodology/wages": "2026-10-10"
+  "/methodology/wages": "2026-10-10",
+  "/explorer/trade/domestic-exports": "2026-10-10",
+  "/explorer/poverty": "2026-10-10",
+  "/explorer/poverty/rates": "2026-10-10",
+  "/explorer/poverty/inequality": "2026-10-10",
+  "/methodology/poverty": "2026-10-10"
 }

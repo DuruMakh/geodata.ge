@@ -1,0 +1,56 @@
+{
+  "status": "passed",
+  "scope": "annual_domestic_exports",
+  "years": [
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "productYears": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "primaryObservations": 2844,
+  "derivedObservations": 2232,
+  "countryEntities": 186,
+  "productEntities": 100,
+  "canonicalSha256": "c9ca08461e00db4c345fd79f17a40a92fe0d6871f105f36af16af069d3a6db85",
+  "catalogueSha256": "0780f0f4211118713c43f26c8ccf8ffc6a83ccc35962ffb118c16e7aa18e67f7",
+  "inputSha256": {
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/full-source-manifest.json": "c9b273fefe788c04240dc353cef46d9dbcc046a5294cfc498591c6e53cb189b2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-layouts.json": "607aea395fde2b71ae2f4f6545cdd2c8444eec4bf021b0bc84b2f1f71321a8dc",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/expected-observation-inventory.json": "803f873b2af1b22bb1c2b76061c03413a7dfe86cca5b931dee1369225c6610ad",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/prepared-validation.json": "c12653a6a6a11f59b6eb105ff287fe867524b7e447196cc8bc89dce4756f489a",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/unresolved-source-issues.json": "95473c512e6458a7da8491806ca318bde18b423e302da5756322d61248f6d8c2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/goods-domestic-annual.csv": "3d9991e104a87e136d0f09564cf5bcd548e7abde35735bf11220e211c2296635",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/identity-review.csv": "ee96ac9b604539c15dc8396b3071068c4ffa9ccd37a4564d94ff1bb28b5ab99b",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/derived-annual.csv": "4cb9835bb34669868d61f913b372dd92febe1e556683a63e03f30973aa22306d",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/coverage.csv": "5a1ca76f67607b737004bcd01e2a345380b746f41e0795d2683543181e3755a2",
+    "data/imports/trade-overview-annual.csv": "924a939acda73809d019a17424106260cf57e787c5ad99d24f4cd38d2ec34c6d",
+    "data/imports/trade-partners-annual.csv": "67998f3a5348110068b7a5305394a145274333f2254c89ba7bf41455f4facf5c",
+    "data/reports/trade-overview-validation.json": "ca8177c19ed7ecf8292c33605d02d9eb609cad47d6b24d81be6f84d8650996f5",
+    "data/reports/trade-partners-validation.json": "7c7ef52d2c1d10c768c40c32d69cfaba5f7915784ed9ea72c19d925f22f79b0f",
+    "data/taxonomy/trade-partners.json": "e4972130f83f47f7365219b625a08cec770193e24a091cccba2e53322e79ccfc",
+    "data/imports/trade-products-catalogue.csv": "2c148fe0783b8ddd6bdf2e23737983f0c78dfefbafb171a269c28d50c187c58a"
+  },
+  "sourceSha256": {
+    "geostat_trade_domestic-export-country-2014-2026": "c4591642eb78303086d4e1538aed31615e8b612b74b203bbbfcda98f826d972c",
+    "geostat_trade_domestic-exports-by-4-digit-2014-2026": "512d7a9511a0312b3c184b57e05862e414f737d663d1b02cb1941df435248679"
+  },
+  "researchPackageStatus": "requires_source_resolution",
+  "outsideScopeHoldCount": 2,
+  "reviewedAt": "2026-10-10"
+}

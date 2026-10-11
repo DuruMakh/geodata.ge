@@ -6,13 +6,13 @@ import { parse } from "csv-parse/sync";
 import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
-import type { ClientTradeOverviewFact, TradeOverviewFact } from "../tradeOverview/types";
+import type { ClientTradeOverviewFact, TradeOverviewFact, TradeChartIndicator } from "../tradeOverview/types";
 import { readTradeProductCatalogue } from "./catalogue";
 import { tradeProductFactKey, type TradeProductEntity, type TradeProductFact, type TradeProductSourceBlock, type TradeProductsData, type TradeProductsAcceptance } from "./types";
 import { tradeProductsEnglishLabels, validateTradeProductsData } from "./validation";
 
 export type ClientTradeProductFact = [entityIndex: number, year: number, measureIndex: 0 | 1, valueUsd: number | null];
-export type ClientTradeProductsData = { entities: TradeProductEntity[]; years: number[]; facts: ClientTradeProductFact[]; nationalFacts: ClientTradeOverviewFact[]; catalogueFingerprint: string; sourceBlock?: TradeProductSourceBlock };
+export type ClientTradeProductsData = { entities: TradeProductEntity[]; years: number[]; facts: ClientTradeProductFact[]; nationalFacts: ClientTradeOverviewFact[]; catalogueFingerprint: string; sourceBlock?: TradeProductSourceBlock; measures?: readonly TradeChartIndicator[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 export async function loadTradeProductsData(): Promise<TradeProductsData> {

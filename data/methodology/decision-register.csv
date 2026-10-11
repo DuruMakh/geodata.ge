@@ -89,3 +89,7 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "wages.measures","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.measures","geodata_decision","2026-10-10"
 "wages.nominal","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.nominal","geodata_decision","2026-10-10"
 "wages.groups","wages","docs/data-methodology/wages-annual.md","Serving on the Wages pages","wages.groups","geodata_decision","2026-10-10"
+"poverty.scope","poverty","docs/data-methodology/poverty-annual.md","Serving on the Poverty and inequality pages","poverty.scope","geodata_decision","2026-10-10"
+"poverty.survey","poverty","docs/data-methodology/poverty-annual.md","Serving on the Poverty and inequality pages","poverty.survey","geodata_decision","2026-10-10"
+"poverty.lines","poverty","docs/data-methodology/poverty-annual.md","Serving on the Poverty and inequality pages","poverty.lines","geodata_decision","2026-10-10"
+"poverty.gini","poverty","docs/data-methodology/poverty-annual.md","Serving on the Poverty and inequality pages","poverty.gini","geodata_decision","2026-10-10"

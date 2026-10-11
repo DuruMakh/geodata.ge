@@ -41,7 +41,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "scope",
       "title": "Which trade is covered?",
       "paragraphs": [
-        "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Separate re-export, regional and services comparisons are excluded. The incomplete 2026 column is not served."
+        "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Domestic exports and supported national/country re-export comparisons are included; regional and services comparisons are excluded. The incomplete 2026 column is not served."
       ]
     },
     {
@@ -90,6 +90,24 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       ]
     },
     {
+      "id": "domestic-validation",
+      "kind": "validation",
+      "title": "How are domestic exports checked?",
+      "paragraphs": [
+        "Domestic exports add two originals checked against exact source cells, units, year headers, identities and national reconciliations. Re-exports require reviewed matching inputs and must reproduce the archived research calculations. This goods subset does not resolve or accept the two services discrepancies."
+      ]
+    },
+    {
+      "id": "domestic-exports",
+      "kind": "classification",
+      "title": "Domestic exports and re-exports",
+      "paragraphs": [
+        "The Domestic exports page compares total exports, domestic exports and calculated re-exports nationally for 2014–2025. Country comparisons show domestic exports and supported re-exports for the same years. All are goods exports in nominal USD on an FOB basis. Domestic exports include goods originating in Georgia and imported goods substantially processed here; they do not measure domestic value added.",
+        "Re-exports equal total exports minus domestic exports only where identities and years have a reviewed match. The historical Macedonia (FYR) entry has no reviewed total-export counterpart, so its re-export figures remain unavailable. Missing figures stay gaps, dashes and blank workbook cells; source decimal differences are preserved.",
+        "The product view covers 2020–2025 and retains 99 source-published products plus Other commodities. Omitted products are not zero, the remainder is not allocated, and no product re-exports are inferred. Shares use the matching national domestic-export total. Excel includes the entire selected comparison and its applicable originals."
+      ]
+    },
+    {
       "id": "validation",
       "kind": "validation",
       "title": "How are the figures checked?",
@@ -104,7 +122,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "Thirteen frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
+        "Fifteen frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, two domestic-export workbooks, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
       ]
     }
   ],
@@ -114,7 +132,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "trade",
       "title": "Which trade is covered?",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Separate re-export, regional and services comparisons are excluded. The incomplete 2026 column is not served.",
+      "summary": "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Domestic exports and supported national/country re-export comparisons are included; regional and services comparisons are excluded. The incomplete 2026 column is not served.",
       "detail": [],
       "canonicalDecisionIds": [
         "trade.scope"
