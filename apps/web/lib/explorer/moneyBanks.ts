@@ -44,6 +44,9 @@ export function moneyBanksViewSeries(section: MoneyBanksSectionId, view: MoneyBa
   }
 }
 
+/** Only on Money supply does the first series contain the others (M3 holds M2, M1 and M0); elsewhere it is a peer, so tables and Excel show no total row. */
+export const moneyBanksHasTotalRow = (section: MoneyBanksSectionId) => section === "supply";
+
 /** A view's initial selection: its first series, except that Loans and deposits compares the two totals. */
 export function moneyBanksDefaultSelection(section: MoneyBanksSectionId, view: MoneyBanksView): string[] {
   return section === "loans-deposits" && view === "amount" ? ["loans.total", "deposits.total"] : [moneyBanksViewSeries(section, view)[0].id];

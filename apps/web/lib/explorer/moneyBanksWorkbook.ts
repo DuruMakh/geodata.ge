@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import type { ClientNationalGdpFact } from "./clientData";
-import { buildMoneyBanksModel, moneyBanksViewFacts, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
+import { buildMoneyBanksModel, moneyBanksHasTotalRow, moneyBanksViewFacts, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
 import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const MILLION = 1_000_000;
@@ -48,7 +48,7 @@ export function buildMoneyBanksWorkbookExportModel(input: {
       rows: model.selected.map(series => {
         const values = Object.fromEntries(model.years.map(year => [year, toExport(series.valuesByYear[year])]));
         return {
-          kind: series.reference ? "total" : "item", parentLabel: null, label: labels[series.id], change: null, valuesByYear: values,
+          kind: series.reference && moneyBanksHasTotalRow(section) ? "total" : "item", parentLabel: null, label: labels[series.id], change: null, valuesByYear: values,
           ...(rowFormat(series.decimals) ? { numberFormat: rowFormat(series.decimals) } : {}),
           basisByYear: Object.fromEntries(model.years.map(year => [year, values[year] === null ? null : "actual"])),
         };

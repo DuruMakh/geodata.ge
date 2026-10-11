@@ -61,7 +61,7 @@ Line under the heading: "2025: broad money (M3) 57.7 billion GEL".
 
 The GDP ratios are NBG's own published "monetization coefficients" at period end, not calculated by fiscal.ge.
 
-> Changed after preview review (Duru, 2026-10-11): no tab row; an icon-only switch on the chart toolbar (`₾` / `ChartPie`) switches between the amounts and the two ratios, carrying M3 and M2 across.
+> Changed after preview review (Duru, 2026-10-11): no tab row; an icon-only switch on the chart toolbar (`₾` / `ChartPie`) switches between the amounts and % of GDP (which series % of GDP shows is set by the next note).
 
 > Changed after preview review (Duru, 2026-10-11): % of GDP shows all four series, M3, M2, M1 and M0, with the same ids as the amounts, so the selection stays when switching. Each value is the December amount ÷ Fiscal.ge's national GDP at current prices × 100, using the debt page's GDP facts and share-of-GDP calculation; it is marked calculated (Excel status), the source line names the GDP source and preliminary GDP years, and Excel's Sources sheet adds Geostat's GDP files. The latest-value line on % of GDP reads M3's value (2025: 55.1%). NBG's own ratios (`money.m3_to_gdp`, `money.m2_to_gdp`) stay in the dataset, CSV and mirror but are no longer shown; they use an earlier GDP estimate, so they match before 2010 and differ by 0.4–1.1 points from 2010 (56.0% against 55.1% for M3 in 2025). This supersedes the table row and the sentence above for Compared with GDP.
 
@@ -82,7 +82,7 @@ Line under the heading: "2025: bank loans 72.5 billion GEL".
 > Changed after preview review (Duru, 2026-10-11): no tabs; an icon-only measure switch on the chart toolbar (`₾` Amount, `CircleDollarSign` Share in foreign currency, as % of GDP became a `ChartPie` icon on Money supply) carries any loan to the loans share and any deposit to the deposits share, and each share back to its total.
 
 - Loans are NBG table L3.5 (loans granted by banks, excluding interbank loans, including overdue loans and accrued interest). Deposits are NBG table D3.17 (all deposits in banks). People are table D3.23 and companies and organisations ("legal entities") table D3.27; the two add up exactly to D3.17's total from 2015. NBG publishes each deposit table as a lari sheet and a foreign-currency sheet, so the three deposit totals (all, people, companies) are lari + foreign currency added up by fiscal.ge and marked as calculated.
-- The foreign-currency share is foreign-currency amount ÷ total amount from those same tables, calculated by fiscal.ge, so the Share tab always agrees with the Loans and Deposits tabs. NBG's own dollarization ratio counts non-bank deposits only, and table D3.17 also includes banks' deposits, so the two differ (47.7% against 48.6% at the end of 2025); the methodology page says so.
+- The foreign-currency share is foreign-currency amount ÷ total amount from those same tables, calculated by fiscal.ge, so the foreign-currency share always agrees with the loan and deposit amounts. NBG's own dollarization ratio counts non-bank deposits only, and table D3.17 also includes banks' deposits, so the two differ (47.7% against 48.6% at the end of 2025); the methodology page says so.
 - Foreign-currency amounts are NBG's lari values at the end-of-month official rate. No exchange rate is served.
 
 ## 6. Interest rates page
@@ -173,7 +173,7 @@ Exchange rates (Duru's decision), monthly or quarterly values, 2026 before its y
 ## 11. Verification
 
 1. The canonical file reproduces every served value from the original cells; the independent verification passes; CSV and database modes agree.
-2. Defaults, tabs, nesting, tab switching, gaps (companies' deposits before 2015, the National Bank rate before 2008, capital before 2014) and URL state behave as in sections 3–7, with the 2025 values given there.
+2. Defaults, measure icons, nesting, measure switching, gaps (companies' deposits before 2015, the National Bank rate before 2008, capital before 2014) and URL state behave as in sections 3–7, with the 2025 values given there.
 3. Chart, table and Excel agree for the same settings, and the source links work.
 4. Georgian and English work at 390, 768 and 1440 pixels, with keyboard use and language switching keeping the settings.
 5. A live preview goes to Duru first. After Duru approves it, run `npm run check`, `npm run build` and `npm run test:browser` once, then push and open the PR.

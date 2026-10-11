@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { ChartPie, CircleDollarSign } from "lucide-react";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
-import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksSeriesModel, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
+import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksSeriesModel, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { formatAmount, formatInUnit, unitFor, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -60,7 +60,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildMoneyBanksModel(section, facts, state, gdpFacts);
-  // Each tab has one unit. Amounts share the site's billion-GEL scale, its decimals read from every value the tab can show;
+  // Each view has one unit. Amounts share the site's billion-GEL scale, its decimals read from every value the view can show;
   // percents keep each series' own precision (two decimals for the National Bank rate, one elsewhere).
   const percent = model.unit === "percent";
   const viewIds = new Set<string>(model.series.map(series => series.id));
@@ -72,7 +72,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const matches = (id: string) => matchesLabelQuery(query, [labels[id]]);
   const reference = model.series[0];
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
-  const total = rows.find(row => row.itemId === reference.id) ?? null;
+  const total = moneyBanksHasTotalRow(section) ? rows.find(row => row.itemId === reference.id) ?? null : null;
   const allIds = model.series.map(series => series.id);
   // Parts nest under their total (as on Poverty): the count and bulk action cover the top-level rows, nested ticks are counted apart.
   const topIds = model.series.filter(series => !series.parentId).map(series => series.id);
@@ -125,7 +125,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={percent} unit={unit} shareLabel={tabLabel} formatTooltipValue={valueLabel} /></div>
-            : <ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
+            : <ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
               shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={row => decimalsOf(row.itemId)} />}
           <RangeStrip years={moneyBanksCoverage(section, state.view, facts, gdpFacts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyBanksModel(section, facts, s, gdpFacts).range, patch) }))} />
         </section>

@@ -211,6 +211,8 @@ test("the deposits workbook exports million GEL, leaves 2010-2014 company deposi
   expect(model.readable.title).toBe("Loans and deposits · Amount");
   expect(model.readable.years).toHaveLength(16);
   expect(model.readable.rows).toHaveLength(5);
+  // All deposits is a peer of All loans on this page, not a total over the rows below it.
+  expect(model.readable.rows.map(row => row.kind)).not.toContain("total");
   expect(model.readable.unitLabel).toBe("million GEL");
   expect(model.readable.numberFormat).toBe("#,##0.0");
   expect(model.readable.rows[0].valuesByYear[2025]).toBe(68496.9);
@@ -230,6 +232,11 @@ test("the deposits workbook exports million GEL, leaves 2010-2014 company deposi
   const legalRow = [...Array(sheet.rowCount).keys()].map(i => sheet.getRow(i + 1)).find(row => row.getCell(1).value === "deposits.legal_entities")!;
   expect(legalRow.getCell(2).value).toBeNull();
   expect(legalRow.getCell(17).value).not.toBeNull();
+});
+
+test("only the Money supply workbook styles its first series as a total", async () => {
+  expect((await workbookFor("supply", "amount", ["money.m3", "money.m2"], 2020, 2025)).readable.rows.map(row => row.kind)).toEqual(["total", "item"]);
+  expect((await workbookFor("bank-health", "main", ["banks.npl_ratio", "banks.roa"], 2020, 2025)).readable.rows.map(row => row.kind)).toEqual(["item", "item"]);
 });
 
 test("the interest-rates workbook shows the National Bank rate to two decimals and the rest to one", async () => {
