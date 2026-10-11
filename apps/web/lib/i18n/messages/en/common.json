@@ -78,6 +78,10 @@
   "common.poverty": "Poverty and inequality",
   "common.povertyRates": "Poverty",
   "common.povertyInequality": "Inequality",
+  "common.livingStandards": "Living standards",
+  "common.householdIncome": "Income",
+  "common.householdSpending": "Spending",
   "common.dataWages": "Data · Wages",
-  "common.dataPoverty": "Data · Poverty and inequality"
+  "common.dataPoverty": "Data · Poverty and inequality",
+  "common.dataLivingStandards": "Data · Living standards"
 }

@@ -78,6 +78,10 @@
   "common.poverty": "სიღარიბე და უთანასწორობა",
   "common.povertyRates": "სიღარიბე",
   "common.povertyInequality": "უთანასწორობა",
+  "common.livingStandards": "ცხოვრების დონე",
+  "common.householdIncome": "შემოსავლები",
+  "common.householdSpending": "ხარჯები",
   "common.dataWages": "მონაცემები · ხელფასები",
-  "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა"
+  "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა",
+  "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე"
 }
