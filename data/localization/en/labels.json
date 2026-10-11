@@ -22686,5 +22686,57 @@
   "fdi.region.shida_kartli": {
     "text": "Shida Kartli",
     "reviewedAt": "2026-10-10"
+  },
+  "services.total": {
+    "text": "Total services trade",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.manufacturing": {
+    "text": "Manufacturing services on physical inputs owned by others",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.maintenance_repair": {
+    "text": "Maintenance and repair services n.i.e.",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.transport": {
+    "text": "Transport",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.travel": {
+    "text": "Travel",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.construction": {
+    "text": "Construction",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.insurance_pension": {
+    "text": "Insurance and pension services",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.financial": {
+    "text": "Financial services",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.intellectual_property": {
+    "text": "Charges for the use of intellectual property n.i.e.",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.telecommunications_computer_information": {
+    "text": "Telecommunications, computer, and information services",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.other_business": {
+    "text": "Other business services",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.personal_cultural_recreational": {
+    "text": "Personal, cultural, and recreational services",
+    "reviewedAt": "2026-10-11"
+  },
+  "services.government": {
+    "text": "Government goods and services n.i.e.",
+    "reviewedAt": "2026-10-11"
   }
 }

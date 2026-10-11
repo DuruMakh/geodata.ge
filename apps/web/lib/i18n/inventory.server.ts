@@ -14,6 +14,7 @@ import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
+import tradeServiceRegistry from "../../../../data/taxonomy/trade-services.json";
 import moneyTransferRegistry from "../../../../data/taxonomy/money-transfer-countries.json";
 import foreignInvestmentRegistry from "../../../../data/taxonomy/foreign-investment.json";
 import { readTradeProductCatalogue } from "../data/tradeProducts/catalogue";
@@ -66,6 +67,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...sectorRegistry.map(row => row.id), "economic-sectors",
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
+      ...tradeServiceRegistry.map(row => row.id),
       ...moneyTransferRegistry.map(row => row.id),
       ...foreignInvestmentRegistry.map(row => row.id),
       ...tradeProducts.map(row => row.id),
