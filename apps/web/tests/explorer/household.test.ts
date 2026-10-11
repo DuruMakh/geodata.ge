@@ -1,3 +1,4 @@
+import path from "node:path";
 import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadServedHouseholdData, toClientHouseholdFact } from "../../lib/data/household/importHousehold";
@@ -7,7 +8,10 @@ import {
   householdCoverage, householdViewSeries, parseHouseholdHash, serializeHouseholdHash, type HouseholdState,
 } from "../../lib/explorer/household";
 import { buildHouseholdHubCards } from "../../lib/explorer/householdHubCards";
-import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
+import { buildHouseholdWorkbookExportModel, householdWorkbookSources } from "../../lib/explorer/householdWorkbook";
+import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
+import { projectPublicSources } from "../../lib/methodology/publicSources";
+import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Locale, Presentation } from "../../lib/i18n/types";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
@@ -189,6 +193,25 @@ test("a missing early region year is a blank cell, never zero, and the numeric f
   expect(data.getCell(gapRow, 3).value).toBeNull();
   expect(data.getCell(2, 1).numFmt).not.toBe("0.0");
   expect(data.getCell(2, 3).type).toBe(ExcelJS.ValueType.Number);
+});
+
+test.each(["ka", "en"] as const)("the %s income workbook lists validated links to the archived Geostat workbooks it was built from", async (locale: Locale) => {
+  const root = path.resolve(process.cwd(), "../..");
+  const [manifest, catalogue] = await Promise.all([loadReviewedSourceManifest(root, "household-income"), loadEnglishCatalogue(root)]);
+  const sources = householdWorkbookSources(manifest, projectPublicSources(manifest, locale, catalogue.documents));
+  // Only the twelve served workbooks, not the population totals, page captures or metadata.
+  expect(sources.map(source => source.sourceId).sort()).toEqual([...HOUSEHOLD_SOURCES].sort());
+  const ids = ["georgia", "region.guria"];
+  const model = buildHouseholdWorkbookExportModel({
+    section: "income", facts, sources, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
+    state: { mode: "table", view: "areas", area: "georgia", measure: "per_capita", range: { kind: "manual", start: 2019, end: 2025 }, selectedIds: ids },
+  }, await presentationFor(locale));
+  expect(model.sources.map(source => source.absoluteUrl)).toEqual([
+    "https://fiscal.ge/downloads/methodology/household-income/files/107-income-per-capita.xlsx",
+    "https://fiscal.ge/downloads/methodology/household-income/files/109-income-per-capita-region.xlsx",
+  ]);
+  expect(model.sources.every(source => source.organization && source.title && source.retrievedAt === "2026-10-11")).toBe(true);
+  expect(model.sources[0].title).toBe(locale === "en" ? "Distribution of average monthly incomes per capita" : "ერთ სულ მოსახლეზე საშუალო თვიური შემოსავლების განაწილება");
 });
 
 test("the hub has an income and a spending card with Georgia per-household sparklines", async () => {

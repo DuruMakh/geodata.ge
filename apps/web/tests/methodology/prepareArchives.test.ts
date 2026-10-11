@@ -88,6 +88,7 @@ async function createFixtureRepository() {
   const rows: Record<MethodologyDatasetId, ReviewedSourceManifestRow[]> = {
     wages: [await writeReviewedSource(repositoryRoot, "wages", "1995-2025", "docs/Raw Data/Wages/geostat-earnings-annual/official/01-earnings-annual.xlsx", "downloads/methodology/wages/files/01-earnings-annual.xlsx", "wages-headline")],
     poverty: [await writeReviewedSource(repositoryRoot, "poverty", "2004-2025", "docs/Raw Data/Poverty/geostat-poverty-annual/official/302-absolute-poverty.xlsx", "downloads/methodology/poverty/files/302-absolute-poverty.xlsx", "poverty-absolute")],
+    "household-income": [await writeReviewedSource(repositoryRoot, "household-income", "2002-2025", "docs/Raw Data/Households/geostat-household-income-spending-annual/official/104-income-per-household.xlsx", "downloads/methodology/household-income/files/104-income-per-household.xlsx", "household-income-household")],
     trade: [await writeReviewedSource(repositoryRoot, "trade", "1995-2025", "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx", "downloads/methodology/trade/files/ftrade_1995-2026.xlsx", "trade-total")],
     "external-flows": [
       await writeReviewedSource(repositoryRoot, "external-flows", "2000-2025", "docs/Raw Data/External/2026-10-10/official/nbg/REMC_money-transfers-by-countries-eng.xlsx", "downloads/methodology/external-flows/files/remc_money-transfers-by-countries-eng.xlsx", "external-remc"),

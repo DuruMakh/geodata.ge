@@ -1,4 +1,5 @@
-import { HouseholdExplorer, type HouseholdExplorerProps } from "../../components/household/household-explorer";
+import path from "node:path";
+import { HouseholdExplorer } from "../../components/household/household-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -8,6 +9,7 @@ import { HOUSEHOLD_AREAS, type HouseholdArea } from "../data/household/types";
 import { WAGES_REGIONS } from "../data/wages/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HOUSEHOLD_SECTIONS, householdCoverage, householdViewSeries, type HouseholdSectionId } from "../explorer/household";
+import { householdWorkbookSources } from "../explorer/householdWorkbook";
 import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
@@ -17,6 +19,9 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
+import { loadEnglishCatalogue } from "../i18n/catalogue.server";
+import { projectPublicSources } from "../methodology/publicSources";
+import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -34,8 +39,10 @@ function householdAreaLabels(presentation: Presentation): Record<HouseholdArea, 
 }
 
 export async function renderHouseholdPage(locale: Locale, section: HouseholdSectionId) {
-  const [data, presentation] = await Promise.all([
+  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const [data, presentation, manifest, catalogue] = await Promise.all([
     loadServedHouseholdData(), getPresentation(locale, ["household", "common", "controls", "format", "main", "workbook"], WAGES_REGIONS),
+    loadReviewedSourceManifest(root, "household-income"), loadEnglishCatalogue(root),
   ]);
   // Each page receives only its own section's observations.
   const facts = data.facts.map(toClientHouseholdFact).filter(f => f.indicatorId.startsWith(`${section}.`));
@@ -45,8 +52,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   const t = (key: string) => message(presentation.messages, `household.${key}`);
   const labels = Object.fromEntries(householdViewSeries(section, "parts", "georgia").map(series => [series.id, t(`series.${series.id}`)]));
   const areaLabels = householdAreaLabels(presentation);
-  // The household source archive is published with the methodology page; until then the workbook carries no source links.
-  const sources: HouseholdExplorerProps["sources"] = [];
+  const sources = householdWorkbookSources(manifest, projectPublicSources(manifest, locale, catalogue.documents));
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`), hubTitle = t("hub.title");
   const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`)).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, { label: title }];

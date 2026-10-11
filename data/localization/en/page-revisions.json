@@ -249,5 +249,6 @@
   "/explorer/living-standards/spending": "2026-10-11",
   "/explorer/living-standards/poverty": "2026-10-11",
   "/explorer/living-standards/inequality": "2026-10-11",
-  "/methodology/poverty": "2026-10-10"
+  "/methodology/poverty": "2026-10-10",
+  "/methodology/household-income": "2026-10-11"
 }

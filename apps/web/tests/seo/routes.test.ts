@@ -62,7 +62,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Domestic exports adds one further bilingual pair.
     // Poverty adds its hub, two pages and methodology page: 4 bilingual pairs.
     // Living standards replaces the Poverty hub and adds Income and Spending: 2 more bilingual pairs.
-    expect(urls).toHaveLength(502);
+    // The Household income and spending methodology adds one more bilingual pair.
+    expect(urls).toHaveLength(504);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

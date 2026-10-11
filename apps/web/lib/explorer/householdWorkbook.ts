@@ -1,4 +1,6 @@
-import { householdSourceId, type ClientHouseholdFact } from "../data/household/types";
+import { HOUSEHOLD_SOURCES, householdSourceId, type ClientHouseholdFact } from "../data/household/types";
+import type { PublicSourceManifestRow } from "../methodology/publicSources";
+import type { ValidatedSourceManifestRow } from "../methodology/sourceManifest";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
@@ -6,6 +8,14 @@ import { buildHouseholdModel, type HouseholdSectionId, type HouseholdState } fro
 import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource, type WorkbookReadableRow } from "./workbookModel";
 
 const NUMBER_FORMAT = "0.0";
+
+/** The twelve served workbooks of the validated archive, as the Sources sheet lists them; the population totals, page captures and metadata are not data sources of any value shown. */
+export function householdWorkbookSources(manifest: readonly ValidatedSourceManifestRow[], publicSources: readonly PublicSourceManifestRow[]): (WorkbookPublicSource & { sourceId: string })[] {
+  return manifest.filter(source => HOUSEHOLD_SOURCES.includes(source.source_id)).map(source => {
+    const translated = publicSources.find(row => row.source_id === source.source_id)!;
+    return { sourceId: source.source_id, years: source.years, title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at };
+  });
+}
 
 export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSectionId; facts: readonly ClientHouseholdFact[]; state: HouseholdState; labels: Readonly<Record<string, string>>; areaLabel: string; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
   const { section, facts, state, labels } = input, { locale, messages } = presentation;
