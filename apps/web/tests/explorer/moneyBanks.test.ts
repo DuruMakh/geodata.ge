@@ -1,13 +1,14 @@
 import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../lib/data/moneyBanks/importMoneyBanks";
-import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
+import { MONEY_BANKS_SOURCES, type ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import { INK } from "../../lib/explorer/colors";
 import { buildMoneyBanksHubCards } from "../../lib/explorer/moneyBanksHubCards";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
+import { loadMoneyBanksWorkbookSources } from "../../lib/pages/moneyBanks";
 import {
   MONEY_BANKS_SECTIONS, buildMoneyBanksModel, changeMoneyBanksView, defaultMoneyBanksState, moneyBanksCoverage, moneyBanksViewSeries, moneyBanksViews,
   parseMoneyBanksHash, serializeMoneyBanksHash,
@@ -177,6 +178,22 @@ test("the Profits workbook keeps the 2008 loss as a negative percent", async () 
   expect(roa.valuesByYear[2008]!).toBeLessThan(0);
   expect(model.analysis.rows.find(r => r[0] === 2008 && r[1] === "banks.roa")![2]!).toBeLessThan(0);
   expect(model.sources.map(source => source.title)).toEqual(["nbg_fsi_archive"]);
+});
+
+test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG workbooks with their public links", async locale => {
+  const sources = await loadMoneyBanksWorkbookSources(locale);
+  expect(sources.map(source => source.sourceId).sort()).toEqual([...MONEY_BANKS_SOURCES].sort());
+  for (const source of sources) expect(source.downloadHref).toMatch(/^\/downloads\/methodology\/money\/files\/[a-z0-9._-]+\.xlsx$/);
+  const range = (first: number, last: number) => Array.from({ length: last - first + 1 }, (_, i) => first + i);
+  expect(sources.find(source => source.sourceId === "nbg_fsi_archive")!.years).toEqual(range(2001, 2021));
+  expect(sources.find(source => source.sourceId === "nbg_fsi")!.years).toEqual(range(2022, 2025));
+  expect(sources.find(source => source.sourceId === "nbg_fsi")!.title).toBe(locale === "en" ? "Financial soundness indicators (FSI)" : "ფინანსური მდგრადობის მაჩვენებლები (FSI)");
+  expect(new Set(sources.map(source => source.organization))).toEqual(new Set([locale === "en" ? "National Bank of Georgia (NBG)" : "საქართველოს ეროვნული ბანკი"]));
+  const model = buildMoneyBanksWorkbookExportModel({
+    section: "bank-health", facts, sources, siteOrigin: "https://fiscal.ge", labels: labelsFor(["banks.npl_ratio"]),
+    state: { mode: "table", view: "npl", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ["banks.npl_ratio"] },
+  }, await presentation());
+  expect(model.sources.map(source => source.absoluteUrl).sort()).toEqual(["https://fiscal.ge/downloads/methodology/money/files/fsieng-archive.xlsx", "https://fiscal.ge/downloads/methodology/money/files/fsieng.xlsx"]);
 });
 
 test("the hub has four cards with the first series of each page and their latest values", async () => {

@@ -69,6 +69,7 @@ const DATASET_SOURCE_NOTES = {
   demography: "common.geostatSourceNote",
   wages: "common.geostatSourceNote",
   poverty: "common.geostatSourceNote",
+  money: "common.nbgSourceNote",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -87,6 +88,7 @@ const DATASET_DOWNLOADS = {
   demography: null,
   wages: null,
   poverty: null,
+  money: null,
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -109,6 +111,7 @@ const DATASET_JSON_DOWNLOADS = {
   demography: [],
   wages: [],
   poverty: [],
+  money: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
     { href: "/downloads/data/government-debt-rates.json", labelKey: "methodology.jsonRates" },
@@ -136,6 +139,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   demography: [],
   wages: [],
   poverty: [],
+  money: [],
 } as const;
 
 export async function methodologyArticleMetadata(locale: Locale, { params }: MethodologyDatasetPageProps): Promise<Metadata> {
@@ -180,12 +184,12 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
       {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
       {dataset === "demography" ? null : (
       <JsonLd
-        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" || dataset === "poverty" || dataset === "external-flows" ? {
+        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" || dataset === "poverty" || dataset === "money" || dataset === "external-flows" ? {
           "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
           url: `${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`, locale)}`,
           temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
           spatialCoverage: { "@type": "Place", name: seoMessage(locale, "seo.country") },
-          creator: dataset === "external-flows" ? { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" } : { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
+          creator: dataset === "external-flows" || dataset === "money" ? { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" } : { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
           publisher: { "@id": `${resolveSiteUrl()}/#organization` },
         } : dataset === "inflation" ? {
           "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,

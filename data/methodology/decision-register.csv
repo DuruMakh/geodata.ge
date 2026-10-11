@@ -93,3 +93,7 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "poverty.survey","poverty","docs/data-methodology/poverty-annual.md","Serving on the Poverty and inequality pages","poverty.survey","geodata_decision","2026-10-10"
 "poverty.lines","poverty","docs/data-methodology/poverty-annual.md","Serving on the Poverty and inequality pages","poverty.lines","geodata_decision","2026-10-10"
 "poverty.gini","poverty","docs/data-methodology/poverty-annual.md","Serving on the Poverty and inequality pages","poverty.gini","geodata_decision","2026-10-10"
+"money.scope","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.scope","geodata_decision","2026-10-11"
+"money.year_values","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.year_values","geodata_decision","2026-10-11"
+"money.calculated","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.calculated","geodata_decision","2026-10-11"
+"money.bank_health_breaks","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.bank_health_breaks","limitation","2026-10-11"

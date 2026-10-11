@@ -9,7 +9,9 @@ import { DEMOGRAPHY_METHODOLOGY as EN_DEMOGRAPHY } from "./content/en/demography
 import { WAGES_METHODOLOGY_CONTENT } from "./content/wages";
 import { WAGES_METHODOLOGY_CONTENT as EN_WAGES } from "./content/en/wages";
 import { POVERTY_METHODOLOGY_CONTENT } from "./content/poverty";
+import { MONEY_BANKS_METHODOLOGY_CONTENT } from "./content/moneyBanks";
 import { POVERTY_METHODOLOGY_CONTENT as EN_POVERTY } from "./content/en/poverty";
+import { MONEY_BANKS_METHODOLOGY_CONTENT as EN_MONEY_BANKS } from "./content/en/moneyBanks";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
@@ -49,6 +51,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
   inflation: INFLATION_METHODOLOGY_CONTENT,
+  money: MONEY_BANKS_METHODOLOGY_CONTENT,
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
   wages: WAGES_METHODOLOGY_CONTENT,
   poverty: POVERTY_METHODOLOGY_CONTENT,
@@ -67,6 +70,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   demography: EN_DEMOGRAPHY,
   wages: EN_WAGES,
   poverty: EN_POVERTY,
+  money: EN_MONEY_BANKS,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {

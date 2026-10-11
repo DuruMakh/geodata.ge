@@ -1,3 +1,4 @@
+import path from "node:path";
 import { MoneyBanksExplorer, type MoneyBanksExplorerProps } from "../../components/money-banks/money-banks-explorer";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
@@ -12,9 +13,12 @@ import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
+import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
+import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
+import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -52,9 +56,20 @@ function moneyBanksLabels(presentation: Presentation, section: MoneyBanksSection
   return Object.fromEntries(sectionSeriesIds(section).map(id => [id, message(presentation.messages, `moneyBanks.series.${id}`)]));
 }
 
+/** The archived NBG workbooks (data/methodology/source-archives/money.csv) with their public download links, for the Excel Sources sheet. */
+export async function loadMoneyBanksWorkbookSources(locale: Locale): Promise<MoneyBanksExplorerProps["sources"]> {
+  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const [manifest, catalogue] = await Promise.all([loadReviewedSourceManifest(root, "money"), loadEnglishCatalogue(root)]);
+  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
+  return manifest.filter(source => source.media_type.includes("spreadsheet")).map(source => {
+    const translated = publicSources.find(row => row.source_id === source.source_id)!;
+    return { sourceId: source.source_id, years: source.years, title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at };
+  });
+}
+
 export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSectionId) {
-  const [data, presentation] = await Promise.all([
-    loadServedMoneyBanksData(), getPresentation(locale, ["moneyBanks", "common", "controls", "format", "main", "workbook"], []),
+  const [data, presentation, sources] = await Promise.all([
+    loadServedMoneyBanksData(), getPresentation(locale, ["moneyBanks", "common", "controls", "format", "main", "workbook"], []), loadMoneyBanksWorkbookSources(locale),
   ]);
   // Each page receives only the observations its views can show.
   const ids = new Set(sectionSeriesIds(section));
@@ -63,9 +78,6 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
   const firstYear = Math.min(...years), lastYear = Math.max(...years);
   const href = MONEY_BANKS_SECTIONS.find(item => item.id === section)!.href;
   const labels = moneyBanksLabels(presentation, section);
-  // The workbook's original files come from the reviewed source archive (data/methodology/source-archives/money.csv),
-  // which is published together with the methodology page; until it exists the workbook lists none.
-  const sources: MoneyBanksExplorerProps["sources"] = [];
   const t = (key: string) => message(presentation.messages, `moneyBanks.${key}`);
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();

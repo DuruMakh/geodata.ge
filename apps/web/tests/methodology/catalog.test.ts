@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation", "unemployment", "wages", "poverty", "trade", "external-flows", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation", "money", "unemployment", "wages", "poverty", "trade", "external-flows", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -353,6 +353,7 @@ describe("methodology catalog", () => {
       demography: { fileCount: 2, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2004, maxYear: 2026 },
       wages: { fileCount: 12, totalBytes: 100, latestRetrievedAt: "2026-10-09", validated: true, minYear: 1995, maxYear: 2025 },
       poverty: { fileCount: 7, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2004, maxYear: 2025 },
+      money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       debt: { fileCount: 10, totalBytes: 400, latestRetrievedAt: "2026-09-01", validated: true },
     };
 
@@ -405,6 +406,7 @@ describe("methodology catalog", () => {
         originalFileCount: 14,
         reviewedAt: METHODOLOGY_CONTENT.inflation.reviewedAt,
       },
+      { id: "money", title: METHODOLOGY_CONTENT.money.title, summary: METHODOLOGY_CONTENT.money.summary, href: "/methodology/money", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 20, reviewedAt: METHODOLOGY_CONTENT.money.reviewedAt },
       { id: "unemployment", title: METHODOLOGY_CONTENT.unemployment.title, summary: METHODOLOGY_CONTENT.unemployment.summary, href: "/methodology/unemployment", coverage: { firstYear: 2010, lastYear: 2025 }, originalFileCount: 9, reviewedAt: METHODOLOGY_CONTENT.unemployment.reviewedAt },
       { id: "wages", title: METHODOLOGY_CONTENT.wages.title, summary: METHODOLOGY_CONTENT.wages.summary, href: "/methodology/wages", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 12, reviewedAt: METHODOLOGY_CONTENT.wages.reviewedAt },
       { id: "poverty", title: METHODOLOGY_CONTENT.poverty.title, summary: METHODOLOGY_CONTENT.poverty.summary, href: "/methodology/poverty", coverage: { firstYear: 2004, lastYear: 2025 }, originalFileCount: 7, reviewedAt: METHODOLOGY_CONTENT.poverty.reviewedAt },
@@ -429,6 +431,7 @@ describe("methodology catalog", () => {
       demography: { fileCount: 2, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2004, maxYear: 2026 },
       wages: { fileCount: 12, totalBytes: 100, latestRetrievedAt: "2026-10-09", validated: true, minYear: 1995, maxYear: 2025 },
       poverty: { fileCount: 7, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2004, maxYear: 2025 },
+      money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       debt: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true },
     } satisfies Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary>;
 
