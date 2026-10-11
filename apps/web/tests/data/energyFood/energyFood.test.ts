@@ -92,9 +92,11 @@ test.each([
   ["a negative household consumption", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "energy.final.households", 2020), { value: "-5", publishedValue: "-5.0" }); }, /range/],
   ["a no-flow row with value 5", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "energy.imports.crude_oil", 2013), { value: "5", publishedValue: "5.0" }); }, /no-flow/],
   ["a zero food ratio", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "food.self_sufficiency.wheat", 2020), { value: "0", publishedValue: "0" }); }, /range/],
-  ["a General food ratio with a decimal", (facts: EnergyFoodFact[]) => { Object.assign(food(facts), { value: "73.4", publishedValue: "73.4" }); }, /whole number/],
+  ["a General food ratio with a decimal", (facts: EnergyFoodFact[]) => { Object.assign(food(facts), { value: "73.4", publishedValue: "73.4" }); }, /more decimals|whole number/],
   ["a food ratio published with a decimal", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "food.self_sufficiency.meat", 2024), { publishedValue: "47.1" }); }, /published value|whole number/],
   ["a General ktoe value that is not the 15-digit cut of its stored value", (facts: EnergyFoodFact[]) => { Object.assign(general(facts, "ktoe"), { publishedValue: "1.5" }); }, /published value/],
+  ["a ktoe value published with two decimals", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "energy.supply.total", 2024), { value: "5914.55", publishedValue: "5914.55" }); }, /Invalid energy and food published value, more decimals/],
+  ["a gwh value published with two decimals", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "electricity.production.total", 2024), { value: "14234.15", publishedValue: "14234.15" }); }, /more decimals/],
   ["a non-numeric published value", (facts: EnergyFoodFact[]) => { facts[0].publishedValue = "n/a"; }, /Invalid energy and food published value/],
   ["a wrong source for the year", (facts: EnergyFoodFact[]) => { find(facts, "energy.supply.total", 2020).sourceId = "geostat_energy_balance_2021_aggregated"; }, /source contract/],
 ] as const)("validation rejects %s", (_, mutate, error) => {

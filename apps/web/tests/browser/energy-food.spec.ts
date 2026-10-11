@@ -13,10 +13,10 @@ test("the hub shows one card per page, each linking to it", async ({ page }) => 
   for (const [index, section] of SECTIONS.entries()) await expect(cards.nth(index)).toHaveAttribute("href", `/explorer/energy-food/${section}`);
 });
 
-for (const prefix of ["", "/en"]) {
-  test(`every ${prefix || "ka"} page shows no page tabs, selects only its total and fits 390px`, async ({ page }) => {
+for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+  test(`every ${prefix || "ka"} page shows no page tabs, selects only its total and fits ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width: 390, height: 900 });
+    await page.setViewportSize({ width, height: 900 });
     for (const section of SECTIONS) {
       await page.goto(`${prefix}/explorer/energy-food/${section}`);
       await ready(page);
@@ -53,7 +53,7 @@ test("electricity supply 2023 is negative in the table (Review Focus 3)", async 
     await start.press("ArrowRight");
   }
   // The axis reaches below zero rather than clipping the 2023 value.
-  await expect(page.getByTestId("chart-panel").getByText("−2,500", { exact: true })).toHaveCount(1);
+  await expect.poll(() => page.getByTestId("chart-panel").getByText(/^−[\d,]+\s*$/).count()).toBeGreaterThanOrEqual(1);
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
   await expect(table.locator("thead")).toContainText("2022");

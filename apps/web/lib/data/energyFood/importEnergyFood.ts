@@ -5,7 +5,7 @@ import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
 import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
-import { energyFoodFactKey, type ClientEnergyFoodFact, type EnergyFoodAcceptance, type EnergyFoodFact } from "./types";
+import { ENERGY_FOOD_UNIT_DECIMALS, energyFoodFactKey, type ClientEnergyFoodFact, type EnergyFoodAcceptance, type EnergyFoodFact } from "./types";
 import { validateEnergyFoodFacts } from "./validation";
 
 const REQUIRED = ["year", "indicator_id", "value", "published_value", "unit", "basis", "value_status", "source_id", "source_sheet", "source_cell", "source_number_format", "last_reviewed_at"];
@@ -52,11 +52,8 @@ export function loadServedEnergyFoodData(): Promise<{ facts: EnergyFoodFact[] }>
   return servedPromise;
 }
 
-/** Every published value already carries exactly its unit's decimals: one for energy and electricity, none for the food ratios. */
-const CLIENT_DECIMALS: Record<EnergyFoodFact["unit"], number> = { ktoe: 1, gwh: 1, percent: 0 };
-
 /** Client values are the figures Geostat prints (published precision); exact stored values stay server-side. */
 export function toClientEnergyFoodFact(fact: EnergyFoodFact): ClientEnergyFoodFact {
   const { year, indicatorId, sourceId, valueStatus } = fact;
-  return { year, indicatorId, sourceId, valueStatus, value: Number(fact.publishedValue), decimals: CLIENT_DECIMALS[fact.unit] };
+  return { year, indicatorId, sourceId, valueStatus, value: Number(fact.publishedValue), decimals: ENERGY_FOOD_UNIT_DECIMALS[fact.unit] };
 }

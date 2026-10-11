@@ -89,7 +89,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "classification",
       "title": "Dashes and gaps",
       "paragraphs": [
-        "In the balances Geostat writes “-” where a flow did not occur. Fiscal.ge shows such a value as 0 (no flow) and lists it in the validation report; three values are affected: crude oil imports in 2013 and 2021, and crude oil supply in 2013. Cells that Geostat marks “…” (not published) would be gaps rather than zero. They appear only in a non-ferrous metals industry sub-row of several 2013–2020 workbooks, which the pages do not use; no shown series contains one, and validation fails if one ever does. Nothing is estimated, interpolated or derived."
+        "In the balances Geostat writes “-” where a flow did not occur. Fiscal.ge stores and shows such a value as 0, marks it “No flow” in the Data sheet of the Excel download and lists it in the validation report; three values are affected: crude oil imports in 2013 and 2021, and crude oil supply in 2013. Cells that Geostat marks “…” (not published) would be gaps rather than zero. They appear only in a non-ferrous metals industry sub-row of several 2013–2020 workbooks, which the pages do not use; no shown series contains one, and validation fails if one ever does. Nothing is estimated, interpolated or derived."
       ]
     },
     {
@@ -189,7 +189,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "energy-food",
       "title": "Dashes and gaps",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "In the balances Geostat writes “-” where a flow did not occur. Fiscal.ge shows such a value as 0 (no flow) and lists it in the validation report; three values are affected: crude oil imports in 2013 and 2021, and crude oil supply in 2013. Cells that Geostat marks “…” (not published) would be gaps rather than zero. They appear only in a non-ferrous metals industry sub-row of several 2013–2020 workbooks, which the pages do not use; no shown series contains one, and validation fails if one ever does. Nothing is estimated, interpolated or derived.",
+      "summary": "In the balances Geostat writes “-” where a flow did not occur. Fiscal.ge stores and shows such a value as 0, marks it “No flow” in the Data sheet of the Excel download and lists it in the validation report; three values are affected: crude oil imports in 2013 and 2021, and crude oil supply in 2013. Cells that Geostat marks “…” (not published) would be gaps rather than zero. They appear only in a non-ferrous metals industry sub-row of several 2013–2020 workbooks, which the pages do not use; no shown series contains one, and validation fails if one ever does. Nothing is estimated, interpolated or derived.",
       "detail": [],
       "canonicalDecisionIds": [
         "energy-food.dashes"

@@ -49,6 +49,9 @@ export type EnergyFoodFact = {
   sourceNumberFormat: string;
   lastReviewedAt: string;
 };
+/** Decimals every published value of a unit carries: one for energy and electricity, none for the food ratios. */
+export const ENERGY_FOOD_UNIT_DECIMALS: Record<EnergyFoodFact["unit"], number> = { ktoe: 1, gwh: 1, percent: 0 };
+
 export type ClientEnergyFoodFact = Pick<EnergyFoodFact, "year" | "indicatorId" | "sourceId" | "valueStatus"> & { value: number; decimals: number };
 export type EnergyFoodAcceptance = {
   status: "passed";

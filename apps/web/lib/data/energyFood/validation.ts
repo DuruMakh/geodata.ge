@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_SOURCES, energyFoodFactKey, type EnergyFoodFact, type EnergyFoodIndicator } from "./types";
+import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_SOURCES, ENERGY_FOOD_UNIT_DECIMALS, energyFoodFactKey, type EnergyFoodFact, type EnergyFoodIndicator } from "./types";
 
 const D = Decimal.clone({ precision: 50, rounding: Decimal.ROUND_HALF_UP });
 const range = (start: number, end: number) => Array.from({ length: end - start + 1 }, (_, i) => start + i);
@@ -58,6 +58,8 @@ export function validateEnergyFoodFacts(facts: readonly EnergyFoodFact[]): void 
     if (fact.valueStatus === "no_flow" && !value.isZero()) throw new Error(`Energy and food no-flow value is not zero: ${key}`);
     let published: Decimal;
     try { published = new D(fact.publishedValue); } catch { throw new Error(`Invalid energy and food published value: ${key}`); }
+    // The client prints every value with its unit's decimals, so a published value with more would be shown rounded.
+    if (published.decimalPlaces() > ENERGY_FOOD_UNIT_DECIMALS[fact.unit]) throw new Error(`Invalid energy and food published value, more decimals than its unit shows: ${key}`);
     // Excel keeps 15 significant digits, so the stored value is cut to 15 before it is shown.
     const stored = value.toSignificantDigits(15);
     // A General cell shows the stored value as is; any other format rounds it half-up to the format's decimals.

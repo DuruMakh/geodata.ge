@@ -39,7 +39,7 @@ The ratio is Geostat's published number for each of 12 foods and each year 2014�
 
 ## Dashes, gaps and unpublished cells
 
-Geostat writes "-" where a flow did not occur. A served dash is stored as `0` with `value_status = no_flow` and listed in the validation report; there are three: crude oil imports in 2013 and 2021 and crude oil supply in 2013. Cells marked "…" (not published) occur only in an industry sub-row (non-ferrous metals) of several 2013–2020 workbooks that is never served; no served series may contain one and validation fails if it does. Nothing is estimated, interpolated or derived.
+Geostat writes "-" where a flow did not occur. A served dash is stored as `0` with `value_status = no_flow` and listed in the validation report; charts and tables show it as a plain 0.0 and only the Excel Data sheet marks it "No flow"; there are three: crude oil imports in 2013 and 2021 and crude oil supply in 2013. Cells marked "…" (not published) occur only in an industry sub-row (non-ferrous metals) of several 2013–2020 workbooks that is never served; no served series may contain one and validation fails if it does. Nothing is estimated, interpolated or derived.
 
 ## Indicators
 
