@@ -86,6 +86,7 @@ model SourceDocument {
   tradePartnerFacts TradePartnerFact[]
   wagesFacts WagesFact[]
   povertyFacts PovertyFact[]
+  moneyBanksFacts MoneyBanksFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
   currentAccountFacts CurrentAccountFact[]
@@ -129,6 +130,7 @@ model ImportRun {
   tradePartnerFacts TradePartnerFact[]
   wagesFacts WagesFact[]
   povertyFacts PovertyFact[]
+  moneyBanksFacts MoneyBanksFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentEntities ForeignInvestmentEntity[]
@@ -801,6 +803,28 @@ model PovertyFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, groupId, year])
+}
+
+// Mirror of data/imports/money-banks-annual.csv: NBG's yearly money, loan, deposit,
+// interest-rate and bank-health figures, exact stored decimals with their published rounding.
+model MoneyBanksFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
 }
 
 // Mirror of the served data/imports/demography-*.csv files: one flat observation table in the

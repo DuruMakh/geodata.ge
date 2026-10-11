@@ -1,10 +1,14 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+import { loadMoneyBanksFactsFromMirror, moneyBanksMirrorCreateRows } from "../../../lib/db/mirrorRows";
+import { assertMoneyBanksParity, loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../../lib/data/moneyBanks/importMoneyBanks";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { MONEY_BANKS_CSV_HEADERS, prepareMoneyBanksData, REVIEWED_AT } from "../../../lib/data/moneyBanks/prepareMoneyBanks";
-import { MONEY_BANKS_INDICATORS, MONEY_BANKS_SOURCES, type MoneyBanksFact } from "../../../lib/data/moneyBanks/types";
+import { MONEY_BANKS_INDICATORS, MONEY_BANKS_PUBLIC_SOURCES, MONEY_BANKS_SOURCES, moneyBanksSourceDocumentId, type MoneyBanksFact } from "../../../lib/data/moneyBanks/types";
 import { expectedMoneyBanksKeys, moneyBanksDisplayDecimals, validateMoneyBanksFacts } from "../../../lib/data/moneyBanks/validation";
 
 const root = path.resolve(process.cwd(), "../..");
@@ -84,4 +88,72 @@ test("negative return on assets and equity are allowed", async () => {
   const facts = (await loadFacts()).map(f => ({ ...f }));
   expect(Math.min(...facts.filter(f => f.indicatorId === "banks.roe").map(f => Number(f.value)))).toBeLessThan(0);
   expect(() => validateMoneyBanksFacts(facts)).not.toThrow();
+});
+
+test("loading serves the same 730 values as the canonical file", async () => {
+  const facts = await loadMoneyBanksFacts();
+  expect(facts).toEqual(await loadFacts());
+});
+
+test("loading refuses a canonical file whose fingerprint differs from the report", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "money-banks-"));
+  try {
+    await fs.mkdir(path.join(dir, "apps/web"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/imports"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/reports"), { recursive: true });
+    const csv = await fs.readFile(path.join(root, "data/imports/money-banks-annual.csv"), "utf8");
+    await fs.writeFile(path.join(dir, "data/imports/money-banks-annual.csv"), csv.replace("57680.2", "57680.3"));
+    await fs.copyFile(path.join(root, "data/reports/money-banks-validation.json"), path.join(dir, "data/reports/money-banks-validation.json"));
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.join(dir, "apps/web"));
+    try {
+      await expect(loadMoneyBanksFacts()).rejects.toThrow(/fingerprint/);
+    } finally {
+      cwd.mockRestore();
+    }
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadFacts();
+  const m3 = facts.findIndex(f => f.indicatorId === "money.m3" && f.year === 2025);
+  const policy = facts.findIndex(f => f.indicatorId === "rates.policy" && f.year === 2025);
+  expect(facts[policy].value).toMatch(/^8(\.0+)?$/);
+  expect(() => assertMoneyBanksParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const rewritten = facts.map(f => ({ ...f }));
+  rewritten[policy].value = "8";
+  rewritten[policy].publishedValue = "8.00";
+  const padded = rewritten.map(f => ({ ...f }));
+  padded[policy].value = "8.00";
+  expect(() => assertMoneyBanksParity(rewritten, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[m3].value = new Decimal(changed[m3].value).plus("0.000001").toFixed();
+  expect(() => assertMoneyBanksParity(facts, changed)).toThrow();
+  expect(() => assertMoneyBanksParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry numeric values in lari or percent with their display precision", async () => {
+  const facts = await loadFacts();
+  expect(toClientMoneyBanksFact(find(facts, "money.m3", 2025))).toMatchObject({ value: 57680200000, unit: "gel", decimals: 1, indicatorId: "money.m3", year: 2025, valueStatus: "official" });
+  expect(toClientMoneyBanksFact(find(facts, "rates.policy", 2025))).toMatchObject({ value: 8, unit: "percent", decimals: 2 });
+  expect(toClientMoneyBanksFact(find(facts, "banks.roe", 2025))).toMatchObject({ unit: "percent", decimals: 1 });
+  expect(toClientMoneyBanksFact(find(facts, "deposits.fx_share", 2025))).toMatchObject({ value: 48.6, valueStatus: "calculated" });
+});
+
+test("the database mirror round-trips exact decimals and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = moneyBanksMirrorCreateRows(facts, "money-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ moneyBanksFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "moneyBanksFact">;
+  const mirror = await loadMoneyBanksFactsFromMirror(db(rows));
+  expect(() => assertMoneyBanksParity(facts, mirror)).not.toThrow();
+  expect(rows[0].importRunId).toBe("money-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadMoneyBanksFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(MONEY_BANKS_PUBLIC_SOURCES.filter(id => !ids.has(moneyBanksSourceDocumentId(id)))).toEqual([]);
 });

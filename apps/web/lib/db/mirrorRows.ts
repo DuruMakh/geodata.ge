@@ -34,6 +34,8 @@ import { TRADE_DOMESTIC_DOCUMENT_IDS, type TradeDomesticEntity, type TradeDomest
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types";
+import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
+import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -646,6 +648,24 @@ export async function loadPovertyFactsFromMirror(db: Pick<MirrorClient, "poverty
       year: row.year, indicatorId: row.indicatorId as PovertyFact["indicatorId"], groupId: row.groupId as PovertyFact["groupId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as PovertyFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function moneyBanksMirrorCreateRows(facts: readonly MoneyBanksFact[], importRunId: string): Prisma.MoneyBanksFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: moneyBanksSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadMoneyBanksFactsFromMirror(db: Pick<MirrorClient, "moneyBanksFact">): Promise<MoneyBanksFact[]> {
+  const rows = await db.moneyBanksFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== moneyBanksSourceDocumentId(row.sourceId)) throw new Error("Money and banks source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as MoneyBanksFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(moneyBanksDisplayDecimals(row.indicatorId)), unit: row.unit as MoneyBanksFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as MoneyBanksFact["valueStatus"],
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }
