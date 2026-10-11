@@ -44,7 +44,7 @@ These apply to all four pages, exactly as on Poverty:
 - Every series has a fixed, distinguishable colour, and labels identify every series without colour.
 - A year without a value (for example companies' deposits before 2015) is a gap in the chart, a dash in the table and a blank Excel cell, never zero.
 - Every tab mixes only one unit, so any combination of ticks shares one axis.
-- **Yearly values only.** Amounts and ratios are the December (year-end) value; interest rates on loans and deposits are NBG's annual averages; the National Bank rate is the rate in force on 31 December. The last year shown is 2025. 2026 is added once December 2026 is published.
+- **Yearly values only.** Amounts and ratios are the December (year-end) value; interest rates on loans and deposits are NBG's annual weighted average interest rates (the contractual yearly rate, weighted by the amounts outstanding at the end of the year); the National Bank rate is the rate in force on 31 December. The last year shown is 2025. 2026 is added once December 2026 is published.
 - The source line reads like the others, for example: "Source: National Bank of Georgia · million GEL, end of year · 1995–2025 · Methodology and sources".
 
 ## 4. Money supply page
@@ -73,7 +73,7 @@ Line under the heading: "2025: bank loans 72.5 billion GEL".
 | Share in foreign currency | **Loans**, Deposits | Loans 2002–2025, deposits 1996–2025 | % |
 
 - Loans are NBG table L3.5 (loans granted by banks, excluding interbank loans, including overdue loans and accrued interest). Deposits are NBG table D3.17 (all deposits in banks). People are table D3.23 and companies and organisations ("legal entities") table D3.27; the two add up exactly to D3.17's total from 2015. NBG publishes each deposit table as a lari sheet and a foreign-currency sheet, so the three deposit totals (all, people, companies) are lari + foreign currency added up by fiscal.ge and marked as calculated.
-- The foreign-currency share is foreign-currency amount ÷ total amount from those same tables, calculated by fiscal.ge, so the Share tab always agrees with the Loans and Deposits tabs. This is the same calculation NBG uses for its deposit dollarization ratio. NBG's money-statistics ratio uses a narrower set of deposits and runs about one point lower (47.7% against 48.6% in 2025); the methodology page says so.
+- The foreign-currency share is foreign-currency amount ÷ total amount from those same tables, calculated by fiscal.ge, so the Share tab always agrees with the Loans and Deposits tabs. NBG's own dollarization ratio counts non-bank deposits only, and table D3.17 also includes banks' deposits, so the two differ (47.7% against 48.6% at the end of 2025); the methodology page says so.
 - Foreign-currency amounts are NBG's lari values at the end-of-month official rate. No exchange rate is served.
 
 ## 6. Interest rates page
@@ -86,7 +86,7 @@ No tabs. One chart, all in percent per year:
 - Loans: Average rate on loans, with In lari and In foreign currency nested under it (1996–2025).
 - Deposits: Average rate on deposits, with In lari and In foreign currency nested under it (1996–2025).
 
-The loan and deposit rates are NBG's annual weighted averages (tables LWIR and DWIR). The methodology notes that before 20 August 2008 NBG used the 7-day certificate-of-deposit rate as its policy rate, and the refinancing rate after; the chart starts in 2008 because the NBG file starts in January 2008.
+The loan and deposit rates are what NBG publishes as annual weighted average interest rates (tables LWIR and DWIR): each loan's or deposit's contractual yearly rate, weighted by its amount, for the amounts outstanding at the end of the year, excluding zero-rate items and interbank loans and deposits. The methodology notes that before 20 August 2008 NBG used the 7-day certificate-of-deposit rate as its policy rate, and the refinancing rate after; the chart starts in 2008 because the NBG file starts in January 2008.
 
 ## 7. Bank health page
 
@@ -153,7 +153,7 @@ About 730 served values in total. The research package also keeps the API listin
 
 - The NBG workbooks and methodology PDFs are published through the existing source archive (`data/methodology/source-archives/money.csv`). The methodology bundle must not pull large data files (the PR #170 rule).
 - Excel reuses the three-sheet writer (Summary, Data, Sources) in the reader's language: the active tab's selected series and years, explicit units, blank missing cells, the "calculated by fiscal.ge" status on the deposit totals and the two shares, and validated source links. It has no internal identifier or cell-reference columns.
-- `/methodology/money` explains in plain words: what M0–M3 are (NBG's definitions), what "end of year" and "annual average" mean here, which banks the tables cover, how foreign-currency amounts are turned into lari, how the foreign-currency share is calculated and how it differs from NBG's ratio, the 2008 change of policy instrument, what each bank-health measure means, the two bank-health breaks (2022 file change, 2023 IFRS review), and that the pages state no causes.
+- `/methodology/money` explains in plain words: what M0–M3 are (NBG's definitions), what "end of year" and NBG's "annual weighted average interest rate" mean here, which banks the tables cover, how foreign-currency amounts are turned into lari, how the foreign-currency share is calculated and how it differs from NBG's ratio, the 2008 change of policy instrument, what each bank-health measure means, the two bank-health breaks (2022 file change, 2023 IFRS review), and that the pages state no causes.
 
 ## 10. Out of scope
 

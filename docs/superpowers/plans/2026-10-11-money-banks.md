@@ -14,7 +14,7 @@
 
 ## Global Constraints
 
-- Yearly values only: December (year-end) values for amounts, ratios and bank health; NBG annual averages for loan and deposit rates; the rate in force on 31 December for the National Bank rate. Last year 2025.
+- Yearly values only: December (year-end) values for amounts, ratios and bank health; NBG annual weighted average interest rates (contractual rates weighted by year-end amounts outstanding) for loan and deposit rates; the rate in force on 31 December for the National Bank rate. Last year 2025.
 - No exchange-rate series anywhere (Duru's decision). Foreign-currency amounts are NBG's lari values.
 - Under each page heading, only the one-line `LatestValueLine`. No summary block, and no notes under the chart beyond one `SourceNote` line.
 - Tabs are centred `TextTab`s. Supply: **Amount | Compared with GDP**. Loans and deposits: **Loans | Deposits | Share in foreign currency**. Bank health: **Bad loans | Profits | Capital**. Interest rates has no tabs.
@@ -192,8 +192,8 @@ Keys in `moneyBanks.json` mirror `poverty.json`: `title`, `hubSummary`, `metaTit
 The Georgian proposals are as follows; final wording follows the catalogue conventions:
 - hub: ფული და ბანკები
 - pages: ფულის მასა, სესხები და დეპოზიტები, საპროცენტო განაკვეთები, ბანკების მდგრადობა
-- tabs: მოცულობა | მშპ-სთან შეფარდებით · სესხები | დეპოზიტები | წილი უცხოურ ვალუტაში · უიმედო სესხები | მომგებიანობა | კაპიტალი
-- series: ფართო ფული (M3), ფართო ფული ლარში (M2), ვიწრო ფული (M1), ნაღდი ფული ბანკებს გარეთ (M0); ყველა სესხი / დეპოზიტი, ლარში, უცხოურ ვალუტაში; ფიზიკური პირების დეპოზიტები, იურიდიული პირების დეპოზიტები; ეროვნული ბანკის განაკვეთი (მონეტარული პოლიტიკის განაკვეთი); უიმედო სესხების წილი; აქტივებზე / კაპიტალზე უკუგება; კაპიტალის ადეკვატურობა, პირველადი კაპიტალის ადეკვატურობა
+- tabs: მოცულობა | მშპ-სთან შეფარდებით · სესხები | დეპოზიტები | წილი უცხოურ ვალუტაში · უმოქმედო სესხები | მომგებიანობა | კაპიტალი
+- series: ფართო ფული (M3), ფართო ფული ლარში (M2), ვიწრო ფული (M1), ნაღდი ფული ბანკებს გარეთ (M0); ყველა სესხი / დეპოზიტი, ლარში, უცხოურ ვალუტაში; ფიზიკური პირების დეპოზიტები, იურიდიული პირების დეპოზიტები; ეროვნული ბანკის განაკვეთი (მონეტარული პოლიტიკის განაკვეთი); უმოქმედო სესხების წილი; აქტივებზე / კაპიტალზე უკუგება; კაპიტალის ადეკვატურობა, პირველადი კაპიტალის ადეკვატურობა
 - latest lines (English): "2025: broad money (M3) 57.7 bn GEL", "2025: bank loans 72.5 bn GEL", "2025: National Bank rate 8.00%", "2025: bad loans 2.5% of all loans"
 
 - [ ] **Step 1: Add the files, then run** `npm run i18n:check`. Expected: FAIL (new namespace not inventoried).
@@ -235,7 +235,7 @@ The Georgian proposals are as follows; final wording follows the catalogue conve
 - Create: `apps/web/lib/methodology/content/moneyBanks.ts`, `apps/web/lib/methodology/content/en/moneyBanks.ts`, `data/methodology/source-archives/money.csv`
 - Modify: everything Poverty's Task 8 modified, with `"money"` in place of `"poverty"`. That covers `lib/methodology/types.ts` (`LIVE_METHODOLOGY_IDS`), `catalog.ts`, `sourceInventory.ts`, `content/en/revisions.ts`, `lib/pages/methodology-article.tsx`, `data/localization/en/documents.json`, `data/methodology/decision-register.csv` and `lib/factQuery/buildSnapshot.ts` (keep money sources out), plus the tests `tests/methodology/catalog.test.ts`, `tests/methodology/prepareArchives.test.ts`, `tests/i18n/methodologyCoverage.test.ts`, `tests/factQuery/buildSnapshot.test.ts`, `tests/browser/methodology.spec.ts` and `tests/browser/bilingual-methodology.spec.ts`.
 
-The content covers spec §9 in plain words: NBG's M0–M3 definitions (from the M2.1 Notes sheet), end of year and annual average, coverage (resident commercial banks), lari conversion at the end-of-month official rate, the foreign-currency share calculation and NBG's narrower ratio (47.7% against 48.6% in 2025), the 2008 policy-instrument change, each bank-health measure, both bank-health breaks (the 2022 file change with the two overlap values, and the 2023 IFRS review with bad loans 1.5% → 3.1%), and no causes. It does not say anything NBG did not publish.
+The content covers spec §9 in plain words: NBG's M0–M3 definitions (from the M2.1 Notes sheet), end of year and NBG's annual weighted average interest rates, coverage (resident commercial banks), lari conversion at the end-of-month official rate, the foreign-currency share calculation and NBG's narrower ratio (47.7% against 48.6% in 2025), the 2008 policy-instrument change, each bank-health measure, both bank-health breaks (the 2022 file change with the two overlap values, and the 2023 IFRS review with bad loans 1.5% → 3.1%), and no causes. It does not say anything NBG did not publish.
 
 - [ ] **Step 1: Update the catalogue, archive and snapshot tests** to expect `money`. **Step 2: Run** them. Expected: FAIL.
 - [ ] **Step 3: Implement**, then run `npm run data:check-methodology-archives` and the methodology tests. Expected: PASS, and `buildSnapshot.test.ts` passes with no money source in the snapshot.

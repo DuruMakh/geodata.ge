@@ -2,9 +2,9 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Money/nbg-money-banks-annual/`, collected on 2026-10-11 from the National Bank of Georgia (NBG) statistics page. The research captures are immutable. The 730 served values appear on the Money and banks pages under the approved design `docs/superpowers/specs/2026-10-11-money-banks-design.md`; see [Serving on the Money and banks pages](#serving-on-the-money-and-banks-pages). Nothing is published through MCP or included in central machine-readable publications.
+This methodology governs the research package at `docs/Raw Data/Money/nbg-money-banks-annual/`, collected on 2026-10-11 from the National Bank of Georgia (NBG) statistics page. The research captures are immutable. The 730 served values (611 official, 119 calculated) appear on the Money and banks pages under the approved design `docs/superpowers/specs/2026-10-11-money-banks-design.md`; see [Serving on the Money and banks pages](#serving-on-the-money-and-banks-pages). Nothing is published through MCP or included in central machine-readable publications.
 
-The user approved annual data only: money aggregates, bank loans and deposits, interest rates and bank-health measures. Exchange rates, monthly and quarterly values, 2026, and breakdowns by sector, region, purpose or maturity are excluded.
+The user approved annual data only: money aggregates, bank loans and deposits, interest rates and bank-health measures. Exchange-rate statistics are excluded at the owner's request, as are monthly and quarterly values, 2026, and breakdowns by sector, region, purpose or maturity. Foreign-currency amounts are NBG's lari values.
 
 NBG is the sole publisher. Ten workbooks, four NBG methodology PDFs, five file listings from NBG's statistics API and the statistics page capture are preserved under `official/`. Exact URLs, retrieval times, byte sizes and SHA-256 fingerprints live in `source-manifest.csv` and `source-manifest.json`; the package README holds the full cell map.
 
@@ -19,14 +19,20 @@ NBG is the sole publisher. Ten workbooks, four NBG methodology PDFs, five file l
 | `deposits.total`, `deposits.individuals`, `deposits.legal_entities` | Lari plus foreign currency, calculated from D3.17, D3.23 and D3.27 | D3.17, D3.23, D3.27 | 1996–2025, 2002–2025, 2015–2025 |
 | `loans.fx_share`, `deposits.fx_share` | Foreign-currency amount ÷ total × 100, calculated | L3.5, D3.17 | 2002–2025, 1996–2025 |
 | `rates.policy` | Monetary policy rate in force on 31 December, % | MPR | 2008–2025 |
-| `rates.loans_total`, `_gel`, `_fx`; `rates.deposits_total`, `_gel`, `_fx` | NBG annual weighted average interest rates on year-end principal amounts, zero-rate and interbank items excluded, % | LWIR, DWIR | 1996–2025 |
+| `rates.loans_total`, `_gel`, `_fx`; `rates.deposits_total`, `_gel`, `_fx` | NBG's annual weighted average interest rates: the contractual yearly rate of each loan or deposit, weighted by its amount, for the amounts outstanding at the end of the year; zero-rate and interbank items excluded, % | LWIR, DWIR | 1996–2025 |
 | `banks.npl_ratio` | Non-performing loans to total gross loans (IMF methodology), % | FSI archive (Q4), FSI current (December) | 2003–2025 |
 | `banks.roa`, `banks.roe` | Return on assets and on equity, % (may be negative) | FSI archive, FSI current | 2001–2025 |
 | `banks.capital_ratio`, `banks.tier1_ratio` | Regulatory and Tier 1 capital to risk-weighted assets (Basel III), % | FSI archive, FSI current | 2014–2025 |
 
+Each year holds one value: the December figure for amounts, ratios and bank health (the fourth-quarter value in the archive FSI file, 2001–2021), and for `rates.policy` the rate in force on 31 December. Amounts are stored in million GEL (`gel_million`) and ratios in percent (`percent`).
+
 M0–M3 follow the definitions on the M2.1 `Notes` sheet: M0 is currency in circulation excluding cash in commercial banks' vaults; M1 adds lari transferable deposits of the resident non-financial sector and households; M2 adds lari term and savings deposits of the resident non-financial sector, other financial corporations and households; M3 adds their foreign-currency deposits. Deposit amounts include accrued interest, and NBG converts foreign-currency amounts into lari at the official month-end exchange rate.
 
 All rows use `basis=actual`. `value_status` is `official` for transcribed cells and `calculated` for the 119 rows of the three deposit totals and the two foreign-currency shares. No other value is interpolated, rebased or derived.
+
+## Identifiers
+
+Indicator IDs are stable lowercase ASCII names in the form `group.name`, with the groups `money`, `loans`, `deposits`, `rates` and `banks`; the table above lists all 28. Source IDs are `nbg_*` (ten workbooks, four methodology PDFs, five API listings and the page capture) and series-break IDs are `fsi_method_2022` and `fsi_ifrs_2023`. Georgian and English labels are display data, never identifiers. `data/imports/money-banks-annual.csv` has one row per indicator and year, with the columns `year`, `indicator_id`, `value`, `published_value`, `unit`, `basis`, `value_status`, `source_id`, `source_sheet`, `source_cell` and `last_reviewed_at`. `value` keeps the stored precision and `published_value` rounds half-up to the printed format.
 
 ## Series boundaries
 
@@ -49,14 +55,16 @@ Both bank-health breaks are recorded in `data/imports/money-banks-series-breaks.
 
 `npm run data:prepare-money` writes `data/imports/money-banks-annual.csv` (UTF-8 with BOM) and `data/reports/money-banks-validation.json`; `npm run data:check-money` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `MoneyBanksFact` is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
 
-The pages show the published value: one decimal for percents, two for the National Bank rate, and the site's GEL formatting for amounts. Missing years are gaps, dashes and blank Excel cells, never zero. The pages describe the figures and state no causes.
+The pages show the published value: one decimal for percents, two for the National Bank rate, and amounts in billion GEL with the site's GEL formatting; Excel keeps amounts in million GEL. Missing years are gaps, dashes and blank Excel cells, never zero. The pages describe the figures and state no causes.
+
+Routes are `/explorer/money` with `/supply`, `/loans-deposits`, `/interest-rates` and `/bank-health`, plus `/methodology/money`, each mirrored under `/en`. The sidebar entry sits after Inflation.
 
 - **Money supply**: Amount (M3, M2, M1, M0) and Compared with GDP.
 - **Loans and deposits**: Loans and Deposits (totals with lari and foreign currency nested under them; deposits of people and of companies and organisations) and Share in foreign currency.
 - **Interest rates**: the National Bank rate and the loan and deposit rates.
 - **Bank health**: Bad loans, Profits and Capital.
 
-Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, the calculated status of the five derived series, empty cells for missing values and validated links to the archived NBG workbooks (`data/methodology/source-archives/money.csv`). Internal cell references are not exported. `/methodology/money` publishes all twenty originals; the HTML capture downloads as a `.txt` file.
+The two series breaks are explained on `/methodology/money` and no change is computed across either. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, the calculated status of the five derived series, empty cells for missing values and validated links to the archived NBG workbooks (`data/methodology/source-archives/money.csv`). Internal cell references are not exported. `/methodology/money` publishes all twenty originals; the HTML capture downloads as a `.txt` file.
 
 ## Statistical limitations and future use
 
