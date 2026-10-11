@@ -848,8 +848,8 @@ test.describe("municipality page", () => {
     await expectMunicipalAppReady(page);
 
     const rankKpi = page.getByTestId("entity-kpi").filter({ hasText: "წილი მუნიციპალურ ხარჯებში" });
-    await expect(rankKpi).toContainText("მე-51 ადგილი 64-დან");
-    await expect(rankKpi).not.toContainText("მე-26 ადგილი 64-დან");
+    await expect(rankKpi).toContainText("51-ე ადგილი 64-დან");
+    await expect(rankKpi).not.toContainText("26-ე ადგილი 64-დან");
   });
 
   test("renders the municipal headline gauge and side KPI trends", async ({ page }) => {
