@@ -65,7 +65,7 @@ Two centred text tabs follow, styled like the Poverty tabs:
 - Values are lari a month, shown to one decimal as Geostat prints them.
 - Years: Georgia runs 2002–2025, towns and villages 2006–2025, and regions 2011–2025. Guria, Mtskheta-Mtianeti, Racha-Lechkhumi and Kvemo Svaneti, and Samtskhe-Javakheti start in 2019, because Geostat's sample was too small before then and their earlier cells are "…". Missing years are gaps in the chart, dashes in the table and blank Excel cells, never zero.
 - The initial state is the first tab, Georgia, per household, chart mode and all years, with only Total income selected. The first series stays first, selectable and removable.
-- Switching tab, area or per household / per person keeps the chart or table mode and the years, clamped to what the new choice covers. Switching tab or area selects that list's first series alone.
+- Switching tab, area or per household / per person keeps the chart or table mode and the years, clamped to what the new choice covers. Switching tab selects that list's first series alone. Switching area or per household / per person keeps the ticked lines, because the list stays the same.
 - Chart | Table, the year range, nested rows, search, the series count and Select all, Excel, and URL state all work as on the Poverty page. The URL stores tab, area, per household / per person, mode, selection and years, and they survive a language change.
 - The source line reads: "Source: Geostat, Household Incomes and Expenditures Survey · ₾ a month per household · 2002–2025 · Methodology and sources".
 
