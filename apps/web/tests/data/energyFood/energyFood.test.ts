@@ -1,8 +1,13 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
+import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
 import { strToU8, zipSync } from "fflate";
 import { describe, expect, test } from "vitest";
+import { assertEnergyFoodParity, loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../../lib/data/energyFood/importEnergyFood";
+import { energyFoodMirrorCreateRows, loadEnergyFoodFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { prepareEnergyFoodData, readWorkbookCells } from "../../../lib/data/energyFood/prepareEnergyFood";
 import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_PUBLIC_SOURCES, ENERGY_FOOD_SOURCES, type EnergyFoodFact } from "../../../lib/data/energyFood/types";
 import { energyFoodDisplayDecimals, expectedEnergyFoodKeys, validateEnergyFoodFacts } from "../../../lib/data/energyFood/validation";
@@ -108,4 +113,64 @@ test("validation accepts the real negative electricity supply", () => {
   const facts = loadFacts();
   for (const year of [2016, 2023]) expect(Number(find(facts, "energy.supply.electricity", year).value)).toBeLessThan(0);
   expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
+});
+
+describe("loading and parity", () => {
+  test("loadEnergyFoodFacts serves the 681 canonical rows", async () => {
+    const facts = await loadEnergyFoodFacts();
+    expect(facts).toHaveLength(681);
+    expect(find(facts, "energy.supply.electricity", 2023).value).toBe("-58.3");
+  });
+
+  test("loadEnergyFoodFacts rejects a canonical file that no longer matches its acceptance fingerprint", async () => {
+    const copy = fs.mkdtempSync(path.join(os.tmpdir(), "energy-food-"));
+    try {
+      for (const relative of ["data/imports/energy-food-annual.csv", "data/reports/energy-food-validation.json"]) {
+        fs.mkdirSync(path.dirname(path.join(copy, relative)), { recursive: true });
+        fs.copyFileSync(path.join(root, relative), path.join(copy, relative));
+      }
+      await expect(loadEnergyFoodFacts(copy)).resolves.toHaveLength(681);
+      fs.appendFileSync(path.join(copy, "data/imports/energy-food-annual.csv"), "\n");
+      await expect(loadEnergyFoodFacts(copy)).rejects.toThrow(/fingerprint/);
+    } finally {
+      fs.rmSync(copy, { recursive: true, force: true });
+    }
+  });
+
+  test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+    const facts = await loadEnergyFoodFacts();
+    const padded = facts.map(f => ({ ...f }));
+    Object.assign(find(padded, "energy.supply.total", 2013), { value: `${find(facts, "energy.supply.total", 2013).value}0`, publishedValue: `${find(facts, "energy.supply.total", 2013).publishedValue}0` });
+    expect(() => assertEnergyFoodParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+    expect(() => assertEnergyFoodParity(facts, padded)).not.toThrow();
+    expect(new Decimal("5914.50").eq("5914.5")).toBe(true);
+    const changed = facts.map(f => ({ ...f }));
+    changed[5].value = new Decimal(changed[5].value).plus("0.00000001").toFixed();
+    expect(() => assertEnergyFoodParity(facts, changed)).toThrow();
+    expect(() => assertEnergyFoodParity(facts, facts.slice(1))).toThrow();
+  });
+
+  test("client facts carry the published figure and a precision set by the unit", async () => {
+    const facts = await loadEnergyFoodFacts();
+    expect(toClientEnergyFoodFact(find(facts, "energy.supply.total", 2023))).toMatchObject({ value: Number(find(facts, "energy.supply.total", 2023).publishedValue), decimals: 1, sourceId: "geostat_energy_balance_2023_aggregated" });
+    expect(toClientEnergyFoodFact(find(facts, "electricity.production.total", 2024)).decimals).toBe(1);
+    expect(toClientEnergyFoodFact(find(facts, "food.self_sufficiency.wheat", 2023))).toMatchObject({ decimals: 0, sourceId: "geostat_food_balance_sheets" });
+    expect(toClientEnergyFoodFact(find(facts, "food.self_sufficiency.meat", 2025)).decimals).toBe(0);
+    // A General-format row (no fixed precision in its cell) still gets the unit's decimals.
+    expect(toClientEnergyFoodFact(general(facts, "ktoe")).decimals).toBe(1);
+    expect(toClientEnergyFoodFact(food(facts)).decimals).toBe(0);
+    expect(facts.every(f => { const c = toClientEnergyFoodFact(f); return c.decimals === (f.unit === "percent" ? 0 : 1) && c.value === Number(f.publishedValue); })).toBe(true);
+  });
+
+  test("the database mirror round-trips exact decimals and source relations", async () => {
+    const facts = await loadEnergyFoodFacts();
+    const rows = energyFoodMirrorCreateRows(facts, "energy-food-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+    const db = (list: typeof rows) => ({ energyFoodFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "energyFoodFact">;
+    const mirror = await loadEnergyFoodFactsFromMirror(db(rows));
+    expect(() => assertEnergyFoodParity(facts, mirror)).not.toThrow();
+    expect(mirror.find(f => f.value === "-58.3")).toBeDefined();
+    expect(rows[0].importRunId).toBe("energy-food-run-1");
+    expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+    await expect(loadEnergyFoodFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+  });
 });

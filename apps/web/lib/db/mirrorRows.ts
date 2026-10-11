@@ -34,6 +34,7 @@ import { TRADE_DOMESTIC_DOCUMENT_IDS, type TradeDomesticEntity, type TradeDomest
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types";
+import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyFood/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -645,6 +646,24 @@ export async function loadPovertyFactsFromMirror(db: Pick<MirrorClient, "poverty
     return {
       year: row.year, indicatorId: row.indicatorId as PovertyFact["indicatorId"], groupId: row.groupId as PovertyFact["groupId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as PovertyFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function energyFoodMirrorCreateRows(facts: readonly EnergyFoodFact[], importRunId: string): Prisma.EnergyFoodFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: energyFoodSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadEnergyFoodFactsFromMirror(db: Pick<MirrorClient, "energyFoodFact">): Promise<EnergyFoodFact[]> {
+  const rows = await db.energyFoodFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== energyFoodSourceDocumentId(row.sourceId)) throw new Error("Energy and food source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as EnergyFoodFact["indicatorId"], value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
+      unit: row.unit as EnergyFoodFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as EnergyFoodFact["valueStatus"],
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
