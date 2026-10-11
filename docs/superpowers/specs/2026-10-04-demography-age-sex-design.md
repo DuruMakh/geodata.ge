@@ -6,6 +6,8 @@ Status: Owner approved the layout (mockup of 2026-10-10, real figures) and the d
 >
 > **Owner change 2026-10-11 (second, after the live preview and mockups):** on the national page the two year-button rows and the `შედარება` toggle are replaced by two native selects side by side, `წელი` and `შედარება წელთან` (option `არცერთი` first, the default), with the 2025 option carrying the census-change label; the pyramid/table switch and its `pyramid` hash key are removed (the pyramid is always shown; the place block keeps its own switch). §3.2, §7 and the tests are adjusted to match.
 
+> **Owner change 2026-10-11 (third, after mockups):** the native selects' open list is drawn by the browser and looks out of place, so the two menus become a custom `YearPicker` (`components/ui/year-picker.tsx`, DESIGN §7.15): the same underlined trigger, opening a four-column year grid in the region picker's panel style, `არცერთი` as a full-width row above the compare grid, 2025 marked with an accent `*` and a footer line `* 2025 — აღწერით გადათვლა` instead of the option text. Behaviour, test ids and the hash keys are unchanged. §3.2 is adjusted to match.
+
 Supersedes: the 2026-10-04 version, which assumed the withdrawn click-to-select map block. Foundation rules still come from `2026-10-04-demography-section-design.md` (census break §5, tokens §7).
 
 ## 1. Outcome and scope
@@ -50,8 +52,8 @@ Both files are already canonical and validated. This work adds them to the serve
 ### 3.2 Georgia's pyramid by year
 
 - **Controls.**
-  - A `წელი` select listing 2004–2026, the latest selected; the 2025 option reads `2025 · აღწერით გადათვლა`.
-  - A `შედარება წელთან` select beside it: `არცერთი` first (default, comparison off), then every year except the one shown, 2025 labelled the same way. Choosing a year turns the comparison on, `არცერთი` turns it off, and choosing as the shown year the one being compared drops the comparison. The selects use Unemployment's underlined select style (`SELECT_CLASS`), at natural width side by side, full width on phones.
+  - A `წელი` year picker listing 2004–2026 in a four-column grid, the latest selected; 2025 carries an accent `*` and the grid's footer reads `* 2025 — აღწერით გადათვლა`.
+  - A `შედარება წელთან` year picker beside it: a full-width `არცერთი` row first (default, comparison off), then every year except the one shown, 2025 marked the same way. Choosing a year turns the comparison on, `არცერთი` turns it off, and choosing as the shown year the one being compared drops the comparison. The pickers' triggers use Unemployment's underlined select look (`SELECT_CLASS`), at natural width side by side, full width on phones.
   - Measure `%` | `ადამიანი`.
 - **Figure.** The pyramid for the selected year, at most 640px wide, centred.
   - Men left, women right. Ages run up the centre gutter, 0–4 at the bottom.
@@ -104,7 +106,7 @@ Owner decision, 2026-10-10, during planning: reuse the Unemployment → Age heat
 - The `sex.male` and `sex.female` colour tokens.
 
 **Small additive changes; default output unchanged:**
-- The year-button row in `components/analysis/analysis-view.tsx` is lifted into a shared `YearButtonRow`, with an optional per-year tag (the "planned" tag; the census label on this page is now carried by the year menus' option text instead). Analysis must render exactly as before, and its browser specs prove it.
+- The year-button row in `components/analysis/analysis-view.tsx` is lifted into a shared `YearButtonRow`, with an optional per-year tag (the "planned" tag; the census label on this page is now carried by the year pickers' `*` mark and footer instead). Analysis must render exactly as before, and its browser specs prove it.
 - The table and legend of `UnemploymentAgeHeatmap` are lifted into a shared `HeatmapTable` (`components/main-explorer/heatmap-table.tsx`) with an optional `breakYear`; Unemployment renders exactly as before (§3.4).
 - Demography loader, validation and served-file lists gain the two files; `servedRows` gains a client projection for age rows.
 - `DEMOGRAPHY_PAGES` flips `age-sex` to live, and the hub card gains a figure (Georgia's 65+ share, latest year).
@@ -116,6 +118,7 @@ Owner decision, 2026-10-10, during planning: reuse the Unemployment → Age heat
 - `demographyAgeSexWorkbook.ts`.
 - `components/demography/age-sex-explorer.tsx` (national parts 3.2–3.4) and `age-sex-section.tsx` (place block).
 - `lib/pages/demography-age-sex.tsx` and the `(ka)` and `(en)` route files.
+- `components/ui/year-picker.tsx` (`YearPicker`, owner change of 2026-10-11): `RegionPicker`, `CityPicker` and `EntityPicker` are search-first and navigate by links; none chooses a value in place, so it reuses `RegionPicker`'s panel anatomy and open/close behaviour and the `SELECT_CLASS` trigger look instead.
 
 ## 6. Pyramid drawing
 
