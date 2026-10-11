@@ -3,7 +3,6 @@ import type { ServedDemographyObservation } from "../data/demography/types";
 import type { ClientAgeFact } from "../servedRows";
 import { projectAgeObservation } from "./clientData";
 import { GEORGIA_PLACE_ID } from "./demographyAreas";
-import type { ChartMode } from "./types";
 
 /** The 18 age groups the pyramid draws, youngest first: the census's own grouping, where 0 and 1-4 of the annual table are one row. */
 export const AGE_SEX_GROUPS = CENSUS_AGE_GROUPS.map((group) => group.id);
@@ -123,7 +122,6 @@ export type AgeSexState = {
   /** A second year to set beside the first; null when none is chosen. */
   compare: number | null;
   measure: AgeMeasure;
-  pyramidMode: ChartMode;
 };
 
 /** True when exactly one of the two years is on the census side of the 2025 re-base. */
@@ -154,7 +152,6 @@ export function parseAgeSexHash(hash: string, years: readonly number[]): AgeSexS
     year,
     compare: compare === year ? null : compare,
     measure: pick(["share", "persons"], params.get("measure"), "share"),
-    pyramidMode: pick(["line", "table"], params.get("pyramid"), "line"),
   };
 }
 
@@ -163,6 +160,5 @@ export function serializeAgeSexHash(state: AgeSexState, years: readonly number[]
   if (state.year !== years.at(-1)) params.set("year", String(state.year));
   if (state.compare !== null) params.set("cmp", String(state.compare));
   if (state.measure === "persons") params.set("measure", "persons");
-  if (state.pyramidMode === "table") params.set("pyramid", "table");
   return params.toString();
 }

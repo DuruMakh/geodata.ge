@@ -10,7 +10,7 @@ const hasNoSidewaysScroll = (page: Page) => page.evaluate(() => document.documen
 const percentTicks = (page: Page) => page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /^\d+(\.\d+)?%$/ });
 
 test.describe("the Age and sex page", () => {
-  test("renders its three parts in order, with 2026 pressed in a row of 23 years", async ({ page }) => {
+  test("renders its three parts in order, with 2026 chosen in a menu of 23 years and no comparison", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Age and sex");
@@ -22,9 +22,16 @@ test.describe("the Age and sex page", () => {
     const tops = await Promise.all(["age-sex-pyramid", "age-sex-heatmap", "age-sex-regions"].map(async (id) => (await page.getByTestId(id).boundingBox())!.y));
     expect(tops[0]).toBeLessThan(tops[1]!);
     expect(tops[1]).toBeLessThan(tops[2]!);
-    const years = page.getByTestId("age-sex-year-row").getByRole("button");
-    await expect(years).toHaveCount(23);
-    await expect(years.filter({ hasText: /^2026$/ })).toHaveAttribute("aria-pressed", "true");
+    const year = page.getByTestId("age-sex-year-select");
+    await expect(year.locator("option")).toHaveCount(23);
+    await expect(year).toHaveValue("2026");
+    await expect(year.locator('option[value="2025"]')).toHaveText("2025 · Census re-base");
+    const compare = page.getByTestId("age-sex-compare-select");
+    await expect(compare.locator("option")).toHaveCount(23);
+    await expect(compare.locator('option[value="2026"]')).toHaveCount(0);
+    await expect(compare).toHaveValue("");
+    await expect(compare.locator('option[value="2025"]')).toHaveText("2025 · Census re-base");
+    for (const gone of ["age-sex-year-row", "age-sex-compare-row", "age-sex-compare-toggle", "age-sex-pyramid-mode-table"]) await expect(page.getByTestId(gone)).toHaveCount(0);
     await expect(page.getByTestId("age-sex-pyramid-summary")).toContainText("65+: 18.1%");
   });
 
@@ -44,23 +51,39 @@ test.describe("the Age and sex page", () => {
     await expectAppReady(page);
     const summary = page.getByTestId("age-sex-pyramid-summary");
     const before = await summary.textContent();
-    await page.getByTestId("age-sex-year-row").getByRole("button", { name: "2010", exact: true }).click();
+    await page.getByTestId("age-sex-year-select").selectOption("2010");
     await expect(page).toHaveURL(/#.*year=2010/);
     await expect(summary).not.toHaveText(before ?? "");
+  });
+
+  test("choosing the compared year to be the shown year drops the comparison", async ({ page }) => {
+    await page.goto(`${NATIONAL}#year=2010&cmp=2004`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveValue("2004");
+    await page.getByTestId("age-sex-year-select").selectOption("2004");
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveValue("");
+    await expect(page.getByTestId("pyramid-outline-left")).toHaveCount(0);
+    await expect(page).toHaveURL(/#.*year=2004/);
+    await expect(page).not.toHaveURL(/cmp=/);
   });
 
   test("comparing within one census basis draws the outline; across the re-base it keeps shares and says why", async ({ page }) => {
     await page.goto(`${NATIONAL}#year=2010`);
     await expectAppReady(page);
-    await page.getByTestId("age-sex-compare-toggle").click();
+    await page.getByTestId("age-sex-compare-select").selectOption("2004");
     await expect(page.getByTestId("pyramid-legend")).toContainText("2004");
     await expect(page.getByTestId("pyramid-outline-left")).toBeAttached();
     await expect(page.getByTestId("age-sex-compare-note")).toHaveCount(0);
     await expect(page.getByTestId("age-sex-measure-persons")).not.toHaveAttribute("aria-disabled", "true");
 
-    await page.getByTestId("age-sex-year-row").getByRole("button", { name: "2026", exact: true }).click();
+    await page.getByTestId("age-sex-year-select").selectOption("2026");
     await expect(page.getByTestId("age-sex-compare-note")).toContainText("2026 and 2004");
     await expect(page.getByTestId("age-sex-measure-persons")).toHaveAttribute("aria-disabled", "true");
+
+    await page.getByTestId("age-sex-compare-select").selectOption("");
+    await expect(page.getByTestId("pyramid-outline-left")).toHaveCount(0);
+    await expect(page.getByTestId("age-sex-compare-note")).toHaveCount(0);
+    await expect(page.getByTestId("age-sex-measure-persons")).not.toHaveAttribute("aria-disabled", "true");
   });
 
   test("a saved link across the re-base opens on shares, not people", async ({ page }) => {
@@ -68,16 +91,17 @@ test.describe("the Age and sex page", () => {
     await expectAppReady(page);
     await expect(page.getByTestId("age-sex-pyramid-panel")).toHaveAttribute("data-measure", "share");
     await expect(page.getByTestId("age-sex-measure-persons")).toHaveAttribute("aria-disabled", "true");
+    await expect(page.getByTestId("age-sex-year-select")).toHaveValue("2026");
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveValue("2004");
     expect(await percentTicks(page).count()).toBeGreaterThan(2);
     await expect(page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /thousand/i })).toHaveCount(0);
   });
 
-  test("the pyramid has a table twin that shows the published total", async ({ page }) => {
-    await page.goto(NATIONAL);
+  test("an old link to the removed pyramid table is ignored", async ({ page }) => {
+    await page.goto(`${NATIONAL}#pyramid=table`);
     await expectAppReady(page);
-    await page.getByTestId("age-sex-pyramid-mode-table").click();
-    await expect(page.getByTestId("age-sex-pyramid-panel").getByRole("table")).toContainText("3,941,103");
-    await expect(page.getByTestId("age-sex-pyramid-figure")).toHaveCount(0);
+    await expect(page.getByTestId("age-sex-pyramid-figure")).toBeVisible();
+    await expect(page.getByTestId("age-sex-pyramid-panel").getByRole("table")).toHaveCount(0);
   });
 
   test("the heat map carries the re-base label", async ({ page }) => {

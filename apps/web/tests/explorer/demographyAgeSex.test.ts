@@ -128,7 +128,7 @@ describe("the heat map", () => {
 
 describe("the hash", () => {
   it("defaults to the latest year", () => {
-    expect(parseAgeSexHash("", years)).toEqual({ year: 2026, compare: null, measure: "share", pyramidMode: "line" });
+    expect(parseAgeSexHash("", years)).toEqual({ year: 2026, compare: null, measure: "share" });
   });
 
   it("drops an unknown year, an unknown comparison and a comparison with itself", () => {
@@ -150,10 +150,12 @@ describe("the hash", () => {
   });
 
   it("round-trips and serializes the default state to nothing", () => {
-    const hash = "year=2010&cmp=2004&measure=persons&pyramid=table";
+    const hash = "year=2010&cmp=2004&measure=persons";
     expect(serializeAgeSexHash(parseAgeSexHash(`#${hash}`, years), years)).toBe(hash);
-    // The age-groups-over-time part is gone: an old link that asks for its table is ignored.
+    // The age-groups-over-time table and the pyramid's table twin are gone: an old link that asks for either is ignored.
     expect(serializeAgeSexHash(parseAgeSexHash("#bands=table", years), years)).toBe("");
+    expect(serializeAgeSexHash(parseAgeSexHash("#pyramid=table", years), years)).toBe("");
+    expect(parseAgeSexHash("#pyramid=table", years)).toEqual(parseAgeSexHash("", years));
     expect(serializeAgeSexHash(parseAgeSexHash("", years), years)).toBe("");
   });
 });

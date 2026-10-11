@@ -3,6 +3,8 @@
 Date: 2026-10-04, rewritten 2026-10-10 against the built Population, Migration and Births pages.
 Status: Owner approved the layout (mockup of 2026-10-10, real figures) and the design summary; this file awaits the owner's review before the plan.
 > **Owner change 2026-10-11 (after the live preview):** the national page opens with Georgia's pyramid, the age-by-year heat map follows, and the regions move to the bottom as a *regional glance* that is not clickable (no links, no arrows, no tab stops, no touch strip; hover highlighting and the list search stay). The "age groups over time" part is removed entirely: its chart, table view, Excel download, `bands` hash key and messages. §1, §3, §3.1, §3.3, §7, §9 and the tests below are adjusted to match.
+>
+> **Owner change 2026-10-11 (second, after the live preview and mockups):** on the national page the two year-button rows and the `შედარება` toggle are replaced by two native selects side by side, `წელი` and `შედარება წელთან` (option `არცერთი` first, the default), with the 2025 option carrying the census-change label; the pyramid/table switch and its `pyramid` hash key are removed (the pyramid is always shown; the place block keeps its own switch). §3.2, §7 and the tests are adjusted to match.
 
 Supersedes: the 2026-10-04 version, which assumed the withdrawn click-to-select map block. Foundation rules still come from `2026-10-04-demography-section-design.md` (census break §5, tokens §7).
 
@@ -48,9 +50,9 @@ Both files are already canonical and validated. This work adds them to the serve
 ### 3.2 Georgia's pyramid by year
 
 - **Controls.**
-  - Year buttons 2004–2026. The 2025 button carries a census-change tag, a dashed divider before it, and a mark on the selected year.
+  - A `წელი` select listing 2004–2026, the latest selected; the 2025 option reads `2025 · აღწერით გადათვლა`.
+  - A `შედარება წელთან` select beside it: `არცერთი` first (default, comparison off), then every year except the one shown, 2025 labelled the same way. Choosing a year turns the comparison on, `არცერთი` turns it off, and choosing as the shown year the one being compared drops the comparison. The selects use Unemployment's underlined select style (`SELECT_CLASS`), at natural width side by side, full width on phones.
   - Measure `%` | `ადამიანი`.
-  - A `შედარება` switch, off by default. When on, it shows a second year row for the comparison year, defaulting to the first year (2004).
 - **Figure.** The pyramid for the selected year, at most 640px wide, centred.
   - Men left, women right. Ages run up the centre gutter, 0–4 at the bottom.
   - A tinted band behind the 65+ rows, labelled `65+ · {share}%`.
@@ -58,7 +60,7 @@ Both files are already canonical and validated. This work adds them to the serve
 - **Comparison.** The comparison year is drawn as a 1.5px ink outline over the bars, and the legend names both years.
   - If the two years fall on opposite sides of the 2025 break, the break note shows above the figure. The measure is forced to `%`: the `ადამიანი` tab is disabled, with the reason given. No difference is computed anywhere.
   - Within one side of the break, nothing is restricted.
-- **Table view.** The 18 groups plus a total row: men, women, total, share. When the comparison is on, the comparison year's columns are added.
+- **No table view.** The pyramid has no table twin on this page (removed 2026-10-11); each row's accessible name carries its counts, and the heat map and the workbooks carry the data. The place block keeps its own switch.
 - **Default.** The latest loaded year, `%`, comparison off.
 
 ### 3.3 Age groups over time (removed 2026-10-11)
@@ -102,7 +104,7 @@ Owner decision, 2026-10-10, during planning: reuse the Unemployment → Age heat
 - The `sex.male` and `sex.female` colour tokens.
 
 **Small additive changes; default output unchanged:**
-- The year-button row in `components/analysis/analysis-view.tsx` is lifted into a shared `YearButtonRow`, with an optional per-year tag (the "planned" tag there, the census tag here). Analysis must render exactly as before, and its browser specs prove it.
+- The year-button row in `components/analysis/analysis-view.tsx` is lifted into a shared `YearButtonRow`, with an optional per-year tag (the "planned" tag; the census label on this page is now carried by the year menus' option text instead). Analysis must render exactly as before, and its browser specs prove it.
 - The table and legend of `UnemploymentAgeHeatmap` are lifted into a shared `HeatmapTable` (`components/main-explorer/heatmap-table.tsx`) with an optional `breakYear`; Unemployment renders exactly as before (§3.4).
 - Demography loader, validation and served-file lists gain the two files; `servedRows` gains a client projection for age rows.
 - `DEMOGRAPHY_PAGES` flips `age-sex` to live, and the hub card gains a figure (Georgia's 65+ share, latest year).
@@ -130,7 +132,7 @@ Rows are the interactive unit. Each has an aria-label such as `25–29: მა�
 
 ## 7. State
 
-The national page keeps `year`, `compare` (absent = off), `measure` (`share|persons`) and the pyramid's `mode` in the hash. A `bands` key from the removed part is ignored. Updates use replace, not push (`useReplaceHash`, as on inflation cities). Rules:
+The national page keeps `year`, `compare` (absent = off), `measure` (`share|persons`) in the hash. A `bands` key from the removed part and a `pyramid` key from the removed table switch are ignored. Updates use replace, not push (`useReplaceHash`, as on inflation cities). Rules:
 
 - Unknown values are rejected.
 - Years are clamped to loaded facts.
@@ -158,7 +160,7 @@ Every workbook keeps basis and source hyperlinks and has no internal columns. Ge
 
 ## 10. Accessibility and responsive
 
-- Every figure is `role="img"` or a named group, and has a table twin.
+- Every figure is `role="img"` or a named group; the national pyramid's rows carry their counts in their names, and the place block's pyramid has a table twin.
 - Focus is the 2px accent ring.
 - Sex is carried by position and labels, not only colour.
 - Pyramids fit 320px without scrolling; the heat map scrolls inside its own frame, as on Unemployment; no horizontal page overflow.
@@ -180,9 +182,9 @@ Every workbook keeps basis and source hyperlinks and has no internal columns. Ge
 
 **Browser (both languages):**
 - The national page's three parts in order (pyramid, heat map, regional glance).
-- Year buttons and keys.
+- The year and compared-with menus and their keys.
 - Comparison within one side of the break, and across it (note shown, `%` forced, no difference).
-- The table twins.
+- The place block's table twin.
 - The heat map's break rule and label, and Unemployment's heat map unchanged.
 - The regional glance has no links (no `a` in its map or list).
 - The place block's settlement and measure switches.

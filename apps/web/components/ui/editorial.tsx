@@ -29,6 +29,9 @@ export function TextTab({ label, active, onClick, testId }: TextTabProps) {
   );
 }
 
+/** The underlined native select every explorer menu shares (Unemployment's indicator, Age and sex's year menus). */
+export const SELECT_CLASS = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
+
 export function TabDivider() {
   return <span aria-hidden className="h-[13px] w-px bg-[var(--control)]" />;
 }

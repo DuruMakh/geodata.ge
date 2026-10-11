@@ -30,10 +30,9 @@ import type { ClientAgeFact } from "../../lib/servedRows";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
-import { YearButtonRow } from "../ui/year-button-row";
-import { Callout, SectionTitle, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
-import { Download, ModeTabs } from "./national-vital-charts";
-import { PopulationPyramid, PyramidTable } from "./population-pyramid";
+import { Callout, SELECT_CLASS, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Download } from "./national-vital-charts";
+import { PopulationPyramid } from "./population-pyramid";
 
 const SECTION_CLASS = "mt-16 border-t-2 border-[var(--ink)] pt-[22px]";
 const percent = (value: number | null) => formatShare(value === null ? null : value / 100);
@@ -67,7 +66,7 @@ export function AgeSexExplorer({
   const [first, last] = [years[0]!, years.at(-1)!];
   const update = (patch: Partial<AgeSexState>) => setState((previous) => ({ ...previous, ...patch }));
   const breakLabel = t("breakLabel");
-  const breakTag = (year: number) => (year === CENSUS_STEP.toYear ? breakLabel : null);
+  const yearText = (year: number) => (year === CENSUS_STEP.toYear ? `${year} · ${breakLabel}` : String(year));
   const source = (
     <>
       {t("annualSource", { first, last })}{" "}
@@ -87,8 +86,6 @@ export function AgeSexExplorer({
   const shares = bandShares(pyramid);
   const place = t("georgia");
   const date = String(state.year);
-  // A comparison opens on the first year, or on the latest when the first is the year shown.
-  const defaultCompare = state.year === first ? last : first;
   const chooseYear = (year: number) => update({ year, compare: state.compare === year ? null : state.compare });
 
   // Heat map
@@ -99,8 +96,25 @@ export function AgeSexExplorer({
     <>
       <section data-testid="age-sex-pyramid" className={SECTION_CLASS}>
         <SectionTitle>{t("pyramidTitle")}</SectionTitle>
-        <YearButtonRow years={years} value={state.year} onChange={chooseYear} tagFor={breakTag} testId="age-sex-year-row" />
-        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-3">
+          <label className="flex min-w-0 flex-col gap-1 text-[11px] font-semibold text-[var(--muted)] max-[767px]:w-full">
+            <span>{t("yearMenu")}</span>
+            <select data-testid="age-sex-year-select" value={state.year} className={SELECT_CLASS} onChange={(event) => chooseYear(Number(event.target.value))}>
+              {years.map((year) => <option key={year} value={year}>{yearText(year)}</option>)}
+            </select>
+          </label>
+          <label className="flex min-w-0 flex-col gap-1 text-[11px] font-semibold text-[var(--muted)] max-[767px]:w-full">
+            <span>{t("compareMenu")}</span>
+            <select
+              data-testid="age-sex-compare-select"
+              value={state.compare ?? ""}
+              className={SELECT_CLASS}
+              onChange={(event) => update({ compare: event.target.value === "" ? null : Number(event.target.value) })}
+            >
+              <option value="">{t("compareNone")}</option>
+              {years.filter((year) => year !== state.year).map((year) => <option key={year} value={year}>{yearText(year)}</option>)}
+            </select>
+          </label>
           <SegmentedTabs<AgeMeasure>
             ariaLabel={t("measureLabel")}
             value={measure}
@@ -116,45 +130,23 @@ export function AgeSexExplorer({
               },
             ]}
           />
-          <TextTab
-            label={t("compareToggle")}
-            active={state.compare !== null}
-            onClick={() => update({ compare: state.compare === null ? defaultCompare : null })}
-            testId="age-sex-compare-toggle"
-          />
         </div>
-        {state.compare === null ? null : (
-          <YearButtonRow
-            years={years.filter((year) => year !== state.year)}
-            value={state.compare}
-            onChange={(year) => update({ compare: year })}
-            tagFor={breakTag}
-            testId="age-sex-compare-row"
-          />
-        )}
         {crossing ? (
           <div className="mt-4">
             <Callout testId="age-sex-compare-note">{t("compareNote", { year: state.year, compare: state.compare! })}</Callout>
           </div>
         ) : null}
-        <div className="mt-5">
-          <ModeTabs value={state.pyramidMode} onChange={(pyramidMode) => update({ pyramidMode })} testId="age-sex-pyramid" lineLabel={t("pyramidMode")} />
-        </div>
-        <div className="mt-5" data-testid="age-sex-pyramid-panel" data-mode={state.pyramidMode} data-measure={measure}>
-          {state.pyramidMode === "line" ? (
-            <div className="mx-auto max-w-[640px]">
-              <PopulationPyramid
-                pyramid={pyramid}
-                year={state.year}
-                compare={compare}
-                measure={measure}
-                ariaLabel={t("pyramidAria", { place, date })}
-                testId="age-sex-pyramid-figure"
-              />
-            </div>
-          ) : (
-            <PyramidTable pyramid={pyramid} year={state.year} compare={compare} caption={t("pyramidTableCaption", { place, date })} />
-          )}
+        <div className="mt-5" data-testid="age-sex-pyramid-panel" data-measure={measure}>
+          <div className="mx-auto max-w-[640px]">
+            <PopulationPyramid
+              pyramid={pyramid}
+              year={state.year}
+              compare={compare}
+              measure={measure}
+              ariaLabel={t("pyramidAria", { place, date })}
+              testId="age-sex-pyramid-figure"
+            />
+          </div>
         </div>
         <p data-testid="age-sex-pyramid-summary" className="mt-4 font-[family-name:var(--font-numeric)] text-[12px] text-[var(--body)]">
           {t("pyramidSummary", {
