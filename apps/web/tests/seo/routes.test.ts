@@ -61,7 +61,8 @@ describe("indexable Fiscal.ge routes", () => {
     // External flows adds its hub, Money from abroad and its methodology, each in both languages.
     // Domestic exports adds one further bilingual pair.
     // Poverty adds its hub, two pages and methodology page: 4 bilingual pairs.
-    expect(urls).toHaveLength(498);
+    // Services trade adds one further bilingual pair.
+    expect(urls).toHaveLength(500);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -85,6 +86,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/domestic-exports");
+    expect(urls).toContain("https://fiscal.ge/explorer/trade/services");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/trade/services");
     for (const route of ["/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account", "/methodology/external-flows"]) {
       expect(urls).toContain(`https://fiscal.ge${route}`);
       expect(urls).toContain(`https://fiscal.ge/en${route}`);

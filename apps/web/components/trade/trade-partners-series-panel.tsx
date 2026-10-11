@@ -17,7 +17,7 @@ export function TradePartnersSeriesPanel({ data, state, model, onTabChange, onSe
   const { locale, englishLabels, messages } = useI18n();
   const t = (key: string) => message(messages, `trade.partners.${key}`);
   const label = (entity: (typeof data.entities)[number]) => publicLabel(locale, entity.id, entity.labelKa, englishLabels);
-  const visible = model.activeEntities.filter(entity => matchesLabelQuery(query, [label(entity), entity.sourceCode ?? ""]));
+  const visible = model.activeEntities.filter(entity => matchesLabelQuery(query, services ? [entity.labelKa, publicLabel("en", entity.id, entity.labelKa, englishLabels)] : [label(entity), entity.sourceCode ?? ""]));
   const toggle = (id: string) => onSelectionChange(state.selectedIds.includes(id) ? state.selectedIds.filter(selected => selected !== id) : [...state.selectedIds, id]);
   const row = (id: string, text: string) => <SeriesSelectorRow key={id} id={id} label={text} color={tradePartnerColor(id)} value={formatInUnit(model.valuesByEntity[id][model.range.end], model.unit)} selected={model.selectedIds.includes(id)} level={id === totalId ? "total" : "item"} wrapLabel onToggle={() => toggle(id)} />;
   return <>
