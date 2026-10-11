@@ -44,6 +44,17 @@ const archiveSummary = {
   validated: true,
 };
 
+it.each([
+  ["ka", "საქსტატის მომსახურებით ვაჭრობის გვერდი"],
+  ["en", "Geostat services trade source page"],
+] as const)("renders the Services publisher link in the %s Trade methodology", async (locale, label) => {
+  const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+  const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "trade" }) }));
+  const services = markup.match(/<section[^>]*id="services"[\s\S]*?<\/section>/)?.[0] ?? "";
+  expect(services).toContain('href="https://www.geostat.ge/en/modules/categories/766/international-trade-in-services"');
+  expect(services).toMatch(new RegExp(`<a[^>]*>${label}</a>`));
+});
+
 it("omits processed-data links for an article without a public dataset publication", () => {
   const markup = renderToStaticMarkup(createElement(MethodologyArticle, {
     locale: "ka", messages: { ...common, ...methodology }, content: METHODOLOGY_CONTENT.debt,

@@ -99,6 +99,7 @@ for (const prefix of ["", "/en"]) {
     await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
     await page.getByTestId("source-label").getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/trade$`));
+    await expect(page.locator("#services").getByRole("link", { name: prefix ? "Geostat services trade source page" : "საქსტატის მომსახურებით ვაჭრობის გვერდი", exact: true })).toHaveAttribute("href", "https://www.geostat.ge/en/modules/categories/766/international-trade-in-services");
     await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(18);
     for (const filename of ["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx", "1004_180325_en.pdf"]) {
       await expect(page.locator(`a[href="/downloads/methodology/trade/files/${filename}"]`)).toHaveCount(1);

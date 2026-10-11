@@ -121,6 +121,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "id": "services",
       "kind": "classification",
       "title": "Services trade: national totals and types",
+      "sourceLinks": [{ "href": "https://www.geostat.ge/en/modules/categories/766/international-trade-in-services", "label": "Geostat services trade source page" }],
       "paragraphs": [
         "Services trade covers annual transactions between Georgian residents and non-residents for 2020–2024. Exports are supplied by residents to non-residents; imports are received by residents from non-residents. Goods FOB/CIF valuation, domestic exports and re-exports do not apply to these series. Amounts are nominal USD: exact source decimals in thousand USD are converted to USD without inflation adjustment or currency conversion.",
         "Overview shows total services trade, exports, imports and balance; Service types retains all twelve published categories and the national services total. Travel keeps its complete published meaning; Telecommunications, computer, and information services is not an IT-only estimate. n.i.e. means “not included elsewhere”. Type shares use the matching same-year national services total; Balance has no share.",

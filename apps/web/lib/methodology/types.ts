@@ -54,6 +54,7 @@ export type MethodologyContent = {
     kind: MethodologySectionKind;
     title: string;
     paragraphs: readonly string[];
+    sourceLinks?: readonly { href: string; label: string }[];
   }[];
   decisions: readonly MethodologyDecision[];
   technicalAppendix: readonly MethodologyDecision[];

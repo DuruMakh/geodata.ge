@@ -186,10 +186,27 @@ for (const prefix of ["", "/en"]) test(`Services real Excel includes every selec
   await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
   const national = await download("trade-excel-download");
   expect(national.worksheets[1].rowCount).toBe(21);
+  const nationalIndicators = prefix ? {
+    "Total services trade": "trade.turnover", "Services exports": "trade.exports",
+    "Services imports": "trade.imports", "Services balance": "trade.balance",
+  } : {
+    "მომსახურებით ვაჭრობა სულ": "trade.turnover", "მომსახურების ექსპორტი": "trade.exports",
+    "მომსახურების იმპორტი": "trade.imports", "მომსახურების სალდო": "trade.balance",
+  };
+  const nationalPairs = new Set<string>();
   national.worksheets[1].eachRow((row, index) => {
     if (index === 1) return;
-    expect(facts.filter(fact => fact.entity_id === "services.total" && fact.year === String(row.getCell(1).value)).map(fact => Number(fact.value_usd))).toContain(row.getCell(4).value);
+    const year = String(row.getCell(1).value), label = String(row.getCell(3).value);
+    const indicator = nationalIndicators[label as keyof typeof nationalIndicators];
+    expect(indicator).toBeTruthy();
+    const pair = `${indicator}:${year}`;
+    expect(nationalPairs.has(pair)).toBe(false); nationalPairs.add(pair);
+    const fact = facts.find(item => item.entity_id === "services.total" && item.year === year && item.indicator_id === indicator);
+    expect(fact).toBeTruthy();
+    expect(row.getCell(4).value).toBe(Number(fact!.value_usd));
   });
+  expect([...nationalPairs].sort()).toEqual(facts.filter(fact => fact.entity_id === "services.total").map(fact => `${fact.indicator_id}:${fact.year}`).sort());
+  expect(nationalPairs.size).toBe(20);
   const metadata = archive.find(row => row.public_download_path.endsWith("1004_180325_en.pdf"))!;
   const response = await request.get(`/${metadata.public_download_path}`); expect(response.ok()).toBe(true);
   expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(metadata.sha256);
