@@ -19,6 +19,7 @@
   "household.area.settlement.rural": "Villages",
   "household.measure.per_household": "Per household",
   "household.measure.per_capita": "Per person",
+  "household.measureLabel": "Per household or per person",
   "household.series.income.total": "Total income",
   "household.series.income.wages": "Wages and salaries",
   "household.series.income.self_employment": "Self-employment",

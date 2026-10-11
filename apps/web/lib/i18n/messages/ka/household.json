@@ -19,6 +19,7 @@
   "household.area.settlement.rural": "სოფელი",
   "household.measure.per_household": "ერთ შინამეურნეობაზე",
   "household.measure.per_capita": "ერთ სულზე",
+  "household.measureLabel": "ერთ შინამეურნეობაზე ან ერთ სულზე",
   "household.series.income.total": "შემოსავლები, სულ",
   "household.series.income.wages": "დაქირავებული შრომიდან",
   "household.series.income.self_employment": "თვითდასაქმებიდან",

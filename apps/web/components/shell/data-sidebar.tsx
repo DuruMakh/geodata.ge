@@ -12,7 +12,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { UNEMPLOYMENT_SECTIONS } from "../../lib/explorer/unemploymentSections";
 import { WAGES_SECTIONS } from "../../lib/explorer/wages";
-import { POVERTY_SECTIONS } from "../../lib/explorer/poverty";
+import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../../lib/explorer/livingStandards";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
@@ -38,7 +38,7 @@ export function DataSidebar() {
   const inflationActive = pathname.includes("/explorer/inflation");
   const unemploymentActive = pathname.includes("/explorer/unemployment");
   const wagesActive = pathname.includes("/explorer/wages");
-  const povertyActive = pathname.includes("/explorer/poverty");
+  const livingStandardsActive = pathname.includes(LIVING_STANDARDS_HUB_PATH);
   const tradeActive = pathname.includes("/explorer/trade");
   const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
   const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
@@ -49,7 +49,7 @@ export function DataSidebar() {
   const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
   const tradeDomesticActive = pathname.endsWith("/explorer/trade/domestic-exports");
   const demographyActive = pathname.includes("/explorer/demography");
-  const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !wagesActive && !povertyActive && !tradeActive && !externalActive && !demographyActive;
+  const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !wagesActive && !livingStandardsActive && !tradeActive && !externalActive && !demographyActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
   const regionsActive = pathname.includes("/explorer/economy/regions");
@@ -201,7 +201,7 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : wagesActive ? "common.dataWages" : povertyActive ? "common.dataPoverty" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : wagesActive ? "common.dataWages" : livingStandardsActive ? "common.dataLivingStandards" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
@@ -344,13 +344,13 @@ export function DataSidebar() {
                 {message(messages, section.labelKey)}
               </Link>;
             }) : null}
-            <Link href={pageHref("/explorer/poverty", locale)} data-testid="poverty-link" aria-current={pathname.endsWith("/explorer/poverty") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${povertyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.poverty")}
+            <Link href={pageHref(LIVING_STANDARDS_HUB_PATH, locale)} data-testid="living-standards-link" aria-current={pathname.endsWith(LIVING_STANDARDS_HUB_PATH) ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${livingStandardsActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.livingStandards")}
             </Link>
-            {povertyActive ? POVERTY_SECTIONS.map(section => {
+            {livingStandardsActive ? LIVING_STANDARDS_SECTIONS.map(section => {
               const active = pathname.endsWith(section.href);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`poverty-${section.id}-link`} aria-current={active ? "page" : undefined}
+              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (active) event.preventDefault();
                   setSheetOpen(false);

@@ -21,7 +21,7 @@ import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
 import { WAGES_REGIONS } from "../data/wages/types";
-import { POVERTY_SECTIONS } from "../explorer/poverty";
+import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -34,7 +34,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/trade/domestic-exports", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
     "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
-    "/explorer/poverty", ...POVERTY_SECTIONS.map(section => section.href),
+    LIVING_STANDARDS_HUB_PATH, ...LIVING_STANDARDS_SECTIONS.map(section => section.href),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),
