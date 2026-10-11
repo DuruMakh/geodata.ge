@@ -3,7 +3,7 @@ import { beforeAll, expect, test } from "vitest";
 import { loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../lib/data/energyFood/importEnergyFood";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
 import {
-  buildEnergyFoodModel, defaultEnergyFoodState, energyFoodCoverage, energyFoodSeries, energyFoodUnit,
+  buildEnergyFoodModel, defaultEnergyFoodState, energyFoodCoverage, energyFoodDisplayLabels, energyFoodSeries, energyFoodUnit,
   ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId,
 } from "../../lib/explorer/energyFood";
 import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
@@ -100,6 +100,23 @@ test("children nest under their parent and the top-level rows are counted per pa
       expect(list.findIndex(item => item.id === s.parentId)).toBeLessThan(list.indexOf(s));
     }
   }
+});
+
+test("the list keeps plain fuel names, and outside it no two series on a page share a name", async () => {
+  for (const locale of ["ka", "en"] as const) {
+    const messages = await getMessages(locale, ["energyFood"]);
+    for (const { id: section } of ENERGY_FOOD_SECTIONS) {
+      const labels = Object.fromEntries(energyFoodSeries(section).map(s => [s.id, messages[`energyFood.series.${s.id}`]]));
+      const shown = energyFoodDisplayLabels(section, labels);
+      expect(new Set(Object.values(shown)).size, `${locale} ${section}`).toBe(energyFoodSeries(section).length);
+    }
+  }
+  const en = await getMessages("en", ["energyFood"]);
+  const labels = Object.fromEntries(energyFoodSeries("energy-supply").map(s => [s.id, en[`energyFood.series.${s.id}`]]));
+  expect(labels["energy.imports.natural_gas"]).toBe("Natural gas");
+  const shown = energyFoodDisplayLabels("energy-supply", labels);
+  expect(shown["energy.imports.natural_gas"]).toBe("Imports — Natural gas");
+  expect(shown["energy.supply.natural_gas"]).toBe("Natural gas");
 });
 
 test("wind has no rows before 2016, so its early years are gaps rather than zeros", () => {

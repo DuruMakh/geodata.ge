@@ -66,6 +66,20 @@ export function energyFoodSeries(section: EnergyFoodSectionId): EnergyFoodSeries
   return [...SERIES[section]];
 }
 
+/**
+ * Names for a series outside the nested list (chart tooltip, table, workbook). The list shows plain names, so an
+ * imports child reads "Natural gas" like the supply child above it; where a name repeats on a page, the child of a
+ * non-reference parent carries its parent's name ("Imports — Natural gas") so no two series share a label.
+ */
+export function energyFoodDisplayLabels(section: EnergyFoodSectionId, labels: Readonly<Record<string, string>>): Record<string, string> {
+  const series = energyFoodSeries(section);
+  const counts = new Map<string, number>();
+  for (const s of series) counts.set(labels[s.id], (counts.get(labels[s.id]) ?? 0) + 1);
+  const reference = series.find(s => s.reference)!.id;
+  return Object.fromEntries(series.map(s => [s.id,
+    s.parentId && s.parentId !== reference && counts.get(labels[s.id])! > 1 ? `${labels[s.parentId]} — ${labels[s.id]}` : labels[s.id]]));
+}
+
 export type EnergyFoodUnit = "ktoe" | "gwh" | "percent";
 const UNITS: Record<EnergyFoodSectionId, EnergyFoodUnit> = { "energy-supply": "ktoe", electricity: "gwh", "energy-use": "ktoe", "food-self-sufficiency": "percent" };
 export function energyFoodUnit(section: EnergyFoodSectionId): EnergyFoodUnit {

@@ -2,14 +2,15 @@ import type { ClientEnergyFoodFact } from "../data/energyFood/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
-import { buildEnergyFoodModel, energyFoodUnit, type EnergyFoodSectionId, type EnergyFoodState } from "./energyFood";
+import { buildEnergyFoodModel, energyFoodDisplayLabels, energyFoodUnit, type EnergyFoodSectionId, type EnergyFoodState } from "./energyFood";
 import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 /** The Data sheet's columns in order; the numeric format is keyed by the 1-based position of each `value` column. */
 const ANALYSIS_COLUMNS = ["year", "series", "value", "status"] as const;
 
 export function buildEnergyFoodWorkbookExportModel(input: { section: EnergyFoodSectionId; facts: readonly ClientEnergyFoodFact[]; state: EnergyFoodState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
-  const { section, facts, state, labels } = input, { locale, messages } = presentation;
+  const { section, facts, state } = input, { locale, messages } = presentation;
+  const labels = energyFoodDisplayLabels(section, input.labels);
   const t = (key: string) => message(messages, `energyFood.${key}`);
   const model = buildEnergyFoodModel(section, facts, state);
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.year}`, f]));

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useCallback, useState, type ReactNode } from "react";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
-import { buildEnergyFoodModel, energyFoodCoverage, energyFoodUnit, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodSeriesModel, type EnergyFoodState } from "../../lib/explorer/energyFood";
+import { buildEnergyFoodModel, energyFoodCoverage, energyFoodDisplayLabels, energyFoodUnit, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodSeriesModel, type EnergyFoodState } from "../../lib/explorer/energyFood";
 import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -47,7 +47,9 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   const valueLabel = (value: number | null | undefined, decimals?: number) => value == null ? "—" : `${format(value, decimals)}${suffix}`;
   const matches = (id: string) => matchesLabelQuery(query, [labels[id]]);
   const reference = model.series[0];
-  const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
+  // The list nests plain names; the chart and table name a repeated child with its parent.
+  const shown = energyFoodDisplayLabels(section, labels);
+  const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: shown[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const total = rows.find(row => row.itemId === reference.id) ?? null;
   const allIds = model.series.map(series => series.id);
   // Breakdowns nest under their total: the count and bulk action cover the top-level rows, nested ticks are counted apart.
@@ -88,7 +90,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
             <span className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={percent} unit={unit} shareLabel={title} formatTooltipValue={value => valueLabel(value)} /></div>
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: shown[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={percent} unit={unit} shareLabel={title} formatTooltipValue={value => valueLabel(value)} /></div>
             // Food ratios are whole percents, as Geostat prints them.
             : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} percentDecimals={0} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
           <RangeStrip years={energyFoodCoverage(section, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildEnergyFoodModel(section, facts, s).range, patch) }))} />
