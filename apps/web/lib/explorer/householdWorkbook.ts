@@ -30,13 +30,10 @@ export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSec
   }
   const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
   const status = (value: number | null) => value === null ? workbookMessage(locale, "workbook.unavailable") : t("status.survey_estimate");
-  const parts = state.view === "parts";
-  const tab = t(parts ? `tab.parts.${section}` : "tab.areas");
-  const title = [input.title ?? t(`page.${section}.title`), tab, ...(parts ? [input.areaLabel] : []), t(`measure.${state.measure}`)].join(" · ");
-  const areaSlug = parts ? state.area.replace(/\./g, "-") : "all";
-  const kind = (series: typeof model.selected[number]): WorkbookReadableRow["kind"] => series.reference ? "total" : series.parentId ? "item" : parts ? "group" : "item";
+  const title = [input.title ?? t(`page.${section}.title`), t(`tab.parts.${section}`), input.areaLabel, t(`measure.${state.measure}`)].join(" · ");
+  const kind = (series: typeof model.selected[number]): WorkbookReadableRow["kind"] => series.reference ? "total" : series.parentId ? "item" : "group";
   return {
-    locale, filename: workbookFilename(`household-${section}-${state.view}-${areaSlug}-${state.measure}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
+    locale, filename: workbookFilename(`household-${section}-${state.area.replace(/\./g, "-")}-${state.measure}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title, subtitle: `${model.range.start}–${model.range.end} · ${t(`unitLong.${state.measure}`)}`,
       unitLabel: t("unitGel"), amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat: NUMBER_FORMAT,

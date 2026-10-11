@@ -3,7 +3,7 @@ import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegion
 import { sectionTotal, type HouseholdSectionId } from "./household";
 import { regionalMapGeometry, quantileBucket, type RegionMapModel } from "./regionalEconomyMap";
 
-/** The Regions tab's map: the section total for each region in the latest year all eleven regions have, as published (one decimal). */
+/** The map that picks the page's area: the section total for each region in the latest year all eleven regions have, as published (one decimal). */
 export function buildHouseholdRegionMapModel(section: HouseholdSectionId, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]): RegionMapModel {
   const ids = new Set<string>(REGIONAL_ECONOMY_REGIONS.map(region => region.id));
   const regional = facts.filter(f => f.indicatorId === sectionTotal(section) && f.measure === measure && ids.has(f.areaId));

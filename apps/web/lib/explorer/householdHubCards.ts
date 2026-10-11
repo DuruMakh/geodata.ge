@@ -9,7 +9,7 @@ import { HOUSEHOLD_SECTIONS, householdCoverage, sectionTotal } from "./household
 export function buildHouseholdHubCards(facts: readonly ClientHouseholdFact[], presentation: Presentation): HubCardModel[] {
   const t = (key: string) => message(presentation.messages, `household.${key}`);
   return HOUSEHOLD_SECTIONS.map((section, index) => {
-    const { years } = householdCoverage(section.id, "parts", "georgia", "per_household", facts);
+    const { years } = householdCoverage(section.id, "georgia", "per_household", facts);
     const national = facts.filter(f => f.indicatorId === sectionTotal(section.id) && f.areaId === "georgia" && f.measure === "per_household").sort((a, b) => a.year - b.year);
     const last = national.at(-1)!;
     return {

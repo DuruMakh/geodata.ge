@@ -38,13 +38,18 @@ Fiscal.ge does no calculation of its own. Every value shown is a figure Geostat 
 
 ## 3. Income page
 
-> **Changed after preview 2026-10-11:** Regions map replaces Compare areas and the area dropdown. The second tab is "Regions" (`tab=areas`): the shared `RegionIndex` map and ranked list of the section total for the latest year all eleven regions have, without an overview block; a region opens the first tab for it. The first tab's area is a Georgia | Towns | Villages switch, plus an active pill for a region reached from the map. Per household / per person is an icon switch on the right of the controls row: Lucide `Users` (per household) and `User` (per person), with the full labels as accessible names and tooltips.
+> **Changed after the second preview, 2026-10-11 (owner decision, 21:08Z):** the page is one view, and the map picks the area. This replaces the tabs, the Compare areas tab, the area dropdown and the later Regions tab with its Georgia | Towns | Villages switch.
+> - Under the latest-value line sits the shared `RegionIndex` map and ranked list of the section total for the latest year all eleven regions have, without an overview block. Georgia is the list's first, unranked row. Clicking Georgia, or a region on the map or in the list, sets the page's area (URL `area`; Georgia is the default and is not written), marks that row, and scrolls to and focuses the chart.
+> - Below it is the chart workspace described here: Chart | Table on the left of the controls row, the measure icons on the right, the chart or table, the years, the series list with Excel, and one source line that also credits the map's geoBoundaries outlines. There is no area switch on the chart.
+> - For Georgia, the list ends with two more top-level lines, Towns and Villages: the section total for each, unticked at first, from 2006. A region's list does not have them. Changing area keeps the ticked lines the new area has and refits the years.
+> - Old links: `tab` is ignored, and `area=settlement.urban|settlement.rural` opens Georgia.
+> - Per household / per person is an icon switch: Lucide `HouseHeart` (per household) and `User` (per person), with the full labels as accessible names and tooltips. The map follows it.
 
 Under the heading there is one short line from `LatestValueLine`: "Average monthly household income · 2025: 2,025.8 ₾". It always shows Georgia per household, whatever is selected below. Nothing else sits under the heading.
 
 Two centred text tabs follow, styled like the Poverty tabs:
 
-**Where it comes from | Regions** (originally Compare areas; see the note above)
+**Where it comes from | Compare areas** (superseded: there are no tabs; see the note above)
 
 ### Where it comes from
 
@@ -54,7 +59,7 @@ Two centred text tabs follow, styled like the Poverty tabs:
 | Borrowing and selling property | Borrowing and using savings; Selling property |
 
 - The nested rows of Total income are Geostat's parts of total income. Together they add up to it: the seven cash sources plus non-cash income.
-- An **area** choice in the chart panel picks Georgia, Towns or Villages; a region opened from the Regions map shows as one more active choice. Georgia is the default. (The original design was a dropdown of Georgia, Towns, Villages and the 11 regions; see the note above.)
+- The **area** is Georgia or a region, picked on the map or its list. Georgia is the default, and its list adds Towns and Villages as lines. (The original design was a dropdown of Georgia, Towns, Villages and the 11 regions; see the note above.)
 
 ### Compare areas (superseded 2026-10-11, see note)
 
@@ -73,7 +78,7 @@ Two centred text tabs follow, styled like the Poverty tabs:
 
 ## 4. Spending page
 
-> **Changed after preview 2026-10-11:** the same Regions map, area switch and icon measure switch as the Income page (§3).
+> **Changed after the second preview, 2026-10-11:** one view, with the same area-picking map, Towns and Villages lines for Georgia and icon measure switch as the Income page (§3).
 
 The line under the heading reads "Average monthly household consumption spending · 2025: 1,438.7 ₾".
 
@@ -85,7 +90,7 @@ It has the same two tabs (**What it's spent on | Regions**), the same area choic
 | Savings, lending and other payments | Saving and lending; Agriculture; Transfers to others; Buying property |
 
 - The nested rows of Consumption spending add up to it: the eight cash categories plus non-cash consumption.
-- The Regions map shows consumption spending for each region (originally Compare areas showed it for each area).
+- The map shows consumption spending for each region (originally Compare areas showed it for each area).
 
 Final labels in both languages follow Geostat's Georgian and English workbook rows and the bilingual catalogue conventions. The English names above are plain-language proposals.
 

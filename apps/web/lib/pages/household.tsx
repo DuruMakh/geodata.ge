@@ -48,13 +48,14 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   ]);
   // Each page receives only its own section's observations.
   const facts = data.facts.map(toClientHouseholdFact).filter(f => f.indicatorId.startsWith(`${section}.`));
-  const years = householdCoverage(section, "parts", "georgia", "per_household", facts).years;
+  const years = householdCoverage(section, "georgia", "per_household", facts).years;
   const firstYear = years[0], lastYear = years.at(-1)!;
   const href = HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href;
   const t = (key: string) => message(presentation.messages, `household.${key}`);
-  const labels = Object.fromEntries(householdViewSeries(section, "parts", "georgia").map(series => [series.id, t(`series.${series.id}`)]));
+  // Line names; the towns and villages lines take their names from areaLabels.
+  const labels = Object.fromEntries(householdViewSeries(section, "georgia").filter(series => series.indicatorId === series.id).map(series => [series.id, t(`series.${series.id}`)]));
   const areaLabels = householdAreaLabels(presentation);
-  // The Regions tab map for each measure; the geometry is read on the server.
+  // The area-picking map for each measure; the geometry is read on the server.
   const regionMaps = Object.fromEntries(HOUSEHOLD_MEASURES.map(measure => [measure, buildHouseholdRegionMapModel(section, measure, facts)])) as Record<HouseholdMeasure, RegionMapModel>;
   const sources = householdWorkbookSources(manifest, projectPublicSources(manifest, locale, catalogue.documents));
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`), hubTitle = message(presentation.messages, "common.livingStandards");
