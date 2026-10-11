@@ -97,7 +97,9 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
   const model = buildWagesModel(section, facts, state);
   const unit: ValueUnit = { divisor: 1, label: t("unit"), decimals: model.decimals };
   const format = (value: number | null | undefined, decimals = model.decimals) => formatInUnit(value, { ...unit, decimals });
-  const valueLabel = (value: number | null | undefined) => value == null ? "—" : `${format(value)} ${unit.label}`;
+  // Averages are published to one decimal and the median in whole lari, so a mixed selection formats each series at its own precision.
+  const decimalsOf = (id: string) => model.series.find(series => series.id === id)?.decimals ?? model.decimals;
+  const valueLabel = (value: number | null | undefined, id?: string) => value == null ? "—" : `${format(value, id ? decimalsOf(id) : model.decimals)} ${unit.label}`;
   const matches = (id: string) => matchesLabelQuery(query, [labels[id]]);
   const reference = model.series[0];
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
@@ -125,7 +127,7 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
   const changeView = (view: WagesView) => { if (view === state.view) return; setQuery(""); update(s => changeWagesView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="wages-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-    await downloadWorkbook(buildWagesWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
+    await downloadWorkbook(buildWagesWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title, regionId }, presentation));
   }} />;
   const heatmap = section === "industries" ? buildWagesHeatmap(model) : null;
   return <div data-testid={`wages-${section}`} className="@container">
@@ -155,8 +157,8 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
             </label> : <span className="text-[11px] text-[var(--muted)]">{t("unitMonthly")}</span>}
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={false} unit={unit} shareLabel={title} formatTooltipValue={valueLabel} /></div>
-            : <ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={false} unit={unit} shareLabel={title} formatTooltipValue={(value, id) => valueLabel(value, id)} /></div>
+            : <ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} decimalsForRow={row => decimalsOf(row.itemId)} />}
           <RangeStrip years={wagesCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildWagesModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || section === "overview" ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}

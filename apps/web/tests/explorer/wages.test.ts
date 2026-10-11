@@ -3,7 +3,8 @@ import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadWagesFacts, toClientWagesFact } from "../../lib/data/wages/importWages";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
-import { buildWagesHeatmap, buildWagesModel, changeWagesView, defaultWagesState, parseWagesHash, serializeWagesHash, wagesCoverage, wagesViewSeries, type WagesState } from "../../lib/explorer/wages";
+import { buildWagesHeatmap, buildWagesModel, changeWagesView, defaultWagesState, parseWagesHash, serializeWagesHash, wagesCoverage, wagesSummaryValues, wagesViewSeries, type WagesState } from "../../lib/explorer/wages";
+import { message } from "../../lib/i18n/messages";
 import { buildWagesHubCards } from "../../lib/explorer/wagesHubCards";
 import { buildWagesWorkbookExportModel } from "../../lib/explorer/wagesWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
@@ -96,4 +97,39 @@ test.each(["ka", "en"] as const)("the %s workbook keeps selected series, years, 
   for (const source of model.sources) expect(source.absoluteUrl).toMatch(/^https:\/\/fiscal\.ge\/downloads\/methodology\/wages\/files\//);
   const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
   expect(excel.worksheets).toHaveLength(3);
+});
+
+async function overviewWorkbook(locale: Locale, patch: Partial<Parameters<typeof buildWagesWorkbookExportModel>[0]>) {
+  const presentation: Presentation = { locale, englishLabels: {}, messages: await getMessages(locale, ["wages", "workbook", "format"]) };
+  return buildWagesWorkbookExportModel({
+    section: "overview", facts, labels: { average: "Average", median: "Median" }, sources: [], siteOrigin: "https://fiscal.ge",
+    state: { mode: "table", view: "main", range: { kind: "manual", start: 2022, end: 2022 }, selectedIds: ["average"] }, ...patch,
+  }, presentation);
+}
+
+test("the Data sheet formats the amount column", async () => {
+  const model = await overviewWorkbook("en", {});
+  expect(model.analysis.numericFormats).toEqual({ 3: "#,##0.0" });
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  const amount = excel.worksheets[1].getCell("C2");
+  expect(amount.value).toBe(1543);
+  expect(amount.numFmt).toBe("#,##0.0");
+});
+
+test("a region workbook is named after its region", async () => {
+  const state = { ...defaultWagesState("regions", facts), range: { kind: "manual" as const, start: 2024, end: 2025 } };
+  const adjara = await overviewWorkbook("en", { section: "regions", state, regionId: "region.adjara" });
+  const guria = await overviewWorkbook("en", { section: "regions", state, regionId: "region.guria" });
+  expect(adjara.filename).toContain("adjara");
+  expect(guria.filename).toContain("guria");
+  expect(adjara.filename).not.toBe(guria.filename);
+});
+
+test("wages summaries take their years and activity count from the facts", async () => {
+  const messages = await getMessages("en", ["wages"]);
+  const text = (key: string, from: readonly ClientWagesFact[], extra: Record<string, string> = {}) => message(messages, key, { ...wagesSummaryValues(from), ...extra });
+  expect(text("wages.page.overview.summary", facts)).toBe("Georgia’s average monthly wage since 1995 and median monthly wage since 2018, with comparisons between public and non-public employers and between women and men.");
+  expect(text("wages.page.industries.summary", facts)).toBe("Compare average monthly wages across 19 economic activities since 2014, for all employees, women, men or each employer type, or the median wage by activity since 2018.");
+  expect(text("wages.regionSummary", facts, { region: "Adjara" })).toBe("Average monthly wage in Adjara since 2010, with Georgia’s average for comparison.");
+  expect(text("wages.page.overview.summary", facts.filter(f => f.year >= 1996))).toContain("since 1996");
 });

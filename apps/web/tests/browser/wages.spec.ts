@@ -86,3 +86,12 @@ test("the regions index opens each region's own page", async ({ page }) => {
   await page.getByTestId("wages-region-map").locator('a[data-region-id="region.imereti"]').click({ force: true });
   await expect(page).toHaveURL(/\/explorer\/wages\/regions\/imereti$/);
 });
+
+test("the median shows whole lari beside the average", async ({ page }) => {
+  await page.goto("/en/explorer/wages/overview#view=table&sel=average,median");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const table = page.getByTestId("explorer-table");
+  await expect(table).toContainText("2,165.2");
+  await expect(table).toContainText("1,531");
+  await expect(table).not.toContainText("1,531.0");
+});

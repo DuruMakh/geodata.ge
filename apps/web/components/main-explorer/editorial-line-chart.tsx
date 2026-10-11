@@ -51,7 +51,7 @@ type EditorialLineChartProps = {
   shareLabel: string;
   preliminaryLabel?: string;
   showAxisUnit?: boolean;
-  formatTooltipValue?: (value: number) => string;
+  formatTooltipValue?: (value: number, seriesId: string) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
   /** Axis label or tooltip header for a period value. Omit to print the value. */
@@ -188,8 +188,8 @@ export function EditorialLineChart({
   // The phone drawing prints the amount unit once, above the axis.
   const unitCaption = share || unit.label.trim() === "" ? null : unit.label;
 
-  const formatValue = (value: number | null) =>
-    formatTooltipValue && value !== null ? formatTooltipValue(value) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
+  const formatValue = (value: number | null, seriesId = "") =>
+    formatTooltipValue && value !== null ? formatTooltipValue(value, seriesId) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
   const axisPeriod = (index: number) => (formatPeriod ? formatPeriod(years[index]!, "axis") : String(years[index]));
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
