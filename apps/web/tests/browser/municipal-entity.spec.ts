@@ -1105,7 +1105,7 @@ test.describe("period comparison on desktop", () => {
     const table = page.getByTestId("comparison-table");
     await table.scrollIntoViewIfNeeded();
     const wrapped = await table.locator("tbody td").evaluateAll(cells => cells.filter(cell => {
-      if (cell.cellIndex === 0) return false;
+      if ((cell as HTMLTableCellElement).cellIndex === 0) return false;
       const line = parseFloat(getComputedStyle(cell).lineHeight) || 20;
       const style = getComputedStyle(cell);
       const content = cell.getBoundingClientRect().height - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
