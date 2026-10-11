@@ -63,6 +63,8 @@ The GDP ratios are NBG's own published "monetization coefficients" at period end
 
 > Changed after preview review (Duru, 2026-10-11): no tab row; an icon-only switch on the chart toolbar (`₾` / `ChartPie`) switches between the amounts and the two ratios, carrying M3 and M2 across.
 
+> Changed after preview review (Duru, 2026-10-11): % of GDP shows all four series, M3, M2, M1 and M0, with the same ids as the amounts, so the selection stays when switching. Each value is the December amount ÷ Fiscal.ge's national GDP at current prices × 100, using the debt page's GDP facts and share-of-GDP calculation; it is marked calculated (Excel status), the source line names the GDP source and preliminary GDP years, and Excel's Sources sheet adds Geostat's GDP files. The latest-value line on % of GDP reads M3's value (2025: 55.1%). NBG's own ratios (`money.m3_to_gdp`, `money.m2_to_gdp`) stay in the dataset, CSV and mirror but are no longer shown; they use an earlier GDP estimate, so they match before 2010 and differ by 0.4–1.1 points from 2010 (56.0% against 55.1% for M3 in 2025). This supersedes the table row and the sentence above for Compared with GDP.
+
 ## 5. Loans and deposits page
 
 Line under the heading: "2025: bank loans 72.5 billion GEL".
@@ -151,7 +153,7 @@ About 730 served values in total. The research package also keeps the API listin
   - every percent lies within 0–100, except return on assets and equity, which may be negative (they were in 2008);
   - capital and return on assets for 2022 agree between the archive and current FSI files, and the recorded 2022 breaks exist for bad loans and return on equity;
   - a few anchor values match what NBG shows: M3 end-2025 57,680.2 million GEL; loans end-2025 72,453.0 million GEL; National Bank rate 8.00% at the end of 2025; bad loans 2.5% in 2025.
-- No interpolation, rebasing or other derived figures beyond the three deposit totals and the two foreign-currency shares.
+- No interpolation, rebasing or other derived figures beyond the three deposit totals and the two foreign-currency shares. The % of GDP values (§4, changed after preview review) are calculated on the page from the served GDP, not stored.
 
 ### Serving
 

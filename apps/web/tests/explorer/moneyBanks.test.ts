@@ -1,7 +1,11 @@
 import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
+import { readCsvRecords } from "../../lib/data/csv";
 import { loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../lib/data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SOURCES, type ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
+import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
+import { SERVED_DATA_FILES } from "../../lib/data/servedData";
+import { projectGdpFact, type ClientNationalGdpFact } from "../../lib/explorer/clientData";
 import { INK } from "../../lib/explorer/colors";
 import { buildMoneyBanksHubCards } from "../../lib/explorer/moneyBanksHubCards";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
@@ -15,7 +19,11 @@ import {
 } from "../../lib/explorer/moneyBanks";
 
 let facts: ClientMoneyBanksFact[];
-beforeAll(async () => { facts = (await loadMoneyBanksFacts()).map(toClientMoneyBanksFact); });
+let gdpFacts: ClientNationalGdpFact[];
+beforeAll(async () => {
+  facts = (await loadMoneyBanksFacts()).map(toClientMoneyBanksFact);
+  gdpFacts = (await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts)).map(projectGdpFact);
+});
 
 test("the four sections and their views", () => {
   expect(MONEY_BANKS_SECTIONS.map(s => [s.id, s.href, s.labelKey])).toEqual([
@@ -35,10 +43,10 @@ test("each page starts with its first series selected, loans and deposits with b
   expect(defaultMoneyBanksState("loans-deposits")).toEqual({ mode: "line", range: { kind: "all" }, view: "amount", selectedIds: ["loans.total", "deposits.total"] });
   expect(defaultMoneyBanksState("interest-rates")).toEqual({ mode: "line", range: { kind: "all" }, view: "main", selectedIds: ["rates.policy"] });
   expect(defaultMoneyBanksState("bank-health")).toEqual({ mode: "line", range: { kind: "all" }, view: "main", selectedIds: ["banks.npl_ratio"] });
-  expect(moneyBanksDefaultSelection("supply", "gdp")).toEqual(["money.m3_to_gdp"]);
+  expect(moneyBanksDefaultSelection("supply", "gdp")).toEqual(["money.m3"]);
   expect(moneyBanksDefaultSelection("loans-deposits", "fx_share")).toEqual(["loans.fx_share"]);
   expect(moneyBanksCoverage("supply", "amount", facts)).toMatchObject({ min: 1995, max: 2025 });
-  expect(moneyBanksCoverage("supply", "gdp", facts)).toMatchObject({ min: 1996, max: 2025 });
+  expect(moneyBanksCoverage("supply", "gdp", facts, gdpFacts)).toMatchObject({ min: 1996, max: 2025 });
   expect(moneyBanksCoverage("loans-deposits", "amount", facts)).toMatchObject({ min: 1996, max: 2025 });
   expect(moneyBanksCoverage("interest-rates", "main", facts)).toMatchObject({ min: 1996, max: 2025 });
   expect(moneyBanksCoverage("bank-health", "main", facts)).toMatchObject({ min: 2001, max: 2025 });
@@ -49,7 +57,7 @@ test("totals nest their lari and foreign-currency rows", () => {
   const shape = (section: Parameters<typeof moneyBanksViewSeries>[0], view: Parameters<typeof moneyBanksViewSeries>[1]) =>
     moneyBanksViewSeries(section, view).map(s => [s.id, s.reference, s.parentId]);
   expect(shape("supply", "amount").map(r => r[0])).toEqual(["money.m3", "money.m2", "money.m1", "money.m0"]);
-  expect(shape("supply", "gdp").map(r => r[0])).toEqual(["money.m3_to_gdp", "money.m2_to_gdp"]);
+  expect(shape("supply", "gdp").map(r => r[0])).toEqual(["money.m3", "money.m2", "money.m1", "money.m0"]);
   expect(shape("loans-deposits", "amount")).toEqual([
     ["loans.total", true, undefined], ["loans.gel", false, "loans.total"], ["loans.fx", false, "loans.total"],
     ["deposits.total", false, undefined], ["deposits.gel", false, "deposits.total"], ["deposits.fx", false, "deposits.total"],
@@ -67,22 +75,41 @@ test("totals nest their lari and foreign-currency rows", () => {
   ]);
 });
 
-test("switching to the GDP ratios clamps a range starting 1995 to 1996, and switching back keeps it", () => {
+test("switching to % of GDP clamps a range starting 1995 to 1996, and switching back keeps it", () => {
   const start = { ...defaultMoneyBanksState("supply"), range: { kind: "manual" as const, start: 1995, end: 2005 } };
-  const gdp = changeMoneyBanksView(start, "supply", "gdp", facts);
-  expect(gdp).toMatchObject({ view: "gdp", range: { kind: "manual", start: 1996, end: 2005 }, selectedIds: ["money.m3_to_gdp"] });
-  const back = changeMoneyBanksView(gdp, "supply", "amount", facts);
+  const gdp = changeMoneyBanksView(start, "supply", "gdp", facts, gdpFacts);
+  expect(gdp).toMatchObject({ view: "gdp", range: { kind: "manual", start: 1996, end: 2005 }, selectedIds: ["money.m3"] });
+  const back = changeMoneyBanksView(gdp, "supply", "amount", facts, gdpFacts);
   expect(back).toMatchObject({ view: "amount", range: { kind: "manual", start: 1996, end: 2005 }, selectedIds: ["money.m3"] });
 });
 
-test("the % of GDP switch carries M3 and M2 across, drops M1 and M0, and falls back to the default", () => {
-  const supply = (selectedIds: string[]) => ({ ...defaultMoneyBanksState("supply"), selectedIds });
-  expect(changeMoneyBanksView(supply(["money.m3", "money.m2", "money.m1", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp", "money.m2_to_gdp"]);
-  expect(changeMoneyBanksView(supply(["money.m2", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m2_to_gdp"]);
-  expect(changeMoneyBanksView(supply(["money.m1", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp"]);
-  expect(changeMoneyBanksView(supply([]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp"]);
-  const gdp = { ...defaultMoneyBanksState("supply"), view: "gdp" as const, selectedIds: ["money.m2_to_gdp"] };
-  expect(changeMoneyBanksView(gdp, "supply", "amount", facts).selectedIds).toEqual(["money.m2"]);
+test("the % of GDP switch keeps the selection of M3, M2, M1 and M0 both ways, and falls back to the default when empty", () => {
+  const view = (view: "amount" | "gdp", selectedIds: string[]) => ({ ...defaultMoneyBanksState("supply"), view, selectedIds });
+  for (const selectedIds of [["money.m3", "money.m2", "money.m1", "money.m0"], ["money.m2", "money.m0"], ["money.m1"]]) {
+    expect(changeMoneyBanksView(view("amount", selectedIds), "supply", "gdp", facts, gdpFacts).selectedIds).toEqual(selectedIds);
+    expect(changeMoneyBanksView(view("gdp", selectedIds), "supply", "amount", facts, gdpFacts).selectedIds).toEqual(selectedIds);
+  }
+  expect(changeMoneyBanksView(view("amount", []), "supply", "gdp", facts, gdpFacts).selectedIds).toEqual(["money.m3"]);
+});
+
+test("% of GDP shows all four aggregates, each December amount divided by Fiscal.ge's GDP and marked calculated", async () => {
+  const model = buildMoneyBanksModel("supply", facts, { ...defaultMoneyBanksState("supply"), view: "gdp", selectedIds: ["money.m3", "money.m2", "money.m1", "money.m0"] }, gdpFacts);
+  expect(model.unit).toBe("percent");
+  expect(model.series.map(s => s.id)).toEqual(["money.m3", "money.m2", "money.m1", "money.m0"]);
+  expect(model.selected.map(s => s.id)).toEqual(["money.m3", "money.m2", "money.m1", "money.m0"]);
+  expect(model.years[0]).toBe(1996);
+  for (const series of model.series) { expect(series.decimals).toBe(1); for (const year of model.years) expect(series.valuesByYear[year]).not.toBeNull(); }
+  // M1 / GDP × 100, both read from the canonical CSVs.
+  const money = await readCsvRecords("../../data/imports/money-banks-annual.csv");
+  const gdp = await readCsvRecords(SERVED_DATA_FILES.gdpFacts);
+  const m1 = Number(money.find(row => row.indicator_id === "money.m1" && row.year === "2025")!.published_value);
+  const gdp2025 = Number(gdp.find(row => row.year === "2025")!.gdp_current_prices_million_gel);
+  expect(model.series.find(s => s.id === "money.m1")!.valuesByYear[2025]).toBeCloseTo(m1 / gdp2025 * 100, 10);
+  // 2025 on Fiscal.ge's GDP: NBG's own coefficients (56.0 and 33.9) use an earlier GDP estimate.
+  expect(model.series.map(s => Number(s.valuesByYear[2025]!.toFixed(1)))).toEqual([55.1, 33.4, 19.8, 5.8]);
+  // Before 2010 NBG's M3 coefficient used the same GDP, so the two agree.
+  const nbgM3 = facts.find(f => f.indicatorId === "money.m3_to_gdp" && f.year === 2009)!.value;
+  expect(Number(model.series[0].valuesByYear[2009]!.toFixed(1))).toBe(nbgM3);
 });
 
 test("the foreign-currency switch carries loans and deposits to their shares and back to the totals", () => {
@@ -114,9 +141,9 @@ test("the hash round-trips, drops another tab's series and keeps an explicit emp
   const hash = serializeMoneyBanksHash(state, "loans-deposits");
   expect(hash).toContain("tab=amount");
   expect(parseMoneyBanksHash(`#${hash}`, "loans-deposits", facts)).toEqual(state);
-  const gdp = { mode: "line" as const, view: "gdp" as const, range: { kind: "all" as const }, selectedIds: ["money.m2_to_gdp"] };
+  const gdp = { mode: "line" as const, view: "gdp" as const, range: { kind: "all" as const }, selectedIds: ["money.m2", "money.m1"] };
   expect(serializeMoneyBanksHash(gdp, "supply")).toContain("tab=gdp");
-  expect(parseMoneyBanksHash(`#${serializeMoneyBanksHash(gdp, "supply")}`, "supply", facts)).toEqual(gdp);
+  expect(parseMoneyBanksHash(`#${serializeMoneyBanksHash(gdp, "supply")}`, "supply", facts, gdpFacts)).toEqual(gdp);
   expect(parseMoneyBanksHash("#tab=fx_share&sel=", "loans-deposits", facts).selectedIds).toEqual([]);
   expect(parseMoneyBanksHash("#tab=fx_share&sel=loans.total", "loans-deposits", facts).selectedIds).toEqual([]);
   expect(parseMoneyBanksHash("#tab=unknown", "loans-deposits", facts)).toMatchObject({ view: "amount", selectedIds: ["loans.total", "deposits.total"] });
@@ -163,7 +190,7 @@ const TEST_MESSAGES = {
   "moneyBanks.series": "Series", "moneyBanks.amountHeader.gel": "Amount (million GEL)", "moneyBanks.amountHeader.percent": "Value (%)",
   "moneyBanks.page.supply.title": "Money supply", "moneyBanks.page.loans-deposits.title": "Loans and deposits", "moneyBanks.page.interest-rates.title": "Interest rates", "moneyBanks.page.bank-health.title": "Bank health",
   "moneyBanks.page.supply.summary": "supply", "moneyBanks.page.loans-deposits.summary": "loans", "moneyBanks.page.interest-rates.summary": "rates", "moneyBanks.page.bank-health.summary": "health",
-  "moneyBanks.tab.amount": "Amount",
+  "moneyBanks.tab.amount": "Amount", "moneyBanks.tab.gdp": "Compared with GDP",
 };
 const presentation = async (): Promise<Presentation> => ({ locale: "en", englishLabels: {}, messages: { ...await getMessages("en", ["workbook", "format", "common"]), ...TEST_MESSAGES } });
 const SOURCES = ["nbg_money_aggregates", "nbg_loans_l3_5", "nbg_deposits_d3_17", "nbg_deposits_individuals_d3_23", "nbg_deposits_legal_d3_27", "nbg_policy_rate", "nbg_fsi_archive", "nbg_fsi"].map(sourceId => ({
@@ -231,6 +258,27 @@ test("the bank-health workbook keeps the 2008 loss as a negative percent", async
   expect(roa.valuesByYear[2008]!).toBeLessThan(0);
   expect(model.analysis.rows.find(r => r[0] === 2008 && r[1] === "banks.roa")![2]!).toBeLessThan(0);
   expect(model.sources.map(source => source.title)).toEqual(["nbg_fsi_archive"]);
+});
+
+test("the % of GDP workbook exports the calculated shares and cites the GDP source beside the NBG money file", async () => {
+  const gdpSources = [{ years: [2010, 2025], title: "Geostat GDP", organization: "Geostat", downloadHref: "https://www.geostat.ge/media/gdp.xlsx" as const, retrievedAt: "2026-08-13" }];
+  const model = buildMoneyBanksWorkbookExportModel({
+    section: "supply", facts, gdpFacts, gdpSources, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["money.m1", "money.m0"]),
+    state: { mode: "table", view: "gdp", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ["money.m1", "money.m0"] },
+  }, await presentation());
+  expect(model.filename).toBe("fiscal-money-supply-gdp-2020-2025-en.xlsx");
+  expect(model.readable.unitLabel).toBe("%");
+  expect(model.readable.rows.map(row => Number(row.valuesByYear[2025]!.toFixed(1)))).toEqual([19.8, 5.8]);
+  expect(new Set(model.analysis.rows.map(row => row[3]))).toEqual(new Set(["Calculated by Fiscal.ge"]));
+  expect(model.analysis.rows).toHaveLength(12);
+  expect(model.sources.map(source => source.title)).toEqual(["nbg_money_aggregates", "Geostat GDP"]);
+  // The amounts cite only the NBG file.
+  const amounts = buildMoneyBanksWorkbookExportModel({
+    section: "supply", facts, gdpFacts, gdpSources, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["money.m1"]),
+    state: { mode: "table", view: "amount", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ["money.m1"] },
+  }, await presentation());
+  expect(amounts.sources.map(source => source.title)).toEqual(["nbg_money_aggregates"]);
+  expect(amounts.analysis.rows[0][3]).toBe("Official");
 });
 
 test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG workbooks with their public links", async locale => {

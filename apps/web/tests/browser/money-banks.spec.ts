@@ -56,7 +56,7 @@ test("money supply has no tabs and defaults to the amounts with broad money alon
   await expect(page.getByTestId("source-label")).toContainText("საქართველოს ეროვნული ბანკი");
 });
 
-test("the % of GDP icon shows NBG's ratios, carries M3 and M2 across and drops M1", async ({ page }) => {
+test("the % of GDP icon shows all four aggregates against Fiscal.ge's GDP and keeps M1 selected", async ({ page }) => {
   await page.goto("/en/explorer/money/supply");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByRole("group", { name: "Measure" }).getByRole("button", { name: "Compared with GDP" })).toBeVisible();
@@ -69,17 +69,32 @@ test("the % of GDP icon shows NBG's ratios, carries M3 and M2 across and drops M
   // The icon carries no text, so the unit caption beside it stays and names the percent.
   await expect(page.getByTestId("money-unit-label")).toHaveText("%");
   // Touch readers get no tooltip: the line under the heading names the selected measure.
-  await expect(page.getByTestId("money-latest")).toHaveText("Broad money (M3) to GDP · 2025: 56.0%");
-  await expect(page.getByTestId("series-status")).toContainText("2 / 2");
-  for (const id of ["money.m3_to_gdp", "money.m2_to_gdp"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("money-latest")).toHaveText("Broad money (M3), % of GDP · 2025: 55.1%");
+  // The same four series, with the selection kept.
+  await expect(page.getByTestId("series-status")).toContainText("3 / 4");
+  for (const id of ["money.m3", "money.m2", "money.m1"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(pressed("money.m0"))).toHaveAttribute("aria-pressed", "false");
   await expect(page).toHaveURL(/tab=gdp/);
+  await expect(page).toHaveURL(/sel=money\.m3(%2C|,)money\.m2(%2C|,)money\.m1(&|$)/);
   await expect(page.getByTestId("year-range-strip")).toContainText("1996–2025");
+  await expect(page.getByTestId("source-label")).toContainText("GDP: Geostat, at current prices. GDP for 2025 is preliminary.");
+  await page.getByTestId("chart-mode-table").click();
+  await expect(await cell(page, "Narrow money (M1)", 2025)).toHaveText("19.8%");
+  // Excel holds the calculated shares and cites Geostat's GDP beside the NBG file.
+  const promise = page.waitForEvent("download"); await page.getByTestId("money-excel-download").click();
+  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await (await promise).path())!);
+  const texts = (sheet: ExcelJS.Worksheet) => { const values: string[] = []; sheet.eachRow(row => row.eachCell(entry => { values.push(String(entry.value)); })); return values.join("\n"); };
+  expect(texts(workbook.worksheets[1])).toContain("Calculated by Fiscal.ge");
+  expect(texts(workbook.worksheets[1])).not.toContain("Official");
+  expect(texts(workbook.worksheets[2])).toMatch(/Geostat|National Statistics Office/);
+  await page.getByTestId("chart-mode-line").click();
   await page.getByTestId("money-measure-amount").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "gel");
   await expect(page.getByTestId("money-unit-label")).toHaveText("bn GEL");
   await expect(page.getByTestId("money-latest")).toContainText("Broad money (M3) · 2025: 57.7");
-  for (const id of ["money.m3", "money.m2"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(2);
+  for (const id of ["money.m3", "money.m2", "money.m1"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(3);
+  await expect(page.getByTestId("source-label")).not.toContainText("GDP");
 });
 
 test("company deposits before 2015 are a dash, not zero", async ({ page }) => {
@@ -183,7 +198,7 @@ test("the Excel download keeps the 2008 loss as a negative number", async ({ pag
 });
 
 const SAVED: Record<string, { hash: string; measure?: string; selected: string[]; range: string }> = {
-  "supply": { hash: "tab=gdp&view=table&sel=money.m3_to_gdp%2Cmoney.m2_to_gdp&start=2000&end=2020", measure: "gdp", selected: ["money.m3_to_gdp", "money.m2_to_gdp"], range: "2000–2020" },
+  "supply": { hash: "tab=gdp&view=table&sel=money.m3%2Cmoney.m1&start=2000&end=2020", measure: "gdp", selected: ["money.m3", "money.m1"], range: "2000–2020" },
   "loans-deposits": { hash: "tab=fx_share&view=table&sel=deposits.fx_share&start=2005&end=2015", measure: "fx_share", selected: ["deposits.fx_share"], range: "2005–2015" },
   "interest-rates": { hash: "view=table&sel=rates.policy%2Crates.loans_gel&start=2010&end=2020", selected: ["rates.policy", "rates.loans_gel"], range: "2010–2020" },
   "bank-health": { hash: "view=table&sel=banks.tier1_ratio&start=2016&end=2024", selected: ["banks.tier1_ratio"], range: "2016–2024" },

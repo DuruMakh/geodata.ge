@@ -59,12 +59,12 @@ The pages show the published value: one decimal for percents, two for the Nation
 
 Routes are `/explorer/money` with `/supply`, `/loans-deposits`, `/interest-rates` and `/bank-health`, plus `/methodology/money`, each mirrored under `/en`. The sidebar entry sits after Inflation.
 
-- **Money supply**: M3, M2, M1 and M0, with a % of GDP icon switch for NBG's M3 and M2 ratios to GDP.
+- **Money supply**: M3, M2, M1 and M0, with a % of GDP icon switch that shows the same four series as a percentage of GDP: each December amount ÷ Fiscal.ge's national GDP at current prices (`data/imports/national-gdp-annual-1996-2025.csv`, the GDP of the budget and debt pages) × 100, calculated on the page with the debt page's share-of-GDP function and marked calculated. The source line names the GDP source and any preliminary GDP year (2025). NBG's `money.m3_to_gdp` and `money.m2_to_gdp` stay in the CSV and mirror but are not shown: NBG divides by an earlier GDP estimate, so they match the page's values to 2009 and differ by 0.4–1.1 points for M3 from 2010 (2025: 56.0% against 55.1%; M2 33.9% against 33.4%).
 - **Loans and deposits**: Amount (loans and deposits together: totals with lari and foreign currency nested under them; deposits of people and of companies and organisations), with a share-in-foreign-currency icon switch.
 - **Interest rates**: the National Bank rate and the loan and deposit rates.
 - **Bank health**: bad loans, return on assets and on equity, and the two capital ratios in one list.
 
-The two series breaks are explained on `/methodology/money` and no change is computed across either. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, the calculated status of the five derived series, empty cells for missing values and validated links to the archived NBG workbooks (`data/methodology/source-archives/money.csv`). Internal cell references are not exported. `/methodology/money` publishes all twenty originals; the HTML capture downloads as a `.txt` file.
+The two series breaks are explained on `/methodology/money` and no change is computed across either. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, the calculated status of the five derived series and of the % of GDP values, empty cells for missing values and validated links to the archived NBG workbooks (`data/methodology/source-archives/money.csv`); on % of GDP the Sources sheet also lists Geostat's GDP files, as on the debt page. Internal cell references are not exported. `/methodology/money` publishes all twenty originals; the HTML capture downloads as a `.txt` file.
 
 ## Statistical limitations and future use
 

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ChartPie, CircleDollarSign } from "lucide-react";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
-import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksSeriesModel, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
+import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
+import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksSeriesModel, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { formatAmount, formatInUnit, unitFor, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -24,14 +25,14 @@ import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
-function useMoneyBanksState(section: MoneyBanksSectionId, facts: ClientMoneyBanksFact[]) {
-  const [state, setState] = useState(() => parseMoneyBanksHash("", section, facts));
+function useMoneyBanksState(section: MoneyBanksSectionId, facts: ClientMoneyBanksFact[], gdpFacts: ClientNationalGdpFact[]) {
+  const [state, setState] = useState(() => parseMoneyBanksHash("", section, facts, gdpFacts));
   const current = useRef(state);
   useEffect(() => {
-    function restore() { const next = parseMoneyBanksHash(window.location.hash, section, facts); current.current = next; setState(next); }
+    function restore() { const next = parseMoneyBanksHash(window.location.hash, section, facts, gdpFacts); current.current = next; setState(next); }
     restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
     return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [section, facts]);
+  }, [section, facts, gdpFacts]);
   useAppReady();
   const update = useCallback((change: (previous: MoneyBanksState) => MoneyBanksState, push = false) => {
     const next = change(current.current); current.current = next;
@@ -47,16 +48,18 @@ function useMoneyBanksState(section: MoneyBanksSectionId, facts: ClientMoneyBank
 
 export type MoneyBanksExplorerProps = {
   section: MoneyBanksSectionId; facts: ClientMoneyBanksFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
+  /** National GDP and its Geostat files, for the % of GDP view (Money supply only; empty elsewhere). */
+  gdpFacts: ClientNationalGdpFact[]; gdpSources: WorkbookPublicSource[];
   lastReviewedAt: string; siteOrigin: string;
 };
 
-export function MoneyBanksExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin }: MoneyBanksExplorerProps) {
+export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, gdpSources, lastReviewedAt, siteOrigin }: MoneyBanksExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `moneyBanks.${key}`, values);
-  const { state, update } = useMoneyBanksState(section, facts);
+  const { state, update } = useMoneyBanksState(section, facts, gdpFacts);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const model = buildMoneyBanksModel(section, facts, state);
+  const model = buildMoneyBanksModel(section, facts, state, gdpFacts);
   // Each tab has one unit. Amounts share the site's billion-GEL scale, its decimals read from every value the tab can show;
   // percents keep each series' own precision (two decimals for the National Bank rate, one elsewhere).
   const percent = model.unit === "percent";
@@ -91,19 +94,22 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
   // view names its series, so touch readers, who get no tooltip, see which measure the switch selected (DESIGN §7.2a).
   const views = moneyBanksViews(section);
   const headline = moneyBanksViewSeries(section, state.view)[0].id;
-  const latest = facts.filter(f => f.indicatorId === headline).sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = moneyBanksViewFacts(state.view, facts, gdpFacts).filter(f => f.indicatorId === headline).sort((a, b) => a.year - b.year).at(-1)!;
+  const measureLabel = state.view === views[0] ? t(`latest.${section}`) : state.view === "gdp" ? t("latest.gdp") : labels[headline];
+  // % of GDP divides by the debt page's GDP: the source line names it and its preliminary years, as on the debt page.
+  const preliminaryGdpYears = state.view === "gdp" ? model.years.filter(year => gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
   const latestValue = latest.unit === "gel" ? formatAmount(latest.value, locale) : `${formatInUnit(latest.value, { divisor: 1, label: "", decimals: latest.decimals })}${t("unitPercent")}`;
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
   // Money supply and Loans and deposits switch between their amounts and a share with the icon measure switch (DESIGN §7.2a), not tabs.
-  const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts), true); };
+  const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts, gdpFacts), true); };
   const downloadAction = <ExcelDownloadButton testId="money-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-    await downloadWorkbook(buildMoneyBanksWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
+    await downloadWorkbook(buildMoneyBanksWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation));
   }} />;
   return <div data-testid={`money-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
-    <LatestValueLine testId="money-latest" measure={state.view === views[0] ? t(`latest.${section}`) : labels[headline]} period={latest.year} value={latestValue} />
+    <LatestValueLine testId="money-latest" measure={measureLabel} period={latest.year} value={latestValue} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-view={state.view} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">
@@ -121,9 +127,11 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={percent} unit={unit} shareLabel={tabLabel} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
               shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={row => decimalsOf(row.itemId)} />}
-          <RangeStrip years={moneyBanksCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyBanksModel(section, facts, s).range, patch) }))} />
+          <RangeStrip years={moneyBanksCoverage(section, state.view, facts, gdpFacts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyBanksModel(section, facts, s, gdpFacts).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} · {unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")}
+          {state.view === "gdp" ? <> · {message(messages, "main.gdpSource")}{preliminaryGdpYears.length ? ` ${message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") })}` : null}</> : null}
+          {" · "}{unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
           <Link href={pageHref("/methodology/money", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>

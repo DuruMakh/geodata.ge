@@ -1,5 +1,7 @@
 import type { ClientMoneyBanksFact, MoneyBanksIndicator } from "../data/moneyBanks/types";
+import type { ClientNationalGdpFact } from "./clientData";
 import { colorForItem, INK } from "./colors";
+import { shareOfGdp } from "./debtExplorer";
 import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
@@ -33,9 +35,9 @@ const flat = (ids: readonly MoneyBanksIndicator[]) => ids.map((id, index) => top
 /** The series a view offers, reference first. */
 export function moneyBanksViewSeries(section: MoneyBanksSectionId, view: MoneyBanksView): MoneyBanksSeriesDefinition[] {
   switch (view) {
-    case "amount": return section === "supply" ? flat(["money.m3", "money.m2", "money.m1", "money.m0"])
+    // The % of GDP view shows the same four aggregates, divided by GDP (see moneyBanksViewFacts).
+    case "amount": case "gdp": return section === "supply" ? flat(["money.m3", "money.m2", "money.m1", "money.m0"])
       : [...withParts("loans.total", true, ["loans.gel", "loans.fx"]), ...withParts("deposits.total", false, ["deposits.gel", "deposits.fx"]), top("deposits.individuals"), top("deposits.legal_entities")];
-    case "gdp": return flat(["money.m3_to_gdp", "money.m2_to_gdp"]);
     case "fx_share": return flat(["loans.fx_share", "deposits.fx_share"]);
     case "main": return section === "bank-health" ? flat(["banks.npl_ratio", "banks.roa", "banks.roe", "banks.capital_ratio", "banks.tier1_ratio"])
       : [top("rates.policy", true), ...withParts("rates.loans_total", false, ["rates.loans_gel", "rates.loans_fx"]), ...withParts("rates.deposits_total", false, ["rates.deposits_gel", "rates.deposits_fx"])];
@@ -48,15 +50,14 @@ export function moneyBanksDefaultSelection(section: MoneyBanksSectionId, view: M
 }
 
 /**
- * The series the measure switch carries across, as [amount, share] pairs: M3 and M2 to and from NBG's ratios to GDP, and
- * every loan or deposit amount to its foreign-currency share. A share carries back to its first pair, the total.
+ * The series the foreign-currency switch carries across, as [amount, share] pairs: every loan or deposit amount to its
+ * foreign-currency share. A share carries back to its first pair, the total. The % of GDP switch keeps the same ids.
  */
 const MEASURE_PAIRS: readonly (readonly [string, string])[] = [
-  ["money.m3", "money.m3_to_gdp"], ["money.m2", "money.m2_to_gdp"],
   ...(["loans.total", "loans.gel", "loans.fx"] as const).map(id => [id, "loans.fx_share"] as const),
   ...(["deposits.total", "deposits.gel", "deposits.fx", "deposits.individuals", "deposits.legal_entities"] as const).map(id => [id, "deposits.fx_share"] as const),
 ];
-const counterpart = (id: string) => { const pair = MEASURE_PAIRS.find(([amount, share]) => amount === id || share === id); return pair && (pair[0] === id ? pair[1] : pair[0]); };
+const counterpart = (id: string) => { const pair = MEASURE_PAIRS.find(([amount, share]) => amount === id || share === id); return pair ? (pair[0] === id ? pair[1] : pair[0]) : id; };
 
 export function moneyBanksSeriesColor(series: MoneyBanksSeriesDefinition, index: number): string {
   return series.reference ? INK : colorForItem(series.id, index);
@@ -66,10 +67,25 @@ export type MoneyBanksState = { mode: "line" | "table"; range: PeriodRange; view
 
 const cellKey = (f: { indicatorId: string; year: number }) => `${f.indicatorId}:${f.year}`;
 
+/**
+ * The values a view shows. The % of GDP view divides each December amount of M3, M2, M1 and M0 by Fiscal.ge's national
+ * GDP at current prices for the year, with the debt page's share of GDP, and marks the result calculated; a year without
+ * GDP has no value. Every other view shows the facts as they are.
+ */
+export function moneyBanksViewFacts(view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[]): readonly ClientMoneyBanksFact[] {
+  if (view !== "gdp") return facts;
+  const ids = new Set<string>(moneyBanksViewSeries("supply", "gdp").map(s => s.id));
+  const gdpByYear = new Map(gdpFacts.map(f => [f.year, f]));
+  return facts.flatMap(f => {
+    const share = ids.has(f.indicatorId) ? shareOfGdp(f.value, f.year, gdpByYear) : null;
+    return share === null ? [] : [{ ...f, value: share * 100, unit: "percent" as const, decimals: 1, valueStatus: "calculated" as const }];
+  });
+}
+
 /** A view's years: every year any of its series has a value. */
-export function moneyBanksCoverage(section: MoneyBanksSectionId, view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[]) {
+export function moneyBanksCoverage(section: MoneyBanksSectionId, view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[] = []) {
   const ids = new Set<string>(moneyBanksViewSeries(section, view).map(s => s.id));
-  const years = [...new Set(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year))].sort((a, b) => a - b);
+  const years = [...new Set(moneyBanksViewFacts(view, facts, gdpFacts).filter(f => ids.has(f.indicatorId)).map(f => f.year))].sort((a, b) => a - b);
   if (!years.length) throw new Error(`No money and banks years for ${section}:${view}`);
   return { min: years[0], max: years.at(-1)!, years };
 }
@@ -79,7 +95,7 @@ export function defaultMoneyBanksState(section: MoneyBanksSectionId): MoneyBanks
   return { mode: "line", range: { kind: "all" }, view, selectedIds: moneyBanksDefaultSelection(section, view) };
 }
 
-export function parseMoneyBanksHash(hash: string, section: MoneyBanksSectionId, facts: readonly ClientMoneyBanksFact[]): MoneyBanksState {
+export function parseMoneyBanksHash(hash: string, section: MoneyBanksSectionId, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): MoneyBanksState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   const views = moneyBanksViews(section);
   const view = views.find(item => item === p.get("tab")) ?? views[0];
@@ -87,7 +103,7 @@ export function parseMoneyBanksHash(hash: string, section: MoneyBanksSectionId, 
   const requested = p.has("sel") ? p.get("sel")!.split(",") : moneyBanksDefaultSelection(section, view);
   return {
     mode: p.get("view") === "table" ? "table" : "line", view,
-    range: refitRange(parseYearRangeKeys(p), moneyBanksCoverage(section, view, facts), { collapseToAll: true }),
+    range: refitRange(parseYearRangeKeys(p), moneyBanksCoverage(section, view, facts, gdpFacts), { collapseToAll: true }),
     selectedIds: series.map(s => s.id).filter(id => requested.includes(id)),
   };
 }
@@ -102,23 +118,24 @@ export function serializeMoneyBanksHash(state: MoneyBanksState, section: MoneyBa
 }
 
 /**
- * Switching view keeps mode and years (clamped to the view's coverage). Selected M3 and M2 carry across to and from
- * their GDP ratios, and loans and deposits to and from their foreign-currency shares (a share back to its total);
- * anything else (and an empty result) falls back to the new view's default selection.
- * A chosen range is never collapsed to "all", so 1995–2005 picked on the amounts becomes 1996–2005 on the GDP ratios
+ * Switching view keeps mode and years (clamped to the view's coverage). M3, M2, M1 and M0 keep their selection between
+ * the amounts and % of GDP, and loans and deposits carry to and from their foreign-currency shares (a share back to its
+ * total); an empty result falls back to the new view's default selection.
+ * A chosen range is never collapsed to "all", so 1995–2005 picked on the amounts becomes 1996–2005 on % of GDP
  * and stays 1996–2005 when switching back.
  */
-export function changeMoneyBanksView(state: MoneyBanksState, section: MoneyBanksSectionId, view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[]): MoneyBanksState {
+export function changeMoneyBanksView(state: MoneyBanksState, section: MoneyBanksSectionId, view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): MoneyBanksState {
   const carried = new Set(state.selectedIds.map(counterpart));
   const selectedIds = moneyBanksViewSeries(section, view).map(s => s.id).filter(id => carried.has(id));
-  return { ...state, view, selectedIds: selectedIds.length ? selectedIds : moneyBanksDefaultSelection(section, view), range: refitRange(state.range, moneyBanksCoverage(section, view, facts), { collapseToAll: false }) };
+  return { ...state, view, selectedIds: selectedIds.length ? selectedIds : moneyBanksDefaultSelection(section, view), range: refitRange(state.range, moneyBanksCoverage(section, view, facts, gdpFacts), { collapseToAll: false }) };
 }
 
 export type MoneyBanksSeriesModel = MoneyBanksSeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null; decimals: number };
 export type MoneyBanksModel = { range: ResolvedPeriodRange; years: number[]; series: MoneyBanksSeriesModel[]; selected: MoneyBanksSeriesModel[]; unit: "gel" | "percent" };
 
-export function buildMoneyBanksModel(section: MoneyBanksSectionId, facts: readonly ClientMoneyBanksFact[], state: MoneyBanksState): MoneyBanksModel {
-  const range = resolveRange(state.range, moneyBanksCoverage(section, state.view, facts));
+export function buildMoneyBanksModel(section: MoneyBanksSectionId, allFacts: readonly ClientMoneyBanksFact[], state: MoneyBanksState, gdpFacts: readonly ClientNationalGdpFact[] = []): MoneyBanksModel {
+  const range = resolveRange(state.range, moneyBanksCoverage(section, state.view, allFacts, gdpFacts));
+  const facts = moneyBanksViewFacts(state.view, allFacts, gdpFacts);
   const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
   const byCell = new Map(facts.map(f => [cellKey(f), f]));
   const definitions = moneyBanksViewSeries(section, state.view);

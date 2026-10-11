@@ -2,15 +2,24 @@ import type { ClientMoneyBanksFact } from "../data/moneyBanks/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
-import { buildMoneyBanksModel, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
+import type { ClientNationalGdpFact } from "./clientData";
+import { buildMoneyBanksModel, moneyBanksViewFacts, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
 import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const MILLION = 1_000_000;
 
-export function buildMoneyBanksWorkbookExportModel(input: { section: MoneyBanksSectionId; facts: readonly ClientMoneyBanksFact[]; state: MoneyBanksState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
-  const { section, facts, state, labels } = input, { locale, messages } = presentation;
+/**
+ * On % of GDP, `gdpFacts` are the national GDP the shares divide by, and `gdpSources` (its Geostat files) join the NBG
+ * workbooks on the Sources sheet, as on the debt page.
+ */
+export function buildMoneyBanksWorkbookExportModel(input: {
+  section: MoneyBanksSectionId; facts: readonly ClientMoneyBanksFact[]; state: MoneyBanksState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string;
+  gdpFacts?: readonly ClientNationalGdpFact[]; gdpSources?: readonly WorkbookPublicSource[];
+}, presentation: Presentation): WorkbookExportModel {
+  const { section, state, labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `moneyBanks.${key}`);
-  const model = buildMoneyBanksModel(section, facts, state);
+  const model = buildMoneyBanksModel(section, input.facts, state, input.gdpFacts);
+  const facts = moneyBanksViewFacts(state.view, input.facts, input.gdpFacts ?? []);
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.year}`, f]));
   const neededYears = new Map<string, Set<number>>();
   for (const series of model.selected) for (const year of model.years) {
@@ -50,6 +59,6 @@ export function buildMoneyBanksWorkbookExportModel(input: { section: MoneyBanksS
       numericFormats: { 3: numberFormat },
       rowNumberFormats: Object.fromEntries(cells.flatMap(({ series }, index) => rowFormat(series.decimals) ? [[index, rowFormat(series.decimals)!]] : [])),
     },
-    sources: withAbsoluteUrls(originals, input.siteOrigin),
+    sources: withAbsoluteUrls([...originals, ...(state.view === "gdp" ? input.gdpSources ?? [] : [])], input.siteOrigin),
   };
 }
