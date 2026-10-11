@@ -72,6 +72,8 @@ export const SERVED_DATA_FILES = {
   currentAccountFacts: "../../data/imports/current-account-annual.csv",
   tradeProductEntities: "../../data/imports/trade-products-catalogue.csv",
   tradeProductFacts: "../../data/imports/trade-products-annual.csv",
+  tradeServiceEntities: "../../data/taxonomy/trade-services.json",
+  tradeServiceFacts: "../../data/imports/trade-services-annual.csv",
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
   demographyPopulationFacts: "../../data/imports/demography-population-annual.csv",
   demographyDensityFacts: "../../data/imports/demography-density-annual.csv",

@@ -3,6 +3,7 @@ import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import { assertSameServedRows } from "../servedDataParity";
+import { resolveServedDataSource } from "../servedDataSource";
 import { TRADE_SERVICES_FIELDS, tradeServicesFactKey, type TradeServiceEntity, type TradeServiceFact, type TradeServicesAcceptance, type TradeServicesData } from "./types";
 import { tradeServicesHash, validateTradeServicesData } from "./validation";
 
@@ -23,4 +24,13 @@ export function assertTradeServicesParity(csv: TradeServicesData, mirror: TradeS
   assertSameServedRows("Services catalogue", csv.entities, mirror.entities, entity => entity.id);
   const normalize = (facts: TradeServiceFact[]) => facts.map(f => ({ ...f, valueUsd: f.valueUsd === null ? null : new Decimal(f.valueUsd).toFixed() }));
   assertSameServedRows("Services facts", normalize(csv.facts), normalize(mirror.facts), tradeServicesFactKey);
+}
+let served: Promise<TradeServicesData> | null = null;
+export function loadServedTradeServicesData(): Promise<TradeServicesData> {
+  served ??= (async () => {
+    const csv = await loadTradeServicesData();
+    if (resolveServedDataSource() === "csv") return csv;
+    const { loadTradeServicesDataFromDb } = await import("../../db/servedDataDb");
+    const mirror = await loadTradeServicesDataFromDb(); assertTradeServicesParity(csv, mirror); return mirror;
+  })(); return served;
 }
