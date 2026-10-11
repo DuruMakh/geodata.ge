@@ -29,7 +29,7 @@ export function buildTradePartnersWorkbookModel(input: { data: ClientTradePartne
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: TRADE_PARTNER_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
-      return { id, kind: id === TRADE_PARTNER_TOTAL_ID ? "total" : "item", label: entity ? publicLabel(presentation.locale, id, entity.labelKa, presentation.englishLabels) : t("partners.total"), parentLabel: entity ? t(entity.kind === "country" ? "partners.countries" : "partners.groups") : t("partners.total"), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };
+      return { id, kind: id === TRADE_PARTNER_TOTAL_ID ? "total" : "item", label: entity ? publicLabel(presentation.locale, id, entity.labelKa, presentation.englishLabels) : t("partners.total"), parentLabel: entity ? t(entity.kind === "country" ? "partners.countries" : "partners.groups") : t("partners.total"), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: model.valuesByEntity[id][year] === null ? "not_available" as const : "actual" as const }])) };
     }), sources: input.sources.filter(source => filenames.has(source.downloadHref.split("/").at(-1)!)), siteOrigin: input.siteOrigin,
   });
   const groupNote = model.selectedIds.some(id => entities.get(id)?.kind === "group") ? ` · ${t("partners.groupOverlap")}` : "";

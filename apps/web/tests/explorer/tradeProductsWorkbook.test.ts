@@ -67,3 +67,15 @@ test("retains an old version's original source even when the selected years have
   expect(imports.sources.map(source => source.title)).toEqual(["ftrade_1995-2026.xlsx", "import-products--1995-1999_eng.xlsx"]);
   expect(build({ data, state: { ...state, selectedIds: [] }, sources, siteOrigin: "https://fiscal.ge" }, p).sources).toEqual([]);
 });
+
+test("marks a missing product amount Unavailable, not Actual", async () => {
+  const build = await builder(), p = await presentation("en"), data = productData(), { workbookMessage } = await import("../../lib/i18n/workbook");
+  data.entities[0] = { ...data.entities[0], id: "goods.hs4.1995-1999.8703", sourceBlock: "1995-1999" };
+  data.years = [1995, 2024, 2025]; data.facts = data.facts.map(fact => fact[0] === 0 ? [fact[0], 1995, fact[2], fact[3]] : fact);
+  p.englishLabels = { ...p.englishLabels, [data.entities[0].id]: "Motor cars" };
+  // The national reference keeps 2025 in range; the old version has no 2025 value.
+  const state = { ...DEFAULT_TRADE_PRODUCTS_STATE, selectedIds: ["goods.total", data.entities[0].id], range: { kind: "manual" as const, start: 2025, end: 2025 } };
+  const model = build({ data, state, sources, siteOrigin: "https://fiscal.ge" }, p);
+  expect(model.analysis.rows.map(row => [row[3], row[4]])).toEqual([[1000, workbookMessage("en", "workbook.actual")], [null, workbookMessage("en", "workbook.unavailable")]]);
+  expect(model.readable.rows[1].basisByYear[2025]).toBe("not_available");
+});

@@ -26,7 +26,7 @@ export function buildTradeProductsWorkbookModel(input: { data: ClientTradeProduc
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: TRADE_PRODUCT_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
-      return { id, kind: id === TRADE_PRODUCT_TOTAL_ID ? "total" : "item", label: entity ? tradeProductLabel(entity, presentation, !input.data.sourceBlock) : t("partners.total"), parentLabel: t(`indicator.${input.state.measure}`), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };
+      return { id, kind: id === TRADE_PRODUCT_TOTAL_ID ? "total" : "item", label: entity ? tradeProductLabel(entity, presentation, !input.data.sourceBlock) : t("partners.total"), parentLabel: t(`indicator.${input.state.measure}`), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: model.valuesByEntity[id][year] === null ? "not_available" as const : "actual" as const }])) };
     }), sources, siteOrigin: input.siteOrigin,
   });
   exportModel.sources = withAbsoluteUrls(mergeSourcesByHref(sources, source => {

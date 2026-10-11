@@ -74,3 +74,13 @@ test.each(["en", "ka"] as const)("%s Summary keeps small positive and negative a
     expect(cells[1].numFmt).not.toContain("Red");
   }
 });
+
+test.each(["en", "ka"] as const)("%s marks a missing partner amount Unavailable, not Actual", async locale => {
+  const build = await builder(), p = await presentation(locale), { workbookMessage } = await import("../../lib/i18n/workbook");
+  const state = { ...DEFAULT_TRADE_PARTNERS_STATE, measure: "trade.imports" as const, selectedIds: ["partner.1995-2025.530"], range: { kind: "manual" as const, start: 2025, end: 2025 } };
+  const model = build({ data, state, sources, siteOrigin: "https://fiscal.ge" }, p);
+  expect(model.analysis.rows).toHaveLength(1);
+  expect(model.analysis.rows[0][3]).toBeNull();
+  expect(model.analysis.rows[0][4]).toBe(workbookMessage(locale, "workbook.unavailable"));
+  expect(model.readable.rows[0].basisByYear[2025]).toBe("not_available");
+});
