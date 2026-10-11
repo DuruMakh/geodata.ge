@@ -88,7 +88,7 @@ Primary records must retain the fixed family columns, including empty display fi
 Run from the repository root:
 
 ```powershell
-$tradePython = 'C:/Users/Mylaptop/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
+$tradePython = 'python'  # any Python 3 with openpyxl installed
 $tradePackage = 'docs/Raw Data/Trade/geostat-external-trade/2026-10-07'
 & $tradePython -X utf8 "$tradePackage/prepare.py" --write
 & $tradePython -X utf8 "$tradePackage/prepare.py" --check

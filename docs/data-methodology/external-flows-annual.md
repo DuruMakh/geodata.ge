@@ -1,6 +1,6 @@
 # Annual external flows research foundation: money transfers, FDI and the current account
 
-Approved scope: 2026-10-10. This began as a research package. The 2026-10-10 Money from abroad design promotes one subset to a public page (see the last section); everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
+Approved scope: 2026-10-10. This began as a research package. Three public pages now serve parts of it, each approved on 2026-10-10: Money from abroad, Foreign investment and Current account (see their sections below); everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
 
 ## Source capture and coverage
 
