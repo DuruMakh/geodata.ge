@@ -38,6 +38,8 @@ Fiscal.ge does no calculation of its own. Every value shown is a figure Geostat 
 
 ## 3. Income page
 
+> **Changed after preview 2026-10-11:** Regions map replaces Compare areas and the area dropdown. The second tab is "Regions" (`tab=areas`): the shared `RegionIndex` map and ranked list of the section total for the latest year all eleven regions have, without an overview block; a region opens the first tab for it. The first tab's area is a Georgia | Towns | Villages switch, plus an active pill for a region reached from the map. Per household / per person is an icon switch on the right of the controls row: Lucide `Users` (per household) and `User` (per person), with the full labels as accessible names and tooltips.
+
 Under the heading there is one short line from `LatestValueLine`: "Average monthly household income · 2025: 2,025.8 ₾". It always shows Georgia per household, whatever is selected below. Nothing else sits under the heading.
 
 Two centred text tabs follow, styled like the Poverty tabs:
@@ -70,6 +72,8 @@ Two centred text tabs follow, styled like the Poverty tabs:
 - The source line reads: "Source: Geostat, Household Incomes and Expenditures Survey · ₾ a month per household · 2002–2025 · Methodology and sources".
 
 ## 4. Spending page
+
+> **Changed after preview 2026-10-11:** the same Regions map, area switch and icon measure switch as the Income page (§3).
 
 The line under the heading reads "Average monthly household consumption spending · 2025: 1,438.7 ₾".
 

@@ -5,11 +5,13 @@ import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedHouseholdData, toClientHouseholdFact } from "../data/household/importHousehold";
-import { HOUSEHOLD_AREAS, type HouseholdArea } from "../data/household/types";
+import { HOUSEHOLD_AREAS, HOUSEHOLD_MEASURES, type HouseholdArea, type HouseholdMeasure } from "../data/household/types";
 import { WAGES_REGIONS } from "../data/wages/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HOUSEHOLD_SECTIONS, householdCoverage, householdViewSeries, type HouseholdSectionId } from "../explorer/household";
 import { householdWorkbookSources } from "../explorer/householdWorkbook";
+import { buildHouseholdRegionMapModel } from "../explorer/householdRegionMap";
+import type { RegionMapModel } from "../explorer/regionalEconomyMap";
 import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
@@ -41,7 +43,7 @@ function householdAreaLabels(presentation: Presentation): Record<HouseholdArea, 
 export async function renderHouseholdPage(locale: Locale, section: HouseholdSectionId) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedHouseholdData(), getPresentation(locale, ["household", "common", "controls", "format", "main", "workbook"], WAGES_REGIONS),
+    loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "common", "controls", "format", "main", "workbook"], WAGES_REGIONS),
     loadReviewedSourceManifest(root, "household-income"), loadEnglishCatalogue(root),
   ]);
   // Each page receives only its own section's observations.
@@ -52,6 +54,8 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   const t = (key: string) => message(presentation.messages, `household.${key}`);
   const labels = Object.fromEntries(householdViewSeries(section, "parts", "georgia").map(series => [series.id, t(`series.${series.id}`)]));
   const areaLabels = householdAreaLabels(presentation);
+  // The Regions tab map for each measure; the geometry is read on the server.
+  const regionMaps = Object.fromEntries(HOUSEHOLD_MEASURES.map(measure => [measure, buildHouseholdRegionMapModel(section, measure, facts)])) as Record<HouseholdMeasure, RegionMapModel>;
   const sources = householdWorkbookSources(manifest, projectPublicSources(manifest, locale, catalogue.documents));
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`), hubTitle = message(presentation.messages, "common.livingStandards");
   const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`)).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
@@ -67,7 +71,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
-      <HouseholdExplorer key={section} section={section} facts={facts} labels={labels} areaLabels={areaLabels} sources={sources} siteOrigin={origin} />
+      <HouseholdExplorer key={section} section={section} facts={facts} labels={labels} areaLabels={areaLabels} regionMaps={regionMaps} sources={sources} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

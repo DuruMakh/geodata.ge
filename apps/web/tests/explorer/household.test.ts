@@ -8,6 +8,7 @@ import {
   householdCoverage, householdViewSeries, parseHouseholdHash, serializeHouseholdHash, type HouseholdState,
 } from "../../lib/explorer/household";
 import { buildHouseholdHubCards } from "../../lib/explorer/householdHubCards";
+import { buildHouseholdRegionMapModel } from "../../lib/explorer/householdRegionMap";
 import { buildHouseholdWorkbookExportModel, householdWorkbookSources } from "../../lib/explorer/householdWorkbook";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
 import { projectPublicSources } from "../../lib/methodology/publicSources";
@@ -122,6 +123,26 @@ test("a region's missing early years are null in the areas model", () => {
   expect(model.selected.map(s => s.id)).toEqual(["georgia", "region.guria"]);
 });
 
+test("the Regions map colours the eleven regions by the section total in the latest year all of them have, as published", () => {
+  const income = buildHouseholdRegionMapModel("income", "per_household", facts);
+  expect(income.year).toBe(2025);
+  expect(income.regions).toHaveLength(11);
+  expect(new Set(income.regions.map(region => region.regionId))).toEqual(new Set(HOUSEHOLD_AREAS.filter(area => area.startsWith("region."))));
+  expect(income.regions.find(region => region.regionId === "region.tbilisi")!.value).toBe(2317.5);
+  expect(income.regions.map(region => region.rank)).toEqual(Array.from({ length: 11 }, (_, i) => i + 1));
+  expect(income.regions[0].value).toBe(Math.max(...income.regions.map(region => region.value)));
+  expect(income.regions.every((region, i) => i === 0 || income.regions[i - 1].value >= region.value)).toBe(true);
+  expect([income.legendMin, income.legendMax]).toEqual([income.regions.at(-1)!.value, income.regions[0].value]);
+  expect(income.regions.every(region => region.pathD.startsWith("M") && region.bucket >= 0 && region.bucket <= 5)).toBe(true);
+  const perPerson = buildHouseholdRegionMapModel("income", "per_capita", facts);
+  expect(perPerson.regions.find(region => region.regionId === "region.tbilisi")!.value).toBe(745.4);
+  expect(perPerson.regions.map(region => region.value)).not.toEqual(income.regions.map(region => region.value));
+  expect(buildHouseholdRegionMapModel("spending", "per_household", facts).regions.every(region => region.value > 0)).toBe(true);
+  // A year missing one region is not a map year: the map falls back to the latest complete one.
+  const withoutGuria2025 = facts.filter(f => !(f.year === 2025 && f.areaId === "region.guria"));
+  expect(buildHouseholdRegionMapModel("income", "per_household", withoutGuria2025).year).toBe(2024);
+});
+
 const SOURCES = HOUSEHOLD_SOURCES.map(sourceId => ({
   sourceId, years: Array.from({ length: 24 }, (_, i) => 2002 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-11",
   downloadHref: `/downloads/methodology/household/files/${sourceId}.xlsx` as const,
@@ -162,7 +183,7 @@ test("the workbook title names the page, tab, area on parts, and the measure", a
     section: "spending", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["georgia"]), areaLabel: "Georgia", title: "Custom",
     state: { ...defaultHouseholdState("spending"), view: "areas", selectedIds: ["georgia"], range: { kind: "manual", start: 2020, end: 2021 } },
   }, presentation);
-  expect(areas.readable.title).toBe("Custom · Compare areas · Per household");
+  expect(areas.readable.title).toBe("Custom · Regions · Per household");
 });
 
 test("a spending parts workbook for villages per person lists only that source", async () => {

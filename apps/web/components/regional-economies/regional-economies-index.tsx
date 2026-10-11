@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { formatAmount } from "../../lib/explorer/format";
@@ -30,7 +30,8 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
   ]} />;
 }
 
-export function RegionIndex({ model, sourceNote, metric, summary }: { model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }> }) {
+/** An empty summary leaves out the overview block; listFooter sits under the ranked list. */
+export function RegionIndex({ model, sourceNote, metric, summary, listFooter }: { model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>; listFooter?: ReactNode }) {
   const { locale, messages, englishLabels } = useI18n();
   const [query, setQuery] = useState("");
   const [mapActive, setMapActive] = useState<string | null>(null);
@@ -51,7 +52,7 @@ export function RegionIndex({ model, sourceNote, metric, summary }: { model: Reg
       <div data-testid="regional-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
         <div className="min-w-0">
           <RegionMap model={model} metric={metric} activeRegionId={activeRegionId} onActiveRegionChange={setMapActive} />
-          <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
+          {summary.length ? <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
             <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
               {message(messages, "regionalEconomies.summaryTitle")}
             </h2>
@@ -64,7 +65,7 @@ export function RegionIndex({ model, sourceNote, metric, summary }: { model: Reg
                 </div>
               ))}
             </div>
-          </div>
+          </div> : null}
         </div>
 
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
@@ -111,6 +112,7 @@ export function RegionIndex({ model, sourceNote, metric, summary }: { model: Reg
               ))}
             </div>
           )}
+          {listFooter}
         </div>
       </div>
       <div className="mt-9 border-t border-[var(--hairline)] pt-4">

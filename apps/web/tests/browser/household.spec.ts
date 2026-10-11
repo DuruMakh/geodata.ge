@@ -1,6 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
-import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -27,8 +26,10 @@ test("income defaults to total income per household, and area and per person kee
   await expect(page.locator(pressed("income.total"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2002–2025");
   await expect(page.getByTestId("source-label")).toContainText("2002–2025");
-  await page.getByTestId("household-area").selectOption("region.guria");
-  await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
+  await expect(page.getByTestId("household-area-georgia")).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("household-area-settlement.rural").click();
+  await expect(page.getByTestId("household-area-settlement.rural")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2006–2025");
   await page.locator('[data-series-id="income.total"] [aria-expanded]').click();
   await page.locator(pressed("income.wages")).click();
   await page.getByTestId("household-measure-per_capita").click();
@@ -37,23 +38,70 @@ test("income defaults to total income per household, and area and per person kee
   await expect(page.locator(pressed("income.wages"))).toHaveAttribute("aria-pressed", "true");
   // The headline stays Georgia per household whatever is chosen below.
   await expect(page.getByTestId("household-latest")).toContainText("2,025.8");
-  await expect(page).toHaveURL(/area=region\.guria/);
+  await expect(page).toHaveURL(/area=settlement\.rural/);
   await expect(page).toHaveURL(/per=person/);
 });
 
-test("compare areas shows a dash before a region's first year and no Other regions line", async ({ page }) => {
-  await page.goto("/en/explorer/living-standards/income#tab=areas&per=household&view=table&sel=georgia,region.guria,region.imereti&start=2017&end=2019");
+test("the Regions tab maps the eleven regions, and a region opens the first tab for it", async ({ page }) => {
+  await page.goto("/en/explorer/living-standards/income#tab=areas&per=household");
   await ready(page);
+  await expect(page.getByTestId("household-tab-areas")).toHaveText("Regions");
   await expect(page.getByTestId("household-tab-areas")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("household-area")).toHaveCount(0);
-  const table = page.getByTestId("explorer-table");
-  await expect.poll(() => tableSeriesValues(table, "Guria")).toEqual(["—", "—", expect.stringMatching(/^\d/)]);
-  for (const value of await tableSeriesValues(table, "Imereti")) expect(value).toMatch(/^\d/);
-  await page.getByTestId("series-toggle-all").click();
-  await page.getByTestId("series-toggle-all").click();
-  await expect.poll(() => tableSeriesCount(table)).toBe(14);
-  await expect(page.getByTestId("series-status")).toContainText("14 / 14");
-  await expect(table).not.toContainText("Other regions");
+  const map = page.getByTestId("household-region-map");
+  await expect(map.getByTestId("regional-map-path")).toHaveCount(11);
+  const rows = page.getByTestId("regional-list-row");
+  await expect(rows).toHaveCount(11);
+  await expect(rows.first()).toHaveAttribute("data-region-id", "region.tbilisi");
+  await expect(rows.first()).toContainText("2,317.5");
+  // No at-a-glance block, no Chart | Table, no area switch, and the map's source note is the only source line.
+  await expect(page.getByText("Regional overview")).toHaveCount(0);
+  await expect(page.getByTestId("chart-mode-line")).toHaveCount(0);
+  await expect(page.getByTestId("household-area-georgia")).toHaveCount(0);
+  await expect(page.getByTestId("source-label")).toHaveCount(0);
+  await expect(page.getByTestId("regional-source-note")).toContainText("Household Incomes and Expenditures Survey · ₾ a month per household · 2025");
+  await expect(page.getByTestId("household-latest")).toContainText("2,025.8");
+  // The workbook holds Georgia and the eleven regions for the map's year.
+  const promise = page.waitForEvent("download"); await page.getByTestId("household-excel-download").click();
+  const download = await promise;
+  expect(download.suggestedFilename()).toBe("fiscal-household-income-areas-all-per_household-2025-2025-en.xlsx");
+  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
+  expect(workbook.getWorksheet("Data")!.rowCount).toBe(13);
+  // The measure switch is an icon pair named by its full labels.
+  await expect(page.getByTestId("household-measure-per_household")).toHaveAccessibleName("Per household");
+  await expect(page.getByTestId("household-measure-per_capita")).toHaveAccessibleName("Per person");
+  await expect(page.getByTestId("household-measure-per_capita").locator("svg")).toHaveCount(1);
+  await page.getByTestId("household-measure-per_capita").click();
+  await expect(rows.first()).toContainText("745.4");
+  await expect(page.getByTestId("regional-source-note")).toContainText("₾ a month per person · 2025");
+  await page.locator('[data-testid="regional-list-row"][data-region-id="region.guria"]').click();
+  await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/income#tab=parts&area=region\.guria&per=person/);
+  await expect(page.getByTestId("household-tab-parts")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("household-area-region.guria")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("household-area-region.guria")).toHaveText("Guria");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
+  await expect(page.getByTestId("household-measure-per_capita")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(pressed("income.total"))).toHaveAttribute("aria-pressed", "true");
+  // Back to the map, then a region on the map itself.
+  await page.getByTestId("household-all-regions").click();
+  await expect(page.getByTestId("household-tab-areas")).toHaveAttribute("aria-pressed", "true");
+  await map.locator('a[data-region-id="region.kakheti"]').click();
+  await expect(page.getByTestId("household-area-region.kakheti")).toHaveAttribute("aria-pressed", "true");
+  // Choosing Georgia drops the region option.
+  await page.getByTestId("household-area-georgia").click();
+  await expect(page.getByTestId("household-area-region.kakheti")).toHaveCount(0);
+  await expect(page.getByTestId("household-all-regions")).toHaveCount(0);
+});
+
+test("the Georgian Regions tab opens a region in Georgian", async ({ page }) => {
+  await page.goto("/explorer/living-standards/spending#tab=areas&per=household");
+  await ready(page);
+  await expect(page.getByTestId("household-tab-areas")).toHaveText("რეგიონები");
+  await expect(page.getByTestId("household-region-map").getByTestId("regional-map-path")).toHaveCount(11);
+  await page.locator('[data-testid="regional-list-row"][data-region-id="region.guria"]').click();
+  await expect(page).toHaveURL(/\/explorer\/living-standards\/spending#tab=parts&area=region\.guria&per=household/);
+  expect(new URL(page.url()).pathname).toBe("/explorer/living-standards/spending");
+  await expect(page.getByTestId("household-area-region.guria")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
 });
 
 test("spending reads consumption spending and exports Excel", async ({ page }) => {
@@ -74,12 +122,12 @@ test("the language switch keeps tab, area, per person and selection", async ({ p
   await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/income#/);
   await ready(page);
-  await expect(page.getByTestId("household-area")).toHaveValue("region.adjara");
+  await expect(page.getByTestId("household-area-region.adjara")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("household-measure-per_capita")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
   await expect(page.locator(pressed("income.total"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(pressed("income.remittances"))).toHaveAttribute("aria-pressed", "true");
-  // A second hop on Compare areas: the tab itself must survive the switch.
+  // A second hop on the Regions tab: the tab itself must survive the switch.
   await page.goto("/explorer/living-standards/income#tab=areas&per=person&sel=georgia,region.tbilisi");
   await ready(page);
   await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
@@ -87,9 +135,8 @@ test("the language switch keeps tab, area, per person and selection", async ({ p
   await ready(page);
   await expect(page.getByTestId("household-tab-areas")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("household-measure-per_capita")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(pressed("georgia"))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(pressed("region.tbilisi"))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(pressed("region.adjara"))).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("household-region-map").getByTestId("regional-map-path")).toHaveCount(11);
+  await expect(page).toHaveURL(/sel=georgia(,|%2C)region\.tbilisi/);
 });
 
 test("the sidebar lists Living standards after Wages, with its four pages and the current one active", async ({ page }) => {
@@ -106,7 +153,7 @@ test("the sidebar lists Living standards after Wages, with its four pages and th
 for (const prefix of ["", "/en"]) test(`household pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 900 });
-  for (const path of ["/explorer/living-standards", "/explorer/living-standards/income", "/explorer/living-standards/spending#tab=areas"]) {
+  for (const path of ["/explorer/living-standards", "/explorer/living-standards/income", "/explorer/living-standards/spending#tab=areas", "/explorer/living-standards/income#tab=parts&area=region.racha_lechkhumi_kvemo_svaneti"]) {
     await page.goto(`${prefix}${path}`);
     if (path !== "/explorer/living-standards") await ready(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), path).toBe(true);
