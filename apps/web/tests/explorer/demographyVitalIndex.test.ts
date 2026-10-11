@@ -39,3 +39,8 @@ describe("births per 100 deaths index", () => {
     expect(index.map.shapes.length).toBeGreaterThan(0);
   });
 });
+
+it("the index rows are unchanged by the shared row builder (fingerprint recorded before the refactor)", async () => {
+  const { createHash } = await import("node:crypto");
+  expect(createHash("sha256").update(JSON.stringify(index)).digest("hex")).toBe("4e08de4bc81aaf31c5d61dc651188e13ea7e3fdec414c91275ffc3ec9b963356");
+});

@@ -137,6 +137,8 @@ export const SERIES_COLORS: Record<string, string> = {
   "vital.deaths": "#8C5A32",
   "sex.male": "#3D5A98",
   "sex.female": "#C26E4C",
+  // Births page: the first year of the mother's-age fertility curve (the last is ACCENT).
+  "fertility.first_year": "#3D5A98",
 };
 
 // Open-ended top-level sets cycle through the editorial palette by position so

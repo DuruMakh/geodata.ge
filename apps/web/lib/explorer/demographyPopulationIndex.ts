@@ -31,6 +31,52 @@ export const ranked = (rows: Array<Omit<MunicipalListRow, "rank">>): MunicipalLi
     .sort((left, right) => right.valueGel - left.valueGel)
     .map((row, index) => ({ ...row, rank: index + 1 }));
 
+/**
+ * The index's three row groups for one value per place: municipalities and regions ranked highest first, and Georgia
+ * unranked. Names stay Georgian (`nameKa`, `subtitleKa`); the index list localizes them for English.
+ */
+export function placeIndexRows({ regions, municipalities, valueOf }: {
+  regions: readonly MunicipalRegion[];
+  municipalities: readonly Municipality[];
+  valueOf: (placeId: string) => number;
+}): { municipalities: MunicipalListRow[]; regions: MunicipalListRow[]; country: MunicipalListRow } {
+  const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
+  return {
+    municipalities: ranked(
+      municipalities.map((municipality) => ({
+        id: municipality.code,
+        kind: "municipality" as const,
+        nameKa: municipality.displayNameKa,
+        subtitleKa: regionLabels.get(municipality.regionId) ?? "",
+        regionId: municipality.regionId,
+        valueGel: valueOf(municipality.code),
+        budgetPerResidentGel: null,
+      })),
+    ),
+    regions: ranked(
+      regions.map((region) => ({
+        id: region.id,
+        kind: "region" as const,
+        nameKa: region.kaLabel,
+        subtitleKa: `${municipalities.filter((municipality) => municipality.regionId === region.id).length} მუნიციპალიტეტი`,
+        regionId: region.id,
+        valueGel: valueOf(region.id),
+        budgetPerResidentGel: null,
+      })),
+    ),
+    country: {
+      id: MUNICIPAL_COUNTRY_ID,
+      kind: "country",
+      nameKa: "საქართველო",
+      subtitleKa: `${municipalities.length} მუნიციპალიტეტი`,
+      regionId: null,
+      valueGel: valueOf(GEORGIA_PLACE_ID),
+      budgetPerResidentGel: null,
+      rank: null,
+    },
+  };
+}
+
 export function buildPopulationIndexModel({
   facts,
   regions,
@@ -48,40 +94,7 @@ export function buildPopulationIndexModel({
     if (!fact) throw new Error(`No ${year} population for ${id}`);
     return fact.value;
   };
-  const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
-
-  const municipalityRows = ranked(
-    municipalities.map((municipality) => ({
-      id: municipality.code,
-      kind: "municipality" as const,
-      nameKa: municipality.displayNameKa,
-      subtitleKa: regionLabels.get(municipality.regionId) ?? "",
-      regionId: municipality.regionId,
-      valueGel: values.get(municipality.code)!,
-      budgetPerResidentGel: null,
-    })),
-  );
-  const regionRows = ranked(
-    regions.map((region) => ({
-      id: region.id,
-      kind: "region" as const,
-      nameKa: region.kaLabel,
-      subtitleKa: `${municipalities.filter((municipality) => municipality.regionId === region.id).length} მუნიციპალიტეტი`,
-      regionId: region.id,
-      valueGel: population(region.id),
-      budgetPerResidentGel: null,
-    })),
-  );
-  const country: MunicipalListRow = {
-    id: MUNICIPAL_COUNTRY_ID,
-    kind: "country",
-    nameKa: "საქართველო",
-    subtitleKa: `${municipalities.length} მუნიციპალიტეტი`,
-    regionId: null,
-    valueGel: population(GEORGIA_PLACE_ID),
-    budgetPerResidentGel: null,
-    rank: null,
-  };
+  const { municipalities: municipalityRows, regions: regionRows, country } = placeIndexRows({ regions, municipalities, valueOf: (id) => values.get(id) ?? population(id) });
 
   const density = facts.filter((fact) => fact.seriesId === SERIES.populationDensity);
   if (density.length === 0) throw new Error("No density values for the index");

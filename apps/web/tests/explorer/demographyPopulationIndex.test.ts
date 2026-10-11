@@ -87,3 +87,8 @@ describe("population index model", () => {
     expect(() => buildPopulationIndexModel({ facts: without, regions, municipalities })).toThrow(/33/);
   });
 });
+
+test("the index rows are unchanged by the shared row builder (fingerprint recorded before the refactor)", async () => {
+  const { createHash } = await import("node:crypto");
+  expect(createHash("sha256").update(JSON.stringify(index)).digest("hex")).toBe("96a3713cb7d58727ee659b136a7e5025acaf757a431e9d71b7bb1a1904514070");
+});
