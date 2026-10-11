@@ -30,7 +30,8 @@ import type { ClientAgeFact } from "../../lib/servedRows";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
-import { Callout, SELECT_CLASS, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { YearPicker } from "../ui/year-picker";
 import { Download } from "./national-vital-charts";
 import { PopulationPyramid } from "./population-pyramid";
 
@@ -66,7 +67,6 @@ export function AgeSexExplorer({
   const [first, last] = [years[0]!, years.at(-1)!];
   const update = (patch: Partial<AgeSexState>) => setState((previous) => ({ ...previous, ...patch }));
   const breakLabel = t("breakLabel");
-  const yearText = (year: number) => (year === CENSUS_STEP.toYear ? `${year} · ${breakLabel}` : String(year));
   const source = (
     <>
       {t("annualSource", { first, last })}{" "}
@@ -97,24 +97,25 @@ export function AgeSexExplorer({
       <section data-testid="age-sex-pyramid" className={SECTION_CLASS}>
         <SectionTitle>{t("pyramidTitle")}</SectionTitle>
         <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-3">
-          <label className="flex min-w-0 flex-col gap-1 text-[11px] font-semibold text-[var(--muted)] max-[767px]:w-full">
-            <span>{t("yearMenu")}</span>
-            <select data-testid="age-sex-year-select" value={state.year} className={SELECT_CLASS} onChange={(event) => chooseYear(Number(event.target.value))}>
-              {years.map((year) => <option key={year} value={year}>{yearText(year)}</option>)}
-            </select>
-          </label>
-          <label className="flex min-w-0 flex-col gap-1 text-[11px] font-semibold text-[var(--muted)] max-[767px]:w-full">
-            <span>{t("compareMenu")}</span>
-            <select
-              data-testid="age-sex-compare-select"
-              value={state.compare ?? ""}
-              className={SELECT_CLASS}
-              onChange={(event) => update({ compare: event.target.value === "" ? null : Number(event.target.value) })}
-            >
-              <option value="">{t("compareNone")}</option>
-              {years.filter((year) => year !== state.year).map((year) => <option key={year} value={year}>{yearText(year)}</option>)}
-            </select>
-          </label>
+          <YearPicker
+            label={t("yearMenu")}
+            years={years}
+            value={state.year}
+            onChange={(year) => chooseYear(year!)}
+            markYear={CENSUS_STEP.toYear}
+            markLabel={breakLabel}
+            testId="age-sex-year-select"
+          />
+          <YearPicker
+            label={t("compareMenu")}
+            years={years.filter((year) => year !== state.year)}
+            value={state.compare}
+            onChange={(year) => update({ compare: year })}
+            noneLabel={t("compareNone")}
+            markYear={CENSUS_STEP.toYear}
+            markLabel={breakLabel}
+            testId="age-sex-compare-select"
+          />
           <SegmentedTabs<AgeMeasure>
             ariaLabel={t("measureLabel")}
             value={measure}

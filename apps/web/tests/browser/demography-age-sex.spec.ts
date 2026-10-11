@@ -7,10 +7,22 @@ const IMERETI = `${TEST_BASE_URL}/en/explorer/demography/population/region/imere
 const expectAppReady = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const hasNoSidewaysScroll = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
 /** The pyramid's axis labels: the drawing's text nodes that are a bare percent. */
+/** Opens a year picker by its trigger and returns its year grid. */
+const openPicker = async (page: Page, testId: string) => {
+  await page.getByTestId(testId).click();
+  const list = page.getByRole("listbox");
+  await expect(list).toBeVisible();
+  return list;
+};
+const pick = async (page: Page, testId: string, name: string) => {
+  const list = await openPicker(page, testId);
+  await list.getByRole("option", { name, exact: true }).click();
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+};
 const percentTicks = (page: Page) => page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /^\d+(\.\d+)?%$/ });
 
 test.describe("the Age and sex page", () => {
-  test("renders its three parts in order, with 2026 chosen in a menu of 23 years and no comparison", async ({ page }) => {
+  test("renders its three parts in order, with 2026 chosen in a picker of 23 years and no comparison", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Age and sex");
@@ -23,14 +35,24 @@ test.describe("the Age and sex page", () => {
     expect(tops[0]).toBeLessThan(tops[1]!);
     expect(tops[1]).toBeLessThan(tops[2]!);
     const year = page.getByTestId("age-sex-year-select");
-    await expect(year.locator("option")).toHaveCount(23);
-    await expect(year).toHaveValue("2026");
-    await expect(year.locator('option[value="2025"]')).toHaveText("2025 · Census re-base");
+    await expect(year).toHaveText("2026");
+    await expect(year).toHaveAttribute("aria-expanded", "false");
+    const yearGrid = await openPicker(page, "age-sex-year-select");
+    await expect(year).toHaveAttribute("aria-expanded", "true");
+    await expect(yearGrid.getByRole("option")).toHaveCount(23);
+    await expect(yearGrid.getByRole("option", { selected: true })).toHaveText("2026");
+    await expect(yearGrid.getByRole("option", { name: "2025 (Census re-base)" })).toBeVisible();
+    await expect(page.getByTestId("age-sex-year-select-panel")).toContainText("* 2025 — Census re-base");
+    await page.keyboard.press("Escape");
     const compare = page.getByTestId("age-sex-compare-select");
-    await expect(compare.locator("option")).toHaveCount(23);
-    await expect(compare.locator('option[value="2026"]')).toHaveCount(0);
-    await expect(compare).toHaveValue("");
-    await expect(compare.locator('option[value="2025"]')).toHaveText("2025 · Census re-base");
+    await expect(compare).toHaveText("None");
+    const compareGrid = await openPicker(page, "age-sex-compare-select");
+    const options = compareGrid.getByRole("option");
+    await expect(options).toHaveCount(23);
+    await expect(options.first()).toHaveText("None");
+    await expect(options.first()).toHaveAttribute("aria-selected", "true");
+    await expect(compareGrid.getByRole("option", { name: "2026", exact: true })).toHaveCount(0);
+    await page.keyboard.press("Escape");
     for (const gone of ["age-sex-year-row", "age-sex-compare-row", "age-sex-compare-toggle", "age-sex-pyramid-mode-table"]) await expect(page.getByTestId(gone)).toHaveCount(0);
     await expect(page.getByTestId("age-sex-pyramid-summary")).toContainText("65+: 18.1%");
   });
@@ -51,17 +73,59 @@ test.describe("the Age and sex page", () => {
     await expectAppReady(page);
     const summary = page.getByTestId("age-sex-pyramid-summary");
     const before = await summary.textContent();
-    await page.getByTestId("age-sex-year-select").selectOption("2010");
+    await pick(page, "age-sex-year-select", "2010");
     await expect(page).toHaveURL(/#.*year=2010/);
     await expect(summary).not.toHaveText(before ?? "");
+    await expect(page.getByTestId("age-sex-year-select")).toHaveText("2010");
+  });
+
+  test("the year grid works from the keyboard and closes on Escape or an outside click", async ({ page }) => {
+    await page.goto(`${NATIONAL}#year=2010`);
+    await expectAppReady(page);
+    const trigger = page.getByTestId("age-sex-year-select");
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    const list = page.getByRole("listbox");
+    await expect(list).toBeFocused();
+    await expect(list).toHaveAttribute("aria-activedescendant", (await list.getByRole("option", { name: "2010", exact: true }).getAttribute("id"))!);
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Enter");
+    await expect(list).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await expect(page).toHaveURL(/#.*year=2011/);
+
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("listbox")).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveText("2011");
+    await expect(page).toHaveURL(/#.*year=2011/);
+
+    // Space chooses too, and its key release on the trigger does not open the grid again.
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("listbox")).toBeFocused();
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Space");
+    await expect(page).toHaveURL(/#.*year=2010/);
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+
+    await trigger.click();
+    await expect(page.getByRole("listbox")).toBeVisible();
+    await page.mouse.click(5, 5);
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(trigger).toHaveText("2010");
   });
 
   test("choosing the compared year to be the shown year drops the comparison", async ({ page }) => {
     await page.goto(`${NATIONAL}#year=2010&cmp=2004`);
     await expectAppReady(page);
-    await expect(page.getByTestId("age-sex-compare-select")).toHaveValue("2004");
-    await page.getByTestId("age-sex-year-select").selectOption("2004");
-    await expect(page.getByTestId("age-sex-compare-select")).toHaveValue("");
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveText("2004");
+    await pick(page, "age-sex-year-select", "2004");
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveText("None");
     await expect(page.getByTestId("pyramid-outline-left")).toHaveCount(0);
     await expect(page).toHaveURL(/#.*year=2004/);
     await expect(page).not.toHaveURL(/cmp=/);
@@ -70,17 +134,17 @@ test.describe("the Age and sex page", () => {
   test("comparing within one census basis draws the outline; across the re-base it keeps shares and says why", async ({ page }) => {
     await page.goto(`${NATIONAL}#year=2010`);
     await expectAppReady(page);
-    await page.getByTestId("age-sex-compare-select").selectOption("2004");
+    await pick(page, "age-sex-compare-select", "2004");
     await expect(page.getByTestId("pyramid-legend")).toContainText("2004");
     await expect(page.getByTestId("pyramid-outline-left")).toBeAttached();
     await expect(page.getByTestId("age-sex-compare-note")).toHaveCount(0);
     await expect(page.getByTestId("age-sex-measure-persons")).not.toHaveAttribute("aria-disabled", "true");
 
-    await page.getByTestId("age-sex-year-select").selectOption("2026");
+    await pick(page, "age-sex-year-select", "2026");
     await expect(page.getByTestId("age-sex-compare-note")).toContainText("2026 and 2004");
     await expect(page.getByTestId("age-sex-measure-persons")).toHaveAttribute("aria-disabled", "true");
 
-    await page.getByTestId("age-sex-compare-select").selectOption("");
+    await pick(page, "age-sex-compare-select", "None");
     await expect(page.getByTestId("pyramid-outline-left")).toHaveCount(0);
     await expect(page.getByTestId("age-sex-compare-note")).toHaveCount(0);
     await expect(page.getByTestId("age-sex-measure-persons")).not.toHaveAttribute("aria-disabled", "true");
@@ -91,8 +155,8 @@ test.describe("the Age and sex page", () => {
     await expectAppReady(page);
     await expect(page.getByTestId("age-sex-pyramid-panel")).toHaveAttribute("data-measure", "share");
     await expect(page.getByTestId("age-sex-measure-persons")).toHaveAttribute("aria-disabled", "true");
-    await expect(page.getByTestId("age-sex-year-select")).toHaveValue("2026");
-    await expect(page.getByTestId("age-sex-compare-select")).toHaveValue("2004");
+    await expect(page.getByTestId("age-sex-year-select")).toHaveText("2026");
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveText("2004");
     expect(await percentTicks(page).count()).toBeGreaterThan(2);
     await expect(page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /thousand/i })).toHaveCount(0);
   });
@@ -218,6 +282,17 @@ test.describe("at 390px", () => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
     expect(await hasNoSidewaysScroll(page)).toBe(true);
+    // The open year grid fits the phone and adds no sideways scroll.
+    for (const picker of ["age-sex-year-select", "age-sex-compare-select"]) {
+      await openPicker(page, picker);
+      const panel = (await page.getByTestId(`${picker}-panel`).boundingBox())!;
+      expect(panel.x).toBeGreaterThanOrEqual(0);
+      expect(panel.x + panel.width).toBeLessThanOrEqual(390);
+      expect(await hasNoSidewaysScroll(page)).toBe(true);
+      const cell = (await page.getByRole("listbox").getByRole("option").nth(1).boundingBox())!;
+      expect(cell.height).toBeGreaterThanOrEqual(44);
+      await page.keyboard.press("Escape");
+    }
     const scroller = page.getByTestId("age-sex-heatmap").getByTestId("age-heatmap-scroller");
     await scroller.scrollIntoViewIfNeeded();
     await expect

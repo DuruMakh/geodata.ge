@@ -218,20 +218,19 @@ describe("age and sex page", () => {
     expect(html).not.toMatch(GEORGIAN);
   });
 
-  it("opens on two year menus, the latest year and no comparison, with no year rows and no pyramid table switch", async () => {
+  it("opens on two year pickers, the latest year and no comparison, with no year rows and no pyramid table switch", async () => {
     const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
-    const menu = (testId: string) => html.match(new RegExp(`<select[^>]*data-testid="${testId}"[^>]*>.*?</select>`, "s"))?.[0] ?? "";
-    const year = menu("age-sex-year-select");
-    expect((year.match(/<option/g) ?? []).length).toBe(23);
-    expect(year).toMatch(/<option value="2026" selected=""[^>]*>2026<\/option>/);
-    expect(year).toContain("2025 · Census re-base</option>");
-    const compare = menu("age-sex-compare-select");
-    const options = compare.match(/<option[^>]*>[^<]*<\/option>/g) ?? [];
-    expect(options).toHaveLength(23);
-    expect(options[0]).toMatch(/value=""[^>]*>None<\/option>/);
-    expect(compare).not.toContain('value="2026"');
-    expect(compare).toContain("2025 · Census re-base</option>");
-    expect(compare).not.toMatch(/<option[^>]*selected=""[^>]*value="\d/);
+    const trigger = (testId: string) => html.match(new RegExp(`<button[^>]*data-testid="${testId}"[^>]*>.*?</button>`, "s"))?.[0] ?? "";
+    const year = trigger("age-sex-year-select");
+    expect(year).toContain('aria-haspopup="listbox"');
+    expect(year).toContain('aria-expanded="false"');
+    expect(year).toContain(">2026<");
+    const compare = trigger("age-sex-compare-select");
+    expect(compare).toContain('aria-haspopup="listbox"');
+    expect(compare).toContain(">None<");
+    const pyramid = html.slice(html.indexOf('data-testid="age-sex-pyramid"'), html.indexOf('data-testid="age-sex-heatmap"'));
+    expect(pyramid).not.toContain("<select");
+    expect(pyramid).not.toContain('role="listbox"');
     for (const gone of ["age-sex-year-row", "age-sex-compare-row", "age-sex-compare-toggle", "age-sex-pyramid-mode-line", "age-sex-pyramid-mode-table"]) {
       expect(html).not.toContain(`data-testid="${gone}"`);
     }
