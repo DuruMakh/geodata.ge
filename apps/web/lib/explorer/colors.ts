@@ -35,6 +35,11 @@ export const SERIES_COLORS: Record<string, string> = {
   "city.gori": "#A5822B",
   "city.telavi": "#7A4E8C",
   "city.zugdidi": "#4A707A",
+  // Current account parts (External flows): reused hexes, so the hashed palette that Trade and External flows draw from is unchanged.
+  "ca.goods": "#3D5A98",
+  "ca.services": "#1F6E56",
+  "ca.primary_income": "#A5822B",
+  "ca.secondary_income": "#7A4E8C",
 
   "spending.social_protection": "#B3402A",
   "spending.health": "#1F6E56",

@@ -3,9 +3,8 @@ import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { buildTradePartnersModel } from "./tradePartners";
-import { unitFor } from "./format";
 import { TRADE_PARTNER_TOTAL_ID, type TradePartnersState } from "./tradePartnersState";
-import { buildWorkbookExportModel, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { applySignedAmountFormat, buildWorkbookExportModel, EXACT_SIGNED_FORMAT, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 export function buildTradePartnersWorkbookModel(input: { data: ClientTradePartnersData; state: TradePartnersState; sources: readonly WorkbookPublicSource[]; siteOrigin: string }, presentation: Presentation): WorkbookExportModel {
   const model = buildTradePartnersModel(input.data, input.state, presentation);
@@ -36,13 +35,10 @@ export function buildTradePartnersWorkbookModel(input: { data: ClientTradePartne
   exportModel.readable.subtitle = `${t(`indicator.${input.state.measure}`)} · ${model.range.start}–${model.range.end} · ${model.unit.label} · ${t(domestic ? "domestic.workbookNote" : "workbook.formulas")}${groupNote}`;
   if (domestic) exportModel.readable.fitSubtitle = true;
   const values = model.selectedIds.flatMap(id => model.years.map(year => model.valuesByEntity[id][year])).filter((value): value is number => value !== null);
-  const amountDecimals = Math.max(model.unit.decimals, unitFor(values, model.unit, 15).decimals);
-  const amountFormat = "#,##0." + "0".repeat(amountDecimals);
-  exportModel.readable.amountDecimals = amountDecimals;
-  exportModel.readable.numberFormat = `${amountFormat};"−"${amountFormat}`;
+  applySignedAmountFormat(exportModel, values, model.unit);
   exportModel.analysis.headers[3] = t("workbook.amount");
   exportModel.analysis.headers.push(t("workbook.publication"));
   exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, t("publicationUnspecified")]);
-  exportModel.analysis.numericFormats = { 4: '#,##0.###############;"−"#,##0.###############' };
+  exportModel.analysis.numericFormats = { 4: EXACT_SIGNED_FORMAT };
   return exportModel;
 }

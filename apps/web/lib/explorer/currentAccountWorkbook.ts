@@ -3,9 +3,8 @@ import { CURRENT_ACCOUNT_SERIES } from "../data/externalFlows/types";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { buildCurrentAccountModel, type CurrentAccountGdp } from "./currentAccount";
-import { unitFor } from "./format";
 import type { CurrentAccountState } from "./currentAccountState";
-import { buildWorkbookExportModel, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { applySignedAmountFormat, buildWorkbookExportModel, EXACT_SIGNED_FORMAT, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const SOURCE_FILE = "bop-6_bopbpm6eng.xlsx";
 /** The active tab's series, years and unit. The Balance tab always exports all five; % of GDP keeps the USD amount beside the share and cites the GDP it divides by. */
@@ -24,11 +23,8 @@ export function buildCurrentAccountWorkbookModel(input: { facts: readonly Client
   });
   exportModel.readable.subtitle = `${tab} · ${model.range.start}–${model.range.end} · ${model.unit.label}`;
   const values = ids.flatMap(id => model.years.map(year => model.valuesById[id][year])).filter((value): value is number => value !== null);
-  const decimals = Math.max(model.unit.decimals, unitFor(values, model.unit, 15).decimals), format = "#,##0." + "0".repeat(decimals);
-  exportModel.readable.amountDecimals = decimals;
-  exportModel.readable.numberFormat = `${format};"−"${format}`;
+  applySignedAmountFormat(exportModel, values, model.unit);
   exportModel.analysis.headers[3] = t("workbook.amount");
-  const exact = '#,##0.###############;"−"#,##0.###############';
-  exportModel.analysis.numericFormats = percent ? { 4: exact, [exportModel.analysis.headers.length]: exact } : { 4: exact };
+  exportModel.analysis.numericFormats = percent ? { 4: EXACT_SIGNED_FORMAT, [exportModel.analysis.headers.length]: EXACT_SIGNED_FORMAT } : { 4: EXACT_SIGNED_FORMAT };
   return exportModel;
 }
