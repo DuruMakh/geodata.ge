@@ -49,7 +49,7 @@ export type EnergyFoodFact = {
   sourceNumberFormat: string;
   lastReviewedAt: string;
 };
-export type ClientEnergyFoodFact = Pick<EnergyFoodFact, "year" | "indicatorId" | "sourceId"> & { value: number; decimals: number };
+export type ClientEnergyFoodFact = Pick<EnergyFoodFact, "year" | "indicatorId" | "sourceId" | "valueStatus"> & { value: number; decimals: number };
 export type EnergyFoodAcceptance = {
   status: "passed";
   years: { min: number; max: number };

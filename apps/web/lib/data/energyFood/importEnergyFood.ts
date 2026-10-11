@@ -57,6 +57,6 @@ const CLIENT_DECIMALS: Record<EnergyFoodFact["unit"], number> = { ktoe: 1, gwh: 
 
 /** Client values are the figures Geostat prints (published precision); exact stored values stay server-side. */
 export function toClientEnergyFoodFact(fact: EnergyFoodFact): ClientEnergyFoodFact {
-  const { year, indicatorId, sourceId } = fact;
-  return { year, indicatorId, sourceId, value: Number(fact.publishedValue), decimals: CLIENT_DECIMALS[fact.unit] };
+  const { year, indicatorId, sourceId, valueStatus } = fact;
+  return { year, indicatorId, sourceId, valueStatus, value: Number(fact.publishedValue), decimals: CLIENT_DECIMALS[fact.unit] };
 }

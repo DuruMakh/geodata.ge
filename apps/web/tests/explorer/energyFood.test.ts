@@ -1,3 +1,4 @@
+import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../lib/data/energyFood/importEnergyFood";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
@@ -6,6 +7,11 @@ import {
   ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId,
 } from "../../lib/explorer/energyFood";
 import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
+import { buildEnergyFoodHubCards } from "../../lib/explorer/energyFoodHubCards";
+import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Locale, Presentation } from "../../lib/i18n/types";
 import { contrastRatio } from "../helpers/contrast";
 
 let facts: ClientEnergyFoodFact[];
@@ -177,4 +183,131 @@ test("within a page every non-reference series has its own readable colour, even
   expect(supply).toHaveLength(16);
   expect(supply.slice(0, 14).map(s => s.color)).toEqual(EDITORIAL_PALETTE);
   expect(supply.slice(14).map(s => s.color)).toEqual(["#0D89C2", "#474A02"]);
+});
+
+// The energyFood message namespace arrives with the copy; these are the keys the workbook and the cards read.
+const COPY: Record<Locale, Record<string, string>> = {
+  en: {
+    "energyFood.unit.ktoe": "ktoe", "energyFood.unit.gwh": "GWh", "energyFood.unit.percent": "%", "energyFood.series": "Series",
+    "energyFood.status.published": "Published", "energyFood.status.no_flow": "No flow",
+    "common.energySupply": "Energy supply", "common.electricity": "Electricity", "common.energyUse": "Energy use", "common.foodSelfSufficiency": "Food self-sufficiency",
+    ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} title`], [`energyFood.page.${id}.summary`, `${id} summary`]])),
+  },
+  ka: {
+    "energyFood.unit.ktoe": "ktoe", "energyFood.unit.gwh": "GWh", "energyFood.unit.percent": "%", "energyFood.series": "სერია",
+    "energyFood.status.published": "გამოქვეყნებული", "energyFood.status.no_flow": "ნაკადი არ არის",
+    "common.energySupply": "ენერგიის მიწოდება", "common.electricity": "ელექტროენერგია", "common.energyUse": "ენერგიის მოხმარება", "common.foodSelfSufficiency": "სურსათის თვითუზრუნველყოფა",
+    ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} სათაური`], [`energyFood.page.${id}.summary`, `${id} აღწერა`]])),
+  },
+};
+const presentationFor = async (locale: Locale): Promise<Presentation> => ({ locale, englishLabels: {}, messages: { ...(await getMessages(locale, ["workbook", "format"])), ...COPY[locale] } });
+const sourceFor = (sourceId: string, years: number[]) => ({
+  sourceId, years, title: sourceId, organization: "Geostat", retrievedAt: "2026-10-11",
+  downloadHref: `/downloads/methodology/energy-food/files/${sourceId}.xlsx` as const,
+});
+const BALANCE_YEARS = Array.from({ length: 12 }, (_, i) => 2013 + i);
+const SOURCES = [
+  ...BALANCE_YEARS.map(year => sourceFor(`geostat_energy_balance_${year}_aggregated`, [year])),
+  ...BALANCE_YEARS.map(year => sourceFor(`geostat_energy_balance_${year}_electricity`, [year])),
+  sourceFor("geostat_food_balance_sheets", Array.from({ length: 12 }, (_, i) => 2014 + i)),
+];
+const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
+
+test.each(["en", "ka"] as const)("the %s energy-supply workbook keeps two series over five years and only the five balance sources", async (locale: Locale) => {
+  const ids = ["energy.imports.total", "energy.imports.natural_gas"];
+  const labels = { "energy.imports.total": "Imports", "energy.imports.natural_gas": "Natural gas imports" };
+  const model = buildEnergyFoodWorkbookExportModel({
+    section: "energy-supply", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels,
+    state: { mode: "table", range: { kind: "manual", start: 2020, end: 2024 }, selectedIds: ids },
+  }, await presentationFor(locale));
+  expect(model.filename).toBe(`fiscal-energy-food-energy-supply-2020-2024${locale === "en" ? "-en" : ""}.xlsx`);
+  expect(model.readable.years).toEqual([2020, 2021, 2022, 2023, 2024]);
+  expect(model.readable.rows.map(row => row.label)).toEqual(["Imports", "Natural gas imports"]);
+  expect(model.readable.rows.every(row => Object.keys(row.valuesByYear).length === 5)).toBe(true);
+  expect(model.readable.numberFormat).toBe("#,##0.0");
+  expect(model.readable.unitLabel).toBe(COPY[locale]["energyFood.unit.ktoe"]);
+  expect(model.analysis.rows).toHaveLength(10);
+  expect(model.analysis.headers).toHaveLength(4);
+  expect(model.analysis.headers.join(" ")).not.toMatch(/source_cell|sheet|source_id/i);
+  expect(model.sources.map(source => source.title)).toEqual([2020, 2021, 2022, 2023, 2024].map(year => `geostat_energy_balance_${year}_aggregated`));
+  expect(model.sources.every(source => source.absoluteUrl === `https://fiscal.ge${source.downloadHref}`)).toBe(true);
+  const excel = await loadWorkbook(model);
+  expect(excel.worksheets).toHaveLength(3);
+});
+
+test("the analysis sheet formats exactly its value column, whichever section it is", async () => {
+  for (const [section, format] of [["energy-supply", "#,##0.0"], ["electricity", "#,##0.0"], ["energy-use", "#,##0.0"], ["food-self-sufficiency", "0"]] as const) {
+    const state = { ...defaultEnergyFoodState(section), range: { kind: "manual" as const, start: 2016, end: 2018 } };
+    const model = buildEnergyFoodWorkbookExportModel({
+      section, facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { [state.selectedIds[0]]: "Total" }, state,
+    }, await presentationFor("en"));
+    const { headers, rows, numericFormats } = model.analysis;
+    // The value column is the only one holding numbers other than the year, and it is the only one keyed.
+    const valueColumns = headers.flatMap((_, i) => (i > 0 && rows.every(r => typeof r[i] === "number") ? [i + 1] : []));
+    expect(valueColumns).toEqual([3]);
+    expect(Object.keys(numericFormats ?? {}).map(Number)).toEqual(valueColumns);
+    expect(numericFormats).toEqual({ 3: format });
+    expect(model.readable.numberFormat).toBe(format);
+    const sheet = (await loadWorkbook(model)).getWorksheet(model.sheetNames[1])!;
+    for (let row = 2; row <= rows.length + 1; row++) {
+      expect(sheet.getCell(row, 3).numFmt, `${section} value cell`).toBe(format);
+      expect(sheet.getCell(row, 2).numFmt, `${section} label cell`).not.toBe(format);
+    }
+  }
+});
+
+test("gaps stay blank cells, a dash is a zero marked no flow and a published zero stays a zero", async () => {
+  const electricity = buildEnergyFoodWorkbookExportModel({
+    section: "electricity", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { "electricity.production.wind": "Wind" },
+    state: { mode: "table", range: { kind: "manual", start: 2014, end: 2017 }, selectedIds: ["electricity.production.wind"] },
+  }, await presentationFor("en"));
+  expect(electricity.readable.rows[0].valuesByYear).toMatchObject({ 2014: null, 2015: null });
+  expect(electricity.readable.rows[0].valuesByYear[2016]).toBeGreaterThan(0);
+  expect(electricity.readable.rows[0].basisByYear).toMatchObject({ 2014: null, 2015: null, 2016: "published" });
+  expect(electricity.analysis.rows.slice(0, 3).map(r => r.slice(2))).toEqual([[null, "Not available"], [null, "Not available"], [expect.any(Number), "Published"]]);
+  // Only the years that have a value cite a source.
+  expect(electricity.sources.map(source => source.title)).toEqual(["geostat_energy_balance_2016_electricity", "geostat_energy_balance_2017_electricity"]);
+  const excel = await loadWorkbook(electricity);
+  expect(excel.getWorksheet(electricity.sheetNames[1])!.getCell(2, 3).value).toBeNull();
+
+  const crude = buildEnergyFoodWorkbookExportModel({
+    section: "energy-supply", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { "energy.imports.crude_oil": "Crude oil imports", "energy.supply.crude_oil": "Crude oil supply" },
+    state: { mode: "table", range: { kind: "manual", start: 2013, end: 2014 }, selectedIds: ["energy.imports.crude_oil", "energy.supply.crude_oil"] },
+  }, await presentationFor("en"));
+  const cell = (year: number, label: string) => crude.analysis.rows.find(r => r[0] === year && r[1] === label)!.slice(2);
+  expect(cell(2013, "Crude oil supply")).toEqual([0, "No flow"]);
+  expect(cell(2013, "Crude oil imports")).toEqual([0, "No flow"]);
+  expect(cell(2014, "Crude oil supply")).toEqual([0, "Published"]);
+});
+
+test("the food workbook is whole numbers with the published wheat ratios, and a source missing from the list is an error", async () => {
+  const model = buildEnergyFoodWorkbookExportModel({
+    section: "food-self-sufficiency", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { "food.self_sufficiency.wheat": "Wheat" },
+    state: { mode: "table", range: { kind: "manual", start: 2022, end: 2025 }, selectedIds: ["food.self_sufficiency.wheat"] },
+  }, await presentationFor("en"));
+  expect(model.filename).toBe("fiscal-energy-food-food-self-sufficiency-2022-2025-en.xlsx");
+  expect(model.readable.numberFormat).toBe("0");
+  expect(model.readable.amountDecimals).toBe(0);
+  const wheat = (year: number) => model.analysis.rows.find(r => r[0] === year)!.slice(2);
+  expect(wheat(2023)).toEqual([22, "Published"]);
+  expect(wheat(2025)).toEqual([19, "Published"]);
+  expect(model.sources.map(source => source.title)).toEqual(["geostat_food_balance_sheets"]);
+  expect(model.sources[0].years).toEqual([2022, 2023, 2024, 2025]);
+  expect(() => buildEnergyFoodWorkbookExportModel({
+    section: "food-self-sufficiency", facts, sources: [], siteOrigin: "https://fiscal.ge", labels: {}, state: defaultEnergyFoodState("food-self-sufficiency"),
+  }, { locale: "en", englishLabels: {}, messages: COPY.en })).toThrow(/geostat_food_balance_sheets/);
+});
+
+test("the hub has four cards with sparklines and the latest published values", async () => {
+  const cards = buildEnergyFoodHubCards(facts, await presentationFor("en"));
+  expect(cards.map(card => card.href)).toEqual(ENERGY_FOOD_SECTIONS.map(s => s.href));
+  expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04"]);
+  expect(cards.map(card => card.title)).toEqual(["Energy supply", "Electricity", "Energy use", "Food self-sufficiency"]);
+  expect(cards.map(card => card.footer)).toEqual(["2024 · 5,914.5 · 2013–2024", "2024 · 14,234.1 · 2013–2024", "2024 · 5,456.7 · 2013–2024", "2025 · 19% · 2014–2025"]);
+  expect(cards.map(card => card.series?.length)).toEqual([12, 12, 12, 12]);
+  expect(cards.map(card => card.series!.at(-1))).toEqual([5914.5, 14234.1, 5456.7, 19]);
+  expect(cards.every(card => card.comingSoon === false && card.seriesColor === INK)).toBe(true);
+  expect(cards.map(card => card.description)).toEqual(ENERGY_FOOD_SECTIONS.map(s => `${s.id} summary`));
+  const ka = buildEnergyFoodHubCards(facts, await presentationFor("ka"));
+  expect(ka.map(card => card.footer)).toEqual(cards.map(card => card.footer));
 });
