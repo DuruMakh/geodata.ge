@@ -15,7 +15,7 @@ The pages answer five questions:
 - Who uses the energy: households, transport, industry or businesses?
 - How much of each main food does Georgia produce itself? In 2025 it produced 19% of the wheat it used, 30% of the poultry, 68% of the milk and 158% of the grapes.
 
-The pages keep the production editorial look and reuse the Poverty and Wages workspace, series list, tabs, table and Excel download. No new chart type, chart library or visual direction is added.
+The pages keep the production editorial look and reuse the Poverty and Wages workspace, series list, table and Excel download. No new chart type, chart library or visual direction is added.
 
 ## 2. Pages and navigation
 
@@ -36,10 +36,10 @@ The pages keep the production editorial look and reuse the Poverty and Wages wor
 ## 3. Rules shared by all four pages
 
 - Under the heading there is one short line from `LatestValueLine` with the latest published values. Nothing else sits under the heading: no headline-number block or ranking. The only text under the chart is one short source line.
-- Tabs are centred text tabs, styled like the Poverty tabs. Each tab has its own series list. Switching tabs selects that tab's first series alone and keeps the year range, clamped to the new tab's years.
-- On each tab, only the applicable total is selected first. It stays first, selectable and removable. Where a tab has no total, its first series is selected.
+- No page has tabs (Duru, 2026-10-11, after the Money and banks preview: one chart with every series tickable in the standard list on the right). Each page has one series list; breakdowns nest under the total they break down.
+- On each page, only the page's main total is selected first. It stays first, selectable and removable.
 - Nested rows, counts, Select all and search work as on Poverty and Wages.
-- Chart | Table, the year range and Excel work as on Poverty. The tab, range, selection and chart/table mode live in the URL and survive a language change.
+- Chart | Table, the year range and Excel work as on Poverty. The range, selection and chart/table mode live in the URL and survive a language change.
 - Every series has a fixed, distinguishable colour, and labels identify every series without colour.
 - Every value is Geostat's own published number. No shares, differences, sums, per-person figures or other calculations of our own are served.
 
@@ -47,13 +47,14 @@ The pages keep the production editorial look and reuse the Poverty and Wages wor
 
 Line under the heading: "Energy supply · 2024: 5,914.5 · imports 5,099.0" (thousand tonnes of oil equivalent). Energy values show to one decimal, as Geostat publishes them.
 
-**Overview | Supply by fuel | Imports by fuel**
+One series list, in this order (2013–2024):
 
-| Tab | Series (selected first in bold) | Years |
-| --- | --- | --- |
-| Overview | **Domestic supply**, Production, Imports, Exports (the balance's Total column) | 2013–2024 |
-| Supply by fuel | **Total**, with natural gas, oil products, hydro, biofuel and waste, coal, crude oil, wind/solar/geothermal and electricity nested under it | 2013–2024 |
-| Imports by fuel | **Total**, with natural gas, oil products, coal, crude oil and electricity nested under it | 2013–2024 |
+- **Domestic supply** (selected first), with natural gas, oil products, hydro, biofuel and waste, coal, crude oil, wind/solar/geothermal and electricity nested under it
+- Production
+- Imports, with natural gas, oil products, coal, crude oil and electricity nested under it
+- Exports
+
+Domestic supply, production, imports and exports are the balance's Total column.
 
 - Unit: thousand tonnes of oil equivalent (the balance's KTOE sheet). The methodology explains the unit in plain words: one tonne of oil equivalent is the energy in one tonne of crude oil, so different fuels can be added together.
 - Electricity's domestic supply is imports minus exports as Geostat publishes it, so it is small and can be negative (2023). The chart draws it as published.
@@ -62,13 +63,13 @@ Line under the heading: "Energy supply · 2024: 5,914.5 · imports 5,099.0" (tho
 
 Line under the heading: "Electricity production · 2024: 14,234.1 GWh · imports 2,301.8 · exports 2,121.7".
 
-**Production | Imports and exports | Use**
+One series list, in this order (2013–2024; wind from 2016):
 
-| Tab | Series (selected first in bold) | Years |
-| --- | --- | --- |
-| Production | **Total production**, with hydro plants, thermal plants and wind plants nested under it | 2013–2024 (wind from 2016) |
-| Imports and exports | **Imports**, Exports | 2013–2024 |
-| Use | **Final consumption**, with households, commercial and public services, industry, transport, agriculture/forestry/fishing and other (not specified) nested under it; then Network losses | 2013–2024 |
+- **Total production** (selected first), with hydro plants, thermal plants and wind plants nested under it
+- Imports
+- Exports
+- Final consumption, with households, commercial and public services, industry, transport, agriculture/forestry/fishing and other (not specified) nested under it
+- Network losses
 
 - Unit: GWh (the balance's electricity sheet).
 - Wind has no value before 2016 because Geostat's balance has no wind column before then. It is a gap, not zero.
@@ -78,12 +79,10 @@ Line under the heading: "Electricity production · 2024: 14,234.1 GWh · imports
 
 Line under the heading: "Final energy use · 2024: 5,456.7" (thousand tonnes of oil equivalent).
 
-**By user | By fuel**
+One series list, in this order (2013–2024):
 
-| Tab | Series (selected first in bold) | Years |
-| --- | --- | --- |
-| By user | **Final consumption**, with households, transport, industry, commercial and public services, agriculture/forestry/fishing, other (not specified) and non-energy use nested under it | 2013–2024 |
-| By fuel | **Final consumption**, with natural gas, oil products, electricity, biofuel and waste, coal and wind/solar/geothermal nested under it | 2013–2024 |
+- **Final consumption** (selected first), with households, transport, industry, commercial and public services, agriculture/forestry/fishing, other (not specified) and non-energy use nested under it
+- Then consumption by fuel as top-level rows: natural gas, oil products, electricity, biofuel and waste, coal, and wind/solar/geothermal
 
 - Unit: thousand tonnes of oil equivalent.
 - "Non-energy use" means fuel used as a raw material, for example gas for fertiliser, not burned for energy. The methodology says so.
@@ -92,7 +91,7 @@ Line under the heading: "Final energy use · 2024: 5,456.7" (thousand tonnes of 
 
 Line under the heading: "Wheat self-sufficiency · 2025: 19%".
 
-No tabs. One line chart of the self-sufficiency ratio for 12 foods in Geostat's order: **Wheat** (selected first), maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat, and poultry nested under it), milk and milk products, and eggs.
+One line chart of the self-sufficiency ratio for 12 foods in Geostat's order: **Wheat** (selected first), maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat, and poultry nested under it), milk and milk products, and eggs.
 
 - Unit: percent. Values show as Geostat's file displays them: whole numbers for every year.
 - Years 2014–2025 for all 12 foods. No value is missing.
@@ -151,7 +150,7 @@ One package, `docs/Raw Data/EnergyFood/geostat-energy-food-annual/`, follows the
 ## 10. Sources, Excel and methodology
 
 - The workbooks are published through the existing source archive (`data/methodology/source-archives/energy-food.csv`). The methodology bundle must not pull in large data files (the PR #170 rule).
-- Excel reuses the three-sheet writer (Summary, Data, Sources) in the reader's language. It contains the active tab's selected series and years, explicit units and validated source links, with no internal identifier or cell-reference columns.
+- Excel reuses the three-sheet writer (Summary, Data, Sources) in the reader's language. It contains the page's selected series and years, explicit units and validated source links, with no internal identifier or cell-reference columns.
 - `/methodology/energy-food` explains in plain words what an energy balance is, the oil-equivalent unit, domestic supply, final consumption and non-energy use, what the electricity rows mean, the food self-sufficiency ratio and its footnotes, and rules 1–6 from section 8.
 
 ## 11. Out of scope
@@ -161,7 +160,7 @@ Energy prices, monthly energy data, 2025 energy figures before Geostat publishes
 ## 12. Verification
 
 1. The canonical files reproduce all served values from the original cells. The independent verification passes, and CSV and database modes agree.
-2. Defaults, tabs, nesting, tab switching, the wind gap before 2016 and URL state behave as in sections 3–7. The latest-value lines read the numbers in this document.
+2. Defaults, nesting, the wind gap before 2016 and URL state behave as in sections 3–7. The latest-value lines read the numbers in this document.
 3. Chart, table and Excel agree for the same settings, and the source links work.
 4. Georgian and English work at 390, 768 and 1440 pixels, with keyboard use and language switching keeping the settings.
 5. A live preview goes to Duru first. After Duru approves it, run `npm run check`, `npm run build` and `npm run test:browser` once, then push and open the PR.
@@ -171,7 +170,7 @@ During implementation, also update `Project_Definition.md` section 2 (a new appr
 ## 13. Reuse
 
 - **Used as is:**
-  - `ExplorerWorkspace`, `ExplorerHeading`, `LatestValueLine`, `EditorialLineChart`, `ExplorerTable`, `RangeStrip`, `SeriesAside`, `SeriesSelector` and `SeriesSelectorRow` (with nested rows), `SegmentedTabs`, `SourceNote`
+  - `ExplorerWorkspace`, `ExplorerHeading`, `LatestValueLine`, `EditorialLineChart`, `ExplorerTable`, `RangeStrip`, `SeriesAside`, `SeriesSelector` and `SeriesSelectorRow` (with nested rows), `SegmentedTabs` (Chart | Table only), `SourceNote`
   - the three-sheet Excel writer and `ExcelDownloadButton`
   - the source archive and methodology components
   - the generated-artifact check and the served-rows parity check

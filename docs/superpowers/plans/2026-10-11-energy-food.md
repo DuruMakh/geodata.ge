@@ -14,8 +14,8 @@
 
 - Yearly data only. Every served value is a Geostat cell. No shares, differences, sums, per-person figures, estimates or interpolation.
 - Under each page heading, only the one-line `LatestValueLine` (value plus optional `note`). Nothing else sits under the heading, and the only text under the chart is one `SourceNote` line.
-- Tabs are centred `TextTab`s. Energy supply: **Overview | Supply by fuel | Imports by fuel**. Electricity: **Production | Imports and exports | Use**. Energy use: **By user | By fuel**. Food has no tabs.
-- On each tab only the first series is selected by default; it stays first, selectable and removable. Selection is unlimited, and search never scopes the bulk action or the count.
+- No page has tabs (Duru, 2026-10-11). Each page has one series list; breakdowns nest under their total (spec §4–7).
+- On each page only the main total is selected by default; it stays first, selectable and removable. Selection is unlimited, and search never scopes the bulk action or the count.
 - Values show at Geostat's published precision: one decimal for ktoe and GWh, and whole numbers for food (every food cell is formatted to whole numbers).
 - A Geostat "-" in a served balance cell is served as 0 with `value_status=no_flow`. A cell with no column (wind before 2016) is a gap, a dash in the table and a blank Excel cell. A "…" cell in any served position fails validation.
 - Stable lowercase ASCII IDs only (the ID table in Task 1). Labels are display data.
@@ -31,8 +31,8 @@
 1. **A self-closing blank cell before a value** (`<c r="C5" s="3"/><c r="D5"><v>12</v></c>`) must read C5 as blank and D5 as 12. Owner: Task 1 (`test_self_closing_cell`) and Task 2 (a unit test on the cell reader).
 2. **Sheets stored out of order** (`GWh&TJ` is `sheet2.xml` in the 2013 electricity workbook, and the sheet name is `GWH&TJ` in other years): rows come from the sheet named in the manifest, matched case-insensitively through the workbook rels. Owner: Tasks 1 and 2.
 3. **Negative electricity supply** (`energy.supply.electricity`, 2023) draws below zero in chart, table and Excel, and is not clipped or shown as a gap. Owner: Task 4 (model) and Task 7 (browser).
-4. **A saved link with a wind series and a range before 2016** (`#tab=production&from=2013&to=2015&sel=electricity.production.wind`): the wind series stays selected and shows as a gap, never 0. The empty-chart callout appears only when nothing is selected. Owner: Task 4.
-5. **Language switch and tab switch** keep range, selection rules and chart/table mode. A range picked on a 2013–2024 energy tab stays the same on another energy tab. Owner: Task 4 and Task 7.
+4. **A saved link with a wind series and a range before 2016** (`#from=2013&to=2015&sel=electricity.production.wind` on Electricity): the wind series stays selected and shows as a gap, never 0. The empty-chart callout appears only when nothing is selected. Owner: Task 4.
+5. **Language switch** keeps range, selection and chart/table mode. Owner: Task 4 and Task 7.
 
 ---
 
@@ -156,34 +156,28 @@ All are dated 2026-10-11.
   - `ENERGY_FOOD_HUB_PATH = "/explorer/energy-food"`
   - `ENERGY_FOOD_SECTIONS`, four entries `{ id, href, labelKey }`: `energy-supply`, `electricity`, `energy-use` and `food-self-sufficiency`. Each href is `/explorer/energy-food/${id}`. The labelKeys are `common.energySupply`, `common.electricity`, `common.energyUse` and `common.foodSelfSufficiency`.
   - `EnergyFoodSectionId`
-  - `EnergyFoodView = "overview" | "supply_fuel" | "imports_fuel" | "production" | "trade" | "use" | "by_user" | "by_fuel" | "main"` and `energyFoodViews(section)`
+  - No views or tabs (Duru, 2026-10-11): each section has one series list.
   - `EnergyFoodSeriesDefinition = { id: EnergyFoodIndicator; reference: boolean; parentId?: string }`. The series ID is the indicator ID.
-  - `energyFoodViewSeries(section, view)`:
-    - overview: supply.total (reference), production.total, imports.total, exports.total
-    - supply_fuel: supply.total (reference) with natural_gas, oil_products, hydro, biofuel_waste, coal, crude_oil, wind_solar_geothermal and electricity as children
-    - imports_fuel: imports.total (reference) with natural_gas, oil_products, coal, crude_oil and electricity as children
-    - production: electricity.production.total (reference) with hydro, thermal and wind as children
-    - trade: electricity.imports (reference), electricity.exports
-    - use (electricity): electricity.final.total (reference) with households, commercial_public, industry, transport, agriculture and other_unspecified as children; then electricity.losses top-level
-    - by_user: energy.final.total (reference) with households, transport, industry, commercial_public, agriculture, other_unspecified and non_energy as children
-    - by_fuel: energy.final.total (reference) with natural_gas, oil_products, electricity, biofuel_waste, coal and wind_solar_geothermal as children (final_fuel IDs)
-    - main (food): wheat (reference), maize, potato, vegetables, grapes, meat with beef, pork, sheep_goat_meat and poultry_meat as children, milk, eggs
+  - `energyFoodSeries(section)`, in this order:
+    - energy-supply: energy.supply.total (reference) with natural_gas, oil_products, hydro, biofuel_waste, coal, crude_oil, wind_solar_geothermal and electricity as children; energy.production.total; energy.imports.total with natural_gas, oil_products, coal, crude_oil and electricity as children; energy.exports.total
+    - electricity: electricity.production.total (reference) with hydro, thermal and wind as children; electricity.imports; electricity.exports; electricity.final.total with households, commercial_public, industry, transport, agriculture and other_unspecified as children; electricity.losses
+    - energy-use: energy.final.total (reference) with households, transport, industry, commercial_public, agriculture, other_unspecified and non_energy as children; then the six energy.final_fuel IDs top-level: natural_gas, oil_products, electricity, biofuel_waste, coal, wind_solar_geothermal
+    - food-self-sufficiency: wheat (reference), maize, potato, vegetables, grapes, meat with beef, pork, sheep_goat_meat and poultry_meat as children, milk, eggs
   - `energyFoodUnit(section): "ktoe" | "gwh" | "percent"`
-  - `energyFoodCoverage(section, view, facts)`
-  - `EnergyFoodState`, `defaultEnergyFoodState`, `parseEnergyFoodHash`, `serializeEnergyFoodHash`, `changeEnergyFoodView`, `EnergyFoodModel`, `buildEnergyFoodModel` and `energyFoodSeriesColor`, all with the Poverty semantics and signatures (section instead of Poverty's section)
+  - `energyFoodCoverage(section, facts)`
+  - `EnergyFoodState` (no view field), `defaultEnergyFoodState`, `parseEnergyFoodHash`, `serializeEnergyFoodHash`, `EnergyFoodModel`, `buildEnergyFoodModel` and `energyFoodSeriesColor`, all with the Poverty semantics and signatures (section instead of Poverty's section)
 
 - [ ] **Step 1: Write the tests.**
-  - Default states: supply → view `overview`, selection `["energy.supply.total"]`, coverage 2013–2024. Food → `["food.self_sufficiency.wheat"]`, 2014–2025.
-  - `#tab=production&from=2013&to=2015&sel=electricity.production.wind` keeps wind selected, and its `valuesByYear` are all `null` (Review Focus 4).
-  - `changeEnergyFoodView` from `overview` with range 2015–2020 to `imports_fuel` keeps 2015–2020 and selects only `energy.imports.total` (Review Focus 5).
-  - Hash round-trip, including an explicit empty `sel=`. Unknown IDs are dropped, and an unknown `tab` falls back to the first view. The food hash never writes `tab`.
-  - `buildEnergyFoodModel` on `supply_fuel` 2023 gives a negative `energy.supply.electricity` end value (Review Focus 3).
+  - Default states: supply → selection `["energy.supply.total"]`, coverage 2013–2024. Food → `["food.self_sufficiency.wheat"]`, 2014–2025.
+  - Electricity `#from=2013&to=2015&sel=electricity.production.wind` keeps wind selected, and its `valuesByYear` are all `null` (Review Focus 4).
+  - Hash round-trip, including an explicit empty `sel=`. Unknown IDs are dropped. No hash writes `tab`, and a legacy `tab=` key is ignored.
+  - `buildEnergyFoodModel` on energy-supply with `energy.supply.electricity` selected, 2023, gives a negative `energy.supply.electricity` end value (Review Focus 3).
   - End values: `energy.supply.total` 2024 is `5914.5`, `electricity.production.total` 2024 is `14234.1`, `food.self_sufficiency.wheat` 2025 is `19`.
-  - Nesting: food has one parent (meat) with 4 children, and electricity `use` has 2 top-level rows.
+  - Nesting: food has one parent (meat) with 4 children; electricity has 5 top-level rows (production, imports, exports, final, losses); energy-supply has 4; energy-use has 7.
 - [ ] **Step 2: Run** `npx vitest run tests/explorer/energyFood.test.ts`. Expected: FAIL.
 - [ ] **Step 3: Implement**, reusing `resolveRange`, `refitRange(…, { collapseToAll: true })`, `parseYearRangeKeys`, `writeYearRangeKeys` and `colorForItem` as `poverty.ts` does. Model `decimals` is the maximum fact decimals among selected rows.
 - [ ] **Step 4: Run** the test file. Expected: PASS.
-- [ ] **Step 5: Commit** `feat: model energy and food tabs, nesting and state`.
+- [ ] **Step 5: Commit** `feat: model energy and food series, nesting and state`.
 
 ### Task 5: Excel workbook and hub cards
 
@@ -194,14 +188,14 @@ All are dated 2026-10-11.
 **Interfaces:**
 - Produces:
   - `buildEnergyFoodWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title? }, presentation): WorkbookExportModel`, mirroring `povertyWorkbook.ts`:
-    - filename `energy-food-${section}${view === "main" ? "" : `-${view}`}-${start}-${end}`
+    - filename `energy-food-${section}-${start}-${end}`
     - unit labels `energyFood.unit.ktoe|gwh|percent`
     - `numberFormat` `"#,##0.0"` for ktoe and gwh, `"0"` for food; `numericFormats` keyed by 1-based value-column numbers
     - status `energyFood.status.published|no_flow`
   - `buildEnergyFoodHubCards(facts, presentation): HubCardModel[]` returns four cards with sparklines: `energy.supply.total`, `electricity.production.total`, `energy.final.total` and `food.self_sufficiency.wheat`. The footers read `"2024 · 5,914.5 · 2013–2024"`, `"2024 · 14,234.1 · 2013–2024"`, `"2024 · 5,456.7 · 2013–2024"` and `"2025 · 19% · 2014–2025"`.
 
 - [ ] **Step 1: Write the tests.**
-  - A workbook for `imports_fuel` 2020–2024 with total and gas selected has 2 rows × 5 years. Its sources are only the five aggregated-balance IDs for 2020–2024, and the value-column formats are `#,##0.0`.
+  - A workbook for energy-supply 2020–2024 with `energy.imports.total` and `energy.imports.natural_gas` selected has 2 rows × 5 years. Its sources are only the five aggregated-balance IDs for 2020–2024, and the value-column formats are `#,##0.0`.
   - A food workbook keeps blank cells blank and uses `0` for 2023 and 2025.
   - The hub cards show the four footers above.
 - [ ] **Step 2: Run.** Expected: FAIL. **Step 3: Implement.** **Step 4: Run.** Expected: PASS.
@@ -213,7 +207,7 @@ All are dated 2026-10-11.
 - Create: `apps/web/lib/i18n/messages/{ka,en}/energyFood.json`
 - Modify: `lib/i18n/messages/{ka,en}/common.json` (`energyFood` for the hub, plus `energySupply`, `electricity`, `energyUse` and `foodSelfSufficiency`), `lib/i18n/types.ts`, `lib/i18n/messages.server.ts`, `lib/i18n/inventory.server.ts`, `data/localization/en/page-revisions.json` (5 new routes)
 
-Keys in `energyFood.json` mirror `poverty.json`: `title`, `hubSummary`, `metaTitle`, `metaDescription`, `page.<section>.title|summary`, `tabs`, `tab.<view>`, `series.<indicatorId>` for all 57 IDs, `unit.ktoe|gwh|percent` with long forms, `latest.<section>`, `latestNote.energy-supply` ("imports {value}"), `latestNote.electricity` ("imports {imports} · exports {exports}"), `sourceNote.energy` / `sourceNote.food`, `methodology`, `search`, `series`, `status.published|no_flow`, `emptySelection`, `nestedSelected` and `subcategoriesFor`.
+Keys in `energyFood.json` mirror `poverty.json`: `title`, `hubSummary`, `metaTitle`, `metaDescription`, `page.<section>.title|summary`, `series.<indicatorId>` for all 57 IDs, `unit.ktoe|gwh|percent` with long forms, `latest.<section>`, `latestNote.energy-supply` ("imports {value}"), `latestNote.electricity` ("imports {imports} · exports {exports}"), `sourceNote.energy` / `sourceNote.food`, `methodology`, `search`, `series`, `status.published|no_flow`, `emptySelection`, `nestedSelected` and `subcategoriesFor`.
 
 Georgian names come from spec §2. Series labels come from Geostat's Georgian files in the research package:
 - ბუნებრივი გაზი, ნავთობპროდუქტები, ჰიდრო, ბიოსაწვავი და ნარჩენები, ქვანახშირი, ნედლი ნავთობი, ქარი, მზე და გეოთერმული, ელექტროენერგია
@@ -236,16 +230,16 @@ Georgian names come from spec §2. Series labels come from Geostat's Georgian fi
 **Interfaces:**
 - Consumes: Tasks 3–6.
 - Produces:
-  - `EnergyFoodExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin })`, mirroring `PovertyExplorer`. `share` is true only on food. Test IDs use the prefix `energy-food`, for example `energy-food-tab-${view}`, `energy-food-latest` and `energy-food-excel-download`.
+  - `EnergyFoodExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin })`, mirroring `PovertyExplorer`. `share` is true only on food. Test IDs use the prefix `energy-food`, for example `energy-food-latest` and `energy-food-excel-download`.
   - `LatestValueLine`, with `note` for the import and export values on supply and electricity
   - `renderEnergyFoodHub`, `energyFoodHubMetadata`, `renderEnergyFoodPage(locale, section)` and `energyFoodPageMetadata`
 
 - [ ] **Step 1: Write `tests/browser/energy-food.spec.ts`.**
   - The hub shows four cards.
-  - Energy supply defaults to Overview with one selected row, and the latest line contains `5,914.5` and `5,099.0`.
-  - On Supply by fuel, ticking Electricity and choosing 2022–2024 shows a negative 2023 value in table mode (Review Focus 3).
-  - Electricity Production with wind ticked and range 2013–2015 shows the chart, not the empty callout (Review Focus 4).
-  - Food shows no tabs and `19%`, and the Meat row expands to four children.
+  - No page shows page-level tabs. Energy supply defaults to one selected row (Domestic supply), and the latest line contains `5,914.5` and `5,099.0`.
+  - On Energy supply, expanding Domestic supply, ticking Electricity and choosing 2022–2024 shows a negative 2023 value in table mode (Review Focus 3).
+  - Electricity with wind ticked and range 2013–2015 shows the chart, not the empty callout (Review Focus 4).
+  - Food shows `19%`, and the Meat row expands to four children.
   - Excel fires a `.xlsx`.
   - `/en` keeps the hash (Review Focus 5).
   - At 390 px there is no horizontal scroll.
@@ -274,7 +268,7 @@ It states no causes.
 
 ### Task 9: Live preview for Duru (stop point)
 
-- [ ] **Step 1:** Build and serve with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build && npm run start -- --port 3100`. Capture ka and en screenshots at 1440 and 390 of the hub, each page on each tab, and the methodology page, into `/mnt/project-files/screenshots/energy-food/`.
+- [ ] **Step 1:** Build and serve with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build && npm run start -- --port 3100`. Capture ka and en screenshots at 1440 and 390 of the hub, each page, and the methodology page, into `/mnt/project-files/screenshots/energy-food/`.
 - [ ] **Step 2:** Ask Duru on a card how to review: a clickable preview, which pushes the branch so Vercel makes a private preview link (no PR, no tests, nothing live), or screenshots only. **Wait.** Apply any requested changes and show them again.
 
 ### Task 10: Scope and design documents
