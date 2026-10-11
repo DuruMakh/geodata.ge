@@ -16,10 +16,10 @@ describe("buildFactQuerySnapshot", () => {
     ]);
     // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    // The seven Wages workbooks, the seven Poverty documents and the twenty Money and banks documents are registered sources of human explorers only.
-    expect(sources).toHaveLength(207);
+    // The seven Wages workbooks, the seven Poverty documents, the 42 Energy and food sources and the twenty Money and banks documents are registered sources of human explorers only.
+    expect(sources).toHaveLength(249);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_trade_"))).toHaveLength(13);
-    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !["source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId).sort());
+    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_food_") && !["source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId).sort());
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_trade_"))).toBe(false);
     expect(snapshot.sources.some(source => MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);

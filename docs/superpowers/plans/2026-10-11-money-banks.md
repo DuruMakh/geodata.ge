@@ -112,7 +112,7 @@ Download every file fresh. File URLs are `https://nbg.gov.ge/fm/%E1%83%A1%E1%83%
 ### Task 3: Loader, mirror table and parity
 
 **Files:**
-- Create: `apps/web/lib/data/moneyBanks/importMoneyBanks.ts`, `apps/web/prisma/migrations/20261011090000_money_banks/migration.sql`
+- Create: `apps/web/lib/data/moneyBanks/importMoneyBanks.ts`, `apps/web/prisma/migrations/20261011130000_money_banks/migration.sql`
 - Modify: `apps/web/prisma/schema.prisma` (`MoneyBanksFact`), `apps/web/lib/db/mirrorRows.ts`, `apps/web/lib/db/servedDataDb.ts`, `apps/web/scripts/import-budget-facts.ts`, `data/sources/source-documents.csv` (one row per public source, as Poverty added its 7)
 - Test: extend `apps/web/tests/data/moneyBanks/moneyBanks.test.ts`
 

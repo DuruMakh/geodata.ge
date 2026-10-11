@@ -116,7 +116,7 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(15);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(16);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(0);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -149,6 +149,7 @@ test("sitemap publishes exactly the live methodology routes", async ({ page }) =
     "/methodology/poverty",
     "/methodology/trade",
     "/methodology/external-flows",
+    "/methodology/energy-food",
     "/methodology/demography",
   ]);
 });

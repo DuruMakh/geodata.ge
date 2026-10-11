@@ -61,8 +61,9 @@ describe("indexable Fiscal.ge routes", () => {
     // External flows adds its hub, Money from abroad and its methodology, each in both languages.
     // Domestic exports adds one further bilingual pair.
     // Poverty adds its hub, two pages and methodology page: 4 bilingual pairs.
+    // Energy and food adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
-    expect(urls).toHaveLength(510);
+    expect(urls).toHaveLength(522);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -83,6 +84,10 @@ describe("indexable Fiscal.ge routes", () => {
     for (const page of ["", "/rates", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/poverty${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/poverty${page}`);
+    }
+    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
     }
     for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);

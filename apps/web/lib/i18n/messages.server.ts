@@ -4,6 +4,7 @@ const dictionaries = {
   ka: {
     wages: () => import("./messages/ka/wages.json"),
     poverty: () => import("./messages/ka/poverty.json"),
+    energyFood: () => import("./messages/ka/energyFood.json"),
     moneyBanks: () => import("./messages/ka/moneyBanks.json"),
     trade: () => import("./messages/ka/trade.json"),
     unemployment: () => import("./messages/ka/unemployment.json"),
@@ -32,6 +33,7 @@ const dictionaries = {
   en: {
     wages: () => import("./messages/en/wages.json"),
     poverty: () => import("./messages/en/poverty.json"),
+    energyFood: () => import("./messages/en/energyFood.json"),
     moneyBanks: () => import("./messages/en/moneyBanks.json"),
     trade: () => import("./messages/en/trade.json"),
     unemployment: () => import("./messages/en/unemployment.json"),
