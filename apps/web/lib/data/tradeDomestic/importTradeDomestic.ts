@@ -7,7 +7,7 @@ import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
 import type { ClientTradeOverviewFact, TradeOverviewFact } from "../tradeOverview/types";
-import type { ClientTradePartnersData } from "../tradePartners/importTradePartners";
+import { packTradePartnerFacts, type ClientTradePartnersData } from "../tradePartners/importTradePartners";
 import type { ClientTradeProductsData, ClientTradeProductFact } from "../tradeProducts/importTradeProducts";
 import { TRADE_DOMESTIC_DOCUMENT_IDS, TRADE_DOMESTIC_MEASURES, tradeDomesticFactKey, type TradeDomesticData, type TradeDomesticEntity, type TradeDomesticFact, type TradeDomesticAcceptance } from "./types";
 
@@ -60,7 +60,7 @@ export function toClientTradeDomesticData(data: TradeDomesticData, national: rea
   const nationalYears = new Set(nationalFacts.map(f => f.year));
   return {
     national: [...national.filter(f => f.indicatorId === "trade.exports" && nationalYears.has(f.year)).map(toClientTradeOverviewFact), ...nationalFacts],
-    countries: { entities: countryEntities.map(e => ({ id: e.id, kind: "country", sourceCode: e.code, labelKa: e.labelKa })), facts: data.facts.filter(f => countryIds.has(f.entityId)).map(f => ({ entityId: f.entityId, year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd), sourceId: f.sourceId, basis: f.basis, publicationStatus: f.publicationStatus, lastReviewedAt: f.lastReviewedAt })), nationalFacts, measures: TRADE_DOMESTIC_MEASURES },
+    countries: { entities: countryEntities.map(e => ({ id: e.id, kind: "country", sourceCode: e.code, labelKa: e.labelKa })), facts: packTradePartnerFacts(countryEntities, data.facts.filter(f => countryIds.has(f.entityId))), nationalFacts, measures: TRADE_DOMESTIC_MEASURES },
     products: { entities: productEntities, years: productYears, facts: productFacts, nationalFacts: nationalFacts.filter(f => f.indicatorId === "trade.domestic_exports" && productYears.includes(f.year)), sourceBlock: "2020-2025", catalogueFingerprint: hash(JSON.stringify({ scope: "domestic-exports", entities: productEntities })), measures: ["trade.domestic_exports"] },
     englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])),
   };

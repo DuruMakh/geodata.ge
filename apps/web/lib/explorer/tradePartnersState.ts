@@ -9,7 +9,7 @@ export const TRADE_PARTNER_TOTAL_ID = "goods.total";
 export const DEFAULT_TRADE_PARTNERS_STATE: TradePartnersState = { mode: "line", measure: "trade.turnover", tab: "countries", range: { kind: "all" }, selectedIds: [TRADE_PARTNER_TOTAL_ID] };
 
 export function tradePartnersCoverage(data: ClientTradePartnersData) {
-  const years = [...new Set(data.facts.map(fact => fact.year))].sort((a, b) => a - b);
+  const years = [...new Set(data.facts.map(fact => fact[1]))].sort((a, b) => a - b);
   if (!years.length) throw new Error("No trade partner source years");
   return { min: years[0], max: years.at(-1)!, years };
 }

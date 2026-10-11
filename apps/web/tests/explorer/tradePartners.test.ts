@@ -1,8 +1,8 @@
 import { expect, test } from "vitest";
 import type { Presentation } from "../../lib/i18n/types";
 import { formatInUnit } from "../../lib/explorer/format";
-import { toClientTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
-import { tradePartnerEntities, tradePartnerFacts, tradePartnerNationalFacts } from "../data/tradePartners/fixtures";
+import { toClientTradePartnersData, type ClientTradePartnerFact } from "../../lib/data/tradePartners/importTradePartners";
+import { editClientPartnerFacts, tradePartnerEntities, tradePartnerFacts, tradePartnerNationalFacts } from "../data/tradePartners/fixtures";
 const data = toClientTradePartnersData({ entities: tradePartnerEntities(), facts: tradePartnerFacts() }, tradePartnerNationalFacts());
 const presentation: Presentation = { locale: "en", messages: { "trade.unit.million": "million USD", "trade.unit.billion": "billion USD" }, englishLabels: { "partner.1995-2025.643": "Russia", "partner.1995-2025.530": "Netherlands Antilles", "group.eu": "European Union (EU)", "group.oecd": "OECD" } };
 const modules = async () => ({ ...await import("../../lib/explorer/tradePartnersState"), ...await import("../../lib/explorer/tradePartners") });
@@ -34,7 +34,7 @@ test("missing amounts are unranked, true zero is ranked and negative balance ran
   expect(missing.ranking[0]).toMatchObject({ valueUsd: -150, shareOfNational: null, rank: 1 });
   expect(missing.missingRanking[0]).toMatchObject({ entityId: "partner.1995-2025.530", valueUsd: null, rank: null });
   expect(missing.valuesByEntity["partner.1995-2025.530"][2025]).toBeNull();
-  const zeroData = { ...data, facts: data.facts.map(f => f.entityId.endsWith(".530") ? { ...f, valueUsd: 0 } : f) };
+  const zeroData = { ...data, facts: editClientPartnerFacts(data, f => f.entityId.endsWith(".530") ? 0 : f.valueUsd) };
   expect(build(zeroData, { ...initial, measure: "trade.imports" }, presentation).ranking.find(r => r.entityId.endsWith(".530"))).toMatchObject({ valueUsd: 0, rank: 2, shareOfNational: 0 });
 });
 test("an absent same-year national denominator never borrows a previous year", async () => {
@@ -46,9 +46,9 @@ test("an absent same-year national denominator never borrows a previous year", a
 });
 test("balance orders deficits and surpluses by magnitude and resolves ties by label", async () => {
   const { buildTradePartnersModel: build, DEFAULT_TRADE_PARTNERS_STATE: initial } = await modules();
-  const signed = { ...data, facts: data.facts.map(f => f.entityId === "group.eu" && f.indicatorId === "trade.balance" ? { ...f, valueUsd: -800 } : f) };
+  const signed = { ...data, facts: editClientPartnerFacts(data, f => f.entityId === "group.eu" && f.indicatorId === "trade.balance" ? -800 : f.valueUsd) };
   expect(build(signed, { ...initial, tab: "groups", measure: "trade.balance" }, presentation).ranking.map(r => r.valueUsd)).toEqual([-800, 700]);
-  const ties = { ...data, facts: data.facts.map(f => ({ ...f, valueUsd: 0 })) };
+  const ties = { ...data, facts: editClientPartnerFacts(data, () => 0) };
   expect(build(ties, { ...initial, tab: "groups" }, presentation).ranking.map(r => r.entityId)).toEqual(["group.eu", "group.oecd"]);
 });
 test("available choices follow the active end-year values, signed magnitude, missing-last and label ties", async () => {
@@ -56,18 +56,19 @@ test("available choices follow the active end-year values, signed magnitude, mis
   const ids = (model: ReturnType<typeof build>) => model.activeEntities.map(entity => entity.id);
   expect(ids(build(data, { ...initial, tab: "groups", measure: "trade.exports" }, presentation))).toEqual(["group.oecd", "group.eu"]);
   expect(ids(build(data, { ...initial, tab: "groups", measure: "trade.imports" }, presentation))).toEqual(["group.eu", "group.oecd"]);
-  const priorYear = { ...data, facts: data.facts.map(f => f.entityId === "group.eu" && f.year === 2024 && f.indicatorId === "trade.exports" ? { ...f, valueUsd: 900 } : f) };
+  const priorYear = { ...data, facts: editClientPartnerFacts(data, f => f.entityId === "group.eu" && f.year === 2024 && f.indicatorId === "trade.exports" ? 900 : f.valueUsd) };
   expect(ids(build(priorYear, { ...initial, tab: "groups", measure: "trade.exports", range: { kind: "manual", start: 2024, end: 2024 } }, presentation))).toEqual(["group.eu", "group.oecd"]);
-  const signed = { ...data, facts: data.facts.map(f => f.entityId === "group.eu" && f.indicatorId === "trade.balance" ? { ...f, valueUsd: -800 } : f) };
+  const signed = { ...data, facts: editClientPartnerFacts(data, f => f.entityId === "group.eu" && f.indicatorId === "trade.balance" ? -800 : f.valueUsd) };
   expect(ids(build(signed, { ...initial, tab: "groups", measure: "trade.balance" }, presentation))).toEqual(["group.eu", "group.oecd"]);
-  const ties = { ...data, entities: [...data.entities].reverse(), facts: data.facts.map(f => ({ ...f, valueUsd: 0 })) };
+  // Reversing the entities reverses the indices the facts point at, so each fact keeps its entity.
+  const ties = { ...data, entities: [...data.entities].reverse(), facts: data.facts.map(([entity, year, measure]) => [data.entities.length - 1 - entity, year, measure, 0] as ClientTradePartnerFact) };
   expect(ids(build(ties, { ...initial, tab: "groups" }, presentation))).toEqual(["group.eu", "group.oecd"]);
   const reordered = { ...data, entities: [...data.entities].reverse() };
   expect(ids(build(reordered, initial, presentation))).toEqual(["partner.1995-2025.643", "partner.1995-2025.530"]);
 });
 test("tiny signed amounts in a billion unit remain visibly nonzero", async () => {
   const { buildTradePartnersModel: build, DEFAULT_TRADE_PARTNERS_STATE: initial } = await modules();
-  const tiny = { ...data, facts: data.facts.map(f => f.indicatorId === "trade.balance" ? { ...f, valueUsd: f.entityId === "group.eu" ? 1 : -1 } : f), nationalFacts: data.nationalFacts.map(f => ({ ...f, valueUsd: f.indicatorId === "trade.balance" ? -2e9 : f.valueUsd })) };
+  const tiny = { ...data, facts: editClientPartnerFacts(data, f => f.indicatorId === "trade.balance" ? f.entityId === "group.eu" ? 1 : -1 : f.valueUsd), nationalFacts: data.nationalFacts.map(f => ({ ...f, valueUsd: f.indicatorId === "trade.balance" ? -2e9 : f.valueUsd })) };
   const model = build(tiny, { ...initial, measure: "trade.balance" }, presentation);
   expect(formatInUnit(1, model.unit)).toBe("<0.01");
   expect(formatInUnit(-1, model.unit)).toBe(">−0.01");

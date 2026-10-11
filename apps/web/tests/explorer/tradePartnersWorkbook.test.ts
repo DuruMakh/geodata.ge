@@ -7,7 +7,7 @@ import { toClientTradePartnersData } from "../../lib/data/tradePartners/importTr
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { DEFAULT_TRADE_PARTNERS_STATE } from "../../lib/explorer/tradePartnersState";
-import { tradePartnerEntities, tradePartnerFacts, tradePartnerNationalFacts } from "../data/tradePartners/fixtures";
+import { editClientPartnerFacts, tradePartnerEntities, tradePartnerFacts, tradePartnerNationalFacts } from "../data/tradePartners/fixtures";
 const data = toClientTradePartnersData({ entities: tradePartnerEntities(), facts: tradePartnerFacts() }, tradePartnerNationalFacts());
 const names = ["ftrade_1995-2026.xlsx", "export-country-1995-2026.xlsx", "import-country-1995-2026.xlsx", "export-country-group-1995-2026.xlsx", "import-country-group-1995-2026.xlsx"];
 const sources: WorkbookPublicSource[] = names.map(name => ({ years: [2024, 2025], title: name, organization: "Geostat", downloadHref: `/downloads/methodology/trade/files/${name}`, retrievedAt: "2026-10-07" }));
@@ -47,7 +47,7 @@ test("source selection follows the measure and shared selection, including the o
 });
 test("missing workbook amounts stay blank while tiny signed amounts remain numeric", async () => {
   const build = await builder(), p = await presentation("en");
-  const tiny = { ...data, facts: data.facts.map(f => f.entityId.endsWith(".643") && f.indicatorId === "trade.imports" ? { ...f, valueUsd: 0.000001 } : f) };
+  const tiny = { ...data, facts: editClientPartnerFacts(data, f => f.entityId.endsWith(".643") && f.indicatorId === "trade.imports" ? 0.000001 : f.valueUsd) };
   const model = build({ data: tiny, state: { ...DEFAULT_TRADE_PARTNERS_STATE, measure: "trade.imports", selectedIds: ["partner.1995-2025.643", "partner.1995-2025.530"], range: { kind: "manual", start: 2025, end: 2025 } }, sources, siteOrigin: "https://fiscal.ge" }, p);
   expect(model.analysis.rows.map(row => row[3])).toEqual([0.000001, null]);
   const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
@@ -60,7 +60,7 @@ test.each(["en", "ka"] as const)("%s Summary keeps small positive and negative a
   for (const divisor of [1_000_000_000, 1_000_000]) {
     const small = { ...data,
       nationalFacts: data.nationalFacts.map(f => f.indicatorId === "trade.balance" ? { ...f, valueUsd: 2 * divisor } : f),
-      facts: data.facts.map(f => f.indicatorId === "trade.balance" ? { ...f, valueUsd: f.entityId.endsWith(".643") ? 4_736_258.239671868 : f.entityId === "group.eu" ? -42.03 : 0 } : f),
+      facts: editClientPartnerFacts(data, f => f.indicatorId === "trade.balance" ? f.entityId.endsWith(".643") ? 4_736_258.239671868 : f.entityId === "group.eu" ? -42.03 : 0 : f.valueUsd),
     };
     const model = build({ data: small, state: { ...DEFAULT_TRADE_PARTNERS_STATE, measure: "trade.balance", selectedIds: ["partner.1995-2025.643", "group.eu", "group.oecd", "partner.1995-2025.530"], range: { kind: "manual", start: 2025, end: 2025 } }, sources, siteOrigin: "https://fiscal.ge" }, p);
     const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));

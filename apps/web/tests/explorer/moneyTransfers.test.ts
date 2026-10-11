@@ -79,3 +79,9 @@ test("the partial note names the partial years of the selected lines only", asyn
   const moved = { ...data, facts: data.facts.map(f => f.entityId === "transfer.sudan" && f.year === 2019 ? { ...f, year: 2018 } : f) };
   expect(build(moved, { ...initial, selectedIds: ["transfer.sudan"], range: { kind: "manual", start: 2010, end: 2018 } }, presentation).partialYears).toEqual([2018]);
 });
+
+test("the page's facts carry only what it reads: no source ids or vintages", () => {
+  expect(data.facts[0]).not.toHaveProperty("sourceId");
+  expect(data.facts[0]).not.toHaveProperty("vintage");
+  expect(Object.keys(data.facts[0]!).sort()).toEqual(["entityId", "measure", "monthsReported", "valueStatus", "valueUsd", "year"]);
+});

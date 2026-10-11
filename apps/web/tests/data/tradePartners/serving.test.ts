@@ -19,10 +19,17 @@ test("serves all reviewed entities and facts with a null-preserving thin client 
   const data = await loadTradePartnersData();
   expect(data.entities).toHaveLength(217); expect(data.facts).toHaveLength(22992);
   const client = toClientTradePartnersData({ entities: tradePartnerEntities(), facts: tradePartnerFacts() }, tradePartnerNationalFacts());
-  expect(client.facts.find(f => f.entityId.endsWith(".530"))?.valueUsd).toBeNull();
-  expect(client.facts[0]).not.toHaveProperty("sourceRefs");
-  expect(client.facts[0]).not.toHaveProperty("sourceValue");
+  // Each fact is [entity index, year, measure index, value]: nothing the page does not read.
+  expect(client.facts[0]).toHaveLength(4);
+  expect(client.facts.find(f => client.entities[f[0]]!.id.endsWith(".530"))?.[3]).toBeNull();
   expect(client.nationalFacts).toHaveLength(8);
+});
+
+test("the real client payload stays under 1 MB of JSON", async () => {
+  const { loadTradePartnersData, toClientTradePartnersData } = await loader();
+  const client = toClientTradePartnersData(await loadTradePartnersData(), []);
+  expect(client.facts).toHaveLength(22992);
+  expect(JSON.stringify(client).length).toBeLessThan(1_000_000);
 });
 
 test.each(["trade-partners-annual.csv", "trade-partners.json", "labels.json", "trade-partners-validation.json"])("rejects a stale %s fingerprint", async filename => {

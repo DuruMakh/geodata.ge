@@ -6,11 +6,16 @@ import { parse } from "csv-parse/sync";
 import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
-import type { ClientTradeOverviewFact, TradeOverviewFact, TradeChartIndicator } from "../tradeOverview/types";
+import { TRADE_CHART_INDICATORS, type ClientTradeOverviewFact, type TradeOverviewFact, type TradeChartIndicator } from "../tradeOverview/types";
 import { tradePartnerFactKey, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData, type TradePartnersAcceptance } from "./types";
 import { tradePartnersEnglishLabels, validateTradePartnersData } from "./validation";
 
-export type ClientTradePartnerFact = Pick<TradePartnerFact, "entityId" | "year" | "sourceId" | "basis" | "publicationStatus" | "lastReviewedAt"> & { indicatorId: TradeChartIndicator; valueUsd: number | null };
+/**
+ * One partner observation as the page receives it: the entity's index in `entities`, the year, the measure's index in
+ * TRADE_CHART_INDICATORS and the USD value (null when Geostat publishes none). 23,000 of these are inlined into the page,
+ * so field names and unread metadata stay server-side; Products uses the same shape.
+ */
+export type ClientTradePartnerFact = [entityIndex: number, year: number, measureIndex: number, valueUsd: number | null];
 export type ClientTradePartnersData = { entities: TradePartnerEntity[]; facts: ClientTradePartnerFact[]; nationalFacts: ClientTradeOverviewFact[]; measures?: readonly TradeChartIndicator[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
@@ -55,5 +60,11 @@ export function loadServedTradePartnersData(): Promise<TradePartnersData> {
 }
 
 export function toClientTradePartnersData(data: TradePartnersData, nationalFacts: readonly TradeOverviewFact[]): ClientTradePartnersData {
-  return { entities: data.entities, facts: data.facts.map(({ entityId, year, indicatorId, sourceId, basis, publicationStatus, lastReviewedAt, valueUsd }) => ({ entityId, year, indicatorId, sourceId, basis, publicationStatus, lastReviewedAt, valueUsd: valueUsd === null ? null : Number(valueUsd) })), nationalFacts: nationalFacts.map(toClientTradeOverviewFact) };
+  return { entities: data.entities, facts: packTradePartnerFacts(data.entities, data.facts), nationalFacts: nationalFacts.map(toClientTradeOverviewFact) };
+}
+
+/** Packs partner facts into the compact client shape; the entities' order is the index the facts refer to. */
+export function packTradePartnerFacts(entities: readonly { id: string }[], facts: readonly { entityId: string; year: number; indicatorId: TradeChartIndicator; valueUsd: string | number | null }[]): ClientTradePartnerFact[] {
+  const indices = new Map(entities.map((entity, index) => [entity.id, index]));
+  return facts.map(fact => [indices.get(fact.entityId)!, fact.year, TRADE_CHART_INDICATORS.indexOf(fact.indicatorId), fact.valueUsd === null ? null : Number(fact.valueUsd)]);
 }
