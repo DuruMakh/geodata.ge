@@ -19,6 +19,8 @@ Geostat is the sole publisher. Forty-two originals are preserved under `official
 
 The energy efficiency workbook is used only to cross-check total supply and final consumption. It is not served.
 
+The package holds, besides `official/`: `source-manifest.csv` and `.json`, `prepare.py` (finds every row and column by its printed label, never by a fixed position, and writes `energy-food-annual.csv` and `coverage.csv`), `verify_independent.mjs`, `test_validation.py`, `validation-report.json`, `independent-validation.json` and a README with the cell map. Energy values come from the `KTOE` sheet of "1. Aggregated Energy Balance". Electricity values come from the `Electricity (GWh)` column of the `GWh&TJ` sheet of "2. Electricity and heat" (spelled `GWH&TJ` from 2014). Food ratios come from the row `Self-sufficiency ratio, %` on each of the 12 food sheets.
+
 ## Energy balance, units and definitions
 
 An energy balance is Geostat's yearly account of where a country's energy comes from and where it goes. Energy figures are in thousand tonnes of oil equivalent (the balance's `KTOE` sheet); one tonne of oil equivalent is the energy in one tonne of crude oil, so different fuels can be added together. The terajoule sheet is not used. Electricity is in GWh, as Geostat's electricity workbook publishes it.
@@ -41,14 +43,16 @@ Geostat writes "-" where a flow did not occur. A served dash is stored as `0` wi
 
 ## Indicators
 
-| Indicator IDs | Meaning | Coverage |
-| --- | --- | --- |
-| `energy.supply.{total, coal, crude_oil, oil_products, natural_gas, hydro, wind_solar_geothermal, biofuel_waste, electricity}` | Domestic supply by fuel, ktoe | 2013–2024 |
-| `energy.production.total`, `energy.exports.total`, `energy.imports.{total, coal, crude_oil, oil_products, natural_gas, electricity}` | Production, exports and imports, ktoe | 2013–2024 |
-| `energy.final.{total, industry, transport, commercial_public, households, agriculture, other_unspecified, non_energy}`, `energy.final_fuel.{coal, oil_products, natural_gas, wind_solar_geothermal, biofuel_waste, electricity}` | Final consumption by user and by fuel, ktoe | 2013–2024 |
-| `electricity.production.{total, thermal, hydro}`, `electricity.imports`, `electricity.exports`, `electricity.losses`, `electricity.final.{total, industry, transport, commercial_public, households, agriculture, other_unspecified}` | Electricity, GWh | 2013–2024 |
-| `electricity.production.wind` | Wind plants, GWh | 2016–2024 |
-| `food.self_sufficiency.{wheat, maize, potato, vegetables, grapes, meat, beef, pork, sheep_goat_meat, poultry_meat, milk, eggs}` | Self-sufficiency ratio, % | 2014–2025 |
+The 57 indicator IDs (17 energy supply, 14 energy use, 14 electricity, 12 food) are stable lowercase ASCII identifiers; Georgian and English labels are display data.
+
+| Indicator IDs | Meaning | Source | Coverage |
+| --- | --- | --- | --- |
+| `energy.supply.{total, coal, crude_oil, oil_products, natural_gas, hydro, wind_solar_geothermal, biofuel_waste, electricity}` | Domestic supply by fuel, ktoe | `KTOE`, row Domestic supply | 2013–2024 |
+| `energy.production.total`, `energy.exports.total`, `energy.imports.{total, coal, crude_oil, oil_products, natural_gas, electricity}` | Production, exports and imports, ktoe | `KTOE`, rows Production, Exports, Imports | 2013–2024 |
+| `energy.final.{total, industry, transport, commercial_public, households, agriculture, other_unspecified, non_energy}`, `energy.final_fuel.{coal, oil_products, natural_gas, wind_solar_geothermal, biofuel_waste, electricity}` | Final consumption by user and by fuel, ktoe | `KTOE`, row Final consumption and its user rows | 2013–2024 |
+| `electricity.production.{total, thermal, hydro}`, `electricity.imports`, `electricity.exports`, `electricity.losses`, `electricity.final.{total, industry, transport, commercial_public, households, agriculture, other_unspecified}` | Electricity, GWh | `GWh&TJ`, column `Electricity (GWh)` | 2013–2024 |
+| `electricity.production.wind` | Wind plants, GWh | same column | 2016–2024 |
+| `food.self_sufficiency.{wheat, maize, potato, vegetables, grapes, meat, beef, pork, sheep_goat_meat, poultry_meat, milk, eggs}` | Self-sufficiency ratio, % | the 12 food sheets of the food balance sheets | 2014–2025 |
 
 All rows use `basis=actual`. Each keeps its source ID, sheet, cell, printed row and column label and number format.
 
@@ -69,8 +73,10 @@ All rows use `basis=actual`. Each keeps its source ID, sheet, cell, printed row 
 
 `npm run data:prepare-energy-food` re-reads the package, requires both its report and the independent verification to have passed, and writes `data/imports/energy-food-annual.csv` (UTF-8 with BOM) and `data/reports/energy-food-validation.json`. `npm run data:check-energy-food` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `EnergyFoodFact` is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
 
+Refreshing the data is a deliberate sequence. In the package, run `python3 -B prepare.py --check && python3 -B -m unittest test_validation -v && node verify_independent.mjs` (and `python3 prepare.py` / `node verify_independent.mjs --write` after a source change), then run `npm run data:prepare-energy-food` and `npm run data:check-energy-food` in `apps/web`. The canonical CSV has the columns `year, indicator_id, value, published_value, unit, basis, value_status, source_id, source_sheet, source_cell, source_number_format, last_reviewed_at`; `value_status` is `published` or `no_flow`, and `unit` is `ktoe`, `gwh` or `percent`. The 681 rows are the whole table: `EnergyFoodFact` is created by migration `20261011120000_energy_food` with row-level security on and public grants revoked, and `data:import` compares it with the CSV field by field.
+
 The pages show energy and electricity to one decimal and food ratios as whole percents, as Geostat publishes them. The wind gap before 2016 is a gap, never zero. The pages describe the figures and state no causes. The energy-food sources are registered sources of a human explorer only and are excluded from the fact-query snapshot.
 
-Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, explicit units and validated links to the archived copies of the Geostat workbooks on fiscal.ge. Internal cell references are not exported.
+Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, explicit units and validated links to the archived copies of the Geostat workbooks on fiscal.ge. Energy and electricity values use the number format `#,##0.0` and food ratios `0`. The Data sheet's status column reads "Published" or "No flow (Geostat shows “-”)"; a year with no value (for example wind before 2016) is an empty cell and is marked unavailable, never zero. Internal cell references are not exported.
 
 Original sources: [Energy Balance of Georgia (Geostat)](https://www.geostat.ge/en/modules/categories/328/energy-balance-of-georgia) and [Food Security (Geostat)](https://www.geostat.ge/en/modules/categories/297/food-security).
