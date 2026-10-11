@@ -44,7 +44,7 @@ Under the heading there is one short line from `LatestValueLine`: "Average month
 
 Two centred text tabs follow, styled like the Poverty tabs:
 
-**Where it comes from | Compare areas**
+**Where it comes from | Regions** (originally Compare areas; see the note above)
 
 ### Where it comes from
 
@@ -54,9 +54,9 @@ Two centred text tabs follow, styled like the Poverty tabs:
 | Borrowing and selling property | Borrowing and using savings; Selling property |
 
 - The nested rows of Total income are Geostat's parts of total income. Together they add up to it: the seven cash sources plus non-cash income.
-- An **area** dropdown in the chart panel works like the Wages Industries group dropdown. Its options are Georgia, Towns, Villages and the 11 regions in Geostat's order. Georgia is the default.
+- An **area** choice in the chart panel picks Georgia, Towns or Villages; a region opened from the Regions map shows as one more active choice. Georgia is the default. (The original design was a dropdown of Georgia, Towns, Villages and the 11 regions; see the note above.)
 
-### Compare areas
+### Compare areas (superseded 2026-10-11, see note)
 
 - The series list is **Georgia** (selected first), then Towns, Villages, and the 11 regions: Tbilisi, Adjara, Guria, Imereti, Kakheti, Mtskheta-Mtianeti, Racha-Lechkhumi and Kvemo Svaneti, Samegrelo-Zemo Svaneti, Samtskhe-Javakheti, Kvemo Kartli and Shida Kartli. Final order and names follow the existing region labels used by the Wages pages.
 - Every series shows total income.
@@ -77,7 +77,7 @@ Two centred text tabs follow, styled like the Poverty tabs:
 
 The line under the heading reads "Average monthly household consumption spending · 2025: 1,438.7 ₾".
 
-It has the same two tabs (**What it's spent on | Compare areas**), the same area dropdown, per household / per person switch, years, defaults and behaviour as the Income page.
+It has the same two tabs (**What it's spent on | Regions**), the same area choice, per household / per person switch, years, defaults and behaviour as the Income page.
 
 | Series in the list (selected first in bold) | Nested under it |
 | --- | --- |
@@ -85,7 +85,7 @@ It has the same two tabs (**What it's spent on | Compare areas**), the same area
 | Savings, lending and other payments | Saving and lending; Agriculture; Transfers to others; Buying property |
 
 - The nested rows of Consumption spending add up to it: the eight cash categories plus non-cash consumption.
-- Compare areas shows consumption spending for each area.
+- The Regions map shows consumption spending for each region (originally Compare areas showed it for each area).
 
 Final labels in both languages follow Geostat's Georgian and English workbook rows and the bilingual catalogue conventions. The English names above are plain-language proposals.
 
@@ -167,7 +167,7 @@ These are mostly stated on the methodology page:
 ## 9. Verification
 
 1. The canonical file reproduces every served value from the original cells. The independent verification passes, all rules in section 6 hold, and CSV and database modes agree.
-2. Defaults, tabs, the area dropdown, the per household / per person switch, nesting, missing regional years and URL state behave as in sections 3–4. The 2025 values read 2,025.8 ₾ (income) and 1,438.7 ₾ (spending).
+2. Defaults, tabs, the area choice, the per household / per person switch, nesting, missing regional years and URL state behave as in sections 3–4. The 2025 values read 2,025.8 ₾ (income) and 1,438.7 ₾ (spending).
 3. Chart, table and Excel agree for the same settings, and source links work.
 4. The hub shows four cards. The old Poverty addresses redirect to the new ones and keep the settings after `#`. The sidebar, breadcrumbs and sitemap use the new names.
 5. Georgian and English work at 390, 768 and 1440 pixels, with keyboard use and language switching keeping the settings.
@@ -187,7 +187,7 @@ During implementation, also update `Project_Definition.md` section 2 (section 2H
   - the sidebar entry is renamed and gets four sections
   - `next.config.ts` redirects add three paths
   - the sitemap, methodology catalogue, source inventory, import script and mirror get the new table
-- **New** (each mirrors its Poverty counterpart file by file; Poverty has no area dropdown or per household / per person switch, so its component cannot simply be pointed at this data):
+- **New** (each mirrors its Poverty counterpart file by file; Poverty has no area choice or per household / per person switch, so its component cannot simply be pointed at this data):
   - the research package and `prepare-household-income` script
   - the Prisma model and migration
   - `lib/explorer/householdIncome.ts` (state and model), its workbook and hub-card builders

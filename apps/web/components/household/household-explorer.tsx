@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { User, Users } from "lucide-react";
-import { useCallback, useState, type MouseEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import type { ClientHouseholdFact, HouseholdArea, HouseholdMeasure } from "../../lib/data/household/types";
 import { buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, changeHouseholdView, defaultHouseholdState, HOUSEHOLD_SECTIONS, householdCoverage, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel, type HouseholdState, type HouseholdView } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
@@ -36,9 +36,9 @@ const AREA_OPTIONS: readonly HouseholdArea[] = ["georgia", "settlement.urban", "
  */
 function followSamePageHash(event: MouseEvent<HTMLElement>) {
   const link = (event.target as Element).closest("a");
-  if (!(link instanceof HTMLAnchorElement) || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  if (!(link instanceof HTMLAnchorElement) || link.hasAttribute("target") || link.hasAttribute("download") || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   const url = new URL(link.href);
-  if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) return;
+  if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || url.search !== window.location.search || !url.hash) return;
   event.preventDefault();
   window.location.hash = url.hash;
 }
@@ -109,10 +109,21 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
   const regionsExport: HouseholdState = { ...state, mode: "table", area: "georgia", range: { kind: "manual", start: regionMap.year, end: regionMap.year }, selectedIds: ["georgia", ...regionMap.regions.map(region => region.regionId)] };
   const totalLabel = labels[sectionTotal(section)];
   const regionArea = !AREA_OPTIONS.includes(state.area);
+  // A region opened from the map lands on the first tab: bring its tabs to the top (clear of the phone header) and give them focus.
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const previousView = useRef(state.view);
+  useEffect(() => {
+    const cameFromMap = previousView.current === "areas" && state.view === "parts" && regionArea;
+    previousView.current = state.view;
+    if (!cameFromMap || !tabsRef.current) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    tabsRef.current.focus({ preventScroll: true });
+    tabsRef.current.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
+  }, [state.view, regionArea]);
   return <div data-testid={`household-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
     <LatestValueLine testId="household-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />
-    <div data-testid="household-tabs" role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
+    <div ref={tabsRef} tabIndex={-1} data-testid="household-tabs" role="group" aria-label={t("tabs")} className="mb-6 scroll-mt-[72px] min-[900px]:scroll-mt-3 flex flex-wrap justify-center gap-x-6 gap-y-3">
       {VIEWS.map(view => <TextTab key={view} label={view === "parts" ? t(`tab.parts.${section}`) : t("tab.areas")} active={state.view === view} testId={`household-tab-${view}`} onClick={() => changeView(view)} />)}
     </div>
     {state.view === "areas" ? <section data-testid="household-regions" data-measure={state.measure}>
@@ -133,8 +144,8 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
           <div className="mt-3 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
             <SegmentedTabs<HouseholdArea> ariaLabel={t("areaLabel")} value={state.area} onChange={area => update(s => changeHouseholdArea(s, section, area, facts), true)}
               options={AREA_OPTIONS.map(area => ({ value: area, label: areaLabels[area], testId: `household-area-${area}` }))} />
-            {/* A region is its own active pill, so a long name wraps to the next line on a phone instead of squeezing the three. */}
-            {regionArea ? <SegmentedTabs<HouseholdArea> ariaLabel={t("areaLabel")} value={state.area} onChange={() => undefined} options={[{ value: state.area, label: areaLabels[state.area], testId: `household-area-${state.area}` }]} /> : null}
+            {/* A region is its own active pill, so a long name wraps to the next line on a phone instead of squeezing the three; it and the link return to the map. */}
+            {regionArea ? <SegmentedTabs<HouseholdArea> ariaLabel={t("areaLabel")} value={state.area} onChange={() => changeView("areas")} options={[{ value: state.area, label: areaLabels[state.area], testId: `household-area-${state.area}` }]} /> : null}
             {regionArea ? <button type="button" data-testid="household-all-regions" onClick={() => changeView("areas")} className="cursor-pointer text-[12px] text-[var(--accent)] underline underline-offset-4">{message(messages, "regionalEconomies.allRegions")}</button> : null}
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>

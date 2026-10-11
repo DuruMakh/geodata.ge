@@ -84,6 +84,11 @@ test("changing area or measure keeps the selection, and changing the tab selects
   expect(changeHouseholdArea(state, "income", "region.adjara", facts)).toMatchObject({ area: "region.adjara", selectedIds: ["income.total", "income.wages"] });
   expect(changeHouseholdMeasure(state, "income", "per_capita", facts)).toMatchObject({ measure: "per_capita", selectedIds: ["income.total", "income.wages"] });
   expect(changeHouseholdView(state, "income", "areas", facts)).toMatchObject({ view: "areas", selectedIds: ["georgia"] });
+  // Leaving a region for the Regions tab drops the area, as the hash does, so the first tab reopens on Georgia.
+  const regions = changeHouseholdView({ ...state, area: "region.guria" }, "income", "areas", facts);
+  expect(regions).toMatchObject({ view: "areas", area: "georgia" });
+  expect(parseHouseholdHash(`#${serializeHouseholdHash(regions)}`, "income", facts).area).toBe(regions.area);
+  expect(changeHouseholdView(regions, "income", "parts", facts).area).toBe("georgia");
   expect(changeHouseholdView({ ...state, view: "areas", selectedIds: ["georgia"] }, "income", "parts", facts).selectedIds).toEqual(["income.total"]);
 });
 

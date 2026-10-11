@@ -93,9 +93,13 @@ function fitRange(state: HouseholdState, coverage: { min: number; max: number })
   return range.kind === "all" && state.range.kind === "manual" ? { kind: "manual", start: coverage.min, end: coverage.max } : range;
 }
 
-/** Switching tab keeps mode, measure and years (clamped to the tab's coverage), and selects the new tab's reference. */
+/**
+ * Switching tab keeps mode, measure and years (clamped to the tab's coverage), and selects the new tab's reference.
+ * The Regions tab has no area, so leaving for it drops the area, as the hash does: the first tab then reopens on Georgia.
+ */
 export function changeHouseholdView(state: HouseholdState, section: HouseholdSectionId, view: HouseholdView, facts: readonly ClientHouseholdFact[]): HouseholdState {
-  return { ...state, view, selectedIds: [householdViewSeries(section, view, state.area)[0].id], range: fitRange(state, householdCoverage(section, view, state.area, state.measure, facts)) };
+  const area = view === "areas" ? "georgia" : state.area;
+  return { ...state, view, area, selectedIds: [householdViewSeries(section, view, area)[0].id], range: fitRange({ ...state, area }, householdCoverage(section, view, area, state.measure, facts)) };
 }
 
 /** Switching area keeps the selected parts; a region that starts later narrows the years. */

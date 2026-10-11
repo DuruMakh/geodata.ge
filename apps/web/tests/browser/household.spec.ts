@@ -76,6 +76,7 @@ test("the Regions tab maps the eleven regions, and a region opens the first tab 
   await page.locator('[data-testid="regional-list-row"][data-region-id="region.guria"]').click();
   await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/income#tab=parts&area=region\.guria&per=person/);
   await expect(page.getByTestId("household-tab-parts")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("household-tabs")).toBeFocused();
   await expect(page.getByTestId("household-area-region.guria")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("household-area-region.guria")).toHaveText("Guria");
   await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
@@ -86,10 +87,15 @@ test("the Regions tab maps the eleven regions, and a region opens the first tab 
   await expect(page.getByTestId("household-tab-areas")).toHaveAttribute("aria-pressed", "true");
   await map.locator('a[data-region-id="region.kakheti"]').click();
   await expect(page.getByTestId("household-area-region.kakheti")).toHaveAttribute("aria-pressed", "true");
-  // Choosing Georgia drops the region option.
-  await page.getByTestId("household-area-georgia").click();
+  await expect(page.getByTestId("household-tabs")).toBeFocused();
+  // The region pill also returns to the map; the first tab then opens on Georgia without a region option.
+  await page.getByTestId("household-area-region.kakheti").click();
+  await expect(page.getByTestId("household-tab-areas")).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("household-tab-parts").click();
+  await expect(page.getByTestId("household-area-georgia")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("household-area-region.kakheti")).toHaveCount(0);
   await expect(page.getByTestId("household-all-regions")).toHaveCount(0);
+  await expect(page.getByTestId("household-tabs")).not.toBeFocused();
 });
 
 test("the Georgian Regions tab opens a region in Georgian", async ({ page }) => {
