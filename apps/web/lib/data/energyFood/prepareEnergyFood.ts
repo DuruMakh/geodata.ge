@@ -21,7 +21,7 @@ const decodeXml = (text: string) => text.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|q
   return String.fromCodePoint(entity[1].toLowerCase() === "x" ? parseInt(entity.slice(2), 16) : Number(entity.slice(1)));
 });
 const attribute = (attributes: string, name: string) => new RegExp(`\\b${name}="([^"]*)"`).exec(attributes)?.[1];
-const textOf = (xml: string) => [...xml.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(match => decodeXml(match[1])).join("");
+const textOf = (xml: string) => [...xml.matchAll(/<t\b[^>]*?(?:\/>|>([\s\S]*?)<\/t>)/g)].map(match => decodeXml(match[1] ?? "")).join("");
 
 /**
  * Reads every non-empty cell of every sheet of an .xlsx, keyed `${sheetName}:${address}`.
@@ -40,7 +40,7 @@ export function readWorkbookCells(bytes: Uint8Array): Map<string, WorkbookCell> 
     const id = attribute(match[1], "Id"), target = attribute(match[1], "Target");
     if (id && target) targets.set(id, target.startsWith("/") ? target.slice(1) : `xl/${target}`);
   }
-  const strings = files["xl/sharedStrings.xml"] ? [...read("xl/sharedStrings.xml").matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(match => textOf(match[1])) : [];
+  const strings = files["xl/sharedStrings.xml"] ? [...read("xl/sharedStrings.xml").matchAll(/<si\b[^>]*?(?:\/>|>([\s\S]*?)<\/si>)/g)].map(match => textOf(match[1] ?? "")) : [];
   const cells = new Map<string, WorkbookCell>();
   for (const sheet of read("xl/workbook.xml").matchAll(/<sheet\b([^>]*?)\/?>/g)) {
     const name = attribute(sheet[1], "name"), id = attribute(sheet[1], "r:id");
@@ -62,7 +62,7 @@ export function readWorkbookCells(bytes: Uint8Array): Map<string, WorkbookCell> 
 }
 
 /** A dash, with or without the non-breaking space the 2013-2015 workbooks add. */
-const isDash = (cell: WorkbookCell | undefined) => cell?.text?.replace(/[\s ]/g, "") === "-";
+const isDash = (cell: WorkbookCell | undefined) => cell?.text?.replace(/\s/g, "") === "-";
 
 /**
  * Promotes the research package's 681 primary observations into the canonical

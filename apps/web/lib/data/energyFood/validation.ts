@@ -19,14 +19,10 @@ export function expectedEnergyFoodKeys(): Set<string> {
 }
 
 /**
- * Decimals Geostat displays a cell with. A `General` cell shows its stored
- * value, so its precision is that of the row's published value.
+ * Decimals Geostat displays a fixed-precision cell with. A `General` cell has no
+ * fixed precision (it shows the stored value), so it is checked at the call site.
  */
-export function energyFoodDisplayDecimals(numberFormat: string, publishedValue?: string): number {
-  if (numberFormat === "General") {
-    if (publishedValue === undefined) throw new Error("A General number format needs the published value");
-    return publishedValue.split(".")[1]?.length ?? 0;
-  }
+export function energyFoodDisplayDecimals(numberFormat: string): number {
   // "#,##0.0;[Red]#,##0.0" only recolours negatives, so its first section sets the precision.
   const match = /^(?:#,##)?0(?:\.(0+))?$/.exec(numberFormat.split(";")[0]);
   if (!match) throw new Error(`Unexpected energy and food number format: ${numberFormat}`);
@@ -60,9 +56,15 @@ export function validateEnergyFoodFacts(facts: readonly EnergyFoodFact[]): void 
     if (!value.isFinite() || value.decimalPlaces() > 20) throw new Error(`Energy and food value outside its range or database precision: ${key}`);
     if (unit === "percent" ? !value.gt(0) : value.lt(0) && fact.indicatorId !== "energy.supply.electricity") throw new Error(`Energy and food value outside its range or database precision: ${key}`);
     if (fact.valueStatus === "no_flow" && !value.isZero()) throw new Error(`Energy and food no-flow value is not zero: ${key}`);
-    const decimals = energyFoodDisplayDecimals(fact.sourceNumberFormat, fact.publishedValue);
-    // Excel keeps 15 significant digits, so the stored value is cut to 15 before it is rounded for display.
-    if (!value.toSignificantDigits(15).toDecimalPlaces(decimals).eq(fact.publishedValue)) throw new Error(`Energy and food published value does not match its stored value: ${key}`);
+    let published: Decimal;
+    try { published = new D(fact.publishedValue); } catch { throw new Error(`Invalid energy and food published value: ${key}`); }
+    // Excel keeps 15 significant digits, so the stored value is cut to 15 before it is shown.
+    const stored = value.toSignificantDigits(15);
+    // A General cell shows the stored value as is; any other format rounds it half-up to the format's decimals.
+    const shown = fact.sourceNumberFormat === "General" ? stored : stored.toDecimalPlaces(energyFoodDisplayDecimals(fact.sourceNumberFormat));
+    if (!shown.eq(published)) throw new Error(`Energy and food published value does not match its stored value: ${key}`);
+    // Food ratios publish as whole numbers. Cells formatted "0" round a decimal (47.1 shows 47); General cells show the stored value, which is then an integer.
+    if (unit === "percent" && (!published.isInteger() || (fact.sourceNumberFormat === "General" && !value.isInteger()))) throw new Error(`Invalid energy and food ratio, not a whole number: ${key}`);
     seen.add(key);
   }
   const missing = [...expected].filter(key => !seen.has(key));

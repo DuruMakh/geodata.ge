@@ -16,6 +16,10 @@ const loadFacts = (): EnergyFoodFact[] =>
   }));
 const find = (facts: readonly EnergyFoodFact[], indicatorId: string, year: number) => facts.find(f => f.indicatorId === indicatorId && f.year === year)!;
 
+/** A General-format row of the given unit; its published value is the stored value cut to 15 significant digits. */
+const general = (facts: readonly EnergyFoodFact[], unit: string) => facts.find(f => f.unit === unit && f.sourceNumberFormat === "General")!;
+const food = (facts: readonly EnergyFoodFact[]) => general(facts, "percent");
+
 test("the canonical file reproduces the research package", async () => {
   await expect(prepareEnergyFoodData(root, "check")).resolves.toBeUndefined();
 });
@@ -43,29 +47,33 @@ describe("readWorkbookCells", () => {
     entry("xl/workbook.xml", `<workbook><sheets><sheet name="Data" sheetId="1" r:id="rId1"/><sheet name="GWh&amp;TJ" sheetId="2" r:id="rId2"/></sheets></workbook>`),
     // The first listed sheet is stored as sheet2.xml and the second as sheet1.xml.
     entry("xl/_rels/workbook.xml.rels", `<Relationships><Relationship Id="rId2" Type="x/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId1" Type="x/worksheet" Target="/xl/worksheets/sheet2.xml"/></Relationships>`),
-    entry("xl/sharedStrings.xml", `<sst><si><t>Label</t></si><si><r><t>-</t></r><r><t xml:space="preserve">&#160;</t></r></si></sst>`),
+    entry("xl/sharedStrings.xml", `<sst><si><t>Label</t></si><si><r><t>-</t></r><r><t xml:space="preserve">&#160;</t></r></si><si/><si><t/></si><si><t>After</t></si></sst>`),
     entry("xl/worksheets/sheet2.xml", `<worksheet><sheetData><row r="5"><c r="B5" s="3" t="s"><v>1</v></c><c r="C5" s="3"/><c r="D5"><v>12</v></c></row></sheetData></worksheet>`),
     entry("xl/worksheets/sheet1.xml", sheets),
   ]));
 
   test("resolves out-of-order sheets and is not misled by a self-closing cell", () => {
-    const cells = readWorkbookCells(workbook(`<worksheet><sheetData><row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1"><v>7.25</v></c></row></sheetData></worksheet>`));
+    const cells = readWorkbookCells(workbook(`<worksheet><sheetData><row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1"><v>7.25</v></c></row><row r="2"><c r="A2" t="s"><v>2</v></c><c r="B2" t="s"><v>3</v></c><c r="C2" t="s"><v>4</v></c></row></sheetData></worksheet>`));
     expect(cells.get("Data:C5")).toBeUndefined();
     expect(cells.get("Data:D5")).toEqual({ token: "12" });
     expect(cells.get("Data:B5")).toEqual({ text: "- " });
     expect(cells.get("GWh&TJ:A1")).toEqual({ text: "Label" });
     expect(cells.get("GWh&TJ:B1")).toEqual({ token: "7.25" });
     expect(cells.get("GWh&TJ:D5")).toBeUndefined();
+    // Self-closing <si/> and <t/> hold no text and must not swallow the string after them.
+    expect(cells.get("GWh&TJ:A2")).toEqual({ text: "" });
+    expect(cells.get("GWh&TJ:B2")).toEqual({ text: "" });
+    expect(cells.get("GWh&TJ:C2")).toEqual({ text: "After" });
   });
 });
 
 describe("energyFoodDisplayDecimals", () => {
-  test.each([["#,##0.0", undefined, 1], ["0.0", undefined, 1], ["0", undefined, 0], ["#,##0.0;[Red]#,##0.0", undefined, 1], ["General", "22", 0], ["General", "138.7", 1]] as const)("%s (%s) shows %i decimals", (format, published, decimals) => {
-    expect(energyFoodDisplayDecimals(format, published)).toBe(decimals);
+  test.each([["#,##0.0", 1], ["0.0", 1], ["0", 0], ["#,##0.0;[Red]#,##0.0", 1]] as const)("%s shows %i decimals", (format, decimals) => {
+    expect(energyFoodDisplayDecimals(format)).toBe(decimals);
   });
-  test("rejects an unknown format and a General format with no published value", () => {
+  test("rejects General, which has no fixed precision, and unknown formats", () => {
+    expect(() => energyFoodDisplayDecimals("General")).toThrow(/number format/);
     expect(() => energyFoodDisplayDecimals("0.00%")).toThrow(/number format/);
-    expect(() => energyFoodDisplayDecimals("General")).toThrow(/published value/);
   });
 });
 
@@ -79,11 +87,21 @@ test.each([
   ["a negative household consumption", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "energy.final.households", 2020), { value: "-5", publishedValue: "-5.0" }); }, /range/],
   ["a no-flow row with value 5", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "energy.imports.crude_oil", 2013), { value: "5", publishedValue: "5.0" }); }, /no-flow/],
   ["a zero food ratio", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "food.self_sufficiency.wheat", 2020), { value: "0", publishedValue: "0" }); }, /range/],
+  ["a General food ratio with a decimal", (facts: EnergyFoodFact[]) => { Object.assign(food(facts), { value: "73.4", publishedValue: "73.4" }); }, /whole number/],
+  ["a food ratio published with a decimal", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "food.self_sufficiency.meat", 2024), { publishedValue: "47.1" }); }, /published value|whole number/],
+  ["a General ktoe value that is not the 15-digit cut of its stored value", (facts: EnergyFoodFact[]) => { Object.assign(general(facts, "ktoe"), { publishedValue: "1.5" }); }, /published value/],
+  ["a non-numeric published value", (facts: EnergyFoodFact[]) => { facts[0].publishedValue = "n/a"; }, /Invalid energy and food published value/],
   ["a wrong source for the year", (facts: EnergyFoodFact[]) => { find(facts, "energy.supply.total", 2020).sourceId = "geostat_energy_balance_2021_aggregated"; }, /source contract/],
 ] as const)("validation rejects %s", (_, mutate, error) => {
   const facts = loadFacts().map(f => ({ ...f }));
   mutate(facts);
   expect(() => validateEnergyFoodFacts(facts)).toThrow(error);
+});
+
+test("General rows publish the stored value cut to 15 significant digits", () => {
+  const facts = loadFacts().map(f => ({ ...f }));
+  Object.assign(general(facts, "ktoe"), { value: "520.20000000000005", publishedValue: "520.2" });
+  expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
 });
 
 test("validation accepts the real negative electricity supply", () => {
