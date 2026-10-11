@@ -78,6 +78,12 @@
   "common.poverty": "სიღარიბე და უთანასწორობა",
   "common.povertyRates": "სიღარიბე",
   "common.povertyInequality": "უთანასწორობა",
+  "common.moneyBanks": "ფული და ბანკები",
+  "common.moneySupply": "ფულის მასა",
+  "common.moneyLoansDeposits": "სესხები და დეპოზიტები",
+  "common.moneyInterestRates": "საპროცენტო განაკვეთები",
+  "common.moneyBankHealth": "ბანკების მდგრადობა",
   "common.dataWages": "მონაცემები · ხელფასები",
-  "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა"
+  "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა",
+  "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები"
 }

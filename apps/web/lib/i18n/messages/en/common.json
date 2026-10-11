@@ -78,6 +78,12 @@
   "common.poverty": "Poverty and inequality",
   "common.povertyRates": "Poverty",
   "common.povertyInequality": "Inequality",
+  "common.moneyBanks": "Money and banks",
+  "common.moneySupply": "Money supply",
+  "common.moneyLoansDeposits": "Loans and deposits",
+  "common.moneyInterestRates": "Interest rates",
+  "common.moneyBankHealth": "Bank health",
   "common.dataWages": "Data · Wages",
-  "common.dataPoverty": "Data · Poverty and inequality"
+  "common.dataPoverty": "Data · Poverty and inequality",
+  "common.dataMoneyBanks": "Data · Money and banks"
 }

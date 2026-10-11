@@ -247,5 +247,10 @@
   "/explorer/poverty": "2026-10-10",
   "/explorer/poverty/rates": "2026-10-10",
   "/explorer/poverty/inequality": "2026-10-10",
-  "/methodology/poverty": "2026-10-10"
+  "/methodology/poverty": "2026-10-10",
+  "/explorer/money": "2026-10-11",
+  "/explorer/money/supply": "2026-10-11",
+  "/explorer/money/loans-deposits": "2026-10-11",
+  "/explorer/money/interest-rates": "2026-10-11",
+  "/explorer/money/bank-health": "2026-10-11"
 }
