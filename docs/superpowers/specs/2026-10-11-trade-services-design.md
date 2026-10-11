@@ -1,7 +1,7 @@
 # Services trade: Overview and service types
 
 Date: 2026-10-11
-Status: First-release scope approved on 2026-10-11 when the owner selected "Overview + service types first (Recommended)". This detailed written design awaits review before the implementation plan. Publishing and live database operations remain separate.
+Status: First-release scope approved on 2026-10-11 when the owner selected "Overview + service types first (Recommended)". The written design was approved on 2026-10-11 when the owner said "continue" after the specification was presented for review. Implementation follows review of the written plan. Publishing and live database operations remain separate.
 
 ## 1. Intended result and scope
 
