@@ -297,3 +297,12 @@ test("removing a product and Back restore the same view", async ({ page }) => {
   await page.goBack();
   await expect(panel).toHaveAttribute("data-selected-count", "2");
 });
+
+test("the Add products dialog casts no shadow (DESIGN §6.6)", async ({ page }) => {
+  await page.goto("/en/explorer/trade/products");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await page.getByTestId("trade-products-add").click();
+  const dialog = page.getByTestId("trade-products-picker");
+  await expect(dialog).toBeVisible();
+  expect(await dialog.evaluate(element => getComputedStyle(element).boxShadow)).toBe("none");
+});

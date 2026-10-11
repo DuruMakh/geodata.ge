@@ -546,3 +546,14 @@ test("published download bytes match the manifest integrity record", async ({ pa
     expect(response.status(), href).toBe(200);
   }
 });
+
+test.describe("the source archive on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("keeps its column headers and table roles when stacked", async ({ page }) => {
+    await page.goto("/en/methodology/wages#source-archive");
+    const archive = page.getByTestId("source-archive");
+    await expect(archive.locator("table")).toHaveAttribute("role", "table");
+    await expect(archive.getByRole("columnheader")).toHaveCount(5);
+    await expect(archive.getByTestId("source-archive-row").first().getByRole("cell")).toHaveCount(5);
+  });
+});

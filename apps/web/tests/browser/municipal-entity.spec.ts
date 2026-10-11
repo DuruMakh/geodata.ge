@@ -1096,3 +1096,21 @@ test.describe("municipality page", () => {
     }
   });
 });
+
+test.describe("period comparison on desktop", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  test("keeps every amount and change on one line", async ({ page }) => {
+    await page.goto("/explorer/municipalities/batumi");
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const table = page.getByTestId("comparison-table");
+    await table.scrollIntoViewIfNeeded();
+    const wrapped = await table.locator("tbody td").evaluateAll(cells => cells.filter(cell => {
+      if (cell.cellIndex === 0) return false;
+      const line = parseFloat(getComputedStyle(cell).lineHeight) || 20;
+      const style = getComputedStyle(cell);
+      const content = cell.getBoundingClientRect().height - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      return content > line * 1.5;
+    }).map(cell => cell.textContent));
+    expect(wrapped).toEqual([]);
+  });
+});
