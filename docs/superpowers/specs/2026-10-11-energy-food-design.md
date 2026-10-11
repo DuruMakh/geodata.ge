@@ -94,7 +94,7 @@ Line under the heading: "Wheat self-sufficiency · 2025: 19%".
 
 No tabs. One line chart of the self-sufficiency ratio for 12 foods in Geostat's order: **Wheat** (selected first), maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat, and poultry nested under it), milk and milk products, and eggs.
 
-- Unit: percent. Values show as Geostat publishes them: whole numbers to 2023, one decimal for 2024 and 2025.
+- Unit: percent. Values show as Geostat's file displays them: whole numbers for every year.
 - Years 2014–2025 for all 12 foods. No value is missing.
 - The methodology explains the ratio in plain words. 100% means Georgia produces as much as it uses. Below 100% means it imports the rest. Above 100% means it produces more than it uses and the rest is exported or stored. It quotes Geostat's definition: domestic production divided by production plus imports minus exports. Wheat counts flour and other wheat products converted into wheat, and grapes count wine converted into grapes, as Geostat's footnotes say.
 - Sheep and goat meat reached 345% in 2018. The chart shows it as published.

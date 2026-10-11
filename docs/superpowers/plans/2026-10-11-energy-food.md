@@ -16,7 +16,7 @@
 - Under each page heading, only the one-line `LatestValueLine` (value plus optional `note`). Nothing else sits under the heading, and the only text under the chart is one `SourceNote` line.
 - Tabs are centred `TextTab`s. Energy supply: **Overview | Supply by fuel | Imports by fuel**. Electricity: **Production | Imports and exports | Use**. Energy use: **By user | By fuel**. Food has no tabs.
 - On each tab only the first series is selected by default; it stays first, selectable and removable. Selection is unlimited, and search never scopes the bulk action or the count.
-- Values show at Geostat's published precision: one decimal for ktoe and GWh, and per cell for food (whole numbers to 2023, one decimal for 2024–2025).
+- Values show at Geostat's published precision: one decimal for ktoe and GWh, and whole numbers for food (every food cell is formatted to whole numbers).
 - A Geostat "-" in a served balance cell is served as 0 with `value_status=no_flow`. A cell with no column (wind before 2016) is a gap, a dash in the table and a blank Excel cell. A "…" cell in any served position fails validation.
 - Stable lowercase ASCII IDs only (the ID table in Task 1). Labels are display data.
 - The canonical CSV is UTF-8 with BOM. The methodology bundle must not pull large data files (PR #170 rule).
@@ -139,7 +139,7 @@ All are dated 2026-10-11.
 - [ ] **Step 1: Add parity tests.**
   - `assertEnergyFoodParity` passes on identical arrays and on `"5914.50"` vs `"5914.5"`, and throws on a changed value or a missing row.
   - `loadEnergyFoodFacts` throws on a fingerprint mismatch (temp copy).
-  - `toClientEnergyFoodFact` gives `decimals` 1 for ktoe rows, 0 for food 2023 and 1 for food 2025.
+  - `toClientEnergyFoodFact` gives `decimals` 1 for ktoe rows and 0 for food rows (2023 and 2025).
 - [ ] **Step 2: Run** the test file. Expected: FAIL.
 - [ ] **Step 3: Implement** by copying each Poverty addition in the same file. Run `npx prisma validate` and `npx prisma generate`.
 - [ ] **Step 4: Run** `npx vitest run tests/data/energyFood/energyFood.test.ts && npm run typecheck`. Expected: PASS.
@@ -196,13 +196,13 @@ All are dated 2026-10-11.
   - `buildEnergyFoodWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title? }, presentation): WorkbookExportModel`, mirroring `povertyWorkbook.ts`:
     - filename `energy-food-${section}${view === "main" ? "" : `-${view}`}-${start}-${end}`
     - unit labels `energyFood.unit.ktoe|gwh|percent`
-    - `numberFormat` `"#,##0.0"` for ktoe and gwh, `"0"` / `"0.0"` per food cell decimals; `numericFormats` keyed by 1-based value-column numbers
+    - `numberFormat` `"#,##0.0"` for ktoe and gwh, `"0"` for food; `numericFormats` keyed by 1-based value-column numbers
     - status `energyFood.status.published|no_flow`
   - `buildEnergyFoodHubCards(facts, presentation): HubCardModel[]` returns four cards with sparklines: `energy.supply.total`, `electricity.production.total`, `energy.final.total` and `food.self_sufficiency.wheat`. The footers read `"2024 · 5,914.5 · 2013–2024"`, `"2024 · 14,234.1 · 2013–2024"`, `"2024 · 5,456.7 · 2013–2024"` and `"2025 · 19% · 2014–2025"`.
 
 - [ ] **Step 1: Write the tests.**
   - A workbook for `imports_fuel` 2020–2024 with total and gas selected has 2 rows × 5 years. Its sources are only the five aggregated-balance IDs for 2020–2024, and the value-column formats are `#,##0.0`.
-  - A food workbook keeps blank cells blank, 2023 wheat uses `0` and 2025 uses `0.0`.
+  - A food workbook keeps blank cells blank and uses `0` for 2023 and 2025.
   - The hub cards show the four footers above.
 - [ ] **Step 2: Run.** Expected: FAIL. **Step 3: Implement.** **Step 4: Run.** Expected: PASS.
 - [ ] **Step 5: Commit** `feat: export energy and food to Excel and build hub cards`.
