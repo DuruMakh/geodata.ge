@@ -102,3 +102,8 @@ test("% of GDP names the GDP source in the source line", async ({ page }) => {
   await expect(line).toContainText("GDP: Geostat");
   await expect(line).not.toContainText("nominal USD");
 });
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/external/current-account");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
+});

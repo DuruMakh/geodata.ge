@@ -50,7 +50,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const valueLabel = useCallback((value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`, [model.unit]);
   const chart = useMemo(() => <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />, [model, lineSeries, measureLabel, valueLabel]);
   return <div data-testid="trade-products" className="@container">
-    {!domestic ? <><ExplorerHeading>{t("title")}</ExplorerHeading><p className="mb-4 text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p></> : null}
+    {!domestic ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}
     <div className={`mb-4 flex flex-wrap items-center ${domestic ? "justify-end" : "justify-between"} gap-3`}>
       {!domestic ? <div role="group" aria-label={t("measure")} className="flex items-center gap-5">{TRADE_PRODUCT_MEASURES.map(id => <TextTab key={id} label={message(messages, `trade.indicator.${id}`)} active={state.measure === id} onClick={() => update(previous => ({ ...previous, measure: id }), true)} testId={`trade-products-measure-${id}`} />)}</div> : null}
       <button type="button" data-testid="trade-products-add" onClick={event => setPicker({ view: "categories", opener: event.currentTarget })} className="flex min-h-11 cursor-pointer items-center gap-2 border border-[var(--control)] px-3 text-[0.8125rem] font-medium hover:bg-[var(--tint)]"><Plus size={16} aria-hidden />{t("add")}</button>

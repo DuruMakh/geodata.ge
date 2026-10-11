@@ -40,7 +40,6 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="foreign-investment" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
-    <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("intro")}</p>
     <div role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{FOREIGN_INVESTMENT_DIMENSIONS.map(dimension => <TextTab key={dimension} label={t(`tab.${dimension}`)} active={state.dimension === dimension} onClick={() => update(s => switchForeignInvestmentTab(s, dimension, data), true)} testId={`foreign-investment-tab-${dimension}`} />)}</div>
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">

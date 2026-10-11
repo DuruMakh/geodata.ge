@@ -50,7 +50,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin }: { 
   }} />;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: TRADE_OVERVIEW_COLORS[id], vals: model.years.map(year => model.valuesByIndicator[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="trade-overview" className="@container">
-    {!domestic ? <><ExplorerHeading>{title}</ExplorerHeading><p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p></> : null}
+    {!domestic ? <ExplorerHeading>{title}</ExplorerHeading> : null}
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-unit="usd" className="border-t border-[var(--ink)] pt-4">

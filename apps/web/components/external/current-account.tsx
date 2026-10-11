@@ -44,7 +44,6 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
   const lineSeries = shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="current-account" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
-    <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("intro")}</p>
     <div role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{CURRENT_ACCOUNT_TABS.map(tab => <TextTab key={tab} label={t(`tab.${tab}`)} active={state.tab === tab} onClick={() => update(s => ({ ...s, tab }), true)} testId={`current-account-tab-${tab}`} />)}</div>
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">

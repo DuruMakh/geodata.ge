@@ -306,3 +306,8 @@ test("the Add products dialog casts no shadow (DESIGN §6.6)", async ({ page }) 
   await expect(dialog).toBeVisible();
   expect(await dialog.evaluate(element => getComputedStyle(element).boxShadow)).toBe("none");
 });
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/trade/products");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
+});

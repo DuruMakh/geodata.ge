@@ -43,7 +43,6 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: model.colorById[id], vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true }));
   return <div data-testid="money-from-abroad" className="@container">
     <ExplorerHeading>{message(messages, "external.money.title")}</ExplorerHeading>
-    <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("intro")}</p>
     <div role="group" aria-label={t("measure")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{MONEY_TRANSFER_MEASURES.map(measure => <TextTab key={measure} label={message(messages, `external.measure.${measure}`)} active={state.measure === measure} onClick={() => update(s => ({ ...s, measure }), true)} testId={`money-from-abroad-measure-${measure}`} />)}</div>
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">

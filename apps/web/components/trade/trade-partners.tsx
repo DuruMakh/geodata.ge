@@ -34,7 +34,6 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin }: { d
   const entities = new Map(data.entities.map(entity => [entity.id, entity]));
   const label = (id: string) => id === TRADE_PARTNER_TOTAL_ID ? t("total") : publicLabel(locale, id, entities.get(id)!.labelKa, englishLabels);
   const measureLabel = message(messages, `trade.indicator.${state.measure}`);
-  const scale = t(model.unit.divisor === 1_000_000_000 ? "scale.billion" : "scale.million");
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: tradePartnerColor(id), valuesByYear: model.valuesByEntity[id] }));
   const total = rows.find(row => row.itemId === TRADE_PARTNER_TOTAL_ID) ?? null;
   const measureControls = <div role="group" aria-label={t("measure")} className={domestic ? "flex flex-wrap items-center gap-2 text-[12px]" : "mb-6 flex flex-wrap gap-x-5 gap-y-3"}>{(data.measures ?? TRADE_OVERVIEW_INDICATORS).map((id, index) => <Fragment key={id}>{domestic && index > 0 ? <TabDivider /> : null}<TextTab label={message(messages, `trade.indicator.${id}`)} active={state.measure === id} onClick={() => update(s => ({ ...s, measure: id }), true)} testId={`trade-partners-measure-${id}`} /></Fragment>)}</div>;
@@ -45,7 +44,7 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin }: { d
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: tradePartnerColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="trade-partners" className="@container">
-    {!domestic ? <><ExplorerHeading>{t("title")}</ExplorerHeading><p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{message(messages, "trade.partners.summaryWithScale", { scale })}</p></> : null}
+    {!domestic ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}
     {!domestic ? measureControls : null}
     {state.tab === "groups" || model.selectedIds.some(id => entities.get(id)?.kind === "group") ? <p data-testid="trade-partners-group-note" className="mb-4 max-w-[850px] border-l-2 border-[var(--accent)] pl-3 text-[12px] leading-relaxed text-[var(--muted)]">{t("groupOverlap")}</p> : null}
     <ExplorerWorkspace>

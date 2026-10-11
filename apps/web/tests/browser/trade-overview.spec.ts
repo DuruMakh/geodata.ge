@@ -201,3 +201,8 @@ test("an explicitly empty selection and Back restore the same view", async ({ pa
   await page.goBack();
   await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 });
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/trade/overview");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
+});
