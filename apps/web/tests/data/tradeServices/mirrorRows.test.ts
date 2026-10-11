@@ -89,6 +89,14 @@ test("rejects a changed derivation counterpart and an omitted observation", asyn
   await expect(loadTradeServicesDataFromMirror(db).then(mirror => assertTradeServicesParity(csv, mirror))).rejects.toThrow(/parity|does not match/i);
 });
 
+test("rejects a derived fact attached to a native source document", async () => {
+  const { facts, db } = await fixture();
+  const derived = facts.find(f => f.role === "derived")!;
+  expect(derived.sourceDocumentId).toBeNull();
+  derived.sourceDocumentId = Object.values(TRADE_SERVICES_DOCUMENT_IDS)[0];
+  await expect(loadTradeServicesDataFromMirror(db)).rejects.toThrow(/source relation/i);
+});
+
 test("the existing importer checks complete Services parity inside its transaction and reports both tables", async () => {
   const script = await readFile("scripts/import-budget-facts.ts", "utf8");
   const transactionStart = script.indexOf("await prisma.$transaction(");

@@ -597,6 +597,7 @@ export async function loadTradeServicesDataFromMirror(db: Pick<MirrorClient, "tr
   const [entityRows, factRows] = await Promise.all([db.tradeServiceEntity.findMany({ orderBy: { id: "asc" } }), db.tradeServiceFact.findMany({ orderBy: [{ entityId: "asc" }, { year: "asc" }, { indicatorId: "asc" }] })]);
   const entities = entityRows.map(({ id, kind, labelKa, labelEn }) => ({ id, kind: kind as TradeServiceEntity["kind"], labelKa, labelEn }));
   const facts = factRows.map(row => {
+    if (row.role === "derived" && row.sourceDocumentId !== null) throw new Error("Services derived source relation mismatch");
     if (row.role !== "derived" && (!row.sourceId || !TRADE_SERVICES_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_SERVICES_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId)) throw new Error("Services source relation mismatch");
     return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradeServiceFact["indicatorId"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as TradeServiceFact["valueStatus"], publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradeServiceFact["role"], sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock, lastReviewedAt: isoDate(row.lastReviewedAt) };
   });
