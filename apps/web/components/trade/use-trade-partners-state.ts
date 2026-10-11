@@ -21,7 +21,8 @@ export function useTradePartnersState(data: ClientTradePartnersData) {
       catch { /* Embedded contexts may deny History access; the view still updates. */ }
     }
     setState(next);
-    if (data.measures) window.dispatchEvent(new Event("trade-domestic-state"));
+    if (data.dataset === "services") window.dispatchEvent(new Event("trade-services-state"));
+    else if (data.measures) window.dispatchEvent(new Event("trade-domestic-state"));
   }, [data]);
   return { state, update };
 }

@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
 import type { toClientTradeDomesticData } from "../../lib/data/tradeDomestic/importTradeDomestic";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
@@ -9,31 +8,13 @@ import { TextTab } from "../ui/editorial";
 import { TradeOverview } from "./trade-overview";
 import { TradePartners } from "./trade-partners";
 import { TradeProducts } from "./trade-products";
+import { useTradeSectionsState } from "./use-trade-sections-state";
 
 type Section = "overview" | "countries" | "products";
 const sections: Section[] = ["overview", "countries", "products"];
-const sectionFromHash = () => {
-  const section = new URLSearchParams(window.location.hash.slice(1)).get("section") as Section;
-  return sections.includes(section) ? section : "overview";
-};
 export function TradeDomesticExports({ data, sources, lastReviewedAt, siteOrigin }: { data: ReturnType<typeof toClientTradeDomesticData>; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const { messages } = useI18n(), t = (key: string) => message(messages, `trade.domestic.${key}`);
-  const [section, setSection] = useState<Section>("overview");
-  const saved = useRef<Partial<Record<Section, string>>>({});
-  useEffect(() => {
-    const cache = () => { saved.current[sectionFromHash()] = window.location.hash; };
-    const restore = () => { cache(); setSection(sectionFromHash()); };
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    window.addEventListener("trade-domestic-state", cache);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); window.removeEventListener("trade-domestic-state", cache); };
-  }, []);
-  const changeSection = (next: Section) => {
-    if (next === section) return;
-    saved.current[section] = window.location.hash;
-    const hash = saved.current[next] || `#section=${next}`;
-    try { window.history.pushState(null, "", hash); } catch { /* The comparison still works in embedded contexts. */ }
-    setSection(next);
-  };
+  const { section, changeSection } = useTradeSectionsState(sections, "overview", "trade-domestic-state");
   const props = { sources, lastReviewedAt, siteOrigin };
   return <div data-testid="trade-domestic" data-section={section} className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>

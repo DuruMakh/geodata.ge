@@ -10,8 +10,9 @@ import type { ClientTradeOverviewFact, TradeOverviewFact, TradeChartIndicator } 
 import { tradePartnerFactKey, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData, type TradePartnersAcceptance } from "./types";
 import { tradePartnersEnglishLabels, validateTradePartnersData } from "./validation";
 
-export type ClientTradePartnerFact = Pick<TradePartnerFact, "entityId" | "year" | "sourceId" | "basis" | "publicationStatus" | "lastReviewedAt"> & { indicatorId: TradeChartIndicator; valueUsd: number | null };
-export type ClientTradePartnersData = { entities: TradePartnerEntity[]; facts: ClientTradePartnerFact[]; nationalFacts: ClientTradeOverviewFact[]; measures?: readonly TradeChartIndicator[] };
+export type ClientTradePartnerFact = Pick<TradePartnerFact, "entityId" | "year" | "basis" | "publicationStatus" | "lastReviewedAt"> & { indicatorId: TradeChartIndicator; valueUsd: number | null; sourceId: string | null };
+export type ClientTradePartnerEntity = Omit<TradePartnerEntity, "kind"> & { kind: TradePartnerEntity["kind"] | "service_type" };
+export type ClientTradePartnersData = { dataset?: "services"; entities: ClientTradePartnerEntity[]; facts: ClientTradePartnerFact[]; nationalFacts: ClientTradeOverviewFact[]; measures?: readonly TradeChartIndicator[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 export async function loadTradePartnersData(): Promise<TradePartnersData> {
