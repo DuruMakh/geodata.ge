@@ -106,7 +106,7 @@ test("the model carries lari amounts, gaps, signed values and per-series precisi
 // The money messages arrive with the page text, so these tests carry the few labels the workbook and hub cards read.
 const TEST_MESSAGES = {
   "common.moneySupply": "Money supply", "common.moneyLoansDeposits": "Loans and deposits", "common.moneyInterestRates": "Interest rates", "common.moneyBankHealth": "Bank health",
-  "moneyBanks.unitMlnGel": "million GEL", "moneyBanks.unitPercent": "%", "moneyBanks.status.official": "Official", "moneyBanks.status.calculated": "Calculated by fiscal.ge",
+  "moneyBanks.unitMlnGel": "million GEL", "moneyBanks.unitPercent": "%", "moneyBanks.status.official": "Official", "moneyBanks.status.calculated": "Calculated by Fiscal.ge",
   "moneyBanks.series": "Series", "moneyBanks.amountHeader.gel": "Amount (million GEL)", "moneyBanks.amountHeader.percent": "Value (%)",
   "moneyBanks.page.supply.title": "Money supply", "moneyBanks.page.loans-deposits.title": "Loans and deposits", "moneyBanks.page.interest-rates.title": "Interest rates", "moneyBanks.page.bank-health.title": "Bank health",
   "moneyBanks.page.supply.summary": "supply", "moneyBanks.page.loans-deposits.summary": "loans", "moneyBanks.page.interest-rates.summary": "rates", "moneyBanks.page.bank-health.summary": "health",
@@ -137,7 +137,7 @@ test("the Deposits workbook exports million GEL, leaves 2010-2014 company deposi
   for (let year = 2010; year <= 2014; year++) { expect(legal.valuesByYear[year]).toBeNull(); expect(legal.basisByYear[year]).toBeNull(); }
   expect(legal.valuesByYear[2015]).not.toBeNull();
   const status = (id: string, year: number) => model.analysis.rows.find(r => r[0] === year && r[1] === id)![3];
-  expect(status("deposits.total", 2025)).toBe("Calculated by fiscal.ge");
+  expect(status("deposits.total", 2025)).toBe("Calculated by Fiscal.ge");
   expect(status("deposits.gel", 2025)).toBe("Official");
   expect(status("deposits.legal_entities", 2012)).toBe("Not available");
   expect(model.analysis.rows).toHaveLength(80);
