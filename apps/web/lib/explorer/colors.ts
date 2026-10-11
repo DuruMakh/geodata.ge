@@ -11,6 +11,10 @@ export const SERIES_COLORS: Record<string, string> = {
   // parts, so these are new hexes (no other entry uses them), at least 14 CIEDE2000 from every line of either list.
   "settlement.urban": "#7777AA",
   "settlement.rural": "#667722",
+  // Household Spending: food and clothing take the two palette hexes that health and education (fixed budget
+  // colours above) leave unused in that list, so no two of its lines share a colour.
+  "spending.food": "#7A4E8C",
+  "spending.clothing": "#2F4B3A",
   "expenditure.total": INK,
   "revenue.total": INK,
   "admin_spending.total": INK,

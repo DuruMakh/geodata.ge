@@ -101,13 +101,11 @@ test("an area change that leaves nothing ticked falls back to the first series, 
   expect(changeHouseholdArea({ ...towns, selectedIds: [] }, "income", "region.guria", facts).selectedIds).toEqual([]);
 });
 
-test("towns and villages draw in colours no other line of Georgia's list uses", () => {
+test("no two lines of Georgia's list share a colour, towns and villages included", () => {
   for (const section of ["income", "spending"] as const) {
     const series = buildHouseholdModel(section, facts, defaultHouseholdState(section)).series;
-    for (const id of ["settlement.urban", "settlement.rural"]) {
-      const color = series.find(s => s.id === id)!.color;
-      expect(series.filter(s => s.color === color).map(s => s.id), `${section} ${id}`).toEqual([id]);
-    }
+    expect(series.map(s => s.id), section).toEqual(expect.arrayContaining(["settlement.urban", "settlement.rural"]));
+    expect(new Set(series.map(s => s.color)).size, section).toBe(series.length);
   }
 });
 
