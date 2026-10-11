@@ -3,17 +3,13 @@ import type { TradePartnerEntity, TradePartnerKind } from "../data/tradePartners
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
-import { INK, SERIES_COLORS } from "./colors";
+import { INK, stableSeriesColor } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { TRADE_PARTNER_TOTAL_ID, tradePartnersBulkSelection, tradePartnersCoverage, type TradePartnersState } from "./tradePartnersState";
 
-const palette = [...new Set(Object.values(SERIES_COLORS))].filter(color => color !== INK);
 export function tradePartnerColor(id: string): string {
-  if (id === TRADE_PARTNER_TOTAL_ID) return INK;
-  let hash = 0;
-  for (const letter of id) hash = (hash * 31 + letter.charCodeAt(0)) >>> 0;
-  return palette[hash % palette.length];
+  return id === TRADE_PARTNER_TOTAL_ID ? INK : stableSeriesColor(id);
 }
 export type TradePartnerRankingRow = { entityId: string; kind: TradePartnerKind; label: string; valueUsd: number | null; shareOfNational: number | null; rank: number | null; color: string };
 export type TradePartnersModel = { years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[]; valuesByEntity: Record<string, Record<number, number | null>>; activeEntities: TradePartnerEntity[]; offTabSelected: TradePartnerEntity[]; ranking: TradePartnerRankingRow[]; missingRanking: TradePartnerRankingRow[]; selectedCount: number; totalCount: number };

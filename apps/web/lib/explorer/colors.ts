@@ -321,3 +321,25 @@ export function colorForProgram(parentColor: string, ordinal: number): string {
 export function colorForItem(itemId: string, index: number): string {
   return SERIES_COLORS[itemId] ?? EDITORIAL_PALETTE[index % EDITORIAL_PALETTE.length] ?? OTHER_COLOR;
 }
+
+// The series palette without ink, which marks totals. Built from SERIES_COLORS, so adding a new hex there
+// recolours every hashed line on Trade and External flows; reusing an existing hex does not.
+const STABLE_PALETTE = [...new Set(Object.values(SERIES_COLORS))].filter((color) => color !== INK);
+
+/** A colour that depends only on the id, so a country keeps its colour across measures, years and pages. */
+export function stableSeriesColor(id: string): string {
+  let hash = 0;
+  for (const letter of id) hash = (hash * 31 + letter.charCodeAt(0)) >>> 0;
+  return STABLE_PALETTE[hash % STABLE_PALETTE.length]!;
+}
+
+/** Each listed id keeps `colorOf(id)` unless an earlier id in the list already has it; it then takes the next free palette colour. */
+export function distinctSeriesColors(ids: readonly string[], colorOf: (id: string) => string): Record<string, string> {
+  const used = new Set<string>();
+  return Object.fromEntries(ids.map((id) => {
+    let color = colorOf(id);
+    for (let index = STABLE_PALETTE.indexOf(color); used.has(color);) color = STABLE_PALETTE[++index % STABLE_PALETTE.length]!;
+    used.add(color);
+    return [id, color];
+  }));
+}

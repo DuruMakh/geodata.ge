@@ -2,7 +2,7 @@
 import Link from "next/link";
 import type { ClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
 import { MONEY_TRANSFER_MEASURES, MONEY_TRANSFER_TOTAL_ID } from "../../lib/data/externalFlows/types";
-import { buildMoneyTransfersModel, moneyTransferColor } from "../../lib/explorer/moneyTransfers";
+import { buildMoneyTransfersModel } from "../../lib/explorer/moneyTransfers";
 import { moneyTransfersCoverage } from "../../lib/explorer/moneyTransfersState";
 import { buildMoneyTransfersWorkbookModel } from "../../lib/explorer/moneyTransfersWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -26,14 +26,14 @@ import { MoneyFromAbroadRanking } from "./money-from-abroad-ranking";
 
 export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientMoneyTransfersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
-  const t = (key: string) => message(messages, `external.money.${key}`);
+  const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
   const { state, update } = useMoneyFromAbroadState(data), model = buildMoneyTransfersModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label;
   const measureLabel = message(messages, `external.measure.${state.measure}`);
   const partialByYear = (id: string) => Object.fromEntries(Object.keys(model.partialMonths[id] ?? {}).map(year => [Number(year), true]));
-  const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: moneyTransferColor(id), valuesByYear: model.valuesByEntity[id], preliminaryByYear: partialByYear(id) }));
+  const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: model.colorById[id], valuesByYear: model.valuesByEntity[id], preliminaryByYear: partialByYear(id) }));
   const total = rows.find(row => row.itemId === MONEY_TRANSFER_TOTAL_ID) ?? null;
-  const partialShown = model.selectedIds.some(id => model.partialMonths[id]);
+  const partialShown = model.partialYears.length > 0;
   const downloadAction = <ExcelDownloadButton testId="money-from-abroad-excel-download" disabled={!model.selectedCount} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildMoneyTransfersWorkbookModel({ data, state, sources, siteOrigin }, presentation));
@@ -47,14 +47,14 @@ export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: {
         <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} /><span className="text-[11px] text-[var(--muted)]">{measureLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selectedIds.map(id => ({ id, label: label(id), color: moneyTransferColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true }))} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} preliminaryLabel={t("partial")} formatTooltipValue={value => `${formatInUnit(value, model.unit)} ${model.unit.label}`} /></div>
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selectedIds.map(id => ({ id, label: label(id), color: model.colorById[id], vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true }))} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} preliminaryLabel={t("partial")} formatTooltipValue={value => `${formatInUnit(value, model.unit)} ${model.unit.label}`} /></div>
             : <ExplorerTable caption={`${message(messages, "external.money.title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== MONEY_TRANSFER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} preliminaryLabel={t("partial")} />}
           <RangeStrip years={moneyTransfersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyTransfersModel(data, s, presentation).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
           <Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
-        {partialShown ? <p data-testid="money-from-abroad-partial-note" className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("partialNote")}</p> : null}
+        {partialShown ? <p data-testid="money-from-abroad-partial-note" className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("partialNote", { years: model.partialYears.join(", ") })}</p> : null}
       </div>
       <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel model={model} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>

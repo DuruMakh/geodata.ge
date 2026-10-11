@@ -24,7 +24,7 @@
   "external.money.searchCountries": "Search countries",
   "external.money.emptySelection": "Select series to compare their trends. The ranking stays visible below.",
   "external.money.partial": "partial",
-  "external.money.partialNote": "Partial: some 2019 months are blank in NBG's source.",
+  "external.money.partialNote": "Partial: some months of {years} are blank in NBG's source.",
   "external.money.rankingTitle": "Money transfers by country · {measure} · {year}",
   "external.money.country": "Country",
   "external.money.share": "Share of all countries",
