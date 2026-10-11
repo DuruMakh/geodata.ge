@@ -157,6 +157,13 @@ test.describe("the phone legend", () => {
     await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
   });
 
+  test("prints percentage points on the inflation Contribution tab", async ({ page }) => {
+    await page.goto("/en/explorer/inflation/categories");
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend.locator("li").first()).toBeVisible();
+    for (const item of await legend.locator("li").all()) await expect(item).toContainText(/pp$/);
+  });
+
   test("prints English percentages on the unemployment gender page", async ({ page }) => {
     await page.goto("/en/explorer/unemployment/gender");
     const legend = page.getByTestId("chart-phone-legend");
