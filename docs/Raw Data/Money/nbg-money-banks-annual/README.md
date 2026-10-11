@@ -70,7 +70,7 @@ Layout notes, observed in the files of 2026-10-11:
 - a published value that is not the stored value rounded to its decimals;
 - a percent outside 0–100 (return on assets and equity may be negative, as in 2008) or a negative amount;
 - a calculated value that does not equal its inputs (deposit total, foreign-currency shares);
-- lari plus foreign currency differing from the total by more than 0.01 for loans or deposits in any year;
+- lari plus foreign currency differing from total loans by more than 0.01 in any year (total deposits are that sum by construction);
 - people plus companies differing from all deposits by more than 0.01 in any year from 2015;
 - M0 ≤ M1 ≤ M2 ≤ M3 failing in any year;
 - the 2022 overlap of the two FSI files not agreeing to one decimal for capital, Tier 1 and return on assets, or not differing for bad loans and return on equity;
