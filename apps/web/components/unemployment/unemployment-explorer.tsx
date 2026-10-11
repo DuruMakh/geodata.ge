@@ -30,14 +30,13 @@ import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { Callout, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
+import { Callout, SegmentedTabs, SELECT_CLASS, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
 import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-panel";
 import { useUnemploymentState } from "./use-unemployment-state";
 import { UnemploymentAgeHeatmap } from "./unemployment-age-heatmap";
 
 export type UnemploymentExplorerProps = { section: UnemploymentSectionId; regionId?: string; regions?: MunicipalRegion[]; facts: ClientUnemploymentObservation[]; registry: UnemploymentGroupDefinition[]; sources: (WorkbookPublicSource & { sourceId: string })[]; lastReviewedAt: string; siteOrigin: string };
-const selectClass = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
 export function UnemploymentExplorer({ section, regionId, regions, facts, registry, sources, lastReviewedAt, siteOrigin }: UnemploymentExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string) => message(messages, `unemployment.${key}`);
@@ -110,7 +109,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")}
               options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
             {section === "age" ? <label className="min-w-0 w-full text-[11px] min-[768px]:text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("indicator")}</span>
-                <select data-testid="unemployment-indicator" value={state.indicator} className={selectClass}
+                <select data-testid="unemployment-indicator" value={state.indicator} className={SELECT_CLASS}
                   onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>
                   {[true, false].map(rate => <optgroup key={String(rate)} label={t(rate ? "rateHeader" : "countHeader")}>
                     {unemploymentIndicators(state.breakdown).filter(indicator => unemploymentIsRate(indicator) === rate).map(indicator => <option key={indicator} value={indicator}>{t(`indicator.${indicator}`)}</option>)}

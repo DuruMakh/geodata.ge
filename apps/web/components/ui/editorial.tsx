@@ -134,3 +134,6 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
     </span>
   );
 }
+
+/** The explorers' native dropdown: an underlined field without a box (Unemployment's breakdown, Wages' employer group). */
+export const SELECT_CLASS = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";

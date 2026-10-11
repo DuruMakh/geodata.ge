@@ -145,6 +145,34 @@ export function regionalMapGeometry() {
   };
 }
 
+/**
+ * The eleven regions coloured by one latest-year value each and ranked from the highest (Unemployment, Wages). Every
+ * listed region needs a value and a shape, and every value a listed region; `measure` names the value in errors.
+ */
+export function buildLatestValueRegionMapModel({ regions, latest, year, firstYear, measure }: {
+  regions: readonly { id: string; kaLabel: string; sortOrder: number }[];
+  latest: ReadonlyMap<string, number>;
+  year: number;
+  firstYear: number;
+  measure: string;
+}): RegionMapModel {
+  const geometry = regionalMapGeometry();
+  const placed = regions.map(region => {
+    const value = latest.get(region.id);
+    if (value === undefined) throw new Error(`Missing latest regional ${measure} for ${region.id}`);
+    const pathD = geometry.pathByRegion.get(region.id);
+    if (!pathD) throw new Error(`Missing regional geometry for ${region.id}`);
+    return { regionId: region.id, nameKa: region.kaLabel, value, pathD, sortOrder: region.sortOrder };
+  });
+  if (latest.size !== placed.length) throw new Error(`Regional ${measure} contains an unknown latest-year region`);
+  const bucketOf = quantileBucket(placed.map(region => region.value));
+  return {
+    viewBox: geometry.viewBox, occupiedAreas: geometry.occupiedAreas, firstYear, year,
+    regions: placed.sort((a, b) => b.value - a.value || a.sortOrder - b.sortOrder).map((region, index) => ({ regionId: region.regionId, nameKa: region.nameKa, value: region.value, pathD: region.pathD, rank: index + 1, bucket: bucketOf(region.value) })),
+    legendMin: Math.min(...placed.map(region => region.value)), legendMax: Math.max(...placed.map(region => region.value)),
+  };
+}
+
 export function buildRegionalEconomyMapModel({
   facts,
   regions,

@@ -133,3 +133,9 @@ test("wages summaries take their years and activity count from the facts", async
   expect(text("wages.regionSummary", facts, { region: "Adjara" })).toBe("Average monthly wage in Adjara since 2010, with Georgia’s average for comparison.");
   expect(text("wages.page.overview.summary", facts.filter(f => f.year >= 1996))).toContain("since 1996");
 });
+
+test("the wages region map model is unchanged by the shared builder (fingerprint recorded before the refactor)", async () => {
+  const { createHash } = await import("node:crypto");
+  const { buildWagesRegionMapModel } = await import("../../lib/explorer/wagesRegionMap");
+  expect(createHash("sha256").update(JSON.stringify(buildWagesRegionMapModel(facts))).digest("hex")).toBe("eb60e44956f58444c260457470cc34a5b05009136e69fae2114843e9d7cf3acc");
+});
