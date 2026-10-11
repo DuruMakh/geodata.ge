@@ -1,27 +1,11 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
 import type { ClientTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
 import { parseTradePartnersHash, serializeTradePartnersHash, type TradePartnersState } from "../../lib/explorer/tradePartnersState";
-import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-state";
+
+// Inside Domestic exports, each change tells the page which hash to keep for its Countries section.
+const OPTIONS: HashStateOptions<ClientTradePartnersData, TradePartnersState> = { afterWrite: data => { if (data.measures) window.dispatchEvent(new Event("trade-domestic-state")); } };
 
 export function useTradePartnersState(data: ClientTradePartnersData) {
-  const [state, setState] = useState(() => parseTradePartnersHash("", data));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseTradePartnersHash(window.location.hash, data); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [data]);
-  useAppReady();
-  const update = useCallback((change: (previous: TradePartnersState) => TradePartnersState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeTradePartnersHash(next, data)}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-    if (data.measures) window.dispatchEvent(new Event("trade-domestic-state"));
-  }, [data]);
-  return { state, update };
+  return useHashState(data, parseTradePartnersHash, serializeTradePartnersHash, OPTIONS);
 }

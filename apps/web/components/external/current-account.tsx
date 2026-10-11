@@ -22,7 +22,7 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
-import { useHashState } from "./use-money-from-abroad-state";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 
 export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastReviewedAt, siteOrigin }: { facts: ClientCurrentAccountFact[]; gdp: CurrentAccountGdp[]; sources: WorkbookPublicSource[]; gdpSources?: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {

@@ -95,3 +95,13 @@ test("the median shows whole lari beside the average", async ({ page }) => {
   await expect(table).toContainText("1,531");
   await expect(table).not.toContainText("1,531.0");
 });
+
+test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
+  await page.goto("/en/explorer/wages/overview#view=line&sel=");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.locator('[data-series-id="average"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+});

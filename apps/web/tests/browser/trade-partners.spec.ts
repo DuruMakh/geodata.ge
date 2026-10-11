@@ -113,3 +113,13 @@ test("Qatar's downloaded Summary keeps its small 2025 turnover visibly nonzero",
   expect(Number(SSF.format(amount.numFmt, amount.value))).toBeGreaterThan(0);
   expect(excel.worksheets[1].getCell("D2").value).toBeCloseTo(4_736_258.239671868, 6);
 });
+
+test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
+  await page.goto("/en/explorer/trade/partners#sel=&view=line&tab=countries&measure=trade.exports");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.locator('[data-series-id="goods.total"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+});

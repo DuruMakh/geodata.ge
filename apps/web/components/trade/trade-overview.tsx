@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { type ClientTradeOverviewFact, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import { buildTradeOverviewModel, TRADE_OVERVIEW_COLORS } from "../../lib/explorer/tradeOverview";
 import { parseTradeOverviewHash, serializeTradeOverviewHash, tradeOverviewCoverage, tradeOverviewIndicators, type TradeOverviewState } from "../../lib/explorer/tradeOverviewState";
@@ -15,7 +15,7 @@ import { matchesLabelQuery } from "../../lib/i18n/search";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -25,34 +25,18 @@ import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
 
-function useTradeOverviewState(facts: ClientTradeOverviewFact[]) {
-  const [state, setState] = useState(() => parseTradeOverviewHash("", facts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseTradeOverviewHash(window.location.hash, facts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [facts]);
-  useAppReady();
-  const update = useCallback((change: (previous: TradeOverviewState) => TradeOverviewState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeTradeOverviewHash(next)}${facts.some(f => f.indicatorId === "trade.domestic_exports") ? "&section=overview" : ""}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-    if (facts.some(f => f.indicatorId === "trade.domestic_exports")) window.dispatchEvent(new Event("trade-domestic-state"));
-  }, [facts]);
-  return { state, update };
-}
+
+// Inside Domestic exports the hash also names the section, and each change tells the page which hash to keep for it.
+const isDomestic = (facts: readonly ClientTradeOverviewFact[]) => facts.some(f => f.indicatorId === "trade.domestic_exports");
+const serializeOverview = (state: TradeOverviewState, facts: readonly ClientTradeOverviewFact[]) => `${serializeTradeOverviewHash(state)}${isDomestic(facts) ? "&section=overview" : ""}`;
+const OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: facts => { if (isDomestic(facts)) window.dispatchEvent(new Event("trade-domestic-state")); } };
 
 export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin }: { facts: ClientTradeOverviewFact[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string) => message(messages, `trade.${key}`);
   const indicators = tradeOverviewIndicators(facts), domestic = facts.some(f => f.indicatorId === "trade.domestic_exports"), totalId = indicators[0];
   const title = t(domestic ? "domestic.title" : "title");
-  const { state, update } = useTradeOverviewState(facts);
+  const { state, update } = useHashState(facts, parseTradeOverviewHash, serializeOverview, OVERVIEW_OPTIONS);
   const [query, setQuery] = useState("");
   const model = buildTradeOverviewModel(facts, state, presentation);
   const label = (id: TradeChartIndicator) => t(domestic && id === "trade.exports" ? "domestic.totalExports" : `indicator.${id}`);

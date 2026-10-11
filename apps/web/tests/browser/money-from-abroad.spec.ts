@@ -97,3 +97,13 @@ test("Excel follows the selection and measure and links the untouched NBG origin
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("2000/2025");
 });
+
+test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
+  await page.goto("/en/explorer/external/money-from-abroad#measure=received&view=line&sel=");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.locator('[data-series-id="transfer.total"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+});

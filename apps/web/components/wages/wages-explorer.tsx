@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
 import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesRegionHref, wagesViews, type WagesSectionId, type WagesSeriesModel, type WagesState, type WagesView } from "../../lib/explorer/wages";
@@ -19,6 +19,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -33,26 +34,10 @@ import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 const selectClass = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
 
-function useWagesState(section: WagesSectionId, facts: ClientWagesFact[]) {
-  const [state, setState] = useState(() => parseWagesHash("", section, facts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseWagesHash(window.location.hash, section, facts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [section, facts]);
-  useAppReady();
-  const update = useCallback((change: (previous: WagesState) => WagesState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeWagesHash(next, section)}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-  }, [section]);
-  return { state, update };
-}
+
+type WagesHashData = { section: WagesSectionId; facts: ClientWagesFact[] };
+const parseWages = (hash: string, { section, facts }: WagesHashData) => parseWagesHash(hash, section, facts);
+const serializeWages = (state: WagesState, { section }: WagesHashData) => serializeWagesHash(state, section);
 
 /** The Regions index: the map and ranked list only; each region opens its own page. */
 export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMapModel; national: { year: number; value: number } }) {
@@ -88,7 +73,8 @@ export type WagesExplorerProps = {
 export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin, regionId, regions }: WagesExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
-  const { state, update } = useWagesState(section, facts);
+  const hashData = useMemo(() => ({ section, facts }), [section, facts]);
+  const { state, update } = useHashState(hashData, parseWages, serializeWages);
   const [pickerOpen, setPickerOpen] = useState(false);
   const regionName = regionId ? labels[regionId] : "";
   const ordered = regions ?? [], regionIndex = ordered.findIndex(region => region.id === regionId);

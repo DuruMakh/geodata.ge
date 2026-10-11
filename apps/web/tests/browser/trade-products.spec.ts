@@ -287,3 +287,13 @@ test.describe("the phone legend", () => {
     await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
   });
 });
+
+test("removing a product and Back restore the same view", async ({ page }) => {
+  await page.goto(`/en/explorer/trade/products${hash(["goods.total", "goods.hs4.2020-2025.2204"])}`);
+  const panel = page.getByTestId("chart-panel");
+  await expect(panel).toHaveAttribute("data-selected-count", "2");
+  await page.locator('[data-testid="trade-products-selected-label"][data-series-id="goods.hs4.2020-2025.2204"]').click();
+  await expect(panel).toHaveAttribute("data-selected-count", "1");
+  await page.goBack();
+  await expect(panel).toHaveAttribute("data-selected-count", "2");
+});

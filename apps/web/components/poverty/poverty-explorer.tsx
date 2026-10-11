@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { ClientPovertyFact } from "../../lib/data/poverty/types";
 import { buildPovertyModel, changePovertyView, parsePovertyHash, povertyCoverage, povertyViews, serializePovertyHash, type PovertySectionId, type PovertySeriesModel, type PovertyState, type PovertyView } from "../../lib/explorer/poverty";
 import { buildPovertyWorkbookExportModel } from "../../lib/explorer/povertyWorkbook";
@@ -15,7 +15,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -24,36 +24,21 @@ import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
 
-function usePovertyState(section: PovertySectionId, facts: ClientPovertyFact[]) {
-  const [state, setState] = useState(() => parsePovertyHash("", section, facts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parsePovertyHash(window.location.hash, section, facts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [section, facts]);
-  useAppReady();
-  const update = useCallback((change: (previous: PovertyState) => PovertyState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializePovertyHash(next, section)}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-  }, [section]);
-  return { state, update };
-}
 
 export type PovertyExplorerProps = {
   section: PovertySectionId; facts: ClientPovertyFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
   lastReviewedAt: string; siteOrigin: string;
 };
 
+type PovertyHashData = { section: PovertySectionId; facts: ClientPovertyFact[] };
+const parsePoverty = (hash: string, { section, facts }: PovertyHashData) => parsePovertyHash(hash, section, facts);
+const serializePoverty = (state: PovertyState, { section }: PovertyHashData) => serializePovertyHash(state, section);
+
 export function PovertyExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin }: PovertyExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `poverty.${key}`, values);
-  const { state, update } = usePovertyState(section, facts);
+  const povertyHashData = useMemo(() => ({ section, facts }), [section, facts]);
+  const { state, update } = useHashState(povertyHashData, parsePoverty, serializePoverty);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildPovertyModel(section, facts, state);

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
 import { MONEY_TRANSFER_MEASURES, MONEY_TRANSFER_TOTAL_ID } from "../../lib/data/externalFlows/types";
 import { buildMoneyTransfersModel } from "../../lib/explorer/moneyTransfers";
-import { moneyTransfersCoverage } from "../../lib/explorer/moneyTransfersState";
+import { moneyTransfersCoverage, parseMoneyTransfersHash, serializeMoneyTransfersHash } from "../../lib/explorer/moneyTransfersState";
 import { buildMoneyTransfersWorkbookModel } from "../../lib/explorer/moneyTransfersWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { formatDisplayDate, formatInUnit } from "../../lib/explorer/format";
@@ -20,7 +20,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
-import { useMoneyFromAbroadState } from "./use-money-from-abroad-state";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 import { MoneyFromAbroadRanking } from "./money-from-abroad-ranking";
 
@@ -28,7 +28,7 @@ import { MoneyFromAbroadRanking } from "./money-from-abroad-ranking";
 export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientMoneyTransfersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
-  const { state, update } = useMoneyFromAbroadState(data), model = buildMoneyTransfersModel(data, state, presentation);
+  const { state, update } = useHashState(data, parseMoneyTransfersHash, serializeMoneyTransfersHash), model = buildMoneyTransfersModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label;
   const measureLabel = message(messages, `external.measure.${state.measure}`);
   const partialByYear = (id: string) => Object.fromEntries(Object.keys(model.partialMonths[id] ?? {}).map(year => [Number(year), true]));

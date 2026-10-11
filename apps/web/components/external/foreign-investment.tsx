@@ -20,7 +20,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
-import { useHashState } from "./use-money-from-abroad-state";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 import { ExternalRanking } from "./external-ranking";
 
