@@ -252,5 +252,6 @@
   "/explorer/energy-food/energy-supply": "2026-10-11",
   "/explorer/energy-food/electricity": "2026-10-11",
   "/explorer/energy-food/energy-use": "2026-10-11",
-  "/explorer/energy-food/food-self-sufficiency": "2026-10-11"
+  "/explorer/energy-food/food-self-sufficiency": "2026-10-11",
+  "/methodology/energy-food": "2026-10-11"
 }

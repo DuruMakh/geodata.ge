@@ -3961,5 +3961,257 @@
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-10" },
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
     "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2013_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2013 (Energy Balance of Georgia 2013)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2013_electricity": {
+    "title": { "text": "Electricity and heat, 2013 (Energy Balance of Georgia 2013)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2014_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2014 (Energy Balance of Georgia 2014)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2014_electricity": {
+    "title": { "text": "Electricity and heat, 2014 (Energy Balance of Georgia 2014)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2015_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2015 (Energy Balance of Georgia 2015)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2015_electricity": {
+    "title": { "text": "Electricity and heat, 2015 (Energy Balance of Georgia 2015)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2016_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2016 (Energy Balance of Georgia 2016)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2016_electricity": {
+    "title": { "text": "Electricity and heat, 2016 (Energy Balance of Georgia 2016)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2017_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2017 (Energy Balance of Georgia 2017)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2017_electricity": {
+    "title": { "text": "Electricity and heat, 2017 (Energy Balance of Georgia 2017)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2018_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2018 (Energy Balance of Georgia 2018)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2018_electricity": {
+    "title": { "text": "Electricity and heat, 2018 (Energy Balance of Georgia 2018)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2019_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2019 (Energy Balance of Georgia 2019)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2019_electricity": {
+    "title": { "text": "Electricity and heat, 2019 (Energy Balance of Georgia 2019)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2020_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2020 (Energy Balance of Georgia 2020)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2020_electricity": {
+    "title": { "text": "Electricity and heat, 2020 (Energy Balance of Georgia 2020)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2021_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2021 (Energy Balance of Georgia 2021)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2021_electricity": {
+    "title": { "text": "Electricity and heat, 2021 (Energy Balance of Georgia 2021)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2022_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2022 (Energy Balance of Georgia 2022)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2022_electricity": {
+    "title": { "text": "Electricity and heat, 2022 (Energy Balance of Georgia 2022)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2023_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2023 (Energy Balance of Georgia 2023)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2023_electricity": {
+    "title": { "text": "Electricity and heat, 2023 (Energy Balance of Georgia 2023)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2024_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2024 (Energy Balance of Georgia 2024)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2024_electricity": {
+    "title": { "text": "Electricity and heat, 2024 (Energy Balance of Georgia 2024)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_efficiency": {
+    "title": { "text": "Energy efficiency indicators, 2013-2024", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_food_balance_sheets": {
+    "title": { "text": "Food balance sheets, 2014-2025", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2024_aggregated_ka": {
+    "title": { "text": "Aggregated Energy Balance, 2024 (Georgian labels)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "ka"
+  },
+  "geostat_food_balance_sheets_ka": {
+    "title": { "text": "Food balance sheets (Georgian labels)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "ka"
+  },
+  "geostat_energy_balance_page_2013": {
+    "title": { "text": "Energy Balance of Georgia 2013 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2014": {
+    "title": { "text": "Energy Balance of Georgia 2014 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2015": {
+    "title": { "text": "Energy Balance of Georgia 2015 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2016": {
+    "title": { "text": "Energy Balance of Georgia 2016 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2017": {
+    "title": { "text": "Energy Balance of Georgia 2017 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2018": {
+    "title": { "text": "Energy Balance of Georgia 2018 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2019": {
+    "title": { "text": "Energy Balance of Georgia 2019 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2020": {
+    "title": { "text": "Energy Balance of Georgia 2020 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2021": {
+    "title": { "text": "Energy Balance of Georgia 2021 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2022": {
+    "title": { "text": "Energy Balance of Georgia 2022 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2023": {
+    "title": { "text": "Energy Balance of Georgia 2023 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2024": {
+    "title": { "text": "Energy Balance of Georgia 2024 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_index_page": {
+    "title": { "text": "Energy Balance of Georgia (index page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_food_security_page": {
+    "title": { "text": "Food Security (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
   }
 }

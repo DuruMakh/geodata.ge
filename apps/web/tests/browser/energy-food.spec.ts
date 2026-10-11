@@ -120,6 +120,11 @@ test("Excel downloads an .xlsx of the selection", async ({ page }) => {
   expect(download.suggestedFilename()).toMatch(/\.xlsx$/);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets).toHaveLength(3);
+  // The Sources sheet links to the fiscal.ge archive copies of the Geostat workbooks.
+  const links: string[] = [];
+  workbook.worksheets[2].eachRow(row => row.eachCell(cell => { const value = cell.value as { hyperlink?: string } | null; if (value && typeof value === "object" && value.hyperlink) links.push(value.hyperlink); }));
+  expect(links.length).toBeGreaterThan(0);
+  for (const link of links) expect(link).toContain("/downloads/methodology/energy-food/files/");
 });
 
 test("switching to English keeps range, selection and table mode (Review Focus 5)", async ({ page }) => {

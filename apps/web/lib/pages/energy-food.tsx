@@ -1,6 +1,4 @@
-import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { parse } from "csv-parse/sync";
 import { EnergyFoodExplorer } from "../../components/energy-food/energy-food-explorer";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
@@ -9,7 +7,6 @@ import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedEnergyFoodData, toClientEnergyFoodFact } from "../data/energyFood/importEnergyFood";
-import { energyFoodSourceDocumentId } from "../data/energyFood/types";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyFoodSeries, type EnergyFoodSectionId } from "../explorer/energyFood";
 import { buildEnergyFoodHubCards } from "../explorer/energyFoodHubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
@@ -17,13 +14,14 @@ import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
+import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
+import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
+import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-
-const RESEARCH_PACKAGE = "docs/Raw Data/EnergyFood/geostat-energy-food-annual";
 
 export async function energyFoodHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["energyFood"]);
@@ -54,26 +52,19 @@ function energyFoodLabels(presentation: Presentation, section: EnergyFoodSection
   return Object.fromEntries(energyFoodSeries(section).map(series => [series.id, message(presentation.messages, `energyFood.series.${series.id}`)]));
 }
 
-type ResearchManifestRow = { source_id: string; dataset_title: string; publisher: string; resolved_file_url: string; retrieved_at: string };
-
 /**
- * The workbook cites each Geostat file the page's values were read from, at the address the reviewed research
- * manifest recorded, for the years that file supplies. Georgian titles are the reviewed source-document names.
+ * The workbook cites each archived Geostat file the page's values were read from, for the years that file supplies.
+ * Links point to the copies in the fiscal.ge source archive.
  */
 async function energyFoodSources(root: string, locale: Locale, facts: readonly { sourceId: string; year: number }[]): Promise<(WorkbookPublicSource & { sourceId: string })[]> {
-  const [manifestText, documentsText] = await Promise.all([
-    readFile(path.join(/* turbopackIgnore: true */ root, RESEARCH_PACKAGE, "source-manifest.json"), "utf8"),
-    readFile(path.join(/* turbopackIgnore: true */ root, "data/sources/source-documents.csv")),
-  ]);
-  const manifest = new Map((JSON.parse(manifestText) as ResearchManifestRow[]).map(row => [row.source_id, row]));
-  const documents = new Map((parse(documentsText, { bom: true, columns: true, skip_empty_lines: true }) as Record<string, string>[]).map(row => [row.source_id, row.source_name]));
+  const [manifest, catalogue] = await Promise.all([loadReviewedSourceManifest(root, "energy-food"), loadEnglishCatalogue(root)]);
+  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
   return [...new Set(facts.map(f => f.sourceId))].map(sourceId => {
-    const row = manifest.get(sourceId), kaTitle = documents.get(energyFoodSourceDocumentId(sourceId));
-    if (!row || !kaTitle || !row.resolved_file_url.startsWith("https://")) throw new Error(`Missing reviewed energy and food source ${sourceId}`);
+    const source = manifest.find(row => row.source_id === sourceId), translated = publicSources.find(row => row.source_id === sourceId);
+    if (!source || !translated) throw new Error(`Missing reviewed energy and food source ${sourceId}`);
     return {
       sourceId, years: [...new Set(facts.filter(f => f.sourceId === sourceId).map(f => f.year))].sort((a, b) => a - b),
-      title: locale === "ka" ? kaTitle : row.dataset_title, organization: locale === "ka" ? "საქსტატი" : row.publisher,
-      downloadHref: row.resolved_file_url as `https://${string}`, retrievedAt: row.retrieved_at,
+      title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at,
     };
   });
 }
