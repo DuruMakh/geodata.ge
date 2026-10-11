@@ -14,6 +14,7 @@
   "external.annual": "annual",
   "external.investment.title": "Foreign investment",
   "external.investment.summary": "Direct investment into Georgia by country, sector and region.",
+  "external.account.sourceNotePercent": "Source: National Bank of Georgia · % of GDP ·",
   "external.account.title": "Current account",
   "external.account.summary": "Georgia's yearly balance with the rest of the world: goods, services, income and transfers.",
   "external.money.summary": "Annual money transfers into and out of Georgia by country, in nominal US dollars.",

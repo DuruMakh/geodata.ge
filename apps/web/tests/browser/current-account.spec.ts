@@ -82,12 +82,23 @@ test("Excel follows the tab and unit and links the untouched NBG workbook", asyn
   expect(values.some(value => value.includes("Goods"))).toBe(false);
   const rows = parse(await readFile("../../data/methodology/source-archives/external-flows.csv"), { columns: true, bom: true }) as Record<string, string>[];
   const links = excel.getWorksheet("Sources")!.getColumn(4).values.filter(value => typeof value === "object" && value !== null && "hyperlink" in value) as { hyperlink: string }[];
-  expect(links).toHaveLength(1);
-  for (const link of links) {
+  // % of GDP also cites the Geostat GDP it divides by (SNA 2008 covers 2020–2025), linked at Geostat as on the Debt page.
+  const geostat = links.filter(link => new URL(link.hyperlink).hostname.endsWith("geostat.ge"));
+  expect(geostat).toHaveLength(1);
+  expect(links).toHaveLength(2);
+  for (const link of links.filter(link => !geostat.includes(link))) {
     const pathname = new URL(link.hyperlink).pathname, source = rows.find(row => `/${row.public_download_path}` === pathname)!;
     const response = await request.get(pathname); expect(response.ok()).toBe(true);
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(source.sha256);
   }
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("2000/2025");
+});
+
+test("% of GDP names the GDP source in the source line", async ({ page }) => {
+  await page.goto("/en/explorer/external/current-account#tab=in&unit=gdp&sel=ca.balance&start=2020&end=2025");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const line = page.getByTestId("source-label");
+  await expect(line).toContainText("GDP: Geostat");
+  await expect(line).not.toContainText("nominal USD");
 });

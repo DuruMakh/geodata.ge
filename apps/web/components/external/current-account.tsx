@@ -24,7 +24,7 @@ import { Callout, SegmentedTabs, SourceNote, SwatchBar, TextTab } from "../ui/ed
 import { useHashState } from "./use-money-from-abroad-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 
-export function CurrentAccount({ facts, gdp, sources, lastReviewedAt, siteOrigin }: { facts: ClientCurrentAccountFact[]; gdp: CurrentAccountGdp[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastReviewedAt, siteOrigin }: { facts: ClientCurrentAccountFact[]; gdp: CurrentAccountGdp[]; sources: WorkbookPublicSource[]; gdpSources?: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.account.${key}`, values);
   const { state, update } = useHashState(facts, parseCurrentAccountHash, serializeCurrentAccountHash), model = buildCurrentAccountModel(facts, gdp, state, presentation);
@@ -38,7 +38,7 @@ export function CurrentAccount({ facts, gdp, sources, lastReviewedAt, siteOrigin
   const scaled = (id: CurrentAccountSeriesId) => model.years.map(year => { const value = model.valuesById[id][year]; return value === null ? null : value / model.unit.divisor; });
   const downloadAction = <ExcelDownloadButton testId="current-account-excel-download" disabled={!shown.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-    await downloadWorkbook(buildCurrentAccountWorkbookModel({ facts, gdp, state, sources, siteOrigin }, presentation));
+    await downloadWorkbook(buildCurrentAccountWorkbookModel({ facts, gdp, state, sources, gdpSources, siteOrigin }, presentation));
   }} />;
   return <div data-testid="current-account" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
@@ -60,7 +60,8 @@ export function CurrentAccount({ facts, gdp, sources, lastReviewedAt, siteOrigin
               : <div className="mt-5"><EditorialLineChart years={model.years} series={shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }))} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>}
           <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildCurrentAccountModel(facts, gdp, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+          {percent ? ` · ${message(messages, "main.gdpSource")}` : null}
           {model.preliminaryGdpYears.length ? ` · ${message(messages, "main.preliminaryGdp", { years: model.preliminaryGdpYears.join(", ") })}` : null}
           <Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
