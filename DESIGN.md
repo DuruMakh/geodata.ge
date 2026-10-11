@@ -349,7 +349,7 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/inflation/cities                              Inflation by city: Georgia page (§25.3)
 /explorer/inflation/cities/[city]                       Inflation in one city (§25.3)
 /explorer/money                       ფული და ბანკები   Money and banks hub (§33)
-/explorer/money/supply                                  Money supply on two tabs: amount, compared with GDP (§33)
+/explorer/money/supply                                  Money supply with a % of GDP pill (§33)
 /explorer/money/loans-deposits                          Loans, deposits and their foreign-currency share (§33)
 /explorer/money/interest-rates                          National Bank rate and bank interest rates (§33)
 /explorer/money/bank-health                             Bad loans, profits and capital (§33)

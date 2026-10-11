@@ -105,6 +105,10 @@ test("the hash round-trips, drops another tab's series and keeps an explicit emp
     expect(single).not.toContain("tab=");
     expect(parseMoneyBanksHash(`#${single}`, section, facts)).toEqual(defaultMoneyBanksState(section));
   }
+  // Links saved while bank health still had tabs keep their selection.
+  expect(parseMoneyBanksHash("#tab=profits&sel=banks.roe,banks.roa", "bank-health", facts).selectedIds).toEqual(["banks.roa", "banks.roe"]);
+  expect(parseMoneyBanksHash("#tab=capital&sel=banks.tier1_ratio", "bank-health", facts).selectedIds).toEqual(["banks.tier1_ratio"]);
+  expect(parseMoneyBanksHash("#tab=npl&sel=", "bank-health", facts).selectedIds).toEqual([]);
 });
 
 test("the model carries lari amounts, gaps, signed values and per-series precision", () => {

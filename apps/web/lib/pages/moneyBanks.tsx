@@ -88,7 +88,7 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
       temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
       spatialCoverage: { "@type": "Place", name: locale === "ka" ? "საქართველო" : "Georgia" },
       creator: { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" }, publisher: { "@id": `${origin}/#organization` },
-      variableMeasured: moneyBanksViews(section).map(view => view === "main" ? title : t(`tab.${view}`)),
+      variableMeasured: moneyBanksViews(section).flatMap(view => moneyBanksViewSeries(section, view).map(series => t(`series.${series.id}`))),
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/money", locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
