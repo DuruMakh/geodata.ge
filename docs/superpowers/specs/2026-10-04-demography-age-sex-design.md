@@ -53,7 +53,7 @@ Both files are already canonical and validated. This work adds them to the serve
 
 - **Controls.**
   - A `წელი` year picker listing 2004–2026 in a four-column grid, the latest selected; 2025 carries an accent `*` and the grid's footer reads `* 2025 — აღწერით გადათვლა`.
-  - A `შედარება წელთან` year picker beside it: a full-width `არცერთი` row first (default, comparison off), then every year except the one shown, 2025 marked the same way. Choosing a year turns the comparison on, `არცერთი` turns it off, and choosing as the shown year the one being compared drops the comparison. The pickers' triggers use Unemployment's underlined select look (`SELECT_CLASS`), at natural width side by side, full width on phones.
+  - A `შედარება წელთან` year picker beside it: a full-width `არცერთი` row first (default, comparison off), then every year except the one shown, 2025 marked the same way. Choosing a year turns the comparison on, `არცერთი` turns it off, and choosing as the shown year the one being compared drops the comparison. The pickers' triggers use Unemployment's underlined select look (`SELECT_CLASS`) and fill their picker; the two pickers share one fixed width side by side (so the measure tabs do not move when a value changes), full width on phones.
   - Measure `%` | `ადამიანი`.
 - **Figure.** The pyramid for the selected year, at most 640px wide, centred.
   - Men left, women right. Ages run up the centre gutter, 0–4 at the bottom.

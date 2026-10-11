@@ -6,7 +6,6 @@ const IMERETI = `${TEST_BASE_URL}/en/explorer/demography/population/region/imere
 
 const expectAppReady = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const hasNoSidewaysScroll = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-/** The pyramid's axis labels: the drawing's text nodes that are a bare percent. */
 /** Opens a year picker by its trigger and returns its year grid. */
 const openPicker = async (page: Page, testId: string) => {
   await page.getByTestId(testId).click();
@@ -19,6 +18,13 @@ const pick = async (page: Page, testId: string, name: string) => {
   await list.getByRole("option", { name, exact: true }).click();
   await expect(page.getByRole("listbox")).toHaveCount(0);
 };
+/** The year grid's keyboard-active option is the named one. */
+const expectActive = async (page: Page, name: string) => {
+  const list = page.getByRole("listbox");
+  const id = await list.getByRole("option", { name, exact: true }).getAttribute("id");
+  await expect(list).toHaveAttribute("aria-activedescendant", id!);
+};
+/** The pyramid's axis labels: the drawing's text nodes that are a bare percent. */
 const percentTicks = (page: Page) => page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /^\d+(\.\d+)?%$/ });
 
 test.describe("the Age and sex page", () => {
@@ -118,6 +124,54 @@ test.describe("the Age and sex page", () => {
     await page.mouse.click(5, 5);
     await expect(page.getByRole("listbox")).toHaveCount(0);
     await expect(trigger).toHaveText("2010");
+  });
+
+  test("the year grid's keys move a row, jump to the ends and reach the none row; Tab closes onto the trigger", async ({ page }) => {
+    await page.goto(`${NATIONAL}#year=2010`);
+    await expectAppReady(page);
+    const year = page.getByTestId("age-sex-year-select");
+    await year.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("listbox")).toBeFocused();
+    await expectActive(page, "2010");
+    await page.keyboard.press("ArrowDown");
+    await expectActive(page, "2014");
+    await page.keyboard.press("End");
+    await expectActive(page, "2026");
+    await page.keyboard.press("Home");
+    await expectActive(page, "2004");
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(year).toBeFocused();
+    await expect(year).toHaveText("2010");
+
+    const compare = page.getByTestId("age-sex-compare-select");
+    await compare.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("listbox")).toBeFocused();
+    await expectActive(page, "None");
+    await page.keyboard.press("End");
+    await page.keyboard.press("Home");
+    await expectActive(page, "None");
+    await page.keyboard.press("ArrowDown");
+    await expectActive(page, "2004");
+    await page.keyboard.press("Escape");
+    await expect(compare).toBeFocused();
+    await expect(compare).toHaveText("None");
+  });
+
+  test("a grid opened by mouse shows the ring after the arrows, and a click on its footer keeps Escape working", async ({ page }) => {
+    await page.goto(`${NATIONAL}#year=2010`);
+    await expectAppReady(page);
+    const list = await openPicker(page, "age-sex-year-select");
+    await page.getByTestId("age-sex-year-select-panel").getByText("* 2025 — Census re-base").click();
+    await expect(list).toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await expectActive(page, "2011");
+    await expect(list.getByRole("option", { name: "2011", exact: true })).toHaveCSS("outline-style", "solid");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(page.getByTestId("age-sex-year-select")).toBeFocused();
   });
 
   test("choosing the compared year to be the shown year drops the comparison", async ({ page }) => {
@@ -288,6 +342,11 @@ test.describe("at 390px", () => {
       const panel = (await page.getByTestId(`${picker}-panel`).boundingBox())!;
       expect(panel.x).toBeGreaterThanOrEqual(0);
       expect(panel.x + panel.width).toBeLessThanOrEqual(390);
+      // The open grid is brought fully into view, footer included.
+      await expect.poll(async () => {
+        const box = (await page.getByTestId(`${picker}-panel`).boundingBox())!;
+        return box.y >= 0 && box.y + box.height <= 844;
+      }).toBe(true);
       expect(await hasNoSidewaysScroll(page)).toBe(true);
       const cell = (await page.getByRole("listbox").getByRole("option").nth(1).boundingBox())!;
       expect(cell.height).toBeGreaterThanOrEqual(44);

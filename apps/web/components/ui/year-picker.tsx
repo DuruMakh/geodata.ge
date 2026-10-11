@@ -34,8 +34,11 @@ export function YearPicker({
   const baseId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+  // Set once the arrow keys move through the grid, so a grid opened by mouse shows the ring too.
+  const [navigated, setNavigated] = useState(false);
   const hasNone = noneLabel !== undefined;
   const offset = hasNone ? 1 : 0;
   const options: (number | null)[] = hasNone ? [null, ...years] : [...years];
@@ -44,11 +47,15 @@ export function YearPicker({
   const optionId = (index: number) => `${baseId}-${options[index] ?? "none"}`;
 
   useEffect(() => {
-    if (open) listRef.current?.focus();
+    if (!open) return;
+    listRef.current?.focus({ preventScroll: true });
+    // On a phone the grid can open below the fold: bring all of it into view.
+    panelRef.current?.scrollIntoView({ block: "nearest" });
   }, [open]);
 
   const show = () => {
     setActive(selectedIndex);
+    setNavigated(false);
     setOpen(true);
   };
   const close = () => {
@@ -79,13 +86,14 @@ export function YearPicker({
       close();
       return;
     } else if (event.key === "Tab") {
-      // Hand focus back to the trigger first, so Tab carries on from there.
+      event.preventDefault();
       close();
       return;
     }
     if (next === null) return;
     event.preventDefault();
     setActive(next);
+    setNavigated(true);
   };
 
   const labelId = `${baseId}-label`;
@@ -94,14 +102,18 @@ export function YearPicker({
     const selected = options[index] === value;
     return [
       "cursor-pointer text-[var(--ink)] hover:bg-[var(--tint)]",
-      // The active option carries the focus ring while the list has keyboard focus.
-      index === active ? "group-focus-visible:outline-2 group-focus-visible:-outline-offset-2 group-focus-visible:outline-[color:var(--accent)]" : "",
+      // The active option carries the focus ring while the list has keyboard focus, or has focus after arrow keys.
+      index !== active
+        ? ""
+        : navigated
+          ? "group-focus:outline-2 group-focus:-outline-offset-2 group-focus:outline-[color:var(--accent)]"
+          : "group-focus-visible:outline-2 group-focus-visible:-outline-offset-2 group-focus-visible:outline-[color:var(--accent)]",
       selected ? "border-b-2 border-b-[var(--accent)] bg-[var(--tint)] font-semibold" : "border-b-2 border-b-transparent",
     ].join(" ");
   };
 
   return (
-    <div className="flex min-w-0 flex-col gap-1 text-[11px] font-semibold text-[var(--muted)] max-[767px]:w-full">
+    <div className="flex w-[168px] min-w-0 flex-col gap-1 text-[11px] font-semibold text-[var(--muted)] max-[767px]:w-full">
       <span id={labelId}>{label}</span>
       <div className="relative">
         <button
@@ -113,7 +125,7 @@ export function YearPicker({
           aria-expanded={open}
           aria-labelledby={`${labelId} ${baseId}-trigger`}
           onClick={() => (open ? close() : show())}
-          className="flex items-center justify-between gap-3 border-b border-[var(--control)] bg-transparent py-2 text-left text-[12px] font-normal text-[var(--ink)] max-[767px]:min-h-[44px] max-[767px]:w-full"
+          className="flex w-full items-center justify-between gap-3 border-b border-[var(--control)] bg-transparent py-2 text-left text-[12px] font-normal text-[var(--ink)] max-[767px]:min-h-[44px]"
         >
           <span className={value === null ? "" : NUMERIC}>{valueText}</span>
           {open ? <ChevronUp aria-hidden size={16} strokeWidth={1.5} /> : <ChevronDown aria-hidden size={16} strokeWidth={1.5} />}
@@ -121,7 +133,8 @@ export function YearPicker({
         {open ? (
           <>
             <div aria-hidden className="fixed inset-0 z-30" onClick={close} />
-            <div data-testid={`${testId}-panel`} className="absolute top-full left-0 z-40 mt-1 w-[248px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]">
+            {/* Mouse presses in the panel never take focus from the list, so Escape and the arrows keep working. */}
+            <div ref={panelRef} data-testid={`${testId}-panel`} onMouseDown={(event) => event.preventDefault()} className="absolute top-full left-0 z-40 mt-1 w-[248px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]">
               <div
                 ref={listRef}
                 role="listbox"
