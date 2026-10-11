@@ -39,6 +39,7 @@ These apply to all four pages, exactly as on Poverty:
 
 - Under the heading there is one short line from `LatestValueLine` (wording in each page section). Nothing else sits under the heading, and the only text under the chart is one short source line.
 - Tabs are centred text tabs. Each tab has its own series list. Switching tabs selects that tab's first series alone and keeps the year range, clamped to the new tab's years.
+  > Changed after preview review (Duru, 2026-10-11): no page has a tab row. Money supply and Loans and deposits switch measures with an icon-only control in the chart toolbar (DESIGN.md §7.2a), carrying matching series across; Interest rates and Bank health have one list each.
 - The first series of the first tab is selected on arrival and stays first, selectable and removable. Selection is unlimited.
 - Chart | Table, the year range and Excel work as on Poverty. Tab, range, selection and chart/table mode live in the URL and survive a language change.
 - Every series has a fixed, distinguishable colour, and labels identify every series without colour.
@@ -60,7 +61,7 @@ Line under the heading: "2025: broad money (M3) 57.7 billion GEL".
 
 The GDP ratios are NBG's own published "monetization coefficients" at period end, not calculated by fiscal.ge.
 
-> Changed after preview review (Duru, 2026-10-11): no tab row; the % of GDP pill on the chart toolbar switches between the amounts and the two ratios, carrying M3 and M2 across.
+> Changed after preview review (Duru, 2026-10-11): no tab row; an icon-only switch on the chart toolbar (`₾` / `ChartPie`) switches between the amounts and the two ratios, carrying M3 and M2 across.
 
 ## 5. Loans and deposits page
 

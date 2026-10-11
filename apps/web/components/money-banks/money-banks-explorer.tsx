@@ -111,9 +111,9 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
             <div className="flex items-center gap-3.5">
               <span data-testid="money-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
-              {views.length > 1 ? <SegmentedTabs ariaLabel={t("measure")} value={state.view} onChange={changeView} options={views.map((view, index) => ({
+              {views.length > 1 ? <SegmentedTabs ariaLabel={t("measure")} value={state.view} onChange={changeView} options={views.map(view => ({
                 value: view, label: t(`tab.${view}`), testId: `money-measure-${view}`,
-                icon: index === 0 ? <span aria-hidden="true" className="text-base">₾</span> : view === "gdp" ? <ChartPie aria-hidden="true" size={18} strokeWidth={1.5} /> : <CircleDollarSign aria-hidden="true" size={18} strokeWidth={1.5} />,
+                icon: view === "amount" ? <span aria-hidden="true" className="text-base">₾</span> : view === "gdp" ? <ChartPie aria-hidden="true" size={18} strokeWidth={1.5} /> : <CircleDollarSign aria-hidden="true" size={18} strokeWidth={1.5} />,
               }))} /> : null}
             </div>
           </div>
