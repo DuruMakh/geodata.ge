@@ -110,7 +110,8 @@ test.describe("the ↑ chart pill", () => {
     await expect(page.getByTestId("chart-frame")).toBeInViewport({ ratio: 0.5 });
     // Change the selection without scrolling the chart away.
     await page.evaluate(() => (document.querySelector('[data-testid="series-toggle-all"]') as HTMLButtonElement).click());
-    await page.waitForTimeout(300);
+    // The pill decides as soon as the new selection renders: wait for that, not for a fixed time.
+    await expect(page.locator('[data-series-id="expenditure.total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByTestId("chart-return-pill")).toHaveCount(0);
   });
 
@@ -119,8 +120,9 @@ test.describe("the ↑ chart pill", () => {
     test("never shows", async ({ page }) => {
       await page.goto("/explorer/expenditure");
       await page.mouse.wheel(0, 1400);
-      await page.locator('[data-series-id="spending.education"]').getByTestId("series-row-toggle").click();
-      await page.waitForTimeout(300);
+      const education = page.locator('[data-series-id="spending.education"]').getByTestId("series-row-toggle");
+      await education.click();
+      await expect(education).toHaveAttribute("aria-pressed", "true");
       await expect(page.getByTestId("chart-return-pill")).toBeHidden();
     });
   });
