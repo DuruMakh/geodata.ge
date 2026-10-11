@@ -1,5 +1,5 @@
 import type { ClientEnergyFoodFact, EnergyFoodIndicator } from "../data/energyFood/types";
-import { colorForItem, INK } from "./colors";
+import { EDITORIAL_PALETTE, INK } from "./colors";
 import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
@@ -72,8 +72,16 @@ export function energyFoodUnit(section: EnergyFoodSectionId): EnergyFoodUnit {
   return UNITS[section];
 }
 
+/**
+ * Energy supply has 16 non-reference series, two more than the editorial palette holds, so the hub extends the palette
+ * with two hexes already in use for economic sectors (sector.j and sector.n). Both sit at CIEDE2000 >= 16 from every
+ * palette colour and ink, and at >= 3:1 against paper and tint.
+ */
+const ENERGY_FOOD_PALETTE = [...EDITORIAL_PALETTE, "#0D89C2", "#474A02"] as const;
+
+/** The reference is drawn in ink; `index` is the series' position among the non-reference series, so no colour repeats on a page. */
 export function energyFoodSeriesColor(series: EnergyFoodSeriesDefinition, index: number): string {
-  return series.reference ? INK : colorForItem(series.id, index);
+  return series.reference ? INK : ENERGY_FOOD_PALETTE[index % ENERGY_FOOD_PALETTE.length];
 }
 
 export type EnergyFoodState = { mode: "line" | "table"; range: PeriodRange; selectedIds: string[] };
@@ -122,9 +130,10 @@ export function buildEnergyFoodModel(section: EnergyFoodSectionId, facts: readon
   const range = resolveRange(state.range, energyFoodCoverage(section, facts));
   const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
   const byCell = new Map(facts.map(f => [cellKey(f), f]));
-  const series = energyFoodSeries(section).map((definition, index) => {
+  let colorIndex = 0;
+  const series = energyFoodSeries(section).map(definition => {
     const valuesByYear = Object.fromEntries(years.map(year => [year, byCell.get(cellKey({ indicatorId: definition.id, year }))?.value ?? null]));
-    return { ...definition, color: energyFoodSeriesColor(definition, index), valuesByYear, endValue: valuesByYear[range.end] };
+    return { ...definition, color: energyFoodSeriesColor(definition, definition.reference ? 0 : colorIndex++), valuesByYear, endValue: valuesByYear[range.end] };
   });
   const selected = series.filter(s => state.selectedIds.includes(s.id));
   const selectedIds = new Set<string>(selected.map(s => s.id));

@@ -2,10 +2,11 @@ import { beforeAll, expect, test } from "vitest";
 import { loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../lib/data/energyFood/importEnergyFood";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
 import {
-  buildEnergyFoodModel, defaultEnergyFoodState, energyFoodCoverage, energyFoodSeries, energyFoodSeriesColor, energyFoodUnit,
+  buildEnergyFoodModel, defaultEnergyFoodState, energyFoodCoverage, energyFoodSeries, energyFoodUnit,
   ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId,
 } from "../../lib/explorer/energyFood";
-import { INK } from "../../lib/explorer/colors";
+import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
+import { contrastRatio } from "../helpers/contrast";
 
 let facts: ClientEnergyFoodFact[];
 beforeAll(async () => { facts = (await loadEnergyFoodFacts()).map(toClientEnergyFoodFact); });
@@ -128,7 +129,7 @@ test("a range outside the coverage is refitted and a full range collapses to all
   expect(parseEnergyFoodHash("#start=2016&end=2020", "energy-supply", facts).range).toEqual({ kind: "manual", start: 2016, end: 2020 });
 });
 
-test("end values are the published figures and net imports show as a negative supply", () => {
+test("end values are the published figures", () => {
   const supply = buildEnergyFoodModel("energy-supply", facts, defaultEnergyFoodState("energy-supply"));
   expect(supply.range).toMatchObject({ start: 2013, end: 2024 });
   expect(supply.series.find(s => s.id === "energy.supply.total")!.endValue).toBe(5914.5);
@@ -136,19 +137,44 @@ test("end values are the published figures and net imports show as a negative su
   expect(electricity.series.find(s => s.id === "electricity.production.total")!.endValue).toBe(14234.1);
   const food = buildEnergyFoodModel("food-self-sufficiency", facts, defaultEnergyFoodState("food-self-sufficiency"));
   expect(food.series.find(s => s.id === "food.self_sufficiency.wheat")!.endValue).toBe(19);
-  const negative = buildEnergyFoodModel("energy-supply", facts, { mode: "line", range: { kind: "manual", start: 2013, end: 2023 }, selectedIds: ["energy.supply.electricity"] });
-  expect(negative.range.end).toBe(2023);
-  expect(negative.selected.map(s => s.id)).toEqual(["energy.supply.electricity"]);
-  expect(negative.selected[0].endValue!).toBeLessThan(0);
+});
+
+test("negative electricity supply passes through unclipped, in 2016 and 2023", () => {
+  const model = buildEnergyFoodModel("energy-supply", facts, { mode: "line", range: { kind: "all" }, selectedIds: ["energy.supply.electricity"] });
+  expect(model.selected.map(s => s.id)).toEqual(["energy.supply.electricity"]);
+  const { valuesByYear } = model.selected[0];
+  expect(valuesByYear[2016]!).toBeLessThan(0);
+  expect(valuesByYear[2023]!).toBeLessThan(0);
+  expect(valuesByYear[2024]!).toBeGreaterThan(0);
+  const to2023 = buildEnergyFoodModel("energy-supply", facts, { mode: "line", range: { kind: "manual", start: 2013, end: 2023 }, selectedIds: ["energy.supply.electricity"] });
+  expect(to2023.selected[0].endValue!).toBeLessThan(0);
 });
 
 test("the model lists every series of the page, colours the reference ink and takes decimals from the selection", () => {
   const model = buildEnergyFoodModel("energy-supply", facts, defaultEnergyFoodState("energy-supply"));
   expect(model.series.map(s => s.id)).toEqual(energyFoodSeries("energy-supply").map(s => s.id));
   expect(model.series[0].color).toBe(INK);
-  expect(model.series[1].color).toBe(energyFoodSeriesColor(energyFoodSeries("energy-supply")[1], 1));
-  expect(model.series[1].color).not.toBe(INK);
+  expect(model.series[1].color).toBe("#B3402A");
   expect(model.decimals).toBe(1);
   expect(buildEnergyFoodModel("food-self-sufficiency", facts, defaultEnergyFoodState("food-self-sufficiency")).decimals).toBe(0);
   expect(buildEnergyFoodModel("food-self-sufficiency", facts, { ...defaultEnergyFoodState("food-self-sufficiency"), selectedIds: [] }).decimals).toBe(0);
+});
+
+test("within a page every non-reference series has its own readable colour, even with all selected", () => {
+  for (const { id } of ENERGY_FOOD_SECTIONS) {
+    const model = buildEnergyFoodModel(id, facts, { ...defaultEnergyFoodState(id), selectedIds: energyFoodSeries(id).map(s => s.id) });
+    const others = model.series.filter(s => !s.reference).map(s => s.color);
+    expect(model.series.filter(s => s.reference).map(s => s.color), id).toEqual([INK]);
+    expect(new Set(others).size, id).toBe(others.length);
+    expect(others, id).not.toContain(INK);
+    for (const hex of others) {
+      expect(contrastRatio(hex, "#F7F2E9"), `${id} ${hex} on paper`).toBeGreaterThanOrEqual(3);
+      expect(contrastRatio(hex, "#F1EADC"), `${id} ${hex} on tint`).toBeGreaterThanOrEqual(3);
+    }
+  }
+  // Energy supply is the page that outgrows the 14-colour editorial palette: 16 non-reference series.
+  const supply = buildEnergyFoodModel("energy-supply", facts, defaultEnergyFoodState("energy-supply")).series.filter(s => !s.reference);
+  expect(supply).toHaveLength(16);
+  expect(supply.slice(0, 14).map(s => s.color)).toEqual(EDITORIAL_PALETTE);
+  expect(supply.slice(14).map(s => s.color)).toEqual(["#0D89C2", "#474A02"]);
 });
