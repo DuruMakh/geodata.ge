@@ -181,7 +181,7 @@ During implementation, also update `Project_Definition.md` section 2 (a new appr
 - **Small additions:**
   - the sidebar, sitemap, methodology catalogue and source inventory get the new section
   - the import script and mirror read and compare the new tables
-- **New** (each mirrors its Poverty counterpart; first check whether the Poverty explorer can take the energy and food series as configuration instead of a copy, and prefer that if it needs only small optional additions):
+- **New** (each mirrors its Poverty counterpart, as the Money and banks and Living standards hubs do). Turning the Poverty explorer into one shared, configurable explorer would avoid this repetition, but the Living standards thread is moving the Poverty files right now, so this branch does not edit them. That clean-up is a separate follow-up for Duru to decide on. The data readers locate rows and columns by their label text, not by fixed positions, and do not copy the Poverty import's spreadsheet-reading shortcut that the Money and banks review flagged:
   - the two research packages and prepare scripts
   - the Prisma models and migration
   - the explorer state and model, workbook and hub-card modules, the page module, routes and messages
@@ -189,7 +189,7 @@ During implementation, also update `Project_Definition.md` section 2 (a new appr
 
 ## 14. Coordination
 
-This branch starts from `main` after the Poverty merge (PR #174). The Money and banks hub and the Household income and spending hub are being built in other threads and touch the same shared files: sidebar, sitemap, methodology catalogue, mirror files and browser-test page counts. Whichever merges first, the others merge `main` in and resolve those files.
+This branch starts from `main` after the Poverty merge (PR #174). The Money and banks hub (which also makes the sidebar scroll) and the Living standards hub (which moves the Poverty pages to new addresses) are being built in other threads. They touch the same shared files: sidebar, sitemap, methodology catalogue, mirror files and browser-test page counts. This branch does not edit Poverty files. When either merges, this branch merges `main` in and resolves the shared files.
 
 ## 15. Decision for Duru
 
