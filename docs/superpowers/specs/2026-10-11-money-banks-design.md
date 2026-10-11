@@ -102,7 +102,7 @@ Line under the heading: "2025: bad loans 2.5% of all loans".
 
 All values are percent. They are NBG's Financial Soundness Indicators, which follow the IMF method: Q4 values from the archive file for 2001–2021 and December values from the current file for 2022–2025. "Bad loans" is NBG's "non-performing loans to total gross loans" by the IMF method (the archive's NBG-method series, which runs higher, is not served). Capital uses the Basel III series, which starts in 2014; the older Basel I series is not served.
 
-**Method change in 2022.** NBG moved to the updated IMF guide in 2022. For capital and return on assets the old and new files give the same 2022 value. For bad loans (1.7% old against 1.5% new) and return on equity (30.2% against 24.8%) they do not. The page draws one line per measure, the data records a series break at 2022 for those two measures (as the demography data does for the 2025 census), and the methodology page explains it. No change across the break is computed anywhere.
+**Two changes in the bank-health files.** Values to 2021 come from NBG's archive file and values from 2022 from the current file, which follows the 2019 IMF FSI methodology. For 2022 the two files agree on capital and return on assets, but give different values for bad loans (1.7% archive against 1.5% current) and return on equity (30.2% against 24.8%). Separately, the current file says its data were reviewed from January 2023 because of IFRS implementation; bad loans moved from 1.5% in December 2022 to 3.1% in January 2023. The page draws one line per measure. The data records both breaks in `data/imports/money-banks-series-breaks.csv` (`fsi_method_2022` for bad loans and return on equity from 2022, `fsi_ifrs_2023` for all five measures from 2023), as the demography data does for the 2025 census, and the methodology page explains them. No change across a break is computed anywhere.
 
 ## 8. Data foundation
 
@@ -133,7 +133,7 @@ About 730 served values in total. The research package also keeps the API listin
 ### Canonical file and checks
 
 - `npm run data:prepare-money` writes `data/imports/money-banks-annual.csv` (UTF-8 with BOM) and `data/reports/money-banks-validation.json`. `--check` reproduces both byte for byte and runs in `data:validate`.
-- Each row keeps the exact workbook value, unit (`gel_million` or `percent`), `basis=actual`, value status (`official`, or `calculated` for the three deposit totals and the two foreign-currency shares), source ID, sheet and cell. The 2022 bank-health break is recorded in `data/imports/money-banks-series-breaks.csv` in demography's break format.
+- Each row keeps the exact workbook value, unit (`gel_million` or `percent`), `basis=actual`, value status (`official`, or `calculated` for the three deposit totals and the two foreign-currency shares), source ID, sheet and cell. The bank-health breaks are recorded in `data/imports/money-banks-series-breaks.csv` in demography's break format.
 - Stable lowercase IDs, for example `money.m3`, `money.m2`, `money.m1`, `money.m0`, `money.m3_to_gdp`, `money.m2_to_gdp`, `loans.total`, `loans.gel`, `loans.fx`, `loans.fx_share`, `deposits.total`, `deposits.gel`, `deposits.fx`, `deposits.individuals`, `deposits.legal_entities`, `deposits.fx_share`, `rates.policy`, `rates.loans_total`, `rates.loans_gel`, `rates.loans_fx`, `rates.deposits_total`, `rates.deposits_gel`, `rates.deposits_fx`, `banks.npl_ratio`, `banks.roa`, `banks.roe`, `banks.capital_ratio`, `banks.tier1_ratio`.
 - Validation rejects a changed value, a missing, extra or duplicate observation, and a year outside each table's coverage. It also checks:
   - lari + foreign currency equals the total, within rounding, for loans and deposits every year;
@@ -153,7 +153,7 @@ About 730 served values in total. The research package also keeps the API listin
 
 - The NBG workbooks and methodology PDFs are published through the existing source archive (`data/methodology/source-archives/money.csv`). The methodology bundle must not pull large data files (the PR #170 rule).
 - Excel reuses the three-sheet writer (Summary, Data, Sources) in the reader's language: the active tab's selected series and years, explicit units, blank missing cells, the "calculated by fiscal.ge" status on the deposit totals and the two shares, and validated source links. It has no internal identifier or cell-reference columns.
-- `/methodology/money` explains in plain words: what M0–M3 are (NBG's definitions), what "end of year" and "annual average" mean here, which banks the tables cover, how foreign-currency amounts are turned into lari, how the foreign-currency share is calculated and how it differs from NBG's ratio, the 2008 change of policy instrument, what each bank-health measure means, the 2022 method change, and that the pages state no causes.
+- `/methodology/money` explains in plain words: what M0–M3 are (NBG's definitions), what "end of year" and "annual average" mean here, which banks the tables cover, how foreign-currency amounts are turned into lari, how the foreign-currency share is calculated and how it differs from NBG's ratio, the 2008 change of policy instrument, what each bank-health measure means, the two bank-health breaks (2022 file change, 2023 IFRS review), and that the pages state no causes.
 
 ## 10. Out of scope
 

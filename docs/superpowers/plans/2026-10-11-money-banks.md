@@ -48,7 +48,7 @@ Download every file fresh. File URLs are `https://nbg.gov.ge/fm/%E1%83%A1%E1%83%
 
 **Interfaces:**
 - Produces: `money-banks-annual.csv` with columns `year,indicator_id,value,published_value,unit,basis,value_status,source_id,source_sheet,source_cell`. `value` is the exact `<v>` token (for calculated rows, the exact decimal sum or ratio computed with `decimal`). `published_value` is `value` rounded half-up to 1 decimal, or 2 for `rates.policy`. For calculated rows, `source_cell` joins the input cells with `+` (sums) or `/` (shares).
-- Produces: `money-banks-series-breaks.csv` with demography's header `break_id,applies_to,reference_date,reason,source_note` and one row: `fsi_method_2022`, `banks.npl_ratio;banks.roe`, `2022-12-31`, the reason in spec §7.
+- Produces: `money-banks-series-breaks.csv` with demography's header `break_id,applies_to,reference_date,reason,source_note` and two rows: `fsi_method_2022` (`banks.npl_ratio;banks.roe`, `2022-01-01`) and `fsi_ifrs_2023` (all five `banks.*`, `2023-01-01`), with the factual reasons in spec §7 (controller ruling, Task 1 fix round 1).
 - Source IDs: `nbg_money_aggregates` (M2.1), `nbg_loans_l3_5`, `nbg_deposits_d3_17`, `nbg_deposits_individuals_d3_23`, `nbg_deposits_legal_d3_27`, `nbg_policy_rate`, `nbg_loan_rates_lwir`, `nbg_deposit_rates_dwir`, `nbg_fsi_archive`, `nbg_fsi`, plus `nbg_statistics_page` and one ID per methodology PDF.
 - The cell map. `prepare.py` finds columns by header label text and rows by the date or year in column A, never by fixed positions:
 
@@ -76,7 +76,7 @@ Download every file fresh. File URLs are `https://nbg.gov.ge/fm/%E1%83%A1%E1%83%
   - `test_people_plus_companies`: individuals + legal entities equals `deposits.total` within 0.01 for 2015–2025.
   - `test_money_order`: M0 ≤ M1 ≤ M2 ≤ M3 every year.
   - `test_ranges`: every percent lies in 0–100, except `banks.roa` and `banks.roe`; `banks.roa` 2008 is negative.
-  - `test_fsi_overlap`: archive 2022Q4 and current December 2022 agree to one decimal for `banks.capital_ratio`, `banks.tier1_ratio` and `banks.roa`, and differ for `banks.npl_ratio` (1.7 / 1.5) and `banks.roe` (30.2 / 24.8). The break file has exactly the `fsi_method_2022` row.
+  - `test_fsi_overlap`: archive 2022Q4 and current December 2022 agree to one decimal for `banks.capital_ratio`, `banks.tier1_ratio` and `banks.roa`, and differ for `banks.npl_ratio` (1.7 / 1.5) and `banks.roe` (30.2 / 24.8). The break file has exactly the `fsi_method_2022` and `fsi_ifrs_2023` rows.
   - `test_anchor_values`: published values `money.m3` 2025 `57680.2`, `loans.total` 2025 `72453.0`, `rates.policy` 2025 `8.00`, `banks.npl_ratio` 2025 `2.5`, `deposits.fx_share` 2025 `48.6`, `loans.fx_share` 2025 `41.9`.
   - `test_no_exchange_rates`: no indicator ID contains `exchange` or `fx_rate`, and no exchange-rate workbook is in `official/`.
 - [ ] **Step 2: Run** `cd "docs/Raw Data/Money/nbg-money-banks-annual" && python3 -m unittest test_validation -v`. Expected: FAIL (no `prepare` module).
