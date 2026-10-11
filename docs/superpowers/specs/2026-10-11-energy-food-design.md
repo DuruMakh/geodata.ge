@@ -138,7 +138,7 @@ One package, `docs/Raw Data/EnergyFood/geostat-energy-food-annual/`, follows the
   - final consumption equals industry + transport + other sectors + non-energy use within 0.5;
   - total electricity production equals thermal + hydro + wind within 0.5 GWh;
   - total energy supply and final consumption match the energy efficiency workbook for all 12 years;
-  - for each food and year, the published ratio is within 10 percentage points of production ÷ (production + imports − exports) × 100 from the same sheet. Geostat's stock changes explain the small differences, for example sheep and goat meat 299 against 291 in 2017;
+  - for each food and year, the published ratio is within 10 percentage points of production ÷ (production + imports − exports) × 100 from the same sheet. A few published ratios differ from it, for example sheep and goat meat 299 against 291 in 2017; no reason is given;
   - spot values: 2024 energy supply 5,914.5, 2024 imports 5,099.0, 2024 electricity production 14,234.1 GWh, 2025 wheat 19%.
 - No estimates, interpolation or derived figures are served.
 
