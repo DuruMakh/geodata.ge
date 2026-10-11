@@ -36,6 +36,7 @@ test("income is one view: the map and list pick the area, Georgia first, and tow
   await expect(rows.first()).toHaveAttribute("aria-current", "true");
   await expect(rows.nth(1)).toHaveAttribute("data-region-id", "region.tbilisi");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "georgia");
+  await expect(page.getByTestId("household-chosen-area")).toHaveText("საქართველო");
   // One source line, carrying the map's boundaries credit.
   await expect(page.getByTestId("regional-source-note")).toHaveCount(0);
   await expect(page.getByTestId("source-label")).toContainText("2002–2025");
@@ -75,6 +76,7 @@ test("the list and the map set the area, which keeps the measure and the ticks t
   await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/income#area=region\.guria&per=person/);
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "region.guria");
   await expect(page.getByTestId("chart-panel")).toBeFocused();
+  await expect(page.getByTestId("household-chosen-area")).toHaveText("Guria");
   await expect(row(page, "region.guria")).toHaveAttribute("aria-current", "true");
   await expect(rows.first()).not.toHaveAttribute("aria-current", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
@@ -92,6 +94,7 @@ test("the list and the map set the area, which keeps the measure and the ticks t
   await rows.first().click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "georgia");
   await expect(rows.first()).toHaveAttribute("aria-current", "true");
+  await expect(page.getByTestId("household-chosen-area")).toHaveText("Georgia");
   await expect(page).not.toHaveURL(/area=/);
   await expect(page.getByTestId("year-range-strip")).toContainText("2002–2025");
   await expect(page.locator(pressed("settlement.rural"))).toHaveAttribute("aria-pressed", "false");

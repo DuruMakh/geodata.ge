@@ -123,6 +123,13 @@ test("old links: a towns or villages area opens Georgia, and the tab is ignored"
   expect(parseHouseholdHash("#tab=areas&per=household&sel=georgia,region.tbilisi,settlement.urban", "income", facts)).toMatchObject({ area: "georgia", selectedIds: ["settlement.urban"] });
 });
 
+test("a selection naming nothing the area has falls back to the first series, while an empty one stays empty", () => {
+  expect(parseHouseholdHash("#tab=areas&per=household&sel=georgia,region.tbilisi", "income", facts).selectedIds).toEqual(["income.total"]);
+  expect(parseHouseholdHash("#area=region.guria&sel=settlement.urban", "spending", facts).selectedIds).toEqual(["spending.consumption"]);
+  expect(parseHouseholdHash("#area=region.guria&sel=", "income", facts).selectedIds).toEqual([]);
+  expect(parseHouseholdHash("#sel=", "income", facts).selectedIds).toEqual([]);
+});
+
 test("the model carries published values for the chosen measure", () => {
   const perHousehold = buildHouseholdModel("income", facts, defaultHouseholdState("income"));
   expect(perHousehold.selected[0].endValue).toBe(2025.8);

@@ -124,6 +124,7 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section ref={chartRef} tabIndex={-1} aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={state.area} data-unit="gel" data-measure={state.measure} className="scroll-mt-[72px] min-[900px]:scroll-mt-3 border-t border-[var(--ink)] pt-4">
+          <h2 data-testid="household-chosen-area" className="mb-3 break-words font-[family-name:var(--font-display)] text-[19px] font-semibold">{areaLabels[state.area]}</h2>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
             {measureTabs}

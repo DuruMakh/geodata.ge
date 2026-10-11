@@ -57,17 +57,21 @@ export function defaultHouseholdState(section: HouseholdSectionId): HouseholdSta
   return { mode: "line", range: { kind: "all" }, area: "georgia", measure: "per_household", selectedIds: [householdViewSeries(section, "georgia")[0].id] };
 }
 
-/** An old link's tab is ignored, and its towns or villages area opens Georgia, whose list has them as lines. */
+/**
+ * An old link's tab is ignored, and its towns or villages area opens Georgia, whose list has them as lines.
+ * A selection naming nothing the area has (an old Regions-tab link) falls back to the first series; an empty one stays empty.
+ */
 export function parseHouseholdHash(hash: string, section: HouseholdSectionId, facts: readonly ClientHouseholdFact[]): HouseholdState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   const area = HOUSEHOLD_AREAS.find(item => item === p.get("area") && !SETTLEMENTS.includes(item)) ?? "georgia";
   const measure = HOUSEHOLD_MEASURES.find(item => MEASURE_KEYS[item] === p.get("per")) ?? "per_household";
   const series = householdViewSeries(section, area);
   const requested = p.has("sel") ? p.get("sel")!.split(",") : [series[0].id];
+  const selectedIds = series.map(s => s.id).filter(id => requested.includes(id));
   return {
     mode: p.get("view") === "table" ? "table" : "line", area, measure,
     range: refitRange(parseYearRangeKeys(p), householdCoverage(section, area, measure, facts), { collapseToAll: true }),
-    selectedIds: series.map(s => s.id).filter(id => requested.includes(id)),
+    selectedIds: selectedIds.length || p.get("sel") === "" ? selectedIds : [series[0].id],
   };
 }
 
