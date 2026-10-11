@@ -48,9 +48,12 @@ test("electricity supply 2023 is negative in the table (Review Focus 3)", async 
   await page.locator(toggle("energy.supply.electricity")).click();
   await expect(page.getByTestId("series-status")).toContainText("1 / 4");
   const start = page.getByTestId("range-start-handle");
-  while (await start.getAttribute("aria-valuenow") !== "2022") await start.press("ArrowRight");
+  for (let presses = 0; await start.getAttribute("aria-valuenow") !== "2022"; presses++) {
+    expect(presses, "the start handle should reach 2022 within 20 presses").toBeLessThan(20);
+    await start.press("ArrowRight");
+  }
   // The axis reaches below zero rather than clipping the 2023 value.
-  await expect(page.getByTestId("chart-panel").locator("svg").first()).toContainText("−");
+  await expect(page.getByTestId("chart-panel").getByText("−2,500", { exact: true })).toHaveCount(1);
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
   await expect(table.locator("thead")).toContainText("2022");
@@ -67,6 +70,8 @@ test("electricity keeps the wind gap before 2016 as a chart, not the empty callo
   await expect(page.locator(toggle("electricity.production.wind"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
   await expect(page.getByTestId("chart-panel").locator("svg").first()).toBeVisible();
+  // The panel names the unit; axis ticks carry numbers only.
+  await expect(page.getByTestId("chart-panel").locator("svg").first()).not.toContainText("GWh");
   await page.getByTestId("chart-mode-table").click();
   const wind = page.getByTestId("explorer-table").locator("tbody tr", { hasText: "Wind plants" });
   await expect(wind).toContainText("—");
@@ -91,8 +96,20 @@ test("food shows whole-number wheat self-sufficiency and nests four meats under 
   // A nested tick is counted apart; the top-level count stays.
   await expect(page.getByTestId("series-status")).toContainText("1 / 8");
   await page.getByTestId("chart-mode-table").click();
-  await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("19");
+  const wheat = page.getByTestId("explorer-table").locator("tbody tr").first();
+  await expect(wheat).toContainText("Wheat");
+  await expect(wheat.locator("td").last()).toHaveText("19%");
   await expect(page.getByTestId("explorer-table")).not.toContainText("19.0");
+});
+
+test("clearing the selection shows the empty callout and disables Excel", async ({ page }) => {
+  await page.goto("/en/explorer/energy-food/energy-supply");
+  await ready(page);
+  await expect(page.getByTestId("energy-food-excel-download")).toBeEnabled();
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await expect(page.getByTestId("energy-food-excel-download")).toBeDisabled();
 });
 
 test("Excel downloads an .xlsx of the selection", async ({ page }) => {

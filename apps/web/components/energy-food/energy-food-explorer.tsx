@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
 import { buildEnergyFoodModel, energyFoodCoverage, energyFoodUnit, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodSeriesModel, type EnergyFoodState } from "../../lib/explorer/energyFood";
 import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
@@ -15,34 +15,13 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashExplorerState } from "../explorer-shell/use-hash-explorer-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
-
-function useEnergyFoodState(section: EnergyFoodSectionId, facts: ClientEnergyFoodFact[]) {
-  const [state, setState] = useState(() => parseEnergyFoodHash("", section, facts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseEnergyFoodHash(window.location.hash, section, facts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [section, facts]);
-  useAppReady();
-  const update = useCallback((change: (previous: EnergyFoodState) => EnergyFoodState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeEnergyFoodHash(next, section)}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-  }, [section]);
-  return { state, update };
-}
 
 export type EnergyFoodExplorerProps = {
   section: EnergyFoodSectionId; facts: ClientEnergyFoodFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
@@ -52,16 +31,19 @@ export type EnergyFoodExplorerProps = {
 export function EnergyFoodExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin }: EnergyFoodExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `energyFood.${key}`, values);
-  const { state, update } = useEnergyFoodState(section, facts);
+  const parse = useCallback((hash: string) => parseEnergyFoodHash(hash, section, facts), [section, facts]);
+  const serialize = useCallback((next: EnergyFoodState) => serializeEnergyFoodHash(next, section), [section]);
+  const { state, update } = useHashExplorerState(parse, serialize);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildEnergyFoodModel(section, facts, state);
   // Energy is in thousand tonnes of oil equivalent or GWh; food is a self-sufficiency percent, drawn on a percent axis.
+  // The chart panel names the unit, so axis ticks and cells carry numbers only; the latest line adds "GWh" to its value.
   const unitKind = energyFoodUnit(section), percent = unitKind === "percent";
-  const unit: ValueUnit = { divisor: 1, label: unitKind === "gwh" ? t("unit.gwh") : "", decimals: model.decimals };
+  const unit: ValueUnit = { divisor: 1, label: "", decimals: model.decimals };
   const unitLabel = t(`unit.${unitKind}Long`);
   const format = (value: number | null | undefined, decimals = model.decimals) => formatInUnit(value, { ...unit, decimals });
-  const suffix = percent ? "%" : unit.label ? ` ${unit.label}` : "";
+  const suffix = percent ? "%" : unitKind === "gwh" ? ` ${t("unit.gwh")}` : "";
   const valueLabel = (value: number | null | undefined, decimals?: number) => value == null ? "—" : `${format(value, decimals)}${suffix}`;
   const matches = (id: string) => matchesLabelQuery(query, [labels[id]]);
   const reference = model.series[0];
@@ -107,8 +89,8 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={percent} unit={unit} shareLabel={title} formatTooltipValue={value => valueLabel(value)} /></div>
-            // Food ratios are whole numbers as Geostat prints them, so table cells stay in the unit rather than the one-decimal share format; the caption names the percent.
-            : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
+            // Food ratios are whole percents, as Geostat prints them.
+            : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} percentDecimals={0} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
           <RangeStrip years={energyFoodCoverage(section, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildEnergyFoodModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(percent ? "sourceNote.food" : "sourceNote.energy")} · {unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
