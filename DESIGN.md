@@ -457,7 +457,7 @@ spacing:
 
 Everything under `/explorer` renders inside a persistent shell: a dark sidebar on the left, the content column beside it (max-width 1180px, **centred** in the space left over, page padding `20px` / `34px` at ≥768px). Centring matters past ~1500px: left-aligned, the column strands the whole surplus as one blank margin on the right. Implementation: `apps/web/components/shell/`.
 
-**Sidebar (expanded, ≥900px).** 232px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls. Dividers on ink are `rgba(247,242,233,0.12)`; the active row background is `rgba(247,242,233,0.07)`.
+**Sidebar (expanded, ≥900px).** 232px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls. When its links exceed the viewport height, the expanded sidebar's panel below the brand row scrolls on its own. Dividers on ink are `rgba(247,242,233,0.12)`; the active row background is `rgba(247,242,233,0.07)`.
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
