@@ -10,7 +10,7 @@ export const MONEY_BANKS_SECTIONS = [
   { id: "bank-health", href: "/explorer/money/bank-health", labelKey: "common.moneyBankHealth" },
 ] as const;
 export type MoneyBanksSectionId = typeof MONEY_BANKS_SECTIONS[number]["id"];
-/** The views of a page: loans and deposits switch them with tabs, money supply with the % of GDP pill; interest rates and bank health have one. */
+/** The views of a page: money supply and loans and deposits switch them with the icon measure switch; interest rates and bank health have one. */
 export type MoneyBanksView = "amount" | "gdp" | "fx_share" | "main";
 const VIEWS: Record<MoneyBanksSectionId, readonly MoneyBanksView[]> = {
   "supply": ["amount", "gdp"],
@@ -47,8 +47,16 @@ export function moneyBanksDefaultSelection(section: MoneyBanksSectionId, view: M
   return section === "loans-deposits" && view === "amount" ? ["loans.total", "deposits.total"] : [moneyBanksViewSeries(section, view)[0].id];
 }
 
-/** The money-supply series NBG publishes both as an amount and as a ratio to GDP; the % of GDP pill carries them across. */
-const GDP_PAIRS: readonly (readonly [string, string])[] = [["money.m3", "money.m3_to_gdp"], ["money.m2", "money.m2_to_gdp"]];
+/**
+ * The series the measure switch carries across, as [amount, share] pairs: M3 and M2 to and from NBG's ratios to GDP, and
+ * every loan or deposit amount to its foreign-currency share. A share carries back to its first pair, the total.
+ */
+const MEASURE_PAIRS: readonly (readonly [string, string])[] = [
+  ["money.m3", "money.m3_to_gdp"], ["money.m2", "money.m2_to_gdp"],
+  ...(["loans.total", "loans.gel", "loans.fx"] as const).map(id => [id, "loans.fx_share"] as const),
+  ...(["deposits.total", "deposits.gel", "deposits.fx", "deposits.individuals", "deposits.legal_entities"] as const).map(id => [id, "deposits.fx_share"] as const),
+];
+const counterpart = (id: string) => { const pair = MEASURE_PAIRS.find(([amount, share]) => amount === id || share === id); return pair && (pair[0] === id ? pair[1] : pair[0]); };
 
 export function moneyBanksSeriesColor(series: MoneyBanksSeriesDefinition, index: number): string {
   return series.reference ? INK : colorForItem(series.id, index);
@@ -95,12 +103,13 @@ export function serializeMoneyBanksHash(state: MoneyBanksState, section: MoneyBa
 
 /**
  * Switching view keeps mode and years (clamped to the view's coverage). Selected M3 and M2 carry across to and from
- * their GDP ratios; anything else (and an empty result) falls back to the new view's default selection.
+ * their GDP ratios, and loans and deposits to and from their foreign-currency shares (a share back to its total);
+ * anything else (and an empty result) falls back to the new view's default selection.
  * A chosen range is never collapsed to "all", so 1995–2005 picked on the amounts becomes 1996–2005 on the GDP ratios
  * and stays 1996–2005 when switching back.
  */
 export function changeMoneyBanksView(state: MoneyBanksState, section: MoneyBanksSectionId, view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[]): MoneyBanksState {
-  const carried = new Set(GDP_PAIRS.flatMap(([amount, ratio]) => state.selectedIds.includes(amount) ? [ratio] : state.selectedIds.includes(ratio) ? [amount] : []));
+  const carried = new Set(state.selectedIds.map(counterpart));
   const selectedIds = moneyBanksViewSeries(section, view).map(s => s.id).filter(id => carried.has(id));
   return { ...state, view, selectedIds: selectedIds.length ? selectedIds : moneyBanksDefaultSelection(section, view), range: refitRange(state.range, moneyBanksCoverage(section, view, facts), { collapseToAll: false }) };
 }

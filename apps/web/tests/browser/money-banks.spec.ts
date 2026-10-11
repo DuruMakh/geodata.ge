@@ -28,6 +28,9 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await page.goto(`${prefix}/explorer/money/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
       await expect(page.getByTestId("series-status")).toContainText(INITIAL_COUNT[section]);
+      // No money page has a tab row: two of them switch measures with icons on the chart toolbar.
+      await expect(page.getByTestId("money-tabs")).toHaveCount(0);
+      await expect(page.locator('[data-testid^="money-measure-"]')).toHaveCount(section === "supply" || section === "loans-deposits" ? 2 : 0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     expect(errors).toEqual([]);
@@ -39,7 +42,12 @@ test("money supply has no tabs and defaults to the amounts with broad money alon
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("money-latest")).toContainText("57.7");
   await expect(page.getByTestId("money-tabs")).toHaveCount(0);
-  await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "false");
+  // The icon switch: ₾ for the amounts, a pie for % of GDP, each named for screen readers and in its tooltip.
+  const measures = page.getByRole("group", { name: "მაჩვენებელი" });
+  await expect(measures.getByRole("button", { name: "მოცულობა" })).toHaveAttribute("aria-pressed", "true");
+  await expect(measures.getByRole("button", { name: "მშპ-სთან შეფარდებით" })).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("money-measure-amount")).toHaveText("₾");
+  await expect(page.getByTestId("money-measure-gdp").locator("svg.lucide-chart-pie")).toHaveCount(1);
   await expect(page.getByTestId("money-unit-label")).toBeVisible();
   await expect(page.getByTestId("series-status")).toContainText("1 / 4");
   await expect(page.locator(pressed("money.m3"))).toHaveAttribute("aria-pressed", "true");
@@ -48,23 +56,28 @@ test("money supply has no tabs and defaults to the amounts with broad money alon
   await expect(page.getByTestId("source-label")).toContainText("საქართველოს ეროვნული ბანკი");
 });
 
-test("the % of GDP pill shows NBG's ratios, carries M3 and M2 across and drops M1", async ({ page }) => {
+test("the % of GDP icon shows NBG's ratios, carries M3 and M2 across and drops M1", async ({ page }) => {
   await page.goto("/en/explorer/money/supply");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByRole("group", { name: "Measure" }).getByRole("button", { name: "Compared with GDP" })).toBeVisible();
   await page.locator(pressed("money.m2")).click();
   await page.locator(pressed("money.m1")).click();
-  await page.getByTestId("measure-share-toggle").click();
-  await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Compared with GDP" }).click();
+  await expect(page.getByTestId("money-measure-gdp")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("money-measure-amount")).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
-  // The pill already says % of GDP, so the unit caption beside it goes, as on Debt.
-  await expect(page.getByTestId("money-unit-label")).toHaveCount(0);
+  // The icon carries no text, so the unit caption beside it stays and names the percent.
+  await expect(page.getByTestId("money-unit-label")).toHaveText("%");
+  // Touch readers get no tooltip: the line under the heading names the selected measure.
+  await expect(page.getByTestId("money-latest")).toHaveText("Broad money (M3) to GDP · 2025: 56.0%");
   await expect(page.getByTestId("series-status")).toContainText("2 / 2");
   for (const id of ["money.m3_to_gdp", "money.m2_to_gdp"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/tab=gdp/);
   await expect(page.getByTestId("year-range-strip")).toContainText("1996–2025");
-  await page.getByTestId("measure-share-toggle").click();
+  await page.getByTestId("money-measure-amount").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "gel");
-  await expect(page.getByTestId("money-unit-label")).toBeVisible();
+  await expect(page.getByTestId("money-unit-label")).toHaveText("bn GEL");
+  await expect(page.getByTestId("money-latest")).toContainText("Broad money (M3) · 2025: 57.7");
   for (const id of ["money.m3", "money.m2"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(2);
 });
@@ -80,11 +93,11 @@ test("company deposits before 2015 are a dash, not zero", async ({ page }) => {
   await expect(await cell(page, "All deposits", 2014)).not.toHaveText("—");
 });
 
-test("loans and deposits share one tab with both totals selected and their parts nested", async ({ page }) => {
+test("loans and deposits has no tabs, both totals selected and their parts nested", async ({ page }) => {
   await page.goto("/explorer/money/loans-deposits");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("money-tabs").locator('[data-testid^="money-tab-"]')).toHaveCount(2);
-  await expect(page.getByTestId("money-tab-amount")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("money-tabs")).toHaveCount(0);
+  await expect(page.getByTestId("money-measure-amount")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("series-status")).toContainText("2 / 4");
   for (const id of ["loans.total", "deposits.total"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(2);
@@ -95,6 +108,36 @@ test("loans and deposits share one tab with both totals selected and their parts
   await page.locator(pressed("loans.gel")).click();
   await expect(page.getByTestId("series-status")).toContainText("2 / 4");
   await expect(page).toHaveURL(/sel=loans\.total(%2C|,)loans\.gel(%2C|,)deposits\.total(&|$)/);
+});
+
+test("the foreign-currency icon carries loans and deposits to their shares and back to the totals", async ({ page }) => {
+  await page.goto("/en/explorer/money/loans-deposits");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const measures = page.getByRole("group", { name: "Measure" });
+  await expect(measures.getByRole("button", { name: "Amount" })).toHaveAttribute("aria-pressed", "true");
+  const share = measures.getByRole("button", { name: "Share in foreign currency" });
+  await expect(share).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("money-measure-fx_share").locator("svg.lucide-circle-dollar-sign")).toHaveCount(1);
+  // Only deposits selected: people's deposits carry to the deposits share.
+  await page.locator(pressed("loans.total")).click();
+  await page.locator(pressed("deposits.total")).click();
+  await page.locator(pressed("deposits.individuals")).click();
+  await share.click();
+  await expect(share).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/tab=fx_share/);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
+  await expect(page.getByTestId("money-latest")).toHaveText("Share of loans in foreign currency · 2025: 41.9%");
+  await expect(page.locator(pressed("deposits.fx_share"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(1);
+  // The hash key and the Excel filename keep the view's id.
+  const promise = page.waitForEvent("download"); await page.getByTestId("money-excel-download").click();
+  expect((await promise).suggestedFilename()).toContain("money-loans-deposits-fx_share-");
+  await page.locator(pressed("loans.fx_share")).click();
+  await measures.getByRole("button", { name: "Amount" }).click();
+  await expect(page).toHaveURL(/tab=amount/);
+  for (const id of ["loans.total", "deposits.total"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(2);
+  await expect(page.getByTestId("money-latest")).toContainText("Bank loans · 2025:");
 });
 
 test("the National Bank rate has no tabs, two decimals and a gap before 2008", async ({ page }) => {
@@ -139,9 +182,9 @@ test("the Excel download keeps the 2008 loss as a negative number", async ({ pag
   expect(values).toContain(-2.5);
 });
 
-const SAVED: Record<string, { hash: string; tab?: string; gdp?: boolean; selected: string[]; range: string }> = {
-  "supply": { hash: "tab=gdp&view=table&sel=money.m3_to_gdp%2Cmoney.m2_to_gdp&start=2000&end=2020", gdp: true, selected: ["money.m3_to_gdp", "money.m2_to_gdp"], range: "2000–2020" },
-  "loans-deposits": { hash: "tab=fx_share&view=table&sel=deposits.fx_share&start=2005&end=2015", tab: "fx_share", selected: ["deposits.fx_share"], range: "2005–2015" },
+const SAVED: Record<string, { hash: string; measure?: string; selected: string[]; range: string }> = {
+  "supply": { hash: "tab=gdp&view=table&sel=money.m3_to_gdp%2Cmoney.m2_to_gdp&start=2000&end=2020", measure: "gdp", selected: ["money.m3_to_gdp", "money.m2_to_gdp"], range: "2000–2020" },
+  "loans-deposits": { hash: "tab=fx_share&view=table&sel=deposits.fx_share&start=2005&end=2015", measure: "fx_share", selected: ["deposits.fx_share"], range: "2005–2015" },
   "interest-rates": { hash: "view=table&sel=rates.policy%2Crates.loans_gel&start=2010&end=2020", selected: ["rates.policy", "rates.loans_gel"], range: "2010–2020" },
   "bank-health": { hash: "view=table&sel=banks.tier1_ratio&start=2016&end=2024", selected: ["banks.tier1_ratio"], range: "2016–2024" },
 };
@@ -156,8 +199,7 @@ for (const section of SECTIONS) {
     await page.getByTestId("language-switch").getByRole("link", { name: "English", exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/en/explorer/money/${section}#`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-    if (saved.tab) await expect(page.getByTestId(`money-tab-${saved.tab}`)).toHaveAttribute("aria-pressed", "true");
-    if (saved.gdp) await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
+    if (saved.measure) await expect(page.getByTestId(`money-measure-${saved.measure}`)).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
     await expect(page.getByTestId("year-range-strip")).toContainText(saved.range);
     for (const id of saved.selected) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");

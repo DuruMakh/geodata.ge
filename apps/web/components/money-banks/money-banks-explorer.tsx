@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { ChartPie, CircleDollarSign } from "lucide-react";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksSeriesModel, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
@@ -14,7 +15,6 @@ import { matchesLabelQuery } from "../../lib/i18n/search";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
-import { MeasurePill } from "../explorer-shell/measure-pill";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
@@ -22,7 +22,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 function useMoneyBanksState(section: MoneyBanksSectionId, facts: ClientMoneyBanksFact[]) {
   const [state, setState] = useState(() => parseMoneyBanksHash("", section, facts));
@@ -87,14 +87,15 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
       {open ? nested.map(renderRow) : null}
     </div>;
   }
-  // The latest-value line is the page's headline: the first series of its first tab, in that series' own unit.
-  const headline = moneyBanksViewSeries(section, moneyBanksViews(section)[0])[0].id;
+  // The latest-value line is the page's headline: the first series of the current view, in that series' own unit. A share
+  // view names its series, so touch readers, who get no tooltip, see which measure the switch selected (DESIGN §7.2a).
+  const views = moneyBanksViews(section);
+  const headline = moneyBanksViewSeries(section, state.view)[0].id;
   const latest = facts.filter(f => f.indicatorId === headline).sort((a, b) => a.year - b.year).at(-1)!;
   const latestValue = latest.unit === "gel" ? formatAmount(latest.value, locale) : `${formatInUnit(latest.value, { divisor: 1, label: "", decimals: latest.decimals })}${t("unitPercent")}`;
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
-  // Money supply switches between its amounts and NBG's GDP ratios with the % of GDP pill, not tabs.
-  const gdpPill = section === "supply";
+  // Money supply and Loans and deposits switch between their amounts and a share with the icon measure switch (DESIGN §7.2a), not tabs.
   const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="money-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
@@ -102,18 +103,18 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, lastReview
   }} />;
   return <div data-testid={`money-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
-    <LatestValueLine testId="money-latest" measure={t(`latest.${section}`)} period={latest.year} value={latestValue} />
-    {!gdpPill && moneyBanksViews(section).length > 1 ? <div data-testid="money-tabs" role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
-      {moneyBanksViews(section).map(view => <TextTab key={view} label={t(`tab.${view}`)} active={state.view === view} testId={`money-tab-${view}`} onClick={() => changeView(view)} />)}
-    </div> : null}
+    <LatestValueLine testId="money-latest" measure={state.view === views[0] ? t(`latest.${section}`) : labels[headline]} period={latest.year} value={latestValue} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-view={state.view} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className={`flex flex-wrap ${views.length > 1 ? "items-center" : "items-end"} justify-between gap-3`}>
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
             <div className="flex items-center gap-3.5">
-              {gdpPill && state.view === "gdp" ? null : <span data-testid="money-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>}
-              {gdpPill ? <MeasurePill label={message(messages, "main.percentGdp")} pressed={state.view === "gdp"} onChange={pressed => changeView(pressed ? "gdp" : "amount")} /> : null}
+              <span data-testid="money-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
+              {views.length > 1 ? <SegmentedTabs ariaLabel={t("measure")} value={state.view} onChange={changeView} options={views.map((view, index) => ({
+                value: view, label: t(`tab.${view}`), testId: `money-measure-${view}`,
+                icon: index === 0 ? <span aria-hidden="true" className="text-base">₾</span> : view === "gdp" ? <ChartPie aria-hidden="true" size={18} strokeWidth={1.5} /> : <CircleDollarSign aria-hidden="true" size={18} strokeWidth={1.5} />,
+              }))} /> : null}
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>

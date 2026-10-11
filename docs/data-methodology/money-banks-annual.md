@@ -59,8 +59,8 @@ The pages show the published value: one decimal for percents, two for the Nation
 
 Routes are `/explorer/money` with `/supply`, `/loans-deposits`, `/interest-rates` and `/bank-health`, plus `/methodology/money`, each mirrored under `/en`. The sidebar entry sits after Inflation.
 
-- **Money supply**: M3, M2, M1 and M0, with a % of GDP pill for NBG's M3 and M2 ratios to GDP.
-- **Loans and deposits**: Amount (loans and deposits together: totals with lari and foreign currency nested under them; deposits of people and of companies and organisations) and Share in foreign currency.
+- **Money supply**: M3, M2, M1 and M0, with a % of GDP icon switch for NBG's M3 and M2 ratios to GDP.
+- **Loans and deposits**: Amount (loans and deposits together: totals with lari and foreign currency nested under them; deposits of people and of companies and organisations), with a share-in-foreign-currency icon switch.
 - **Interest rates**: the National Bank rate and the loan and deposit rates.
 - **Bank health**: bad loans, return on assets and on equity, and the two capital ratios in one list.
 

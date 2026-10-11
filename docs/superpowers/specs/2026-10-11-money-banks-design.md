@@ -76,6 +76,8 @@ Line under the heading: "2025: bank loans 72.5 billion GEL".
 
 > Changed after preview review (Duru, 2026-10-11): two tabs: Amount (loans then deposits, with **All loans** and **All deposits** both selected) and Share in foreign currency.
 
+> Changed after preview review (Duru, 2026-10-11): no tabs; an icon-only measure switch on the chart toolbar (`₾` Amount, `CircleDollarSign` Share in foreign currency, as % of GDP became a `ChartPie` icon on Money supply) carries any loan to the loans share and any deposit to the deposits share, and each share back to its total.
+
 - Loans are NBG table L3.5 (loans granted by banks, excluding interbank loans, including overdue loans and accrued interest). Deposits are NBG table D3.17 (all deposits in banks). People are table D3.23 and companies and organisations ("legal entities") table D3.27; the two add up exactly to D3.17's total from 2015. NBG publishes each deposit table as a lari sheet and a foreign-currency sheet, so the three deposit totals (all, people, companies) are lari + foreign currency added up by fiscal.ge and marked as calculated.
 - The foreign-currency share is foreign-currency amount ÷ total amount from those same tables, calculated by fiscal.ge, so the Share tab always agrees with the Loans and Deposits tabs. NBG's own dollarization ratio counts non-bank deposits only, and table D3.17 also includes banks' deposits, so the two differ (47.7% against 48.6% at the end of 2025); the methodology page says so.
 - Foreign-currency amounts are NBG's lari values at the end-of-month official rate. No exchange rate is served.

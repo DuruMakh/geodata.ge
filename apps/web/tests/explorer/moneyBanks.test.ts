@@ -75,7 +75,7 @@ test("switching to the GDP ratios clamps a range starting 1995 to 1996, and swit
   expect(back).toMatchObject({ view: "amount", range: { kind: "manual", start: 1996, end: 2005 }, selectedIds: ["money.m3"] });
 });
 
-test("the % of GDP pill carries M3 and M2 across, drops M1 and M0, and falls back to the default", () => {
+test("the % of GDP switch carries M3 and M2 across, drops M1 and M0, and falls back to the default", () => {
   const supply = (selectedIds: string[]) => ({ ...defaultMoneyBanksState("supply"), selectedIds });
   expect(changeMoneyBanksView(supply(["money.m3", "money.m2", "money.m1", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp", "money.m2_to_gdp"]);
   expect(changeMoneyBanksView(supply(["money.m2", "money.m0"]), "supply", "gdp", facts).selectedIds).toEqual(["money.m2_to_gdp"]);
@@ -83,10 +83,30 @@ test("the % of GDP pill carries M3 and M2 across, drops M1 and M0, and falls bac
   expect(changeMoneyBanksView(supply([]), "supply", "gdp", facts).selectedIds).toEqual(["money.m3_to_gdp"]);
   const gdp = { ...defaultMoneyBanksState("supply"), view: "gdp" as const, selectedIds: ["money.m2_to_gdp"] };
   expect(changeMoneyBanksView(gdp, "supply", "amount", facts).selectedIds).toEqual(["money.m2"]);
-  // Loans and deposits has no pairs: each tab starts from its own default.
-  const share = changeMoneyBanksView(defaultMoneyBanksState("loans-deposits"), "loans-deposits", "fx_share", facts);
-  expect(share.selectedIds).toEqual(["loans.fx_share"]);
-  expect(changeMoneyBanksView(share, "loans-deposits", "amount", facts).selectedIds).toEqual(["loans.total", "deposits.total"]);
+});
+
+test("the foreign-currency switch carries loans and deposits to their shares and back to the totals", () => {
+  const amount = (selectedIds: string[]) => ({ ...defaultMoneyBanksState("loans-deposits"), selectedIds });
+  const toShare = (selectedIds: string[]) => changeMoneyBanksView(amount(selectedIds), "loans-deposits", "fx_share", facts).selectedIds;
+  // The default pair of totals becomes both shares.
+  expect(toShare(["loans.total", "deposits.total"])).toEqual(["loans.fx_share", "deposits.fx_share"]);
+  // Any loan maps to the loans share and any deposit to the deposits share, de-duplicated and in the view's order.
+  expect(toShare(["loans.gel", "loans.fx"])).toEqual(["loans.fx_share"]);
+  expect(toShare(["deposits.legal_entities", "loans.fx"])).toEqual(["loans.fx_share", "deposits.fx_share"]);
+  for (const id of ["deposits.total", "deposits.gel", "deposits.fx", "deposits.individuals", "deposits.legal_entities"]) expect(toShare([id])).toEqual(["deposits.fx_share"]);
+  // Nothing selected falls back to the share view's default.
+  expect(toShare([])).toEqual(["loans.fx_share"]);
+  const share = (selectedIds: string[]) => ({ ...defaultMoneyBanksState("loans-deposits"), view: "fx_share" as const, selectedIds });
+  const toAmount = (selectedIds: string[]) => changeMoneyBanksView(share(selectedIds), "loans-deposits", "amount", facts).selectedIds;
+  expect(toAmount(["loans.fx_share", "deposits.fx_share"])).toEqual(["loans.total", "deposits.total"]);
+  expect(toAmount(["deposits.fx_share"])).toEqual(["deposits.total"]);
+  expect(toAmount(["loans.fx_share"])).toEqual(["loans.total"]);
+  expect(toAmount([])).toEqual(["loans.total", "deposits.total"]);
+  // The switch keeps the years, clamped to the view's coverage, and survives the round trip.
+  const ranged = { ...amount(["deposits.individuals"]), range: { kind: "manual" as const, start: 2005, end: 2015 } };
+  const there = changeMoneyBanksView(ranged, "loans-deposits", "fx_share", facts);
+  expect(there).toMatchObject({ view: "fx_share", range: { kind: "manual", start: 2005, end: 2015 }, selectedIds: ["deposits.fx_share"] });
+  expect(changeMoneyBanksView(there, "loans-deposits", "amount", facts)).toMatchObject({ view: "amount", range: { kind: "manual", start: 2005, end: 2015 }, selectedIds: ["deposits.total"] });
 });
 
 test("the hash round-trips, drops another tab's series and keeps an explicit empty selection", () => {
