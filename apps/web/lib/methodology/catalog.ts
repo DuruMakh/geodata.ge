@@ -10,6 +10,8 @@ import { WAGES_METHODOLOGY_CONTENT } from "./content/wages";
 import { WAGES_METHODOLOGY_CONTENT as EN_WAGES } from "./content/en/wages";
 import { POVERTY_METHODOLOGY_CONTENT } from "./content/poverty";
 import { POVERTY_METHODOLOGY_CONTENT as EN_POVERTY } from "./content/en/poverty";
+import { ENERGY_FOOD_METHODOLOGY_CONTENT } from "./content/energyFood";
+import { ENERGY_FOOD_METHODOLOGY_CONTENT as EN_ENERGY_FOOD } from "./content/en/energyFood";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
@@ -54,6 +56,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   poverty: POVERTY_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
   "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
+  "energy-food": ENERGY_FOOD_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
 
@@ -67,6 +70,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   demography: EN_DEMOGRAPHY,
   wages: EN_WAGES,
   poverty: EN_POVERTY,
+  "energy-food": EN_ENERGY_FOOD,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {

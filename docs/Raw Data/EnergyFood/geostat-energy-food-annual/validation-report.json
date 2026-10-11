@@ -1,0 +1,332 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-11",
+  "scope": "Annual research only: Geostat energy balances 2013-2024 (supply, imports, exports, final consumption, electricity) and food self-sufficiency ratios 2014-2025; no monthly data, prices or serving",
+  "primary_observation_count": 681,
+  "observations_by_group": {
+    "electricity": 165,
+    "food": 144,
+    "supply page": 204,
+    "use page": 168
+  },
+  "observations_by_source": {
+    "geostat_energy_balance_2013_aggregated": 31,
+    "geostat_energy_balance_2013_electricity": 13,
+    "geostat_energy_balance_2014_aggregated": 31,
+    "geostat_energy_balance_2014_electricity": 13,
+    "geostat_energy_balance_2015_aggregated": 31,
+    "geostat_energy_balance_2015_electricity": 13,
+    "geostat_energy_balance_2016_aggregated": 31,
+    "geostat_energy_balance_2016_electricity": 14,
+    "geostat_energy_balance_2017_aggregated": 31,
+    "geostat_energy_balance_2017_electricity": 14,
+    "geostat_energy_balance_2018_aggregated": 31,
+    "geostat_energy_balance_2018_electricity": 14,
+    "geostat_energy_balance_2019_aggregated": 31,
+    "geostat_energy_balance_2019_electricity": 14,
+    "geostat_energy_balance_2020_aggregated": 31,
+    "geostat_energy_balance_2020_electricity": 14,
+    "geostat_energy_balance_2021_aggregated": 31,
+    "geostat_energy_balance_2021_electricity": 14,
+    "geostat_energy_balance_2022_aggregated": 31,
+    "geostat_energy_balance_2022_electricity": 14,
+    "geostat_energy_balance_2023_aggregated": 31,
+    "geostat_energy_balance_2023_electricity": 14,
+    "geostat_energy_balance_2024_aggregated": 31,
+    "geostat_energy_balance_2024_electricity": 14,
+    "geostat_food_balance_sheets": 144
+  },
+  "no_flow_count": 3,
+  "no_flow_cells": [
+    {
+      "indicator_id": "energy.imports.crude_oil",
+      "year": 2013,
+      "source_id": "geostat_energy_balance_2013_aggregated",
+      "source_sheet": "KTOE",
+      "source_cell": "C6"
+    },
+    {
+      "indicator_id": "energy.imports.crude_oil",
+      "year": 2021,
+      "source_id": "geostat_energy_balance_2021_aggregated",
+      "source_sheet": "KTOE",
+      "source_cell": "C7"
+    },
+    {
+      "indicator_id": "energy.supply.crude_oil",
+      "year": 2013,
+      "source_id": "geostat_energy_balance_2013_aggregated",
+      "source_sheet": "KTOE",
+      "source_cell": "C11"
+    }
+  ],
+  "ellipsis_cells_in_served_values": 0,
+  "imputed_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": [
+    "no duplicate, missing or extra observation",
+    "published value equals the stored value as Geostat displays it",
+    "every row equals its re-read source cell, number format and printed row and column label",
+    "production + imports - exports - bunkers + stock changes = domestic supply within 0.2, every fuel and year",
+    "Total column = sum of fuel columns within 0.5 for supply, imports and final consumption",
+    "final consumption = industry + transport + other sectors (+ non-energy use) within 0.5",
+    "electricity production = thermal + hydro + wind within 0.5 GWh",
+    "electricity supply - energy sector - losses = final consumption within 0.5 GWh",
+    "food ratio within 10 points of production / (production + import - export)",
+    "efficiency workbook cross-check: see independent-validation.json"
+  ],
+  "source_checks": [
+    {
+      "source_id": "geostat_energy_balance_2013_aggregated",
+      "sha256": "BF69A1B3346BE1421EE3166F7DE3692A35F91C5B01B298037B1528B54A07EF09",
+      "bytes": 22173,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2013_electricity",
+      "sha256": "8704D6062DFA6D58BE842A8B508BFCF8ECD9C3A3A4840ECBA35A07C59F989903",
+      "bytes": 17101,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2014_aggregated",
+      "sha256": "7FA655679C366FEE5ED45AD5C9CBB66D7E164464F4DBEF4930D4D864B4B3A7C5",
+      "bytes": 22755,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2014_electricity",
+      "sha256": "443460CE1228FE8BBDBC9977BC48D735BC1CBAC1502117860DE814FEE87746A3",
+      "bytes": 16653,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2015_aggregated",
+      "sha256": "2CE226CC6540806B8CEA2DF9784D4086A054CBBB9EBEE7CAB807AAEFE13338B0",
+      "bytes": 23244,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2015_electricity",
+      "sha256": "4CE0F6EC6D827B9CC916FA8EA6B9694623CF26E8C6FAA0F6E08FF9D779D7D921",
+      "bytes": 18241,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2016_aggregated",
+      "sha256": "ABE02A7269D350EA4777B0F0B2527D8E96934ECED934B0FA022528629F7A3C4F",
+      "bytes": 23799,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2016_electricity",
+      "sha256": "8C852833DBECF007AAF5736ABD0F0F8E0CED54E426AA56B6C5384A4CC8AEC98E",
+      "bytes": 18974,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2017_aggregated",
+      "sha256": "0F6873F9026B8A775E4D39002D6444378332B1D23F134CF33E882DFE2D1D9ADB",
+      "bytes": 23359,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2017_electricity",
+      "sha256": "7AE7ECFAAB0A4A35ED7EDEF9B1CEF01343019D25EA20A550EA098B681FA6CC16",
+      "bytes": 18929,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2018_aggregated",
+      "sha256": "F07DE85180AF72F9D136D221AEE108D0EB5C6EDD2C725A7BE52162F0A598EC3B",
+      "bytes": 23473,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2018_electricity",
+      "sha256": "C1C2802B8CE89BF8D4F6FF93764ECF46444AA0E3835E0BB0E1766D442562B000",
+      "bytes": 19141,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2019_aggregated",
+      "sha256": "2B73F781845CF9439CB12D9BA1D876EDF3FEB02DCDA82B3270F3376D7683B264",
+      "bytes": 23778,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2019_electricity",
+      "sha256": "97F13308BB91A7C939411A053372F8D3A6EE0BDB4EA9ADC4D0E2D070A70FD7C8",
+      "bytes": 19400,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2020_aggregated",
+      "sha256": "F96B3F7449FF9877EF7687DE7E6F4F89DD44E3212682C4CCD23FA52116371B40",
+      "bytes": 23751,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2020_electricity",
+      "sha256": "C55A35CDE45CAC2B75139F56EB990078D3E396D38083542B0E975D50D82BFB28",
+      "bytes": 19346,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2021_aggregated",
+      "sha256": "222058AF213CDCCB04980F8D7F70AA01C880B7F3BC85E4EAC670322AE73BB3E5",
+      "bytes": 23512,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2021_electricity",
+      "sha256": "A82A5B0ADD5892BD18280A1B5FA6BC5800C5DCEEFD164B24996E1D1D584ECCB9",
+      "bytes": 19413,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2022_aggregated",
+      "sha256": "FF31E83F0242558B952A90E43483EC25CF3CEEAADF83B36D6313E0765028645D",
+      "bytes": 23643,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2022_electricity",
+      "sha256": "D49FE1A2620567B6056DB089EDB337B763587C8A5D5790242F90EAA430A15E12",
+      "bytes": 19415,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2023_aggregated",
+      "sha256": "6E38FE4412E2DB86945B837729606459F71BA89F94B9E9F5E4B30311B4F8CF17",
+      "bytes": 24139,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2023_electricity",
+      "sha256": "497418F5E87D8BA5A501527B5740D322B62E73EA292B0449B4CBEB6AD7DDF1E1",
+      "bytes": 19410,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2024_aggregated",
+      "sha256": "0A5E23C95B2A1107B737C771F1EBA12DBBC9D5FE28D8B15A947E4D0A31CF6D44",
+      "bytes": 24301,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2024_electricity",
+      "sha256": "A6ADD6732D9B8CE01D1E38DFB934A735C1E9AFFF084E0071FDEADD2D6F6A7549",
+      "bytes": 19516,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_efficiency",
+      "sha256": "03778583F447A4EE3CD10FCB652D6CACB7B4294D99000764F2D900107B87CC83",
+      "bytes": 39424,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_food_balance_sheets",
+      "sha256": "05623A3948EA312415CAA738E0C859AF4EEB6E94F72F166411E6AA03FEB4698B",
+      "bytes": 60185,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_2024_aggregated_ka",
+      "sha256": "7310830F554CE38C8F9929966309EAFAB46CB24EAFF2CD84DBFC604E908A4C14",
+      "bytes": 24975,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_food_balance_sheets_ka",
+      "sha256": "9C09E26578F5B54E3044D22C55DEEA1C7AA87577DEECBB8AFF5603B0650B5C0C",
+      "bytes": 61436,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2013",
+      "sha256": "D7BB930B675E07EC3AC76737F9F17DA9411A32D6671FAB5443F12DE848BF9F9F",
+      "bytes": 64409,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2014",
+      "sha256": "78D18338BD10B3EA061594D7262ABC2FA77822A54EBE62A71D2660EDA6128DCF",
+      "bytes": 64414,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2015",
+      "sha256": "73387078B03FB6D1B76C7D6A2A0FFB2201E5E976B65553C8EB292E44035934B8",
+      "bytes": 64413,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2016",
+      "sha256": "1496EC0C537A7947F1AB158267417AB3A1820D84CF0D4895DE765C46900A8834",
+      "bytes": 64414,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2017",
+      "sha256": "7CC21D418FFD93934C36E6A59D58F5F7086735A7F11601BE59B9ACEB7B7E188C",
+      "bytes": 64398,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2018",
+      "sha256": "48E31238F7C2C812C4D8CF46F937A07363A005FAD1629679D2F850B24E6CC71A",
+      "bytes": 64420,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2019",
+      "sha256": "4857E867EE2932AA7B5ABD688AF16F042560820B15E2D013C1B892DE7054CDBC",
+      "bytes": 64416,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2020",
+      "sha256": "D63945DA06DA826F75F816A46C4E79FB36C1EEAB5C16D967A0B039B03613A485",
+      "bytes": 64417,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2021",
+      "sha256": "73DAFF6816F6132C85B44CF3E44394A1350E9A398B7BAC9CA801D0D072A22EAA",
+      "bytes": 74397,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2022",
+      "sha256": "6BDAD2FF96F6EF478C64A74D3F8799F8C1E659A7A2C962F9C897ECF4CC575DCE",
+      "bytes": 74393,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2023",
+      "sha256": "E72108302975B255D6AD33058650DD56D488B7B65C545B6DC58D27E7ED5E7624",
+      "bytes": 74393,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_page_2024",
+      "sha256": "B5A58D4D33D90CD23504B25BCAD2DBAC8824986C037AE8CE0E44D3F04070BD67",
+      "bytes": 74393,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_energy_balance_index_page",
+      "sha256": "2C4B6CD26F084D29A633C026FB7A69EA892106E4917AF66AB318E80752C89AD3",
+      "bytes": 68941,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_food_security_page",
+      "sha256": "527E1AEC05BF9D6D6862C87822C77FE3FB40315BA07027FCF60F79ED7078D460",
+      "bytes": 92464,
+      "passed": true
+    }
+  ]
+}
