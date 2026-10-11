@@ -33,7 +33,7 @@ Geostat's balance has no wind column before 2016, so `electricity.production.win
 
 ## Food self-sufficiency ratio
 
-The ratio is Geostat's published number for each of 12 foods and each year 2014–2025 (wheat, maize, potatoes, vegetables, grapes, meat, beef, pork, sheep and goat meat, poultry meat, milk and milk products, eggs). It is not recalculated. In plain terms it relates production to the quantity available, production divided by production plus imports minus exports, times 100; Geostat's published ratios can differ from that arithmetic because Geostat also accounts for changes in stocks (sheep and goat meat 299 against 291 in 2017). Geostat's footnotes: wheat and maize balances include products made from them converted into wheat and maize; the grape balance counts wine converted into grapes. Sheep and goat meat reaches 345% in 2018 and is kept as published. Food values show as whole percents.
+The ratio is Geostat's published number for each of 12 foods and each year 2014–2025 (wheat, maize, potatoes, vegetables, grapes, meat, beef, pork, sheep and goat meat, poultry meat, milk and milk products, eggs). It is not recalculated. In plain terms it relates production to the quantity available, production divided by production plus imports minus exports, times 100; Geostat's published ratios mostly match that formula and a few differ (sheep and goat meat in 2017: 299 published, 291 by the formula); no reason for the difference is given. Geostat's footnotes: wheat and maize balances include products made from them converted into wheat and maize; the grape balance counts wine converted into grapes. Sheep and goat meat reaches 345% in 2018 and is kept as published. Food values show as whole percents.
 
 ## Dashes, gaps and unpublished cells
 

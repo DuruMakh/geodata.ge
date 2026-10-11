@@ -117,7 +117,7 @@ class EnergyFoodPackageTests(unittest.TestCase):
         self.assertEqual(len(flows), 144)
         gap = abs(Decimal(find(self.rows, 'food.self_sufficiency.sheep_goat_meat', 2017)['value']) -
                   prepare.implied_ratio(*flows[('sheep_goat_meat', 2017)]))
-        self.assertGreater(gap, 5)  # Geostat's stock changes explain a gap this size (299 against 291)
+        self.assertGreater(gap, 5)  # a gap this size is plausible but not explained
         self.assertLessEqual(gap, 10)
 
     def test_spot_values(self):
