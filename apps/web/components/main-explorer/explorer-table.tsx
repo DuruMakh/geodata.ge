@@ -41,7 +41,7 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   /** Each row's `kaLabel` already holds its label in the page language, with no catalogue entry to look up. */
   rowLabelsLocalized?: boolean;
   shareValueForYear: (row: Row, year: number) => number | null;
-  /** Decimals of a share cell; one unless the publisher prints whole percents. */
+  /** Decimals of a share cell in the year columns; one unless the publisher prints whole percents. */
   percentDecimals?: number;
 };
 

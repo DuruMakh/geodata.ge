@@ -1,4 +1,4 @@
-import type { ClientEnergyFoodFact, EnergyFoodIndicator } from "../data/energyFood/types";
+import { ENERGY_FOOD_UNIT_DECIMALS, type ClientEnergyFoodFact, type EnergyFoodFact, type EnergyFoodIndicator } from "../data/energyFood/types";
 import { EDITORIAL_PALETTE, INK } from "./colors";
 import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
@@ -80,7 +80,7 @@ export function energyFoodDisplayLabels(section: EnergyFoodSectionId, labels: Re
     s.parentId && s.parentId !== reference && counts.get(labels[s.id])! > 1 ? `${labels[s.parentId]} — ${labels[s.id]}` : labels[s.id]]));
 }
 
-export type EnergyFoodUnit = "ktoe" | "gwh" | "percent";
+export type EnergyFoodUnit = EnergyFoodFact["unit"];
 const UNITS: Record<EnergyFoodSectionId, EnergyFoodUnit> = { "energy-supply": "ktoe", electricity: "gwh", "energy-use": "ktoe", "food-self-sufficiency": "percent" };
 export function energyFoodUnit(section: EnergyFoodSectionId): EnergyFoodUnit {
   return UNITS[section];
@@ -137,8 +137,6 @@ export function serializeEnergyFoodHash(state: EnergyFoodState, _section: Energy
 export type EnergyFoodSeriesModel = EnergyFoodSeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null };
 export type EnergyFoodModel = { range: ResolvedPeriodRange; years: number[]; series: EnergyFoodSeriesModel[]; selected: EnergyFoodSeriesModel[]; decimals: number };
 
-/** Decimals of an empty selection fall back to the unit's own precision. */
-const UNIT_DECIMALS: Record<EnergyFoodUnit, number> = { ktoe: 1, gwh: 1, percent: 0 };
 
 export function buildEnergyFoodModel(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[], state: EnergyFoodState): EnergyFoodModel {
   const range = resolveRange(state.range, energyFoodCoverage(section, facts));
@@ -152,6 +150,6 @@ export function buildEnergyFoodModel(section: EnergyFoodSectionId, facts: readon
   const selected = series.filter(s => state.selectedIds.includes(s.id));
   const selectedIds = new Set<string>(selected.map(s => s.id));
   const selectedDecimals = facts.filter(f => selectedIds.has(f.indicatorId)).map(f => f.decimals);
-  const decimals = selectedDecimals.length ? Math.max(...selectedDecimals) : UNIT_DECIMALS[energyFoodUnit(section)];
+  const decimals = selectedDecimals.length ? Math.max(...selectedDecimals) : ENERGY_FOOD_UNIT_DECIMALS[energyFoodUnit(section)]; // an empty selection falls back to the unit's own precision
   return { range, years, series, selected, decimals };
 }
