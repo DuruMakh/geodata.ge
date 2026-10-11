@@ -218,10 +218,11 @@ export function DataSidebar() {
       ) : (
         // Below 900px the bar is pinned, so the open panel hangs from it over the
         // page and scrolls on its own: an in-flow panel inside a pinned bar would
-        // grow the document above the reader's position and jump the page.
+        // grow the document above the reader's position and jump the page. From
+        // 900px the expanded panel scrolls inside the full-height bar when its links overflow.
         <div
           id={MOBILE_NAV_ID}
-          className={`${sheetOpen ? "flex" : "hidden min-[900px]:flex"} flex-1 flex-col max-[900px]:absolute max-[900px]:inset-x-0 max-[900px]:top-full max-[900px]:max-h-[calc(100dvh-56px-env(safe-area-inset-top))] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:border-b max-[900px]:border-[rgba(247,242,233,0.12)] max-[900px]:bg-[var(--ink)] max-[900px]:px-4 max-[900px]:pb-4 min-[900px]:flex-col`}
+          className={`${sheetOpen ? "flex" : "hidden min-[900px]:flex"} flex-1 flex-col max-[900px]:absolute max-[900px]:inset-x-0 max-[900px]:top-full max-[900px]:max-h-[calc(100dvh-56px-env(safe-area-inset-top))] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:border-b max-[900px]:border-[rgba(247,242,233,0.12)] max-[900px]:bg-[var(--ink)] max-[900px]:px-4 max-[900px]:pb-4 min-[900px]:flex-col min-[900px]:min-h-0 min-[900px]:overflow-y-auto`}
         >
           <div aria-hidden className="mt-4 mb-3.5 h-px bg-[rgba(247,242,233,0.12)] max-[900px]:mt-0" />
           <p className="mb-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
