@@ -1,5 +1,5 @@
 import type { ClientHouseholdFact, HouseholdArea, HouseholdIndicator, HouseholdMeasure } from "../data/household/types";
-import { HOUSEHOLD_AREAS, HOUSEHOLD_MEASURES } from "../data/household/types";
+import { HOUSEHOLD_AREAS, HOUSEHOLD_MEASURES, householdFactKey } from "../data/household/types";
 import { colorForItem, INK } from "./colors";
 import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
@@ -28,8 +28,8 @@ const GROUPS: Record<HouseholdSectionId, ReadonlyArray<{ parent: HouseholdIndica
   ],
 };
 
-/** The indicator the areas tab compares: the section's first group, which is its reference total. */
-const sectionTotal = (section: HouseholdSectionId): HouseholdIndicator => GROUPS[section][0].parent;
+/** The section's headline indicator: its first group's reference total. The areas tab compares it, and the hub cards and latest-value line show it. */
+export const sectionTotal = (section: HouseholdSectionId): HouseholdIndicator => GROUPS[section][0].parent;
 
 /** The series a view offers, reference first. */
 export function householdViewSeries(section: HouseholdSectionId, view: HouseholdView, area: HouseholdArea): HouseholdSeriesDefinition[] {
@@ -45,8 +45,6 @@ export function householdSeriesColor(series: HouseholdSeriesDefinition, index: n
 }
 
 export type HouseholdState = { mode: "line" | "table"; range: PeriodRange; view: HouseholdView; area: HouseholdArea; measure: HouseholdMeasure; selectedIds: string[] };
-
-const cellKey = (f: { indicatorId: string; areaId: string; measure: string; year: number }) => `${f.indicatorId}:${f.areaId}:${f.measure}:${f.year}`;
 
 /** A view's years: every year any of its series has a value for the measure. */
 export function householdCoverage(section: HouseholdSectionId, view: HouseholdView, area: HouseholdArea, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]) {
@@ -115,9 +113,9 @@ export type HouseholdModel = { range: ResolvedPeriodRange; years: number[]; seri
 export function buildHouseholdModel(section: HouseholdSectionId, facts: readonly ClientHouseholdFact[], state: HouseholdState): HouseholdModel {
   const range = resolveRange(state.range, householdCoverage(section, state.view, state.area, state.measure, facts));
   const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
-  const byCell = new Map(facts.map(f => [cellKey(f), f]));
+  const byCell = new Map(facts.map(f => [householdFactKey(f), f]));
   const series = householdViewSeries(section, state.view, state.area).map((definition, index) => {
-    const valuesByYear = Object.fromEntries(years.map(year => [year, byCell.get(cellKey({ ...definition, measure: state.measure, year }))?.value ?? null]));
+    const valuesByYear = Object.fromEntries(years.map(year => [year, byCell.get(householdFactKey({ ...definition, measure: state.measure, year }))?.value ?? null]));
     return { ...definition, color: householdSeriesColor(definition, index), valuesByYear, endValue: valuesByYear[range.end] };
   });
   return { range, years, series, selected: series.filter(s => state.selectedIds.includes(s.id)) };

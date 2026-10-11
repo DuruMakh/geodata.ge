@@ -33,9 +33,9 @@ function povertyLabels(presentation: Presentation, section: PovertySectionId): R
 
 export async function renderPovertyPage(locale: Locale, section: PovertySectionId) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [data, presentation, manifest, catalogue, hubMessages] = await Promise.all([
+  const [data, presentation, manifest, catalogue] = await Promise.all([
     loadServedPovertyData(), getPresentation(locale, ["poverty", "common", "controls", "format", "main", "workbook"], []),
-    loadReviewedSourceManifest(root, "poverty"), loadEnglishCatalogue(root), getMessages(locale, ["household"]),
+    loadReviewedSourceManifest(root, "poverty"), loadEnglishCatalogue(root),
   ]);
   // Each page receives only the observations its views can show.
   const facts = data.facts.map(toClientPovertyFact).filter(f => f.indicatorId.startsWith(section === "inequality" ? "gini." : "poverty."));
@@ -51,7 +51,7 @@ export async function renderPovertyPage(locale: Locale, section: PovertySectionI
   const t = (key: string) => message(presentation.messages, `poverty.${key}`);
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const hubTitle = message(hubMessages, "household.hub.title");
+  const hubTitle = message(presentation.messages, "common.livingStandards");
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, { label: title }];
   return <I18nProvider {...presentation}>
     <JsonLd testId="explorer-dataset-json-ld" data={{

@@ -115,7 +115,7 @@ for (const prefix of ["", "/en"]) test(`household pages fit a 390px screen ${pre
 });
 
 test("an old poverty bookmark lands on the new address with its tab", async ({ page }) => {
-  // Redirects come from next.config; run against a served build (or CI's next start), not the default dev webServer.
+  // Redirects come from next.config and next dev serves them too (the municipality redirect specs run there); this one is skipped on the default local dev webServer and runs against a served build (PLAYWRIGHT_BASE_URL) or in CI.
   test.skip(!process.env.PLAYWRIGHT_BASE_URL && !process.env.CI, "redirects are checked against a served build");
   await page.goto("/en/explorer/poverty/rates#tab=relative");
   await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/poverty#tab=relative/);

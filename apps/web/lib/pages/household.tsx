@@ -53,7 +53,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   const labels = Object.fromEntries(householdViewSeries(section, "parts", "georgia").map(series => [series.id, t(`series.${series.id}`)]));
   const areaLabels = householdAreaLabels(presentation);
   const sources = householdWorkbookSources(manifest, projectPublicSources(manifest, locale, catalogue.documents));
-  const title = t(`page.${section}.title`), description = t(`page.${section}.summary`), hubTitle = t("hub.title");
+  const title = t(`page.${section}.title`), description = t(`page.${section}.summary`), hubTitle = message(presentation.messages, "common.livingStandards");
   const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`)).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, { label: title }];
   return <I18nProvider {...presentation}>

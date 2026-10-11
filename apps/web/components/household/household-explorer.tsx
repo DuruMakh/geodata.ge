@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useCallback, useState, type ReactNode } from "react";
 import { HOUSEHOLD_AREAS, type ClientHouseholdFact, type HouseholdArea, type HouseholdMeasure } from "../../lib/data/household/types";
-import { buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, changeHouseholdView, householdCoverage, parseHouseholdHash, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel, type HouseholdView } from "../../lib/explorer/household";
+import { buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, changeHouseholdView, householdCoverage, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel, type HouseholdView } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -69,7 +69,7 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
     </div>;
   }
   // The latest-value line is the page's headline: Georgia per household, whatever is chosen below.
-  const latest = facts.filter(f => f.indicatorId === (section === "income" ? "income.total" : "spending.consumption") && f.areaId === "georgia" && f.measure === "per_household").sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === "georgia" && f.measure === "per_household").sort((a, b) => a.year - b.year).at(-1)!;
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "parts" ? t(`tab.parts.${section}`) : t("tab.areas");
   const chartLabel = state.view === "parts" ? `${tabLabel} · ${areaLabels[state.area]}` : tabLabel;

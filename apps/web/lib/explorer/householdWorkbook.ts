@@ -1,4 +1,4 @@
-import { HOUSEHOLD_SOURCES, householdSourceId, type ClientHouseholdFact } from "../data/household/types";
+import { HOUSEHOLD_SOURCES, householdFactKey, householdSourceId, type ClientHouseholdFact } from "../data/household/types";
 import type { PublicSourceManifestRow } from "../methodology/publicSources";
 import type { ValidatedSourceManifestRow } from "../methodology/sourceManifest";
 import type { Presentation } from "../i18n/types";
@@ -21,10 +21,10 @@ export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSec
   const { section, facts, state, labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `household.${key}`);
   const model = buildHouseholdModel(section, facts, state);
-  const byCell = new Set(facts.map(f => `${f.indicatorId}:${f.areaId}:${f.measure}:${f.year}`));
+  const byCell = new Set(facts.map(householdFactKey));
   const neededYears = new Map<string, Set<number>>();
   for (const series of model.selected) for (const year of model.years) {
-    if (!byCell.has(`${series.indicatorId}:${series.areaId}:${state.measure}:${year}`)) continue;
+    if (!byCell.has(householdFactKey({ indicatorId: series.indicatorId, areaId: series.areaId, measure: state.measure, year }))) continue;
     const sourceId = householdSourceId(series.indicatorId, series.areaId, state.measure);
     neededYears.set(sourceId, (neededYears.get(sourceId) ?? new Set<number>()).add(year));
   }
