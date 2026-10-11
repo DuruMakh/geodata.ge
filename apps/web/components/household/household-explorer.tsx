@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { HOUSEHOLD_AREAS, type ClientHouseholdFact, type HouseholdArea, type HouseholdMeasure } from "../../lib/data/household/types";
-import { buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, changeHouseholdView, householdCoverage, parseHouseholdHash, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel, type HouseholdState, type HouseholdView } from "../../lib/explorer/household";
+import { buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, changeHouseholdView, householdCoverage, parseHouseholdHash, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel, type HouseholdView } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -15,37 +15,16 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { useHashState } from "../external/use-money-from-abroad-state";
 
 const VIEWS: readonly HouseholdView[] = ["parts", "areas"];
 const selectClass = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
-
-function useHouseholdState(section: HouseholdSectionId, facts: ClientHouseholdFact[]) {
-  const [state, setState] = useState(() => parseHouseholdHash("", section, facts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseHouseholdHash(window.location.hash, section, facts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [section, facts]);
-  useAppReady();
-  const update = useCallback((change: (previous: HouseholdState) => HouseholdState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeHouseholdHash(next)}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-  }, []);
-  return { state, update };
-}
 
 export type HouseholdExplorerProps = {
   section: HouseholdSectionId; facts: ClientHouseholdFact[];
@@ -57,7 +36,9 @@ export type HouseholdExplorerProps = {
 export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabels, sources, siteOrigin }: HouseholdExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `household.${key}`, values);
-  const { state, update } = useHouseholdState(section, facts);
+  // parse is an effect dependency of useHashState, so its identity changes only with the section.
+  const parse = useCallback((hash: string, f: ClientHouseholdFact[]) => parseHouseholdHash(hash, section, f), [section]);
+  const { state, update } = useHashState(facts, parse, serializeHouseholdHash);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildHouseholdModel(section, facts, state);

@@ -79,6 +79,28 @@ test("the language switch keeps tab, area, per person and selection", async ({ p
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
   await expect(page.locator(pressed("income.total"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(pressed("income.remittances"))).toHaveAttribute("aria-pressed", "true");
+  // A second hop on Compare areas: the tab itself must survive the switch.
+  await page.goto("/explorer/living-standards/income#tab=areas&per=person&sel=georgia,region.tbilisi");
+  await ready(page);
+  await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/income#/);
+  await ready(page);
+  await expect(page.getByTestId("household-tab-areas")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("household-measure-per_capita")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(pressed("georgia"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(pressed("region.tbilisi"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(pressed("region.adjara"))).toHaveAttribute("aria-pressed", "false");
+});
+
+test("the sidebar lists Living standards after Wages, with its four pages and the current one active", async ({ page }) => {
+  await page.goto("/en/explorer/living-standards/spending");
+  await ready(page);
+  const entry = page.getByTestId("living-standards-link");
+  await expect(entry).toHaveText("Living standards");
+  expect(await page.getByTestId("wages-link").evaluate((wages, living) => Boolean(wages.compareDocumentPosition(living!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+  for (const id of ["income", "spending", "rates", "inequality"]) await expect(page.getByTestId(`living-standards-${id}-link`)).toBeVisible();
+  await expect(page.getByTestId("living-standards-spending-link")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("living-standards-income-link")).not.toHaveAttribute("aria-current", "page");
 });
 
 for (const prefix of ["", "/en"]) test(`household pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {

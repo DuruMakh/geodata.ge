@@ -48,7 +48,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   // The household source archive is published with the methodology page; until then the workbook carries no source links.
   const sources: HouseholdExplorerProps["sources"] = [];
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`), hubTitle = t("hub.title");
-  const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
+  const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`)).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, { label: title }];
   return <I18nProvider {...presentation}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
