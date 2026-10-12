@@ -35,7 +35,7 @@
 
 ## Before you start (lead only)
 
-- [ ] **Op 1: get the owner's answers to Q1–Q10** (end of this document). Tasks marked "waits on Qn" use the recommended default if no answer has come by the time they start, and say so in the commit body.
+- [ ] **Op 1: get the owner's answers to the open questions** (end of this document; Q7, Q9 and Q10 were answered on 2026-10-12). Tasks marked "waits on Qn" use the recommended default if no answer has come by the time they start, and say so in the commit body.
 - [ ] **Op 2: decide the order with the component-reuse branch.** The owner's local branch has component-reuse Tasks 0–10 done and not merged. Tasks 33, 34 and 36 below touch the same explorers. Merge that branch first, or rebase this plan's Phase 4 onto it. The other phases do not depend on it.
 - [ ] **Op 3: deadline outside this plan.** audit-fixes Task 20 (dependency audit) is still open. `scripts/audit-dependencies.ts:7` lets the braces advisory pass only until **2026-11-02 04:00 Tbilisi**; from then CI fails on every PR and nothing can be released. Do that task before 2026-11-02, whatever happens to this plan.
 - [ ] **Op 4:** `git fetch origin && git switch -c claude/platform-review-fixes origin/main && cd apps/web && npm ci` (compare `node_modules/.package-lock.json` with `package-lock.json`).
@@ -105,7 +105,7 @@ Effort S–M. Risk medium: a real claude.ai connector may share a few source add
 Why: X2-05 (`ci.yml` has no `permissions:` block), X2-06 (deploy can be dispatched from any branch with production database credentials).
 
 **Files:**
-- Modify: `.github/workflows/ci.yml:1-16` (top-level `permissions: contents: read`), `.github/workflows/deploy-production.yml:23,44` (`github.ref == 'refs/heads/main'` on the dispatch branch of the job `if`; `environment: production` only after Q9 is answered yes and the owner has created the environment)
+- Modify: `.github/workflows/ci.yml:1-16` (top-level `permissions: contents: read`), `.github/workflows/deploy-production.yml:23,44` (`github.ref == 'refs/heads/main'` on the dispatch branch of the job `if`). The owner said no to a protected GitHub environment for now (Q9, 2026-10-12); do not add `environment:`.
 - Test: none in the repo; verified in Task 50 by the CI run itself.
 
 - [ ] **Step 1: Implement** the two edits.
@@ -709,11 +709,11 @@ Effort M. Risk medium: CI configuration is only proven by a CI run, which needs 
 
 ### Task 44: Docs match the shipped site [parallel-safe]
 
-Why: X4-06, X4-07, X4-08 (AGENTS.md: stale route inventory, a UI-contract default that contradicts approved scopes, a `codex/*` branch rule that conflicts with harness branch names), X4-09 to X4-12 and X4-19 (DESIGN.md §2, §6.2, §6.7, §17/§18, dead paths), X4-13, X4-14 (Project_Definition.md sidebar statements), X4-15 (READMEs list 3 of 11 hubs), X4-16 (database-import.md table), X4-17, X4-18 (deployment runbook), X4-22 (Noto Serif Georgian licence file), U21-19 (DESIGN §28.1/§28.4 vs §17).
+Why: X4-06, X4-07, X4-08 (AGENTS.md: stale route inventory, a UI-contract default that contradicts approved scopes; the `codex/*` branch rule, X4-08, stays as it is: the owner does not care about branch names, Q10), X4-09 to X4-12 and X4-19 (DESIGN.md §2, §6.2, §6.7, §17/§18, dead paths), X4-13, X4-14 (Project_Definition.md sidebar statements), X4-15 (READMEs list 3 of 11 hubs), X4-16 (database-import.md table), X4-17, X4-18 (deployment runbook), X4-22 (Noto Serif Georgian licence file), U21-19 (DESIGN §28.1/§28.4 vs §17).
 
 Also: X4-10 and X4-11 by id (DESIGN.md §17/§18 hub-card exception; the `% მშპ-ში` sentence).
 
-**Files:** the documents named. AGENTS.md: change only the Project Snapshot route sentence (point to Project_Definition.md §2), the UI-contract default sentence and the branch rule; do not touch "Engineering Behavior". Branch rule wording waits on Q10.
+**Files:** the documents named. AGENTS.md: change only the Project Snapshot route sentence (point to Project_Definition.md §2), and the UI-contract default sentence; do not touch "Engineering Behavior". 
 
 - [ ] **Step 1:** Edit. `npm run check` is not needed for docs; run `npx vitest run tests/seo/agentFiles.test.ts`.
 - [ ] **Step 2: Commit** `docs: AGENTS, DESIGN, scope, READMEs and runbooks match the shipped hubs`
@@ -759,7 +759,7 @@ Effort M. Risk low.
 
 ### Task 48: Consistent numbers, sentences and spacing [parallel-safe]
 
-Why: U11-01 (Q6: the flat 100% share-of-GDP view on Sectors), U06-08 (Q7: debt change colours). One number at two precisions or one sentence twice on a screen, missing separators, small layout nits: U07-13, U10-14, U13-14, U09-16, U18-10, U12-06, U26-12, U26-13, U02-03, U02-04, U04-04, U04-05, U04-10, U04-11, U21-08, U21-10, U22-17, U28-05, U28-06, U23-04, U23-05, U14-10, U14-11, U14-12, U27-05, U27-06, U20-10, U26-16, U26-05, U07-10, U07-11, U01-05, U01-06, U01-07, U09-10, U09-11, U17-11, U16-06, U16-16, U29-16, U29-17, U29-18, U29-10, U29-13.
+Why: U11-01 (Q6: the flat 100% share-of-GDP view on Sectors). One number at two precisions or one sentence twice on a screen, missing separators, small layout nits: U07-13, U10-14, U13-14, U09-16, U18-10, U12-06, U26-12, U26-13, U02-03, U02-04, U04-04, U04-05, U04-10, U04-11, U21-08, U21-10, U22-17, U28-05, U28-06, U23-04, U23-05, U14-10, U14-11, U14-12, U27-05, U27-06, U20-10, U26-16, U26-05, U07-10, U07-11, U01-05, U01-06, U01-07, U09-10, U09-11, U17-11, U16-06, U16-16, U29-16, U29-17, U29-18, U29-10, U29-13.
 
 Also (low): U03-14, U05-14, U06-05, U06-09, U07-12, U08-09, U08-10, U09-17, U10-13, U17-06, U18-11, U20-09, U21-17, U22-14, U22-16, U24-09, U25-07, U28-09, U28-10, U28-19 (deep links that first paint the default view, repeated sentences, small layout and wording items). U05-14, U07-12, U18-11 and U20-09 change wording or remove a block: show the owner first.
 
@@ -799,10 +799,10 @@ Effort S–M. Risk low.
 | Q4 | On laptops and tablets (768–1099 px column width) a multi-line chart has no legend and its key is a screen below. Show the phone legend up to 1100 px? | Yes (one class change). | Task 7 |
 | Q5 | iPhones zoom the page when the 12 px dropdowns on Wages and Unemployment are tapped. Make those dropdowns 16 px on phones only? | Yes, phones only. | Task 46 |
 | Q6 | On Sectors, switching to "share of GDP" with only Total selected shows a flat 100% line. What should it show? | Select the five largest sectors automatically when switching to share. | Task 48 |
-| Q7 | Debt colours: rising debt is green and a falling rate is red, which reads as good/bad. Use neutral ink for changes? | Yes. | Task 48 |
+| Q7 | Debt colours: rising debt is green and a falling rate is red. Use neutral ink for changes? | **Answered 2026-10-12: no.** Colours stay; U06-08 is not done. | — |
 | Q8 | In Excel, nested series (e.g. "60% line" under "Georgia") lose their parent's name. Add the parent to the row name in the workbook? | Yes. | Task 49 |
-| Q9 | Create a protected "production" environment in GitHub and move the three deploy secrets into it? This is a GitHub settings step only the owner can do. | Yes. | Task 4 |
-| Q10 | AGENTS.md says branches must be `codex/*`; Claude sessions use `claude/*`. Allow any non-`main` feature branch? | Yes. | Task 44 |
+| Q9 | Create a protected "production" environment in GitHub and move the three deploy secrets into it? | **Answered 2026-10-12: not for now.** Task 4 keeps only the main-branch check. | Task 4 |
+| Q10 | AGENTS.md says branches must be `codex/*`; Claude sessions use `claude/*`. | **Answered 2026-10-12: does not matter.** AGENTS.md is left as is (X4-08 not done). | — |
 
 ## Georgian text for owner review
 
@@ -833,6 +833,7 @@ The full list (182 rows from every report, including U25-10) is `.superpowers/pl
 | U12-09, U16-10 (small duplicated payloads), U26-07 (a jump link in long member lists) | The report itself judged them acceptable or optional. |
 | X1-18 (a shared chart shell for the two chart components) | Task 12 copies the keyboard pattern instead; a full extraction is a larger refactor than any finding needs. |
 | U04-02, U19-11 (legend between 768 and 1099 px) | Owner decision Q4. |
+| U06-08 (debt change colours), X4-08 (branch naming rule), the protected GitHub environment in X2-06 | Owner said no or not now (Q7, Q10, Q9; 2026-10-12). |
 | U14-15 (layout shift on inflation pages on phones) | Root cause not isolated; needs a separate investigation before a fix can be planned. |
 | 27 rejected test removals (`result-*.md`, verdict REJECTED) | Each proves something no other test does. |
 
