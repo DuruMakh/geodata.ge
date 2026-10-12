@@ -53,7 +53,7 @@ export type StackedColumnChartProps = {
   ariaLabel: string;
   /** Periods per calendar year on the x axis: 12 for months (default), 1 for years. */
   periodsPerYear?: number;
-  /** A colour key drawn as a swatch row above the plot, so colour is never the only cue (DESIGN.md §13); none when absent. */
+  /** A colour key drawn as a swatch row above the plot, so colour is never the only cue (DESIGN.md §13); none when absent or empty. */
   legend?: { id: string; label: string; color: string }[];
 };
 
@@ -431,7 +431,7 @@ export function StackedColumnChart({
     // role="img" belongs on the svg, not the figure: it is children-presentational,
     // so on the figure it would hide the sr-only figcaption that carries the numbers.
     <figure ref={layoutRef} className="m-0">
-      {legend === undefined ? null : (
+      {legend?.length ? (
         <ul data-testid="stack-chart-legend" className="mb-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)]">
           {legend.map((entry) => (
             <li key={entry.id} data-legend-series-id={entry.id} className="flex min-w-0 items-center gap-2">
@@ -440,7 +440,7 @@ export function StackedColumnChart({
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
       <ChartScrollFrame
         testId="stack-chart-frame"
         scrollKey={scrollKey}

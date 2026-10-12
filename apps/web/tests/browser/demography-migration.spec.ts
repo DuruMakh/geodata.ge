@@ -41,6 +41,29 @@ test("removing Russia relabels the net line, removes its bars and writes the sel
   await expect(page).toHaveURL(/sel=citizenship\.georgia%2Ccitizenship\.turkey/);
 });
 
+// U27-04: on a phone the citizenship colours and the net line are named above the chart, not only in the list below it.
+test("at 390px the key above the chart names the selected groups and the net line and follows the selection", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/en${PATH}`);
+  await ready(page);
+  const items = page.getByTestId("chart-panel").getByTestId("stack-chart-legend").locator("li");
+  await expect(items).toHaveCount(7);
+  for (const item of await items.all()) {
+    await expect(item.locator("span[aria-hidden]")).toBeVisible();
+    await expect(item).toHaveText(/\S/);
+  }
+  await expect(items.last()).toHaveText("Net migration");
+  const legendBox = (await page.getByTestId("stack-chart-legend").boundingBox())!;
+  const chartBox = (await page.getByTestId("chart-panel").locator("svg[data-geometry]").boundingBox())!;
+  expect(legendBox.y + legendBox.height).toBeLessThanOrEqual(chartBox.y);
+  const russiaKey = page.getByTestId("stack-chart-legend").locator('[data-legend-series-id="citizenship.russian_federation"]');
+  await expect(russiaKey).toHaveCount(1);
+  await page.locator('[data-testid="series-row"][data-series-id="citizenship.russian_federation"] [data-testid="series-row-toggle"]').click();
+  await expect(items).toHaveCount(6);
+  await expect(russiaKey).toHaveCount(0);
+  await expect(items.last()).toHaveText("Net migration (selected groups)");
+});
+
 test("moving the range end changes the period of the key figures and the address", async ({ page }) => {
   await page.goto(`/en${PATH}`);
   await ready(page);

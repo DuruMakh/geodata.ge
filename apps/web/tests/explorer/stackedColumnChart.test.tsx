@@ -248,5 +248,6 @@ describe("StackedColumnChart", () => {
     // Without it the chart is exactly what it was.
     expect(markup).not.toContain("stack-chart-legend");
     expect(html.replace(row, "")).toBe(markup);
+    expect(renderGeorgianMarkup(<StackedColumnChart {...props} legend={[]} />)).toBe(markup);
   });
 });
