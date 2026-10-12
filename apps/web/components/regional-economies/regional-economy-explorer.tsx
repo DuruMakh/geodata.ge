@@ -1,7 +1,7 @@
 "use client";
 
-import { ChartPie, ChevronDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ChartPie } from "lucide-react";
+import { useMemo } from "react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { REGIONAL_GDP_TOTAL } from "../../lib/data/regionalEconomies/types";
@@ -19,7 +19,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
+import { PlaceHeading } from "../explorer-shell/place-heading";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -59,7 +59,6 @@ export function RegionalEconomyExplorer({
   const presentation = useI18n();
   const { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `regionalEconomies.${key}`);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const { state, update } = useRegionalEconomyState(facts, registry);
   const model = useMemo(() => buildRegionalEconomyModel(facts, registry, state), [facts, registry, state]);
   const share = state.measure === "share_of_region_gdp";
@@ -76,20 +75,17 @@ export function RegionalEconomyExplorer({
 
   return (
     <div data-testid="regional-economy-explorer" className="@container">
-      <div className="relative mt-[34px] mb-3 flex flex-col gap-3 min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between">
-        <h1 className="font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">
-          {t("detailHeadingLead")} {" "}
-          <button data-testid="region-picker-trigger" type="button" aria-expanded={pickerOpen} onClick={() => setPickerOpen((open) => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
-            {regionLabel}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
-          </button>
-        </h1>
-        <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions} activeRegionId={region.id} />
-        <EntityNeighbourLinks
-          testId="regional-entity-navigation"
-          previous={{ href: pageHref(regionalEconomyHref(previousRegion.id), locale), label: publicLabel(locale, previousRegion.id, previousRegion.kaLabel, englishLabels) }}
-          next={{ href: pageHref(regionalEconomyHref(nextRegion.id), locale), label: publicLabel(locale, nextRegion.id, nextRegion.kaLabel, englishLabels) }}
-        />
-      </div>
+      <PlaceHeading
+        lead={t("detailHeadingLead")}
+        placeLabel={regionLabel}
+        triggerTestId="region-picker-trigger"
+        picker={(open, close) => <RegionPicker open={open} onClose={close} regions={regions} activeRegionId={region.id} />}
+        neighbours={{
+          testId: "regional-entity-navigation",
+          previous: { href: pageHref(regionalEconomyHref(previousRegion.id), locale), label: publicLabel(locale, previousRegion.id, previousRegion.kaLabel, englishLabels) },
+          next: { href: pageHref(regionalEconomyHref(nextRegion.id), locale), label: publicLabel(locale, nextRegion.id, nextRegion.kaLabel, englishLabels) },
+        }}
+      />
       <LatestValueLine testId="regional-headline" measure={t("total")} period={model.headline?.year ?? "—"} value={share ? formatShare(model.headline ? model.headline.value / 100 : null) : formatAmount(model.headline?.value, locale)} />
       <div className="mb-[30px] grid text-[13px] text-[var(--muted)]">
         <p aria-hidden={share} className={`[grid-area:1/1] ${share ? "invisible" : ""}`}>{t("contextNominal")}</p>

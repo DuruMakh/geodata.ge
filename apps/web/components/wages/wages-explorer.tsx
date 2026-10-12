@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
@@ -28,7 +27,7 @@ import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionIndex } from "../regional-economies/regional-economies-index";
 import { RegionPicker } from "../regional-economies/region-picker";
-import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
+import { PlaceHeading } from "../explorer-shell/place-heading";
 import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
 import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote } from "../ui/editorial";
 
@@ -73,7 +72,6 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
   const hashData = useMemo(() => ({ section, facts }), [section, facts]);
   const { state, update } = useHashState(hashData, parseWages, serializeWages);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const regionName = regionId ? labels[regionId] : "";
   const ordered = regions ?? [], regionIndex = ordered.findIndex(region => region.id === regionId);
   const neighbours = regionIndex < 0 ? null : { previous: ordered[(regionIndex - 1 + ordered.length) % ordered.length]!, next: ordered[(regionIndex + 1) % ordered.length]! };
@@ -117,19 +115,17 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
   const heatmap = section === "industries" ? buildWagesHeatmap(model) : null;
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
   return <div data-testid={`wages-${section}`} className="@container">
-    {regionId ? <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
-      <div className="relative min-w-0 min-[768px]:flex-1">
-        <ExplorerHeading>{t("regionHeadingLead")}{" "}
-          <button type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
-            {regionName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
-          </button>
-        </ExplorerHeading>
-        <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={ordered} activeRegionId={regionId} hrefForRegion={wagesRegionHref} indexHref="/explorer/wages/regions" />
-      </div>
-      {neighbours ? <EntityNeighbourLinks testId="wages-region-navigation" className="mb-3"
-        previous={{ href: pageHref(wagesRegionHref(neighbours.previous.id), locale), label: labels[neighbours.previous.id] }}
-        next={{ href: pageHref(wagesRegionHref(neighbours.next.id), locale), label: labels[neighbours.next.id] }} /> : null}
-    </div> : <ExplorerHeading>{title}</ExplorerHeading>}
+    {regionId ? <PlaceHeading
+      lead={t("regionHeadingLead")}
+      placeLabel={regionName}
+      triggerTestId="region-picker-trigger"
+      picker={(open, close) => <RegionPicker open={open} onClose={close} regions={ordered} activeRegionId={regionId} hrefForRegion={wagesRegionHref} indexHref="/explorer/wages/regions" />}
+      neighbours={neighbours ? {
+        testId: "wages-region-navigation",
+        previous: { href: pageHref(wagesRegionHref(neighbours.previous.id), locale), label: labels[neighbours.previous.id] },
+        next: { href: pageHref(wagesRegionHref(neighbours.next.id), locale), label: labels[neighbours.next.id] },
+      } : undefined}
+    /> : <ExplorerHeading>{title}</ExplorerHeading>}
     <LatestValueLine testId="wages-latest" measure={regionId ? `${t("series.average")} · ${regionName}` : t("series.average")} period={latest.year} value={`${format(latest.value, 1)} ${unit.label}`} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
