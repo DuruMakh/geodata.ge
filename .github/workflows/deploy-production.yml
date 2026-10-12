@@ -40,8 +40,10 @@ jobs:
     # and only for push-triggered CI runs: a fork PR's CI run can carry
     # head_branch == main, so admitting pull_request-sourced runs would let
     # outside PRs trigger production deploys. workflow_dispatch is the
-    # manual escape hatch (reruns, rollout, deploying past a flaky check).
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    # manual escape hatch (reruns, rollout, deploying past a flaky check),
+    # and only from main: a dispatch runs the workflow file from the chosen
+    # branch with the production database secrets.
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
