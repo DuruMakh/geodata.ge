@@ -10,7 +10,7 @@ import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { Message } from "../../lib/i18n/message";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { HeroKpi, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
 import { SectionTitle } from "../ui/editorial";
 
 // ძირითადი ინდიკატორები for the categories page: always the latest published
@@ -64,7 +64,7 @@ export function InflationCategoryIndicators({ index }: { index: CategoryIndex })
       <SectionTitle>{message(messages, "main.indicators")}</SectionTitle>
       <div
         data-testid="period-kpi-cards"
-        className={`mt-[26px] grid ${hero === null ? "" : "@min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]"}`}
+        className={hero === null ? "mt-[26px] grid " : KPI_GRID_CLASS}
       >
         {hero !== null && (
           <HeroKpi

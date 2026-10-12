@@ -21,6 +21,8 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -88,15 +90,13 @@ export function RegionalEconomyExplorer({
           next={{ href: pageHref(regionalEconomyHref(nextRegion.id), locale), label: publicLabel(locale, nextRegion.id, nextRegion.kaLabel, englishLabels) }}
         />
       </div>
-      <p data-testid="regional-headline" className="mb-2 text-[13px] text-[var(--body)]">
-        {t("total")} · {model.headline?.year ?? "—"}: <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{share ? formatShare(model.headline ? model.headline.value / 100 : null) : formatAmount(model.headline?.value, locale)}</span>
-      </p>
+      <LatestValueLine testId="regional-headline" measure={t("total")} period={model.headline?.year ?? "—"} value={share ? formatShare(model.headline ? model.headline.value / 100 : null) : formatAmount(model.headline?.value, locale)} />
       <div className="mb-[30px] grid text-[13px] text-[var(--muted)]">
         <p aria-hidden={share} className={`[grid-area:1/1] ${share ? "invisible" : ""}`}>{t("contextNominal")}</p>
         <p aria-hidden={!share} className={`[grid-area:1/1] ${share ? "" : "invisible"}`}>{t("contextShare")}</p>
       </div>
       <p role="status" className="sr-only">{message(messages, "regionalEconomies.rangeChanged", { start: model.range.start, end: model.range.end })}</p>
-      <div className="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">
+      <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section data-testid="regional-chart-panel" data-mode={state.mode} data-measure={state.measure} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -125,7 +125,7 @@ export function RegionalEconomyExplorer({
             await downloadWorkbook(buildRegionalEconomyWorkbookExportModel(facts, registry, state, region, presentation, sources, siteOrigin));
           }} />
         } />
-      </div>
+      </ExplorerWorkspace>
       <RegionHighlights facts={facts} registry={registry} year={model.range.end} />
     </div>
   );
