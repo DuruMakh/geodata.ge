@@ -60,6 +60,11 @@ it("every page sends a report-only CSP that allows only the site, Google Analyti
   for (const host of policy?.match(/https:\/\/[^\s;]+/g) ?? []) {
     expect(host).toMatch(/^https:\/\/(www\.googletagmanager\.com|\*\.googletagmanager\.com|\*\.google-analytics\.com|\*\.analytics\.google\.com|www\.clarity\.ms|\*\.clarity\.ms|c\.bing\.com)$/);
   }
+  // Outside development, no eval and no source wide enough to admit any host.
+  expect(policy).not.toContain("'unsafe-eval'");
+  for (const token of policy?.split(/[\s;]+/) ?? []) {
+    expect(["*", "https:", "http:"]).not.toContain(token);
+  }
   // Report-only first: no page is blocked until the policy is deliberately switched to enforcing.
   expect(headers?.find(rule => rule.source === "/(.*)")?.headers.map(header => header.key)).not.toContain("Content-Security-Policy");
 });
