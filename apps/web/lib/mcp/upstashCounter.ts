@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import type { Counter } from "./limits";
 
 // One atomic command per limit check. The minute bucket is a sliding window;
-// the daily key already includes its UTC date and stores only an integer.
+// each daily key (per client and shared) already includes its UTC date and
+// stores only an integer.
 // Redis time keeps different function instances on the same clock.
 const HIT = `
 local key = KEYS[1]

@@ -2,6 +2,7 @@ import { createMcpHandler, isLegacyRequest, WebStandardStreamableHTTPServerTrans
 import {
   LIMITS,
   RATE_MAX_REQUESTS,
+  RATE_PER_KEY_DAILY_MAX,
   RATE_WINDOW_SECONDS,
   type CounterVerdict,
   createCounter,
@@ -292,7 +293,9 @@ async function serve(request: Request, context: RequestContext): Promise<Respons
   // a single caller spend all 10,000 of it on answers it never received, and
   // take the endpoint down for everybody else until the next UTC day - the
   // per-key limit offering no protection at all, because the very requests it
-  // denies are the ones doing the spending.
+  // denies are the ones doing the spending. The same holds one window up: a
+  // key's own daily cap is checked before the shared one, so a key that has
+  // used its day cannot go on to spend everybody else's.
   const key = clientKey(request);
   // No trusted platform header means no way to tell two callers apart, so they
   // share one bucket rather than skipping the limit. Every request on Vercel is
@@ -302,10 +305,19 @@ async function serve(request: Request, context: RequestContext): Promise<Respons
   const perKeyRefusal = refusalFor(perKey);
   if (perKeyRefusal !== null) return perKeyRefusal;
 
-  const daily = await counter().hit(`mcp:daily:${new Date().toISOString().slice(0, 10)}`, DAY_SECONDS, DAILY_MAX);
+  const today = new Date().toISOString().slice(0, 10);
+  const untilMidnight = (): HeadersInit => ({ "retry-after": String(DAY_SECONDS - Math.floor(Date.now() / 1000) % DAY_SECONDS) });
+
+  const perKeyDaily = await counter().hit(`mcp:keyday:${key ?? "unkeyed"}:${today}`, DAY_SECONDS, RATE_PER_KEY_DAILY_MAX);
+  if (perKeyDaily === "deny") {
+    return rpcError(429, "rate_limited", "თქვენი დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.", "Your daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.", untilMidnight());
+  }
+  const perKeyDailyRefusal = refusalFor(perKeyDaily);
+  if (perKeyDailyRefusal !== null) return perKeyDailyRefusal;
+
+  const daily = await counter().hit(`mcp:daily:${today}`, DAY_SECONDS, DAILY_MAX);
   if (daily === "deny") {
-    const retryAfter = DAY_SECONDS - Math.floor(Date.now() / 1000) % DAY_SECONDS;
-    return rpcError(429, "rate_limited", "დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.", "The daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.", { "retry-after": String(retryAfter) });
+    return rpcError(429, "rate_limited", "დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.", "The daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.", untilMidnight());
   }
   const dailyRefusal = refusalFor(daily);
   if (dailyRefusal !== null) return dailyRefusal;

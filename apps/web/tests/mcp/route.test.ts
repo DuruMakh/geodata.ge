@@ -226,6 +226,39 @@ describe("/mcp guards", () => {
       vi.resetModules();
     }
   });
+
+  it("one key is refused after its daily cap while another key still passes", async () => {
+    process.env.MCP_RATE_LIMITER = "memory";
+    vi.resetModules();
+    // Only the clock is faked: each request lands just over a second after the
+    // last, so the 60-a-minute limit never fires and only the daily cap can.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-12T06:00:00Z"));
+    try {
+      const { POST: freshPost } = await import("../../app/mcp/route");
+      const from = (address: string, body: unknown = initialize) => post(body, { "x-vercel-forwarded-for": address });
+
+      // Every request counts, including one the protocol layer then rejects.
+      // An empty message is that, and costs about a millisecond against the
+      // sixty a full initialize exchange takes, so the thousand stay quick.
+      for (let i = 0; i < 1_000; i += 1) {
+        const counted = await freshPost(from("203.0.113.7", {}));
+        expect(counted.status, `request ${i + 1}`).toBe(400);
+        vi.advanceTimersByTime(1_001);
+      }
+
+      const refused = await freshPost(from("203.0.113.7"));
+      expect(refused.status).toBe(429);
+      // Retry at the next UTC midnight, not in a minute.
+      expect(Number(refused.headers.get("retry-after"))).toBeGreaterThan(60);
+      expect(Number(refused.headers.get("retry-after"))).toBeLessThanOrEqual(18 * 60 * 60);
+
+      expect((await freshPost(from("198.51.100.4"))).status).toBe(200);
+    } finally {
+      vi.useRealTimers();
+      vi.resetModules();
+    }
+  });
 });
 
 describe("what the log is allowed to say", () => {

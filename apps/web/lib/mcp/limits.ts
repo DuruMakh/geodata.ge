@@ -9,6 +9,11 @@ import { upstashCounter } from "./upstashCounter";
 /** Requests per rolling window, per key. Spec 11.3: 60 in a rolling minute. */
 export const RATE_WINDOW_SECONDS = 60;
 export const RATE_MAX_REQUESTS = 60;
+/**
+ * Requests per key per UTC day. Without it one key at 60 a minute could spend
+ * the whole shared daily allowance on its own (owner decision 2026-10-12).
+ */
+export const RATE_PER_KEY_DAILY_MAX = 1_000;
 
 /**
  * Is /mcp switched off?

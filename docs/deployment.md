@@ -396,27 +396,37 @@ no automatic retry; an unavailable service, invalid response, or missing
 credentials fails closed with 503. Memory-only counters are refused in Vercel
 Production.
 
-Two limits are checked in order:
+Three limits are checked in order, each only after the one before it has
+allowed the request:
 
 1. **60 requests in a rolling minute per client key.** A Redis sorted set uses
    Redis server time and expires 60 seconds after the most recent accepted hit.
    The key is a hash of the trusted platform address header, not a stored raw IP.
    An unidentifiable caller shares one bucket.
-2. **10,000 accepted requests per UTC day globally.** The date-keyed integer is
-   checked only after the client limit allows the request, so per-client denials
-   cannot drain the global quota. The daily key expires automatically.
+2. **1,000 requests per UTC day per client key**, the same key as the minute
+   limit. Without it one key at 60 a minute could take the whole global
+   allowance in under three hours. Callers behind one shared address (one
+   connector's few outbound addresses, for example) share this cap.
+3. **10,000 accepted requests per UTC day globally.**
+
+Per-client refusals (limits 1 and 2) never touch the application's global daily
+counter, so they cannot drain it. They are not free: every refusal still costs
+Upstash commands (below). Both daily keys are date-keyed integers that expire
+automatically.
 
 Each hit is an atomic Lua operation. Counters are shared across function
 instances. Production and preview counter namespaces are separate. A limit
-reached returns 429 and Retry-After; the daily refusal points to the next UTC day.
+reached returns 429 and Retry-After; either daily refusal points to the next UTC day.
 These are request allowances, so initialization and discovery also count.
 
 The free service has its own monthly quota (500,000 commands at setup).
 [Upstash counts EVAL and its nested Redis commands](https://upstash.com/docs/redis/sdks/ratelimit-ts/costs):
-the current successful request uses six for the minute bucket and four for the
-daily bucket. That allows roughly 50,000 accepted requests per month before
-other usage; refused requests also consume commands. The 10,000/day application
-ceiling is not guaranteed sustainable daily capacity on the free plan. It does
+the current successful request uses six for the minute bucket and four for each
+of the two daily buckets, fourteen in all. That allows roughly 35,000 accepted
+requests per month before other usage. Refused requests also consume commands:
+about four for a minute refusal and eight for a per-client daily refusal. The
+10,000/day application ceiling is not guaranteed sustainable daily capacity on
+the free plan. It does
 not guarantee continuous availability under an attack or sustained maximum
 traffic. Provider quota exhaustion pauses MCP through the same fail-closed 503;
 static pages and bulk files continue working. Review usage before changing the
