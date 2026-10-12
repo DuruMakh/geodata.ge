@@ -84,6 +84,16 @@ model SourceDocument {
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
+  wagesFacts WagesFact[]
+  povertyFacts PovertyFact[]
+  energyFoodFacts EnergyFoodFact[]
+  moneyBanksFacts MoneyBanksFact[]
+  householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
+  moneyTransferFacts MoneyTransferFact[]
+  foreignInvestmentFacts ForeignInvestmentFact[]
+  currentAccountFacts CurrentAccountFact[]
+  tradeProductFacts TradeProductFact[]
+  tradeDomesticFacts TradeDomesticFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
@@ -120,6 +130,20 @@ model ImportRun {
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerEntities TradePartnerEntity[]
   tradePartnerFacts TradePartnerFact[]
+  wagesFacts WagesFact[]
+  povertyFacts PovertyFact[]
+  energyFoodFacts EnergyFoodFact[]
+  moneyBanksFacts MoneyBanksFact[]
+  householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
+  moneyTransferEntities MoneyTransferEntity[]
+  moneyTransferFacts MoneyTransferFact[]
+  foreignInvestmentEntities ForeignInvestmentEntity[]
+  foreignInvestmentFacts ForeignInvestmentFact[]
+  currentAccountFacts CurrentAccountFact[]
+  tradeProductEntities TradeProductEntity[]
+  tradeProductFacts TradeProductFact[]
+  tradeDomesticEntities TradeDomesticEntity[]
+  tradeDomesticFacts TradeDomesticFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
   inflationCpiFacts InflationCpiFact[]
@@ -542,6 +566,175 @@ model TradePartnerFact {
   @@id([entityId, indicatorId, year])
 }
 
+model MoneyTransferEntity {
+  id          String @id
+  kind        String
+  labelKa     String
+  importRunId String?
+  importRun   ImportRun? @relation(fields: [importRunId], references: [id])
+  facts       MoneyTransferFact[]
+}
+
+model MoneyTransferFact {
+  entityId         String
+  entity           MoneyTransferEntity @relation(fields: [entityId], references: [id])
+  year             Int
+  measure          String
+  valueUsd         Decimal? @db.Decimal(40, 20)
+  unit             String
+  basis            String
+  valueStatus      String
+  monthsReported   Int?
+  sourceId         String
+  sourceSheet      String
+  sourceCells      String
+  sourceUnit       String
+  vintage          String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime @db.Date
+  importRunId      String?
+  importRun        ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([entityId, measure, year])
+}
+
+model CurrentAccountFact {
+  seriesId         String
+  year             Int
+  flow             String
+  valueUsd         Decimal @db.Decimal(40, 20)
+  unit             String
+  basis            String
+  sourceId         String
+  sourceSheet      String
+  sourceCells      String
+  sourceUnit       String
+  vintage          String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime @db.Date
+  importRunId      String?
+  importRun        ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([seriesId, flow, year])
+}
+
+model ForeignInvestmentEntity {
+  id          String  @id
+  dimension   String?
+  kind        String
+  labelKa     String
+  importRunId String?
+  importRun   ImportRun? @relation(fields: [importRunId], references: [id])
+  facts       ForeignInvestmentFact[]
+}
+
+model ForeignInvestmentFact {
+  entityId         String
+  entity           ForeignInvestmentEntity @relation(fields: [entityId], references: [id])
+  year             Int
+  valueUsd         Decimal? @db.Decimal(40, 20)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCells      String
+  sourceUnit       String
+  vintage          String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime @db.Date
+  importRunId      String?
+  importRun        ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([entityId, year])
+}
+
+model TradeProductEntity {
+  id            String @id
+  sourceBlock   String
+  code          String
+  labelKa       String
+  sourceLabelEn String
+  categoryId    String
+  aliasesKa     String[]
+  aliasesEn     String[]
+  importRunId   String?
+  importRun     ImportRun? @relation(fields: [importRunId], references: [id])
+  facts         TradeProductFact[]
+}
+
+model TradeProductFact {
+  entityId           String
+  entity             TradeProductEntity @relation(fields: [entityId], references: [id])
+  year               Int
+  indicatorId        String
+  valueUsd           Decimal? @db.Decimal(40, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  publicationStatus  String
+  role               String
+  sourceId           String
+  sourceRefs         String
+  sourceValue        String?
+  sourceUnit         String
+  sourceLabel        String
+  sourceNumberFormat String
+  sourceBlock        String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime @db.Date
+  importRunId        String?
+  importRun          ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([entityId, indicatorId, year])
+}
+
+model TradeDomesticEntity {
+  id          String @id
+  kind        String
+  code        String?
+  labelKa     String
+  labelEn     String
+  sourceBlock String
+  categoryId  String?
+  aliasesKa   String[]
+  aliasesEn   String[]
+  importRunId String?
+  importRun   ImportRun? @relation(fields: [importRunId], references: [id])
+  facts       TradeDomesticFact[]
+}
+
+model TradeDomesticFact {
+  entityId           String
+  entity             TradeDomesticEntity @relation(fields: [entityId], references: [id])
+  year               Int
+  indicatorId        String
+  valueUsd           Decimal @db.Decimal(40, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  publicationStatus  String
+  role               String
+  sourceId           String
+  sourceRefs         String
+  sourceValue        String?
+  sourceUnit         String?
+  sourceLabel        String?
+  sourceNumberFormat String?
+  sourceBlock        String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime @db.Date
+  importRunId        String?
+  importRun          ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([entityId, indicatorId, year])
+}
+
 model TradeOverviewFact {
   year               Int
   indicatorId        String
@@ -564,6 +757,127 @@ model TradeOverviewFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/wages-annual.csv. An unavailable source cell keeps
+// null values and its "unavailable" status; it is never filled.
+model WagesFact {
+  year               Int
+  indicatorId        String
+  dimension          String
+  groupId            String
+  sectorId           String
+  value              Decimal?       @db.Decimal(30, 20)
+  publishedValue     Decimal?       @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String?
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, dimension, groupId, sectorId, year])
+}
+
+// Mirror of data/imports/poverty-annual.csv: Geostat's annual poverty rates and
+// Gini coefficients, exact stored decimals with their published rounding.
+model PovertyFact {
+  year               Int
+  indicatorId        String
+  groupId            String
+  value              Decimal        @db.Decimal(30, 20)
+  publishedValue     Decimal        @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, groupId, year])
+}
+
+// Mirror of data/imports/energy-food-annual.csv: Geostat's annual energy balance,
+// electricity balance and food self-sufficiency ratios, exact stored decimals with
+// their published rounding.
+model EnergyFoodFact {
+  year               Int
+  indicatorId        String
+  value              Decimal        @db.Decimal(30, 20)
+  publishedValue     Decimal        @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/money-banks-annual.csv: NBG's yearly money, loan, deposit,
+// interest-rate and bank-health figures, exact stored decimals with their published rounding.
+model MoneyBanksFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/household-income-spending-annual.csv: Geostat's average monthly
+// household incomes and expenditures, exact stored decimals with their published rounding.
+model HouseholdIncomeSpendingFact {
+  year               Int
+  indicatorId        String
+  areaId             String
+  measure            String
+  value              Decimal        @db.Decimal(30, 20)
+  publishedValue     Decimal        @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, areaId, measure, year])
 }
 
 // Mirror of the served data/imports/demography-*.csv files: one flat observation table in the

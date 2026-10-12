@@ -1,0 +1,18 @@
+[
+  {
+    "url": "https://ex-trade-api.geostat.ge/api/trade/classificatory?lang=ka",
+    "file": "classificatory-ka.json",
+    "bytes": 2299767,
+    "sha256": "064758f8579f75f68a9fa39095b310f53ac085d093440d0897cdf553ed4abfe0",
+    "retrievedAt": "2026-10-10",
+    "purpose": "translation reference only; not historical HS identity or value evidence"
+  },
+  {
+    "url": "https://ex-trade-api.geostat.ge/api/trade/classificatory?lang=en",
+    "file": "classificatory-en.json",
+    "bytes": 1127561,
+    "sha256": "7925462f6e5153ea42ef8e31c6e4b4de87aedcf0757677b68bbf02b439709499",
+    "retrievedAt": "2026-10-10",
+    "purpose": "translation reference only; not historical HS identity or value evidence"
+  }
+]

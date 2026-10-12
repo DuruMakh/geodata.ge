@@ -13,6 +13,11 @@ every run. The database is never edited directly and never becomes a second
 editing surface — if the database and the CSVs ever disagree, the CSVs win and
 the import is re-run.
 
+The complete replacement and its parity checks share a five-minute transaction
+limit; opening that transaction has a separate 30-second wait limit. Exceeding
+either limit fails the import. Validation and exact row parity remain inside the
+same all-or-nothing transaction, and a failure preserves the previous mirror.
+
 ## What the import loads
 
 Unemployment uses the existing single import transaction. Source IDs retain their original research identity in each observation; the source-register relation adds the required `source.` prefix. The importer validates all observations and registered references before opening the transaction, deletes unemployment children before source parents, creates rows with the active run ID and reloads them through the serving mapper. Exact field/value parity must pass before commit. Both numeric fields use Decimal(40,20), and displayed values preserve one-decimal precision. The private table has row-level security enabled and grants no access to `anon` or `authenticated`. Local verification covers schema generation, mapping and rejection of missing/mismatched rows; applying the migration and importing a live mirror requires delivery authorization.
@@ -313,3 +318,7 @@ Verify instead by either:
 
 Production is unaffected by all of this: deploys run `prisma migrate deploy`,
 which never uses a shadow database, so P3006 is not in the production path.
+
+## Domestic exports mirror
+
+The domestic-export extension adds `TradeDomesticEntity` (287 rows) and `TradeDomesticFact` (5,076 rows) from the accepted domestic catalogue and CSV. Migration `20261010120000_trade_domestic_exports` adds only these tables, their entity/source/import relations, RLS and revoked public-role grants. It was generated offline by comparing the previous and current Prisma schemas; it does not assume live-database state. The existing import transaction clears the new facts before entities and source documents, imports facts in 1,000-row batches, and compares every field before committing. The serving reader repeats CSV/database parity checks. No live import or migration is part of local page implementation; an authorized release applies them through the existing Actions pipeline.

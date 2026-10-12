@@ -1,0 +1,765 @@
+﻿source_sheet,source_label,country_id,identity_label_en,basis
+2000-2007(eng),USA,united_states_of_america,United States of America,renamed_or_abbreviated
+2000-2007(eng),Russia,russian_federation,Russian Federation,renamed_or_abbreviated
+2000-2007(eng),Germany,germany,Germany,same_label
+2000-2007(eng),Israel,israel,Israel,same_label
+2000-2007(eng),Spain,spain,Spain,same_label
+2000-2007(eng),Greece,greece,Greece,same_label
+2000-2007(eng),Belgium,belgium,Belgium,same_label
+2000-2007(eng),Ukraine,ukraine,Ukraine,same_label
+2000-2007(eng),UK,united_kingdom_of_great_britain_and_northern_ireland,United Kingdom of Great Britain and Northern Ireland,renamed_or_abbreviated
+2000-2007(eng),Poland,poland,Poland,same_label
+2000-2007(eng),Netherlands,netherlands,Netherlands,same_label
+2000-2007(eng),Kazakhstan,kazakhstan,Kazakhstan,same_label
+2000-2007(eng),Canada,canada,Canada,same_label
+2000-2007(eng),Turkey,turkey,Turkey,same_label
+2000-2007(eng),France,france,France,same_label
+2000-2007(eng),UAE,united_arab_emirates,United Arab Emirates,renamed_or_abbreviated
+2000-2007(eng),Azerbaijan,azerbaijan,Azerbaijan,same_label
+2000-2007(eng),Turkmenistan,turkmenistan,Turkmenistan,same_label
+2000-2007(eng),Other Countries,other_countries,Other Countries,remainder_kept_separate
+2008-2009(eng),Russian Federation,russian_federation,Russian Federation,same_label
+2008-2009(eng),Greece,greece,Greece,same_label
+2008-2009(eng),Italy,italy,Italy,same_label
+2008-2009(eng),United States,united_states_of_america,United States of America,renamed_or_abbreviated
+2008-2009(eng),Ukraine,ukraine,Ukraine,same_label
+2008-2009(eng),Spain,spain,Spain,same_label
+2008-2009(eng),Turkey,turkey,Turkey,same_label
+2008-2009(eng),India,india,India,same_label
+2008-2009(eng),Israel,israel,Israel,same_label
+2008-2009(eng),Germany,germany,Germany,same_label
+2008-2009(eng),Kazakhstan,kazakhstan,Kazakhstan,same_label
+2008-2009(eng),France,france,France,same_label
+2008-2009(eng),Azerbaijan,azerbaijan,Azerbaijan,same_label
+2008-2009(eng),Mexico,mexico,Mexico,same_label
+2008-2009(eng),Canada,canada,Canada,same_label
+2008-2009(eng),Cyprus,cyprus,Cyprus,same_label
+2008-2009(eng),Ireland,ireland,Ireland,same_label
+2008-2009(eng),Armenia,armenia,Armenia,same_label
+2008-2009(eng),United Kingdom,united_kingdom_of_great_britain_and_northern_ireland,United Kingdom of Great Britain and Northern Ireland,renamed_or_abbreviated
+2008-2009(eng),Portugal,portugal,Portugal,same_label
+2008-2009(eng),Austria,austria,Austria,same_label
+2008-2009(eng),Belgium,belgium,Belgium,same_label
+2008-2009(eng),Sweden,sweden,Sweden,same_label
+2008-2009(eng),Australia,australia,Australia,same_label
+2008-2009(eng),United Arab Emirates,united_arab_emirates,United Arab Emirates,same_label
+2008-2009(eng),Kyrgyzstan,kyrgyzstan,Kyrgyzstan,same_label
+2008-2009(eng),Uzbekistan,uzbekistan,Uzbekistan,same_label
+2008-2009(eng),Philippines,philippines,Philippines,same_label
+2008-2009(eng),Senegal,senegal,Senegal,same_label
+2008-2009(eng),China,china,China,same_label
+2008-2009(eng),Belarus,belarus,Belarus,same_label
+2008-2009(eng),Romania,romania,Romania,same_label
+2008-2009(eng),Switzerland,switzerland,Switzerland,same_label
+2008-2009(eng),Netherlands,netherlands,Netherlands,same_label
+2008-2009(eng),Costa Rica,costa_rica,Costa Rica,same_label
+2008-2009(eng),Brazil,brazil,Brazil,same_label
+2008-2009(eng),Iraq,iraq,Iraq,same_label
+2008-2009(eng),Poland,poland,Poland,same_label
+2008-2009(eng),Dominica,dominica,Dominica,same_label
+2008-2009(eng),Benin,benin,Benin,same_label
+2008-2009(eng),Colombia,colombia,Colombia,same_label
+2008-2009(eng),Cuba,cuba,Cuba,same_label
+2008-2009(eng),Tonga,tonga,Tonga,same_label
+2008-2009(eng),Bulgaria,bulgaria,Bulgaria,same_label
+2008-2009(eng),Tajikistan,tajikistan,Tajikistan,same_label
+2008-2009(eng),Pakistan,pakistan,Pakistan,same_label
+2008-2009(eng),Czech Republic,czechia,Czechia,renamed_or_abbreviated
+2008-2009(eng),Honduras,honduras,Honduras,same_label
+2008-2009(eng),"Moldova, Republic of",moldova_republic_of,"Moldova, Republic of",same_label
+2008-2009(eng),Saudi Arabia,saudi_arabia,Saudi Arabia,same_label
+2008-2009(eng),Morocco,morocco,Morocco,same_label
+2008-2009(eng),Nepal,nepal,Nepal,same_label
+2008-2009(eng),Viet Nam,viet_nam,Viet Nam,same_label
+2008-2009(eng),Estonia,estonia,Estonia,same_label
+2008-2009(eng),Norway,norway,Norway,same_label
+2008-2009(eng),Denmark,denmark,Denmark,same_label
+2008-2009(eng),Guatemala,guatemala,Guatemala,same_label
+2008-2009(eng),Cote d'ivoire,cote_divoire,Côte dIvoire,renamed_or_abbreviated
+2008-2009(eng),Latvia,latvia,Latvia,same_label
+2008-2009(eng),Tunisia,tunisia,Tunisia,same_label
+2008-2009(eng),Egypt,egypt,Egypt,same_label
+2008-2009(eng),Finland,finland,Finland,same_label
+2008-2009(eng),Lithuania,lithuania,Lithuania,same_label
+2008-2009(eng),Mongolia,mongolia,Mongolia,same_label
+2008-2009(eng),Malta,malta,Malta,same_label
+2008-2009(eng),"Taiwan, Province of China",taiwan_province_of_china,"Taiwan, Province of China",same_label
+2008-2009(eng),Lebanon,lebanon,Lebanon,same_label
+2008-2009(eng),Jordan,jordan,Jordan,same_label
+2008-2009(eng),Malaysia,malaysia,Malaysia,same_label
+2008-2009(eng),New Zealand,new_zealand,New Zealand,same_label
+2008-2009(eng),Kuwait,kuwait,Kuwait,same_label
+2008-2009(eng),Turkmenistan,turkmenistan,Turkmenistan,same_label
+2008-2009(eng),Syrian Arab Republic,syrian_arab_republic,Syrian Arab Republic,same_label
+2008-2009(eng),Ecuador,ecuador,Ecuador,same_label
+2008-2009(eng),Oman,oman,Oman,same_label
+2008-2009(eng),Thailand,thailand,Thailand,same_label
+2008-2009(eng),Cape Verde,cabo_verde,Cabo Verde,renamed_or_abbreviated
+2008-2009(eng),Congo,congo,Congo,same_label
+2008-2009(eng),Afghanistan,afghanistan,Afghanistan,same_label
+2008-2009(eng),Slovakia,slovakia,Slovakia,same_label
+2008-2009(eng),"Iran, Islamic Republic of",iran_islamic_republic_of,"Iran, Islamic Republic of",same_label
+2008-2009(eng),Chile,chile,Chile,same_label
+2008-2009(eng),Luxembourg,luxembourg,Luxembourg,same_label
+2008-2009(eng),South Africa,south_africa,South Africa,same_label
+2008-2009(eng),Cameroon,cameroon,Cameroon,same_label
+2008-2009(eng),Bahrain,bahrain,Bahrain,same_label
+2008-2009(eng),Burundi,burundi,Burundi,same_label
+2008-2009(eng),Niger,niger,Niger,same_label
+2008-2009(eng),Rwanda,rwanda,Rwanda,same_label
+2008-2009(eng),Qatar,qatar,Qatar,same_label
+2008-2009(eng),Sierra Leone,sierra_leone,Sierra Leone,same_label
+2008-2009(eng),Bangladesh,bangladesh,Bangladesh,same_label
+2008-2009(eng),Togo,togo,Togo,same_label
+2008-2009(eng),Serbia,serbia,Serbia,same_label
+2008-2009(eng),Singapore,singapore,Singapore,same_label
+2008-2009(eng),Bolivia,bolivia_plurinational_state_of,"Bolivia, Plurinational State of",renamed_or_abbreviated
+2008-2009(eng),Japan,japan,Japan,same_label
+2008-2009(eng),Kiribati,kiribati,Kiribati,same_label
+2008-2009(eng),Hungary,hungary,Hungary,same_label
+2008-2009(eng),Panama,panama,Panama,same_label
+2008-2009(eng),EL Salvador,el_salvador,El Salvador,renamed_or_abbreviated
+2008-2009(eng),Albania,albania,Albania,same_label
+2008-2009(eng),Yemen,yemen,Yemen,same_label
+2008-2009(eng),Iceland,iceland,Iceland,same_label
+2008-2009(eng),Nigeria,nigeria,Nigeria,same_label
+2008-2009(eng),Brunei Darussalam,brunei_darussalam,Brunei Darussalam,same_label
+2008-2009(eng),"Congo, the Democratic Republic of the",congo_the_democratic_republic_of_the,"Congo, the Democratic Republic of the",same_label
+2008-2009(eng),Belize,belize,Belize,same_label
+2008-2009(eng),Paraguay,paraguay,Paraguay,same_label
+2008-2009(eng),Cambodia,cambodia,Cambodia,same_label
+2008-2009(eng),Guyana,guyana,Guyana,same_label
+2008-2009(eng),Indonesia,indonesia,Indonesia,same_label
+2008-2009(eng),Argentina,argentina,Argentina,same_label
+2008-2009(eng),Zambia,zambia,Zambia,same_label
+2008-2009(eng),Kenya,kenya,Kenya,same_label
+2008-2009(eng),Hong Kong,hong_kong,Hong Kong,same_label
+2008-2009(eng),Guinea,guinea,Guinea,same_label
+2008-2009(eng),Liberia,liberia,Liberia,same_label
+2008-2009(eng),Ghana,ghana,Ghana,same_label
+2008-2009(eng),Bermuda,bermuda,Bermuda,same_label
+2008-2009(eng),Uganda,uganda,Uganda,same_label
+2008-2009(eng),Croatia,croatia,Croatia,same_label
+2008-2009(eng),San Marino,san_marino,San Marino,same_label
+2008-2009(eng),"Macedonia, the former Yugoslav Republic of",north_macedonia,North Macedonia,renamed_or_abbreviated
+2008-2009(eng),Algeria,algeria,Algeria,same_label
+2008-2009(eng),"Korea, Republic of",korea_republic_of,"Korea, Republic of",same_label
+2008-2009(eng),Sudan,sudan,Sudan,same_label
+2008-2009(eng),Mali,mali,Mali,same_label
+2008-2009(eng),Madagascar,madagascar,Madagascar,same_label
+2008-2009(eng),Uruguay,uruguay,Uruguay,same_label
+2008-2009(eng),Turks and Caicos Islands,turks_and_caicos_islands,Turks and Caicos Islands,same_label
+2008-2009(eng),Aruba,aruba,Aruba,same_label
+2008-2009(eng),Mauritania,mauritania,Mauritania,same_label
+2008-2009(eng),Gibraltar,gibraltar,Gibraltar,same_label
+2008-2009(eng),Angola,angola,Angola,same_label
+2008-2009(eng),Lao People's Democratic Republic,lao_peoples_democratic_republic,Lao Peoples Democratic Republic,renamed_or_abbreviated
+2008-2009(eng),Solomon Islands,solomon_islands,Solomon Islands,same_label
+2008-2009(eng),Peru,peru,Peru,same_label
+2008-2009(eng),Slovenia,slovenia,Slovenia,same_label
+2008-2009(eng),Monaco,monaco,Monaco,same_label
+2008-2009(eng),Timor-LESTE,timor_leste,Timor-Leste,renamed_or_abbreviated
+2008-2009(eng),Guam,guam,Guam,same_label
+2008-2009(eng),Nicaragua,nicaragua,Nicaragua,same_label
+2008-2009(eng),Eritrea,eritrea,Eritrea,same_label
+2008-2009(eng),Bosnia and Herzegovina,bosnia_and_herzegovina,Bosnia and Herzegovina,same_label
+2008-2009(eng),Trinidad and Tobago,trinidad_and_tobago,Trinidad and Tobago,same_label
+2008-2009(eng),Zimbabwe,zimbabwe,Zimbabwe,same_label
+2008-2009(eng),Chad,chad,Chad,same_label
+2008-2009(eng),Palestinian Teritory Occupied,palestine_state_of,"Palestine, State of",renamed_or_abbreviated
+2008-2009(eng),Suriname,suriname,Suriname,same_label
+2008-2009(eng),Antarctica,antarctica,Antarctica,same_label
+2008-2009(eng),American Samoa,american_samoa,American Samoa,same_label
+2008-2009(eng),Andorra,andorra,Andorra,same_label
+2008-2009(eng),Antigua and Barbuda,antigua_and_barbuda,Antigua and Barbuda,same_label
+2008-2009(eng),Bahamas,bahamas,Bahamas,same_label
+2008-2009(eng),Barbados,barbados,Barbados,same_label
+2008-2009(eng),Bhutan,bhutan,Bhutan,same_label
+2008-2009(eng),Botswana,botswana,Botswana,same_label
+2008-2009(eng),Bouvet Island,bouvet_island,Bouvet Island,same_label
+2008-2009(eng),"Virgin Islands, British",virgin_islands_british,"Virgin Islands, British",same_label
+2008-2009(eng),Myanmar,myanmar,Myanmar,same_label
+2008-2009(eng),Cayman Islands,cayman_islands,Cayman Islands,same_label
+2008-2009(eng),Central African Republic,central_african_republic,Central African Republic,same_label
+2008-2009(eng),Sri Lanka,sri_lanka,Sri Lanka,same_label
+2008-2009(eng),Christmas Island,christmas_island,Christmas Island,same_label
+2008-2009(eng),Cocos (Keeling) Islands,cocos_keeling_islands,Cocos (Keeling) Islands,same_label
+2008-2009(eng),Comoros,comoros,Comoros,same_label
+2008-2009(eng),Mayotte,mayotte,Mayotte,same_label
+2008-2009(eng),Cook Islands,cook_islands,Cook Islands,same_label
+2008-2009(eng),Dominican Republic,dominican_republic,Dominican Republic,same_label
+2008-2009(eng),Equatorial Guinea,equatorial_guinea,Equatorial Guinea,same_label
+2008-2009(eng),Ethiopia,ethiopia,Ethiopia,same_label
+2008-2009(eng),Faroe Islands,faroe_islands,Faroe Islands,same_label
+2008-2009(eng),Falkland Islands (Malvinas),falkland_islands_malvinas,Falkland Islands (Malvinas),same_label
+2008-2009(eng),South Georgia and the South Sandwich Islands,south_georgia_and_the_south_sandwich_islands,South Georgia and the South Sandwich Islands,same_label
+2008-2009(eng),Fiji,fiji,Fiji,same_label
+2008-2009(eng),Aland Islands,aland_islands,Aland Islands,same_label
+2008-2009(eng),French Guiana,french_guiana,French Guiana,same_label
+2008-2009(eng),French Polynesia,french_polynesia,French Polynesia,same_label
+2008-2009(eng),Franch Southern Territories,french_southern_territories,French Southern Territories,renamed_or_abbreviated
+2008-2009(eng),Djibouti,djibouti,Djibouti,same_label
+2008-2009(eng),Gabon,gabon,Gabon,same_label
+2008-2009(eng),Gambia,gambia,Gambia,same_label
+2008-2009(eng),Greenland,greenland,Greenland,same_label
+2008-2009(eng),Grenada,grenada,Grenada,same_label
+2008-2009(eng),Guadeloupe,guadeloupe,Guadeloupe,same_label
+2008-2009(eng),Haiti,haiti,Haiti,same_label
+2008-2009(eng),Heard Island and McDonald Islands,heard_island_and_mcdonald_islands,Heard Island and McDonald Islands,same_label
+2008-2009(eng),Holy See (Vatican City State),holy_see,Holy See,renamed_or_abbreviated
+2008-2009(eng),Jamaica,jamaica,Jamaica,same_label
+2008-2009(eng),"Korea, Democratic People's Republic of",korea_democratic_peoples_republic_of,"Korea, Democratic Peoples Republic of",renamed_or_abbreviated
+2008-2009(eng),Lesotho,lesotho,Lesotho,same_label
+2008-2009(eng),Libyan Arab Jamahiriya,libya,Libya,renamed_or_abbreviated
+2008-2009(eng),Liechtenstein,liechtenstein,Liechtenstein,same_label
+2008-2009(eng),Macau,macao,Macao,renamed_or_abbreviated
+2008-2009(eng),Malawi,malawi,Malawi,same_label
+2008-2009(eng),Maldives,maldives,Maldives,same_label
+2008-2009(eng),Martinique,martinique,Martinique,same_label
+2008-2009(eng),Mauritius,mauritius,Mauritius,same_label
+2008-2009(eng),Montenegro,montenegro,Montenegro,same_label
+2008-2009(eng),Montserrat,montserrat,Montserrat,same_label
+2008-2009(eng),Mozambique,mozambique,Mozambique,same_label
+2008-2009(eng),Namibia,namibia,Namibia,same_label
+2008-2009(eng),Nauru,nauru,Nauru,same_label
+2008-2009(eng),Curasao,curacao,Curaçao,renamed_or_abbreviated
+2008-2009(eng),Sint Maarten (Dutch part),sint_maarten_dutch_part,Sint Maarten (Dutch part),same_label
+2008-2009(eng),"Bonaire, Saint Eustatius and Saba",bonaire_sint_eustatius_and_saba,"Bonaire, Sint Eustatius and Saba",renamed_or_abbreviated
+2008-2009(eng),New Caledonia,new_caledonia,New Caledonia,same_label
+2008-2009(eng),Vanuatu,vanuatu,Vanuatu,same_label
+2008-2009(eng),Niue,niue,Niue,same_label
+2008-2009(eng),Norfolk Island,norfolk_island,Norfolk Island,same_label
+2008-2009(eng),Northern Mariana Islands,northern_mariana_islands,Northern Mariana Islands,same_label
+2008-2009(eng),United States Minor Outlying Islands,united_states_minor_outlying_islands,United States Minor Outlying Islands,same_label
+2008-2009(eng),"Micronesia, Federated States of",micronesia_federated_states_of,"Micronesia, Federated States of",same_label
+2008-2009(eng),Marshall Islands,marshall_islands,Marshall Islands,same_label
+2008-2009(eng),Palau,palau,Palau,same_label
+2008-2009(eng),Papua New Guinea,papua_new_guinea,Papua New Guinea,same_label
+2008-2009(eng),Pitcairn,pitcairn,Pitcairn,same_label
+2008-2009(eng),Guinea-Bissau,guinea_bissau,Guinea-Bissau,same_label
+2008-2009(eng),Puerto Rico,puerto_rico,Puerto Rico,same_label
+2008-2009(eng),Reunion,reunion,Réunion,renamed_or_abbreviated
+2008-2009(eng),Saint Barthelemy,saint_barthelemy,Saint Barthélemy,renamed_or_abbreviated
+2008-2009(eng),Saint Helena,saint_helena_ascension_and_tristan_da_cunha,"Saint Helena, Ascension and Tristan da Cunha",renamed_or_abbreviated
+2008-2009(eng),Saint Kitts and Nevis,saint_kitts_and_nevis,Saint Kitts and Nevis,same_label
+2008-2009(eng),Anguilla,anguilla,Anguilla,same_label
+2008-2009(eng),Saint Lucia,saint_lucia,Saint Lucia,same_label
+2008-2009(eng),Saint Martin,saint_martin,Saint Martin,label_only_in_this_block
+2008-2009(eng),Saint Pierre and Miquelon,saint_pierre_and_miquelon,Saint Pierre and Miquelon,same_label
+2008-2009(eng),Saint Vincent and the Grenadines,saint_vincent_and_the_grenadines,Saint Vincent and the Grenadines,same_label
+2008-2009(eng),Sao Tome and Principe,sao_tome_and_principe,Sao Tome and Principe,same_label
+2008-2009(eng),Seychelles,seychelles,Seychelles,same_label
+2008-2009(eng),Somalia,somalia,Somalia,same_label
+2008-2009(eng),Western Sahara,western_sahara,Western Sahara,same_label
+2008-2009(eng),Svalbard and Jan Mayen,svalbard_and_jan_mayen,Svalbard and Jan Mayen,same_label
+2008-2009(eng),Swaziland,eswatini,Eswatini,renamed_or_abbreviated
+2008-2009(eng),Tokelau,tokelau,Tokelau,same_label
+2008-2009(eng),Tuvalu,tuvalu,Tuvalu,same_label
+2008-2009(eng),Guernsey,guernsey,Guernsey,same_label
+2008-2009(eng),Jersey,jersey,Jersey,same_label
+2008-2009(eng),Isle of Man,isle_of_man,Isle of Man,same_label
+2008-2009(eng),"Tanzania, United Republic of",tanzania_united_republic_of,"Tanzania, United Republic of",same_label
+2008-2009(eng),"Virgin Islands, U.S",virgin_islands_u_s,"Virgin Islands, U.S.",renamed_or_abbreviated
+2008-2009(eng),Burkina Faso,burkina_faso,Burkina Faso,same_label
+2008-2009(eng),Venezuela,venezuela_bolivarian_republic_of,"Venezuela, Bolivarian Republic of",renamed_or_abbreviated
+2008-2009(eng),Wallis and Futuna,wallis_and_futuna,Wallis and Futuna,same_label
+2008-2009(eng),Samoa,samoa,Samoa,same_label
+2008-2009(eng),British Indian Ocean Territory,british_indian_ocean_territory,British Indian Ocean Territory,same_label
+2008-2009(eng),Areas not elsewhere specified,areas_not_elsewhere_specified,Areas not elsewhere specified,remainder_kept_separate
+2010-2011 (eng),Russian Federation,russian_federation,Russian Federation,same_label
+2010-2011 (eng),Italy,italy,Italy,same_label
+2010-2011 (eng),Greece,greece,Greece,same_label
+2010-2011 (eng),United States,united_states_of_america,United States of America,renamed_or_abbreviated
+2010-2011 (eng),Israel,israel,Israel,same_label
+2010-2011 (eng),Turkey,turkey,Turkey,same_label
+2010-2011 (eng),Spain,spain,Spain,same_label
+2010-2011 (eng),Germany,germany,Germany,same_label
+2010-2011 (eng),Ukraine,ukraine,Ukraine,same_label
+2010-2011 (eng),Azerbaijan,azerbaijan,Azerbaijan,same_label
+2010-2011 (eng),Poland,poland,Poland,same_label
+2010-2011 (eng),France,france,France,same_label
+2010-2011 (eng),Kazakhstan,kazakhstan,Kazakhstan,same_label
+2010-2011 (eng),Kyrgyzstan,kyrgyzstan,Kyrgyzstan,same_label
+2010-2011 (eng),United Kingdom,united_kingdom_of_great_britain_and_northern_ireland,United Kingdom of Great Britain and Northern Ireland,renamed_or_abbreviated
+2010-2011 (eng),Canada,canada,Canada,same_label
+2010-2011 (eng),Cyprus,cyprus,Cyprus,same_label
+2010-2011 (eng),Armenia,armenia,Armenia,same_label
+2010-2011 (eng),Iraq,iraq,Iraq,same_label
+2010-2011 (eng),United Arab Emirates,united_arab_emirates,United Arab Emirates,same_label
+2010-2011 (eng),Ireland,ireland,Ireland,same_label
+2010-2011 (eng),Sweden,sweden,Sweden,same_label
+2010-2011 (eng),Belgium,belgium,Belgium,same_label
+2010-2011 (eng),Uzbekistan,uzbekistan,Uzbekistan,same_label
+2010-2011 (eng),Belarus,belarus,Belarus,same_label
+2010-2011 (eng),Austria,austria,Austria,same_label
+2010-2011 (eng),Australia,australia,Australia,same_label
+2010-2011 (eng),Netherlands,netherlands,Netherlands,same_label
+2010-2011 (eng),Czech Republic,czechia,Czechia,renamed_or_abbreviated
+2010-2011 (eng),Jordan,jordan,Jordan,same_label
+2010-2011 (eng),Saudi Arabia,saudi_arabia,Saudi Arabia,same_label
+2010-2011 (eng),Portugal,portugal,Portugal,same_label
+2010-2011 (eng),Kuwait,kuwait,Kuwait,same_label
+2010-2011 (eng),Switzerland,switzerland,Switzerland,same_label
+2010-2011 (eng),Lithuania,lithuania,Lithuania,same_label
+2010-2011 (eng),Malta,malta,Malta,same_label
+2010-2011 (eng),Qatar,qatar,Qatar,same_label
+2010-2011 (eng),Latvia,latvia,Latvia,same_label
+2010-2011 (eng),Lebanon,lebanon,Lebanon,same_label
+2010-2011 (eng),Tajikistan,tajikistan,Tajikistan,same_label
+2010-2011 (eng),Estonia,estonia,Estonia,same_label
+2010-2011 (eng),Iceland,iceland,Iceland,same_label
+2010-2011 (eng),China,china,China,same_label
+2010-2011 (eng),Denmark,denmark,Denmark,same_label
+2010-2011 (eng),"Moldova, Republic of",moldova_republic_of,"Moldova, Republic of",same_label
+2010-2011 (eng),Bulgaria,bulgaria,Bulgaria,same_label
+2010-2011 (eng),Egypt,egypt,Egypt,same_label
+2010-2011 (eng),Oman,oman,Oman,same_label
+2010-2011 (eng),Bahrain,bahrain,Bahrain,same_label
+2010-2011 (eng),Finland,finland,Finland,same_label
+2010-2011 (eng),Slovakia,slovakia,Slovakia,same_label
+2010-2011 (eng),Norway,norway,Norway,same_label
+2010-2011 (eng),Japan,japan,Japan,same_label
+2010-2011 (eng),Congo,congo,Congo,same_label
+2010-2011 (eng),"Korea, Republic of",korea_republic_of,"Korea, Republic of",same_label
+2010-2011 (eng),Brazil,brazil,Brazil,same_label
+2010-2011 (eng),Albania,albania,Albania,same_label
+2010-2011 (eng),Palestinian Teritory Occupied,palestine_state_of,"Palestine, State of",renamed_or_abbreviated
+2010-2011 (eng),United States Minor Outlying Islands,united_states_minor_outlying_islands,United States Minor Outlying Islands,same_label
+2010-2011 (eng),Pakistan,pakistan,Pakistan,same_label
+2010-2011 (eng),"Congo, the Democratic Republic of the",congo_the_democratic_republic_of_the,"Congo, the Democratic Republic of the",same_label
+2010-2011 (eng),Hungary,hungary,Hungary,same_label
+2010-2011 (eng),Djibouti,djibouti,Djibouti,same_label
+2010-2011 (eng),Afghanistan,afghanistan,Afghanistan,same_label
+2010-2011 (eng),Philippines,philippines,Philippines,same_label
+2010-2011 (eng),New Zealand,new_zealand,New Zealand,same_label
+2010-2011 (eng),Thailand,thailand,Thailand,same_label
+2010-2011 (eng),American Samoa,american_samoa,American Samoa,same_label
+2010-2011 (eng),"Taiwan, Province of China",taiwan_province_of_china,"Taiwan, Province of China",same_label
+2010-2011 (eng),Serbia,serbia,Serbia,same_label
+2010-2011 (eng),Nigeria,nigeria,Nigeria,same_label
+2010-2011 (eng),Malaysia,malaysia,Malaysia,same_label
+2010-2011 (eng),Trinidad and Tobago,trinidad_and_tobago,Trinidad and Tobago,same_label
+2010-2011 (eng),Panama,panama,Panama,same_label
+2010-2011 (eng),Romania,romania,Romania,same_label
+2010-2011 (eng),Ecuador,ecuador,Ecuador,same_label
+2010-2011 (eng),Cameroon,cameroon,Cameroon,same_label
+2010-2011 (eng),Turks and Caicos Islands,turks_and_caicos_islands,Turks and Caicos Islands,same_label
+2010-2011 (eng),Peru,peru,Peru,same_label
+2010-2011 (eng),Indonesia,indonesia,Indonesia,same_label
+2010-2011 (eng),Slovenia,slovenia,Slovenia,same_label
+2010-2011 (eng),Guinea,guinea,Guinea,same_label
+2010-2011 (eng),Mongolia,mongolia,Mongolia,same_label
+2010-2011 (eng),"Iran, Islamic Republic of",iran_islamic_republic_of,"Iran, Islamic Republic of",same_label
+2010-2011 (eng),Turkmenistan,turkmenistan,Turkmenistan,same_label
+2010-2011 (eng),Singapore,singapore,Singapore,same_label
+2010-2011 (eng),Luxembourg,luxembourg,Luxembourg,same_label
+2010-2011 (eng),Croatia,croatia,Croatia,same_label
+2010-2011 (eng),Mexico,mexico,Mexico,same_label
+2010-2011 (eng),Viet Nam,viet_nam,Viet Nam,same_label
+2010-2011 (eng),Cote d'ivoire,cote_divoire,Côte dIvoire,renamed_or_abbreviated
+2010-2011 (eng),Suriname,suriname,Suriname,same_label
+2010-2011 (eng),Haiti,haiti,Haiti,same_label
+2010-2011 (eng),South Africa,south_africa,South Africa,same_label
+2010-2011 (eng),Brunei Darussalam,brunei_darussalam,Brunei Darussalam,same_label
+2010-2011 (eng),Syrian Arab Republic,syrian_arab_republic,Syrian Arab Republic,same_label
+2010-2011 (eng),Costa Rica,costa_rica,Costa Rica,same_label
+2010-2011 (eng),Guyana,guyana,Guyana,same_label
+2010-2011 (eng),Liberia,liberia,Liberia,same_label
+2010-2011 (eng),Palau,palau,Palau,same_label
+2010-2011 (eng),Swaziland,eswatini,Eswatini,renamed_or_abbreviated
+2010-2011 (eng),Kenya,kenya,Kenya,same_label
+2010-2011 (eng),Hong Kong,hong_kong,Hong Kong,same_label
+2010-2011 (eng),Guam,guam,Guam,same_label
+2010-2011 (eng),Zambia,zambia,Zambia,same_label
+2010-2011 (eng),"Macedonia, the former Yugoslav Republic of",north_macedonia,North Macedonia,renamed_or_abbreviated
+2010-2011 (eng),Libyan Arab Jamahiriya,libya,Libya,renamed_or_abbreviated
+2010-2011 (eng),Togo,togo,Togo,same_label
+2010-2011 (eng),EL Salvador,el_salvador,El Salvador,renamed_or_abbreviated
+2010-2011 (eng),Zimbabwe,zimbabwe,Zimbabwe,same_label
+2010-2011 (eng),Bahamas,bahamas,Bahamas,same_label
+2010-2011 (eng),Papua New Guinea,papua_new_guinea,Papua New Guinea,same_label
+2010-2011 (eng),India,india,India,same_label
+2010-2011 (eng),Fiji,fiji,Fiji,same_label
+2010-2011 (eng),Bosnia and Herzegovina,bosnia_and_herzegovina,Bosnia and Herzegovina,same_label
+2010-2011 (eng),Gabon,gabon,Gabon,same_label
+2010-2011 (eng),Ghana,ghana,Ghana,same_label
+2010-2011 (eng),Bolivia,bolivia_plurinational_state_of,"Bolivia, Plurinational State of",renamed_or_abbreviated
+2010-2011 (eng),Uruguay,uruguay,Uruguay,same_label
+2010-2011 (eng),Gibraltar,gibraltar,Gibraltar,same_label
+2010-2011 (eng),Macau,macao,Macao,renamed_or_abbreviated
+2010-2011 (eng),Western Sahara,western_sahara,Western Sahara,same_label
+2010-2011 (eng),Grenada,grenada,Grenada,same_label
+2010-2011 (eng),Cambodia,cambodia,Cambodia,same_label
+2010-2011 (eng),Bangladesh,bangladesh,Bangladesh,same_label
+2010-2011 (eng),Central African Republic,central_african_republic,Central African Republic,same_label
+2010-2011 (eng),Chile,chile,Chile,same_label
+2010-2011 (eng),Argentina,argentina,Argentina,same_label
+2010-2011 (eng),Mauritius,mauritius,Mauritius,same_label
+2010-2011 (eng),Senegal,senegal,Senegal,same_label
+2010-2011 (eng),Tunisia,tunisia,Tunisia,same_label
+2010-2011 (eng),Colombia,colombia,Colombia,same_label
+2010-2011 (eng),Ethiopia,ethiopia,Ethiopia,same_label
+2010-2011 (eng),Uganda,uganda,Uganda,same_label
+2010-2011 (eng),Dominica,dominica,Dominica,same_label
+2010-2011 (eng),Mali,mali,Mali,same_label
+2010-2011 (eng),Barbados,barbados,Barbados,same_label
+2010-2011 (eng),Greenland,greenland,Greenland,same_label
+2010-2011 (eng),Niger,niger,Niger,same_label
+2010-2011 (eng),Rwanda,rwanda,Rwanda,same_label
+2010-2011 (eng),Montenegro,montenegro,Montenegro,same_label
+2010-2011 (eng),Lao People's Democratic Republic,lao_peoples_democratic_republic,Lao Peoples Democratic Republic,renamed_or_abbreviated
+2010-2011 (eng),Tuvalu,tuvalu,Tuvalu,same_label
+2010-2011 (eng),French Guiana,french_guiana,French Guiana,same_label
+2010-2011 (eng),Kiribati,kiribati,Kiribati,same_label
+2010-2011 (eng),Burundi,burundi,Burundi,same_label
+2010-2011 (eng),Sudan,sudan,Sudan,same_label
+2010-2011 (eng),Andorra,andorra,Andorra,same_label
+2010-2011 (eng),Saint Vincent and the Grenadines,saint_vincent_and_the_grenadines,Saint Vincent and the Grenadines,same_label
+2010-2011 (eng),South Georgia and the South Sandwich Islands,south_georgia_and_the_south_sandwich_islands,South Georgia and the South Sandwich Islands,same_label
+2010-2011 (eng),"Korea, Democratic People's Republic of",korea_democratic_peoples_republic_of,"Korea, Democratic Peoples Republic of",renamed_or_abbreviated
+2010-2011 (eng),Cocos (Keeling) Islands,cocos_keeling_islands,Cocos (Keeling) Islands,same_label
+2010-2011 (eng),British Indian Ocean Territory,british_indian_ocean_territory,British Indian Ocean Territory,same_label
+2010-2011 (eng),Equatorial Guinea,equatorial_guinea,Equatorial Guinea,same_label
+2010-2011 (eng),Yemen,yemen,Yemen,same_label
+2010-2011 (eng),Algeria,algeria,Algeria,same_label
+2010-2011 (eng),Faroe Islands,faroe_islands,Faroe Islands,same_label
+2010-2011 (eng),Tonga,tonga,Tonga,same_label
+2010-2011 (eng),"Bonaire, Saint Eustatius and Saba",bonaire_sint_eustatius_and_saba,"Bonaire, Sint Eustatius and Saba",renamed_or_abbreviated
+2010-2011 (eng),Jamaica,jamaica,Jamaica,same_label
+2010-2011 (eng),Vanuatu,vanuatu,Vanuatu,same_label
+2010-2011 (eng),Namibia,namibia,Namibia,same_label
+2010-2011 (eng),Jersey,jersey,Jersey,same_label
+2010-2011 (eng),Benin,benin,Benin,same_label
+2010-2011 (eng),Maldives,maldives,Maldives,same_label
+2010-2011 (eng),Dominican Republic,dominican_republic,Dominican Republic,same_label
+2010-2011 (eng),Belize,belize,Belize,same_label
+2010-2011 (eng),"Tanzania, United Republic of",tanzania_united_republic_of,"Tanzania, United Republic of",same_label
+2010-2011 (eng),French Polynesia,french_polynesia,French Polynesia,same_label
+2010-2011 (eng),Mauritania,mauritania,Mauritania,same_label
+2010-2011 (eng),Burkina Faso,burkina_faso,Burkina Faso,same_label
+2010-2011 (eng),Solomon Islands,solomon_islands,Solomon Islands,same_label
+2010-2011 (eng),Sri Lanka,sri_lanka,Sri Lanka,same_label
+2010-2011 (eng),Bermuda,bermuda,Bermuda,same_label
+2010-2011 (eng),Somalia,somalia,Somalia,same_label
+2010-2011 (eng),Cayman Islands,cayman_islands,Cayman Islands,same_label
+2010-2011 (eng),Paraguay,paraguay,Paraguay,same_label
+2010-2011 (eng),Seychelles,seychelles,Seychelles,same_label
+2010-2011 (eng),Saint Kitts and Nevis,saint_kitts_and_nevis,Saint Kitts and Nevis,same_label
+2010-2011 (eng),Curasao,curacao,Curaçao,renamed_or_abbreviated
+2010-2011 (eng),Botswana,botswana,Botswana,same_label
+2010-2011 (eng),Gambia,gambia,Gambia,same_label
+2010-2011 (eng),Honduras,honduras,Honduras,same_label
+2010-2011 (eng),Puerto Rico,puerto_rico,Puerto Rico,same_label
+2010-2011 (eng),Aland Islands,aland_islands,Aland Islands,same_label
+2010-2011 (eng),Saint Barthelemy,saint_barthelemy,Saint Barthélemy,renamed_or_abbreviated
+2010-2011 (eng),Reunion,reunion,Réunion,renamed_or_abbreviated
+2010-2011 (eng),Sierra Leone,sierra_leone,Sierra Leone,same_label
+2010-2011 (eng),Marshall Islands,marshall_islands,Marshall Islands,same_label
+2010-2011 (eng),Aruba,aruba,Aruba,same_label
+2010-2011 (eng),Northern Mariana Islands,northern_mariana_islands,Northern Mariana Islands,same_label
+2010-2011 (eng),Morocco,morocco,Morocco,same_label
+2010-2011 (eng),Franch Southern Territories,french_southern_territories,French Southern Territories,renamed_or_abbreviated
+2010-2011 (eng),"Virgin Islands, British",virgin_islands_british,"Virgin Islands, British",same_label
+2010-2011 (eng),Cape Verde,cabo_verde,Cabo Verde,renamed_or_abbreviated
+2010-2011 (eng),Nauru,nauru,Nauru,same_label
+2010-2011 (eng),Guatemala,guatemala,Guatemala,same_label
+2010-2011 (eng),Anguilla,anguilla,Anguilla,same_label
+2010-2011 (eng),"Virgin Islands, U.S",virgin_islands_u_s,"Virgin Islands, U.S.",renamed_or_abbreviated
+2010-2011 (eng),Isle of Man,isle_of_man,Isle of Man,same_label
+2010-2011 (eng),Guinea-Bissau,guinea_bissau,Guinea-Bissau,same_label
+2010-2011 (eng),Antigua and Barbuda,antigua_and_barbuda,Antigua and Barbuda,same_label
+2010-2011 (eng),San Marino,san_marino,San Marino,same_label
+2010-2011 (eng),Tokelau,tokelau,Tokelau,same_label
+2010-2011 (eng),Saint Pierre and Miquelon,saint_pierre_and_miquelon,Saint Pierre and Miquelon,same_label
+2010-2011 (eng),Falkland Islands (Malvinas),falkland_islands_malvinas,Falkland Islands (Malvinas),same_label
+2010-2011 (eng),Venezuela,venezuela_bolivarian_republic_of,"Venezuela, Bolivarian Republic of",renamed_or_abbreviated
+2010-2011 (eng),Heard Island and McDonald Islands,heard_island_and_mcdonald_islands,Heard Island and McDonald Islands,same_label
+2010-2011 (eng),Angola,angola,Angola,same_label
+2010-2011 (eng),Monaco,monaco,Monaco,same_label
+2010-2011 (eng),Norfolk Island,norfolk_island,Norfolk Island,same_label
+2010-2011 (eng),Mozambique,mozambique,Mozambique,same_label
+2010-2011 (eng),Myanmar,myanmar,Myanmar,same_label
+2010-2011 (eng),Malawi,malawi,Malawi,same_label
+2010-2011 (eng),Cook Islands,cook_islands,Cook Islands,same_label
+2010-2011 (eng),Chad,chad,Chad,same_label
+2010-2011 (eng),Liechtenstein,liechtenstein,Liechtenstein,same_label
+2010-2011 (eng),Guernsey,guernsey,Guernsey,same_label
+2010-2011 (eng),Cuba,cuba,Cuba,same_label
+2010-2011 (eng),Montserrat,montserrat,Montserrat,same_label
+2010-2011 (eng),Eritrea,eritrea,Eritrea,same_label
+2010-2011 (eng),Wallis and Futuna,wallis_and_futuna,Wallis and Futuna,same_label
+2010-2011 (eng),Nepal,nepal,Nepal,same_label
+2010-2011 (eng),Comoros,comoros,Comoros,same_label
+2010-2011 (eng),Nicaragua,nicaragua,Nicaragua,same_label
+2010-2011 (eng),Sao Tome and Principe,sao_tome_and_principe,Sao Tome and Principe,same_label
+2010-2011 (eng),Bouvet Island,bouvet_island,Bouvet Island,same_label
+2010-2011 (eng),Guadeloupe,guadeloupe,Guadeloupe,same_label
+2010-2011 (eng),Pitcairn,pitcairn,Pitcairn,same_label
+2010-2011 (eng),Lesotho,lesotho,Lesotho,same_label
+2010-2011 (eng),Bhutan,bhutan,Bhutan,same_label
+2010-2011 (eng),Holy See (Vatican City State),holy_see,Holy See,renamed_or_abbreviated
+2010-2011 (eng),Madagascar,madagascar,Madagascar,same_label
+2010-2011 (eng),Saint Martin,saint_martin,Saint Martin,label_only_in_this_block
+2010-2011 (eng),"Micronesia, Federated States of",micronesia_federated_states_of,"Micronesia, Federated States of",same_label
+2010-2011 (eng),Samoa,samoa,Samoa,same_label
+2010-2011 (eng),Saint Lucia,saint_lucia,Saint Lucia,same_label
+2010-2011 (eng),Christmas Island,christmas_island,Christmas Island,same_label
+2010-2011 (eng),Antarctica,antarctica,Antarctica,same_label
+2010-2011 (eng),Timor-LESTE,timor_leste,Timor-Leste,renamed_or_abbreviated
+2010-2011 (eng),Saint Helena,saint_helena_ascension_and_tristan_da_cunha,"Saint Helena, Ascension and Tristan da Cunha",renamed_or_abbreviated
+2010-2011 (eng),Mayotte,mayotte,Mayotte,same_label
+2010-2011 (eng),Martinique,martinique,Martinique,same_label
+2010-2011 (eng),Sint Maarten (Dutch part),sint_maarten_dutch_part,Sint Maarten (Dutch part),same_label
+2010-2011 (eng),New Caledonia,new_caledonia,New Caledonia,same_label
+2010-2011 (eng),Niue,niue,Niue,same_label
+2010-2011 (eng),Svalbard and Jan Mayen,svalbard_and_jan_mayen,Svalbard and Jan Mayen,same_label
+2010-2011 (eng),Areas not elsewhere specified,areas_not_elsewhere_specified,Areas not elsewhere specified,remainder_kept_separate
+2012-2026 (eng),United States of America,united_states_of_america,United States of America,same_label
+2012-2026 (eng),Italy,italy,Italy,same_label
+2012-2026 (eng),Germany,germany,Germany,same_label
+2012-2026 (eng),Greece,greece,Greece,same_label
+2012-2026 (eng),Israel,israel,Israel,same_label
+2012-2026 (eng),Turkey,turkey,Turkey,same_label
+2012-2026 (eng),Spain,spain,Spain,same_label
+2012-2026 (eng),Kazakhstan,kazakhstan,Kazakhstan,same_label
+2012-2026 (eng),United Kingdom of Great Britain and Northern Ireland,united_kingdom_of_great_britain_and_northern_ireland,United Kingdom of Great Britain and Northern Ireland,same_label
+2012-2026 (eng),France,france,France,same_label
+2012-2026 (eng),Russian Federation,russian_federation,Russian Federation,same_label
+2012-2026 (eng),Ireland,ireland,Ireland,same_label
+2012-2026 (eng),Azerbaijan,azerbaijan,Azerbaijan,same_label
+2012-2026 (eng),Canada,canada,Canada,same_label
+2012-2026 (eng),Kyrgyzstan,kyrgyzstan,Kyrgyzstan,same_label
+2012-2026 (eng),Netherlands,netherlands,Netherlands,same_label
+2012-2026 (eng),Poland,poland,Poland,same_label
+2012-2026 (eng),United Arab Emirates,united_arab_emirates,United Arab Emirates,same_label
+2012-2026 (eng),Saudi Arabia,saudi_arabia,Saudi Arabia,same_label
+2012-2026 (eng),Belgium,belgium,Belgium,same_label
+2012-2026 (eng),Cyprus,cyprus,Cyprus,same_label
+2012-2026 (eng),Jordan,jordan,Jordan,same_label
+2012-2026 (eng),Armenia,armenia,Armenia,same_label
+2012-2026 (eng),Lebanon,lebanon,Lebanon,same_label
+2012-2026 (eng),Uzbekistan,uzbekistan,Uzbekistan,same_label
+2012-2026 (eng),Tajikistan,tajikistan,Tajikistan,same_label
+2012-2026 (eng),Slovakia,slovakia,Slovakia,same_label
+2012-2026 (eng),Austria,austria,Austria,same_label
+2012-2026 (eng),Belarus,belarus,Belarus,same_label
+2012-2026 (eng),Czechia,czechia,Czechia,same_label
+2012-2026 (eng),Lithuania,lithuania,Lithuania,same_label
+2012-2026 (eng),Sweden,sweden,Sweden,same_label
+2012-2026 (eng),Qatar,qatar,Qatar,same_label
+2012-2026 (eng),Switzerland,switzerland,Switzerland,same_label
+2012-2026 (eng),Portugal,portugal,Portugal,same_label
+2012-2026 (eng),Australia,australia,Australia,same_label
+2012-2026 (eng),"Moldova, Republic of",moldova_republic_of,"Moldova, Republic of",same_label
+2012-2026 (eng),Malta,malta,Malta,same_label
+2012-2026 (eng),Bulgaria,bulgaria,Bulgaria,same_label
+2012-2026 (eng),Kuwait,kuwait,Kuwait,same_label
+2012-2026 (eng),Egypt,egypt,Egypt,same_label
+2012-2026 (eng),"Congo, the Democratic Republic of the",congo_the_democratic_republic_of_the,"Congo, the Democratic Republic of the",same_label
+2012-2026 (eng),Denmark,denmark,Denmark,same_label
+2012-2026 (eng),Iceland,iceland,Iceland,same_label
+2012-2026 (eng),Oman,oman,Oman,same_label
+2012-2026 (eng),Finland,finland,Finland,same_label
+2012-2026 (eng),Bahrain,bahrain,Bahrain,same_label
+2012-2026 (eng),Serbia,serbia,Serbia,same_label
+2012-2026 (eng),Iraq,iraq,Iraq,same_label
+2012-2026 (eng),Estonia,estonia,Estonia,same_label
+2012-2026 (eng),Latvia,latvia,Latvia,same_label
+2012-2026 (eng),Hungary,hungary,Hungary,same_label
+2012-2026 (eng),Pakistan,pakistan,Pakistan,same_label
+2012-2026 (eng),"Korea, Republic of",korea_republic_of,"Korea, Republic of",same_label
+2012-2026 (eng),Albania,albania,Albania,same_label
+2012-2026 (eng),Romania,romania,Romania,same_label
+2012-2026 (eng),Ukraine,ukraine,Ukraine,same_label
+2012-2026 (eng),Norway,norway,Norway,same_label
+2012-2026 (eng),China,china,China,same_label
+2012-2026 (eng),Luxembourg,luxembourg,Luxembourg,same_label
+2012-2026 (eng),Japan,japan,Japan,same_label
+2012-2026 (eng),"Palestine, State of",palestine_state_of,"Palestine, State of",same_label
+2012-2026 (eng),Philippines,philippines,Philippines,same_label
+2012-2026 (eng),New Zealand,new_zealand,New Zealand,same_label
+2012-2026 (eng),Thailand,thailand,Thailand,same_label
+2012-2026 (eng),North Macedonia,north_macedonia,North Macedonia,same_label
+2012-2026 (eng),Chile,chile,Chile,same_label
+2012-2026 (eng),Kenya,kenya,Kenya,same_label
+2012-2026 (eng),Zimbabwe,zimbabwe,Zimbabwe,same_label
+2012-2026 (eng),South Africa,south_africa,South Africa,same_label
+2012-2026 (eng),Montenegro,montenegro,Montenegro,same_label
+2012-2026 (eng),Croatia,croatia,Croatia,same_label
+2012-2026 (eng),Singapore,singapore,Singapore,same_label
+2012-2026 (eng),Turkmenistan,turkmenistan,Turkmenistan,same_label
+2012-2026 (eng),Slovenia,slovenia,Slovenia,same_label
+2012-2026 (eng),Suriname,suriname,Suriname,same_label
+2012-2026 (eng),Malaysia,malaysia,Malaysia,same_label
+2012-2026 (eng),Sudan,sudan,Sudan,same_label
+2012-2026 (eng),Yemen,yemen,Yemen,same_label
+2012-2026 (eng),Panama,panama,Panama,same_label
+2012-2026 (eng),Bosnia and Herzegovina,bosnia_and_herzegovina,Bosnia and Herzegovina,same_label
+2012-2026 (eng),"Tanzania, United Republic of",tanzania_united_republic_of,"Tanzania, United Republic of",same_label
+2012-2026 (eng),Trinidad and Tobago,trinidad_and_tobago,Trinidad and Tobago,same_label
+2012-2026 (eng),Cameroon,cameroon,Cameroon,same_label
+2012-2026 (eng),Mauritius,mauritius,Mauritius,same_label
+2012-2026 (eng),Hong Kong,hong_kong,Hong Kong,same_label
+2012-2026 (eng),Brazil,brazil,Brazil,same_label
+2012-2026 (eng),Central African Republic,central_african_republic,Central African Republic,same_label
+2012-2026 (eng),Peru,peru,Peru,same_label
+2012-2026 (eng),Maldives,maldives,Maldives,same_label
+2012-2026 (eng),Ecuador,ecuador,Ecuador,same_label
+2012-2026 (eng),British Indian Ocean Territory,british_indian_ocean_territory,British Indian Ocean Territory,same_label
+2012-2026 (eng),Cambodia,cambodia,Cambodia,same_label
+2012-2026 (eng),Jamaica,jamaica,Jamaica,same_label
+2012-2026 (eng),Côte dIvoire,cote_divoire,Côte dIvoire,same_label
+2012-2026 (eng),Dominican Republic,dominican_republic,Dominican Republic,same_label
+2012-2026 (eng),Somalia,somalia,Somalia,same_label
+2012-2026 (eng),South Sudan,south_sudan,South Sudan,same_label
+2012-2026 (eng),Libya,libya,Libya,same_label
+2012-2026 (eng),Argentina,argentina,Argentina,same_label
+2012-2026 (eng),Bahamas,bahamas,Bahamas,same_label
+2012-2026 (eng),Marshall Islands,marshall_islands,Marshall Islands,same_label
+2012-2026 (eng),Lao Peoples Democratic Republic,lao_peoples_democratic_republic,Lao Peoples Democratic Republic,same_label
+2012-2026 (eng),Andorra,andorra,Andorra,same_label
+2012-2026 (eng),Mali,mali,Mali,same_label
+2012-2026 (eng),"Venezuela, Bolivarian Republic of",venezuela_bolivarian_republic_of,"Venezuela, Bolivarian Republic of",same_label
+2012-2026 (eng),Colombia,colombia,Colombia,same_label
+2012-2026 (eng),Zambia,zambia,Zambia,same_label
+2012-2026 (eng),Burkina Faso,burkina_faso,Burkina Faso,same_label
+2012-2026 (eng),Turks and Caicos Islands,turks_and_caicos_islands,Turks and Caicos Islands,same_label
+2012-2026 (eng),Togo,togo,Togo,same_label
+2012-2026 (eng),Chad,chad,Chad,same_label
+2012-2026 (eng),Indonesia,indonesia,Indonesia,same_label
+2012-2026 (eng),India,india,India,same_label
+2012-2026 (eng),Seychelles,seychelles,Seychelles,same_label
+2012-2026 (eng),Rwanda,rwanda,Rwanda,same_label
+2012-2026 (eng),Eswatini,eswatini,Eswatini,same_label
+2012-2026 (eng),San Marino,san_marino,San Marino,same_label
+2012-2026 (eng),Mexico,mexico,Mexico,same_label
+2012-2026 (eng),Uruguay,uruguay,Uruguay,same_label
+2012-2026 (eng),Belize,belize,Belize,same_label
+2012-2026 (eng),"Taiwan, Province of China",taiwan_province_of_china,"Taiwan, Province of China",same_label
+2012-2026 (eng),Puerto Rico,puerto_rico,Puerto Rico,same_label
+2012-2026 (eng),Uganda,uganda,Uganda,same_label
+2012-2026 (eng),Niger,niger,Niger,same_label
+2012-2026 (eng),Botswana,botswana,Botswana,same_label
+2012-2026 (eng),Senegal,senegal,Senegal,same_label
+2012-2026 (eng),Gabon,gabon,Gabon,same_label
+2012-2026 (eng),Sierra Leone,sierra_leone,Sierra Leone,same_label
+2012-2026 (eng),Guam,guam,Guam,same_label
+2012-2026 (eng),Malawi,malawi,Malawi,same_label
+2012-2026 (eng),Gibraltar,gibraltar,Gibraltar,same_label
+2012-2026 (eng),Paraguay,paraguay,Paraguay,same_label
+2012-2026 (eng),Morocco,morocco,Morocco,same_label
+2012-2026 (eng),Aruba,aruba,Aruba,same_label
+2012-2026 (eng),Liberia,liberia,Liberia,same_label
+2012-2026 (eng),Mozambique,mozambique,Mozambique,same_label
+2012-2026 (eng),Afghanistan,afghanistan,Afghanistan,same_label
+2012-2026 (eng),Benin,benin,Benin,same_label
+2012-2026 (eng),Honduras,honduras,Honduras,same_label
+2012-2026 (eng),Dominica,dominica,Dominica,same_label
+2012-2026 (eng),"Bonaire, Sint Eustatius and Saba",bonaire_sint_eustatius_and_saba,"Bonaire, Sint Eustatius and Saba",same_label
+2012-2026 (eng),Congo,congo,Congo,same_label
+2012-2026 (eng),Nigeria,nigeria,Nigeria,same_label
+2012-2026 (eng),Macao,macao,Macao,same_label
+2012-2026 (eng),Guinea,guinea,Guinea,same_label
+2012-2026 (eng),Ghana,ghana,Ghana,same_label
+2012-2026 (eng),Guyana,guyana,Guyana,same_label
+2012-2026 (eng),Curaçao,curacao,Curaçao,same_label
+2012-2026 (eng),Brunei Darussalam,brunei_darussalam,Brunei Darussalam,same_label
+2012-2026 (eng),Namibia,namibia,Namibia,same_label
+2012-2026 (eng),Grenada,grenada,Grenada,same_label
+2012-2026 (eng),Antigua and Barbuda,antigua_and_barbuda,Antigua and Barbuda,same_label
+2012-2026 (eng),"Micronesia, Federated States of",micronesia_federated_states_of,"Micronesia, Federated States of",same_label
+2012-2026 (eng),Cabo Verde,cabo_verde,Cabo Verde,same_label
+2012-2026 (eng),Eritrea,eritrea,Eritrea,same_label
+2012-2026 (eng),Syrian Arab Republic,syrian_arab_republic,Syrian Arab Republic,same_label
+2012-2026 (eng),Guadeloupe,guadeloupe,Guadeloupe,same_label
+2012-2026 (eng),Burundi,burundi,Burundi,same_label
+2012-2026 (eng),Vanuatu,vanuatu,Vanuatu,same_label
+2012-2026 (eng),Tunisia,tunisia,Tunisia,same_label
+2012-2026 (eng),Anguilla,anguilla,Anguilla,same_label
+2012-2026 (eng),Saint Lucia,saint_lucia,Saint Lucia,same_label
+2012-2026 (eng),Costa Rica,costa_rica,Costa Rica,same_label
+2012-2026 (eng),French Polynesia,french_polynesia,French Polynesia,same_label
+2012-2026 (eng),Guatemala,guatemala,Guatemala,same_label
+2012-2026 (eng),Cocos (Keeling) Islands,cocos_keeling_islands,Cocos (Keeling) Islands,same_label
+2012-2026 (eng),American Samoa,american_samoa,American Samoa,same_label
+2012-2026 (eng),Tokelau,tokelau,Tokelau,same_label
+2012-2026 (eng),Tonga,tonga,Tonga,same_label
+2012-2026 (eng),Mongolia,mongolia,Mongolia,same_label
+2012-2026 (eng),"Bolivia, Plurinational State of",bolivia_plurinational_state_of,"Bolivia, Plurinational State of",same_label
+2012-2026 (eng),Saint Vincent and the Grenadines,saint_vincent_and_the_grenadines,Saint Vincent and the Grenadines,same_label
+2012-2026 (eng),Cayman Islands,cayman_islands,Cayman Islands,same_label
+2012-2026 (eng),New Caledonia,new_caledonia,New Caledonia,same_label
+2012-2026 (eng),Barbados,barbados,Barbados,same_label
+2012-2026 (eng),"Virgin Islands, British",virgin_islands_british,"Virgin Islands, British",same_label
+2012-2026 (eng),Bermuda,bermuda,Bermuda,same_label
+2012-2026 (eng),Gambia,gambia,Gambia,same_label
+2012-2026 (eng),Fiji,fiji,Fiji,same_label
+2012-2026 (eng),Nicaragua,nicaragua,Nicaragua,same_label
+2012-2026 (eng),Monaco,monaco,Monaco,same_label
+2012-2026 (eng),Cuba,cuba,Cuba,same_label
+2012-2026 (eng),Sint Maarten (Dutch part),sint_maarten_dutch_part,Sint Maarten (Dutch part),same_label
+2012-2026 (eng),Lesotho,lesotho,Lesotho,same_label
+2012-2026 (eng),Sao Tome and Principe,sao_tome_and_principe,Sao Tome and Principe,same_label
+2012-2026 (eng),Bangladesh,bangladesh,Bangladesh,same_label
+2012-2026 (eng),Madagascar,madagascar,Madagascar,same_label
+2012-2026 (eng),El Salvador,el_salvador,El Salvador,same_label
+2012-2026 (eng),Kiribati,kiribati,Kiribati,same_label
+2012-2026 (eng),Nepal,nepal,Nepal,same_label
+2012-2026 (eng),French Southern Territories,french_southern_territories,French Southern Territories,same_label
+2012-2026 (eng),United States Minor Outlying Islands,united_states_minor_outlying_islands,United States Minor Outlying Islands,same_label
+2012-2026 (eng),Martinique,martinique,Martinique,same_label
+2012-2026 (eng),Montserrat,montserrat,Montserrat,same_label
+2012-2026 (eng),Haiti,haiti,Haiti,same_label
+2012-2026 (eng),Liechtenstein,liechtenstein,Liechtenstein,same_label
+2012-2026 (eng),Papua New Guinea,papua_new_guinea,Papua New Guinea,same_label
+2012-2026 (eng),Djibouti,djibouti,Djibouti,same_label
+2012-2026 (eng),Palau,palau,Palau,same_label
+2012-2026 (eng),Viet Nam,viet_nam,Viet Nam,same_label
+2012-2026 (eng),Faroe Islands,faroe_islands,Faroe Islands,same_label
+2012-2026 (eng),Algeria,algeria,Algeria,same_label
+2012-2026 (eng),Guinea-Bissau,guinea_bissau,Guinea-Bissau,same_label
+2012-2026 (eng),Comoros,comoros,Comoros,same_label
+2012-2026 (eng),Solomon Islands,solomon_islands,Solomon Islands,same_label
+2012-2026 (eng),Western Sahara,western_sahara,Western Sahara,same_label
+2012-2026 (eng),Sri Lanka,sri_lanka,Sri Lanka,same_label
+2012-2026 (eng),Ethiopia,ethiopia,Ethiopia,same_label
+2012-2026 (eng),Bhutan,bhutan,Bhutan,same_label
+2012-2026 (eng),Mauritania,mauritania,Mauritania,same_label
+2012-2026 (eng),"Virgin Islands, U.S.",virgin_islands_u_s,"Virgin Islands, U.S.",same_label
+2012-2026 (eng),Saint Kitts and Nevis,saint_kitts_and_nevis,Saint Kitts and Nevis,same_label
+2012-2026 (eng),Myanmar,myanmar,Myanmar,same_label
+2012-2026 (eng),Greenland,greenland,Greenland,same_label
+2012-2026 (eng),Angola,angola,Angola,same_label
+2012-2026 (eng),Holy See,holy_see,Holy See,same_label
+2012-2026 (eng),Réunion,reunion,Réunion,same_label
+2012-2026 (eng),Mayotte,mayotte,Mayotte,same_label
+2012-2026 (eng),French Guiana,french_guiana,French Guiana,same_label
+2012-2026 (eng),Samoa,samoa,Samoa,same_label
+2012-2026 (eng),Equatorial Guinea,equatorial_guinea,Equatorial Guinea,same_label
+2012-2026 (eng),Northern Mariana Islands,northern_mariana_islands,Northern Mariana Islands,same_label
+2012-2026 (eng),Guernsey,guernsey,Guernsey,same_label
+2012-2026 (eng),Tuvalu,tuvalu,Tuvalu,same_label
+2012-2026 (eng),"Iran, Islamic Republic of",iran_islamic_republic_of,"Iran, Islamic Republic of",same_label
+2012-2026 (eng),Christmas Island,christmas_island,Christmas Island,same_label
+2012-2026 (eng),Cook Islands,cook_islands,Cook Islands,same_label
+2012-2026 (eng),Pitcairn,pitcairn,Pitcairn,same_label
+2012-2026 (eng),"Korea, Democratic Peoples Republic of",korea_democratic_peoples_republic_of,"Korea, Democratic Peoples Republic of",same_label
+2012-2026 (eng),Timor-Leste,timor_leste,Timor-Leste,same_label
+2012-2026 (eng),Antarctica,antarctica,Antarctica,same_label
+2012-2026 (eng),Aland Islands,aland_islands,Aland Islands,same_label
+2012-2026 (eng),Wallis and Futuna,wallis_and_futuna,Wallis and Futuna,same_label
+2012-2026 (eng),South Georgia and the South Sandwich Islands,south_georgia_and_the_south_sandwich_islands,South Georgia and the South Sandwich Islands,same_label
+2012-2026 (eng),Norfolk Island,norfolk_island,Norfolk Island,same_label
+2012-2026 (eng),Nauru,nauru,Nauru,same_label
+2012-2026 (eng),Jersey,jersey,Jersey,same_label
+2012-2026 (eng),Isle of Man,isle_of_man,Isle of Man,same_label
+2012-2026 (eng),Bouvet Island,bouvet_island,Bouvet Island,same_label
+2012-2026 (eng),Heard Island and McDonald Islands,heard_island_and_mcdonald_islands,Heard Island and McDonald Islands,same_label
+2012-2026 (eng),Netherlands Antilles,netherlands_antilles,Netherlands Antilles,same_label
+2012-2026 (eng),Niue,niue,Niue,same_label
+2012-2026 (eng),Saint Barthélemy,saint_barthelemy,Saint Barthélemy,same_label
+2012-2026 (eng),Saint Pierre and Miquelon,saint_pierre_and_miquelon,Saint Pierre and Miquelon,same_label
+2012-2026 (eng),"Saint Helena, Ascension and Tristan da Cunha",saint_helena_ascension_and_tristan_da_cunha,"Saint Helena, Ascension and Tristan da Cunha",same_label
+2012-2026 (eng),Svalbard and Jan Mayen,svalbard_and_jan_mayen,Svalbard and Jan Mayen,same_label
+2012-2026 (eng),Falkland Islands (Malvinas),falkland_islands_malvinas,Falkland Islands (Malvinas),same_label
+2012-2026 (eng),Other Territories,other_territories,Other Territories,remainder_kept_separate

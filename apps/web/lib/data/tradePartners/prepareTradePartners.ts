@@ -3,11 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
-import { unzipSync, strFromU8 } from "fflate";
-import * as XLSX from "xlsx";
 import { serializeBomCsvRows } from "../csvEscape";
 import { readVerifiedPackageFile } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
+import { readTradeSourceWorksheet } from "../parsing/tradeSourceWorkbook";
 import { TRADE_PARTNER_SOURCES, TRADE_PARTNER_GROUP_IDS, tradePartnerFactKey, type TradePartnerEntity, type TradePartnerFact, type TradePartnersAcceptance } from "./types";
 import { tradePartnersEnglishLabels, validateTradePartnersData } from "./validation";
 
@@ -19,7 +18,6 @@ type LayoutRow = { row_index: number; role: string; item_id: string; dimensions:
 type Layout = { family: string; flow: "export" | "import"; source_id: string; source_sheet: string; source_unit: string; year_columns: Record<string, string>; rows: LayoutRow[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 const fields = ["entity_id", "year", "indicator_id", "value_usd", "unit", "basis", "value_status", "publication_status", "role", "source_id", "source_refs", "source_value", "source_unit", "source_label", "source_number_format", "source_block", "last_reviewed_at"];
-const attribute = (tag: string, name: string) => new RegExp(`\\b${name}="([^"]*)"`).exec(tag)?.[1];
 
 export async function prepareTradePartnersData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
   const directory = path.join(repositoryRoot, RESEARCH), inputSha256: Record<string, string> = {};
@@ -54,17 +52,8 @@ export async function prepareTradePartnersData(repositoryRoot: string, mode: "wr
     const source = matchingSources[0], layout = matchingLayouts[0];
     const { bytes, sha256 } = await readVerifiedPackageFile(directory, source.local_file, source, "Trade source capture/hash mismatch");
     sourceSha256[sourceId] = sha256;
-    const workbook = XLSX.read(bytes, { type: "buffer", sheets: layout.source_sheet, cellNF: true, sheetStubs: true }), sheet = workbook.Sheets[layout.source_sheet];
-    if (!sheet || sheet.A3?.v !== "(Thsd. USD)" || layout.source_id !== sourceId || layout.source_unit !== "thousand_usd" || JSON.stringify(Object.keys(layout.year_columns).map(Number).sort((a, b) => a - b)) !== JSON.stringify(years)) throw new Error(`Trade source unit/coverage mismatch: ${sourceId}`);
-    const zip = unzipSync(bytes), workbookXml = strFromU8(zip["xl/workbook.xml"]), relationships = strFromU8(zip["xl/_rels/workbook.xml.rels"]);
-    const sheetTag = [...workbookXml.matchAll(/<sheet\b([^>]+)\/?\s*>/g)].map(m => m[1]).find(tag => attribute(tag, "name") === layout.source_sheet)!;
-    const sheetRid = attribute(sheetTag, "r:id"), relationship = [...relationships.matchAll(/<Relationship\b([^>]+)\/?\s*>/g)].map(m => m[1]).find(tag => attribute(tag, "Id") === sheetRid)!;
-    const target = attribute(relationship, "Target")!, sheetPath = target.startsWith("/") ? target.slice(1) : path.posix.normalize(path.posix.join("xl", target));
-    const xml = strFromU8(zip[sheetPath]), stored = new Map<string, string>();
-    for (const match of xml.matchAll(/<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)) {
-      const address = attribute(match[1], "r"), token = /<v>([^<]+)<\/v>/.exec(match[2] ?? "")?.[1];
-      if (address && token) stored.set(address, token);
-    }
+    const { sheet, storedValues: stored } = readTradeSourceWorksheet(bytes, layout.source_sheet);
+    if (sheet.A3?.v !== "(Thsd. USD)" || layout.source_id !== sourceId || layout.source_unit !== "thousand_usd" || JSON.stringify(Object.keys(layout.year_columns).map(Number).sort((a, b) => a - b)) !== JSON.stringify(years)) throw new Error(`Trade source unit/coverage mismatch: ${sourceId}`);
     for (const declaredRow of layout.rows) {
       for (const label of declaredRow.label_cells) if (String(sheet[label.cell]?.v) !== label.value || (sheet[label.cell]?.z ?? "General") !== label.format) throw new Error(`Trade source label/format mismatch: ${sourceId}:${label.cell}`);
       for (const code of declaredRow.code_cells) if (String(sheet[code.cell]?.v) !== code.value || (sheet[code.cell]?.z ?? "General") !== code.format || stored.get(code.cell) !== code.stored_value) throw new Error(`Trade source identity/code cell mismatch: ${sourceId}:${code.cell}`);

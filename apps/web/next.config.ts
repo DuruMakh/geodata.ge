@@ -12,12 +12,24 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/mcp": ["./lib/factQuery/generated/snapshot.json"],
   },
+  // Methodology pages read the generated archives under public/downloads at
+  // build time, so the tracer bundles all of them (over Vercel's 250 MB
+  // function limit). Every page is prerendered and the CDN serves public/
+  // directly, so no function needs these files at request time.
+  outputFileTracingExcludes: {
+    "*": ["./public/downloads/**"],
+  },
   async redirects() {
-    return MUNICIPALITY_ROUTES.flatMap(({ code, slug }) => ["", "/en"].map((prefix) => ({
-      source: `${prefix}/explorer/municipalities/${code}`,
-      destination: `${prefix}/explorer/municipalities/${slug}`,
-      permanent: true,
-    })));
+    return [
+      ...MUNICIPALITY_ROUTES.flatMap(({ code, slug }) => ["", "/en"].map((prefix) => ({
+        source: `${prefix}/explorer/municipalities/${code}`,
+        destination: `${prefix}/explorer/municipalities/${slug}`,
+        permanent: true,
+      }))),
+      // The Poverty and inequality hub became Living standards; the part after # carries over in the browser.
+      ...[["/explorer/poverty", "/explorer/living-standards"], ["/explorer/poverty/rates", "/explorer/living-standards/poverty"], ["/explorer/poverty/inequality", "/explorer/living-standards/inequality"]]
+        .flatMap(([source, destination]) => ["", "/en"].map((prefix) => ({ source: `${prefix}${source}`, destination: `${prefix}${destination}`, permanent: true }))),
+    ];
   },
   async headers() {
     return [

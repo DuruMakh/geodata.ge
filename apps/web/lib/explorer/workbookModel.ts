@@ -52,6 +52,8 @@ export type WorkbookReadableRow = {
   valuesByYear: Record<number, number | null>;
   basisByYear: Record<number, WorkbookBasis | null>;
   change: number | null;
+  /** Replaces the sheet's `numberFormat` for this row, for a series shown to a different precision. */
+  numberFormat?: string;
 };
 
 export const SHEET_NAMES = {
@@ -86,6 +88,8 @@ export type WorkbookExportModel = {
   };
   analysis: {
     numericFormats?: Record<number,string>;
+    /** Replaces `numericFormats` on single rows, keyed by the row's index in `rows`. */
+    rowNumberFormats?: Record<number,string>;
     /** Data-sheet column widths in characters, from the first column; a column without one keeps the writer's default. */
     columnWidths?: number[];
     headers: string[];

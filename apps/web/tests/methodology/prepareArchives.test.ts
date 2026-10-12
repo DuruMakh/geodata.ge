@@ -86,7 +86,16 @@ async function createFixtureRepository() {
   const repositoryRoot = await mkdtemp(path.join(tmpdir(), "methodology-archives-repository-"));
   tempDirectories.push(repositoryRoot);
   const rows: Record<MethodologyDatasetId, ReviewedSourceManifestRow[]> = {
+    wages: [await writeReviewedSource(repositoryRoot, "wages", "1995-2025", "docs/Raw Data/Wages/geostat-earnings-annual/official/01-earnings-annual.xlsx", "downloads/methodology/wages/files/01-earnings-annual.xlsx", "wages-headline")],
+    money: [await writeReviewedSource(repositoryRoot, "money", "1995-2025", "docs/Raw Data/Money/nbg-money-banks-annual/official/money-aggregates-and-monetary-ratioseng.xlsx", "downloads/methodology/money/files/money-aggregates-and-monetary-ratioseng.xlsx", "money-aggregates")],
+    poverty: [await writeReviewedSource(repositoryRoot, "poverty", "2004-2025", "docs/Raw Data/Poverty/geostat-poverty-annual/official/302-absolute-poverty.xlsx", "downloads/methodology/poverty/files/302-absolute-poverty.xlsx", "poverty-absolute")],
+    "household-income": [await writeReviewedSource(repositoryRoot, "household-income", "2002-2025", "docs/Raw Data/Households/geostat-household-income-spending-annual/official/104-income-per-household.xlsx", "downloads/methodology/household-income/files/104-income-per-household.xlsx", "household-income-household")],
+    "energy-food": [await writeReviewedSource(repositoryRoot, "energy-food", "2013-2024", "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2024-aggregated.xlsx", "downloads/methodology/energy-food/files/energy-balance-2024-aggregated.xlsx", "energy-balance-2024-aggregated")],
     trade: [await writeReviewedSource(repositoryRoot, "trade", "1995-2025", "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx", "downloads/methodology/trade/files/ftrade_1995-2026.xlsx", "trade-total")],
+    "external-flows": [
+      await writeReviewedSource(repositoryRoot, "external-flows", "2000-2025", "docs/Raw Data/External/2026-10-10/official/nbg/REMC_money-transfers-by-countries-eng.xlsx", "downloads/methodology/external-flows/files/remc_money-transfers-by-countries-eng.xlsx", "external-remc"),
+      await writeReviewedSource(repositoryRoot, "external-flows", "1996-2025", "docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-countries.xlsx", "downloads/methodology/external-flows/files/fdi_eng-countries.xlsx", "external-fdi-countries"),
+    ],
     unemployment: [await writeReviewedSource(repositoryRoot, "unemployment", "2010-2025", "docs/Raw Data/Unemployment/geostat-labour-force-annual/official/lfs.xlsx", "downloads/methodology/unemployment/files/lfs.xlsx", "lfs")],
     "economic-sectors": [await writeReviewedSource(repositoryRoot,"economic-sectors","2011-2025","docs/Raw Data/Economy/economic-sectors/sources/growth.xlsx","downloads/methodology/economic-sectors/files/growth.xlsx","sector-growth")],
     "regional-economies": [

@@ -1,0 +1,275 @@
+import { expect, test, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
+import { createHash } from "node:crypto";
+import { readFile, mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { parse } from "csv-parse/sync";
+import { readTradeProductCatalogue } from "../../lib/data/tradeProducts/catalogue";
+import { loadTradeProductCatalogueFingerprint, toClientTradeProductsData, type ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
+import { encodeTradeProductsSelection } from "../../lib/explorer/tradeProductsSelection";
+import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
+
+const root = path.resolve(process.cwd(), "../.."), output = path.resolve(process.cwd(), "output/trade-products");
+let catalogue: ClientTradeProductsData, legacyCatalogue: ClientTradeProductsData;
+test.beforeAll(async () => {
+  const entities = (await readTradeProductCatalogue(root)).sort((a, b) => a.sourceBlock.localeCompare(b.sourceBlock, "en") || a.code.localeCompare(b.code, "en"));
+  const catalogueFingerprint = createHash("sha256").update(await readFile(path.join(root, "data/imports/trade-products-catalogue.csv"))).digest("hex");
+  legacyCatalogue = { entities, catalogueFingerprint, years: [], facts: [], nationalFacts: [] };
+  catalogue = toClientTradeProductsData({ entities, facts: [] }, [], await loadTradeProductCatalogueFingerprint("2020-2025"), "2020-2025");
+  await mkdir(output, { recursive: true });
+});
+const productToggle = (page: Page, id: string) => page.getByTestId("trade-products-picker").locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
+const hash = (ids: string[], extra = "") => `#measure=trade.exports&view=line&sel=${encodeTradeProductsSelection(ids, catalogue)}${extra}`;
+
+for (const prefix of ["", "/en"]) {
+  test(`offers one beer entry and a current-period national reference ${prefix || "ka"}`, async ({ page }) => {
+    await page.goto(`${prefix}/explorer/trade/products`);
+    await page.getByTestId("trade-products-add").click();
+    await page.getByTestId("series-search").fill("2203");
+    await expect(page.getByTestId("trade-product-result")).toHaveCount(1);
+    await expect(page.getByTestId("trade-product-result")).toContainText("2203");
+    await expect(page.getByTestId("trade-product-result")).not.toContainText("2020–2025");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 1193");
+    await productToggle(page, "goods.hs4.2020-2025.2203").click();
+    await page.getByTestId("trade-products-compare").click();
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
+    await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuemin", "2020");
+    await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2020");
+    await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuemax", "2025");
+  });
+}
+
+for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
+  test(`keeps selected product labels compact ${prefix || "ka"} ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 768 });
+    const ids = ["2204", "2603", "7108", "8403", "8703"].map(code => `goods.hs4.2020-2025.${code}`);
+    await page.goto(`${prefix}/explorer/trade/products${hash(ids)}`);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "5");
+    await page.evaluate(() => document.fonts.ready);
+    const labels = page.locator('[data-testid="trade-products-selected-label"]:visible');
+    await expect(labels).toHaveCount(width === 390 ? 2 : 4);
+    for (const label of await labels.all()) {
+      const bounds = await label.boundingBox();
+      expect(bounds!.height).toBeLessThanOrEqual(width === 390 ? 38 : 30);
+      expect(bounds!.width).toBeLessThanOrEqual(240);
+      await expect(label).toContainText((await label.getAttribute("data-series-id"))!.slice(-4));
+      await expect(label).not.toContainText("2020–2025");
+    }
+    const selection = await page.getByTestId("trade-products-selection").boundingBox();
+    expect(selection!.height).toBeLessThanOrEqual(width === 390 ? 80 : 30);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.getByTestId("trade-products-selection").screenshot({ path: path.join(output, `compact-${prefix ? "en" : "ka"}-${width}.png`) });
+  });
+}
+
+for (const prefix of ["", "/en"]) {
+  test(`keeps chart years within the current period when adding and removing the total ${prefix || "ka"}`, async ({ page }) => {
+    const wine = "goods.hs4.2020-2025.2204";
+    await page.goto(`${prefix}/explorer/trade/products${hash([wine], "&start=1995&end=2025")}`);
+    const start = page.getByTestId("range-start-handle"), end = page.getByTestId("range-end-handle");
+    await expect(start).toHaveAttribute("aria-valuemin", "2020");
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await expect(end).toHaveAttribute("aria-valuemax", "2025");
+    await expect(page.getByTestId("trade-products-plot").locator("svg text").filter({ hasText: /^1995$/ })).toHaveCount(0);
+    await page.getByTestId("trade-products-add").click();
+    await page.getByTestId("series-search").fill("2204");
+    await expect(page.getByTestId("trade-product-result")).toHaveCount(1);
+    await productToggle(page, "goods.total").click();
+    await page.getByTestId("trade-products-compare").click();
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.locator('[data-testid="trade-products-selected-label"][data-series-id="goods.total"]').click();
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.reload(); await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.getByTestId("trade-products-measure-trade.imports").click();
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await end.focus(); await end.press("ArrowLeft"); await end.press("ArrowLeft");
+    await expect(end).toHaveAttribute("aria-valuenow", "2023");
+    await page.reload(); await expect(end).toHaveAttribute("aria-valuenow", "2023");
+  });
+}
+
+for (const prefix of ["", "/en"]) {
+  test(`keeps an import-only product in its historical period when switched to Exports ${prefix || "ka"}`, async ({ page }) => {
+    const id = "goods.hs4.2020-2025.9008";
+    await page.goto(`${prefix}/explorer/trade/products${hash([id]).replace("measure=trade.exports", "measure=trade.imports")}`);
+    const start = page.getByTestId("range-start-handle"), end = page.getByTestId("range-end-handle");
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await page.getByTestId("trade-products-measure-trade.exports").click();
+    await expect(start).toHaveAttribute("aria-valuemin", "2020");
+    await expect(start).toHaveAttribute("aria-valuenow", "2020");
+    await expect(end).toHaveAttribute("aria-valuemax", "2025");
+    await page.getByTestId("chart-mode-table").click();
+    expect(await tableSeriesValues(page.getByTestId("explorer-table"), "9008")).toEqual(["—", "—", "—", "—", "—", "—"]);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1");
+  });
+}
+
+for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
+  test(`opens the finder over the visible chart and cancels its draft ${prefix || "ka"} ${width}px`, async ({ page }) => {
+    const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 768 });
+    await page.goto(`${prefix}/explorer/trade/products`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.exports");
+    const plot = page.getByTestId("trade-products-plot"), opener = page.getByTestId("trade-products-add"), picker = page.getByTestId("trade-products-picker");
+    await expect(picker).toHaveCount(0);
+    await expect(plot.locator("svg")).toBeVisible(); await page.evaluate(() => document.fonts.ready);
+    const before = await plot.boundingBox(); expect(before!.y).toBeLessThan(page.viewportSize()!.height);
+    await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuenow", "2025");
+    await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2020");
+    await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-page.png`), fullPage: true });
+    await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-preview.png`) });
+    const chartElement = await plot.locator("svg").elementHandle();
+    await opener.click(); await expect(picker).toBeVisible();
+    expect((await plot.boundingBox())!.y).toBeCloseTo(before!.y, 0);
+    await expect(page.getByTestId("trade-products-close")).toBeFocused();
+    await expect(page.getByTestId("trade-product-category")).toHaveCount(8);
+    await expect(page.getByTestId("trade-product-result")).toHaveCount(0);
+    await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-picker.png`) });
+    for (let i = 0; i < 12; i++) {
+      await page.keyboard.press("Tab");
+      expect(await picker.evaluate(element => element.contains(document.activeElement))).toBe(true);
+    }
+    await page.getByTestId("series-search").fill("cars");
+    await productToggle(page, "goods.hs4.2020-2025.8703").click();
+    await expect(page.getByTestId("series-status")).toContainText("2 / 1193");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1");
+    await page.keyboard.press("Escape"); await expect(picker).toHaveCount(0); await expect(opener).toBeFocused();
+    expect(await chartElement!.evaluate(element => element.isConnected)).toBe(true);
+    for (const method of ["close", "backdrop"] as const) {
+      await page.evaluate(() => window.scrollTo(0, 120));
+      const scroll = await page.evaluate(() => scrollY);
+      await opener.click(); await page.getByTestId("series-search").fill("8703");
+      await productToggle(page, "goods.hs4.2020-2025.8703").click();
+      if (method === "close") await page.getByTestId("trade-products-close").click(); else await page.mouse.click(2, 2);
+      await expect(picker).toHaveCount(0); await expect(opener).toBeFocused();
+      expect(await page.evaluate(() => scrollY)).toBeCloseTo(scroll, 0);
+      await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1");
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(errors).toEqual([]);
+  });
+}
+
+for (const prefix of ["", "/en"]) {
+  test(`keeps Close and Compare within the visual viewport above a phone keyboard ${prefix || "ka"}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${prefix}/explorer/trade/products`);
+    await page.getByTestId("trade-products-add").click();
+    await page.getByTestId("series-search").focus();
+    await page.evaluate(() => {
+      const viewport = window.visualViewport!;
+      Object.defineProperties(viewport, { height: { configurable: true, get: () => 460 }, offsetTop: { configurable: true, get: () => 80 } });
+      viewport.dispatchEvent(new Event("resize"));
+    });
+    const bounds = await page.getByTestId("trade-products-picker").boundingBox();
+    expect(bounds!.y).toBeGreaterThanOrEqual(80);
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(540);
+    const compare = await page.getByTestId("trade-products-compare").boundingBox();
+    expect(compare!.y + compare!.height).toBeLessThanOrEqual(540);
+    await page.getByTestId("series-search").fill("8703");
+    await productToggle(page, "goods.hs4.2020-2025.8703").click();
+    await page.getByTestId("trade-products-compare").click();
+    await expect(page.getByTestId("trade-products-picker")).toHaveCount(0);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
+  });
+  test(`current comparisons retain navigation, empty selection and language ${prefix || "ka"}`, async ({ page }) => {
+    await page.setViewportSize({ width: prefix ? 1366 : 390, height: 844 });
+    const ids = ["goods.hs4.2020-2025.2204", "goods.hs4.2020-2025.8703"];
+    await page.goto(`${prefix}/explorer/trade/products${hash(ids, "&start=2018&end=2025")}`);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
+    await expect(page.getByTestId("trade-products-selected-label").first()).toContainText("2204");
+    await page.getByTestId("chart-mode-table").click();
+    const table = page.getByTestId("explorer-table");
+    expect(await tableSeriesCount(table)).toBe(2);
+    expect(await tableSeriesValues(table, "8703")).toHaveLength(6);
+    const end = page.getByTestId("range-end-handle"); await end.focus();
+    for (let i = 0; i < 3; i++) await end.press("ArrowLeft");
+    await expect(end).toHaveAttribute("aria-valuenow", "2022");
+    expect(await tableSeriesValues(table, "8703")).toHaveLength(3);
+    await page.getByTestId("trade-products-measure-trade.imports").click();
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.imports");
+    await page.goBack(); await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.exports");
+    await page.goForward(); await page.reload();
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
+    const saved = page.url();
+    if (!prefix) await page.getByTestId("sidebar-toggle").click();
+    await page.getByTestId("trade-products-link").click(); await expect(page).toHaveURL(saved);
+    if (!prefix) await page.getByTestId("sidebar-toggle").click();
+    await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.imports");
+    await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuenow", "2022");
+    await page.goto(`${prefix}/explorer/trade/products${hash([])}`); await page.reload();
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+    await expect(page.getByTestId("trade-products-excel-download")).toBeDisabled();
+    await expect(page.getByTestId("trade-products-selection-reset")).toHaveCount(0);
+    await page.goto(`${prefix}/explorer/trade/products#sel=v1.${"0".repeat(64)}.bad`);
+    await expect(page.getByTestId("trade-products-selection-reset")).toBeVisible();
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1");
+    const legacy = encodeTradeProductsSelection(["goods.hs4.1995-1999.2203", "goods.hs4.2020-2025.2203"], legacyCatalogue);
+    await page.goto(`${prefix}/explorer/trade/products#sel=${legacy}&start=1995&end=2025`);
+    await expect(page.getByTestId("trade-products-selection-reset")).toBeVisible();
+    await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2020");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1");
+  });
+}
+
+test("global filtered selection plots and exports every current product beyond all visible pages", async ({ page, request }, info) => {
+  test.setTimeout(240_000);
+  const timings: Record<string, number> = {}, errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
+  await page.setViewportSize({ width: 1366, height: 768 }); await page.goto("/en/explorer/trade/products");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  let start = Date.now(); await page.getByTestId("trade-products-add").click(); await expect(page.getByTestId("trade-product-category")).toHaveCount(8); timings.openMs = Date.now() - start;
+  await page.getByTestId("trade-product-category").filter({ hasText: "Vehicles and transport" }).click();
+  expect(await page.getByTestId("trade-product-result").count()).toBe(25);
+  await page.getByTestId("series-search").fill("no-matching-product-xyz");
+  await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("0 / 1193");
+  await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("1193 / 1193");
+  await page.getByTestId("trade-products-tab-selected").click();
+  await expect(page.getByTestId("trade-product-result")).toHaveCount(25);
+  await page.getByTestId("trade-products-next").click(); await expect(page.getByTestId("trade-product-result")).toHaveCount(25);
+  start = Date.now(); await page.getByTestId("trade-products-compare").click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1193"); timings.applyAllMs = Date.now() - start;
+  expect(new URL(page.url()).hash.length).toBeLessThan(1024);
+  await expect(page.locator('[data-testid="trade-products-selected-label"]:visible')).toHaveCount(4);
+  const facts = parse(await readFile(path.join(root, "data/imports/trade-products-annual.csv")), { columns: true, bom: true }) as Record<string, string>[];
+  const numericalExports = new Set(facts.filter(fact => fact.source_block === "2020-2025" && fact.indicator_id === "trade.exports" && fact.value_status === "numeric").map(fact => fact.entity_id));
+  await expect(page.getByTestId("trade-products-plot").locator('svg circle[r="3.5"]:not([stroke])')).toHaveCount(numericalExports.size + 1);
+  await writeFile(path.join(output, "timings.json"), JSON.stringify(timings, null, 2));
+  start = Date.now(); await page.getByTestId("trade-products-more").click(); await expect(page.getByTestId("series-status")).toContainText("1193 / 1193"); timings.reopenAllMs = Date.now() - start;
+  start = Date.now(); await page.getByTestId("series-search").fill("8703"); await expect(page.getByTestId("trade-product-result")).toHaveCount(1); timings.searchAllMs = Date.now() - start;
+  await page.getByTestId("trade-products-close").click(); await expect(page.getByTestId("trade-products-more")).toBeFocused();
+  await page.getByTestId("chart-mode-table").click(); expect(await tableSeriesCount(page.getByTestId("explorer-table"))).toBe(25);
+  await page.getByTestId("trade-products-table-next").click(); expect(await tableSeriesCount(page.getByTestId("explorer-table"))).toBe(25);
+  start = Date.now(); const pending = page.waitForEvent("download", { timeout: 180_000 }); await page.getByTestId("trade-products-excel-download").click(); const download = await pending; timings.exportAllMs = Date.now() - start;
+  await writeFile(path.join(output, "timings.json"), JSON.stringify(timings, null, 2));
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.readFile((await download.path())!);
+  expect(excel.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
+  expect(excel.getWorksheet("Data")!.rowCount).toBe(1193 * 6 + 1);
+  expect(excel.getWorksheet("Summary")!.rowCount).toBe(1193 + 4);
+  expect(excel.getWorksheet("Data")!.getCell("D1").value).toBe("Amount (USD)");
+  const exportedYears = excel.getWorksheet("Data")!.getColumn(1).values.slice(2);
+  expect(new Set(exportedYears)).toEqual(new Set([2020, 2021, 2022, 2023, 2024, 2025]));
+  expect(excel.getWorksheet("Summary")!.getColumn(1).values.some(value => String(value).includes("8703") && !String(value).includes("2020–2025"))).toBe(true);
+  const sourceSheet = excel.getWorksheet("Sources")!; expect(sourceSheet.rowCount).toBe(5);
+  for (const row of [4, 5]) {
+    const link = sourceSheet.getCell(row, 4).value as { hyperlink: string };
+    expect(link.hyperlink).toContain("https://fiscal.ge/downloads/methodology/trade/files/");
+    const response = await request.get(new URL(link.hyperlink).pathname); expect(response.ok()).toBe(true);
+  }
+  await page.getByTestId("trade-products-more").click(); await page.getByTestId("series-search").fill("8703");
+  await productToggle(page, "goods.hs4.2020-2025.8703").click(); await page.getByTestId("trade-products-compare").click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "1192");
+  await page.getByTestId("trade-partners-show-all").click();
+  expect(await page.getByTestId("trade-partners-ranking-row").count()).toBe(25);
+  await page.getByTestId("trade-products-ranking-next").click();
+  expect(await page.getByTestId("trade-partners-ranking-row").count()).toBe(25);
+  for (let index = 0; index < 100 && !(await page.getByTestId("trade-partners-unavailable-row").count()); index++) await page.getByTestId("trade-products-ranking-next").click();
+  expect(await page.getByTestId("trade-partners-unavailable-row").count()).toBeGreaterThan(0);
+  expect(await page.getByTestId("trade-partners-unavailable-row").count() + await page.getByTestId("trade-partners-ranking-row").count()).toBeLessThanOrEqual(25);
+  expect(errors).toEqual([]);
+  await writeFile(path.join(output, "timings.json"), JSON.stringify(timings, null, 2));
+  await info.attach("all-products-timings", { body: JSON.stringify(timings), contentType: "application/json" });
+});

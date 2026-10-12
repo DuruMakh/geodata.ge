@@ -39,6 +39,8 @@ export type ChartSeries = {
   forecastFromYear?: number;
   /** Reference lines (the NBG target) draw dashed and without an end dot. */
   dashed?: boolean;
+  /** Draws a hollow point on each `preliminary` value, so it is marked without hovering. */
+  hollowPreliminary?: boolean;
 };
 
 type EditorialLineChartProps = {
@@ -49,7 +51,8 @@ type EditorialLineChartProps = {
   shareLabel: string;
   preliminaryLabel?: string;
   showAxisUnit?: boolean;
-  formatTooltipValue?: (value: number) => string;
+  /** `seriesId` lets a chart whose series differ in precision format each readout row on its own. */
+  formatTooltipValue?: (value: number, seriesId: string) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
   /** Axis label or tooltip header for a period value. Omit to print the value. */
@@ -186,8 +189,8 @@ export function EditorialLineChart({
   // The phone drawing prints the amount unit once, above the axis.
   const unitCaption = share || unit.label.trim() === "" ? null : unit.label;
 
-  const formatValue = (value: number | null) =>
-    formatTooltipValue && value !== null ? formatTooltipValue(value) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
+  const formatValue = (value: number | null, seriesId: string) =>
+    formatTooltipValue && value !== null ? formatTooltipValue(value, seriesId) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
   const axisPeriod = (index: number) => (formatPeriod ? formatPeriod(years[index]!, "axis") : String(years[index]));
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
@@ -452,7 +455,7 @@ export function EditorialLineChart({
               ))}
               {line.dashed ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
               {points
-                .filter(([, , index]) => line.planned[index])
+                .filter(([, , index]) => line.planned[index] || (line.hollowPreliminary && line.preliminary?.[index]))
                 .map(([px, py, index]) => (
                   <circle key={`planned-${index}`} cx={px} cy={py} r={3} fill="#F7F2E9" stroke={line.color} strokeWidth={1.5} />
                 ))}

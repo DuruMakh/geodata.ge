@@ -1,5 +1,7 @@
 export const TRADE_OVERVIEW_INDICATORS = ["trade.turnover", "trade.exports", "trade.imports", "trade.balance"] as const;
 export type TradeOverviewIndicator = (typeof TRADE_OVERVIEW_INDICATORS)[number];
+export const TRADE_DOMESTIC_OVERVIEW_INDICATORS = ["trade.exports", "trade.domestic_exports", "trade.reexports"] as const;
+export type TradeChartIndicator = TradeOverviewIndicator | "trade.domestic_exports" | "trade.reexports";
 export const TRADE_OVERVIEW_SOURCE = "geostat_trade_ftrade-1995-2026";
 export const TRADE_OVERVIEW_DOCUMENT_ID = "source.geostat_trade_ftrade_1995_2026";
 export const TRADE_OVERVIEW_SHEET = "1995-2026";
@@ -20,7 +22,7 @@ export type TradeOverviewFact = {
   sourceNumberFormat: string | null;
   lastReviewedAt: string;
 };
-export type ClientTradeOverviewFact = Pick<TradeOverviewFact, "year" | "indicatorId" | "sourceId" | "publicationStatus" | "role" | "lastReviewedAt"> & { valueUsd: number };
+export type ClientTradeOverviewFact = Pick<TradeOverviewFact, "year" | "sourceId" | "publicationStatus" | "role" | "lastReviewedAt"> & { indicatorId: TradeChartIndicator; valueUsd: number };
 export type TradeOverviewAcceptance = {
   status: "passed";
   scope: "national_goods_overview";

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { Fragment } from "react";
 import type { ClientTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
 import { TRADE_OVERVIEW_INDICATORS } from "../../lib/data/tradeOverview/types";
 import { buildTradePartnersModel, tradePartnerColor } from "../../lib/explorer/tradePartners";
@@ -19,12 +20,13 @@ import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SegmentedTabs, SourceNote, TabDivider, TextTab } from "../ui/editorial";
 import { useTradePartnersState } from "./use-trade-partners-state";
 import { TradePartnersSeriesPanel } from "./trade-partners-series-panel";
 import { TradePartnersRanking } from "./trade-partners-ranking";
 
 export function TradePartners({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientTradePartnersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+  const domestic = Boolean(data.measures);
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `trade.partners.${key}`);
   const { state, update } = useTradePartnersState(data), model = buildTradePartnersModel(data, state, presentation);
@@ -34,14 +36,14 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin }: { d
   const scale = t(model.unit.divisor === 1_000_000_000 ? "scale.billion" : "scale.million");
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: tradePartnerColor(id), valuesByYear: model.valuesByEntity[id] }));
   const total = rows.find(row => row.itemId === TRADE_PARTNER_TOTAL_ID) ?? null;
+  const measureControls = <div role="group" aria-label={t("measure")} className={domestic ? "flex flex-wrap items-center gap-2 text-[12px]" : "mb-6 flex flex-wrap gap-x-5 gap-y-3"}>{(data.measures ?? TRADE_OVERVIEW_INDICATORS).map((id, index) => <Fragment key={id}>{domestic && index > 0 ? <TabDivider /> : null}<TextTab label={message(messages, `trade.indicator.${id}`)} active={state.measure === id} onClick={() => update(s => ({ ...s, measure: id }), true)} testId={`trade-partners-measure-${id}`} /></Fragment>)}</div>;
   const downloadAction = <ExcelDownloadButton testId="trade-partners-excel-download" disabled={!model.selectedCount} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildTradePartnersWorkbookModel({ data, state, sources, siteOrigin }, presentation));
   }} />;
   return <div data-testid="trade-partners" className="@container">
-    <ExplorerHeading>{t("title")}</ExplorerHeading>
-    <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{message(messages, "trade.partners.summaryWithScale", { scale })}</p>
-    <div role="group" aria-label={t("measure")} className="mb-6 flex flex-wrap gap-x-5 gap-y-3">{TRADE_OVERVIEW_INDICATORS.map(id => <TextTab key={id} label={message(messages, `trade.indicator.${id}`)} active={state.measure === id} onClick={() => update(s => ({ ...s, measure: id }), true)} testId={`trade-partners-measure-${id}`} />)}</div>
+    {!domestic ? <><ExplorerHeading>{t("title")}</ExplorerHeading><p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{message(messages, "trade.partners.summaryWithScale", { scale })}</p></> : null}
+    {!domestic ? measureControls : null}
     {state.tab === "groups" || model.selectedIds.some(id => entities.get(id)?.kind === "group") ? <p data-testid="trade-partners-group-note" className="mb-4 max-w-[850px] border-l-2 border-[var(--accent)] pl-3 text-[12px] leading-relaxed text-[var(--muted)]">{t("groupOverlap")}</p> : null}
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
@@ -52,9 +54,9 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin }: { d
             : <ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== TRADE_PARTNER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <RangeStrip years={tradePartnersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradePartnersModel(data, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{t("definitions")}</p></div>
+        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.countryDefinitions") : t("definitions")}</p></div>
       </div>
-      <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
+      <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} measureControls={measureControls} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <TradePartnersRanking key={`${state.tab}:${state.measure}:${model.range.end}`} model={model} tab={state.tab} measure={state.measure} />
   </div>;

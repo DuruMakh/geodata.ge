@@ -24,11 +24,14 @@ export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFo
 
 type SeriesSelectorProps = {
   controls?: ReactNode;
+  controlsAfterSearch?: boolean;
   query: string;
   onQueryChange: (query: string) => void;
   searchPlaceholder: string;
   /** False hides the search field: a list of ten rows or fewer is read at a glance. */
   searchable?: boolean;
+  searchFocus?: "page" | "local";
+  listLayout?: "aside" | "flow";
   countLabel?: string;
   selectedCount: number;
   totalCount: number;
@@ -45,10 +48,13 @@ type SeriesSelectorProps = {
 
 export function SeriesSelector({
   controls,
+  controlsAfterSearch = false,
   query,
   onQueryChange,
   searchPlaceholder,
   searchable = true,
+  searchFocus = "page",
+  listLayout = "aside",
   countLabel,
   selectedCount,
   totalCount,
@@ -65,23 +71,27 @@ export function SeriesSelector({
   const bulkState: "false" | "mixed" | "true" =
     hasSelection && allSelected ? "true" : hasSelection ? "mixed" : "false";
   const bulkMark = bulkState === "true" ? "✓" : bulkState === "mixed" ? "—" : "";
+  const selectorControls = controls ? <div data-selector-section="controls" className={controlsAfterSearch ? "mt-3.5 mb-1" : undefined}>{controls}</div> : null;
 
   return (
     <div data-testid="series-selector">
-      {controls ? <div data-selector-section="controls">{controls}</div> : null}
+      {!controlsAfterSearch ? selectorControls : null}
 
       {searchable ? (
         <input
           data-testid="series-search"
           data-selector-section="search"
           {...SEARCH_FIELD_PROPS}
+          onFocus={searchFocus === "page" ? revealSearchField : undefined}
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
           placeholder={searchPlaceholder}
           aria-label={message(messages, "controls.searchSeries")}
-          className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
+          className={`${controls && !controlsAfterSearch ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
         />
       ) : null}
+
+      {controlsAfterSearch ? selectorControls : null}
 
       <div
         data-testid="series-actions"
@@ -155,7 +165,7 @@ export function SeriesSelector({
         // chart (owner decision D4, 2026-10-07) the list flows with the page, so a finger
         // swipe never gets caught inside it.
         // overflow-y clip keeps the last caret's downward hit extension inside the list.
-        className="flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto"
+        className={listLayout === "aside" ? "flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto" : "flex flex-col overflow-y-clip"}
       >
         {children}
       </div>
@@ -175,6 +185,7 @@ type SeriesSelectorRowProps = {
   /** Optional decorative icon beside the label; the official text remains the accessible name. */
   art?: ReactNode;
   selected: boolean;
+  selectionRole?: "button" | "checkbox";
   level?: string;
   parentId?: string | null;
   showCaretColumn?: boolean;
@@ -200,6 +211,7 @@ export function SeriesSelectorRow({
   metaLabel,
   art,
   selected,
+  selectionRole = "button",
   level,
   parentId,
   showCaretColumn = false,
@@ -256,7 +268,9 @@ export function SeriesSelectorRow({
         type="button"
         data-testid="series-row-toggle"
         onClick={onToggle}
-        aria-pressed={selected}
+        role={selectionRole === "checkbox" ? "checkbox" : undefined}
+        aria-checked={selectionRole === "checkbox" ? selected : undefined}
+        aria-pressed={selectionRole === "button" ? selected : undefined}
         title={label}
         className={`flex min-w-0 flex-1 cursor-pointer items-start gap-2.5 py-[7px] pr-1.5 text-left ${isChild ? "pl-0.5" : "pl-1"}`}
       >

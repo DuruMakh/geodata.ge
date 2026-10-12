@@ -14,8 +14,17 @@ import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
+import moneyTransferRegistry from "../../../../data/taxonomy/money-transfer-countries.json";
+import foreignInvestmentRegistry from "../../../../data/taxonomy/foreign-investment.json";
+import { readTradeProductCatalogue } from "../data/tradeProducts/catalogue";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
+import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
+import { WAGES_REGIONS } from "../data/wages/types";
+import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
+import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdRegionHref } from "../explorer/household";
+import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -25,8 +34,13 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
     "/explorer/unemployment",
-    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners",
+    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/trade/domestic-exports", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
+    "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
+    LIVING_STANDARDS_HUB_PATH, ...LIVING_STANDARDS_SECTIONS.map(section => section.href),
+    ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => householdRegionHref(section.id, id))),
+    ENERGY_FOOD_HUB_PATH, ...ENERGY_FOOD_SECTIONS.map(section => section.href),
+    "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),
@@ -43,9 +57,9 @@ export async function listPublicPagePaths(): Promise<string[]> {
 }
 
 export async function loadTranslationInventory(): Promise<TranslationInventory> {
-  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, tradeDocuments, pagePaths] = await Promise.all([
+  const [explorer, municipal, documents, debtDocuments, unemploymentDocuments, tradeDocuments, wagesDocuments, externalDocuments, pagePaths, tradeProducts] = await Promise.all([
     loadServedExplorerData(), loadServedMunicipalData(), loadManifestDocuments(),
-    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "trade"), listPublicPagePaths(),
+    loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "debt"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "unemployment"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "trade"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "wages"), loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "external-flows"), listPublicPagePaths(), readTradeProductCatalogue(path.resolve(process.cwd(), "../..")),
   ]);
   const sources = resolvePublicSources({ sourceDocuments: explorer.sourceDocuments, manifestDocuments: documents });
   const programmeHistory = explorer.adminFacts.filter((fact) => fact.level === "major_program").map((fact) => {
@@ -58,6 +72,9 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...sectorRegistry.map(row => row.id), "economic-sectors",
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
+      ...moneyTransferRegistry.map(row => row.id),
+      ...foreignInvestmentRegistry.map(row => row.id),
+      ...tradeProducts.map(row => row.id),
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),
       "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia", "snapshot.other",
@@ -67,13 +84,15 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       "national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance",
     ]),
     sourceIds: sortedUnique(sources.map((row) => row.sourceId)),
-    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id), ...unemploymentDocuments.map(row => row.source_id), ...tradeDocuments.map(row => row.source_id)]),
+    documentIds: sortedUnique([...documents.map((row) => row.documentId), ...debtDocuments.map((row) => row.source_id), ...unemploymentDocuments.map(row => row.source_id), ...tradeDocuments.map(row => row.source_id), ...wagesDocuments.map(row => row.source_id), ...externalDocuments.map(row => row.source_id)]),
     derivedSourceIds: sortedUnique(sources.filter((row) => row.derivation !== null).map((row) => row.sourceId)),
     attributedDocumentIds: sortedUnique([
       ...documents.filter((row) => row.attribution !== null).map((row) => row.documentId),
       ...debtDocuments.map((row) => row.source_id),
       ...unemploymentDocuments.map(row => row.source_id),
       ...tradeDocuments.map(row => row.source_id),
+      ...wagesDocuments.map(row => row.source_id),
+      ...externalDocuments.map(row => row.source_id),
     ]),
     programmeHistory,
   };

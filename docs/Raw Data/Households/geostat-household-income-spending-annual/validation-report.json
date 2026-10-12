@@ -1,0 +1,195 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-11",
+  "scope": "Annual research only: average monthly household income and spending lines per household and per person, for Georgia, towns and villages, and regions; the sum lines and population-total workbooks are archived but not served; no estimates, shares or inflation adjustment",
+  "primary_observation_count": 10638,
+  "observations_by_source": {
+    "geostat_household_income_capita_national": 288,
+    "geostat_household_income_capita_region": 1596,
+    "geostat_household_income_capita_settlement": 480,
+    "geostat_household_income_household_national": 288,
+    "geostat_household_income_household_region": 1596,
+    "geostat_household_income_household_settlement": 480,
+    "geostat_household_spending_capita_national": 360,
+    "geostat_household_spending_capita_region": 1995,
+    "geostat_household_spending_capita_settlement": 600,
+    "geostat_household_spending_household_national": 360,
+    "geostat_household_spending_household_region": 1995,
+    "geostat_household_spending_household_settlement": 600
+  },
+  "imputed_values": 0,
+  "reconciliation_failed_count": 0,
+  "reconciliation": {
+    "sum_checks": 5280,
+    "max_sum_error": "5.5e-8"
+  },
+  "check_only_values": 3882,
+  "placeholder_cells_not_served": {
+    "geostat_household_income_household_region": {
+      "x": 105,
+      "…": 480
+    },
+    "geostat_household_income_capita_region": {
+      "x": 105,
+      "…": 480
+    },
+    "geostat_household_spending_household_region": {
+      "x": 126,
+      "…": 576
+    },
+    "geostat_household_spending_capita_region": {
+      "x": 126,
+      "…": 576
+    }
+  },
+  "footnotes": {
+    "geostat_household_income_household_region": [
+      "* The data of 2011-2018 includes Imereti, Racha-Lechkhumi and Kvemo Svaneti regions.",
+      "** Includes Guria, Samtskhe-Javakheti and Mtskheta-Mtianeti regions.",
+      "… The data is not available due to small sample size of the survey. Survey sample size has been increased since 2019."
+    ],
+    "geostat_household_income_capita_region": [
+      "* The data of 2011-2018 includes Imereti, Racha-Lechkhumi and Kvemo Svaneti regions.",
+      "** Includes Guria, Samtskhe-Javakheti and Mtskheta-Mtianeti regions.",
+      "… The data is not available due to small sample size of the survey. Survey sample size has been increased since 2019."
+    ],
+    "geostat_household_spending_household_region": [
+      "* The data of 2011-2018 includes Imereti, Racha-Lechkhumi and Kvemo Svaneti regions.",
+      "** Includes Guria, Samtskhe-Javakheti and Mtskheta-Mtianeti regions.",
+      "… The data is not available due to small sample size of the survey. Survey sample size has been increased since 2019."
+    ],
+    "geostat_household_spending_capita_region": [
+      "* The data of 2011-2018 includes Imereti, Racha-Lechkhumi and Kvemo Svaneti regions.",
+      "** Includes Guria, Samtskhe-Javakheti and Mtskheta-Mtianeti regions.",
+      "… The data is not available due to small sample size of the survey. Survey sample size has been increased since 2019."
+    ]
+  },
+  "source_checks": [
+    {
+      "source_id": "geostat_household_income_population_national",
+      "sha256": "FA421691FB36BCE89D91EC72B3E356758C089561AA40A0B0C8C9DEDE7711FD07",
+      "bytes": 17149,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_population_settlement",
+      "sha256": "2D98A31ED17B9C067B8E801ACC40F06714BBF89BFAC1E139B6252AC39B34DC59",
+      "bytes": 23168,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_population_region",
+      "sha256": "3CD25BE5DCA962666FAC1082F2B3E16F478E12523D18F1363CA7D52F25F7F755",
+      "bytes": 55049,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_household_national",
+      "sha256": "04F4383D4D5A05A43F9C987FA6E3D35C4B45AA6A95ABAAB4B30347552BE51020",
+      "bytes": 19009,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_household_settlement",
+      "sha256": "B6FEAC079BBB7FD4FFDA5D16F7B4E26EA3F1B3106FFB9EA792E6D255207AD5F9",
+      "bytes": 24312,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_household_region",
+      "sha256": "25469F5FDF7A722044E7592AC04C4E7047B1AD3DA3948B1D30CD8AF31E137D37",
+      "bytes": 55076,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_capita_national",
+      "sha256": "BD4194EBE1F383380ED877D2677F3BB6B334A0EBBB791B8E7779ED969C90D8DC",
+      "bytes": 18961,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_capita_settlement",
+      "sha256": "958D8C1EF726E1258CDCBE69BE6D07F989D68E3FBECCDAAC0C0C0C04D89D574A",
+      "bytes": 23021,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_capita_region",
+      "sha256": "F40ADA5D4B163DF2FAAA1A004B1A857F8CE92B943EA3D5A398CB8D0FE5C1FD19",
+      "bytes": 55679,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_population_national",
+      "sha256": "A07523454A8DC5248DD437A52DC433CAFD1A095F33ED3940E1FD09791D230A24",
+      "bytes": 20195,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_population_settlement",
+      "sha256": "F46498B1FF9629D5728513E29CC4C5033ACAA5166C301A87488939024CFCDB1D",
+      "bytes": 24942,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_population_region",
+      "sha256": "11736657E1E962781DD815065FFF91034AD42A38AF6EE5E81C2FD03AEAAB002A",
+      "bytes": 63090,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_household_national",
+      "sha256": "61AEF2CEBDC4649FF67CE585B888491042C3FAF74F4E64B997514F6D7D79DF70",
+      "bytes": 20250,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_household_settlement",
+      "sha256": "A03894A6DE13DC401E29AB8CC771E819E52F1CFE7293C6A28B9CA41E762E8030",
+      "bytes": 27084,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_household_region",
+      "sha256": "527B87D20142BA85BC53E9E396BC0DEBA4B1C6161529E4E6F04D2ED27024BEA0",
+      "bytes": 63113,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_capita_national",
+      "sha256": "425857171C5239DC13FD26C44C94F74251F1BA2EBE313821A5D803F1AA6BD747",
+      "bytes": 20275,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_capita_settlement",
+      "sha256": "AA4CE551DA48C0BF39637E49374F7693772A355A4891B1B6B55CFDE9B7B3D07B",
+      "bytes": 25321,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_capita_region",
+      "sha256": "5AFB1F1FADF5445DFFFE113E705D31B1CE770CCF2D89F4CF0F7A11F21B724BB1",
+      "bytes": 63237,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_income_page",
+      "sha256": "7619337D167DC10291DCB0D3F0FBF0470104CB7568DA01A814DBE2EC0352C4F2",
+      "bytes": 103339,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_spending_page",
+      "sha256": "7743A8E42912AF9B4BCB24C24A325F75A270B3081D98B0D3D91012B29E58F96B",
+      "bytes": 103583,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_household_hies_metadata_2026",
+      "sha256": "D7E6A378FBD7A2AA0A2EFB5C65BF08E1DDBF3E0D161668B08F9715D1FB7458EF",
+      "bytes": 128655,
+      "passed": true
+    }
+  ]
+}

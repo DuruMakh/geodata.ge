@@ -24,7 +24,17 @@ import {
   loadEconomicSectorFactsFromMirror,
   loadUnemploymentFactsFromMirror,
   loadTradeOverviewFactsFromMirror,
+  loadWagesFactsFromMirror,
+  loadPovertyFactsFromMirror,
+  loadEnergyFoodFactsFromMirror,
+  loadMoneyBanksFactsFromMirror,
+  loadHouseholdFactsFromMirror,
   loadTradePartnersDataFromMirror,
+  loadMoneyTransfersDataFromMirror,
+  loadForeignInvestmentDataFromMirror,
+  loadCurrentAccountFactsFromMirror,
+  loadTradeProductsDataFromMirror,
+  loadTradeDomesticDataFromMirror,
   loadRegionalEconomyFactsFromMirror,
   loadDemographyFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
@@ -122,8 +132,46 @@ export async function loadTradeOverviewFactsFromDb() {
   return loadTradeOverviewFactsFromMirror(prisma);
 }
 
+export async function loadWagesFactsFromDb() {
+  return loadWagesFactsFromMirror(prisma);
+}
+
+export async function loadPovertyFactsFromDb() {
+  return loadPovertyFactsFromMirror(prisma);
+}
+
+export async function loadEnergyFoodFactsFromDb() {
+  return loadEnergyFoodFactsFromMirror(prisma);
+}
+
+export async function loadMoneyBanksFactsFromDb() {
+  return loadMoneyBanksFactsFromMirror(prisma);
+}
+
+export async function loadHouseholdFactsFromDb() {
+  return loadHouseholdFactsFromMirror(prisma);
+}
+
 export async function loadTradePartnersDataFromDb() {
   return loadTradePartnersDataFromMirror(prisma);
+}
+
+export async function loadMoneyTransfersDataFromDb() {
+  return loadMoneyTransfersDataFromMirror(prisma);
+}
+
+export async function loadForeignInvestmentDataFromDb() {
+  return loadForeignInvestmentDataFromMirror(prisma);
+}
+
+export async function loadCurrentAccountFactsFromDb() {
+  return loadCurrentAccountFactsFromMirror(prisma);
+}
+export async function loadTradeProductsDataFromDb() {
+  return loadTradeProductsDataFromMirror(prisma);
+}
+export async function loadTradeDomesticDataFromDb() {
+  return loadTradeDomesticDataFromMirror(prisma);
 }
 export async function loadRegionalEconomyFactsFromDb() {
   return loadRegionalEconomyFactsFromMirror(prisma);

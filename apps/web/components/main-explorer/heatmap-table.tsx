@@ -7,8 +7,9 @@ import { STATUS_MARK_CLASS } from "./explorer-table";
 type HeatmapRow = { id: string; label: string; values: (number | null)[] };
 
 /** Rows by years, each cell shaded on the shared six-step ramp, then the scale legend.
- *  With `breakYear`, that year's column gets a rule on its left and the header prints `breakLabel`. */
-export function HeatmapTable({ caption, rowHeader, years, rows, maximum, format, scaleLabel, breakYear, breakLabel }: {
+ *  With `breakYear`, that year's column gets a rule on its left and the header prints `breakLabel`.
+ *  With `wrapRowLabels`, long row labels wrap inside a bounded column instead of staying on one line. */
+export function HeatmapTable({ caption, rowHeader, years, rows, maximum, format, scaleLabel, breakYear, breakLabel, wrapRowLabels }: {
   caption: string;
   rowHeader: string;
   years: readonly number[];
@@ -18,6 +19,7 @@ export function HeatmapTable({ caption, rowHeader, years, rows, maximum, format,
   scaleLabel: string;
   breakYear?: number;
   breakLabel?: string;
+  wrapRowLabels?: boolean;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const yearsKey = years.join(",");
@@ -40,7 +42,7 @@ export function HeatmapTable({ caption, rowHeader, years, rows, maximum, format,
           </th>)}
         </tr></thead>
         <tbody>{rows.map(row => <tr key={row.id} data-heatmap-group={row.id}>
-          <th scope="row" className="sticky left-0 z-10 whitespace-nowrap bg-[var(--paper)] px-3 py-2 text-left font-normal text-[var(--ink)]">{row.label}</th>
+          <th scope="row" className={`sticky left-0 z-10 ${wrapRowLabels ? "min-w-[150px] max-w-[240px] text-[12px] leading-snug" : "whitespace-nowrap"} bg-[var(--paper)] px-3 py-2 text-left font-normal text-[var(--ink)]`}>{row.label}</th>
           {row.values.map((value, index) => {
             const bin = value === null ? null : unemploymentAgeHeatmapBin(value, maximum, MAP_RAMP.length);
             return <td key={years[index]} data-heatmap-cell={`${row.id}:${years[index]}`} data-value={value ?? ""} data-bin={bin ?? ""} className="px-3 py-2 text-center font-[family-name:var(--font-numeric)] tabular-nums"

@@ -1,0 +1,37 @@
+import { expect, test } from "vitest";
+import ExcelJS from "exceljs";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { loadTradeDomesticData, toClientTradeDomesticData } from "../../lib/data/tradeDomestic/importTradeDomestic";
+import { loadTradeOverviewFacts } from "../../lib/data/tradeOverview/importTradeOverview";
+import { getMessages } from "../../lib/i18n/messages.server";
+import { loadWorkbookSources } from "../../lib/methodology/workbookSources";
+import { buildTradeOverviewWorkbookExportModel } from "../../lib/explorer/tradeOverviewWorkbook";
+import { buildTradePartnersWorkbookModel } from "../../lib/explorer/tradePartnersWorkbook";
+import { buildTradeProductsWorkbookModel } from "../../lib/explorer/tradeProductsWorkbook";
+import { parseTradeOverviewHash } from "../../lib/explorer/tradeOverviewState";
+import { parseTradePartnersHash } from "../../lib/explorer/tradePartnersState";
+import { parseTradeProductsHash, tradeProductsBulkSelection } from "../../lib/explorer/tradeProductsState";
+
+test.each(["en", "ka"] as const)("domestic %s workbooks keep complete selections, correct totals and applicable original sources", async locale => {
+  const [domestic, national, messages, sources] = await Promise.all([loadTradeDomesticData(), loadTradeOverviewFacts(), getMessages(locale, ["trade", "workbook", "format"]), loadWorkbookSources("trade", undefined, locale)]);
+  const data = toClientTradeDomesticData(domestic, national), presentation = { locale, messages, englishLabels: data.englishLabels }, siteOrigin = "https://fiscal.ge";
+  const all = buildTradeOverviewWorkbookExportModel({ facts: data.national, state: parseTradeOverviewHash("#sel=trade.exports,trade.domestic_exports,trade.reexports", data.national), sources, siteOrigin }, presentation);
+  expect(all.analysis.rows).toHaveLength(36);
+  expect(all.sources).toHaveLength(2);
+  expect(all.sources.some(source => source.downloadHref.endsWith("domestic-export-country-2014-2026.xlsx"))).toBe(true);
+  const countryState = { ...parseTradePartnersHash("", data.countries), measure: "trade.reexports" as const, selectedIds: ["partner.2014-2025.807", "partner.2014-2025.643"] };
+  const countries = buildTradePartnersWorkbookModel({ data: data.countries, state: countryState, sources, siteOrigin }, presentation);
+  expect(countries.analysis.rows).toHaveLength(24);
+  const missing = countries.analysis.rows.filter(row => row[2] === (locale === "en" ? "Macedonia (FYR)" : "მაკედონია (ყოფილი იუგოსლავიის რესპუბლიკა)"));
+  expect(missing).toHaveLength(12);
+  expect(missing.every(row => row[3] === null)).toBe(true);
+  expect(countries.sources.map(source => source.downloadHref.split("/").at(-1)).sort()).toEqual(["domestic-export-country-2014-2026.xlsx", "export-country-1995-2026.xlsx"]);
+  const products = buildTradeProductsWorkbookModel({ data: data.products, state: { ...parseTradeProductsHash("", data.products), selectedIds: tradeProductsBulkSelection(data.products) }, sources, siteOrigin }, presentation);
+  expect(products.analysis.rows).toHaveLength(606);
+  expect(products.readable.subtitle).toContain("2020–2025");
+  expect(products.sources.map(source => source.downloadHref.split("/").at(-1)).sort()).toEqual(["domestic-export-country-2014-2026.xlsx", "domestic-exports-by-4-digit-2014-2026.xlsx"]);
+  expect(products.readable.rows.some(row => row.label.includes(locale === "en" ? "Other commodities" : "სხვა საქონელი"))).toBe(true);
+  const oneYear = buildTradeOverviewWorkbookExportModel({ facts: data.national, state: { ...parseTradeOverviewHash("#sel=trade.exports,trade.domestic_exports,trade.reexports", data.national), range: { kind: "manual", start: 2025, end: 2025 } }, sources, siteOrigin }, presentation);
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(oneYear));
+  expect(excel.worksheets[0].getRow(2).height).toBeGreaterThan(15);
+});

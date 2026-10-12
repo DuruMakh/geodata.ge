@@ -19,6 +19,13 @@ export function ExplorerFooter({locale}:{locale:Locale}) {
   else if (pathname==='/explorer/deficit') noteKey='common.deficitSourceNote';
   else if (pathname==='/explorer/unemployment'||pathname.startsWith('/explorer/unemployment/')) noteKey='common.geostatSourceNote';
   else if (pathname==='/explorer/trade'||pathname.startsWith('/explorer/trade/')) noteKey='common.geostatSourceNote';
+  else if (pathname==='/explorer/wages'||pathname.startsWith('/explorer/wages/')) noteKey='common.geostatSourceNote';
+  else if (pathname==='/explorer/living-standards'||pathname.startsWith('/explorer/living-standards/')) noteKey='common.geostatSourceNote';
+  else if (pathname==='/explorer/energy-food'||pathname.startsWith('/explorer/energy-food/')) noteKey='common.geostatSourceNote';
+  else if (pathname==='/explorer/money'||pathname.startsWith('/explorer/money/')) noteKey='common.nbgSourceNote';
+  else if (pathname==='/explorer/external/foreign-investment') noteKey='common.geostatSourceNote';
+  else if (pathname==='/explorer/external') noteKey='common.externalHubSourceNote';
+  else if (pathname.startsWith('/explorer/external/')) noteKey='common.nbgSourceNote';
   else if (pathname==='/explorer/inflation/categories'||pathname==='/explorer/inflation/products') noteKey='common.geostatSourceNote';
   else if (inflation) noteKey='common.inflationSourceNote';
   else if (demography) noteKey='common.geostatSourceNote';
