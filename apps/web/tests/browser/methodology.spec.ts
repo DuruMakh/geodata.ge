@@ -1,5 +1,6 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { createHash } from "node:crypto";
+import { LIVE_METHODOLOGY_IDS } from "../../lib/methodology/types";
 import { expectReadableText } from "./color-contrast";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -561,4 +562,22 @@ test.describe("the source archive on a phone", () => {
     await expect(archive.getByRole("columnheader")).toHaveCount(5);
     await expect(archive.getByTestId("source-archive-row").first().getByRole("cell")).toHaveCount(5);
   });
+});
+
+// U29-05: a long Georgian heading (municipalities, household income) was wider than the screen at 38px.
+test("no methodology article scrolls sideways on a 360px phone", async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.setViewportSize({ width: 360, height: 800 });
+  for (const id of LIVE_METHODOLOGY_IDS) {
+    for (const prefix of ["", "/en"]) {
+      const path = `${prefix}/methodology/${id}`;
+      await page.goto(`${TEST_BASE_URL}${path}`);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      expect.soft(scrollWidth, path).toBe(clientWidth);
+    }
+  }
 });

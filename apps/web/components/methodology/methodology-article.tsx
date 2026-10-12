@@ -48,7 +48,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
 
       <header className="border-b-2 border-[var(--ink)] pb-10 pt-9 min-[768px]:pb-14 min-[768px]:pt-12">
         <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.articleOverline")}</p>
-        <h1 className="mt-4 max-w-[900px] text-balance font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
+        <h1 className="mt-4 max-w-[900px] text-balance [overflow-wrap:anywhere] font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
           {content.title}
         </h1>
         <p className="mt-6 max-w-[790px] text-pretty text-[0.9375rem] leading-[1.8] text-[var(--body)]">{content.summary}</p>
