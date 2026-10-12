@@ -3,6 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { TEST_BASE_URL } from "./test-base-url";
 
+// A line chart without its own label is named "{first series}, {count} სერია, {first}–{last}".
+const LINE_CHART_NAME = /, \d+ სერია, \d{4}–\d{4}$/;
+
 async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
@@ -33,7 +36,7 @@ test.describe("Government Debt explorer", () => {
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("რამდენია მთავრობის ვალი და როგორ ვიხდით მას");
       await expect(page.getByTestId("debt-explorer")).toHaveCount(1);
       await expect(page.getByTestId("chart-panel")).toHaveCount(1);
-      await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(1);
+      await expect(page.getByRole("img", { name: LINE_CHART_NAME })).toHaveCount(1);
       await expect(page.getByTestId("explorer-table")).toHaveCount(0);
 
       const selector = page.getByTestId("series-selector");
@@ -139,7 +142,7 @@ test.describe("Government Debt explorer", () => {
 
     await page.getByTestId("chart-mode-line").click();
     await expect(page.getByTestId("explorer-table")).toHaveCount(0);
-    await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(1);
+    await expect(page.getByRole("img", { name: LINE_CHART_NAME })).toHaveCount(1);
   });
 
   test("restores the family total for unknown-only selections but preserves explicit empty selection", async ({ page }) => {
@@ -166,7 +169,7 @@ test.describe("Government Debt explorer", () => {
 
     const callout = page.getByTestId("no-range-data-callout");
     await expect(callout).toContainText("არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის");
-    await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(0);
+    await expect(page.getByRole("img", { name: LINE_CHART_NAME })).toHaveCount(0);
 
     await page.getByTestId("chart-mode-table").click();
     await expect(callout).toBeVisible();

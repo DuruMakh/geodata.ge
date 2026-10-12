@@ -4,6 +4,9 @@ import ExcelJS from "exceljs";
 import { expectReadableText } from "./color-contrast";
 import { TEST_BASE_URL } from "./test-base-url";
 
+// A line chart without its own label is named "{first series}, {count} სერია, {first}–{last}".
+const LINE_CHART_NAME = /, \d+ სერია, \d{4}–\d{4}$/;
+
 function collectConsoleProblems(page: Page) {
   const consoleProblems: string[] = [];
 
@@ -304,7 +307,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(chartPanel).toHaveAttribute("data-measure", "share_of_gdp");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveText("% მშპ-ში");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("img", { name: "მრავალწლიანი დინამიკა" }).hover({ position: { x: 300, y: 100 } });
+  await page.getByRole("img", { name: LINE_CHART_NAME }).hover({ position: { x: 300, y: 100 } });
   await expect(page.getByTestId("chart-tooltip")).toContainText("წილი მშპ-ში");
   await chartPanel.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).not.toContainText("წილი მშპ-ში 2025");
@@ -925,6 +928,35 @@ test("budget field identifies a circle with its category and amount on hover and
   await expect(tooltip).toHaveCount(0);
   await point.focus();
   await expect(tooltip).toBeVisible();
+});
+
+test("the line chart is named from its series and read with the arrow keys", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
+  await expectAppReady(page);
+
+  const frame = page.getByTestId("chart-frame");
+  const chart = frame.locator('svg[role="img"]:visible');
+  await expect(chart).toHaveAttribute("aria-label", /^.+, 1 სერია, \d{4}–\d{4}$/);
+  const [, first, last] = /(\d{4})–(\d{4})$/.exec((await chart.getAttribute("aria-label")) ?? "")!;
+  const caption = page.locator(`[id="${await chart.getAttribute("aria-describedby")}"]`);
+  await expect(caption).toContainText(`, ${last}: `);
+
+  // The scroll frame stays a stop of its own; the chart is the next one.
+  await frame.focus();
+  await page.keyboard.press("Tab");
+  await expect(chart).toBeFocused();
+
+  const period = page.getByTestId("chart-tooltip").locator(":scope > div").first().locator("span").first();
+  await page.keyboard.press("End");
+  await expect(period).toHaveText(last!);
+  await page.keyboard.press("ArrowLeft");
+  await expect(period).toHaveText(String(Number(last) - 1));
+  await page.keyboard.press("Home");
+  await expect(period).toHaveText(first!);
+  await expect(page.locator('figure [aria-live="polite"]')).toHaveText(new RegExp(`^${first}: .+ \\d`));
+
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("chart-tooltip")).toHaveCount(0);
 });
 
 test("mobile explorer and analysis layouts have no page overflow", async ({ page }) => {

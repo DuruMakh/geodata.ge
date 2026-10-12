@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildTooltipRows,
   EditorialLineChart,
+  periodReadoutText,
   TOOLTIP_ROW_CAP,
   type ChartSeries,
 } from "../../components/main-explorer/editorial-line-chart";
@@ -287,11 +288,51 @@ describe("EditorialLineChart accessible name", () => {
     );
   const imageLabels = (markup: string) => [...markup.matchAll(/<svg\b[^>]*role="img"[^>]*aria-label="([^"]*)"/g)].map((match) => match[1]);
 
-  it("keeps the generic trend label when no name is given", () => {
-    expect(imageLabels(render({}))).toEqual(["მრავალწლიანი დინამიკა", "მრავალწლიანი დინამიკა"]);
+  it("names the chart from its series and years when no label is passed", () => {
+    expect(imageLabels(render({}))).toEqual(["სერია, 1 სერია, 2024–2025", "სერია, 1 სერია, 2024–2025"]);
   });
 
   it("names every drawing with the given ariaLabel", () => {
     expect(imageLabels(render({ ariaLabel: "X" }))).toEqual(["X", "X"]);
+  });
+});
+
+describe("EditorialLineChart text for assistive technology", () => {
+  const series: ChartSeries[] = [
+    { id: "total", label: "სულ", color: "#B3402A", vals: [10_000_000_000, 12_000_000_000, 13_500_000_000], planned: [false, false, false] },
+    // Ends a year early: its latest value is 2024's, said with its year.
+    { id: "early", label: "ადრეული", color: "#4A707A", vals: [2_000_000_000, 3_000_000_000, null], planned: [false, false, false] },
+    { id: "empty", label: "ცარიელი", color: "#8A6D3B", vals: [null, null, null], planned: [false, false, false] },
+  ];
+  const markup = renderGeorgianMarkup(
+    createElement(EditorialLineChart, { years: [2023, 2024, 2025], series, share: false, unit: UNIT_BN, shareLabel: "% წილი" }),
+  );
+
+  it("the figcaption lists each line's latest value", () => {
+    const caption = /<figcaption id="([^"]+)"[^>]*>([\s\S]*?)<\/figcaption>/.exec(markup);
+    expect(caption).not.toBeNull();
+    const [, id, text] = caption!;
+    expect(text).toContain("სულ, 2025: 13.5 მლრდ");
+    expect(text).toContain("ადრეული, 2024: 3.0 მლრდ");
+    expect(text).toContain("ცარიელი: არ არის ხელმისაწვდომი");
+    // Both drawings point at it.
+    expect(markup.match(new RegExp(`<svg[^>]*aria-describedby="${id}"`, "g"))).toHaveLength(2);
+  });
+
+  it("is a keyboard stop of its own", () => {
+    expect(chartGeometry(markup, "desktop")).toMatch(/^<svg[^>]*tabindex="0"/);
+  });
+
+  it("a missing year is read as not available, never as zero", () => {
+    const formatValue = (value: number) => (value / 1e9).toFixed(1);
+    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა" };
+    const gap: ChartSeries[] = [
+      { id: "a", label: "ა", color: "#B3402A", vals: [5_000_000_000, null, 7_000_000_000], planned: [false, false, false] },
+      { id: "b", label: "ბ", color: "#4A707A", vals: [1_000_000_000, null, null], planned: [false, false, false] },
+    ];
+    expect(periodReadoutText(gap, 1, "2024", formatValue, labels)).toBe("2024: არ არის ხელმისაწვდომი");
+    // A line missing in a year with data is left out, as in the visible readout — not read as 0.
+    expect(periodReadoutText(gap, 2, "2025", formatValue, labels)).toBe("2025: ა 7.0");
+    expect(periodReadoutText(gap, 0, "2023", formatValue, labels)).toBe("2023: ა 5.0, ბ 1.0");
   });
 });
