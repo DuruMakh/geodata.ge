@@ -9,13 +9,15 @@ import { TradePartnersRanking } from "../../components/trade/trade-partners-rank
 import { buildTradePartnersModel } from "../../lib/explorer/tradePartners";
 import { parseTradePartnersHash } from "../../lib/explorer/tradePartnersState";
 
-test.each(["en", "ka"] as const)("services %s has one heading, two page tabs and a twelve-type ranking", async locale => {
+test.each(["en", "ka"] as const)("services %s has one heading, overview and four measure tabs, and a twelve-type ranking", async locale => {
   const data = toClientTradeServicesData(await loadTradeServicesData()), presentation = { locale, englishLabels: data.englishLabels, messages: await getMessages(locale, ["trade", "controls", "main", "format", "common"]) };
   const props = { sources: [], lastReviewedAt: "2026-10-11", siteOrigin: "https://fiscal.ge" };
   const page = renderToStaticMarkup(<I18nProvider {...presentation}><TradeServices data={data} {...props} /></I18nProvider>);
   expect(page.match(/<h1/g)).toHaveLength(1);
-  expect(page).toContain('data-testid="trade-services-section-types"');
   expect(page).toContain('data-testid="trade-services-section-overview"');
+  for (const measure of ["trade.turnover", "trade.exports", "trade.imports", "trade.balance"]) {
+    expect(page).toContain(`data-testid="trade-services-section-${measure}"`);
+  }
   if (locale === "en") expect(page).toContain("Georgia&#x27;s annual services trade, in nominal US dollars.");
   const html = renderToStaticMarkup(<I18nProvider {...presentation}><TradePartners data={data.types} {...props} /></I18nProvider>);
   expect(html.match(/data-testid="trade-partners-ranking-row"/g)).toHaveLength(12);

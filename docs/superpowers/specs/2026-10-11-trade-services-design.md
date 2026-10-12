@@ -7,6 +7,8 @@ Status: First-release scope approved on 2026-10-11 when the owner selected "Over
 
 Help Fiscal.ge readers understand Georgia's services exports and imports, see their balance, and compare the twelve published service types over time. Readers can inspect and download the same annual figures in Georgian or English using the established Trade controls.
 
+Navigation amendment approved 2026-10-12: the owner requested moving the four measure controls to the page-level tabs, replacing Service types. Keep Overview followed by Total services trade, Services exports, Services imports and Services balance. The four measure tabs share the existing service-type comparison state and retain the existing saved-link format.
+
 The owner approved one Services trade page with **Overview** and **Service types** views for the captured 2020–2024 annual data. Countries are deferred. Preserve the source's missing observation, exact decimals and two unresolved country-table discrepancies.
 
 Approaches considered:
@@ -26,7 +28,7 @@ The first release has no country or type-by-country comparisons, combined goods-
 - Extend the existing `/methodology/trade` page and its English mirror.
 - Reuse breadcrumbs, source notes, language links, metadata, Dataset JSON-LD and sitemap patterns. Coverage and review dates come from the accepted package.
 
-Keep one heading and one short lead line: "Georgia's annual services trade, in nominal US dollars." Do not add a summary paragraph or source-warning block beneath the heading. Put definitions and the reason for deferring countries in the methodology. Use one row of text tabs, **Overview | Service types**, below the lead line.
+Keep one heading and one short lead line: "Georgia's annual services trade, in nominal US dollars." Do not add a summary paragraph or source-warning block beneath the heading. Put definitions and the reason for deferring countries in the methodology. Use one row of text tabs, **Overview | Total services trade | Services exports | Services imports | Services balance**, below the lead line.
 
 This is services supplied between residents and non-residents. Services exports are supplied by Georgian residents to non-residents; services imports are received by Georgian residents from non-residents. Do not reuse the goods-only FOB/CIF, final-destination, sending-country or re-export explanations. Travel remains the publisher's Travel category, and Telecommunications, computer, and information services remains the complete published category rather than an IT-only estimate.
 
@@ -51,7 +53,7 @@ Reuse `TradePartners`, its model, series panel and ranking through a small expli
 
 - One measure at a time: Total services trade, Services exports, Services imports or Services balance. Start with Total services trade, matching the current partner comparison default.
 - One series selector: the removable national services total first, followed by the twelve published service types. Initially only the total is selected.
-- No Countries/Country groups browsing controls. Put the compact measure controls below search, as on Domestic exports, so there is only one page-level tab row.
+- No Countries/Country groups browsing controls. The four page-level measure tabs open this comparison directly; do not repeat measure controls below search.
 - Reuse multilingual search, unlimited selections and the standard `Series {selected} / {all}` count. The denominator is thirteen, derived from the accepted catalogue. Search does not narrow Clear/Select all, counts, ranking or Excel.
 - Sort type choices by the active end-year amount, or absolute amount for Balance; put unavailable choices last with a stable label/ID tie-break.
 - Keep the applicable national total in ink and assign stable editorial colors to the twelve types using the existing palette. Color never substitutes for a readable label.

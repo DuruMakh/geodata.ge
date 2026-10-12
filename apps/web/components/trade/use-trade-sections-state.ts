@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-export function useTradeSectionsState<T extends string>(sections: readonly T[], defaultSection: T, eventName: string): { section: T; changeSection: (next: T) => void } {
+export function useTradeSectionsState<T extends string>(sections: readonly T[], defaultSection: T, eventName: string): { section: T; changeSection: (next: T, parameters?: Record<string, string>) => void } {
   const [section, setSection] = useState<T>(defaultSection);
   const saved = useRef<Partial<Record<T, string>>>({});
   useEffect(() => {
@@ -15,10 +15,15 @@ export function useTradeSectionsState<T extends string>(sections: readonly T[], 
     window.addEventListener(eventName, cache);
     return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); window.removeEventListener(eventName, cache); };
   }, [sections, defaultSection, eventName]);
-  const changeSection = (next: T) => {
+  const changeSection = (next: T, parameters?: Record<string, string>) => {
     if (next === section) return;
     saved.current[section] = window.location.hash;
-    const hash = saved.current[next] || `#section=${next}`;
+    let hash = saved.current[next] || `#section=${next}`;
+    if (parameters) {
+      const params = new URLSearchParams(hash.slice(1));
+      for (const [key, value] of Object.entries(parameters)) params.set(key, value);
+      hash = `#${params}`;
+    }
     try { window.history.pushState(null, "", hash); } catch { /* The comparison still works in embedded contexts. */ }
     setSection(next);
   };
