@@ -133,9 +133,10 @@ test("phones skip the sticky axis and the scroll position logic", async ({ page 
   const frame = page.getByTestId("chart-frame");
   await expect(page.getByTestId("chart-frame-y-axis")).toHaveCount(0);
   expect(await frame.evaluate((element) => [element.scrollLeft, element.scrollWidth - element.clientWidth])).toEqual([0, 0]);
-  // Still a named, focusable region.
-  await expect(frame).toHaveAttribute("tabindex", "0");
+  // Still a named region; with nothing to scroll, the chart inside is the keyboard stop.
+  await expect(frame).not.toHaveAttribute("tabindex");
   await expect(frame).toHaveAttribute("role", "region");
+  await expect(frame.locator('svg[role="img"]')).toHaveAttribute("tabindex", "0");
 });
 
 // The pinned tooltip floated over the plot; with ten inflation categories it

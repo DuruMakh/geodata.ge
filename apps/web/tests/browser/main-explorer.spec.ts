@@ -942,19 +942,31 @@ test("the line chart is named from its series and read with the arrow keys", asy
   const caption = page.locator(`[id="${await chart.getAttribute("aria-describedby")}"]`);
   await expect(caption).toContainText(`, ${last}: `);
 
-  // The scroll frame stays a stop of its own; the chart is the next one.
-  await frame.focus();
+  // A pointer sees the readout; the live line speaks only for the keys.
+  const live = page.locator('figure [aria-live="polite"]');
+  await chart.hover({ position: { x: 300, y: 100 } });
+  await expect(page.getByTestId("chart-tooltip")).toBeVisible();
+  await expect(live).toHaveText("");
+  await page.mouse.move(0, 0);
+
+  // Nothing scrolls sideways, so the frame is no stop: Tab goes from the control before it straight to the chart.
+  await expect(frame).not.toHaveAttribute("tabindex");
+  await chart.evaluate((svg) => {
+    const stops = [...document.querySelectorAll<HTMLElement | SVGElement>('a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+      .filter((element) => element.getClientRects().length > 0);
+    (stops[stops.indexOf(svg) - 1] as HTMLElement).focus();
+  });
   await page.keyboard.press("Tab");
   await expect(chart).toBeFocused();
 
-  const period = page.getByTestId("chart-tooltip").locator(":scope > div").first().locator("span").first();
+  const period = page.getByTestId("chart-tooltip").getByTestId("chart-tooltip-period");
   await page.keyboard.press("End");
   await expect(period).toHaveText(last!);
   await page.keyboard.press("ArrowLeft");
   await expect(period).toHaveText(String(Number(last) - 1));
   await page.keyboard.press("Home");
   await expect(period).toHaveText(first!);
-  await expect(page.locator('figure [aria-live="polite"]')).toHaveText(new RegExp(`^${first}: .+ \\d`));
+  await expect(live).toHaveText(new RegExp(`^${first}: .+ \\d`));
 
   await page.keyboard.press("Escape");
   await expect(page.getByTestId("chart-tooltip")).toHaveCount(0);
@@ -1082,10 +1094,12 @@ test("mobile chart fits its frame and the table keeps contained horizontal scrol
   await expectAppReady(page);
 
   // D1 (2026-10-07): phones draw the chart at the frame's width, so it no
-  // longer scrolls; the frame keeps its focusable, named region.
+  // longer scrolls; the frame keeps its named region, and with nothing to
+  // scroll the chart inside is the keyboard stop instead of the frame.
   const chart = page.getByTestId("chart-frame");
   await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
-  await expect(chart).toHaveAttribute("tabindex", "0");
+  await expect(chart).not.toHaveAttribute("tabindex");
+  await expect(chart.locator('svg[role="img"]')).toHaveAttribute("tabindex", "0");
   // The name mentions sideways scrolling only where the frame scrolls.
   await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი");
   expect(await chart.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);

@@ -243,8 +243,11 @@ test.describe("desktop", () => {
     const frame = page.getByTestId("chart-frame");
     if (await frame.evaluate((element) => element.scrollWidth > element.clientWidth + 1)) {
       await expect(frame).toHaveAttribute("aria-label", "Multi-year chart — scroll horizontally");
+      // A sideways scroll to operate makes the frame a keyboard stop of its own.
+      await expect(frame).toHaveAttribute("tabindex", "0");
     } else {
       await expect(frame).toHaveAttribute("aria-label", "Multi-year chart");
+      await expect(frame).not.toHaveAttribute("tabindex");
     }
   });
 });

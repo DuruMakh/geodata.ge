@@ -146,7 +146,9 @@ export function ChartScrollFrame({
       ref={scroller}
       data-testid={testId}
       role="region"
-      tabIndex={0}
+      // A stop of its own only while there is a sideways scroll to operate; otherwise
+      // the chart inside is the one keyboard stop.
+      tabIndex={overflowing ? 0 : undefined}
       // Name the sideways scroll only when there is one (a phone chart fits its frame).
       aria-label={message(messages, overflowing ? "controls.chartScrollable" : "controls.chartRegion")}
       className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
@@ -308,7 +310,7 @@ export function ChartTooltip({
         className="mt-2 flex flex-col gap-1 rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-3 py-2"
       >
         <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[12px] text-[var(--muted)]">
-          <span>{header}</span>
+          <span data-testid="chart-tooltip-period">{header}</span>
           {headerRight ? <span className="text-right">{headerRight}</span> : null}
         </div>
         {rows.map((row) => (
@@ -344,7 +346,7 @@ export function ChartTooltip({
       }
     >
       <div className="mb-0.5 flex justify-between gap-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--muted)]">
-        <span>{header}</span>
+        <span data-testid="chart-tooltip-period">{header}</span>
         {headerRight ? <span>{headerRight}</span> : null}
       </div>
       {rows.map((row) => (

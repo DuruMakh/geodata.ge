@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type KeyboardEvent } from "react";
+import { useId, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { stepPeriodIndex } from "../../lib/explorer/chartNavigation";
@@ -118,6 +118,16 @@ export function buildTooltipRows(
   return { rows: present.slice(0, cap), hidden: Math.max(0, present.length - cap) };
 }
 
+export type SpokenLabels = { notAvailable: string; other: string; planned: string; preliminary?: string };
+
+/** The status a drawn value carries (hollow planned point, preliminary superscript), said in words. */
+function spokenStatus(line: ChartSeries, index: number, labels: SpokenLabels): string {
+  const marks: string[] = [];
+  if (line.planned[index]) marks.push(labels.planned);
+  if (labels.preliminary && line.preliminary?.[index]) marks.push(labels.preliminary);
+  return marks.length === 0 ? "" : ` (${marks.join(", ")})`;
+}
+
 /**
  * One period of the readout as a sentence for a screen reader. It reads the rows the
  * hover readout shows, so a line with no value that period is left out (never read
@@ -128,11 +138,12 @@ export function periodReadoutText(
   index: number,
   period: string,
   formatValue: (value: number, seriesId: string) => string,
-  labels: { notAvailable: string; other: string },
+  labels: SpokenLabels,
 ): string {
   const { rows, hidden } = buildTooltipRows(series, index);
   if (rows.length === 0) return `${period}: ${labels.notAvailable}`;
-  const parts = rows.map((row) => `${row.label} ${formatValue(row.value, row.id)}`);
+  const byId = new Map(series.map((line) => [line.id, line]));
+  const parts = rows.map((row) => `${row.label} ${formatValue(row.value, row.id)}${spokenStatus(byId.get(row.id)!, index, labels)}`);
   if (hidden > 0) parts.push(`+${hidden} ${labels.other}`);
   return `${period}: ${parts.join(", ")}`;
 }
@@ -218,7 +229,12 @@ export function EditorialLineChart({
   // Text read aloud has no axis beside it, so an amount carries its unit.
   const spokenValue = (value: number, seriesId: string) =>
     formatTooltipValue || share || unit.label.trim() === "" ? formatValue(value, seriesId) : `${formatValue(value, seriesId)} ${unit.label}`;
-  const notAvailable = message(messages, "controls.notAvailable");
+  const spokenLabels: SpokenLabels = {
+    notAvailable: message(messages, "controls.notAvailable"),
+    other: message(messages, "controls.other"),
+    planned: message(messages, "controls.planned"),
+    preliminary: preliminaryLabel,
+  };
   const chartName =
     ariaLabel ??
     (series.length === 0 || n === 0
@@ -270,12 +286,26 @@ export function EditorialLineChart({
   const active = mobileWidth === null || mobileWidth === undefined ? desktop : phone!;
 
   const { svgRef, hover, pinned, setHover, handlers } = useChartPointer(n, active.width, active.padLeft, active.padRight);
+  // The live line speaks only for the keys: a pointer already sees the readout.
+  const [keyboardReading, setKeyboardReading] = useState(false);
+  const pointerHandlers = {
+    ...handlers,
+    onPointerDown: (event: ReactPointerEvent<SVGSVGElement>) => {
+      setKeyboardReading(false);
+      handlers.onPointerDown(event);
+    },
+    onPointerMove: (event: ReactPointerEvent<SVGSVGElement>) => {
+      setKeyboardReading(false);
+      handlers.onPointerMove(event);
+    },
+  };
 
   // The keys step the same period the pointer hovers, so the readout follows them.
   function handleKeyDown(event: KeyboardEvent<SVGSVGElement>) {
     const next = stepPeriodIndex(event.key, hover, n);
     if (next === undefined) return;
     event.preventDefault();
+    setKeyboardReading(true);
     setHover(next);
   }
 
@@ -327,7 +357,7 @@ export function EditorialLineChart({
         aria-describedby={captionId}
         tabIndex={0}
         className={`h-auto w-full [&:focus:not(:focus-visible)]:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${className}`}
-        {...handlers}
+        {...pointerHandlers}
         onKeyDown={handleKeyDown}
         onBlur={() => setHover(null)}
       >
@@ -541,14 +571,16 @@ export function EditorialLineChart({
             const latest = line.vals.findLastIndex((value) => value !== null && value !== undefined);
             return (
               <li key={line.id}>
-                {latest === -1 ? `${line.label}: ${notAvailable}` : `${line.label}, ${tooltipPeriod(latest)}: ${spokenValue(line.vals[latest]!, line.id)}`}
+                {latest === -1
+                  ? `${line.label}: ${spokenLabels.notAvailable}`
+                  : `${line.label}, ${tooltipPeriod(latest)}: ${spokenValue(line.vals[latest]!, line.id)}${spokenStatus(line, latest, spokenLabels)}`}
               </li>
             );
           })}
         </ul>
       </figcaption>
       <p className="sr-only" aria-live="polite">
-        {hover === null ? "" : periodReadoutText(series, hover, tooltipPeriod(hover), spokenValue, { notAvailable, other: message(messages, "controls.other") })}
+        {hover === null || !keyboardReading ? "" : periodReadoutText(series, hover, tooltipPeriod(hover), spokenValue, spokenLabels)}
       </p>
     </figure>
   );

@@ -325,7 +325,7 @@ describe("EditorialLineChart text for assistive technology", () => {
 
   it("a missing year is read as not available, never as zero", () => {
     const formatValue = (value: number) => (value / 1e9).toFixed(1);
-    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა" };
+    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა", planned: "გეგმა" };
     const gap: ChartSeries[] = [
       { id: "a", label: "ა", color: "#B3402A", vals: [5_000_000_000, null, 7_000_000_000], planned: [false, false, false] },
       { id: "b", label: "ბ", color: "#4A707A", vals: [1_000_000_000, null, null], planned: [false, false, false] },
@@ -334,5 +334,24 @@ describe("EditorialLineChart text for assistive technology", () => {
     // A line missing in a year with data is left out, as in the visible readout — not read as 0.
     expect(periodReadoutText(gap, 2, "2025", formatValue, labels)).toBe("2025: ა 7.0");
     expect(periodReadoutText(gap, 0, "2023", formatValue, labels)).toBe("2023: ა 5.0, ბ 1.0");
+  });
+
+  it("says a preliminary or planned value is one, as the drawing marks it", () => {
+    const marked: ChartSeries[] = [
+      { id: "gdp", label: "მშპ", color: "#B3402A", vals: [80_000_000_000, 90_000_000_000], planned: [false, false], preliminary: [false, true] },
+      { id: "plan", label: "გეგმა", color: "#4A707A", vals: [null, 30_000_000_000], planned: [false, true] },
+    ];
+    const formatValue = (value: number) => (value / 1e9).toFixed(1);
+    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა", planned: "გეგმა", preliminary: "წინასწ." };
+    expect(periodReadoutText(marked, 1, "2025", formatValue, labels)).toBe("2025: მშპ 90.0 (წინასწ.), გეგმა 30.0 (გეგმა)");
+    expect(periodReadoutText(marked, 0, "2024", formatValue, labels)).toBe("2024: მშპ 80.0");
+
+    const caption = /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(
+      renderGeorgianMarkup(
+        createElement(EditorialLineChart, { years: [2024, 2025], series: marked, share: false, unit: UNIT_BN, shareLabel: "% წილი", preliminaryLabel: "წინასწ." }),
+      ),
+    )![1];
+    expect(caption).toContain("მშპ, 2025: 90.0 მლრდ (წინასწ.)");
+    expect(caption).toContain("გეგმა, 2025: 30.0 მლრდ (გეგმა)");
   });
 });

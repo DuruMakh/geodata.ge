@@ -125,7 +125,9 @@ test("a tap focuses the stacked chart without a focus ring; the keyboard still g
   await expect(svg).toBeFocused();
   expect(await svg.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
 
-  await frame.focus();
+  // The fitted frame is no stop of its own, so step back one stop and Tab into the chart again.
+  await page.keyboard.press("Shift+Tab");
+  await expect(svg).not.toBeFocused();
   await page.keyboard.press("Tab");
   await expect(svg).toBeFocused();
   expect(await svg.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
