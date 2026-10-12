@@ -1,13 +1,11 @@
 import path from "node:path";
 import { notFound } from "next/navigation";
-import { BudgetHub } from "../../components/hub/budget-hub";
 import { InflationCategories } from "../../components/inflation/inflation-categories";
 import { InflationCities } from "../../components/inflation/inflation-cities";
 import { InflationOverview } from "../../components/inflation/inflation-overview";
 import { InflationProducts } from "../../components/inflation/inflation-products";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
-import { PageHeader } from "../../components/shell/page-header";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedProductData } from "../data/inflation/importProducts";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
@@ -38,7 +36,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { inflationProductDatasetJsonLd } from "../seo/inflationProductDataset";
 import { resolveSiteUrl } from "../siteUrl";
-import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
+import { TopicHub } from "./hub";
 
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
@@ -116,17 +114,7 @@ export async function renderInflationHub(locale: Locale) {
     facts.map((fact) => fact.lastReviewedAt).sort().at(-1),
   );
   return (
-    <I18nProvider {...presentation}>
-      <BreadcrumbJsonLd items={[{ name: t("common.home"), path: pageHref("/", locale) }, { name: t("common.inflation"), path: pageHref(HUB_PATH, locale) }]} />
-      <main className="px-5 pb-16 min-[768px]:px-[34px]">
-        <div className="mx-auto max-w-[1180px]">
-          <PageHeader crumbs={[{ label: t("common.home"), href: pageHref("/", locale) }, { label: t("common.data") }, { label: t("common.inflation") }]} coverage={coverage} />
-          <ExplorerHeading>{t("inflation.hubHeading")}</ExplorerHeading>
-          <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{t("inflation.hubDescription")}</p>
-          <BudgetHub cards={buildInflationHubCards(facts, presentation, categories, weights, buildLatestProductHubSummary(productData), cities.map(cityFactInput))} locale={locale} testId="inflation-hub" />
-        </div>
-      </main>
-    </I18nProvider>
+    <TopicHub locale={locale} presentation={presentation} title={t("inflation.hubHeading")} crumbLabel={t("common.inflation")} summary={t("inflation.hubDescription")} path={HUB_PATH} coverage={coverage} cards={buildInflationHubCards(facts, presentation, categories, weights, buildLatestProductHubSummary(productData), cities.map(cityFactInput))} testId="inflation-hub" />
   );
 }
 

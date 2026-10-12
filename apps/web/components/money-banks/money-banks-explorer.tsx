@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ChartPie, CircleDollarSign } from "lucide-react";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
@@ -17,7 +17,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -25,25 +25,13 @@ import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
+type MoneyBanksHashData = { section: MoneyBanksSectionId; facts: ClientMoneyBanksFact[]; gdpFacts: ClientNationalGdpFact[] };
+const parseMoneyBanksState = (hash: string, data: MoneyBanksHashData) => parseMoneyBanksHash(hash, data.section, data.facts, data.gdpFacts);
+const serializeMoneyBanksState = (state: MoneyBanksState, data: MoneyBanksHashData) => serializeMoneyBanksHash(state, data.section);
+
 function useMoneyBanksState(section: MoneyBanksSectionId, facts: ClientMoneyBanksFact[], gdpFacts: ClientNationalGdpFact[]) {
-  const [state, setState] = useState(() => parseMoneyBanksHash("", section, facts, gdpFacts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseMoneyBanksHash(window.location.hash, section, facts, gdpFacts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [section, facts, gdpFacts]);
-  useAppReady();
-  const update = useCallback((change: (previous: MoneyBanksState) => MoneyBanksState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeMoneyBanksHash(next, section)}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-  }, [section]);
-  return { state, update };
+  const data = useMemo(() => ({ section, facts, gdpFacts }), [section, facts, gdpFacts]);
+  return useHashState(data, parseMoneyBanksState, serializeMoneyBanksState);
 }
 
 export type MoneyBanksExplorerProps = {

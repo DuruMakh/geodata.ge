@@ -11,6 +11,7 @@ import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
 import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../../lib/servedRows";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { SeriesAside } from "../explorer-shell/series-aside";
+import { buildTreeRows } from "../main-explorer/series-panel";
 
 type DebtSeriesPanelProps = {
   items: GovernmentDebtExplorerModel["items"];
@@ -57,31 +58,14 @@ export function DebtSeriesPanel({
     if (!current || fact.year > current.year) summaryBySeries.set(fact.seriesId, fact);
   }
 
-  const visibleRows: Array<{
-    item: GovernmentDebtExplorerModel["items"][number];
-    isChild: boolean;
-    hasChildren: boolean;
-    expanded: boolean;
-    expansionLocked: boolean;
-  }> = [];
-
-  for (const parent of items.filter((item) => item.parentItemId === null)) {
-    const children = items.filter((item) => item.parentItemId === parent.id);
-    const parentMatches = normalizedQuery === "" || matches(parent, normalizedQuery);
-    const matchedChildren = normalizedQuery === ""
-      ? children
-      : children.filter((child) => matches(child, normalizedQuery));
-    if (!parentMatches && matchedChildren.length === 0) continue;
-
-    const forcedOpen = normalizedQuery !== "" && !parentMatches && matchedChildren.length > 0;
-    const expanded = forcedOpen || expandedIds.includes(parent.id);
-    visibleRows.push({ item: parent, isChild: false, hasChildren: children.length > 0, expanded, expansionLocked: forcedOpen });
-    if (expanded) {
-      for (const child of forcedOpen ? matchedChildren : children) {
-        visibleRows.push({ item: child, isChild: true, hasChildren: false, expanded: false, expansionLocked: false });
-      }
-    }
-  }
+  const visibleRows = buildTreeRows(
+    items.filter((item) => item.parentItemId === null),
+    (parent) => items.filter((item) => item.parentItemId === parent.id),
+    matches,
+    (item) => item.id,
+    normalizedQuery,
+    expandedIds,
+  ).map(({ item, isChild, hasChildren, expanded, locked }) => ({ item, isChild, hasChildren, expanded, expansionLocked: locked }));
 
   const hasSelection = selectedIds.length > 0;
   // Families never combine, so the bulk control's "all" (DESIGN.md §7.7) is the

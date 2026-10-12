@@ -11,7 +11,7 @@ import { displayedValue } from "../../lib/explorer/inflationGrid";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { HeroKpi, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
 import { SectionTitle } from "../ui/editorial";
 
 // ძირითადი ინდიკატორები on a city page (spec 2026-09-30 §5): the city's total
@@ -49,7 +49,7 @@ export function InflationCityCategoryIndicators({ index, cityId }: { index: City
   return (
     <section data-testid="inflation-city-category-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <SectionTitle>{message(messages, "main.indicators")}</SectionTitle>
-      <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div data-testid="period-kpi-cards" className={KPI_GRID_CLASS}>
         {latest.total ? (
           <HeroKpi label={`${t("categoryTab.yoy")} · ${periodLabel(messages, latest.period, "long")}`} value={pct(latest.total.value)}>
             <p data-testid="inflation-city-category-hero" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">

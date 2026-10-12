@@ -47,7 +47,7 @@ exports[`'economy' shell > keeps its wrapper, heading, workspace, aside and meas
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main class="px-5 pb-16 min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+    "<main class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [],
@@ -95,7 +95,7 @@ exports[`'inflation' shell > keeps its wrapper, heading, workspace, aside and me
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main class="px-5 pb-16 min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+    "<main class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [],
@@ -151,7 +151,7 @@ exports[`'region' shell > keeps its wrapper, heading, workspace, aside and measu
   ],
   "pill": [],
   "workspace": [
-    "<div class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
+    "<div data-testid="explorer-workspace" class="grid items-start gap-8 @min-[1100px]:grid-cols-[minmax(0,1fr)_292px] @min-[1100px]:gap-10">",
   ],
 }
 `;

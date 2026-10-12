@@ -10,6 +10,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { TabDivider, TextTab } from "../ui/editorial";
+import { toggleId } from "../../lib/explorer/selection";
 
 export function TradePartnersSeriesPanel({ data, state, model, onTabChange, onSelectionChange, measureControls, downloadAction }: { data: ClientTradePartnersData; state: TradePartnersState; model: TradePartnersModel; onTabChange: (tab: TradePartnersTab) => void; onSelectionChange: (ids: string[]) => void; measureControls?: ReactNode; downloadAction: ReactNode }) {
   const services = data.dataset === "services", embedded = services || Boolean(data.measures), totalId = tradePartnersTotalId(data);
@@ -18,7 +19,7 @@ export function TradePartnersSeriesPanel({ data, state, model, onTabChange, onSe
   const t = (key: string) => message(messages, `trade.partners.${key}`);
   const label = (entity: (typeof data.entities)[number]) => publicLabel(locale, entity.id, entity.labelKa, englishLabels);
   const visible = model.activeEntities.filter(entity => matchesLabelQuery(query, services ? [entity.labelKa, publicLabel("en", entity.id, entity.labelKa, englishLabels)] : [label(entity), entity.sourceCode ?? ""]));
-  const toggle = (id: string) => onSelectionChange(state.selectedIds.includes(id) ? state.selectedIds.filter(selected => selected !== id) : [...state.selectedIds, id]);
+  const toggle = (id: string) => onSelectionChange(toggleId(state.selectedIds, id));
   const row = (id: string, text: string) => <SeriesSelectorRow key={id} id={id} label={text} color={tradePartnerColor(id)} value={formatInUnit(model.valuesByEntity[id][model.range.end], model.unit)} selected={model.selectedIds.includes(id)} level={id === totalId ? "total" : "item"} wrapLabel onToggle={() => toggle(id)} />;
   return <>
     <p className="mb-3 text-[11px] text-[var(--muted)]">{model.range.end} · {model.unit.label}</p>

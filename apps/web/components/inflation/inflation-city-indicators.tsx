@@ -10,7 +10,7 @@ import { displayedValue } from "../../lib/explorer/inflationGrid";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { HeroKpi, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, SideKpiList, type SideKpi } from "../main-explorer/kpi-blocks";
 import { SectionTitle } from "../ui/editorial";
 
 // ძირითადი ინდიკატორები for the cities page (spec §6): the latest published month,
@@ -58,7 +58,7 @@ export function InflationCityIndicators({ index }: { index: CityIndex }) {
   return (
     <section data-testid="inflation-city-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
       <SectionTitle>{message(messages, "main.indicators")}</SectionTitle>
-      <div data-testid="period-kpi-cards" className="mt-[26px] grid @min-[1100px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div data-testid="period-kpi-cards" className={KPI_GRID_CLASS}>
         <HeroKpi label={`${t("cityHighest")} · ${periodLabel(messages, latest.period, "long")}`} value={pct(highest.value)}>
           <p data-testid="inflation-city-hero" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
             {t("cityHeroDetail", {

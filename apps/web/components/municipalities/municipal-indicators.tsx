@@ -5,32 +5,11 @@ import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalK
 import { formatAmount, formatAmountParts, formatShare } from "../../lib/explorer/format";
 import type { Locale } from "../../lib/i18n/types";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { Sparkline } from "../ui/sparkline";
-import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
+import { SectionTitle, ShareBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
-import { HERO_KPI_VALUE_CLASS, KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, MOVER_LABEL_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, MoverRow, PeriodComparisonTable, SideKpiList } from "../main-explorer/kpi-blocks";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
-
-function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) {
-  const growth = mover.growth;
-  const width = growth === null || maxAbs === 0 ? 0 : Math.max(4, (Math.abs(growth) / maxAbs) * 100);
-
-  return (
-    <div title={mover.label} className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5">
-      <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-        {String(mover.rank).padStart(2, "0")}
-      </span>
-      <span className={`text-[0.78125rem] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>{mover.label}</span>
-      <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
-        <span className="block h-full" style={{ width: `${width.toFixed(0)}%`, backgroundColor: growthColor(growth) }} />
-      </span>
-      <span className="text-right font-[family-name:var(--font-numeric)] text-xs" style={{ color: growthColor(growth) }}>
-        {formatShare(growth, true)}
-      </span>
-    </div>
-  );
-}
 
 /**
  * An amount whose unit may drop under its number: below 768px the comparison table
@@ -99,60 +78,28 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
               </p>
             </div>
           ) : (
-          <div data-testid="entity-kpi" className="min-w-0 @min-[1100px]:pr-11">
-            <Overline>{message(messages, "municipal.periodChange")}</Overline>
-            <p
-              className={HERO_KPI_VALUE_CLASS}
-              style={{ color: headline.change !== null && headline.change < 0 ? NEGATIVE : "var(--ink)" }}
-            >
-              {formatShare(headline.change, true)}
-            </p>
-            <div className="mt-7 max-w-[480px]">
-              <div data-testid="municipal-change-gauge" className="flex h-[3px] bg-[var(--hairline-soft)]">
-                <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${(gaugeBase * 100).toFixed(1)}%` }} />
-                <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - gaugeBase) * 100).toFixed(1)}%` }} />
-              </div>
-              <div className="mt-2 flex justify-between gap-4">
-                <p data-testid="municipal-change-start" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-                  {startYear} · {formatAmount(headline.start, locale)}
-                </p>
-                <p data-testid="municipal-change-end" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-                  {endYear} · {formatAmount(headline.end, locale)}
-                </p>
-              </div>
-              {showSentence ? (
-                <p data-testid="municipal-change-sentence" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
-                  <Message messages={messages} id={grew ? "municipal.changeIncreased" : "municipal.changeDecreased"} values={{
-                    start: startYear, end: endYear,
-                    amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari(`${deltaParts.num} ${deltaParts.unit}`.trim())}</span>,
-                    annual: headline.cagr !== null ? <Message messages={messages} id={headline.cagr >= 0 ? "municipal.annualGrowth" : "municipal.annualChange"} values={{ rate: <span className="font-[family-name:var(--font-numeric)] text-xs">{formatShare(headline.cagr, true)}</span> }} /> : ".",
-                  }} />
-                </p>
-              ) : null}
+          <HeroKpi label={message(messages, "municipal.periodChange")} value={formatShare(headline.change, true)} valueColor={headline.change !== null && headline.change < 0 ? NEGATIVE : "var(--ink)"} testId="entity-kpi">
+            <ShareBar share={gaugeBase} restColor="var(--accent)" testId="municipal-change-gauge" />
+            <div className="mt-2 flex justify-between gap-4">
+              <p data-testid="municipal-change-start" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
+                {startYear} · {formatAmount(headline.start, locale)}
+              </p>
+              <p data-testid="municipal-change-end" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
+                {endYear} · {formatAmount(headline.end, locale)}
+              </p>
             </div>
-          </div>
+            {showSentence ? (
+              <p data-testid="municipal-change-sentence" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
+                <Message messages={messages} id={grew ? "municipal.changeIncreased" : "municipal.changeDecreased"} values={{
+                  start: startYear, end: endYear,
+                  amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari(`${deltaParts.num} ${deltaParts.unit}`.trim())}</span>,
+                  annual: headline.cagr !== null ? <Message messages={messages} id={headline.cagr >= 0 ? "municipal.annualGrowth" : "municipal.annualChange"} values={{ rate: <span className="font-[family-name:var(--font-numeric)] text-xs">{formatShare(headline.cagr, true)}</span> }} /> : ".",
+                }} />
+              </p>
+            ) : null}
+          </HeroKpi>
           )}
-          <div className={SIDE_KPI_LIST_CLASS}>
-            {sideKpis.map((kpi, index) => (
-              <div key={kpi.label} data-testid="entity-kpi" className={sideKpiRowClass(index, sideKpis.length)}>
-                <div data-testid="side-kpi">
-                  <Overline>{kpi.label}</Overline>
-                  <div className="mt-[7px] flex items-baseline justify-between gap-4">
-                    <span className={SIDE_KPI_VALUE_CLASS}>
-                      {kpi.value}
-                      {kpi.unit ? (
-                        <span className={KPI_UNIT_CLASS}>
-                          {withLari(kpi.unit)}
-                        </span>
-                      ) : null}
-                    </span>
-                    <span className={`min-w-0 text-right text-xs text-[var(--muted)] ${KPI_DETAIL_CLIP_CLASS}`} title={kpi.detail}>{kpi.detail}</span>
-                  </div>
-                  <Sparkline values={sideSeries[index]!} color="var(--ink)" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <SideKpiList rowTestId="entity-kpi" kpis={sideKpis.map((kpi, index) => ({ label: kpi.label, value: kpi.value, unit: kpi.unit ?? "", color: "var(--ink)", detail: kpi.detail, spark: { values: sideSeries[index]!, color: "var(--ink)" } }))} />
         </div>
 
       {singleYear ? null : (
@@ -161,7 +108,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.fastestGrowth")}</h3>
           <div className="flex flex-col">
             {movers.up.map((mover) => (
-              <MoverRow key={mover.label} mover={mover} maxAbs={maxAbs} />
+              <MoverRow key={mover.label} rank={mover.rank} label={mover.label} change={mover.growth} maxAbs={maxAbs} />
             ))}
           </div>
         </div>
@@ -169,7 +116,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.slowestGrowth")}</h3>
           <div className="flex flex-col">
             {movers.down.map((mover) => (
-              <MoverRow key={mover.label} mover={mover} maxAbs={maxAbs} />
+              <MoverRow key={mover.label} rank={mover.rank} label={mover.label} change={mover.growth} maxAbs={maxAbs} />
             ))}
           </div>
         </div>
@@ -177,64 +124,22 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
       )}
 
       {singleYear ? null : (
-      <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <h3 className="mb-1 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.periodComparison")}</h3>
-        <div className="overflow-x-auto">
-          <table data-testid="comparison-table" className="w-full min-w-[560px] table-fixed border-collapse @max-[768px]:min-w-0">
-            <caption className="sr-only">{message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}</caption>
-            <colgroup>
-              {/* Phones: the ცვლილება header needs ~76px on every platform, so the name column narrows
-                  (12px names, tighter swatch gap) and leaves the two amounts (6,134.2) their room. */}
-              <col className="w-[44%] @max-[768px]:w-[40%] @max-[340px]:w-[33%]" />
-              <col />
-              <col className="@max-[768px]:w-[76px] @max-[340px]:w-[80px]" />
-              <col />
-            </colgroup>
-            <thead>
-              <tr>
-                {[message(messages, "municipal.function"), String(startYear), message(messages, "municipal.change"), String(endYear)].map((label, index) => (
-                  <th
-                    key={`comparison-header-${index}`}
-                    className={`border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right @max-[768px]:pl-1" : "px-3 pt-1.5 pb-2 text-right @max-[768px]:px-1"} text-[0.6875rem] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em] @max-[768px]:tracking-normal"} text-[var(--muted)]`}
-                  >
-                    {label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {comparison.map((row) => (
-                <tr
-                  key={row.label}
-                  className={`border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)] ${row.isTotal ? "bg-[var(--tint)]" : ""}`}
-                >
-                  <td className="py-2.5 pr-3 @max-[768px]:pr-2" title={row.label}>
-                    <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
-                      <SwatchBar color={row.color} className="mt-[7px]" />
-                      <span className="min-w-0 break-words text-[0.78125rem] leading-[1.4] text-[var(--ink)] @max-[768px]:text-[0.75rem]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                        {row.label}
-                      </span>
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                    <AmountText value={row.fromGel} locale={locale} />
-                  </td>
-                  <td
-                    data-testid="comparison-change-cell"
-                    className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] @max-[768px]:px-1"
-                    style={{ color: growthColor(row.changeShare) }}
-                  >
-                    <AmountText value={row.changeGel} signed locale={locale} />
-                  </td>
-                  <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                    <AmountText value={row.toGel} locale={locale} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        <PeriodComparisonTable
+          variant="municipal"
+          heading={message(messages, "municipal.periodComparison")}
+          caption={message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}
+          firstColumnLabel={message(messages, "municipal.function")}
+          changeLabel={message(messages, "municipal.change")}
+          startYear={startYear}
+          endYear={endYear}
+          rows={comparison.map((row) => ({
+            key: row.label, label: row.label, title: row.label, color: row.color, emphasis: row.isTotal,
+            start: <AmountText value={row.fromGel} locale={locale} />,
+            change: <AmountText value={row.changeGel} signed locale={locale} />,
+            changeColor: growthColor(row.changeShare),
+            end: <AmountText value={row.toGel} locale={locale} />,
+          }))}
+        />
       )}
     </section>
   );

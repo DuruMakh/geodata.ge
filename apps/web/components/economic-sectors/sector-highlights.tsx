@@ -9,11 +9,9 @@ import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
-import { Overline, SectionTitle, SourceNote } from "../ui/editorial";
-import { withLari } from "../ui/lari";
-import { Sparkline } from "../ui/sparkline";
+import { SectionTitle, ShareBar, SourceNote } from "../ui/editorial";
 import { sectorColor } from "../../lib/explorer/economicSectors";
-import { KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 
 export function SectorHighlights({ facts, registry, year }: {
   facts: ClientSectorObservation[]; registry: SectorDefinition[]; year: number;
@@ -51,36 +49,22 @@ export function SectorHighlights({ facts, registry, year }: {
         <p className="text-[0.78125rem] text-[var(--muted)]"><Message messages={messages} id="sectors.rowYear" values={{ year: <span className="font-[family-name:var(--font-numeric)]">{year}</span> }} /></p>
       </div>
       <div data-testid="sector-kpi-layout" className={KPI_GRID_CLASS}>
-        <div data-testid="sector-highlight-largest" className="min-w-0 @min-[1100px]:pr-11">
-          <Overline>{t("largest")}</Overline>
-          <p data-testid="sector-hero-value" className="mt-3.5 font-[family-name:var(--font-display)] text-[44px] font-semibold leading-none tracking-[-0.02em] min-[768px]:text-[62px]">
-            {amount.num}
-            {amount.unit ? <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-base font-medium tracking-normal text-[var(--body)]">{withLari(amount.unit)}</span> : null}
-          </p>
-          <div className="mt-7 max-w-[480px]">
-            {model.largestShare != null ? (
-              <>
-                <div aria-hidden="true" className="flex h-[3px] bg-[var(--hairline-soft)]">
-                  <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${Math.max(0, Math.min(100, model.largestShare))}%` }} />
-                </div>
-                <p className="mt-2 font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">{percentage(model.largestShare)} {t("ofGdp")}</p>
-              </>
-            ) : null}
-            <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
-          </div>
-        </div>
-        <div data-testid="sector-side-kpis" className={SIDE_KPI_LIST_CLASS}>
-        {cards.map((card, index) => (
-          <div key={card.id} data-testid={`sector-highlight-${card.id}`} className={sideKpiRowClass(index, cards.length)}>
-            <Overline>{card.label}</Overline>
-            <div className="mt-[7px] flex items-baseline justify-between gap-4">
-              <p className={SIDE_KPI_VALUE_CLASS} style={{ color: card.color }}>{card.value}</p>
-              <p title={card.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${card.available ? KPI_DETAIL_CLIP_CLASS : "leading-relaxed"}`}>{card.detail}</p>
-            </div>
-            <Sparkline values={card.trend} color={card.trendColor} />
-          </div>
-        ))}
-        </div>
+        <HeroKpi label={t("largest")} value={amount.num} unit={amount.unit || undefined} testId="sector-highlight-largest" valueTestId="sector-hero-value">
+          {model.largestShare != null ? (
+            <>
+              <ShareBar share={model.largestShare / 100} />
+              <p className="mt-2 font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">{percentage(model.largestShare)} {t("ofGdp")}</p>
+            </>
+          ) : null}
+          <p className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">{model.largest ? name(model.largest.seriesId) : t("unavailable")}</p>
+        </HeroKpi>
+        <SideKpiList
+          testId="sector-side-kpis"
+          kpis={cards.map((card) => ({
+            label: card.label, value: card.value, unit: "", color: card.color, detail: card.detail, wrapDetail: !card.available,
+            spark: { values: card.trend, color: card.trendColor }, testId: `sector-highlight-${card.id}`,
+          }))}
+        />
       </div>
       <div className="mt-5">
         <SourceNote>{t("highlightsScope")}{model.preliminary ? ` · ${t("preliminary")}` : ""}</SourceNote>

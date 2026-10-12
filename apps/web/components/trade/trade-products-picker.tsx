@@ -12,6 +12,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { TabDivider, TextTab } from "../ui/editorial";
+import { toggleId } from "../../lib/explorer/selection";
 
 export function TradeProductsPicker({ data, model, selectedIds, initialView, returnFocusTo, onApply, onClose }: { data: ClientTradeProductsData; model: TradeProductsModel; selectedIds: readonly string[]; initialView: "categories" | "selected"; returnFocusTo: HTMLElement | null; onApply: (selectedIds: string[]) => void; onClose: () => void }) {
   const presentation = useI18n(), t = (key: string) => message(presentation.messages, `trade.products.${key}`);
@@ -48,7 +49,7 @@ export function TradeProductsPicker({ data, model, selectedIds, initialView, ret
       window.scrollTo(x, y); returnFocusTo?.focus({ preventScroll: true });
     };
   }, [returnFocusTo]);
-  const toggle = (id: string) => setDraft(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id]);
+  const toggle = (id: string) => setDraft(current => toggleId(current, id));
   const changeView = (next: TradeProductsBrowseView) => { setView(next); setCategoryId(null); setQuery(""); setPage(0); };
   const changeCategory = (next: TradeProductCategoryId | null) => { setCategoryId(next); setQuery(""); setPage(0); };
   const row = (id: string, label: string) => <SeriesSelectorRow id={id} label={label} color={tradeProductColor(id)} value={formatInUnit(model.valuesByEntity[id][model.range.end], model.unit)} selected={selected.has(id)} selectionRole="checkbox" wrapLabel onToggle={() => toggle(id)} />;
