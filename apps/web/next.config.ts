@@ -20,11 +20,16 @@ const nextConfig: NextConfig = {
     "*": ["./public/downloads/**"],
   },
   async redirects() {
-    return MUNICIPALITY_ROUTES.flatMap(({ code, slug }) => ["", "/en"].map((prefix) => ({
-      source: `${prefix}/explorer/municipalities/${code}`,
-      destination: `${prefix}/explorer/municipalities/${slug}`,
-      permanent: true,
-    })));
+    return [
+      ...MUNICIPALITY_ROUTES.flatMap(({ code, slug }) => ["", "/en"].map((prefix) => ({
+        source: `${prefix}/explorer/municipalities/${code}`,
+        destination: `${prefix}/explorer/municipalities/${slug}`,
+        permanent: true,
+      }))),
+      // The Poverty and inequality hub became Living standards; the part after # carries over in the browser.
+      ...[["/explorer/poverty", "/explorer/living-standards"], ["/explorer/poverty/rates", "/explorer/living-standards/poverty"], ["/explorer/poverty/inequality", "/explorer/living-standards/inequality"]]
+        .flatMap(([source, destination]) => ["", "/en"].map((prefix) => ({ source: `${prefix}${source}`, destination: `${prefix}${destination}`, permanent: true }))),
+    ];
   },
   async headers() {
     return [

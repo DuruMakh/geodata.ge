@@ -51,6 +51,7 @@ type EditorialLineChartProps = {
   shareLabel: string;
   preliminaryLabel?: string;
   showAxisUnit?: boolean;
+  /** `seriesId` lets a chart whose series differ in precision format each readout row on its own. */
   formatTooltipValue?: (value: number, seriesId: string) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
@@ -188,7 +189,7 @@ export function EditorialLineChart({
   // The phone drawing prints the amount unit once, above the axis.
   const unitCaption = share || unit.label.trim() === "" ? null : unit.label;
 
-  const formatValue = (value: number | null, seriesId = "") =>
+  const formatValue = (value: number | null, seriesId: string) =>
     formatTooltipValue && value !== null ? formatTooltipValue(value, seriesId) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
   const axisPeriod = (index: number) => (formatPeriod ? formatPeriod(years[index]!, "axis") : String(years[index]));
 

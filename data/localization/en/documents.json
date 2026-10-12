@@ -4213,5 +4213,251 @@
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
     "documentLanguage": "en"
+  },
+  "nbg_money_aggregates": {
+    "title": { "text": "Money aggregates and monetary ratios (M2.1)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_loans_l3_5": {
+    "title": { "text": "Loans granted by banks to the economy (L3.5)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposits_d3_17": {
+    "title": { "text": "Deposits by type (D3.17)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposits_individuals_d3_23": {
+    "title": { "text": "Deposits of individuals (D3.23)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposits_legal_d3_27": {
+    "title": { "text": "Deposits of legal entities (D3.27)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_policy_rate": {
+    "title": { "text": "Monetary policy rate (MPR)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_loan_rates_lwir": {
+    "title": { "text": "Annual weighted average interest rates on loans (LWIR)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposit_rates_dwir": {
+    "title": { "text": "Annual weighted average interest rates on deposits (DWIR)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_fsi_archive": {
+    "title": { "text": "Financial soundness indicators (FSI) - archive", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_fsi": {
+    "title": { "text": "Financial soundness indicators (FSI)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_monetary_statistics": {
+    "title": { "text": "Methodology of monetary statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_loans": {
+    "title": { "text": "Methodology of loan statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_deposits": {
+    "title": { "text": "Methodology of deposit statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_interest_rates": {
+    "title": { "text": "Methodology of interest rate statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_15": {
+    "title": { "text": "National Bank file list - category 15 (monetary statistics)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_16": {
+    "title": { "text": "National Bank file list - category 16 (deposits)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_17": {
+    "title": { "text": "National Bank file list - category 17 (loans)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_19": {
+    "title": { "text": "National Bank file list - category 19 (financial markets)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_27": {
+    "title": { "text": "National Bank file list - category 27 (archive)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_statistics_page": {
+    "title": { "text": "National Bank statistics page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_national": {
+    "title": { "text": "Distribution of average monthly incomes of the total population", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_settlement": {
+    "title": { "text": "Distribution of average monthly incomes of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_region": {
+    "title": { "text": "Distribution of average monthly incomes of the total population by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_national": {
+    "title": { "text": "Distribution of average monthly incomes per household", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_settlement": {
+    "title": { "text": "Distribution of average monthly incomes per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_region": {
+    "title": { "text": "Distribution of average monthly incomes per household by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_national": {
+    "title": { "text": "Distribution of average monthly incomes per capita", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_settlement": {
+    "title": { "text": "Distribution of average monthly incomes per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_region": {
+    "title": { "text": "Distribution of average monthly incomes per capita by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_national": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_region": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_national": {
+    "title": { "text": "Distribution of average monthly expenditures per household", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_region": {
+    "title": { "text": "Distribution of average monthly expenditures per household by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_national": {
+    "title": { "text": "Distribution of average monthly expenditures per capita", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_region": {
+    "title": { "text": "Distribution of average monthly expenditures per capita by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_page": {
+    "title": { "text": "Households incomes source page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_page": {
+    "title": { "text": "Households expenditures source page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_hies_metadata_2026": {
+    "title": { "text": "Metadata: Households Incomes and Expenditures Survey (25 May 2026)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
   }
 }

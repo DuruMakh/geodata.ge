@@ -1,0 +1,731 @@
+﻿year,indicator_id,value,published_value,unit,basis,value_status,source_id,source_sheet,source_cell,last_reviewed_at
+1995,money.m3,179.441,179.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D6,2026-10-11
+1996,money.m3,255.75399999999999,255.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D18,2026-10-11
+1997,money.m3,370.49700000000001,370.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D30,2026-10-11
+1998,money.m3,364.96300000000002,365.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D42,2026-10-11
+1999,money.m3,435.66800000000001,435.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D54,2026-10-11
+2000,money.m3,608.11900000000003,608.1,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D66,2026-10-11
+2001,money.m3,749.33100000000002,749.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D78,2026-10-11
+2002,money.m3,890.30799999999999,890.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D90,2026-10-11
+2003,money.m3,1095.6279999999999,1095.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D102,2026-10-11
+2004,money.m3,1534.2080000000001,1534.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D114,2026-10-11
+2005,money.m3,1961.5050000000001,1961.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D126,2026-10-11
+2006,money.m3,2799.78,2799.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D138,2026-10-11
+2007,money.m3,4098.857,4098.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D150,2026-10-11
+2008,money.m3,4421.6980000000003,4421.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D162,2026-10-11
+2009,money.m3,4763.607,4763.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D174,2026-10-11
+2010,money.m3,6199.009,6199.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D186,2026-10-11
+2011,money.m3,7097.777,7097.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D198,2026-10-11
+2012,money.m3,7903.7389999999996,7903.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D210,2026-10-11
+2013,money.m3,9836.6190000000006,9836.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D222,2026-10-11
+2014,money.m3,11189.835999999999,11189.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D234,2026-10-11
+2015,money.m3,13120.378000000001,13120.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D246,2026-10-11
+2016,money.m3,15886.611999999999,15886.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D258,2026-10-11
+2017,money.m3,18204.386999999999,18204.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D270,2026-10-11
+2018,money.m3,20738.62,20738.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D282,2026-10-11
+2019,money.m3,24113.481,24113.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D294,2026-10-11
+2020,money.m3,30379.59,30379.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D306,2026-10-11
+2021,money.m3,33846.235000000001,33846.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D318,2026-10-11
+2022,money.m3,37581.906999999999,37581.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D330,2026-10-11
+2023,money.m3,43369.305999999997,43369.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D342,2026-10-11
+2024,money.m3,49467.603000000003,49467.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D354,2026-10-11
+2025,money.m3,57680.224000000002,57680.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,D366,2026-10-11
+1995,money.m2,160.14500000000001,160.1,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E6,2026-10-11
+1996,money.m2,220.751,220.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E18,2026-10-11
+1997,money.m2,294.97399999999999,295.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E30,2026-10-11
+1998,money.m2,259.86500000000001,259.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E42,2026-10-11
+1999,money.m2,282.71300000000002,282.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E54,2026-10-11
+2000,money.m2,380.27100000000002,380.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E66,2026-10-11
+2001,money.m2,405.37700000000001,405.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E78,2026-10-11
+2002,money.m2,465.096,465.1,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E90,2026-10-11
+2003,money.m2,530.27700000000004,530.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E102,2026-10-11
+2004,money.m2,856.52099999999996,856.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E114,2026-10-11
+2005,money.m2,1104.1300000000001,1104.1,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E126,2026-10-11
+2006,money.m2,1473.1690000000001,1473.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E138,2026-10-11
+2007,money.m2,2262.9630000000002,2263.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E150,2026-10-11
+2008,money.m2,1999.22,1999.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E162,2026-10-11
+2009,money.m2,2330.4859999999999,2330.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E174,2026-10-11
+2010,money.m2,2960.2539999999999,2960.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E186,2026-10-11
+2011,money.m2,3783.18,3783.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E198,2026-10-11
+2012,money.m2,4069.1619999999998,4069.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E210,2026-10-11
+2013,money.m2,5418.4030000000002,5418.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E222,2026-10-11
+2014,money.m2,5911.31,5911.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E234,2026-10-11
+2015,money.m2,5685.8140000000003,5685.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E246,2026-10-11
+2016,money.m2,6526.6412469699999,6526.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E258,2026-10-11
+2017,money.m2,8350.3301851999986,8350.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E270,2026-10-11
+2018,money.m2,9675.968996268999,9676.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E282,2026-10-11
+2019,money.m2,11228.810604422997,11228.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E294,2026-10-11
+2020,money.m2,13659.690951258997,13659.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E306,2026-10-11
+2021,money.m2,16107.475543766997,16107.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E318,2026-10-11
+2022,money.m2,19766.15796878601,19766.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E330,2026-10-11
+2023,money.m2,25227.270866336003,25227.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E342,2026-10-11
+2024,money.m2,27786.703522320993,27786.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E354,2026-10-11
+2025,money.m2,34902.002194028406,34902.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,E366,2026-10-11
+1995,money.m1,154.53399999999999,154.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F6,2026-10-11
+1996,money.m1,212.44800000000001,212.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F18,2026-10-11
+1997,money.m1,277.863,277.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F30,2026-10-11
+1998,money.m1,250.29599999999999,250.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F42,2026-10-11
+1999,money.m1,274.87900000000002,274.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F54,2026-10-11
+2000,money.m1,369.64400000000001,369.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F66,2026-10-11
+2001,money.m1,395.63200000000001,395.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F78,2026-10-11
+2002,money.m1,454.84399999999999,454.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F90,2026-10-11
+2003,money.m1,519.38,519.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F102,2026-10-11
+2004,money.m1,827.75,827.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F114,2026-10-11
+2005,money.m1,1029.383,1029.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F126,2026-10-11
+2006,money.m1,1337.7370000000001,1337.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F138,2026-10-11
+2007,money.m1,1947.5540000000001,1947.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F150,2026-10-11
+2008,money.m1,1752.4590000000001,1752.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F162,2026-10-11
+2009,money.m1,2019.366,2019.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F174,2026-10-11
+2010,money.m1,2509.9989999999998,2510.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F186,2026-10-11
+2011,money.m1,3137.9070000000002,3137.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F198,2026-10-11
+2012,money.m1,3336.9479999999999,3336.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F210,2026-10-11
+2013,money.m1,4307.5020000000004,4307.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F222,2026-10-11
+2014,money.m1,4460.8370000000004,4460.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F234,2026-10-11
+2015,money.m1,4758.7060000000001,4758.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F246,2026-10-11
+2016,money.m1,5555.4680175899994,5555.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F258,2026-10-11
+2017,money.m1,6936.6231764699987,6936.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F270,2026-10-11
+2018,money.m1,7842.9087547649988,7842.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F282,2026-10-11
+2019,money.m1,8882.9452578699984,8882.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F294,2026-10-11
+2020,money.m1,10037.200279498998,10037.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F306,2026-10-11
+2021,money.m1,11328.750334196999,11328.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F318,2026-10-11
+2022,money.m1,13367.348119576005,13367.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F330,2026-10-11
+2023,money.m1,17632.837590707004,17632.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F342,2026-10-11
+2024,money.m1,17231.315094057998,17231.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F354,2026-10-11
+2025,money.m1,20760.885344826198,20760.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,F366,2026-10-11
+1995,money.m0,124.779,124.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G6,2026-10-11
+1996,money.m0,176.733,176.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G18,2026-10-11
+1997,money.m0,239.691,239.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G30,2026-10-11
+1998,money.m0,212.185,212.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G42,2026-10-11
+1999,money.m0,244.03800000000001,244.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G54,2026-10-11
+2000,money.m0,315.20499999999998,315.2,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G66,2026-10-11
+2001,money.m0,348.85,348.9,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G78,2026-10-11
+2002,money.m0,390.791,390.8,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G90,2026-10-11
+2003,money.m0,441.536,441.5,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G102,2026-10-11
+2004,money.m0,615.99300000000005,616.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G114,2026-10-11
+2005,money.m0,736.28399999999999,736.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G126,2026-10-11
+2006,money.m0,827.35699999999997,827.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G138,2026-10-11
+2007,money.m0,1152.07,1152.1,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G150,2026-10-11
+2008,money.m0,1082.5540000000001,1082.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G162,2026-10-11
+2009,money.m0,1229.4359999999999,1229.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G174,2026-10-11
+2010,money.m0,1372.989,1373.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G186,2026-10-11
+2011,money.m0,1438.992,1439.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G198,2026-10-11
+2012,money.m0,1550.028,1550.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G210,2026-10-11
+2013,money.m0,1899.625,1899.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G222,2026-10-11
+2014,money.m0,1942.5820000000001,1942.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G234,2026-10-11
+2015,money.m0,1980.41,1980.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G246,2026-10-11
+2016,money.m0,2371.732,2371.7,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G258,2026-10-11
+2017,money.m0,2690.002,2690.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G270,2026-10-11
+2018,money.m0,2831.5610000000001,2831.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G282,2026-10-11
+2019,money.m0,3244.2840000000001,3244.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G294,2026-10-11
+2020,money.m0,3732.5889999999999,3732.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G306,2026-10-11
+2021,money.m0,3542.3069999999998,3542.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G318,2026-10-11
+2022,money.m0,3888.01,3888.0,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G330,2026-10-11
+2023,money.m0,4741.3890000000001,4741.4,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G342,2026-10-11
+2024,money.m0,5429.308,5429.3,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G354,2026-10-11
+2025,money.m0,6091.58,6091.6,gel_million,actual,official,nbg_money_aggregates,Monetary Ratios-eng,G366,2026-10-11
+1996,money.m3_to_gdp,6.6112422879990662,6.6,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V18,2026-10-11
+1997,money.m3_to_gdp,8.1339847549333673,8.1,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V30,2026-10-11
+1998,money.m3_to_gdp,7.2671335933644921,7.3,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V42,2026-10-11
+1999,money.m3_to_gdp,7.6855015512850349,7.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V54,2026-10-11
+2000,money.m3_to_gdp,10.063096311153849,10.1,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V66,2026-10-11
+2001,money.m3_to_gdp,11.227615180611116,11.2,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V78,2026-10-11
+2002,money.m3_to_gdp,11.940787904608586,11.9,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V90,2026-10-11
+2003,money.m3_to_gdp,12.793272013398806,12.8,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V102,2026-10-11
+2004,money.m3_to_gdp,15.616467238674382,15.6,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V114,2026-10-11
+2005,money.m3_to_gdp,16.879049710030475,16.9,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V126,2026-10-11
+2006,money.m3_to_gdp,20.303098502585616,20.3,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V138,2026-10-11
+2007,money.m3_to_gdp,24.119751486628736,24.1,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V150,2026-10-11
+2008,money.m3_to_gdp,23.180774330264391,23.2,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V162,2026-10-11
+2009,money.m3_to_gdp,26.485149212529986,26.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V174,2026-10-11
+2010,money.m3_to_gdp,28.407713225968479,28.4,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V186,2026-10-11
+2011,money.m3_to_gdp,27.857663327643948,27.9,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V198,2026-10-11
+2012,money.m3_to_gdp,29.028698495066337,29.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V210,2026-10-11
+2013,money.m3_to_gdp,34.402132688969978,34.4,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V222,2026-10-11
+2014,money.m3_to_gdp,35.952325212149987,36.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V234,2026-10-11
+2015,money.m3_to_gdp,38.663244364640448,38.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V246,2026-10-11
+2016,money.m3_to_gdp,44.331409702616249,44.3,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V258,2026-10-11
+2017,money.m3_to_gdp,44.660559594936089,44.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V270,2026-10-11
+2018,money.m3_to_gdp,46.499833197219928,46.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V282,2026-10-11
+2019,money.m3_to_gdp,48.958744582261502,49.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V294,2026-10-11
+2020,money.m3_to_gdp,61.663492143332753,61.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V306,2026-10-11
+2021,money.m3_to_gdp,56.407267031815415,56.4,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V318,2026-10-11
+2022,money.m3_to_gdp,52.375901590846944,52.4,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V330,2026-10-11
+2023,money.m3_to_gdp,54.045391663137018,54.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V342,2026-10-11
+2024,money.m3_to_gdp,54.312636348726983,54.3,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V354,2026-10-11
+2025,money.m3_to_gdp,55.962184922867955,56.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,V366,2026-10-11
+1996,money.m2_to_gdp,5.7063973731829005,5.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W18,2026-10-11
+1997,money.m2_to_gdp,6.475925399963927,6.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W30,2026-10-11
+1998,money.m2_to_gdp,5.1744336264625517,5.2,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W42,2026-10-11
+1999,money.m2_to_gdp,4.9872595144829397,5.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W54,2026-10-11
+2000,money.m2_to_gdp,6.2926892160569059,6.3,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W66,2026-10-11
+2001,money.m2_to_gdp,6.0739821219687684,6.1,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W78,2026-10-11
+2002,money.m2_to_gdp,6.2378473665881931,6.2,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W90,2026-10-11
+2003,money.m2_to_gdp,6.1918669091698124,6.2,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W102,2026-10-11
+2004,money.m2_to_gdp,8.7183956853102984,8.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W114,2026-10-11
+2005,money.m2_to_gdp,9.5012113696337828,9.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W126,2026-10-11
+2006,money.m2_to_gdp,10.68294652985138,10.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W138,2026-10-11
+2007,money.m2_to_gdp,13.316419865003004,13.3,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W150,2026-10-11
+2008,money.m2_to_gdp,10.48092112388052,10.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W162,2026-10-11
+2009,money.m2_to_gdp,12.957255565395171,13.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W174,2026-10-11
+2010,money.m2_to_gdp,13.565722937401169,13.6,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W186,2026-10-11
+2011,money.m2_to_gdp,14.84838671067447,14.8,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W198,2026-10-11
+2012,money.m2_to_gdp,14.94513774287182,14.9,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W210,2026-10-11
+2013,money.m2_to_gdp,18.950069112753106,19.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W222,2026-10-11
+2014,money.m2_to_gdp,18.992711800505539,19.0,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W234,2026-10-11
+2015,money.m2_to_gdp,16.75500639776671,16.8,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W246,2026-10-11
+2016,money.m2_to_gdp,18.212518005816552,18.2,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W258,2026-10-11
+2017,money.m2_to_gdp,20.485744390817349,20.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W270,2026-10-11
+2018,money.m2_to_gdp,21.695317448701022,21.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W282,2026-10-11
+2019,money.m2_to_gdp,22.798386941501104,22.8,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W294,2026-10-11
+2020,money.m2_to_gdp,27.725991221517891,27.7,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W306,2026-10-11
+2021,money.m2_to_gdp,26.844305554390356,26.8,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W318,2026-10-11
+2022,money.m2_to_gdp,27.547041309060528,27.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W330,2026-10-11
+2023,money.m2_to_gdp,31.437388796656677,31.4,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W342,2026-10-11
+2024,money.m2_to_gdp,30.508232301809958,30.5,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W354,2026-10-11
+2025,money.m2_to_gdp,33.862425724292621,33.9,percent,actual,official,nbg_money_aggregates,Monetary Ratios-eng,W366,2026-10-11
+2002,loans.total,632.99900000000002,633.0,gel_million,actual,official,nbg_loans_l3_5,Eng,B6,2026-10-11
+2003,loans.total,779.67399999999998,779.7,gel_million,actual,official,nbg_loans_l3_5,Eng,B18,2026-10-11
+2004,loans.total,947.67499999999995,947.7,gel_million,actual,official,nbg_loans_l3_5,Eng,B30,2026-10-11
+2005,loans.total,1736.1020000000001,1736.1,gel_million,actual,official,nbg_loans_l3_5,Eng,B42,2026-10-11
+2006,loans.total,2704.384,2704.4,gel_million,actual,official,nbg_loans_l3_5,Eng,B54,2026-10-11
+2007,loans.total,4632.0479999999998,4632.0,gel_million,actual,official,nbg_loans_l3_5,Eng,B66,2026-10-11
+2008,loans.total,6059.598,6059.6,gel_million,actual,official,nbg_loans_l3_5,Eng,B78,2026-10-11
+2009,loans.total,5253.9049999999997,5253.9,gel_million,actual,official,nbg_loans_l3_5,Eng,B90,2026-10-11
+2010,loans.total,6328.8540000000003,6328.9,gel_million,actual,official,nbg_loans_l3_5,Eng,B102,2026-10-11
+2011,loans.total,7803.1419999999998,7803.1,gel_million,actual,official,nbg_loans_l3_5,Eng,B114,2026-10-11
+2012,loans.total,8808.1730000000007,8808.2,gel_million,actual,official,nbg_loans_l3_5,Eng,B126,2026-10-11
+2013,loans.total,10569.861000000001,10569.9,gel_million,actual,official,nbg_loans_l3_5,Eng,B138,2026-10-11
+2014,loans.total,13080.853999999999,13080.9,gel_million,actual,official,nbg_loans_l3_5,Eng,B150,2026-10-11
+2015,loans.total,16142.112999999999,16142.1,gel_million,actual,official,nbg_loans_l3_5,Eng,B162,2026-10-11
+2016,loans.total,19061.163,19061.2,gel_million,actual,official,nbg_loans_l3_5,Eng,B174,2026-10-11
+2017,loans.total,22438.587,22438.6,gel_million,actual,official,nbg_loans_l3_5,Eng,B186,2026-10-11
+2018,loans.total,26800.495999999999,26800.5,gel_million,actual,official,nbg_loans_l3_5,Eng,B198,2026-10-11
+2019,loans.total,32199.092000000001,32199.1,gel_million,actual,official,nbg_loans_l3_5,Eng,B210,2026-10-11
+2020,loans.total,38799.057000000001,38799.1,gel_million,actual,official,nbg_loans_l3_5,Eng,B222,2026-10-11
+2021,loans.total,43581.097999999998,43581.1,gel_million,actual,official,nbg_loans_l3_5,Eng,B234,2026-10-11
+2022,loans.total,45261.284,45261.3,gel_million,actual,official,nbg_loans_l3_5,Eng,B246,2026-10-11
+2023,loans.total,53336.756000000001,53336.8,gel_million,actual,official,nbg_loans_l3_5,Eng,B258,2026-10-11
+2024,loans.total,62941.159,62941.2,gel_million,actual,official,nbg_loans_l3_5,Eng,B270,2026-10-11
+2025,loans.total,72453.039000000004,72453.0,gel_million,actual,official,nbg_loans_l3_5,Eng,B282,2026-10-11
+2002,loans.gel,102.492,102.5,gel_million,actual,official,nbg_loans_l3_5,Eng,L6,2026-10-11
+2003,loans.gel,100.015,100.0,gel_million,actual,official,nbg_loans_l3_5,Eng,L18,2026-10-11
+2004,loans.gel,135.131,135.1,gel_million,actual,official,nbg_loans_l3_5,Eng,L30,2026-10-11
+2005,loans.gel,406.83600000000001,406.8,gel_million,actual,official,nbg_loans_l3_5,Eng,L42,2026-10-11
+2006,loans.gel,707.43899999999996,707.4,gel_million,actual,official,nbg_loans_l3_5,Eng,L54,2026-10-11
+2007,loans.gel,1455.8040000000001,1455.8,gel_million,actual,official,nbg_loans_l3_5,Eng,L66,2026-10-11
+2008,loans.gel,1657.2840000000001,1657.3,gel_million,actual,official,nbg_loans_l3_5,Eng,L78,2026-10-11
+2009,loans.gel,1217.7470000000001,1217.7,gel_million,actual,official,nbg_loans_l3_5,Eng,L90,2026-10-11
+2010,loans.gel,1645.7750000000001,1645.8,gel_million,actual,official,nbg_loans_l3_5,Eng,L102,2026-10-11
+2011,loans.gel,2426.8490000000002,2426.8,gel_million,actual,official,nbg_loans_l3_5,Eng,L114,2026-10-11
+2012,loans.gel,2855.5659999999998,2855.6,gel_million,actual,official,nbg_loans_l3_5,Eng,L126,2026-10-11
+2013,loans.gel,3969.5590000000002,3969.6,gel_million,actual,official,nbg_loans_l3_5,Eng,L138,2026-10-11
+2014,loans.gel,5126.7389999999996,5126.7,gel_million,actual,official,nbg_loans_l3_5,Eng,L150,2026-10-11
+2015,loans.gel,5717.1589999999997,5717.2,gel_million,actual,official,nbg_loans_l3_5,Eng,L162,2026-10-11
+2016,loans.gel,6601.5709999999999,6601.6,gel_million,actual,official,nbg_loans_l3_5,Eng,L174,2026-10-11
+2017,loans.gel,9652.6039999999994,9652.6,gel_million,actual,official,nbg_loans_l3_5,Eng,L186,2026-10-11
+2018,loans.gel,11530.934999999999,11530.9,gel_million,actual,official,nbg_loans_l3_5,Eng,L198,2026-10-11
+2019,loans.gel,14397.602999999999,14397.6,gel_million,actual,official,nbg_loans_l3_5,Eng,L210,2026-10-11
+2020,loans.gel,17281.749,17281.7,gel_million,actual,official,nbg_loans_l3_5,Eng,L222,2026-10-11
+2021,loans.gel,21469.738000000001,21469.7,gel_million,actual,official,nbg_loans_l3_5,Eng,L234,2026-10-11
+2022,loans.gel,24991.695,24991.7,gel_million,actual,official,nbg_loans_l3_5,Eng,L246,2026-10-11
+2023,loans.gel,29271.092000000001,29271.1,gel_million,actual,official,nbg_loans_l3_5,Eng,L258,2026-10-11
+2024,loans.gel,35708.580999999998,35708.6,gel_million,actual,official,nbg_loans_l3_5,Eng,L270,2026-10-11
+2025,loans.gel,42080.847000000002,42080.8,gel_million,actual,official,nbg_loans_l3_5,Eng,L282,2026-10-11
+2002,loans.fx,530.50699999999995,530.5,gel_million,actual,official,nbg_loans_l3_5,Eng,V6,2026-10-11
+2003,loans.fx,679.65899999999999,679.7,gel_million,actual,official,nbg_loans_l3_5,Eng,V18,2026-10-11
+2004,loans.fx,812.54399999999998,812.5,gel_million,actual,official,nbg_loans_l3_5,Eng,V30,2026-10-11
+2005,loans.fx,1329.2660000000001,1329.3,gel_million,actual,official,nbg_loans_l3_5,Eng,V42,2026-10-11
+2006,loans.fx,1996.9459999999999,1996.9,gel_million,actual,official,nbg_loans_l3_5,Eng,V54,2026-10-11
+2007,loans.fx,3176.2449999999999,3176.2,gel_million,actual,official,nbg_loans_l3_5,Eng,V66,2026-10-11
+2008,loans.fx,4402.3140000000003,4402.3,gel_million,actual,official,nbg_loans_l3_5,Eng,V78,2026-10-11
+2009,loans.fx,4036.1570000000002,4036.2,gel_million,actual,official,nbg_loans_l3_5,Eng,V90,2026-10-11
+2010,loans.fx,4683.0789999999997,4683.1,gel_million,actual,official,nbg_loans_l3_5,Eng,V102,2026-10-11
+2011,loans.fx,5376.2929999999997,5376.3,gel_million,actual,official,nbg_loans_l3_5,Eng,V114,2026-10-11
+2012,loans.fx,5952.6059999999998,5952.6,gel_million,actual,official,nbg_loans_l3_5,Eng,V126,2026-10-11
+2013,loans.fx,6600.3019999999997,6600.3,gel_million,actual,official,nbg_loans_l3_5,Eng,V138,2026-10-11
+2014,loans.fx,7954.116,7954.1,gel_million,actual,official,nbg_loans_l3_5,Eng,V150,2026-10-11
+2015,loans.fx,10424.954,10425.0,gel_million,actual,official,nbg_loans_l3_5,Eng,V162,2026-10-11
+2016,loans.fx,12459.592000000001,12459.6,gel_million,actual,official,nbg_loans_l3_5,Eng,V174,2026-10-11
+2017,loans.fx,12785.983,12786.0,gel_million,actual,official,nbg_loans_l3_5,Eng,V186,2026-10-11
+2018,loans.fx,15269.561,15269.6,gel_million,actual,official,nbg_loans_l3_5,Eng,V198,2026-10-11
+2019,loans.fx,17801.489000000001,17801.5,gel_million,actual,official,nbg_loans_l3_5,Eng,V210,2026-10-11
+2020,loans.fx,21517.308000000001,21517.3,gel_million,actual,official,nbg_loans_l3_5,Eng,V222,2026-10-11
+2021,loans.fx,22111.361000000001,22111.4,gel_million,actual,official,nbg_loans_l3_5,Eng,V234,2026-10-11
+2022,loans.fx,20269.589,20269.6,gel_million,actual,official,nbg_loans_l3_5,Eng,V246,2026-10-11
+2023,loans.fx,24065.664000000001,24065.7,gel_million,actual,official,nbg_loans_l3_5,Eng,V258,2026-10-11
+2024,loans.fx,27232.578000000001,27232.6,gel_million,actual,official,nbg_loans_l3_5,Eng,V270,2026-10-11
+2025,loans.fx,30372.190999999999,30372.2,gel_million,actual,official,nbg_loans_l3_5,Eng,V282,2026-10-11
+1996,deposits.gel,43.59,43.6,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J17,2026-10-11
+1997,deposits.gel,55.134999999999998,55.1,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J29,2026-10-11
+1998,deposits.gel,47.389000000000003,47.4,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J41,2026-10-11
+1999,deposits.gel,38.857999999999997,38.9,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J53,2026-10-11
+2000,deposits.gel,61.165999999999997,61.2,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J65,2026-10-11
+2001,deposits.gel,56.597000000000001,56.6,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J77,2026-10-11
+2002,deposits.gel,87.057000000000002,87.1,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J89,2026-10-11
+2003,deposits.gel,101.771,101.8,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J101,2026-10-11
+2004,deposits.gel,266.38,266.4,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J113,2026-10-11
+2005,deposits.gel,418.53699999999998,418.5,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J125,2026-10-11
+2006,deposits.gel,744.99199999999996,745.0,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J137,2026-10-11
+2007,deposits.gel,1243.338,1243.3,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J149,2026-10-11
+2008,deposits.gel,1014.7089999999999,1014.7,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J161,2026-10-11
+2009,deposits.gel,1301.0820000000001,1301.1,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J173,2026-10-11
+2010,deposits.gel,1922.663,1922.7,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J185,2026-10-11
+2011,deposits.gel,3001.4630000000002,3001.5,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J197,2026-10-11
+2012,deposits.gel,2967.8649999999998,2967.9,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J209,2026-10-11
+2013,deposits.gel,4099.375,4099.4,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J221,2026-10-11
+2014,deposits.gel,4948.92,4948.9,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J233,2026-10-11
+2015,deposits.gel,4631.9319999999998,4631.9,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J245,2026-10-11
+2016,deposits.gel,5036.28,5036.3,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J257,2026-10-11
+2017,deposits.gel,7088.2309999999998,7088.2,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J269,2026-10-11
+2018,deposits.gel,8639.0370000000003,8639.0,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J281,2026-10-11
+2019,deposits.gel,9595.8369999999995,9595.8,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J293,2026-10-11
+2020,deposits.gel,13442.352999999999,13442.4,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J305,2026-10-11
+2021,deposits.gel,15014.789000000001,15014.8,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J317,2026-10-11
+2022,deposits.gel,19806.355,19806.4,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J329,2026-10-11
+2023,deposits.gel,25140.987000000001,25141.0,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J341,2026-10-11
+2024,deposits.gel,27767.428,27767.4,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J353,2026-10-11
+2025,deposits.gel,35201.902000000002,35201.9,gel_million,actual,official,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng,J365,2026-10-11
+1996,deposits.fx,37.628999999999998,37.6,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J17,2026-10-11
+1997,deposits.fx,77.331000000000003,77.3,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J29,2026-10-11
+1998,deposits.fx,105.068,105.1,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J41,2026-10-11
+1999,deposits.fx,153.97999999999999,154.0,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J53,2026-10-11
+2000,deposits.fx,227.98400000000001,228.0,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J65,2026-10-11
+2001,deposits.fx,338.024,338.0,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J77,2026-10-11
+2002,deposits.fx,518.68399999999997,518.7,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J89,2026-10-11
+2003,deposits.fx,632.59299999999996,632.6,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J101,2026-10-11
+2004,deposits.fx,716.59,716.6,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J113,2026-10-11
+2005,deposits.fx,1119.69,1119.7,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J125,2026-10-11
+2006,deposits.fx,1582.9059999999999,1582.9,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J137,2026-10-11
+2007,deposits.fx,2262.0569999999998,2262.1,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J149,2026-10-11
+2008,deposits.fx,2830.1660000000002,2830.2,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J161,2026-10-11
+2009,deposits.fx,2872.8150000000001,2872.8,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J173,2026-10-11
+2010,deposits.fx,3894.991,3895.0,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J185,2026-10-11
+2011,deposits.fx,4350.732,4350.7,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J197,2026-10-11
+2012,deposits.fx,5235.4889999999996,5235.5,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J209,2026-10-11
+2013,deposits.fx,6188.5230000000001,6188.5,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J221,2026-10-11
+2014,deposits.fx,7476.5649999999996,7476.6,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J233,2026-10-11
+2015,deposits.fx,10873.08,10873.1,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J245,2026-10-11
+2016,deposits.fx,13266.004000000001,13266.0,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J257,2026-10-11
+2017,deposits.fx,13787.578,13787.6,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J269,2026-10-11
+2018,deposits.fx,15265.036,15265.0,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J281,2026-10-11
+2019,deposits.fx,17647.328000000001,17647.3,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J293,2026-10-11
+2020,deposits.fx,21982.690999999999,21982.7,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J305,2026-10-11
+2021,deposits.fx,23020.657999999999,23020.7,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J317,2026-10-11
+2022,deposits.fx,26230.758999999998,26230.8,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J329,2026-10-11
+2023,deposits.fx,26945.166000000001,26945.2,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J341,2026-10-11
+2024,deposits.fx,32427.626,32427.6,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J353,2026-10-11
+2025,deposits.fx,33294.983999999997,33295.0,gel_million,actual,official,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng,J365,2026-10-11
+1996,deposits.total,81.218999999999998,81.2,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J17+J17,2026-10-11
+1997,deposits.total,132.466000000000001,132.5,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J29+J29,2026-10-11
+1998,deposits.total,152.457000000000003,152.5,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J41+J41,2026-10-11
+1999,deposits.total,192.837999999999987,192.8,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J53+J53,2026-10-11
+2000,deposits.total,289.150000000000007,289.2,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J65+J65,2026-10-11
+2001,deposits.total,394.621000000000001,394.6,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J77+J77,2026-10-11
+2002,deposits.total,605.740999999999972,605.7,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J89+J89,2026-10-11
+2003,deposits.total,734.36399999999996,734.4,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J101+J101,2026-10-11
+2004,deposits.total,982.97,983.0,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J113+J113,2026-10-11
+2005,deposits.total,1538.22699999999998,1538.2,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J125+J125,2026-10-11
+2006,deposits.total,2327.89799999999986,2327.9,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J137+J137,2026-10-11
+2007,deposits.total,3505.3949999999998,3505.4,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J149+J149,2026-10-11
+2008,deposits.total,3844.8750000000001,3844.9,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J161+J161,2026-10-11
+2009,deposits.total,4173.8970000000002,4173.9,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J173+J173,2026-10-11
+2010,deposits.total,5817.654,5817.7,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J185+J185,2026-10-11
+2011,deposits.total,7352.1950000000002,7352.2,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J197+J197,2026-10-11
+2012,deposits.total,8203.3539999999994,8203.4,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J209+J209,2026-10-11
+2013,deposits.total,10287.8980000000001,10287.9,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J221+J221,2026-10-11
+2014,deposits.total,12425.4849999999996,12425.5,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J233+J233,2026-10-11
+2015,deposits.total,15505.0119999999998,15505.0,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J245+J245,2026-10-11
+2016,deposits.total,18302.284000000001,18302.3,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J257+J257,2026-10-11
+2017,deposits.total,20875.8089999999998,20875.8,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J269+J269,2026-10-11
+2018,deposits.total,23904.0730000000003,23904.1,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J281+J281,2026-10-11
+2019,deposits.total,27243.1650000000005,27243.2,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J293+J293,2026-10-11
+2020,deposits.total,35425.043999999998,35425.0,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J305+J305,2026-10-11
+2021,deposits.total,38035.447,38035.4,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J317+J317,2026-10-11
+2022,deposits.total,46037.113999999998,46037.1,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J329+J329,2026-10-11
+2023,deposits.total,52086.153000000002,52086.2,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J341+J341,2026-10-11
+2024,deposits.total,60195.054,60195.1,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J353+J353,2026-10-11
+2025,deposits.total,68496.885999999999,68496.9,gel_million,actual,calculated,nbg_deposits_d3_17,NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng,J365+J365,2026-10-11
+2002,deposits.individuals,267.68999999999999,267.7,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B18+B18,2026-10-11
+2003,deposits.individuals,396.095000000000011,396.1,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B30+B30,2026-10-11
+2004,deposits.individuals,493.254,493.3,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B42+B42,2026-10-11
+2005,deposits.individuals,724.109000000000021,724.1,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B54+B54,2026-10-11
+2006,deposits.individuals,1109.28599999999995,1109.3,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B66+B66,2026-10-11
+2007,deposits.individuals,1573.04899999999998,1573.0,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B78+B78,2026-10-11
+2008,deposits.individuals,1858.943,1858.9,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B90+B90,2026-10-11
+2009,deposits.individuals,2104.38499999999988,2104.4,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B102+B102,2026-10-11
+2010,deposits.individuals,2641.44000000000019,2641.4,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B114+B114,2026-10-11
+2011,deposits.individuals,3148.89700000000003,3148.9,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B126+B126,2026-10-11
+2012,deposits.individuals,3871.70800000000005,3871.7,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B138+B138,2026-10-11
+2013,deposits.individuals,4819.3889999999999,4819.4,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B150+B150,2026-10-11
+2014,deposits.individuals,5844.5640000000001,5844.6,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B162+B162,2026-10-11
+2015,deposits.individuals,7421.7849999999999,7421.8,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B174+B174,2026-10-11
+2016,deposits.individuals,9280.1289999999999,9280.1,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B186+B186,2026-10-11
+2017,deposits.individuals,10780.6040000000002,10780.6,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B198+B198,2026-10-11
+2018,deposits.individuals,12480.7819999999992,12480.8,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B210+B210,2026-10-11
+2019,deposits.individuals,15042.9889999999998,15043.0,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B222+B222,2026-10-11
+2020,deposits.individuals,18454.7880000000006,18454.8,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B234+B234,2026-10-11
+2021,deposits.individuals,20231.7599999999988,20231.8,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B246+B246,2026-10-11
+2022,deposits.individuals,23926.6559999999997,23926.7,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B258+B258,2026-10-11
+2023,deposits.individuals,27236.4609999999996,27236.5,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B270+B270,2026-10-11
+2024,deposits.individuals,31545.400000000002,31545.4,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B282+B282,2026-10-11
+2025,deposits.individuals,35579.090000000002,35579.1,gel_million,actual,calculated,nbg_deposits_individuals_d3_23,NC Dep.of Individuals-eng+FC Dep.of Individuals-eng,B294+B294,2026-10-11
+2015,deposits.legal_entities,8083.2269999999999,8083.2,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B8+B8,2026-10-11
+2016,deposits.legal_entities,9022.1559999999999,9022.2,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B20+B20,2026-10-11
+2017,deposits.legal_entities,10095.2050000000009,10095.2,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B32+B32,2026-10-11
+2018,deposits.legal_entities,11423.2899999999999,11423.3,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B44+B44,2026-10-11
+2019,deposits.legal_entities,12200.1759999999995,12200.2,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B56+B56,2026-10-11
+2020,deposits.legal_entities,16970.2559999999994,16970.3,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B68+B68,2026-10-11
+2021,deposits.legal_entities,17803.6869999999999,17803.7,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B80+B80,2026-10-11
+2022,deposits.legal_entities,22110.4580000000007,22110.5,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B92+B92,2026-10-11
+2023,deposits.legal_entities,24849.6919999999995,24849.7,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B104+B104,2026-10-11
+2024,deposits.legal_entities,28649.654,28649.7,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B116+B116,2026-10-11
+2025,deposits.legal_entities,32917.796,32917.8,gel_million,actual,calculated,nbg_deposits_legal_d3_27,NC+FC,B128+B128,2026-10-11
+2002,loans.fx_share,83.80850522670650873671189917,83.8,percent,actual,calculated,nbg_loans_l3_5,Eng,V6/B6,2026-10-11
+2003,loans.fx_share,87.17220274114565926713479585,87.2,percent,actual,calculated,nbg_loans_l3_5,Eng,V18/B18,2026-10-11
+2004,loans.fx_share,85.74078666209407474824104583,85.7,percent,actual,calculated,nbg_loans_l3_5,Eng,V30/B30,2026-10-11
+2005,loans.fx_share,76.56612341901570434420768947,76.6,percent,actual,calculated,nbg_loans_l3_5,Eng,V42/B42,2026-10-11
+2006,loans.fx_share,73.84106694907231739279628928,73.8,percent,actual,calculated,nbg_loans_l3_5,Eng,V54/B54,2026-10-11
+2007,loans.fx_share,68.57107266591365281927444042,68.6,percent,actual,calculated,nbg_loans_l3_5,Eng,V66/B66,2026-10-11
+2008,loans.fx_share,72.65026491856390968509792234,72.7,percent,actual,calculated,nbg_loans_l3_5,Eng,V78/B78,2026-10-11
+2009,loans.fx_share,76.8220399873998564965700743,76.8,percent,actual,calculated,nbg_loans_l3_5,Eng,V90/B90,2026-10-11
+2010,loans.fx_share,73.99568705487596139858715078,74.0,percent,actual,calculated,nbg_loans_l3_5,Eng,V102/B102,2026-10-11
+2011,loans.fx_share,68.89907937084830492381349387,68.9,percent,actual,calculated,nbg_loans_l3_5,Eng,V114/B114,2026-10-11
+2012,loans.fx_share,67.58048462490461219297813094,67.6,percent,actual,calculated,nbg_loans_l3_5,Eng,V126/B126,2026-10-11
+2013,loans.fx_share,62.44454870314755393239809841,62.4,percent,actual,calculated,nbg_loans_l3_5,Eng,V138/B138,2026-10-11
+2014,loans.fx_share,60.80731426250916498321243112,60.8,percent,actual,calculated,nbg_loans_l3_5,Eng,V150/B150,2026-10-11
+2015,loans.fx_share,64.58233813627745417110747126,64.6,percent,actual,calculated,nbg_loans_l3_5,Eng,V162/B162,2026-10-11
+2016,loans.fx_share,65.36637874614471845185941697,65.4,percent,actual,calculated,nbg_loans_l3_5,Eng,V174/B174,2026-10-11
+2017,loans.fx_share,56.9821219134698633207162287,57.0,percent,actual,calculated,nbg_loans_l3_5,Eng,V186/B186,2026-10-11
+2018,loans.fx_share,56.97491941940179230171409587,57.0,percent,actual,calculated,nbg_loans_l3_5,Eng,V198/B198,2026-10-11
+2019,loans.fx_share,55.28568631686881247192665194,55.3,percent,actual,calculated,nbg_loans_l3_5,Eng,V210/B210,2026-10-11
+2020,loans.fx_share,55.45832724748954709238610496,55.5,percent,actual,calculated,nbg_loans_l3_5,Eng,V222/B222,2026-10-11
+2021,loans.fx_share,50.73612647391307583558938666,50.7,percent,actual,calculated,nbg_loans_l3_5,Eng,V234/B234,2026-10-11
+2022,loans.fx_share,44.78350415335101849960774423,44.8,percent,actual,calculated,nbg_loans_l3_5,Eng,V246/B246,2026-10-11
+2023,loans.fx_share,45.12022440959851504429282483,45.1,percent,actual,calculated,nbg_loans_l3_5,Eng,V258/B258,2026-10-11
+2024,loans.fx_share,43.26672471982919952268435349,43.3,percent,actual,calculated,nbg_loans_l3_5,Eng,V270/B270,2026-10-11
+2025,loans.fx_share,41.91983030553072773552919951,41.9,percent,actual,calculated,nbg_loans_l3_5,Eng,V282/B282,2026-10-11
+1996,deposits.fx_share,46.33029217301370236841852702,46.3,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J17/(J17+J17),2026-10-11
+1997,deposits.fx_share,58.37799888273217460798998322,58.4,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J29/(J29+J29),2026-10-11
+1998,deposits.fx_share,68.91648136851702311635776576,68.9,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J41/(J41+J41),2026-10-11
+1999,deposits.fx_share,79.84940727449983944057859223,79.8,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J53/(J53+J53),2026-10-11
+2000,deposits.fx_share,78.84627356043576153579832294,78.8,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J65/(J65+J65),2026-10-11
+2001,deposits.fx_share,85.65788440047539262822332212,85.7,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J77/(J77+J77),2026-10-11
+2002,deposits.fx_share,85.62801593420290090580701349,85.6,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J89/(J89+J89),2026-10-11
+2003,deposits.fx_share,86.14161369566046190399386112,86.1,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J101/(J101+J101),2026-10-11
+2004,deposits.fx_share,72.90049543729717081904839415,72.9,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J113/(J113+J113),2026-10-11
+2005,deposits.fx_share,72.79094697986708168288486654,72.8,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J125/(J125+J125),2026-10-11
+2006,deposits.fx_share,67.99722324603569379741348394,68.0,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J137/(J137+J137),2026-10-11
+2007,deposits.fx_share,64.53073048829019066500240277,64.5,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J149/(J149+J149),2026-10-11
+2008,deposits.fx_share,73.60879092298189476618119125,73.6,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J161/(J161+J161),2026-10-11
+2009,deposits.fx_share,68.82812393310136695619829943,68.8,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J173/(J173+J173),2026-10-11
+2010,deposits.fx_share,66.95123154453668093702375562,67.0,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J185/(J185+J185),2026-10-11
+2011,deposits.fx_share,59.17596037645900144988101169,59.2,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J197/(J197+J197),2026-10-11
+2012,deposits.fx_share,63.82132235180878434513412576,63.8,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J209/(J209+J209),2026-10-11
+2013,deposits.fx_share,60.15342492703563001739106543,60.2,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J221/(J221+J221),2026-10-11
+2014,deposits.fx_share,60.17121263274632612477380586,60.2,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J233/(J233+J233),2026-10-11
+2015,deposits.fx_share,70.12622757080097803376388965,70.1,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J245/(J245+J245),2026-10-11
+2016,deposits.fx_share,72.4827786521070281456249585,72.5,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J257/(J257+J257),2026-10-11
+2017,deposits.fx_share,66.04571827611567116796018086,66.0,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J269/(J269+J269),2026-10-11
+2018,deposits.fx_share,63.85956066984902450900864464,63.9,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J281/(J281+J281),2026-10-11
+2019,deposits.fx_share,64.77708445402727868114654714,64.8,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J293/(J293+J293),2026-10-11
+2020,deposits.fx_share,62.05409653125624979063379745,62.1,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J305/(J305+J305),2026-10-11
+2021,deposits.fx_share,60.52422099837553900707411168,60.5,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J317/(J317+J317),2026-10-11
+2022,deposits.fx_share,56.9774182630127491040128303,57.0,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J329/(J329+J329),2026-10-11
+2023,deposits.fx_share,51.7319180781118543451685488,51.7,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J341/(J341+J341),2026-10-11
+2024,deposits.fx_share,53.87091437778259987938543921,53.9,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J353/(J353+J353),2026-10-11
+2025,deposits.fx_share,48.60802577214969668267876838,48.6,percent,actual,calculated,nbg_deposits_d3_17,FC Dep.volume&Int.rates-eng/(NC Dep.volume&Int.rates-eng+FC Dep.volume&Int.rates-eng),J365/(J365+J365),2026-10-11
+2008,rates.policy,8,8.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C15,2026-10-11
+2009,rates.policy,5,5.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C27,2026-10-11
+2010,rates.policy,7.5,7.50,percent,actual,official,nbg_policy_rate,MPIR-Eng,C40,2026-10-11
+2011,rates.policy,6.75,6.75,percent,actual,official,nbg_policy_rate,MPIR-Eng,C51,2026-10-11
+2012,rates.policy,5.25,5.25,percent,actual,official,nbg_policy_rate,MPIR-Eng,C63,2026-10-11
+2013,rates.policy,3.75,3.75,percent,actual,official,nbg_policy_rate,MPIR-Eng,C71,2026-10-11
+2014,rates.policy,4,4.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C79,2026-10-11
+2015,rates.policy,8,8.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C87,2026-10-11
+2016,rates.policy,6.5,6.50,percent,actual,official,nbg_policy_rate,MPIR-Eng,C95,2026-10-11
+2017,rates.policy,7.25,7.25,percent,actual,official,nbg_policy_rate,MPIR-Eng,C103,2026-10-11
+2018,rates.policy,7,7.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C111,2026-10-11
+2019,rates.policy,9,9.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C120,2026-10-11
+2020,rates.policy,8,8.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C128,2026-10-11
+2021,rates.policy,10.5,10.50,percent,actual,official,nbg_policy_rate,MPIR-Eng,C136,2026-10-11
+2022,rates.policy,11,11.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C144,2026-10-11
+2023,rates.policy,9.5,9.50,percent,actual,official,nbg_policy_rate,MPIR-Eng,C152,2026-10-11
+2024,rates.policy,8,8.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C160,2026-10-11
+2025,rates.policy,8,8.00,percent,actual,official,nbg_policy_rate,MPIR-Eng,C168,2026-10-11
+1996,rates.loans_total,61.22,61.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B5,2026-10-11
+1997,rates.loans_total,50.8,50.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B6,2026-10-11
+1998,rates.loans_total,35.25,35.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B7,2026-10-11
+1999,rates.loans_total,31.25,31.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B8,2026-10-11
+2000,rates.loans_total,27.3,27.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B9,2026-10-11
+2001,rates.loans_total,24.38,24.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B10,2026-10-11
+2002,rates.loans_total,22.98,23.0,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B11,2026-10-11
+2003,rates.loans_total,21.5,21.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B12,2026-10-11
+2004,rates.loans_total,20.2,20.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B13,2026-10-11
+2005,rates.loans_total,17.940000000000001,17.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B14,2026-10-11
+2006,rates.loans_total,17.350000000000001,17.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B15,2026-10-11
+2007,rates.loans_total,17.7,17.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B16,2026-10-11
+2008,rates.loans_total,18.63,18.6,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B17,2026-10-11
+2009,rates.loans_total,19.34,19.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B18,2026-10-11
+2010,rates.loans_total,18.559999999999999,18.6,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B19,2026-10-11
+2011,rates.loans_total,17.059999999999999,17.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B20,2026-10-11
+2012,rates.loans_total,16.89,16.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B21,2026-10-11
+2013,rates.loans_total,15.86,15.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B22,2026-10-11
+2014,rates.loans_total,14.35,14.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B23,2026-10-11
+2015,rates.loans_total,13.242167007666344,13.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B24,2026-10-11
+2016,rates.loans_total,12.234978896856346,12.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B25,2026-10-11
+2017,rates.loans_total,12.425767027682422,12.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B26,2026-10-11
+2018,rates.loans_total,11.681524786924312,11.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B27,2026-10-11
+2019,rates.loans_total,10.752091994834764,10.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B28,2026-10-11
+2020,rates.loans_total,10.473520153784317,10.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B29,2026-10-11
+2021,rates.loans_total,10.986647362250618,11.0,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B30,2026-10-11
+2022,rates.loans_total,12.2024620422805,12.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B31,2026-10-11
+2023,rates.loans_total,12.192174169288284,12.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B32,2026-10-11
+2024,rates.loans_total,11.975610836424611,12.0,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B33,2026-10-11
+2025,rates.loans_total,12.482253381162698,12.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,B34,2026-10-11
+1996,rates.loans_gel,57.11,57.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E5,2026-10-11
+1997,rates.loans_gel,49.58,49.6,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E6,2026-10-11
+1998,rates.loans_gel,35.78,35.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E7,2026-10-11
+1999,rates.loans_gel,29.68,29.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E8,2026-10-11
+2000,rates.loans_gel,24.48,24.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E9,2026-10-11
+2001,rates.loans_gel,22.32,22.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E10,2026-10-11
+2002,rates.loans_gel,23.57,23.6,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E11,2026-10-11
+2003,rates.loans_gel,24.03,24.0,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E12,2026-10-11
+2004,rates.loans_gel,25.38,25.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E13,2026-10-11
+2005,rates.loans_gel,21.34,21.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E14,2026-10-11
+2006,rates.loans_gel,20.28,20.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E15,2026-10-11
+2007,rates.loans_gel,20.94,20.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E16,2026-10-11
+2008,rates.loans_gel,21.82,21.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E17,2026-10-11
+2009,rates.loans_gel,23.6,23.6,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E18,2026-10-11
+2010,rates.loans_gel,22.61,22.6,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E19,2026-10-11
+2011,rates.loans_gel,22.56,22.6,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E20,2026-10-11
+2012,rates.loans_gel,22.13,22.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E21,2026-10-11
+2013,rates.loans_gel,20.69,20.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E22,2026-10-11
+2014,rates.loans_gel,18.190000000000001,18.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E23,2026-10-11
+2015,rates.loans_gel,18.534549408295796,18.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E24,2026-10-11
+2016,rates.loans_gel,17.919681088757439,17.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E25,2026-10-11
+2017,rates.loans_gel,17.979749676999976,18.0,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E26,2026-10-11
+2018,rates.loans_gel,16.758506458946986,16.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E27,2026-10-11
+2019,rates.loans_gel,15.351948618697703,15.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E28,2026-10-11
+2020,rates.loans_gel,15.102078511786809,15.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E29,2026-10-11
+2021,rates.loans_gel,15.686239288145188,15.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E30,2026-10-11
+2022,rates.loans_gel,15.870927765549741,15.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E31,2026-10-11
+2023,rates.loans_gel,15.080584000217801,15.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E32,2026-10-11
+2024,rates.loans_gel,14.42047628645224,14.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E33,2026-10-11
+2025,rates.loans_gel,15.155208363096904,15.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,E34,2026-10-11
+1996,rates.loans_fx,64.92,64.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H5,2026-10-11
+1997,rates.loans_fx,52.21,52.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H6,2026-10-11
+1998,rates.loans_fx,34.909999999999997,34.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H7,2026-10-11
+1999,rates.loans_fx,31.74,31.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H8,2026-10-11
+2000,rates.loans_fx,27.96,28.0,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H9,2026-10-11
+2001,rates.loans_fx,24.9,24.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H10,2026-10-11
+2002,rates.loans_fx,22.87,22.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H11,2026-10-11
+2003,rates.loans_fx,21.12,21.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H12,2026-10-11
+2004,rates.loans_fx,19.489999999999998,19.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H13,2026-10-11
+2005,rates.loans_fx,17.100000000000001,17.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H14,2026-10-11
+2006,rates.loans_fx,16.329999999999998,16.3,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H15,2026-10-11
+2007,rates.loans_fx,16.53,16.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H16,2026-10-11
+2008,rates.loans_fx,17.12,17.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H17,2026-10-11
+2009,rates.loans_fx,18.079999999999998,18.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H18,2026-10-11
+2010,rates.loans_fx,17.190000000000001,17.2,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H19,2026-10-11
+2011,rates.loans_fx,14.86,14.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H20,2026-10-11
+2012,rates.loans_fx,14.43,14.4,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H21,2026-10-11
+2013,rates.loans_fx,13.45,13.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H22,2026-10-11
+2014,rates.loans_fx,11.88,11.9,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H23,2026-10-11
+2015,rates.loans_fx,10.543405006448815,10.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H24,2026-10-11
+2016,rates.loans_fx,9.4809831292823219,9.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H25,2026-10-11
+2017,rates.loans_fx,8.6943956380496896,8.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H26,2026-10-11
+2018,rates.loans_fx,8.098222845885763,8.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H27,2026-10-11
+2019,rates.loans_fx,7.1080179721255936,7.1,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H28,2026-10-11
+2020,rates.loans_fx,6.8470285109477684,6.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H29,2026-10-11
+2021,rates.loans_fx,6.5072507261121899,6.5,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H30,2026-10-11
+2022,rates.loans_fx,7.7547752295672403,7.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H31,2026-10-11
+2023,rates.loans_fx,8.7156701674522523,8.7,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H32,2026-10-11
+2024,rates.loans_fx,8.7958197654041648,8.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H33,2026-10-11
+2025,rates.loans_fx,8.8098225833991854,8.8,percent,actual,official,nbg_loan_rates_lwir,loans % Annual,H34,2026-10-11
+1996,rates.deposits_total,16.690000000000001,16.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B5,2026-10-11
+1997,rates.deposits_total,17.989999999999998,18.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B6,2026-10-11
+1998,rates.deposits_total,14.39,14.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B7,2026-10-11
+1999,rates.deposits_total,12.95,13.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B8,2026-10-11
+2000,rates.deposits_total,10.98,11.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B9,2026-10-11
+2001,rates.deposits_total,9.6999999999999993,9.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B10,2026-10-11
+2002,rates.deposits_total,9.7799999999999994,9.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B11,2026-10-11
+2003,rates.deposits_total,8.7899999999999991,8.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B12,2026-10-11
+2004,rates.deposits_total,7.77,7.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B13,2026-10-11
+2005,rates.deposits_total,6.79,6.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B14,2026-10-11
+2006,rates.deposits_total,7.47,7.5,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B15,2026-10-11
+2007,rates.deposits_total,8.32,8.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B16,2026-10-11
+2008,rates.deposits_total,8.94,8.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B17,2026-10-11
+2009,rates.deposits_total,9.7200000000000006,9.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B18,2026-10-11
+2010,rates.deposits_total,8.7100000000000009,8.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B19,2026-10-11
+2011,rates.deposits_total,8.25,8.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B20,2026-10-11
+2012,rates.deposits_total,8.39,8.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B21,2026-10-11
+2013,rates.deposits_total,7.31,7.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B22,2026-10-11
+2014,rates.deposits_total,5.85,5.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B23,2026-10-11
+2015,rates.deposits_total,5.9259433964977637,5.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B24,2026-10-11
+2016,rates.deposits_total,5.0447203579513245,5.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B25,2026-10-11
+2017,rates.deposits_total,4.8334603371813154,4.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B26,2026-10-11
+2018,rates.deposits_total,4.7458400570383459,4.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B27,2026-10-11
+2019,rates.deposits_total,4.7231077781566926,4.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B28,2026-10-11
+2020,rates.deposits_total,5.169590841289331,5.2,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B29,2026-10-11
+2021,rates.deposits_total,5.4235093705604704,5.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B30,2026-10-11
+2022,rates.deposits_total,6.3694918101104028,6.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B31,2026-10-11
+2023,rates.deposits_total,6.8871714107372366,6.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B32,2026-10-11
+2024,rates.deposits_total,6.6588177276998923,6.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B33,2026-10-11
+2025,rates.deposits_total,7.073663529037594,7.1,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,B34,2026-10-11
+1996,rates.deposits_gel,9.7100000000000009,9.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E5,2026-10-11
+1997,rates.deposits_gel,13.63,13.6,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E6,2026-10-11
+1998,rates.deposits_gel,9.25,9.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E7,2026-10-11
+1999,rates.deposits_gel,5.49,5.5,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E8,2026-10-11
+2000,rates.deposits_gel,4.0599999999999996,4.1,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E9,2026-10-11
+2001,rates.deposits_gel,4.7,4.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E10,2026-10-11
+2002,rates.deposits_gel,5.32,5.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E11,2026-10-11
+2003,rates.deposits_gel,4.92,4.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E12,2026-10-11
+2004,rates.deposits_gel,4.5599999999999996,4.6,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E13,2026-10-11
+2005,rates.deposits_gel,5.65,5.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E14,2026-10-11
+2006,rates.deposits_gel,7.74,7.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E15,2026-10-11
+2007,rates.deposits_gel,8.2799999999999994,8.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E16,2026-10-11
+2008,rates.deposits_gel,8.7799999999999994,8.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E17,2026-10-11
+2009,rates.deposits_gel,8.56,8.6,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E18,2026-10-11
+2010,rates.deposits_gel,8.2799999999999994,8.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E19,2026-10-11
+2011,rates.deposits_gel,9.02,9.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E20,2026-10-11
+2012,rates.deposits_gel,9.26,9.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E21,2026-10-11
+2013,rates.deposits_gel,8.4499999999999993,8.5,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E22,2026-10-11
+2014,rates.deposits_gel,7.62,7.6,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E23,2026-10-11
+2015,rates.deposits_gel,9.959733608928973,10.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E24,2026-10-11
+2016,rates.deposits_gel,9.3312926939364154,9.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E25,2026-10-11
+2017,rates.deposits_gel,8.6992137354944603,8.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E26,2026-10-11
+2018,rates.deposits_gel,7.99567480105559,8.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E27,2026-10-11
+2019,rates.deposits_gel,8.3965471322556819,8.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E28,2026-10-11
+2020,rates.deposits_gel,9.1926186539031622,9.2,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E29,2026-10-11
+2021,rates.deposits_gel,10.325925489272386,10.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E30,2026-10-11
+2022,rates.deposits_gel,11.173309896458127,11.2,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E31,2026-10-11
+2023,rates.deposits_gel,10.80158102823316,10.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E32,2026-10-11
+2024,rates.deposits_gel,10.413665116235082,10.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E33,2026-10-11
+2025,rates.deposits_gel,10.312261397067376,10.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,E34,2026-10-11
+1996,rates.deposits_fx,20.45,20.5,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H5,2026-10-11
+1997,rates.deposits_fx,19.91,19.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H6,2026-10-11
+1998,rates.deposits_fx,15.9,15.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H7,2026-10-11
+1999,rates.deposits_fx,13.66,13.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H8,2026-10-11
+2000,rates.deposits_fx,11.45,11.5,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H9,2026-10-11
+2001,rates.deposits_fx,10.029999999999999,10.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H10,2026-10-11
+2002,rates.deposits_fx,10.02,10.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H11,2026-10-11
+2003,rates.deposits_fx,8.9499999999999993,9.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H12,2026-10-11
+2004,rates.deposits_fx,7.97,8.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H13,2026-10-11
+2005,rates.deposits_fx,6.94,6.9,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H14,2026-10-11
+2006,rates.deposits_fx,7.42,7.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H15,2026-10-11
+2007,rates.deposits_fx,8.33,8.3,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H16,2026-10-11
+2008,rates.deposits_fx,9,9.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H17,2026-10-11
+2009,rates.deposits_fx,9.9600000000000009,10.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H18,2026-10-11
+2010,rates.deposits_fx,8.8000000000000007,8.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H19,2026-10-11
+2011,rates.deposits_fx,8.06,8.1,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H20,2026-10-11
+2012,rates.deposits_fx,8.18,8.2,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H21,2026-10-11
+2013,rates.deposits_fx,6.95,7.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H22,2026-10-11
+2014,rates.deposits_fx,5.17,5.2,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H23,2026-10-11
+2015,rates.deposits_fx,4.4071670789016562,4.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H24,2026-10-11
+2016,rates.deposits_fx,3.6608767329898475,3.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H25,2026-10-11
+2017,rates.deposits_fx,2.9786021351747229,3.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H26,2026-10-11
+2018,rates.deposits_fx,2.954683472430133,3.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H27,2026-10-11
+2019,rates.deposits_fx,2.8441889732592633,2.8,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H28,2026-10-11
+2020,rates.deposits_fx,2.5973302314364437,2.6,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H29,2026-10-11
+2021,rates.deposits_fx,1.6660050621200555,1.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H30,2026-10-11
+2022,rates.deposits_fx,1.3924554399462092,1.4,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H31,2026-10-11
+2023,rates.deposits_fx,1.9548138313715133,2.0,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H32,2026-10-11
+2024,rates.deposits_fx,2.5676109322062959,2.6,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H33,2026-10-11
+2025,rates.deposits_fx,2.66586088292603,2.7,percent,actual,official,nbg_deposit_rates_dwir,Dep %-Annual,H34,2026-10-11
+2003,banks.npl_ratio,2.343194655973972,2.3,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,P10,2026-10-11
+2004,banks.npl_ratio,1.9715676643963242,2.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,T10,2026-10-11
+2005,banks.npl_ratio,1.194325980586773,1.2,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,X10,2026-10-11
+2006,banks.npl_ratio,0.80588216364692966,0.8,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AB10,2026-10-11
+2007,banks.npl_ratio,0.8384185711969836,0.8,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AF10,2026-10-11
+2008,banks.npl_ratio,4.0580813051785576,4.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AJ10,2026-10-11
+2009,banks.npl_ratio,6.2554410291771907,6.3,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AN10,2026-10-11
+2010,banks.npl_ratio,5.9196827046094,5.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AR10,2026-10-11
+2011,banks.npl_ratio,4.5260016010742836,4.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AV10,2026-10-11
+2012,banks.npl_ratio,3.6802555019312297,3.7,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AZ10,2026-10-11
+2013,banks.npl_ratio,3.0317160657941788,3.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BD10,2026-10-11
+2014,banks.npl_ratio,3.0270644295270008,3.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BH10,2026-10-11
+2015,banks.npl_ratio,2.7114511435797981,2.7,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BL10,2026-10-11
+2016,banks.npl_ratio,3.4469750174477864,3.4,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BP10,2026-10-11
+2017,banks.npl_ratio,2.7787999697928374,2.8,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BT10,2026-10-11
+2018,banks.npl_ratio,2.6788683438240661,2.7,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BX10,2026-10-11
+2019,banks.npl_ratio,1.9284095650986144,1.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CB10,2026-10-11
+2020,banks.npl_ratio,2.2674383359858878,2.3,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CF10,2026-10-11
+2021,banks.npl_ratio,1.8766310248113156,1.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CJ10,2026-10-11
+2022,banks.npl_ratio,1.5145479863200153,1.5,percent,actual,official,nbg_fsi,FSD,O20,2026-10-11
+2023,banks.npl_ratio,2.5161240039774411,2.5,percent,actual,official,nbg_fsi,FSD,AA20,2026-10-11
+2024,banks.npl_ratio,2.5254552253903704,2.5,percent,actual,official,nbg_fsi,FSD,AM20,2026-10-11
+2025,banks.npl_ratio,2.5171254343605569,2.5,percent,actual,official,nbg_fsi,FSD,AY20,2026-10-11
+2001,banks.roa,2.0794814181542591,2.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,H21,2026-10-11
+2002,banks.roa,5.1270475895845502,5.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,L21,2026-10-11
+2003,banks.roa,4.6893400606139748,4.7,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,P21,2026-10-11
+2004,banks.roa,2.4098358245818483,2.4,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,T21,2026-10-11
+2005,banks.roa,3.7112568666313654,3.7,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,X21,2026-10-11
+2006,banks.roa,3.6390032848806286,3.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AB21,2026-10-11
+2007,banks.roa,2.6296552334970613,2.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AF21,2026-10-11
+2008,banks.roa,-2.5392274900358998,-2.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AJ21,2026-10-11
+2009,banks.roa,-0.79577653875395493,-0.8,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AN21,2026-10-11
+2010,banks.roa,2.0174348886592361,2.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AR21,2026-10-11
+2011,banks.roa,3.1573130194394126,3.2,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AV21,2026-10-11
+2012,banks.roa,1.3384177879479227,1.3,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AZ21,2026-10-11
+2013,banks.roa,2.8573964782919683,2.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BD21,2026-10-11
+2014,banks.roa,3.0207822310938144,3.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BH21,2026-10-11
+2015,banks.roa,2.6573291925972207,2.7,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BL21,2026-10-11
+2016,banks.roa,3.1199784707469846,3.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BP21,2026-10-11
+2017,banks.roa,3.0983549223688294,3.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BT21,2026-10-11
+2018,banks.roa,2.9695062974332491,3.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BX21,2026-10-11
+2019,banks.roa,2.4265718773808396,2.4,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CB21,2026-10-11
+2020,banks.roa,0.14758138779277508,0.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CF21,2026-10-11
+2021,banks.roa,3.9103950463303514,3.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CJ21,2026-10-11
+2022,banks.roa,3.8153921849504084,3.8,percent,actual,official,nbg_fsi,FSD,O29,2026-10-11
+2023,banks.roa,4.4635993379991445,4.5,percent,actual,official,nbg_fsi,FSD,AA29,2026-10-11
+2024,banks.roa,4.2379849904904221,4.2,percent,actual,official,nbg_fsi,FSD,AM29,2026-10-11
+2025,banks.roa,3.9092369769489648,3.9,percent,actual,official,nbg_fsi,FSD,AY29,2026-10-11
+2001,banks.roe,6.5325796461000589,6.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,H22,2026-10-11
+2002,banks.roe,17.88131845166334,17.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,L22,2026-10-11
+2003,banks.roe,17.751900878747364,17.8,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,P22,2026-10-11
+2004,banks.roe,10.085605238364579,10.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,T22,2026-10-11
+2005,banks.roe,18.158577257350924,18.2,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,X22,2026-10-11
+2006,banks.roe,20.182720802461567,20.2,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AB22,2026-10-11
+2007,banks.roe,13.179369238782948,13.2,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AF22,2026-10-11
+2008,banks.roe,-12.606231320978845,-12.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AJ22,2026-10-11
+2009,banks.roe,-4.307721835911698,-4.3,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AN22,2026-10-11
+2010,banks.roe,11.522217219540719,11.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AR22,2026-10-11
+2011,banks.roe,19.176489397113926,19.2,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AV22,2026-10-11
+2012,banks.roe,7.8716809334956865,7.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,AZ22,2026-10-11
+2013,banks.roe,16.571646823918616,16.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BD22,2026-10-11
+2014,banks.roe,17.464623149026917,17.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BH22,2026-10-11
+2015,banks.roe,17.579914040053428,17.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BL22,2026-10-11
+2016,banks.roe,22.069362681435013,22.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BP22,2026-10-11
+2017,banks.roe,23.254795797242554,23.3,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BT22,2026-10-11
+2018,banks.roe,23.435024903273305,23.4,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BX22,2026-10-11
+2019,banks.roe,19.858995778306515,19.9,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CB22,2026-10-11
+2020,banks.roe,1.4467705700349556,1.4,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CF22,2026-10-11
+2021,banks.roe,34.421700837886185,34.4,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CJ22,2026-10-11
+2022,banks.roe,24.790763267656637,24.8,percent,actual,official,nbg_fsi,FSD,O32,2026-10-11
+2023,banks.roe,24.666871530778067,24.7,percent,actual,official,nbg_fsi,FSD,AA32,2026-10-11
+2024,banks.roe,24.369821804214993,24.4,percent,actual,official,nbg_fsi,FSD,AM32,2026-10-11
+2025,banks.roe,22.89961304976314,22.9,percent,actual,official,nbg_fsi,FSD,AY32,2026-10-11
+2014,banks.capital_ratio,16.519357672508573,16.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BH8,2026-10-11
+2015,banks.capital_ratio,16.660066253961602,16.7,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BL8,2026-10-11
+2016,banks.capital_ratio,15.055920594889601,15.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BP8,2026-10-11
+2017,banks.capital_ratio,19.130673477622324,19.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BT8,2026-10-11
+2018,banks.capital_ratio,18.399204365417514,18.4,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BX8,2026-10-11
+2019,banks.capital_ratio,19.453373954808214,19.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CB8,2026-10-11
+2020,banks.capital_ratio,17.587926159640503,17.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CF8,2026-10-11
+2021,banks.capital_ratio,19.567149603005795,19.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CJ8,2026-10-11
+2022,banks.capital_ratio,20.326957006361756,20.3,percent,actual,official,nbg_fsi,FSD,O5,2026-10-11
+2023,banks.capital_ratio,22.136166494854614,22.1,percent,actual,official,nbg_fsi,FSD,AA5,2026-10-11
+2024,banks.capital_ratio,22.720099687209551,22.7,percent,actual,official,nbg_fsi,FSD,AM5,2026-10-11
+2025,banks.capital_ratio,22.22608897830473,22.2,percent,actual,official,nbg_fsi,FSD,AY5,2026-10-11
+2014,banks.tier1_ratio,13.085665042313742,13.1,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BH9,2026-10-11
+2015,banks.tier1_ratio,12.013297324644705,12.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BL9,2026-10-11
+2016,banks.tier1_ratio,10.482824341971272,10.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BP9,2026-10-11
+2017,banks.tier1_ratio,13.954374172236628,14.0,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BT9,2026-10-11
+2018,banks.tier1_ratio,13.518585615410908,13.5,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,BX9,2026-10-11
+2019,banks.tier1_ratio,14.624431096231483,14.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CB9,2026-10-11
+2020,banks.tier1_ratio,12.806867846227551,12.8,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CF9,2026-10-11
+2021,banks.tier1_ratio,15.582781168428445,15.6,percent,actual,official,nbg_fsi_archive,FSI_Deposit_Takers_eng,CJ9,2026-10-11
+2022,banks.tier1_ratio,17.123052654862299,17.1,percent,actual,official,nbg_fsi,FSD,O8,2026-10-11
+2023,banks.tier1_ratio,19.697149914021672,19.7,percent,actual,official,nbg_fsi,FSD,AA8,2026-10-11
+2024,banks.tier1_ratio,20.169007378862794,20.2,percent,actual,official,nbg_fsi,FSD,AM8,2026-10-11
+2025,banks.tier1_ratio,19.846680504029422,19.8,percent,actual,official,nbg_fsi,FSD,AY8,2026-10-11

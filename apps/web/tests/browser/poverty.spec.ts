@@ -4,15 +4,15 @@ import ExcelJS from "exceljs";
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`poverty hub and pages render ${prefix || "ka"} at ${width}px`, async ({ page }) => {
+  test(`living standards hub and poverty pages render ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`${prefix}/explorer/poverty`);
-    const hub = page.getByTestId("poverty-hub");
-    await expect(hub.locator("a")).toHaveCount(2);
-    await expect(hub.locator("a").first()).toHaveAttribute("href", `${prefix}/explorer/poverty/rates`);
-    for (const section of ["rates", "inequality"]) {
-      await page.goto(`${prefix}/explorer/poverty/${section}`);
+    await page.goto(`${prefix}/explorer/living-standards`);
+    const hub = page.getByTestId("living-standards-hub");
+    await expect(hub.locator("a")).toHaveCount(4);
+    await expect(hub.locator("a").nth(2)).toHaveAttribute("href", `${prefix}/explorer/living-standards/poverty`);
+    for (const section of ["poverty", "inequality"]) {
+      await page.goto(`${prefix}/explorer/living-standards/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
       await expect(page.getByTestId("series-status")).toContainText("1 /");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -22,7 +22,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 }
 
 test("rates default to Georgia's poverty line and tabs keep the clamped years", async ({ page }) => {
-  await page.goto("/en/explorer/poverty/rates");
+  await page.goto("/en/explorer/living-standards/poverty");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("poverty-latest")).toContainText("2025: 7.1%");
   await expect(page.getByTestId("poverty-tab-absolute")).toHaveAttribute("aria-pressed", "true");
@@ -40,7 +40,7 @@ test("rates default to Georgia's poverty line and tabs keep the clamped years", 
 });
 
 test("relative lines nest towns and villages without changing the top-level count", async ({ page }) => {
-  await page.goto("/en/explorer/poverty/rates#tab=relative");
+  await page.goto("/en/explorer/living-standards/poverty#tab=relative");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("series-status")).toContainText("1 / 2");
   await page.locator('[data-series-id="poverty.relative_40|georgia"] [aria-expanded]').click();
@@ -55,7 +55,7 @@ test("relative lines nest towns and villages without changing the top-level coun
 });
 
 test("inequality shows the Gini coefficient with two decimals and no tabs, and exports Excel", async ({ page }) => {
-  await page.goto("/en/explorer/poverty/inequality#view=table&start=2020&end=2025");
+  await page.goto("/en/explorer/living-standards/inequality#view=table&start=2020&end=2025");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("poverty-latest")).toContainText("2025: 0.34");
   await expect(page.getByTestId("poverty-tabs")).toHaveCount(0);

@@ -290,8 +290,8 @@ export function ChartTooltip({
   headerRight?: string | null;
   rows: TooltipRow[];
   hidden: number;
-  /** Also given the row's series id, for charts whose series are published at different precisions. */
-  formatValue: (value: number, seriesId: string) => string;
+  /** Receives the row's id too, so a readout can format one series differently (e.g. more decimals). */
+  formatValue: (value: number, id: string) => string;
   preliminaryLabel?: string;
   testId?: string;
   /** "panel": the phone readout, in flow under the chart so it never covers the plot. */
