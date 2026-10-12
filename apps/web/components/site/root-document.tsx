@@ -4,6 +4,9 @@ import type { ReactNode } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JsonLd } from "../seo/json-ld";
 import { SiteAnalytics } from "./site-analytics";
+import { SkipLink } from "./skip-link";
+import { getCommonMessages } from "../../lib/i18n/common.server";
+import { message } from "../../lib/i18n/messages";
 import { resolveSiteUrl } from "../../lib/siteUrl";
 import { siteJsonLd } from "../../lib/seo/structuredData";
 import type { Locale } from "../../lib/i18n/types";
@@ -45,6 +48,7 @@ export function RootDocument({ locale, children }: { locale: Locale; children: R
   return (
     <html lang={locale} className={`h-full antialiased ${notoSansGeorgian.variable} ${notoSerifGeorgian.variable} ${geistMono.variable}`}>
       <body className="min-h-full flex flex-col">
+        <SkipLink label={message(getCommonMessages(locale), "common.skipToContent")} />
         <JsonLd data={siteJsonLd(resolveSiteUrl(), locale)} testId="site-json-ld" />
         {children}
         <SiteAnalytics />

@@ -20,7 +20,7 @@ export function MethodologyHub({
   breadcrumbItems: readonly BreadcrumbItem[];
 }) {
   return (
-    <main data-testid="methodology-hub" className="mx-auto w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-14">
+    <main id="content" tabIndex={-1} data-testid="methodology-hub" className="mx-auto outline-none w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-14">
       <BreadcrumbTrail items={breadcrumbItems} />
       <section className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 border-b-2 border-[var(--ink)] pb-14 min-[860px]:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] min-[860px]:gap-16 min-[860px]:pb-20">
         <div className="max-w-[620px]">

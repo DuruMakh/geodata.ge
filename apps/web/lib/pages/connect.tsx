@@ -177,7 +177,7 @@ export async function renderConnectPage(locale: Locale) {
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
       <div className="mx-auto max-w-[1240px]">
         <SiteHeader locale={locale} active="connect" testId="connect-header" />
-        <main className="pt-10 min-[768px]:pt-16">
+        <main id="content" tabIndex={-1} className="pt-10 outline-none min-[768px]:pt-16">
           <BreadcrumbTrail items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "connect.breadcrumb"), path: pageHref("/connect", locale) }]} />
 
           <header className="border-t-2 border-[var(--ink)] pt-8">

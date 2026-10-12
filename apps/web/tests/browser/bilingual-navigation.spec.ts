@@ -69,3 +69,59 @@ for (const route of ["/no-such-page", "/en/no-such-page", "/explorer/municipalit
     expect(html).toContain("noindex");
   });
 }
+
+for (const { path, label } of [
+  { path: "/explorer/debt", label: "მთავარ შინაარსზე გადასვლა" },
+  { path: "/en/explorer/debt", label: "Skip to content" },
+]) {
+  test(`the first Tab reaches a skip link that moves focus to the content: ${path}, JavaScript on`, async ({ page }) => {
+    const hash = "#f=rate&m=table&r=2015-2025&sel=debt.rate.external";
+    await page.goto(`${path}${hash}`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: label, exact: true });
+    await expect(skip).toBeFocused();
+    expect((await skip.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#content")).toBeFocused();
+    // These pages keep their view in the URL hash; skipping must not replace it.
+    expect(new URL(page.url()).hash).toBe(hash);
+    await page.keyboard.press("Tab");
+    expect(await page.evaluate(() => document.getElementById("content")!.contains(document.activeElement))).toBe(true);
+  });
+
+  test(`the first Tab reaches a skip link that moves focus to the content: ${path}, JavaScript off`, async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto(path);
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: label, exact: true });
+    await expect(skip).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#content")).toBeFocused();
+    await context.close();
+  });
+}
+
+for (const path of ["/", "/en"]) {
+  test(`the landing page has one banner, one main and one footer: ${path}`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.getByRole("banner")).toHaveCount(1);
+    await expect(page.getByRole("main")).toHaveCount(1);
+    await expect(page.getByRole("contentinfo")).toHaveCount(1);
+  });
+}
+
+test("every page family has one skip target and a skip link that points to it", async ({ request }) => {
+  for (const [path, status] of [
+    ["/", 200], ["/en", 200], ["/about", 200], ["/en/connect", 200], ["/methodology", 200], ["/en/methodology/inflation", 200],
+    ["/explorer", 200], ["/en/explorer/debt", 200], ["/explorer/municipalities/batumi", 200], ["/no-such-page", 404], ["/explorer/municipalities/no-such-place", 404],
+  ] as const) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(status);
+    const html = await response.text();
+    expect(html.match(/\sid="content"/g), path).toHaveLength(1);
+    // The skip link is the first focusable element in the body.
+    expect(html.slice(html.indexOf("<body")).match(/<(?:a|button|input|select|summary)\b[^>]*>/)?.[0], path).toContain('href="#content"');
+  }
+});

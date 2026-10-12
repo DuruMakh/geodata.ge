@@ -43,7 +43,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
   ];
 
   return (
-    <main className="@container mx-auto w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-12">
+    <main id="content" tabIndex={-1} className="@container mx-auto outline-none w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-12">
       <BreadcrumbTrail items={breadcrumbItems} />
 
       <header className="border-b-2 border-[var(--ink)] pb-10 pt-9 min-[768px]:pb-14 min-[768px]:pt-12">

@@ -26,7 +26,7 @@ const englishDestinations = [
 
 export default function NotFound() {
   return (
-    <RootDocument locale="ka"><main className="min-h-screen bg-[var(--paper)] px-5 py-6 text-[var(--ink)] min-[768px]:px-7 min-[768px]:py-8">
+    <RootDocument locale="ka"><main id="content" tabIndex={-1} className="min-h-screen outline-none bg-[var(--paper)] px-5 py-6 text-[var(--ink)] min-[768px]:px-7 min-[768px]:py-8">
       <div className="mx-auto max-w-[760px] min-[768px]:pt-[min(18vh,11rem)]">
         <section data-testid="not-found-recovery" className="border-t-2 border-[var(--ink)] pt-5">
           <p className="font-[family-name:var(--font-numeric)] text-[11px] font-medium tracking-[0.08em] text-[var(--muted)]">

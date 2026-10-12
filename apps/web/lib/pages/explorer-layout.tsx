@@ -12,7 +12,7 @@ export async function renderExplorerLayout(locale: Locale, children: ReactNode) 
       <div className="flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">
         <DataSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex-1">{children}</div>
+          <div id="content" tabIndex={-1} className="flex-1 outline-none">{children}</div>
           <div className="px-5 min-[768px]:px-[34px]">
             <div className="mx-auto max-w-[1180px]"><ExplorerFooter locale={locale} /></div>
           </div>

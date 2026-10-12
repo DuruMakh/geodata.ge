@@ -836,6 +836,7 @@ The workspace's own breakpoints measure the **content column**, not the viewport
 - All controls have accessible names; toggles expose pressed/selected state (`aria-pressed`, `aria-checked`, `aria-expanded`); slider handles expose `role="slider"` with value attributes and keyboard support. Slider handles keep the 15 px visual dot but expose a 30 × 30 px interactive target.
 - Static SVG charts: `role="img"` + Georgian accessible label. Charts with focusable data points use a named `group` with individually named point images instead. SVG-only data must also exist in table/tooltip/summary.
 - Focus visible (accent ring) on paper.
+- Every page opens with a `მთავარ შინაარსზე გადასვლა` / `Skip to content` link, hidden until it has keyboard focus and then shown top-left on `paper` (ink, 13px, weight 600, 44px tall, the accent ring), that moves focus to the page's single `#content` (the explorer content column, or the site page's `main`, which header and footer sit beside) without changing the URL hash.
 - Never color-only meaning: swatch + label + value.
 - Respect `prefers-reduced-motion`.
 - Text floors: body copy ≥12px everywhere. Below 768px no informational text is under 11px, chart text included (§5.2, D8); from 768px only the metadata tiers listed in §4.1 (8.5–10.5px, each held to 4.5:1) and the 10–11px chart axes go below 12px.
