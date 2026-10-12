@@ -1426,7 +1426,7 @@ test("exposes the explorer breadcrumb as a navigation landmark", async ({ page }
   // 76 municipal pages — rendered the same information as a paragraph of spans
   // with an unhidden "/" separator and the current page marked by colour alone.
   const header = page.getByTestId("explorer-header");
-  const trail = header.getByRole("navigation", { name: "Breadcrumb" });
+  const trail = header.getByRole("navigation", { name: "ნავიგაციის ბილიკი" });
 
   await expect(trail).toBeVisible();
   await expect(trail.locator("[aria-current='page']")).toHaveText("ხარჯები");

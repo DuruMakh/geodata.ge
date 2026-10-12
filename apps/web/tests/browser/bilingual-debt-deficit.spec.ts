@@ -49,7 +49,7 @@ for (const [name, scope, hash] of [
   if (name === "rate") await expect(page.getByTestId("debt-measure-label")).toHaveText("%");
   if (name === "service") await expect(page.getByTestId("debt-forecast-note")).toContainText("portfolio outstanding on 31 December 2025");
   if (scope === "deficit") await expect(page.getByTestId("deficit-forecast-note")).toContainText("2026–2031");
-  const numbers = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].slice(1).map(cell => {
+  const numbers = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].map(cell => {
     const copy = cell.cloneNode(true) as HTMLElement;
     const annotations = copy.querySelectorAll("sup").length;
     copy.querySelectorAll("sup").forEach(annotation => annotation.remove());

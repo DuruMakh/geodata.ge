@@ -414,8 +414,8 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
     const totalRow = page.getByTestId("explorer-table").locator("tbody tr").last();
     await expect(totalRow).toContainText("მთლიანი ბიუჯეტი");
 
-    // Total row, last-year cell (label, then one td per year, then change,
-    // then share — third from the end). A hard-coded billion divisor would
+    // Total row, last-year cell (one td per year after the label's th, then
+    // change, then share — third from the end). A hard-coded billion divisor would
     // collapse Tbilisi's hundreds-of-millions total to a low single digit;
     // the million divisor keeps it in the hundreds or thousands.
     const cells = await totalRow.locator("td").allTextContents();

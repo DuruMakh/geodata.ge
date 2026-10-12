@@ -163,7 +163,8 @@ for (const { path, back, href, trail } of [
     await page.goto(path);
     const header = page.getByTestId("explorer-header");
     const jsonLd = await page.getByTestId("breadcrumb-json-ld").textContent();
-    const crumb = header.getByRole("navigation", { name: "Breadcrumb" });
+    const landmark = path.startsWith("/en/") ? "Breadcrumb" : "ნავიგაციის ბილიკი";
+    const crumb = header.getByRole("navigation", { name: landmark });
     await expect(crumb.getByRole("link")).toHaveCount(1);
     await expect(crumb.getByRole("link")).toHaveText(`←${back}`);
     await expect(crumb.getByRole("link")).toHaveAttribute("href", href);
@@ -171,7 +172,7 @@ for (const { path, back, href, trail } of [
     expect((await header.boundingBox())?.height ?? 999).toBeLessThanOrEqual(80);
 
     await page.setViewportSize({ width: 1024, height: 800 });
-    const full = header.getByRole("navigation", { name: "Breadcrumb" });
+    const full = header.getByRole("navigation", { name: landmark });
     await expect(full.locator("[aria-current=page]")).toHaveCount(1);
     if (trail) expect((await full.innerText()).split("/").map((part) => part.trim().toLowerCase())).toEqual(trail.map((part) => part.toLowerCase()));
     // Structured data is server-rendered once and does not depend on the width.

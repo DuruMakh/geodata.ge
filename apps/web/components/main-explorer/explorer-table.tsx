@@ -254,9 +254,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
 
   const total = showTotal && totalRow ? (
     <tr className="border-t-2 border-[var(--ink)]">
-      <td className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35] ${labelClass}`} style={cellPad}>
+      <th scope="row" className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35] ${labelClass}`} style={cellPad}>
         {rowLabel(totalRow)}
-      </td>
+      </th>
       {years.map((year) => (
         <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={{ ...cellPad, ...breakStyle(year) }}>
           {cellValue(totalRow, year)}
@@ -302,22 +302,22 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
-            <th className={`sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`}>
+            <th scope="col" className={`sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`}>
               {firstColumnLabel}
             </th>
             {years.map((year, index) => (
-              <th key={year} data-latest-year={index === lastIndex ? "" : undefined} style={breakStyle(year)} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
+              <th key={year} scope="col" data-latest-year={index === lastIndex ? "" : undefined} style={breakStyle(year)} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
                 {year}
                 {breakMark(year)}
               </th>
             ))}
             {showChangeColumn ? (
-              <th className={`${headCellClass} ${PIN_RIGHT_CLASS} ${shareColumnLabel ? "right-24" : "right-0"} z-[2] w-28 min-w-28 bg-[var(--paper)] uppercase tracking-[0.06em] shadow-[-1px_0_0_var(--hairline-soft)]`}>
+              <th scope="col" className={`${headCellClass} ${PIN_RIGHT_CLASS} ${shareColumnLabel ? "right-24" : "right-0"} z-[2] w-28 min-w-28 bg-[var(--paper)] uppercase tracking-[0.06em] shadow-[-1px_0_0_var(--hairline-soft)]`}>
                 {message(messages, "controls.change")}
               </th>
             ) : null}
             {shareColumnLabel ? (
-              <th className={`${headCellClass} ${PIN_RIGHT_CLASS} right-0 z-[2] w-24 min-w-24 bg-[var(--paper)] pr-0 uppercase tracking-[0.06em]`}>
+              <th scope="col" className={`${headCellClass} ${PIN_RIGHT_CLASS} right-0 z-[2] w-24 min-w-24 bg-[var(--paper)] pr-0 uppercase tracking-[0.06em]`}>
                 {shareColumnLabel} {endYear}
               </th>
             ) : null}
@@ -327,8 +327,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
           {totalFirst ? total : null}
           {rows.map((row) => (
             <tr key={row.itemId} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
-              <td
-                className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`}
+              <th
+                scope="row"
+                className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left font-normal shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`}
                 style={cellPad}
                 title={rowLabel(row)}
               >
@@ -336,7 +337,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   <SwatchBar color={row.color} />
                   <span className="text-[13px] font-medium text-[var(--ink)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35]">{rowLabel(row)}</span>
                 </span>
-              </td>
+              </th>
               {years.map((year, index) => (
                 <td
                   key={year}

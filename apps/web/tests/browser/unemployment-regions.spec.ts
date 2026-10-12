@@ -158,8 +158,8 @@ test("regional comparison keeps parent history when a region employment child is
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");
   const georgia = table.locator("tbody tr").filter({ hasText: /Georgia.*Employed/ });
   const hired = table.locator("tbody tr").filter({ hasText: /Tbilisi.*Hired/ });
-  await expect(georgia.locator("td").nth(1)).not.toHaveText("—");
-  await expect(hired.locator("td").nth(10)).toHaveText("—");
+  await expect(georgia.locator("td").nth(0)).not.toHaveText("—");
+  await expect(hired.locator("td").nth(9)).toHaveText("—");
   await expect(hired.locator("td").last()).toHaveText("361.2");
   await page.reload();
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");

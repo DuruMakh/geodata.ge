@@ -35,7 +35,7 @@ for (const viewport of [
       await expect(page.getByTestId("mission-copy").locator("p").nth(index)).toHaveText(copy);
     }
     await expect(page.getByTestId("mission-copy").locator("h2")).toHaveCount(0);
-    await expect(page.getByRole("navigation", { name: "Breadcrumb" })).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "ნავიგაციის ბილიკი" })).toHaveCount(0);
     await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(0);
     await expect(page.getByText("ჩვენი მიზანი / ტექსტი", { exact: true })).toHaveCount(0);
     await expect(page.getByText("საჯარო მონაცემი უნდა მუშაობდეს ადამიანისთვის.", { exact: true })).toHaveCount(0);

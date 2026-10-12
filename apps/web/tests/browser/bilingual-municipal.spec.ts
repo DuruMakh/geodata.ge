@@ -100,7 +100,7 @@ for (const [name, path, share] of [["municipality", "/khulo", false], ["region",
     if (name === "adjara") await expect(page.getByTestId("municipal-source-note")).toContainText("six municipalities");
     if (name === "country") await expect(page.getByTestId("municipal-source-note")).toContainText("69 official municipal budget units");
     if (name !== "country") await expect(page.getByTestId("municipal-entity-summary")).toContainText("2025");
-    const values = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].slice(1).map(cell => cell.textContent?.trim())));
+    const values = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].map(cell => cell.textContent?.trim())));
     const before = await values();
     expect(before.length).toBeGreaterThan(0);
     const hash = new URL(page.url()).hash;

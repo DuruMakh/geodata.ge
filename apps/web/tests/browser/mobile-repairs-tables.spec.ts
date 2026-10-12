@@ -10,7 +10,7 @@ async function visibleYearCells(scroller: Locator): Promise<number> {
     const yearColumns = headers.flatMap((th, index) => (/^\d{4}$/.test(th.textContent?.trim() ?? "") ? [index] : []));
     const row = element.querySelector("tbody tr");
     if (!row) return 0;
-    const cells = [...row.querySelectorAll("td")];
+    const cells = [...row.querySelectorAll("th, td")];
     const frame = element.getBoundingClientRect();
     return yearColumns.filter((index) => {
       const cell = cells[index];
@@ -50,7 +50,7 @@ for (const { name, path, minYears } of columnCases) {
     await expect.poll(() => scroller.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
     await expect.poll(() => visibleYearCells(scroller)).toBeGreaterThanOrEqual(minYears);
     // Names wrap at a readable size rather than widening the column.
-    expect(await scroller.locator("tbody td").first().evaluate((cell) => parseFloat(getComputedStyle(cell.querySelector("span span:last-child") ?? cell).fontSize))).toBeGreaterThanOrEqual(12);
+    expect(await scroller.locator("tbody th").first().evaluate((cell) => parseFloat(getComputedStyle(cell.querySelector("span span:last-child") ?? cell).fontSize))).toBeGreaterThanOrEqual(12);
     expect(await scroller.locator("thead th").evaluateAll((cells) => cells.slice(1).filter((cell) => getComputedStyle(cell).position === "sticky").length)).toBe(0);
     const latestVisible = await scroller.evaluate((element) => {
       const latest = element.querySelector("thead th[data-latest-year]")!.getBoundingClientRect();

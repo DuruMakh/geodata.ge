@@ -44,7 +44,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
 
   return (
     <main id="content" tabIndex={-1} className="@container mx-auto outline-none w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-12">
-      <BreadcrumbTrail items={breadcrumbItems} />
+      <BreadcrumbTrail items={breadcrumbItems} label={message(messages, "common.breadcrumb")} />
 
       <header className="border-b-2 border-[var(--ink)] pb-10 pt-9 min-[768px]:pb-14 min-[768px]:pt-12">
         <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.articleOverline")}</p>

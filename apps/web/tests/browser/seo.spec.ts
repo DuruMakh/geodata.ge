@@ -287,8 +287,8 @@ test("breadcrumb links keep non-overlapping 24px mobile targets and keyboard foc
     for (const route of ["/methodology/expenditure", "/explorer/expenditure", "/explorer/municipalities/tbilisi"] as const) {
       await page.goto(`${BASE_URL}${route}`);
       const breadcrumb = route.startsWith("/explorer")
-        ? page.getByTestId("explorer-header").getByRole("navigation", { name: "Breadcrumb" })
-        : page.getByRole("navigation", { name: "Breadcrumb" });
+        ? page.getByTestId("explorer-header").getByRole("navigation", { name: "ნავიგაციის ბილიკი" })
+        : page.getByRole("navigation", { name: "ნავიგაციის ბილიკი" });
       const links = breadcrumb.getByRole("link");
 
       expect(await links.count()).toBeGreaterThan(0);
@@ -518,7 +518,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
 
   // Only the trail on screen: below 768px a separate back-link replaces it.
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible')
     .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
@@ -540,7 +540,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
     "იმერეთი",
     "ჭიათურა",
   ]);
-  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "იმერეთი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible a', { hasText: "იმერეთი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/imereti",
   );
@@ -557,7 +557,7 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
     "თბილისი",
   ];
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible')
     .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
@@ -567,7 +567,7 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
 
   expect(visibleLabels).toEqual(expectedLabels);
   expect(structuredLabels).toEqual(expectedLabels);
-  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/tbilisi",
   );
@@ -600,7 +600,7 @@ for (const [route, expectedLabels] of [
   test(`${route} keeps visible and structured breadcrumbs aligned`, async ({ page }) => {
     await page.goto(`${BASE_URL}${route}`);
     const visibleLabels = await page
-      .locator('nav[aria-label="Breadcrumb"] [data-breadcrumb-label]')
+      .locator('nav[aria-label="ნავიგაციის ბილიკი"] [data-breadcrumb-label]')
       .allTextContents();
     const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
     const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(

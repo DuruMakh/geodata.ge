@@ -138,7 +138,8 @@ test.describe("Government Debt explorer", () => {
     ] as const;
     await expect(table.getByRole("columnheader")).toHaveText(["სერია", ...expectedByYear.map(([year]) => String(year))]);
     const rateRow = table.getByRole("row").filter({ hasText: "საგარეო განაკვეთი" });
-    await expect(rateRow.getByRole("cell")).toHaveText(["საგარეო განაკვეთი", ...expectedByYear.map(([, value]) => value)]);
+    await expect(rateRow.getByRole("rowheader")).toHaveText("საგარეო განაკვეთი");
+    await expect(rateRow.getByRole("cell")).toHaveText(expectedByYear.map(([, value]) => value));
 
     await page.getByTestId("chart-mode-line").click();
     await expect(page.getByTestId("explorer-table")).toHaveCount(0);

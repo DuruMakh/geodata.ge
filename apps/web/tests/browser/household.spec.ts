@@ -84,7 +84,7 @@ test("Georgia opens its own page: heading, 2002–2025, towns and villages as ti
   await page.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("chart-panel").getByRole("row").filter({ hasText: "ქალაქი" })).toHaveCount(1);
   // Breadcrumb: Living standards / Income / Georgia; the sidebar keeps Income active.
-  const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "Breadcrumb" }).first();
+  const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "ნავიგაციის ბილიკი" }).first();
   await expect(crumbs.getByRole("link", { name: "შემოსავლები" })).toHaveAttribute("href", "/explorer/living-standards/income");
   await expect(crumbs.locator("[aria-current=page]")).toHaveText("საქართველო");
   await expect(page.getByTestId("living-standards-income-link")).toHaveAttribute("aria-current", "page");
@@ -123,7 +123,7 @@ test("a list row opens the region's own page: its heading, latest value, years a
   await expect(page.getByTestId("source-label")).not.toContainText("geoBoundaries");
   await expect(page.getByTestId("household-excel-download")).toBeEnabled();
   // Breadcrumb: Living standards / Income / Guria; the sidebar keeps Income active.
-  const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "Breadcrumb" }).first();
+  const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "ნავიგაციის ბილიკი" }).first();
   await expect(crumbs.getByRole("link", { name: "შემოსავლები" })).toHaveAttribute("href", "/explorer/living-standards/income");
   await expect(crumbs.locator("[aria-current=page]")).toHaveText("გურია");
   await expect(page.getByTestId("living-standards-income-link")).toHaveAttribute("aria-current", "page");

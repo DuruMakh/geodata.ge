@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useI18n } from "../../lib/i18n/provider";
+import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 
 // Breadcrumb row above every explorer surface (DESIGN.md §6.7). The right-hand
@@ -24,7 +25,8 @@ type PageHeaderProps = {
 };
 
 export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
-  const { locale } = useI18n();
+  const { locale, messages } = useI18n();
+  const landmark = message(messages, "common.breadcrumb");
   const parent = crumbs.slice(0, -1).findLast((crumb) => crumb.href);
   return (
     <header
@@ -32,7 +34,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
       className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-2 border-[var(--ink)] pt-1 pb-1.5 min-[768px]:gap-y-2 min-[768px]:pt-[18px] min-[768px]:pb-3"
     >
       <nav
-        aria-label="Breadcrumb"
+        aria-label={landmark}
         className="text-[0.6875rem] min-[768px]:text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] max-[768px]:hidden"
       >
         {crumbs.map((crumb, index) => {
@@ -55,7 +57,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
         })}
       </nav>
       {parent?.href ? (
-        <nav aria-label="Breadcrumb" data-testid="explorer-back-crumb" className="min-[768px]:hidden">
+        <nav aria-label={landmark} data-testid="explorer-back-crumb" className="min-[768px]:hidden">
           <Link
             href={pageHref(parent.href, locale)}
             className="inline-flex min-h-11 items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] no-underline hover:text-[var(--ink)]"

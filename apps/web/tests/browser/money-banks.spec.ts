@@ -11,7 +11,8 @@ async function cell(page: Page, label: string, year: number) {
   const table = page.getByTestId("explorer-table");
   const column = (await table.locator("thead th").allInnerTexts()).findIndex(text => text.trim().startsWith(String(year)));
   expect(column).toBeGreaterThan(0);
-  return table.locator("tbody tr", { hasText: label }).locator("td").nth(column);
+  // The row label is the row's <th>, so value cells start one column earlier.
+  return table.locator("tbody tr", { hasText: label }).locator("td").nth(column - 1);
 }
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {

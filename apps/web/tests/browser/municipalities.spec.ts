@@ -507,7 +507,7 @@ test("keeps municipality share as share of its budget", async ({ page }) => {
   const toggle = page.getByTestId("municipal-share-toggle");
   await expect(toggle).toHaveText("% წილი");
   await toggle.click();
-  await expect(table.locator("tbody tr").first().locator("td").nth(1)).not.toHaveText("—");
+  await expect(table.locator("tbody tr").first().locator("td").nth(0)).not.toHaveText("—");
   await expect(page.getByTestId("municipal-workspace")).toContainText("წილი მთლიან ბიუჯეტში, %");
   await expect(page.getByTestId("municipal-workspace")).not.toContainText("მშპ");
 });

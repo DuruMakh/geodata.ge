@@ -21,7 +21,7 @@ export function tableSeriesValues(table: Locator, label: string): Promise<string
       if (column < 0) return [];
       return [...element.querySelectorAll("tbody tr[data-year]")].reverse().map((row) => text(row.querySelectorAll("td")[column]));
     }
-    const row = [...element.querySelectorAll("tbody tr")].find((tr) => text(tr.querySelector("td")).includes(name));
-    return row ? [...row.querySelectorAll("td")].slice(1).map(text) : [];
+    const row = [...element.querySelectorAll("tbody tr")].find((tr) => text(tr.querySelector("th")).includes(name));
+    return row ? [...row.querySelectorAll("td")].map(text) : [];
   }, label);
 }

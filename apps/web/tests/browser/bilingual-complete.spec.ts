@@ -30,12 +30,12 @@ test("the English explorer, language switch and shared bilingual publication agr
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const table = page.getByTestId("explorer-table");
   await expect(table).toContainText(education.seriesLabelEn);
-  const values = await table.locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].slice(1).map(cell => cell.textContent?.trim())));
+  const values = await table.locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].map(cell => cell.textContent?.trim())));
   expect(values.length).toBeGreaterThan(0);
   await page.getByTestId("language-switch").getByRole("link", { name: "ქართული", exact: true }).click();
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(table).toContainText(education.seriesLabelKa);
-  expect(await table.locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].slice(1).map(cell => cell.textContent?.trim())))).toEqual(values);
+  expect(await table.locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].map(cell => cell.textContent?.trim())))).toEqual(values);
   expect(new URL(page.url()).hash).toContain("spending.education");
   expect(education.documentIds.length).toBeGreaterThan(0);
 });
