@@ -111,7 +111,7 @@ for (const prefix of ["", "/en"]) {
   });
 }
 
-test("the two HTML originals download without executing archived website scripts", async ({ page, request }) => {
+test("the two HTML originals open as sandboxed text without executing archived website scripts", async ({ page, request }) => {
   await page.goto("/en/methodology/trade");
   const trackingRequests: string[] = [];
   page.on("request", req => { if (/googletagmanager|google-analytics|recaptcha/.test(req.url())) trackingRequests.push(req.url()); });
@@ -122,14 +122,12 @@ test("the two HTML originals download without executing archived website scripts
     const href = `/downloads/methodology/trade/files/${filename}`;
     const response = await request.get(href);
     expect(response.ok()).toBe(true);
-    expect(response.headers()["content-disposition"]).toBe("attachment");
+    expect(response.headers()["content-type"]).toMatch(/^text\/plain\b/);
     expect(response.headers()["content-security-policy"]).toBe("sandbox; default-src 'none'");
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(hash);
-    const downloaded = page.waitForEvent("download");
     await page.locator(`a[href="${href}"]`).click();
-    const download = await downloaded;
-    expect(download.suggestedFilename()).toBe(filename);
-    expect(createHash("sha256").update(await readFile((await download.path())!)).digest("hex")).toBe(hash);
+    await expect(page).toHaveURL(new RegExp(`${href.replaceAll(".", "\\.")}$`));
+    await page.goBack();
     await expect(page).toHaveURL(/\/en\/methodology\/trade$/);
   }
   expect(trackingRequests).toEqual([]);

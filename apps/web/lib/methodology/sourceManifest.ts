@@ -152,6 +152,10 @@ export async function validateSourceManifest(
     assertRelativeForwardSlashPath(row.repository_source_path, "repository_source_path");
     assertRelativeForwardSlashPath(row.public_download_path, "public_download_path");
     assertStablePublicDownloadPath(row.public_download_path);
+    // An archived web page published as .html would run the source site's scripts on fiscal.ge.
+    if (row.media_type === "text/html" && !row.public_download_path.endsWith(".txt")) {
+      throw new Error(`Archived web page ${row.source_id} must be published as .html.txt: ${row.public_download_path}`);
+    }
     const publicPrefix = `downloads/methodology/${datasetId}/files/`;
     if (!row.public_download_path.startsWith(publicPrefix) || row.public_download_path === publicPrefix) {
       throw new Error(`Invalid public download path for ${datasetId}: ${row.public_download_path}`);

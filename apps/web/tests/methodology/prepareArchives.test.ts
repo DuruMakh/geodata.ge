@@ -237,6 +237,19 @@ describe("methodology archive preparation", () => {
     })).rejects.toThrow(/does not equal the approved original inventory/i);
   });
 
+  it("rejects a text/html archive row whose public path does not end in .txt", async () => {
+    const { repositoryRoot, rows } = await createFixtureRepository();
+    const htmlRow = { ...rows.wages[0], media_type: "text/html", public_download_path: "downloads/methodology/wages/files/x.html" };
+    await writeFile(path.join(repositoryRoot, "data/methodology/source-archives/wages.csv"), manifestCsv([htmlRow]));
+
+    await expect(prepareMethodologyArchives({
+      repositoryRoot,
+      publicRoot: path.join(repositoryRoot, "apps/web/public"),
+      reportPath: path.join(repositoryRoot, "data/reports/methodology-archive-validation.json"),
+      mode: "write",
+    })).rejects.toThrow(htmlRow.source_id);
+  });
+
   it("checks two fresh generations without mutating the public tree", async () => {
     const { repositoryRoot } = await createFixtureRepository();
     const publicRoot = path.join(repositoryRoot, "apps/web/public");
