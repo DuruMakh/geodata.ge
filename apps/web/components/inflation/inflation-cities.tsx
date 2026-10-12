@@ -2,14 +2,13 @@
 
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import {
   buildCityIndex,
   buildCityLines,
   cityCoverage,
-  defaultCityState,
   rangeFromPatch,
   resolveCityRange,
   restoreCityState,
@@ -20,6 +19,7 @@ import {
   cityValues,
   GEORGIA_LINE_ID,
   HEADLINE_ID,
+  type CityIndex,
   type CityState,
   type CityView,
   type PackedCitySeries,
@@ -38,9 +38,8 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
@@ -57,6 +56,10 @@ import { InflationCityTable } from "./inflation-city-table";
 
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
+type CityHashData = { index: CityIndex; view: CityView };
+const parseCityState = (hash: string, { index, view }: CityHashData) => restoreCityState(hash, index, view);
+const serializeCityState = (state: CityState, { view }: CityHashData) => serializeCityHash(state, view);
+
 export type InflationCitiesProps = {
   view: CityView;
   facts: PackedCitySeries[];
@@ -70,17 +73,8 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
   const index = useMemo(() => buildCityIndex(unpackCityFacts(facts)), [facts]);
-  const [state, setState] = useState<CityState>(() => defaultCityState(view));
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    // The hash is read after hydration so the server render stays the stable default view.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(restoreCityState(window.location.hash, index, view));
-    setReady(true);
-  }, [index, view]);
-  useAppReady();
-  useReplaceHash(serializeCityHash(state, view), ready);
+  const hashData = useMemo(() => ({ index, view }), [index, view]);
+  const { state, update } = useHashState(hashData, parseCityState, serializeCityState);
 
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);
@@ -126,7 +120,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
             <SegmentedTabs<CityState["mode"]>
               ariaLabel={message(messages, "controls.viewMode")}
               value={state.mode}
-              onChange={(mode) => setState((current) => ({ ...current, mode }))}
+              onChange={(mode) => update((current) => ({ ...current, mode }))}
               options={[
                 { value: "chart", label: message(messages, "controls.chart"), testId: "chart-mode-chart" },
                 { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
@@ -137,7 +131,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
               </div>
             ) : state.mode === "table" ? (
-              <InflationCityTable index={index} view={view} state={state} range={range} onTableSeriesChange={(lineId) => setState((current) => ({ ...current, tableSeries: lineId }))} />
+              <InflationCityTable index={index} view={view} state={state} range={range} onTableSeriesChange={(lineId) => update((current) => ({ ...current, tableSeries: lineId }))} />
             ) : (
               <div className="mt-5">
                 <EditorialLineChart
@@ -160,7 +154,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
               formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
-              onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+              onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
           <div className="mt-[18px] space-y-2">
@@ -181,8 +175,8 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
           view={view}
           state={state}
           range={range}
-          onToggle={(lineId) => setState((current) => toggleCityLine(current, view, lineId))}
-          onToggleAll={() => setState((current) => toggleAllCityLines(current, view))}
+          onToggle={(lineId) => update((current) => toggleCityLine(current, view, lineId))}
+          onToggleAll={() => update((current) => toggleAllCityLines(current, view))}
           downloadAction={
             <ExcelDownloadButton
               testId="inflation-city-download"

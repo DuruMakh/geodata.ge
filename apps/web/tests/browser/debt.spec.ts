@@ -154,9 +154,8 @@ test.describe("Government Debt explorer", () => {
     await expect(page.getByTestId("series-status")).toContainText("1 / 9");
     await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
 
-    // Change the document URL as well as the hash: the explorer intentionally
-    // parses shared-link state once per mount, so a hash-only navigation would
-    // keep the first case's live state instead of exercising a fresh restore.
+    // Change the document URL as well as the hash so this case exercises a fresh
+    // page load's restore rather than a same-document hash change.
     await page.goto(`${TEST_BASE_URL}/explorer/debt?case=empty#f=rate&m=line&r=2015-2025&sel=`);
     await expectAppReady(page);
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
@@ -266,5 +265,41 @@ test.describe("Government Debt explorer", () => {
     }
     await expect(bulk).toHaveAttribute("data-state", "true");
     await expect(page.getByTestId("series-status")).toContainText("3 / 9");
+  });
+
+  // U06-04: the hash was read once on mount, so an address-bar edit left the URL and the view disagreeing.
+  test("editing the hash in the address bar updates the view", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "stock");
+
+    await page.evaluate(() => { window.location.hash = "f=rate&m=table&sel=debt.rate.total"; });
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "rate");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+    await expect(seriesRow(page, "debt.rate.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
+
+    // The next change builds on the edited state instead of overwriting it with the old one.
+    await page.getByTestId("chart-mode-line").click();
+    await expect(page).toHaveURL(/#f=rate&m=line&r=\d{4}-\d{4}&sel=debt\.rate\.total$/);
+  });
+
+  // Review Focus 3: a deliberate clear must not come back as the default selection.
+  test("an explicitly empty sel= survives Back and Forward", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt`);
+    await expectAppReady(page);
+    await page.getByTestId("series-toggle-all").click();
+    await expect(page).toHaveURL(/#f=stock&m=line&r=\d{4}-\d{4}&sel=$/);
+
+    await page.evaluate(() => { window.location.hash = "f=stock&sel=debt.stock.domestic"; });
+    await expect(page.getByTestId("series-status")).toContainText("1 / 9");
+
+    await page.goBack();
+    await expect(page).toHaveURL(/sel=$/);
+    await expect(page.getByTestId("series-status")).toContainText("0 / 9");
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+
+    await page.goForward();
+    await expect(seriesRow(page, "debt.stock.domestic").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 9");
   });
 });

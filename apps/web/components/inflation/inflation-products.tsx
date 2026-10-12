@@ -3,12 +3,12 @@
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { makePeriod, periodKey, periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { buildProductIndex, productAnnual, productColor, productCumulative, type ClientProduct, type PackedProductSeries } from "../../lib/explorer/inflationProducts";
-import { parseProductHash, serializeProductHash, toggleProduct, type ProductState } from "../../lib/explorer/inflationProductState";
+import { parseProductHash, serializeProductHash, toggleProduct } from "../../lib/explorer/inflationProductState";
 import { buildInflationProductWorkbookExportModel } from "../../lib/explorer/inflationProductWorkbook";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -19,9 +19,8 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
@@ -46,17 +45,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
   const { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `inflation.${key}`, values);
   const index = useMemo(() => buildProductIndex(products, facts), [products, facts]);
-  const [state, setState] = useState<ProductState>(() => parseProductHash("", index));
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    // The static server render is the stable default; restore a shared URL after hydration.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(parseProductHash(window.location.hash, index));
-    setReady(true);
-  }, [index]);
-  useAppReady();
-  useReplaceHash(serializeProductHash(state), ready);
+  const { state, update } = useHashState(index, parseProductHash, serializeProductHash);
 
   const minYear = index.earliestYear;
   const maxYear = periodYear(index.latestPeriod);
@@ -118,7 +107,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
                 data-testid="product-cumulative-toggle"
                 aria-label={toggleAction}
                 aria-pressed={state.indicator === "cumulative"}
-                onClick={() => setState((current) => ({ ...current, indicator: current.indicator === "annual" ? "cumulative" : "annual" }))}
+                onClick={() => update((current) => ({ ...current, indicator: current.indicator === "annual" ? "cumulative" : "annual" }))}
                 className={`flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-[2px] border border-[var(--control)] transition-[background-color,color] duration-150 ${state.indicator === "cumulative" ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--ink)] hover:bg-[var(--tint)]"}`}
               >
                 <TrendingUp size={18} aria-hidden="true" strokeWidth={1.75} />
@@ -153,7 +142,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
           <RangeStrip
             years={years}
             range={range}
-            onChange={(patch) => setState((current) => ({ ...current, range: {
+            onChange={(patch) => update((current) => ({ ...current, range: {
               startYear: patch.start ?? current.range.startYear,
               endYear: patch.end ?? current.range.endYear,
             } }))}
@@ -170,8 +159,8 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
       <InflationProductPanel
         index={index}
         state={state}
-        onToggle={(id) => setState((current) => toggleProduct(current, id))}
-        onClear={() => setState((current) => ({ ...current, selected: [] }))}
+        onToggle={(id) => update((current) => toggleProduct(current, id))}
+        onClear={() => update((current) => ({ ...current, selected: [] }))}
         downloadAction={<ExcelDownloadButton
           testId="inflation-product-download"
           disabled={false}
@@ -180,6 +169,6 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
       />
     </ExplorerWorkspace>
     <InflationProductIndicators index={index} state={state} />
-    <InflationProductTable index={index} state={state} onToggle={(id) => setState((current) => toggleProduct(current, id))} />
+    <InflationProductTable index={index} state={state} onToggle={(id) => update((current) => toggleProduct(current, id))} />
   </ExplorerPage>;
 }

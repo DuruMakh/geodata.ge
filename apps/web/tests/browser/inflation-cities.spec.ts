@@ -154,6 +154,37 @@ test("clearing the selection can be undone from the same control", async ({ page
   await expect(page.getByTestId("series-status")).toContainText("7 / 7");
 });
 
+// U15-08: the hash was read once after hydration, so an address-bar edit needed a reload.
+test("editing the hash in the address bar updates the view", async ({ page }) => {
+  await page.goto(`/en${CITIES}/batumi#sel=total%2C01%2C07`);
+  await ready(page);
+  await expect(page.getByTestId("series-status")).toContainText("3 / 13");
+
+  await page.evaluate(() => { window.location.hash = "m=table&sel=total%2C01&t=01"; });
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  await expect(page.getByTestId("series-status")).toContainText("2 / 13");
+  await expect(page.getByTestId("inflation-city-table-series-cpi.cat.01")).toHaveAttribute("aria-pressed", "true");
+});
+
+// Review Focus 3: a deliberate clear must not come back as the default selection.
+test("an explicitly empty sel= survives Back and Forward", async ({ page }) => {
+  await page.goto(`/en${CITIES}`);
+  await ready(page);
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page).toHaveURL(/#m=chart&sel=$/);
+
+  await page.evaluate(() => { window.location.hash = "m=chart&sel=georgia%2Cbatumi"; });
+  await expect(page.getByTestId("series-status")).toContainText("2 / 7");
+
+  await page.goBack();
+  await expect(page).toHaveURL(/#m=chart&sel=$/);
+  await expect(page.getByTestId("series-status")).toContainText("0 / 7");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+
+  await page.goForward();
+  await expect(page.getByTestId("series-status")).toContainText("2 / 7");
+});
+
 test("the hub links the Georgia page and the sidebar stays on the section across city pages", async ({ page }) => {
   await page.goto("/en/explorer/inflation");
   await page.getByTestId("inflation-hub").locator('a[href="/en/explorer/inflation/cities"]').click();

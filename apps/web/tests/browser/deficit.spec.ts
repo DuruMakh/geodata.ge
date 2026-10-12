@@ -76,6 +76,43 @@ test.describe("General-government deficit explorer", () => {
     await expect(page).toHaveURL(/sel=deficit\.general_government\.balance$/);
   });
 
+  // U07-02: the hash was read once on mount, so an address-bar edit left the URL and the view disagreeing.
+  test("editing the hash in the address bar updates the view", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "line");
+
+    await page.evaluate(() => { window.location.hash = "m=table&sh=0&r=2020-2025"; });
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "amount");
+    await expect(page.getByRole("slider", { name: "საწყისი წელი" })).toHaveAttribute("aria-valuenow", "2020");
+    await expect(page.getByRole("slider", { name: "საბოლოო წელი" })).toHaveAttribute("aria-valuenow", "2025");
+
+    // The next change builds on the edited state instead of overwriting it with the old one.
+    await page.getByTestId("chart-mode-line").click();
+    await expect(page).toHaveURL(/#m=line&sh=0&r=2020-2025&sel=deficit\.general_government\.balance$/);
+  });
+
+  // Review Focus 3: a deliberate clear must not come back as the default selection.
+  test("an explicitly empty sel= survives Back and Forward", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await page.getByTestId("series-row-toggle").click();
+    await expect(page).toHaveURL(/sel=$/);
+
+    await page.evaluate(() => { window.location.hash = "m=line&sh=1&r=2010-2025&sel=deficit.general_government.balance"; });
+    await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+
+    await page.goBack();
+    await expect(page).toHaveURL(/sel=$/);
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+    await expect(page.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
+
+    await page.goForward();
+    await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+    await expect(page.getByRole("slider", { name: "საწყისი წელი" })).toHaveAttribute("aria-valuenow", "2010");
+  });
+
   test("downloads the active range with IMF source and projection status", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");

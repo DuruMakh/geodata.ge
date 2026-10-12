@@ -1,7 +1,7 @@
 "use client";
 
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { ClientGeneralGovernmentBalanceFact } from "../../lib/explorer/clientData";
 import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
 import { parseDeficitHash, serializeDeficitHash } from "../../lib/explorer/deficitUrlState";
@@ -27,10 +27,9 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { useHashState } from "../explorer-shell/use-hash-state";
 
 type DeficitExplorerProps = {
   facts: ClientGeneralGovernmentBalanceFact[];
@@ -39,6 +38,25 @@ type DeficitExplorerProps = {
   siteOrigin?: string;
   lastUpdatedAt: string;
 };
+
+type DeficitBounds = { min: number; max: number };
+type DeficitState = { chartMode: ChartMode; percentage: boolean; selected: boolean; range: { start: number; end: number } };
+
+function parseDeficitState(hash: string, { min, max }: DeficitBounds): DeficitState {
+  const parsed = parseDeficitHash(hash);
+  const start = Math.min(Math.max(parsed.range?.start ?? min, min), max);
+  const end = Math.min(Math.max(parsed.range?.end ?? max, min), max);
+  return {
+    chartMode: parsed.chartMode ?? "line",
+    percentage: parsed.percentage ?? true,
+    selected: parsed.selected ?? true,
+    range: { start: Math.min(start, end), end: Math.max(start, end) },
+  };
+}
+
+function serializeDeficitState({ chartMode, percentage, selected, range }: DeficitState): string {
+  return serializeDeficitHash({ chartMode, percentage, rangeStart: range.start, rangeEnd: range.end, selected });
+}
 
 export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, lastUpdatedAt }: DeficitExplorerProps) {
   const presentation = useI18n();
@@ -49,12 +67,13 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
   );
   const min = years[0] ?? 0;
   const max = years.at(-1) ?? min;
-  const [chartMode, setChartMode] = useState<ChartMode>("line");
-  const [percentage, setPercentage] = useState(true);
-  const [selected, setSelected] = useState(true);
+  const bounds = useMemo(() => ({ min, max }), [min, max]);
+  const { state, update } = useHashState(bounds, parseDeficitState, serializeDeficitState);
+  const { chartMode, percentage, selected } = state;
+  const range = useMemo(() => ({ ...state.range, min, max }), [state.range, min, max]);
+  const setChartMode = (mode: ChartMode) => update((current) => ({ ...current, chartMode: mode }));
+  const setPercentage = (share: boolean) => update((current) => ({ ...current, percentage: share }));
   const [query, setQuery] = useState("");
-  const [range, setRange] = useState({ start: min, end: max, min, max });
-  const parsedRef = useRef(false);
   const model = useMemo(
     () => buildDeficitExplorerModel({ facts, range, percentage, selected }, presentation),
     [facts, range, percentage, selected, presentation],
@@ -88,37 +107,6 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
       : formatAmount(latestActual.generalGovernmentBalanceGel, locale)
     : "—";
   const coverage = coverageLabel(messages, locale, years.length > 0 ? min : undefined, years.length > 0 ? max : undefined, lastUpdatedAt || undefined);
-
-  useEffect(() => {
-    if (parsedRef.current) return;
-    parsedRef.current = true;
-    const parsed = parseDeficitHash(window.location.hash);
-    const rawStart = parsed.range?.start ?? min;
-    const rawEnd = parsed.range?.end ?? max;
-    const start = Math.min(Math.max(rawStart, min), max);
-    const end = Math.min(Math.max(rawEnd, min), max);
-
-    /* eslint-disable react-hooks/set-state-in-effect */
-    if (parsed.chartMode) setChartMode(parsed.chartMode);
-    if (parsed.percentage !== undefined) setPercentage(parsed.percentage);
-    if (parsed.selected !== undefined) setSelected(parsed.selected);
-    setRange({ start: Math.min(start, end), end: Math.max(start, end), min, max });
-    /* eslint-enable react-hooks/set-state-in-effect */
-    // The hash belongs to the initial browser location, not to later prop changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const hash = serializeDeficitHash({
-    chartMode,
-    percentage,
-    rangeStart: range.start,
-    rangeEnd: range.end,
-    selected,
-  });
-
-  useReplaceHash(hash);
-
-  useAppReady();
 
   return (
     <ExplorerPage testId="deficit-explorer" repeatDesktopBottomPadding>
@@ -205,10 +193,9 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
             <RangeStrip
               years={years}
               range={range}
-              onChange={(patch) => setRange((current) => ({
+              onChange={(patch) => update((current) => ({
                 ...current,
-                start: patch.start ?? current.start,
-                end: patch.end ?? current.end,
+                range: { start: patch.start ?? current.range.start, end: patch.end ?? current.range.end },
               }))}
               marker={forecastBoundaryYear === null
                 ? undefined
@@ -245,7 +232,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
             totalCount={1}
             hasSelection={selected}
             allSelected={selected}
-            onToggleAll={() => setSelected(false)}
+            onToggleAll={() => update((current) => ({ ...current, selected: false }))}
             allowSelectAll={false}
             hasVisibleMatches={queryMatches}
           >
@@ -257,7 +244,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                 value={headlineValue}
                 selected={selected}
                 level="total"
-                onToggle={() => setSelected((current) => !current)}
+                onToggle={() => update((current) => ({ ...current, selected: !current.selected }))}
               />
             ) : null}
           </SeriesSelector>

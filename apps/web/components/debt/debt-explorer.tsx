@@ -32,7 +32,6 @@ import { useDebtExplorerState } from "./use-debt-explorer-state";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 
@@ -291,8 +290,6 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
 
 export function DebtExplorer(props: DebtExplorerProps) {
   const state = useDebtExplorerState(props.facts);
-
-  useAppReady();
 
   return (
     <DebtExplorerSurface

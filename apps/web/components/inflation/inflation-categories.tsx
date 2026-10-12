@@ -2,7 +2,7 @@
 
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
 import { formatDisplayDate, formatPoints } from "../../lib/explorer/format";
@@ -10,7 +10,6 @@ import { formatDisplayDate, formatPoints } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import {
   CATEGORY_TABS,
-  DEFAULT_CATEGORY_STATE,
   DIVISION_IDS,
   RESIDUAL_ID,
   buildCategoryIndex,
@@ -25,6 +24,7 @@ import {
   serializeCategoryHash,
   toggleCategory,
   toggleExpanded,
+  type CategoryIndex,
   type CategoryState,
   type PackedCategorySeries,
   type CategoryTab,
@@ -51,9 +51,8 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { useHashState } from "../explorer-shell/use-hash-state";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
@@ -61,6 +60,12 @@ import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 // active rate (owner decision D2, 2026-10-07), then the unit line.
 
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
+
+// A restored hash keeps its range only where the tab has data.
+function parseCategoriesHash(hash: string, index: CategoryIndex): CategoryState {
+  const parsed = parseCategoryHash(hash);
+  return changeCategoryTab(parsed, parsed.tab, index);
+}
 
 export type InflationCategoriesProps = {
   /** Packed on the server: 27,668 rows cross the wire, so they travel as dense runs. */
@@ -80,21 +85,8 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
   const index = useMemo(() => buildCategoryIndex(unpackCategoryFacts(facts), weights), [facts, weights]);
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
-  const [state, setState] = useState<CategoryState>(DEFAULT_CATEGORY_STATE);
-  const [ready, setReady] = useState(false);
+  const { state, update } = useHashState(index, parseCategoriesHash, serializeCategoryHash);
   const [announcement, setAnnouncement] = useState("");
-
-  useEffect(() => {
-    const parsed = parseCategoryHash(window.location.hash);
-    // The hash is read after hydration so the server render stays the stable default view.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(changeCategoryTab(parsed, parsed.tab, index));
-    setReady(true);
-  }, [index]);
-  useAppReady();
-
-  const serializedHash = serializeCategoryHash(state);
-  useReplaceHash(serializedHash, ready);
 
   const range = resolveCategoryRange(state, index);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
@@ -121,7 +113,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
   function selectTab(tab: CategoryTab) {
     const next = changeCategoryTab(state, tab, index);
     const nextRange = resolveCategoryRange(next, index);
-    setState(next);
+    update(() => next);
     setAnnouncement(
       t("rangeChanged", {
         start: periodLabel(messages, nextRange.start, "short"),
@@ -190,7 +182,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
             <SegmentedTabs<CategoryState["mode"]>
               ariaLabel={message(messages, "controls.viewMode")}
               value={state.mode}
-              onChange={(mode) => setState((current) => ({ ...current, mode }))}
+              onChange={(mode) => update((current) => ({ ...current, mode }))}
               options={[
                 {
                   value: "chart",
@@ -209,7 +201,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
                 index={index}
                 state={state}
                 range={range}
-                onTableSeriesChange={(categoryId) => setState((current) => ({ ...current, tableSeries: categoryId }))}
+                onTableSeriesChange={(categoryId) => update((current) => ({ ...current, tableSeries: categoryId }))}
               />
             ) : state.tab === "contrib" ? (
               <div className="mt-5">
@@ -262,7 +254,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
               formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
-              onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+              onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
           <div className="mt-[18px] space-y-2">
@@ -287,12 +279,12 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
           index={index}
           state={state}
           range={range}
-          onToggle={(categoryId) => setState((current) => toggleCategory(current, categoryId, index))}
-          onToggleExpanded={(categoryId) => setState((current) => toggleExpanded(current, categoryId))}
+          onToggle={(categoryId) => update((current) => toggleCategory(current, categoryId, index))}
+          onToggleExpanded={(categoryId) => update((current) => toggleExpanded(current, categoryId))}
           onToggleAll={() =>
             // Clearing 55 rows was a one-way door: the selector hides the bulk
             // button when nothing is selected, and the hash keeps it empty.
-            setState((current) => ({
+            update((current) => ({
               ...current,
               selected: current.selected.length > 0 ? [] : DIVISION_IDS.filter((id) => index.order.includes(id)),
             }))

@@ -2,7 +2,7 @@
 
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import type { ClientCpiFact } from "../../lib/servedRows";
@@ -11,9 +11,9 @@ import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explor
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
-  DEFAULT_INFLATION_STATE, INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
+  INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
   parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection,
-  type InflationState, type InflationTab,
+  type InflationIndex, type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
 import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -31,14 +31,19 @@ import { InflationTable } from "./inflation-table";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { useHashState } from "../explorer-shell/use-hash-state";
 
 // Inflation overview (spec §6): the GDP overview's centred tabs over the Budget
 // explorers' workspace — chart or monthly table, range strip and series panel.
 
 const INDEX_UNIT = { divisor: 1, label: "", decimals: 1 };
+
+// A restored hash keeps its range only where the tab has data.
+function parseOverviewHash(hash: string, index: InflationIndex): InflationState {
+  const parsed = parseInflationHash(hash);
+  return changeInflationTab(parsed, parsed.tab, index);
+}
 
 export type InflationOverviewProps = {
   facts: ClientCpiFact[];
@@ -59,21 +64,8 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
     () => indexInflationFacts(facts, sourceIdBySeriesMeasure),
     [facts, sourceIdBySeriesMeasure],
   );
-  const [state, setState] = useState<InflationState>(DEFAULT_INFLATION_STATE);
-  const [ready, setReady] = useState(false);
+  const { state, update } = useHashState(index, parseOverviewHash, serializeInflationHash);
   const [announcement, setAnnouncement] = useState("");
-
-  useEffect(() => {
-    const parsed = parseInflationHash(window.location.hash);
-    // The hash is read after hydration so the server render stays the stable default view.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(changeInflationTab(parsed, parsed.tab, index));
-    setReady(true);
-  }, [index]);
-  useAppReady();
-
-  const serializedHash = serializeInflationHash(state);
-  useReplaceHash(serializedHash, ready);
 
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);
@@ -97,7 +89,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   function selectTab(tab: InflationTab) {
     const next = changeInflationTab(state, tab, index);
     const nextRange = resolveInflationRange(next, index);
-    setState(next);
+    update(() => next);
     setAnnouncement(t("rangeChanged", { start: periodLabel(messages, nextRange.start, "short"), end: periodLabel(messages, nextRange.end, "short") }));
   }
 
@@ -138,7 +130,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
             <SegmentedTabs<InflationState["mode"]>
               ariaLabel={message(messages, "controls.viewMode")}
               value={state.mode}
-              onChange={(mode) => setState((current) => ({ ...current, mode }))}
+              onChange={(mode) => update((current) => ({ ...current, mode }))}
               options={[
                 { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
                 { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
@@ -149,7 +141,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
               </div>
             ) : state.mode === "table" ? (
-              <InflationTable index={index} state={state} range={range} onTableSeriesChange={(key) => setState((current) => ({ ...current, tableSeries: key }))} />
+              <InflationTable index={index} state={state} range={range} onTableSeriesChange={(key) => update((current) => ({ ...current, tableSeries: key }))} />
             ) : (
               <div className="mt-5">
                 <EditorialLineChart
@@ -172,7 +164,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
               formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
-              onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+              onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
           <div className="mt-[18px] space-y-2">
@@ -190,8 +182,8 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
           targets={targets}
           state={state}
           range={range}
-          onToggle={(key) => setState((current) => toggleSelection(current, key))}
-          onClear={() => setState((current) => ({ ...current, selected: [] }))}
+          onToggle={(key) => update((current) => toggleSelection(current, key))}
+          onClear={() => update((current) => ({ ...current, selected: [] }))}
           downloadAction={
             <ExcelDownloadButton
               testId="inflation-download"
