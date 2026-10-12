@@ -1,0 +1,682 @@
+﻿year,indicator_id,value,published_value,unit,basis,value_status,source_id,source_sheet,source_cell,source_label,source_number_format
+2013,electricity.exports,450.4,450.4,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E7,Exports | Electricity (GWh),"#,##0.0"
+2014,electricity.exports,604.4,604.4,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E6,Exports | Electricity (GWh),"#,##0.0"
+2015,electricity.exports,659.9,659.9,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E6,Exports | Electricity (GWh),"#,##0.0"
+2016,electricity.exports,1408.6,1408.6,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0"
+2017,electricity.exports,939.7,939.7,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0"
+2018,electricity.exports,602,602.0,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.exports,379.6,379.6,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.exports,255.6,255.6,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0"
+2021,electricity.exports,1574.7,1574.7,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0"
+2022,electricity.exports,4131.3,4131.3,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0"
+2023,electricity.exports,4912.8999999999996,4912.9,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0"
+2024,electricity.exports,2121.6999999999998,2121.7,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F6,Exports | Electricity (GWh),"#,##0.0"
+2013,electricity.final.agriculture,34.6,34.6,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E42,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2014,electricity.final.agriculture,30.5,30.5,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E41,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2015,electricity.final.agriculture,56.7,56.7,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E41,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2016,electricity.final.agriculture,52.5,52.5,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F43,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2017,electricity.final.agriculture,62.9,62.9,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F43,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2018,electricity.final.agriculture,79.400000000000006,79.4,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F44,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.final.agriculture,80.900000000000006,80.9,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F46,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.final.agriculture,83.8,83.8,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F46,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2021,electricity.final.agriculture,94.7,94.7,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F46,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2022,electricity.final.agriculture,107,107.0,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F46,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2023,electricity.final.agriculture,112,112.0,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F46,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2024,electricity.final.agriculture,104,104.0,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F46,Agriculture/forestry/fishing | Electricity (GWh),"#,##0.0"
+2013,electricity.final.commercial_public,2572.1999999999998,2572.2,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E40,Commercial and public services | Electricity (GWh),"#,##0.0"
+2014,electricity.final.commercial_public,2567.5,2567.5,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E39,Commercial and public services | Electricity (GWh),"#,##0.0"
+2015,electricity.final.commercial_public,2544.9,2544.9,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E39,Commercial and public services | Electricity (GWh),"#,##0.0"
+2016,electricity.final.commercial_public,2882,2882.0,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F41,Commercial and public services | Electricity (GWh),"#,##0.0"
+2017,electricity.final.commercial_public,3051.9,3051.9,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F41,Commercial and public services | Electricity (GWh),"#,##0.0"
+2018,electricity.final.commercial_public,3781,3781.0,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F42,Commercial and public services | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.final.commercial_public,3785.8,3785.8,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F44,Commercial and public services | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.final.commercial_public,2915,2915.0,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F44,Commercial and public services | Electricity (GWh),"#,##0.0"
+2021,electricity.final.commercial_public,3641.7,3641.7,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F44,Commercial and public services | Electricity (GWh),"#,##0.0"
+2022,electricity.final.commercial_public,3694.9,3694.9,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F44,Commercial and public services | Electricity (GWh),"#,##0.0"
+2023,electricity.final.commercial_public,3361.2,3361.2,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F44,Commercial and public services | Electricity (GWh),"#,##0.0"
+2024,electricity.final.commercial_public,4021.5,4021.5,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F44,Commercial and public services | Electricity (GWh),"#,##0.0"
+2013,electricity.final.households,2253.3000000000002,2253.3,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E41,Residential | Electricity (GWh),"#,##0.0"
+2014,electricity.final.households,2465.1999999999998,2465.2,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E40,Residential | Electricity (GWh),"#,##0.0"
+2015,electricity.final.households,2462.4,2462.4,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E40,Residential | Electricity (GWh),"#,##0.0"
+2016,electricity.final.households,2423,2423.0,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F42,Residential | Electricity (GWh),"#,##0.0"
+2017,electricity.final.households,2460.9,2460.9,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F42,Residential | Electricity (GWh),"#,##0.0"
+2018,electricity.final.households,2484,2484.0,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F43,Residential | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.final.households,2461,2461.0,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F45,Residential | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.final.households,2565,2565.0,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F45,Residential | Electricity (GWh),"#,##0.0"
+2021,electricity.final.households,2641,2641.0,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F45,Residential | Electricity (GWh),"#,##0.0"
+2022,electricity.final.households,2682,2682.0,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F45,Residential | Electricity (GWh),"#,##0.0"
+2023,electricity.final.households,2751,2751.0,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F45,Residential | Electricity (GWh),"#,##0.0"
+2024,electricity.final.households,2959,2959.0,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F45,Residential | Electricity (GWh),"#,##0.0"
+2013,electricity.final.industry,2327.3000000000002,2327.3,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E23,Industry | Electricity (GWh),"#,##0.0"
+2014,electricity.final.industry,2816.9,2816.9,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E22,Industry | Electricity (GWh),"#,##0.0"
+2015,electricity.final.industry,2751.3,2751.3,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E22,Industry | Electricity (GWh),"#,##0.0"
+2016,electricity.final.industry,2901.6000000000008,2901.6,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F24,Industry | Electricity (GWh),"#,##0.0"
+2017,electricity.final.industry,3294.5,3294.5,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F24,Industry | Electricity (GWh),"#,##0.0"
+2018,electricity.final.industry,3305.7,3305.7,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F24,Industry | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.final.industry,3252.8,3252.8,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F25,Industry | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.final.industry,3126.4,3126.4,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F25,Industry | Electricity (GWh),"#,##0.0"
+2021,electricity.final.industry,3562.4,3562.4,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F25,Industry | Electricity (GWh),"#,##0.0"
+2022,electricity.final.industry,3638.6,3638.6,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F25,Industry | Electricity (GWh),"#,##0.0"
+2023,electricity.final.industry,3116.9,3116.9,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F25,Industry | Electricity (GWh),"#,##0.0"
+2024,electricity.final.industry,3123.3,3123.3,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F25,Industry | Electricity (GWh),"#,##0.0"
+2013,electricity.final.other_unspecified,1605.3,1605.3,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E43,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2014,electricity.final.other_unspecified,1638.6,1638.6,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E42,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2015,electricity.final.other_unspecified,1797.2,1797.2,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E42,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2016,electricity.final.other_unspecified,1926.9,1926.9,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F44,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2017,electricity.final.other_unspecified,2001.8,2001.8,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F44,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2018,electricity.final.other_unspecified,1921.7,1921.7,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F45,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.final.other_unspecified,2059.9,2059.9,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F47,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.final.other_unspecified,2552.4,2552.4,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F47,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2021,electricity.final.other_unspecified,2956,2956.0,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F47,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2022,electricity.final.other_unspecified,3028.6,3028.6,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F47,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2023,electricity.final.other_unspecified,2702.9,2702.9,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F47,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2024,electricity.final.other_unspecified,2552.6999999999998,2552.7,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F47,Not elsewhere specified (Other) | Electricity (GWh),"#,##0.0"
+2013,electricity.final.total,9074.7000000000007,9074.7,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E22,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2014,electricity.final.total,9785.5,9785.5,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E21,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2015,electricity.final.total,9906.4,9906.4,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E21,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2016,electricity.final.total,10486.5,10486.5,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F23,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2017,electricity.final.total,11208.5,11208.5,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F23,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2018,electricity.final.total,11937.3,11937.3,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F23,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.final.total,12059.3,12059.3,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F24,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.final.total,11479.3,11479.3,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F24,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2021,electricity.final.total,13118.6,13118.6,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F24,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2022,electricity.final.total,13385.5,13385.5,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F24,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2023,electricity.final.total,12268.5,12268.5,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F24,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2024,electricity.final.total,13006.1,13006.1,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F24,FINAL CONSUMPTION | Electricity (GWh),"#,##0.0"
+2013,electricity.final.transport,282,282.0,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E37,Transport | Electricity (GWh),"#,##0.0"
+2014,electricity.final.transport,266.7,266.7,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E36,Transport | Electricity (GWh),"#,##0.0"
+2015,electricity.final.transport,293.89999999999998,293.9,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E36,Transport | Electricity (GWh),"#,##0.0"
+2016,electricity.final.transport,300.5,300.5,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F38,Transport | Electricity (GWh),"#,##0.0"
+2017,electricity.final.transport,336.5,336.5,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F38,Transport | Electricity (GWh),"#,##0.0"
+2018,electricity.final.transport,365.5,365.5,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F38,Transport | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.final.transport,418.9,418.9,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F39,Transport | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.final.transport,236.7,236.7,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F39,Transport | Electricity (GWh),"#,##0.0"
+2021,electricity.final.transport,222.8,222.8,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F39,Transport | Electricity (GWh),"#,##0.0"
+2022,electricity.final.transport,234.4,234.4,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F39,Transport | Electricity (GWh),"#,##0.0"
+2023,electricity.final.transport,224.5,224.5,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F39,Transport | Electricity (GWh),"#,##0.0"
+2024,electricity.final.transport,245.6,245.6,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F39,Transport | Electricity (GWh),"#,##0.0"
+2013,electricity.imports,484.1,484.1,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E6,Imports | Electricity (GWh),"#,##0.0"
+2014,electricity.imports,852.7,852.7,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E5,Imports | Electricity (GWh),"#,##0.0"
+2015,electricity.imports,699.3,699.3,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E5,Imports | Electricity (GWh),"#,##0.0"
+2016,electricity.imports,1328.5,1328.5,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0"
+2017,electricity.imports,1751.2,1751.2,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0"
+2018,electricity.imports,1522.2,1522.2,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.imports,1762.7,1762.7,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.imports,1711.9,1711.9,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0"
+2021,electricity.imports,3189.9,3189.9,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0"
+2022,electricity.imports,4693.3999999999996,4693.4,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0"
+2023,electricity.imports,4234.3,4234.3,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0"
+2024,electricity.imports,2301.8000000000002,2301.8,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F5,Imports | Electricity (GWh),"#,##0.0"
+2013,electricity.losses,804.6,804.6,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E21,Losses | Electricity (GWh),"#,##0.0"
+2014,electricity.losses,599.9,599.9,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E20,Losses | Electricity (GWh),"#,##0.0"
+2015,electricity.losses,711.4,711.4,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E20,Losses | Electricity (GWh),"#,##0.0"
+2016,electricity.losses,783.7,783.7,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F22,Distribution Losses | Electricity (GWh),"#,##0.0"
+2017,electricity.losses,903.6,903.6,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F22,Distribution Losses | Electricity (GWh),"#,##0.0"
+2018,electricity.losses,886,886.0,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F22,Distribution Losses | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.losses,918.2,918.2,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F23,Losses | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.losses,887.7,887.7,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F23,LOSSES | Electricity (GWh),"#,##0.0"
+2021,electricity.losses,891.5,891.5,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F23,LOSSES | Electricity (GWh),"#,##0.0"
+2022,electricity.losses,1135.5999999999999,1135.6,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F23,LOSSES | Electricity (GWh),"#,##0.0"
+2023,electricity.losses,1150.5,1150.5,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F23,LOSSES | Electricity (GWh),"#,##0.0"
+2024,electricity.losses,1124.0999999999999,1124.1,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F23,LOSSES | Electricity (GWh),"#,##0.0"
+2013,electricity.production.hydro,8271.2000000000007,8271.2,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2014,electricity.production.hydro,8335.2999999999993,8335.3,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E15,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2015,electricity.production.hydro,8453.7999999999993,8453.8,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E15,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2016,electricity.production.hydro,9329.19,9329.2,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2017,electricity.production.hydro,9210.4,9210.4,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2018,electricity.production.hydro,9949.4,9949.4,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.production.hydro,8931.7000000000007,8931.7,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.production.hydro,8248.2000000000007,8248.2,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2021,electricity.production.hydro,10182.1,10182.1,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2022,electricity.production.hydro,10771.4,10771.4,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2023,electricity.production.hydro,10863.2,10863.2,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2024,electricity.production.hydro,11344.4,11344.4,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F16,MA Hydro Electricity Plants | Electricity (GWh),"#,##0.0"
+2013,electricity.production.thermal,1788.1,1788.1,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2014,electricity.production.thermal,2035.9,2035.9,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E14,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2015,electricity.production.thermal,2378.6999999999998,2378.7,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E14,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2016,electricity.production.thermal,2235.4499999999998,2235.5,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2017,electricity.production.thermal,2233,2233.0,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2018,electricity.production.thermal,2114.9,2114.9,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.production.thermal,2840.4,2840.4,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.production.thermal,2820.8,2820.8,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2021,electricity.production.thermal,2379.6,2379.6,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2022,electricity.production.thermal,3387.7,3387.7,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2023,electricity.production.thermal,3446.5,3446.5,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2024,electricity.production.thermal,2812.2,2812.2,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F15,MA Thermal Electricity Plants | Electricity (GWh),"#,##0.0"
+2013,electricity.production.total,10059.299999999999,10059.3,gwh,actual,published,geostat_energy_balance_2013_electricity,GWh&TJ,E5,Production | Electricity (GWh),"#,##0.0"
+2014,electricity.production.total,10371.200000000001,10371.2,gwh,actual,published,geostat_energy_balance_2014_electricity,GWH&TJ,E4,Production | Electricity (GWh),"#,##0.0"
+2015,electricity.production.total,10832.5,10832.5,gwh,actual,published,geostat_energy_balance_2015_electricity,GWH&TJ,E4,Production | Electricity (GWh),"#,##0.0"
+2016,electricity.production.total,11573.6,11573.6,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0"
+2017,electricity.production.total,11531.2,11531.2,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0"
+2018,electricity.production.total,12148.6,12148.6,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.production.total,11856.8,11856.8,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.production.total,11159.8,11159.8,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0"
+2021,electricity.production.total,12645.1,12645.1,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0"
+2022,electricity.production.total,14246.6,14246.6,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0"
+2023,electricity.production.total,14395.8,14395.8,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0"
+2024,electricity.production.total,14234.1,14234.1,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F4,Production | Electricity (GWh),"#,##0.0"
+2016,electricity.production.wind,9,9.0,gwh,actual,published,geostat_energy_balance_2016_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0"
+2017,electricity.production.wind,87.8,87.8,gwh,actual,published,geostat_energy_balance_2017_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0"
+2018,electricity.production.wind,84.3,84.3,gwh,actual,published,geostat_energy_balance_2018_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2019,electricity.production.wind,84.7,84.7,gwh,actual,published,geostat_energy_balance_2019_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0;[Red]#,##0.0"
+2020,electricity.production.wind,90.8,90.8,gwh,actual,published,geostat_energy_balance_2020_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0"
+2021,electricity.production.wind,83.4,83.4,gwh,actual,published,geostat_energy_balance_2021_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0"
+2022,electricity.production.wind,87.5,87.5,gwh,actual,published,geostat_energy_balance_2022_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0"
+2023,electricity.production.wind,86.1,86.1,gwh,actual,published,geostat_energy_balance_2023_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0"
+2024,electricity.production.wind,77.599999999999994,77.6,gwh,actual,published,geostat_energy_balance_2024_electricity,GWH&TJ,F17,Wind Electricity Plants | Electricity (GWh),"#,##0.0"
+2013,energy.exports.total,110.8,110.8,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L7,Exports | Total,"#,##0.0"
+2014,energy.exports.total,121.1,121.1,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L8,Exports | Total,"#,##0.0"
+2015,energy.exports.total,407.1,407.1,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L8,Exports | Total,"#,##0.0"
+2016,energy.exports.total,249.6,249.6,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L7,Exports | Total,"#,##0.0"
+2017,energy.exports.total,337.8,337.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L7,Exports | Total,"#,##0.0"
+2018,energy.exports.total,164.2,164.2,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L7,Exports | Total,"#,##0.0"
+2019,energy.exports.total,55.3,55.3,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L8,Exports | Total,"#,##0.0"
+2020,energy.exports.total,38.4,38.4,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L8,Exports | Total,"#,##0.0"
+2021,energy.exports.total,161,161.0,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L8,Exports | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.exports.total,408.6,408.6,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L8,Exports | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.exports.total,504.2,504.2,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L8,Exports | Total,General
+2024,energy.exports.total,301.8,301.8,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L8,Exports | Total,General
+2013,energy.final.agriculture,13.7,13.7,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L59,Agriculture/forestry/fishing | Total,"#,##0.0"
+2014,energy.final.agriculture,12.1,12.1,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L60,Agriculture/forestry/fishing | Total,"#,##0.0"
+2015,energy.final.agriculture,18.7,18.7,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L60,Agriculture/forestry/fishing | Total,"#,##0.0"
+2016,energy.final.agriculture,29.5,29.5,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L61,Agriculture/forestry/fishing | Total,"#,##0.0"
+2017,energy.final.agriculture,30.9,30.9,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L61,Agriculture/forestry/fishing | Total,"#,##0.0"
+2018,energy.final.agriculture,26.8,26.8,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L61,Agriculture/forestry/fishing | Total,"#,##0.0"
+2019,energy.final.agriculture,26.8,26.8,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L63,Agriculture/forestry/fishing | Total,"#,##0.0"
+2020,energy.final.agriculture,24.7,24.7,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L63,Agriculture/forestry/fishing | Total,"#,##0.0"
+2021,energy.final.agriculture,25.7,25.7,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L63,Agriculture/forestry/fishing | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.agriculture,29.6,29.6,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L63,Agriculture/forestry/fishing | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.agriculture,30.4,30.4,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L63,Agriculture/forestry/fishing | Total,General
+2024,energy.final.agriculture,31.3,31.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L63,Agriculture/forestry/fishing | Total,General
+2013,energy.final.commercial_public,351.1,351.1,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L57,Commercial and public services | Total,"#,##0.0"
+2014,energy.final.commercial_public,428.6,428.6,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L58,Commercial and public services | Total,"#,##0.0"
+2015,energy.final.commercial_public,402.9,402.9,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L58,Commercial and public services | Total,"#,##0.0"
+2016,energy.final.commercial_public,433.3,433.3,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L59,Commercial and public services | Total,"#,##0.0"
+2017,energy.final.commercial_public,453,453.0,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L59,Commercial and public services | Total,"#,##0.0"
+2018,energy.final.commercial_public,514.9,514.9,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L59,Commercial and public services | Total,"#,##0.0"
+2019,energy.final.commercial_public,535.5,535.5,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L61,Commercial and public services | Total,"#,##0.0"
+2020,energy.final.commercial_public,412.9,412.9,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L61,Commercial and public services | Total,"#,##0.0"
+2021,energy.final.commercial_public,544.5,544.5,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L61,Commercial and public services | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.commercial_public,551,551.0,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L61,Commercial and public services | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.commercial_public,520.20000000000005,520.2,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L61,Commercial and public services | Total,General
+2024,energy.final.commercial_public,594.70000000000005,594.7,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L61,Commercial and public services | Total,General
+2013,energy.final.households,1159.3,1159.3,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L58,Residential | Total,"#,##0.0"
+2014,energy.final.households,1182.3,1182.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L59,Residential | Total,"#,##0.0"
+2015,energy.final.households,1200.8,1200.8,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L59,Residential | Total,"#,##0.0"
+2016,energy.final.households,1265.5999999999999,1265.6,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L60,Residential | Total,"#,##0.0"
+2017,energy.final.households,1336.3,1336.3,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L60,Residential | Total,"#,##0.0"
+2018,energy.final.households,1227.3,1227.3,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L60,Residential | Total,"#,##0.0"
+2019,energy.final.households,1300.7,1300.7,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L62,Residential | Total,"#,##0.0"
+2020,energy.final.households,1408.2,1408.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L62,Residential | Total,"#,##0.0"
+2021,energy.final.households,1507.7,1507.7,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L62,Residential | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.households,1575.6,1575.6,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L62,Residential | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.households,1586.1,1586.1,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L62,Residential | Total,"#,##0.0"
+2024,energy.final.households,1742.2,1742.2,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L62,Residential | Total,"#,##0.0"
+2013,energy.final.industry,735.1,735.1,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L35,Industry | Total,"#,##0.0"
+2014,energy.final.industry,756.2,756.2,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L36,Industry | Total,"#,##0.0"
+2015,energy.final.industry,778.4,778.4,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L36,Industry | Total,"#,##0.0"
+2016,energy.final.industry,747.4,747.4,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L37,Industry | Total,"#,##0.0"
+2017,energy.final.industry,837,837.0,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L37,Industry | Total,"#,##0.0"
+2018,energy.final.industry,869.3,869.3,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L37,Industry | Total,"#,##0.0"
+2019,energy.final.industry,822.7,822.7,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L38,Industry | Total,"#,##0.0"
+2020,energy.final.industry,783.3,783.3,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L38,Industry | Total,"#,##0.0"
+2021,energy.final.industry,826.9,826.9,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L38,Industry | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.industry,891.1,891.1,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L38,Industry | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.industry,777.4,777.4,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L38,Industry | Total,General
+2024,energy.final.industry,798.7,798.7,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L38,Industry | Total,General
+2013,energy.final.non_energy,221.8,221.8,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L61,Non-energy use | Total,"#,##0.0"
+2014,energy.final.non_energy,224,224.0,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L62,Non-energy use | Total,"#,##0.0"
+2015,energy.final.non_energy,240.12432531835881,240.1,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L62,Non-energy use | Total,"#,##0.0"
+2016,energy.final.non_energy,230.48568118849721,230.5,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L63,Non-energy use | Total,"#,##0.0"
+2017,energy.final.non_energy,243.3648994936467,243.4,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L63,Non-energy use | Total,"#,##0.0"
+2018,energy.final.non_energy,258.60000000000002,258.6,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L63,Non-energy use | Total,"#,##0.0"
+2019,energy.final.non_energy,325.2,325.2,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L65,Non-energy use | Total,"#,##0.0"
+2020,energy.final.non_energy,297.8,297.8,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L65,Non-energy use | Total,"#,##0.0"
+2021,energy.final.non_energy,269,269.0,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L65,Non-energy use | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.non_energy,290.10000000000002,290.1,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L65,Non-energy use | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.non_energy,300.7,300.7,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L65,Non-energy use | Total,General
+2024,energy.final.non_energy,294.7,294.7,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L65,Non-energy use | Total,General
+2013,energy.final.other_unspecified,138,138.0,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L60,Not elsewhere specified (Other) | Total,"#,##0.0"
+2014,energy.final.other_unspecified,140.9,140.9,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L61,Not elsewhere specified (Other) | Total,"#,##0.0"
+2015,energy.final.other_unspecified,154.5,154.5,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L61,Not elsewhere specified (Other) | Total,"#,##0.0"
+2016,energy.final.other_unspecified,165.7,165.7,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L62,Not elsewhere specified (Other) | Total,"#,##0.0"
+2017,energy.final.other_unspecified,172.1,172.1,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L62,Not elsewhere specified (Other) | Total,"#,##0.0"
+2018,energy.final.other_unspecified,165.2,165.2,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L62,Not elsewhere specified (Other) | Total,"#,##0.0"
+2019,energy.final.other_unspecified,177.1,177.1,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L64,Not elsewhere specified (Other) | Total,"#,##0.0"
+2020,energy.final.other_unspecified,219.5,219.5,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L64,Not elsewhere specified (Other) | Total,"#,##0.0"
+2021,energy.final.other_unspecified,254.2,254.2,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L64,Not elsewhere specified (Other) | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.other_unspecified,260.39999999999998,260.4,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L64,Not elsewhere specified (Other) | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.other_unspecified,232.4,232.4,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L64,Not elsewhere specified (Other) | Total,General
+2024,energy.final.other_unspecified,219.5,219.5,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L64,Not elsewhere specified (Other) | Total,General
+2013,energy.final.total,3736.4,3736.4,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L34,FINAL CONSUMPTION | Total,"#,##0.0"
+2014,energy.final.total,3999.3,3999.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L35,FINAL CONSUMPTION | Total,"#,##0.0"
+2015,energy.final.total,4168.8,4168.8,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L35,FINAL CONSUMPTION | Total,"#,##0.0"
+2016,energy.final.total,4396.1000000000004,4396.1,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L36,FINAL CONSUMPTION | Total,"#,##0.0"
+2017,energy.final.total,4455.2,4455.2,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L36,FINAL CONSUMPTION | Total,"#,##0.0"
+2018,energy.final.total,4414.1000000000004,4414.1,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L36,FINAL CONSUMPTION | Total,"#,##0.0"
+2019,energy.final.total,4592,4592.0,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L37,FINAL CONSUMPTION | Total,"#,##0.0"
+2020,energy.final.total,4486.8999999999996,4486.9,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L37,FINAL CONSUMPTION | Total,"#,##0.0"
+2021,energy.final.total,4913.1000000000004,4913.1,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L37,FINAL CONSUMPTION | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.total,5190.8,5190.8,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L37,FINAL CONSUMPTION | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.total,5136,5136.0,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L37,FINAL CONSUMPTION | Total,"#,##0.0"
+2024,energy.final.total,5456.7,5456.7,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L37,FINAL CONSUMPTION | Total,"#,##0.0"
+2013,energy.final.transport,1117.3,1117.3,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L49,Transport | Total,"#,##0.0"
+2014,energy.final.transport,1255.2,1255.2,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L50,Transport | Total,"#,##0.0"
+2015,energy.final.transport,1373.3,1373.3,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L50,Transport | Total,"#,##0.0"
+2016,energy.final.transport,1524.1,1524.1,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L51,Transport | Total,"#,##0.0"
+2017,energy.final.transport,1382.6,1382.6,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L51,Transport | Total,"#,##0.0"
+2018,energy.final.transport,1351.9,1351.9,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L51,Transport | Total,"#,##0.0"
+2019,energy.final.transport,1404.1,1404.1,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L52,Transport | Total,"#,##0.0"
+2020,energy.final.transport,1340.4,1340.4,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L52,Transport | Total,"#,##0.0"
+2021,energy.final.transport,1485,1485.0,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L52,Transport | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.final.transport,1593,1593.0,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L52,Transport | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.final.transport,1688.9,1688.9,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L52,Transport | Total,"#,##0.0"
+2024,energy.final.transport,1775.7,1775.7,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L52,Transport | Total,"#,##0.0"
+2013,energy.final_fuel.biofuel_waste,481.1,481.1,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,I34,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2014,energy.final_fuel.biofuel_waste,465,465.0,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,I35,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2015,energy.final_fuel.biofuel_waste,398.3,398.3,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,I35,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2016,energy.final_fuel.biofuel_waste,386.7,386.7,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,I36,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2017,energy.final_fuel.biofuel_waste,363.4,363.4,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,I36,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2018,energy.final_fuel.biofuel_waste,270.8,270.8,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,I36,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2019,energy.final_fuel.biofuel_waste,245.5,245.5,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,I37,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2020,energy.final_fuel.biofuel_waste,227.8,227.8,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,I37,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2021,energy.final_fuel.biofuel_waste,235.3,235.3,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,I37,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0;[Red]#,##0.0"
+2022,energy.final_fuel.biofuel_waste,208.1,208.1,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,I37,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0;[Red]#,##0.0"
+2023,energy.final_fuel.biofuel_waste,208.4,208.4,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,I37,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2024,energy.final_fuel.biofuel_waste,194.3,194.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,I37,FINAL CONSUMPTION | Biofuel & Waste,"#,##0.0"
+2013,energy.final_fuel.coal,315.10000000000002,315.1,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,B34,FINAL CONSUMPTION | Coal,"#,##0.0"
+2014,energy.final_fuel.coal,290.39999999999998,290.4,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,B35,FINAL CONSUMPTION | Coal,"#,##0.0"
+2015,energy.final_fuel.coal,271.39999999999998,271.4,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,B35,FINAL CONSUMPTION | Coal,"#,##0.0"
+2016,energy.final_fuel.coal,250.1,250.1,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,B36,FINAL CONSUMPTION | Coal,"#,##0.0"
+2017,energy.final_fuel.coal,276.3,276.3,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,B36,FINAL CONSUMPTION | Coal,"#,##0.0"
+2018,energy.final_fuel.coal,294,294.0,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,B36,FINAL CONSUMPTION | Coal,"#,##0.0"
+2019,energy.final_fuel.coal,241.3,241.3,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,B37,FINAL CONSUMPTION | Coal,"#,##0.0"
+2020,energy.final_fuel.coal,213,213.0,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,B37,FINAL CONSUMPTION | Coal,"#,##0.0"
+2021,energy.final_fuel.coal,224.2,224.2,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,B37,FINAL CONSUMPTION | Coal,"#,##0.0;[Red]#,##0.0"
+2022,energy.final_fuel.coal,235.6,235.6,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,B37,FINAL CONSUMPTION | Coal,"#,##0.0;[Red]#,##0.0"
+2023,energy.final_fuel.coal,207.5,207.5,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,B37,FINAL CONSUMPTION | Coal,General
+2024,energy.final_fuel.coal,192.2,192.2,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,B37,FINAL CONSUMPTION | Coal,General
+2013,energy.final_fuel.electricity,780.3,780.3,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,J34,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2014,energy.final_fuel.electricity,841.4,841.4,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,J35,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2015,energy.final_fuel.electricity,851.8,851.8,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,J35,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2016,energy.final_fuel.electricity,901.7,901.7,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,J36,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2017,energy.final_fuel.electricity,963.8,963.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,J36,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2018,energy.final_fuel.electricity,1026.4000000000001,1026.4,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,J36,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2019,energy.final_fuel.electricity,1036.9000000000001,1036.9,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,J37,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2020,energy.final_fuel.electricity,987,987.0,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,J37,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2021,energy.final_fuel.electricity,1128,1128.0,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,J37,FINAL CONSUMPTION | Electricity,"#,##0.0;[Red]#,##0.0"
+2022,energy.final_fuel.electricity,1150.9000000000001,1150.9,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,J37,FINAL CONSUMPTION | Electricity,"#,##0.0;[Red]#,##0.0"
+2023,energy.final_fuel.electricity,1054.9000000000001,1054.9,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,J37,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2024,energy.final_fuel.electricity,1118.3,1118.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,J37,FINAL CONSUMPTION | Electricity,"#,##0.0"
+2013,energy.final_fuel.natural_gas,1156,1156.0,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,E34,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2014,energy.final_fuel.natural_gas,1337.3,1337.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,E35,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2015,energy.final_fuel.natural_gas,1430.4,1430.4,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,E35,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2016,energy.final_fuel.natural_gas,1406.6,1406.6,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,E36,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2017,energy.final_fuel.natural_gas,1535.8,1535.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,E36,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2018,energy.final_fuel.natural_gas,1536.5,1536.5,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,E36,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2019,energy.final_fuel.natural_gas,1669.6,1669.6,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,E37,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2020,energy.final_fuel.natural_gas,1728.5,1728.5,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,E37,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2021,energy.final_fuel.natural_gas,1916.1,1916.1,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,E37,FINAL CONSUMPTION | Natural Gas,"#,##0.0;[Red]#,##0.0"
+2022,energy.final_fuel.natural_gas,2170.9,2170.9,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,E37,FINAL CONSUMPTION | Natural Gas,"#,##0.0;[Red]#,##0.0"
+2023,energy.final_fuel.natural_gas,2158.4,2158.4,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,E37,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2024,energy.final_fuel.natural_gas,2316.3000000000002,2316.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,E37,FINAL CONSUMPTION | Natural Gas,"#,##0.0"
+2013,energy.final_fuel.oil_products,990.3,990.3,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,D34,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2014,energy.final_fuel.oil_products,1050.3,1050.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,D35,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2015,energy.final_fuel.oil_products,1200.5,1200.5,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,D35,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2016,energy.final_fuel.oil_products,1432.7,1432.7,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,D36,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2017,energy.final_fuel.oil_products,1297.2,1297.2,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,D36,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2018,energy.final_fuel.oil_products,1267.4000000000001,1267.4,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,D36,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2019,energy.final_fuel.oil_products,1379.3,1379.3,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,D37,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2020,energy.final_fuel.oil_products,1313.3,1313.3,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,D37,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2021,energy.final_fuel.oil_products,1391.1,1391.1,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,D37,FINAL CONSUMPTION | Oil products,"#,##0.0;[Red]#,##0.0"
+2022,energy.final_fuel.oil_products,1406.3,1406.3,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,D37,FINAL CONSUMPTION | Oil products,"#,##0.0;[Red]#,##0.0"
+2023,energy.final_fuel.oil_products,1487.7,1487.7,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,D37,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2024,energy.final_fuel.oil_products,1616.2,1616.2,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,D37,FINAL CONSUMPTION | Oil products,"#,##0.0"
+2013,energy.final_fuel.wind_solar_geothermal,13.5,13.5,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,H34,"FINAL CONSUMPTION | Geothermal, solar etc.","#,##0.0"
+2014,energy.final_fuel.wind_solar_geothermal,14.9,14.9,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,H35,"FINAL CONSUMPTION | Geothermal, solar etc","#,##0.0"
+2015,energy.final_fuel.wind_solar_geothermal,16.5,16.5,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,H35,"FINAL CONSUMPTION | Geothermal, solar etc","#,##0.0"
+2016,energy.final_fuel.wind_solar_geothermal,18.399999999999999,18.4,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,H36,"FINAL CONSUMPTION | Geothermal, solar etc","#,##0.0"
+2017,energy.final_fuel.wind_solar_geothermal,18.8,18.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,H36,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0"
+2018,energy.final_fuel.wind_solar_geothermal,19.100000000000001,19.1,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,H36,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0"
+2019,energy.final_fuel.wind_solar_geothermal,19.3,19.3,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,H37,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0"
+2020,energy.final_fuel.wind_solar_geothermal,17.2,17.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,H37,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0"
+2021,energy.final_fuel.wind_solar_geothermal,18.399999999999999,18.4,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,H37,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0;[Red]#,##0.0"
+2022,energy.final_fuel.wind_solar_geothermal,18.899999999999999,18.9,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,H37,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0;[Red]#,##0.0"
+2023,energy.final_fuel.wind_solar_geothermal,19.100000000000001,19.1,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,H37,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0"
+2024,energy.final_fuel.wind_solar_geothermal,19.3,19.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,H37,"FINAL CONSUMPTION | Geothermal, wind, solar etc","#,##0.0"
+2013,energy.imports.coal,156.1,156.1,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,B6,Imports | Coal,"#,##0.0"
+2014,energy.imports.coal,168.3,168.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,B7,Imports | Coal,"#,##0.0"
+2015,energy.imports.coal,152.1,152.1,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,B7,Imports | Coal,"#,##0.0"
+2016,energy.imports.coal,165.4,165.4,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,B6,Imports | Coal,"#,##0.0"
+2017,energy.imports.coal,192.8,192.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,B6,Imports | Coal,"#,##0.0"
+2018,energy.imports.coal,268.7,268.7,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,B6,Imports | Coal,"#,##0.0"
+2019,energy.imports.coal,254.3,254.3,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,B7,Imports | Coal,"#,##0.0"
+2020,energy.imports.coal,175.5,175.5,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,B7,Imports | Coal,"#,##0.0"
+2021,energy.imports.coal,163.69999999999999,163.7,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,B7,Imports | Coal,"#,##0.0;[Red]#,##0.0"
+2022,energy.imports.coal,158.6,158.6,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,B7,Imports | Coal,"#,##0.0;[Red]#,##0.0"
+2023,energy.imports.coal,142,142.0,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,B7,Imports | Coal,0.0
+2024,energy.imports.coal,138.69999999999999,138.7,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,B7,Imports | Coal,0.0
+2013,energy.imports.crude_oil,0,0.0,ktoe,actual,no_flow,geostat_energy_balance_2013_aggregated,KTOE,C6,Imports | Crude Oil,"#,##0.0"
+2014,energy.imports.crude_oil,10.3,10.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,C7,Imports | Crude oil,"#,##0.0"
+2015,energy.imports.crude_oil,135.30000000000001,135.3,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,C7,Imports | Crude oil,"#,##0.0"
+2016,energy.imports.crude_oil,43.3,43.3,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,C6,Imports | Crude oil,"#,##0.0"
+2017,energy.imports.crude_oil,60.5,60.5,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,C6,Imports | Crude oil,"#,##0.0"
+2018,energy.imports.crude_oil,2,2.0,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,C6,Imports | Crude oil,"#,##0.0"
+2019,energy.imports.crude_oil,9.1999999999999993,9.2,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,C7,Imports | Crude oil,"#,##0.0"
+2020,energy.imports.crude_oil,4.2,4.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,C7,Imports | Crude oil,"#,##0.0"
+2021,energy.imports.crude_oil,0,0.0,ktoe,actual,no_flow,geostat_energy_balance_2021_aggregated,KTOE,C7,Imports | Crude oil,"#,##0.0;[Red]#,##0.0"
+2022,energy.imports.crude_oil,1.4,1.4,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,C7,Imports | Crude oil,"#,##0.0;[Red]#,##0.0"
+2023,energy.imports.crude_oil,7,7.0,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,C7,Imports | Crude oil,0.0
+2024,energy.imports.crude_oil,10.7,10.7,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,C7,Imports | Crude oil,0.0
+2013,energy.imports.electricity,41.6,41.6,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,J6,Imports | Electricity,"#,##0.0"
+2014,energy.imports.electricity,73.3,73.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,J7,Imports | Electricity,"#,##0.0"
+2015,energy.imports.electricity,60.1,60.1,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,J7,Imports | Electricity,"#,##0.0"
+2016,energy.imports.electricity,114.2,114.2,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,J6,Imports | Electricity,"#,##0.0"
+2017,energy.imports.electricity,150.6,150.6,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,J6,Imports | Electricity,"#,##0.0"
+2018,energy.imports.electricity,130.9,130.9,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,J6,Imports | Electricity,"#,##0.0"
+2019,energy.imports.electricity,151.6,151.6,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,J7,Imports | Electricity,"#,##0.0"
+2020,energy.imports.electricity,147.19999999999999,147.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,J7,Imports | Electricity,"#,##0.0"
+2021,energy.imports.electricity,274.3,274.3,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,J7,Imports | Electricity,"#,##0.0;[Red]#,##0.0"
+2022,energy.imports.electricity,403.6,403.6,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,J7,Imports | Electricity,"#,##0.0;[Red]#,##0.0"
+2023,energy.imports.electricity,364.1,364.1,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,J7,Imports | Electricity,General
+2024,energy.imports.electricity,197.9,197.9,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,J7,Imports | Electricity,General
+2013,energy.imports.natural_gas,1645.4,1645.4,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,E6,Imports | Natural Gas,"#,##0.0"
+2014,energy.imports.natural_gas,1875.3,1875.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0"
+2015,energy.imports.natural_gas,2148.5,2148.5,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0"
+2016,energy.imports.natural_gas,1945.4,1945.4,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,E6,Imports | Natural Gas,"#,##0.0"
+2017,energy.imports.natural_gas,2047.8,2047.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,E6,Imports | Natural Gas,"#,##0.0"
+2018,energy.imports.natural_gas,2036.6,2036.6,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,E6,Imports | Natural Gas,"#,##0.0"
+2019,energy.imports.natural_gas,2309.1,2309.1,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0"
+2020,energy.imports.natural_gas,2318,2318.0,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0"
+2021,energy.imports.natural_gas,2396.9,2396.9,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0;[Red]#,##0.0"
+2022,energy.imports.natural_gas,2872.9,2872.9,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0;[Red]#,##0.0"
+2023,energy.imports.natural_gas,2875.5,2875.5,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0"
+2024,energy.imports.natural_gas,2894.9,2894.9,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,E7,Imports | Natural Gas,"#,##0.0"
+2013,energy.imports.oil_products,1096.2,1096.2,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,D6,Imports | Oil products,"#,##0.0"
+2014,energy.imports.oil_products,1152.2,1152.2,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0"
+2015,energy.imports.oil_products,1382.5,1382.5,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0"
+2016,energy.imports.oil_products,1526.6,1526.6,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,D6,Imports | Oil products,"#,##0.0"
+2017,energy.imports.oil_products,1466.8,1466.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,D6,Imports | Oil products,"#,##0.0"
+2018,energy.imports.oil_products,1478.3,1478.3,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,D6,Imports | Oil products,"#,##0.0"
+2019,energy.imports.oil_products,1449.2,1449.2,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0"
+2020,energy.imports.oil_products,1378.1,1378.1,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0"
+2021,energy.imports.oil_products,1459.4,1459.4,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0;[Red]#,##0.0"
+2022,energy.imports.oil_products,1532.9,1532.9,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0;[Red]#,##0.0"
+2023,energy.imports.oil_products,1660,1660.0,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0"
+2024,energy.imports.oil_products,1856.9,1856.9,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,D7,Imports | Oil products,"#,##0.0"
+2013,energy.imports.total,2939.4,2939.4,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L6,Imports | Total,"#,##0.0"
+2014,energy.imports.total,3279.4,3279.4,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L7,Imports | Total,"#,##0.0"
+2015,energy.imports.total,3878.6,3878.6,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L7,Imports | Total,"#,##0.0"
+2016,energy.imports.total,3795.2,3795.2,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L6,Imports | Total,"#,##0.0"
+2017,energy.imports.total,3918.4,3918.4,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L6,Imports | Total,"#,##0.0"
+2018,energy.imports.total,3916.5,3916.5,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L6,Imports | Total,"#,##0.0"
+2019,energy.imports.total,4173.3999999999996,4173.4,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L7,Imports | Total,"#,##0.0"
+2020,energy.imports.total,4023,4023.0,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L7,Imports | Total,"#,##0.0"
+2021,energy.imports.total,4294.3,4294.3,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L7,Imports | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.imports.total,4969.5,4969.5,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L7,Imports | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.imports.total,5048.6000000000004,5048.6,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L7,Imports | Total,"#,##0.0"
+2024,energy.imports.total,5099,5099.0,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L7,Imports | Total,"#,##0.0"
+2013,energy.production.total,1428.7,1428.7,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L5,Production | Total,"#,##0.0"
+2014,energy.production.total,1371.8,1371.8,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L6,Production | Total,"#,##0.0"
+2015,energy.production.total,1318.8,1318.8,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L6,Production | Total,"#,##0.0"
+2016,energy.production.total,1376.2,1376.2,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L5,Production | Total,"#,##0.0"
+2017,energy.production.total,1333.7,1333.7,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L5,Production | Total,"#,##0.0"
+2018,energy.production.total,1251.5,1251.5,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L5,Production | Total,"#,##0.0"
+2019,energy.production.total,1092.3,1092.3,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L6,Production | Total,"#,##0.0"
+2020,energy.production.total,1043.3,1043.3,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L6,Production | Total,"#,##0.0"
+2021,energy.production.total,1247.5999999999999,1247.6,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L6,Production | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.production.total,1271.7,1271.7,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L6,Production | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.production.total,1284.9000000000001,1284.9,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L6,Production | Total,"#,##0.0"
+2024,energy.production.total,1319.3,1319.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L6,Production | Total,"#,##0.0"
+2013,energy.supply.biofuel_waste,481.1,481.1,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,I11,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2014,energy.supply.biofuel_waste,465,465.0,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2015,energy.supply.biofuel_waste,398.3,398.3,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2016,energy.supply.biofuel_waste,386.7,386.7,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,I11,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2017,energy.supply.biofuel_waste,363.4,363.4,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,I11,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2018,energy.supply.biofuel_waste,270.8,270.8,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,I11,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2019,energy.supply.biofuel_waste,245.5,245.5,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2020,energy.supply.biofuel_waste,227.8,227.8,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0"
+2021,energy.supply.biofuel_waste,235.3,235.3,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.biofuel_waste,208.1,208.1,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.biofuel_waste,208.4,208.4,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,General
+2024,energy.supply.biofuel_waste,194.3,194.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,I12,DOMESTIC SUPPLY | Biofuel & Waste,General
+2013,energy.supply.coal,315.7,315.7,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,B11,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2014,energy.supply.coal,290.89999999999998,290.9,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2015,energy.supply.coal,271.8,271.8,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2016,energy.supply.coal,261.3,261.3,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,B11,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2017,energy.supply.coal,291.8,291.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,B11,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2018,energy.supply.coal,302.8,302.8,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,B11,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2019,energy.supply.coal,241.5,241.5,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2020,energy.supply.coal,213.2,213.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,"#,##0.0"
+2021,energy.supply.coal,224.5,224.5,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.coal,235.9,235.9,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.coal,207.8,207.8,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,General
+2024,energy.supply.coal,192.5,192.5,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,B12,DOMESTIC SUPPLY | Coal,General
+2013,energy.supply.crude_oil,0,0.0,ktoe,actual,no_flow,geostat_energy_balance_2013_aggregated,KTOE,C11,DOMESTIC SUPPLY | Crude Oil,"#,##0.0"
+2014,energy.supply.crude_oil,0,0.0,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,"#,##0.0"
+2015,energy.supply.crude_oil,14.7,14.7,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,"#,##0.0"
+2016,energy.supply.crude_oil,64.400000000000006,64.4,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,C11,DOMESTIC SUPPLY | Crude oil,"#,##0.0"
+2017,energy.supply.crude_oil,90.2,90.2,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,C11,DOMESTIC SUPPLY | Crude oil,"#,##0.0"
+2018,energy.supply.crude_oil,24.5,24.5,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,C11,DOMESTIC SUPPLY | Crude oil,"#,##0.0"
+2019,energy.supply.crude_oil,38.200000000000003,38.2,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,"#,##0.0"
+2020,energy.supply.crude_oil,37.9,37.9,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,"#,##0.0"
+2021,energy.supply.crude_oil,35.4,35.4,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.crude_oil,35,35.0,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.crude_oil,47.2,47.2,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,General
+2024,energy.supply.crude_oil,41.4,41.4,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,C12,DOMESTIC SUPPLY | Crude oil,General
+2013,energy.supply.electricity,2.9,2.9,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,J11,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2014,energy.supply.electricity,21.4,21.4,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2015,energy.supply.electricity,3.4,3.4,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2016,energy.supply.electricity,-6.9,-6.9,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,J11,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2017,energy.supply.electricity,69.8,69.8,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,J11,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2018,energy.supply.electricity,79.099999999999994,79.1,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,J11,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2019,energy.supply.electricity,118.9,118.9,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2020,energy.supply.electricity,125.2,125.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,"#,##0.0"
+2021,energy.supply.electricity,138.9,138.9,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.electricity,48.3,48.3,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.electricity,-58.3,-58.3,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,General
+2024,energy.supply.electricity,15.5,15.5,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,J12,DOMESTIC SUPPLY | Electricity,General
+2013,energy.supply.hydro,711.2,711.2,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,G11,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2014,energy.supply.hydro,716.7,716.7,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2015,energy.supply.hydro,726.9,726.9,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2016,energy.supply.hydro,802.2,802.2,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,G11,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2017,energy.supply.hydro,792,792.0,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,G11,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2018,energy.supply.hydro,855.5,855.5,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,G11,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2019,energy.supply.hydro,768,768.0,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2020,energy.supply.hydro,709.2,709.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,"#,##0.0"
+2021,energy.supply.hydro,875.5,875.5,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.hydro,926.2,926.2,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.hydro,934.1,934.1,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,General
+2024,energy.supply.hydro,975.4,975.4,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,G12,DOMESTIC SUPPLY | Hydro,General
+2013,energy.supply.natural_gas,1649.8,1649.8,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,E11,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2014,energy.supply.natural_gas,1883.8,1883.8,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2015,energy.supply.natural_gas,2075.1999999999998,2075.2,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2016,energy.supply.natural_gas,1950.9,1950.9,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,E11,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2017,energy.supply.natural_gas,2054.9,2054.9,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,E11,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2018,energy.supply.natural_gas,2045.3,2045.3,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,E11,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2019,energy.supply.natural_gas,2317.4,2317.4,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2020,energy.supply.natural_gas,2325.6999999999998,2325.7,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2021,energy.supply.natural_gas,2410.6999999999998,2410.7,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.natural_gas,2885.5,2885.5,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.natural_gas,2889.6,2889.6,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2024,energy.supply.natural_gas,2908.5,2908.5,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,E12,DOMESTIC SUPPLY | Natural Gas,"#,##0.0"
+2013,energy.supply.oil_products,990.3,990.3,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,D11,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2014,energy.supply.oil_products,1050.3,1050.3,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2015,energy.supply.oil_products,1188.9000000000001,1188.9,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2016,energy.supply.oil_products,1369.8,1369.8,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,D11,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2017,energy.supply.oil_products,1142.0999999999999,1142.1,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,D11,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2018,energy.supply.oil_products,1245.5999999999999,1245.6,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,D11,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2019,energy.supply.oil_products,1343.4,1343.4,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2020,energy.supply.oil_products,1276.2,1276.2,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2021,energy.supply.oil_products,1341.2,1341.2,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.oil_products,1364,1364.0,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.oil_products,1418.4,1418.4,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2024,energy.supply.oil_products,1559.6,1559.6,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,D12,DOMESTIC SUPPLY | Oil products,"#,##0.0"
+2013,energy.supply.total,4166.5,4166.5,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,L11,DOMESTIC SUPPLY | Total,"#,##0.0"
+2014,energy.supply.total,4444.8999999999996,4444.9,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0"
+2015,energy.supply.total,4697.7,4697.7,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0"
+2016,energy.supply.total,4849.6000000000004,4849.6,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,L11,DOMESTIC SUPPLY | Total,"#,##0.0"
+2017,energy.supply.total,4832.3999999999996,4832.4,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,L11,DOMESTIC SUPPLY | Total,"#,##0.0"
+2018,energy.supply.total,4851.8999999999996,4851.9,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,L11,DOMESTIC SUPPLY | Total,"#,##0.0"
+2019,energy.supply.total,5101.3999999999996,5101.4,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0"
+2020,energy.supply.total,4941.7,4941.7,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0"
+2021,energy.supply.total,5288.4,5288.4,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0;[Red]#,##0.0"
+2022,energy.supply.total,5730.8,5730.8,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0;[Red]#,##0.0"
+2023,energy.supply.total,5675,5675.0,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0"
+2024,energy.supply.total,5914.5,5914.5,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,L12,DOMESTIC SUPPLY | Total,"#,##0.0"
+2013,energy.supply.wind_solar_geothermal,15.4,15.4,ktoe,actual,published,geostat_energy_balance_2013_aggregated,KTOE,H11,"DOMESTIC SUPPLY | Geothermal, solar etc.","#,##0.0"
+2014,energy.supply.wind_solar_geothermal,16.8,16.8,ktoe,actual,published,geostat_energy_balance_2014_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, solar etc","#,##0.0"
+2015,energy.supply.wind_solar_geothermal,18.5,18.5,ktoe,actual,published,geostat_energy_balance_2015_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, solar etc","#,##0.0"
+2016,energy.supply.wind_solar_geothermal,21.2,21.2,ktoe,actual,published,geostat_energy_balance_2016_aggregated,KTOE,H11,"DOMESTIC SUPPLY | Geothermal, solar etc","#,##0.0"
+2017,energy.supply.wind_solar_geothermal,28.3,28.3,ktoe,actual,published,geostat_energy_balance_2017_aggregated,KTOE,H11,"DOMESTIC SUPPLY | Geothermal, wind, solar etc","#,##0.0"
+2018,energy.supply.wind_solar_geothermal,28.3,28.3,ktoe,actual,published,geostat_energy_balance_2018_aggregated,KTOE,H11,"DOMESTIC SUPPLY | Geothermal, wind, solar etc","#,##0.0"
+2019,energy.supply.wind_solar_geothermal,28.5,28.5,ktoe,actual,published,geostat_energy_balance_2019_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, wind, solar etc","#,##0.0"
+2020,energy.supply.wind_solar_geothermal,26.5,26.5,ktoe,actual,published,geostat_energy_balance_2020_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, wind, solar etc","#,##0.0"
+2021,energy.supply.wind_solar_geothermal,27,27.0,ktoe,actual,published,geostat_energy_balance_2021_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, wind, solar etc","#,##0.0;[Red]#,##0.0"
+2022,energy.supply.wind_solar_geothermal,27.8,27.8,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, wind, solar etc","#,##0.0;[Red]#,##0.0"
+2023,energy.supply.wind_solar_geothermal,27.9,27.9,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, wind, solar etc",General
+2024,energy.supply.wind_solar_geothermal,27.3,27.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,H12,"DOMESTIC SUPPLY | Geothermal, wind, solar etc",General
+2014,food.self_sufficiency.beef,73,73,percent,actual,published,geostat_food_balance_sheets,Beef,B18,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.beef,79,79,percent,actual,published,geostat_food_balance_sheets,Beef,C18,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.beef,81,81,percent,actual,published,geostat_food_balance_sheets,Beef,D18,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.beef,78,78,percent,actual,published,geostat_food_balance_sheets,Beef,E18,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.beef,78,78,percent,actual,published,geostat_food_balance_sheets,Beef,F18,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.beef,76,76,percent,actual,published,geostat_food_balance_sheets,Beef,G18,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.beef,80,80,percent,actual,published,geostat_food_balance_sheets,Beef,H18,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.beef,83,83,percent,actual,published,geostat_food_balance_sheets,Beef,I18,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.beef,83,83,percent,actual,published,geostat_food_balance_sheets,Beef,J18,"Self-sufficiency ratio, % | 2022",0
+2023,food.self_sufficiency.beef,74,74,percent,actual,published,geostat_food_balance_sheets,Beef,K18,"Self-sufficiency ratio, % | 2023",0
+2024,food.self_sufficiency.beef,74,74,percent,actual,published,geostat_food_balance_sheets,Beef,L18,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.beef,71.900000000000006,72,percent,actual,published,geostat_food_balance_sheets,Beef,M18,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.eggs,96,96,percent,actual,published,geostat_food_balance_sheets,Egg,B18,"Self-sufficiency ratio,% | 2014",General
+2015,food.self_sufficiency.eggs,102,102,percent,actual,published,geostat_food_balance_sheets,Egg,C18,"Self-sufficiency ratio,% | 2015",General
+2016,food.self_sufficiency.eggs,100,100,percent,actual,published,geostat_food_balance_sheets,Egg,D18,"Self-sufficiency ratio,% | 2016",General
+2017,food.self_sufficiency.eggs,98,98,percent,actual,published,geostat_food_balance_sheets,Egg,E18,"Self-sufficiency ratio,% | 2017",General
+2018,food.self_sufficiency.eggs,99,99,percent,actual,published,geostat_food_balance_sheets,Egg,F18,"Self-sufficiency ratio,% | 2018",General
+2019,food.self_sufficiency.eggs,96,96,percent,actual,published,geostat_food_balance_sheets,Egg,G18,"Self-sufficiency ratio,% | 2019",General
+2020,food.self_sufficiency.eggs,97,97,percent,actual,published,geostat_food_balance_sheets,Egg,H18,"Self-sufficiency ratio,% | 2020",General
+2021,food.self_sufficiency.eggs,98,98,percent,actual,published,geostat_food_balance_sheets,Egg,I18,"Self-sufficiency ratio,% | 2021",General
+2022,food.self_sufficiency.eggs,96,96,percent,actual,published,geostat_food_balance_sheets,Egg,J18,"Self-sufficiency ratio,% | 2022",0
+2023,food.self_sufficiency.eggs,93,93,percent,actual,published,geostat_food_balance_sheets,Egg,K18,"Self-sufficiency ratio,% | 2023",0
+2024,food.self_sufficiency.eggs,96.5,97,percent,actual,published,geostat_food_balance_sheets,Egg,L18,"Self-sufficiency ratio,% | 2024",0
+2025,food.self_sufficiency.eggs,97.6,98,percent,actual,published,geostat_food_balance_sheets,Egg,M18,"Self-sufficiency ratio,% | 2025",0
+2014,food.self_sufficiency.grapes,165,165,percent,actual,published,geostat_food_balance_sheets,Grapes,B19,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.grapes,122,122,percent,actual,published,geostat_food_balance_sheets,Grapes,C19,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.grapes,151,151,percent,actual,published,geostat_food_balance_sheets,Grapes,D19,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.grapes,184,184,percent,actual,published,geostat_food_balance_sheets,Grapes,E19,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.grapes,152,152,percent,actual,published,geostat_food_balance_sheets,Grapes,F19,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.grapes,151,151,percent,actual,published,geostat_food_balance_sheets,Grapes,G19,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.grapes,145,145,percent,actual,published,geostat_food_balance_sheets,Grapes,H19,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.grapes,173,173,percent,actual,published,geostat_food_balance_sheets,Grapes,I19,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.grapes,201,201,percent,actual,published,geostat_food_balance_sheets,Grapes,J19,"Self-sufficiency ratio, % | 2022",General
+2023,food.self_sufficiency.grapes,236,236,percent,actual,published,geostat_food_balance_sheets,Grapes,K19,"Self-sufficiency ratio, % | 2023",0
+2024,food.self_sufficiency.grapes,172,172,percent,actual,published,geostat_food_balance_sheets,Grapes,L19,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.grapes,158,158,percent,actual,published,geostat_food_balance_sheets,Grapes,M19,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.maize,91,91,percent,actual,published,geostat_food_balance_sheets,Maize,B19,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.maize,77,77,percent,actual,published,geostat_food_balance_sheets,Maize,C19,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.maize,79,79,percent,actual,published,geostat_food_balance_sheets,Maize,D19,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.maize,64,64,percent,actual,published,geostat_food_balance_sheets,Maize,E19,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.maize,71,71,percent,actual,published,geostat_food_balance_sheets,Maize,F19,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.maize,70,70,percent,actual,published,geostat_food_balance_sheets,Maize,G19,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.maize,68,68,percent,actual,published,geostat_food_balance_sheets,Maize,H19,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.maize,74,74,percent,actual,published,geostat_food_balance_sheets,Maize,I19,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.maize,62,62,percent,actual,published,geostat_food_balance_sheets,Maize,J19,"Self-sufficiency ratio, % | 2022",General
+2023,food.self_sufficiency.maize,70,70,percent,actual,published,geostat_food_balance_sheets,Maize,K19,"Self-sufficiency ratio, % | 2023",General
+2024,food.self_sufficiency.maize,79,79,percent,actual,published,geostat_food_balance_sheets,Maize,L19,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.maize,78,78,percent,actual,published,geostat_food_balance_sheets,Maize,M19,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.meat,43,43,percent,actual,published,geostat_food_balance_sheets,Meat,B18,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.meat,48,48,percent,actual,published,geostat_food_balance_sheets,Meat,C18,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.meat,48,48,percent,actual,published,geostat_food_balance_sheets,Meat,D18,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.meat,48,48,percent,actual,published,geostat_food_balance_sheets,Meat,E18,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.meat,52,52,percent,actual,published,geostat_food_balance_sheets,Meat,F18,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.meat,48,48,percent,actual,published,geostat_food_balance_sheets,Meat,G18,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.meat,49,49,percent,actual,published,geostat_food_balance_sheets,Meat,H18,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.meat,51,51,percent,actual,published,geostat_food_balance_sheets,Meat,I18,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.meat,50,50,percent,actual,published,geostat_food_balance_sheets,Meat,J18,"Self-sufficiency ratio, % | 2022",0
+2023,food.self_sufficiency.meat,47,47,percent,actual,published,geostat_food_balance_sheets,Meat,K18,"Self-sufficiency ratio, % | 2023",0
+2024,food.self_sufficiency.meat,47.1,47,percent,actual,published,geostat_food_balance_sheets,Meat,L18,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.meat,46.6,47,percent,actual,published,geostat_food_balance_sheets,Meat,M18,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.milk,90,90,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,B18,"Self-sufficiency ratio, % | 2014",0
+2015,food.self_sufficiency.milk,87,87,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,C18,"Self-sufficiency ratio, % | 2015",0
+2016,food.self_sufficiency.milk,82,82,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,D18,"Self-sufficiency ratio, % | 2016",0
+2017,food.self_sufficiency.milk,82,82,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,E18,"Self-sufficiency ratio, % | 2017",0
+2018,food.self_sufficiency.milk,81,81,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,F18,"Self-sufficiency ratio, % | 2018",0
+2019,food.self_sufficiency.milk,81,81,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,G18,"Self-sufficiency ratio, % | 2019",0
+2020,food.self_sufficiency.milk,81,81,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,H18,"Self-sufficiency ratio, % | 2020",0
+2021,food.self_sufficiency.milk,81,81,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,I18,"Self-sufficiency ratio, % | 2021",0
+2022,food.self_sufficiency.milk,77,77,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,J18,"Self-sufficiency ratio, % | 2022",0
+2023,food.self_sufficiency.milk,75,75,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,K18,"Self-sufficiency ratio, % | 2023",0
+2024,food.self_sufficiency.milk,73.599999999999994,74,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,L18,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.milk,68.400000000000006,68,percent,actual,published,geostat_food_balance_sheets,Milk and Milk Products,M18,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.pork,44,44,percent,actual,published,geostat_food_balance_sheets,Pork,B17,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.pork,49,49,percent,actual,published,geostat_food_balance_sheets,Pork,C17,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.pork,44,44,percent,actual,published,geostat_food_balance_sheets,Pork,D17,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.pork,40,40,percent,actual,published,geostat_food_balance_sheets,Pork,E17,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.pork,44,44,percent,actual,published,geostat_food_balance_sheets,Pork,F17,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.pork,46,46,percent,actual,published,geostat_food_balance_sheets,Pork,G17,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.pork,53,53,percent,actual,published,geostat_food_balance_sheets,Pork,H17,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.pork,52,52,percent,actual,published,geostat_food_balance_sheets,Pork,I17,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.pork,47,47,percent,actual,published,geostat_food_balance_sheets,Pork,J17,"Self-sufficiency ratio, % | 2022",0
+2023,food.self_sufficiency.pork,46,46,percent,actual,published,geostat_food_balance_sheets,Pork,K17,"Self-sufficiency ratio, % | 2023",0
+2024,food.self_sufficiency.pork,52.4,52,percent,actual,published,geostat_food_balance_sheets,Pork,L17,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.pork,51.7,52,percent,actual,published,geostat_food_balance_sheets,Pork,M17,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.potato,88,88,percent,actual,published,geostat_food_balance_sheets,Potato,B19,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.potato,89,89,percent,actual,published,geostat_food_balance_sheets,Potato,C19,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.potato,90,90,percent,actual,published,geostat_food_balance_sheets,Potato,D19,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.potato,113,113,percent,actual,published,geostat_food_balance_sheets,Potato,E19,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.potato,102,102,percent,actual,published,geostat_food_balance_sheets,Potato,F19,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.potato,93,93,percent,actual,published,geostat_food_balance_sheets,Potato,G19,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.potato,92,92,percent,actual,published,geostat_food_balance_sheets,Potato,H19,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.potato,115,115,percent,actual,published,geostat_food_balance_sheets,Potato,I19,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.potato,101,101,percent,actual,published,geostat_food_balance_sheets,Potato,J19,"Self-sufficiency ratio, % | 2022",General
+2023,food.self_sufficiency.potato,87,87,percent,actual,published,geostat_food_balance_sheets,Potato,K19,"Self-sufficiency ratio, % | 2023",General
+2024,food.self_sufficiency.potato,107,107,percent,actual,published,geostat_food_balance_sheets,Potato,L19,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.potato,139,139,percent,actual,published,geostat_food_balance_sheets,Potato,M19,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.poultry_meat,24,24,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,B17,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.poultry_meat,31,31,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,C17,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.poultry_meat,35,35,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,D17,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.poultry_meat,33,33,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,E17,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.poultry_meat,35,35,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,F17,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.poultry_meat,31,31,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,G17,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.poultry_meat,33,33,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,H17,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.poultry_meat,37,37,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,I17,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.poultry_meat,34,34,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,J17,"Self-sufficiency ratio, % | 2022",0
+2023,food.self_sufficiency.poultry_meat,32,32,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,K17,"Self-sufficiency ratio, % | 2023",0
+2024,food.self_sufficiency.poultry_meat,29.9,30,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,L17,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.poultry_meat,29.6,30,percent,actual,published,geostat_food_balance_sheets,Poultry Meat,M17,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.sheep_goat_meat,79,79,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,B17,"Self-sufficiency ratio, % | 2014",0
+2015,food.self_sufficiency.sheep_goat_meat,95,95,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,C17,"Self-sufficiency ratio, % | 2015",0
+2016,food.self_sufficiency.sheep_goat_meat,113,113,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,D17,"Self-sufficiency ratio, % | 2016",0
+2017,food.self_sufficiency.sheep_goat_meat,299,299,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,E17,"Self-sufficiency ratio, % | 2017",0
+2018,food.self_sufficiency.sheep_goat_meat,345,345,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,F17,"Self-sufficiency ratio, % | 2018",0
+2019,food.self_sufficiency.sheep_goat_meat,184,184,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,G17,"Self-sufficiency ratio, % | 2019",0
+2020,food.self_sufficiency.sheep_goat_meat,97,97,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,H17,"Self-sufficiency ratio, % | 2020",0
+2021,food.self_sufficiency.sheep_goat_meat,105,105,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,I17,"Self-sufficiency ratio, % | 2021",0
+2022,food.self_sufficiency.sheep_goat_meat,103,103,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,J17,"Self-sufficiency ratio, % | 2022",0
+2023,food.self_sufficiency.sheep_goat_meat,100,100,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,K17,"Self-sufficiency ratio, % | 2023",0
+2024,food.self_sufficiency.sheep_goat_meat,104.1,104,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,L17,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.sheep_goat_meat,97.6,98,percent,actual,published,geostat_food_balance_sheets,Sheep and Goat Meat,M17,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.vegetables,66,66,percent,actual,published,geostat_food_balance_sheets,Vegetables,B19,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.vegetables,66,66,percent,actual,published,geostat_food_balance_sheets,Vegetables,C19,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.vegetables,64,64,percent,actual,published,geostat_food_balance_sheets,Vegetables,D19,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.vegetables,65,65,percent,actual,published,geostat_food_balance_sheets,Vegetables,E19,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.vegetables,60,60,percent,actual,published,geostat_food_balance_sheets,Vegetables,F19,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.vegetables,62,62,percent,actual,published,geostat_food_balance_sheets,Vegetables,G19,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.vegetables,63,63,percent,actual,published,geostat_food_balance_sheets,Vegetables,H19,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.vegetables,61,61,percent,actual,published,geostat_food_balance_sheets,Vegetables,I19,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.vegetables,52,52,percent,actual,published,geostat_food_balance_sheets,Vegetables,J19,"Self-sufficiency ratio, % | 2022",General
+2023,food.self_sufficiency.vegetables,52,52,percent,actual,published,geostat_food_balance_sheets,Vegetables,K19,"Self-sufficiency ratio, % | 2023",General
+2024,food.self_sufficiency.vegetables,49,49,percent,actual,published,geostat_food_balance_sheets,Vegetables,L19,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.vegetables,48,48,percent,actual,published,geostat_food_balance_sheets,Vegetables,M19,"Self-sufficiency ratio, % | 2025",0
+2014,food.self_sufficiency.wheat,7,7,percent,actual,published,geostat_food_balance_sheets,Wheat,B20,"Self-sufficiency ratio, % | 2014",General
+2015,food.self_sufficiency.wheat,17,17,percent,actual,published,geostat_food_balance_sheets,Wheat,C20,"Self-sufficiency ratio, % | 2015",General
+2016,food.self_sufficiency.wheat,19,19,percent,actual,published,geostat_food_balance_sheets,Wheat,D20,"Self-sufficiency ratio, % | 2016",General
+2017,food.self_sufficiency.wheat,15,15,percent,actual,published,geostat_food_balance_sheets,Wheat,E20,"Self-sufficiency ratio, % | 2017",General
+2018,food.self_sufficiency.wheat,14,14,percent,actual,published,geostat_food_balance_sheets,Wheat,F20,"Self-sufficiency ratio, % | 2018",General
+2019,food.self_sufficiency.wheat,15,15,percent,actual,published,geostat_food_balance_sheets,Wheat,G20,"Self-sufficiency ratio, % | 2019",General
+2020,food.self_sufficiency.wheat,15,15,percent,actual,published,geostat_food_balance_sheets,Wheat,H20,"Self-sufficiency ratio, % | 2020",General
+2021,food.self_sufficiency.wheat,22,22,percent,actual,published,geostat_food_balance_sheets,Wheat,I20,"Self-sufficiency ratio, % | 2021",General
+2022,food.self_sufficiency.wheat,22,22,percent,actual,published,geostat_food_balance_sheets,Wheat,J20,"Self-sufficiency ratio, % | 2022",General
+2023,food.self_sufficiency.wheat,22,22,percent,actual,published,geostat_food_balance_sheets,Wheat,K20,"Self-sufficiency ratio, % | 2023",General
+2024,food.self_sufficiency.wheat,22,22,percent,actual,published,geostat_food_balance_sheets,Wheat,L20,"Self-sufficiency ratio, % | 2024",0
+2025,food.self_sufficiency.wheat,19,19,percent,actual,published,geostat_food_balance_sheets,Wheat,M20,"Self-sufficiency ratio, % | 2025",0

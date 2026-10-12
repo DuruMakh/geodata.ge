@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 25,
+  "efficiency_workbook": "official/energy-efficiency.xls",
+  "observations": 681,
+  "cells_found_again_from_labels": 681,
+  "source_cells_matched": 681,
+  "stored_values_matched": 681,
+  "dash_status_matched": 681,
+  "published_values_matched": 681,
+  "labels_and_formats_matched": 681,
+  "efficiency_values_matched": 24,
+  "efficiency_tolerance_ktoe": 0.05,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "altered_dash_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "wrong_cell_detected": true,
+    "wrong_label_detected": true,
+    "efficiency_mismatch_detected": true
+  },
+  "failures": []
+}
