@@ -158,7 +158,6 @@
   "inflation.basketShare": "Basket share",
   "inflation.largestContributor": "Largest contributor",
   "inflation.categoryContributionNote": "Contributions are calculated by Fiscal.ge from Geostat published price changes and consumer basket weights. Contribution = basket weight for the month’s year ÷ 100 × annual price change (pp).",
-  "inflation.categorySubgroups": "Subgroups",
   "inflation.category.cpi.cat.01": "Food and non-alcoholic beverages",
   "inflation.category.cpi.cat.01_1": "Food",
   "inflation.category.cpi.cat.01_2": "Non-alcoholic beverages",

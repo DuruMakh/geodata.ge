@@ -19,6 +19,7 @@
   "municipal.clearSearch": "ძებნის გასუფთავება",
   "municipal.municipalities": "მუნიციპალიტეტები",
   "municipal.regions": "რეგიონები",
+  "municipal.levelLabel": "ტერიტორიული დონე",
   "municipal.indicators": "ძირითადი ინდიკატორები",
   "municipal.boundaries": "საზღვრები:",
   "municipal.perResidentShort": "{amount} ერთ მოსახლეზე",

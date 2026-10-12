@@ -14,7 +14,7 @@ import { formatAmount, formatInUnit, formatPerResidentGel, UNIT_PERSONS } from "
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
 import { municipalEntityHref, type MunicipalEntityKind } from "../../lib/seo/internalLinks";
-import { SourceNote, TabDivider, TextTab } from "../ui/editorial";
+import { SourceNote, TabDivider, TextTab, TextTabGroup } from "../ui/editorial";
 import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 import { MunicipalityMap } from "./municipality-map";
 import { useAppReady } from "../explorer-shell/use-app-ready";
@@ -240,11 +240,11 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                 : "flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-1 border-b-2 border-[var(--ink)] pb-2"
             }
           >
-            <span className="flex min-w-0 flex-wrap items-baseline gap-x-3.5">
+            <TextTabGroup ariaLabel={message(messages, "municipal.levelLabel")} className="flex min-w-0 flex-wrap items-baseline gap-x-3.5">
               <TextTab label={message(messages, "municipal.municipalities")} active={level === "muni"} onClick={() => setLevel("muni")} testId="level-muni" />
               <TabDivider />
               <TextTab label={message(messages, "municipal.regions")} active={level === "region"} onClick={() => setLevel("region")} testId="level-region" />
-            </span>
+            </TextTabGroup>
             <span className={`${overrides?.unitLabel === undefined ? "" : "ml-auto "}font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]`}>
               {overrides?.unitLabel ?? message(messages, "municipal.gel")}
             </span>

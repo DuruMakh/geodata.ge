@@ -111,6 +111,9 @@ export function SeriesSelector({
             role="checkbox"
             data-testid="series-toggle-all"
             aria-checked={bulkState}
+            // One name in every state: aria-checked carries the state, so a screen reader never
+            // hears a checkbox called "Clear" that is half checked. The visible word still names the action.
+            aria-label={message(messages, "controls.selectAllSeries")}
             onClick={onToggleAll}
             className="grid min-h-11 shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 pr-1 pl-0.5 text-left"
           >
@@ -269,14 +272,13 @@ export function SeriesSelectorRow({
             if (!expansionLocked) onToggleExpanded?.();
           }}
           aria-expanded={hasChildren ? expanded : undefined}
-          aria-label={expansionLabel ?? message(messages, "controls.subprogrammes")}
+          aria-label={expansionLabel ?? message(messages, "controls.subitemsFor", { label })}
           aria-disabled={expansionLocked || undefined}
-          // The caret keeps its 22px column; a transparent extension over the row button's
-          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px), and
-          // 12px below the row it reaches 44px tall (D8). The extension only runs downward:
+          // The caret's own box is 24px wide (WCAG 2.5.8, which axe measures on the element), and
+          // a transparent extension 12px below the row makes it 44px tall (D8). The extension only runs downward:
           // a following row's own caret paints over it, so it never steals that row's taps,
           // and it only lands in the empty caret gutter of a row without children.
-          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:top-0 before:-bottom-3 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
+          className={`relative z-[1] flex w-6 flex-none items-center justify-center text-base leading-none before:absolute before:top-0 before:-bottom-3 before:inset-x-0 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
           tabIndex={hasChildren && !expansionLocked ? 0 : -1}
         >

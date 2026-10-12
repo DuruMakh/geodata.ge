@@ -19,6 +19,7 @@
   "municipal.clearSearch": "Clear search",
   "municipal.municipalities": "Municipalities",
   "municipal.regions": "Regions",
+  "municipal.levelLabel": "Territorial level",
   "municipal.indicators": "Key indicators",
   "municipal.boundaries": "Boundaries:",
   "municipal.perResidentShort": "{amount} per resident",

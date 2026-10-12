@@ -94,7 +94,7 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </div>
 <div class="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
 <div class="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
-<span class="flex min-w-0 flex-wrap items-baseline gap-x-3.5">
+<span role="group" aria-label="Territorial level" class="flex min-w-0 flex-wrap items-baseline gap-x-3.5">
 <button type="button" data-testid="level-muni" aria-pressed="true" class="-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[0.78125rem] transition-colors duration-150 font-semibold text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4">Municipalities</button>
 <span aria-hidden="true" class="h-[13px] w-px bg-[var(--control)]">
 </span>

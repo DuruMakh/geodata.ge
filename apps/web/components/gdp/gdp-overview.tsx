@@ -22,7 +22,7 @@ import {
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { PageHeader } from "../shell/page-header";
-import { TextTab, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { TextTab, TextTabGroup, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -158,7 +158,7 @@ export function GdpOverview({
         data-testid="gdp-indicators"
         className="mb-3 py-2"
       >
-        <div className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
+        <TextTabGroup ariaLabel={t("indicator")} className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
           {(["real", "nominal", "growth", "per_capita"] as const).map(
             (id) => (
               <TextTab
@@ -170,7 +170,7 @@ export function GdpOverview({
               />
             ),
           )}
-        </div>
+        </TextTabGroup>
       </div>
       <p role="status" className="sr-only">
         {announcement}

@@ -15,6 +15,7 @@
   "analysis.structureFields": "Composition by spending field",
   "analysis.expenditure": "Expenditure",
   "analysis.revenue": "Receipts",
+  "analysis.sideLabel": "Budget side",
   "analysis.fields": "Fields",
   "analysis.ministries": "Institutions",
   "analysis.plannedBudget": "Planned budget data",

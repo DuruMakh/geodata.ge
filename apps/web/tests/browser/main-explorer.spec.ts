@@ -696,7 +696,8 @@ test("shared ministries program links restore with the parent expanded", async (
 
   await page.getByTestId("grouping-ministries").click();
   const panel = page.getByTestId("series-selector");
-  await panel.getByRole("button", { name: "ქვეპროგრამები" }).first().click();
+  // Each caret is named after its own ministry.
+  await panel.getByRole("button", { name: /^.+ — ქვესერიები$/ }).first().click();
   const firstProgram = panel.locator("[data-level='major_program']").first();
   await firstProgram.getByRole("button").last().click();
   await expect(page).toHaveURL(/sel=[^&]*admin_program/);

@@ -108,7 +108,6 @@ export function InflationCategoryPanel({
             hasChildren={row.hasChildren}
             expanded={row.expanded}
             expansionLocked={row.expansionLocked}
-            expansionLabel={message(messages, "inflation.categorySubgroups")}
             isChild={row.level === 3}
             showRail={row.level === 3 && state.selected.includes(row.categoryId)}
             onToggle={() => onToggle(row.categoryId)}

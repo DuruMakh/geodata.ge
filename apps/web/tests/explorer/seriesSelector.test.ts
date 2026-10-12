@@ -179,7 +179,7 @@ describe("optional debt selector semantics", () => {
     expect(markup).not.toContain('data-testid="series-toggle-all"');
   });
 
-  it("keeps the existing ministry caret name by default and accepts a debt-specific name", () => {
+  it("accepts a debt-specific caret name", () => {
     const base = {
       id: "parent",
       label: "ვალი",
@@ -192,14 +192,87 @@ describe("optional debt selector semantics", () => {
       onToggle: () => {},
       onToggleExpanded: () => {},
     };
-    const existing = renderGeorgianMarkup(createElement(SeriesSelectorRow, base));
     const debt = renderGeorgianMarkup(createElement(SeriesSelectorRow, {
       ...base,
       expansionLabel: "ვალი — ქვესერიების ჩაკეცვა",
     }));
 
-    expect(existing).toContain('aria-label="ქვეპროგრამები"');
     expect(debt).toContain('aria-label="ვალი — ქვესერიების ჩაკეცვა"');
+  });
+});
+
+describe("series lists for screen readers and fingers", () => {
+  const caret = (markup: string) => markup.match(/<button[^>]*aria-expanded[^>]*>/)?.[0] ?? "";
+
+  it("a caret is at least 24px wide and named after its row", () => {
+    const row = renderGeorgianMarkup(createElement(SeriesSelectorRow, {
+      id: "parent",
+      label: "ვალი",
+      color: "#1E1B16",
+      value: "1.0 მლრდ ₾",
+      selected: false,
+      showCaretColumn: true,
+      hasChildren: true,
+      onToggle: () => {},
+    }));
+
+    expect(caret(row)).toContain('aria-label="ვალი — ქვესერიები"');
+    expect(caret(row)).toMatch(/class="[^"]*\bw-6\b/);
+    expect(caret(row)).not.toContain("w-[22px]");
+    // The invisible hit area no longer reaches past the box sideways; it still runs 12px below the row.
+    expect(caret(row)).not.toContain("before:-right-1");
+    expect(caret(row)).toContain("before:-bottom-3");
+
+    // The ministries list passes no name of its own: each caret is named after its ministry.
+    const ministries = renderGeorgianMarkup(createElement(SeriesPanel, {
+      items,
+      rows: [],
+      scope: "ministries",
+      showGrouping: false,
+      grouping: "ministries",
+      selectedIds: [],
+      endYear: 2025,
+      expandedIds: [],
+      onGroupingChange: () => {},
+      onSelectionChange: () => {},
+      onToggle: () => {},
+      onToggleExpanded: () => {},
+      downloadAction: createElement("div"),
+    }));
+    expect(ministries).toContain('aria-label="Education ministry — ქვესერიები"');
+    expect(ministries).toContain('aria-label="Health ministry — ქვესერიები"');
+  });
+
+  it("the select-all checkbox keeps one name and reports state through aria-checked", () => {
+    const bulk = (hasSelection: boolean, allSelected: boolean) => {
+      const props = {
+        query: "",
+        onQueryChange: () => {},
+        searchPlaceholder: "ძებნა",
+        selectedCount: 1,
+        totalCount: 3,
+        hasSelection,
+        allSelected,
+        onToggleAll: () => {},
+        hasVisibleMatches: true,
+        children: createElement("div"),
+      };
+      const markup = renderGeorgianMarkup(createElement(SeriesSelector, props));
+      return markup.match(/<button[^>]*data-testid="series-toggle-all"[^>]*>[^]*?<\/button>/)?.[0] ?? "";
+    };
+
+    for (const [hasSelection, allSelected, state, visible] of [
+      [false, false, "false", "ყველას მონიშვნა"],
+      [true, false, "mixed", "გასუფთავება"],
+      [true, true, "true", "გასუფთავება"],
+    ] as const) {
+      const control = bulk(hasSelection, allSelected);
+      expect(control).toContain('role="checkbox"');
+      expect(control).toContain('aria-label="ყველა სერიის მონიშვნა"');
+      expect(control).toContain(`aria-checked="${state}"`);
+      // The visible action word stays (AGENTS.md UI contract); only the announced name is fixed.
+      expect(control).toContain(visible);
+    }
   });
 });
 

@@ -29,6 +29,7 @@ it("renders centered four indicator controls and the existing chart", async () =
     </I18nProvider>,
   );
   expect(html).toContain('data-testid="gdp-indicators"');
+  expect(html).toContain('<span role="group" aria-label="GDP indicator"');
   expect(html).toContain("Real GDP");
   expect(html).toContain("Nominal GDP");
   expect(html).toContain("GDP growth");

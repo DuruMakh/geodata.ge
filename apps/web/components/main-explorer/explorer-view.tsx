@@ -9,7 +9,7 @@ import { formatDisplayDate } from "../../lib/explorer/format";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
-import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SegmentedTabs, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
 import { Indicators } from "./indicators";
@@ -127,10 +127,10 @@ export function ExplorerView({
                 from what they change, so below 1100px they lead the chart panel instead
                 (owner decision D4, 2026-10-07). Same state and URL key `g`. */}
             {showGrouping ? (
-              <div data-testid="chart-grouping" className="mb-3.5 flex gap-[18px] border-b border-[var(--row-border)] pb-3 @min-[1100px]:hidden">
+              <TextTabGroup ariaLabel={message(messages, "controls.grouping")} testId="chart-grouping" className="mb-3.5 flex gap-[18px] border-b border-[var(--row-border)] pb-3 @min-[1100px]:hidden">
                 <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
                 <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
-              </div>
+              </TextTabGroup>
             ) : null}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <SegmentedTabs<ChartMode>

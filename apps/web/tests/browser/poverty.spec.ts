@@ -39,6 +39,15 @@ test("rates default to Georgia's poverty line and tabs keep the clamped years", 
   await expect(page.getByTestId("series-status")).toContainText("1 / 3");
 });
 
+test("a series caret is a full 24px target named after its row", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/en/explorer/living-standards/poverty#tab=relative");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const caret = page.locator('[data-series-id="poverty.relative_40|georgia"] [aria-expanded]');
+  await expect(caret).toHaveAccessibleName(/Georgia/);
+  expect((await caret.boundingBox())!.width).toBeGreaterThanOrEqual(24);
+});
+
 test("relative lines nest towns and villages without changing the top-level count", async ({ page }) => {
   await page.goto("/en/explorer/living-standards/poverty#tab=relative");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");

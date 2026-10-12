@@ -14,9 +14,13 @@ test("English selection controls keep their complete denominator while searching
   await search.fill("თავდაცვა");
   expect((await status.innerText()).replace(/\s+/g, " ")).toBe(before);
   const bulk = page.getByTestId("series-toggle-all");
-  await expect(bulk).toHaveAccessibleName("Clear");
+  // One announced name in every state; the visible word names the action and aria-checked the state.
+  await expect(bulk).toHaveAccessibleName("Select all series");
+  await expect(bulk).toContainText("Clear");
   await bulk.click();
-  await expect(bulk).toHaveAccessibleName("Select all");
+  await expect(bulk).toHaveAccessibleName("Select all series");
+  await expect(bulk).toContainText("Select all");
+  await expect(bulk).toHaveAttribute("aria-checked", "false");
   await bulk.click();
   await expect(status).toContainText(`${denominator} / ${denominator}`);
   await expect(page.getByTestId("range-start-handle")).toHaveAccessibleName("Start year");
@@ -24,6 +28,8 @@ test("English selection controls keep their complete denominator while searching
   await expect(page.getByTestId("series-excel")).toHaveAccessibleName("Download");
   await expect(page.getByTestId("grouping-fields")).toHaveAccessibleName("Functions");
   await expect(page.getByTestId("grouping-ministries")).toHaveAccessibleName("Ministries");
+  await expect(page.getByTestId("chart-grouping")).toHaveAttribute("role", "group");
+  await expect(page.getByTestId("chart-grouping")).toHaveAttribute("aria-label", "Grouping");
   await expect(page.getByTestId("chart-mode-line")).toHaveAccessibleName("Line");
   await expect(page.getByTestId("chart-mode-table")).toHaveAccessibleName("Table");
 });

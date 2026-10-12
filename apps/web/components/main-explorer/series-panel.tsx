@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
-import { TextTab } from "../ui/editorial";
+import { TextTab, TextTabGroup } from "../ui/editorial";
 import { SeriesSelector, SeriesSelectorRow } from "./series-selector";
 import { SeriesAside } from "../explorer-shell/series-aside";
 
@@ -140,10 +140,10 @@ export function SeriesPanel({
         controls={
           showGrouping ? (
             // Two-column layout only: stacked, the chart panel carries these tabs (ExplorerView).
-            <div className="flex gap-[18px] border-b border-[var(--row-border)] pb-3 @max-[1100px]:hidden">
+            <TextTabGroup ariaLabel={message(messages, "controls.grouping")} className="flex gap-[18px] border-b border-[var(--row-border)] pb-3 @max-[1100px]:hidden">
               <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="aside-grouping-fields" />
               <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="aside-grouping-ministries" />
-            </div>
+            </TextTabGroup>
           ) : undefined
         }
         query={query}

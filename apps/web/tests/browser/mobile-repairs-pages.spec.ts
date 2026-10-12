@@ -67,10 +67,11 @@ for (const locale of ["ka", "en"] as const) {
     await caret.scrollIntoViewIfNeeded();
     const hit = await caret.evaluate((button) => {
       const box = button.getBoundingClientRect();
-      const target = document.elementFromPoint(box.left + 24.5, box.top + box.height / 2);
+      // The caret's own box is the 24px target (axe measures the element), so its last column answers.
+      const target = document.elementFromPoint(box.left + 23.5, box.top + box.height / 2);
       return { width: Math.round(box.width), hitsCaret: target === button || button.contains(target) };
     });
-    expect(hit).toEqual({ width: 22, hitsCaret: true });
+    expect(hit).toEqual({ width: 24, hitsCaret: true });
   });
 }
 

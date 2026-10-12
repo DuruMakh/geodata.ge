@@ -31,6 +31,22 @@ export function TextTab({ label, active, onClick, id, testId }: TextTabProps) {
   );
 }
 
+type TextTabGroupProps = {
+  ariaLabel: string;
+  children: ReactNode;
+  className?: string;
+  testId?: string;
+};
+
+/** A row of TextTabs announced as one named choice, the way SegmentedTabs announces its options. */
+export function TextTabGroup({ ariaLabel, children, className, testId }: TextTabGroupProps) {
+  return (
+    <span role="group" aria-label={ariaLabel} data-testid={testId} className={className}>
+      {children}
+    </span>
+  );
+}
+
 /** The underlined native select look of Unemployment's indicator menu; the year picker's button trigger matches it with its own classes. */
 export const SELECT_CLASS = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
 
