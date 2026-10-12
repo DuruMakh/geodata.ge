@@ -99,7 +99,7 @@ export function ExplorerView({
 
     return {
       id: item.id,
-      label: label.length > 30 ? `${label.slice(0, 29)}…` : label,
+      label,
       color: item.color,
       vals: model.years.map((year) => {
         const value = pointsByYear.get(year)?.value ?? null;

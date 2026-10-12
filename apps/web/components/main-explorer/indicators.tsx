@@ -35,10 +35,6 @@ const SCOPE_LABEL: Record<ExplorerScope, string> = {
   revenue: "main.revenueScope",
 };
 
-function truncate(text: string, length: number): string {
-  return text.length > length ? `${text.slice(0, length - 1)}…` : text;
-}
-
 type MoverRowProps = {
   row: ExplorerTableRow;
   rank: number;
@@ -119,7 +115,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       value: biggestParts.num,
       unit: biggestParts.unit,
       color: "var(--ink)",
-      detail: biggestIncrease ? truncate(rowLabel(biggestIncrease.row), 46) : MISSING,
+      detail: biggestIncrease ? rowLabel(biggestIncrease.row) : MISSING,
       spark: biggestIncrease ? { values: seriesValues(biggestIncrease.row) ?? [], color: biggestIncrease.row.color } : null,
     },
     {
@@ -128,7 +124,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       value: slowest ? formatShare(slowest.change, true) : MISSING,
       unit: "",
       color: slowest && (slowest.change ?? 0) < 0 ? NEGATIVE : "var(--ink)",
-      detail: slowest ? truncate(rowLabel(slowest), 46) : MISSING,
+      detail: slowest ? rowLabel(slowest) : MISSING,
       spark: slowest ? { values: seriesValues(slowest) ?? [], color: slowest.color } : null,
     },
     {
@@ -137,7 +133,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       value: largestShare ? formatShare(largestShare.shareByYear?.[endYear] ?? null) : MISSING,
       unit: "",
       color: "var(--ink)",
-      detail: largestShare ? `${truncate(rowLabel(largestShare), 40)}, ${endYear}` : MISSING,
+      detail: largestShare ? `${rowLabel(largestShare)}, ${endYear}` : MISSING,
       spark: largestShare ? { values: buildKpiShareSeries(largestShare, years), color: ACCENT } : null,
     },
   ].filter((kpi) => !singleYear || !kpi.isDelta);
@@ -252,7 +248,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           <tbody>
             {[
               totalRow ? { row: totalRow, label: rowLabel(totalRow), weight: 600, color: "var(--ink)" } : null,
-              ...comparisonSorted.map((row) => ({ row, label: truncate(rowLabel(row), 40), weight: 500, color: row.color })),
+              ...comparisonSorted.map((row) => ({ row, label: rowLabel(row), weight: 500, color: row.color })),
             ]
               .filter((entry): entry is { row: ExplorerTableRow; label: string; weight: number; color: string } => entry !== null)
               .map(({ row, label, weight, color }) => {
@@ -265,7 +261,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
                     <td className="py-2.5 pr-3" title={rowLabel(row)}>
                       <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
                         <SwatchBar color={color} className="mt-[7px]" />
-                        <span className="min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]" style={{ fontWeight: weight }}>
+                        <span className="line-clamp-2 min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]" style={{ fontWeight: weight }}>
                           {label}
                         </span>
                       </span>

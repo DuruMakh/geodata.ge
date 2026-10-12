@@ -1035,7 +1035,9 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
     expect(await ranking.getByTestId("ranking-share-bar").evaluateAll((elements) => elements.every((element) => getComputedStyle(element).display === "none"))).toBe(true);
     const longLabel = ranking.locator('tbody td[title="ინფრასტრუქტურა და რეგიონული განვითარება"]');
     await expect(longLabel).toHaveCount(1);
-    await expect(longLabel).toContainText("ინფრასტრუქტურა და…");
+    // The whole name is in the cell; CSS clamps it to two lines on a phone.
+    await expect(longLabel).toContainText("ინფრასტრუქტურა და რეგიონული განვითარება");
+    expect(await longLabel.locator(".line-clamp-2").evaluate((element) => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))).toBeLessThanOrEqual(2.05);
 
     for (const sideTestId of ["analysis-side-expenditure", "analysis-side-revenue"]) {
       await page.getByTestId(sideTestId).click();
