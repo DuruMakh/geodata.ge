@@ -23,26 +23,36 @@ All paths are relative to `apps/web/` unless they start with `docs/`. Run every 
 - Owner decisions are pre-filled with the recommended answer (see "Decision gates"). If the owner answers otherwise, only the named step changes.
 - The done-check runs once, at the end (Task 14), per `CLAUDE.md`. While editing, run only the named test files.
 
-## Other branches (checked 2026-10-11, after `git fetch`)
+## Other branches (re-checked 2026-10-12, after `git fetch`; branch merged with `main` at d8c23379)
 
-Our base was `main` at 12f2bfe1. Since then:
+Merged into `main` since the audit: #173 domestic exports, #174 poverty, #175 energy & food, #176 audit fixes, #177 money & banks, #178 local fonts, #179 living standards, #180 age & sex. What that means for this plan:
 
-| Where | What | Touches this plan | Consequence |
-|---|---|---|---|
-| `main` (#173 domestic exports, #174 poverty) | New `/explorer/trade/domestic-exports` and `/explorer/poverty` (hub + rates + inequality) | `trade-overview.tsx` (hash gains `&section=overview` and fires a `trade-domestic-state` event), `use-trade-partners-state.ts` (serialize takes `data`, fires the event), `use-trade-products-state.ts` (fires the event), `trade-partners-ranking.tsx` (`measure` is `TradeChartIndicator`; domestic/re-export measures use the products share note), `lib/pages/trade.tsx`, new `lib/pages/poverty.tsx` (**an 8th topic-hub copy**), new `poverty-explorer.tsx` (**a 7th URL-state copy**) | Task 0 syncs first. Task 7 covers 8 hubs. Task 12 keeps the domestic share-note rule. |
-| `claude/code-review-quality-audit-c480b5` (local, 24 commits, not pushed, **work in progress**: uncommitted edits in its worktree) | The 2026-10-10 audit fixes | **Already did most of row 1**: created `components/explorer-shell/use-hash-state.ts` (`useHashState` with `normalize` and `afterWrite`) and moved Trade, External flows, Wages and Poverty onto it. Added `SELECT_CLASS` to `ui/editorial.tsx` (row 13). It **deliberately left** Unemployment, Sectors and Regions on their own copies. Also edits `unemployment-explorer.tsx`, `wages-explorer.tsx`, `poverty-explorer.tsx`, the 3 external pages and `lib/pages/{external,wages}.tsx`. | Tasks 3, 4, 6, 8 and 12 start only after it merges to `main`, and build on its hook instead of creating one. |
-| `origin/claude/project-thread-bfv991` (living standards, pushed) | New hub + household pages | `lib/pages/poverty.tsx`; adds `lib/pages/living-standards.tsx` (**a hub copy**); `household-explorer.tsx` imports `useHashState` from `external/use-money-from-abroad-state`, **which the audit-fixes branch deletes** | Whichever of the two merges second must switch that import to `explorer-shell/use-hash-state` (typecheck catches it). |
-| `origin/claude/project-thread-0yo9lo` (energy & food, pushed) | New hub + explorer | Adds `lib/pages/energy-food.tsx` (**a hub copy**) and a **third generic hook**, `explorer-shell/use-hash-explorer-state.ts` | That hook should be `useHashState`. Task 4 folds it in if the branch has merged; otherwise flag it to that session. |
-| `origin/claude/project-thread-2lywh9` (money & banks, pushed) | New hub + explorer | Adds `lib/pages/moneyBanks.tsx` (**a hub copy**) and an inline URL-state copy in `money-banks-explorer.tsx` | Same as above. |
-| `claude/demographics-remaining-3119f2` (local, Age and sex, waiting on owner's Georgian review) | New page | Also adds `SELECT_CLASS` to `ui/editorial.tsx` (same name as audit-fixes, so a trivial merge conflict between those two); `RegionMap` links become optional; touches `unemployment-explorer.tsx` (dropdown class only). Uses `HeroKpi`/`SideKpiList` properly. | No conflict with this plan's logic. Task 6 rebases over its `unemployment-explorer.tsx` change. |
-| `codex/trade-services` (local) | Services trade data | No plan file | None. |
-| `codex/national-budget-gdp-share` (Aug), `claude/musing-kepler-b1db3a`, `claude/keen-euler-poq4zn` | Stale | `indicators.tsx` (Aug branch only) | Ignore unless revived. |
+- **URL-state hook (Task 4).** `components/explorer-shell/use-hash-state.ts` exists (from #176, with `normalize` and `afterWrite`). It is used by Trade (3), External flows (3), Wages, Poverty and Household. Still on their own copies:
+  - `unemployment/use-unemployment-state.ts`;
+  - `economic-sectors/use-economic-sectors-state.ts`;
+  - `regional-economies/use-regional-economy-state.ts`;
+  - the inline copy in `money-banks/money-banks-explorer.tsx`;
+  - the separate generic hook `explorer-shell/use-hash-explorer-state.ts` (only caller: `energy-food/energy-food-explorer.tsx`).
 
-**Sequencing:**
-1. Task 0 syncs this worktree with `main`.
-2. Phase 1 Tasks 1 and 2 touch no file any other branch touches, so they can go now.
-3. Tasks 3–13 wait until the audit-fixes branch is merged, then sync again.
-4. Task 7 (hubs) and Task 4 (URL state) run after whichever feature branches (energy & food, money & banks, living standards) have merged by then, and convert their copies too. Any branch merging after this one inherits `TopicHub` and `useHashState` and should use them; tell its session.
+  `trade/trade-domestic-exports.tsx` (section switcher) and `municipalities/municipalities-index.tsx` (level switch) write the hash for a different job. They stay.
+- **Topic hubs (Task 7).** 10 copies in `lib/pages/`: `demography`, `economy`, `energy-food`, `external`, `inflation`, `living-standards`, `moneyBanks`, `trade`, `unemployment`, `wages`. (`/explorer/poverty` now lives under Living standards; `lib/pages/poverty.tsx` renders sub-pages only.) `hub.tsx` is the budget hub: it gets `ExplorerPage` in Task 1 but is not a `TopicHub`.
+- **Dropdown class (row 13).** Done as `SELECT_CLASS` in `ui/editorial.tsx`.
+- **Still open: `codex/trade-services`** (Codex worktree, 12 commits, "local completion" recorded 2026-10-12, uncommitted edits including `ui/editorial.tsx`). It edits:
+  - `lib/pages/trade.tsx`
+  - `trade-overview.tsx`
+  - `trade-partners-ranking.tsx`
+  - `trade-partners-series-panel.tsx`
+  - `trade-partners.tsx`
+  - `use-trade-partners-state.ts`
+  - `trade-domestic-exports.tsx`
+  - and adds `trade-services.tsx` and `use-trade-sections-state.ts`.
+
+**Sequencing (supersedes the 2026-10-11 version):**
+1. Tasks 0–11 and 13 run now, **leaving Trade files alone**: Task 3 skips `trade-overview.tsx` and `trade-products-picker.tsx`; Task 7 converts the 9 non-Trade hubs.
+2. After `codex/trade-services` merges, sync again. Then do Task 12 (ranking) and a short "Trade follow-up" step: the Trade hub via `TopicHub`, `toggleId` in the two Trade files, and a check of `use-trade-sections-state.ts` for another URL-state copy.
+3. If Trade services has not merged by the time Task 13 is done, ship Tasks 0–11 and 13 as this PR and do the Trade part as a small follow-up.
+
+## Decision gates (recommended defaults used below)
 
 | Gate | Default in this plan | If the owner says no |
 |---|---|---|
