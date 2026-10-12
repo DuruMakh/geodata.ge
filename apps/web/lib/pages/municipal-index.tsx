@@ -1,7 +1,7 @@
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import type { Locale } from "../i18n/types";
-import { getMunicipalPresentation } from "./municipal-presentation.server";
+import { getMunicipalPresentation, municipalUpdatedNote } from "./municipal-presentation.server";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
@@ -20,7 +20,7 @@ import {
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PER_RESIDENT_YEAR,
 } from "../explorer/municipalData";
-import { formatPerResidentGel, formatDisplayDate } from "../explorer/format";
+import { formatPerResidentGel } from "../explorer/format";
 import { buildMunicipalityMapModel } from "../explorer/municipalityMapData";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
@@ -132,7 +132,7 @@ export async function renderMunicipalIndex(locale: Locale) {
         municipalities={list.municipalities}
         regions={list.regions}
         country={buildCountryListRow(countryTotalFacts, comparisonYear)}
-        sourceNote={message(messages, "municipal.indexSource", { year: comparisonYear, municipalities: municipalities.length, budgets: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
+        sourceNote={message(messages, "municipal.indexSource", { year: comparisonYear, municipalities: municipalities.length, budgets: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
         kpis={buildIndexKpis({
           municipalities,
           totalFacts,

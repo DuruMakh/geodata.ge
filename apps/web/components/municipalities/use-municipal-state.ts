@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ChartMode } from "../../lib/explorer/types";
 import { parseMunicipalHash, serializeMunicipalHash } from "../../lib/explorer/urlState";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { toggleId } from "../../lib/explorer/selection";
 
 function clampYear(year: number, min: number, max: number): number {
   return Math.min(Math.max(year, min), max);
@@ -60,7 +61,7 @@ export function useMunicipalState(years: number[], defaultSelection: string[], k
 
   function toggleSeries(itemId: string) {
     setSelectedIds((current) =>
-      current.includes(itemId) ? current.filter((id) => id !== itemId) : [...current, itemId],
+      toggleId(current, itemId),
     );
   }
 

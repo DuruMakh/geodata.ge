@@ -1,6 +1,6 @@
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { Locale } from "../i18n/types";
-import { getMunicipalPresentation } from "./municipal-presentation.server";
+import { getMunicipalPresentation, municipalUpdatedNote } from "./municipal-presentation.server";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
@@ -21,7 +21,7 @@ import {
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PUBLIC_PAGE_COUNT,
 } from "../explorer/municipalData";
-import { formatAmount, formatShare, formatDisplayDate } from "../explorer/format";
+import { formatAmount, formatShare } from "../explorer/format";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import {
   MUNICIPALITY_ROUTES,
@@ -242,7 +242,7 @@ export async function renderMunicipality(slug: string, locale: Locale) {
           next: { label: publicLabel(locale, next.code, next.displayNameKa, englishLabels), href: pageHref(municipalityHrefForCode(next.code), locale) },
         }}
         summary={summary}
-        sourceNote={message(messages, "municipal.source") + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
+        sourceNote={message(messages, "municipal.source") + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
       />
     </ExplorerPage>
   );

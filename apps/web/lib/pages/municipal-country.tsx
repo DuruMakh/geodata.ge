@@ -1,7 +1,6 @@
 import { coverageLabel } from "../explorer/coverageLabel";
-import { formatDisplayDate } from "../explorer/format";
 import type { Locale } from "../i18n/types";
-import { getMunicipalPresentation } from "./municipal-presentation.server";
+import { getMunicipalPresentation, municipalUpdatedNote } from "./municipal-presentation.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
@@ -150,7 +149,7 @@ export async function renderMunicipalCountry(locale: Locale) {
           budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
         }}
         pickerGroups={pickerGroups}
-        sourceNote={message(messages, "municipal.countrySource", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
+        sourceNote={message(messages, "municipal.countrySource", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
       />
     </ExplorerPage>
   );

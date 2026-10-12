@@ -1,6 +1,6 @@
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { Locale } from "../i18n/types";
-import { getMunicipalPresentation } from "./municipal-presentation.server";
+import { getMunicipalPresentation, municipalUpdatedNote } from "./municipal-presentation.server";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
@@ -26,7 +26,7 @@ import {
 } from "../explorer/municipalData";
 import { municipalRankLabel, REGION_GENITIVE_KA } from "../explorer/municipalLabels";
 import { municipalityHrefForCode } from "../explorer/municipalityRoutes";
-import { formatAmount, formatShare, formatDisplayDate } from "../explorer/format";
+import { formatAmount, formatShare } from "../explorer/format";
 import { shareOfTotal } from "../explorer/share";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
@@ -278,7 +278,7 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
           next: { label: publicLabel(locale, next.id, next.kaLabel, englishLabels), href: hrefFor(next) },
         }}
         summary={summary}
-        sourceNote={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraSource" : "municipal.regionSource") + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
+        sourceNote={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraSource" : "municipal.regionSource") + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
       >
         <EntityMemberList
           heading={message(messages, "municipal.regionMembers")}

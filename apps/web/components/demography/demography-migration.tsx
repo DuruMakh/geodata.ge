@@ -40,6 +40,7 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { toggleId } from "../../lib/explorer/selection";
 
 const SEX_KEYS = { total: "sexTotal", male: "sexMale", female: "sexFemale" } as const;
 const SEX_ICONS = {
@@ -231,7 +232,7 @@ export function MigrationExplorer({
                 onToggle={() =>
                   update((s) => ({
                     ...s,
-                    selectedIds: s.selectedIds.includes(group) ? s.selectedIds.filter((id) => id !== group) : [...s.selectedIds, group],
+                    selectedIds: toggleId(s.selectedIds, group),
                   }))
                 }
               />
