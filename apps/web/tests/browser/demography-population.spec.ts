@@ -287,6 +287,27 @@ test.describe("phone layouts at 390px", () => {
   }
 });
 
+// The births-and-deaths chart names its colours at rest (WCAG 1.4.1), not only in the hover readout, on a phone and on a desktop.
+for (const width of [390, 1440]) {
+  for (const [locale, prefix, names] of [
+    ["ka", "", ["დაბადებები", "გარდაცვალებები", "ბუნებრივი მატება"]],
+    ["en", "/en", ["Births", "Deaths", "Natural increase"]],
+  ] as const) {
+    test(`${locale}: the births-and-deaths chart shows three named swatches above it at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`${prefix}/explorer/demography/population/region/imereti`);
+      await ready(page);
+      const section = page.getByTestId("vital-section");
+      const items = section.getByTestId("stack-chart-legend").locator("li");
+      await expect(items).toHaveText(names);
+      for (const item of await items.all()) await expect(item.locator("span[aria-hidden]")).toBeVisible();
+      const legendBox = (await section.getByTestId("stack-chart-legend").boundingBox())!;
+      const chartBox = (await section.locator("svg[data-geometry]").boundingBox())!;
+      expect(legendBox.y + legendBox.height).toBeLessThanOrEqual(chartBox.y);
+    });
+  }
+}
+
 // Owner decision D7: on a touch phone the first tap on the map previews a place in a strip under it and the second opens its page.
 // The Population index gives the map persons and the Population page (`hrefForCode`), so the strip must not fall back to the Budget page's
 // per-resident wording and link. A second tap on the shape goes through the index's own addresses, so the strip's link is tapped too.

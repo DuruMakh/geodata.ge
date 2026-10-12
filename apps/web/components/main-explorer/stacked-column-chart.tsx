@@ -7,6 +7,7 @@ import { CHART_AXIS_LABEL, CHART_LATTICE, INK } from "../../lib/explorer/colors"
 import { buildDotLattice, type DotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
+import { SwatchBar } from "../ui/editorial";
 import {
   ChartScrollFrame,
   ChartTooltip,
@@ -52,6 +53,8 @@ export type StackedColumnChartProps = {
   ariaLabel: string;
   /** Periods per calendar year on the x axis: 12 for months (default), 1 for years. */
   periodsPerYear?: number;
+  /** A colour key drawn as a swatch row above the plot, so colour is never the only cue (DESIGN.md §13); none when absent. */
+  legend?: { id: string; label: string; color: string }[];
 };
 
 const W = 920;
@@ -143,6 +146,7 @@ export function StackedColumnChart({
   compactReadout = false,
   ariaLabel,
   periodsPerYear = 12,
+  legend,
 }: StackedColumnChartProps) {
   const captionId = useId();
   const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();
@@ -427,6 +431,16 @@ export function StackedColumnChart({
     // role="img" belongs on the svg, not the figure: it is children-presentational,
     // so on the figure it would hide the sr-only figcaption that carries the numbers.
     <figure ref={layoutRef} className="m-0">
+      {legend === undefined ? null : (
+        <ul data-testid="stack-chart-legend" className="mb-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)]">
+          {legend.map((entry) => (
+            <li key={entry.id} data-legend-series-id={entry.id} className="flex min-w-0 items-center gap-2">
+              <SwatchBar color={entry.color} />
+              <span className="min-w-0 break-words">{entry.label}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       <ChartScrollFrame
         testId="stack-chart-frame"
         scrollKey={scrollKey}

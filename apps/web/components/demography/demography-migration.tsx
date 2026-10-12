@@ -160,6 +160,10 @@ export function MigrationExplorer({
                   periodsPerYear={1}
                   segments={segments}
                   overlay={{ label: netLabel, values: scaled(model.totals.net, 1) }}
+                  legend={[
+                    ...model.selectedIds.map((group) => ({ id: group, label: groupLabel(group), color: MIGRATION_COLORS[group] })),
+                    { id: "net", label: netLabel, color: INK },
+                  ]}
                   formatPeriod={String}
                   formatValue={(value) => persons(Math.abs(Math.round(value * CHART_SCALE)))}
                   formatOverlayValue={(value) => signedPersons(Math.round(value * CHART_SCALE))}

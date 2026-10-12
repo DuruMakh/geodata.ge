@@ -84,6 +84,11 @@ export function VitalSection({
                 { id: "deaths", label: t("vitalDeaths"), color: DEATHS, marker: "down", values: values(model.deaths, -1) },
               ]}
               overlay={{ label: t("vitalNatural"), values: values(model.natural, 1) }}
+              legend={[
+                { id: "births", label: t("vitalBirths"), color: BIRTHS },
+                { id: "deaths", label: t("vitalDeaths"), color: DEATHS },
+                { id: "natural", label: t("vitalNatural"), color: INK },
+              ]}
               formatPeriod={String}
               formatValue={(value) => persons(Math.abs(value))}
               formatOverlayValue={(value) => signedPersons(value)}
