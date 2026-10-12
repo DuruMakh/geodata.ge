@@ -9,7 +9,7 @@ export const REVIEWED_MISSING_MARKERS: readonly string[] = ["-"];
  * A stored cell may sit this far from a whole number of persons. Geostat's cells carry float noise
  * (3930.4279999999999 thousand) of about 2e-9 persons; a real fraction of a person would be far larger.
  */
-const WHOLE_PERSON_TOLERANCE = 1e-6;
+export const WHOLE_PERSON_TOLERANCE = 1e-6;
 
 export class UnexpectedCellError extends DemographyStopError {
   constructor(
