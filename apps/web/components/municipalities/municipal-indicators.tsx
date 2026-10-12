@@ -5,10 +5,9 @@ import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalK
 import { formatAmount, formatAmountParts, formatShare } from "../../lib/explorer/format";
 import type { Locale } from "../../lib/i18n/types";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { Sparkline } from "../ui/sparkline";
-import { Overline, SectionTitle, SwatchBar } from "../ui/editorial";
+import { SectionTitle, SwatchBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
-import { HERO_KPI_VALUE_CLASS, KPI_DETAIL_CLIP_CLASS, KPI_GRID_CLASS, MOVER_LABEL_CLASS, KPI_UNIT_CLASS, SIDE_KPI_LIST_CLASS, SIDE_KPI_VALUE_CLASS, sideKpiRowClass } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, MOVER_LABEL_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
 
@@ -99,60 +98,31 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
               </p>
             </div>
           ) : (
-          <div data-testid="entity-kpi" className="min-w-0 @min-[1100px]:pr-11">
-            <Overline>{message(messages, "municipal.periodChange")}</Overline>
-            <p
-              className={HERO_KPI_VALUE_CLASS}
-              style={{ color: headline.change !== null && headline.change < 0 ? NEGATIVE : "var(--ink)" }}
-            >
-              {formatShare(headline.change, true)}
-            </p>
-            <div className="mt-7 max-w-[480px]">
-              <div data-testid="municipal-change-gauge" className="flex h-[3px] bg-[var(--hairline-soft)]">
-                <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${(gaugeBase * 100).toFixed(1)}%` }} />
-                <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - gaugeBase) * 100).toFixed(1)}%` }} />
-              </div>
-              <div className="mt-2 flex justify-between gap-4">
-                <p data-testid="municipal-change-start" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-                  {startYear} · {formatAmount(headline.start, locale)}
-                </p>
-                <p data-testid="municipal-change-end" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-                  {endYear} · {formatAmount(headline.end, locale)}
-                </p>
-              </div>
-              {showSentence ? (
-                <p data-testid="municipal-change-sentence" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
-                  <Message messages={messages} id={grew ? "municipal.changeIncreased" : "municipal.changeDecreased"} values={{
-                    start: startYear, end: endYear,
-                    amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari(`${deltaParts.num} ${deltaParts.unit}`.trim())}</span>,
-                    annual: headline.cagr !== null ? <Message messages={messages} id={headline.cagr >= 0 ? "municipal.annualGrowth" : "municipal.annualChange"} values={{ rate: <span className="font-[family-name:var(--font-numeric)] text-xs">{formatShare(headline.cagr, true)}</span> }} /> : ".",
-                  }} />
-                </p>
-              ) : null}
+          <HeroKpi label={message(messages, "municipal.periodChange")} value={formatShare(headline.change, true)} valueColor={headline.change !== null && headline.change < 0 ? NEGATIVE : "var(--ink)"} testId="entity-kpi">
+            <div data-testid="municipal-change-gauge" className="flex h-[3px] bg-[var(--hairline-soft)]">
+              <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${(gaugeBase * 100).toFixed(1)}%` }} />
+              <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - gaugeBase) * 100).toFixed(1)}%` }} />
             </div>
-          </div>
+            <div className="mt-2 flex justify-between gap-4">
+              <p data-testid="municipal-change-start" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
+                {startYear} · {formatAmount(headline.start, locale)}
+              </p>
+              <p data-testid="municipal-change-end" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
+                {endYear} · {formatAmount(headline.end, locale)}
+              </p>
+            </div>
+            {showSentence ? (
+              <p data-testid="municipal-change-sentence" className="mt-4 text-[0.78125rem] leading-relaxed text-[var(--body)]">
+                <Message messages={messages} id={grew ? "municipal.changeIncreased" : "municipal.changeDecreased"} values={{
+                  start: startYear, end: endYear,
+                  amount: <span className="font-[family-name:var(--font-numeric)] text-xs">{withLari(`${deltaParts.num} ${deltaParts.unit}`.trim())}</span>,
+                  annual: headline.cagr !== null ? <Message messages={messages} id={headline.cagr >= 0 ? "municipal.annualGrowth" : "municipal.annualChange"} values={{ rate: <span className="font-[family-name:var(--font-numeric)] text-xs">{formatShare(headline.cagr, true)}</span> }} /> : ".",
+                }} />
+              </p>
+            ) : null}
+          </HeroKpi>
           )}
-          <div className={SIDE_KPI_LIST_CLASS}>
-            {sideKpis.map((kpi, index) => (
-              <div key={kpi.label} data-testid="entity-kpi" className={sideKpiRowClass(index, sideKpis.length)}>
-                <div data-testid="side-kpi">
-                  <Overline>{kpi.label}</Overline>
-                  <div className="mt-[7px] flex items-baseline justify-between gap-4">
-                    <span className={SIDE_KPI_VALUE_CLASS}>
-                      {kpi.value}
-                      {kpi.unit ? (
-                        <span className={KPI_UNIT_CLASS}>
-                          {withLari(kpi.unit)}
-                        </span>
-                      ) : null}
-                    </span>
-                    <span className={`min-w-0 text-right text-xs text-[var(--muted)] ${KPI_DETAIL_CLIP_CLASS}`} title={kpi.detail}>{kpi.detail}</span>
-                  </div>
-                  <Sparkline values={sideSeries[index]!} color="var(--ink)" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <SideKpiList rowTestId="entity-kpi" kpis={sideKpis.map((kpi, index) => ({ label: kpi.label, value: kpi.value, unit: kpi.unit ?? "", color: "var(--ink)", detail: kpi.detail, spark: { values: sideSeries[index]!, color: "var(--ink)" } }))} />
         </div>
 
       {singleYear ? null : (

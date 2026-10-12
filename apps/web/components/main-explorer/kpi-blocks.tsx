@@ -30,15 +30,18 @@ export function sideKpiRowClass(index: number, count: number): string {
   return index === 0 ? "pt-0.5 pb-3.5" : index === count - 1 ? "border-t border-[var(--hairline-soft)] pt-3.5" : "border-t border-[var(--hairline-soft)] py-3.5";
 }
 
-export function HeroKpi({ label, value, valueColor = "var(--ink)", children }: { label: string; value: string; valueColor?: string; children: ReactNode }) {
+/** `unit` sits after the figure in the UI face (₾ in the sans lari glyph); the ids are for pages that test their hero. */
+export function HeroKpi({ label, value, unit, valueColor = "var(--ink)", testId, valueTestId, children }: { label: string; value: string; unit?: string; valueColor?: string; testId?: string; valueTestId?: string; children: ReactNode }) {
   return (
-    <div className="min-w-0 @min-[1100px]:pr-11">
+    <div data-testid={testId} className="min-w-0 @min-[1100px]:pr-11">
       <Overline>{label}</Overline>
       <p
+        data-testid={valueTestId}
         className={HERO_KPI_VALUE_CLASS}
         style={{ color: valueColor }}
       >
         {value}
+        {unit ? <span className="ml-1.5 font-[family-name:var(--font-numeric)] text-base font-medium tracking-normal text-[var(--body)]">{withLari(unit)}</span> : null}
       </p>
       <div className="mt-7 max-w-[480px]">{children}</div>
     </div>
@@ -53,37 +56,46 @@ export type SideKpi = {
   detail: string;
   wrapDetail?: boolean;
   spark: { values: (number | null)[]; color: string } | null;
+  /** Replaces the row's `side-kpi` test id. */
+  testId?: string;
 };
 
-export function SideKpiList({ kpis }: { kpis: SideKpi[] }) {
+/** `testId` names the list; `rowTestId` wraps each row in an outer element with that id (municipal pages). */
+export function SideKpiList({ kpis, testId, rowTestId }: { kpis: SideKpi[]; testId?: string; rowTestId?: string }) {
   return (
-    <div className={SIDE_KPI_LIST_CLASS}>
-      {kpis.map((kpi, index) => (
-        <div
-          key={kpi.label}
-          data-testid="side-kpi"
-          className={sideKpiRowClass(index, kpis.length)}
-        >
-          <Overline>{kpi.label}</Overline>
-          <div className="mt-[7px] flex items-baseline justify-between gap-4">
-            <p
-              className={SIDE_KPI_VALUE_CLASS}
-              style={{ color: kpi.color }}
-            >
-              {kpi.value}
-              {kpi.unit ? (
-                <span className={KPI_UNIT_CLASS}>
-                  {withLari(kpi.unit)}
-                </span>
-              ) : null}
-            </p>
-            <p title={kpi.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${kpi.wrapDetail ? "break-words" : KPI_DETAIL_CLIP_CLASS}`}>
-              {kpi.detail}
-            </p>
+    <div data-testid={testId} className={SIDE_KPI_LIST_CLASS}>
+      {kpis.map((kpi, index) => {
+        const body = (
+          <>
+            <Overline>{kpi.label}</Overline>
+            <div className="mt-[7px] flex items-baseline justify-between gap-4">
+              <p
+                className={SIDE_KPI_VALUE_CLASS}
+                style={{ color: kpi.color }}
+              >
+                {kpi.value}
+                {kpi.unit ? (
+                  <span className={KPI_UNIT_CLASS}>
+                    {withLari(kpi.unit)}
+                  </span>
+                ) : null}
+              </p>
+              <p title={kpi.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${kpi.wrapDetail ? "break-words" : KPI_DETAIL_CLIP_CLASS}`}>
+                {kpi.detail}
+              </p>
+            </div>
+            {kpi.spark ? <Sparkline values={kpi.spark.values} color={kpi.spark.color} /> : null}
+          </>
+        );
+        const rowClass = sideKpiRowClass(index, kpis.length);
+        return rowTestId ? (
+          <div key={kpi.label} data-testid={rowTestId} className={rowClass}>
+            <div data-testid={kpi.testId ?? "side-kpi"}>{body}</div>
           </div>
-          {kpi.spark ? <Sparkline values={kpi.spark.values} color={kpi.spark.color} /> : null}
-        </div>
-      ))}
+        ) : (
+          <div key={kpi.label} data-testid={kpi.testId ?? "side-kpi"} className={rowClass}>{body}</div>
+        );
+      })}
     </div>
   );
 }
