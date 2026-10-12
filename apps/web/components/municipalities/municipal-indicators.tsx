@@ -5,7 +5,7 @@ import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalK
 import { formatAmount, formatAmountParts, formatShare } from "../../lib/explorer/format";
 import type { Locale } from "../../lib/i18n/types";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { SectionTitle } from "../ui/editorial";
+import { SectionTitle, ShareBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 import { HeroKpi, KPI_GRID_CLASS, MoverRow, PeriodComparisonTable, SideKpiList } from "../main-explorer/kpi-blocks";
 
@@ -79,10 +79,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
             </div>
           ) : (
           <HeroKpi label={message(messages, "municipal.periodChange")} value={formatShare(headline.change, true)} valueColor={headline.change !== null && headline.change < 0 ? NEGATIVE : "var(--ink)"} testId="entity-kpi">
-            <div data-testid="municipal-change-gauge" className="flex h-[3px] bg-[var(--hairline-soft)]">
-              <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${(gaugeBase * 100).toFixed(1)}%` }} />
-              <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - gaugeBase) * 100).toFixed(1)}%` }} />
-            </div>
+            <ShareBar share={gaugeBase} restColor="var(--accent)" testId="municipal-change-gauge" />
             <div className="mt-2 flex justify-between gap-4">
               <p data-testid="municipal-change-start" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
                 {startYear} · {formatAmount(headline.start, locale)}

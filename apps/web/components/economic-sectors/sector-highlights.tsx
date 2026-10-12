@@ -9,7 +9,7 @@ import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
-import { SectionTitle, SourceNote } from "../ui/editorial";
+import { SectionTitle, ShareBar, SourceNote } from "../ui/editorial";
 import { sectorColor } from "../../lib/explorer/economicSectors";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 
@@ -52,9 +52,7 @@ export function SectorHighlights({ facts, registry, year }: {
         <HeroKpi label={t("largest")} value={amount.num} unit={amount.unit || undefined} testId="sector-highlight-largest" valueTestId="sector-hero-value">
           {model.largestShare != null ? (
             <>
-              <div aria-hidden="true" className="flex h-[3px] bg-[var(--hairline-soft)]">
-                <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${Math.max(0, Math.min(100, model.largestShare))}%` }} />
-              </div>
+              <ShareBar share={model.largestShare / 100} />
               <p className="mt-2 font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">{percentage(model.largestShare)} {t("ofGdp")}</p>
             </>
           ) : null}

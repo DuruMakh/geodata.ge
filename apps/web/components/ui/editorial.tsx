@@ -142,3 +142,28 @@ export function SegmentedTabs<T extends string>({ options, value, onChange, aria
     </span>
   );
 }
+
+type ShareBarProps = {
+  /** The filled fraction, 0–1; clamped. */
+  share: number;
+  color?: string;
+  /** Fills the remainder in a second colour (a two-part split). */
+  restColor?: string;
+  className?: string;
+  testId?: string;
+  fillTestId?: string;
+};
+
+/**
+ * The thin 3px share bar under a figure (DESIGN.md §8.5). Decorative: the figure is
+ * always printed beside it. Spans only, so it sits inside links and phrasing content.
+ */
+export function ShareBar({ share, color = "var(--ink)", restColor, className = "", testId, fillTestId }: ShareBarProps) {
+  const filled = Math.max(0, Math.min(1, share));
+  return (
+    <span aria-hidden="true" data-testid={testId} className={`flex h-[3px] bg-[var(--hairline-soft)] ${className}`}>
+      <span data-testid={fillTestId} className="h-[3px]" style={{ width: `${(filled * 100).toFixed(1)}%`, background: color }} />
+      {restColor ? <span className="h-[3px]" style={{ width: `${((1 - filled) * 100).toFixed(1)}%`, background: restColor }} /> : null}
+    </span>
+  );
+}
