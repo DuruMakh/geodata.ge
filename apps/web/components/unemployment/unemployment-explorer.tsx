@@ -19,14 +19,13 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { unemploymentRegionHref } from "../../lib/explorer/unemploymentRegionRoutes";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { RegionPicker } from "../regional-economies/region-picker";
-import { ChevronDown } from "lucide-react";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
-import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
+import { PlaceHeading } from "../explorer-shell/place-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
@@ -42,7 +41,6 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
   const t = (key: string) => message(messages, `unemployment.${key}`);
   const { state, update } = useUnemploymentState(facts, registry, section, regionId);
   const [query, setQuery] = useState(""), [announcement, setAnnouncement] = useState("");
-  const [pickerOpen, setPickerOpen] = useState(false);
   const region = regionId ? registry.find(group => group.id === regionId)! : null;
   const regionName = region ? locale === "en" ? region.labelEn : region.labelKa : "";
   const orderedRegions = (regions ?? []).slice().sort((left, right) => left.sortOrder - right.sortOrder);
@@ -78,24 +76,18 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
     await downloadWorkbook(buildUnemploymentWorkbookExportModel(facts, registry, state, presentation, sources, siteOrigin));
   }} />;
   return <div data-testid="unemployment-explorer" className="@container">
-    {region ? <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
-      <div className="relative min-w-0 min-[768px]:flex-1">
-        <ExplorerHeading>{t("regionHeadingLead")}{" "}
-          <button type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
-            {regionName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
-          </button>
-        </ExplorerHeading>
-        <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />
-      </div>
-      {/* Previous/next in the regions' fixed order, as on Economy region pages;
-          the bottom margin matches the heading's so both share a baseline row. */}
-      {neighbours ? <EntityNeighbourLinks
-        testId="unemployment-region-navigation"
-        className="mb-3"
-        previous={{ href: pageHref(unemploymentRegionHref(neighbours.previous.id), locale), label: publicLabel(locale, neighbours.previous.id, neighbours.previous.kaLabel, presentation.englishLabels) }}
-        next={{ href: pageHref(unemploymentRegionHref(neighbours.next.id), locale), label: publicLabel(locale, neighbours.next.id, neighbours.next.kaLabel, presentation.englishLabels) }}
-      /> : null}
-    </div> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
+    {region ? <PlaceHeading
+      lead={t("regionHeadingLead")}
+      placeLabel={regionName}
+      triggerTestId="region-picker-trigger"
+      picker={(open, close) => <RegionPicker open={open} onClose={close} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />}
+      // Previous/next in the regions' fixed order, as on Economy region pages.
+      neighbours={neighbours ? {
+        testId: "unemployment-region-navigation",
+        previous: { href: pageHref(unemploymentRegionHref(neighbours.previous.id), locale), label: publicLabel(locale, neighbours.previous.id, neighbours.previous.kaLabel, presentation.englishLabels) },
+        next: { href: pageHref(unemploymentRegionHref(neighbours.next.id), locale), label: publicLabel(locale, neighbours.next.id, neighbours.next.kaLabel, presentation.englishLabels) },
+      } : undefined}
+    /> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
     {latest ? <LatestValueLine testId="unemployment-latest" measure={latestMeasure} period={latest.year} value={valueLabel(latest.value)} /> : null}
     <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
     <p role="status" className="sr-only">{announcement}</p>

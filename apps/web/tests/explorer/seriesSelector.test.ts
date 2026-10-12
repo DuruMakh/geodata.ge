@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
-import { buildSeriesPanelRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
+import { buildSeriesPanelRows, buildTreeRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
 import { SeriesSelector, SeriesSelectorRow } from "../../components/main-explorer/series-selector";
 import type { ExplorerItem } from "../../lib/explorer/types";
 
@@ -213,5 +213,34 @@ describe("series selector reference rows", () => {
 
   it("keeps the solid swatch by default", () => {
     expect(render()).not.toContain("stroke-dasharray");
+  });
+});
+
+describe("buildTreeRows", () => {
+  type Node = { id: string; label: string; parent: string | null };
+  const nodes: Node[] = [
+    { id: "p1", label: "Domestic debt", parent: null },
+    { id: "c1", label: "Bonds", parent: "p1" },
+    { id: "c2", label: "Loans", parent: "p1" },
+    { id: "p2", label: "External debt", parent: null },
+  ];
+  const parents = nodes.filter((node) => node.parent === null);
+  const childrenOf = (parent: Node) => nodes.filter((node) => node.parent === parent.id);
+  const matches = (node: Node, query: string) => node.label.toLowerCase().includes(query);
+  const idOf = (node: Node) => node.id;
+
+  it("opens and locks a parent whose child alone matches, listing only that child", () => {
+    const rows = buildTreeRows(parents, childrenOf, matches, idOf, "bonds", []);
+    expect(rows.map((row) => [row.item.id, row.isChild, row.expanded, row.locked])).toEqual([
+      ["p1", false, true, true],
+      ["c1", true, false, false],
+    ]);
+  });
+
+  it("lists every child of a parent the reader expanded", () => {
+    const rows = buildTreeRows(parents, childrenOf, matches, idOf, "", ["p1"]);
+    expect(rows.map((row) => row.item.id)).toEqual(["p1", "c1", "c2", "p2"]);
+    expect(rows[0]).toMatchObject({ hasChildren: true, expanded: true, locked: false });
+    expect(rows[3]).toMatchObject({ hasChildren: false, expanded: false });
   });
 });

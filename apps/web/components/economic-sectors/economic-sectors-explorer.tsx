@@ -27,6 +27,7 @@ import { SectorSeriesPanel } from "./sector-series-panel";
 import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -96,20 +97,17 @@ export function EconomicSectorsExplorer({
   return (
     <div data-testid="economic-sectors-explorer" className="@container">
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
-      <p
-        data-testid="sectors-headline"
-        className="mb-2 text-[13px] text-[var(--body)]"
-      >
-        {t("reference")} · {model.headline?.year ?? "—"}:{" "}
-        <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">
-          {percent
+      <LatestValueLine
+        testId="sectors-headline"
+        measure={t("reference")}
+        period={model.headline?.year ?? "—"}
+        value={
+          percent
             ? formatShare(model.headline ? model.headline.value / 100 : null)
-            : formatAmount(model.headline?.value, locale)}
-        </span>
-        {model.headline?.status === "preliminary"
-          ? ` · ${t("preliminary")}`
-          : ""}
-      </p>
+            : formatAmount(model.headline?.value, locale)
+        }
+        note={model.headline?.status === "preliminary" ? t("preliminary") : undefined}
+      />
       <div className="mb-[30px] grid text-[13px] text-[var(--muted)]">
         {(["nominal", "share_of_gdp", "real_growth"] as const).map(measure => (
           <p key={measure} aria-hidden={measure !== state.measure}

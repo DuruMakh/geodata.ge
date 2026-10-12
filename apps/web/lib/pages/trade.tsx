@@ -8,9 +8,7 @@ import { TRADE_SERVICES_SOURCES } from "../data/tradeServices/types";
 import { TradeDomesticExports } from "../../components/trade/trade-domestic-exports";
 import { loadServedTradeDomesticData, toClientTradeDomesticData } from "../data/tradeDomestic/importTradeDomestic";
 import { TRADE_DOMESTIC_DOCUMENT_IDS } from "../data/tradeDomestic/types";
-import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
-import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { PageHeader } from "../../components/shell/page-header";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -36,6 +34,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import { TopicHub } from "./hub";
 
 const PRODUCT_SOURCE_BLOCK = "2020-2025";
 
@@ -52,15 +51,7 @@ export async function tradeOverviewMetadata(locale: Locale) {
 export async function renderTradeHub(locale: Locale) {
   const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade", "common"], [])]);
   const title = message(presentation.messages, "trade.hubTitle");
-  return <I18nProvider {...presentation}>
-    <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref("/explorer/trade", locale) }]} />
-    <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage="" />
-      <ExplorerHeading>{title}</ExplorerHeading>
-      <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "trade.hubSummary")}</p>
-      <BudgetHub cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} locale={locale} testId="trade-hub" />
-    </ExplorerPage>
-  </I18nProvider>;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage="" cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} testId="trade-hub" />;
 }
 export async function tradeProductsMetadata(locale: Locale) {
   const [products, messages] = await Promise.all([loadServedTradeProductsData(), getMessages(locale, ["trade"])]);

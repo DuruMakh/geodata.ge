@@ -1,8 +1,6 @@
 import path from "node:path";
 import { EnergyFoodExplorer } from "../../components/energy-food/energy-food-explorer";
-import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
-import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
@@ -22,6 +20,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import { TopicHub } from "./hub";
 
 export async function energyFoodHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["energyFood"]);
@@ -31,15 +30,7 @@ export async function energyFoodHubMetadata(locale: Locale) {
 export async function renderEnergyFoodHub(locale: Locale) {
   const [{ facts }, presentation] = await Promise.all([loadServedEnergyFoodData(), getPresentation(locale, ["energyFood", "common"], [])]);
   const title = message(presentation.messages, "energyFood.title"), years = facts.map(f => f.year);
-  return <I18nProvider {...presentation}>
-    <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref(ENERGY_FOOD_HUB_PATH, locale) }]} />
-    <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} />
-      <ExplorerHeading>{title}</ExplorerHeading>
-      <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "energyFood.hubSummary")}</p>
-      <BudgetHub cards={buildEnergyFoodHubCards(facts.map(toClientEnergyFoodFact), presentation)} locale={locale} testId="energy-food-hub" />
-    </ExplorerPage>
-  </I18nProvider>;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "energyFood.hubSummary")} path={ENERGY_FOOD_HUB_PATH} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildEnergyFoodHubCards(facts.map(toClientEnergyFoodFact), presentation)} testId="energy-food-hub" />;
 }
 
 export async function energyFoodPageMetadata(locale: Locale, section: EnergyFoodSectionId) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup, type EntityPickerOverrides } from "./entity-picker";
 
 export type EntityNavigation = { prev: { label: string; href: string }; next: { label: string; href: string } };
@@ -71,19 +72,8 @@ export function EntityHeading({ title, triggerLabel, metaLine, entityId, navigat
         <div className="text-[12.5px] text-[var(--muted)]">{metaLine}</div>
       </div>
       {navigation ? (
-        <span
-          data-testid="municipal-entity-navigation"
-          className="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink"
-        >
-          {/* Plain <a> on purpose (full page load); 44px-tall targets below 768px,
-              matching EntityNeighbourLinks on the other detail pages. */}
-          <a href={navigation.prev.href} className="flex min-h-11 min-w-0 items-center font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
-            <span className="min-w-0 truncate">← {navigation.prev.label}</span>
-          </a>
-          <a href={navigation.next.href} className="flex min-h-11 min-w-0 items-center justify-end text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
-            <span className="min-w-0 truncate">{navigation.next.label} →</span>
-          </a>
-        </span>
+        // Plain <a> on purpose (full page load).
+        <EntityNeighbourLinks testId="municipal-entity-navigation" plainAnchors previous={navigation.prev} next={navigation.next} />
       ) : null}
     </div>
   );

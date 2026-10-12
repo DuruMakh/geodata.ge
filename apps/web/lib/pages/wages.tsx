@@ -1,9 +1,7 @@
 import path from "node:path";
 import { notFound } from "next/navigation";
 import { WagesExplorer, WagesRegionsIndex } from "../../components/wages/wages-explorer";
-import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
-import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
@@ -27,6 +25,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import { TopicHub } from "./hub";
 
 const LABEL_IDS = [...WAGES_SECTORS, ...WAGES_REGIONS];
 
@@ -38,15 +37,7 @@ export async function wagesHubMetadata(locale: Locale) {
 export async function renderWagesHub(locale: Locale) {
   const [{ facts }, presentation] = await Promise.all([loadServedWagesData(), getPresentation(locale, ["wages", "common"], [])]);
   const title = message(presentation.messages, "wages.title"), years = facts.map(f => f.year);
-  return <I18nProvider {...presentation}>
-    <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref("/explorer/wages", locale) }]} />
-    <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} />
-      <ExplorerHeading>{title}</ExplorerHeading>
-      <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "wages.hubSummary")}</p>
-      <BudgetHub cards={buildWagesHubCards(facts.map(toClientWagesFact), presentation)} locale={locale} testId="wages-hub" />
-    </ExplorerPage>
-  </I18nProvider>;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "wages.hubSummary")} path={"/explorer/wages"} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildWagesHubCards(facts.map(toClientWagesFact), presentation)} testId="wages-hub" />;
 }
 
 export async function wagesPageMetadata(locale: Locale, section: WagesSectionId) {

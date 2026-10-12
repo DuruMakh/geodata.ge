@@ -6,6 +6,7 @@ import { getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/ex
 import { type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
 import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { toggleId } from "../../lib/explorer/selection";
 
 type UseExplorerStateInput = {
   facts: ClientBudgetFact[];
@@ -99,7 +100,7 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
       const fresh = existing[scope] ?? defaultSelections[scope];
       return {
         ...existing,
-        [scope]: fresh.includes(itemId) ? fresh.filter((id) => id !== itemId) : [...fresh, itemId],
+        [scope]: toggleId(fresh, itemId),
       };
     });
   }
@@ -110,7 +111,7 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
 
   function toggleMinistryExpanded(ministryId: string) {
     setExpandedMinistries((current) =>
-      current.includes(ministryId) ? current.filter((id) => id !== ministryId) : [...current, ministryId],
+      toggleId(current, ministryId),
     );
   }
 

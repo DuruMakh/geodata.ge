@@ -24,6 +24,7 @@ import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selec
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
+import { toggleId } from "../../lib/explorer/selection";
 
 // Inside Domestic exports and Services the hash also names the section, and each change tells the page which hash to keep for it.
 const isDomestic = (facts: readonly ClientTradeOverviewFact[]) => facts.some(f => f.indicatorId === "trade.domestic_exports");
@@ -73,7 +74,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
       <SeriesAside label={message(messages, "controls.series")}>
         <p className="mb-3 text-[11px] text-[var(--muted)]">{model.range.end} · {model.unit.label}</p>
         <SeriesSelector query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} selectedCount={model.selectedIds.length} totalCount={indicators.length} hasSelection={model.selectedIds.length > 0} allSelected={model.selectedIds.length === indicators.length} onToggleAll={() => update(s => ({ ...s, selectedIds: s.selectedIds.length ? [] : [...indicators] }), true)} hasVisibleMatches={indicators.some(matches)}>
-          {indicators.filter(id => id === totalId || matches(id)).map(id => <SeriesSelectorRow key={id} id={id} label={label(id)} color={TRADE_OVERVIEW_COLORS[id]} value={formatInUnit(model.endValues[id], model.unit)} selected={model.selectedIds.includes(id)} level={id === totalId ? "total" : "item"} wrapLabel onToggle={() => update(s => ({ ...s, selectedIds: s.selectedIds.includes(id) ? s.selectedIds.filter(selected => selected !== id) : [...s.selectedIds, id] }), true)} />)}
+          {indicators.filter(id => id === totalId || matches(id)).map(id => <SeriesSelectorRow key={id} id={id} label={label(id)} color={TRADE_OVERVIEW_COLORS[id]} value={formatInUnit(model.endValues[id], model.unit)} selected={model.selectedIds.includes(id)} level={id === totalId ? "total" : "item"} wrapLabel onToggle={() => update(s => ({ ...s, selectedIds: toggleId(s.selectedIds, id) }), true)} />)}
         </SeriesSelector>
         {downloadAction}
       </SeriesAside>
