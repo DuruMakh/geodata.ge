@@ -101,7 +101,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     }),
     planned: model.years.map(() => false),
     ...(props.family === "service" && model.forecastStartYear !== null
-      ? { forecastFromYear: model.forecastStartYear }
+      ? { forecastFromYear: model.forecastStartYear, preliminary: model.years.map((year) => year >= model.forecastStartYear!) }
       : {}),
   }));
   const totalItemId = model.items.find((item) => item.family === props.family && item.parentItemId === null)?.id;
@@ -223,10 +223,11 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                   share={isPercent}
                   unit={unit}
                   shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
+                  preliminaryLabel={message(messages, "debt.forecast")}
                 />
               </div>
             )}
-            <ChartSelectionAids series={chartSeries} chartShown={props.chartMode === "line"} share={isPercent} unit={unit} />
+            <ChartSelectionAids series={chartSeries} chartShown={props.chartMode === "line"} share={isPercent} unit={unit} years={model.years} />
 
             <RangeStrip
               years={familyYears}

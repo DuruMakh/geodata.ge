@@ -78,7 +78,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
         planned: model.years.map(() => false),
         ...(model.forecastStartYear === null
           ? {}
-          : { forecastFromYear: model.forecastStartYear }),
+          : { forecastFromYear: model.forecastStartYear, preliminary: model.years.map((year) => year >= model.forecastStartYear!) }),
       }]
     : [];
   const queryMatches = matchesLabelQuery(query, [DEFICIT_ITEM.kaLabel, model.tableRow.enLabel, DEFICIT_ITEM.id]);
@@ -196,6 +196,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                   share={percentage}
                   unit={unit}
                   shareLabel={message(messages, "main.shareGdp")}
+                  preliminaryLabel={message(messages, "deficit.forecast")}
                 />
               </div>
             )}

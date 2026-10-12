@@ -17,6 +17,16 @@ describe("legendValue", () => {
     expect(legendValue([5, null], { share: true, unit: UNIT_BN })).toBe("—");
     expect(legendValue([], { share: true, unit: UNIT_BN })).toBe("—");
   });
+
+  // U06-03: debt service drew its 2030 projection as the line's plain latest value.
+  it("the phone legend shows the last published value", () => {
+    const forecast = { share: false, unit: UNIT_BN, forecastFromYear: 2026 };
+    expect(legendValue([4.1e9, 4.4e9, 4.0e9, 3.7e9], { ...forecast, years: [2024, 2025, 2026, 2030] })).toBe("4.4 მლრდ · 2025");
+    // A range that ends before the forecast reads its last period, as every other legend does.
+    expect(legendValue([4.1e9, 4.4e9], { ...forecast, years: [2024, 2025] })).toBe("4.4 მლრდ");
+    // A range of forecast years only has no published value to show.
+    expect(legendValue([4.0e9, 3.7e9], { ...forecast, years: [2026, 2030] })).toBe("—");
+  });
 });
 
 describe("enoughInView", () => {

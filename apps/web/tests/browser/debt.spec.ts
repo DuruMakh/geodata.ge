@@ -239,6 +239,14 @@ test.describe("Government Debt explorer", () => {
     expect(summary.getCell("D4").numFmt).toContain("პროგნოზი");
   });
 
+  // U06-03: a projection year read like an actual one in the hover readout.
+  test("hovering a projection year shows the forecast label", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=line&r=2027-2030&sel=debt.service.total`);
+    await expectAppReady(page);
+    await page.getByRole("img", { name: LINE_CHART_NAME }).hover({ position: { x: 300, y: 100 } });
+    await expect(page.getByTestId("chart-tooltip")).toContainText("პროგნოზი");
+  });
+
   test("the bulk control clears, then selects every row of the active family", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/debt`);
     await expectAppReady(page);

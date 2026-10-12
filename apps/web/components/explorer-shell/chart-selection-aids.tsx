@@ -17,7 +17,7 @@ import { withLari } from "../ui/lari";
 // - a floating "↑ chart" pill that appears when the selection changes while the chart is
 //   off-screen (stacked layouts, below 1100px), and leads back to it.
 
-export type AidSeries = { id: string; label: string; color: string; vals: (number | null)[] };
+export type AidSeries = { id: string; label: string; color: string; vals: (number | null)[]; forecastFromYear?: number };
 
 /** How long the pill waits for the next selection change before it leaves. */
 export const RETURN_PILL_MS = 4000;
@@ -28,16 +28,41 @@ export function legendShown(lines: number, legendCap: number = TOOLTIP_ROW_CAP):
   return lines >= 2 && lines <= legendCap;
 }
 
-/** The legend's value for a line: its value in the last period drawn, formatted like the chart. */
+/**
+ * The legend's value for a line: its value in the last period drawn, formatted like the chart.
+ * A line with forecast years shows its last published value instead, with that value's year
+ * when a later year is drawn: a projection is never read as the latest value.
+ */
 export function legendValue(
   vals: readonly (number | null)[],
-  { share, unit, formatValue }: { share: boolean; unit: ValueUnit; formatValue?: (value: number, seriesId: string) => string },
+  {
+    share,
+    unit,
+    formatValue,
+    years,
+    forecastFromYear,
+  }: {
+    share: boolean;
+    unit: ValueUnit;
+    formatValue?: (value: number, seriesId: string) => string;
+    /** The periods drawn, one per value; needed with `forecastFromYear`. */
+    years?: readonly number[];
+    forecastFromYear?: number;
+  },
   seriesId = "",
 ): string {
-  const value = vals.at(-1);
+  const index =
+    forecastFromYear === undefined || years === undefined
+      ? vals.length - 1
+      : vals.findLastIndex((value, period) => value !== null && years[period]! < forecastFromYear);
+  const value = vals[index];
   if (value === null || value === undefined) return MISSING;
-  if (formatValue) return formatValue(value, seriesId);
-  return share ? formatShare(value / 100) : `${formatInUnit(value, unit)} ${unit.label}`.trim();
+  const text = formatValue
+    ? formatValue(value, seriesId)
+    : share
+      ? formatShare(value / 100)
+      : `${formatInUnit(value, unit)} ${unit.label}`.trim();
+  return index < vals.length - 1 && years ? `${text} · ${years[index]}` : text;
 }
 
 /** Whether `visible` px of a `height` px element are enough to call it in view on a `viewport` px screen. */
@@ -62,6 +87,7 @@ export function ChartSelectionAids({
   unit,
   formatValue,
   legendCap,
+  years,
 }: {
   /** The selected series, in the chart's own units (shares ×100, as EditorialLineChart takes them). */
   series: AidSeries[];
@@ -73,6 +99,8 @@ export function ChartSelectionAids({
   formatValue?: (value: number, seriesId: string) => string;
   /** Above this many lines the legend is left out (the return pill stays); ten unless given. */
   legendCap?: number;
+  /** The periods drawn; a page whose series carry `forecastFromYear` passes them so the legend skips projections. */
+  years?: readonly number[];
 }) {
   const { messages } = useI18n();
   const anchor = useRef<HTMLDivElement>(null);
@@ -116,7 +144,7 @@ export function ChartSelectionAids({
             <li key={line.id} data-legend-series-id={line.id} className="flex min-w-0 items-center gap-2">
               <SwatchBar color={line.color} />
               <span className="min-w-0 break-words">{line.label}</span>
-              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{withLari(legendValue(line.vals, { share, unit, formatValue }, line.id))}</span>
+              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{withLari(legendValue(line.vals, { share, unit, formatValue, years, forecastFromYear: line.forecastFromYear }, line.id))}</span>
             </li>
           ))}
         </ul>

@@ -43,6 +43,23 @@ test.describe("General-government deficit explorer", () => {
     await expect(page.getByTestId("explorer-table").getByText("პროგნოზი", { exact: true })).toHaveCount(6);
   });
 
+  // U07-01/U07-16: the dashed segment was the only forecast cue, and a range of one projection point has none.
+  test("hovering a projection year shows the forecast label", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/deficit#r=2030-2031`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const chart = page.getByTestId("chart-panel").getByRole("img");
+    await chart.hover({ position: { x: 300, y: 100 } });
+    await expect(page.getByTestId("chart-tooltip")).toContainText("პროგნოზი");
+
+    // An actual year reads without it.
+    await page.goto(`${TEST_BASE_URL}/explorer/deficit#r=2024-2025`);
+    await page.reload();
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await chart.hover({ position: { x: 300, y: 100 } });
+    await expect(page.getByTestId("chart-tooltip")).toBeVisible();
+    await expect(page.getByTestId("chart-tooltip")).not.toContainText("პროგნოზი");
+  });
+
   test("restores and updates its shareable URL state", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/deficit#m=table&sh=0&r=2001-2026&sel=deficit.general_government_balance`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
