@@ -35,9 +35,11 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/wages/overview",
   "https://fiscal.ge/explorer/wages/industries",
   "https://fiscal.ge/explorer/wages/regions",
-  "https://fiscal.ge/explorer/poverty",
-  "https://fiscal.ge/explorer/poverty/rates",
-  "https://fiscal.ge/explorer/poverty/inequality",
+  "https://fiscal.ge/explorer/living-standards",
+  "https://fiscal.ge/explorer/living-standards/income",
+  "https://fiscal.ge/explorer/living-standards/spending",
+  "https://fiscal.ge/explorer/living-standards/poverty",
+  "https://fiscal.ge/explorer/living-standards/inequality",
   "https://fiscal.ge/explorer/trade",
   "https://fiscal.ge/explorer/trade/overview",
   "https://fiscal.ge/explorer/trade/partners",
@@ -151,7 +153,7 @@ describe("Fiscal.ge agent instructions", () => {
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
     expect(targets).toEqual(requiredTargets);
-    expect(targets).toHaveLength(81);
+    expect(targets).toHaveLength(83);
     expect(new Set(targets).size).toBe(targets.length);
   });
 

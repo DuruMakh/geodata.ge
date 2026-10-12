@@ -34,9 +34,11 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Wages overview](https://fiscal.ge/explorer/wages/overview) — Georgia's average monthly wage from 1995, for women and men from 1999 and public and non-public employers from 2000, and the median from 2018.
 - [Wages by industry](https://fiscal.ge/explorer/wages/industries) — the 19 NACE Rev.2 sections from 2014 for each employer group, and the median by section from 2018.
 - [Wages by region](https://fiscal.ge/explorer/wages/regions) — the average wage of the 11 regions from 2010 on a map, with one page per region.
-- [Poverty and inequality](https://fiscal.ge/explorer/poverty) — the poverty section: Geostat's annual household-survey estimates. Browse-only: there is no MCP tool and no bulk file for poverty.
-- [Poverty](https://fiscal.ge/explorer/poverty/rates) — the share of people below the absolute poverty line (Georgia, towns, villages, age groups, women and men) and below 60% and 40% of median consumption, 2004–2025, and below the World Bank's international lines as republished by Geostat, 2004–2024.
-- [Inequality](https://fiscal.ge/explorer/poverty/inequality) — six Gini coefficients of income and expenditure, 2006–2025.
+- [Living standards](https://fiscal.ge/explorer/living-standards) — the living-standards section: household income and spending from 2002, poverty rates from 2004 and inequality from 2006, from Geostat's household surveys. Browse-only: there is no MCP tool and no bulk file for living standards.
+- [Household income](https://fiscal.ge/explorer/living-standards/income) — average monthly household income in Georgia by source, with towns, villages and regions compared, and one page per region.
+- [Household spending](https://fiscal.ge/explorer/living-standards/spending) — average monthly household spending in Georgia by category, with towns, villages and regions compared, and one page per region.
+- [Poverty](https://fiscal.ge/explorer/living-standards/poverty) — the share of people below the absolute poverty line (Georgia, towns, villages, age groups, women and men) and below 60% and 40% of median consumption, 2004–2025, and below the World Bank's international lines as republished by Geostat, 2004–2024.
+- [Inequality](https://fiscal.ge/explorer/living-standards/inequality) — six Gini coefficients of income and expenditure, 2006–2025.
 - [Trade](https://fiscal.ge/explorer/trade) — the trade section: Geostat's annual goods trade in nominal USD. Browse-only: there is no MCP tool and no bulk file for trade.
 - [Trade overview](https://fiscal.ge/explorer/trade/overview) — total trade, exports, imports and the trade balance, 1995–2025.
 - [Trading partners](https://fiscal.ge/explorer/trade/partners) — 212 countries and five published country groups (EU, CIS, BSEC, OECD, GUAM), 1995–2025, with end-year rankings; groups overlap and are never added up.
