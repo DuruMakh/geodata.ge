@@ -177,6 +177,8 @@ export function RegionPicker({
   indexHref?: string;
 }) {
   const { locale, messages, englishLabels } = useI18n();
+  // Closed, the picker renders nothing, so it builds no labels (a page may not load every place's English name).
+  if (!open) return null;
   const t = (key: string) => message(messages, `regionalEconomies.${key}`);
   const allRegionsLabel = t("allRegions");
   const options = regions.map((region) => ({
