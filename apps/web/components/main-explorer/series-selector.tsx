@@ -2,7 +2,7 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import type { FocusEvent, ReactNode } from "react";
+import { useRef, type FocusEvent, type ReactNode } from "react";
 import { SwatchBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 
@@ -19,6 +19,9 @@ export function revealSearchField(event: FocusEvent<HTMLInputElement>) {
 /** A series list with this many rows or fewer drops its search field: it is read at a glance. */
 export const SEARCHABLE_MIN_ROWS = 10;
 
+/** A series list with more rows than this scrolls inside its panel at every width (`listLayout="scroll"`). */
+export const LONG_LIST_ROWS = 30;
+
 /** Mobile keyboard hints shared by the site's search fields. */
 export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFocus: revealSearchField } as const;
 
@@ -31,7 +34,8 @@ type SeriesSelectorProps = {
   /** False hides the search field: a list of ten rows or fewer is read at a glance. */
   searchable?: boolean;
   searchFocus?: "page" | "local";
-  listLayout?: "aside" | "flow";
+  /** "scroll" caps a long list in its own scroller at every width and adds a "skip the list" button before it. */
+  listLayout?: "aside" | "flow" | "scroll";
   countLabel?: string;
   selectedCount: number;
   totalCount: number;
@@ -68,6 +72,7 @@ export function SeriesSelector({
   children,
 }: SeriesSelectorProps) {
   const { messages } = useI18n();
+  const listEnd = useRef<HTMLSpanElement>(null);
   const bulkState: "false" | "mixed" | "true" =
     hasSelection && allSelected ? "true" : hasSelection ? "mixed" : "false";
   const bulkMark = bulkState === "true" ? "✓" : bulkState === "mixed" ? "—" : "";
@@ -158,17 +163,32 @@ export function SeriesSelector({
 
       {listHeader}
 
+      {listLayout === "scroll" ? (
+        // A button, not an in-page link: these pages keep their state in the URL hash.
+        <button
+          type="button"
+          data-testid="series-skip-list"
+          onClick={() => listEnd.current?.focus()}
+          className="sr-only cursor-pointer text-[12px] font-semibold text-[var(--accent)] underline underline-offset-4 focus:not-sr-only focus:mb-1 focus:inline-flex focus:min-h-11 focus:items-center"
+        >
+          {message(messages, "controls.skipList")}
+        </button>
+      ) : null}
+
       <div
         data-testid="series-list"
         data-selector-section="list"
         // The 430px inner scroll belongs to the sticky two-column aside; stacked under the
         // chart (owner decision D4, 2026-10-07) the list flows with the page, so a finger
-        // swipe never gets caught inside it.
+        // swipe never gets caught inside it. A list over LONG_LIST_ROWS rows ("scroll")
+        // keeps its own scroller at every width, or it would push the rest of the page
+        // thousands of pixels down (DESIGN §7.7).
         // overflow-y clip keeps the last caret's downward hit extension inside the list.
-        className={listLayout === "aside" ? "flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto" : "flex flex-col overflow-y-clip"}
+        className={listLayout === "scroll" ? "flex max-h-[min(430px,60svh)] flex-col overflow-y-auto" : listLayout === "aside" ? "flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto" : "flex flex-col overflow-y-clip"}
       >
         {children}
       </div>
+      {listLayout === "scroll" ? <span ref={listEnd} tabIndex={-1} className="outline-none" /> : null}
     </div>
   );
 }

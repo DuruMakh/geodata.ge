@@ -587,11 +587,13 @@ one whose caret is later collapsed, so the status never understates the chart.
 A program is still selectable individually once its caret is open; `გასუფთავება`
 clears everything, programs included.
 
+**Long lists scroll inside their panel** (exception to D4, 2026-10-12). D4's rule that a stacked list flows with the page was written for short lists. A list of more than 30 rows (`LONG_LIST_ROWS`; trade partners 218, domestic-export countries 187, inflation products 305) uses `listLayout="scroll"`: the list scrolls inside a box of at most `min(430px, 60svh)` at every width, so the content after it stays within a couple of screens of the chart. Before the list sits a `სიის გამოტოვება` / `Skip the list` button, hidden until it has keyboard focus, that moves focus to the end of the list (a button, not an in-page link, because these pages keep their state in the URL hash). Trade partners and domestic-export countries also put their Excel button above the list, under the end-year · unit line (§7.8). The inflation products list keeps its phone top ten and `მეტი პროდუქტი` button; after that button the remaining rows scroll inside the same box.
+
 Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. Search inputs are `type="search"` with `enterkeyhint="search"`; on stacked layouts focusing the field scrolls it to the top of the viewport so results stay above the on-screen keyboard. The placeholder is `ძებნა` / `Search` in every series panel, the products list and the municipal and regional indexes (all underline fields, h34); heading pickers keep their descriptive placeholder. A query with no matches shows `კატეგორია ვერ მოიძებნა — შეცვალე საძიებო ტექსტი.` The total row stays pinned regardless of the query, so this message names the categories that missed rather than claiming zero results — it would otherwise render directly above a visible `მთლიანი ხარჯი`. While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
 
 ### 7.8 Excel Button
 
-Excel remains dataset-owned below the selector and is not part of the shared selector contract.
+Excel remains dataset-owned below the selector and is not part of the shared selector contract. Trade partners and domestic-export countries place it above their long list instead (§7.7).
 
 Full-width block, h38, ink bg, paper text, sans 12.5/600, radius 2px. Hover: opacity 0.85. Label: `ჩამოტვირთვა`; while creating the file it is disabled and reads `Excel მზადდება…`; failures show `ფაილი ვერ მომზადდა — სცადეთ თავიდან.` below the action. There is one public action, no public explorer CSV action or format menu. It creates a Fiscal.ge `.xlsx` file for the active range, selected series, grouping, and measure; selector search never narrows it. The three visible sheets are `მარტივი ცხრილი`, `მონაცემები`, and `წყაროები` (§15).
 
@@ -671,7 +673,7 @@ workspace:
   gap: "40px"
 ```
 
-Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline, grouping tabs (expenditure only, §7.2b), search, action-left/status-right row, series rows, dataset-owned Excel button. The series list scrolls inside a ≤430px box only in the sticky two-column aside (≥1100px); stacked, the list flows with the page (owner decision D4, 2026-10-07).
+Left: segmented control + unit note + measure pill row → chart or table → range strip → source note. Right (aside, sticky, 1px hairline left border, 26px padding-left): `სერიები` overline, grouping tabs (expenditure only, §7.2b), search, action-left/status-right row, series rows, dataset-owned Excel button. The series list scrolls inside a ≤430px box only in the sticky two-column aside (≥1100px); stacked, the list flows with the page (owner decision D4, 2026-10-07), except a list over 30 rows, which scrolls inside its panel at every width (§7.7).
 
 ### 8.3 Line Chart
 

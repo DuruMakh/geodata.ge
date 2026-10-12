@@ -128,3 +128,22 @@ test("nothing but the heading sits above the controls (DESIGN §17)", async ({ p
   await page.goto("/en/explorer/trade/partners");
   expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
 });
+
+// U21-01/05: the 218 countries (187 on Domestic exports) scroll inside their panel at every
+// width, the Excel button sits above them, and a skip button leads past them to the ranking.
+for (const path of ["/explorer/trade/partners", "/en/explorer/trade/domestic-exports#section=countries"]) {
+  test(`the country list scrolls inside its panel and the ranking is within two screens of the chart ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(path);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const list = page.getByTestId("series-list");
+    expect(await list.evaluate(element => element.querySelectorAll("[data-testid='series-row']").length)).toBeGreaterThan(150);
+    expect(await page.evaluate(() => document.scrollingElement!.scrollHeight)).toBeLessThan(4000);
+    expect(await list.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+    const chart = (await page.getByTestId("chart-panel").boundingBox())!, ranking = (await page.getByTestId("trade-partners-ranking").boundingBox())!;
+    expect(ranking.y - chart.y).toBeLessThan(2 * 812);
+    expect(await page.getByTestId("trade-partners-excel-download").evaluate((excel, element) => Boolean(excel.compareDocumentPosition(element!) & Node.DOCUMENT_POSITION_FOLLOWING), await list.elementHandle())).toBe(true);
+    await page.getByTestId("series-skip-list").focus(); await page.keyboard.press("Enter"); await page.keyboard.press("Tab");
+    await expect(page.getByTestId("trade-partners-show-all")).toBeFocused();
+  });
+}

@@ -36,9 +36,10 @@ export function InflationProductPanel({ index, state, onToggle, onClear, downloa
   const [query, setQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
   const visible = filteredProductIds(index, query);
-  // Stacked under the chart the list flows with the page (owner decision D4), so 305
-  // rows would be a page of their own: phones list the top ten (plus anything already
-  // selected) behind a "more products" button. A search always looks through every product.
+  // 305 rows scroll inside the panel at every width (DESIGN §7.7), behind a "skip the
+  // list" button for keyboards (U14-05). Stacked, phones also list only the top ten (plus
+  // anything already selected) behind a "more products" button. A search always looks
+  // through every product.
   const collapsed = !showAll && query === "" && visible.length > PHONE_PRODUCT_ROWS;
   // A product stays listed once it has been selected, so unticking it does not make
   // the row vanish from under the finger.
@@ -51,6 +52,7 @@ export function InflationProductPanel({ index, state, onToggle, onClear, downloa
       query={query}
       onQueryChange={setQuery}
       searchPlaceholder={message(messages, "controls.search")}
+      listLayout="scroll"
       countLabel={message(messages, "inflation.productsCount")}
       selectedCount={state.selected.length}
       totalCount={index.products.length}
