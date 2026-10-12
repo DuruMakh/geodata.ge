@@ -63,8 +63,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Poverty adds its hub, two pages and methodology page: 4 bilingual pairs.
     // Living standards replaces the Poverty hub and adds Income and Spending: 2 more bilingual pairs.
     // The Household income and spending methodology adds one more bilingual pair.
-    // Income and Spending add a page for each of the 11 regions: 22 more bilingual pairs.
-    expect(urls).toHaveLength(548);
+    // Income and Spending add a page for Georgia and each of the 11 regions: 24 more bilingual pairs.
+    expect(urls).toHaveLength(552);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -87,6 +87,8 @@ describe("indexable Fiscal.ge routes", () => {
     for (const section of ["income", "spending"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards/${section}/regions/guria`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/guria`);
+      expect(urls).toContain(`https://fiscal.ge/explorer/living-standards/${section}/regions/georgia`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/georgia`);
     }
     expect(urls.some((url) => url.includes("/explorer/poverty"))).toBe(false);
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");

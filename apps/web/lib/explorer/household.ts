@@ -1,5 +1,5 @@
 import type { ClientHouseholdFact, HouseholdArea, HouseholdIndicator, HouseholdMeasure } from "../data/household/types";
-import { HOUSEHOLD_MEASURES, householdFactKey } from "../data/household/types";
+import { HOUSEHOLD_AREAS, HOUSEHOLD_MEASURES, householdFactKey } from "../data/household/types";
 import { colorForItem, INK } from "./colors";
 import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
@@ -9,14 +9,19 @@ export const HOUSEHOLD_SECTIONS = [
   { id: "spending", href: "/explorer/living-standards/spending", labelKey: "common.householdSpending" },
 ] as const;
 export type HouseholdSectionId = typeof HOUSEHOLD_SECTIONS[number]["id"];
-/** Towns and villages are lines of Georgia's list, not areas a page shows: those are Georgia (the section page) and the eleven regions (their own pages). */
+/** Towns and villages are lines of Georgia's list, not areas with a page: those are Georgia and the eleven regions. */
 const SETTLEMENTS: readonly HouseholdArea[] = ["settlement.urban", "settlement.rural"];
+/** The areas with a page of their own under each section: Georgia first, then the eleven regions. */
+export const HOUSEHOLD_PAGE_AREAS: readonly HouseholdArea[] = HOUSEHOLD_AREAS.filter(area => !SETTLEMENTS.includes(area));
 const MEASURE_KEYS: Record<HouseholdMeasure, string> = { per_household: "household", per_capita: "person" };
 
-/** A region's own page under its section; the slug drops the `region.` prefix, as on the Wages region pages. */
+/** An area's own page under its section (Georgia's slug is `georgia`); a region's slug drops the `region.` prefix, as on the Wages region pages. */
 export const householdRegionHref = (section: HouseholdSectionId, regionId: string): `/${string}` => `${HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href}/regions/${regionId.replace(/^region\./, "")}`;
 /** The hash a link to another area's page carries: the per person choice, and nothing else (per household is every page's default). */
 export const householdMeasureHash = (measure: HouseholdMeasure) => measure === "per_household" ? "" : `#per=${MEASURE_KEYS[measure]}`;
+/** The section index page's view is only the measure, kept in the hash as `per`. */
+export const parseHouseholdMeasure = (hash: string): HouseholdMeasure => HOUSEHOLD_MEASURES.find(item => MEASURE_KEYS[item] === new URLSearchParams(hash.replace(/^#/, "")).get("per")) ?? "per_household";
+export const serializeHouseholdMeasure = (measure: HouseholdMeasure) => `per=${MEASURE_KEYS[measure]}`;
 
 export type HouseholdSeriesDefinition = { id: string; indicatorId: HouseholdIndicator; areaId: HouseholdArea; reference: boolean; parentId?: string };
 
@@ -48,7 +53,7 @@ export function householdSeriesColor(series: HouseholdSeriesDefinition, index: n
   return series.reference ? INK : colorForItem(series.id, index);
 }
 
-/** A page's view; the area is the page's own (Georgia, or the region of a region page) and is not part of it. */
+/** An area page's view; the area is the page's own (Georgia or a region) and is not part of it. */
 export type HouseholdState = { mode: "line" | "table"; range: PeriodRange; measure: HouseholdMeasure; selectedIds: string[] };
 
 /** An area's years: every year any of its series has a value for the measure. */
@@ -69,7 +74,7 @@ export function defaultHouseholdState(section: HouseholdSectionId): HouseholdSta
  */
 export function parseHouseholdHash(hash: string, section: HouseholdSectionId, area: HouseholdArea, facts: readonly ClientHouseholdFact[]): HouseholdState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
-  const measure = HOUSEHOLD_MEASURES.find(item => MEASURE_KEYS[item] === p.get("per")) ?? "per_household";
+  const measure = parseHouseholdMeasure(hash);
   const series = householdViewSeries(section, area);
   const requested = p.has("sel") ? p.get("sel")!.split(",") : [series[0].id];
   const selectedIds = series.map(s => s.id).filter(id => requested.includes(id));

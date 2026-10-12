@@ -1,15 +1,15 @@
 import path from "node:path";
 import { notFound } from "next/navigation";
-import { HouseholdExplorer } from "../../components/household/household-explorer";
+import { HouseholdExplorer, HouseholdIndex } from "../../components/household/household-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedHouseholdData, toClientHouseholdFact } from "../data/household/importHousehold";
 import { HOUSEHOLD_AREAS, HOUSEHOLD_MEASURES, type HouseholdArea, type HouseholdMeasure } from "../data/household/types";
-import { WAGES_REGIONS } from "../data/wages/types";
+import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
-import { HOUSEHOLD_SECTIONS, householdCoverage, householdRegionHref, householdViewSeries, type HouseholdSectionId } from "../explorer/household";
+import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdCoverage, householdRegionHref, householdViewSeries, sectionTotal, type HouseholdSectionId } from "../explorer/household";
 import { householdWorkbookSources } from "../explorer/householdWorkbook";
 import { buildHouseholdRegionMapModel } from "../explorer/householdRegionMap";
 import type { RegionMapModel } from "../explorer/regionalEconomyMap";
@@ -33,11 +33,13 @@ export async function householdPageMetadata(locale: Locale, section: HouseholdSe
   return fiscalMetadata({ locale, path: HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `household.page.${section}.metaTitle`), description: message(messages, `household.page.${section}.summary`) });
 }
 
-export const householdRegionStaticParams = () => WAGES_REGIONS.map(id => ({ id: id.replace(/^region\./, "") }));
+/** Georgia and the eleven regions, in the picker's and previous/next order; Georgia's English name is the catalogue's `georgia` label. */
+const AREA_PAGES: readonly MunicipalRegion[] = HOUSEHOLD_PAGE_AREAS.map(id => id === "georgia" ? { id, kaLabel: "საქართველო", sortOrder: 0 } : REGIONAL_ECONOMY_REGIONS.find(region => region.id === id)!);
+export const householdRegionStaticParams = () => HOUSEHOLD_PAGE_AREAS.map(id => ({ id: id.replace(/^region\./, "") }));
 function regionForSlug(slug: string) {
-  const id = `region.${slug}`;
-  if (!(WAGES_REGIONS as readonly string[]).includes(id)) notFound();
-  return REGIONAL_ECONOMY_REGIONS.find(region => region.id === id)!;
+  const area = AREA_PAGES.find(item => item.id === (slug === "georgia" ? slug : `region.${slug}`));
+  if (!area) notFound();
+  return area;
 }
 export async function householdRegionPageMetadata(section: HouseholdSectionId, slug: string, locale: Locale) {
   const region = regionForSlug(slug), presentation = await getPresentation(locale, ["household"], [region.id]);
@@ -54,15 +56,16 @@ function householdAreaLabels(presentation: Presentation): Record<HouseholdArea, 
   })) as Record<HouseholdArea, string>;
 }
 
-/** A section page (Georgia, with the map whose regions open their own pages), or with regionId that region's page. */
+/** A section's index page (the map and list whose rows open their own pages), or with regionId that area's page (Georgia or a region). */
 export async function renderHouseholdPage(locale: Locale, section: HouseholdSectionId, regionId?: HouseholdArea) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "common", "controls", "format", "main", "workbook"], WAGES_REGIONS),
+    loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "common", "controls", "format", "main", "workbook"], HOUSEHOLD_PAGE_AREAS),
     loadReviewedSourceManifest(root, "household-income"), loadEnglishCatalogue(root),
   ]);
-  // Each page receives only its own section's observations, and a region page only its region's.
-  const facts = data.facts.map(toClientHouseholdFact).filter(f => f.indicatorId.startsWith(`${section}.`) && (!regionId || f.areaId === regionId));
+  // Each page reads only its own section's observations, and an area page only its lines' (Georgia's include towns and villages).
+  const areaIds = new Set<string>(regionId ? householdViewSeries(section, regionId).map(series => series.areaId) : []);
+  const facts = data.facts.map(toClientHouseholdFact).filter(f => f.indicatorId.startsWith(`${section}.`) && (!regionId || areaIds.has(f.areaId)));
   const years = householdCoverage(section, regionId ?? "georgia", "per_household", facts).years;
   const firstYear = years[0], lastYear = years.at(-1)!;
   const sectionHref = HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href;
@@ -71,13 +74,11 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   // Line names; the towns and villages lines take their names from areaLabels.
   const labels = Object.fromEntries(householdViewSeries(section, "georgia").filter(series => series.indicatorId === series.id).map(series => [series.id, t(`series.${series.id}`)]));
   const areaLabels = householdAreaLabels(presentation);
-  // The section page's map for each measure; the geometry is read on the server. Region pages have no map.
-  const regionMaps = regionId ? undefined : Object.fromEntries(HOUSEHOLD_MEASURES.map(measure => [measure, buildHouseholdRegionMapModel(section, measure, facts)])) as Record<HouseholdMeasure, RegionMapModel>;
   const sources = householdWorkbookSources(manifest, projectPublicSources(manifest, locale, catalogue.documents));
   const regionName = regionId ? areaLabels[regionId] : "", sectionTitle = t(`page.${section}.title`);
   const title = regionId ? t(`page.${section}.regionTitle`, { region: regionName }) : sectionTitle;
   const description = regionId ? t(`page.${section}.regionSummary`, { region: regionName }) : t(`page.${section}.summary`), hubTitle = message(presentation.messages, "common.livingStandards");
-  const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`) && (!regionId || f.areaId === regionId)).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
+  const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`) && (!regionId || areaIds.has(f.areaId))).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ label: sectionTitle, href: pageHref(sectionHref, locale) }] : []), { label: regionId ? regionName : title }];
   return <I18nProvider {...presentation}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
@@ -90,7 +91,10 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ name: sectionTitle, path: pageHref(sectionHref, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
-      <HouseholdExplorer key={regionId ?? section} section={section} facts={facts} labels={labels} areaLabels={areaLabels} regionMaps={regionMaps} sources={sources} siteOrigin={origin} regionId={regionId} regions={regionId ? REGIONAL_ECONOMY_REGIONS : undefined} />
+      {regionId ? <HouseholdExplorer key={regionId} section={section} facts={facts} labels={labels} areaLabels={areaLabels} sources={sources} siteOrigin={origin} area={regionId} areas={AREA_PAGES} />
+        // The index: the map for each measure is built on the server; the page itself receives only Georgia's section total.
+        : <HouseholdIndex key={section} section={section} facts={facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === "georgia")}
+          regionMaps={Object.fromEntries(HOUSEHOLD_MEASURES.map(measure => [measure, buildHouseholdRegionMapModel(section, measure, facts)])) as Record<HouseholdMeasure, RegionMapModel>} />}
     </ExplorerPage>
   </I18nProvider>;
 }

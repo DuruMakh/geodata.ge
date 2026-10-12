@@ -31,12 +31,12 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
 }
 
 /**
- * An empty summary leaves out the overview block, and no sourceNote leaves out the footer (the page then credits the boundaries itself).
- * leadRow is an unranked row above the ranked list, linked through hrefForRegion; selectedId marks the page's current row (and region on the map).
+ * An empty summary leaves out the overview block.
+ * leadRow is an unranked row above the ranked list, linked through hrefForRegion.
  */
-export function RegionIndex({ model, sourceNote, metric, summary, leadRow, selectedId }: {
-  model: RegionMapModel; sourceNote?: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>;
-  leadRow?: { id: string; label: string; value: number }; selectedId?: string;
+export function RegionIndex({ model, sourceNote, metric, summary, leadRow }: {
+  model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>;
+  leadRow?: { id: string; label: string; value: number };
 }) {
   const { locale, messages, englishLabels } = useI18n();
   const [query, setQuery] = useState("");
@@ -53,14 +53,13 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, selec
     ]));
   }, [englishLabels, model.regions, query]);
   const lead = leadRow && matchesLabelQuery(query, [leadRow.label]) ? leadRow : null;
-  const rowClass = (id: string) => `grid grid-cols-[22px_minmax(0,1fr)_112px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[9px] pr-1 transition-colors hover:bg-[var(--tint)] ${id === activeRegionId || id === selectedId ? "bg-[var(--tint)]" : "bg-transparent"}`;
-  const labelClass = (id: string) => `min-w-0 text-[12.5px] ${id === selectedId ? "font-semibold" : "font-medium"}`;
+  const rowClass = (id: string) => `grid grid-cols-[22px_minmax(0,1fr)_112px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[9px] pr-1 transition-colors hover:bg-[var(--tint)] ${id === activeRegionId ? "bg-[var(--tint)]" : "bg-transparent"}`;
 
   return (
     <>
       <div data-testid="regional-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
         <div className="min-w-0">
-          <RegionMap model={model} metric={metric} activeRegionId={activeRegionId ?? selectedId ?? null} onActiveRegionChange={setMapActive} />
+          <RegionMap model={model} metric={metric} activeRegionId={activeRegionId} onActiveRegionChange={setMapActive} />
           {summary.length ? <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
             <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
               {message(messages, "regionalEconomies.summaryTitle")}
@@ -101,9 +100,9 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, selec
           ) : (
             <div className="mt-1.5 max-h-[620px] overflow-y-auto">
               {lead ? (
-                <Link href={pageHref(metric.hrefForRegion(lead.id), locale)} data-testid="regional-list-row" data-region-id={lead.id} aria-current={lead.id === selectedId ? "true" : undefined} className={rowClass(lead.id)}>
+                <Link href={pageHref(metric.hrefForRegion(lead.id), locale)} data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
                   <span aria-hidden />
-                  <span className={labelClass(lead.id)}>{lead.label}</span>
+                  <span className="min-w-0 text-[12.5px] font-medium">{lead.label}</span>
                   <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(lead.value)}</span>
                   <span aria-hidden className="text-[var(--faint)]">→</span>
                 </Link>
@@ -115,7 +114,6 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, selec
                   data-testid="regional-list-row"
                   data-region-id={region.regionId}
                   data-active={region.regionId === activeRegionId ? "true" : undefined}
-                  aria-current={region.regionId === selectedId ? "true" : undefined}
                   onMouseEnter={() => setPointerActive(region.regionId)}
                   onMouseLeave={() => setPointerActive(null)}
                   onFocus={() => setFocusActive(region.regionId)}
@@ -123,7 +121,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, selec
                   className={rowClass(region.regionId)}
                 >
                   <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{String(region.rank).padStart(2, "0")}</span>
-                  <span className={labelClass(region.regionId)}>{publicLabel(locale, region.regionId, region.nameKa, englishLabels)}</span>
+                  <span className="min-w-0 text-[12.5px] font-medium">{publicLabel(locale, region.regionId, region.nameKa, englishLabels)}</span>
                   <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(region.value)}</span>
                   <span aria-hidden className="text-[var(--faint)]">→</span>
                 </Link>
@@ -132,12 +130,12 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, selec
           )}
         </div>
       </div>
-      {sourceNote === undefined ? null : <div className="mt-9 border-t border-[var(--hairline)] pt-4">
+      <div className="mt-9 border-t border-[var(--hairline)] pt-4">
         <SourceNote testId="regional-source-note">
           {sourceNote} {message(messages, "regionalEconomies.boundaries")} {" "}
           <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer" className="underline underline-offset-2">geoBoundaries</a> (CC BY 3.0).
         </SourceNote>
-      </div>}
+      </div>
     </>
   );
 }

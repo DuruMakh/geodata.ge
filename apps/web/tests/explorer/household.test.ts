@@ -4,8 +4,8 @@ import { beforeAll, expect, test } from "vitest";
 import { loadServedHouseholdData, toClientHouseholdFact } from "../../lib/data/household/importHousehold";
 import { HOUSEHOLD_AREAS, HOUSEHOLD_SOURCES, type ClientHouseholdFact } from "../../lib/data/household/types";
 import {
-  buildHouseholdModel, changeHouseholdMeasure, defaultHouseholdState, HOUSEHOLD_SECTIONS,
-  householdCoverage, householdMeasureHash, householdRegionHref, householdViewSeries, parseHouseholdHash, serializeHouseholdHash, type HouseholdState,
+  buildHouseholdModel, changeHouseholdMeasure, defaultHouseholdState, HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS,
+  householdCoverage, householdMeasureHash, householdRegionHref, householdViewSeries, parseHouseholdHash, parseHouseholdMeasure, serializeHouseholdHash, serializeHouseholdMeasure, type HouseholdState,
 } from "../../lib/explorer/household";
 import { householdRegionStaticParams } from "../../lib/pages/household";
 import { buildHouseholdHubCards } from "../../lib/explorer/householdHubCards";
@@ -66,16 +66,34 @@ test("parts nest under their total in spec order, and Georgia adds towns and vil
   expect(householdViewSeries("income", "region.tbilisi").some(s => s.areaId.startsWith("settlement."))).toBe(false);
 });
 
-test("each region has its own page under its section, and a link to it carries only the per person choice", () => {
+test("Georgia and each region have their own page under the section, and a link to one carries only the per person choice", () => {
+  expect(householdRegionHref("income", "georgia")).toBe("/explorer/living-standards/income/regions/georgia");
   expect(householdRegionHref("income", "region.guria")).toBe("/explorer/living-standards/income/regions/guria");
   expect(householdRegionHref("spending", "region.racha_lechkhumi_kvemo_svaneti")).toBe("/explorer/living-standards/spending/regions/racha_lechkhumi_kvemo_svaneti");
   expect(householdMeasureHash("per_household")).toBe("");
   expect(householdMeasureHash("per_capita")).toBe("#per=person");
   expect(parseHouseholdHash(householdMeasureHash("per_capita"), "income", "region.guria", facts).measure).toBe("per_capita");
+  // Georgia first, then the eleven regions; towns and villages have no page.
+  expect(HOUSEHOLD_PAGE_AREAS).toEqual(["georgia", ...HOUSEHOLD_AREAS.filter(area => area.startsWith("region."))]);
   const slugs = householdRegionStaticParams().map(params => params.id);
-  expect(slugs).toHaveLength(11);
-  expect(slugs).toContain("guria");
-  expect(slugs.map(slug => `region.${slug}`).sort()).toEqual(HOUSEHOLD_AREAS.filter(area => area.startsWith("region.")).sort());
+  expect(slugs).toHaveLength(12);
+  expect(slugs.slice(0, 3)).toEqual(["georgia", "tbilisi", "adjara"]);
+  expect(slugs.some(slug => slug.startsWith("settlement"))).toBe(false);
+});
+
+test("the index page keeps only the measure in its hash", () => {
+  expect(serializeHouseholdMeasure("per_capita")).toBe("per=person");
+  expect(serializeHouseholdMeasure("per_household")).toBe("per=household");
+  expect(parseHouseholdMeasure("#per=person")).toBe("per_capita");
+  expect(parseHouseholdMeasure("#per=household&view=table&sel=income.total")).toBe("per_household");
+  expect(parseHouseholdMeasure("")).toBe("per_household");
+  expect(parseHouseholdMeasure("#per=nonsense")).toBe("per_household");
+});
+
+test("Georgia's page has towns and villages as lines and starts in 2002", () => {
+  const georgia = buildHouseholdModel("income", "georgia", facts.filter(f => ["georgia", "settlement.urban", "settlement.rural"].includes(f.areaId)), defaultHouseholdState("income"));
+  expect(georgia.range).toMatchObject({ start: 2002, end: 2025 });
+  expect(georgia.series.slice(-2).map(s => s.id)).toEqual(["settlement.urban", "settlement.rural"]);
 });
 
 test("a region page's model starts at the region's first year and has no towns or villages lines", () => {
