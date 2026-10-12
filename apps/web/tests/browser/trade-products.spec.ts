@@ -273,3 +273,41 @@ test("global filtered selection plots and exports every current product beyond a
   await writeFile(path.join(output, "timings.json"), JSON.stringify(timings, null, 2));
   await info.attach("all-products-timings", { body: JSON.stringify(timings), contentType: "application/json" });
 });
+
+test.describe("the phone legend", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("lists two products and stays hidden above ten", async ({ page }) => {
+    const ids = catalogue.entities.slice(0, 11).map(entity => entity.id);
+    await page.goto(`/en/explorer/trade/products${hash(ids.slice(0, 2))}`);
+    await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
+    await page.goto("about:blank");
+    await page.goto(`/en/explorer/trade/products${hash(ids)}`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "11");
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+  });
+});
+
+test("removing a product and Back restore the same view", async ({ page }) => {
+  await page.goto(`/en/explorer/trade/products${hash(["goods.total", "goods.hs4.2020-2025.2204"])}`);
+  const panel = page.getByTestId("chart-panel");
+  await expect(panel).toHaveAttribute("data-selected-count", "2");
+  await page.locator('[data-testid="trade-products-selected-label"][data-series-id="goods.hs4.2020-2025.2204"]').click();
+  await expect(panel).toHaveAttribute("data-selected-count", "1");
+  await page.goBack();
+  await expect(panel).toHaveAttribute("data-selected-count", "2");
+});
+
+test("the Add products dialog casts no shadow (DESIGN §6.6)", async ({ page }) => {
+  await page.goto("/en/explorer/trade/products");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await page.getByTestId("trade-products-add").click();
+  const dialog = page.getByTestId("trade-products-picker");
+  await expect(dialog).toBeVisible();
+  expect(await dialog.evaluate(element => getComputedStyle(element).boxShadow)).toBe("none");
+});
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/trade/products");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
+});

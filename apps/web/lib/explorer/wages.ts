@@ -107,6 +107,20 @@ export function serializeWagesHash(state: WagesState, section: WagesSectionId): 
   return p.toString();
 }
 
+/** The years and activity count the page summaries state, read from the facts so new releases never leave them stale. */
+export function wagesSummaryValues(facts: readonly ClientWagesFact[]): { averageFrom: number; medianFrom: number; sectionsFrom: number; sectionCount: number; regionsFrom: number } {
+  const valued = facts.filter(f => f.value !== null);
+  const first = (keep: (f: ClientWagesFact) => boolean) => Math.min(...valued.filter(keep).map(f => f.year));
+  const average = (f: ClientWagesFact) => f.indicatorId === "average_monthly_nominal_earnings";
+  return {
+    averageFrom: first(f => average(f) && f.dimension === "national" && f.sectorId === "total"),
+    medianFrom: first(f => f.indicatorId === "median_monthly_earnings"),
+    sectionsFrom: first(f => average(f) && f.sectorId !== "total"),
+    sectionCount: new Set(valued.filter(f => average(f) && f.sectorId !== "total").map(f => f.sectorId)).size,
+    regionsFrom: first(f => average(f) && f.dimension === "region"),
+  };
+}
+
 /** Switching group keeps mode and years, and selects the new view's reference. */
 export function changeWagesView(state: WagesState, section: WagesSectionId, view: WagesView, facts: readonly ClientWagesFact[]): WagesState {
   return { ...state, view, selectedIds: [wagesViewSeries(section, view, facts)[0].id], range: refitRange(state.range, wagesCoverage(section, view, facts), { collapseToAll: true }) };

@@ -6,7 +6,7 @@ import { parse } from "csv-parse/sync";
 import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { wagesFactKey, type ClientWagesFact, type WagesAcceptance, type WagesFact } from "./types";
-import { validateWagesFacts, wagesDisplayDecimals } from "./validation";
+import { validateWagesFacts } from "./validation";
 
 const REQUIRED = ["year", "indicator_id", "dimension", "group_id", "sector_id", "value", "published_value", "unit", "basis", "value_status", "source_id", "source_sheet", "source_cell", "source_number_format", "last_reviewed_at"];
 
@@ -54,5 +54,5 @@ export function loadServedWagesData(): Promise<{ facts: WagesFact[] }> {
 /** Client values are the figures Geostat prints (published precision); exact stored values stay server-side. */
 export function toClientWagesFact(fact: WagesFact): ClientWagesFact {
   const { year, indicatorId, dimension, groupId, sectorId, valueStatus, sourceId } = fact;
-  return { year, indicatorId, dimension, groupId, sectorId, valueStatus, sourceId, value: fact.publishedValue === null ? null : Number(fact.publishedValue), decimals: fact.sourceNumberFormat === null ? 0 : wagesDisplayDecimals(fact.sourceNumberFormat) };
+  return { year, indicatorId, dimension, groupId, sectorId, valueStatus, sourceId, value: fact.publishedValue === null ? null : Number(fact.publishedValue) };
 }

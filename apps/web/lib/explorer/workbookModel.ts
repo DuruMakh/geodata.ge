@@ -1,5 +1,6 @@
 import type { Locale } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
+import { unitFor, type ValueUnit } from "./format";
 
 export type WorkbookBasis = "actual" | "planned" | "forecast" | "not_available" | "published" | "preliminary";
 
@@ -182,6 +183,19 @@ function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: strin
                 : workbookMessage(locale, "workbook.actual");
   const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : workbookMessage(locale, "workbook.noPeriod");
   return `${period} · ${basis} · ${unitLabel}`;
+}
+
+/** A Data-sheet format that keeps every stored digit, with a true minus sign rather than red. */
+export const EXACT_SIGNED_FORMAT = '#,##0.###############;"−"#,##0.###############';
+
+/**
+ * Sets the Summary sheet's decimals and number format for signed amounts (Trade, External flows): at least the unit's
+ * decimals, and enough that no small selected value reads as zero, with a true minus sign rather than red.
+ */
+export function applySignedAmountFormat(model: WorkbookExportModel, values: readonly number[], unit: ValueUnit): void {
+  const decimals = Math.max(unit.decimals, unitFor([...values], unit, 15).decimals), format = "#,##0." + "0".repeat(decimals);
+  model.readable.amountDecimals = decimals;
+  model.readable.numberFormat = `${format};"−"${format}`;
 }
 
 export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookExportModel {

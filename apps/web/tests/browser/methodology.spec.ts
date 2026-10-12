@@ -384,7 +384,9 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   await expect(contents).toHaveCSS("position", "static");
   // Phones get each source as a stacked block with a full-width download link
   // instead of the 760px table in a sideways scroller.
-  await expect(page.getByTestId("source-archive").locator("thead")).toBeHidden();
+  // The header row is visually hidden but kept for screen readers (sr-only), so the stacked rows keep their column names.
+  const header = (await page.getByTestId("source-archive").locator("thead").boundingBox())!;
+  expect(header.width <= 1 && header.height <= 1).toBe(true);
   const archiveScroller = page.getByTestId("source-archive").locator("table").locator("..");
   expect(await archiveScroller.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
   const firstCard = page.getByTestId("source-archive-row").first();
@@ -548,4 +550,15 @@ test("published download bytes match the manifest integrity record", async ({ pa
     const response = await request.get(`${TEST_BASE_URL}${href}`);
     expect(response.status(), href).toBe(200);
   }
+});
+
+test.describe("the source archive on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("keeps its column headers and table roles when stacked", async ({ page }) => {
+    await page.goto("/en/methodology/wages#source-archive");
+    const archive = page.getByTestId("source-archive");
+    await expect(archive.locator("table")).toHaveAttribute("role", "table");
+    await expect(archive.getByRole("columnheader")).toHaveCount(5);
+    await expect(archive.getByTestId("source-archive-row").first().getByRole("cell")).toHaveCount(5);
+  });
 });

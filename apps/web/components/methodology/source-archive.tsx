@@ -104,26 +104,29 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
 
       {/* Below 760px the same rows render as stacked blocks — year, title, file
           name, publisher, then a full-width download link showing format and
-          size. The 760px table only scrolled sideways there and hid the links. */}
+          size. The 760px table only scrolled sideways there and hid the links.
+          display:block drops the table's native roles in Chromium, so they are
+          explicit, and the header row and the format and size cells stay for
+          screen readers (sr-only) rather than being hidden. */}
       <div className="mt-7 border-t-2 border-[var(--ink)] min-[760px]:overflow-x-auto">
-        <table className="w-full border-collapse text-left text-[0.71875rem] max-[759px]:block min-[760px]:min-w-[760px]">
+        <table role="table" className="w-full border-collapse text-left text-[0.71875rem] max-[759px]:block min-[760px]:min-w-[760px]">
           <caption className="sr-only">{message(messages, "methodology.archiveCaption", { dataset: datasetLabel, period: captionPeriod })}</caption>
-          <thead className="max-[759px]:hidden">
-            <tr className="border-b border-[var(--ink)] text-[0.6875rem] min-[768px]:text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
-              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.year")}</th>
-              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.file")}</th>
-              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.format")}</th>
-              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.size")}</th>
-              <th className="px-2 py-3 font-semibold">{message(messages, "methodology.download")}</th>
+          <thead role="rowgroup" className="max-[759px]:sr-only">
+            <tr role="row" className="border-b border-[var(--ink)] text-[0.6875rem] min-[768px]:text-[9.5px] uppercase tracking-[0.05em] text-[var(--muted)]">
+              <th role="columnheader" className="px-2 py-3 font-semibold">{message(messages, "methodology.year")}</th>
+              <th role="columnheader" className="px-2 py-3 font-semibold">{message(messages, "methodology.file")}</th>
+              <th role="columnheader" className="px-2 py-3 font-semibold">{message(messages, "methodology.format")}</th>
+              <th role="columnheader" className="px-2 py-3 font-semibold">{message(messages, "methodology.size")}</th>
+              <th role="columnheader" className="px-2 py-3 font-semibold">{message(messages, "methodology.download")}</th>
             </tr>
           </thead>
-          <tbody className="max-[759px]:block">
+          <tbody role="rowgroup" className="max-[759px]:block">
             {filteredRows.map((row) => {
               const format = formatLabel(row);
               return (
-                <tr key={row.source_id} data-testid="source-archive-row" className="border-b border-[var(--hairline-soft)] align-top max-[759px]:block max-[759px]:py-4">
-                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[0.6875rem] max-[759px]:text-[var(--muted)]">{row.year}</td>
-                  <td className="max-w-[320px] px-2 py-4 max-[759px]:block max-[759px]:max-w-none max-[759px]:p-0 max-[759px]:pt-1">
+                <tr key={row.source_id} role="row" data-testid="source-archive-row" className="border-b border-[var(--hairline-soft)] align-top max-[759px]:block max-[759px]:py-4">
+                  <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[0.6875rem] max-[759px]:text-[var(--muted)]">{row.year}</td>
+                  <td role="cell" className="max-w-[320px] px-2 py-4 max-[759px]:block max-[759px]:max-w-none max-[759px]:p-0 max-[759px]:pt-1">
                     <span className="block font-semibold text-[var(--ink)] max-[759px]:text-[0.8125rem] max-[759px]:leading-snug">{row.title}</span>
                     <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9.5px] text-[var(--muted)]">
                       {row.official_filename}
@@ -131,9 +134,9 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
                     <span className="mt-1 block text-[0.6875rem] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[0.6875rem]">{row.publisher}</span>
                     {row.documentLanguage ? <span className="mt-1 block text-[0.6875rem] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[0.6875rem]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
                   </td>
-                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:hidden">{format}</td>
-                  <td className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:hidden">{formatBytes(row.byte_size)}</td>
-                  <td className="px-2 py-4 max-[759px]:block max-[759px]:p-0 max-[759px]:pt-3">
+                  <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:sr-only">{format}</td>
+                  <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:sr-only">{formatBytes(row.byte_size)}</td>
+                  <td role="cell" className="px-2 py-4 max-[759px]:block max-[759px]:p-0 max-[759px]:pt-3">
                     <a
                       href={row.downloadHref}
                       aria-label={message(messages, "methodology.downloadFile", { title: row.title, format })}
@@ -147,8 +150,8 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
               );
             })}
             {filteredRows.length === 0 ? (
-              <tr className="max-[759px]:block">
-                <td colSpan={5} data-testid="source-archive-empty" className="py-12 text-center text-[0.8125rem] text-[var(--muted)] max-[759px]:block">
+              <tr role="row" className="max-[759px]:block">
+                <td role="cell" colSpan={5} data-testid="source-archive-empty" className="py-12 text-center text-[0.8125rem] text-[var(--muted)] max-[759px]:block">
                   {message(messages, "methodology.empty")}
                 </td>
               </tr>

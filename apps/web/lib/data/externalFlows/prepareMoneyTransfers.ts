@@ -4,7 +4,7 @@ import path from "node:path";
 import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
 import { serializeBomCsvRows } from "../csvEscape";
-import { readVerifiedPackageFile } from "../sourcePackage";
+import { readVerifiedResearchPackage } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import { MONEY_TRANSFER_SOURCES, MONEY_TRANSFER_TOTAL_ID, MONEY_TRANSFER_YEARS, PERSONAL_TRANSFERS_ID, moneyTransferFactKey, type MoneyTransferEntity, type MoneyTransferFact, type MoneyTransfersAcceptance } from "./types";
 import { moneyTransfersEnglishLabels, validateMoneyTransfersData } from "./validation";
@@ -18,21 +18,8 @@ const fields = ["entity_id", "year", "measure", "value_usd", "unit", "basis", "v
 
 /** Copies the accepted annual money-transfer and personal-transfer rows from the frozen external-flows research package. */
 export async function prepareMoneyTransfersData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
-  const directory = path.join(repositoryRoot, RESEARCH), inputSha256: Record<string, string> = {};
-  const manifestBytes = await fs.readFile(path.join(directory, "artifact-manifest.csv"));
-  inputSha256["artifact-manifest.csv"] = hash(manifestBytes);
-  const manifest = new Map(rows(manifestBytes).map(row => [row.file, row]));
-  const research: Record<string, Buffer> = {};
-  for (const name of PROTECTED) {
-    const entry = manifest.get(name);
-    if (!entry) throw new Error(`Money transfer research artifact missing from manifest: ${name}`);
-    const { bytes, sha256 } = await readVerifiedPackageFile(directory, name, { sha256: entry.sha256, bytes: Number(entry.bytes) }, `Money transfer research artifact hash mismatch: ${name}`);
-    research[name] = bytes; inputSha256[name] = sha256;
-  }
-  const evidenceBytes = await fs.readFile(path.join(directory, "independent-verification.json"));
-  const evidence = JSON.parse(evidenceBytes.toString("utf8")) as { result: string; input_artifact_sha256: Record<string, string> };
-  if (evidence.result !== "pass" || ["money-transfers-annual.csv", "bop-annual.csv"].some(name => evidence.input_artifact_sha256?.[name] !== inputSha256[name])) throw new Error("Money transfer independent verification is not current and passing");
-  inputSha256["independent-verification.json"] = hash(evidenceBytes);
+  const directory = path.join(repositoryRoot, RESEARCH);
+  const { research, inputSha256 } = await readVerifiedResearchPackage(directory, { label: "Money transfer", files: PROTECTED, verifiedInputs: ["money-transfers-annual.csv", "bop-annual.csv"] });
   const validation = JSON.parse(research["prepared-validation.json"].toString("utf8")) as { checks: { fail: number } };
   if (validation.checks?.fail !== 0) throw new Error("Money transfer research package has failing checks");
   const identityBytes = await fs.readFile(path.join(directory, "money-transfer-country-identities.csv"));

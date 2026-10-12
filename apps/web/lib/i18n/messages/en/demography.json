@@ -131,6 +131,7 @@
   "demography.vitalHeroLabel": "Natural increase, {year}",
   "demography.vitalRatio": "Births per 100 deaths",
   "demography.vitalDeathsSince": "Deaths have outnumbered births every year since {year}.",
+  "demography.vitalDeathsWholeSeries": "Deaths have outnumbered births in every year on record, {first}–{last}.",
   "demography.vitalDeathsAhead": "Deaths outnumbered births in {year}.",
   "demography.vitalBirthsAhead": "Births outnumbered deaths in {year}.",
   "demography.vitalEven": "Births and deaths were equal in {year}.",

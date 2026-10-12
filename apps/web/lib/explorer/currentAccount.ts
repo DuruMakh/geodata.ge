@@ -2,12 +2,12 @@ import type { ClientCurrentAccountFact } from "../data/externalFlows/importCurre
 import { CURRENT_ACCOUNT_SERIES, type CurrentAccountFlow, type CurrentAccountSeriesId } from "../data/externalFlows/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
-import { INK } from "./colors";
+import { INK, SERIES_COLORS } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { currentAccountCoverage, type CurrentAccountState, type CurrentAccountTab } from "./currentAccountState";
 
-export const CURRENT_ACCOUNT_COLORS: Record<CurrentAccountSeriesId, string> = { "ca.balance": INK, "ca.goods": "#3D5A98", "ca.services": "#1F6E56", "ca.primary_income": "#A5822B", "ca.secondary_income": "#7A4E8C" };
+export const CURRENT_ACCOUNT_COLORS: Record<CurrentAccountSeriesId, string> = { "ca.balance": INK, "ca.goods": SERIES_COLORS["ca.goods"]!, "ca.services": SERIES_COLORS["ca.services"]!, "ca.primary_income": SERIES_COLORS["ca.primary_income"]!, "ca.secondary_income": SERIES_COLORS["ca.secondary_income"]! };
 const FLOW_BY_TAB: Record<CurrentAccountTab, CurrentAccountFlow> = { balance: "net", in: "credit", out: "debit" };
 export type CurrentAccountGdp = { year: number; valueUsd: number; preliminary: boolean };
 export type CurrentAccountSeries = { id: CurrentAccountSeriesId; label: string; color: string };

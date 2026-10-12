@@ -1,6 +1,6 @@
 # Annual external flows research foundation: money transfers, FDI and the current account
 
-Approved scope: 2026-10-10. This began as a research package. The 2026-10-10 Money from abroad design promotes one subset to a public page (see the last section); everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
+Approved scope: 2026-10-10. This began as a research package. Three public pages now serve parts of it, each approved on 2026-10-10: Money from abroad, Foreign investment and Current account (see their sections below); everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
 
 ## Source capture and coverage
 
@@ -99,7 +99,7 @@ The approved 2026-10-10 Current account design (`docs/superpowers/specs/2026-10-
 
 `npm run data:prepare-current-account` reads `bop-annual.csv`, `prepared-validation.json` and `prepared-reconciliation.csv` after proving them against `artifact-manifest.csv` and a passing `independent-verification.json`, and requires each year's passing package controls. Validation rejects a missing or extra series, flow or year, a duplicate, a value that does not keep its published decimals, net that differs from credit minus debit by more than 1 USD, and a year whose four parts do not add up to the current account for credit, debit and net within 1 USD. It writes `data/imports/current-account-annual.csv` (UTF-8 with BOM, 390 rows: five series `ca.balance`, `ca.goods`, `ca.services`, `ca.primary_income`, `ca.secondary_income` × three flows × 26 years) and `data/reports/current-account-validation.json`. `npm run data:check-current-account` reproduces both byte for byte and runs in `data:validate`.
 
-- **% of GDP** is computed at build time from the served `nominal_usd` GDP series; preliminary GDP years are named on the page.
+- **% of GDP** is computed at build time from the served `nominal_usd` GDP series; preliminary GDP years are named on the page. In that mode the source line names Geostat's GDP beside NBG, and the Excel Sources sheet lists the Geostat GDP workbooks (SNA 1993 for 1996–2009, SNA 2008 from 2010) for the exported years, as the Debt page does.
 - **Negative values** are kept as published and drawn below zero.
 - **Goods** differ from the Trade pages (change of ownership vs border crossing; FOB vs CIF); the methodology page explains this with the 2025 figures.
 - **Secondary income** contains the balance-of-payments personal transfers; it is not added to Money from abroad.

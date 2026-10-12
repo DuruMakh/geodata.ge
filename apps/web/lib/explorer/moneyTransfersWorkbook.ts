@@ -3,9 +3,8 @@ import { MONEY_TRANSFER_TOTAL_ID } from "../data/externalFlows/types";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { buildMoneyTransfersModel } from "./moneyTransfers";
-import { unitFor } from "./format";
 import type { MoneyTransfersState } from "./moneyTransfersState";
-import { buildWorkbookExportModel, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { applySignedAmountFormat, buildWorkbookExportModel, EXACT_SIGNED_FORMAT, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const TRANSFERS_FILE = "remc_money-transfers-by-countries-eng.xlsx";
 export function buildMoneyTransfersWorkbookModel(input: { data: ClientMoneyTransfersData; state: MoneyTransfersState; sources: readonly WorkbookPublicSource[]; siteOrigin: string }, presentation: Presentation): WorkbookExportModel {
@@ -23,15 +22,12 @@ export function buildMoneyTransfersWorkbookModel(input: { data: ClientMoneyTrans
   const notes = [partial && t("workbook.partialNote")].filter(Boolean);
   exportModel.readable.subtitle = [`${t(`measure.${input.state.measure}`)} · ${model.range.start}–${model.range.end} · ${model.unit.label}`, ...notes].join(" · ");
   const values = model.selectedIds.flatMap(id => model.years.map(year => model.valuesByEntity[id][year])).filter((value): value is number => value !== null);
-  const amountDecimals = Math.max(model.unit.decimals, unitFor(values, model.unit, 15).decimals);
-  const amountFormat = "#,##0." + "0".repeat(amountDecimals);
-  exportModel.readable.amountDecimals = amountDecimals;
-  exportModel.readable.numberFormat = `${amountFormat};"−"${amountFormat}`;
+  applySignedAmountFormat(exportModel, values, model.unit);
   exportModel.analysis.headers[3] = t("workbook.amount");
   exportModel.analysis.headers.push(t("workbook.months"));
   // Analysis rows run year by year, then series by series.
   const keys = model.years.flatMap(year => model.selectedIds.map(id => `${id}:${year}`));
   exportModel.analysis.rows = exportModel.analysis.rows.map((row, index) => [...row, months.get(keys[index]) ?? null]);
-  exportModel.analysis.numericFormats = { 4: '#,##0.###############;"−"#,##0.###############' };
+  exportModel.analysis.numericFormats = { 4: EXACT_SIGNED_FORMAT };
   return exportModel;
 }

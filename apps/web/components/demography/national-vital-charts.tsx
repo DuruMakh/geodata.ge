@@ -19,7 +19,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 /** The first year of the fertility curve; the last is ACCENT. Distinct from the grey of the years between. */
-const FIRST_YEAR_COLOR = "#3D5A98";
+const FIRST_YEAR_COLOR = SERIES_COLORS["fertility.first_year"]!;
 
 export function ModeTabs({ value, onChange, testId, lineLabel }: { value: ChartMode; onChange: (mode: ChartMode) => void; testId: string; lineLabel?: string }) {
   const { messages } = useI18n();

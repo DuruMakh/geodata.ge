@@ -14,7 +14,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     for (const section of ["overview", "industries", "regions"]) {
       await page.goto(`${prefix}/explorer/wages/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-      await expect(page.getByTestId("wages-nominal-note")).toHaveCount(0);
+      // DESIGN §17: only the one-line latest value sits under the heading.
+      expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.getAttribute("data-testid"))).toBe("wages-latest");
       if (section !== "regions") await expect(page.getByTestId("series-status")).toContainText("1 /");
       await page.screenshot({ path: info.outputPath(`wages-${section}-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -85,4 +86,23 @@ test("the regions index opens each region's own page", async ({ page }) => {
   await page.goto("/explorer/wages/regions");
   await page.getByTestId("wages-region-map").locator('a[data-region-id="region.imereti"]').click({ force: true });
   await expect(page).toHaveURL(/\/explorer\/wages\/regions\/imereti$/);
+});
+
+test("the median shows whole lari beside the average", async ({ page }) => {
+  await page.goto("/en/explorer/wages/overview#view=table&sel=average,median");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const table = page.getByTestId("explorer-table");
+  await expect(table).toContainText("2,165.2");
+  await expect(table).toContainText("1,531");
+  await expect(table).not.toContainText("1,531.0");
+});
+
+test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
+  await page.goto("/en/explorer/wages/overview#view=line&sel=");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.locator('[data-series-id="average"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 });

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
 import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesRegionHref, wagesViews, type WagesSectionId, type WagesSeriesModel, type WagesState, type WagesView } from "../../lib/explorer/wages";
@@ -19,7 +19,9 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
@@ -30,26 +32,10 @@ import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
 import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote } from "../ui/editorial";
 
-function useWagesState(section: WagesSectionId, facts: ClientWagesFact[]) {
-  const [state, setState] = useState(() => parseWagesHash("", section, facts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseWagesHash(window.location.hash, section, facts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [section, facts]);
-  useAppReady();
-  const update = useCallback((change: (previous: WagesState) => WagesState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeWagesHash(next, section)}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-  }, [section]);
-  return { state, update };
-}
+
+type WagesHashData = { section: WagesSectionId; facts: ClientWagesFact[] };
+const parseWages = (hash: string, { section, facts }: WagesHashData) => parseWagesHash(hash, section, facts);
+const serializeWages = (state: WagesState, { section }: WagesHashData) => serializeWagesHash(state, section);
 
 /** The Regions index: the map and ranked list only; each region opens its own page. */
 export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMapModel; national: { year: number; value: number } }) {
@@ -85,7 +71,8 @@ export type WagesExplorerProps = {
 export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin, regionId, regions }: WagesExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
-  const { state, update } = useWagesState(section, facts);
+  const hashData = useMemo(() => ({ section, facts }), [section, facts]);
+  const { state, update } = useHashState(hashData, parseWages, serializeWages);
   const [pickerOpen, setPickerOpen] = useState(false);
   const regionName = regionId ? labels[regionId] : "";
   const ordered = regions ?? [], regionIndex = ordered.findIndex(region => region.id === regionId);
@@ -95,7 +82,9 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
   const model = buildWagesModel(section, facts, state);
   const unit: ValueUnit = { divisor: 1, label: t("unit"), decimals: model.decimals };
   const format = (value: number | null | undefined, decimals = model.decimals) => formatInUnit(value, { ...unit, decimals });
-  const valueLabel = (value: number | null | undefined) => value == null ? "—" : `${format(value)} ${unit.label}`;
+  // Averages are published to one decimal and the median in whole lari, so a mixed selection formats each series at its own precision.
+  const decimalsOf = (id: string) => model.series.find(series => series.id === id)?.decimals ?? model.decimals;
+  const valueLabel = (value: number | null | undefined, id?: string) => value == null ? "—" : `${format(value, id ? decimalsOf(id) : model.decimals)} ${unit.label}`;
   const matches = (id: string) => matchesLabelQuery(query, [labels[id]]);
   const reference = model.series[0];
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
@@ -123,9 +112,10 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
   const changeView = (view: WagesView) => { if (view === state.view) return; setQuery(""); update(s => changeWagesView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="wages-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-    await downloadWorkbook(buildWagesWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
+    await downloadWorkbook(buildWagesWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title, regionId }, presentation));
   }} />;
   const heatmap = section === "industries" ? buildWagesHeatmap(model) : null;
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
   return <div data-testid={`wages-${section}`} className="@container">
     {regionId ? <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
       <div className="relative min-w-0 min-[768px]:flex-1">
@@ -153,8 +143,9 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
             </label> : <span className="text-[11px] text-[var(--muted)]">{t("unitMonthly")}</span>}
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={false} unit={unit} shareLabel={title} formatTooltipValue={valueLabel} /></div>
-            : <ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={title} formatTooltipValue={(value, id) => valueLabel(value, id)} /></div>
+            : <ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} decimalsForRow={row => decimalsOf(row.itemId)} />}
+          <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={(value, id) => valueLabel(value, id)} />
           <RangeStrip years={wagesCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildWagesModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || section === "overview" ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}

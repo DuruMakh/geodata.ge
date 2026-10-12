@@ -24,11 +24,12 @@ const SWATCH_CAP = 6;
 /** The legend's value for a line: its value in the last period drawn, formatted like the chart. */
 export function legendValue(
   vals: readonly (number | null)[],
-  { share, unit, formatValue }: { share: boolean; unit: ValueUnit; formatValue?: (value: number) => string },
+  { share, unit, formatValue }: { share: boolean; unit: ValueUnit; formatValue?: (value: number, seriesId: string) => string },
+  seriesId = "",
 ): string {
   const value = vals.at(-1);
   if (value === null || value === undefined) return MISSING;
-  if (formatValue) return formatValue(value);
+  if (formatValue) return formatValue(value, seriesId);
   return share ? formatShare(value / 100) : `${formatInUnit(value, unit)} ${unit.label}`.trim();
 }
 
@@ -53,6 +54,7 @@ export function ChartSelectionAids({
   share,
   unit,
   formatValue,
+  legendCap,
 }: {
   /** The selected series, in the chart's own units (shares ×100, as EditorialLineChart takes them). */
   series: AidSeries[];
@@ -60,7 +62,10 @@ export function ChartSelectionAids({
   chartShown: boolean;
   share: boolean;
   unit: ValueUnit;
-  formatValue?: (value: number) => string;
+  /** Also given the line's series id, for pages whose series are published at different precisions. */
+  formatValue?: (value: number, seriesId: string) => string;
+  /** Above this many lines the legend is left out (the return pill stays); for pages with unlimited selection. */
+  legendCap?: number;
 }) {
   const { messages } = useI18n();
   const anchor = useRef<HTMLDivElement>(null);
@@ -98,13 +103,13 @@ export function ChartSelectionAids({
 
   return (
     <div ref={anchor}>
-      {chartShown && series.length >= 2 ? (
+      {chartShown && series.length >= 2 && (legendCap === undefined || series.length <= legendCap) ? (
         <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)] @min-[768px]:hidden">
           {series.map((line) => (
             <li key={line.id} data-legend-series-id={line.id} className="flex min-w-0 items-center gap-2">
               <SwatchBar color={line.color} />
               <span className="min-w-0 break-words">{line.label}</span>
-              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{withLari(legendValue(line.vals, { share, unit, formatValue }))}</span>
+              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{withLari(legendValue(line.vals, { share, unit, formatValue }, line.id))}</span>
             </li>
           ))}
         </ul>

@@ -3,7 +3,7 @@ import { FOREIGN_INVESTMENT_TOTAL_ID, type ForeignInvestmentEntity } from "../da
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
-import { INK, SERIES_COLORS } from "./colors";
+import { distinctSeriesColors } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { moneyTransferColor } from "./moneyTransfers";
@@ -13,17 +13,6 @@ const TOP_COUNTRIES = 10;
 
 /** The same stable per-id colour rule as Money from abroad; the total is ink. */
 export const foreignInvestmentColor = (id: string): string => moneyTransferColor(id === FOREIGN_INVESTMENT_TOTAL_ID ? "transfer.total" : id);
-const palette = [...new Set(Object.values(SERIES_COLORS))].filter(color => color !== INK);
-/** Each listed id keeps its stable colour unless an earlier series in the same list already has it; it then takes the next free palette colour. */
-function distinctColors(ids: string[]): Record<string, string> {
-  const used = new Set<string>();
-  return Object.fromEntries(ids.map(id => {
-    let color = foreignInvestmentColor(id);
-    for (let index = palette.indexOf(color); used.has(color);) color = palette[++index % palette.length];
-    used.add(color);
-    return [id, color];
-  }));
-}
 export type ForeignInvestmentRankingRow = { entityId: string; label: string; valueUsd: number | null; share: number | null; rank: number | null; color: string };
 export type ForeignInvestmentSeries = { id: string; label: string; color: string };
 export type ForeignInvestmentModel = {
@@ -47,7 +36,7 @@ export function buildForeignInvestmentModel(data: ClientForeignInvestmentData, s
   const country = state.dimension === "country";
   // Countries fold into the end year's top 10 and Other countries; sectors and regions are short fixed lists shown in full.
   const listed = country ? items.filter(entity => entity.kind === "country" && value(entity.id, range.end) !== null).sort(byValue).slice(0, TOP_COUNTRIES) : items;
-  const colors = distinctColors([total, ...listed].map(entity => entity.id).concat(country ? [FOREIGN_INVESTMENT_OTHERS_ID] : []));
+  const colors = distinctSeriesColors([total, ...listed].map(entity => entity.id).concat(country ? [FOREIGN_INVESTMENT_OTHERS_ID] : []), foreignInvestmentColor);
   const series: ForeignInvestmentSeries[] = [total, ...listed].map(entity => ({ id: entity.id, label: label(entity), color: colors[entity.id] }));
   if (country) series.push({ id: FOREIGN_INVESTMENT_OTHERS_ID, label: message(presentation.messages, "external.investment.otherCountries"), color: colors[FOREIGN_INVESTMENT_OTHERS_ID] });
   const ids = series.map(item => item.id), selectedIds = ids.filter(id => state.selectedIds.includes(id));

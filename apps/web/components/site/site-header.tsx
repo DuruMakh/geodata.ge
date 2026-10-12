@@ -5,6 +5,7 @@ import { getCommonMessages } from "../../lib/i18n/common.server";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import type { Locale } from "../../lib/i18n/types";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 
 type SiteHeaderProps = {
   locale?: Locale;
@@ -12,13 +13,6 @@ type SiteHeaderProps = {
   testId: string;
 };
 
-const MENU_DATASETS = [
-  { href: "/explorer", labelKey: "common.budget" },
-  { href: "/explorer/economy", labelKey: "common.economy" },
-  { href: "/explorer/inflation", labelKey: "common.inflation" },
-  { href: "/explorer/unemployment", labelKey: "common.unemployment" },
-  { href: "/explorer/trade", labelKey: "common.trade" },
-] as const;
 
 function navLinkClass(isActive: boolean) {
   return isActive
@@ -77,7 +71,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
           <div data-testid="menu-datasets" className="min-[900px]:hidden">
             <span className="flex min-h-9 items-center text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--faint)]">{message(messages, "common.data")}</span>
             <ul className="flex list-none flex-col border-l border-[var(--hairline)] pl-4">
-              {MENU_DATASETS.map(({ href, labelKey }) => (
+              {DATASET_HUBS.map(({ href, labelKey }) => (
                 <li key={href}>
                   <Link href={pageHref(href, locale)} className={navLinkClass(false)}>
                     {message(messages, labelKey)}

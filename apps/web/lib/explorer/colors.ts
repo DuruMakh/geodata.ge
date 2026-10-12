@@ -43,6 +43,11 @@ export const SERIES_COLORS: Record<string, string> = {
   "city.gori": "#A5822B",
   "city.telavi": "#7A4E8C",
   "city.zugdidi": "#4A707A",
+  // Current account parts (External flows): reused hexes, so the hashed palette that Trade and External flows draw from is unchanged.
+  "ca.goods": "#3D5A98",
+  "ca.services": "#1F6E56",
+  "ca.primary_income": "#A5822B",
+  "ca.secondary_income": "#7A4E8C",
 
   "spending.social_protection": "#B3402A",
   "spending.health": "#1F6E56",
@@ -140,6 +145,8 @@ export const SERIES_COLORS: Record<string, string> = {
   "vital.deaths": "#8C5A32",
   "sex.male": "#3D5A98",
   "sex.female": "#C26E4C",
+  // Births page: the first year of the mother's-age fertility curve (the last is ACCENT).
+  "fertility.first_year": "#3D5A98",
 };
 
 // Open-ended top-level sets cycle through the editorial palette by position so
@@ -328,4 +335,26 @@ export function colorForProgram(parentColor: string, ordinal: number): string {
 
 export function colorForItem(itemId: string, index: number): string {
   return SERIES_COLORS[itemId] ?? EDITORIAL_PALETTE[index % EDITORIAL_PALETTE.length] ?? OTHER_COLOR;
+}
+
+// The series palette without ink, which marks totals. Built from SERIES_COLORS, so adding a new hex there
+// recolours every hashed line on Trade and External flows; reusing an existing hex does not.
+const STABLE_PALETTE = [...new Set(Object.values(SERIES_COLORS))].filter((color) => color !== INK);
+
+/** A colour that depends only on the id, so a country keeps its colour across measures, years and pages. */
+export function stableSeriesColor(id: string): string {
+  let hash = 0;
+  for (const letter of id) hash = (hash * 31 + letter.charCodeAt(0)) >>> 0;
+  return STABLE_PALETTE[hash % STABLE_PALETTE.length]!;
+}
+
+/** Each listed id keeps `colorOf(id)` unless an earlier id in the list already has it; it then takes the next free palette colour. */
+export function distinctSeriesColors(ids: readonly string[], colorOf: (id: string) => string): Record<string, string> {
+  const used = new Set<string>();
+  return Object.fromEntries(ids.map((id) => {
+    let color = colorOf(id);
+    for (let index = STABLE_PALETTE.indexOf(color); used.has(color);) color = STABLE_PALETTE[++index % STABLE_PALETTE.length]!;
+    used.add(color);
+    return [id, color];
+  }));
 }

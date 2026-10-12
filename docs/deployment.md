@@ -106,6 +106,18 @@ server-side at request time.
   red `main` blocks production updates by design. The workflow's manual
   trigger (Actions → *Deploy production* → *Run workflow*) is the
   "import + redeploy" escape hatch.
+- **Function size**: Vercel refuses any server function over 250 MB. On
+  2026-10-10 the methodology pages traced every file under `public/downloads`
+  into their functions (250.13 MB) and the production deploy failed; the fix
+  is `outputFileTracingExcludes: { "*": ["./public/downloads/**"] }` in
+  `apps/web/next.config.ts` (the pages are prerendered and the CDN serves
+  `public/` directly). `npm run check:function-size`, run in `postbuild`, sums
+  every route's `.nft.json` trace together with the shared
+  `next-server.js.nft.json` files, prints the five largest and fails the build
+  above 200 MB, so the next such regression fails in CI rather than at deploy.
+  A data loader that reads files under `public/` or `docs/Raw Data/` at
+  request time, without a `/* turbopackIgnore: true */` path hint, is the
+  usual cause.
 - **Previews**: unchanged — every push to any other branch (and every PR)
   gets its own preview deployment, always CSV-mode (the database env vars
   are scoped to Production only), so data-PR previews never depend on the

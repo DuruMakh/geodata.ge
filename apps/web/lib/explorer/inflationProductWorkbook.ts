@@ -85,7 +85,7 @@ export function buildInflationProductWorkbookExportModel(input: {
       years: [1, 2],
       headerLabels: {
         category: t("productsProductColumn"),
-        columns: [t("productsAnnualColumn", { period: latestLabel }), t("productsCumulativeColumn", { start: state.range.startYear, end: endLabel })],
+        columns: [t("productsWorkbookAnnualColumn", { period: latestLabel }), t("productsWorkbookCumulativeColumn", { start: state.range.startYear, end: endLabel })],
       },
       rows,
     },

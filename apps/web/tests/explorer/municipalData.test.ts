@@ -1132,7 +1132,7 @@ describe("buildEntityKpis", () => {
       rankOutOf: 64,
     });
 
-    expect(historical.standing.detail).toBe("მე-26 ადგილი 64-დან");
+    expect(historical.standing.detail).toBe("26-ე ადგილი 64-დან");
   });
 
   it("shares the largest function against the official total", () => {

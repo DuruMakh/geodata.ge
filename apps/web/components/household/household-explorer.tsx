@@ -28,7 +28,7 @@ import { RegionPicker } from "../regional-economies/region-picker";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { HouseholdIcon } from "../ui/household-icon";
-import { useHashState } from "../external/use-money-from-abroad-state";
+import { useHashState } from "../explorer-shell/use-hash-state";
 
 /** The per household / per person icon switch. */
 function MeasureTabs({ value, onChange }: { value: HouseholdMeasure; onChange: (measure: HouseholdMeasure) => void }) {

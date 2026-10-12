@@ -20,7 +20,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     const key = page.getByTestId("current-account-key");
     await expect(key.locator("[data-series-id]")).toHaveCount(5);
     await expect(page.getByTestId("series-row-toggle")).toHaveCount(0);
-    await expect(page.getByTestId("current-account").locator("h1 + p")).toHaveCount(1);
+    // DESIGN §17 (owner, 2026-10-11): nothing but the heading above the controls.
+    await expect(page.getByTestId("current-account").locator("h1 + p")).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: info.outputPath(`balance-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("measure-share-toggle").click();
@@ -82,12 +83,49 @@ test("Excel follows the tab and unit and links the untouched NBG workbook", asyn
   expect(values.some(value => value.includes("Goods"))).toBe(false);
   const rows = parse(await readFile("../../data/methodology/source-archives/external-flows.csv"), { columns: true, bom: true }) as Record<string, string>[];
   const links = excel.getWorksheet("Sources")!.getColumn(4).values.filter(value => typeof value === "object" && value !== null && "hyperlink" in value) as { hyperlink: string }[];
-  expect(links).toHaveLength(1);
-  for (const link of links) {
+  // % of GDP also cites the Geostat GDP it divides by (SNA 2008 covers 2020–2025), linked at Geostat as on the Debt page.
+  const geostat = links.filter(link => new URL(link.hyperlink).hostname.endsWith("geostat.ge"));
+  expect(geostat).toHaveLength(1);
+  expect(links).toHaveLength(2);
+  for (const link of links.filter(link => !geostat.includes(link))) {
     const pathname = new URL(link.hyperlink).pathname, source = rows.find(row => `/${row.public_download_path}` === pathname)!;
     const response = await request.get(pathname); expect(response.ok()).toBe(true);
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(source.sha256);
   }
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("2000/2025");
+});
+
+test("% of GDP names the GDP source in the source line", async ({ page }) => {
+  await page.goto("/en/explorer/external/current-account#tab=in&unit=gdp&sel=ca.balance&start=2020&end=2025");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const line = page.getByTestId("source-label");
+  await expect(line).toContainText("GDP: Geostat");
+  await expect(line).not.toContainText("nominal USD");
+});
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/external/current-account");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
+});
+
+test.describe("the return pill on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("names the chart, not the table, over the Balance stack", async ({ page }) => {
+    await page.goto("/en/explorer/external/current-account#tab=in&unit=usd&sel=ca.balance");
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    // Scrolled past the chart, the view switches to Balance (as Back would); read the pill's label as soon as it appears.
+    const label = await page.evaluate(() => new Promise<string | null>(resolve => {
+      window.scrollTo(0, document.body.scrollHeight);
+      window.location.hash = "tab=balance&unit=usd";
+      const started = performance.now();
+      const look = () => {
+        const text = document.querySelector('[data-testid="chart-return-pill"]')?.textContent;
+        if (text) resolve(text); else if (performance.now() - started > 3000) resolve(null); else requestAnimationFrame(look);
+      };
+      look();
+    }));
+    expect(label).toContain("Chart");
+    expect(label).not.toContain("Table");
+  });
 });

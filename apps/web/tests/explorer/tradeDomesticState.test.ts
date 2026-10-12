@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { parseTradeOverviewHash, serializeTradeOverviewHash } from "../../lib/explorer/tradeOverviewState";
 import { parseTradePartnersHash, serializeTradePartnersHash } from "../../lib/explorer/tradePartnersState";
 import { parseTradeProductsHash, serializeTradeProductsHash, tradeProductsCoverage } from "../../lib/explorer/tradeProductsState";
-import type { ClientTradeOverviewFact } from "../../lib/data/tradeOverview/types";
+import { TRADE_CHART_INDICATORS, type ClientTradeOverviewFact } from "../../lib/data/tradeOverview/types";
 import type { ClientTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
 import type { ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 
@@ -14,7 +14,7 @@ test("national domestic comparisons default to the export total and preserve an 
   expect(state.selectedIds).toEqual([]);
 });
 
-const countries: ClientTradePartnersData = { entities: [], nationalFacts: national, facts: [{ entityId: "country", year: 2014, indicatorId: "trade.domestic_exports", valueUsd: 1, sourceId: "source", basis: "actual", publicationStatus: "unspecified", lastReviewedAt: "2026-10-10" }], measures: ["trade.domestic_exports", "trade.reexports"] };
+const countries: ClientTradePartnersData = { entities: [], nationalFacts: national, facts: [[0, 2014, TRADE_CHART_INDICATORS.indexOf("trade.domestic_exports"), 1]], measures: ["trade.domestic_exports", "trade.reexports"] };
 test("country links keep the domestic measure and reject unrelated imports and group views", () => {
   const state = parseTradePartnersHash("#measure=trade.reexports&tab=groups&sel=", countries);
   expect(state.measure).toBe("trade.reexports");
