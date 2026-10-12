@@ -3,6 +3,7 @@ export const DEMOGRAPHY_HUB_PATH = "/explorer/demography";
 export const POPULATION_PATH = "/explorer/demography/population";
 export const MIGRATION_PATH = "/explorer/demography/migration";
 export const BIRTHS_DEATHS_PATH = "/explorer/demography/births-deaths";
+export const AGE_SEX_PATH = "/explorer/demography/age-sex";
 
 /**
  * The four Demography pages in hub order, and the one place that decides which are live. A name stays a
@@ -11,7 +12,7 @@ export const BIRTHS_DEATHS_PATH = "/explorer/demography/births-deaths";
  */
 export const DEMOGRAPHY_PAGES = [
   { id: "population", path: POPULATION_PATH, live: true, titleKey: "populationTitle", descriptionKey: "populationDescription", labelKey: "common.demographyPopulation" },
-  { id: "age-sex", path: "/explorer/demography/age-sex", live: false, titleKey: "ageSexTitle", descriptionKey: "ageSexDescription", labelKey: "common.demographyAgeSex" },
+  { id: "age-sex", path: AGE_SEX_PATH, live: true, titleKey: "ageSexTitle", descriptionKey: "ageSexDescription", labelKey: "common.demographyAgeSex" },
   { id: "migration", path: MIGRATION_PATH, live: true, titleKey: "migrationTitle", descriptionKey: "migrationDescription", labelKey: "common.demographyMigration" },
   { id: "births-deaths", path: BIRTHS_DEATHS_PATH, live: true, titleKey: "birthsDeathsTitle", descriptionKey: "birthsDeathsDescription", labelKey: "common.demographyBirthsDeaths" },
 ] as const;

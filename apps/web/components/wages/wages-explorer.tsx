@@ -28,9 +28,7 @@ import { RegionIndex } from "../regional-economies/regional-economies-index";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
-
-const selectClass = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
+import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 function useWagesState(section: WagesSectionId, facts: ClientWagesFact[]) {
   const [state, setState] = useState(() => parseWagesHash("", section, facts));
@@ -149,7 +147,7 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
           <div className="flex flex-wrap items-end justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
             {section === "industries" ? <label className="min-w-0 w-full text-[11px] min-[768px]:text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("groupLabel")}</span>
-              <select data-testid="wages-group" value={state.view} className={selectClass} onChange={event => changeView(event.target.value as WagesView)}>
+              <select data-testid="wages-group" value={state.view} className={SELECT_CLASS} onChange={event => changeView(event.target.value as WagesView)}>
                 {wagesViews(section).map(view => <option key={view} value={view}>{t(`group.${view}`)}</option>)}
               </select>
             </label> : <span className="text-[11px] text-[var(--muted)]">{t("unitMonthly")}</span>}

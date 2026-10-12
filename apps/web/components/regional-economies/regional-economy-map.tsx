@@ -14,7 +14,8 @@ import { pageHref } from "../../lib/i18n/routes";
 import { useTouchPreview } from "../explorer-shell/use-touch-preview";
 
 export type RegionMapMetric = {
-  hrefForRegion: (id: string) => string;
+  /** Absent, the regions are plain shapes and rows: no links, no tab stops, no touch preview (used only by Age and sex). */
+  hrefForRegion?: (id: string) => string;
   formatValue: (value: number) => string;
   mapAria: string;
   entityAria: (name: string, value: number, year: number) => string;
@@ -48,7 +49,8 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
   const pointerRegionId = useRef<string | null>(null);
   const focusedRegionId = useRef<string | null>(null);
   const preview = useTouchPreview();
-  const hrefFor = (regionId: string) => pageHref(metric.hrefForRegion(regionId), locale);
+  const linkFor = metric.hrefForRegion;
+  const hrefFor = (regionId: string) => pageHref(linkFor!(regionId), locale);
   const labelFor = (region: RegionMapModel["regions"][number]) => publicLabel(locale, region.regionId, region.nameKa, englishLabels);
   const touchTargets = useMemo(
     () => mapTouchTargets(model.regions.map((region) => ({ id: region.regionId, bounds: pathBounds(region.pathD) })), Number(model.viewBox.split(" ")[2])),
@@ -80,6 +82,36 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
         </defs>
         {model.regions.map((region, index) => {
           const selected = region.regionId === activeRegionId || region.regionId === preview.previewId;
+          const shape = (
+            <path
+              data-testid="regional-map-path"
+              d={region.pathD}
+              fill={MAP_RAMP[region.bucket]}
+              fillRule="evenodd"
+              clipRule="evenodd"
+              stroke={selected ? "var(--ink)" : "var(--hairline-soft)"}
+              strokeWidth={selected ? 2.2 : 0.7}
+              strokeLinejoin="round"
+            />
+          );
+          const hover = {
+            onMouseEnter: () => { pointerRegionId.current = region.regionId; onActiveRegionChange(region.regionId); },
+            onMouseLeave: () => { pointerRegionId.current = null; onActiveRegionChange(focusedRegionId.current); },
+          };
+          if (!linkFor) {
+            return (
+              <g
+                key={region.regionId}
+                role="img"
+                data-region-id={region.regionId}
+                data-active={selected ? "true" : undefined}
+                aria-label={metric.entityAria(labelFor(region), region.value, model.year)}
+                {...hover}
+              >
+                {shape}
+              </g>
+            );
+          }
           return (
             <a
               key={region.regionId}
@@ -90,8 +122,7 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
               tabIndex={index === rovingIndex ? 0 : -1}
               aria-label={metric.entityAria(labelFor(region), region.value, model.year)}
               onClick={(event) => { if (!preview.opens(region.regionId)) event.preventDefault(); }}
-              onMouseEnter={() => { pointerRegionId.current = region.regionId; onActiveRegionChange(region.regionId); }}
-              onMouseLeave={() => { pointerRegionId.current = null; onActiveRegionChange(focusedRegionId.current); }}
+              {...hover}
               onFocus={() => { focusedRegionId.current = region.regionId; setRovingIndex(index); onActiveRegionChange(region.regionId); }}
               onBlur={() => { focusedRegionId.current = null; onActiveRegionChange(pointerRegionId.current); }}
               onKeyDown={(event) => {
@@ -103,23 +134,14 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
                   ?.querySelectorAll<SVGAElement>("[data-region-map-target]")[next]?.focus();
               }}
             >
-              <path
-                data-testid="regional-map-path"
-                d={region.pathD}
-                fill={MAP_RAMP[region.bucket]}
-                fillRule="evenodd"
-                clipRule="evenodd"
-                stroke={selected ? "var(--ink)" : "var(--hairline-soft)"}
-                strokeWidth={selected ? 2.2 : 0.7}
-                strokeLinejoin="round"
-              />
+              {shape}
             </a>
           );
         })}
         {/* Fingertip-sized hit areas for regions smaller than 24px on a phone
             (Tbilisi). Coarse pointers only, so mouse hover and clicks are unchanged;
             hidden from assistive technology, which reaches the region's own link. */}
-        {touchTargets.map((target) => (
+        {(linkFor ? touchTargets : []).map((target) => (
           <circle
             key={target.id}
             data-map-touch-target={target.id}
@@ -151,7 +173,7 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
         ))}
       </svg>
       <div aria-live="polite">
-        {previewRegion ? (
+        {linkFor && previewRegion ? (
           <Link
             href={hrefFor(previewRegion.regionId)}
             data-testid="map-touch-preview"

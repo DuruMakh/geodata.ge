@@ -3,15 +3,15 @@ import { createHash } from "node:crypto";
 import { expectReadableText } from "./color-contrast";
 import { TEST_BASE_URL } from "./test-base-url";
 
-// The badge shows on paper in one place today: the one card of the Demography hub whose page is not published. The
-// methodology hub's future-dataset list and the sidebar's teaser list are both empty. The badge has no fill of its own,
-// so it is measured against the card it sits on (--tile), not against the page.
+// The badge shows on paper nowhere today: every Demography page is published, and the methodology hub's future-dataset
+// list and the sidebar's teaser list are both empty. A hub card that is not published shows it; the badge has no fill of
+// its own, so the loop measures it against the card it sits on (--tile), not against the page, once the count allows one.
 for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
   test(`coming-soon badges on the Demography hub are readable on their cards at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto(`${TEST_BASE_URL}/explorer/demography`);
     const badges = page.getByTestId("demography-hub").getByText("მალე", { exact: true });
-    await expect(badges).toHaveCount(1);
+    await expect(badges).toHaveCount(0);
     for (const badge of await badges.all()) {
       await expectReadableText(badge, badge.locator("xpath=ancestor::*[@data-testid='hub-card']"));
     }

@@ -13,6 +13,7 @@ import {
 } from "../../lib/pages/demography";
 import { demographyMigrationPageMetadata, renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
 import { demographyBirthsDeathsPageMetadata, renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
+import { demographyAgeSexPageMetadata, renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
 import {
   demographyPopulationPageMetadata,
   loadPopulationBasics,
@@ -33,8 +34,9 @@ describe("demography hub page", () => {
     const html = renderToStaticMarkup(await renderDemographyPage("en"));
     expect(html).toContain('data-testid="demography-hub"');
     expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(1);
+    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(0);
     expect(html).toContain('href="/en/explorer/demography/population"');
+    expect(html).toContain('href="/en/explorer/demography/age-sex"');
     expect(html).toContain('href="/en/explorer/demography/migration"');
     expect(html).toContain('href="/en/explorer/demography/births-deaths"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
@@ -198,8 +200,61 @@ describe("births and deaths page", () => {
   });
 });
 
-// The twelve Geostat originals listed in data/methodology/source-archives/demography.csv.
+describe("age and sex page", () => {
+  it("renders the pyramid, the heat map and a regional glance, in that order, with no dataset markup or Georgian in English", async () => {
+    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    expect(html).toContain(">Age and sex</h1>");
+    expect(html).toContain("2004–2026 · annual, and the 2024 census");
+    expect(html).toContain("31.2%");
+    expect(html).toContain("13.1%");
+    const at = (testId: string) => html.indexOf(`data-testid="${testId}"`);
+    expect(at("age-sex-pyramid")).toBeGreaterThan(-1);
+    expect(at("age-sex-pyramid")).toBeLessThan(at("age-sex-heatmap"));
+    expect(at("age-sex-heatmap")).toBeLessThan(at("age-sex-region-map"));
+    expect(html).not.toContain('data-testid="age-sex-bands"');
+    expect(html).toContain('href="/en/methodology/demography"');
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('"@type":"Dataset"');
+    expect(html).not.toMatch(GEORGIAN);
+  });
+
+  it("opens on two year pickers, the latest year and no comparison, with no year rows and no pyramid table switch", async () => {
+    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    const trigger = (testId: string) => html.match(new RegExp(`<button[^>]*data-testid="${testId}"[^>]*>.*?</button>`, "s"))?.[0] ?? "";
+    const year = trigger("age-sex-year-select");
+    expect(year).toContain('aria-haspopup="listbox"');
+    expect(year).toContain('aria-expanded="false"');
+    expect(year).toContain(">2026<");
+    const compare = trigger("age-sex-compare-select");
+    expect(compare).toContain('aria-haspopup="listbox"');
+    expect(compare).toContain(">None<");
+    const pyramid = html.slice(html.indexOf('data-testid="age-sex-pyramid"'), html.indexOf('data-testid="age-sex-heatmap"'));
+    expect(pyramid).not.toContain("<select");
+    expect(pyramid).not.toContain('role="listbox"');
+    for (const gone of ["age-sex-year-row", "age-sex-compare-row", "age-sex-compare-toggle", "age-sex-pyramid-mode-line", "age-sex-pyramid-mode-table"]) {
+      expect(html).not.toContain(`data-testid="${gone}"`);
+    }
+  });
+
+  it("shows the regional glance without a single link to a region page", async () => {
+    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    expect(html).not.toContain('#age-sex"');
+    expect(html).not.toContain("/explorer/demography/population/region/");
+  });
+
+  it("has no Georgian in the English metadata, and its own canonical address and title", async () => {
+    const en = await demographyAgeSexPageMetadata("en");
+    expect(String(en.title)).not.toMatch(GEORGIAN);
+    expect(String(en.description)).not.toMatch(GEORGIAN);
+    const metadata = await demographyAgeSexPageMetadata("ka");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/age-sex");
+    expect(String(metadata.title)).toBe("ასაკი და სქესი — დემოგრაფია | Fiscal.ge");
+  });
+});
+
+// The fourteen Geostat originals listed in data/methodology/source-archives/demography.csv.
 const REVIEWED_SOURCE_IDS = [
+  "source.geostat_census2024_population_by_age_settlement",
   "source.geostat_demography_births",
   "source.geostat_demography_crude_birth_rate",
   "source.geostat_demography_crude_death_rate",
@@ -211,14 +266,15 @@ const REVIEWED_SOURCE_IDS = [
   "source.geostat_demography_migration_citizenship",
   "source.geostat_demography_natural_increase",
   "source.geostat_demography_net_migration",
+  "source.geostat_demography_population_age_sex",
   "source.geostat_municipal_population",
 ];
 
 describe("population sources", () => {
-  it("are the twelve reviewed demography sources in either language, each downloadable from the demography files", async () => {
+  it("are the fourteen reviewed demography sources in either language, each downloadable from the demography files", async () => {
     for (const locale of ["en", "ka"] as const) {
       const sources = await loadPopulationSources(locale);
-      expect(sources, locale).toHaveLength(12);
+      expect(sources, locale).toHaveLength(14);
       expect(sources.map((source) => source.sourceId).sort(), locale).toEqual(REVIEWED_SOURCE_IDS);
       for (const source of sources) expect(source.downloadHref, locale).toMatch(/^\/downloads\/methodology\/demography\/files\/[^/]+$/);
     }

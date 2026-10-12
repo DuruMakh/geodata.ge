@@ -5,7 +5,7 @@ import {
   loadDemographyFacts,
   SERVED_DEMOGRAPHY_FILES,
 } from "../../../lib/data/demography/importDemography";
-import { FAMILIES, populationEstimateBasis, SERIES } from "../../../lib/data/demography/series";
+import { AGE_BANDS, AGE_GROUPS, CENSUS_AGE_GROUPS, FAMILIES, populationEstimateBasis, SERIES } from "../../../lib/data/demography/series";
 import type { DemographyObservation } from "../../../lib/data/demography/types";
 import { SERVED_DATA_FILES } from "../../../lib/data/servedData";
 import { loadSourceDocuments } from "../../../lib/data/sources";
@@ -27,6 +27,8 @@ describe("demography loader", () => {
       SERVED_DATA_FILES.demographyMigrationFacts,
       SERVED_DATA_FILES.demographyVitalFacts,
       SERVED_DATA_FILES.demographyFertilityFacts,
+      SERVED_DATA_FILES.demographyStructureFacts,
+      SERVED_DATA_FILES.demographyCensusFacts,
     ]);
   });
 
@@ -56,13 +58,65 @@ describe("demography loader", () => {
   test("every row's basis is the one its series and year require", () => {
     const migration = new Set<string>(FAMILIES.migration);
     const registered = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility]);
-    const lineage = facts.filter((row) => !migration.has(row.seriesId) && !registered.has(row.seriesId));
+    const census = new Set<string>(FAMILIES.census);
+    const lineage = facts.filter((row) => !migration.has(row.seriesId) && !registered.has(row.seriesId) && !census.has(row.seriesId));
     expect(lineage.every((row) => row.estimateBasis === populationEstimateBasis(row.year))).toBe(true);
     expect(facts.filter((row) => migration.has(row.seriesId)).every((row) => row.estimateBasis === "border_police")).toBe(true);
     expect(facts.filter((row) => migration.has(row.seriesId))).toHaveLength(1_778);
     expect(facts.filter((row) => registered.has(row.seriesId)).every((row) => row.estimateBasis === "registered")).toBe(true);
     expect(facts.filter((row) => FAMILIES.vital.includes(row.seriesId as never))).toHaveLength(2_595);
     expect(facts.filter((row) => row.seriesId === SERIES.ageSpecificFertilityRate)).toHaveLength(84);
+    expect(facts.filter((row) => census.has(row.seriesId)).every((row) => row.estimateBasis === "census_count")).toBe(true);
+    expect(facts.filter((row) => census.has(row.seriesId))).toHaveLength(2_628);
+    expect(facts.filter((row) => FAMILIES.structure.includes(row.seriesId as never))).toHaveLength(1_587);
+  });
+
+  test("the age groups add up", () => {
+    const annual = (seriesId: string, sex: string, ageGroup: string) =>
+      new Map(
+        facts
+          .filter((row) => row.seriesId === seriesId && row.geographyId === "country.georgia" && row.sex === sex && row.ageGroup === ageGroup)
+          .map((row) => [row.year, Number(row.value)]),
+      );
+    for (const sex of ["male", "female", "total"]) {
+      const totals = annual(SERIES.populationByAgeSex, sex, "total");
+      expect(totals.size, sex).toBe(23);
+      const groups = AGE_GROUPS.map((group) => annual(SERIES.populationByAgeSex, sex, group.id));
+      for (const [year, total] of totals) {
+        expect(groups.reduce((sum, group) => sum + group.get(year)!, 0), `${sex} ${year}`).toBe(total);
+      }
+      for (const band of AGE_BANDS) {
+        const bands = annual(SERIES.populationAgeBand, sex, band.id);
+        expect(bands.size, `${sex} ${band.id}`).toBe(23);
+        for (const [year, value] of bands) {
+          const sum = groups.slice(band.first, band.last + 1).reduce((acc, group) => acc + group.get(year)!, 0);
+          expect(value, `${sex} ${band.id} ${year}`).toBe(sum);
+        }
+      }
+    }
+    expect(annual(SERIES.populationByAgeSex, "total", "total").get(2026)).toBe(3_941_103);
+
+    const census = (geographyId: string, sex: string, seriesId: string, ageGroup?: string) =>
+      facts.filter(
+        (row) => row.seriesId === seriesId && row.geographyId === geographyId && row.sex === sex && row.settlement === "total" && (ageGroup === undefined || row.ageGroup === ageGroup),
+      );
+    const places = ["country.georgia", ...new Set(facts.filter((row) => /^region\./.test(row.geographyId)).map((row) => row.geographyId))];
+    expect(places).toHaveLength(12);
+    for (const place of places) {
+      const counted = census(place, "total", SERIES.censusPopulationBySettlement);
+      expect(counted, place).toHaveLength(1);
+      let sum = 0;
+      for (const sex of ["male", "female"]) {
+        for (const group of CENSUS_AGE_GROUPS) {
+          const row = census(place, sex, SERIES.censusPopulationByAge, group.id);
+          expect(row, `${place} ${sex} ${group.id}`).toHaveLength(1);
+          sum += Number(row[0].value);
+        }
+      }
+      expect(sum, place).toBe(Number(counted[0].value));
+    }
+    expect(census("country.georgia", "total", SERIES.censusPopulationBySettlement)[0].value).toBe("3929581");
+    expect(census("region.imereti", "total", SERIES.censusPopulationBySettlement)[0].value).toBe("510741");
   });
 
   test("births minus deaths equal natural increase in every row, and the age rates add up to the total fertility rate", () => {
@@ -105,6 +159,7 @@ describe("demography loader", () => {
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     const registered = new Set(sources.map((source) => source.sourceId));
     expect([...new Set(facts.map((row) => row.sourceId))].sort()).toEqual([
+      "source.geostat_census2024_population_by_age_settlement",
       "source.geostat_demography_births",
       "source.geostat_demography_crude_birth_rate",
       "source.geostat_demography_crude_death_rate",
@@ -116,6 +171,7 @@ describe("demography loader", () => {
       "source.geostat_demography_migration_citizenship",
       "source.geostat_demography_natural_increase",
       "source.geostat_demography_net_migration",
+      "source.geostat_demography_population_age_sex",
       "source.geostat_municipal_population",
     ]);
     expect(facts.every((row) => registered.has(row.sourceId))).toBe(true);
