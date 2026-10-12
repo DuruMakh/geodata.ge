@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile, mkdir } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
+import { workbookMessage } from "../../lib/i18n/workbook";
 
 const toggle = (page: Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 const section = (page: Page, id: string) => page.getByTestId(`trade-services-section-${id}`);
@@ -176,8 +177,9 @@ for (const prefix of ["", "/en"]) test(`Services real Excel includes every selec
       const entity = entities.find(item => item[prefix ? "labelEn" : "labelKa"] === label)!;
       expect(entity).toBeTruthy(); seen.add(`${entity.id}:${year}`);
       const fact = facts.find(item => item.entity_id === entity.id && item.year === year && item.indicator_id === measure);
-      expect(row.getCell(4).value).toBe(fact?.value_usd ? Number(fact.value_usd) : null);
-      expect(row.getCell(5).value).toBe(prefix ? "Actual" : "ფაქტი");
+      const value = fact?.value_usd ? Number(fact.value_usd) : null;
+      expect(row.getCell(4).value).toBe(value);
+      expect(row.getCell(5).value).toBe(workbookMessage(prefix ? "en" : "ka", value === null ? "workbook.unavailable" : "workbook.actual"));
       expect(row.getCell(6).value).toBe(prefix ? "Unspecified" : "დაუზუსტებელი");
     });
     expect(seen.size).toBe(65);
