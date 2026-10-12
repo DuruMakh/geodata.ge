@@ -10,9 +10,9 @@ import { ACCENT, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { compoundAnnualGrowth, isGrowthRankable, rankPeriodDeltas } from "../../lib/explorer/indicators";
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
 import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
-import { SectionTitle, SwatchBar } from "../ui/editorial";
+import { SectionTitle } from "../ui/editorial";
 import { withLari } from "../ui/lari";
-import { HeroKpi, KPI_GRID_CLASS, MOVER_LABEL_CLASS, SideKpiList } from "./kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, MoverRow, PeriodComparisonTable, SideKpiList } from "./kpi-blocks";
 
 // "ძირითადი ინდიკატორები" per DESIGN.md §8.5: hero KPI with a two-segment gauge and
 // an editorial sentence, three side KPIs, the movers board, and the period comparison.
@@ -37,40 +37,6 @@ const SCOPE_LABEL: Record<ExplorerScope, string> = {
 
 function truncate(text: string, length: number): string {
   return text.length > length ? `${text.slice(0, length - 1)}…` : text;
-}
-
-type MoverRowProps = {
-  row: ExplorerTableRow;
-  rank: number;
-  maxAbsChange: number;
-};
-
-function MoverRow({ row, rank, maxAbsChange }: MoverRowProps) {
-  const { locale, englishLabels } = useI18n();
-  const rowLabel = (value: ExplorerTableRow) => publicLabel(locale, value.itemId, value.kaLabel, englishLabels);
-  const change = row.change ?? 0;
-  const color = change >= 0 ? POSITIVE : NEGATIVE;
-  const barWidth = `${Math.max(4, Math.round((Math.abs(change) / maxAbsChange) * 100))}%`;
-
-  return (
-    <div
-      title={rowLabel(row)}
-      className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5"
-    >
-      <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-        {String(rank).padStart(2, "0")}
-      </span>
-      <span className={`text-[0.78125rem] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>
-        {rowLabel(row)}
-      </span>
-      <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
-        <span className="block h-full" style={{ background: color, width: barWidth }} />
-      </span>
-      <span className="text-right font-[family-name:var(--font-numeric)] text-xs" style={{ color }}>
-        {formatShare(row.change, true)}
-      </span>
-    </div>
-  );
 }
 
 export function Indicators({ model, scope }: IndicatorsProps) {
@@ -207,7 +173,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "main.fastestGrowth")}</h3>
           <div className="flex flex-col">
             {topGrowth.map((row, index) => (
-              <MoverRow key={row.itemId} row={row} rank={index + 1} maxAbsChange={maxAbsChange} />
+              <MoverRow key={row.itemId} rank={index + 1} label={rowLabel(row)} change={row.change} maxAbs={maxAbsChange} />
             ))}
           </div>
         </div>
@@ -215,7 +181,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
           <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "main.slowestGrowth")}</h3>
           <div className="flex flex-col">
             {bottomGrowth.map((row, index) => (
-              <MoverRow key={row.itemId} row={row} rank={index + 1} maxAbsChange={maxAbsChange} />
+              <MoverRow key={row.itemId} rank={index + 1} label={rowLabel(row)} change={row.change} maxAbs={maxAbsChange} />
             ))}
           </div>
         </div>
@@ -223,71 +189,29 @@ export function Indicators({ model, scope }: IndicatorsProps) {
       )}
 
       {singleYear ? null : (
-      <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <h3 className="mb-1 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "main.comparison")}</h3>
-        <table className="w-full table-fixed border-collapse">
-          <caption className="sr-only">{message(messages, "main.comparisonCaption", { scope: message(messages, SCOPE_LABEL[scope]), startYear, endYear })}</caption>
-          <colgroup>
-            <col className="w-[44%]" />
-            <col />
-            <col className="@max-[768px]:w-[76px]" />
-            <col />
-          </colgroup>
-          <thead>
-            <tr>
-              <th className="border-b-2 border-[var(--ink)] pr-3 pt-1.5 pb-2 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]">
-                {message(messages, FIRST_COL_LABEL[scope])}
-              </th>
-              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] font-semibold text-[var(--muted)] @max-[768px]:px-1">
-                {startYear}
-              </th>
-              <th className="border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] @max-[768px]:px-1 @max-[768px]:tracking-normal">
-                {message(messages, "controls.change")}
-              </th>
-              <th className="border-b-2 border-[var(--ink)] pl-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] font-semibold text-[var(--muted)] @max-[768px]:pl-1">
-                {endYear}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              totalRow ? { row: totalRow, label: rowLabel(totalRow), weight: 600, color: "var(--ink)" } : null,
-              ...comparisonSorted.map((row) => ({ row, label: truncate(rowLabel(row), 40), weight: 500, color: row.color })),
-            ]
-              .filter((entry): entry is { row: ExplorerTableRow; label: string; weight: number; color: string } => entry !== null)
-              .map(({ row, label, weight, color }) => {
-                const startValue = row.valuesByYear[startYear] ?? null;
-                const endValue = row.valuesByYear[endYear] ?? null;
-                const delta = startValue === null || endValue === null ? null : endValue - startValue;
-
-                return (
-                  <tr key={row.itemId} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
-                    <td className="py-2.5 pr-3" title={rowLabel(row)}>
-                      <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
-                        <SwatchBar color={color} className="mt-[7px]" />
-                        <span className="min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]" style={{ fontWeight: weight }}>
-                          {label}
-                        </span>
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: weight }}>
-                      {comparisonCell(startValue)}
-                    </td>
-                    <td
-                      className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap @max-[768px]:px-1"
-                      style={{ color: delta === null ? "var(--muted)" : delta >= 0 ? POSITIVE : NEGATIVE }}
-                    >
-                      {delta === null ? MISSING : `${delta >= 0 ? "+" : "−"}${formatBn(Math.abs(delta))}`}
-                    </td>
-                    <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: weight }}>
-                      {comparisonCell(endValue)}
-                    </td>
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
-      </div>
+        <PeriodComparisonTable
+          heading={message(messages, "main.comparison")}
+          caption={message(messages, "main.comparisonCaption", { scope: message(messages, SCOPE_LABEL[scope]), startYear, endYear })}
+          firstColumnLabel={message(messages, FIRST_COL_LABEL[scope])}
+          changeLabel={message(messages, "controls.change")}
+          startYear={startYear}
+          endYear={endYear}
+          rows={[
+            ...(totalRow ? [{ row: totalRow, label: rowLabel(totalRow), emphasis: true, color: "var(--ink)" }] : []),
+            ...comparisonSorted.map((row) => ({ row, label: truncate(rowLabel(row), 40), emphasis: false, color: row.color })),
+          ].map(({ row, label, emphasis, color }) => {
+            const startValue = row.valuesByYear[startYear] ?? null;
+            const endValue = row.valuesByYear[endYear] ?? null;
+            const delta = startValue === null || endValue === null ? null : endValue - startValue;
+            return {
+              key: row.itemId, label, title: rowLabel(row), color, emphasis,
+              start: comparisonCell(startValue),
+              change: delta === null ? MISSING : `${delta >= 0 ? "+" : "−"}${formatBn(Math.abs(delta))}`,
+              changeColor: delta === null ? "var(--muted)" : delta >= 0 ? POSITIVE : NEGATIVE,
+              end: comparisonCell(endValue),
+            };
+          })}
+        />
       )}
     </section>
   );

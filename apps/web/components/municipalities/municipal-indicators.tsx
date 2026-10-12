@@ -5,31 +5,11 @@ import type { MunicipalComparisonRow, MunicipalIndicatorPresentation, MunicipalK
 import { formatAmount, formatAmountParts, formatShare } from "../../lib/explorer/format";
 import type { Locale } from "../../lib/i18n/types";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { SectionTitle, SwatchBar } from "../ui/editorial";
+import { SectionTitle } from "../ui/editorial";
 import { withLari } from "../ui/lari";
-import { HeroKpi, KPI_GRID_CLASS, MOVER_LABEL_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
+import { HeroKpi, KPI_GRID_CLASS, MoverRow, PeriodComparisonTable, SideKpiList } from "../main-explorer/kpi-blocks";
 
 // KPI row (DESIGN.md §7.11), movers board (§7.13) and the period comparison.
-
-function MoverRow({ mover, maxAbs }: { mover: MunicipalMover; maxAbs: number }) {
-  const growth = mover.growth;
-  const width = growth === null || maxAbs === 0 ? 0 : Math.max(4, (Math.abs(growth) / maxAbs) * 100);
-
-  return (
-    <div title={mover.label} className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5">
-      <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-        {String(mover.rank).padStart(2, "0")}
-      </span>
-      <span className={`text-[0.78125rem] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>{mover.label}</span>
-      <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
-        <span className="block h-full" style={{ width: `${width.toFixed(0)}%`, backgroundColor: growthColor(growth) }} />
-      </span>
-      <span className="text-right font-[family-name:var(--font-numeric)] text-xs" style={{ color: growthColor(growth) }}>
-        {formatShare(growth, true)}
-      </span>
-    </div>
-  );
-}
 
 /**
  * An amount whose unit may drop under its number: below 768px the comparison table
@@ -131,7 +111,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.fastestGrowth")}</h3>
           <div className="flex flex-col">
             {movers.up.map((mover) => (
-              <MoverRow key={mover.label} mover={mover} maxAbs={maxAbs} />
+              <MoverRow key={mover.label} rank={mover.rank} label={mover.label} change={mover.growth} maxAbs={maxAbs} />
             ))}
           </div>
         </div>
@@ -139,7 +119,7 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
           <h3 className="mb-3 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.slowestGrowth")}</h3>
           <div className="flex flex-col">
             {movers.down.map((mover) => (
-              <MoverRow key={mover.label} mover={mover} maxAbs={maxAbs} />
+              <MoverRow key={mover.label} rank={mover.rank} label={mover.label} change={mover.growth} maxAbs={maxAbs} />
             ))}
           </div>
         </div>
@@ -147,64 +127,22 @@ export function MunicipalIndicators({ entityLabel, kpis, movers, comparison, pre
       )}
 
       {singleYear ? null : (
-      <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
-        <h3 className="mb-1 text-[0.8125rem] font-semibold text-[var(--ink)]">{message(messages, "municipal.periodComparison")}</h3>
-        <div className="overflow-x-auto">
-          <table data-testid="comparison-table" className="w-full min-w-[560px] table-fixed border-collapse @max-[768px]:min-w-0">
-            <caption className="sr-only">{message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}</caption>
-            <colgroup>
-              {/* Phones: the ცვლილება header needs ~76px on every platform, so the name column narrows
-                  (12px names, tighter swatch gap) and leaves the two amounts (6,134.2) their room. */}
-              <col className="w-[44%] @max-[768px]:w-[40%] @max-[340px]:w-[33%]" />
-              <col />
-              <col className="@max-[768px]:w-[76px] @max-[340px]:w-[80px]" />
-              <col />
-            </colgroup>
-            <thead>
-              <tr>
-                {[message(messages, "municipal.function"), String(startYear), message(messages, "municipal.change"), String(endYear)].map((label, index) => (
-                  <th
-                    key={`comparison-header-${index}`}
-                    className={`border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right @max-[768px]:pl-1" : "px-3 pt-1.5 pb-2 text-right @max-[768px]:px-1"} text-[0.6875rem] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em] @max-[768px]:tracking-normal"} text-[var(--muted)]`}
-                  >
-                    {label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {comparison.map((row) => (
-                <tr
-                  key={row.label}
-                  className={`border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)] ${row.isTotal ? "bg-[var(--tint)]" : ""}`}
-                >
-                  <td className="py-2.5 pr-3 @max-[768px]:pr-2" title={row.label}>
-                    <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
-                      <SwatchBar color={row.color} className="mt-[7px]" />
-                      <span className="min-w-0 break-words text-[0.78125rem] leading-[1.4] text-[var(--ink)] @max-[768px]:text-[0.75rem]" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                        {row.label}
-                      </span>
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--muted)] @max-[768px]:px-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                    <AmountText value={row.fromGel} locale={locale} />
-                  </td>
-                  <td
-                    data-testid="comparison-change-cell"
-                    className="px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] @max-[768px]:px-1"
-                    style={{ color: growthColor(row.changeShare) }}
-                  >
-                    <AmountText value={row.changeGel} signed locale={locale} />
-                  </td>
-                  <td className="py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--ink)] @max-[768px]:pl-1" style={{ fontWeight: row.isTotal ? 600 : 500 }}>
-                    <AmountText value={row.toGel} locale={locale} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        <PeriodComparisonTable
+          variant="municipal"
+          heading={message(messages, "municipal.periodComparison")}
+          caption={message(messages, "municipal.comparisonCaption", { name: entityLabel, start: startYear, end: endYear })}
+          firstColumnLabel={message(messages, "municipal.function")}
+          changeLabel={message(messages, "municipal.change")}
+          startYear={startYear}
+          endYear={endYear}
+          rows={comparison.map((row) => ({
+            key: row.label, label: row.label, title: row.label, color: row.color, emphasis: row.isTotal,
+            start: <AmountText value={row.fromGel} locale={locale} />,
+            change: <AmountText value={row.changeGel} signed locale={locale} />,
+            changeColor: growthColor(row.changeShare),
+            end: <AmountText value={row.toGel} locale={locale} />,
+          }))}
+        />
       )}
     </section>
   );

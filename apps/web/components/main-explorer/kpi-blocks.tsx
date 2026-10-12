@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { Overline } from "../ui/editorial";
+import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
+import { formatShare } from "../../lib/explorer/format";
+import { Overline, SwatchBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 import { Sparkline } from "../ui/sparkline";
 
@@ -96,6 +98,104 @@ export function SideKpiList({ kpis, testId, rowTestId }: { kpis: SideKpi[]; test
           <div key={kpi.label} data-testid={kpi.testId ?? "side-kpi"} className={rowClass}>{body}</div>
         );
       })}
+    </div>
+  );
+}
+
+/** One "fastest / slowest growth" row: rank, name, a bar sized against the largest change, the signed share. */
+export function MoverRow({ rank, label, change, maxAbs }: { rank: number; label: string; change: number | null; maxAbs: number }) {
+  const color = change === null ? "var(--muted)" : change >= 0 ? POSITIVE : NEGATIVE;
+  const width = change === null || maxAbs === 0 ? 0 : Math.max(4, Math.round((Math.abs(change) / maxAbs) * 100));
+  return (
+    <div title={label} className="grid grid-cols-[24px_minmax(0,1fr)_96px_72px] items-center gap-3 border-t border-[var(--hairline-soft)] py-2.5">
+      <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
+        {String(rank).padStart(2, "0")}
+      </span>
+      <span className={`text-[0.78125rem] font-medium leading-[1.4] text-[var(--ink)] ${MOVER_LABEL_CLASS}`}>{label}</span>
+      <span className="block h-[3px] overflow-hidden bg-[var(--hairline-soft)]">
+        <span className="block h-full" style={{ width: `${width}%`, backgroundColor: color }} />
+      </span>
+      <span className="text-right font-[family-name:var(--font-numeric)] text-xs" style={{ color }}>
+        {formatShare(change, true)}
+      </span>
+    </div>
+  );
+}
+
+/** A start-year / change / end-year row; the cells arrive formatted. `emphasis` is the total row. */
+export type ComparisonRow = { key: string; label: string; title: string; color: string; start: ReactNode; change: ReactNode; end: ReactNode; changeColor: string; emphasis: boolean };
+
+// The national table sits in the budget column; the municipal one may scroll below
+// 560px and narrows its name column on small phones, and its cells carry test ids.
+const COMPARISON_CLASSES = {
+  national: {
+    cols: ["w-[44%]", undefined, "@max-[768px]:w-[76px]", undefined],
+    th: [
+      "border-b-2 border-[var(--ink)] pr-3 pt-1.5 pb-2 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]",
+      "border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] font-semibold text-[var(--muted)] @max-[768px]:px-1",
+      "border-b-2 border-[var(--ink)] px-3 pt-1.5 pb-2 text-right text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] @max-[768px]:px-1 @max-[768px]:tracking-normal",
+      "border-b-2 border-[var(--ink)] pl-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] font-semibold text-[var(--muted)] @max-[768px]:pl-1",
+    ],
+    nameCell: "py-2.5 pr-3",
+    name: "min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]",
+    start: "px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--muted)] @max-[768px]:px-1",
+    change: "px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap @max-[768px]:px-1",
+    end: "py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--ink)] @max-[768px]:pl-1",
+  },
+  municipal: {
+    // Phones: the change header needs ~76px on every platform, so the name column narrows
+    // (12px names, tighter swatch gap) and leaves the two amounts (6,134.2) their room.
+    cols: ["w-[44%] @max-[768px]:w-[40%] @max-[340px]:w-[33%]", undefined, "@max-[768px]:w-[76px] @max-[340px]:w-[80px]", undefined],
+    th: [0, 1, 2, 3].map((index) => `border-b-2 border-[var(--ink)] ${index === 0 ? "pr-3 pt-1.5 pb-2 text-left" : index === 3 ? "pl-3 pt-1.5 pb-2 text-right @max-[768px]:pl-1" : "px-3 pt-1.5 pb-2 text-right @max-[768px]:px-1"} text-[0.6875rem] font-semibold ${index === 1 || index === 3 ? "font-[family-name:var(--font-numeric)]" : "uppercase tracking-[0.06em] @max-[768px]:tracking-normal"} text-[var(--muted)]`),
+    nameCell: "py-2.5 pr-3 @max-[768px]:pr-2",
+    name: "min-w-0 break-words text-[0.78125rem] leading-[1.4] text-[var(--ink)] @max-[768px]:text-[0.75rem]",
+    start: "px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--muted)] @max-[768px]:px-1",
+    change: "px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] @max-[768px]:px-1",
+    end: "py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] text-[var(--ink)] @max-[768px]:pl-1",
+  },
+};
+
+/** The period comparison under the movers (DESIGN.md §8.5): one row per series, start year, change, end year. */
+export function PeriodComparisonTable({ heading, caption, firstColumnLabel, changeLabel, startYear, endYear, rows, variant = "national" }: {
+  heading: string; caption: string; firstColumnLabel: string; changeLabel: string; startYear: number; endYear: number; rows: ComparisonRow[]; variant?: "national" | "municipal";
+}) {
+  const c = COMPARISON_CLASSES[variant];
+  const municipal = variant === "municipal";
+  const table = (
+    <table data-testid={municipal ? "comparison-table" : undefined} className={municipal ? "w-full min-w-[560px] table-fixed border-collapse @max-[768px]:min-w-0" : "w-full table-fixed border-collapse"}>
+      <caption className="sr-only">{caption}</caption>
+      <colgroup>
+        {c.cols.map((className, index) => <col key={index} className={className} />)}
+      </colgroup>
+      <thead>
+        <tr>
+          {[firstColumnLabel, String(startYear), changeLabel, String(endYear)].map((label, index) => <th key={index} className={c.th[index]}>{label}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => {
+          const weight = row.emphasis ? 600 : 500;
+          return (
+            <tr key={row.key} className={municipal ? `border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)] ${row.emphasis ? "bg-[var(--tint)]" : ""}` : "border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]"}>
+              <td className={c.nameCell} title={row.title}>
+                <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
+                  <SwatchBar color={row.color} className="mt-[7px]" />
+                  <span className={c.name} style={{ fontWeight: weight }}>{row.label}</span>
+                </span>
+              </td>
+              <td className={c.start} style={{ fontWeight: weight }}>{row.start}</td>
+              <td data-testid={municipal ? "comparison-change-cell" : undefined} className={c.change} style={{ color: row.changeColor }}>{row.change}</td>
+              <td className={c.end} style={{ fontWeight: weight }}>{row.end}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+  return (
+    <div data-testid="period-comparison" className="mt-9 border-t border-[var(--hairline)] pt-6">
+      <h3 className="mb-1 text-[0.8125rem] font-semibold text-[var(--ink)]">{heading}</h3>
+      {municipal ? <div className="overflow-x-auto">{table}</div> : table}
     </div>
   );
 }
