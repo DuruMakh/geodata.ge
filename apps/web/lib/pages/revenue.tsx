@@ -6,6 +6,7 @@ import { getPresentation } from "../i18n/presentation.server";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
+import { publicGlossaryEntry } from "../data/glossary";
 import { loadServedExplorerData, loadServedLandingData } from "../data/servedData";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
@@ -69,7 +70,7 @@ export async function renderRevenuePage(locale: Locale) {
         presentation={presentation}
         nav="revenue"
         facts={ownFacts.map(projectBudgetFact)}
-        glossaryEntries={Array.from(glossary.values())}
+        glossaryEntries={Array.from(glossary.values(), publicGlossaryEntry)}
         gdpFacts={gdpFacts.map(projectGdpFact)}
         workbookSources={workbookSources}
         gdpWorkbookSources={gdpWorkbookSources}

@@ -20,6 +20,7 @@ import {
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PUBLIC_PAGE_COUNT,
 } from "../explorer/municipalData";
+import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { formatAmount, formatShare, formatDisplayDate } from "../explorer/format";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import {
@@ -218,8 +219,8 @@ export async function renderMunicipality(slug: string, locale: Locale) {
           entityId={code}
           metaLine={message(messages, "municipal.municipalityMeta", { region: regionName, rank: municipalRankLabel(rank, locale), count: municipalities.length, year: latestYear })}
           functions={functions}
-          functionFacts={own.functionFacts}
-          totalFacts={own.totalFacts}
+          functionFacts={own.functionFacts.map(projectMunicipalFunctionFact)}
+          totalFacts={own.totalFacts.map(projectMunicipalTotalFact)}
           metrics={{
             kind: "ranked",
             nationalTotalByYear,

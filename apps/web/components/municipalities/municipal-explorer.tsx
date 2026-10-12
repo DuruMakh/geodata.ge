@@ -9,7 +9,8 @@ import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { publicLabel } from "../../lib/i18n/labels";
 import { workbookMessage } from "../../lib/i18n/workbook";
 import { useMemo, useState, type ReactNode } from "react";
-import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
+import type { MunicipalFunction } from "../../lib/data/municipal/types";
+import type { ClientMunicipalFunctionFact, ClientMunicipalTotalFact } from "../../lib/explorer/clientData";
 import {
   buildComparisonRows,
   buildCountryKpis,
@@ -59,14 +60,15 @@ type MunicipalExplorerBaseProps = {
   metaLine: string;
   entityId: string;
 
-  // Raw facts, already narrowed (and, for a region, aggregated) by the route.
+  // Raw facts, already narrowed (and, for a region, aggregated) and projected to
+  // their public fields by the route.
   // NOT a prebuilt model: change, the share column, the KPIs, the movers and the
   // comparison table are all functions of the selected range, which is client
   // state. Handing over one full-span model and filtering its years array would
   // leave all five describing a period the reader is not looking at.
   functions: MunicipalFunction[];
-  functionFacts: MunicipalFunctionFact[];
-  totalFacts: MunicipalTotalFact[];
+  functionFacts: ClientMunicipalFunctionFact[];
+  totalFacts: ClientMunicipalTotalFact[];
 
   workbookBasename: string;
   workbookSources: WorkbookPublicSource[];

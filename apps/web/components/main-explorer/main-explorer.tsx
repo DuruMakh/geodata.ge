@@ -8,7 +8,7 @@ import type { Presentation } from "../../lib/i18n/types";
 import { publicLabel } from "../../lib/i18n/labels";
 import { workbookMessage } from "../../lib/i18n/workbook";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
-import type { GlossaryEntry } from "../../lib/data/glossary";
+import type { PublicGlossaryEntry } from "../../lib/data/glossary";
 import type {
   ClientAdminFact,
   ClientBudgetFact,
@@ -46,7 +46,7 @@ type MainExplorerProps = {
   // whole admin corpus out of that route's RSC payload.
   adminFacts?: ClientAdminFact[];
   adminCategories?: AdminSpendingCategory[];
-  glossaryEntries: GlossaryEntry[];
+  glossaryEntries: PublicGlossaryEntry[];
   gdpFacts?: ClientNationalGdpFact[];
   workbookSources?: WorkbookPublicSource[];
   adminWorkbookSources?: WorkbookPublicSource[];

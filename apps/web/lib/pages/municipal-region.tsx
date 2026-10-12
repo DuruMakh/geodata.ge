@@ -23,6 +23,7 @@ import {
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
   regionFactsFor,
 } from "../explorer/municipalData";
+import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { municipalRankLabel, REGION_GENITIVE_KA } from "../explorer/municipalLabels";
 import { municipalityHrefForCode } from "../explorer/municipalityRoutes";
 import { formatAmount, formatShare, formatDisplayDate } from "../explorer/format";
@@ -253,8 +254,8 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
           entityId={regionId}
           metaLine={message(messages, members.memberCodes.length === 1 ? "municipal.regionMetaOne" : "municipal.regionMeta", { members: members.memberCodes.length, rank: municipalRankLabel(rank, locale), count: regions.length }) + (regionId === ADJARA_REGION_ID ? message(messages, "municipal.adjaraMetaSuffix") : "")}
           functions={functions}
-          functionFacts={own.functionFacts}
-          totalFacts={own.totalFacts}
+          functionFacts={own.functionFacts.map(projectMunicipalFunctionFact)}
+          totalFacts={own.totalFacts.map(projectMunicipalTotalFact)}
           metrics={{
             kind: "ranked",
             nationalTotalByYear,

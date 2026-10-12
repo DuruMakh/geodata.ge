@@ -17,6 +17,7 @@ import {
   latestReviewedAtForMunicipalFacts,
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
 } from "../explorer/municipalData";
+import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 import { georgiaDescription } from "../seo/municipalMetadata";
@@ -135,8 +136,8 @@ export async function renderMunicipalCountry(locale: Locale) {
           entityId={MUNICIPAL_COUNTRY_ID}
           metaLine={message(messages, "municipal.countryMeta", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT, first: firstYear, last: latestYear })}
           functions={functions}
-          functionFacts={countryFunctionFacts}
-          totalFacts={countryTotalFacts}
+          functionFacts={countryFunctionFacts.map(projectMunicipalFunctionFact)}
+          totalFacts={countryTotalFacts.map(projectMunicipalTotalFact)}
           metrics={{ kind: "country", budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT }}
           workbookBasename="municipalities-georgia"
           workbookSources={entityWorkbookSources}

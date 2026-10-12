@@ -9,6 +9,7 @@ import {
   type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
+import type { ClientMunicipalFunctionFact, ClientMunicipalTotalFact } from "./clientData";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import type { Presentation, TemplateValues } from "../i18n/types";
@@ -48,8 +49,8 @@ export type MunicipalEntityModel = {
 
 export type MunicipalEntityInput = {
   functions: MunicipalFunction[];
-  functionFacts: MunicipalFunctionFact[];
-  totalFacts: MunicipalTotalFact[];
+  functionFacts: ClientMunicipalFunctionFact[];
+  totalFacts: ClientMunicipalTotalFact[];
   startYear: number;
   endYear: number;
 };

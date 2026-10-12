@@ -4,7 +4,7 @@ import { publicLabel } from "../i18n/labels";
 import type { Presentation } from "../i18n/types";
 import kaAnalysis from "../i18n/messages/ka/analysis.json";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
-import type { GlossaryEntry } from "../data/glossary";
+import type { PublicGlossaryEntry } from "../data/glossary";
 import type { ClientAdminFact, ClientBudgetFact } from "./clientData";
 import { colorForItem, OTHER_COLOR } from "./colors";
 import { formatAmountParts, formatShare, MISSING } from "./format";
@@ -22,7 +22,7 @@ export type SingleYearSnapshotInput = {
   adminFacts?: ClientAdminFact[];
   adminCategories?: Map<string, AdminSpendingCategory>;
   grouping?: ExpenditureGrouping;
-  glossary: Map<string, GlossaryEntry>;
+  glossary: Map<string, PublicGlossaryEntry>;
   side: ExplorerSide;
   year: number;
 };
@@ -34,7 +34,7 @@ type SnapshotFact = {
   basis: "actual" | "planned";
 };
 
-function labelsFor(id: string, glossary: Map<string, GlossaryEntry>) {
+function labelsFor(id: string, glossary: Map<string, PublicGlossaryEntry>) {
   const entry = glossary.get(id);
   return {
     kaLabel: entry?.kaLabel ?? id,

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { getPresentation } from "../i18n/presentation.server";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { publicGlossaryEntry } from "../data/glossary";
 import { loadServedExplorerData } from "../data/servedData";
 import { referencedSourceIds } from "../data/sources";
 import { projectAdminFact, projectBudgetFact } from "../explorer/clientData";
@@ -52,7 +53,7 @@ export async function renderAnalysisPage(locale: Locale) {
         facts={facts.map(projectBudgetFact)}
         adminFacts={ownAdminFacts.map(projectAdminFact)}
         adminCategories={adminCategories}
-        glossaryEntries={Array.from(glossary.values())}
+        glossaryEntries={Array.from(glossary.values(), publicGlossaryEntry)}
         lastUpdatedAt={lastUpdatedAt}
       />
     </>
