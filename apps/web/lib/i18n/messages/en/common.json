@@ -83,7 +83,13 @@
   "common.electricity": "Electricity",
   "common.energyUse": "Energy use",
   "common.foodSelfSufficiency": "Food self-sufficiency",
+  "common.moneyBanks": "Money and banks",
+  "common.moneySupply": "Money supply",
+  "common.moneyLoansDeposits": "Loans and deposits",
+  "common.moneyInterestRates": "Interest rates",
+  "common.moneyBankHealth": "Bank health",
   "common.dataWages": "Data · Wages",
   "common.dataPoverty": "Data · Poverty and inequality",
-  "common.dataEnergyFood": "Data · Energy and food"
+  "common.dataEnergyFood": "Data · Energy and food",
+  "common.dataMoneyBanks": "Data · Money and banks"
 }

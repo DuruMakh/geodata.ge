@@ -87,6 +87,7 @@ async function createFixtureRepository() {
   tempDirectories.push(repositoryRoot);
   const rows: Record<MethodologyDatasetId, ReviewedSourceManifestRow[]> = {
     wages: [await writeReviewedSource(repositoryRoot, "wages", "1995-2025", "docs/Raw Data/Wages/geostat-earnings-annual/official/01-earnings-annual.xlsx", "downloads/methodology/wages/files/01-earnings-annual.xlsx", "wages-headline")],
+    money: [await writeReviewedSource(repositoryRoot, "money", "1995-2025", "docs/Raw Data/Money/nbg-money-banks-annual/official/money-aggregates-and-monetary-ratioseng.xlsx", "downloads/methodology/money/files/money-aggregates-and-monetary-ratioseng.xlsx", "money-aggregates")],
     poverty: [await writeReviewedSource(repositoryRoot, "poverty", "2004-2025", "docs/Raw Data/Poverty/geostat-poverty-annual/official/302-absolute-poverty.xlsx", "downloads/methodology/poverty/files/302-absolute-poverty.xlsx", "poverty-absolute")],
     "energy-food": [await writeReviewedSource(repositoryRoot, "energy-food", "2013-2024", "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2024-aggregated.xlsx", "downloads/methodology/energy-food/files/energy-balance-2024-aggregated.xlsx", "energy-balance-2024-aggregated")],
     trade: [await writeReviewedSource(repositoryRoot, "trade", "1995-2025", "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx", "downloads/methodology/trade/files/ftrade_1995-2026.xlsx", "trade-total")],

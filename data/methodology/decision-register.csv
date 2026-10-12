@@ -100,3 +100,7 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "energy-food.electricity","energy-food","docs/data-methodology/energy-food-annual.md","Electricity rows","energy-food.electricity","geodata_decision","2026-10-11"
 "energy-food.food","energy-food","docs/data-methodology/energy-food-annual.md","Food self-sufficiency ratio","energy-food.food","official_fact","2026-10-11"
 "energy-food.dashes","energy-food","docs/data-methodology/energy-food-annual.md","Dashes, gaps and unpublished cells","energy-food.dashes","geodata_decision","2026-10-11"
+"money.scope","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.scope","geodata_decision","2026-10-11"
+"money.year_values","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.year_values","geodata_decision","2026-10-11"
+"money.calculated","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.calculated","geodata_decision","2026-10-11"
+"money.bank_health_breaks","money","docs/data-methodology/money-banks-annual.md","Serving on the Money and banks pages","money.bank_health_breaks","limitation","2026-10-11"

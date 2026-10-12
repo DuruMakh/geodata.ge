@@ -23,6 +23,7 @@ import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
 import { WAGES_REGIONS } from "../data/wages/types";
 import { POVERTY_SECTIONS } from "../explorer/poverty";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -37,6 +38,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
     "/explorer/poverty", ...POVERTY_SECTIONS.map(section => section.href),
     ENERGY_FOOD_HUB_PATH, ...ENERGY_FOOD_SECTIONS.map(section => section.href),
+    "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),

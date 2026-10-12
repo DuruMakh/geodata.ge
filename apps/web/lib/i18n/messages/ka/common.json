@@ -83,7 +83,13 @@
   "common.electricity": "ელექტროენერგია",
   "common.energyUse": "ენერგიის მოხმარება",
   "common.foodSelfSufficiency": "სურსათით თვითუზრუნველყოფა",
+  "common.moneyBanks": "ფული და ბანკები",
+  "common.moneySupply": "ფულის მასა",
+  "common.moneyLoansDeposits": "სესხები და დეპოზიტები",
+  "common.moneyInterestRates": "საპროცენტო განაკვეთები",
+  "common.moneyBankHealth": "ბანკების მდგრადობა",
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataPoverty": "მონაცემები · სიღარიბე და უთანასწორობა",
-  "common.dataEnergyFood": "მონაცემები · ენერგეტიკა და სურსათი"
+  "common.dataEnergyFood": "მონაცემები · ენერგეტიკა და სურსათი",
+  "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები"
 }

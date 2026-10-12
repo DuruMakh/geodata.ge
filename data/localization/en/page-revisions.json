@@ -253,5 +253,11 @@
   "/explorer/energy-food/electricity": "2026-10-11",
   "/explorer/energy-food/energy-use": "2026-10-11",
   "/explorer/energy-food/food-self-sufficiency": "2026-10-11",
-  "/methodology/energy-food": "2026-10-11"
+  "/methodology/energy-food": "2026-10-11",
+  "/explorer/money": "2026-10-11",
+  "/explorer/money/supply": "2026-10-11",
+  "/explorer/money/loans-deposits": "2026-10-11",
+  "/explorer/money/interest-rates": "2026-10-11",
+  "/explorer/money/bank-health": "2026-10-11",
+  "/methodology/money": "2026-10-11"
 }

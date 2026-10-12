@@ -17,4 +17,5 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   wages: "2026-10-10",
   poverty: "2026-10-10",
   "energy-food": "2026-10-11",
+  money: "2026-10-11",
 };
