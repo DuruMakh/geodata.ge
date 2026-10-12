@@ -4,8 +4,8 @@ import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } 
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
 export const POVERTY_SECTIONS = [
-  { id: "rates", href: "/explorer/poverty/rates", labelKey: "common.povertyRates" },
-  { id: "inequality", href: "/explorer/poverty/inequality", labelKey: "common.povertyInequality" },
+  { id: "rates", href: "/explorer/living-standards/poverty", labelKey: "common.povertyRates" },
+  { id: "inequality", href: "/explorer/living-standards/inequality", labelKey: "common.povertyInequality" },
 ] as const;
 export type PovertySectionId = typeof POVERTY_SECTIONS[number]["id"];
 /** The tabs of the rates page; the inequality page has one view. */

@@ -11,6 +11,8 @@ import { WAGES_METHODOLOGY_CONTENT as EN_WAGES } from "./content/en/wages";
 import { POVERTY_METHODOLOGY_CONTENT } from "./content/poverty";
 import { MONEY_BANKS_METHODOLOGY_CONTENT } from "./content/moneyBanks";
 import { POVERTY_METHODOLOGY_CONTENT as EN_POVERTY } from "./content/en/poverty";
+import { HOUSEHOLD_INCOME_METHODOLOGY_CONTENT } from "./content/household-income";
+import { HOUSEHOLD_INCOME_METHODOLOGY_CONTENT as EN_HOUSEHOLD_INCOME } from "./content/en/household-income";
 import { ENERGY_FOOD_METHODOLOGY_CONTENT } from "./content/energyFood";
 import { ENERGY_FOOD_METHODOLOGY_CONTENT as EN_ENERGY_FOOD } from "./content/en/energyFood";
 import { MONEY_BANKS_METHODOLOGY_CONTENT as EN_MONEY_BANKS } from "./content/en/moneyBanks";
@@ -57,6 +59,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
   wages: WAGES_METHODOLOGY_CONTENT,
   poverty: POVERTY_METHODOLOGY_CONTENT,
+  "household-income": HOUSEHOLD_INCOME_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
   "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
   "energy-food": ENERGY_FOOD_METHODOLOGY_CONTENT,
@@ -73,6 +76,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   demography: EN_DEMOGRAPHY,
   wages: EN_WAGES,
   poverty: EN_POVERTY,
+  "household-income": EN_HOUSEHOLD_INCOME,
   "energy-food": EN_ENERGY_FOOD,
   money: EN_MONEY_BANKS,
 };

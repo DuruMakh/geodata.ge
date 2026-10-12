@@ -12,7 +12,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { UNEMPLOYMENT_SECTIONS } from "../../lib/explorer/unemploymentSections";
 import { WAGES_SECTIONS } from "../../lib/explorer/wages";
-import { POVERTY_SECTIONS } from "../../lib/explorer/poverty";
+import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../../lib/explorer/livingStandards";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../../lib/explorer/energyFood";
 import { MONEY_BANKS_SECTIONS } from "../../lib/explorer/moneyBanks";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
@@ -41,7 +41,7 @@ export function DataSidebar() {
   const moneyBanksActive = pathname.includes("/explorer/money");
   const unemploymentActive = pathname.includes("/explorer/unemployment");
   const wagesActive = pathname.includes("/explorer/wages");
-  const povertyActive = pathname.includes("/explorer/poverty");
+  const livingStandardsActive = pathname.includes(LIVING_STANDARDS_HUB_PATH);
   const tradeActive = pathname.includes("/explorer/trade");
   const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
   const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
@@ -53,7 +53,7 @@ export function DataSidebar() {
   const tradeDomesticActive = pathname.endsWith("/explorer/trade/domestic-exports");
   const demographyActive = pathname.includes("/explorer/demography");
   const energyFoodActive = pathname.includes(ENERGY_FOOD_HUB_PATH);
-  const budgetActive = !economyActive && !inflationActive && !moneyBanksActive && !unemploymentActive && !wagesActive && !povertyActive && !tradeActive && !externalActive && !demographyActive && !energyFoodActive;
+  const budgetActive = !economyActive && !inflationActive && !moneyBanksActive && !unemploymentActive && !wagesActive && !livingStandardsActive && !tradeActive && !externalActive && !demographyActive && !energyFoodActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
   const regionsActive = pathname.includes("/explorer/economy/regions");
@@ -205,7 +205,7 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : energyFoodActive ? "common.dataEnergyFood" : wagesActive ? "common.dataWages" : povertyActive ? "common.dataPoverty" : moneyBanksActive ? "common.dataMoneyBanks" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : energyFoodActive ? "common.dataEnergyFood" : wagesActive ? "common.dataWages" : livingStandardsActive ? "common.dataLivingStandards" : moneyBanksActive ? "common.dataMoneyBanks" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
@@ -366,15 +366,16 @@ export function DataSidebar() {
                 {message(messages, section.labelKey)}
               </Link>;
             }) : null}
-            <Link href={pageHref("/explorer/poverty", locale)} data-testid="poverty-link" aria-current={pathname.endsWith("/explorer/poverty") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${povertyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.poverty")}
+            <Link href={pageHref(LIVING_STANDARDS_HUB_PATH, locale)} data-testid="living-standards-link" aria-current={pathname.endsWith(LIVING_STANDARDS_HUB_PATH) ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${livingStandardsActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.livingStandards")}
             </Link>
-            {povertyActive ? POVERTY_SECTIONS.map(section => {
-              const active = pathname.endsWith(section.href);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`poverty-${section.id}-link`} aria-current={active ? "page" : undefined}
+            {livingStandardsActive ? LIVING_STANDARDS_SECTIONS.map(section => {
+              // Income and Spending stay active on their region pages, from which the link still opens the section page.
+              const current = pathname.endsWith(section.href), active = current || pathname.includes(`${section.href}/`);
+              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
-                  if (active) event.preventDefault();
+                  if (current) event.preventDefault();
                   setSheetOpen(false);
                 }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>

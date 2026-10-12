@@ -88,6 +88,7 @@ model SourceDocument {
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
   moneyBanksFacts MoneyBanksFact[]
+  householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
   currentAccountFacts CurrentAccountFact[]
@@ -133,6 +134,7 @@ model ImportRun {
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
   moneyBanksFacts MoneyBanksFact[]
+  householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentEntities ForeignInvestmentEntity[]
@@ -851,6 +853,31 @@ model MoneyBanksFact {
   importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/household-income-spending-annual.csv: Geostat's average monthly
+// household incomes and expenditures, exact stored decimals with their published rounding.
+model HouseholdIncomeSpendingFact {
+  year               Int
+  indicatorId        String
+  areaId             String
+  measure            String
+  value              Decimal        @db.Decimal(30, 20)
+  publishedValue     Decimal        @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, areaId, measure, year])
 }
 
 // Mirror of the served data/imports/demography-*.csv files: one flat observation table in the

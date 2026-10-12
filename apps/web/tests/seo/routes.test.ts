@@ -61,9 +61,12 @@ describe("indexable Fiscal.ge routes", () => {
     // External flows adds its hub, Money from abroad and its methodology, each in both languages.
     // Domestic exports adds one further bilingual pair.
     // Poverty adds its hub, two pages and methodology page: 4 bilingual pairs.
+    // Living standards replaces the Poverty hub and adds Income and Spending: 2 more bilingual pairs.
+    // The Household income and spending methodology adds one more bilingual pair.
+    // Income and Spending add a page for Georgia and each of the 11 regions: 24 more bilingual pairs.
     // Energy and food adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
-    expect(urls).toHaveLength(522);
+    expect(urls).toHaveLength(576);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -81,10 +84,17 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/methodology/money");
     expect(urls).toContain("https://fiscal.ge/en/methodology/money");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
-    for (const page of ["", "/rates", "/inequality"]) {
-      expect(urls).toContain(`https://fiscal.ge/explorer/poverty${page}`);
-      expect(urls).toContain(`https://fiscal.ge/en/explorer/poverty${page}`);
+    for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards${page}`);
     }
+    for (const section of ["income", "spending"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/living-standards/${section}/regions/guria`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/guria`);
+      expect(urls).toContain(`https://fiscal.ge/explorer/living-standards/${section}/regions/georgia`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/georgia`);
+    }
+    expect(urls.some((url) => url.includes("/explorer/poverty"))).toBe(false);
     for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);

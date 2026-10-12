@@ -13,6 +13,9 @@ import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
 import { WAGES_REGIONS } from "../data/wages/types";
 import { loadServedPovertyData } from "../data/poverty/importPoverty";
 import { POVERTY_SECTIONS } from "../explorer/poverty";
+import { loadServedHouseholdData } from "../data/household/importHousehold";
+import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdRegionHref } from "../explorer/household";
+import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
@@ -52,7 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -73,6 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedWagesData(),
     loadServedCurrentAccountFacts(),
     loadServedPovertyData(),
+    loadServedHouseholdData(),
     loadServedEnergyFoodData(),
     loadServedMoneyBanksData(),
   ]);
@@ -87,6 +91,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tradeModified = new Date(tradeFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const wagesModified = new Date(wagesFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const povertyModified = new Date(povertyFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  const householdModified = new Date(householdFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  const livingStandardsModified = householdModified > povertyModified ? householdModified : povertyModified;
   const energyFoodModified = new Date(energyFoodFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const moneyBanksModified = new Date(moneyBanksFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradePartnersModified = new Date(tradePartnerFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
@@ -139,7 +145,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/wages`, lastModified: wagesModified },
     ...WAGES_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: wagesModified })),
     ...WAGES_REGIONS.map(id => ({ url: `${siteUrl}${wagesRegionHref(id)}`, lastModified: wagesModified })),
-    { url: `${siteUrl}/explorer/poverty`, lastModified: povertyModified },
+    { url: `${siteUrl}${LIVING_STANDARDS_HUB_PATH}`, lastModified: livingStandardsModified },
+    ...HOUSEHOLD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: householdModified })),
+    ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => ({ url: `${siteUrl}${householdRegionHref(section.id, id)}`, lastModified: householdModified }))),
     ...POVERTY_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: povertyModified })),
     { url: `${siteUrl}${ENERGY_FOOD_HUB_PATH}`, lastModified: energyFoodModified },
     ...ENERGY_FOOD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: energyFoodModified })),

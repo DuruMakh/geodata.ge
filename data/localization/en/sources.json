@@ -1507,5 +1507,89 @@
   "source.nbg_statistics_page": {
     "name": { "text": "National Bank statistics page", "reviewedAt": "2026-10-11" },
     "derivation": null
+  },
+  "source.geostat_household_income_population_national": {
+    "name": { "text": "Distribution of average monthly incomes of the total population", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_population_settlement": {
+    "name": { "text": "Distribution of average monthly incomes of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_population_region": {
+    "name": { "text": "Distribution of average monthly incomes of the total population by regions", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_household_national": {
+    "name": { "text": "Distribution of average monthly incomes per household", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_household_settlement": {
+    "name": { "text": "Distribution of average monthly incomes per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_household_region": {
+    "name": { "text": "Distribution of average monthly incomes per household by regions", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_capita_national": {
+    "name": { "text": "Distribution of average monthly incomes per capita", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_capita_settlement": {
+    "name": { "text": "Distribution of average monthly incomes per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_capita_region": {
+    "name": { "text": "Distribution of average monthly incomes per capita by regions", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_population_national": {
+    "name": { "text": "Distribution of average monthly expenditures of the total population", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_population_settlement": {
+    "name": { "text": "Distribution of average monthly expenditures of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_population_region": {
+    "name": { "text": "Distribution of average monthly expenditures of the total population by regions", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_household_national": {
+    "name": { "text": "Distribution of average monthly expenditures per household", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_household_settlement": {
+    "name": { "text": "Distribution of average monthly expenditures per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_household_region": {
+    "name": { "text": "Distribution of average monthly expenditures per household by regions", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_capita_national": {
+    "name": { "text": "Distribution of average monthly expenditures per capita", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_capita_settlement": {
+    "name": { "text": "Distribution of average monthly expenditures per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_capita_region": {
+    "name": { "text": "Distribution of average monthly expenditures per capita by regions", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_income_page": {
+    "name": { "text": "Households incomes source page", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_spending_page": {
+    "name": { "text": "Households expenditures source page", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.geostat_household_hies_metadata_2026": {
+    "name": { "text": "Metadata for the Households Incomes and Expenditures Survey, 2026 edition", "reviewedAt": "2026-10-11" },
+    "derivation": null
   }
 }

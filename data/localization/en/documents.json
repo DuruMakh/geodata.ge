@@ -4333,5 +4333,131 @@
     "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
     "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
     "documentLanguage": "en"
+  },
+  "geostat_household_income_population_national": {
+    "title": { "text": "Distribution of average monthly incomes of the total population", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_settlement": {
+    "title": { "text": "Distribution of average monthly incomes of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_region": {
+    "title": { "text": "Distribution of average monthly incomes of the total population by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_national": {
+    "title": { "text": "Distribution of average monthly incomes per household", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_settlement": {
+    "title": { "text": "Distribution of average monthly incomes per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_region": {
+    "title": { "text": "Distribution of average monthly incomes per household by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_national": {
+    "title": { "text": "Distribution of average monthly incomes per capita", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_settlement": {
+    "title": { "text": "Distribution of average monthly incomes per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_region": {
+    "title": { "text": "Distribution of average monthly incomes per capita by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_national": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_region": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_national": {
+    "title": { "text": "Distribution of average monthly expenditures per household", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_region": {
+    "title": { "text": "Distribution of average monthly expenditures per household by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_national": {
+    "title": { "text": "Distribution of average monthly expenditures per capita", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_region": {
+    "title": { "text": "Distribution of average monthly expenditures per capita by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_page": {
+    "title": { "text": "Households incomes source page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_page": {
+    "title": { "text": "Households expenditures source page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_hies_metadata_2026": {
+    "title": { "text": "Metadata: Households Incomes and Expenditures Survey (25 May 2026)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
   }
 }

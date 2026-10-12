@@ -69,6 +69,7 @@ const DATASET_SOURCE_NOTES = {
   demography: "common.geostatSourceNote",
   wages: "common.geostatSourceNote",
   poverty: "common.geostatSourceNote",
+  "household-income": "common.geostatSourceNote",
   "energy-food": "common.geostatSourceNote",
   money: "common.nbgSourceNote",
 } as const;
@@ -89,6 +90,7 @@ const DATASET_DOWNLOADS = {
   demography: null,
   wages: null,
   poverty: null,
+  "household-income": null,
   "energy-food": null,
   money: null,
 } as const;
@@ -113,6 +115,7 @@ const DATASET_JSON_DOWNLOADS = {
   demography: [],
   wages: [],
   poverty: [],
+  "household-income": [],
   "energy-food": [],
   money: [],
   debt: [
@@ -142,6 +145,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   demography: [],
   wages: [],
   poverty: [],
+  "household-income": [],
   "energy-food": [],
   money: [],
 } as const;
@@ -188,7 +192,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
       {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
       {dataset === "demography" ? null : (
       <JsonLd
-        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" || dataset === "poverty" || dataset === "energy-food" || dataset === "money" || dataset === "external-flows" ? {
+        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" || dataset === "poverty" || dataset === "household-income" || dataset === "energy-food" || dataset === "money" || dataset === "external-flows" ? {
           "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
           url: `${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`, locale)}`,
           temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
