@@ -2,9 +2,7 @@ import path from "node:path";
 import { CurrentAccount } from "../../components/external/current-account";
 import { ForeignInvestment } from "../../components/external/foreign-investment";
 import { MoneyFromAbroad } from "../../components/external/money-from-abroad";
-import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
-import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { PageHeader } from "../../components/shell/page-header";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -29,6 +27,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { loadGdpWorkbookSources, projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import { TopicHub } from "./hub";
 
 async function loadClientMoneyTransfers() {
   const data = await loadServedMoneyTransfersData();
@@ -51,15 +50,7 @@ export async function externalHubMetadata(locale: Locale) {
 export async function renderExternalHub(locale: Locale) {
   const [{ client }, { client: investment }, { client: account }, presentation] = await Promise.all([loadClientMoneyTransfers(), loadClientForeignInvestment(), loadClientCurrentAccount(), getPresentation(locale, ["external", "common"], [])]);
   const title = message(presentation.messages, "external.hubTitle");
-  return <I18nProvider {...presentation}>
-    <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref("/explorer/external", locale) }]} />
-    <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage="" />
-      <ExplorerHeading>{title}</ExplorerHeading>
-      <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "external.hubSummary")}</p>
-      <BudgetHub cards={buildExternalHubCards(client, investment, account, presentation)} locale={locale} testId="external-hub" />
-    </ExplorerPage>
-  </I18nProvider>;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "external.hubSummary")} path={"/explorer/external"} coverage="" cards={buildExternalHubCards(client, investment, account, presentation)} testId="external-hub" />;
 }
 
 export async function moneyFromAbroadMetadata(locale: Locale) {

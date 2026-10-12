@@ -1,4 +1,6 @@
-import type { Locale } from "../i18n/types";
+import type { ReactNode } from "react";
+import type { Locale, Presentation } from "../i18n/types";
+import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
@@ -7,11 +9,12 @@ import { pageHref } from "../i18n/routes";
 import { formatDisplayDate } from "../explorer/format";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
+import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
 import { SourceNote } from "../../components/ui/editorial";
-import { buildHubCards } from "../explorer/hubCards";
+import { buildHubCards, type HubCardModel } from "../explorer/hubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { fiscalMetadata } from "../seo/metadata";
@@ -78,5 +81,29 @@ export async function renderHubPage(locale: Locale) {
         </SourceNote>
       </div>
     </ExplorerPage>
+  );
+}
+
+/**
+ * A topic hub (Economy, Inflation, Trade, …): breadcrumb, heading, one summary line and
+ * the hub cards. `crumbLabel` names the hub in the breadcrumbs when it differs from the
+ * heading (Inflation's). The Budget hub above keeps its own heading and source note.
+ */
+export function TopicHub({ locale, presentation, title, crumbLabel = title, summary, path, coverage, cards, testId, breadcrumb = true, after }: {
+  locale: Locale; presentation: Presentation; title: string; crumbLabel?: string; summary: string; path: `/${string}`;
+  coverage: string; cards: HubCardModel[]; testId: string; breadcrumb?: boolean; after?: ReactNode;
+}) {
+  const home = message(presentation.messages, "common.home");
+  return (
+    <I18nProvider {...presentation}>
+      {breadcrumb ? <BreadcrumbJsonLd items={[{ name: home, path: pageHref("/", locale) }, { name: crumbLabel, path: pageHref(path, locale) }]} /> : null}
+      <ExplorerPage containerQueries={false}>
+        <PageHeader crumbs={[{ label: home, href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: crumbLabel }]} coverage={coverage} />
+        <ExplorerHeading>{title}</ExplorerHeading>
+        <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{summary}</p>
+        <BudgetHub cards={cards} locale={locale} testId={testId} />
+        {after}
+      </ExplorerPage>
+    </I18nProvider>
   );
 }
