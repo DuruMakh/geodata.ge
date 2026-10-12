@@ -28,8 +28,36 @@ function matches(item: ExplorerItem, query: string): boolean {
   return matchesLabelQuery(query, [item.kaLabel, item.enLabel, item.id]);
 }
 
+/** A parent/child series list row: `locked` is true while a search forces the parent open. */
+export type TreeRow<T> = { item: T; isChild: boolean; hasChildren: boolean; expanded: boolean; locked: boolean };
+
+/**
+ * Parents with their children under them. While searching, a parent is listed when it or a
+ * child matches; a parent listed only for its matching children opens to just those children
+ * with its caret locked open. A name-matched parent still honours its own caret, showing all
+ * its children, so the caret is never a silent no-op.
+ */
+export function buildTreeRows<T>(parents: readonly T[], childrenOf: (parent: T) => T[], matches: (item: T, query: string) => boolean, idOf: (item: T) => string, query: string, expandedIds: readonly string[]): TreeRow<T>[] {
+  const searching = query.trim() !== "";
+  const rows: TreeRow<T>[] = [];
+  for (const parent of parents) {
+    const children = childrenOf(parent);
+    const parentMatches = !searching || matches(parent, query);
+    const matchedChildren = searching ? children.filter((child) => matches(child, query)) : children;
+    if (!parentMatches && matchedChildren.length === 0) continue;
+    const forcedOpen = searching && !parentMatches && matchedChildren.length > 0;
+    const expanded = forcedOpen || expandedIds.includes(idOf(parent));
+    rows.push({ item: parent, isChild: false, hasChildren: children.length > 0, expanded, locked: forcedOpen });
+    if (expanded) {
+      for (const child of forcedOpen ? matchedChildren : children) {
+        rows.push({ item: child, isChild: true, hasChildren: false, expanded: false, locked: false });
+      }
+    }
+  }
+  return rows;
+}
+
 export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expandedIds: string[]): SeriesPanelRow[] {
-  const normalizedQuery = query.trim().toLowerCase();
   const total = items.find((item) => item.level === "total");
   const selectable = items.filter((item) => item.level !== "total");
   const categories = selectable.filter((item) => item.level !== "major_program");
@@ -44,29 +72,10 @@ export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expan
   const rows: SeriesPanelRow[] = total
     ? [{ item: total, isProgram: false, hasChildren: false, expanded: false, caretLocked: false }]
     : [];
-
-  for (const category of categories) {
-    const programs = programsByParent.get(category.id) ?? [];
-    const categoryMatches = !normalizedQuery || matches(category, normalizedQuery);
-    const matchedPrograms = normalizedQuery ? programs.filter((program) => matches(program, normalizedQuery)) : programs;
-
-    if (!categoryMatches && matchedPrograms.length === 0) continue;
-
-    // While searching, ministries with matching programs auto-expand to the matches
-    // (caret locked open); a name-matched ministry still honors the manual caret,
-    // showing all its programs — the caret is never a silent no-op.
-    const forcedOpen = Boolean(normalizedQuery) && !categoryMatches && matchedPrograms.length > 0;
-    const expanded = forcedOpen || expandedIds.includes(category.id);
-
-    rows.push({ item: category, isProgram: false, hasChildren: programs.length > 0, expanded, caretLocked: forcedOpen });
-
-    if (expanded) {
-      for (const program of forcedOpen ? matchedPrograms : programs) {
-        rows.push({ item: program, isProgram: true, hasChildren: false, expanded: false, caretLocked: false });
-      }
-    }
+  // Ministries with matching programs auto-expand to the matches (caret locked open).
+  for (const row of buildTreeRows(categories, (category) => programsByParent.get(category.id) ?? [], matches, (item) => item.id, query.trim().toLowerCase(), expandedIds)) {
+    rows.push({ item: row.item, isProgram: row.isChild, hasChildren: row.hasChildren, expanded: row.expanded, caretLocked: row.locked });
   }
-
   return rows;
 }
 
