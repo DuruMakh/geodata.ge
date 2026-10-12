@@ -565,8 +565,30 @@ no budget data and require no migration when a code release is rolled back.
   URLs; `metadataBase` comes from `resolveSiteUrl()`.
 - Security headers (nosniff, `X-Frame-Options: DENY`, referrer policy,
   permissions policy) are set in `apps/web/next.config.ts` `headers()`;
-  Vercel adds HSTS itself. There is deliberately no Content-Security-Policy
-  yet — adding one needs testing against the chart/canvas code first.
+  Vercel adds HSTS itself.
+- Every response also carries a `Content-Security-Policy-Report-Only` header
+  (the `contentSecurityPolicy` constant in `apps/web/next.config.ts`): only the
+  site itself, plus Google Analytics (`www.googletagmanager.com`,
+  `*.google-analytics.com`, `*.analytics.google.com`) and Microsoft Clarity
+  (`*.clarity.ms`, `c.bing.com`) as loaded by
+  `apps/web/components/site/site-analytics.tsx`, with `frame-ancestors 'none'`,
+  `object-src 'none'` and `base-uri 'self'`. It is report-only so a missed
+  source cannot break a page: browsers block nothing and print each violation
+  in the console as `[Report Only] Refused to …` (an info message). There is no
+  `report-uri`, because a collecting endpoint would be a second request-time
+  route, so watch the console on production pages. Pages are prerendered, so
+  Next.js's inline scripts cannot carry a per-request nonce and `script-src`
+  allows `'unsafe-inline'`; the policy therefore limits where scripts, images
+  and connections may come from and who may frame the site, but does not stop
+  an injected inline script. To enforce it, as a separate decision: confirm the
+  production console shows no reports on the landing page, an explorer page, a
+  methodology page and an Excel download in both languages, with analytics
+  loaded; check that archived PDFs under `/downloads/methodology/*/files/`
+  still open in the browser's viewer (they also receive this policy, and
+  `object-src 'none'` is the directive most likely to affect a viewer; non-PDF
+  archive files already carry their own enforcing sandbox policy, which applies
+  independently); then rename the header key to `Content-Security-Policy` and
+  update `tests/seo/nextConfig.test.ts`.
 
 
 ## GDP dataset release checks

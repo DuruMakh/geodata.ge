@@ -1,6 +1,24 @@
 import type { NextConfig } from "next";
 import { MUNICIPALITY_ROUTES } from "./lib/explorer/municipalityRoutes";
 
+// Report-only for now (docs/deployment.md, "SEO and headers"): browsers log what the
+// policy would block without blocking it. Pages are prerendered, so Next.js's inline
+// scripts cannot carry a per-request nonce and script-src needs 'unsafe-inline'; React
+// needs 'unsafe-eval' only in development. The outside hosts are the two analytics
+// services components/site/site-analytics.tsx loads and the endpoints they report to.
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://*.clarity.ms https://c.bing.com`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com https://*.clarity.ms https://c.bing.com",
+  "font-src 'self'",
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.clarity.ms https://c.bing.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   poweredByHeader: false,
@@ -49,6 +67,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
         ],
       },
     ];
