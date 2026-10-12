@@ -39,7 +39,8 @@ import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-block
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
-import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SectionTitle, SegmentedTabs, ShareBar, SourceNote } from "../ui/editorial";
+import { toggleId } from "../../lib/explorer/selection";
 
 const SEX_KEYS = { total: "sexTotal", male: "sexMale", female: "sexFemale" } as const;
 const SEX_ICONS = {
@@ -235,7 +236,7 @@ export function MigrationExplorer({
                 onToggle={() =>
                   update((s) => ({
                     ...s,
-                    selectedIds: s.selectedIds.includes(group) ? s.selectedIds.filter((id) => id !== group) : [...s.selectedIds, group],
+                    selectedIds: toggleId(s.selectedIds, group),
                   }))
                 }
               />
@@ -266,10 +267,7 @@ export function MigrationExplorer({
           <HeroKpi label={t("heroNetLabel", { year: indicators.year })} value={signedPersons(net)} valueColor={net !== null && net < 0 ? NEGATIVE : "var(--ink)"}>
             {arrivalsShare === null ? null : (
               <>
-                <div className="flex h-[3px] bg-[var(--hairline-soft)]">
-                  <div className="h-[3px] bg-[var(--ink)]" style={{ width: `${(arrivalsShare * 100).toFixed(1)}%` }} />
-                  <div className="h-[3px] bg-[var(--accent)]" style={{ width: `${((1 - arrivalsShare) * 100).toFixed(1)}%` }} />
-                </div>
+                <ShareBar share={arrivalsShare} restColor="var(--accent)" />
                 <div className="mt-2 flex justify-between gap-4">
                   <p className={`inline-flex items-center gap-1 ${KPI_META_CLASS}`}>
                     <ArrowUp aria-hidden size={12} strokeWidth={2} />

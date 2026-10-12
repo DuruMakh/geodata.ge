@@ -192,3 +192,21 @@ test("representative small-region and true-zero values remain distinct from miss
   await expect(transport).toContainText("0.00");
   await expect(transport).not.toContainText("—");
 });
+
+test("a range drag adds no Back step; a view switch adds one", async ({ page }) => {
+  await page.goto("/en/explorer/economy/regions/imereti");
+  await expect(page.getByTestId("regional-mode-line")).toHaveAttribute("aria-pressed", "true");
+  const end = page.getByTestId("range-end-handle");
+  const lastYear = await end.getAttribute("aria-valuenow");
+
+  await page.getByTestId("regional-mode-table").click();
+  await expect(page.getByTestId("regional-chart-panel")).toHaveAttribute("data-mode", "table");
+  for (let step = 0; step < 3; step++) await end.press("ArrowLeft");
+  await expect(end).toHaveAttribute("aria-valuenow", String(Number(lastYear) - 3));
+
+  // One Back undoes the view switch and the whole drag with it, and stays on this page.
+  await page.goBack();
+  await expect(page).toHaveURL(/\/en\/explorer\/economy\/regions\/imereti(#.*)?$/);
+  await expect(page.getByTestId("regional-chart-panel")).toHaveAttribute("data-mode", "line");
+  await expect(end).toHaveAttribute("aria-valuenow", lastYear!);
+});

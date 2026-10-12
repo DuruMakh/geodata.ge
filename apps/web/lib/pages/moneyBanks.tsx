@@ -1,8 +1,6 @@
 import path from "node:path";
 import { MoneyBanksExplorer, type MoneyBanksExplorerProps } from "../../components/money-banks/money-banks-explorer";
-import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
-import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
@@ -24,6 +22,7 @@ import { loadGdpWorkbookSources } from "../methodology/workbookSources";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
+import { TopicHub } from "./hub";
 
 export async function moneyBanksHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["moneyBanks"]);
@@ -33,15 +32,7 @@ export async function moneyBanksHubMetadata(locale: Locale) {
 export async function renderMoneyBanksHub(locale: Locale) {
   const [{ facts }, presentation] = await Promise.all([loadServedMoneyBanksData(), getPresentation(locale, ["moneyBanks", "common"], [])]);
   const title = message(presentation.messages, "moneyBanks.title"), years = facts.map(f => f.year);
-  return <I18nProvider {...presentation}>
-    <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref("/explorer/money", locale) }]} />
-    <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} />
-      <ExplorerHeading>{title}</ExplorerHeading>
-      <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "moneyBanks.hubSummary")}</p>
-      <BudgetHub cards={buildMoneyBanksHubCards(facts.map(toClientMoneyBanksFact), presentation)} locale={locale} testId="money-hub" />
-    </ExplorerPage>
-  </I18nProvider>;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "moneyBanks.hubSummary")} path={"/explorer/money"} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildMoneyBanksHubCards(facts.map(toClientMoneyBanksFact), presentation)} testId="money-hub" />;
 }
 
 export async function moneyBanksPageMetadata(locale: Locale, section: MoneyBanksSectionId) {

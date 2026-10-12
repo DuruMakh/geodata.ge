@@ -189,11 +189,11 @@ exports[`the place-page shell pieces > EntityHeading's markup is the Budget head
 </h1>
 <div class="text-[12.5px] text-[var(--muted)]">Adjara · Rank 2 of 64</div>
 </div>
-<span data-testid="municipal-entity-navigation" class="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink">
+<span data-testid="municipal-entity-navigation" class="grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink ">
 <a href="/a" class="flex min-h-11 min-w-0 items-center font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
 <span class="min-w-0 truncate">← Kobuleti</span>
 </a>
-<a href="/b" class="flex min-h-11 min-w-0 items-center justify-end text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0">
+<a href="/b" class="flex min-h-11 min-w-0 items-center font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)] no-underline hover:text-[var(--ink)] min-[768px]:min-h-0 justify-end text-right">
 <span class="min-w-0 truncate">Keda →</span>
 </a>
 </span>

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
 import { buildEnergyFoodModel, energyFoodCoverage, energyFoodDisplayLabels, energyFoodUnit, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodSeriesModel, type EnergyFoodState } from "../../lib/explorer/energyFood";
 import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
@@ -16,7 +16,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useHashExplorerState } from "../explorer-shell/use-hash-explorer-state";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -29,12 +29,15 @@ export type EnergyFoodExplorerProps = {
   lastReviewedAt: string; siteOrigin: string;
 };
 
+type EnergyFoodHashData = { section: EnergyFoodExplorerProps["section"]; facts: EnergyFoodExplorerProps["facts"] };
+const parseEnergyFoodState = (hash: string, data: EnergyFoodHashData) => parseEnergyFoodHash(hash, data.section, data.facts);
+const serializeEnergyFoodState = (next: EnergyFoodState, data: EnergyFoodHashData) => serializeEnergyFoodHash(next, data.section);
+
 export function EnergyFoodExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin }: EnergyFoodExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `energyFood.${key}`, values);
-  const parse = useCallback((hash: string) => parseEnergyFoodHash(hash, section, facts), [section, facts]);
-  const serialize = useCallback((next: EnergyFoodState) => serializeEnergyFoodHash(next, section), [section]);
-  const { state, update } = useHashExplorerState(parse, serialize);
+  const hashData = useMemo(() => ({ section, facts }), [section, facts]);
+  const { state, update } = useHashState(hashData, parseEnergyFoodState, serializeEnergyFoodState);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildEnergyFoodModel(section, facts, state);

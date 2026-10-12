@@ -1,11 +1,11 @@
 import { coverageLabel } from "../explorer/coverageLabel";
-import { formatDisplayDate } from "../explorer/format";
 import type { Locale } from "../i18n/types";
-import { getMunicipalPresentation } from "./municipal-presentation.server";
+import { getMunicipalPresentation, municipalUpdatedNote } from "./municipal-presentation.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
 import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
+import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
@@ -92,7 +92,7 @@ export async function renderMunicipalCountry(locale: Locale) {
   }, presentation);
 
   return (
-    <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+    <ExplorerPage testId="explorer-shell">
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
           datasetId: "municipal-expenditure",
@@ -117,43 +117,41 @@ export async function renderMunicipalCountry(locale: Locale) {
         testId="explorer-dataset-json-ld"
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name: message(messages, "municipal.georgia"), path: pageHref(ROUTE, locale) }]} />
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: pageHref("/", locale) },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
-            { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
-            { label: message(messages, "municipal.georgia") },
-          ]}
-          coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
-        />
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: pageHref("/", locale) },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
+          { label: message(messages, "municipal.georgia") },
+        ]}
+        coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
+      />
 
-        <MunicipalExplorer
-          presentation={presentation}
-          title={message(messages, "municipal.howCountrySpent")}
-          triggerLabel={message(messages, "municipal.countryTrigger")}
-          entityId={MUNICIPAL_COUNTRY_ID}
-          metaLine={message(messages, "municipal.countryMeta", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT, first: firstYear, last: latestYear })}
-          functions={functions}
-          functionFacts={countryFunctionFacts.map(projectMunicipalFunctionFact)}
-          totalFacts={countryTotalFacts.map(projectMunicipalTotalFact)}
-          metrics={{ kind: "country", budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT }}
-          workbookBasename="municipalities-georgia"
-          workbookSources={entityWorkbookSources}
-          functionalWorkbookSources={functionalWorkbookSources}
-          supplementalWorkbookSources={adjustmentWorkbookSources}
-          siteOrigin={resolveSiteUrl()}
-          pickerCountry={{
-            id: MUNICIPAL_COUNTRY_ID,
-            nameKa: "საქართველო",
-            valueGel: nationalTotalByYear[latestYear] ?? 0,
-            budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-          }}
-          pickerGroups={pickerGroups}
-          sourceNote={message(messages, "municipal.countrySource", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
-        />
-      </div>
-    </main>
+      <MunicipalExplorer
+        presentation={presentation}
+        title={message(messages, "municipal.howCountrySpent")}
+        triggerLabel={message(messages, "municipal.countryTrigger")}
+        entityId={MUNICIPAL_COUNTRY_ID}
+        metaLine={message(messages, "municipal.countryMeta", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT, first: firstYear, last: latestYear })}
+        functions={functions}
+        functionFacts={countryFunctionFacts.map(projectMunicipalFunctionFact)}
+        totalFacts={countryTotalFacts.map(projectMunicipalTotalFact)}
+        metrics={{ kind: "country", budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT }}
+        workbookBasename="municipalities-georgia"
+        workbookSources={entityWorkbookSources}
+        functionalWorkbookSources={functionalWorkbookSources}
+        supplementalWorkbookSources={adjustmentWorkbookSources}
+        siteOrigin={resolveSiteUrl()}
+        pickerCountry={{
+          id: MUNICIPAL_COUNTRY_ID,
+          nameKa: "საქართველო",
+          valueGel: nationalTotalByYear[latestYear] ?? 0,
+          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
+        }}
+        pickerGroups={pickerGroups}
+        sourceNote={message(messages, "municipal.countrySource", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
+      />
+    </ExplorerPage>
   );
 }

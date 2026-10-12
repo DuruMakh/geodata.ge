@@ -4,9 +4,7 @@ import { UnemploymentLegacyLink } from "../../components/unemployment/unemployme
 import { UnemploymentRegionsIndex } from "../../components/unemployment/unemployment-regions-index";
 import { buildUnemploymentRegionMapModel, UNEMPLOYMENT_REGIONS } from "../explorer/unemploymentRegionMap";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
-import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
-import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
@@ -28,6 +26,7 @@ import { unemploymentIndicators } from "../data/unemployment/types";
 import { unemploymentOverviewIndicators } from "../explorer/unemploymentOverview";
 import { UNEMPLOYMENT_SECTIONS, unemploymentBreakdownsForSection, type UnemploymentSectionId } from "../explorer/unemploymentSections";
 import { UNEMPLOYMENT_AGE_FIRST_YEAR } from "../explorer/unemploymentAge";
+import { TopicHub } from "./hub";
 
 export async function unemploymentHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["unemployment"]);
@@ -37,16 +36,7 @@ export async function unemploymentHubMetadata(locale: Locale) {
 export async function renderUnemploymentHub(locale: Locale) {
   const [{ facts }, presentation] = await Promise.all([loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "common"], [])]);
   const title = message(presentation.messages, "unemployment.title");
-  return <I18nProvider {...presentation}>
-    <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref("/explorer/unemployment", locale) }]} />
-    <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage={coverageLabel(presentation.messages, locale, Math.min(...facts.map(f => f.year)), Math.max(...facts.map(f => f.year)), facts.map(f => f.lastReviewedAt).sort().at(-1))} />
-      <ExplorerHeading>{title}</ExplorerHeading>
-      <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "unemployment.hubSummary")}</p>
-      <BudgetHub cards={buildUnemploymentHubCards(facts, presentation)} locale={locale} testId="unemployment-hub" />
-      <UnemploymentLegacyLink locale={locale} />
-    </ExplorerPage>
-  </I18nProvider>;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "unemployment.hubSummary")} path={"/explorer/unemployment"} coverage={coverageLabel(presentation.messages, locale, Math.min(...facts.map(f => f.year)), Math.max(...facts.map(f => f.year)), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildUnemploymentHubCards(facts, presentation)} testId="unemployment-hub" after={<UnemploymentLegacyLink locale={locale} />} />;
 }
 
 export async function unemploymentPageMetadata(locale: Locale, section: UnemploymentSectionId) {
