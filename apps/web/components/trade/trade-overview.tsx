@@ -25,32 +25,34 @@ import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
 
-
-// Inside Domestic exports the hash also names the section, and each change tells the page which hash to keep for it.
+// Inside Domestic exports and Services the hash also names the section, and each change tells the page which hash to keep for it.
 const isDomestic = (facts: readonly ClientTradeOverviewFact[]) => facts.some(f => f.indicatorId === "trade.domestic_exports");
 const serializeOverview = (state: TradeOverviewState, facts: readonly ClientTradeOverviewFact[]) => `${serializeTradeOverviewHash(state)}${isDomestic(facts) ? "&section=overview" : ""}`;
+const serializeServicesOverview = (state: TradeOverviewState) => `${serializeTradeOverviewHash(state)}&section=overview`;
 const OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: facts => { if (isDomestic(facts)) window.dispatchEvent(new Event("trade-domestic-state")); } };
+const SERVICES_OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: () => window.dispatchEvent(new Event("trade-services-state")) };
 
-export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin }: { facts: ClientTradeOverviewFact[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, dataset }: { dataset?: "services"; facts: ClientTradeOverviewFact[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string) => message(messages, `trade.${key}`);
   const indicators = tradeOverviewIndicators(facts), domestic = facts.some(f => f.indicatorId === "trade.domestic_exports"), totalId = indicators[0];
-  const title = t(domestic ? "domestic.title" : "title");
-  const { state, update } = useHashState(facts, parseTradeOverviewHash, serializeOverview, OVERVIEW_OPTIONS);
+  const services = dataset === "services";
+  const title = t(services ? "services.title" : domestic ? "domestic.title" : "title");
+  const { state, update } = useHashState(facts, parseTradeOverviewHash, services ? serializeServicesOverview : serializeOverview, services ? SERVICES_OVERVIEW_OPTIONS : OVERVIEW_OPTIONS);
   const [query, setQuery] = useState("");
   const model = buildTradeOverviewModel(facts, state, presentation);
-  const label = (id: TradeChartIndicator) => t(domestic && id === "trade.exports" ? "domestic.totalExports" : `indicator.${id}`);
+  const label = (id: TradeChartIndicator) => t(services ? `services.indicator.${id}` : domestic && id === "trade.exports" ? "domestic.totalExports" : `indicator.${id}`);
   const matches = (id: TradeChartIndicator) => matchesLabelQuery(query, [label(id)]);
   const valueLabel = (value: number | null | undefined) => value == null ? "—" : `${formatInUnit(value, model.unit)} ${model.unit.label}`;
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: TRADE_OVERVIEW_COLORS[id], valuesByYear: model.valuesByIndicator[id] }));
   const total = rows.find(row => row.itemId === totalId) ?? null;
   const downloadAction = <ExcelDownloadButton testId="trade-excel-download" disabled={!model.selectedIds.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-    await downloadWorkbook(buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin }, presentation));
+    await downloadWorkbook(buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation));
   }} />;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: TRADE_OVERVIEW_COLORS[id], vals: model.years.map(year => model.valuesByIndicator[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="trade-overview" className="@container">
-    {!domestic ? <ExplorerHeading>{title}</ExplorerHeading> : null}
+    {!domestic && !services ? <ExplorerHeading>{title}</ExplorerHeading> : null}
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
@@ -64,7 +66,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin }: { 
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradeOverviewCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradeOverviewModel(facts, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t(services ? "services.sourceNote" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
           <Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote>{domestic ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("domestic.definitions")}</p> : null}</div>
       </div>
@@ -87,10 +89,10 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin }: { 
       </dl>
     </section>
     {!domestic ? <section data-testid="trade-balance-context" className="mt-10 border-t-2 border-[var(--ink)] pt-5">
-      <SectionTitle>{t("balanceTitle")}</SectionTitle>
-      <p className="mt-2 max-w-[900px] text-[12px] leading-relaxed text-[var(--muted)]">{t("balanceNote")}</p>
+      <SectionTitle>{t(services ? "services.balanceTitle" : "balanceTitle")}</SectionTitle>
+      <p className="mt-2 max-w-[900px] text-[12px] leading-relaxed text-[var(--muted)]">{t(services ? "services.balanceNote" : "balanceNote")}</p>
       <p className="my-4 text-[11px] text-[var(--muted)]">{model.unit.label} · {model.range.start}–{model.range.end}</p>
-      <StackedColumnChart periods={model.years} periodsPerYear={1} segments={[{ id: "trade.balance", label: label("trade.balance"), color: TRADE_OVERVIEW_COLORS["trade.balance"], values: model.balanceValues.map(value => value === null ? null : value / model.unit.divisor) }]} overlay={null} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} ariaLabel={t("balanceAria")} />
+      <StackedColumnChart periods={model.years} periodsPerYear={1} segments={[{ id: "trade.balance", label: label("trade.balance"), color: TRADE_OVERVIEW_COLORS["trade.balance"], values: model.balanceValues.map(value => value === null ? null : value / model.unit.divisor) }]} overlay={null} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} ariaLabel={t(services ? "services.balanceAria" : "balanceAria")} />
     </section> : null}
   </div>;
 }

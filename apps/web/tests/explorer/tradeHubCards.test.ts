@@ -15,3 +15,19 @@ test("Products becomes the third live card when its reviewed coverage is supplie
   expect(cards[2]).toMatchObject({ href: "/explorer/trade/products", comingSoon: false, title: "Products" });
   expect(cards[2].footer).toContain("1995–2025");
 });
+
+
+test("Services is the fifth live card, with independent services turnover and coverage", () => {
+  const facts = tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) }));
+  const services = [2020, 2024].map((year, index) => ({ ...facts[0], year, indicatorId: "trade.turnover" as const, valueUsd: [345, 678][index] }));
+  for (const locale of ["ka", "en"] as const) {
+    const title = locale === "en" ? "Services trade" : "მომსახურებით ვაჭრობა";
+    const presentation = { locale, englishLabels: {}, messages: { "trade.title": "Overview", "trade.summary": "Goods", "trade.annual": "Annual", "trade.partners.title": "Partners", "trade.partners.summary": "Countries", "trade.products.title": "Products", "trade.products.summary": "Goods", "trade.domestic.title": "Domestic exports", "trade.domestic.summary": "Goods", "trade.services.title": title, "trade.services.summary": "Annual services" } };
+    const cards = buildTradeHubCards(facts, presentation, { min: 1995, max: 2025, years: [1995, 2025] }, { min: 2020, max: 2025, years: [2020, 2025] }, facts.map(f => ({ ...f, indicatorId: "trade.domestic_exports" as const })), services);
+    expect(cards).toHaveLength(5);
+    expect(cards[3].href).toBe("/explorer/trade/domestic-exports");
+    expect(cards[4]).toMatchObject({ index: "05", title, href: "/explorer/trade/services", comingSoon: false, series: [345, 678] });
+    expect(cards[4].footer).toContain("2020–2024");
+    expect(buildTradeHubCards(facts, presentation, { min: 1995, max: 2025, years: [1995, 2025] }, { min: 2020, max: 2025, years: [2020, 2025] }, facts)).toHaveLength(4);
+  }
+});

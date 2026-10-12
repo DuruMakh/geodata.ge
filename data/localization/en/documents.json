@@ -4459,5 +4459,50 @@
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
     "documentLanguage": "en"
+  },
+  "geostat_services_georgian-exports-of-services-by-types": {
+    "title": {
+      "text": "Services exports by type, 2020–2024",
+      "reviewedAt": "2026-10-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-11"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_services_georgian-imports-of-services-by-types": {
+    "title": {
+      "text": "Services imports by type, 2020–2024",
+      "reviewedAt": "2026-10-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-11"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_services_metadata_2025": {
+    "title": {
+      "text": "International trade in services metadata, March 2025",
+      "reviewedAt": "2026-10-11"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-11"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-11"
+    },
+    "documentLanguage": "en"
   }
 }

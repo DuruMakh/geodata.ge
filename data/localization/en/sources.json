@@ -1591,5 +1591,19 @@
   "source.geostat_household_hies_metadata_2026": {
     "name": { "text": "Metadata for the Households Incomes and Expenditures Survey, 2026 edition", "reviewedAt": "2026-10-11" },
     "derivation": null
+  },
+  "source.geostat_services_georgian_exports_of_services_by_types": {
+    "name": {
+      "text": "Services exports by type, 2020–2024",
+      "reviewedAt": "2026-10-11"
+    },
+    "derivation": null
+  },
+  "source.geostat_services_georgian_imports_of_services_by_types": {
+    "name": {
+      "text": "Services imports by type, 2020–2024",
+      "reviewedAt": "2026-10-11"
+    },
+    "derivation": null
   }
 }

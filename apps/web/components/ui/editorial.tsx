@@ -8,13 +8,15 @@ type TextTabProps = {
   label: string;
   active: boolean;
   onClick: () => void;
+  id?: string;
   testId?: string;
 };
 
-export function TextTab({ label, active, onClick, testId }: TextTabProps) {
+export function TextTab({ label, active, onClick, id, testId }: TextTabProps) {
   return (
     <button
       type="button"
+      id={id}
       data-testid={testId}
       aria-pressed={active}
       onClick={onClick}
