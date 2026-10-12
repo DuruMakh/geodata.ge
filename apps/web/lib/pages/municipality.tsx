@@ -7,6 +7,7 @@ import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
+import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
@@ -176,7 +177,7 @@ export async function renderMunicipality(slug: string, locale: Locale) {
   }, presentation);
 
   return (
-    <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+    <ExplorerPage testId="explorer-shell">
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
@@ -198,53 +199,51 @@ export async function renderMunicipality(slug: string, locale: Locale) {
         testId="explorer-dataset-json-ld"
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name: regionBreadcrumbLabel, path: pageHref(regionPath, locale) }, { name, path: pageHref(municipalityHrefForCode(code), locale) }]} />
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: pageHref("/", locale) },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
-            { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
-            { label: regionBreadcrumbLabel, href: pageHref(regionPath, locale) },
-            { label: name },
-          ]}
-          coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
-        />
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: pageHref("/", locale) },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
+          { label: regionBreadcrumbLabel, href: pageHref(regionPath, locale) },
+          { label: name },
+        ]}
+        coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
+      />
 
-        <MunicipalExplorer
-          presentation={presentation}
-          title={message(messages, "municipal.howSpent")}
-          triggerLabel={name}
-          entityId={code}
-          metaLine={message(messages, "municipal.municipalityMeta", { region: regionName, rank: municipalRankLabel(rank, locale), count: municipalities.length, year: latestYear })}
-          functions={functions}
-          functionFacts={own.functionFacts}
-          totalFacts={own.totalFacts}
-          metrics={{
-            kind: "ranked",
-            nationalTotalByYear,
-            rankByYear,
-            rankOutOf: municipalities.length,
-          }}
-          workbookBasename={`municipality-${code}`}
-          workbookSources={entityWorkbookSources}
-          functionalWorkbookSources={functionalWorkbookSources}
-          siteOrigin={resolveSiteUrl()}
-          pickerCountry={{
-            id: MUNICIPAL_COUNTRY_ID,
-            nameKa: "საქართველო",
-            valueGel: nationalTotalByYear[latestYear] ?? 0,
-            budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-          }}
-          pickerGroups={buildPickerGroups(listInput)}
-          navigation={{
-            prev: { label: publicLabel(locale, prev.code, prev.displayNameKa, englishLabels), href: pageHref(municipalityHrefForCode(prev.code), locale) },
-            next: { label: publicLabel(locale, next.code, next.displayNameKa, englishLabels), href: pageHref(municipalityHrefForCode(next.code), locale) },
-          }}
-          summary={summary}
-          sourceNote={message(messages, "municipal.source") + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
-        />
-      </div>
-    </main>
+      <MunicipalExplorer
+        presentation={presentation}
+        title={message(messages, "municipal.howSpent")}
+        triggerLabel={name}
+        entityId={code}
+        metaLine={message(messages, "municipal.municipalityMeta", { region: regionName, rank: municipalRankLabel(rank, locale), count: municipalities.length, year: latestYear })}
+        functions={functions}
+        functionFacts={own.functionFacts}
+        totalFacts={own.totalFacts}
+        metrics={{
+          kind: "ranked",
+          nationalTotalByYear,
+          rankByYear,
+          rankOutOf: municipalities.length,
+        }}
+        workbookBasename={`municipality-${code}`}
+        workbookSources={entityWorkbookSources}
+        functionalWorkbookSources={functionalWorkbookSources}
+        siteOrigin={resolveSiteUrl()}
+        pickerCountry={{
+          id: MUNICIPAL_COUNTRY_ID,
+          nameKa: "საქართველო",
+          valueGel: nationalTotalByYear[latestYear] ?? 0,
+          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
+        }}
+        pickerGroups={buildPickerGroups(listInput)}
+        navigation={{
+          prev: { label: publicLabel(locale, prev.code, prev.displayNameKa, englishLabels), href: pageHref(municipalityHrefForCode(prev.code), locale) },
+          next: { label: publicLabel(locale, next.code, next.displayNameKa, englishLabels), href: pageHref(municipalityHrefForCode(next.code), locale) },
+        }}
+        summary={summary}
+        sourceNote={message(messages, "municipal.source") + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
+      />
+    </ExplorerPage>
   );
 }

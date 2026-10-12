@@ -6,6 +6,7 @@ import { Message } from "../i18n/message";
 import { pageHref } from "../i18n/routes";
 import { formatDisplayDate } from "../explorer/format";
 import { BudgetHub } from "../../components/hub/budget-hub";
+import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
@@ -48,39 +49,34 @@ export async function renderHubPage(locale: Locale) {
   const coverage = coverageLabel(messages, locale, years[0], years.at(-1), lastUpdatedAt || undefined);
 
   return (
-    <main
-      data-testid="explorer-shell"
-      className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"
-    >
+    <ExplorerPage testId="explorer-shell" containerQueries={false}>
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }]} />
-      <div className="mx-auto max-w-[1180px]">
-        <LegacyHashRedirect />
-        <PageHeader
-          crumbs={[{ label: message(messages, "common.home"), href: pageHref("/", locale) }, { label: message(messages, "common.data") }, { label: message(messages, "common.budget") }]}
-          coverage={coverage}
-        />
-        <h1 className="mt-[22px] mb-2 font-[family-name:var(--font-display)] text-[34px] font-semibold leading-[1.15] tracking-[-0.01em]">
-          {message(messages, "hub.heading")}
-        </h1>
-        <p
-          data-testid="explorer-hub-introduction"
-          className="mb-[26px] max-w-[640px] text-[13.5px] leading-relaxed text-[var(--body)]"
-        >
-          {message(messages, "hub.introduction")}
-          {" "}{message(messages, "hub.explore")}
-        </p>
-        <BudgetHub cards={cards} locale={locale} />
-        <div className="mt-[26px] max-w-[860px]">
-          <SourceNote>
-            {message(messages, "hub.source")}
-            {lastUpdatedAt ? (
-              <>
-                {" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} />
-              </>
-            ) : null}
-          </SourceNote>
-        </div>
+      <LegacyHashRedirect />
+      <PageHeader
+        crumbs={[{ label: message(messages, "common.home"), href: pageHref("/", locale) }, { label: message(messages, "common.data") }, { label: message(messages, "common.budget") }]}
+        coverage={coverage}
+      />
+      <h1 className="mt-[22px] mb-2 font-[family-name:var(--font-display)] text-[34px] font-semibold leading-[1.15] tracking-[-0.01em]">
+        {message(messages, "hub.heading")}
+      </h1>
+      <p
+        data-testid="explorer-hub-introduction"
+        className="mb-[26px] max-w-[640px] text-[13.5px] leading-relaxed text-[var(--body)]"
+      >
+        {message(messages, "hub.introduction")}
+        {" "}{message(messages, "hub.explore")}
+      </p>
+      <BudgetHub cards={cards} locale={locale} />
+      <div className="mt-[26px] max-w-[860px]">
+        <SourceNote>
+          {message(messages, "hub.source")}
+          {lastUpdatedAt ? (
+            <>
+              {" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} />
+            </>
+          ) : null}
+        </SourceNote>
       </div>
-    </main>
+    </ExplorerPage>
   );
 }

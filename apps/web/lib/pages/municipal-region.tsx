@@ -7,6 +7,7 @@ import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
+import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -212,7 +213,7 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
         }, presentation);
 
   return (
-    <main data-testid="explorer-shell" className="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]">
+    <ExplorerPage testId="explorer-shell">
       <JsonLd
         data={explorerDatasetJsonLd({ locale,
           origin: resolveSiteUrl(),
@@ -234,64 +235,62 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
         testId="explorer-dataset-json-ld"
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name, path: pageHref(`/explorer/municipalities/region/${id}`, locale) }]} />
-      <div className="@container mx-auto max-w-[1180px]">
-        <PageHeader
-          crumbs={[
-            { label: message(messages, "common.home"), href: pageHref("/", locale) },
-            { label: message(messages, "common.data") },
-            { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
-            { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
-            { label: name },
-          ]}
-          coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
-        />
+      <PageHeader
+        crumbs={[
+          { label: message(messages, "common.home"), href: pageHref("/", locale) },
+          { label: message(messages, "common.data") },
+          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
+          { label: name },
+        ]}
+        coverage={coverageLabel(messages, locale, firstYear, latestYear, lastUpdatedAt || undefined)}
+      />
 
-        <MunicipalExplorer
-          presentation={presentation}
-          title={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraHeading" : "municipal.howSpent")}
-          triggerLabel={name}
-          entityId={regionId}
-          metaLine={message(messages, members.memberCodes.length === 1 ? "municipal.regionMetaOne" : "municipal.regionMeta", { members: members.memberCodes.length, rank: municipalRankLabel(rank, locale), count: regions.length }) + (regionId === ADJARA_REGION_ID ? message(messages, "municipal.adjaraMetaSuffix") : "")}
-          functions={functions}
-          functionFacts={own.functionFacts}
-          totalFacts={own.totalFacts}
-          metrics={{
-            kind: "ranked",
-            nationalTotalByYear,
-            rankByYear,
-            rankOutOf: regions.length,
-          }}
-          workbookBasename={`region-${id}`}
-          workbookSources={entityWorkbookSources}
-          functionalWorkbookSources={functionalWorkbookSources}
-          supplementalWorkbookSources={regionId === ADJARA_REGION_ID ? adjustmentWorkbookSources : []}
-          siteOrigin={resolveSiteUrl()}
-          pickerCountry={{
-            id: MUNICIPAL_COUNTRY_ID,
-            nameKa: "საქართველო",
-            valueGel: nationalTotalByYear[latestYear] ?? 0,
-            budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-          }}
-          pickerGroups={buildPickerGroups(listInput)}
-          navigation={{
-            prev: { label: publicLabel(locale, prev.id, prev.kaLabel, englishLabels), href: hrefFor(prev) },
-            next: { label: publicLabel(locale, next.id, next.kaLabel, englishLabels), href: hrefFor(next) },
-          }}
-          summary={summary}
-          sourceNote={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraSource" : "municipal.regionSource") + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
-        >
-          <EntityMemberList
-            heading={message(messages, "municipal.regionMembers")}
-            rows={memberRows.map((member) => ({
-              id: member.id,
-              href: pageHref(municipalityHrefForCode(member.id), locale),
-              rank: member.rank,
-              label: publicLabel(locale, member.id, member.nameKa, englishLabels),
-              value: formatAmount(member.valueGel, locale),
-            }))}
-          />
-        </MunicipalExplorer>
-      </div>
-    </main>
+      <MunicipalExplorer
+        presentation={presentation}
+        title={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraHeading" : "municipal.howSpent")}
+        triggerLabel={name}
+        entityId={regionId}
+        metaLine={message(messages, members.memberCodes.length === 1 ? "municipal.regionMetaOne" : "municipal.regionMeta", { members: members.memberCodes.length, rank: municipalRankLabel(rank, locale), count: regions.length }) + (regionId === ADJARA_REGION_ID ? message(messages, "municipal.adjaraMetaSuffix") : "")}
+        functions={functions}
+        functionFacts={own.functionFacts}
+        totalFacts={own.totalFacts}
+        metrics={{
+          kind: "ranked",
+          nationalTotalByYear,
+          rankByYear,
+          rankOutOf: regions.length,
+        }}
+        workbookBasename={`region-${id}`}
+        workbookSources={entityWorkbookSources}
+        functionalWorkbookSources={functionalWorkbookSources}
+        supplementalWorkbookSources={regionId === ADJARA_REGION_ID ? adjustmentWorkbookSources : []}
+        siteOrigin={resolveSiteUrl()}
+        pickerCountry={{
+          id: MUNICIPAL_COUNTRY_ID,
+          nameKa: "საქართველო",
+          valueGel: nationalTotalByYear[latestYear] ?? 0,
+          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
+        }}
+        pickerGroups={buildPickerGroups(listInput)}
+        navigation={{
+          prev: { label: publicLabel(locale, prev.id, prev.kaLabel, englishLabels), href: hrefFor(prev) },
+          next: { label: publicLabel(locale, next.id, next.kaLabel, englishLabels), href: hrefFor(next) },
+        }}
+        summary={summary}
+        sourceNote={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraSource" : "municipal.regionSource") + (lastUpdatedAt ? message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt }) : "")}
+      >
+        <EntityMemberList
+          heading={message(messages, "municipal.regionMembers")}
+          rows={memberRows.map((member) => ({
+            id: member.id,
+            href: pageHref(municipalityHrefForCode(member.id), locale),
+            rank: member.rank,
+            label: publicLabel(locale, member.id, member.nameKa, englishLabels),
+            value: formatAmount(member.valueGel, locale),
+          }))}
+        />
+      </MunicipalExplorer>
+    </ExplorerPage>
   );
 }
