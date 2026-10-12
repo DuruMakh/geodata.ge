@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { formatAmount } from "../../lib/explorer/format";
@@ -34,9 +34,10 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
  * An empty summary leaves out the overview block.
  * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
  */
-export function RegionIndex({ model, sourceNote, metric, summary, leadRow }: {
+export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapControls }: {
   model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>;
   leadRow?: { id: string; label: string; value: number };
+  mapControls?: ReactNode;
 }) {
   const { locale, messages, englishLabels } = useI18n();
   const [query, setQuery] = useState("");
@@ -61,6 +62,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow }: {
     <>
       <div data-testid="regional-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
         <div className="min-w-0">
+          {mapControls ? <div className="mb-4 flex justify-end">{mapControls}</div> : null}
           <RegionMap model={model} metric={metric} activeRegionId={activeRegionId} onActiveRegionChange={setMapActive} />
           {summary.length ? <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
             <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">

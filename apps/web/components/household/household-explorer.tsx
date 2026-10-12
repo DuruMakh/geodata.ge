@@ -66,8 +66,8 @@ export function HouseholdIndex({ section, facts, regionMaps }: {
     <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>
     <LatestValueLine testId="household-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />
     <section data-testid="household-regions" data-measure={measure} className="mt-4">
-      <div className="mb-4 flex justify-end"><MeasureTabs value={measure} onChange={next => update(() => next, true)} /></div>
       <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNote")} · ${unitLabel} · ${regionMap.year}.`}
+        mapControls={<MeasureTabs value={measure} onChange={next => update(() => next, true)} />}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: id => `${householdRegionHref(section, id)}${householdMeasureHash(measure)}`, formatValue: valueLabel, legend: `${totalLabel} · ${unitLabel}`, testId: "household-region-map",
           mapAria: t("regionMapAria", { total: totalLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
