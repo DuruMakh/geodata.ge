@@ -349,10 +349,11 @@ export function DataSidebar() {
               {message(messages, "common.livingStandards")}
             </Link>
             {livingStandardsActive ? LIVING_STANDARDS_SECTIONS.map(section => {
-              const active = pathname.endsWith(section.href);
+              // Income and Spending stay active on their region pages, from which the link still opens the section page.
+              const current = pathname.endsWith(section.href), active = current || pathname.includes(`${section.href}/`);
               return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
-                  if (active) event.preventDefault();
+                  if (current) event.preventDefault();
                   setSheetOpen(false);
                 }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>

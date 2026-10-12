@@ -1,4 +1,4 @@
-import { HOUSEHOLD_SOURCES, householdFactKey, householdSourceId, type ClientHouseholdFact } from "../data/household/types";
+import { HOUSEHOLD_SOURCES, householdFactKey, householdSourceId, type ClientHouseholdFact, type HouseholdArea } from "../data/household/types";
 import type { PublicSourceManifestRow } from "../methodology/publicSources";
 import type { ValidatedSourceManifestRow } from "../methodology/sourceManifest";
 import type { Presentation } from "../i18n/types";
@@ -17,10 +17,10 @@ export function householdWorkbookSources(manifest: readonly ValidatedSourceManif
   });
 }
 
-export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSectionId; facts: readonly ClientHouseholdFact[]; state: HouseholdState; labels: Readonly<Record<string, string>>; areaLabel: string; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
-  const { section, facts, state, labels } = input, { locale, messages } = presentation;
+export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSectionId; area: HouseholdArea; facts: readonly ClientHouseholdFact[]; state: HouseholdState; labels: Readonly<Record<string, string>>; areaLabel: string; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
+  const { section, area, facts, state, labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `household.${key}`);
-  const model = buildHouseholdModel(section, facts, state);
+  const model = buildHouseholdModel(section, area, facts, state);
   const byCell = new Set(facts.map(householdFactKey));
   const neededYears = new Map<string, Set<number>>();
   for (const series of model.selected) for (const year of model.years) {
@@ -33,7 +33,7 @@ export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSec
   const title = [input.title ?? t(`page.${section}.title`), t(`tab.parts.${section}`), input.areaLabel, t(`measure.${state.measure}`)].join(" · ");
   const kind = (series: typeof model.selected[number]): WorkbookReadableRow["kind"] => series.reference ? "total" : series.parentId ? "item" : "group";
   return {
-    locale, filename: workbookFilename(`household-${section}-${state.area.replace(/\./g, "-")}-${state.measure}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
+    locale, filename: workbookFilename(`household-${section}-${area.replace(/\./g, "-")}-${state.measure}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title, subtitle: `${model.range.start}–${model.range.end} · ${t(`unitLong.${state.measure}`)}`,
       unitLabel: t("unitGel"), amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat: NUMBER_FORMAT,

@@ -1,0 +1,15 @@
+import type { SVGProps } from "react";
+
+// Material Symbols "family_restroom" (outlined, weight 400), Apache-2.0, © Google (https://fonts.google.com/icons).
+const PATH = "M720.08-727q-30.08 0-51.58-21.42t-21.5-51.5q0-30.08 21.42-51.58t51.5-21.5q30.08 0 51.58 21.42t21.5 51.5q0 30.08-21.42 51.58t-51.5 21.5ZM660-80v-336q0-30-15-54t-44-35l41-120q8-25 29.5-40t48.5-15q27 0 48.5 15t29.5 40l102 295H790v250H660ZM495-500q-25 0-42.5-17.5T435-560q0-25 17.5-42.5T495-620q25 0 42.5 17.5T555-560q0 25-17.5 42.5T495-500ZM220.08-727q-30.08 0-51.58-21.42t-21.5-51.5q0-30.08 21.42-51.58t51.5-21.5q30.08 0 51.58 21.42t21.5 51.5q0 30.08-21.42 51.58t-51.5 21.5ZM150-80v-290H80v-250q0-24.75 17.63-42.38Q115.25-680 140-680h160q24.75 0 42.38 17.62Q360-644.75 360-620v250h-70v290H150Zm290 0v-170h-50v-166q0-18.33 12.83-31.17Q415.67-460 434-460h122q18.33 0 31.17 12.83Q600-434.33 600-416v166h-50v170H440Z";
+
+/**
+ * The per household icon: the one approved glyph from outside Lucide (DESIGN.md §7.2a), since Lucide has no
+ * family icon. It takes the props the measure buttons pass to a Lucide icon; being a solid glyph it is filled
+ * with the text colour, so it follows the button's plain and pressed states, and a stroke width has no effect.
+ */
+export function HouseholdIcon({ size = 24, ...props }: Omit<SVGProps<SVGSVGElement>, "width" | "height"> & { size?: number | string }) {
+  return <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 -960 960 960" data-icon="family-restroom" {...props} fill="currentColor" stroke="none">
+    <path d={PATH} />
+  </svg>;
+}

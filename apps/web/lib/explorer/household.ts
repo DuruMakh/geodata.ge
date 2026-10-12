@@ -1,5 +1,5 @@
 import type { ClientHouseholdFact, HouseholdArea, HouseholdIndicator, HouseholdMeasure } from "../data/household/types";
-import { HOUSEHOLD_AREAS, HOUSEHOLD_MEASURES, householdFactKey } from "../data/household/types";
+import { HOUSEHOLD_MEASURES, householdFactKey } from "../data/household/types";
 import { colorForItem, INK } from "./colors";
 import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
@@ -9,9 +9,14 @@ export const HOUSEHOLD_SECTIONS = [
   { id: "spending", href: "/explorer/living-standards/spending", labelKey: "common.householdSpending" },
 ] as const;
 export type HouseholdSectionId = typeof HOUSEHOLD_SECTIONS[number]["id"];
-/** Towns and villages are lines of Georgia's list, not areas a page shows: those are Georgia and the eleven regions. */
+/** Towns and villages are lines of Georgia's list, not areas a page shows: those are Georgia (the section page) and the eleven regions (their own pages). */
 const SETTLEMENTS: readonly HouseholdArea[] = ["settlement.urban", "settlement.rural"];
 const MEASURE_KEYS: Record<HouseholdMeasure, string> = { per_household: "household", per_capita: "person" };
+
+/** A region's own page under its section; the slug drops the `region.` prefix, as on the Wages region pages. */
+export const householdRegionHref = (section: HouseholdSectionId, regionId: string): `/${string}` => `${HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href}/regions/${regionId.replace(/^region\./, "")}`;
+/** The hash a link to another area's page carries: the per person choice, and nothing else (per household is every page's default). */
+export const householdMeasureHash = (measure: HouseholdMeasure) => measure === "per_household" ? "" : `#per=${MEASURE_KEYS[measure]}`;
 
 export type HouseholdSeriesDefinition = { id: string; indicatorId: HouseholdIndicator; areaId: HouseholdArea; reference: boolean; parentId?: string };
 
@@ -43,7 +48,8 @@ export function householdSeriesColor(series: HouseholdSeriesDefinition, index: n
   return series.reference ? INK : colorForItem(series.id, index);
 }
 
-export type HouseholdState = { mode: "line" | "table"; range: PeriodRange; area: HouseholdArea; measure: HouseholdMeasure; selectedIds: string[] };
+/** A page's view; the area is the page's own (Georgia, or the region of a region page) and is not part of it. */
+export type HouseholdState = { mode: "line" | "table"; range: PeriodRange; measure: HouseholdMeasure; selectedIds: string[] };
 
 /** An area's years: every year any of its series has a value for the measure. */
 export function householdCoverage(section: HouseholdSectionId, area: HouseholdArea, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]) {
@@ -54,22 +60,21 @@ export function householdCoverage(section: HouseholdSectionId, area: HouseholdAr
 }
 
 export function defaultHouseholdState(section: HouseholdSectionId): HouseholdState {
-  return { mode: "line", range: { kind: "all" }, area: "georgia", measure: "per_household", selectedIds: [householdViewSeries(section, "georgia")[0].id] };
+  return { mode: "line", range: { kind: "all" }, measure: "per_household", selectedIds: [householdViewSeries(section, "georgia")[0].id] };
 }
 
 /**
- * An old link's tab is ignored, and its towns or villages area opens Georgia, whose list has them as lines.
- * A selection naming nothing the area has (an old Regions-tab link) falls back to the first series; an empty one stays empty.
+ * Reads the view of the page for `area`. An old preview link's tab and area are ignored.
+ * A selection naming nothing the area has falls back to the first series; an empty one stays empty.
  */
-export function parseHouseholdHash(hash: string, section: HouseholdSectionId, facts: readonly ClientHouseholdFact[]): HouseholdState {
+export function parseHouseholdHash(hash: string, section: HouseholdSectionId, area: HouseholdArea, facts: readonly ClientHouseholdFact[]): HouseholdState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
-  const area = HOUSEHOLD_AREAS.find(item => item === p.get("area") && !SETTLEMENTS.includes(item)) ?? "georgia";
   const measure = HOUSEHOLD_MEASURES.find(item => MEASURE_KEYS[item] === p.get("per")) ?? "per_household";
   const series = householdViewSeries(section, area);
   const requested = p.has("sel") ? p.get("sel")!.split(",") : [series[0].id];
   const selectedIds = series.map(s => s.id).filter(id => requested.includes(id));
   return {
-    mode: p.get("view") === "table" ? "table" : "line", area, measure,
+    mode: p.get("view") === "table" ? "table" : "line", measure,
     range: refitRange(parseYearRangeKeys(p), householdCoverage(section, area, measure, facts), { collapseToAll: true }),
     selectedIds: selectedIds.length || p.get("sel") === "" ? selectedIds : [series[0].id],
   };
@@ -77,7 +82,6 @@ export function parseHouseholdHash(hash: string, section: HouseholdSectionId, fa
 
 export function serializeHouseholdHash(state: HouseholdState): string {
   const p = new URLSearchParams();
-  if (state.area !== "georgia") p.set("area", state.area);
   p.set("per", MEASURE_KEYS[state.measure]);
   p.set("view", state.mode);
   p.set("sel", state.selectedIds.join(","));
@@ -86,37 +90,26 @@ export function serializeHouseholdHash(state: HouseholdState): string {
 }
 
 /**
- * Fits a chosen range to the coverage of a newly chosen area or measure. A range the new coverage
- * misses entirely lands on that coverage as a manual range, so choosing the previous area again shows
- * the years the new one showed rather than widening to everything.
+ * Fits a chosen range to the coverage of a newly chosen measure. A range the new coverage
+ * misses entirely lands on that coverage as a manual range rather than widening to everything.
  */
 function fitRange(state: HouseholdState, coverage: { min: number; max: number }): PeriodRange {
   const range = refitRange(state.range, coverage, { collapseToAll: false });
   return range.kind === "all" && state.range.kind === "manual" ? { kind: "manual", start: coverage.min, end: coverage.max } : range;
 }
 
-/**
- * Switching area keeps the ticked lines the new area has (towns and villages are Georgia's alone), or its first series
- * when none of them remain; a region that starts later narrows the years.
- */
-export function changeHouseholdArea(state: HouseholdState, section: HouseholdSectionId, area: HouseholdArea, facts: readonly ClientHouseholdFact[]): HouseholdState {
-  const ids = householdViewSeries(section, area).map(series => series.id);
-  const kept = state.selectedIds.filter(id => ids.includes(id));
-  return { ...state, area, selectedIds: kept.length || !state.selectedIds.length ? kept : [ids[0]], range: fitRange(state, householdCoverage(section, area, state.measure, facts)) };
-}
-
-export function changeHouseholdMeasure(state: HouseholdState, section: HouseholdSectionId, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]): HouseholdState {
-  return { ...state, measure, range: fitRange(state, householdCoverage(section, state.area, measure, facts)) };
+export function changeHouseholdMeasure(state: HouseholdState, section: HouseholdSectionId, area: HouseholdArea, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]): HouseholdState {
+  return { ...state, measure, range: fitRange(state, householdCoverage(section, area, measure, facts)) };
 }
 
 export type HouseholdSeriesModel = HouseholdSeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null };
 export type HouseholdModel = { range: ResolvedPeriodRange; years: number[]; series: HouseholdSeriesModel[]; selected: HouseholdSeriesModel[] };
 
-export function buildHouseholdModel(section: HouseholdSectionId, facts: readonly ClientHouseholdFact[], state: HouseholdState): HouseholdModel {
-  const range = resolveRange(state.range, householdCoverage(section, state.area, state.measure, facts));
+export function buildHouseholdModel(section: HouseholdSectionId, area: HouseholdArea, facts: readonly ClientHouseholdFact[], state: HouseholdState): HouseholdModel {
+  const range = resolveRange(state.range, householdCoverage(section, area, state.measure, facts));
   const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
   const byCell = new Map(facts.map(f => [householdFactKey(f), f]));
-  const series = householdViewSeries(section, state.area).map((definition, index) => {
+  const series = householdViewSeries(section, area).map((definition, index) => {
     const valuesByYear = Object.fromEntries(years.map(year => [year, byCell.get(householdFactKey({ ...definition, measure: state.measure, year }))?.value ?? null]));
     return { ...definition, color: householdSeriesColor(definition, index), valuesByYear, endValue: valuesByYear[range.end] };
   });

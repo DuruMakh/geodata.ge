@@ -14,7 +14,7 @@ import { WAGES_REGIONS } from "../data/wages/types";
 import { loadServedPovertyData } from "../data/poverty/importPoverty";
 import { POVERTY_SECTIONS } from "../explorer/poverty";
 import { loadServedHouseholdData } from "../data/household/importHousehold";
-import { HOUSEHOLD_SECTIONS } from "../explorer/household";
+import { HOUSEHOLD_SECTIONS, householdRegionHref } from "../explorer/household";
 import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { loadServedTradePartnersData } from "../data/tradePartners/importTradePartners";
 import { loadServedMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
@@ -139,6 +139,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...WAGES_REGIONS.map(id => ({ url: `${siteUrl}${wagesRegionHref(id)}`, lastModified: wagesModified })),
     { url: `${siteUrl}${LIVING_STANDARDS_HUB_PATH}`, lastModified: livingStandardsModified },
     ...HOUSEHOLD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: householdModified })),
+    ...HOUSEHOLD_SECTIONS.flatMap(section => WAGES_REGIONS.map(id => ({ url: `${siteUrl}${householdRegionHref(section.id, id)}`, lastModified: householdModified }))),
     ...POVERTY_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: povertyModified })),
     { url: `${siteUrl}/explorer/trade`, lastModified: tradeModified },
     { url: `${siteUrl}/explorer/trade/overview`, lastModified: tradeModified },

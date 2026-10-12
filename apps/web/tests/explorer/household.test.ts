@@ -4,9 +4,10 @@ import { beforeAll, expect, test } from "vitest";
 import { loadServedHouseholdData, toClientHouseholdFact } from "../../lib/data/household/importHousehold";
 import { HOUSEHOLD_AREAS, HOUSEHOLD_SOURCES, type ClientHouseholdFact } from "../../lib/data/household/types";
 import {
-  buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, defaultHouseholdState, HOUSEHOLD_SECTIONS,
-  householdCoverage, householdViewSeries, parseHouseholdHash, serializeHouseholdHash, type HouseholdState,
+  buildHouseholdModel, changeHouseholdMeasure, defaultHouseholdState, HOUSEHOLD_SECTIONS,
+  householdCoverage, householdMeasureHash, householdRegionHref, householdViewSeries, parseHouseholdHash, serializeHouseholdHash, type HouseholdState,
 } from "../../lib/explorer/household";
+import { householdRegionStaticParams } from "../../lib/pages/household";
 import { buildHouseholdHubCards } from "../../lib/explorer/householdHubCards";
 import { buildHouseholdRegionMapModel } from "../../lib/explorer/householdRegionMap";
 import { buildHouseholdWorkbookExportModel, householdWorkbookSources } from "../../lib/explorer/householdWorkbook";
@@ -18,7 +19,6 @@ import type { Locale, Presentation } from "../../lib/i18n/types";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../../lib/explorer/livingStandards";
 import { message } from "../../lib/i18n/messages";
-import { resolveRange } from "../../lib/explorer/periodRange";
 
 let facts: ClientHouseholdFact[];
 beforeAll(async () => { facts = (await loadServedHouseholdData()).facts.map(toClientHouseholdFact); });
@@ -35,7 +35,7 @@ test("the hub lists the four living-standards pages", () => {
 });
 
 test("each page starts on Georgia per household with only its total, and coverage comes from the facts", () => {
-  expect(defaultHouseholdState("income")).toEqual({ mode: "line", range: { kind: "all" }, area: "georgia", measure: "per_household", selectedIds: ["income.total"] });
+  expect(defaultHouseholdState("income")).toEqual({ mode: "line", range: { kind: "all" }, measure: "per_household", selectedIds: ["income.total"] });
   expect(defaultHouseholdState("spending").selectedIds).toEqual(["spending.consumption"]);
   expect(householdCoverage("income", "georgia", "per_household", facts)).toMatchObject({ min: 2002, max: 2025 });
   expect(householdCoverage("income", "region.tbilisi", "per_household", facts)).toMatchObject({ min: 2011, max: 2025 });
@@ -66,97 +66,92 @@ test("parts nest under their total in spec order, and Georgia adds towns and vil
   expect(householdViewSeries("income", "region.tbilisi").some(s => s.areaId.startsWith("settlement."))).toBe(false);
 });
 
-test("choosing a region that starts later narrows a chosen range, and choosing Georgia again keeps those years", () => {
-  const start: HouseholdState = { ...defaultHouseholdState("income"), range: { kind: "manual", start: 2011, end: 2016 } };
-  const guria = changeHouseholdArea(start, "income", "region.guria", facts);
-  expect(guria.area).toBe("region.guria");
-  expect(resolveRange(guria.range, householdCoverage("income", "region.guria", "per_household", facts))).toMatchObject({ start: 2019, end: 2025 });
-  const back = changeHouseholdArea(guria, "income", "georgia", facts);
-  expect(back.range).toEqual({ kind: "manual", start: 2019, end: 2025 });
-  expect(resolveRange(back.range, householdCoverage("income", "georgia", "per_household", facts))).toMatchObject({ start: 2019, end: 2025 });
-  // "All" stays "all", so a later data year still widens the view.
-  expect(changeHouseholdArea(defaultHouseholdState("income"), "income", "region.guria", facts).range).toEqual({ kind: "all" });
+test("each region has its own page under its section, and a link to it carries only the per person choice", () => {
+  expect(householdRegionHref("income", "region.guria")).toBe("/explorer/living-standards/income/regions/guria");
+  expect(householdRegionHref("spending", "region.racha_lechkhumi_kvemo_svaneti")).toBe("/explorer/living-standards/spending/regions/racha_lechkhumi_kvemo_svaneti");
+  expect(householdMeasureHash("per_household")).toBe("");
+  expect(householdMeasureHash("per_capita")).toBe("#per=person");
+  expect(parseHouseholdHash(householdMeasureHash("per_capita"), "income", "region.guria", facts).measure).toBe("per_capita");
+  const slugs = householdRegionStaticParams().map(params => params.id);
+  expect(slugs).toHaveLength(11);
+  expect(slugs).toContain("guria");
+  expect(slugs.map(slug => `region.${slug}`).sort()).toEqual(HOUSEHOLD_AREAS.filter(area => area.startsWith("region.")).sort());
 });
 
-test("changing area or measure keeps the selection the new area has", () => {
+test("a region page's model starts at the region's first year and has no towns or villages lines", () => {
+  const guriaFacts = facts.filter(f => f.areaId === "region.guria");
+  const guria = buildHouseholdModel("income", "region.guria", guriaFacts, defaultHouseholdState("income"));
+  expect(guria.range).toMatchObject({ start: 2019, end: 2025 });
+  expect(guria.series.some(s => s.areaId.startsWith("settlement."))).toBe(false);
+  expect(guria.series.every(s => s.areaId === "region.guria")).toBe(true);
+  expect(guria.selected.map(s => s.id)).toEqual(["income.total"]);
+  expect(guria.selected[0].endValue).not.toBeNull();
+  expect(buildHouseholdModel("spending", "region.kakheti", facts, defaultHouseholdState("spending")).range).toMatchObject({ start: 2011, end: 2025 });
+  // A towns tick from a Georgia link is not a line a region page has: its selection falls back to the total.
+  expect(parseHouseholdHash("#sel=settlement.urban", "income", "region.guria", guriaFacts).selectedIds).toEqual(["income.total"]);
+  // A range the region's years miss shows all of them.
+  expect(parseHouseholdHash("#start=2008&end=2012", "income", "region.guria", guriaFacts).range).toEqual({ kind: "all" });
+});
+
+test("changing measure keeps the selection", () => {
   const state: HouseholdState = { ...defaultHouseholdState("income"), selectedIds: ["income.total", "income.wages"] };
-  expect(changeHouseholdArea(state, "income", "region.adjara", facts)).toMatchObject({ area: "region.adjara", selectedIds: ["income.total", "income.wages"] });
-  expect(changeHouseholdMeasure(state, "income", "per_capita", facts)).toMatchObject({ measure: "per_capita", selectedIds: ["income.total", "income.wages"] });
-});
-
-test("leaving Georgia for Guria drops the towns and villages ticks, keeps the others and starts in 2019", () => {
-  const state: HouseholdState = { ...defaultHouseholdState("income"), selectedIds: ["income.total", "income.remittances", "settlement.urban", "settlement.rural"] };
-  const guria = changeHouseholdArea(state, "income", "region.guria", facts);
-  expect(guria.selectedIds).toEqual(["income.total", "income.remittances"]);
-  expect(buildHouseholdModel("income", facts, guria).range).toMatchObject({ start: 2019, end: 2025 });
-  // A chosen range is refitted to Guria's years too.
-  const chosen = changeHouseholdArea({ ...state, range: { kind: "manual", start: 2008, end: 2012 } }, "income", "region.guria", facts);
-  expect(chosen.range).toEqual({ kind: "manual", start: 2019, end: 2025 });
-  expect(changeHouseholdArea(guria, "income", "georgia", facts).selectedIds).toEqual(["income.total", "income.remittances"]);
-});
-
-test("an area change that leaves nothing ticked falls back to the first series, while an empty selection stays empty", () => {
-  const towns: HouseholdState = { ...defaultHouseholdState("income"), selectedIds: ["settlement.urban", "settlement.rural"] };
-  expect(changeHouseholdArea(towns, "income", "region.guria", facts).selectedIds).toEqual(["income.total"]);
-  expect(changeHouseholdArea({ ...towns, selectedIds: [] }, "income", "region.guria", facts).selectedIds).toEqual([]);
+  expect(changeHouseholdMeasure(state, "income", "georgia", "per_capita", facts)).toMatchObject({ measure: "per_capita", selectedIds: ["income.total", "income.wages"] });
+  expect(changeHouseholdMeasure(state, "income", "region.adjara", "per_capita", facts)).toMatchObject({ measure: "per_capita", selectedIds: ["income.total", "income.wages"] });
 });
 
 test("no two lines of Georgia's list share a colour, towns and villages included", () => {
   for (const section of ["income", "spending"] as const) {
-    const series = buildHouseholdModel(section, facts, defaultHouseholdState(section)).series;
+    const series = buildHouseholdModel(section, "georgia", facts, defaultHouseholdState(section)).series;
     expect(series.map(s => s.id), section).toEqual(expect.arrayContaining(["settlement.urban", "settlement.rural"]));
     expect(new Set(series.map(s => s.color)).size, section).toBe(series.length);
   }
 });
 
-test("the hash round-trips, writes the area only for a region and keeps an explicit empty selection", () => {
-  const state: HouseholdState = { mode: "table", area: "region.adjara", measure: "per_capita", range: { kind: "manual", start: 2014, end: 2020 }, selectedIds: ["income.total", "income.remittances"] };
+test("the hash round-trips and keeps an explicit empty selection, and no longer carries an area", () => {
+  const state: HouseholdState = { mode: "table", measure: "per_capita", range: { kind: "manual", start: 2014, end: 2020 }, selectedIds: ["income.total", "income.remittances"] };
   const hash = serializeHouseholdHash(state);
-  expect(hash).toContain("area=region.adjara");
+  expect(hash).not.toContain("area=");
   expect(hash).toContain("per=person");
   expect(hash).not.toContain("tab=");
-  expect(parseHouseholdHash(`#${hash}`, "income", facts)).toEqual(state);
-  expect(serializeHouseholdHash(defaultHouseholdState("income"))).not.toContain("area=");
+  expect(parseHouseholdHash(`#${hash}`, "income", "region.adjara", facts)).toEqual(state);
   expect(serializeHouseholdHash(defaultHouseholdState("income"))).toContain("per=household");
   const towns: HouseholdState = { ...defaultHouseholdState("income"), selectedIds: ["income.total", "settlement.urban"] };
-  expect(parseHouseholdHash(`#${serializeHouseholdHash(towns)}`, "income", facts)).toEqual(towns);
-  expect(parseHouseholdHash("#sel=", "income", facts).selectedIds).toEqual([]);
-  expect(parseHouseholdHash("#area=region.mars", "income", facts)).toMatchObject({ area: "georgia", measure: "per_household", selectedIds: ["income.total"] });
-  expect(parseHouseholdHash("#per=nonsense", "income", facts)).toMatchObject({ measure: "per_household" });
+  expect(parseHouseholdHash(`#${serializeHouseholdHash(towns)}`, "income", "georgia", facts)).toEqual(towns);
+  expect(parseHouseholdHash("#sel=", "income", "georgia", facts).selectedIds).toEqual([]);
+  expect(parseHouseholdHash("#per=nonsense", "income", "georgia", facts)).toMatchObject({ measure: "per_household" });
   const spending = serializeHouseholdHash(defaultHouseholdState("spending"));
-  expect(parseHouseholdHash(`#${spending}`, "spending", facts)).toEqual(defaultHouseholdState("spending"));
+  expect(parseHouseholdHash(`#${spending}`, "spending", "georgia", facts)).toEqual(defaultHouseholdState("spending"));
 });
 
-test("old links: a towns or villages area opens Georgia, and the tab is ignored", () => {
-  expect(parseHouseholdHash("#tab=parts&area=settlement.rural&per=person&sel=income.total,income.wages", "income", facts)).toEqual({
-    mode: "line", area: "georgia", measure: "per_capita", range: { kind: "all" }, selectedIds: ["income.total", "income.wages"],
+test("old preview links: the tab and the area are ignored, and the page shows its own area", () => {
+  expect(parseHouseholdHash("#tab=parts&area=settlement.rural&per=person&sel=income.total,income.wages", "income", "georgia", facts)).toEqual({
+    mode: "line", measure: "per_capita", range: { kind: "all" }, selectedIds: ["income.total", "income.wages"],
   });
-  expect(parseHouseholdHash("#tab=parts&area=settlement.urban", "income", facts).area).toBe("georgia");
-  expect(parseHouseholdHash("#tab=parts&area=region.guria&sel=income.total", "income", facts)).toMatchObject({ area: "region.guria", selectedIds: ["income.total"] });
+  expect(parseHouseholdHash("#area=region.guria&sel=income.total,settlement.urban", "income", "georgia", facts).selectedIds).toEqual(["income.total", "settlement.urban"]);
   // The old Regions tab's selection named areas: Georgia's towns and villages lines remain, other ids are dropped.
-  expect(parseHouseholdHash("#tab=areas&per=household&sel=georgia,region.tbilisi,settlement.urban", "income", facts)).toMatchObject({ area: "georgia", selectedIds: ["settlement.urban"] });
+  expect(parseHouseholdHash("#tab=areas&per=household&sel=georgia,region.tbilisi,settlement.urban", "income", "georgia", facts).selectedIds).toEqual(["settlement.urban"]);
 });
 
 test("a selection naming nothing the area has falls back to the first series, while an empty one stays empty", () => {
-  expect(parseHouseholdHash("#tab=areas&per=household&sel=georgia,region.tbilisi", "income", facts).selectedIds).toEqual(["income.total"]);
-  expect(parseHouseholdHash("#area=region.guria&sel=settlement.urban", "spending", facts).selectedIds).toEqual(["spending.consumption"]);
-  expect(parseHouseholdHash("#area=region.guria&sel=", "income", facts).selectedIds).toEqual([]);
-  expect(parseHouseholdHash("#sel=", "income", facts).selectedIds).toEqual([]);
+  expect(parseHouseholdHash("#tab=areas&per=household&sel=georgia,region.tbilisi", "income", "georgia", facts).selectedIds).toEqual(["income.total"]);
+  expect(parseHouseholdHash("#sel=settlement.urban", "spending", "region.guria", facts).selectedIds).toEqual(["spending.consumption"]);
+  expect(parseHouseholdHash("#sel=", "income", "region.guria", facts).selectedIds).toEqual([]);
+  expect(parseHouseholdHash("#sel=", "income", "georgia", facts).selectedIds).toEqual([]);
 });
 
 test("the model carries published values for the chosen measure", () => {
-  const perHousehold = buildHouseholdModel("income", facts, defaultHouseholdState("income"));
+  const perHousehold = buildHouseholdModel("income", "georgia", facts, defaultHouseholdState("income"));
   expect(perHousehold.selected[0].endValue).toBe(2025.8);
   expect(perHousehold.years).toEqual(Array.from({ length: 24 }, (_, i) => 2002 + i));
-  const perPerson = buildHouseholdModel("income", facts, { ...defaultHouseholdState("income"), measure: "per_capita" });
+  const perPerson = buildHouseholdModel("income", "georgia", facts, { ...defaultHouseholdState("income"), measure: "per_capita" });
   expect(perPerson.selected[0].endValue).toBe(630.7);
-  expect(buildHouseholdModel("spending", facts, defaultHouseholdState("spending")).selected[0].endValue).toBe(1438.7);
+  expect(buildHouseholdModel("spending", "georgia", facts, defaultHouseholdState("spending")).selected[0].endValue).toBe(1438.7);
   expect(perHousehold.series.filter(s => s.parentId === "income.total")).toHaveLength(8);
   expect(perHousehold.series[0].color).not.toBe(perHousehold.series[1].color);
 });
 
 test("towns and villages leave their years before 2006 empty in Georgia's model, never zero", () => {
-  const model = buildHouseholdModel("income", facts, { ...defaultHouseholdState("income"), selectedIds: ["income.total", "settlement.urban", "settlement.rural"] });
+  const model = buildHouseholdModel("income", "georgia", facts, { ...defaultHouseholdState("income"), selectedIds: ["income.total", "settlement.urban", "settlement.rural"] });
   expect(model.range).toMatchObject({ start: 2002, end: 2025 });
   const towns = model.series.find(s => s.id === "settlement.urban")!;
   expect(towns.valuesByYear[2005]).toBeNull();
@@ -196,8 +191,8 @@ test.each(["ka", "en"] as const)("the %s income workbook for Georgia with towns 
   const ids = ["income.total", "settlement.urban", "settlement.rural"];
   const presentation = await presentationFor(locale);
   const model = buildHouseholdWorkbookExportModel({
-    section: "income", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
-    state: { mode: "table", area: "georgia", measure: "per_household", range: { kind: "manual", start: 2019, end: 2025 }, selectedIds: ids },
+    section: "income", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
+    state: { mode: "table", measure: "per_household", range: { kind: "manual", start: 2019, end: 2025 }, selectedIds: ids },
   }, presentation);
   expect(model.filename).toBe(`fiscal-household-income-georgia-per_household-2019-2025${locale === "en" ? "-en" : ""}.xlsx`);
   expect(model.readable.years).toEqual([2019, 2020, 2021, 2022, 2023, 2024, 2025]);
@@ -217,13 +212,13 @@ test.each(["ka", "en"] as const)("the %s income workbook for Georgia with towns 
 test("the workbook title names the page, its list, the area and the measure", async () => {
   const presentation = await presentationFor("en");
   const model = buildHouseholdWorkbookExportModel({
-    section: "income", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["income.total"]), areaLabel: "Guria",
-    state: { ...defaultHouseholdState("income"), area: "region.guria", measure: "per_capita", range: { kind: "manual", start: 2020, end: 2021 } },
+    section: "income", area: "region.guria", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["income.total"]), areaLabel: "Guria",
+    state: { ...defaultHouseholdState("income"), measure: "per_capita", range: { kind: "manual", start: 2020, end: 2021 } },
   }, presentation);
   expect(model.readable.title).toBe("Income · Where it comes from · Guria · Per person");
   expect(model.filename).toBe("fiscal-household-income-region-guria-per_capita-2020-2021-en.xlsx");
   const custom = buildHouseholdWorkbookExportModel({
-    section: "spending", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["spending.consumption"]), areaLabel: "Georgia", title: "Custom",
+    section: "spending", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["spending.consumption"]), areaLabel: "Georgia", title: "Custom",
     state: { ...defaultHouseholdState("spending"), range: { kind: "manual", start: 2020, end: 2021 } },
   }, presentation);
   expect(custom.readable.title).toBe("Custom · What it’s spent on · Georgia · Per household");
@@ -232,8 +227,8 @@ test("the workbook title names the page, its list, the area and the measure", as
 test("a spending workbook for a region per person lists only that source", async () => {
   const ids = ["spending.consumption", "spending.food"];
   const model = buildHouseholdWorkbookExportModel({
-    section: "spending", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Guria",
-    state: { mode: "table", area: "region.guria", measure: "per_capita", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ids },
+    section: "spending", area: "region.guria", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Guria",
+    state: { mode: "table", measure: "per_capita", range: { kind: "manual", start: 2020, end: 2025 }, selectedIds: ids },
   }, await presentationFor("en"));
   expect(model.sources.map(source => source.title)).toEqual(["geostat_household_spending_capita_region"]);
   expect(model.readable.rows.map(row => [row.kind, row.parentLabel])).toEqual([["total", null], ["item", "label spending.consumption"]]);
@@ -242,8 +237,8 @@ test("a spending workbook for a region per person lists only that source", async
 test("a missing early towns year is a blank cell, never zero, and the numeric format reaches the value cells", async () => {
   const ids = ["income.total", "settlement.urban"];
   const model = buildHouseholdWorkbookExportModel({
-    section: "income", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
-    state: { mode: "table", area: "georgia", measure: "per_household", range: { kind: "manual", start: 2005, end: 2006 }, selectedIds: ids },
+    section: "income", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
+    state: { mode: "table", measure: "per_household", range: { kind: "manual", start: 2005, end: 2006 }, selectedIds: ids },
   }, await presentationFor("en"));
   const gap = model.analysis.rows.find(row => row[0] === 2005 && row[1] === "label settlement.urban")!;
   expect(gap[2]).toBeNull();
@@ -267,8 +262,8 @@ test.each(["ka", "en"] as const)("the %s income workbook lists validated links t
   expect(sources.map(source => source.sourceId).sort()).toEqual([...HOUSEHOLD_SOURCES].sort());
   const ids = ["income.total", "settlement.urban"];
   const model = buildHouseholdWorkbookExportModel({
-    section: "income", facts, sources, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
-    state: { mode: "table", area: "georgia", measure: "per_capita", range: { kind: "manual", start: 2019, end: 2025 }, selectedIds: ids },
+    section: "income", area: "georgia", facts, sources, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
+    state: { mode: "table", measure: "per_capita", range: { kind: "manual", start: 2019, end: 2025 }, selectedIds: ids },
   }, await presentationFor(locale));
   expect(model.sources.map(source => source.absoluteUrl)).toEqual([
     "https://fiscal.ge/downloads/methodology/household-income/files/107-income-per-capita.xlsx",

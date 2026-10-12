@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
-import { HouseHeart, User } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { ChevronDown, User } from "lucide-react";
+import { useCallback, useState, type ReactNode } from "react";
 import type { ClientHouseholdFact, HouseholdArea, HouseholdMeasure } from "../../lib/data/household/types";
-import { buildHouseholdModel, changeHouseholdArea, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel } from "../../lib/explorer/household";
+import type { MunicipalRegion } from "../../lib/data/municipal/types";
+import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -23,46 +24,35 @@ import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionIndex } from "../regional-economies/regional-economies-index";
+import { RegionPicker } from "../regional-economies/region-picker";
+import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { HouseholdIcon } from "../ui/household-icon";
 import { useHashState } from "../external/use-money-from-abroad-state";
-
-/** The same-page hash a plain left click on a link of the map or list goes to, or null. */
-function samePageHash(event: MouseEvent<HTMLElement>): string | null {
-  const link = (event.target as Element).closest("a");
-  if (!link || link.hasAttribute("target") || link.hasAttribute("download") || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return null;
-  const url = new URL(link.getAttribute("href") ?? "", window.location.href);
-  return url.origin === window.location.origin && url.pathname === window.location.pathname && url.search === window.location.search && url.hash ? url.hash : null;
-}
-
-/** The area a page hash names; Georgia is the one it leaves out. */
-const areaOf = (hash: string) => new URLSearchParams(hash.replace(/^#/, "")).get("area") ?? "georgia";
-
-/** Brings the chart to the top (clear of the phone header) and gives it focus. */
-function bringIntoView(chart: HTMLElement | null) {
-  if (!chart) return;
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  chart.focus({ preventScroll: true });
-  chart.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" });
-}
 
 export type HouseholdExplorerProps = {
   section: HouseholdSectionId; facts: ClientHouseholdFact[];
   /** Names of the section's lines; areaLabels names Georgia, towns, villages and the regions. */
   labels: Record<string, string>; areaLabels: Record<HouseholdArea, string>;
-  /** The area-picking map for each measure. */
-  regionMaps: Record<HouseholdMeasure, RegionMapModel>;
+  /** Section pages: the map for each measure, whose regions open their own pages. */
+  regionMaps?: Record<HouseholdMeasure, RegionMapModel>;
   sources: (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string;
+  /** Region pages: the region and the regions offered by the picker and previous/next links. */
+  regionId?: HouseholdArea; regions?: readonly MunicipalRegion[];
 };
 
-export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabels, regionMaps, sources, siteOrigin }: HouseholdExplorerProps) {
+export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabels, regionMaps, sources, siteOrigin, regionId, regions }: HouseholdExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `household.${key}`, values);
-  // parse is an effect dependency of useHashState, so its identity changes only with the section.
-  const parse = useCallback((hash: string, f: ClientHouseholdFact[]) => parseHouseholdHash(hash, section, f), [section]);
+  // The page's own area: Georgia on a section page, the region on a region page.
+  const area: HouseholdArea = regionId ?? "georgia";
+  // parse is an effect dependency of useHashState, so its identity changes only with the page.
+  const parse = useCallback((hash: string, f: ClientHouseholdFact[]) => parseHouseholdHash(hash, section, area, f), [section, area]);
   const { state, update } = useHashState(facts, parse, serializeHouseholdHash);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const model = buildHouseholdModel(section, facts, state);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const model = buildHouseholdModel(section, area, facts, state);
   const labels: Record<string, string> = { ...lineLabels, ...areaLabels };
   const unit: ValueUnit = { divisor: 1, label: t("unitGel"), decimals: 1 };
   const unitLabel = t(`unitLong.${state.measure}`);
@@ -89,63 +79,51 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
       {open ? nested.map(renderRow) : null}
     </div>;
   }
-  // The latest-value line is the page's headline: Georgia per household, whatever is chosen below.
-  const latest = facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === "georgia" && f.measure === "per_household").sort((a, b) => a.year - b.year).at(-1)!;
+  // The latest-value line is the page's headline: its own area per household, whatever is chosen below.
+  const latest = facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === area && f.measure === "per_household").sort((a, b) => a.year - b.year).at(-1)!;
+  const regionName = regionId ? areaLabels[regionId] : "";
   const title = t(`page.${section}.title`);
-  const chartLabel = `${t(`tab.parts.${section}`)} · ${areaLabels[state.area]}`;
-  const measureTabs = <SegmentedTabs<HouseholdMeasure> ariaLabel={t("measureLabel")} value={state.measure} onChange={measure => update(s => changeHouseholdMeasure(s, section, measure, facts), true)} options={[
-    { value: "per_household", label: t("measure.per_household"), testId: "household-measure-per_household", icon: <HouseHeart aria-hidden="true" size={18} strokeWidth={1.5} /> },
+  const chartLabel = `${t(`tab.parts.${section}`)} · ${areaLabels[area]}`;
+  const pagePath = HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href;
+  // Links to another area's page carry the per household or per person choice, and nothing else.
+  const regionHref = (id: string) => `${householdRegionHref(section, id)}${householdMeasureHash(state.measure)}`;
+  const ordered = regions ?? [], regionIndex = ordered.findIndex(region => region.id === regionId);
+  const neighbours = regionIndex < 0 ? null : { previous: ordered[(regionIndex - 1 + ordered.length) % ordered.length]!, next: ordered[(regionIndex + 1) % ordered.length]! };
+  const measureTabs = <SegmentedTabs<HouseholdMeasure> ariaLabel={t("measureLabel")} value={state.measure} onChange={measure => update(s => changeHouseholdMeasure(s, section, area, measure, facts), true)} options={[
+    { value: "per_household", label: t("measure.per_household"), testId: "household-measure-per_household", icon: <HouseholdIcon aria-hidden="true" size={18} strokeWidth={1.5} /> },
     { value: "per_capita", label: t("measure.per_capita"), testId: "household-measure-per_capita", icon: <User aria-hidden="true" size={18} strokeWidth={1.5} /> },
   ]} />;
-  // The map of the section total, in the latest year every region has, for the chosen measure; Georgia leads its list.
-  const regionMap = regionMaps[state.measure];
+  // Section pages: the map of the section total, in the latest year every region has, for the chosen measure.
+  // Each region opens its own page; Georgia leads the list and is this page.
+  const regionMap = regionMaps?.[state.measure];
   const totalLabel = labels[sectionTotal(section)];
-  const georgiaValue = facts.find(f => f.indicatorId === sectionTotal(section) && f.areaId === "georgia" && f.measure === state.measure && f.year === regionMap.year)?.value;
-  const pagePath = HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href;
-  // Georgia or a region becomes the page's area, keeping the ticked lines it has and the measure.
-  const areaHref = (area: string) => `${pagePath}#${serializeHouseholdHash(changeHouseholdArea(state, section, area as HouseholdArea, facts))}`;
-  // After a pick the chart comes into view and takes focus once the new area has rendered, so it is announced with
-  // that area's name; picking the area already shown brings the chart up at once.
-  const chartRef = useRef<HTMLElement>(null);
-  const pendingFocus = useRef(false);
-  useEffect(() => {
-    if (!pendingFocus.current) return;
-    pendingFocus.current = false;
-    bringIntoView(chartRef.current);
-  }, [state.area]);
-  const pick = (area: string) => { if (area === state.area) bringIntoView(chartRef.current); else pendingFocus.current = true; };
-  // List rows are Next links, and Next changes a same-page hash without a hashchange event: follow them as a plain
-  // hash change, so useHashState picks up the area in place. Map paths are SVG links the browser follows itself.
-  const followSamePageHash = (event: MouseEvent<HTMLElement>) => {
-    if (!((event.target as Element).closest("a") instanceof HTMLAnchorElement)) return;
-    const hash = samePageHash(event);
-    if (!hash) return;
-    event.preventDefault();
-    window.location.hash = hash;
-    pick(areaOf(hash));
-  };
-  const followMapPath = (event: MouseEvent<HTMLElement>) => {
-    // A map path a first touch only previews has its click prevented, and the page stays on the map.
-    if (event.defaultPrevented) return;
-    const hash = samePageHash(event);
-    if (hash) return pick(areaOf(hash));
-    // Tbilisi's fingertip target opens its area with location.assign, which has already changed the hash unless the tap only previewed it.
-    const target = (event.target as Element).closest("[data-map-touch-target]")?.getAttribute("data-map-touch-target");
-    if (target && target !== state.area && areaOf(window.location.hash) === target) pendingFocus.current = true;
-  };
+  const georgiaValue = regionMap && facts.find(f => f.indicatorId === sectionTotal(section) && f.areaId === "georgia" && f.measure === state.measure && f.year === regionMap.year)?.value;
+  const mapHref = (id: string) => id === "georgia" ? `${pagePath}#${serializeHouseholdHash(state)}` : regionHref(id);
   return <div data-testid={`household-${section}`} className="@container">
-    <ExplorerHeading>{title}</ExplorerHeading>
-    <LatestValueLine testId="household-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />
-    <section data-testid="household-regions" data-measure={state.measure} className="mt-4 mb-10" onClickCapture={followSamePageHash} onClick={followMapPath}>
-      <RegionIndex model={regionMap} summary={[]} selectedId={state.area} leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: areaLabels.georgia, value: georgiaValue }} metric={{
-        hrefForRegion: areaHref, formatValue: valueLabel, legend: `${totalLabel} · ${unitLabel}`, testId: "household-region-map",
+    {regionId ? <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
+      <div className="relative min-w-0 min-[768px]:flex-1">
+        <ExplorerHeading>{t(`page.${section}.regionHeadingLead`)}{" "}
+          <button type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
+            {regionName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
+          </button>
+        </ExplorerHeading>
+        <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={ordered} activeRegionId={regionId} hrefForRegion={regionHref} indexHref={`${pagePath}${householdMeasureHash(state.measure)}`} />
+      </div>
+      {neighbours ? <EntityNeighbourLinks testId="household-region-navigation" className="mb-3"
+        previous={{ href: pageHref(regionHref(neighbours.previous.id), locale), label: areaLabels[neighbours.previous.id as HouseholdArea] }}
+        next={{ href: pageHref(regionHref(neighbours.next.id), locale), label: areaLabels[neighbours.next.id as HouseholdArea] }} /> : null}
+    </div> : <ExplorerHeading>{title}</ExplorerHeading>}
+    <LatestValueLine testId="household-latest" measure={regionId ? `${t(`latest.${section}`)} · ${regionName}` : t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />
+    {regionMap ? <section data-testid="household-regions" data-measure={state.measure} className="mt-4 mb-10">
+      <RegionIndex model={regionMap} summary={[]} selectedId="georgia" leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: areaLabels.georgia, value: georgiaValue }} metric={{
+        hrefForRegion: mapHref, formatValue: valueLabel, legend: `${totalLabel} · ${unitLabel}`, testId: "household-region-map",
         mapAria: t("regionMapAria", { total: totalLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
       }} />
-    </section>
+    </section> : null}
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
-        <section ref={chartRef} tabIndex={-1} aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={state.area} data-unit="gel" data-measure={state.measure} className="scroll-mt-[72px] min-[900px]:scroll-mt-3 border-t border-[var(--ink)] pt-4">
-          <h2 data-testid="household-chosen-area" className="mb-3 break-words font-[family-name:var(--font-display)] text-[19px] font-semibold">{areaLabels[state.area]}</h2>
+        <section aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={area} data-unit="gel" data-measure={state.measure} className="border-t border-[var(--ink)] pt-4">
+          {regionId ? null : <h2 data-testid="household-chosen-area" className="mb-3 break-words font-[family-name:var(--font-display)] text-[19px] font-semibold">{areaLabels.georgia}</h2>}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
             {measureTabs}
@@ -153,10 +131,10 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
-          <RangeStrip years={householdCoverage(section, state.area, state.measure, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildHouseholdModel(section, facts, s).range, patch) }))} />
+          <RangeStrip years={householdCoverage(section, area, state.measure, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildHouseholdModel(section, area, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} · {unitLabel} · {model.range.start}–{model.range.end} · <Link href={pageHref("/methodology/household-income", locale)} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
-          {" · "}{message(messages, "regionalEconomies.boundaries")} <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer" className="underline underline-offset-2">geoBoundaries</a> (CC BY 3.0)
+          {regionMap ? <>{" · "}{message(messages, "regionalEconomies.boundaries")} <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer" className="underline underline-offset-2">geoBoundaries</a> (CC BY 3.0)</> : null}
         </SourceNote></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}>
@@ -169,7 +147,7 @@ export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabe
         </SeriesSelector>
         <ExcelDownloadButton testId="household-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {
           const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-          await downloadWorkbook(buildHouseholdWorkbookExportModel({ section, facts, state, labels, areaLabel: areaLabels[state.area], sources, siteOrigin, title }, presentation));
+          await downloadWorkbook(buildHouseholdWorkbookExportModel({ section, area, facts, state, labels, areaLabel: areaLabels[area], sources, siteOrigin, title }, presentation));
         }} />
       </SeriesAside>
     </ExplorerWorkspace>
