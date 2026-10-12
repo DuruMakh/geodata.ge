@@ -280,7 +280,7 @@ Weights: Noto Serif Georgian 400–700, Noto Sans Georgian 400–700, Geist Mono
 
 ```yaml
 type:
-  page-title:      { font: display, size: 40px (30px mobile), weight: 600, ls: -0.01em, lh: 1.15 }
+  page-title:      { font: display, size: 40px (30px mobile), weight: 600, ls: -0.01em, lh: 1.15 }  # methodology articles: H1 clamp(24px, 8vw, 30px) below 768px and section H2 clamp(22px, 7vw, 27px), so the longest Georgian word fits a 320px phone without a mid-word break
   hero-value:      { font: display, size: 62px (44px mobile), weight: 600, ls: -0.02em, lh: 1 }   # indicators hero KPI
   headline-value:  { font: display, size: 34px, weight: 600, ls: -0.02em, lh: 1.1 }  # analysis headline stats
   kpi-value:       { font: display, size: 24px, weight: 600, ls: -0.02em, lh: 1.1 }  # indicators side KPIs

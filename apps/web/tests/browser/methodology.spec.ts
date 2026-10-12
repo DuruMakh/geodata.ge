@@ -564,20 +564,27 @@ test.describe("the source archive on a phone", () => {
   });
 });
 
-// U29-05: a long Georgian heading (municipalities, household income) was wider than the screen at 38px.
-test("no methodology article scrolls sideways on a 360px phone", async ({ page }) => {
-  test.setTimeout(240_000);
-  await page.setViewportSize({ width: 360, height: 800 });
+// U29-05: a long Georgian heading (municipalities, household income) was wider than the screen at 38px, and at 320px a 27px
+// section heading (energy and food) was too. A heading may break mid-word only as a last resort, so the check turns that off:
+// every word of every heading has to fit the phone as it is.
+for (const width of [320, 360]) {
   for (const id of LIVE_METHODOLOGY_IDS) {
     for (const prefix of ["", "/en"]) {
       const path = `${prefix}/methodology/${id}`;
-      await page.goto(`${TEST_BASE_URL}${path}`);
-      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-      const { scrollWidth, clientWidth } = await page.evaluate(() => ({
-        scrollWidth: document.documentElement.scrollWidth,
-        clientWidth: document.documentElement.clientWidth,
-      }));
-      expect.soft(scrollWidth, path).toBe(clientWidth);
+      test(`${path} fits a ${width}px phone without splitting a word`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 800 });
+        await page.goto(`${TEST_BASE_URL}${path}`);
+        const heading = page.getByRole("heading", { level: 1 });
+        await expect(heading).toBeVisible();
+        await page.addStyleTag({ content: "main h1, main article h2 { overflow-wrap: normal !important; }" });
+        const fit = await page.evaluate(() => ({
+          headings: [...document.querySelectorAll("main h1, main article h2")]
+            .filter((element) => element.scrollWidth > element.clientWidth)
+            .map((element) => element.textContent),
+          page: document.documentElement.scrollWidth === document.documentElement.clientWidth,
+        }));
+        expect(fit).toEqual({ headings: [], page: true });
+      });
     }
   }
-});
+}
