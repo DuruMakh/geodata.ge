@@ -32,6 +32,13 @@ const input = () => ({
 });
 
 describe("individual-product inflation workbook", () => {
+  it("names the period in both Summary column headers", () => {
+    const model = buildInflationProductWorkbookExportModel(input());
+    const [annual, cumulative] = model.readable.headerLabels!.columns;
+    expect(annual).toMatch(/^Latest 12-month change · \S/);
+    expect(cumulative).toMatch(new RegExp(`^Cumulative change · ${index.defaultRange.startYear}–`));
+  });
+
   it("exports the full current summary with empty selection", () => {
     const model = buildInflationProductWorkbookExportModel(input());
     expect(model.readable.rows).toHaveLength(index.products.length);

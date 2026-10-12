@@ -149,3 +149,8 @@ test("zero unemployment stays valid and combined historical groups retain their 
   const detail = parseUnemploymentHash("start=2010&end=2025", facts, UNEMPLOYMENT_GROUPS, "regions", "region.imereti");
   expect(buildUnemploymentModel(facts, UNEMPLOYMENT_GROUPS, detail).years[0]).toBe(2019);
 });
+
+test("the region map model is unchanged by the shared builder (fingerprint recorded before the refactor)", async () => {
+  const { createHash } = await import("node:crypto");
+  expect(createHash("sha256").update(JSON.stringify(buildUnemploymentRegionMapModel(facts))).digest("hex")).toBe("4d6adf023c1db7c35beddf0bd5634ce07e9551697213d3285b7c43fc5bde16db");
+});

@@ -26,10 +26,34 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/inflation/categories",
   "https://fiscal.ge/explorer/inflation/cities",
   "https://fiscal.ge/explorer/inflation/products",
+  "https://fiscal.ge/explorer/unemployment",
+  "https://fiscal.ge/explorer/unemployment/overview",
+  "https://fiscal.ge/explorer/unemployment/regions",
+  "https://fiscal.ge/explorer/unemployment/age",
+  "https://fiscal.ge/explorer/unemployment/gender",
+  "https://fiscal.ge/explorer/wages",
+  "https://fiscal.ge/explorer/wages/overview",
+  "https://fiscal.ge/explorer/wages/industries",
+  "https://fiscal.ge/explorer/wages/regions",
+  "https://fiscal.ge/explorer/living-standards",
+  "https://fiscal.ge/explorer/living-standards/income",
+  "https://fiscal.ge/explorer/living-standards/spending",
+  "https://fiscal.ge/explorer/living-standards/poverty",
+  "https://fiscal.ge/explorer/living-standards/inequality",
+  "https://fiscal.ge/explorer/trade",
+  "https://fiscal.ge/explorer/trade/overview",
+  "https://fiscal.ge/explorer/trade/partners",
+  "https://fiscal.ge/explorer/trade/products",
+  "https://fiscal.ge/explorer/trade/domestic-exports",
+  "https://fiscal.ge/explorer/external",
+  "https://fiscal.ge/explorer/external/money-from-abroad",
+  "https://fiscal.ge/explorer/external/foreign-investment",
+  "https://fiscal.ge/explorer/external/current-account",
   "https://fiscal.ge/explorer/demography",
   "https://fiscal.ge/explorer/demography/population",
   "https://fiscal.ge/explorer/demography/migration",
   "https://fiscal.ge/explorer/demography/births-deaths",
+  "https://fiscal.ge/explorer/demography/age-sex",
   "https://fiscal.ge/methodology",
   "https://fiscal.ge/methodology/expenditure",
   "https://fiscal.ge/methodology/revenue",
@@ -38,6 +62,11 @@ const requiredTargets = [
   "https://fiscal.ge/methodology/economic-sectors",
   "https://fiscal.ge/methodology/regional-economies",
   "https://fiscal.ge/methodology/inflation",
+  "https://fiscal.ge/methodology/unemployment",
+  "https://fiscal.ge/methodology/wages",
+  "https://fiscal.ge/methodology/poverty",
+  "https://fiscal.ge/methodology/trade",
+  "https://fiscal.ge/methodology/external-flows",
   "https://fiscal.ge/methodology/demography",
   "https://fiscal.ge/downloads/data/gdp-overview.json",
   "https://fiscal.ge/downloads/data/gdp-overview.csv",
@@ -125,7 +154,7 @@ describe("Fiscal.ge agent instructions", () => {
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
     expect(targets).toEqual(requiredTargets);
-    expect(targets).toHaveLength(55);
+    expect(targets).toHaveLength(84);
     expect(new Set(targets).size).toBe(targets.length);
   });
 

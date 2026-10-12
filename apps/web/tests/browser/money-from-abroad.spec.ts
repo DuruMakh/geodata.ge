@@ -56,7 +56,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     expect(await tableSeriesCount(table)).toBe(3);
     expect(await tableSeriesValues(table, prefix ? "Other countries" : "სხვა ქვეყნები")).toHaveLength(11);
     await expect(table).toContainText(prefix ? "partial" : "არასრ.");
-    await expect(page.getByTestId("money-from-abroad-partial-note")).toBeVisible();
+    await expect(page.getByTestId("money-from-abroad-partial-note")).toContainText("2019");
     const before = page.url();
     if (width < 900) await page.getByTestId("sidebar-toggle").click();
     await page.getByTestId("money-from-abroad-link").click(); await expect(page).toHaveURL(before);
@@ -96,4 +96,19 @@ test("Excel follows the selection and measure and links the untouched NBG origin
   }
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("2000/2025");
+});
+
+test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
+  await page.goto("/en/explorer/external/money-from-abroad#measure=received&view=line&sel=");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.locator('[data-series-id="transfer.total"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+});
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/external/money-from-abroad");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
 });

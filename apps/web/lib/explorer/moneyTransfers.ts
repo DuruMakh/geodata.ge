@@ -3,25 +3,25 @@ import { MONEY_TRANSFER_TOTAL_ID, type MoneyTransferEntity } from "../data/exter
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
-import { INK, SERIES_COLORS } from "./colors";
+import { distinctSeriesColors, INK, stableSeriesColor } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { moneyTransfersCoverage, OTHER_COUNTRIES_ID, type MoneyTransfersState } from "./moneyTransfersState";
 
 const TOP_COUNTRIES = 10;
 
-const palette = [...new Set(Object.values(SERIES_COLORS))].filter(color => color !== INK);
 export function moneyTransferColor(id: string): string {
-  if (id === MONEY_TRANSFER_TOTAL_ID) return INK;
-  let hash = 0;
-  for (const letter of id) hash = (hash * 31 + letter.charCodeAt(0)) >>> 0;
-  return palette[hash % palette.length];
+  return id === MONEY_TRANSFER_TOTAL_ID ? INK : stableSeriesColor(id);
 }
 export type MoneyTransferRankingRow = { entityId: string; label: string; valueUsd: number | null; share: number | null; rank: number | null; monthsReported: number | null; color: string };
 export type MoneyTransferSeries = { id: string; label: string; color: string };
 export type MoneyTransfersModel = {
   years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[];
   valuesByEntity: Record<string, Record<number, number | null>>; partialMonths: Record<string, Record<number, number>>;
+  /** Each listed line's colour, distinct within the list (two countries can hash to the same palette colour). */
+  colorById: Record<string, string>;
+  /** Years in which a selected line has blank months, for the partial note. */
+  partialYears: number[];
   /** The list the page offers: the all-country total, the end year's top 10 countries, then all other countries together. */
   series: MoneyTransferSeries[];
   ranking: MoneyTransferRankingRow[]; other: MoneyTransferRankingRow | null;
@@ -40,8 +40,9 @@ export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: 
     .sort((a, b) => value(b.id, range.end)! - value(a.id, range.end)! || label(a).localeCompare(label(b), presentation.locale)).slice(0, TOP_COUNTRIES);
   const topIds = new Set(top.map(entity => entity.id));
   const folded = data.entities.filter(entity => entity.id !== MONEY_TRANSFER_TOTAL_ID && !topIds.has(entity.id));
-  const series: MoneyTransferSeries[] = [total, ...top].map(entity => ({ id: entity.id, label: label(entity), color: moneyTransferColor(entity.id) }));
-  series.push({ id: OTHER_COUNTRIES_ID, label: message(presentation.messages, "external.money.otherCountries"), color: moneyTransferColor(OTHER_COUNTRIES_ID) });
+  const colorById = distinctSeriesColors([total, ...top].map(entity => entity.id).concat(OTHER_COUNTRIES_ID), moneyTransferColor);
+  const series: MoneyTransferSeries[] = [total, ...top].map(entity => ({ id: entity.id, label: label(entity), color: colorById[entity.id] }));
+  series.push({ id: OTHER_COUNTRIES_ID, label: message(presentation.messages, "external.money.otherCountries"), color: colorById[OTHER_COUNTRIES_ID] });
   const ids = series.map(item => item.id), selectedIds = ids.filter(id => state.selectedIds.includes(id));
   // Other countries is the all-country total less the top 10, so the list always adds up to the total.
   const otherValue = (year: number) => { const all = value(MONEY_TRANSFER_TOTAL_ID, year); return all === null ? null : all - top.reduce((sum, entity) => sum + (value(entity.id, year) ?? 0), 0); };
@@ -61,9 +62,10 @@ export function buildMoneyTransfersModel(data: ClientMoneyTransfersData, state: 
   const share = (v: number | null) => v !== null && end !== null && end > 0 ? v / end : null;
   const ranking = top.map((entity, index) => {
     const fact = cells.get(`${entity.id}:${range.end}`)!;
-    return { entityId: entity.id, label: label(entity), valueUsd: fact.valueUsd, share: share(fact.valueUsd), rank: index + 1, monthsReported: fact.valueStatus === "partial_months" ? fact.monthsReported : null, color: moneyTransferColor(entity.id) };
+    return { entityId: entity.id, label: label(entity), valueUsd: fact.valueUsd, share: share(fact.valueUsd), rank: index + 1, monthsReported: fact.valueStatus === "partial_months" ? fact.monthsReported : null, color: colorById[entity.id] };
   });
   const otherEnd = folded.length ? otherValue(range.end) : null;
   const other = otherEnd === null ? null : { entityId: OTHER_COUNTRIES_ID, label: series.at(-1)!.label, valueUsd: otherEnd, share: share(otherEnd), rank: null, monthsReported: null, color: series.at(-1)!.color };
-  return { years, range, unit, selectedIds, valuesByEntity, partialMonths, series, ranking, other, selectedCount: selectedIds.length, totalCount: ids.length };
+  const partialYears = [...new Set(selectedIds.flatMap(id => Object.keys(partialMonths[id] ?? {}).map(Number)))].sort((a, b) => a - b);
+  return { years, range, unit, selectedIds, valuesByEntity, partialMonths, colorById, partialYears, series, ranking, other, selectedCount: selectedIds.length, totalCount: ids.length };
 }

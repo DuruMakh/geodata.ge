@@ -34,6 +34,13 @@ describe("original-source inventory", () => {
     expect(inventory.municipalities.some((row) => row.path.includes("municipality-map-geometry"))).toBe(false);
   });
 
+  it("inventories the 21 household originals and leaves out the Georgian label copies", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "household-income");
+    expect(rows).toHaveLength(21);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Households/geostat-household-income-spending-annual/official/"))).toBe(true);
+    expect(rows.some((row) => row.path.includes("/official/ka/"))).toBe(false);
+  });
+
   it("returns forward-slash paths in lexical order", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     for (const rows of Object.values(inventory)) {

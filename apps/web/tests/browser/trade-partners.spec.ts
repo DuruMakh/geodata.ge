@@ -11,7 +11,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Partners defaults, full ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/trade`);
-    const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(3); await cards.nth(1).click();
+    const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(4); await cards.nth(1).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/partners$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 218");
@@ -112,4 +112,19 @@ test("Qatar's downloaded Summary keeps its small 2025 turnover visibly nonzero",
   expect(amount.value).toBeCloseTo(4_736_258.239671868 / 1_000_000_000, 14);
   expect(Number(SSF.format(amount.numFmt, amount.value))).toBeGreaterThan(0);
   expect(excel.worksheets[1].getCell("D2").value).toBeCloseTo(4_736_258.239671868, 6);
+});
+
+test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
+  await page.goto("/en/explorer/trade/partners#sel=&view=line&tab=countries&measure=trade.exports");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.locator('[data-series-id="goods.total"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+});
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/trade/partners");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
 });

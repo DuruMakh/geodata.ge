@@ -235,6 +235,8 @@
   "inflation.productsProductColumn": "პროდუქტი",
   "inflation.productsAnnualColumn": "წლიური",
   "inflation.productsCumulativeColumn": "დაგროვილი",
+  "inflation.productsWorkbookAnnualColumn": "ბოლო 12 თვის ცვლილება · {period}",
+  "inflation.productsWorkbookCumulativeColumn": "დაგროვილი ცვლილება · {start}–{end}",
   "inflation.productsAnnualIndexColumn": "გამოქვეყნებული წლიური ინდექსი (წინა წელი = 100)",
   "inflation.productsAnnualDataColumn": "გამოქვეყნებული წლიური ცვლილება (%)",
   "inflation.productsCumulativeDataColumn": "Fiscal.ge-ზე გამოთვლილი დაგროვილი ცვლილება (%)",

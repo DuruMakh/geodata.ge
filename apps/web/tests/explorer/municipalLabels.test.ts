@@ -22,10 +22,9 @@ describe("georgianOrdinal", () => {
     expect(georgianOrdinal(1)).toBe("პირველი");
   });
 
-  it("uses the მე- prefix for every other rank", () => {
-    expect(georgianOrdinal(2)).toBe("მე-2");
-    expect(georgianOrdinal(11)).toBe("მე-11");
-    expect(georgianOrdinal(64)).toBe("მე-64");
+  it("follows the vigesimal rule: მე-N for 2–20 and whole twenties, N-ე otherwise", () => {
+    const cases: [number, string][] = [[2, "მე-2"], [11, "მე-11"], [20, "მე-20"], [21, "21-ე"], [37, "37-ე"], [40, "მე-40"], [41, "41-ე"], [60, "მე-60"], [61, "61-ე"], [64, "64-ე"], [80, "მე-80"], [100, "მე-100"]];
+    for (const [rank, ordinal] of cases) expect(georgianOrdinal(rank), String(rank)).toBe(ordinal);
   });
 });
 

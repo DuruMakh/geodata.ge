@@ -29,7 +29,7 @@ export type WagesFact = {
   sourceNumberFormat: string | null;
   lastReviewedAt: string;
 };
-export type ClientWagesFact = Pick<WagesFact, "year" | "indicatorId" | "dimension" | "groupId" | "sectorId" | "valueStatus" | "sourceId"> & { value: number | null; decimals: number };
+export type ClientWagesFact = Pick<WagesFact, "year" | "indicatorId" | "dimension" | "groupId" | "sectorId" | "valueStatus" | "sourceId"> & { value: number | null };
 export type WagesAcceptance = {
   status: "passed";
   years: { min: number; max: number };

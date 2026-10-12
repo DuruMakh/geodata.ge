@@ -26,7 +26,7 @@ import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
-import { projectWorkbookSources } from "../methodology/workbookSources";
+import { loadGdpWorkbookSources, projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -134,7 +134,7 @@ export async function currentAccountMetadata(locale: Locale) {
 
 export async function renderCurrentAccountPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [{ facts, client }, { facts: gdpFacts }] = await Promise.all([loadClientCurrentAccount(), loadServedGdpOverviewData()]);
+  const [{ facts, client }, { facts: gdpFacts }, gdpSources] = await Promise.all([loadClientCurrentAccount(), loadServedGdpOverviewData(), loadGdpWorkbookSources(locale)]);
   const [presentation, manifest, catalogue] = await Promise.all([
     getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], []),
     loadReviewedSourceManifest(root, "external-flows"), loadEnglishCatalogue(root),
@@ -154,7 +154,7 @@ export async function renderCurrentAccountPage(locale: Locale) {
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("account.title"), path: pageHref("/explorer/external/current-account", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
-      <CurrentAccount facts={client} gdp={gdp} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+      <CurrentAccount facts={client} gdp={gdp} sources={sources} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

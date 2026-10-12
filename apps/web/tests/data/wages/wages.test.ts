@@ -21,10 +21,10 @@ test("serves all 1,917 published values and the 12 unavailable public-sector min
   expect(new Set(facts.filter(f => f.indicatorId === "median_monthly_earnings").map(f => f.valueStatus))).toEqual(new Set(["administrative"]));
 });
 
-test("client facts carry the published figure and its display precision", async () => {
+test("client facts carry the published figure", async () => {
   const facts = await loadWagesFacts();
-  expect(toClientWagesFact(find(facts, "average_monthly_nominal_earnings", "national", "georgia", "total", 2025))).toMatchObject({ value: 2165.2, decimals: 1, valueStatus: "survey_estimate" });
-  expect(toClientWagesFact(find(facts, "median_monthly_earnings", "national", "georgia", "total", 2025))).toMatchObject({ value: 1531, decimals: 0 });
+  expect(toClientWagesFact(find(facts, "average_monthly_nominal_earnings", "national", "georgia", "total", 2025))).toMatchObject({ value: 2165.2, valueStatus: "survey_estimate" });
+  expect(toClientWagesFact(find(facts, "median_monthly_earnings", "national", "georgia", "total", 2025))).toMatchObject({ value: 1531 });
   expect(toClientWagesFact(find(facts, "average_monthly_nominal_earnings", "ownership", "public", "sector.b", 2025))).toMatchObject({ value: null, valueStatus: "unavailable" });
 });
 

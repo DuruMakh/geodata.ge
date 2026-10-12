@@ -3,15 +3,15 @@ import { createHash } from "node:crypto";
 import { expectReadableText } from "./color-contrast";
 import { TEST_BASE_URL } from "./test-base-url";
 
-// The badge shows on paper in one place today: the one card of the Demography hub whose page is not published. The
-// methodology hub's future-dataset list and the sidebar's teaser list are both empty. The badge has no fill of its own,
-// so it is measured against the card it sits on (--tile), not against the page.
+// The badge shows on paper nowhere today: every Demography page is published, and the methodology hub's future-dataset
+// list and the sidebar's teaser list are both empty. A hub card that is not published shows it; the badge has no fill of
+// its own, so the loop measures it against the card it sits on (--tile), not against the page, once the count allows one.
 for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
   test(`coming-soon badges on the Demography hub are readable on their cards at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto(`${TEST_BASE_URL}/explorer/demography`);
     const badges = page.getByTestId("demography-hub").getByText("მალე", { exact: true });
-    await expect(badges).toHaveCount(1);
+    await expect(badges).toHaveCount(0);
     for (const badge of await badges.all()) {
       await expectReadableText(badge, badge.locator("xpath=ancestor::*[@data-testid='hub-card']"));
     }
@@ -116,7 +116,7 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(13);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(17);
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(0);
   await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -143,10 +143,14 @@ test("sitemap publishes exactly the live methodology routes", async ({ page }) =
     "/methodology/economic-sectors",
     "/methodology/regional-economies",
     "/methodology/inflation",
+    "/methodology/money",
     "/methodology/unemployment",
     "/methodology/wages",
+    "/methodology/poverty",
+    "/methodology/household-income",
     "/methodology/trade",
     "/methodology/external-flows",
+    "/methodology/energy-food",
     "/methodology/demography",
   ]);
 });
@@ -380,7 +384,9 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
   await expect(contents).toHaveCSS("position", "static");
   // Phones get each source as a stacked block with a full-width download link
   // instead of the 760px table in a sideways scroller.
-  await expect(page.getByTestId("source-archive").locator("thead")).toBeHidden();
+  // The header row is visually hidden but kept for screen readers (sr-only), so the stacked rows keep their column names.
+  const header = (await page.getByTestId("source-archive").locator("thead").boundingBox())!;
+  expect(header.width <= 1 && header.height <= 1).toBe(true);
   const archiveScroller = page.getByTestId("source-archive").locator("table").locator("..");
   expect(await archiveScroller.evaluate((element) => element.scrollWidth - element.clientWidth)).toBe(0);
   const firstCard = page.getByTestId("source-archive-row").first();
@@ -544,4 +550,15 @@ test("published download bytes match the manifest integrity record", async ({ pa
     const response = await request.get(`${TEST_BASE_URL}${href}`);
     expect(response.status(), href).toBe(200);
   }
+});
+
+test.describe("the source archive on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("keeps its column headers and table roles when stacked", async ({ page }) => {
+    await page.goto("/en/methodology/wages#source-archive");
+    const archive = page.getByTestId("source-archive");
+    await expect(archive.locator("table")).toHaveAttribute("role", "table");
+    await expect(archive.getByRole("columnheader")).toHaveCount(5);
+    await expect(archive.getByTestId("source-archive-row").first().getByRole("cell")).toHaveCount(5);
+  });
 });

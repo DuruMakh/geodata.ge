@@ -16,15 +16,16 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
-import { useHashState } from "./use-money-from-abroad-state";
+import { useHashState } from "../explorer-shell/use-hash-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 
-export function CurrentAccount({ facts, gdp, sources, lastReviewedAt, siteOrigin }: { facts: ClientCurrentAccountFact[]; gdp: CurrentAccountGdp[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastReviewedAt, siteOrigin }: { facts: ClientCurrentAccountFact[]; gdp: CurrentAccountGdp[]; sources: WorkbookPublicSource[]; gdpSources?: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.account.${key}`, values);
   const { state, update } = useHashState(facts, parseCurrentAccountHash, serializeCurrentAccountHash), model = buildCurrentAccountModel(facts, gdp, state, presentation);
@@ -38,11 +39,11 @@ export function CurrentAccount({ facts, gdp, sources, lastReviewedAt, siteOrigin
   const scaled = (id: CurrentAccountSeriesId) => model.years.map(year => { const value = model.valuesById[id][year]; return value === null ? null : value / model.unit.divisor; });
   const downloadAction = <ExcelDownloadButton testId="current-account-excel-download" disabled={!shown.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-    await downloadWorkbook(buildCurrentAccountWorkbookModel({ facts, gdp, state, sources, siteOrigin }, presentation));
+    await downloadWorkbook(buildCurrentAccountWorkbookModel({ facts, gdp, state, sources, gdpSources, siteOrigin }, presentation));
   }} />;
+  const lineSeries = shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="current-account" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
-    <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("intro")}</p>
     <div role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{CURRENT_ACCOUNT_TABS.map(tab => <TextTab key={tab} label={t(`tab.${tab}`)} active={state.tab === tab} onClick={() => update(s => ({ ...s, tab }), true)} testId={`current-account-tab-${tab}`} />)}</div>
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
@@ -57,10 +58,13 @@ export function CurrentAccount({ facts, gdp, sources, lastReviewedAt, siteOrigin
           {!shown.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : state.mode === "table" ? <ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== "ca.balance")} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
             : balance ? <div className="mt-5"><StackedColumnChart periods={model.years} periodsPerYear={1} segments={CURRENT_ACCOUNT_PARTS.map(id => ({ id, label: label(id), color: color(id), values: scaled(id) }))} overlay={{ label: label("ca.balance"), values: scaled("ca.balance") }} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} readoutOrder="sign-then-magnitude" ariaLabel={t("balanceAria")} /></div>
-              : <div className="mt-5"><EditorialLineChart years={model.years} series={shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }))} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>}
+              : <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>}
+          {/* The Balance stack is a chart (the return pill says so) but has its own key, so it gets no legend. */}
+          <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={balance ? 0 : undefined} />
           <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildCurrentAccountModel(facts, gdp, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+          {percent ? ` · ${message(messages, "main.gdpSource")}` : null}
           {model.preliminaryGdpYears.length ? ` · ${message(messages, "main.preliminaryGdp", { years: model.preliminaryGdpYears.join(", ") })}` : null}
           <Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>

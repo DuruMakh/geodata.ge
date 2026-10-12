@@ -55,7 +55,9 @@ export function VitalSection({
   const values = (record: Record<number, number | null>, sign: 1 | -1) => model.years.map((year) => (record[year] === null ? null : sign * record[year]!));
   const streakSentence =
     streak.kind === "deaths-ahead"
-      ? t(streak.since === latest.year ? "vitalDeathsAhead" : "vitalDeathsSince", { year: streak.since })
+      ? streak.wholeSeries && streak.since !== latest.year
+        ? t("vitalDeathsWholeSeries", { first, last })
+        : t(streak.since === latest.year ? "vitalDeathsAhead" : "vitalDeathsSince", { year: streak.since })
       : t(streak.kind === "even" ? "vitalEven" : "vitalBirthsAhead", { year: streak.year });
 
   return (

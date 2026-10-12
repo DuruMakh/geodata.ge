@@ -4,7 +4,7 @@ import path from "node:path";
 import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
 import { serializeBomCsvRows } from "../csvEscape";
-import { readVerifiedPackageFile } from "../sourcePackage";
+import { readVerifiedResearchPackage } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import { FOREIGN_INVESTMENT_DIMENSIONS, FOREIGN_INVESTMENT_SOURCES, FOREIGN_INVESTMENT_TOTAL_ID, FOREIGN_INVESTMENT_YEARS, foreignInvestmentFactKey, type ForeignInvestmentAcceptance, type ForeignInvestmentDimension, type ForeignInvestmentEntity, type ForeignInvestmentFact } from "./types";
 import { foreignInvestmentEnglishLabels, validateForeignInvestmentData } from "./foreignInvestmentValidation";
@@ -27,21 +27,8 @@ function entityIdFor(row: Row): string {
 
 /** Copies Geostat's accepted annual FDI inflows (total, countries, sectors, regions) from the frozen external-flows research package. */
 export async function prepareForeignInvestmentData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
-  const directory = path.join(repositoryRoot, RESEARCH), inputSha256: Record<string, string> = {};
-  const manifestBytes = await fs.readFile(path.join(directory, "artifact-manifest.csv"));
-  inputSha256["artifact-manifest.csv"] = hash(manifestBytes);
-  const manifest = new Map(rows(manifestBytes).map(row => [row.file, row]));
-  const research: Record<string, Buffer> = {};
-  for (const name of PROTECTED) {
-    const entry = manifest.get(name);
-    if (!entry) throw new Error(`Foreign investment research artifact missing from manifest: ${name}`);
-    const { bytes, sha256 } = await readVerifiedPackageFile(directory, name, { sha256: entry.sha256, bytes: Number(entry.bytes) }, `Foreign investment research artifact hash mismatch: ${name}`);
-    research[name] = bytes; inputSha256[name] = sha256;
-  }
-  const evidenceBytes = await fs.readFile(path.join(directory, "independent-verification.json"));
-  const evidence = JSON.parse(evidenceBytes.toString("utf8")) as { result: string; input_artifact_sha256: Record<string, string> };
-  if (evidence.result !== "pass" || evidence.input_artifact_sha256?.["fdi-flows-annual.csv"] !== inputSha256["fdi-flows-annual.csv"]) throw new Error("Foreign investment independent verification is not current and passing");
-  inputSha256["independent-verification.json"] = hash(evidenceBytes);
+  const directory = path.join(repositoryRoot, RESEARCH);
+  const { research, inputSha256 } = await readVerifiedResearchPackage(directory, { label: "Foreign investment", files: PROTECTED, verifiedInputs: ["fdi-flows-annual.csv"] });
   const validation = JSON.parse(research["prepared-validation.json"].toString("utf8")) as { checks: { fail: number } };
   if (validation.checks?.fail !== 0) throw new Error("Foreign investment research package has failing checks");
   const catalogueBytes = await fs.readFile(path.join(repositoryRoot, "data/taxonomy/foreign-investment.json"));

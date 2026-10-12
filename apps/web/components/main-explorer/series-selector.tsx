@@ -24,6 +24,7 @@ export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFo
 
 type SeriesSelectorProps = {
   controls?: ReactNode;
+  controlsAfterSearch?: boolean;
   query: string;
   onQueryChange: (query: string) => void;
   searchPlaceholder: string;
@@ -47,6 +48,7 @@ type SeriesSelectorProps = {
 
 export function SeriesSelector({
   controls,
+  controlsAfterSearch = false,
   query,
   onQueryChange,
   searchPlaceholder,
@@ -69,10 +71,11 @@ export function SeriesSelector({
   const bulkState: "false" | "mixed" | "true" =
     hasSelection && allSelected ? "true" : hasSelection ? "mixed" : "false";
   const bulkMark = bulkState === "true" ? "✓" : bulkState === "mixed" ? "—" : "";
+  const selectorControls = controls ? <div data-selector-section="controls" className={controlsAfterSearch ? "mt-3.5 mb-1" : undefined}>{controls}</div> : null;
 
   return (
     <div data-testid="series-selector">
-      {controls ? <div data-selector-section="controls">{controls}</div> : null}
+      {!controlsAfterSearch ? selectorControls : null}
 
       {searchable ? (
         <input
@@ -84,9 +87,11 @@ export function SeriesSelector({
           onChange={(event) => onQueryChange(event.target.value)}
           placeholder={searchPlaceholder}
           aria-label={message(messages, "controls.searchSeries")}
-          className={`${controls ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
+          className={`${controls && !controlsAfterSearch ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
         />
       ) : null}
+
+      {controlsAfterSearch ? selectorControls : null}
 
       <div
         data-testid="series-actions"

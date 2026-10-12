@@ -12,6 +12,9 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { UNEMPLOYMENT_SECTIONS } from "../../lib/explorer/unemploymentSections";
 import { WAGES_SECTIONS } from "../../lib/explorer/wages";
+import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../../lib/explorer/livingStandards";
+import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../../lib/explorer/energyFood";
+import { MONEY_BANKS_SECTIONS } from "../../lib/explorer/moneyBanks";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
@@ -35,8 +38,10 @@ export function DataSidebar() {
   const pathname = usePathname();
   const economyActive = pathname.includes("/explorer/economy");
   const inflationActive = pathname.includes("/explorer/inflation");
+  const moneyBanksActive = pathname.includes("/explorer/money");
   const unemploymentActive = pathname.includes("/explorer/unemployment");
   const wagesActive = pathname.includes("/explorer/wages");
+  const livingStandardsActive = pathname.includes(LIVING_STANDARDS_HUB_PATH);
   const tradeActive = pathname.includes("/explorer/trade");
   const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
   const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
@@ -45,8 +50,10 @@ export function DataSidebar() {
   const foreignInvestmentActive = pathname.endsWith("/explorer/external/foreign-investment");
   const currentAccountActive = pathname.endsWith("/explorer/external/current-account");
   const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
+  const tradeDomesticActive = pathname.endsWith("/explorer/trade/domestic-exports");
   const demographyActive = pathname.includes("/explorer/demography");
-  const budgetActive = !economyActive && !inflationActive && !unemploymentActive && !wagesActive && !tradeActive && !externalActive && !demographyActive;
+  const energyFoodActive = pathname.includes(ENERGY_FOOD_HUB_PATH);
+  const budgetActive = !economyActive && !inflationActive && !moneyBanksActive && !unemploymentActive && !wagesActive && !livingStandardsActive && !tradeActive && !externalActive && !demographyActive && !energyFoodActive;
   const gdpActive = pathname.endsWith("/explorer/economy/gdp");
   const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
   const regionsActive = pathname.includes("/explorer/economy/regions");
@@ -198,7 +205,7 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : wagesActive ? "common.dataWages" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : energyFoodActive ? "common.dataEnergyFood" : wagesActive ? "common.dataWages" : livingStandardsActive ? "common.dataLivingStandards" : moneyBanksActive ? "common.dataMoneyBanks" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
@@ -213,10 +220,12 @@ export function DataSidebar() {
       ) : (
         // Below 900px the bar is pinned, so the open panel hangs from it over the
         // page and scrolls on its own: an in-flow panel inside a pinned bar would
-        // grow the document above the reader's position and jump the page.
+        // grow the document above the reader's position and jump the page. From
+        // 900px the expanded panel scrolls inside the full-height bar when its links overflow; its 4px inner
+        // padding keeps the 2px focus ring (offset 2px) from being clipped by the scroll box.
         <div
           id={MOBILE_NAV_ID}
-          className={`${sheetOpen ? "flex" : "hidden min-[900px]:flex"} flex-1 flex-col max-[900px]:absolute max-[900px]:inset-x-0 max-[900px]:top-full max-[900px]:max-h-[calc(100dvh-56px-env(safe-area-inset-top))] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:border-b max-[900px]:border-[rgba(247,242,233,0.12)] max-[900px]:bg-[var(--ink)] max-[900px]:px-4 max-[900px]:pb-4 min-[900px]:flex-col`}
+          className={`${sheetOpen ? "flex" : "hidden min-[900px]:flex"} flex-1 flex-col max-[900px]:absolute max-[900px]:inset-x-0 max-[900px]:top-full max-[900px]:max-h-[calc(100dvh-56px-env(safe-area-inset-top))] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:border-b max-[900px]:border-[rgba(247,242,233,0.12)] max-[900px]:bg-[var(--ink)] max-[900px]:px-4 max-[900px]:pb-4 min-[900px]:flex-col min-[900px]:min-h-0 min-[900px]:overflow-y-auto min-[900px]:-mx-1 min-[900px]:px-1 min-[900px]:pb-1`}
         >
           <div aria-hidden className="mt-4 mb-3.5 h-px bg-[rgba(247,242,233,0.12)] max-[900px]:mt-0" />
           <p className="mb-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
@@ -312,6 +321,22 @@ export function DataSidebar() {
                 {message(messages, "common.inflationCities")}
               </Link>
             ) : null}
+            <Link href={pageHref("/explorer/money", locale)} data-testid="money-link" aria-current={pathname.endsWith("/explorer/money") ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${moneyBanksActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.moneyBanks")}
+            </Link>
+            {moneyBanksActive ? MONEY_BANKS_SECTIONS.map(section => {
+              const active = pathname.endsWith(section.href);
+              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`money-${section.id}-link`} aria-current={active ? "page" : undefined}
+                onNavigate={(event) => {
+                  if (active) event.preventDefault();
+                  setSheetOpen(false);
+                }}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, section.labelKey)}
+              </Link>;
+            }) : null}
 
             <Link href={pageHref("/explorer/unemployment", locale)} data-testid="unemployment-link" aria-current={pathname.endsWith("/explorer/unemployment") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${unemploymentActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
@@ -334,6 +359,23 @@ export function DataSidebar() {
               return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`wages-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (active) event.preventDefault();
+                  setSheetOpen(false);
+                }}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, section.labelKey)}
+              </Link>;
+            }) : null}
+            <Link href={pageHref(LIVING_STANDARDS_HUB_PATH, locale)} data-testid="living-standards-link" aria-current={pathname.endsWith(LIVING_STANDARDS_HUB_PATH) ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${livingStandardsActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.livingStandards")}
+            </Link>
+            {livingStandardsActive ? LIVING_STANDARDS_SECTIONS.map(section => {
+              // Income and Spending stay active on their region pages, from which the link still opens the section page.
+              const current = pathname.endsWith(section.href), active = current || pathname.includes(`${section.href}/`);
+              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
+                onNavigate={(event) => {
+                  if (current) event.preventDefault();
                   setSheetOpen(false);
                 }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
@@ -372,6 +414,12 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeProducts")}
             </Link> : null}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/domestic-exports", locale)} data-testid="trade-domestic-link" aria-current={tradeDomesticActive ? "page" : undefined}
+              onNavigate={(event) => { if (tradeDomesticActive) event.preventDefault(); setSheetOpen(false); }}
+              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeDomesticActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeDomesticActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+              {message(messages, "common.tradeDomestic")}
+            </Link> : null}
             <Link href={pageHref("/explorer/external", locale)} data-testid="external-link" aria-current={pathname.endsWith("/explorer/external") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${externalActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.external")}
@@ -403,6 +451,22 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${currentAccountActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.currentAccount")}
             </Link> : null}
+            <Link href={pageHref(ENERGY_FOOD_HUB_PATH, locale)} data-testid="energy-food-link" aria-current={pathname.endsWith(ENERGY_FOOD_HUB_PATH) ? "page" : undefined}
+              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${energyFoodActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+              {message(messages, "common.energyFood")}
+            </Link>
+            {energyFoodActive ? ENERGY_FOOD_SECTIONS.map(section => {
+              const active = pathname.endsWith(section.href);
+              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`energy-food-${section.id}-link`} aria-current={active ? "page" : undefined}
+                onNavigate={(event) => {
+                  if (active) event.preventDefault();
+                  setSheetOpen(false);
+                }}
+                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
+                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
+                {message(messages, section.labelKey)}
+              </Link>;
+            }) : null}
             <Link
               href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}
               data-testid="demography-link"

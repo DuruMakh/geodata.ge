@@ -848,8 +848,8 @@ test.describe("municipality page", () => {
     await expectMunicipalAppReady(page);
 
     const rankKpi = page.getByTestId("entity-kpi").filter({ hasText: "წილი მუნიციპალურ ხარჯებში" });
-    await expect(rankKpi).toContainText("მე-51 ადგილი 64-დან");
-    await expect(rankKpi).not.toContainText("მე-26 ადგილი 64-დან");
+    await expect(rankKpi).toContainText("51-ე ადგილი 64-დან");
+    await expect(rankKpi).not.toContainText("26-ე ადგილი 64-დან");
   });
 
   test("renders the municipal headline gauge and side KPI trends", async ({ page }) => {
@@ -1094,5 +1094,23 @@ test.describe("municipality page", () => {
         }
       }
     }
+  });
+});
+
+test.describe("period comparison on desktop", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+  test("keeps every amount and change on one line", async ({ page }) => {
+    await page.goto("/explorer/municipalities/batumi");
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const table = page.getByTestId("comparison-table");
+    await table.scrollIntoViewIfNeeded();
+    const wrapped = await table.locator("tbody td").evaluateAll(cells => cells.filter(cell => {
+      if ((cell as HTMLTableCellElement).cellIndex === 0) return false;
+      const line = parseFloat(getComputedStyle(cell).lineHeight) || 20;
+      const style = getComputedStyle(cell);
+      const content = cell.getBoundingClientRect().height - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+      return content > line * 1.5;
+    }).map(cell => cell.textContent));
+    expect(wrapped).toEqual([]);
   });
 });

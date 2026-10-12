@@ -27,9 +27,13 @@ export const REGION_GENITIVE_KA: Record<string, string> = {
   "region.shida_kartli": "შიდა ქართლის",
 };
 
-/** Georgian ordinal for a rank. First place is პირველი, never მე-1. */
+/**
+ * Georgian ordinal for a rank. First place is პირველი, never მე-1. Georgian counts in twenties:
+ * 2–20 and whole twenties take the prefix (მე-20, მე-40), the rest the suffix (21-ე, 37-ე).
+ */
 export function georgianOrdinal(rank: number): string {
-  return rank === 1 ? "პირველი" : `მე-${rank}`;
+  if (rank === 1) return "პირველი";
+  return rank <= 20 || rank % 20 === 0 ? `მე-${rank}` : `${rank}-ე`;
 }
 
 export function municipalRankLabel(rank: number, locale: Locale): string {

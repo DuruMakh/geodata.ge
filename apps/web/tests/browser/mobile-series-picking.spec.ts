@@ -110,7 +110,8 @@ test.describe("the ↑ chart pill", () => {
     await expect(page.getByTestId("chart-frame")).toBeInViewport({ ratio: 0.5 });
     // Change the selection without scrolling the chart away.
     await page.evaluate(() => (document.querySelector('[data-testid="series-toggle-all"]') as HTMLButtonElement).click());
-    await page.waitForTimeout(300);
+    // The pill decides as soon as the new selection renders: wait for that, not for a fixed time.
+    await expect(page.locator('[data-series-id="expenditure.total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByTestId("chart-return-pill")).toHaveCount(0);
   });
 
@@ -119,8 +120,9 @@ test.describe("the ↑ chart pill", () => {
     test("never shows", async ({ page }) => {
       await page.goto("/explorer/expenditure");
       await page.mouse.wheel(0, 1400);
-      await page.locator('[data-series-id="spending.education"]').getByTestId("series-row-toggle").click();
-      await page.waitForTimeout(300);
+      const education = page.locator('[data-series-id="spending.education"]').getByTestId("series-row-toggle");
+      await education.click();
+      await expect(education).toHaveAttribute("aria-pressed", "true");
       await expect(page.getByTestId("chart-return-pill")).toBeHidden();
     });
   });
@@ -155,6 +157,61 @@ test.describe("the phone legend", () => {
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("explorer-table")).toBeVisible();
     await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+  });
+
+  test("prints percentage points on the inflation Contribution tab", async ({ page }) => {
+    await page.goto("/en/explorer/inflation/categories");
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend.locator("li").first()).toBeVisible();
+    for (const item of await legend.locator("li").all()) await expect(item).toContainText(/pp$/);
+  });
+
+  // Pages built after D4 (2026-10-07) that draw several lines.
+  for (const [name, url] of [
+    ["Trade overview", "/en/explorer/trade/overview#view=line&sel=trade.exports,trade.imports"],
+    ["Trading partners", "/en/explorer/trade/partners#sel=partner.1995-2025.643,group.eu&view=line&tab=countries&measure=trade.exports"],
+    ["Domestic exports", "/en/explorer/trade/domestic-exports#section=overview&view=line&sel=trade.exports,trade.domestic_exports"],
+    ["Money from abroad", "/en/explorer/external/money-from-abroad#measure=received&view=line&sel=transfer.total,transfer.greece"],
+    ["Foreign investment", "/en/explorer/external/foreign-investment#tab=sector&view=line&sel=fdi.total,fdi.sector.k"],
+    ["Current account", "/en/explorer/external/current-account#tab=in&unit=usd&sel=ca.balance,ca.services"],
+    ["Wages", "/en/explorer/wages/overview#view=line&sel=average,median"],
+  ] as const) {
+    test(`lists two lines on ${name}`, async ({ page }) => {
+      await page.goto(url);
+      await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
+    });
+  }
+
+  test("lists two lines on Poverty rates", async ({ page }) => {
+    await page.goto("/en/explorer/poverty/rates#tab=relative&view=line&sel=poverty.relative_60%7Cgeorgia%2Cpoverty.relative_40%7Cgeorgia");
+    await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
+  });
+
+  test("stays hidden for one line on Trade overview and on the Current account Balance tab", async ({ page }) => {
+    await page.goto("/en/explorer/trade/overview");
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+    await page.goto("about:blank");
+    await page.goto("/en/explorer/external/current-account#tab=balance&unit=usd");
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+  });
+
+  test("hides while the tap readout is open on a new page (Trade partners)", async ({ page }) => {
+    await page.goto("/en/explorer/trade/partners#sel=partner.1995-2025.643,group.eu&view=line&tab=countries&measure=trade.exports");
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend).toBeVisible();
+    const box = (await page.getByTestId("chart-frame").boundingBox())!;
+    await page.touchscreen.tap(box.x + box.width * 0.6, box.y + box.height * 0.5);
+    await expect(page.getByTestId("chart-tooltip")).toBeVisible();
+    await expect(legend).toBeHidden();
+  });
+
+  test("keeps the median in whole lari on Wages", async ({ page }) => {
+    await page.goto("/en/explorer/wages/overview#view=line&sel=average,median");
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend.locator('li[data-legend-series-id="median"]')).toContainText(/1,531 GEL$/);
+    await expect(legend.locator('li[data-legend-series-id="average"]')).toContainText(/2,165\.2 GEL$/);
   });
 
   test("prints English percentages on the unemployment gender page", async ({ page }) => {

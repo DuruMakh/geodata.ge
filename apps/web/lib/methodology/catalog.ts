@@ -8,6 +8,14 @@ import { DEMOGRAPHY_METHODOLOGY } from "./content/demography";
 import { DEMOGRAPHY_METHODOLOGY as EN_DEMOGRAPHY } from "./content/en/demography";
 import { WAGES_METHODOLOGY_CONTENT } from "./content/wages";
 import { WAGES_METHODOLOGY_CONTENT as EN_WAGES } from "./content/en/wages";
+import { POVERTY_METHODOLOGY_CONTENT } from "./content/poverty";
+import { MONEY_BANKS_METHODOLOGY_CONTENT } from "./content/moneyBanks";
+import { POVERTY_METHODOLOGY_CONTENT as EN_POVERTY } from "./content/en/poverty";
+import { HOUSEHOLD_INCOME_METHODOLOGY_CONTENT } from "./content/household-income";
+import { HOUSEHOLD_INCOME_METHODOLOGY_CONTENT as EN_HOUSEHOLD_INCOME } from "./content/en/household-income";
+import { ENERGY_FOOD_METHODOLOGY_CONTENT } from "./content/energyFood";
+import { ENERGY_FOOD_METHODOLOGY_CONTENT as EN_ENERGY_FOOD } from "./content/en/energyFood";
+import { MONEY_BANKS_METHODOLOGY_CONTENT as EN_MONEY_BANKS } from "./content/en/moneyBanks";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
@@ -47,10 +55,14 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
   inflation: INFLATION_METHODOLOGY_CONTENT,
+  money: MONEY_BANKS_METHODOLOGY_CONTENT,
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
   wages: WAGES_METHODOLOGY_CONTENT,
+  poverty: POVERTY_METHODOLOGY_CONTENT,
+  "household-income": HOUSEHOLD_INCOME_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
   "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
+  "energy-food": ENERGY_FOOD_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
 
@@ -63,6 +75,10 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   expenditure: EN_EXPENDITURE, revenue: EN_REVENUE, municipalities: EN_MUNICIPALITIES, debt: EN_DEBT, gdp: EN_GDP, inflation: EN_INFLATION,
   demography: EN_DEMOGRAPHY,
   wages: EN_WAGES,
+  poverty: EN_POVERTY,
+  "household-income": EN_HOUSEHOLD_INCOME,
+  "energy-food": EN_ENERGY_FOOD,
+  money: EN_MONEY_BANKS,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {

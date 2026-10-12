@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { strFromU8, unzipSync } from "fflate";
 import * as XLSX from "xlsx";
+import { readTradeSourceWorksheet } from "../parsing/tradeSourceWorkbook";
 import { serializeBomCsvRows } from "../csvEscape";
 import { readVerifiedPackageFile } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
@@ -32,17 +32,14 @@ export async function prepareWagesData(repositoryRoot: string, mode: "write" | "
   for (const source of manifest) {
     const { bytes } = await readVerifiedPackageFile(directory, source.local_file, source, `Wages source capture mismatch: ${source.local_file}`);
     if (!WAGES_SOURCES.includes(source.source_id)) continue;
-    const book = XLSX.read(bytes, { type: "buffer" });
-    const xml = unzipSync(bytes);
-    book.SheetNames.forEach((name, i) => {
-      const sheet = book.Sheets[name];
-      for (const match of strFromU8(xml[`xl/worksheets/sheet${i + 1}.xml`]).matchAll(/<c\b([^>]*)>([\s\S]*?)<\/c>/g)) {
-        const address = /\br="([A-Z]+\d+)"/.exec(match[1])?.[1];
-        const token = /<v>([^<]+)<\/v>/.exec(match[2])?.[1];
-        if (address && token && sheet[address]?.t === "n") numeric.set(`${source.source_id}:${name}:${address}`, token);
-        else if (address && sheet[address]?.t === "s") text.set(`${source.source_id}:${name}:${address}`, String(sheet[address].v).trim());
+    // Each sheet is found by its name in the workbook, not assumed to be sheet{i + 1}.xml.
+    for (const name of XLSX.read(bytes, { type: "buffer", bookSheets: true }).SheetNames) {
+      const { sheet, storedValues } = readTradeSourceWorksheet(bytes, name);
+      for (const [address, token] of storedValues) {
+        if (sheet[address]?.t === "n") numeric.set(`${source.source_id}:${name}:${address}`, token);
+        else if (sheet[address]?.t === "s") text.set(`${source.source_id}:${name}:${address}`, String(sheet[address].v).trim());
       }
-    });
+    }
   }
   const report = JSON.parse(await fs.readFile(path.join(directory, "validation-report.json"), "utf8")) as { status: string; reconciliation_failed_count: number; imputed_values: number };
   if (report.status !== "passed" || report.reconciliation_failed_count !== 0 || report.imputed_values !== 0) throw new Error("Wages research package validation has not passed");

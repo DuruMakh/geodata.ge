@@ -29,6 +29,8 @@ describe.skipIf(!connectionString)("demography mirror integrity", () => {
     const { rows } = await client.query('SELECT "seriesId", count(*)::int AS n FROM "DemographyFact" GROUP BY 1 ORDER BY 1');
     expect(rows).toEqual([
       { seriesId: "demography.age_specific_fertility_rate", n: 84 },
+      { seriesId: "demography.census_population_by_age", n: 1_944 },
+      { seriesId: "demography.census_population_by_settlement", n: 684 },
       { seriesId: "demography.crude_birth_rate", n: 12 },
       { seriesId: "demography.crude_death_rate", n: 12 },
       { seriesId: "demography.deaths", n: 837 },
@@ -43,6 +45,8 @@ describe.skipIf(!connectionString)("demography mirror integrity", () => {
       { seriesId: "demography.live_births", n: 837 },
       { seriesId: "demography.natural_increase", n: 837 },
       { seriesId: "demography.net_migration", n: 14 },
+      { seriesId: "demography.population_age_band", n: 207 },
+      { seriesId: "demography.population_by_age_sex", n: 1_380 },
       { seriesId: "demography.population_density", n: 145 },
       { seriesId: "demography.population_total", n: 923 },
       { seriesId: "demography.total_fertility_rate", n: 12 },

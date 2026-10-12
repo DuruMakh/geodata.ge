@@ -5,7 +5,7 @@ import { workbookMessage } from "../i18n/workbook";
 import { buildWagesModel, type WagesSectionId, type WagesState } from "./wages";
 import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
-export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; facts: readonly ClientWagesFact[]; state: WagesState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
+export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; facts: readonly ClientWagesFact[]; state: WagesState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string; regionId?: string }, presentation: Presentation): WorkbookExportModel {
   const { section, facts, state, labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `wages.${key}`);
   const model = buildWagesModel(section, facts, state);
@@ -21,7 +21,7 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
   const status = (fact: ClientWagesFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
   const view = state.view === "main" ? "" : ` · ${t(`group.${state.view}`)}`;
   return {
-    locale, filename: workbookFilename(`wages-${section}${state.view === "main" ? "" : `-${state.view}`}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
+    locale, filename: workbookFilename(`wages-${section}${input.regionId ? `-${input.regionId.replace(/^region\./, "")}` : ""}${state.view === "main" ? "" : `-${state.view}`}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title: `${input.title ?? t(`page.${section}.title`)}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${t("unitMonthly")} · ${t("nominalNote")}`,
       unitLabel: t("unit"), amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
@@ -33,7 +33,7 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
     analysis: {
       headers: [workbookMessage(locale, "workbook.year"), t("series"), t("amountHeader"), workbookMessage(locale, "workbook.status")],
       rows: model.years.flatMap(year => model.selected.map(series => [year, labels[series.id], series.valuesByYear[year], status(cell(series, year))])),
-      numericFormats: { 2: numberFormat },
+      numericFormats: { 3: numberFormat },
     },
     sources: withAbsoluteUrls(originals, input.siteOrigin),
   };

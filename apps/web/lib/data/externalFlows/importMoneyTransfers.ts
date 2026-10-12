@@ -8,7 +8,7 @@ import { resolveServedDataSource } from "../servedDataSource";
 import { moneyTransferFactKey, type MoneyTransferEntity, type MoneyTransferFact, type MoneyTransfersAcceptance, type MoneyTransfersData } from "./types";
 import { moneyTransfersEnglishLabels, validateMoneyTransfersData } from "./validation";
 
-export type ClientMoneyTransferFact = Pick<MoneyTransferFact, "entityId" | "year" | "measure" | "valueStatus" | "monthsReported" | "sourceId" | "vintage"> & { valueUsd: number | null };
+export type ClientMoneyTransferFact = Pick<MoneyTransferFact, "entityId" | "year" | "measure" | "valueStatus" | "monthsReported"> & { valueUsd: number | null };
 export type ClientMoneyTransfersData = { entities: MoneyTransferEntity[]; facts: ClientMoneyTransferFact[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
@@ -57,5 +57,5 @@ export function loadServedMoneyTransfersData(): Promise<MoneyTransfersData> {
 /** The page shows NBG's money transfers only; the reviewed personal-transfers estimate stays in the data but is not served to it. */
 export function toClientMoneyTransfersData(data: MoneyTransfersData): ClientMoneyTransfersData {
   const estimates = new Set(data.entities.filter(entity => entity.kind === "estimate").map(entity => entity.id));
-  return { entities: data.entities.filter(entity => !estimates.has(entity.id)), facts: data.facts.filter(fact => !estimates.has(fact.entityId)).map(({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd }) => ({ entityId, year, measure, valueStatus, monthsReported, sourceId, vintage, valueUsd: valueUsd === null ? null : Number(valueUsd) })) };
+  return { entities: data.entities.filter(entity => !estimates.has(entity.id)), facts: data.facts.filter(fact => !estimates.has(fact.entityId)).map(({ entityId, year, measure, valueStatus, monthsReported, valueUsd }) => ({ entityId, year, measure, valueStatus, monthsReported, valueUsd: valueUsd === null ? null : Number(valueUsd) })) };
 }

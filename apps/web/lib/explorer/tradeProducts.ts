@@ -1,5 +1,5 @@
 import type { ClientTradeProductsData } from "../data/tradeProducts/importTradeProducts";
-import type { TradeProductEntity } from "../data/tradeProducts/types";
+import { TRADE_PRODUCT_MEASURES, type TradeProductEntity } from "../data/tradeProducts/types";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
@@ -10,7 +10,7 @@ import { TRADE_PRODUCT_TOTAL_ID, tradeProductsBulkSelection, tradeProductsCovera
 
 export const tradeProductColor = tradePartnerColor;
 export function tradeProductLabel(entity: TradeProductEntity, presentation: Presentation, includeSourceBlock = true): string {
-  return `${publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels)} · ${entity.code}${includeSourceBlock ? ` · ${entity.sourceBlock.replace("-", "–")}` : ""}`;
+  return `${publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels)}${entity.code ? ` · ${entity.code}` : ""}${includeSourceBlock ? ` · ${entity.sourceBlock.replace("-", "–")}` : ""}`;
 }
 export type TradeProductRankingRow = { entityId: string; label: string; valueUsd: number | null; shareOfNational: number | null; rank: number | null; color: string };
 export type TradeProductsModel = { years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[]; valuesByEntity: Record<string, Record<number, number | null>>; ranking: TradeProductRankingRow[]; missingRanking: TradeProductRankingRow[]; selectedCount: number; totalCount: number };
@@ -19,7 +19,7 @@ export function buildTradeProductsModel(data: ClientTradeProductsData, state: Tr
   const range = resolveRange(state.range, tradeProductsCoverage(data, state)), years = Array.from({ length: range.end - range.start + 1 }, (_, index) => range.start + index);
   const ids = tradeProductsBulkSelection(data), selected = new Set(state.selectedIds), selectedIds = ids.filter(id => selected.has(id));
   const valuesByEntity: TradeProductsModel["valuesByEntity"] = Object.fromEntries(ids.map(id => [id, Object.fromEntries(years.map(year => [year, null]))]));
-  const measureIndex = state.measure === "trade.exports" ? 0 : 1;
+  const measureIndex = (data.measures ?? TRADE_PRODUCT_MEASURES).findIndex(id => id === state.measure);
   for (const [entityIndex, year, measure, value] of data.facts) {
     if (measure === measureIndex && year >= range.start && year <= range.end) valuesByEntity[data.entities[entityIndex].id][year] = value;
   }

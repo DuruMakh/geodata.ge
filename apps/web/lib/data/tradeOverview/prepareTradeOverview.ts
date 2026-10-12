@@ -2,11 +2,10 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { strFromU8, unzipSync } from "fflate";
-import * as XLSX from "xlsx";
 import Decimal from "decimal.js";
 import { serializeBomCsvRows } from "../csvEscape";
 import { readVerifiedPackageFile } from "../sourcePackage";
+import { readTradeSourceWorksheet } from "../parsing/tradeSourceWorkbook";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import { TRADE_OVERVIEW_SOURCE, TRADE_OVERVIEW_SHEET, TRADE_OVERVIEW_INDICATORS, type TradeOverviewFact, type TradeOverviewAcceptance } from "./types";
 import { tradeOverviewSourceRefs, validateTradeOverviewFacts } from "./validation";
@@ -27,8 +26,7 @@ export async function prepareTradeOverviewData(repositoryRoot: string, mode: "wr
   const matching = sources.filter(source => source.source_id === TRADE_OVERVIEW_SOURCE);
   if (matching.length !== 1 || matching[0].local_file !== "official/FTrade_1995-2026.xlsx") throw new Error("Trade source inventory mismatch");
   const { bytes, sha256 } = await readVerifiedPackageFile(directory, matching[0].local_file, matching[0], "Trade source capture mismatch");
-  const workbook = XLSX.read(bytes, { type: "buffer", cellNF: true });
-  const sheet = workbook.Sheets[TRADE_OVERVIEW_SHEET];
+  const { sheet, storedValues } = readTradeSourceWorksheet(bytes, TRADE_OVERVIEW_SHEET);
   if (!sheet || sheet.A3?.v !== "(Mill. USD)") throw new Error("Trade source unit/sheet mismatch");
   const layouts = (await readJson<Layout[]>("source-layouts.json")).filter(layout => layout.family === "goods_national");
   if (layouts.length !== 2 || ["export", "import"].some(flow => layouts.filter(layout => layout.flow === flow).length !== 1)) throw new Error("Trade source layout mismatch");
@@ -38,13 +36,7 @@ export async function prepareTradeOverviewData(repositoryRoot: string, mode: "wr
   const coverage = (await readCsv("coverage.csv")).filter(row => row.family === "goods_national");
   const coverageKeys = new Set(coverage.map(row => `${row.flow}:${row.year}`));
   if (coverage.length !== years.length * 2 || coverageKeys.size !== coverage.length || years.some(year => ["export", "import"].some(flow => !coverageKeys.has(`${flow}:${year}`))) || coverage.some(row => row.source_id !== TRADE_OVERVIEW_SOURCE || row.source_sheet !== TRADE_OVERVIEW_SHEET || row.numeric_count !== "1" || row.source_key_count !== "1")) throw new Error("Trade reviewed coverage inventory mismatch");
-  const xml = strFromU8(unzipSync(bytes)["xl/worksheets/sheet1.xml"]);
-  const stored = new Map<string, string>();
-  for (const match of xml.matchAll(/<c\b([^>]*)>([\s\S]*?)<\/c>/g)) {
-    const address = /\br="([A-Z]+\d+)"/.exec(match[1])?.[1];
-    const token = /<v>([^<]+)<\/v>/.exec(match[2])?.[1];
-    if (address && token && sheet[address]?.t === "n") stored.set(address, token);
-  }
+  const stored = new Map([...storedValues].filter(([address]) => sheet[address]?.t === "n"));
   const primary = await readCsv("goods-national-annual.csv");
   if (primary.length !== years.length * 2) throw new Error("Trade primary coverage mismatch");
   const facts: TradeOverviewFact[] = [];

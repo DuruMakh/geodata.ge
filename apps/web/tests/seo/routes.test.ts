@@ -56,10 +56,18 @@ describe("indexable Fiscal.ge routes", () => {
     // Population page add two more bilingual pairs; the 75 Population place
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
     // Trading partners and Products each add one further bilingual pair.
-    // The Migration page adds one more bilingual pair, and so does the Births, deaths and fertility page.
+    // The Migration page adds one more bilingual pair, and so do the Births, deaths and fertility page
+    // and the Age and sex page.
     // Wages adds its hub, three pages, 11 region pages and methodology page: 16 bilingual pairs.
     // External flows adds its hub, Money from abroad and its methodology, each in both languages.
-    expect(urls).toHaveLength(488);
+    // Domestic exports adds one further bilingual pair.
+    // Poverty adds its hub, two pages and methodology page: 4 bilingual pairs.
+    // Living standards replaces the Poverty hub and adds Income and Spending: 2 more bilingual pairs.
+    // The Household income and spending methodology adds one more bilingual pair.
+    // Income and Spending add a page for Georgia and each of the 11 regions: 24 more bilingual pairs.
+    // Energy and food adds its hub, four pages and methodology page: 6 bilingual pairs.
+    // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
+    expect(urls).toHaveLength(578);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -73,9 +81,33 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/wages${page}`);
     }
     expect(urls).toContain("https://fiscal.ge/en/methodology/wages");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/poverty");
+    expect(urls).toContain("https://fiscal.ge/methodology/money");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/money");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
+    for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards${page}`);
+    }
+    for (const section of ["income", "spending"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/living-standards/${section}/regions/guria`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/guria`);
+      expect(urls).toContain(`https://fiscal.ge/explorer/living-standards/${section}/regions/georgia`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/georgia`);
+    }
+    expect(urls.some((url) => url.includes("/explorer/poverty"))).toBe(false);
+    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
+    }
+    for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);
+    }
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
+    expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/trade/domestic-exports");
     for (const route of ["/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account", "/methodology/external-flows"]) {
       expect(urls).toContain(`https://fiscal.ge${route}`);
       expect(urls).toContain(`https://fiscal.ge/en${route}`);
@@ -83,6 +115,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
     expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");
+    expect(urls).toContain("https://fiscal.ge/explorer/demography/age-sex");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/demography/age-sex");
     expect(urls.some((url) => url.includes("#") || url.includes("?"))).toBe(false);
   });
 

@@ -76,7 +76,7 @@ export function GdpOverview({
   );
   const d = gdpDisplay(state, presentation);
   // The latest loaded year of the active indicator, whatever range is selected.
-  const latest = buildGdpOverviewModel(facts, { ...state, range: { kind: "all" } }, sourceIdRanges).headline;
+  const latest = useMemo(() => buildGdpOverviewModel(facts, { ...state, range: { kind: "all" } }, sourceIdRanges).headline, [facts, state, sourceIdRanges]);
   const row = {
     itemId: "gdp.overview",
     kaLabel: d.label,

@@ -47,10 +47,11 @@ describe("demography methodology", () => {
     }
   });
 
-  it("archives exactly the twelve Geostat originals it serves, with their recorded hashes", async () => {
+  it("archives exactly the fourteen Geostat originals it serves, with their recorded hashes", async () => {
     const rows = await loadReviewedSourceManifest(root, "demography");
     expect(rows.map((row) => [row.source_id, row.byte_size, row.sha256])).toEqual([
       ["source.geostat_demography_density", 13_917, "77d29d84cb7530f4fb6294f17a768e220f02636d77debfc438509b5c17ac28b8"],
+      ["source.geostat_demography_population_age_sex", 30_302, "24090597005b62bcba6ec966a4cbf6726e97f1c8fb03245404f8edf94a5770f1"],
       ["source.geostat_municipal_population", 34_994, "8bd7a1b56e756e8d6bc92192095795b204b23fd18274aaff39b78c0b0a487a57"],
       ["source.geostat_demography_births", 26_206, "b8b2b0c352aa1e787925e896773b40aa7181d7b2c83bb05c9a1646c7f798a58d"],
       ["source.geostat_demography_crude_birth_rate", 10_365, "9a22452c6363f3b55f43487811fbf9169e6d94b01432a0f8ad393f39d63c55db"],
@@ -62,9 +63,10 @@ describe("demography methodology", () => {
       ["source.geostat_demography_migration_citizenship", 25_694, "6b7fc1d8714e3acacaa5167b8e7c424a3ddb2a13f9c60a95cbd700cd83bb20a0"],
       ["source.geostat_demography_natural_increase", 26_528, "db4c2d808f17936de45cf5b8be6eb2f7c267c9b09ce7a182f873c3fd4591417e"],
       ["source.geostat_demography_net_migration", 11_440, "05aedd93e72ba63ab12b13feec8c46d6ce8870dadef3ece94fc7b87f65fa2196"],
+      ["source.geostat_census2024_population_by_age_settlement", 111_570, "691329dbd890070a888234f2f182496e4132f67948879675a188584c5e34dec7"],
     ]);
     expect(rows.every((row) => row.downloadHref.startsWith("/downloads/methodology/demography/files/"))).toBe(true);
-    expect(rows.map((row) => [row.years[0], row.years.at(-1)])).toEqual([[2014, 2026], [2004, 2026], ...Array(7).fill([2014, 2025]), [2012, 2025], [2014, 2025], [2012, 2025]]);
+    expect(rows.map((row) => [row.years[0], row.years.at(-1)])).toEqual([[2014, 2026], [2004, 2026], [2004, 2026], ...Array(7).fill([2014, 2025]), [2012, 2025], [2014, 2025], [2012, 2025], [2024, 2024]]);
   });
 
   it("keeps the UTF-8 BOM on its Georgian archive manifest, as AGENTS.md requires of Georgian methodology manifests", async () => {
@@ -77,6 +79,7 @@ describe("demography methodology", () => {
     const [catalogue, rows] = await Promise.all([loadEnglishCatalogue(root), loadReviewedSourceManifest(root, "demography")]);
     expect(projectPublicSources(rows, "en", catalogue.documents).map((row) => row.title)).toEqual([
       "Density by regions (number of population per 1 sq.km)",
+      "Population as of 1 January by 5-year age groups and sex",
       "Population as of 1 January by regions and self-governed units",
       "Number of live births by regions and self-governed units",
       "Crude birth rate (Live births per 1 000 population)",
@@ -88,6 +91,7 @@ describe("demography methodology", () => {
       "Number of immigrants and emigrants by sex and citizenship",
       "Natural increase by regions and self-governed units",
       "Net migration (number and rate)",
+      "Population by regions, self-governed units, 5-year age groups, urban-rural settlements and sex (as of November 14, 2024)",
     ]);
   });
 });
