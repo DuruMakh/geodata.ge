@@ -2,30 +2,26 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { RootDocument, rootMetadata } from "../components/site/root-document";
 import "./globals.css";
+import kaCommon from "../lib/i18n/messages/ka/common.json";
+import enCommon from "../lib/i18n/messages/en/common.json";
+import { DATASET_HUBS } from "../lib/navigation/datasetHubs";
 
 export const metadata: Metadata = { ...rootMetadata("ka"), robots: { index: false, follow: true } };
 
 // People-facing recovery: the homepage, the four dataset hubs and methodology.
 // The XML sitemap and the agent guide stay published for machines; on a phone
 // they opened raw files.
+// It renders outside the i18n provider, so the hub labels come straight from the message files.
 const destinations = [
   { href: "/", label: "მთავარი გვერდი" },
-  { href: "/explorer", label: "ბიუჯეტი" },
-  { href: "/explorer/economy", label: "ეკონომიკა" },
-  { href: "/explorer/inflation", label: "ინფლაცია" },
-  { href: "/explorer/unemployment", label: "უმუშევრობა" },
-  { href: "/explorer/trade", label: "საგარეო ვაჭრობა" },
-  { href: "/methodology", label: "მეთოდოლოგია" },
-] as const;
+  ...DATASET_HUBS.map(({ href, labelKey }) => ({ href, label: kaCommon[labelKey] })),
+  { href: "/methodology", label: kaCommon["common.methodology"] },
+];
 
 const englishDestinations = [
-  ["/en", "Home"],
-  ["/en/explorer", "Budget"],
-  ["/en/explorer/economy", "Economy"],
-  ["/en/explorer/inflation", "Inflation"],
-  ["/en/explorer/unemployment", "Unemployment"],
-  ["/en/explorer/trade", "Trade"],
-  ["/en/methodology", "Methodology"],
+  ["/en", enCommon["common.home"]],
+  ...DATASET_HUBS.map(({ href, labelKey }) => [`/en${href}`, enCommon[labelKey]] as const),
+  ["/en/methodology", enCommon["common.methodology"]],
 ] as const;
 
 export default function NotFound() {

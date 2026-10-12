@@ -104,7 +104,7 @@ function writeReadableRow(
       const basis = row.basisByYear[year];
       const isPlanned = basis === "planned";
       const markerKey = isPlanned ? "workbook.planned" : basis === "forecast" ? "workbook.forecast" : null;
-      cell.numFmt = numberFormat ?? readableNumberFormat(isPercentage, markerKey, locale, amountDecimals);
+      cell.numFmt = row.numberFormat ?? numberFormat ?? readableNumberFormat(isPercentage, markerKey, locale, amountDecimals);
       if (row.basisByYear[year] === "preliminary") {
         const marker = workbookMessage(locale, "workbook.preliminary");
         cell.numFmt = isPercentage ? `0.0% "${marker}"` : `#,##0${amountDecimals ? `.${"0".repeat(amountDecimals)}` : ""} "${marker}"`;
@@ -280,6 +280,9 @@ export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<
   writeAnalysisSheet(analysis, model.analysis);
   for (const [column, format] of Object.entries(model.analysis.numericFormats ?? {})) {
     for (let row=2; row<=model.analysis.rows.length+1; row++) analysis.getCell(row,Number(column)).numFmt=format;
+  }
+  for (const [rowIndex, format] of Object.entries(model.analysis.rowNumberFormats ?? {})) {
+    for (const column of Object.keys(model.analysis.numericFormats ?? {})) analysis.getCell(Number(rowIndex)+2,Number(column)).numFmt=format;
   }
   writeSourcesSheet(sources, model.sources, model.sourceYears ?? model.readable.years, model.locale);
 

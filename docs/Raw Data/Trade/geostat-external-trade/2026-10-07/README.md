@@ -10,10 +10,10 @@ See [the methodology](../../../../data-methodology/trade-annual.md), `source-rev
 
 ## Reproduction
 
-From the repository root, using the bundled Python (or a compatible Python with openpyxl for the independent reader):
+From the repository root, using a Python 3 with openpyxl (the independent reader needs it):
 
 ```powershell
-$tradePython = 'C:/Users/Mylaptop/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe'
+$tradePython = 'python'  # any Python 3 with openpyxl installed
 $tradePackage = 'docs/Raw Data/Trade/geostat-external-trade/2026-10-07'
 & $tradePython -X utf8 "$tradePackage/prepare.py" --write
 & $tradePython -X utf8 "$tradePackage/prepare.py" --check

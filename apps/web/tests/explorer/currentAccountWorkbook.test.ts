@@ -48,3 +48,18 @@ test("Money out exports only the selected debit series, and % of GDP exports per
   const empty = run({ facts: all, gdp, sources, siteOrigin: "https://fiscal.ge", state: state({ tab: "in", selectedIds: [] }) }, p);
   expect(empty.readable.rows).toEqual([]); expect(empty.sources).toEqual([]);
 });
+
+test.each(["en", "ka"] as const)("the %s % of GDP workbook lists the GDP sources beside the balance of payments", async locale => {
+  const { loadGdpWorkbookSources } = await import("../../lib/methodology/workbookSources");
+  const p = await presentation(locale), gdpSources = await loadGdpWorkbookSources(locale), buildModel = await build();
+  const input = { facts: await facts(), gdp, sources, gdpSources, siteOrigin: "https://fiscal.ge" };
+  const percent = buildModel({ ...input, state: state({ unit: "gdp", range: { kind: "manual", start: 2008, end: 2012 } }) }, p);
+  const gdpHrefs = gdpSources.map(source => source.downloadHref);
+  const cited = percent.sources.filter(source => gdpHrefs.includes(source.downloadHref));
+  expect(percent.sources.map(source => source.downloadHref.split("/").at(-1))).toContain("bop-6_bopbpm6eng.xlsx");
+  expect(cited).toHaveLength(2);
+  for (const source of cited) expect(source.years.every(year => year >= 2008 && year <= 2012)).toBe(true);
+  if (locale === "en") expect(cited.every(source => !/[ა-ჰ]/.test(source.title))).toBe(true);
+  const usd = buildModel({ ...input, state: state({ unit: "usd", range: { kind: "manual", start: 2008, end: 2012 } }) }, p);
+  expect(usd.sources.some(source => gdpHrefs.includes(source.downloadHref))).toBe(false);
+});

@@ -35,6 +35,10 @@ import { TRADE_SERVICES_DOCUMENT_IDS, type TradeServiceEntity, type TradeService
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types";
+import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyFood/types";
+import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
+import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
+import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
 // Client-parameterized readers of the database mirror. They return exactly the
@@ -663,6 +667,60 @@ export async function loadPovertyFactsFromMirror(db: Pick<MirrorClient, "poverty
     return {
       year: row.year, indicatorId: row.indicatorId as PovertyFact["indicatorId"], groupId: row.groupId as PovertyFact["groupId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as PovertyFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function energyFoodMirrorCreateRows(facts: readonly EnergyFoodFact[], importRunId: string): Prisma.EnergyFoodFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: energyFoodSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadEnergyFoodFactsFromMirror(db: Pick<MirrorClient, "energyFoodFact">): Promise<EnergyFoodFact[]> {
+  const rows = await db.energyFoodFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== energyFoodSourceDocumentId(row.sourceId)) throw new Error("Energy and food source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as EnergyFoodFact["indicatorId"], value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
+      unit: row.unit as EnergyFoodFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as EnergyFoodFact["valueStatus"],
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function moneyBanksMirrorCreateRows(facts: readonly MoneyBanksFact[], importRunId: string): Prisma.MoneyBanksFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: moneyBanksSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadMoneyBanksFactsFromMirror(db: Pick<MirrorClient, "moneyBanksFact">): Promise<MoneyBanksFact[]> {
+  const rows = await db.moneyBanksFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== moneyBanksSourceDocumentId(row.sourceId)) throw new Error("Money and banks source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as MoneyBanksFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(moneyBanksDisplayDecimals(row.indicatorId)), unit: row.unit as MoneyBanksFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as MoneyBanksFact["valueStatus"],
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function householdMirrorCreateRows(facts: readonly HouseholdFact[], importRunId: string): Prisma.HouseholdIncomeSpendingFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: householdSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadHouseholdFactsFromMirror(db: Pick<MirrorClient, "householdIncomeSpendingFact">): Promise<HouseholdFact[]> {
+  const rows = await db.householdIncomeSpendingFact.findMany({ orderBy: [{ indicatorId: "asc" }, { areaId: "asc" }, { measure: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== householdSourceDocumentId(row.sourceId)) throw new Error("Household source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as HouseholdFact["indicatorId"], areaId: row.areaId as HouseholdFact["areaId"], measure: row.measure as HouseholdFact["measure"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as "gel_month", basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });

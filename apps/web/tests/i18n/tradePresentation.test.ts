@@ -9,6 +9,7 @@ import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
 import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 import { getMethodologyContent } from "../../lib/methodology/catalog";
 import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
+import { TRADE_CHART_INDICATORS } from "../../lib/data/tradeOverview/types";
 test("Trade has complete matching messages and explicit USD and publication wording", async () => {
   const [ka, en] = await Promise.all([getMessages("ka", ["trade"]), getMessages("en", ["trade"])]);
   expect(Object.keys(ka).sort()).toEqual(Object.keys(en).sort());
@@ -83,6 +84,7 @@ test("Services metadata and page inputs use accepted services coverage, labels a
     expect(page.props.englishLabels["services.total"]).toBeTruthy();
     expect(props.sources.map(source => path.basename(source.downloadHref)).sort()).toEqual(["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx"]);
     expect(props.sources.every(source => source.downloadHref === source.downloadHref.toLowerCase())).toBe(true);
-    expect(props.data.types.facts.find(fact => fact.entityId === "services.maintenance_repair" && fact.year === 2020 && fact.indicatorId === "trade.exports")?.valueUsd).toBeNull();
+    const repairIndex = props.data.types.entities.findIndex(entity => entity.id === "services.maintenance_repair");
+    expect(props.data.types.facts.find(([entityIndex, year, measureIndex]) => entityIndex === repairIndex && year === 2020 && TRADE_CHART_INDICATORS[measureIndex] === "trade.exports")?.[3]).toBeNull();
   }
 });

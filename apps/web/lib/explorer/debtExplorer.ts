@@ -145,7 +145,8 @@ export function buildDebtDeck(facts: readonly ClientGovernmentDebtFact[], family
   return { year: latest.year, value: latest.value, change };
 }
 
-function shareOfGdp(value: number | null, year: number, gdpByYear: Map<number, ClientNationalGdpFact>): number | null {
+/** An amount as a share (0–1) of national GDP at current prices for its year; null without GDP. Money supply's % of GDP view reuses it. */
+export function shareOfGdp(value: number | null, year: number, gdpByYear: Map<number, ClientNationalGdpFact>): number | null {
   if (value === null) return null;
   const gdp = gdpByYear.get(year)?.gdpCurrentPricesGel;
   return gdp === undefined || gdp <= 0 ? null : value / gdp;

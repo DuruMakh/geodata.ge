@@ -39,12 +39,22 @@ describe("migration workbook", () => {
     expect(model.readable.rows[7]!.valuesByYear).toEqual({ 2022: 125_269, 2023: 245_064 });
     expect(model.readable.rows.at(-1)!.valuesByYear).toEqual({ 2022: 54_509, 2023: -39_207 });
     expect(model.readable.subtitle).toContain("Other countries");
-    expect(model.analysis.headers).toEqual(["Year", "Direction", "Citizenship", "Sex", "Persons"]);
+    expect(model.analysis.headers).toEqual(["Year", "Direction", "Citizenship", "Sex", "Persons", "Status"]);
     expect(model.analysis.rows).toHaveLength(2 * 2 * 6);
-    expect(model.analysis.rows[0]).toEqual([2022, "Arrivals", "Georgia", "All", expect.any(Number)]);
+    expect(model.analysis.rows[0]).toEqual([2022, "Arrivals", "Georgia", "All", expect.any(Number), "Published"]);
     expect(model.sources.map((source) => source.title)).toEqual(["Immigrants and emigrants"]);
     expect(model.sources[0]!.years).toEqual([2022, 2023]);
     expect(JSON.stringify(model)).not.toMatch(GEORGIAN);
+  });
+
+  it("marks a missing value Not available in the status column", () => {
+    const state = { ...DEFAULT_MIGRATION_STATE, range: { kind: "manual" as const, start: 2022, end: 2023 } };
+    const removed = facts.find((fact) => fact.seriesId === MIGRATION_SERIES[0] && fact.year === 2023 && fact.sex === "total")!;
+    const model = buildMigrationWorkbookExportModel({ facts: facts.filter((fact) => fact !== removed), state, sources, siteOrigin: "https://fiscal.ge" }, presentations.en);
+    const missing = model.analysis.rows.filter((row) => row[4] === null);
+    expect(missing.length).toBeGreaterThan(0);
+    expect(missing.every((row) => row.at(-1) === "Not available")).toBe(true);
+    expect(model.analysis.rows.filter((row) => row[4] !== null).every((row) => row.at(-1) === "Published")).toBe(true);
   });
 
   it("follows the sex filter and the selection, and labels the net as the selected groups' net", () => {

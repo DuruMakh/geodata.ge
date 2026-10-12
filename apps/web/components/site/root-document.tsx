@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JsonLd } from "../seo/json-ld";
@@ -8,21 +8,24 @@ import { resolveSiteUrl } from "../../lib/siteUrl";
 import { siteJsonLd } from "../../lib/seo/structuredData";
 import type { Locale } from "../../lib/i18n/types";
 
-const notoSansGeorgian = Noto_Sans_Georgian({
-  subsets: ["georgian", "latin"],
-  weight: ["400", "500", "600", "700"],
+// Stored in the repository rather than loaded from next/font/google, so builds never download
+// fonts; see assets/fonts/README.md.
+const notoSansGeorgian = localFont({
+  src: "../../assets/fonts/NotoSansGeorgian-Variable.woff2",
+  weight: "400 700",
   variable: "--font-noto-sans-georgian",
   display: "swap",
 });
-const notoSerifGeorgian = Noto_Serif_Georgian({
-  subsets: ["georgian", "latin"],
-  weight: ["400", "500", "600", "700"],
+const notoSerifGeorgian = localFont({
+  src: "../../assets/fonts/NotoSerifGeorgian-Variable.woff2",
+  weight: "400 700",
   variable: "--font-noto-serif-georgian",
   display: "swap",
+  adjustFontFallback: "Times New Roman",
 });
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const geistMono = localFont({
+  src: "../../assets/fonts/GeistMono-Variable.woff2",
+  weight: "400 600",
   variable: "--font-geist-mono",
   display: "swap",
   preload: false,

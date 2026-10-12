@@ -1,8 +1,8 @@
 import { SERIES } from "../data/demography/series";
 import type { ServedDemographyObservation } from "../data/demography/types";
-import { MUNICIPAL_COUNTRY_ID, type Municipality, type MunicipalRegion } from "../data/municipal/types";
+import type { Municipality, MunicipalRegion } from "../data/municipal/types";
 import { GEORGIA_PLACE_ID } from "./demographyAreas";
-import { ranked } from "./demographyPopulationIndex";
+import { placeIndexRows } from "./demographyPopulationIndex";
 import { birthsPer100Deaths } from "./demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "./format";
 import type { MunicipalListRow } from "./municipalData";
@@ -66,39 +66,7 @@ export function buildVitalIndexModel({
     return value;
   };
   const values = new Map(municipalities.map((municipality) => [municipality.code, ratio(municipality.code)]));
-  const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
-  const municipalityRows = ranked(
-    municipalities.map((municipality) => ({
-      id: municipality.code,
-      kind: "municipality" as const,
-      nameKa: municipality.displayNameKa,
-      subtitleKa: regionLabels.get(municipality.regionId) ?? "",
-      regionId: municipality.regionId,
-      valueGel: values.get(municipality.code)!,
-      budgetPerResidentGel: null,
-    })),
-  );
-  const regionRows = ranked(
-    regions.map((region) => ({
-      id: region.id,
-      kind: "region" as const,
-      nameKa: region.kaLabel,
-      subtitleKa: `${municipalities.filter((municipality) => municipality.regionId === region.id).length} მუნიციპალიტეტი`,
-      regionId: region.id,
-      valueGel: ratio(region.id),
-      budgetPerResidentGel: null,
-    })),
-  );
-  const country: MunicipalListRow = {
-    id: MUNICIPAL_COUNTRY_ID,
-    kind: "country",
-    nameKa: "საქართველო",
-    subtitleKa: `${municipalities.length} მუნიციპალიტეტი`,
-    regionId: null,
-    valueGel: ratio(GEORGIA_PLACE_ID),
-    budgetPerResidentGel: null,
-    rank: null,
-  };
+  const { municipalities: municipalityRows, regions: regionRows, country } = placeIndexRows({ regions, municipalities, valueOf: ratio });
   const countsById = Object.fromEntries(
     [...municipalities.map((municipality) => municipality.code), ...regions.map((region) => region.id), GEORGIA_PLACE_ID].map((id) => [id, counts.get(id)!]),
   );

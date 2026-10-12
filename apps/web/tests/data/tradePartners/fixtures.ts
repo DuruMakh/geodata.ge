@@ -1,7 +1,8 @@
 import { cp, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import type { TradePartnerEntity, TradePartnerFact, TradePartnersAcceptance } from "../../../lib/data/tradePartners/types";
-import type { TradeOverviewFact } from "../../../lib/data/tradeOverview/types";
+import { TRADE_CHART_INDICATORS, type TradeChartIndicator, type TradeOverviewFact } from "../../../lib/data/tradeOverview/types";
+import type { ClientTradePartnerFact, ClientTradePartnersData } from "../../../lib/data/tradePartners/importTradePartners";
 
 export const TRADE_RESEARCH = "docs/Raw Data/Trade/geostat-external-trade/2026-10-07";
 const root = path.resolve(process.cwd(), "../..");
@@ -84,4 +85,9 @@ export function tradePartnerNationalFacts(): TradeOverviewFact[] {
 
 export function tradePartnersFixtureAcceptance(): TradePartnersAcceptance {
   return { status: "passed", scope: "annual_goods_partners", years: [2024, 2025], countryEntities: 2, groupEntities: 2, primaryObservations: 14, derivedObservations: 12, primaryValueStatusCounts: { numeric: 12, blank: 0, not_applicable: 2 }, sourceSha256: {}, inputSha256: {}, canonicalSha256: "a".repeat(64), catalogueSha256: "b".repeat(64), englishLabelsSha256: "c".repeat(64), reviewedAt: "2026-10-08", researchPackageStatus: "requires_source_resolution", outsideScopeHoldCount: 2 };
+}
+
+/** Test edits read each compact client fact as an object and return its new value; entities and order are unchanged. */
+export function editClientPartnerFacts(data: ClientTradePartnersData, value: (fact: { entityId: string; year: number; indicatorId: TradeChartIndicator; valueUsd: number | null }) => number | null): ClientTradePartnerFact[] {
+  return data.facts.map(([entity, year, measure, valueUsd]) => [entity, year, measure, value({ entityId: data.entities[entity]!.id, year, indicatorId: TRADE_CHART_INDICATORS[measure]!, valueUsd })]);
 }

@@ -42,7 +42,7 @@ describe("births and deaths section", () => {
   });
 
   it("a region, a municipality where births lead, and one where they are equal", async () => {
-    expect(await render("region.imereti")).toContain("Deaths have outnumbered births every year since 2015.");
+    expect(await render("region.imereti")).toContain("Deaths have outnumbered births in every year on record, 2015–2025.");
     expect(await render("06")).toContain("Births outnumbered deaths in 2025.");
     expect(await render("17")).toContain("Births and deaths were equal in 2025.");
   });

@@ -3,6 +3,8 @@
 Date: 2026-10-09
 Status: Approved by the owner on 2026-10-10. Amended the same day by the owner: the Wages overview's Business / non-business tab is removed and Women / men takes its place, replacing the separate Gender page and card. Business and non-business remain groups on Industries. A second amendment that day makes Regions the map and list only, with a page for each region (its average wage beside the Georgia average), replacing the comparison chart and the no-region-pages rule in sections 2 and 3. A third amendment that day removes the summary and nominal note from every Wages page and the overview's tabs: Women, Men, Public and Non-public become subcategories of the average in the series list, beside the median.
 
+Sections 2–3 predate the 2026-10-10 amendments; `Project_Definition.md` §2G is authoritative for what shipped.
+
 ## 1. Intended result
 
 Let Fiscal.ge readers see how much people in Georgia earn, how that has changed since 1995, and how it differs between women and men, industries, regions and kinds of employer. Readers can inspect the same figures in a table and download their selection to Excel.

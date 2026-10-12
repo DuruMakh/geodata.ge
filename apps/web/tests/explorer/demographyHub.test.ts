@@ -8,7 +8,7 @@ import { getMessages } from "../../lib/i18n/messages.server";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 
 describe("demography routes", () => {
-  it("name the four pages in hub order and three pages are live: population, migration and births-deaths", () => {
+  it("name the four pages in hub order, all four live", () => {
     expect(DEMOGRAPHY_PAGES.map((page) => page.id)).toEqual(["population", "age-sex", "migration", "births-deaths"]);
     expect(DEMOGRAPHY_PAGES.map((page) => page.path)).toEqual([
       "/explorer/demography/population",
@@ -16,7 +16,7 @@ describe("demography routes", () => {
       "/explorer/demography/migration",
       "/explorer/demography/births-deaths",
     ]);
-    expect(LIVE_DEMOGRAPHY_PAGES.map((page) => page.id)).toEqual(["population", "migration", "births-deaths"]);
+    expect(LIVE_DEMOGRAPHY_PAGES.map((page) => page.id)).toEqual(["population", "age-sex", "migration", "births-deaths"]);
   });
 
   it("have a sidebar label in both languages for every live page", async () => {
@@ -28,13 +28,18 @@ describe("demography routes", () => {
 });
 
 describe("demography hub cards", () => {
-  it("link only the live pages and show the other one as coming soon", async () => {
+  it("link every page and show none as coming soon", async () => {
     const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common"], [])]);
     const cards = buildDemographyHubCards(facts, presentation);
     expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04"]);
     expect(cards.map((card) => card.title)).toEqual(["Population", "Age and sex", "Migration", "Births, deaths and fertility"]);
-    expect(cards.map((card) => card.href)).toEqual(["/explorer/demography/population", null, "/explorer/demography/migration", "/explorer/demography/births-deaths"]);
-    expect(cards.map((card) => card.comingSoon)).toEqual([false, true, false, false]);
+    expect(cards.map((card) => card.href)).toEqual([
+      "/explorer/demography/population",
+      "/explorer/demography/age-sex",
+      "/explorer/demography/migration",
+      "/explorer/demography/births-deaths",
+    ]);
+    expect(cards.map((card) => card.comingSoon)).toEqual([false, false, false, false]);
   });
 
   it("draw the population card from Georgia's series with the census gap as a break in the line", async () => {
@@ -49,6 +54,19 @@ describe("demography hub cards", () => {
     expect(card.series!.at(-1)).toBe(georgia.at(-1)!.value);
     expect(card.seriesColor).toBe(INK);
     expect(card.footer).toBe("2026: 3,941,103 people · 2004–2026");
+  });
+
+  it("draws the age and sex card from Georgia's share aged 65+ on 1 January", async () => {
+    const { facts } = await loadServedDemographyData();
+    const presentation = await getPresentation("en", ["demography"], []);
+    const card = buildDemographyHubCards(facts, presentation)[1]!;
+    // 23 years plus the gap that keeps the line from joining 2024 to 2025 across the census re-base.
+    expect(card.series).toHaveLength(24);
+    expect(card.series!.filter((value) => value === null)).toHaveLength(1);
+    expect(card.series![0]).toBeCloseTo(14.07, 2);
+    expect(card.series!.at(-1)).toBeCloseTo(18.08, 2);
+    expect(card.seriesColor).toBe(INK);
+    expect(card.footer).toBe("2026: 18.1% aged 65+ · 2004–2026");
   });
 
   it("draws the migration card from Geostat's published net", async () => {

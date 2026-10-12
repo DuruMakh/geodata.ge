@@ -7,13 +7,14 @@ import { buildTradeOverviewModel } from "../../lib/explorer/tradeOverview";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { INK } from "../../lib/explorer/colors";
 import { matchesLabelQuery } from "../../lib/i18n/search";
+import { TRADE_CHART_INDICATORS } from "../../lib/data/tradeOverview/types";
 
 async function fixture() {
-  const data = toClientTradeServicesData(await loadTradeServicesData());
-  return { data, presentation: { locale: "en" as const, englishLabels: data.englishLabels, messages: await getMessages("en", ["trade", "format"]) } };
+  const raw = await loadTradeServicesData(), data = toClientTradeServicesData(raw);
+  return { raw, data, presentation: { locale: "en" as const, englishLabels: data.englishLabels, messages: await getMessages("en", ["trade", "format"]) } };
 }
 test("services adapter preserves the national identity, twenty numeric points and missing type exports", async () => {
-  const { data } = await fixture();
+  const { raw, data } = await fixture();
   expect(data.national).toHaveLength(20);
   expect(data.national.every(f => Number.isFinite(f.valueUsd))).toBe(true);
   expect(data.types.dataset).toBe("services");
@@ -21,13 +22,14 @@ test("services adapter preserves the national identity, twenty numeric points an
   expect(data.types.entities.every(e => e.kind === "service_type")).toBe(true);
   expect(data.national.filter(f => f.role === "derived").every(f => f.sourceId === null)).toBe(true);
   expect(data.national.filter(f => f.role === "total").every(f => f.sourceId?.startsWith("geostat_services_"))).toBe(true);
-  expect(data.types.facts.filter(f => f.indicatorId === "trade.turnover" || f.indicatorId === "trade.balance").every(f => f.sourceId === null)).toBe(true);
-  expect(data.types.facts.filter(f => f.indicatorId === "trade.exports" || f.indicatorId === "trade.imports").every(f => f.sourceId?.startsWith("geostat_services_"))).toBe(true);
+  expect(raw.facts.filter(f => f.indicatorId === "trade.turnover" || f.indicatorId === "trade.balance").every(f => f.sourceId === null)).toBe(true);
+  expect(raw.facts.filter(f => f.indicatorId === "trade.exports" || f.indicatorId === "trade.imports").every(f => f.sourceId?.startsWith("geostat_services_"))).toBe(true);
   expect(tradePartnersTotalId(data.types)).toBe("services.total");
   expect(tradePartnersTotalId({})).toBe("goods.total");
   expect(tradePartnerColor("services.total")).toBe(INK);
   expect(new Set(data.types.entities.map(e => tradePartnerColor(e.id))).size).toBe(12);
-  expect(data.types.facts.find(f => f.entityId === "services.maintenance_repair" && f.year === 2020 && f.indicatorId === "trade.exports")?.valueUsd).toBeNull();
+  const repairIndex = data.types.entities.findIndex(e => e.id === "services.maintenance_repair");
+  expect(data.types.facts.find(([entityIndex, year, measureIndex]) => entityIndex === repairIndex && year === 2020 && TRADE_CHART_INDICATORS[measureIndex] === "trade.exports")?.[3]).toBeNull();
 });
 test("services defaults, complete bulk scope and explicit empty selections survive saved links", async () => {
   const { data } = await fixture(), initial = parseTradePartnersHash("", data.types);

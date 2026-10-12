@@ -41,6 +41,12 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   /** Each row's `kaLabel` already holds its label in the page language, with no catalogue entry to look up. */
   rowLabelsLocalized?: boolean;
   shareValueForYear: (row: Row, year: number) => number | null;
+  /** Decimals of a share cell in the year columns; one unless the publisher prints whole percents. */
+  percentDecimals?: number;
+  /** Decimals of a row's share cells; overrides `percentDecimals` for that row when given. */
+  shareDecimalsForRow?: (row: Row) => number;
+  /** A row's own number of decimals, for tables whose rows are published at different precisions; omit to use `unit.decimals`. */
+  decimalsForRow?: (row: Row) => number;
 };
 
 const headCellClass =
@@ -49,7 +55,7 @@ const numericCellClass =
   "px-3 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap @max-[768px]:px-2.5";
 // On phones a status mark (preliminary, planned, forecast) drops under its number
 // rather than widening every year column.
-const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-medium text-[var(--faint)] @max-[768px]:top-0 @max-[768px]:ml-0 @max-[768px]:block @max-[768px]:leading-tight";
+export const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-medium text-[var(--faint)] @max-[768px]:top-0 @max-[768px]:ml-0 @max-[768px]:block @max-[768px]:leading-tight";
 
 // Below 768px of table width (DESIGN.md §12) the sticky label column wraps and is capped at
 // 40% of the scroller, and the change/share columns scroll with the years instead of
@@ -98,6 +104,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   breakLabel,
   rowLabelsLocalized = false,
   shareValueForYear,
+  percentDecimals = 1,
+  shareDecimalsForRow,
+  decimalsForRow,
 }: ExplorerTableProps<Row>) {
   const { locale, messages, englishLabels } = useI18n();
   const rowLabel = (row: Row) => (rowLabelsLocalized ? row.kaLabel : publicLabel(locale, row.itemId, row.kaLabel, englishLabels));
@@ -111,8 +120,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   const cellValue = (row: Row, year: number): string => {
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
-    if (!share) return formatInUnit(amount, unit);
-    return formatShare(shareValueForYear(row, year));
+    if (!share) return formatInUnit(amount, decimalsForRow ? { ...unit, decimals: decimalsForRow(row) } : unit);
+    return formatShare(shareValueForYear(row, year), false, shareDecimalsForRow?.(row) ?? percentDecimals);
   };
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };

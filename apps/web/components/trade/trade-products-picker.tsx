@@ -56,7 +56,7 @@ export function TradeProductsPicker({ data, model, selectedIds, initialView, ret
     if (event.target !== event.currentTarget) return;
     const bounds = event.currentTarget.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
-  }} className="m-auto h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-[880px] border border-[var(--rule)] bg-[var(--paper)] p-0 text-[var(--ink)] shadow-xl backdrop:bg-black/35 min-[768px]:h-auto min-[768px]:max-h-[min(880px,calc(100dvh-3rem))]">
+  }} className="m-auto h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-[880px] border border-[var(--rule)] bg-[var(--paper)] p-0 text-[var(--ink)] backdrop:bg-black/35 min-[768px]:h-auto min-[768px]:max-h-[min(880px,calc(100dvh-3rem))]">
     <div className="flex h-full max-h-[inherit] flex-col">
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-[var(--rule)] px-4 py-3 min-[768px]:px-6">
         <h2 id="trade-products-picker-title" className="text-lg font-semibold">{t("add")}</h2>

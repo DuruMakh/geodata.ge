@@ -33,7 +33,7 @@ export function buildPovertyWorkbookExportModel(input: { section: PovertySection
     analysis: {
       headers: [workbookMessage(locale, "workbook.year"), t("series"), t(`amountHeader.${unit}`), workbookMessage(locale, "workbook.status")],
       rows: model.years.flatMap(year => model.selected.map(series => [year, labels[series.id], series.valuesByYear[year], status(series.valuesByYear[year])])),
-      numericFormats: { 2: numberFormat },
+      numericFormats: { 3: numberFormat },
     },
     sources: withAbsoluteUrls(originals, input.siteOrigin),
   };

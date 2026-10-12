@@ -3,7 +3,7 @@ import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import type { ClientTradeOverviewFact } from "../tradeOverview/types";
-import type { ClientTradePartnersData } from "../tradePartners/importTradePartners";
+import { packTradePartnerFacts, type ClientTradePartnersData } from "../tradePartners/importTradePartners";
 import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { TRADE_SERVICES_FIELDS, tradeServicesFactKey, type TradeServiceEntity, type TradeServiceFact, type TradeServicesAcceptance, type TradeServicesData } from "./types";
@@ -40,5 +40,5 @@ export function toClientTradeServicesData(data: TradeServicesData): { national: 
   const national = data.facts.filter(f => f.entityId === "services.total" && f.valueUsd !== null).map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd), sourceId: f.sourceId, publicationStatus: f.publicationStatus, role: f.role === "derived" ? "derived" as const : "total" as const, lastReviewedAt: f.lastReviewedAt }));
   const entities = data.entities.filter(e => e.kind === "service_type").map(e => ({ id: e.id, kind: "service_type" as const, sourceCode: null, labelKa: e.labelKa }));
   const ids = new Set(entities.map(e => e.id));
-  return { national, types: { dataset: "services", entities, nationalFacts: national, facts: data.facts.filter(f => ids.has(f.entityId)).map(f => ({ entityId: f.entityId, year: f.year, indicatorId: f.indicatorId, valueUsd: f.valueUsd === null ? null : Number(f.valueUsd), sourceId: f.sourceId, basis: f.basis, publicationStatus: f.publicationStatus, lastReviewedAt: f.lastReviewedAt })) }, englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])) };
+  return { national, types: { dataset: "services", entities, nationalFacts: national, facts: packTradePartnerFacts(entities, data.facts.filter(f => ids.has(f.entityId))) }, englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])) };
 }

@@ -18,7 +18,6 @@ export function TradeDomesticExports({ data, sources, lastReviewedAt, siteOrigin
   const props = { sources, lastReviewedAt, siteOrigin };
   return <div data-testid="trade-domestic" data-section={section} className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
-    <p className="mb-4 max-w-[850px] text-[13px] leading-relaxed text-[var(--body)]">{t(`${section}Summary`)}</p>
     <div role="group" aria-label={t("views")} className="mb-5 flex flex-wrap items-center gap-5">
       {sections.map(id => <TextTab key={id} label={t(id)} active={section === id} onClick={() => changeSection(id)} testId={`trade-domestic-section-${id}`} />)}
     </div>

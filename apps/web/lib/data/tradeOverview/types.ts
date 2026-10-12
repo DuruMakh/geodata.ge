@@ -1,7 +1,9 @@
 export const TRADE_OVERVIEW_INDICATORS = ["trade.turnover", "trade.exports", "trade.imports", "trade.balance"] as const;
 export type TradeOverviewIndicator = (typeof TRADE_OVERVIEW_INDICATORS)[number];
 export const TRADE_DOMESTIC_OVERVIEW_INDICATORS = ["trade.exports", "trade.domestic_exports", "trade.reexports"] as const;
-export type TradeChartIndicator = TradeOverviewIndicator | "trade.domestic_exports" | "trade.reexports";
+/** Every measure a trade chart can draw; its order is the measure index of the compact partner facts. */
+export const TRADE_CHART_INDICATORS = [...TRADE_OVERVIEW_INDICATORS, "trade.domestic_exports", "trade.reexports"] as const;
+export type TradeChartIndicator = (typeof TRADE_CHART_INDICATORS)[number];
 export const TRADE_OVERVIEW_SOURCE = "geostat_trade_ftrade-1995-2026";
 export const TRADE_OVERVIEW_DOCUMENT_ID = "source.geostat_trade_ftrade_1995_2026";
 export const TRADE_OVERVIEW_SHEET = "1995-2026";

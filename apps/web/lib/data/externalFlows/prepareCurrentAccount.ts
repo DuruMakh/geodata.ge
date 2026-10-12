@@ -4,7 +4,7 @@ import path from "node:path";
 import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
 import { serializeBomCsvRows } from "../csvEscape";
-import { readVerifiedPackageFile } from "../sourcePackage";
+import { readVerifiedResearchPackage } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import { CURRENT_ACCOUNT_FLOWS, CURRENT_ACCOUNT_SOURCE, CURRENT_ACCOUNT_YEARS, type CurrentAccountAcceptance, type CurrentAccountFact, type CurrentAccountSeriesId } from "./types";
 import { validateCurrentAccountFacts } from "./currentAccountValidation";
@@ -19,21 +19,8 @@ const fields = ["series_id", "year", "flow", "value_usd", "unit", "basis", "sour
 
 /** Copies NBG's annual current account and its four parts (credit, debit, net) from the frozen external-flows research package. */
 export async function prepareCurrentAccountData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
-  const directory = path.join(repositoryRoot, RESEARCH), inputSha256: Record<string, string> = {};
-  const manifestBytes = await fs.readFile(path.join(directory, "artifact-manifest.csv"));
-  inputSha256["artifact-manifest.csv"] = hash(manifestBytes);
-  const manifest = new Map(rows(manifestBytes).map(row => [row.file, row]));
-  const research: Record<string, Buffer> = {};
-  for (const name of PROTECTED) {
-    const entry = manifest.get(name);
-    if (!entry) throw new Error(`Current account research artifact missing from manifest: ${name}`);
-    const { bytes, sha256 } = await readVerifiedPackageFile(directory, name, { sha256: entry.sha256, bytes: Number(entry.bytes) }, `Current account research artifact hash mismatch: ${name}`);
-    research[name] = bytes; inputSha256[name] = sha256;
-  }
-  const evidenceBytes = await fs.readFile(path.join(directory, "independent-verification.json"));
-  const evidence = JSON.parse(evidenceBytes.toString("utf8")) as { result: string; input_artifact_sha256: Record<string, string> };
-  if (evidence.result !== "pass" || evidence.input_artifact_sha256?.["bop-annual.csv"] !== inputSha256["bop-annual.csv"]) throw new Error("Current account independent verification is not current and passing");
-  inputSha256["independent-verification.json"] = hash(evidenceBytes);
+  const directory = path.join(repositoryRoot, RESEARCH);
+  const { research, inputSha256 } = await readVerifiedResearchPackage(directory, { label: "Current account", files: PROTECTED, verifiedInputs: ["bop-annual.csv"] });
   const validation = JSON.parse(research["prepared-validation.json"].toString("utf8")) as { checks: { fail: number } };
   if (validation.checks?.fail !== 0) throw new Error("Current account research package has failing checks");
 

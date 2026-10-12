@@ -138,6 +138,7 @@ describe("methodology footer attribution", () => {
     ["economic-sectors", "Geostat"],
     ["regional-economies", "Geostat"],
     ["demography", "Geostat"],
+    ["household-income", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
@@ -147,6 +148,19 @@ describe("methodology footer attribution", () => {
     expect(footer).not.toMatch(/\d{4}-\d{2}-\d{2}/);
     const header = markup.match(/<header[\s\S]*?<\/header>/)?.[0] ?? "";
     expect(header).toContain(`Last methodology review · ${METHODOLOGY_CONTENT[dataset as keyof typeof METHODOLOGY_CONTENT].reviewedAt}`);
+  });
+});
+
+describe("household income and spending methodology", () => {
+  it.each([["ka", "შინამეურნეობების შემოსავლები და ხარჯები"], ["en", "Household income and spending"]] as const)("renders the %s article with its 21 archived originals and Dataset markup", async (locale, title) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "household-income" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2002–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    expect(markup).toContain("/downloads/methodology/household-income/files/104-income-per-household.xlsx");
+    expect(markup).toContain("/downloads/methodology/household-income/files/income-page-2026-10-11.html.txt");
+    expect(markup).not.toContain("/official/ka/");
   });
 });
 

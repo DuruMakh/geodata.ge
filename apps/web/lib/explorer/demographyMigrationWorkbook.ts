@@ -67,10 +67,13 @@ export function buildMigrationWorkbookExportModel(
       rows,
     },
     analysis: {
-      headers: [workbookMessage(locale, "workbook.year"), t("directionHeader"), t("citizenshipHeader"), t("sexHeader"), unitLabel],
+      headers: [workbookMessage(locale, "workbook.year"), t("directionHeader"), t("citizenshipHeader"), t("sexHeader"), unitLabel, workbookMessage(locale, "workbook.status")],
       rows: model.years.flatMap((year) =>
         (["arrivals", "departures"] as const).flatMap((direction) =>
-          model.selectedIds.map((group) => [year, t(DIRECTION_KEYS[direction]), groupLabel(group), t(SEX_KEYS[input.state.sex]), model.byDirection[direction][group][year] ?? null]),
+          model.selectedIds.map((group) => {
+            const value = model.byDirection[direction][group][year] ?? null;
+            return [year, t(DIRECTION_KEYS[direction]), groupLabel(group), t(SEX_KEYS[input.state.sex]), value, workbookMessage(locale, value === null ? "workbook.unavailable" : "workbook.published")];
+          }),
         ),
       ),
       numericFormats: { 5: "#,##0" },

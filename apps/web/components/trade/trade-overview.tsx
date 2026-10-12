@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { type ClientTradeOverviewFact, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import { buildTradeOverviewModel, TRADE_OVERVIEW_COLORS } from "../../lib/explorer/tradeOverview";
 import { parseTradeOverviewHash, serializeTradeOverviewHash, tradeOverviewCoverage, tradeOverviewIndicators, type TradeOverviewState } from "../../lib/explorer/tradeOverviewState";
@@ -15,8 +15,9 @@ import { matchesLabelQuery } from "../../lib/i18n/search";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
@@ -24,28 +25,12 @@ import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote, SwatchBar } from "../ui/editorial";
 
-function useTradeOverviewState(facts: ClientTradeOverviewFact[], dataset?: "services") {
-  const [state, setState] = useState(() => parseTradeOverviewHash("", facts));
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() { const next = parseTradeOverviewHash(window.location.hash, facts); current.current = next; setState(next); }
-    restore(); window.addEventListener("popstate", restore); window.addEventListener("hashchange", restore);
-    return () => { window.removeEventListener("popstate", restore); window.removeEventListener("hashchange", restore); };
-  }, [facts]);
-  useAppReady();
-  const update = useCallback((change: (previous: TradeOverviewState) => TradeOverviewState, push = false) => {
-    const next = change(current.current); current.current = next;
-    const hash = `#${serializeTradeOverviewHash(next)}${dataset === "services" || facts.some(f => f.indicatorId === "trade.domestic_exports") ? "&section=overview" : ""}`;
-    if (window.location.hash !== hash) {
-      try { if (push) window.history.pushState(null, "", hash); else window.history.replaceState(null, "", hash); }
-      catch { /* Embedded contexts may deny History access; the view still updates. */ }
-    }
-    setState(next);
-    if (dataset === "services") window.dispatchEvent(new Event("trade-services-state"));
-    else if (facts.some(f => f.indicatorId === "trade.domestic_exports")) window.dispatchEvent(new Event("trade-domestic-state"));
-  }, [facts, dataset]);
-  return { state, update };
-}
+// Inside Domestic exports and Services the hash also names the section, and each change tells the page which hash to keep for it.
+const isDomestic = (facts: readonly ClientTradeOverviewFact[]) => facts.some(f => f.indicatorId === "trade.domestic_exports");
+const serializeOverview = (state: TradeOverviewState, facts: readonly ClientTradeOverviewFact[]) => `${serializeTradeOverviewHash(state)}${isDomestic(facts) ? "&section=overview" : ""}`;
+const serializeServicesOverview = (state: TradeOverviewState) => `${serializeTradeOverviewHash(state)}&section=overview`;
+const OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: facts => { if (isDomestic(facts)) window.dispatchEvent(new Event("trade-domestic-state")); } };
+const SERVICES_OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: () => window.dispatchEvent(new Event("trade-services-state")) };
 
 export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, dataset }: { dataset?: "services"; facts: ClientTradeOverviewFact[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
@@ -53,7 +38,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
   const indicators = tradeOverviewIndicators(facts), domestic = facts.some(f => f.indicatorId === "trade.domestic_exports"), totalId = indicators[0];
   const services = dataset === "services";
   const title = t(services ? "services.title" : domestic ? "domestic.title" : "title");
-  const { state, update } = useTradeOverviewState(facts, dataset);
+  const { state, update } = useHashState(facts, parseTradeOverviewHash, services ? serializeServicesOverview : serializeOverview, services ? SERVICES_OVERVIEW_OPTIONS : OVERVIEW_OPTIONS);
   const [query, setQuery] = useState("");
   const model = buildTradeOverviewModel(facts, state, presentation);
   const label = (id: TradeChartIndicator) => t(services ? `services.indicator.${id}` : domestic && id === "trade.exports" ? "domestic.totalExports" : `indicator.${id}`);
@@ -65,8 +50,9 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation));
   }} />;
+  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: TRADE_OVERVIEW_COLORS[id], vals: model.years.map(year => model.valuesByIndicator[id][year]), planned: model.years.map(() => false) }));
   return <div data-testid="trade-overview" className="@container">
-    {!domestic && !services ? <><ExplorerHeading>{title}</ExplorerHeading><p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p></> : null}
+    {!domestic && !services ? <ExplorerHeading>{title}</ExplorerHeading> : null}
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
@@ -75,8 +61,9 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
             <span className="text-[11px] text-[var(--muted)]">{model.unit.label}</span>
           </div>
           {!model.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t(domestic ? "domestic.emptySelection" : "emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selectedIds.map(id => ({ id, label: label(id), color: TRADE_OVERVIEW_COLORS[id], vals: model.years.map(year => model.valuesByIndicator[id][year]), planned: model.years.map(() => false) }))} share={false} unit={model.unit} shareLabel={t("title")} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={t("title")} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${title} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
+          <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradeOverviewCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradeOverviewModel(facts, s, presentation).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(services ? "services.sourceNote" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}

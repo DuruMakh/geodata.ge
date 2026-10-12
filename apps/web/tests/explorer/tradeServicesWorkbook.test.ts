@@ -9,6 +9,7 @@ import { parseTradeOverviewHash } from "../../lib/explorer/tradeOverviewState";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { workbookMessage } from "../../lib/i18n/workbook";
+import { editClientPartnerFacts } from "../data/tradePartners/fixtures";
 
 // Task 4 registers these native originals in the public archive; this tests the shared writer independently.
 const sourceNames = ["Georgian-Exports-of-Services-by-Types.xlsx", "Georgian-Imports-of-Services-by-Types.xlsx"];
@@ -56,7 +57,7 @@ test.each(["en", "ka"] as const)("services %s native workbooks preserve selectio
     model.analysis.rows.forEach((row, index) => expect(excel.worksheets[1].getCell(index + 2, 4).value).toBe(row[3]));
     expect(JSON.stringify(excel.worksheets[2].getSheetValues())).not.toMatch(/FTrade|1004_180325/);
   }
-  const zeroData = { ...data.types, facts: data.types.facts.map(f => f.entityId === "services.travel" && f.year === 2024 && f.indicatorId === "trade.exports" ? { ...f, valueUsd: 0 } : f) };
+  const zeroData = { ...data.types, facts: editClientPartnerFacts(data.types, f => f.entityId === "services.travel" && f.year === 2024 && f.indicatorId === "trade.exports" ? 0 : f.valueUsd) };
   const zero = buildTradePartnersWorkbookModel({ data: zeroData, state: parseTradePartnersHash("#sel=services.travel&measure=trade.exports&start=2024&end=2024", zeroData), sources, siteOrigin }, presentation);
   const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(zero));
   expect(excel.worksheets[1].getCell("D2").value).toBe(0);

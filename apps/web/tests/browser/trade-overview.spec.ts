@@ -195,3 +195,18 @@ test("encoded HTML source aliases cannot execute from the site origin", async ({
     expect(createHash("sha256").update(await response.body()).digest("hex"), href).toBe(hash);
   }
 });
+
+test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
+  await page.goto("/en/explorer/trade/overview#view=line&sel=");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.locator('[data-series-id="trade.exports"]').getByTestId("series-row-toggle").click();
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+});
+
+test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
+  await page.goto("/en/explorer/trade/overview");
+  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
+});

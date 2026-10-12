@@ -11,7 +11,7 @@ const gdpRows = parse(readFileSync(path.resolve(process.cwd(), "../../data/impor
 const gdp = gdpRows.filter(row => row.series_id === "nominal_usd").map(row => ({ year: Number(row.year), valueUsd: Number(row.value), preliminary: row.status === "preliminary" }));
 async function p(locale: "en" | "ka") { return { locale, englishLabels: {}, messages: await getMessages(locale, ["external", "controls", "main", "format", "common"]) }; }
 
-test.each(["en", "ka"] as const)("renders %s defaults: the Balance tab, a stacked chart with a five-row key, one intro line and one source line", async locale => {
+test.each(["en", "ka"] as const)("renders %s defaults: the Balance tab, a stacked chart with a five-row key, no intro line and one source line", async locale => {
   const { CurrentAccount } = await import("../../components/external/current-account");
   const presentation = await p(locale), facts = toClientCurrentAccountFacts(await loadCurrentAccountFacts());
   const html = renderToStaticMarkup(<I18nProvider {...presentation}><CurrentAccount facts={facts} gdp={gdp} sources={[]} lastReviewedAt="2026-10-10" siteOrigin="https://fiscal.ge" /></I18nProvider>);
@@ -21,7 +21,8 @@ test.each(["en", "ka"] as const)("renders %s defaults: the Balance tab, a stacke
   const key = html.slice(html.indexOf('data-testid="current-account-key"'), html.indexOf('data-testid="current-account-excel-download"'));
   expect(key.match(/data-series-id=/g)).toHaveLength(5);
   expect(key).not.toContain("aria-pressed");
-  expect(html.replaceAll("&#x27;", "'")).toContain(presentation.messages["external.account.intro"]);
+  // DESIGN §17: nothing but the heading above the controls.
+  expect(html).not.toMatch(/<\/h1><p/);
   expect(html.match(/data-testid="source-label"/g)).toHaveLength(1);
   expect(html).toContain('data-testid="measure-share-toggle"');
   expect(html).not.toMatch(/GEL|₾/);

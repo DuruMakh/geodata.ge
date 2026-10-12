@@ -2,9 +2,9 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Poverty/geostat-poverty-annual/`, collected on 2026-10-10 from Geostat's "Poverty and Gini Coefficients" page. The research captures are immutable. The 491 primary values are served on the Poverty and inequality pages under the approved design `docs/superpowers/specs/2026-10-10-poverty-inequality-design.md`; see [Serving on the Poverty and inequality pages](#serving-on-the-poverty-and-inequality-pages). Nothing is published through MCP or included in central machine-readable publications.
+This methodology governs the research package at `docs/Raw Data/Poverty/geostat-poverty-annual/`, collected on 2026-10-10 from Geostat's "Poverty and Gini Coefficients" page. The research captures are immutable. The 491 primary values are served on the Poverty and Inequality pages of the Living standards hub (`/explorer/living-standards/poverty` and `/explorer/living-standards/inequality`; the earlier `/explorer/poverty` addresses redirect there) under the approved designs `docs/superpowers/specs/2026-10-10-poverty-inequality-design.md` and `docs/superpowers/specs/2026-10-11-living-standards-design.md`; see [Serving on the Poverty and inequality pages](#serving-on-the-poverty-and-inequality-pages). Nothing is published through MCP or included in central machine-readable publications.
 
-The user approved annual data only: absolute, relative and international poverty rates and Gini coefficients. Household income and expenditure, poverty by region, the subsistence minimum, the lari value of the international lines and quarterly data are excluded.
+The user approved annual data only: absolute, relative and international poverty rates and Gini coefficients. Household income and expenditure (a separate dataset: `household-income-spending-annual.md`), poverty by region, the subsistence minimum, the lari value of the international lines and quarterly data are excluded.
 
 Geostat is the sole publisher. Four workbooks, the English source page and two current metadata documents (25 May 2026) are preserved under `official/`. Exact URLs, retrieval dates, byte sizes and SHA-256 fingerprints live in `source-manifest.csv` and `source-manifest.json`.
 

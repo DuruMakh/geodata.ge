@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import type { Presentation } from "../../lib/i18n/types";
-import { toClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
+import { loadMoneyTransfersData, toClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
 import { moneyTransferEntities, moneyTransferFacts } from "../data/externalFlows/fixtures";
 const data = toClientMoneyTransfersData({ entities: moneyTransferEntities(), facts: moneyTransferFacts() });
 const presentation: Presentation = { locale: "en", messages: { "external.unit.million": "million USD", "external.unit.billion": "billion USD", "external.money.otherCountries": "Other countries" }, englishLabels: { "transfer.total": "Money transfers, all countries", "bop.personal_transfers": "Personal transfers (official estimate)", "transfer.italy": "Italy", "transfer.sudan": "Sudan", "transfer.other_countries": "Other Countries" } };
@@ -58,4 +58,30 @@ test("the ranking divides by that year's all-country total", async () => {
   const sent = build(data, { ...initial, measure: "sent" }, presentation);
   expect(sent.ranking.map(r => r.entityId)).toEqual(["transfer.italy"]);
   expect(sent.other?.valueUsd).toBe(40);
+});
+
+test("listed lines never share a colour, in either direction and any end year", async () => {
+  const { buildMoneyTransfersModel: build, DEFAULT_MONEY_TRANSFERS_STATE: initial } = await modules();
+  const real = toClientMoneyTransfersData(await loadMoneyTransfersData());
+  for (const measure of ["received", "sent"] as const) for (const end of [2022, 2024, 2025]) {
+    const model = build(real, { ...initial, measure, range: { kind: "manual", start: 2015, end } }, { ...presentation, locale: "ka" });
+    const colors = model.series.map(series => model.colorById[series.id]);
+    expect(colors.every(Boolean), `${measure} ${end}`).toBe(true);
+    expect(new Set(colors).size, `${measure} ${end}`).toBe(colors.length);
+    expect(model.ranking.every(row => row.color === model.colorById[row.entityId])).toBe(true);
+  }
+});
+
+test("the partial note names the partial years of the selected lines only", async () => {
+  const { buildMoneyTransfersModel: build, DEFAULT_MONEY_TRANSFERS_STATE: initial } = await modules();
+  expect(build(data, { ...initial, selectedIds: ["transfer.sudan"] }, presentation).partialYears).toEqual([2019]);
+  expect(build(data, { ...initial, selectedIds: ["transfer.italy"] }, presentation).partialYears).toEqual([]);
+  const moved = { ...data, facts: data.facts.map(f => f.entityId === "transfer.sudan" && f.year === 2019 ? { ...f, year: 2018 } : f) };
+  expect(build(moved, { ...initial, selectedIds: ["transfer.sudan"], range: { kind: "manual", start: 2010, end: 2018 } }, presentation).partialYears).toEqual([2018]);
+});
+
+test("the page's facts carry only what it reads: no source ids or vintages", () => {
+  expect(data.facts[0]).not.toHaveProperty("sourceId");
+  expect(data.facts[0]).not.toHaveProperty("vintage");
+  expect(Object.keys(data.facts[0]!).sort()).toEqual(["entityId", "measure", "monthsReported", "valueStatus", "valueUsd", "year"]);
 });

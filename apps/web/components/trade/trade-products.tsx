@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, X } from "lucide-react";
 import type { ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { TRADE_PRODUCT_MEASURES } from "../../lib/data/tradeProducts/types";
@@ -18,6 +18,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { Callout, SegmentedTabs, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
@@ -45,9 +46,11 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const pageIds = model.selectedIds.slice(page * 25, (page + 1) * 25);
   const rows = pageIds.map(id => ({ itemId: id, kaLabel: labels.get(id)!, color: tradeProductColor(id), valuesByYear: model.valuesByEntity[id] }));
   const total = rows.find(row => row.itemId === TRADE_PRODUCT_TOTAL_ID) ?? null;
-  const chart = useMemo(() => <EditorialLineChart years={model.years} series={model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) }))} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={value => `${formatInUnit(value, model.unit)} ${model.unit.label}`} />, [model, labels, measureLabel]);
+  const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) })), [model, labels]);
+  const valueLabel = useCallback((value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`, [model.unit]);
+  const chart = useMemo(() => <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />, [model, lineSeries, measureLabel, valueLabel]);
   return <div data-testid="trade-products" className="@container">
-    {!domestic ? <><ExplorerHeading>{t("title")}</ExplorerHeading><p className="mb-4 text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p></> : null}
+    {!domestic ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}
     <div className={`mb-4 flex flex-wrap items-center ${domestic ? "justify-end" : "justify-between"} gap-3`}>
       {!domestic ? <div role="group" aria-label={t("measure")} className="flex items-center gap-5">{TRADE_PRODUCT_MEASURES.map(id => <TextTab key={id} label={message(messages, `trade.indicator.${id}`)} active={state.measure === id} onClick={() => update(previous => ({ ...previous, measure: id }), true)} testId={`trade-products-measure-${id}`} />)}</div> : null}
       <button type="button" data-testid="trade-products-add" onClick={event => setPicker({ view: "categories", opener: event.currentTarget })} className="flex min-h-11 cursor-pointer items-center gap-2 border border-[var(--control)] px-3 text-[0.8125rem] font-medium hover:bg-[var(--tint)]"><Plus size={16} aria-hidden />{t("add")}</button>
@@ -66,6 +69,8 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
         : <div data-testid="trade-products-table" data-page={page + 1}><ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== TRADE_PRODUCT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
           <nav aria-label={t("tablePages")} className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted)]"><span>{t("selected")} · {model.selectedCount} · {page + 1} / {pageCount}</span>{pageCount > 1 ? <div className="flex gap-5"><button type="button" data-testid="trade-products-table-previous" disabled={page === 0} onClick={() => setPaging({ selection: state.selectedIds, page: page - 1 })} className="min-h-11 cursor-pointer disabled:opacity-35">{t("previous")}</button><button type="button" data-testid="trade-products-table-next" disabled={page + 1 === pageCount} onClick={() => setPaging({ selection: state.selectedIds, page: page + 1 })} className="min-h-11 cursor-pointer disabled:opacity-35">{t("next")}</button></div> : null}</nav>
         </div>}
+      {/* Directly after the plot, before the chips: the readout CSS and the return pill look for the chart as the previous sibling. With more than ten products the chips name the selection, so the legend is left out. */}
+      <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={10} />
       <div data-testid="trade-products-selection" className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] leading-tight">
         {model.selectedIds.slice(0, 4).map((id, index) => {
           const entity = entities.get(id), name = entity ? publicLabel(locale, id, entity.labelKa, englishLabels) : labels.get(id)!;

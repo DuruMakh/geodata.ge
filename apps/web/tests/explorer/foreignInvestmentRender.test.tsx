@@ -10,7 +10,7 @@ const data = toClientForeignInvestmentData({ entities: foreignInvestmentEntities
 const englishLabels = { "fdi.total": "Foreign direct investment, total", "fdi.country.m49_826": "United Kingdom", "fdi.country.unknown": "Unknown", "fdi.sector.k": "Financial and insurance activities", "fdi.region.guria": "Guria", "fdi.region.tbilisi": "Tbilisi" };
 async function p(locale: "en" | "ka") { return { locale, englishLabels, messages: await getMessages(locale, ["external", "controls", "main", "format", "common"]) }; }
 
-test.each(["en", "ka"] as const)("renders %s defaults: the country tab, the total only, one intro line and the ranking", async locale => {
+test.each(["en", "ka"] as const)("renders %s defaults: the country tab, the total only, no intro line and the ranking", async locale => {
   const { ForeignInvestment } = await import("../../components/external/foreign-investment");
   const presentation = await p(locale);
   const html = renderToStaticMarkup(<I18nProvider {...presentation}><ForeignInvestment data={data} sources={[]} lastReviewedAt="2026-10-10" siteOrigin="https://fiscal.ge" /></I18nProvider>);
@@ -19,7 +19,8 @@ test.each(["en", "ka"] as const)("renders %s defaults: the country tab, the tota
   expect(selection).toContain('data-series-id="fdi.total"');
   expect(html).toContain('data-dimension="country"');
   for (const tab of ["country", "sector", "region"]) expect(html).toContain(`data-testid="foreign-investment-tab-${tab}"`);
-  expect(html).toContain(presentation.messages["external.investment.intro"]);
+  // DESIGN §17: nothing but the heading above the controls.
+  expect(html).not.toMatch(/<\/h1><p/);
   expect(html).toContain(presentation.messages["external.investment.sourceNote"]);
   expect(html).toContain('data-testid="foreign-investment-ranking"');
   expect(html).not.toMatch(/GEL|₾/);

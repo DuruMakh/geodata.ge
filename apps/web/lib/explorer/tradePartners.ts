@@ -1,21 +1,19 @@
 import type { ClientTradePartnersData, ClientTradePartnerEntity } from "../data/tradePartners/importTradePartners";
 import { TRADE_SERVICE_IDS } from "../data/tradeServices/types";
+import { TRADE_CHART_INDICATORS } from "../data/tradeOverview/types";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
-import { INK, SERIES_COLORS } from "./colors";
+import { INK, SERIES_COLORS, stableSeriesColor } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { TRADE_PARTNER_TOTAL_ID, tradePartnersTotalId, tradePartnersBulkSelection, tradePartnersCoverage, type TradePartnersState } from "./tradePartnersState";
 
-const palette = [...new Set(Object.values(SERIES_COLORS))].filter(color => color !== INK);
+const servicePalette = [...new Set(Object.values(SERIES_COLORS))].filter(color => color !== INK);
 export function tradePartnerColor(id: string): string {
   if (id === TRADE_PARTNER_TOTAL_ID || id === "services.total") return INK;
   const serviceIndex = (TRADE_SERVICE_IDS as readonly string[]).indexOf(id);
-  if (serviceIndex > 0) return palette[serviceIndex - 1];
-  let hash = 0;
-  for (const letter of id) hash = (hash * 31 + letter.charCodeAt(0)) >>> 0;
-  return palette[hash % palette.length];
+  return serviceIndex > 0 ? servicePalette[serviceIndex - 1] : stableSeriesColor(id);
 }
 export type TradePartnerRankingRow = { entityId: string; kind: ClientTradePartnerEntity["kind"]; label: string; valueUsd: number | null; shareOfNational: number | null; rank: number | null; color: string };
 export type TradePartnersModel = { years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: string[]; valuesByEntity: Record<string, Record<number, number | null>>; activeEntities: ClientTradePartnerEntity[]; offTabSelected: ClientTradePartnerEntity[]; ranking: TradePartnerRankingRow[]; missingRanking: TradePartnerRankingRow[]; selectedCount: number; totalCount: number };
@@ -25,7 +23,8 @@ export function buildTradePartnersModel(data: ClientTradePartnersData, state: Tr
   const years = Array.from({ length: range.end - range.start + 1 }, (_, index) => range.start + index);
   const ids = tradePartnersBulkSelection(data), selectedIds = ids.filter(id => state.selectedIds.includes(id));
   const totalId = tradePartnersTotalId(data);
-  const cells = new Map(data.facts.filter(f => f.indicatorId === state.measure).map(f => [`${f.entityId}:${f.year}`, f.valueUsd]));
+  const measure = TRADE_CHART_INDICATORS.indexOf(state.measure);
+  const cells = new Map(data.facts.filter(f => f[2] === measure).map(([entity, year, , value]) => [`${data.entities[entity]!.id}:${year}`, value]));
   for (const fact of data.nationalFacts) if (fact.indicatorId === state.measure) cells.set(`${totalId}:${fact.year}`, fact.valueUsd);
   const valuesByEntity = Object.fromEntries(ids.map(id => [id, Object.fromEntries(years.map(year => [year, cells.get(`${id}:${year}`) ?? null]))]));
   const values = ids.flatMap(id => years.map(year => valuesByEntity[id][year]).filter((value): value is number => value !== null));

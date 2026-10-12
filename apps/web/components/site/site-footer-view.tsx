@@ -2,14 +2,11 @@ import Link from "next/link";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import type { Locale, Messages } from "../../lib/i18n/types";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 
 // The four datasets, then the site's own pages (owner decision D3, 2026-10-07).
 const FOOTER_LINKS = [
-  { href: "/explorer", labelKey: "common.budget" },
-  { href: "/explorer/economy", labelKey: "common.economy" },
-  { href: "/explorer/inflation", labelKey: "common.inflation" },
-  { href: "/explorer/unemployment", labelKey: "common.unemployment" },
-  { href: "/explorer/trade", labelKey: "common.trade" },
+  ...DATASET_HUBS,
   { href: "/methodology", labelKey: "common.methodology" },
   { href: "/connect", labelKey: "common.aiConnection" },
   { href: "/about", labelKey: "common.about" },

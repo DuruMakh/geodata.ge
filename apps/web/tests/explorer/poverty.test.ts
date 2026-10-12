@@ -102,14 +102,15 @@ test("the inequality workbook keeps two decimals", async () => {
   }, await presentationFor("en"));
   expect(model.filename).toMatch(/^fiscal-poverty-inequality-2024-2025/);
   expect(model.readable.numberFormat).toBe("0.00");
-  expect(model.analysis.numericFormats).toEqual({ 2: "0.00" });
+  // Column 3 is the value (year, series, value, status); column 2 holds the series label.
+  expect(model.analysis.numericFormats).toEqual({ 3: "0.00" });
   expect(model.analysis.rows.at(-1)!.slice(0, 3)).toEqual([2025, "Total income", 0.34]);
   expect(model.sources.map(source => source.title)).toEqual(["geostat_gini"]);
 });
 
 test("the hub has two cards with national sparklines and their latest values", async () => {
   const cards = buildPovertyHubCards(facts, await presentationFor("en"));
-  expect(cards.map(card => card.href)).toEqual(["/explorer/poverty/rates", "/explorer/poverty/inequality"]);
+  expect(cards.map(card => card.href)).toEqual(["/explorer/living-standards/poverty", "/explorer/living-standards/inequality"]);
   expect(cards.map(card => card.footer)).toEqual(["2025 · 7.1% · 2004–2025", "2025 · 0.34 · 2006–2025"]);
   expect(cards.map(card => card.series?.length)).toEqual([22, 20]);
 });

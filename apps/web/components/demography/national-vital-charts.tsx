@@ -19,9 +19,9 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 /** The first year of the fertility curve; the last is ACCENT. Distinct from the grey of the years between. */
-const FIRST_YEAR_COLOR = "#3D5A98";
+const FIRST_YEAR_COLOR = SERIES_COLORS["fertility.first_year"]!;
 
-function ModeTabs({ value, onChange, testId }: { value: ChartMode; onChange: (mode: ChartMode) => void; testId: string }) {
+export function ModeTabs({ value, onChange, testId, lineLabel }: { value: ChartMode; onChange: (mode: ChartMode) => void; testId: string; lineLabel?: string }) {
   const { messages } = useI18n();
   return (
     <SegmentedTabs<ChartMode>
@@ -29,14 +29,14 @@ function ModeTabs({ value, onChange, testId }: { value: ChartMode; onChange: (mo
       value={value}
       onChange={onChange}
       options={[
-        { value: "line", label: message(messages, "municipal.line"), testId: `${testId}-mode-line` },
+        { value: "line", label: lineLabel ?? message(messages, "municipal.line"), testId: `${testId}-mode-line` },
         { value: "table", label: message(messages, "controls.table"), testId: `${testId}-mode-table` },
       ]}
     />
   );
 }
 
-function Download({ testId, build }: { testId: string; build: () => WorkbookExportModel }) {
+export function Download({ testId, build }: { testId: string; build: () => WorkbookExportModel }) {
   return (
     <div className="mt-4 w-full max-w-[260px]">
       <ExcelDownloadButton

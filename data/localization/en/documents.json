@@ -3962,6 +3962,504 @@
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-10" },
     "documentLanguage": "en"
   },
+  "geostat_energy_balance_2013_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2013 (Energy Balance of Georgia 2013)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2013_electricity": {
+    "title": { "text": "Electricity and heat, 2013 (Energy Balance of Georgia 2013)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2014_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2014 (Energy Balance of Georgia 2014)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2014_electricity": {
+    "title": { "text": "Electricity and heat, 2014 (Energy Balance of Georgia 2014)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2015_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2015 (Energy Balance of Georgia 2015)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2015_electricity": {
+    "title": { "text": "Electricity and heat, 2015 (Energy Balance of Georgia 2015)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2016_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2016 (Energy Balance of Georgia 2016)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2016_electricity": {
+    "title": { "text": "Electricity and heat, 2016 (Energy Balance of Georgia 2016)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2017_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2017 (Energy Balance of Georgia 2017)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2017_electricity": {
+    "title": { "text": "Electricity and heat, 2017 (Energy Balance of Georgia 2017)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2018_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2018 (Energy Balance of Georgia 2018)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2018_electricity": {
+    "title": { "text": "Electricity and heat, 2018 (Energy Balance of Georgia 2018)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2019_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2019 (Energy Balance of Georgia 2019)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2019_electricity": {
+    "title": { "text": "Electricity and heat, 2019 (Energy Balance of Georgia 2019)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2020_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2020 (Energy Balance of Georgia 2020)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2020_electricity": {
+    "title": { "text": "Electricity and heat, 2020 (Energy Balance of Georgia 2020)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2021_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2021 (Energy Balance of Georgia 2021)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2021_electricity": {
+    "title": { "text": "Electricity and heat, 2021 (Energy Balance of Georgia 2021)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2022_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2022 (Energy Balance of Georgia 2022)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2022_electricity": {
+    "title": { "text": "Electricity and heat, 2022 (Energy Balance of Georgia 2022)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2023_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2023 (Energy Balance of Georgia 2023)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2023_electricity": {
+    "title": { "text": "Electricity and heat, 2023 (Energy Balance of Georgia 2023)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2024_aggregated": {
+    "title": { "text": "Aggregated Energy Balance, 2024 (Energy Balance of Georgia 2024)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2024_electricity": {
+    "title": { "text": "Electricity and heat, 2024 (Energy Balance of Georgia 2024)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_efficiency": {
+    "title": { "text": "Energy efficiency indicators, 2013-2024", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_food_balance_sheets": {
+    "title": { "text": "Food balance sheets, 2014-2025", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_2024_aggregated_ka": {
+    "title": { "text": "Aggregated Energy Balance, 2024 (Georgian labels)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "ka"
+  },
+  "geostat_food_balance_sheets_ka": {
+    "title": { "text": "Food balance sheets (Georgian labels)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "ka"
+  },
+  "geostat_energy_balance_page_2013": {
+    "title": { "text": "Energy Balance of Georgia 2013 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2014": {
+    "title": { "text": "Energy Balance of Georgia 2014 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2015": {
+    "title": { "text": "Energy Balance of Georgia 2015 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2016": {
+    "title": { "text": "Energy Balance of Georgia 2016 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2017": {
+    "title": { "text": "Energy Balance of Georgia 2017 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2018": {
+    "title": { "text": "Energy Balance of Georgia 2018 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2019": {
+    "title": { "text": "Energy Balance of Georgia 2019 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2020": {
+    "title": { "text": "Energy Balance of Georgia 2020 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2021": {
+    "title": { "text": "Energy Balance of Georgia 2021 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2022": {
+    "title": { "text": "Energy Balance of Georgia 2022 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2023": {
+    "title": { "text": "Energy Balance of Georgia 2023 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_page_2024": {
+    "title": { "text": "Energy Balance of Georgia 2024 (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_energy_balance_index_page": {
+    "title": { "text": "Energy Balance of Georgia (index page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_food_security_page": {
+    "title": { "text": "Food Security (source page capture)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_money_aggregates": {
+    "title": { "text": "Money aggregates and monetary ratios (M2.1)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_loans_l3_5": {
+    "title": { "text": "Loans granted by banks to the economy (L3.5)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposits_d3_17": {
+    "title": { "text": "Deposits by type (D3.17)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposits_individuals_d3_23": {
+    "title": { "text": "Deposits of individuals (D3.23)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposits_legal_d3_27": {
+    "title": { "text": "Deposits of legal entities (D3.27)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_policy_rate": {
+    "title": { "text": "Monetary policy rate (MPR)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_loan_rates_lwir": {
+    "title": { "text": "Annual weighted average interest rates on loans (LWIR)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_deposit_rates_dwir": {
+    "title": { "text": "Annual weighted average interest rates on deposits (DWIR)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_fsi_archive": {
+    "title": { "text": "Financial soundness indicators (FSI) - archive", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_fsi": {
+    "title": { "text": "Financial soundness indicators (FSI)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_monetary_statistics": {
+    "title": { "text": "Methodology of monetary statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_loans": {
+    "title": { "text": "Methodology of loan statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_deposits": {
+    "title": { "text": "Methodology of deposit statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_meth_interest_rates": {
+    "title": { "text": "Methodology of interest rate statistics", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_15": {
+    "title": { "text": "National Bank file list - category 15 (monetary statistics)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_16": {
+    "title": { "text": "National Bank file list - category 16 (deposits)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_17": {
+    "title": { "text": "National Bank file list - category 17 (loans)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_19": {
+    "title": { "text": "National Bank file list - category 19 (financial markets)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_27": {
+    "title": { "text": "National Bank file list - category 27 (archive)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "nbg_statistics_page": {
+    "title": { "text": "National Bank statistics page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_national": {
+    "title": { "text": "Distribution of average monthly incomes of the total population", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_settlement": {
+    "title": { "text": "Distribution of average monthly incomes of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_population_region": {
+    "title": { "text": "Distribution of average monthly incomes of the total population by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_national": {
+    "title": { "text": "Distribution of average monthly incomes per household", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_settlement": {
+    "title": { "text": "Distribution of average monthly incomes per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_household_region": {
+    "title": { "text": "Distribution of average monthly incomes per household by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_national": {
+    "title": { "text": "Distribution of average monthly incomes per capita", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_settlement": {
+    "title": { "text": "Distribution of average monthly incomes per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_capita_region": {
+    "title": { "text": "Distribution of average monthly incomes per capita by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_national": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_population_region": {
+    "title": { "text": "Distribution of average monthly expenditures of the total population by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_national": {
+    "title": { "text": "Distribution of average monthly expenditures per household", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures per household by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_household_region": {
+    "title": { "text": "Distribution of average monthly expenditures per household by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_national": {
+    "title": { "text": "Distribution of average monthly expenditures per capita", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_settlement": {
+    "title": { "text": "Distribution of average monthly expenditures per capita by urban and rural areas", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_capita_region": {
+    "title": { "text": "Distribution of average monthly expenditures per capita by regions", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_income_page": {
+    "title": { "text": "Households incomes source page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_spending_page": {
+    "title": { "text": "Households expenditures source page", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
+  "geostat_household_hies_metadata_2026": {
+    "title": { "text": "Metadata: Households Incomes and Expenditures Survey (25 May 2026)", "reviewedAt": "2026-10-11" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-11" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
+    "documentLanguage": "en"
+  },
   "geostat_services_georgian-exports-of-services-by-types": {
     "title": {
       "text": "Services exports by type, 2020–2024",

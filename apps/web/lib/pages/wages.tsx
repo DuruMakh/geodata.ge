@@ -11,7 +11,7 @@ import { loadServedWagesData, toClientWagesFact } from "../data/wages/importWage
 import { WAGES_GROUPS, WAGES_REGIONS, WAGES_SECTORS, type ClientWagesFact } from "../data/wages/types";
 import { ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
-import { WAGES_SECTIONS, wagesCoverage, wagesRegionHref, wagesViews, type WagesSectionId } from "../explorer/wages";
+import { WAGES_SECTIONS, wagesCoverage, wagesRegionHref, wagesSummaryValues, wagesViews, type WagesSectionId } from "../explorer/wages";
 import { buildWagesRegionMapModel } from "../explorer/wagesRegionMap";
 import { buildWagesHubCards } from "../explorer/wagesHubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
@@ -50,8 +50,9 @@ export async function renderWagesHub(locale: Locale) {
 }
 
 export async function wagesPageMetadata(locale: Locale, section: WagesSectionId) {
-  const messages = await getMessages(locale, ["wages"]);
-  return fiscalMetadata({ locale, path: WAGES_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `wages.page.${section}.title`), description: message(messages, `wages.page.${section}.summary`) });
+  const [messages, data] = await Promise.all([getMessages(locale, ["wages"]), loadServedWagesData()]);
+  const values = wagesSummaryValues(data.facts.map(toClientWagesFact));
+  return fiscalMetadata({ locale, path: WAGES_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `wages.page.${section}.title`), description: message(messages, `wages.page.${section}.summary`, values) });
 }
 
 /** Display names for every series id a wages page can show, in the page's language. */
@@ -71,9 +72,9 @@ function regionForSlug(slug: string) {
   return REGIONAL_ECONOMY_REGIONS.find(region => region.id === id)!;
 }
 export async function wagesRegionPageMetadata(slug: string, locale: Locale) {
-  const region = regionForSlug(slug), presentation = await getPresentation(locale, ["wages"], [region.id]);
+  const region = regionForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, ["wages"], [region.id]), loadServedWagesData()]);
   const name = publicLabel(locale, region.id, region.kaLabel, presentation.englishLabels);
-  return fiscalMetadata({ locale, path: wagesRegionHref(region.id), title: message(presentation.messages, "wages.regionTitle", { region: name }), description: message(presentation.messages, "wages.regionSummary", { region: name }) });
+  return fiscalMetadata({ locale, path: wagesRegionHref(region.id), title: message(presentation.messages, "wages.regionTitle", { region: name }), description: message(presentation.messages, "wages.regionSummary", { region: name, ...wagesSummaryValues(data.facts.map(toClientWagesFact)) }) });
 }
 export const renderWagesRegionPage = (slug: string, locale: Locale) => renderWagesPage(locale, "regions", regionForSlug(slug).id);
 
@@ -103,7 +104,8 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
   });
   const t = (key: string) => message(presentation.messages, `wages.${key}`);
   const title = regionId ? message(presentation.messages, "wages.regionTitle", { region: regionName }) : t(`page.${section}.title`);
-  const description = regionId ? message(presentation.messages, "wages.regionSummary", { region: regionName }) : t(`page.${section}.summary`);
+  const summaryValues = wagesSummaryValues(data.facts.map(toClientWagesFact));
+  const description = message(presentation.messages, regionId ? "wages.regionSummary" : `wages.page.${section}.summary`, regionId ? { region: regionName, ...summaryValues } : summaryValues);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/wages", locale) }, ...(regionId ? [{ label: t("page.regions.title"), href: pageHref("/explorer/wages/regions", locale) }] : []), { label: regionId ? regionName : title }];
   return <I18nProvider {...presentation}>

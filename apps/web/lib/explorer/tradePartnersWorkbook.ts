@@ -3,9 +3,8 @@ import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { buildTradePartnersModel } from "./tradePartners";
-import { unitFor } from "./format";
 import { tradePartnersTotalId, type TradePartnersState } from "./tradePartnersState";
-import { buildWorkbookExportModel, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { applySignedAmountFormat, buildWorkbookExportModel, EXACT_SIGNED_FORMAT, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 export function buildTradePartnersWorkbookModel(input: { dataset?: "services"; data: ClientTradePartnersData; state: TradePartnersState; sources: readonly WorkbookPublicSource[]; siteOrigin: string }, presentation: Presentation): WorkbookExportModel {
   const model = buildTradePartnersModel(input.data, input.state, presentation);
@@ -36,20 +35,17 @@ export function buildTradePartnersWorkbookModel(input: { dataset?: "services"; d
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: totalId, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
-      return { id, kind: id === totalId ? "total" : "item", label: entity ? publicLabel(presentation.locale, id, entity.labelKa, presentation.englishLabels) : t(services ? "services.total" : "partners.total"), parentLabel: entity ? t(services ? "services.types" : entity.kind === "country" ? "partners.countries" : "partners.groups") : t(services ? "services.total" : "partners.total"), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };
+      return { id, kind: id === totalId ? "total" : "item", label: entity ? publicLabel(presentation.locale, id, entity.labelKa, presentation.englishLabels) : t(services ? "services.total" : "partners.total"), parentLabel: entity ? t(services ? "services.types" : entity.kind === "country" ? "partners.countries" : "partners.groups") : t(services ? "services.total" : "partners.total"), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: model.valuesByEntity[id][year] === null ? "not_available" as const : "actual" as const }])) };
     }), sources: input.sources.filter(source => filenames.has(services ? source.downloadHref.split("/").at(-1)!.toLowerCase() : source.downloadHref.split("/").at(-1)!)), siteOrigin: input.siteOrigin,
   });
   const groupNote = model.selectedIds.some(id => entities.get(id)?.kind === "group") ? ` · ${t("partners.groupOverlap")}` : "";
   exportModel.readable.subtitle = `${indicatorLabel} · ${model.range.start}–${model.range.end} · ${model.unit.label} · ${t(services ? "services.workbookNote" : domestic ? "domestic.workbookNote" : "workbook.formulas")}${groupNote}`;
   if (domestic || services) exportModel.readable.fitSubtitle = true;
   const values = model.selectedIds.flatMap(id => model.years.map(year => model.valuesByEntity[id][year])).filter((value): value is number => value !== null);
-  const amountDecimals = Math.max(model.unit.decimals, unitFor(values, model.unit, 15).decimals);
-  const amountFormat = "#,##0." + "0".repeat(amountDecimals);
-  exportModel.readable.amountDecimals = amountDecimals;
-  exportModel.readable.numberFormat = `${amountFormat};"−"${amountFormat}`;
+  applySignedAmountFormat(exportModel, values, model.unit);
   exportModel.analysis.headers[3] = t("workbook.amount");
   exportModel.analysis.headers.push(t("workbook.publication"));
   exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, t("publicationUnspecified")]);
-  exportModel.analysis.numericFormats = { 4: '#,##0.###############;"−"#,##0.###############' };
+  exportModel.analysis.numericFormats = { 4: EXACT_SIGNED_FORMAT };
   return exportModel;
 }
