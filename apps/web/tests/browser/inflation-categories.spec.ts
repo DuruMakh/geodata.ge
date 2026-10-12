@@ -51,16 +51,16 @@ test("clearing the selection can be undone from the same control", async ({ page
   await page.goto(`/en${CATEGORIES}`);
   await ready(page);
   const bulk = page.getByTestId("series-toggle-all");
-  await expect(bulk).toHaveAttribute("aria-checked", "true");
+  await expect(bulk).toHaveAttribute("data-state", "true");
 
   await bulk.click();
   await expect(page.locator("rect[data-segment]")).toHaveCount(0);
   await expect(bulk).toBeVisible();
-  await expect(bulk).toHaveAttribute("aria-checked", "false");
+  await expect(bulk).toHaveAttribute("data-state", "false");
 
   await bulk.click();
   // Back to the documented default: the 12 divisions, no subgroups.
-  await expect(bulk).toHaveAttribute("aria-checked", "true");
+  await expect(bulk).toHaveAttribute("data-state", "true");
   await expect(page.locator('rect[data-segment="cpi.cat.residual"]').first()).toBeAttached();
 });
 

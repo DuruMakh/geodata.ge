@@ -216,7 +216,7 @@ describe("series lists for screen readers and fingers", () => {
       onToggle: () => {},
     }));
 
-    expect(caret(row)).toContain('aria-label="ვალი — ქვესერიები"');
+    expect(caret(row)).toContain('aria-label="ვალი — ქვეკატეგორიები"');
     expect(caret(row)).toMatch(/class="[^"]*\bw-6\b/);
     expect(caret(row)).not.toContain("w-[22px]");
     // The invisible hit area no longer reaches past the box sideways; it still runs 12px below the row.
@@ -239,11 +239,11 @@ describe("series lists for screen readers and fingers", () => {
       onToggleExpanded: () => {},
       downloadAction: createElement("div"),
     }));
-    expect(ministries).toContain('aria-label="Education ministry — ქვესერიები"');
-    expect(ministries).toContain('aria-label="Health ministry — ქვესერიები"');
+    expect(ministries).toContain('aria-label="Education ministry — ქვეკატეგორიები"');
+    expect(ministries).toContain('aria-label="Health ministry — ქვეკატეგორიები"');
   });
 
-  it("the select-all checkbox keeps one name and reports state through aria-checked", () => {
+  it("the bulk control is a plain button named by its visible word in every state", () => {
     const bulk = (hasSelection: boolean, allSelected: boolean) => {
       const props = {
         query: "",
@@ -267,11 +267,14 @@ describe("series lists for screen readers and fingers", () => {
       [true, true, "true", "გასუფთავება"],
     ] as const) {
       const control = bulk(hasSelection, allSelected);
-      expect(control).toContain('role="checkbox"');
-      expect(control).toContain('aria-label="ყველა სერიის მონიშვნა"');
-      expect(control).toContain(`aria-checked="${state}"`);
-      // The visible action word stays (AGENTS.md UI contract); only the announced name is fixed.
-      expect(control).toContain(visible);
+      // No role, aria-checked or aria-label: the accessible name is the visible word (WCAG 2.5.3).
+      expect(control).not.toContain("role=");
+      expect(control).not.toContain("aria-checked");
+      expect(control).not.toContain("aria-label");
+      expect(control).toContain(`data-state="${state}"`);
+      // The only text that is not aria-hidden is the visible action word.
+      const named = control.replace(/<span aria-hidden="true"[^>]*>[^<]*<\/span>/g, "").replace(/<[^>]+>/g, "");
+      expect(named).toBe(visible);
     }
   });
 });

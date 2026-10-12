@@ -427,7 +427,7 @@ describe("Government Debt route composition", () => {
 
     expect(visibleText).toContain("სერიები 0 / 9");
     expect(visibleText).toContain("ყველას მონიშვნა");
-    expect(markup).toMatch(/<button[^>]*data-testid="series-toggle-all"[^>]*aria-checked="false"/);
+    expect(markup).toMatch(/<button[^>]*data-testid="series-toggle-all"[^>]*data-state="false"/);
   });
 
   it("shows the bulk checkbox full only when every row of the active family is selected", async () => {
@@ -453,7 +453,7 @@ describe("Government Debt route composition", () => {
         onSelectionChange: noop,
         onToggleSeries: noop,
       }));
-      return markup.match(/<button[^>]*data-testid="series-toggle-all"[^>]*aria-checked="([a-z]+)"/)?.[1];
+      return markup.match(/<button[^>]*data-testid="series-toggle-all"[^>]*data-state="([a-z]+)"/)?.[1];
     };
 
     // The default total alone is a partial selection, as in every other explorer.

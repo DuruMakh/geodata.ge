@@ -14,13 +14,11 @@ test("English selection controls keep their complete denominator while searching
   await search.fill("თავდაცვა");
   expect((await status.innerText()).replace(/\s+/g, " ")).toBe(before);
   const bulk = page.getByTestId("series-toggle-all");
-  // One announced name in every state; the visible word names the action and aria-checked the state.
-  await expect(bulk).toHaveAccessibleName("Select all series");
-  await expect(bulk).toContainText("Clear");
+  // A plain action button: its name is the visible word, which names the action.
+  await expect(bulk).toHaveAccessibleName("Clear");
   await bulk.click();
-  await expect(bulk).toHaveAccessibleName("Select all series");
-  await expect(bulk).toContainText("Select all");
-  await expect(bulk).toHaveAttribute("aria-checked", "false");
+  await expect(bulk).toHaveAccessibleName("Select all");
+  await expect(bulk).toHaveAttribute("data-state", "false");
   await bulk.click();
   await expect(status).toContainText(`${denominator} / ${denominator}`);
   await expect(page.getByTestId("range-start-handle")).toHaveAccessibleName("Start year");

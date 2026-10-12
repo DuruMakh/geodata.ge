@@ -108,12 +108,10 @@ export function SeriesSelector({
         {hasSelection || allowSelectAll ? (
           <button
             type="button"
-            role="checkbox"
             data-testid="series-toggle-all"
-            aria-checked={bulkState}
-            // One name in every state: aria-checked carries the state, so a screen reader never
-            // hears a checkbox called "Clear" that is half checked. The visible word still names the action.
-            aria-label={message(messages, "controls.selectAllSeries")}
+            // A plain action button named by its visible word (WCAG 2.5.3): a checkbox called
+            // "Clear" that reports a mixed state confuses a screen reader. The square is decoration.
+            data-state={bulkState}
             onClick={onToggleAll}
             className="grid min-h-11 shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 pr-1 pl-0.5 text-left"
           >

@@ -523,19 +523,19 @@ test.describe("municipality page", () => {
     const status = panel.getByTestId("series-status");
 
     await expect(status).toContainText("სერიები 1 / 11");
-    await expect(bulk).toHaveAttribute("role", "checkbox");
-    await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+    await expect(bulk).not.toHaveAttribute("role", "checkbox");
+    await expect(bulk).toHaveAttribute("data-state", "mixed");
     await expect(indicator).toHaveText("—");
     await expect(bulk).toContainText("გასუფთავება");
     await bulk.click();
-    await expect(bulk).toHaveAttribute("aria-checked", "false");
+    await expect(bulk).toHaveAttribute("data-state", "false");
     await expect(indicator).toHaveText("");
     await expect(bulk).toContainText("ყველას მონიშვნა");
 
     await panel.getByTestId("series-search").fill("განათლება");
     await expect(panel.getByTestId("series-row")).toHaveCount(2);
     await bulk.click();
-    await expect(bulk).toHaveAttribute("aria-checked", "true");
+    await expect(bulk).toHaveAttribute("data-state", "true");
     await expect(indicator).toHaveText("✓");
     await panel.getByTestId("series-search").fill("");
     await expect(panel.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
@@ -697,7 +697,7 @@ test.describe("municipality page", () => {
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-row")).toHaveCount(11);
     await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
-    await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("data-state", "true");
   });
 
   test("downloads the selected range and series as a sourced percentage workbook", async ({ page }) => {

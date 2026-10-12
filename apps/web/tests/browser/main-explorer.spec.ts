@@ -248,23 +248,23 @@ test("bulk selector exposes mixed, empty, and checked states", async ({ page }) 
   const bulk = panel.getByTestId("series-toggle-all");
   const indicator = panel.getByTestId("series-toggle-indicator");
 
-  await expect(bulk).toHaveAttribute("role", "checkbox");
-  await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+  await expect(bulk).not.toHaveAttribute("role", "checkbox");
+  await expect(bulk).toHaveAttribute("data-state", "mixed");
   await expect(indicator).toHaveText("—");
 
   await panel.getByTestId("series-row").nth(1).getByTestId("series-row-toggle").click();
   await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*2 \/ \d+/);
-  await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+  await expect(bulk).toHaveAttribute("data-state", "mixed");
   await expect(indicator).toHaveText("—");
 
   await bulk.click();
-  await expect(bulk).toHaveAttribute("aria-checked", "false");
+  await expect(bulk).toHaveAttribute("data-state", "false");
   await expect(indicator).toHaveText("");
   await expect(bulk).toContainText("ყველას მონიშვნა");
 
   await panel.getByTestId("series-search").fill("ჯანმრთელობა");
   await bulk.click();
-  await expect(bulk).toHaveAttribute("aria-checked", "true");
+  await expect(bulk).toHaveAttribute("data-state", "true");
   await expect(indicator).toHaveText("✓");
   await expect(bulk).toContainText("გასუფთავება");
 });
@@ -697,7 +697,7 @@ test("shared ministries program links restore with the parent expanded", async (
   await page.getByTestId("grouping-ministries").click();
   const panel = page.getByTestId("series-selector");
   // Each caret is named after its own ministry.
-  await panel.getByRole("button", { name: /^.+ — ქვესერიები$/ }).first().click();
+  await panel.getByRole("button", { name: /^.+ — ქვეკატეგორიები$/ }).first().click();
   const firstProgram = panel.locator("[data-level='major_program']").first();
   await firstProgram.getByRole("button").last().click();
   await expect(page).toHaveURL(/sel=[^&]*admin_program/);
