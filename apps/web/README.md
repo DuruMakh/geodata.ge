@@ -31,8 +31,10 @@ npm run check          # lint + typecheck + unit tests + data validation + i18n 
 npm run test           # vitest unit tests
 npm run test:browser   # Playwright browser tests
 npm run prisma:generate
-npm run prisma:migrate
+npm run prisma:deploy  # apply committed migrations
 ```
+
+New migrations are written by hand, not with `prisma migrate dev`: see [Creating a migration](../../docs/data-methodology/database-import.md#creating-a-migration-prisma-migrate-dev-does-not-work-here).
 
 ## Data pipeline scripts
 

@@ -23,7 +23,7 @@ By default (`GEODATA_DATA_SOURCE` unset or `csv`) the app reads CSV data from `d
 
 The reviewed CSVs are the canonical source of truth. Supabase Postgres is the canonical serving store, populated from them by the idempotent, parity-checked import (`npm run data:import`). Production builds set `GEODATA_DATA_SOURCE=db` to render pages from the database at build time — the deployed site stays fully static. See `docs/data-methodology/database-import.md` for the full workflow, including the one-time Supabase setup. (Activation status: live in production since 2026-07-28 — production builds render from the Supabase mirror via the Actions deploy pipeline; CSV remains the break-glass fallback.)
 
-Database commands (`npm run prisma:migrate`, `npm run data:import`, builds with `GEODATA_DATA_SOURCE=db`) need `apps/web/.env` with the Supabase connection strings — copy `apps/web/.env.example` and fill in the pooled (`DATABASE_URL`, port 6543) and session-pooler (`DIRECT_URL`, port 5432) URLs.
+Database commands (`npm run prisma:deploy`, `npm run data:import`, builds with `GEODATA_DATA_SOURCE=db`) need `apps/web/.env` with the Supabase connection strings — copy `apps/web/.env.example` and fill in the pooled (`DATABASE_URL`, port 6543) and session-pooler (`DIRECT_URL`, port 5432) URLs. New migrations are written by hand, not with `prisma migrate dev`: see [Creating a migration](docs/data-methodology/database-import.md#creating-a-migration-prisma-migrate-dev-does-not-work-here).
 
 ## Deployment
 
