@@ -269,3 +269,5 @@ source.geostat_household_spending_capita_region,ერთ სულ მოსა
 source.geostat_household_income_page,შინამეურნეობების შემოსავლების წყაროს გვერდი,docs/Raw Data/Households/geostat-household-income-spending-annual/official/income-page-2026-10-11.html,2026-10-11
 source.geostat_household_spending_page,შინამეურნეობების ხარჯების წყაროს გვერდი,docs/Raw Data/Households/geostat-household-income-spending-annual/official/spending-page-2026-10-11.html,2026-10-11
 source.geostat_household_hies_metadata_2026,შინამეურნეობების შემოსავლებისა და ხარჯების კვლევის მეტამონაცემები,docs/Raw Data/Households/geostat-household-income-spending-annual/official/hies-metadata-2026.pdf,2026-10-10
+source.geostat_services_georgian_exports_of_services_by_types,"მომსახურების ექსპორტი სახეების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Exports-of-services-by-types.xlsx,2026-10-11
+source.geostat_services_georgian_imports_of_services_by_types,"მომსახურების იმპორტი სახეების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Imports-of-services-by-types.xlsx,2026-10-11

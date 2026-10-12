@@ -31,6 +31,7 @@ import { TRADE_PARTNER_DOCUMENT_IDS, type TradePartnerEntity, type TradePartnerF
 import { CURRENT_ACCOUNT_SOURCE, FOREIGN_INVESTMENT_SOURCES, MONEY_TRANSFER_SOURCES, type CurrentAccountFact, type ForeignInvestmentData, type ForeignInvestmentEntity, type ForeignInvestmentFact, type MoneyTransferEntity, type MoneyTransferFact, type MoneyTransfersData } from "../data/externalFlows/types";
 import { TRADE_PRODUCT_DOCUMENT_IDS, type TradeProductEntity, type TradeProductFact, type TradeProductsData } from "../data/tradeProducts/types";
 import { TRADE_DOMESTIC_DOCUMENT_IDS, type TradeDomesticEntity, type TradeDomesticFact, type TradeDomesticData } from "../data/tradeDomestic/types";
+import { TRADE_SERVICES_DOCUMENT_IDS, type TradeServiceEntity, type TradeServiceFact, type TradeServicesData } from "../data/tradeServices/types";
 import type { RegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types";
@@ -586,6 +587,23 @@ export async function loadTradeProductsDataFromMirror(db: Pick<MirrorClient, "tr
   const facts = factRows.map(row => {
     if (!TRADE_PRODUCT_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_PRODUCT_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId) throw new Error("Trade product source relation mismatch");
     return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradeProductFact["indicatorId"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as TradeProductFact["valueStatus"], publicationStatus: row.publicationStatus as "unspecified", role: row.role as "detail", sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock as TradeProductFact["sourceBlock"], lastReviewedAt: isoDate(row.lastReviewedAt) };
+  });
+  return { entities, facts };
+}
+
+export function tradeServiceEntityMirrorCreateRows(entities: readonly TradeServiceEntity[], importRunId: string): Prisma.TradeServiceEntityCreateManyInput[] {
+  return entities.map(entity => ({ ...entity, importRunId }));
+}
+export function tradeServiceFactMirrorCreateRows(facts: readonly TradeServiceFact[], importRunId: string): Prisma.TradeServiceFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({ ...fact, sourceDocumentId: fact.sourceId === null ? null : TRADE_SERVICES_DOCUMENT_IDS[fact.sourceId], lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId }));
+}
+export async function loadTradeServicesDataFromMirror(db: Pick<MirrorClient, "tradeServiceEntity" | "tradeServiceFact">): Promise<TradeServicesData> {
+  const [entityRows, factRows] = await Promise.all([db.tradeServiceEntity.findMany({ orderBy: { id: "asc" } }), db.tradeServiceFact.findMany({ orderBy: [{ entityId: "asc" }, { year: "asc" }, { indicatorId: "asc" }] })]);
+  const entities = entityRows.map(({ id, kind, labelKa, labelEn }) => ({ id, kind: kind as TradeServiceEntity["kind"], labelKa, labelEn }));
+  const facts = factRows.map(row => {
+    if (row.role === "derived" && row.sourceDocumentId !== null) throw new Error("Services derived source relation mismatch");
+    if (row.role !== "derived" && (!row.sourceId || !TRADE_SERVICES_DOCUMENT_IDS[row.sourceId] || row.sourceDocumentId !== TRADE_SERVICES_DOCUMENT_IDS[row.sourceId] || JSON.parse(row.sourceRefs)[0]?.[0] !== row.sourceId)) throw new Error("Services source relation mismatch");
+    return { entityId: row.entityId, year: row.year, indicatorId: row.indicatorId as TradeServiceFact["indicatorId"], valueUsd: row.valueUsd?.toFixed() ?? null, unit: row.unit as "usd", basis: row.basis as "actual", valueStatus: row.valueStatus as TradeServiceFact["valueStatus"], publicationStatus: row.publicationStatus as "unspecified", role: row.role as TradeServiceFact["role"], sourceId: row.sourceId, sourceRefs: row.sourceRefs, sourceValue: row.sourceValue, sourceUnit: row.sourceUnit, sourceLabel: row.sourceLabel, sourceNumberFormat: row.sourceNumberFormat, sourceBlock: row.sourceBlock, lastReviewedAt: isoDate(row.lastReviewedAt) };
   });
   return { entities, facts };
 }

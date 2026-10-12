@@ -1,0 +1,80 @@
+[
+  {
+    "id": "services.total",
+    "kind": "national",
+    "labelKa": "მომსახურებით ვაჭრობა სულ",
+    "labelEn": "Total services trade"
+  },
+  {
+    "id": "services.manufacturing",
+    "kind": "service_type",
+    "labelKa": "სხვათა საკუთრებაში არსებული მატერიალური რესურსების გადამუშავების მომსახურება",
+    "labelEn": "Manufacturing services on physical inputs owned by others"
+  },
+  {
+    "id": "services.maintenance_repair",
+    "kind": "service_type",
+    "labelKa": "ტექნიკური მომსახურება და შეკეთება, სხვა კატეგორიაში ჩაურთველი",
+    "labelEn": "Maintenance and repair services n.i.e."
+  },
+  {
+    "id": "services.transport",
+    "kind": "service_type",
+    "labelKa": "ტრანსპორტი",
+    "labelEn": "Transport"
+  },
+  {
+    "id": "services.travel",
+    "kind": "service_type",
+    "labelKa": "მოგზაურობა",
+    "labelEn": "Travel"
+  },
+  {
+    "id": "services.construction",
+    "kind": "service_type",
+    "labelKa": "მშენებლობა",
+    "labelEn": "Construction"
+  },
+  {
+    "id": "services.insurance_pension",
+    "kind": "service_type",
+    "labelKa": "სადაზღვევო და საპენსიო მომსახურება",
+    "labelEn": "Insurance and pension services"
+  },
+  {
+    "id": "services.financial",
+    "kind": "service_type",
+    "labelKa": "ფინანსური მომსახურება",
+    "labelEn": "Financial services"
+  },
+  {
+    "id": "services.intellectual_property",
+    "kind": "service_type",
+    "labelKa": "ინტელექტუალური საკუთრების გამოყენების საფასური, სხვა კატეგორიაში ჩაურთველი",
+    "labelEn": "Charges for the use of intellectual property n.i.e."
+  },
+  {
+    "id": "services.telecommunications_computer_information",
+    "kind": "service_type",
+    "labelKa": "სატელეკომუნიკაციო, კომპიუტერული და საინფორმაციო მომსახურება",
+    "labelEn": "Telecommunications, computer, and information services"
+  },
+  {
+    "id": "services.other_business",
+    "kind": "service_type",
+    "labelKa": "სხვა ბიზნესმომსახურება",
+    "labelEn": "Other business services"
+  },
+  {
+    "id": "services.personal_cultural_recreational",
+    "kind": "service_type",
+    "labelKa": "პირადი, კულტურული და რეკრეაციული მომსახურება",
+    "labelEn": "Personal, cultural, and recreational services"
+  },
+  {
+    "id": "services.government",
+    "kind": "service_type",
+    "labelKa": "სამთავრობო საქონელი და მომსახურება, სხვა კატეგორიაში ჩაურთველი",
+    "labelEn": "Government goods and services n.i.e."
+  }
+]

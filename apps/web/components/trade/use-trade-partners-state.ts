@@ -3,8 +3,11 @@ import type { ClientTradePartnersData } from "../../lib/data/tradePartners/impor
 import { parseTradePartnersHash, serializeTradePartnersHash, type TradePartnersState } from "../../lib/explorer/tradePartnersState";
 import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-state";
 
-// Inside Domestic exports, each change tells the page which hash to keep for its Countries section.
-const OPTIONS: HashStateOptions<ClientTradePartnersData, TradePartnersState> = { afterWrite: data => { if (data.measures) window.dispatchEvent(new Event("trade-domestic-state")); } };
+// Each change tells the surrounding page which hash to keep for its Countries or Service types section.
+const OPTIONS: HashStateOptions<ClientTradePartnersData, TradePartnersState> = { afterWrite: data => {
+  if (data.dataset === "services") window.dispatchEvent(new Event("trade-services-state"));
+  else if (data.measures) window.dispatchEvent(new Event("trade-domestic-state"));
+} };
 
 export function useTradePartnersState(data: ClientTradePartnersData) {
   return useHashState(data, parseTradePartnersHash, serializeTradePartnersHash, OPTIONS);

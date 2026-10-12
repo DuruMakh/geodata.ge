@@ -2,6 +2,9 @@ import path from "node:path";
 import { TradeOverview } from "../../components/trade/trade-overview";
 import { TradePartners } from "../../components/trade/trade-partners";
 import { TradeProducts } from "../../components/trade/trade-products";
+import { TradeServices } from "../../components/trade/trade-services";
+import { loadServedTradeServicesData, toClientTradeServicesData } from "../data/tradeServices/importTradeServices";
+import { TRADE_SERVICES_SOURCES } from "../data/tradeServices/types";
 import { TradeDomesticExports } from "../../components/trade/trade-domestic-exports";
 import { loadServedTradeDomesticData, toClientTradeDomesticData } from "../data/tradeDomestic/importTradeDomestic";
 import { TRADE_DOMESTIC_DOCUMENT_IDS } from "../data/tradeDomestic/types";
@@ -38,7 +41,7 @@ const PRODUCT_SOURCE_BLOCK = "2020-2025";
 
 export async function tradeHubMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["trade"]);
-  return fiscalMetadata({ locale, path: "/explorer/trade", title: message(messages, "trade.metaTitle"), description: message(messages, "trade.metaDescription") });
+  return fiscalMetadata({ locale, path: "/explorer/trade", title: message(messages, "trade.hubMetaTitle"), description: message(messages, "trade.hubMetaDescription") });
 }
 export async function tradeOverviewMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["trade"]);
@@ -47,7 +50,7 @@ export async function tradeOverviewMetadata(locale: Locale) {
   return fiscalMetadata({ locale, path: "/explorer/trade/overview", title: message(messages, "trade.title"), description: `${message(messages, "trade.metaDescription")} ${min}–${max}.` });
 }
 export async function renderTradeHub(locale: Locale) {
-  const [{ facts }, partners, products, domestic, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), getPresentation(locale, ["trade", "common"], [])]);
+  const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade", "common"], [])]);
   const title = message(presentation.messages, "trade.hubTitle");
   return <I18nProvider {...presentation}>
     <BreadcrumbJsonLd items={[{ name: message(presentation.messages, "common.home"), path: pageHref("/", locale) }, { name: title, path: pageHref("/explorer/trade", locale) }]} />
@@ -55,7 +58,7 @@ export async function renderTradeHub(locale: Locale) {
       <PageHeader crumbs={[{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: title }]} coverage="" />
       <ExplorerHeading>{title}</ExplorerHeading>
       <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{message(presentation.messages, "trade.hubSummary")}</p>
-      <BudgetHub cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national)} locale={locale} testId="trade-hub" />
+      <BudgetHub cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} locale={locale} testId="trade-hub" />
     </ExplorerPage>
   </I18nProvider>;
 }
@@ -171,6 +174,38 @@ export async function renderTradeOverviewPage(locale: Locale) {
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <TradeOverview facts={facts} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+    </ExplorerPage>
+  </I18nProvider>;
+}
+
+
+export async function tradeServicesMetadata(locale: Locale) {
+  const [services, messages] = await Promise.all([loadServedTradeServicesData(), getMessages(locale, ["trade"])]);
+  const { min, max } = tradeOverviewCoverage(toClientTradeServicesData(services).national);
+  return fiscalMetadata({ locale, path: "/explorer/trade/services", title: message(messages, "trade.services.title"), description: `${message(messages, "trade.services.summary")} ${min}–${max}.` });
+}
+
+export async function renderTradeServicesPage(locale: Locale) {
+  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const [services, presentation, manifest, catalogue] = await Promise.all([
+    loadServedTradeServicesData(), getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], []),
+    loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
+  ]);
+  const data = toClientTradeServicesData(services), { min, max } = tradeOverviewCoverage(data.national);
+  const sourceIds = new Set<string>(Object.values(TRADE_SERVICES_SOURCES));
+  const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
+  const lastReviewedAt = services.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
+  const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("services.title");
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
+  return <I18nProvider {...presentation} englishLabels={{ ...presentation.englishLabels, ...data.englishLabels }}>
+    <JsonLd testId="explorer-dataset-json-ld" data={{
+      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/trade/services#dataset`, name: title, description: t("services.summary"), url: `${origin}${pageHref("/explorer/trade/services", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
+      spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: TRADE_OVERVIEW_INDICATORS.map(id => t(`services.indicator.${id}`)),
+    }} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/services", locale) }]} />
+    <ExplorerPage containerQueries={false}>
+      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <TradeServices data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

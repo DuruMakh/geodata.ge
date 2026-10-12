@@ -14,6 +14,7 @@ import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
+import tradeServiceRegistry from "../../../../data/taxonomy/trade-services.json";
 import moneyTransferRegistry from "../../../../data/taxonomy/money-transfer-countries.json";
 import foreignInvestmentRegistry from "../../../../data/taxonomy/foreign-investment.json";
 import { readTradeProductCatalogue } from "../data/tradeProducts/catalogue";
@@ -34,7 +35,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
     "/explorer/economy/sectors",
     "/explorer/unemployment",
-    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/trade/domestic-exports", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account",
+    "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/trade/domestic-exports", "/explorer/trade/services", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account",
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
     "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
     LIVING_STANDARDS_HUB_PATH, ...LIVING_STANDARDS_SECTIONS.map(section => section.href),
@@ -72,6 +73,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...sectorRegistry.map(row => row.id), "economic-sectors",
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
+      ...tradeServiceRegistry.map(row => row.id),
       ...moneyTransferRegistry.map(row => row.id),
       ...foreignInvestmentRegistry.map(row => row.id),
       ...tradeProducts.map(row => row.id),

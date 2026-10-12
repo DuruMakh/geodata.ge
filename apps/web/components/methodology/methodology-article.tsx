@@ -145,6 +145,11 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
                 {section.paragraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
+                {section.sourceLinks?.map((link) => (
+                  <p key={link.href}>
+                    <a href={link.href} className="font-semibold text-[var(--accent)] underline underline-offset-4">{link.label}</a>
+                  </p>
+                ))}
               </div>
 
               {section.kind === "journey" ? <MethodJourney descriptions={journeyDescriptions} messages={messages} /> : null}

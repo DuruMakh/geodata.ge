@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "scope": "annual_services_types",
+  "years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "primaryObservations": 130,
+  "numericObservations": 129,
+  "unavailableObservations": 1,
+  "derivedObservations": 128,
+  "canonicalSha256": "88cfffba50689ee0812a4ca32b94f2006c1c1ca79a5b8bf02f1701ce6b234cc1",
+  "catalogueSha256": "2ccf6e192f6a4a1f55170e76848307c4cb53985ee226f49b66d0bf87cdcc05bb",
+  "englishLabelsSha256": "b83cb17c3414919518cb443233a80e13bb9d3c5560144ec330a7f539c502dd13",
+  "inputSha256": {
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/independent-verification.json": "536110aeb9761ee924044eed913fc4f0ea029892097c3be6a9354233c011077d",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/prepared-validation.json": "c12653a6a6a11f59b6eb105ff287fe867524b7e447196cc8bc89dce4756f489a",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/full-source-manifest.json": "c9b273fefe788c04240dc353cef46d9dbcc046a5294cfc498591c6e53cb189b2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-layouts.json": "607aea395fde2b71ae2f4f6545cdd2c8444eec4bf021b0bc84b2f1f71321a8dc",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/expected-observation-inventory.json": "803f873b2af1b22bb1c2b76061c03413a7dfe86cca5b931dee1369225c6610ad",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/unresolved-source-issues.json": "95473c512e6458a7da8491806ca318bde18b423e302da5756322d61248f6d8c2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/prepared-reconciliation.csv": "57ac3302a548adde1aadce44c0f140804f33d2ded512469273bd460ad6981205",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/coverage.csv": "5a1ca76f67607b737004bcd01e2a345380b746f41e0795d2683543181e3755a2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/services-annual.csv": "18a7172015c06ef8ae3fdf0a1ca505e858bc72fa694216f84ade001af4acefe2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_services_georgian-exports-of-services-by-types-01-2020-2024.csv": "df84e7bfd8fde35b34fc5a6be636baa7ac40604047ec728c7476c468da33f504",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_services_georgian-imports-of-services-by-types-01-2020-2024.csv": "ec5ee592d788fa2745fe444c0aaa88b074c61b4611da5b4d615cc9131e241154"
+  },
+  "sourceSha256": {
+    "geostat_services_georgian-exports-of-services-by-types": "091845ddd121d21e43332cfcdf69008ec3d9444fae279fbe3c6002ba0d75fda3",
+    "geostat_services_georgian-imports-of-services-by-types": "100b9a901dffd1db6604aac7c0b46094e8e46ac425c2090d2d9e18e1141a01d6"
+  },
+  "researchPackageStatus": "requires_source_resolution",
+  "outsideScopeHoldCount": 2,
+  "outsideScopeHolds": [
+    {
+      "check": "service_country_matches_joint",
+      "family": "services",
+      "flow": "import",
+      "year": "2022",
+      "item_id": "partner.2020-2024.826",
+      "expected_usd": "32357843.120000005000",
+      "actual_usd": "32550080.1199999987351000",
+      "difference_usd": "192236.9999999937351000",
+      "tolerance_usd": "1",
+      "status": "fail",
+      "source_refs": "[[\"geostat_services_georgian-imports-of-services-by-countries\",\"Sheet1\",\"E116\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E13\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E71\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E180\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E251\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E290\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E382\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E449\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E519\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E610\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E710\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E772\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E839\"]]",
+      "evidence": "All twelve numeric country/type counterparts are required; absent or symbolic country detail is not zero."
+    },
+    {
+      "check": "service_country_matches_joint",
+      "family": "services",
+      "flow": "import",
+      "year": "2024",
+      "item_id": "partner.2020-2024.826",
+      "expected_usd": "96175488.549999951000",
+      "actual_usd": "96555372.41999999725000",
+      "difference_usd": "379883.87000004625000",
+      "tolerance_usd": "1",
+      "status": "fail",
+      "source_refs": "[[\"geostat_services_georgian-imports-of-services-by-countries\",\"Sheet1\",\"G116\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G13\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G71\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G180\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G251\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G290\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G382\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G449\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G519\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G610\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G710\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G772\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G839\"]]",
+      "evidence": "All twelve numeric country/type counterparts are required; absent or symbolic country detail is not zero."
+    }
+  ],
+  "reviewedAt": "2026-10-11"
+}
