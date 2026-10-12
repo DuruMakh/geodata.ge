@@ -1,11 +1,19 @@
 import { expect, it } from "vitest";
 import nextConfig from "../../next.config";
 
-it("every archived original is served sandboxed", async () => {
+it("noindexes every archived original and serves every non-PDF archived original sandboxed", async () => {
   const headers = await nextConfig.headers?.();
-  const rule = headers?.find(rule => rule.source === "/downloads/methodology/:dataset/files/:path*");
-  expect(rule?.headers).toContainEqual({ key: "Content-Security-Policy", value: "sandbox; default-src 'none'" });
-  expect(rule?.headers).toContainEqual({ key: "X-Robots-Tag", value: "noindex, follow" });
+
+  expect(headers?.filter(rule => rule.source.startsWith("/downloads/methodology/"))).toEqual([
+    {
+      source: "/downloads/methodology/:dataset/files/:path*",
+      headers: [{ key: "X-Robots-Tag", value: "noindex, follow" }],
+    },
+    {
+      source: "/downloads/methodology/:dataset/files/:path((?!.*\\.pdf$).*)",
+      headers: [{ key: "Content-Security-Policy", value: "sandbox; default-src 'none'" }],
+    },
+  ]);
 });
 
 it("noindexes only third-party methodology source originals", async () => {

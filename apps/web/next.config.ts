@@ -35,10 +35,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/downloads/methodology/:dataset/files/:path*",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, follow" },
-          { key: "Content-Security-Policy", value: "sandbox; default-src 'none'" },
-        ],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, follow" }],
+      },
+      // PDFs are left out: a sandboxed document cannot run the browser's PDF viewer in every browser.
+      {
+        source: "/downloads/methodology/:dataset/files/:path((?!.*\\.pdf$).*)",
+        headers: [{ key: "Content-Security-Policy", value: "sandbox; default-src 'none'" }],
       },
       {
         source: "/(.*)",

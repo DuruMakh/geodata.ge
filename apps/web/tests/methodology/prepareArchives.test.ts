@@ -237,17 +237,22 @@ describe("methodology archive preparation", () => {
     })).rejects.toThrow(/does not equal the approved original inventory/i);
   });
 
-  it("rejects a text/html archive row whose public path does not end in .txt", async () => {
+  it.each([
+    ["a text/html archive row whose public path does not end in .txt", "text/html", "downloads/methodology/wages/files/x.html"],
+    ["an .htm public path whatever its media type", "application/pdf", "downloads/methodology/wages/files/x.htm"],
+  ])("rejects %s", async (_case, mediaType, publicPath) => {
     const { repositoryRoot, rows } = await createFixtureRepository();
-    const htmlRow = { ...rows.wages[0], media_type: "text/html", public_download_path: "downloads/methodology/wages/files/x.html" };
+    const htmlRow = { ...rows.wages[0], media_type: mediaType, public_download_path: publicPath };
     await writeFile(path.join(repositoryRoot, "data/methodology/source-archives/wages.csv"), manifestCsv([htmlRow]));
 
-    await expect(prepareMethodologyArchives({
+    const preparation = prepareMethodologyArchives({
       repositoryRoot,
       publicRoot: path.join(repositoryRoot, "apps/web/public"),
       reportPath: path.join(repositoryRoot, "data/reports/methodology-archive-validation.json"),
       mode: "write",
-    })).rejects.toThrow(htmlRow.source_id);
+    });
+    await expect(preparation).rejects.toThrow(htmlRow.source_id);
+    await expect(preparation).rejects.toThrow(/must be published as \.html\.txt/);
   });
 
   it("checks two fresh generations without mutating the public tree", async () => {

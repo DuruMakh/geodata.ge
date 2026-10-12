@@ -153,7 +153,9 @@ export async function validateSourceManifest(
     assertRelativeForwardSlashPath(row.public_download_path, "public_download_path");
     assertStablePublicDownloadPath(row.public_download_path);
     // An archived web page published as .html would run the source site's scripts on fiscal.ge.
-    if (row.media_type === "text/html" && !row.public_download_path.endsWith(".txt")) {
+    const baseMediaType = row.media_type.split(";")[0].trim().toLowerCase();
+    const isWebPage = baseMediaType === "text/html" || baseMediaType === "application/xhtml+xml";
+    if ((isWebPage || /\.(html|htm|xhtml)$/.test(row.public_download_path)) && !row.public_download_path.endsWith(".html.txt")) {
       throw new Error(`Archived web page ${row.source_id} must be published as .html.txt: ${row.public_download_path}`);
     }
     const publicPrefix = `downloads/methodology/${datasetId}/files/`;
