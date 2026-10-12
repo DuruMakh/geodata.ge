@@ -38,17 +38,18 @@ The sitemap lists 580 URLs. The 404 page, `robots`, the share-image route and th
 | Page units U01–U30 | 0 | 7 | 122 | 344 | 473 |
 | X1 shared components | 0 | 1 | 9 | 12 | 22 |
 | X2 security and configuration | 0 | 1 | 2 | 4 | 7 |
-| X3 build, CI and tests | X3_COUNTS |
+| X3 build, CI and tests | 0 | 2 | 10 | 7 | 19 |
 | X4 docs and agent context | 0 | 3 | 12 | 7 | 22 |
-| **All reports** | TOTAL_COUNTS |
+| **All reports** | **0** | **14** | **155** | **374** | **543** |
 
 **Verification outcome**
 
-- **High findings:** all 12 page/X1/X2/X4 highs reproduced (X3: see below). One was downgraded: U21-02 (no legend cap on Trade partners) is a medium, because the 5,100 px legend appears only after "select all". One was merged: X1-01 is the shared cause of U19-01, U24-01 and U25-01.
+- **High findings:** all 14 were reproduced. Two were downgraded to medium: U21-02 (no legend cap on Trade partners; the 5,100 px legend appears only after "select all") and X3-01 (CI builds the site twice; the real cost is about 1.5 min per run on GitHub's runner, not the 4–5 min estimated on the loaded review machine). Three were merged: X1-01 is the shared cause of U19-01, U24-01 and U25-01. That leaves **9 distinct high problems**. Seven are in section 5; the other two are errors in the developer docs (X4-04: CLAUDE.md's test-loop numbers are five times out of date; X4-05: both READMEs point at a database command that can offer to reset the database).
+- **CI timings corrected with real data:** X3 estimated the browser job at about 30 min; the latest PR run (CI run 448, PR #181) took 15 min 21 s for the browser job and 11 min 29 s for the checks job, of which `npm test` was 7 min 48 s.
 - **Withdrawn (5):** U10-17 and U06-14 (source ids in the public CSV downloads are documented lineage columns, not leaked metadata), U29-11 (the repository path in manifests points at the public GitHub repository), U08-13 and U16-11 (the chart drawn twice in the HTML is intended by DESIGN.md §8.3). U13-03 was narrowed to its unused-data part for the same reason.
 - **Corrected:** U13-01 and U22-05 point at a different line than reported (`inflation-categories.tsx:101`, `trade-services.tsx:35`); the problems are real. The page JavaScript totals in U01-08, U22-04, U28-01 and U30-18 counted a 39.5 KB polyfill modern browsers never download.
 - **Turned into owner questions (7):** U04-02/U19-11 (legend between 768 and 1099 px, a gap in decision D4 as written), U16-05 (12 px dropdowns zoom iPhones; DESIGN.md sets the size), U11-01, U06-08, U20-06, U30-04.
-- **Already planned elsewhere (14):** covered by the component-reuse plan (Tasks 4–7, 11–13) or still-open audit-fixes tasks; listed at the end of the plan.
+- **Already planned elsewhere (13):** covered by the component-reuse plan (Tasks 4–7, 11–13) or still-open audit-fixes tasks; listed at the end of the plan.
 - **Proposed test removals (283):** 107 confirmed, 149 partial (merge, keeping named assertions), 27 rejected (the test proves something unique), 0 pointing at tests that do not exist.
 
 ## 4. Scorecard (1–10, from each unit's report)
@@ -87,7 +88,7 @@ The sitemap lists 580 URLs. The 404 page, `robots`, the share-image route and th
 | U30 /mcp, /connect | 7 | 5 | 8 | 8 | 7 | 8 | 9 | 8 | 6 |
 | **Median** | **6** | **6** | **7** | **8** | **6** | **8** | **8** | **9** | **7** |
 
-Cross-cutting scores: X2 security: /mcp 9, headers/CSP 5, environment 8, dependencies 7, GitHub Actions 7, secrets 10, user input 10, downloads 6. X4 docs: llms.txt 4, scope document 8, DESIGN.md 5, AGENTS/CLAUDE 5, other docs 6, READMEs 4, methodology registry 9. X3_SCORES
+Cross-cutting scores: X2 security: /mcp 9, headers/CSP 5, environment 8, dependencies 7, GitHub Actions 7, secrets 10, user input 10, downloads 6. X4 docs: llms.txt 4, scope document 8, DESIGN.md 5, AGENTS/CLAUDE 5, other docs 6, READMEs 4, methodology registry 9. X3 build and tests: build 5, CI 4, unit suite 5, browser suite 4, redundancy 4, flakiness 6, gate composition 5.
 
 **Reading the scorecard:** security and search metadata are strong everywhere. Accessibility is the weakest area across the board, almost entirely because of shared parts (no skip link, charts with no keyboard reading). Speed and code quality are middling, again mostly for shared reasons: the sidebar prefetches the whole site, a few pages ship far more data than they show, and five topic explorers are copies of each other.
 
@@ -102,13 +103,19 @@ Cross-cutting scores: X2 security: /mcp 9, headers/CSP 5, environment 8, depende
 7. **AI assistants are told three data families do not exist.** The `llms.txt` file that guides AI tools says "no datasets beyond those listed here" but leaves out Money and banks, Energy and food and Trade services. (X4-01; Task 19)
 8. **Internal review notes are visible in the page source.** Notes such as "Confirm against source before production" ship in the HTML of the budget pages; municipal pages ship internal reconciliation fields. They are not shown on screen, but anyone viewing the source sees them. (U05-02, X2-03, U09-01; Task 2)
 9. **Two methodology pages scroll sideways on phones.** The Georgian heading of the municipalities and household-income methodology pages is wider than the screen. (U29-01; Task 10)
-10. X3_TOP10
+10. **The automatic checks take about 16 minutes per pull request, and most of that is repetition.** The browser tests have grown five-fold to 1,403 and run one at a time; the site is built twice per run; the unit tests rebuild the same data snapshot about 70 times. Every fix and every hub waits on this. (X3-02, X3-01, X3-04; Tasks 38–43)
 
 **A deadline outside this review:** the CI check that allows one known, low-risk dependency warning expires on **2026-11-02 at 04:00 Tbilisi**. From then on every pull request fails and nothing can be released until audit-fixes Task 20 is done.
 
 ## 6. Test suite
 
-X3_TESTS
+**Size today:** 485 unit-test files with 4,048 tests, and 1,403 browser tests in 64 files (CLAUDE.md still says 281 browser tests and about 150 unit files). On GitHub's runner (CI run 448, 2026-10-12): `npm test` 7 min 48 s, `data:validate` 48 s, build 1 min 32 s, browser job 15 min 21 s (a second build plus all browser tests at one worker). CI wall clock is about 16 minutes.
+
+**Where the time goes (X3):** the same fact-query snapshot is rebuilt about 5 times per check-and-build and about 70 times inside unit tests; three trade data-preparation test files take 24% of all unit-test time because every negative case re-runs the whole preparation; eight files build the full sitemap; one browser file (`bilingual-seo.spec.ts`, 291 tests, 21% of the suite) walks the same 290 routes that two other files also walk; 50 screenshots are taken that nothing compares, with 14.5 s of waiting to feed them; a page-layout check is copied into 52 of 64 browser files.
+
+**Proposed removals, checked one by one:** the page reviews proposed 283 test removals or merges. Each was checked against the test it supposedly duplicates: 107 confirmed, 149 partial (merge but keep named assertions), 27 rejected (they prove something no other test does: for example the only test of the deficit's forecast marker derived from data, the only real-browser build of the 305-product workbook, and the only check that archived HTML aliases cannot run on the site). Reviewers' most common mistakes: citing a "duplicate" that only checks the chart frame and not the whole page, proposing to merge tests that are already one parametrised test, and citing a twin test that does not exist.
+
+**Expected saving** (plan Tasks 38–43): `npm test` on CI from 7 min 48 s to about 4.5–5 min (locally from about 58 s to about 35–40 s); browser test time at one worker from about 12.4 min to about 8 min; the browser job from 15 min 21 s to about 4–6 min once it reuses the checks job's build and runs 2–4 workers; CI wall clock from about 16 to about 9–10 minutes. Infrastructure (one build, caching, workers) saves more than pruning tests does.
 
 ## 7. What was not checked
 

@@ -148,6 +148,8 @@ Effort M. Risk low while report-only. Switching to enforcing is a later, separat
 
 Why: X1-01 (high; merges U19-01, U24-01, U25-01, U27-01, U21-02, U14-07). Living standards income and spending, all four Money and banks pages, all four Energy and food pages, and the national life-expectancy chart have no phone legend and no "↑ chart" pill (DESIGN.md §8.3, owner decision D4). Trade partners can list 218 legend rows (5,420 px) and inflation products 40, because `legendCap` defaults to unlimited. Tests U19-10 and U25-03 are missing.
 
+Also: U27-02 (the national fertility and life charts have no browser test; this task's life-chart case is the first), X1-22 (the phone-legend guard is a hand-kept route list; this task replaces it).
+
 **Files:**
 - Modify: `components/explorer-shell/chart-selection-aids.tsx:51-68` (`legendCap` defaults to 10); `components/household/household-explorer.tsx` (after the chart, ~l.158), `components/money-banks/money-banks-explorer.tsx` (~l.127), `components/energy-food/energy-food-explorer.tsx` (~l.93, hoist `lineSeries`), `components/demography/national-vital-charts.tsx:189`; remove the now-redundant `legendCap={10}` at `components/trade/trade-products.tsx:73`
 - Test: `tests/browser/mobile-series-picking.spec.ts:169-190` (turn the hand-kept list into a list built from the sitemap's line-chart routes, or at least add the four families), `tests/explorer/chartSelectionAids.test.ts` (new `legendCap` unit test, so D195 can be dropped later)
@@ -158,6 +160,7 @@ Reuse: `ChartSelectionAids` as Poverty uses it (`components/poverty/poverty-expl
 - [ ] **Step 2:** Run. Expected: FAIL on the four families and the cap.
 - [ ] **Step 3: Implement** the mounts (same props as Poverty: `series`, `chartShown={state.mode === "line"}`, `share`, `unit`, `formatValue`) and the default.
 - [ ] **Step 4:** Run the spec and `npx playwright test tests/browser/{household,money-banks,energy-food,demography-births-deaths}.spec.ts`. Expected: PASS.
+- [ ] **Step 4b (Q4, X1-21):** if the owner says yes (the default), change `@min-[768px]:hidden` at `chart-selection-aids.tsx:107` to `@min-[1100px]:hidden` and add a 1024 px case to the legend test.
 - [ ] **Step 5: Commit** `fix(mobile): phone legend and return pill on every multi-line chart; legend capped at ten`
 
 Effort M. Risk low.
@@ -179,6 +182,8 @@ Effort S. Risk low.
 ### Task 9: Long country lists scroll inside their panel [parallel-safe]
 
 Why: U21-01 (high): the 218-country list on Trade partners flows with the page, so the ranking, source note and Excel button sit about 7,000 px below the chart on phones and laptops (measured page height 9,894 px at 375 px). U21-04 (every row server-rendered), U21-05 (about 215 Tab presses to reach Excel).
+
+Also: U14-05 (305 inflation products cost 308 Tab presses; give the product list the same scroll layout and a "skip the list" link).
 
 **Files:**
 - Modify: `components/main-explorer/series-selector.tsx:34,168` (new `listLayout: "scroll"`: a capped inner scroller, `max-h-[min(430px,60svh)] overflow-y-auto`, at every width); `components/trade/trade-partners-series-panel.tsx` and the domestic exports countries view (pass `listLayout="scroll"`); move the Excel button above the list in the partners panel
@@ -433,6 +438,8 @@ Effort S. Risk medium: Excel figures change in the last decimals; this is why Q1
 
 Why: fields the client never reads: U22-02 and U23-02 (English names shipped on Georgian pages, about 25 KB gzip on trade products), U17-01 (the unemployment regions map index ships the whole comparison dataset), U17-02, U21-15, U20-11, U25-09, U06-17, U05-06, U29-14 (constant or unused fields per fact).
 
+Also (low): U01-11 (footer logo preloaded ahead of the header logo), U22-03 (empty alias arrays and repeated source block), U24-08 (Money and banks ships every source on every page).
+
 **Files:**
 - Modify: `lib/i18n/presentation.server.ts:11` (`englishLabels` only when `locale === "en"`), `lib/pages/unemployment-regions.tsx` (index gets the map model only), the page loaders named in each finding
 - Test: one render test per page in the existing `tests/explorer/*Render.test.tsx` files: `"the Georgian page carries no English series names"`, `"the regions index carries no comparison facts"`
@@ -500,6 +507,8 @@ Effort M. Risk low.
 
 Why: U30-01 (every request, even `ping`, rebuilds coverage, facts and instructions and re-registers 14 tools; 63 ms for a ping), U30-02 (the bundled snapshot is 46 MB because `prepare-fact-query-snapshot.ts:29` pretty-prints it; 0.6 s and 220 MB per cold start), U30-03 (`tools/list` is 119–134 KB of repeated schema), U30-08 (an id search returns the whole 17 KB catalogue).
 
+Also (low, same files): U30-05 (pass the request id into rate-limit errors), U30-06 (log bad-argument errors as such), U30-07 (cap echoed id strings at about 80 characters), U30-12 ("ka / en" titles on every tool), U30-13 (point a browser visitor to /connect from the 405 answer), U30-14 (one line on /connect about fair-use limits), U30-09, U30-10, U30-11 (stale hardcoded coverage, a duplicated derivation, misleading names).
+
 **Files:**
 - Modify: `lib/mcp/*` (module-level cache of `datasetCoverage`, `facts`, `serverInstructions` keyed by the snapshot object), `scripts/prepare-fact-query-snapshot.ts:29` (minified JSON), the shared output schema (`$defs`/`$ref`), the catalogue tool's `search` filter; the stale numbers in `lib/factQuery/snapshot.ts` and `docs/deployment.md`
 - Test: `tests/mcp/tools.test.ts`, `tests/mcp/outputSchema.test.ts`, `tests/mcp/snapshot.test.ts`, `tests/factQuery/reference.test.ts` (stop condition)
@@ -547,6 +556,8 @@ Effort M. Risk medium.
 
 Why: hand-written Dataset JSON-LD that is thinner than the shared builder (`lib/seo/structuredData.ts:234` `explorerDatasetJsonLd`): U22-06, U28-14, U29-03, U24-06, U17-09, U18-09, U23-09, U21-13, U14-14, U13-07, U15-06, U16-18, U21-14, U12-13. The same `@id` in Georgian and English with different names: U06-13, U07-14, U20-07, U25-08.
 
+Also: U20-14 (Poverty metadata and JSON-LD have no test; this task's sitemap-wide test covers it), U08-07 (one description repeated 76 times in `hasPart`), U09-13 (a measure claimed that the page does not carry).
+
 **Files:**
 - Modify: `lib/seo/datasetVocabulary.ts` (add trade, money, unemployment, wages, external, energy-food, household, inflation ids), `lib/seo/structuredData.ts` (`@id` from `pageHref(href, locale)`; optional "no CSV" mode for methodology), each page loader named in the findings
 - Test: `tests/seo/structuredData.test.ts`: `"every explorer page's Dataset has license, creator and a per-language @id"` over the sitemap
@@ -574,6 +585,8 @@ Effort M. Risk low.
 
 Why: U12-05 (regional economy coverage years and counts hardcoded in copy and metadata; AGENTS.md "derive from loaded facts"), U10-08 (GDP source mapping fans one row into duplicate ids), U03-08 (the budget workbook input builder has no unit test), U01-14 (landing GDP figure has a second source), U06-07, U07-08, U06-15 (two copies of Georgian metadata).
 
+Also (low, dead code and small duplicates, fixed while in these files): U01-15, U01-16, U01-17, U01-18, U02-02, U02-10, U03-09, U03-10, U05-08, U06-16, U07-06, U08-08, U09-05, U09-06, U10-09, U10-10, U10-11, U11-04, U11-05, U12-03, U12-04, U12-14, U13-13, U14-16, U14-17, U14-18, U15-04, U16-08, U16-09, U16-19, U17-08, U18-13, U19-08, U19-09, U20-12, U21-12, U21-20, U22-07, U22-08, U22-09, U23-07, U23-08, U23-15, U25-05, U26-15, U27-11, U28-17, U28-18, U29-12, U29-15.
+
 **Files:**
 - Modify: `lib/i18n/messages/{ka,en}/regional-economies.json` and `lib/pages/regional-economies.tsx` (params), `lib/pages/gdp.tsx` source mapping, move the budget workbook builder to `lib/explorer/budgetWorkbook.ts`, `lib/landing/*`, the debt and deficit metadata
 - Test: `tests/seo/regionalEconomiesMetadata.test.tsx`, a new `tests/explorer/budgetWorkbook.test.ts` beside `workbookModel.test.ts`, `tests/explorer/gdpSources.test.ts`
@@ -589,7 +602,106 @@ Effort M. Risk low.
 
 The page reviews proposed 283 test removals or merges. Three verification agents checked each one against the test it supposedly duplicates (`test-drop-verify/result-{A,B,C}.md`): **107 confirmed, 149 partial (merge, keeping named assertions), 27 rejected** (the test proves something unique), 0 missing. Only confirmed and partial rows are applied, exactly as their "final action" column says.
 
-<!-- X3 section inserted below -->
+**Baseline (CI run 448, PR #181, 2026-10-12):** the checks job took 11 min 29 s, of which `npm test` was 7 min 48 s, `data:validate` 48 s and `npm run build` 1 min 32 s. The browser job took 15 min 21 s, of which `npm run test:browser` was 13 min 56 s (its own second build plus 1,403 tests at one worker). CI wall clock: about 16 min. Locally (CLAUDE.md, 14 cores) `npm test` was 58 s on 2026-09-06; the unit suite has since grown to 485 files and 4,048 tests (X3).
+
+**Expected saving after Tasks 38–43:**
+
+| Suite | Today | After | Where it comes from |
+|---|---|---|---|
+| `npm test` on CI | 7 min 48 s | about 4.5–5 min | shared snapshot fixture (about 180 s of summed file time), trade preparation tests on parsed rows (about 250 s), sitemap built once (about 100 s), duplicate `--check` runs (about 20 s), verified page drops (about 85 s); about 40% of summed file time |
+| `npm test` locally (14 cores) | about 58 s (2026-09-06 figure) | about 35–40 s | same |
+| Browser suite, test time at one worker | about 12.4 min on CI | about 8 min | verified page drops and merges (about 420 s measured on a loaded machine, about 280 s idle) plus X3's suite-level merges (about 200–350 s) |
+| Browser job on CI | 15 min 21 s | about 4–6 min | the above, no second build (about 1.5 min), cached browsers (about 40 s), and 2–4 workers once measured on the runner |
+| CI wall clock | about 16 min | about 9–10 min | the checks job becomes the longest job |
+
+The test files these tasks change are the only expectations this plan edits on purpose. The component-reuse plan relies on `tests/explorer/municipalOverrides.test.tsx`, `tests/explorer/shellClasses.test.tsx` and the wages and unemployment-region fingerprint tests as its refactor guard; leave those until it has merged (X3 note; D076 and D094 are rejected anyway).
+
+### Task 38: One shared snapshot for the unit tests
+
+Why: X3-04. The full fact-query snapshot is built about 5 times per `check` + `build` and again in 48 unit files (215.8 s of summed file time); `tests/factQuery/buildSnapshot.test.ts` builds the identical snapshot 21 times (67.2 s). `scripts/prepare-fact-query-publications.ts:23` rebuilds the snapshot that the previous prebuild step has just written.
+
+**Files:**
+- Create: `tests/helpers/factQuerySnapshot.ts` exporting `testSnapshot(overrides?: Partial<BuildSnapshotOptions>)` (closest existing: `lib/factQuery/snapshot.ts` `loadPackagedSnapshot`, which serves the route and has no test overrides). It reads `lib/factQuery/generated/snapshot.json` (written by `pretest`), or builds once in a vitest `globalSetup` and `provide()`s the path; it replaces `releaseCommit` and `generatedAt` (the only fields of `BuildSnapshotOptions`, `lib/factQuery/buildSnapshot.ts:41`).
+- Modify: `vitest.config.ts` (globalSetup), the 45 files from `grep -l 'buildFactQuerySnapshot(' tests` that build with options only, `tests/factQuery/buildSnapshot.test.ts` (one `beforeAll` for the 19 read-only tests; keep the two real builds of the determinism test at :89-90), `scripts/prepare-fact-query-publications.ts:23` (load the generated file; fail if it is missing)
+
+- [ ] **Step 1:** Record `npx vitest run tests/factQuery tests/mcp --reporter=json` duration.
+- [ ] **Step 2:** Implement the fixture; move files over in batches of about 10, running each batch.
+- [ ] **Step 3:** `npx vitest run tests/factQuery/reference.test.ts` (stop condition) and the batch files: PASS. Re-measure; record both numbers in the commit body.
+- [ ] **Step 4: Commit** `test: one shared fact-query snapshot instead of 70 rebuilds`
+
+Effort M. Risk low; the reference fixture is the guard.
+
+### Task 39: The slowest unit files do less repeated work
+
+Why: X3-09 (the three trade preparation files take 359 s, 24% of summed file time; each negative case copies the workbooks and re-runs the whole preparation; `vitest.config.ts:10-29` `HEAVY_TESTS` misses the two slowest), X3-10 (five unit tests re-run the real-repo `--check` that `data:validate` already runs), X3-11 (eight files build the whole sitemap to assert a few URLs each; 127.5 s), X3-18 (`vitest.config.ts` loaded as CommonJS prints a warning on every run).
+
+**Files:**
+- Modify: `tests/data/trade{Services,Products,Partners}/prepare*.test.ts` (parse once in `beforeAll`, feed mutated parsed rows to the validators, keep one end-to-end write/check round trip per package); `vitest.config.ts:10-29` (add the two files to `HEAVY_TESTS`), rename to `vitest.config.mts` and update `package.json` `test`; delete the `prepare…Data(root, "check")` lines in `tests/data/{moneyBanks/moneyBanks,household/household,energyFood/energyFood,poverty/poverty}.test.ts` and the last line of `tests/data/unemployment/preparation.test.ts:28`; move the URL assertions of `unemploymentPage.test.tsx`, `demographyDiscovery.test.ts`, `inflationProductsDiscovery.test.ts`, `agentFiles.test.ts` (and the other sitemap builders X3-11 names) into `tests/seo/routes.test.ts`, which builds the sitemap once
+- Test: the files themselves; every rejection a negative case proved must still be proved (list them before and after in the commit body)
+
+- [ ] **Step 1:** List the assertions each changed file makes today (`grep -n "expect\|toThrow"`), save the list.
+- [ ] **Step 2:** Implement, one file at a time, running it after each change.
+- [ ] **Step 3:** Compare the assertion list; nothing lost. `npm run data:validate` still runs every removed `--check`.
+- [ ] **Step 4: Commit** `test: trade preparation negatives on parsed rows; one sitemap build; no duplicate data checks`
+
+Effort M. Risk low.
+
+### Task 40: The browser suite checks each page once per concern
+
+Why: X3-12 (`bilingual-seo.spec.ts:24` is 291 tests, 21% of the suite, and already covers `bilingual-complete.spec.ts:5` and most of `seo.spec.ts:104`), X3-14 and D188 (the §17 heading check is copied in 8 specs, the axis-label check in 7, a `scrollWidth` check in 52 of 64 files), X3-15 (behaviour flows repeated at 3 widths × 2 languages; 768 px itself stays, it is the main breakpoint), X3-13 and D001 (at least 16 ids asserted absent that exist nowhere in the code, so the assertions cannot fail), X3-07, X3-08, U22-15, D184, D207 (50 screenshots that nothing compares, 14.5 s of sleeps that only feed them, and `trade-services.spec.ts` rewriting 12 tracked PNGs).
+
+**Files:**
+- Modify: delete `tests/browser/bilingual-complete.spec.ts:5`; add og:url and twitter:card to `bilingual-seo.spec.ts` and drop `seo.spec.ts:104-118`; the Georgian half of `bilingual-seo.spec.ts` uses `request.get` and a DOM parser instead of a browser page; extend `tests/browser/mobile-fit-charts.spec.ts:80-110` into the one route-list layout spec (§17, axis labels inside the chart, no sideways scroll; widths 390, 768, 1440 on one page load) and delete the copies; delete the dead-id absences; delete the unasserted `page.screenshot` calls and `landing.spec.ts:62` `capture()` sleeps, replace `landing.spec.ts:583` with a poll; `trade-services.spec.ts` writes to `info.outputPath()`
+- Test: the suite itself
+
+- [ ] **Step 1:** `npx playwright test --list | tail -1` and a timed run of the affected specs against a built server; save both.
+- [ ] **Step 2:** Implement one concern at a time, running the affected specs after each.
+- [ ] **Step 3:** `git status --porcelain` is empty after running `trade-services.spec.ts`. Re-run the list and the timing; record in the commit body.
+- [ ] **Step 4: Commit** `test(browser): one layout pass per page, no duplicate SEO walks, no unasserted screenshots`
+
+Effort M–L. Risk low; each removed check names where it is still covered.
+
+### Task 41: Apply the verified test removals from the page reviews
+
+Why: the 256 confirmed or partial rows of `test-drop-verify/result-{A,B,C}.md` (107 confirmed, 149 partial). Rows that overlap Tasks 38–40 are done there; skip them here (the verification files mark the pairs: D188/D253/D205, D212/D249, D192/D202, D033/D022, D035/D025, D037/D019). The 27 rejected rows stay untouched.
+
+**Files:** the spec and test files named in the rows. Work file by file inside the task; it is still one commit.
+
+- [ ] **Step 1:** For each file, apply the "final action" column exactly: drop, merge into the named test, or rewrite as described. A PARTIAL row moves its listed assertions before deleting anything.
+- [ ] **Step 2:** Run each changed file; PASS.
+- [ ] **Step 3:** `git diff --stat tests/` and the before/after `--list` count go in the commit body, with the row ids applied.
+- [ ] **Step 4: Commit** `test: apply the verified duplicate-test removals from the 2026-10-12 review`
+
+Effort L (many small edits). Risk low.
+
+### Task 42: Tests follow the data, and the missing page tests exist [parallel-safe]
+
+Why: U01-25 (landing figures pinned as literals), U24-11 (about 8 Money and banks tests pin NBG values and implementation counts such as `[31, 24, 18, 23]`), D070 (a pinned review date). Each data refresh fails these for reasons unrelated to the page.
+
+Also, the missing page tests the reviews named: U01-24, U03-15, U04-15, U05-15, U08-12, U20-13, U20-16, U22-18, U23-16, U24-10, U27-15, U29-21, U30-19 (each report's finding says what to assert). U04-16 is a drop, handled in Task 41.
+
+**Files:** `tests/browser/landing.spec.ts`, `tests/browser/money-banks.spec.ts`, `tests/explorer/moneyBanks*.test.ts`: read expected values from `data/imports/*.csv` (as the % of GDP unit test already does) or assert structure (a number with its unit, three history items, year equals the table header).
+
+- [ ] **Step 1–3:** Rewrite; run; PASS. Then edit one value in the CSV in a throwaway working copy, rerun, and confirm the test still passes because it reads the new value; revert the edit.
+- [ ] **Step 4: Commit** `test: landing and Money and banks tests follow the data instead of pinning it`
+
+Effort S. Risk none.
+
+### Task 43: CI builds once, caches, and runs the browser suite in parallel
+
+Why: X3-01 (every CI run builds the site twice; about 1.5 min on the runner), X3-02 (1,403 browser tests at one worker, about 12.4 min), X3-03 (no cache for `.next/cache` or the Playwright browsers; Chromium and its system packages are installed every run, 39 s), X3-05 (four postbuild re-checks of files prebuild wrote seconds earlier; the 120 MB of archive originals hashed twice), X3-06 (TypeScript runs twice per build, and the standalone `typecheck` misses route types on a fresh checkout), X3-16 (known flakes fixed by manual re-runs; one is an app race), X3-17 (`data:validate` starts 30 processes, about 30 s of start-up), X3-19 (no job timeouts), X3-07 (the "no writes into the repository" guard does not cover the browser job). X4-04 and X4-21: CLAUDE.md's test-loop numbers are five times out of date and do not say how to run the browser suite on a Linux cloud session.
+
+**Files:**
+- Modify: `.github/workflows/ci.yml` (upload `.next` and `public/downloads` from the checks job as an artifact; the browser job downloads it, runs `npm run start -- --port 3100 &` and `PLAYWRIGHT_BASE_URL=http://localhost:3100 npm run test:browser`; cache `apps/web/.next/cache` and `~/.cache/ms-playwright`; `timeout-minutes: 30`/`45`; the porcelain guard in both jobs); `playwright.config.ts:10-21` (`retries: process.env.CI ? 1 : 0`; pin `PW_WORKERS` after measuring 2 and 4 on the runner); `package.json` (`"typecheck": "next typegen && tsc --noEmit"`; drop the four postbuild re-checks once each `--write` verifies what it wrote; one `scripts/validate-all.ts` running the 30 checks in one process, keeping the npm aliases); `CLAUDE.md` "Test loop" and `playwright.config.ts:10-11` comments (new measured numbers with a date; the Linux/cloud command with `CI=1` and `PLAYWRIGHT_BASE_URL`); `docs/deployment.md` (a short known-flakes list)
+- Test: the CI run itself, on the PR (owner go first)
+
+- [ ] **Step 1:** Make the workflow and config changes. Run `npm run check` and `npm run build` locally once; compare the build time with the 4 min 22 s baseline.
+- [ ] **Step 2:** On the PR's first CI run, read both jobs' step times (GitHub Actions job view) and record them against the baseline table above. Try `PW_WORKERS=2` and `4` on two runs; pin the faster one that has no new failures.
+- [ ] **Step 3:** Update CLAUDE.md with the measured numbers and the date.
+- [ ] **Step 4: Commit** `ci: one build per run, caches, parallel browser tests; current test-loop numbers`
+
+Effort M. Risk medium: CI configuration is only proven by a CI run, which needs the owner's go (project rule).
+
 
 ---
 
@@ -598,6 +710,8 @@ The page reviews proposed 283 test removals or merges. Three verification agents
 ### Task 44: Docs match the shipped site [parallel-safe]
 
 Why: X4-06, X4-07, X4-08 (AGENTS.md: stale route inventory, a UI-contract default that contradicts approved scopes, a `codex/*` branch rule that conflicts with harness branch names), X4-09 to X4-12 and X4-19 (DESIGN.md §2, §6.2, §6.7, §17/§18, dead paths), X4-13, X4-14 (Project_Definition.md sidebar statements), X4-15 (READMEs list 3 of 11 hubs), X4-16 (database-import.md table), X4-17, X4-18 (deployment runbook), X4-22 (Noto Serif Georgian licence file), U21-19 (DESIGN §28.1/§28.4 vs §17).
+
+Also: X4-10 and X4-11 by id (DESIGN.md §17/§18 hub-card exception; the `% მშპ-ში` sentence).
 
 **Files:** the documents named. AGENTS.md: change only the Project Snapshot route sentence (point to Project_Definition.md §2), the UI-contract default sentence and the branch rule; do not touch "Engineering Behavior". Branch rule wording waits on Q10.
 
@@ -610,6 +724,8 @@ Effort M. Risk none.
 
 Why: U01-13 (site description says budget only), U10-16, U13-08 (economy and inflation pages call their share image budget data), U26-11, U27-13, U28-11, U28-12, U29-09, U23-10, U11-08, U10-15 (thin or wrong titles, descriptions and Dataset names; ka and en sitemap `lastmod` differ for the same page), U01-21 (footer year hardcoded).
 
+Also (low): U05-12, U09-12, U21-18, U27-14, U28-13 (titles that overstate or differ between languages; hub `lastmod`).
+
 **Files:** `lib/seo/*`, `lib/i18n/messages/{ka,en}/*.json` metadata keys, `app/sitemap.ts`, `components/site/site-footer-view.tsx`.
 
 - [ ] **Step 1–4:** Failing assertions in `tests/seo/metadata.test.ts` (no description over 160 characters; every hub title ends with the brand; one `lastmod` per page pair); implement; PASS.
@@ -619,7 +735,9 @@ Effort M. Risk low; new Georgian copy goes to the owner list.
 
 ### Task 46: Touch targets meet the site's own sizes [parallel-safe]
 
-Why: targets under 44 px where DESIGN.md asks for 44 px, or under 24 px (WCAG 2.5.8): U06-10, U09-15, U13-11, U21-16, U22-13, U23-12, U23-13, U29-06, U30-17, U12-12, U17-04, U02-14, U26-09.
+Why: X1-20 and U16-05 (Q5: 12 px native dropdowns make iPhones zoom; `components/ui/editorial.tsx:35` `SELECT_CLASS`, phones only, and DESIGN.md §7 updated to match). Targets under 44 px where DESIGN.md asks for 44 px, or under 24 px (WCAG 2.5.8): U06-10, U09-15, U13-11, U21-16, U22-13, U23-12, U23-13, U29-06, U30-17, U12-12, U17-04, U02-14, U26-09.
+
+Also (low): U22-12 (the share column header on trade rankings is illegible on phones), U09-14 (picker list height and English placeholder).
 
 **Files:** the components named in each finding (mostly `min-h-11` on phones).
 - [ ] **Step 1–4:** Extend `tests/browser/mobile-repairs-polish.spec.ts` with a target-size check on each page named; implement; PASS.
@@ -631,6 +749,8 @@ Effort S. Risk low.
 
 Why: U10-04, U12-11, U19-05, U17-12, U17-13, U15-03, U26-10, U27-12, U29-07, U29-08, U29-20, U14-08, U14-09, U07-05, U02-12, U02-13, U01-19, U06-12, U16-12, U22-11, U28-16.
 
+Also (low): U01-20, U11-07, U26-08, U29-19.
+
 **Files:** the components named in each finding.
 - [ ] **Step 1–4:** Add an axe check (`@axe-core/playwright` is not installed; use the existing `tests/browser/color-contrast.ts` helper pattern, or ask the owner before adding a dev dependency) on one page per template for the rules touched; implement; PASS.
 - [ ] **Step 5: Commit** `fix(a11y): picker popups, group names, live counts and heading levels`
@@ -639,7 +759,9 @@ Effort M. Risk low.
 
 ### Task 48: Consistent numbers, sentences and spacing [parallel-safe]
 
-Why: one number at two precisions or one sentence twice on a screen, missing separators, small layout nits: U07-13, U10-14, U13-14, U09-16, U18-10, U12-06, U26-12, U26-13, U02-03, U02-04, U04-04, U04-05, U04-10, U04-11, U21-08, U21-10, U22-17, U28-05, U28-06, U23-04, U23-05, U14-10, U14-11, U14-12, U27-05, U27-06, U20-10, U26-16, U26-05, U07-10, U07-11, U01-05, U01-06, U01-07, U09-10, U09-11, U17-11, U16-06, U16-16, U29-16, U29-17, U29-18, U29-10, U29-13.
+Why: U11-01 (Q6: the flat 100% share-of-GDP view on Sectors), U06-08 (Q7: debt change colours). One number at two precisions or one sentence twice on a screen, missing separators, small layout nits: U07-13, U10-14, U13-14, U09-16, U18-10, U12-06, U26-12, U26-13, U02-03, U02-04, U04-04, U04-05, U04-10, U04-11, U21-08, U21-10, U22-17, U28-05, U28-06, U23-04, U23-05, U14-10, U14-11, U14-12, U27-05, U27-06, U20-10, U26-16, U26-05, U07-10, U07-11, U01-05, U01-06, U01-07, U09-10, U09-11, U17-11, U16-06, U16-16, U29-16, U29-17, U29-18, U29-10, U29-13.
+
+Also (low): U03-14, U05-14, U06-05, U06-09, U07-12, U08-09, U08-10, U09-17, U10-13, U17-06, U18-11, U20-09, U21-17, U22-14, U22-16, U24-09, U25-07, U28-09, U28-10, U28-19 (deep links that first paint the default view, repeated sentences, small layout and wording items). U05-14, U07-12, U18-11 and U20-09 change wording or remove a block: show the owner first.
 
 **Files:** the components and message files named in each finding. Wording changes go to the owner list.
 - [ ] **Step 1–4:** For each item, the nearest existing test gets one assertion; implement; PASS.
@@ -650,6 +772,8 @@ Effort M. Risk low.
 ### Task 49: Excel files are tidy and consistent [parallel-safe]
 
 Why: U18-03 (Wages: with Average and Median selected the workbook shows the median as 1,531.0 while the page shows 1,531; this is the remaining part of the known Wages/Poverty Excel item, the rest was fixed in PR #176), U20-05 (a legacy column-4 number format lands on the text Status column, `lib/explorer/workbookWriter.client.ts:259`), U16-17, U17-10 (raw ids such as `labour_force` in file names), U26-14 (raw floating-point shares with no unit), U07-15 (a Group column equal to Category), U20-06 (waits on Q8).
+
+Also: U20-15 (assert in a real download that the value column, not the name column, carries the number format).
 
 **Files:** `lib/explorer/wagesWorkbook.ts` (per-row formats via `rowNumberFormats`, `lib/explorer/workbookModel.ts:92`), `lib/explorer/workbookWriter.client.ts:259`, the unemployment and demography workbook builders.
 - [ ] **Step 1–4:** Failing tests in `tests/explorer/wages.test.ts` (`"median stays whole when shown beside the average"`), `tests/explorer/workbookWriter.test.ts` (`"the status column has no number format"`), and the filename tests; implement; PASS.
@@ -682,7 +806,7 @@ Effort S–M. Risk low.
 
 ## Georgian text for owner review
 
-The full list (182 rows from every report) is `.superpowers/platform-review-2026-10/georgian-wording.md`. The ones this plan touches, with drafts:
+The full list (182 rows from every report, including U25-10) is `.superpowers/platform-review-2026-10/georgian-wording.md`. The ones this plan touches, with drafts:
 
 | Where | Today | Issue | Draft |
 |---|---|---|---|
@@ -706,6 +830,9 @@ The full list (182 rows from every report) is `.superpowers/platform-review-2026
 | U01-09, U01-10 (three.js hero cost) | The owner chose the hero (DESIGN.md §19), and it loads only on desktop after the page has loaded. |
 | U22-04, U29-22, U30-18 (shared JS floor) | Framework floor; the page totals in those findings also counted a 39.5 KB polyfill modern browsers never download. |
 | U09-19 (per-place share images), U09-18, U05-13, U10-07, U11-06, U16-15, U23-14 | Low value or already the owner's spec. |
+| U12-09, U16-10 (small duplicated payloads), U26-07 (a jump link in long member lists) | The report itself judged them acceptable or optional. |
+| X1-18 (a shared chart shell for the two chart components) | Task 12 copies the keyboard pattern instead; a full extraction is a larger refactor than any finding needs. |
+| U04-02, U19-11 (legend between 768 and 1099 px) | Owner decision Q4. |
 | U14-15 (layout shift on inflation pages on phones) | Root cause not isolated; needs a separate investigation before a fix can be planned. |
 | 27 rejected test removals (`result-*.md`, verdict REJECTED) | Each proves something no other test does. |
 
