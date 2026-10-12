@@ -100,3 +100,9 @@ Declined-to-judge items were each resolved against the approved scope:
 - No GitHub CI, merge, deployment or live production proof is claimed. Publishing and live database operations were neither authorized nor performed.
 
 Branch codex/trade-services and the existing managed worktree are preserved. This record and the completed plan are committed locally. Source archives, accepted data, instruction files and deferred housekeeping are unchanged by final bookkeeping. Disposable-database validation and publishing remain separate steps.
+
+## Report preservation during cleanup
+
+The final cleanup check found that the Task 1 implementer report had been tracked inside the temporary SDD folder. Its contents are preserved without change in [task-1-data-verification.md](task-1-data-verification.md); the old scratch path is removed from Git. The recovered report has the same Git blob, `3c6302c635bebcb3bbe2a4c0cb9953d3ac8abb54`. This is documentation-only relocation after the approved implementation; application and data inputs remain identical to the tested commit.
+
+Ruling: Move the accidentally tracked Task 1 report from the temporary SDD folder into the permanent review folder, preserving its exact contents and removing only the old path — cleanup must preserve evidence and leave a clean branch — cost if wrong: an old internal link may need updating; the report contents and runtime behavior are unchanged.
