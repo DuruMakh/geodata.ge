@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useMemo } from "react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import {
   DEFAULT_REGIONAL_ECONOMY_STATE,
@@ -11,39 +11,25 @@ import {
   type RegionalEconomyState,
 } from "../../lib/explorer/regionalEconomies";
 import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
-import { useAppReady } from "../explorer-shell/use-app-ready";
+import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-state";
+
+type RegionalEconomyHashData = { facts: ClientRegionalEconomyObservation[]; registry: SectorDefinition[] };
+
+function parse(hash: string, data: RegionalEconomyHashData): RegionalEconomyState {
+  const parsed = parseRegionalEconomyHash(
+    hash,
+    regionalEconomyDefinitions(data.registry).map((definition) => definition.id),
+  );
+  return changeRegionalEconomyMeasure(parsed, parsed.measure, data.facts);
+}
+
+// The server HTML keeps the default view; the hash (and the measure's own range) is applied after mount.
+const OPTIONS: HashStateOptions<RegionalEconomyHashData, RegionalEconomyState> = { initial: DEFAULT_REGIONAL_ECONOMY_STATE };
 
 export function useRegionalEconomyState(
   facts: ClientRegionalEconomyObservation[],
   registry: SectorDefinition[],
 ) {
-  const [state, setState] = useState<RegionalEconomyState>(DEFAULT_REGIONAL_ECONOMY_STATE);
-  const current = useRef(state);
-  useEffect(() => {
-    function restore() {
-      const parsed = parseRegionalEconomyHash(
-        window.location.hash,
-        regionalEconomyDefinitions(registry).map((definition) => definition.id),
-      );
-      const next = changeRegionalEconomyMeasure(parsed, parsed.measure, facts);
-      current.current = next;
-      setState(next);
-    }
-    restore();
-    window.addEventListener("popstate", restore);
-    window.addEventListener("hashchange", restore);
-    return () => {
-      window.removeEventListener("popstate", restore);
-      window.removeEventListener("hashchange", restore);
-    };
-  }, [facts, registry]);
-  useAppReady();
-  const update = useCallback((change: (previous: RegionalEconomyState) => RegionalEconomyState) => {
-    const next = change(current.current);
-    current.current = next;
-    const hash = `#${serializeRegionalEconomyHash(next)}`;
-    if (window.location.hash !== hash) window.history.pushState(null, "", hash);
-    setState(next);
-  }, []);
-  return { state, update };
+  const data = useMemo(() => ({ facts, registry }), [facts, registry]);
+  return useHashState(data, parse, serializeRegionalEconomyHash, OPTIONS);
 }

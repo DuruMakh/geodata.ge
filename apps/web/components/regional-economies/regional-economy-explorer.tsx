@@ -100,11 +100,11 @@ export function RegionalEconomyExplorer({
         <div className="flex min-w-0 flex-col">
           <section data-testid="regional-chart-panel" data-mode={state.mode} data-measure={state.measure} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={(mode) => update((previous) => ({ ...previous, mode }))} options={[
+              <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={(mode) => update((previous) => ({ ...previous, mode }), "push")} options={[
                 { value: "line", label: message(messages, "controls.chart"), testId: "regional-mode-line" },
                 { value: "table", label: message(messages, "controls.table"), testId: "regional-mode-table" },
               ]} />
-              <SegmentedTabs ariaLabel={t("measure")} value={state.measure} onChange={(measure) => update((previous) => changeRegionalEconomyMeasure(previous, measure, facts))} options={[
+              <SegmentedTabs ariaLabel={t("measure")} value={state.measure} onChange={(measure) => update((previous) => changeRegionalEconomyMeasure(previous, measure, facts), "push")} options={[
                 { value: "nominal", label: t("nominal"), ariaLabel: t("nominal"), testId: "regional-measure-nominal", icon: <span aria-hidden className="text-base">₾</span> },
                 { value: "share_of_region_gdp", label: t("shareOfRegionGdp"), ariaLabel: t("shareOfRegionGdp"), testId: "regional-measure-share", icon: <ChartPie aria-hidden size={18} strokeWidth={1.5} /> },
               ]} />
