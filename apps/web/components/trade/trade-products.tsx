@@ -70,7 +70,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
           <nav aria-label={t("tablePages")} className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted)]"><span>{t("selected")} · {model.selectedCount} · {page + 1} / {pageCount}</span>{pageCount > 1 ? <div className="flex gap-5"><button type="button" data-testid="trade-products-table-previous" disabled={page === 0} onClick={() => setPaging({ selection: state.selectedIds, page: page - 1 })} className="min-h-11 cursor-pointer disabled:opacity-35">{t("previous")}</button><button type="button" data-testid="trade-products-table-next" disabled={page + 1 === pageCount} onClick={() => setPaging({ selection: state.selectedIds, page: page + 1 })} className="min-h-11 cursor-pointer disabled:opacity-35">{t("next")}</button></div> : null}</nav>
         </div>}
       {/* Directly after the plot, before the chips: the readout CSS and the return pill look for the chart as the previous sibling. With more than ten products the chips name the selection, so the legend is left out. */}
-      <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={10} />
+      <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
       <div data-testid="trade-products-selection" className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] leading-tight">
         {model.selectedIds.slice(0, 4).map((id, index) => {
           const entity = entities.get(id), name = entity ? publicLabel(locale, id, entity.labelKa, englishLabels) : labels.get(id)!;

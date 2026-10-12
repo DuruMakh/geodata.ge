@@ -11,6 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { matchesLabelQuery } from "../../lib/i18n/search";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -50,6 +51,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   // The list nests plain names; the chart and table name a repeated child with its parent.
   const shown = energyFoodDisplayLabels(section, labels);
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: shown[series.id], color: series.color, valuesByYear: series.valuesByYear }));
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: shown[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
   const total = rows.find(row => row.itemId === reference.id) ?? null;
   const allIds = model.series.map(series => series.id);
   // Breakdowns nest under their total: the count and bulk action cover the top-level rows, nested ticks are counted apart.
@@ -90,9 +92,10 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
             <span className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.selected.map(series => ({ id: series.id, label: shown[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }))} share={percent} unit={unit} shareLabel={title} formatTooltipValue={value => valueLabel(value)} /></div>
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={percent} unit={unit} shareLabel={title} formatTooltipValue={value => valueLabel(value)} /></div>
             // Food ratios are whole percents, as Geostat prints them.
             : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} percentDecimals={0} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
+          <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={value => valueLabel(value)} />
           <RangeStrip years={energyFoodCoverage(section, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildEnergyFoodModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(percent ? "sourceNote.food" : "sourceNote.energy")} · {unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}

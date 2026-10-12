@@ -5,13 +5,15 @@ import { useEffect, useRef, useState } from "react";
 import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
+import { TOOLTIP_ROW_CAP } from "../main-explorer/editorial-line-chart";
 import { SwatchBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 
-// Owner decision D4 (2026-10-07), phones only. Rendered directly under the chart (or
+// Owner decision D4 (2026-10-07), stacked layouts only. Rendered directly under the chart (or
 // table) inside its chart panel (the nearest [data-chart-panel] or <section>):
 // - a compact legend of the selected lines, each with its latest value, when two or more
-//   lines are drawn (below 768px of column width);
+//   lines are drawn, up to the page's cap (ten by default) (below 1100px of column width, while the series list sits below the
+//   chart: owner decision Q4, 2026-10-12);
 // - a floating "↑ chart" pill that appears when the selection changes while the chart is
 //   off-screen (stacked layouts, below 1100px), and leads back to it.
 
@@ -20,6 +22,11 @@ export type AidSeries = { id: string; label: string; color: string; vals: (numbe
 /** How long the pill waits for the next selection change before it leaves. */
 export const RETURN_PILL_MS = 4000;
 const SWATCH_CAP = 6;
+
+/** Whether the legend lists `lines` lines: two or more, and no more than the cap (by default the tooltip's ten rows). */
+export function legendShown(lines: number, legendCap: number = TOOLTIP_ROW_CAP): boolean {
+  return lines >= 2 && lines <= legendCap;
+}
 
 /** The legend's value for a line: its value in the last period drawn, formatted like the chart. */
 export function legendValue(
@@ -64,7 +71,7 @@ export function ChartSelectionAids({
   unit: ValueUnit;
   /** Also given the line's series id, for pages whose series are published at different precisions. */
   formatValue?: (value: number, seriesId: string) => string;
-  /** Above this many lines the legend is left out (the return pill stays); for pages with unlimited selection. */
+  /** Above this many lines the legend is left out (the return pill stays); ten unless given. */
   legendCap?: number;
 }) {
   const { messages } = useI18n();
@@ -103,8 +110,8 @@ export function ChartSelectionAids({
 
   return (
     <div ref={anchor}>
-      {chartShown && series.length >= 2 && (legendCap === undefined || series.length <= legendCap) ? (
-        <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)] @min-[768px]:hidden">
+      {chartShown && legendShown(series.length, legendCap) ? (
+        <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)] @min-[1100px]:hidden">
           {series.map((line) => (
             <li key={line.id} data-legend-series-id={line.id} className="flex min-w-0 items-center gap-2">
               <SwatchBar color={line.color} />

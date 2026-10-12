@@ -187,6 +187,30 @@ test.describe("the phone legend", () => {
     await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
   });
 
+  // Pages that drew several lines without the legend until 2026-10 (X1-01): each lists every line.
+  for (const [name, url, scope, ids] of [
+    ["Household income", "/en/explorer/living-standards/income/regions/georgia#view=line&sel=income.total,settlement.urban", "chart-panel", ["income.total", "settlement.urban"]],
+    ["Loans and deposits", "/en/explorer/money/loans-deposits", "chart-panel", ["loans.total", "deposits.total"]],
+    ["Energy supply", "/en/explorer/energy-food/energy-supply#view=line&sel=energy.supply.total,energy.production.total", "chart-panel", ["energy.supply.total", "energy.production.total"]],
+    ["Life expectancy", "/en/explorer/demography/births-deaths", "life-section", ["demography.life_expectancy_total", "demography.life_expectancy_male", "demography.life_expectancy_female"]],
+  ] as const) {
+    test(`lists every line on ${name}`, async ({ page }) => {
+      await page.goto(url);
+      const legend = page.getByTestId(scope).getByTestId("chart-phone-legend");
+      await expect(legend).toBeVisible();
+      await expect(legend.locator("li")).toHaveCount(ids.length);
+      expect(await legend.locator("li").evaluateAll((items) => items.map((item) => item.getAttribute("data-legend-series-id")))).toEqual(ids);
+    });
+  }
+
+  test("leaves out the legend above ten lines (Trading partners, 11 countries)", async ({ page }) => {
+    const countries = [643, 792, 840, 826, 860, 804, 784, 764, 756, 807, 818].map((code) => `partner.1995-2025.${code}`);
+    await page.goto(`/en/explorer/trade/partners#sel=${countries.join(",")}&view=line&tab=countries&measure=trade.exports`);
+    await expect(page.getByTestId("series-status")).toContainText("11 / 218");
+    await expect(page.getByTestId("chart-frame")).toBeVisible();
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
+  });
+
   test("stays hidden for one line on Trade overview and on the Current account Balance tab", async ({ page }) => {
     await page.goto("/en/explorer/trade/overview");
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -229,6 +253,21 @@ test.describe("the phone legend", () => {
       await expect(page.getByTestId("chart-phone-legend")).toBeHidden();
     });
   });
+
+  // Q4 (2026-10-12): the legend stays while the series list sits below the chart, up to 1100px of column width
+  // (a 1024px tablet has a 724px column beside the 232px sidebar, a 1280px laptop 980px).
+  for (const width of [1024, 1280]) {
+    test.describe(`stacked layout at ${width}px`, () => {
+      test.use({ viewport: { width, height: 800 }, isMobile: false, hasTouch: false });
+      test("lists the lines under the chart", async ({ page }) => {
+        await page.goto("/explorer/expenditure#g=fields&sel=expenditure.total%2Cspending.social_protection");
+        await expect(page.getByTestId("chart-frame")).toBeVisible();
+        const legend = page.getByTestId("chart-phone-legend");
+        await expect(legend).toBeVisible();
+        await expect(legend.locator("li")).toHaveCount(2);
+      });
+    });
+  }
 });
 
 for (const locale of ["ka", "en"] as const) {

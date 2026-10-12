@@ -255,7 +255,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
                 />
               </div>
             )}
-            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} formatValue={state.tab === "contrib" ? (value) => `${formatContribution(value)} ${t("pp")}` : undefined} />
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} legendCap={DIVISION_IDS.length} formatValue={state.tab === "contrib" ? (value) => `${formatContribution(value)} ${t("pp")}` : undefined} />
             <RangeStrip
               years={tabPeriods}
               range={range}

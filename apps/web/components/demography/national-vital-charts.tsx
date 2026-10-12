@@ -13,6 +13,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientNationalFact } from "../../lib/servedRows";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -82,6 +83,7 @@ export function NationalVitalCharts({
   const ageOrder = [...curves.years.slice(1, -1), curves.years[0]!, curves.years.at(-1)!];
   const lifeColor = (colorKey: string | null) => (colorKey === null ? INK : SERIES_COLORS[colorKey]!);
   const rate1 = (value: number) => formatInUnit(value, UNIT_DENSITY);
+  const lifeSeries = LIFE_SERIES.map((line) => ({ id: line.seriesId, label: t(line.key), color: lifeColor(line.colorKey), vals: flat(seriesByYear(facts, line.seriesId)), planned: none }));
 
   return (
     <>
@@ -188,7 +190,7 @@ export function NationalVitalCharts({
           {lifeMode === "line" ? (
             <EditorialLineChart
               years={years}
-              series={LIFE_SERIES.map((line) => ({ id: line.seriesId, label: t(line.key), color: lifeColor(line.colorKey), vals: flat(seriesByYear(facts, line.seriesId)), planned: none }))}
+              series={lifeSeries}
               share={false}
               unit={UNIT_DENSITY}
               shareLabel=""
@@ -215,6 +217,7 @@ export function NationalVitalCharts({
             />
           )}
         </div>
+        <ChartSelectionAids series={lifeSeries} chartShown={lifeMode === "line"} share={false} unit={UNIT_DENSITY} formatValue={rate1} />
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="national-source-note">{t("nationalSource", { first, last })}</SourceNote></div>
         <Download testId="life-excel-download" build={() => buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
