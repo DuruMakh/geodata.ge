@@ -90,6 +90,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   const noSelection = props.selectedIds.length === 0;
   const noRangeData = !noSelection && !model.points.some((point) => point.value !== null);
   const pointsBySeriesYear = new Map(model.points.map((point) => [`${point.itemId}:${point.year}`, point]));
+  const forecastStartYear = model.forecastStartYear;
   const chartSeries: ChartSeries[] = model.selectedItems.map((item) => ({
     id: item.id,
     label: publicLabel(locale, item.id, item.kaLabel, englishLabels),
@@ -99,8 +100,8 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       return value === null ? null : props.family === "stock" && props.shareOfGdp ? value * 100 : value;
     }),
     planned: model.years.map(() => false),
-    ...(props.family === "service" && model.forecastStartYear !== null
-      ? { forecastFromYear: model.forecastStartYear, preliminary: model.years.map((year) => year >= model.forecastStartYear!) }
+    ...(props.family === "service" && forecastStartYear !== null
+      ? { forecastFromYear: forecastStartYear, preliminary: model.years.map((year) => year >= forecastStartYear) }
       : {}),
   }));
   const totalItemId = model.items.find((item) => item.family === props.family && item.parentItemId === null)?.id;

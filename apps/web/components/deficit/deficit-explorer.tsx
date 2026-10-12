@@ -88,6 +88,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
   );
   const forecastYears = model.years.filter((year) => year >= (model.forecastStartYear ?? Infinity));
   const label = publicLabel(locale, DEFICIT_ITEM.id, DEFICIT_ITEM.kaLabel, englishLabels);
+  const forecastStartYear = model.forecastStartYear;
   const chartSeries: ChartSeries[] = selected
     ? [{
         id: DEFICIT_ITEM.id,
@@ -95,9 +96,9 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
         color: DEFICIT_ITEM.color,
         vals: model.points.map((point) => point.value),
         planned: model.years.map(() => false),
-        ...(model.forecastStartYear === null
+        ...(forecastStartYear === null
           ? {}
-          : { forecastFromYear: model.forecastStartYear, preliminary: model.years.map((year) => year >= model.forecastStartYear!) }),
+          : { forecastFromYear: forecastStartYear, preliminary: model.years.map((year) => year >= forecastStartYear) }),
       }]
     : [];
   const queryMatches = matchesLabelQuery(query, [DEFICIT_ITEM.kaLabel, model.tableRow.enLabel, DEFICIT_ITEM.id]);

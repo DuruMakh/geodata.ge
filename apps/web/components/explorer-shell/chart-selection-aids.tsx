@@ -30,8 +30,8 @@ export function legendShown(lines: number, legendCap: number = TOOLTIP_ROW_CAP):
 
 /**
  * The legend's value for a line: its value in the last period drawn, formatted like the chart.
- * A line with forecast years shows its last published value instead, with that value's year
- * when a later year is drawn: a projection is never read as the latest value.
+ * A line with forecast years reads its last non-forecast period instead, with that period's year
+ * when later (forecast) years are drawn: a projection is never read as the latest value.
  */
 export function legendValue(
   vals: readonly (number | null)[],
@@ -54,7 +54,7 @@ export function legendValue(
   const index =
     forecastFromYear === undefined || years === undefined
       ? vals.length - 1
-      : vals.findLastIndex((value, period) => value !== null && years[period]! < forecastFromYear);
+      : years.findLastIndex((year, period) => period < vals.length && year < forecastFromYear);
   const value = vals[index];
   if (value === null || value === undefined) return MISSING;
   const text = formatValue

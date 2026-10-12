@@ -242,8 +242,17 @@ test.describe("Government Debt explorer", () => {
   test("hovering a projection year shows the forecast label", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=line&r=2027-2030&sel=debt.service.total`);
     await expectAppReady(page);
-    await page.getByRole("img", { name: LINE_CHART_NAME }).hover({ position: { x: 300, y: 100 } });
+    const chart = page.getByRole("img", { name: LINE_CHART_NAME });
+    await chart.hover({ position: { x: 300, y: 100 } });
     await expect(page.getByTestId("chart-tooltip")).toContainText("პროგნოზი");
+
+    // An actual year reads without it.
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=line&r=2024-2025&sel=debt.service.total`);
+    await page.reload();
+    await expectAppReady(page);
+    await chart.hover({ position: { x: 300, y: 100 } });
+    await expect(page.getByTestId("chart-tooltip")).toBeVisible();
+    await expect(page.getByTestId("chart-tooltip")).not.toContainText("პროგნოზი");
   });
 
   test("the bulk control clears, then selects every row of the active family", async ({ page }) => {

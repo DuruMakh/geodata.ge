@@ -26,6 +26,8 @@ describe("legendValue", () => {
     expect(legendValue([4.1e9, 4.4e9], { ...forecast, years: [2024, 2025] })).toBe("4.4 მლრდ");
     // A range of forecast years only has no published value to show.
     expect(legendValue([4.0e9, 3.7e9], { ...forecast, years: [2026, 2030] })).toBe("—");
+    // A missing last actual year reads as a dash, as in every other legend: no reaching back to 2024.
+    expect(legendValue([4.1e9, null, 4.0e9], { ...forecast, years: [2024, 2025, 2026] })).toBe("—");
   });
 });
 
