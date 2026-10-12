@@ -30,7 +30,7 @@ import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { Callout, SegmentedTabs, SELECT_CLASS, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
+import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
 import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-panel";
 import { useUnemploymentState } from "./use-unemployment-state";

@@ -30,8 +30,7 @@ import { RegionIndex } from "../regional-economies/regional-economies-index";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
-import { Callout, SegmentedTabs, SELECT_CLASS, SourceNote } from "../ui/editorial";
-
+import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote } from "../ui/editorial";
 
 
 type WagesHashData = { section: WagesSectionId; facts: ClientWagesFact[] };

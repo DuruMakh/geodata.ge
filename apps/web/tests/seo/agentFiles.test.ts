@@ -53,6 +53,7 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/demography/population",
   "https://fiscal.ge/explorer/demography/migration",
   "https://fiscal.ge/explorer/demography/births-deaths",
+  "https://fiscal.ge/explorer/demography/age-sex",
   "https://fiscal.ge/methodology",
   "https://fiscal.ge/methodology/expenditure",
   "https://fiscal.ge/methodology/revenue",
@@ -153,7 +154,7 @@ describe("Fiscal.ge agent instructions", () => {
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
     expect(targets).toEqual(requiredTargets);
-    expect(targets).toHaveLength(83);
+    expect(targets).toHaveLength(84);
     expect(new Set(targets).size).toBe(targets.length);
   });
 

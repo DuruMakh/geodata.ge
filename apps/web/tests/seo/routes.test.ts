@@ -56,7 +56,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Population page add two more bilingual pairs; the 75 Population place
     // pages (Georgia, 11 regions and 63 municipalities) add 75 more pairs.
     // Trading partners and Products each add one further bilingual pair.
-    // The Migration page adds one more bilingual pair, and so does the Births, deaths and fertility page.
+    // The Migration page adds one more bilingual pair, and so do the Births, deaths and fertility page
+    // and the Age and sex page.
     // Wages adds its hub, three pages, 11 region pages and methodology page: 16 bilingual pairs.
     // External flows adds its hub, Money from abroad and its methodology, each in both languages.
     // Domestic exports adds one further bilingual pair.
@@ -66,7 +67,7 @@ describe("indexable Fiscal.ge routes", () => {
     // Income and Spending add a page for Georgia and each of the 11 regions: 24 more bilingual pairs.
     // Energy and food adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
-    expect(urls).toHaveLength(576);
+    expect(urls).toHaveLength(578);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -114,6 +115,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/economy/regions");
     expect(urls).toContain("https://fiscal.ge/en/explorer/economy/regions/imereti");
     expect(urls).toContain("https://fiscal.ge/methodology/debt");
+    expect(urls).toContain("https://fiscal.ge/explorer/demography/age-sex");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/demography/age-sex");
     expect(urls.some((url) => url.includes("#") || url.includes("?"))).toBe(false);
   });
 

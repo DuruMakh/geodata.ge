@@ -32,7 +32,7 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
 
 /**
  * An empty summary leaves out the overview block.
- * leadRow is an unranked row above the ranked list, linked through hrefForRegion.
+ * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
  */
 export function RegionIndex({ model, sourceNote, metric, summary, leadRow }: {
   model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>;
@@ -53,7 +53,9 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow }: {
     ]));
   }, [englishLabels, model.regions, query]);
   const lead = leadRow && matchesLabelQuery(query, [leadRow.label]) ? leadRow : null;
-  const rowClass = (id: string) => `grid grid-cols-[22px_minmax(0,1fr)_112px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[9px] pr-1 transition-colors hover:bg-[var(--tint)] ${id === activeRegionId ? "bg-[var(--tint)]" : "bg-transparent"}`;
+  const linkFor = metric.hrefForRegion;
+  // Linked rows end in an arrow column; plain rows (no hrefForRegion) have none.
+  const rowClass = (id: string) => `grid ${linkFor === undefined ? "grid-cols-[22px_minmax(0,1fr)_112px]" : "grid-cols-[22px_minmax(0,1fr)_112px_12px]"} items-center gap-[9px] border-b border-[var(--row-border)] py-[9px] pr-1 transition-colors hover:bg-[var(--tint)] ${id === activeRegionId ? "bg-[var(--tint)]" : "bg-transparent"}`;
 
   return (
     <>
@@ -99,33 +101,52 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow }: {
             </div>
           ) : (
             <div className="mt-1.5 max-h-[620px] overflow-y-auto">
-              {lead ? (
-                <Link href={pageHref(metric.hrefForRegion(lead.id), locale)} data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
+              {lead ? (linkFor ? (
+                <Link href={pageHref(linkFor(lead.id), locale)} data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
                   <span aria-hidden />
                   <span className="min-w-0 text-[12.5px] font-medium">{lead.label}</span>
                   <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(lead.value)}</span>
                   <span aria-hidden className="text-[var(--faint)]">→</span>
                 </Link>
-              ) : null}
-              {rows.map((region) => (
-                <Link
-                  key={region.regionId}
-                  href={pageHref(metric.hrefForRegion(region.regionId), locale)}
-                  data-testid="regional-list-row"
-                  data-region-id={region.regionId}
-                  data-active={region.regionId === activeRegionId ? "true" : undefined}
-                  onMouseEnter={() => setPointerActive(region.regionId)}
-                  onMouseLeave={() => setPointerActive(null)}
-                  onFocus={() => setFocusActive(region.regionId)}
-                  onBlur={() => setFocusActive(null)}
-                  className={rowClass(region.regionId)}
-                >
-                  <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{String(region.rank).padStart(2, "0")}</span>
-                  <span className="min-w-0 text-[12.5px] font-medium">{publicLabel(locale, region.regionId, region.nameKa, englishLabels)}</span>
-                  <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(region.value)}</span>
-                  <span aria-hidden className="text-[var(--faint)]">→</span>
-                </Link>
-              ))}
+              ) : (
+                <div data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
+                  <span aria-hidden />
+                  <span className="min-w-0 text-[12.5px] font-medium">{lead.label}</span>
+                  <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(lead.value)}</span>
+                </div>
+              )) : null}
+              {rows.map((region) => {
+                const rowProps = {
+                  "data-testid": "regional-list-row",
+                  "data-region-id": region.regionId,
+                  "data-active": region.regionId === activeRegionId ? "true" : undefined,
+                  onMouseEnter: () => setPointerActive(region.regionId),
+                  onMouseLeave: () => setPointerActive(null),
+                };
+                const cells = (
+                  <>
+                    <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{String(region.rank).padStart(2, "0")}</span>
+                    <span className="min-w-0 text-[12.5px] font-medium">{publicLabel(locale, region.regionId, region.nameKa, englishLabels)}</span>
+                    <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(region.value)}</span>
+                  </>
+                );
+                // Without a link the row is a plain row: nothing to focus, no arrow.
+                return linkFor === undefined ? (
+                  <div key={region.regionId} {...rowProps} className={rowClass(region.regionId)}>{cells}</div>
+                ) : (
+                  <Link
+                    key={region.regionId}
+                    href={pageHref(linkFor(region.regionId), locale)}
+                    {...rowProps}
+                    onFocus={() => setFocusActive(region.regionId)}
+                    onBlur={() => setFocusActive(null)}
+                    className={rowClass(region.regionId)}
+                  >
+                    {cells}
+                    <span aria-hidden className="text-[var(--faint)]">→</span>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
