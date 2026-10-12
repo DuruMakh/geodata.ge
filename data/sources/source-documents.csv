@@ -186,6 +186,68 @@ source.geostat_gini,ჯინის კოეფიციენტები,docs
 source.geostat_poverty_source_page,სიღარიბისა და ჯინის კოეფიციენტების წყაროს გვერდი,docs/Raw Data/Poverty/geostat-poverty-annual/official/poverty-page-2026-10-10.html,2026-10-10
 source.geostat_poverty_metadata_2026,სიღარიბისა და ჯინის კოეფიციენტების მეტამონაცემები,docs/Raw Data/Poverty/geostat-poverty-annual/official/poverty-metadata-2026.pdf,2026-10-10
 source.geostat_hies_metadata_2026,შინამეურნეობების შემოსავლებისა და ხარჯების კვლევის მეტამონაცემები,docs/Raw Data/Poverty/geostat-poverty-annual/official/hies-metadata-2026.pdf,2026-10-10
+source.geostat_energy_balance_2013_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2013",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2013-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2013_electricity,"ელექტროენერგია და სითბო, 2013",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2013-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2014_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2014",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2014-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2014_electricity,"ელექტროენერგია და სითბო, 2014",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2014-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2015_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2015",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2015-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2015_electricity,"ელექტროენერგია და სითბო, 2015",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2015-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2016_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2016",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2016-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2016_electricity,"ელექტროენერგია და სითბო, 2016",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2016-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2017_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2017",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2017-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2017_electricity,"ელექტროენერგია და სითბო, 2017",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2017-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2018_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2018",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2018-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2018_electricity,"ელექტროენერგია და სითბო, 2018",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2018-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2019_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2019",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2019-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2019_electricity,"ელექტროენერგია და სითბო, 2019",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2019-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2020_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2020",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2020-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2020_electricity,"ელექტროენერგია და სითბო, 2020",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2020-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2021_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2021",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2021-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2021_electricity,"ელექტროენერგია და სითბო, 2021",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2021-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2022_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2022",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2022-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2022_electricity,"ელექტროენერგია და სითბო, 2022",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2022-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2023_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2023",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2023-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2023_electricity,"ელექტროენერგია და სითბო, 2023",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2023-electricity.xlsx,2026-10-11
+source.geostat_energy_balance_2024_aggregated,"აგრეგირებული ენერგეტიკული ბალანსი, 2024",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2024-aggregated.xlsx,2026-10-11
+source.geostat_energy_balance_2024_electricity,"ელექტროენერგია და სითბო, 2024",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2024-electricity.xlsx,2026-10-11
+source.geostat_energy_efficiency,"ენერგოეფექტიანობის ინდიკატორები, 2013-2024",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-efficiency.xls,2026-10-11
+source.geostat_food_balance_sheets,"სურსათის ბალანსები, 2014-2025",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/food-balance-sheets.xlsx,2026-10-11
+source.geostat_energy_balance_2024_aggregated_ka,"აგრეგირებული ენერგეტიკული ბალანსი, 2024 (ქართული წარწერები)",docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/energy-balance-2024-aggregated-ka.xlsx,2026-10-11
+source.geostat_food_balance_sheets_ka,სურსათის ბალანსები (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/food-balance-sheets-ka.xlsx,2026-10-11
+source.geostat_energy_balance_page_2013,საქართველოს ენერგეტიკული ბალანსი 2013 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2013.html,2026-10-11
+source.geostat_energy_balance_page_2014,საქართველოს ენერგეტიკული ბალანსი 2014 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2014.html,2026-10-11
+source.geostat_energy_balance_page_2015,საქართველოს ენერგეტიკული ბალანსი 2015 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2015.html,2026-10-11
+source.geostat_energy_balance_page_2016,საქართველოს ენერგეტიკული ბალანსი 2016 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2016.html,2026-10-11
+source.geostat_energy_balance_page_2017,საქართველოს ენერგეტიკული ბალანსი 2017 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2017.html,2026-10-11
+source.geostat_energy_balance_page_2018,საქართველოს ენერგეტიკული ბალანსი 2018 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2018.html,2026-10-11
+source.geostat_energy_balance_page_2019,საქართველოს ენერგეტიკული ბალანსი 2019 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2019.html,2026-10-11
+source.geostat_energy_balance_page_2020,საქართველოს ენერგეტიკული ბალანსი 2020 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2020.html,2026-10-11
+source.geostat_energy_balance_page_2021,საქართველოს ენერგეტიკული ბალანსი 2021 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2021.html,2026-10-11
+source.geostat_energy_balance_page_2022,საქართველოს ენერგეტიკული ბალანსი 2022 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2022.html,2026-10-11
+source.geostat_energy_balance_page_2023,საქართველოს ენერგეტიკული ბალანსი 2023 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2023.html,2026-10-11
+source.geostat_energy_balance_page_2024,საქართველოს ენერგეტიკული ბალანსი 2024 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2024.html,2026-10-11
+source.geostat_energy_balance_index_page,საქართველოს ენერგეტიკული ბალანსი (საინდექსო გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-index-page.html,2026-10-11
+source.geostat_food_security_page,სურსათის უსაფრთხოება (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/food-security-page.html,2026-10-11
+source.nbg_money_aggregates,ფულის აგრეგატები და მონეტარული კოეფიციენტები (M2.1),docs/Raw Data/Money/nbg-money-banks-annual/official/money-aggregates-and-monetary-ratioseng.xlsx,2026-10-11
+source.nbg_loans_l3_5,ბანკების მიერ გაცემული სესხები ეკონომიკაზე (L3.5),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-to-the-economy-l3-5eng.xlsx,2026-10-11
+source.nbg_deposits_d3_17,დეპოზიტები სახეების მიხედვით (D3.17),docs/Raw Data/Money/nbg-money-banks-annual/official/depositsinterest-rates-d3-17eng.xlsx,2026-10-11
+source.nbg_deposits_individuals_d3_23,ფიზიკური პირების დეპოზიტები (D3.23),docs/Raw Data/Money/nbg-money-banks-annual/official/deposits-of-individuals-d3-23eng.xlsx,2026-10-11
+source.nbg_deposits_legal_d3_27,იურიდიული პირების დეპოზიტები (D3.27),docs/Raw Data/Money/nbg-money-banks-annual/official/deposits-of-legal-entities-d3-27eng.xlsx,2026-10-11
+source.nbg_policy_rate,მონეტარული პოლიტიკის განაკვეთი (MPR),docs/Raw Data/Money/nbg-money-banks-annual/official/mpireng.xlsx,2026-10-11
+source.nbg_loan_rates_lwir,სესხებზე წლიური საშუალო შეწონილი საპროცენტო განაკვეთები (LWIR),docs/Raw Data/Money/nbg-money-banks-annual/official/annual-weighted-loans-interest-rates-lwireng.xlsx,2026-10-11
+source.nbg_deposit_rates_dwir,დეპოზიტებზე წლიური საშუალო შეწონილი საპროცენტო განაკვეთები (DWIR),docs/Raw Data/Money/nbg-money-banks-annual/official/annual-weighted-deposit-interest-rates-dwireng.xlsx,2026-10-11
+source.nbg_fsi_archive,ფინანსური მდგრადობის მაჩვენებლები (FSI) - არქივი,docs/Raw Data/Money/nbg-money-banks-annual/official/fsieng-archive.xlsx,2026-10-11
+source.nbg_fsi,ფინანსური მდგრადობის მაჩვენებლები (FSI),docs/Raw Data/Money/nbg-money-banks-annual/official/fsieng.xlsx,2026-10-11
+source.nbg_meth_monetary_statistics,მონეტარული სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/monetary-statistics-meth-eng.pdf,2026-10-11
+source.nbg_meth_loans,სესხების სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/loans-meth-noteseng.pdf,2026-10-11
+source.nbg_meth_deposits,დეპოზიტების სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/deposits-meth-noteseng.pdf,2026-10-11
+source.nbg_meth_interest_rates,საპროცენტო განაკვეთების სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/interest-rates-methodology-eng.pdf,2026-10-11
+source.nbg_api_category_15,ეროვნული ბანკის ფაილების ნუსხა - კატეგორია 15 (მონეტარული სტატისტიკა),docs/Raw Data/Money/nbg-money-banks-annual/official/api-category-15.json,2026-10-11
+source.nbg_api_category_16,ეროვნული ბანკის ფაილების ნუსხა - კატეგორია 16 (დეპოზიტები),docs/Raw Data/Money/nbg-money-banks-annual/official/api-category-16.json,2026-10-11
+source.nbg_api_category_17,ეროვნული ბანკის ფაილების ნუსხა - კატეგორია 17 (სესხები),docs/Raw Data/Money/nbg-money-banks-annual/official/api-category-17.json,2026-10-11
+source.nbg_api_category_19,ეროვნული ბანკის ფაილების ნუსხა - კატეგორია 19 (ფინანსური ბაზრები),docs/Raw Data/Money/nbg-money-banks-annual/official/api-category-19.json,2026-10-11
+source.nbg_api_category_27,ეროვნული ბანკის ფაილების ნუსხა - კატეგორია 27 (არქივი),docs/Raw Data/Money/nbg-money-banks-annual/official/api-category-27.json,2026-10-11
+source.nbg_statistics_page,ეროვნული ბანკის სტატისტიკის გვერდი,docs/Raw Data/Money/nbg-money-banks-annual/official/nbg-statistics-page-2026-10-11.html,2026-10-11
 source.geostat_household_income_population_national,მთლიანი მოსახლეობის საშუალო თვიური შემოსავლების განაწილება,docs/Raw Data/Households/geostat-household-income-spending-annual/official/101-income-total-population.xlsx,2026-10-11
 source.geostat_household_income_population_settlement,მთლიანი მოსახლეობის საშუალო თვიური შემოსავლების განაწილება ქალაქისა და სოფლის მიხედვით,docs/Raw Data/Households/geostat-household-income-spending-annual/official/102-income-total-population-settlement.xlsx,2026-10-11
 source.geostat_household_income_population_region,მთლიანი მოსახლეობის საშუალო თვიური შემოსავლების განაწილება რეგიონების მიხედვით,docs/Raw Data/Households/geostat-household-income-spending-annual/official/103-income-total-population-region.xlsx,2026-10-11

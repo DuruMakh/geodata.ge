@@ -155,7 +155,7 @@ Confirm the SHA-256 of each re-download matches the shared copy. Retrieved 2026-
 ### Task 3: Loader, mirror table and parity
 
 **Files:**
-- Create: `apps/web/lib/data/household/importHousehold.ts`, `apps/web/prisma/migrations/20261011090000_household_income_spending/migration.sql`
+- Create: `apps/web/lib/data/household/importHousehold.ts`, `apps/web/prisma/migrations/20261012090000_household_income_spending/migration.sql`
 - Modify: `apps/web/prisma/schema.prisma`, `lib/db/mirrorRows.ts`, `lib/db/servedDataDb.ts`, `scripts/import-budget-facts.ts`, `data/sources/source-documents.csv` (21 rows). In each, copy the Poverty addition (`git diff b733c26^1 b733c26 -- <file>`).
 - Test: extend `tests/data/household/household.test.ts`
 

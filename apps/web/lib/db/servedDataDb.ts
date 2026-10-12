@@ -26,6 +26,8 @@ import {
   loadTradeOverviewFactsFromMirror,
   loadWagesFactsFromMirror,
   loadPovertyFactsFromMirror,
+  loadEnergyFoodFactsFromMirror,
+  loadMoneyBanksFactsFromMirror,
   loadHouseholdFactsFromMirror,
   loadTradePartnersDataFromMirror,
   loadMoneyTransfersDataFromMirror,
@@ -136,6 +138,14 @@ export async function loadWagesFactsFromDb() {
 
 export async function loadPovertyFactsFromDb() {
   return loadPovertyFactsFromMirror(prisma);
+}
+
+export async function loadEnergyFoodFactsFromDb() {
+  return loadEnergyFoodFactsFromMirror(prisma);
+}
+
+export async function loadMoneyBanksFactsFromDb() {
+  return loadMoneyBanksFactsFromMirror(prisma);
 }
 
 export async function loadHouseholdFactsFromDb() {

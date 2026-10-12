@@ -1,0 +1,181 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-11",
+  "scope": "Annual research only: money aggregates, bank loans and deposits, interest rates and bank-health measures; no exchange rates, monthly or quarterly values, serving or published figures beyond the reviewed cells",
+  "primary_observation_count": 730,
+  "observations_by_source": {
+    "nbg_deposit_rates_dwir": 90,
+    "nbg_deposits_d3_17": 120,
+    "nbg_deposits_individuals_d3_23": 24,
+    "nbg_deposits_legal_d3_27": 11,
+    "nbg_fsi": 20,
+    "nbg_fsi_archive": 77,
+    "nbg_loan_rates_lwir": 90,
+    "nbg_loans_l3_5": 96,
+    "nbg_money_aggregates": 184,
+    "nbg_policy_rate": 18
+  },
+  "imputed_values": 0,
+  "calculated_values": 119,
+  "reconciliation_failed_count": 0,
+  "checks": {
+    "coverage_matches_year_ranges": true,
+    "published_values_are_rounded_stored_values": true,
+    "lari_plus_foreign_equals_total": true,
+    "people_plus_companies_equals_all_deposits_2015_2025": true,
+    "money_aggregates_in_order": true,
+    "percentages_within_0_100_except_roa_roe": true,
+    "fsi_2022_overlap": {
+      "banks.npl_ratio": {
+        "archive_2022q4": "1.7",
+        "archive_cell": "CN10"
+      },
+      "banks.roa": {
+        "archive_2022q4": "3.8",
+        "archive_cell": "CN21"
+      },
+      "banks.roe": {
+        "archive_2022q4": "30.2",
+        "archive_cell": "CN22"
+      },
+      "banks.capital_ratio": {
+        "archive_2022q4": "20.3",
+        "archive_cell": "CN8"
+      },
+      "banks.tier1_ratio": {
+        "archive_2022q4": "17.1",
+        "archive_cell": "CN9"
+      }
+    },
+    "anchor_values": {
+      "money.m3:2025": "57680.2",
+      "loans.total:2025": "72453.0",
+      "rates.policy:2025": "8.00",
+      "banks.npl_ratio:2025": "2.5",
+      "deposits.fx_share:2025": "48.6",
+      "loans.fx_share:2025": "41.9"
+    }
+  },
+  "source_checks": [
+    {
+      "source_id": "nbg_money_aggregates",
+      "sha256": "FC6707C929DBDC2D3CE32C8878DA63D40B72347BEAD33FE96EA91B8805BDD568",
+      "bytes": 119690,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_loans_l3_5",
+      "sha256": "2069706C4A25801FDC18A9CE7DFC55DDFE86D71EAFEA4D959AA05A03DCA73500",
+      "bytes": 107209,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_deposits_d3_17",
+      "sha256": "754A149411DEFAB41863AD49CFFD878076EDFDA4032B0150E50C0BB707DDD9C3",
+      "bytes": 148861,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_deposits_individuals_d3_23",
+      "sha256": "3BD70E5A812BAB5F75667202EECFFC721D543CB1FF9E03C49E75E95490A45C50",
+      "bytes": 152662,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_deposits_legal_d3_27",
+      "sha256": "1D818061BB121354E437FE8D2F540F13D57A6DD2952A68BC99761ECB83F96772",
+      "bytes": 131881,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_policy_rate",
+      "sha256": "738ABC23134E5D7ECE59A3507068D7DDF8465F414116FEFCBA063E79A0A16960",
+      "bytes": 21046,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_loan_rates_lwir",
+      "sha256": "8523525FD2A28B9988BF67B563B01CE7EDEBAAEC760876028042530FD02CE4F2",
+      "bytes": 40210,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_deposit_rates_dwir",
+      "sha256": "2B61764E5E129244D5962980907DB88C610E259464FF9309206C872434E0CA54",
+      "bytes": 39218,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_fsi_archive",
+      "sha256": "E1BEB64F2580566612CC803762235033A5702877B84848DA8E9734BEB67478E4",
+      "bytes": 526917,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_fsi",
+      "sha256": "7C44C18231A38FF263D6EF835FE570B624A56F4B887026BDE548D1F0DDD3B441",
+      "bytes": 360155,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_meth_monetary_statistics",
+      "sha256": "3274483DC909BF2B2C8B2A1F095D7E570F33247518B3450D473F5E975057F659",
+      "bytes": 789478,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_meth_loans",
+      "sha256": "26F5FCF0A4100EA5F6D3027CE5E14846226AC6C01E3D3996E197D180565393AB",
+      "bytes": 311294,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_meth_deposits",
+      "sha256": "F731FA94FF946D70D1E1EFEDD74F1E21556AF72965CDEE0849D421EAD56CC98E",
+      "bytes": 497862,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_meth_interest_rates",
+      "sha256": "5998CDBEAF4D0DAB7C37C99CD000BD770B3457EDF645862C73167DA3422FE9D0",
+      "bytes": 178955,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_api_category_15",
+      "sha256": "338083D6E6D053A85F729E14AB01D17008DB79286671144DE7945E79144FE50F",
+      "bytes": 3030,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_api_category_16",
+      "sha256": "873E50857B55C6FEAC4ECA16696CF9BBB9B80D4B274AB2CEFBCB41E24CB275F0",
+      "bytes": 2969,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_api_category_17",
+      "sha256": "0811E161476ABFE5C8E1FAD60F99726FCFA701A905C68B640D8B078EA55C07A2",
+      "bytes": 3892,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_api_category_19",
+      "sha256": "9486EA36EB70415C7634F0420DF0546E43FC78FD742934EBF6F390E12A89230C",
+      "bytes": 4916,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_api_category_27",
+      "sha256": "31481D6B675C3816C8928C6AC70605E462FD7FB976EE2B01C9E29F58B4C6ADCD",
+      "bytes": 4655,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_statistics_page",
+      "sha256": "079E82143D3F38234ACDC586DF2E4FA569796F6F0D09A23CB5996CD1407502F4",
+      "bytes": 340047,
+      "passed": true
+    }
+  ]
+}

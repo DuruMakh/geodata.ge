@@ -290,7 +290,8 @@ export function ChartTooltip({
   headerRight?: string | null;
   rows: TooltipRow[];
   hidden: number;
-  formatValue: (value: number) => string;
+  /** Receives the row's id too, so a readout can format one series differently (e.g. more decimals). */
+  formatValue: (value: number, id: string) => string;
   preliminaryLabel?: string;
   testId?: string;
   /** "panel": the phone readout, in flow under the chart so it never covers the plot. */
@@ -317,7 +318,7 @@ export function ChartTooltip({
               <RowLabel row={row} className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" />
             </span>
             <span className="shrink-0 font-[family-name:var(--font-numeric)] text-[12px] text-[var(--ink)]">
-              {formatValue(row.value)}
+              {formatValue(row.value, row.id)}
               {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[11px] min-[768px]:text-[10px]">{preliminaryLabel}</sup> : null}
             </span>
           </div>
@@ -353,7 +354,7 @@ export function ChartTooltip({
             <RowLabel row={row} className="max-w-[190px] overflow-hidden text-ellipsis whitespace-nowrap" />
           </span>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink)]">
-            {formatValue(row.value)}
+            {formatValue(row.value, row.id)}
             {row.preliminary && preliminaryLabel ? <sup className="ml-1 text-[11px] min-[768px]:text-[9px]">{preliminaryLabel}</sup> : null}
           </span>
         </div>
