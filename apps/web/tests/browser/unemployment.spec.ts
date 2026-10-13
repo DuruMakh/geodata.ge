@@ -4,6 +4,7 @@ import { tableSeriesCount } from "./explorer-table";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`four unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
@@ -398,15 +399,19 @@ for (const prefix of ["", "/en"]) test(`new controls and year handles work with 
 
 test("both methodology pages link nine byte-identical originals without a nonexistent bulk dataset", async ({ page, request }) => {
   const root = path.resolve(process.cwd(), "../..");
-  const manifest = JSON.parse(await readFile(path.join(root, "docs/Raw Data/Unemployment/geostat-labour-force-annual/source-manifest.json"), "utf8")) as { local_file: string; sha256: string }[];
+  const manifest = JSON.parse(await readFile(path.join(root, "docs/Raw Data/Unemployment/geostat-labour-force-annual/source-manifest.json"), "utf8")) as { source_id: string; sha256: string }[];
+  // The site links each original under its reviewed public path (an archived web page is published as .html.txt).
+  const publishedPath = new Map((await loadReviewedSourceManifest(root, "unemployment")).map((row) => [row.source_id, row.public_download_path]));
   for (const prefix of ["", "/en"]) {
     await page.goto(`${prefix}/methodology/unemployment`);
     await expect(page.locator('a[href^="/downloads/methodology/unemployment/files/"]')).toHaveCount(9);
     await expect(page.getByTestId("processed-dataset-download")).toHaveCount(0);
   }
   for (const source of manifest) {
-    const response = await request.get(`/downloads/methodology/unemployment/files/${path.posix.basename(source.local_file)}`);
-    expect(response.ok()).toBe(true);
+    const published = publishedPath.get(source.source_id);
+    expect(published, source.source_id).toBeDefined();
+    const response = await request.get(`/${published}`);
+    expect(response.ok(), published).toBe(true);
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(source.sha256.toLowerCase());
   }
 });
