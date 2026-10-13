@@ -1,4 +1,3 @@
-import path from "node:path";
 import { EnergyFoodExplorer } from "../../components/energy-food/energy-food-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
@@ -7,16 +6,13 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedEnergyFoodData, toClientEnergyFoodFact } from "../data/energyFood/importEnergyFood";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyFoodSeries, type EnergyFoodSectionId } from "../explorer/energyFood";
 import { coverageLabel } from "../explorer/coverageLabel";
-import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
-import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
-import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
-import { projectPublicSources } from "../methodology/publicSources";
+import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -34,21 +30,17 @@ function energyFoodLabels(presentation: Presentation, section: EnergyFoodSection
  * The workbook cites each archived Geostat file the page's values were read from, for the years that file supplies.
  * Links point to the copies in the fiscal.ge source archive.
  */
-async function energyFoodSources(root: string, locale: Locale, facts: readonly { sourceId: string; year: number }[]): Promise<(WorkbookPublicSource & { sourceId: string })[]> {
-  const [manifest, catalogue] = await Promise.all([loadReviewedSourceManifest(root, "energy-food"), loadEnglishCatalogue(root)]);
-  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
-  return [...new Set(facts.map(f => f.sourceId))].map(sourceId => {
-    const source = manifest.find(row => row.source_id === sourceId), translated = publicSources.find(row => row.source_id === sourceId);
-    if (!source || !translated) throw new Error(`Missing reviewed energy and food source ${sourceId}`);
-    return {
-      sourceId, years: [...new Set(facts.filter(f => f.sourceId === sourceId).map(f => f.year))].sort((a, b) => a - b),
-      title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at,
-    };
+async function energyFoodSources(locale: Locale, facts: readonly { sourceId: string; year: number }[]): Promise<SourcedWorkbookPublicSource[]> {
+  const used = [...new Set(facts.map(f => f.sourceId))];
+  const archived = await loadSourcedWorkbookSources("energy-food", locale, row => used.includes(row.source_id));
+  return used.map(sourceId => {
+    const source = archived.find(row => row.sourceId === sourceId);
+    if (!source) throw new Error(`Missing reviewed energy and food source ${sourceId}`);
+    return { ...source, years: [...new Set(facts.filter(f => f.sourceId === sourceId).map(f => f.year))].sort((a, b) => a - b) };
   });
 }
 
 export async function renderEnergyFoodPage(locale: Locale, section: EnergyFoodSectionId) {
-  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation] = await Promise.all([
     loadServedEnergyFoodData(), getPresentation(locale, ["energyFood", "format", "main", "workbook"], []),
   ]);
@@ -58,7 +50,7 @@ export async function renderEnergyFoodPage(locale: Locale, section: EnergyFoodSe
   const { min: firstYear, max: lastYear } = energyFoodCoverage(section, facts);
   const href = ENERGY_FOOD_SECTIONS.find(item => item.id === section)!.href;
   const labels = energyFoodLabels(presentation, section);
-  const sources = await energyFoodSources(root, locale, facts);
+  const sources = await energyFoodSources(locale, facts);
   const t = (key: string) => message(presentation.messages, `energyFood.${key}`);
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
