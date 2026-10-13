@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { MAP_RAMP } from "../../lib/explorer/colors";
 import { unemploymentAgeHeatmapBin } from "../../lib/explorer/unemploymentAge";
 import { STATUS_MARK_CLASS } from "./explorer-table";
+import { SectionTitle } from "../ui/editorial";
 
 type HeatmapRow = { id: string; label: string; values: (number | null)[] };
 
@@ -57,4 +58,29 @@ export function HeatmapTable({ caption, rowHeader, years, rows, maximum, format,
       <span>{scaleLabel}</span>
     </div>
   </>;
+}
+
+/** A heat map as its own page section: title, caption (the table's name too), a note, then the table and its scale.
+ *  `indicator` and `unit` mark what it shows for tests; the caller supplies every word and the number format. */
+export function HeatmapSection({ testId, indicator, unit, title, caption, note, scaleLabel, rowHeader, years, rows, maximum, format, wrapRowLabels }: {
+  testId: string;
+  indicator: string;
+  unit: string;
+  title: string;
+  caption: string;
+  note: string;
+  scaleLabel: string;
+  rowHeader: string;
+  years: readonly number[];
+  rows: HeatmapRow[];
+  maximum: number;
+  format: (value: number | null) => string;
+  wrapRowLabels?: boolean;
+}) {
+  return <section data-testid={testId} data-indicator={indicator} data-unit={unit} className="mt-12 border-t-2 border-[var(--ink)] pt-5">
+    <SectionTitle>{title}</SectionTitle>
+    <p className="mt-2 text-[12px] text-[var(--body)]">{caption}</p>
+    <p className="mt-2 max-w-[800px] text-[12px] leading-relaxed text-[var(--muted)]">{note}</p>
+    <HeatmapTable caption={caption} rowHeader={rowHeader} years={years} rows={rows} maximum={maximum} format={format} scaleLabel={scaleLabel} wrapRowLabels={wrapRowLabels} />
+  </section>;
 }

@@ -21,12 +21,12 @@ import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
+import { HeatmapSection } from "../main-explorer/heatmap-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { PlaceHeading } from "../explorer-shell/place-heading";
-import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
 import { Callout, SELECT_CLASS, SourceNote } from "../ui/editorial";
 
 
@@ -113,9 +113,8 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS}
         nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }) }} />
     </ExplorerWorkspace>
-    {heatmap ? <UnemploymentAgeHeatmap indicator={state.view} model={{ ...heatmap, rows: heatmap.rows.map(row => ({ ...row, labelKa: labels[row.id], labelEn: labels[row.id] })) }} copy={{
-      testId: "wages-industry-heatmap", title: t("heatmapTitle"), caption: `${t(`group.${state.view}`)} · ${t("unitMonthly")} · ${model.years[0]}–${model.years.at(-1)}`,
-      note: t("heatmapNote"), scale: t("heatmapScale"), rowHeader: t("industry"), unit: "gel", format: value => format(value),
-    }} /> : null}
+    {heatmap ? <HeatmapSection testId="wages-industry-heatmap" indicator={state.view} unit="gel" title={t("heatmapTitle")} caption={`${t(`group.${state.view}`)} · ${t("unitMonthly")} · ${model.years[0]}–${model.years.at(-1)}`}
+      note={t("heatmapNote")} scaleLabel={t("heatmapScale")} rowHeader={t("industry")} years={heatmap.years} maximum={heatmap.maximum} format={value => format(value)} wrapRowLabels
+      rows={heatmap.rows.map(row => ({ id: row.id, label: labels[row.id], values: row.values }))} /> : null}
   </div>;
 }
