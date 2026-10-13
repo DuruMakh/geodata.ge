@@ -1,6 +1,6 @@
 import { findSourceProvenanceFailures, type SourceProvenanceFailure } from "../lib/factQuery/sources";
 import { execFileSync } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { buildFactQuerySnapshot } from "../lib/factQuery/buildSnapshot";
 
@@ -28,7 +28,11 @@ async function main() {
     await mkdir(path.dirname(OUTPUT), { recursive: true });
     // Minified: the function reads and parses this file on every cold start,
     // and indentation made it about 45% larger for no reader's benefit.
-    await writeFile(OUTPUT, `${JSON.stringify(snapshot)}\n`, "utf8");
+    // Written beside the target and renamed into place, so a test run or a
+    // server reading the file never sees half of it.
+    const temporary = `${OUTPUT}.${process.pid}.tmp`;
+    await writeFile(temporary, `${JSON.stringify(snapshot)}\n`, "utf8");
+    await rename(temporary, OUTPUT);
     process.stdout.write(`wrote ${OUTPUT} dataVersion=${snapshot.dataVersion}\n`);
     return;
   }

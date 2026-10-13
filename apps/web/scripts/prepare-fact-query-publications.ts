@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { buildAllPublications } from "../lib/factQuery/publications";
@@ -6,6 +7,7 @@ import type { FactQuerySnapshot } from "../lib/factQuery/types";
 import { loadPackagedSnapshot } from "../lib/mcp/snapshot";
 
 const OUTPUT_DIR = path.join(process.cwd(), "public", "downloads", "data");
+const SNAPSHOT_FILE = "lib/factQuery/generated/snapshot.json";
 
 // The publications are cut from the snapshot the route serves, which
 // data:prepare-fact-query-snapshot has just written earlier in the same chain
@@ -15,9 +17,12 @@ function packagedSnapshot(): FactQuerySnapshot {
   try {
     return loadPackagedSnapshot();
   } catch (error) {
-    throw new Error(
-      `lib/factQuery/generated/snapshot.json is missing or unreadable (${error instanceof Error ? error.message : String(error)}). Run npm run data:prepare-fact-query-snapshot first.`,
-    );
+    const problem = !existsSync(path.join(process.cwd(), SNAPSHOT_FILE))
+      ? "is missing"
+      : error instanceof Error && error.message === "snapshot_incompatible"
+        ? "is from an older schema"
+        : "is unreadable";
+    throw new Error(`${SNAPSHOT_FILE} ${problem}. Run npm run data:prepare-fact-query-snapshot first.`);
   }
 }
 

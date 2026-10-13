@@ -27,7 +27,8 @@ So separate the two things you run tests for:
 
 - **Feedback while editing** — run only what your change can break.
   `npx vitest run tests/<path>/<file>.test.ts` is ~5s and skips both the 150 unrelated
-  files and the 4s `pretest` snapshot rebuild that plain `npm test` always pays.
+  files and the 4s `pretest` snapshot rebuild that plain `npm test` always pays; it rebuilds
+  the snapshot once (~10s) only when the snapshot is missing or one of its inputs changed.
   `npm run typecheck` alone is ~8s. For a single browser spec,
   `npx playwright test tests/browser/<name>.spec.ts`.
 - **The done-check** — `npm run check` (plus `npm run build`, plus `npm run test:browser`
