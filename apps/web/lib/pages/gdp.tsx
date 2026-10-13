@@ -13,7 +13,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
-import { projectPublicSources } from "../methodology/publicSources";
+import { projectPublicSources, sourcedWorkbookSources } from "../methodology/publicSources";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { pageHref } from "../i18n/routes";
 export async function gdpPageMetadata(locale: Locale) {
@@ -46,20 +46,7 @@ export async function renderGdpPage(locale: Locale) {
     locale,
     catalogue.documents,
   );
-  const sources = manifest.flatMap((s) => {
-    const translated = publicSources.find((p) => p.source_id === s.source_id)!;
-    const ids = s.source_id.includes("metadata")
-      ? ["source.wb_gdp_real_usd_2015", "source.wb_gdp_real_growth_percent"]
-      : [s.source_id];
-    return ids.map((sourceId) => ({
-      sourceId,
-      years: s.years,
-      title: translated.title,
-      organization: translated.publisher,
-      downloadHref: s.downloadHref,
-      retrievedAt: s.retrieved_at,
-    }));
-  });
+  const sources = sourcedWorkbookSources(manifest, publicSources, () => true);
   return (
     <I18nProvider {...clientPresentation(presentation)}>
       <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"gdp-overview",origin:resolveSiteUrl(),path:"/explorer/economy/gdp",name:message(presentation.messages,"gdp.heading"),description:message(presentation.messages,"gdp.description"),firstYear:Math.min(...facts.map(f=>f.year)),lastYear:Math.max(...facts.map(f=>f.year)),dateModified:facts.map(f=>f.lastReviewedAt).sort().at(-1)!,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/gdp-overview.csv"})}/>

@@ -5,8 +5,6 @@ import { useMemo } from "react";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import type { Presentation } from "../../lib/i18n/types";
-import { publicLabel } from "../../lib/i18n/labels";
-import { workbookMessage } from "../../lib/i18n/workbook";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { PublicGlossaryEntry } from "../../lib/data/glossary";
 import type {
@@ -15,16 +13,12 @@ import type {
   ClientNationalGdpFact,
 } from "../../lib/explorer/clientData";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
-import { buildExplorerModel, type ExplorerModel } from "../../lib/explorer/explorerData";
+import { buildExplorerModel } from "../../lib/explorer/explorerData";
+import { buildBudgetWorkbookInput } from "../../lib/explorer/budgetWorkbook";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import type { ExplorerSide } from "../../lib/explorer/types";
-import {
-  buildWorkbookExportModel,
-  type WorkbookExportInput,
-  type WorkbookPublicSource,
-  type WorkbookSeries,
-} from "../../lib/explorer/workbookModel";
+import { buildWorkbookExportModel, type WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { BudgetExplorerFrame, budgetTotalsByScope } from "./budget-explorer-frame";
@@ -145,49 +139,6 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     : message(messages, "main.revenueHeading");
   const sectionLabel = message(messages, nav === "revenue" ? "common.revenue" : "common.expenditure");
   const coverage = coverageLabel(messages, locale, scopeYears[0], scopeYears.at(-1), lastUpdatedAt || undefined);
-  function buildWorkbookInput(model: ExplorerModel): WorkbookExportInput {
-    const labelById = new Map(model.items.map((item) => [item.id, publicLabel(locale, item.id, item.kaLabel, presentation.englishLabels)]));
-    const series = model.tableRows.map<WorkbookSeries>((row) => {
-      const pointsByYear: WorkbookSeries["pointsByYear"] = {};
-      for (const year of model.years) {
-        const amountGel = row.valuesByYear[year];
-        const basis = row.basisByYear[year];
-        pointsByYear[year] = amountGel === null || amountGel === undefined || basis === undefined
-          ? null
-          : {
-              amountGel,
-              measureValue: share ? row.shareByYear?.[year] : undefined,
-              basis,
-            };
-      }
-
-      return {
-        id: row.itemId,
-        kind: row.itemId === model.totalRow?.itemId ? "total" : row.level === "admin_category" ? "group" : "item",
-        parentLabel: row.parentItemId ? labelById.get(row.parentItemId) ?? null : null,
-        label: publicLabel(locale, row.itemId, row.kaLabel, presentation.englishLabels),
-        pointsByYear,
-      };
-    });
-
-    const groupLabel = workbookMessage(locale, scope === "revenue" ? "workbook.receipts" : scope === "ministries" ? "workbook.institutions" : "workbook.expenditure");
-    return {
-      locale,
-      filenameBase: scope,
-      title: screenTitle,
-      groupLabel,
-      years: model.years,
-      measure: share
-        ? { kind: "percentage", unitLabel: workbookMessage(locale, "workbook.percentGdp"), analysisHeader: workbookMessage(locale, "workbook.gdpHeader") }
-        : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.millionGel"), readableScale: 1_000_000 },
-      totalId: model.totalRow?.itemId ?? null,
-      series,
-      sources: share
-        ? [...(scope === "ministries" ? adminWorkbookSources : workbookSources), ...gdpWorkbookSources]
-        : scope === "ministries" ? adminWorkbookSources : workbookSources,
-      siteOrigin: siteOrigin ?? window.location.origin,
-    };
-  }
 
   return (
     <BudgetExplorerFrame locale={locale} messages={messages} sectionLabel={sectionLabel} coverage={coverage} title={screenTitle} deck={deck}>
@@ -215,7 +166,15 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
           <ExcelDownloadButton
             testId="series-excel"
             disabled={model.tableRows.length === 0}
-            onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput(model)))}
+            onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildBudgetWorkbookInput({
+              model,
+              presentation,
+              scope,
+              share,
+              title: screenTitle,
+              sources: { budget: workbookSources, admin: adminWorkbookSources, gdp: gdpWorkbookSources },
+              siteOrigin: siteOrigin ?? window.location.origin,
+            })))}
           />
         }
       />

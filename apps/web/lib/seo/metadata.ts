@@ -4,6 +4,16 @@ import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
 import type { Locale } from "../i18n/types";
 import { pageHref } from "../i18n/routes";
 import { seoMessage } from "./strings";
+import { message } from "../i18n/messages";
+import kaDebt from "../i18n/messages/ka/debt.json";
+import enDebt from "../i18n/messages/en/debt.json";
+import kaDeficit from "../i18n/messages/ka/deficit.json";
+import enDeficit from "../i18n/messages/en/deficit.json";
+
+// The debt and deficit titles quote actual-only coverage; both languages read
+// their text from the page's own message file.
+const DEBT_MESSAGES = { ka: kaDebt, en: enDebt };
+const DEFICIT_MESSAGES = { ka: kaDeficit, en: enDeficit };
 
 type FiscalMetadataInput = {
   locale: Locale;
@@ -76,28 +86,32 @@ export function municipalityBudgetTitleKa(
 
 export function governmentDebtMetadata(
   facts: readonly { year: number; family: string; status: string }[],
+  locale: Locale = "ka",
 ): Metadata {
   const { firstYear, lastYear } = coverageFromYears(
     facts.filter((fact) => fact.family === "stock" && fact.status === "actual"),
   );
+  const years = { first: firstYear, last: lastYear };
   return fiscalMetadata({
-    locale: "ka",
-    title: `საქართველოს მთავრობის ვალი ${firstYear}–${lastYear} | Fiscal.ge`,
-    description: `საქართველოს მთავრობის ვალის მოცულობა, ვალის მომსახურება და საპროცენტო განაკვეთები, ${firstYear}–${lastYear}.`,
+    locale,
+    title: message(DEBT_MESSAGES[locale], "debt.metaTitle", years),
+    description: message(DEBT_MESSAGES[locale], "debt.description", years),
     path: DEBT_EXPLORER_PATH,
   });
 }
 
 export function generalGovernmentDeficitMetadata(
   facts: readonly { year: number; status: string }[],
+  locale: Locale = "ka",
 ): Metadata {
   const { firstYear, lastYear } = coverageFromYears(
     facts.filter((fact) => fact.status === "actual"),
   );
+  const years = { first: firstYear, last: lastYear };
   return fiscalMetadata({
-    locale: "ka",
-    title: `საქართველოს ზოგადი მთავრობის დეფიციტი ${firstYear}–${lastYear} | Fiscal.ge`,
-    description: `საქართველოს ზოგადი მთავრობის დეფიციტი ან პროფიციტი, მშპ-ის პროცენტად და ნომინალურ ლარში, ${firstYear}–${lastYear}.`,
+    locale,
+    title: message(DEFICIT_MESSAGES[locale], "deficit.metaTitle", years),
+    description: message(DEFICIT_MESSAGES[locale], "deficit.description", years),
     path: DEFICIT_EXPLORER_PATH,
   });
 }

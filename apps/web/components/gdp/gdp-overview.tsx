@@ -18,6 +18,7 @@ import {
 import {
   buildGdpWorkbookExportModel,
   gdpDisplay,
+  gdpSelectionSources,
 } from "../../lib/explorer/gdpWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -103,9 +104,7 @@ export function GdpOverview({
       vals: m.points.map((p) => d.growth ? p.value * 100 : p.value),
     },
   ];
-  const currentSources = sources.filter((s) =>
-    m.sourceIds.includes(s.sourceId),
-  );
+  const currentSources = gdpSelectionSources(sources, m.sourceIds);
   function select(indicator: GdpIndicator) {
     const next = changeGdpIndicator(state, indicator, facts),
       nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getMessages } from "../../lib/i18n/messages.server";
-import { buildLandingDatasetLinks } from "../../lib/landing/landingDatasets";
+import { buildLandingDatasetLinks, landingGdpFigure } from "../../lib/landing/landingDatasets";
 
 const input = {
   expenditure: { latestYear: 2025, totalGel: 27_700_000_000 },
@@ -58,5 +58,31 @@ describe("buildLandingDatasetLinks", () => {
   it("refuses to render a row without served data rather than invent a figure", async () => {
     const messages = await getMessages("ka", ["common", "landing", "inflation", "trade"]);
     expect(() => buildLandingDatasetLinks({ ...input, cpiFacts: [] } as Parameters<typeof buildLandingDatasetLinks>[0], { locale: "ka", messages })).toThrow();
+  });
+});
+
+describe("landingGdpFigure", () => {
+  const gdpFacts = [
+    { seriesId: "nominal_gel" as const, year: 2024, value: 93_022_275_315, status: "published" as const },
+    { seriesId: "nominal_gel" as const, year: 2025, value: 104_598_139_883, status: "preliminary" as const },
+    { seriesId: "real_usd_2015" as const, year: 2026, value: 27_100_000_000, status: "preliminary" as const },
+  ];
+
+  it("reads the key figure, its year and its status from the latest nominal GDP fact", async () => {
+    const ka = await getMessages("ka", ["landing"]);
+    const en = await getMessages("en", ["landing"]);
+    expect(landingGdpFigure(gdpFacts, ka)).toEqual({ value: "104.6", caption: "ნომინალური მშპ · 2025, წინასწარი", mobileCaption: "მშპ · 2025" });
+    expect(landingGdpFigure(gdpFacts, en)).toEqual({ value: "104.6", caption: "Nominal GDP · 2025, preliminary", mobileCaption: "GDP · 2025" });
+  });
+
+  it("follows the next release instead of a maintained snapshot", async () => {
+    const en = await getMessages("en", ["landing"]);
+    const next = [...gdpFacts.slice(0, 1), { ...gdpFacts[1], value: 112_349_000_000, status: "published" as const }];
+    expect(landingGdpFigure(next, en)).toEqual({ value: "112.3", caption: "Nominal GDP · 2025", mobileCaption: "GDP · 2025" });
+  });
+
+  it("refuses to render without a served nominal GDP fact", async () => {
+    const en = await getMessages("en", ["landing"]);
+    expect(() => landingGdpFigure(gdpFacts.slice(2), en)).toThrow();
   });
 });

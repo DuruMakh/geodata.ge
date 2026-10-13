@@ -27,6 +27,7 @@ import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { projectRegionalObservation } from "../explorer/clientData";
+import { regionalCoverage } from "./regional-economies";
 export {
   regionalEconomiesPageMetadata,
   renderRegionalEconomiesPage,
@@ -55,13 +56,14 @@ async function regionalPresentation(locale: Locale) {
 
 export async function regionalEconomyPageMetadata(slug: string, locale: Locale) {
   const region = regionForSlug(slug);
-  const presentation = await regionalPresentation(locale);
+  const [{ facts }, presentation] = await Promise.all([loadServedRegionalEconomyData(), regionalPresentation(locale)]);
   const regionName = publicLabel(locale, region.id, region.kaLabel, presentation.englishLabels);
+  const params = { ...regionalCoverage(facts.filter((fact) => fact.regionId === region.id), locale).params, region: regionName };
   return fiscalMetadata({
     locale,
     path: `/explorer/economy/regions/${slug}`,
-    title: message(presentation.messages, "regionalEconomies.detailMetaTitle", { region: regionName }),
-    description: message(presentation.messages, "regionalEconomies.detailMetaDescription", { region: regionName }),
+    title: message(presentation.messages, "regionalEconomies.detailMetaTitle", params),
+    description: message(presentation.messages, "regionalEconomies.detailMetaDescription", params),
   });
 }
 
@@ -83,9 +85,9 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
   };
   const regionalFacts = facts.filter((fact) => fact.regionId === region.id);
   if (regionalFacts.length === 0) notFound();
-  const firstYear = Math.min(...regionalFacts.map((fact) => fact.year));
-  const lastYear = Math.max(...regionalFacts.map((fact) => fact.year));
-  const reviewedAt = regionalFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!;
+  const { reviewedAt, params: regionParams } = regionalCoverage(regionalFacts, locale);
+  const { firstYear, lastYear } = regionParams;
+  const params = { ...regionParams, region: regionName };
   const title = message(presentation.messages, "regionalEconomies.heading");
   const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
   const sources = manifest.map((source) => {
@@ -119,8 +121,8 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         datasetId: "regional-economies",
         origin: resolveSiteUrl(),
         path: `/explorer/economy/regions/${slug}`,
-        name: message(presentation.messages, "regionalEconomies.detailMetaTitle", { region: regionName }),
-        description: message(presentation.messages, "regionalEconomies.detailMetaDescription", { region: regionName }),
+        name: message(presentation.messages, "regionalEconomies.detailMetaTitle", params),
+        description: message(presentation.messages, "regionalEconomies.detailMetaDescription", params),
         firstYear,
         lastYear,
         dateModified: reviewedAt,
@@ -129,7 +131,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         partOf: {
           path: "/explorer/economy/regions",
           name: title,
-          description: message(presentation.messages, "regionalEconomies.description"),
+          description: message(presentation.messages, "regionalEconomies.description", regionalCoverage(facts, locale).params),
         },
       })} />
       <ExplorerPage testId="explorer-shell">

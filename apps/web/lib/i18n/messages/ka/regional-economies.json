@@ -1,10 +1,10 @@
 {
   "regionalEconomies.heading": "რეგიონების ეკონომიკა",
-  "regionalEconomies.description": "საქართველოს 11 გამოქვეყნებული რეგიონის მშპ და ეკონომიკური საქმიანობები მიმდინარე ფასებში, 2010–2024.",
+  "regionalEconomies.description": "საქართველოს {regionCount} გამოქვეყნებული რეგიონის მშპ და ეკონომიკური საქმიანობები მიმდინარე ფასებში, {firstYear}–{lastYear}.",
   "regionalEconomies.lead": "რეგიონების მშპ და ეკონომიკური საქმიანობები",
-  "regionalEconomies.indexMetaTitle": "საქართველოს რეგიონების ეკონომიკა, 2010–2024",
-  "regionalEconomies.detailMetaTitle": "{region} — რეგიონის ეკონომიკა, 2010–2024",
-  "regionalEconomies.detailMetaDescription": "გაეცანით {region} მშპ-სა და 20 ეკონომიკურ საქმიანობას მიმდინარე ფასებში 2010–2024 წლებში, ლარში და რეგიონის მშპ-ში წილის სახით.",
+  "regionalEconomies.indexMetaTitle": "საქართველოს რეგიონების ეკონომიკა, {firstYear}–{lastYear}",
+  "regionalEconomies.detailMetaTitle": "{region} — რეგიონის ეკონომიკა, {firstYear}–{lastYear}",
+  "regionalEconomies.detailMetaDescription": "გაეცანით {region} მშპ-სა და {sectorCount} ეკონომიკურ საქმიანობას მიმდინარე ფასებში {firstYear}–{lastYear} წლებში, ლარში და რეგიონის მშპ-ში წილის სახით.",
   "regionalEconomies.mapAria": "რეგიონული მშპ-ის რუკა, {year}",
   "regionalEconomies.mapEntityAria": "{name}: {amount}, {year}",
   "regionalEconomies.legend": "რეგიონული მშპ · მიმდინარე ფასები",
@@ -18,7 +18,8 @@
   "regionalEconomies.largestRegion": "ყველაზე დიდი რეგიონული ეკონომიკა",
   "regionalEconomies.period": "ხელმისაწვდომი პერიოდი",
   "regionalEconomies.currentPrices": "მიმდინარე ფასები",
-  "regionalEconomies.sourceNote": "წყარო: საქსტატის რეგიონული მშპ-ის პუბლიკაციები; გადამოწმებულია 2026 წლის 13 სექტემბერს.",
+  "regionalEconomies.sourceNote": "წყარო: საქსტატის რეგიონული მშპ-ის პუბლიკაციები; გადამოწმებულია {reviewedDate}.",
+  "regionalEconomies.spatialCoverage": "საქართველოს რეგიონები",
   "regionalEconomies.boundaries": "რუკის საზღვრები:",
   "regionalEconomies.total": "რეგიონის მთლიანი მშპ",
   "regionalEconomies.detailHeadingLead": "რეგიონის ეკონომიკა —",
@@ -45,7 +46,7 @@
   "regionalEconomies.topThree": "სამი უდიდესის წილი",
   "regionalEconomies.sectorCount": "გამოქვეყნებული საქმიანობები",
   "regionalEconomies.ofRegionalGdp": "რეგიონის მშპ-ში",
-  "regionalEconomies.highlightsScope": "არჩეული ბოლო წლის 20-ვე გამოქვეყნებული საქმიანობა; მიმდინარე ფასები.",
+  "regionalEconomies.highlightsScope": "არჩეული ბოლო წლის {sectorCount}-ვე გამოქვეყნებული საქმიანობა; მიმდინარე ფასები.",
   "regionalEconomies.unavailable": "მონაცემი არ არის",
   "regionalEconomies.workbookTitle": "{region} — რეგიონის ეკონომიკა — {measure}"
 }

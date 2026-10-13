@@ -1,7 +1,6 @@
 import type { Locale } from "../i18n/types";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
-import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
@@ -10,7 +9,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedExplorerData, loadServedGovernmentDebtData } from "../data/servedData";
 import { projectDebtFact, projectGdpFact } from "../explorer/clientData";
-import { coverageFromYears, fiscalMetadata, governmentDebtMetadata } from "../seo/metadata";
+import { coverageFromYears, governmentDebtMetadata } from "../seo/metadata";
 import { DEBT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -18,10 +17,7 @@ import { loadDebtWorkbookSources, loadGdpWorkbookSources } from "../methodology/
 
 export async function debtPageMetadata(locale: Locale): Promise<Metadata> {
   const { facts } = await loadServedGovernmentDebtData();
-  if (locale === "ka") return governmentDebtMetadata(facts);
-  const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.status === "actual" && fact.family === "stock"));
-  const messages = await getMessages(locale, ["debt"]);
-  return fiscalMetadata({ locale, title: message(messages, "debt.metaTitle", { first: firstYear, last: lastYear }), description: message(messages, "debt.description", { first: firstYear, last: lastYear }), path: DEBT_EXPLORER_PATH });
+  return governmentDebtMetadata(facts, locale);
 }
 
 export async function renderDebtPage(locale: Locale) {

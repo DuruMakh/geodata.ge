@@ -3,7 +3,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
 import type { LandingModel } from "../../lib/landing/landingData";
-import type { LandingDatasetLink } from "../../lib/landing/landingDatasets";
+import type { LandingDatasetLink, LandingGdpFigure } from "../../lib/landing/landingDatasets";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
 import { withLari } from "../ui/lari";
@@ -11,9 +11,9 @@ import { HeroReliefLazy } from "./hero-relief-lazy";
 import { LandingDatasetSection } from "./landing-dataset-section";
 import { LandingFiscalSections } from "./landing-fiscal-sections";
 
-// Country snapshots are maintained by hand; every budget value below them is
-// derived from the same active facts as the matching explorer.
-const KEY_NUMBERS = [
+// Population and area are maintained by hand; the GDP figure and every budget
+// value below them are derived from the same served facts as the matching explorer.
+const COUNTRY_NUMBERS = [
   {
     label: "landing.population",
     value: "3.9",
@@ -30,14 +30,6 @@ const KEY_NUMBERS = [
     mobileCaption: "landing.areaMobile",
     unitTestId: "area-unit",
   },
-  {
-    label: "landing.economy",
-    value: "104.6",
-    unit: "landing.bnGel",
-    caption: "landing.economyCaption",
-    mobileCaption: "landing.economyMobile",
-    unitTestId: "gdp-unit",
-  },
 ] as const;
 
 const HERO_ARIA_LABEL =
@@ -50,8 +42,18 @@ const METHODOLOGY_STEPS = [
   "landing.methodStep4",
 ] as const;
 
-export function LandingPage({ model, datasets, presentation }: { model: LandingModel; datasets: readonly LandingDatasetLink[]; presentation: Presentation }) {
+export function LandingPage({ model, datasets, gdpFigure, presentation }: { model: LandingModel; datasets: readonly LandingDatasetLink[]; gdpFigure: LandingGdpFigure; presentation: Presentation }) {
   const { locale, messages } = presentation;
+  const keyNumbers = [
+    ...COUNTRY_NUMBERS.map((entry) => ({
+      ...entry,
+      label: message(messages, entry.label),
+      unit: message(messages, entry.unit),
+      caption: message(messages, entry.caption),
+      mobileCaption: message(messages, entry.mobileCaption),
+    })),
+    { label: message(messages, "landing.economy"), unit: message(messages, "landing.bnGel"), unitTestId: "gdp-unit", ...gdpFigure },
+  ];
   return (
     <div
       data-testid="landing-shell"
@@ -97,10 +99,10 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
             data-testid="key-numbers"
             className="grid grid-cols-3 gap-3 border-t border-[var(--hairline-soft)] pt-[18px] min-[768px]:gap-8"
           >
-            {KEY_NUMBERS.map((entry) => (
-              <div key={message(messages, entry.label)} data-country-stat className="min-w-0">
+            {keyNumbers.map((entry) => (
+              <div key={entry.label} data-country-stat className="min-w-0">
                 <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] max-[380px]:min-h-[27px] min-[768px]:text-[0.6875rem] min-[768px]:tracking-[0.08em]">
-                  {message(messages, entry.label)}
+                  {entry.label}
                 </div>
                 <div className="mt-2 min-h-[58px] font-[family-name:var(--font-display)] text-[clamp(22px,7vw,46px)] font-semibold leading-[1.05] tracking-[-0.02em] min-[768px]:min-h-0">
                   {entry.value}{" "}
@@ -108,15 +110,15 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
                     data-testid={entry.unitTestId}
                     className="mt-1 block text-[clamp(11px,3vw,25px)] min-[768px]:mt-0 min-[768px]:inline"
                   >
-                    {message(messages, entry.unit)}
+                    {entry.unit}
                   </span>
                 </div>
                 <div className="mt-2 text-[0.6875rem] leading-snug text-[var(--muted)] min-[768px]:text-[0.75rem]">
-                  <span className="hidden min-[381px]:inline">{message(messages, entry.caption)}</span>
+                  <span className="hidden min-[381px]:inline">{entry.caption}</span>
                   <span aria-hidden="true" className="min-[381px]:hidden">
-                    {message(messages, entry.mobileCaption)}
+                    {entry.mobileCaption}
                   </span>
-                  <span className="sr-only min-[381px]:hidden">{message(messages, entry.caption)}</span>
+                  <span className="sr-only min-[381px]:hidden">{entry.caption}</span>
                 </div>
               </div>
             ))}

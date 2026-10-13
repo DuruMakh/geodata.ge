@@ -25,11 +25,12 @@ export function RegionHighlights({ facts, registry, year }: {
     return sector ? locale === "en" ? sector.labelEn : sector.labelKa : t("unavailable");
   };
   const amount = formatAmountParts(model.largest?.value, false, locale);
+  const scope = message(messages, "regionalEconomies.highlightsScope", { sectorCount: model.publishedSectorCount });
   const percent = (value: number | null) => formatShare(value === null ? null : value / 100);
   const cards = [
     { id: "total", label: t("totalKpi"), value: formatAmount(model.total?.value, locale), detail: String(year), trend: model.trends.total, color: "var(--ink)" },
     { id: "top-three", label: t("topThree"), value: percent(model.topThreeSharePct), detail: model.topThree.map((row) => name(row.seriesId)).join(" · ") || t("unavailable"), trend: model.trends.topThreeShare, color: "var(--accent)" },
-    { id: "count", label: t("sectorCount"), value: String(model.publishedSectorCount), detail: t("highlightsScope"), trend: [] as Array<number | null>, color: "var(--ink)" },
+    { id: "count", label: t("sectorCount"), value: String(model.publishedSectorCount), detail: scope, trend: [] as Array<number | null>, color: "var(--ink)" },
   ];
   return (
     <section data-testid="regional-highlights" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
@@ -45,7 +46,7 @@ export function RegionHighlights({ facts, registry, year }: {
         </HeroKpi>
         <SideKpiList kpis={cards.map((card) => ({ label: card.label, value: card.value, unit: "", color: "var(--ink)", detail: card.detail, spark: card.trend.length ? { values: card.trend, color: card.color } : null }))} />
       </div>
-      <div className="mt-5"><SourceNote>{t("highlightsScope")}</SourceNote></div>
+      <div className="mt-5"><SourceNote>{scope}</SourceNote></div>
     </section>
   );
 }
