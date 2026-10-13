@@ -376,47 +376,55 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
   expect(consoleProblems).toEqual([]);
 });
 
-// Next prefetches a <Link> as soon as it enters the viewport (production only), so
-// every sidebar, footer and list row used to pull its page's data in the background.
-test("opening an explorer or methodology page fetches no other page's data", async ({ page }) => {
-  const prefetched: string[] = [];
-  page.on("request", (request) => {
-    const url = new URL(request.url());
-    if (url.searchParams.has("_rsc")) prefetched.push(url.pathname);
-  });
+// Next prefetches a <Link> as soon as it enters the viewport, so every sidebar, footer and
+// list row used to pull its page's data in the background. Prefetch runs only in production:
+// against `next dev` these tests pass without proving anything (CI runs them on `next start`).
+// The municipal index also at phone width, where the whole 64-row list is in the page; the
+// regional index and a region page list their regions; dataset pages link their methodology
+// page; the methodology hub lists every dataset.
+for (const [path, width] of [
+  ["/explorer/municipalities", 390],
+  ["/explorer/municipalities", 1280],
+  ["/explorer/economy/regions", 1280],
+  ["/explorer/economy/regions/imereti", 1280],
+  ["/explorer/unemployment/overview", 1280],
+  ["/methodology", 1280],
+  ["/explorer/expenditure", 1280],
+] as const) {
+  test(`opening ${path} at ${width}px fetches no other page's data`, async ({ page }) => {
+    const prefetched: string[] = [];
+    page.on("request", (request) => {
+      const url = new URL(request.url());
+      if (url.searchParams.has("_rsc")) prefetched.push(url.pathname);
+    });
 
-  // The municipal index also at phone width, where the whole 64-row list is in the page.
-  // The regional index and a region page list their regions; dataset pages link their
-  // methodology page; the methodology hub lists every dataset.
-  for (const [path, width] of [
-    ["/explorer/municipalities", 390],
-    ["/explorer/municipalities", 1280],
-    ["/explorer/economy/regions", 1280],
-    ["/explorer/economy/regions/imereti", 1280],
-    ["/explorer/unemployment/overview", 1280],
-    ["/methodology", 1280],
-    ["/explorer/expenditure", 1280],
-  ] as const) {
-    prefetched.length = 0;
     await page.setViewportSize({ width, height: 844 });
     // Not every page here marks itself ready (the methodology hub does not); networkidle
     // is past hydration, after which visible links would start prefetching.
     await page.goto(`${TEST_BASE_URL}${path}`, { waitUntil: "networkidle" });
-    // Bring the footer and every list row into view, then let the page sit idle.
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    // Scroll the page down half a screen at a time so every link in the page flow passes
+    // through the viewport (a list in its own scroll box, as the municipal index is from
+    // 768px, shows only its first screen), then let the page sit idle.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight / 2) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+    });
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1_000);
-    expect(prefetched, `${path} at ${width}px`).toEqual([]);
-  }
+    expect(prefetched).toEqual([]);
 
-  // Without a prefetch the sidebar still navigates in-app, not by a full reload.
-  await expectAppReady(page);
-  await page.evaluate(() => ((window as unknown as { stillHere?: boolean }).stillHere = true));
-  await page.getByTestId("data-sidebar").getByTestId("section-link-revenue").click();
-  await expect(page).toHaveURL(/\/explorer\/revenue$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
-  expect(await page.evaluate(() => (window as unknown as { stillHere?: boolean }).stillHere)).toBe(true);
-});
+    if (path !== "/explorer/expenditure") return;
+    // Without a prefetch the sidebar still navigates in-app, not by a full reload.
+    await expectAppReady(page);
+    await page.evaluate(() => ((window as unknown as { stillHere?: boolean }).stillHere = true));
+    await page.getByTestId("data-sidebar").getByTestId("section-link-revenue").click();
+    await expect(page).toHaveURL(/\/explorer\/revenue$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
+    expect(await page.evaluate(() => (window as unknown as { stillHere?: boolean }).stillHere)).toBe(true);
+  });
+}
 
 test("ministries grouping expands nested programs by name only", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
