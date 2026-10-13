@@ -4,7 +4,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { Locale, Messages } from "../../lib/i18n/types";
 import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 
-// The four datasets, then the site's own pages (owner decision D3, 2026-10-07).
+// Every dataset hub, then the site's own pages (owner decision D3, 2026-10-07; all hubs since Q3, 2026-10-12).
 const FOOTER_LINKS = [
   ...DATASET_HUBS,
   { href: "/methodology", labelKey: "common.methodology" },

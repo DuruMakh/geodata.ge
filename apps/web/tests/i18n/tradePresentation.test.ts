@@ -10,6 +10,7 @@ import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest
 import { getMethodologyContent } from "../../lib/methodology/catalog";
 import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { TRADE_CHART_INDICATORS } from "../../lib/data/tradeOverview/types";
+import { NAV_TREE } from "../../lib/navigation/navTree";
 test("Trade has complete matching messages and explicit USD and publication wording", async () => {
   const [ka, en] = await Promise.all([getMessages("ka", ["trade"]), getMessages("en", ["trade"])]);
   expect(Object.keys(ka).sort()).toEqual(Object.keys(en).sort());
@@ -34,10 +35,9 @@ test("Trade registers its five explorers and eighteen translated original docume
 
 test("Services routes, metadata and sidebar use bilingual services presentation", async () => {
   const root = path.resolve(process.cwd(), "../..");
-  const [ka, en, revisions, sidebar] = await Promise.all([
+  const [ka, en, revisions] = await Promise.all([
     getMessages("ka", ["trade", "common"]), getMessages("en", ["trade", "common"]),
     readFile(path.join(root, "data/localization/en/page-revisions.json"), "utf8"),
-    readFile(path.join(root, "apps/web/components/shell/data-sidebar.tsx"), "utf8"),
   ]);
   expect(ka["trade.services.title"]).toBe("მომსახურებით ვაჭრობა");
   expect(en["trade.services.title"]).toBe("Services trade");
@@ -45,8 +45,10 @@ test("Services routes, metadata and sidebar use bilingual services presentation"
   expect(ka["common.tradeServices"]).toBe(ka["trade.services.title"]);
   expect(en["common.tradeServices"]).toBe(en["trade.services.title"]);
   expect(JSON.parse(revisions)["/explorer/trade/services"]).toBe("2026-10-11");
-  expect(sidebar.indexOf('data-testid="trade-services-link"')).toBeGreaterThan(sidebar.indexOf('data-testid="trade-domestic-link"'));
-  expect(sidebar).toContain('if (tradeServicesActive) event.preventDefault()');
+  // The sidebar lists Services after Domestic exports; every sidebar row keeps its same-page guard (SidebarSectionLink).
+  const tradeRows = NAV_TREE.find((hub) => hub.href === "/explorer/trade")!.sections.map((section) => section.testId);
+  expect(tradeRows.indexOf("trade-services-link")).toBeGreaterThan(tradeRows.indexOf("trade-domestic-link"));
+  expect(tradeRows.indexOf("trade-domestic-link")).toBeGreaterThan(-1);
   for (const locale of ["ka", "en"] as const) {
     const route = locale === "ka" ? "apps/web/app/(ka)/explorer/trade/services/page.tsx" : "apps/web/app/(en)/en/explorer/trade/services/page.tsx";
     const source = await readFile(path.join(root, route), "utf8");

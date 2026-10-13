@@ -70,7 +70,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
             {message(messages, "common.data")}
           </Link>
           {/* In the ☰ panel the single data link would open the budget hub only;
-              the panel names all four datasets under a plain label instead. */}
+              the panel names every dataset hub under a plain label instead. */}
           <div data-testid="menu-datasets" className="min-[900px]:hidden">
             <span className="flex min-h-9 items-center text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--faint)]">{message(messages, "common.data")}</span>
             <ul className="flex list-none flex-col border-l border-[var(--hairline)] pl-4">
