@@ -1,4 +1,3 @@
-import path from "node:path";
 import { MoneyBanksExplorer, type MoneyBanksExplorerProps } from "../../components/money-banks/money-banks-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
@@ -12,13 +11,10 @@ import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
-import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
-import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
-import { loadGdpWorkbookSources } from "../methodology/workbookSources";
-import { projectPublicSources } from "../methodology/publicSources";
+import { loadGdpWorkbookSources, loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -38,14 +34,8 @@ function moneyBanksLabels(presentation: Presentation, section: MoneyBanksSection
 }
 
 /** The archived NBG workbooks (data/methodology/source-archives/money.csv) with their public download links, for the Excel Sources sheet. */
-export async function loadMoneyBanksWorkbookSources(locale: Locale): Promise<MoneyBanksExplorerProps["sources"]> {
-  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [manifest, catalogue] = await Promise.all([loadReviewedSourceManifest(root, "money"), loadEnglishCatalogue(root)]);
-  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
-  return manifest.filter(source => source.media_type.includes("spreadsheet")).map(source => {
-    const translated = publicSources.find(row => row.source_id === source.source_id)!;
-    return { sourceId: source.source_id, years: source.years, title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at };
-  });
+export function loadMoneyBanksWorkbookSources(locale: Locale): Promise<MoneyBanksExplorerProps["sources"]> {
+  return loadSourcedWorkbookSources("money", locale);
 }
 
 export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSectionId) {

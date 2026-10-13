@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { ChartPie, CircleDollarSign } from "lucide-react";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
-import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksSeriesModel, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
+import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { formatAmount, formatInUnit, unitFor, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -16,12 +16,11 @@ import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
-import { SeriesAside } from "../explorer-shell/series-aside";
+import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
-import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
@@ -60,22 +59,6 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
   const total = moneyBanksHasTotalRow(section) ? rows.find(row => row.itemId === reference.id) ?? null : null;
-  const allIds = model.series.map(series => series.id);
-  // Parts nest under their total (as on Poverty): the count and bulk action cover the top-level rows, nested ticks are counted apart.
-  const topIds = model.series.filter(series => !series.parentId).map(series => series.id);
-  const selectedTop = topIds.filter(id => state.selectedIds.includes(id)).length;
-  const toggleSeries = (id: string) => update(s => ({ ...s, selectedIds: s.selectedIds.includes(id) ? s.selectedIds.filter(item => item !== id) : allIds.filter(item => item === id || s.selectedIds.includes(item)) }), true);
-  const hasNesting = model.series.some(series => series.parentId);
-  function renderRow(series: MoneyBanksSeriesModel): ReactNode {
-    const nested = model.series.filter(child => child.parentId === series.id);
-    const open = expanded[series.id] ?? nested.some(child => state.selectedIds.includes(child.id));
-    return <div key={series.id} className={series.parentId ? "ml-4" : undefined}>
-      <SeriesSelectorRow id={series.id} label={labels[series.id]} color={series.color} value={format(series.endValue, series.id)} selected={state.selectedIds.includes(series.id)} level={series.reference ? "total" : "item"} parentId={series.parentId} isChild={Boolean(series.parentId)} childLabelSize="standard" wrapLabel
-        showCaretColumn={hasNesting} hasChildren={nested.length > 0} expanded={open} expansionLabel={t("subcategoriesFor", { label: labels[series.id] })}
-        onToggleExpanded={() => setExpanded(previous => ({ ...previous, [series.id]: !open }))} onToggle={() => toggleSeries(series.id)} />
-      {open ? nested.map(renderRow) : null}
-    </div>;
-  }
   // The latest-value line is the page's headline: the first series of the current view, in that series' own unit. A share
   // view names its series, so touch readers, who get no tooltip, see which measure the switch selected (DESIGN §7.2a).
   const views = moneyBanksViews(section);
@@ -122,17 +105,11 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
           <Link href={pageHref("/methodology/money", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      <SeriesAside label={message(messages, "controls.series")}>
-        <p className="mb-3 text-[11px] text-[var(--muted)]">{model.range.end} · {unitLabel}</p>
-        {/* Every money list has ten rows or fewer, so none has a search field (DESIGN §7.7). */}
-        <SeriesSelector searchable={false} selectedCount={selectedTop} totalCount={topIds.length}
-          supplementalSelected={model.selected.length > selectedTop ? { label: t("nestedSelected"), count: model.selected.length - selectedTop } : undefined}
-          hasSelection={model.selected.length > 0} allSelected={selectedTop === topIds.length}
-          onToggleAll={() => update(s => ({ ...s, selectedIds: s.selectedIds.length ? [] : [...topIds] }), true)}>
-          {model.series.filter(series => !series.parentId).map(renderRow)}
-        </SeriesSelector>
-        {downloadAction}
-      </SeriesAside>
+      {/* Parts nest under their total (as on Poverty). Every money list has ten rows or fewer, so none has a search field (DESIGN §7.7). */}
+      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{model.range.end} · {unitLabel}</>} downloadAction={downloadAction}
+        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue, series.id), parentId: series.parentId }))}
+        totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} searchable={false}
+        nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }), expanded, onExpandedChange: setExpanded }} />
     </ExplorerWorkspace>
   </div>;
 }
