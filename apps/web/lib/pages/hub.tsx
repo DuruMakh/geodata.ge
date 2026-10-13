@@ -60,12 +60,10 @@ export async function renderHubPage(locale: Locale) {
         crumbs={[{ label: message(messages, "common.home"), href: pageHref("/", locale) }, { label: message(messages, "common.data") }, { label: message(messages, "common.budget") }]}
         coverage={coverage}
       />
-      <h1 className="mt-[22px] mb-2 font-[family-name:var(--font-display)] text-[34px] font-semibold leading-[1.15] tracking-[-0.01em]">
-        {message(messages, "hub.heading")}
-      </h1>
+      <ExplorerHeading>{message(messages, "hub.heading")}</ExplorerHeading>
       <p
         data-testid="explorer-hub-introduction"
-        className="mb-[26px] max-w-[640px] text-[13px] text-[var(--body)]"
+        className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]"
       >
         {message(messages, "hub.introduction")}
       </p>

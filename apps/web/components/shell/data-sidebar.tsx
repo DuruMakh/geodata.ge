@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronsLeft, ChevronsRight, House, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ComingSoonBadge } from "../ui/coming-soon-badge";
 import { SectionNav, SidebarSectionLink } from "./section-nav";
 import { LanguageSwitch } from "../site/language-switch";
 import { useI18n } from "../../lib/i18n/provider";
@@ -14,10 +13,8 @@ import { BUDGET_HUB_PATH, NAV_TREE, currentEntry, openHub } from "../../lib/navi
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
 // 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
-// platform whose first dataset is the budget; teaser rows are markers only.
+// platform whose first dataset is the budget.
 
-// Keys of `common.{key}` labels for datasets not live yet; none today, so no teaser list renders.
-const TEASERS: readonly string[] = [];
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
 const MOBILE_NAV_ID = "data-sidebar-navigation";
@@ -244,23 +241,6 @@ export function DataSidebar() {
                 );
               })}
             </ul>
-            {/* No aria-disabled on the rows: the listitem role ignores it (jsx-a11y
-                flags it), and the ComingSoonBadge text already reads out. */}
-            {TEASERS.length > 0 ? (
-            <ul className="mt-2 flex list-none flex-col gap-0.5 max-[900px]:mt-0">
-              {TEASERS.map((label) => (
-                // Reduced emphasis: a marker must not read as a live dataset row.
-                <li
-                  key={label}
-                  data-testid={`teaser-${label}`}
-                  className="flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center border-transparent px-2.5 py-2 text-[12.5px] font-medium text-[var(--ink-fg-muted)] opacity-60"
-                >
-                  <span className="min-w-0 flex-1 truncate">{message(messages, `common.${label}`)}</span>
-                  <ComingSoonBadge label={message(messages, "common.comingSoon")} />
-                </li>
-              ))}
-            </ul>
-            ) : null}
           </nav>
           <div className="mt-auto border-t border-[rgba(247,242,233,0.12)] pt-3">
             <div className="mb-2 text-[var(--ink-fg-muted)] max-[900px]:mb-0 max-[900px]:[&_a]:min-h-11"><LanguageSwitch /></div>

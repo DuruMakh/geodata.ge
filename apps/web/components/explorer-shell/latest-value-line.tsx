@@ -1,5 +1,8 @@
 import { withLari } from "../ui/lari";
 
+/** The budget, debt and deficit deck under the title: latest value, then its change or note. */
+export const DECK_LINE_CLASS = "mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]";
+
 /**
  * "{measure} · {period}: {value}" under an explorer title (owner decision D2):
  * the sectors page's headline line, so a phone reader sees "what is it now?"

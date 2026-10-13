@@ -86,10 +86,6 @@ export function useDebtExplorerState(facts: ClientGovernmentDebtFact[]) {
     update((current) => ({ ...current, selectedIds: normalizeDebtSelection(ids, current.family) }));
   }
 
-  function switchFamily(family: DebtFamily, selection = getDefaultDebtSelection(family)) {
-    update((current) => withFamily(current, family, selection, fullRanges));
-  }
-
   function toggleSeries(seriesId: DebtSeriesId) {
     update((current) => {
       const family = familyForDebtSeries(seriesId);
@@ -110,6 +106,5 @@ export function useDebtExplorerState(facts: ClientGovernmentDebtFact[]) {
     selectedIds: state.selectedIds,
     setSelectedSeries,
     toggleSeries,
-    switchFamily,
   };
 }

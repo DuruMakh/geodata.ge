@@ -74,8 +74,8 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     toggleMinistryExpanded,
     toggleSeries,
     setSelectedSeries,
-    handleGroupingChange,
-    handleChartModeChange,
+    setGrouping,
+    setChartMode,
   } = state;
 
   const totalsByScope = useMemo(() => budgetTotalsByScope(facts, adminFacts), [facts, adminFacts]);
@@ -155,8 +155,8 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
         selectedIds={selectedIds}
         expandedMinistries={expandedMinistries}
         lastUpdatedAt={lastUpdatedAt}
-        onGroupingChange={handleGroupingChange}
-        onChartModeChange={handleChartModeChange}
+        onGroupingChange={setGrouping}
+        onChartModeChange={setChartMode}
         onShareChange={setShare}
         onRangeChange={(patch) => setRange(scope, patch)}
         onSelectionChange={setSelectedSeries}

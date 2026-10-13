@@ -93,14 +93,6 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     );
   }
 
-  function handleGroupingChange(nextGrouping: ExpenditureGrouping) {
-    setGrouping(nextGrouping);
-  }
-
-  function handleChartModeChange(mode: ChartMode) {
-    setChartMode(mode);
-  }
-
   // Restore shareable state from the URL hash once, after mount (the server render
   // always shows defaults; unknown values are dropped by the parser or the checks below).
   // The hash is a one-time external input on load, so the one extra render is intended.
@@ -168,7 +160,7 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     toggleMinistryExpanded,
     toggleSeries,
     setSelectedSeries,
-    handleGroupingChange,
-    handleChartModeChange,
+    setGrouping,
+    setChartMode,
   };
 }

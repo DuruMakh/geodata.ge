@@ -12,6 +12,7 @@ import type { Locale, Messages } from "../../lib/i18n/types";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { PageHeader } from "../shell/page-header";
+import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 
 // The budget explorer (expenditure, revenue) and the single-year analysis are
 // separate client entries, so neither route ships the other's view; this is
@@ -81,7 +82,7 @@ export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, 
 
       <ExplorerHeading>{title}</ExplorerHeading>
 
-      <p className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+      <p className={DECK_LINE_CLASS}>
         <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{deck.lead}</span>
         {deck.yoy !== null ? (
           <>

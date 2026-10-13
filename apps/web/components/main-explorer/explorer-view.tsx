@@ -12,7 +12,7 @@ import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "..
 import { Callout, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
-import { Indicators } from "./indicators";
+import { FIRST_COL_LABEL, Indicators } from "./indicators";
 import { RangeStrip } from "./range-strip";
 import { SeriesPanel } from "./series-panel";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
@@ -52,13 +52,6 @@ const COVERAGE_NOTE: Record<ExplorerScope, string> = {
   fields: "main.expenditureCoverage",
   ministries: "main.ministryCoverage",
   revenue: "main.revenueCoverage",
-};
-
-// Moved out of ExplorerTable so the table takes a label rather than a scope.
-const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
-  fields: "main.field",
-  ministries: "main.institution",
-  revenue: "main.budgetItem",
 };
 
 // Classification-authorship disclosure (DESIGN.md §7.10): year totals are official;

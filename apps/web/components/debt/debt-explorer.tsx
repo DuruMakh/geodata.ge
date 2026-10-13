@@ -36,6 +36,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 
 type DebtRange = { start: number; end: number; min: number; max: number };
 
@@ -139,7 +140,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
         coverage={coverage}
       />
       <ExplorerHeading>{message(messages, "debt.heading")}</ExplorerHeading>
-      <p data-testid="debt-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+      <p data-testid="debt-deck" className={DECK_LINE_CLASS}>
         <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
           {deck?.year}: {message(messages, FAMILY_LABEL[props.family])} · {deckValue}
         </span>

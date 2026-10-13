@@ -22,8 +22,8 @@ type IndicatorsProps = {
   scope: ExplorerScope;
 };
 
-
-const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
+/** The first table column's message key per scope; the explorer table uses it too. */
+export const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
   fields: "main.field",
   ministries: "main.institution",
   revenue: "main.budgetItem",

@@ -31,6 +31,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useHashState } from "../explorer-shell/use-hash-state";
+import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 
 type DeficitExplorerProps = {
   facts: ClientGeneralGovernmentBalanceFact[];
@@ -121,7 +122,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
         coverage={coverage}
       />
       <ExplorerHeading>{message(messages, "deficit.heading")}</ExplorerHeading>
-      <p data-testid="deficit-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+      <p data-testid="deficit-deck" className={DECK_LINE_CLASS}>
         <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
           {latestActual?.year}: {label} · {headlineValue}
         </span>
