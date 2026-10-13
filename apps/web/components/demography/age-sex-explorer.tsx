@@ -33,11 +33,9 @@ import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { YearPicker } from "../ui/year-picker";
-import { Download } from "./national-vital-charts";
+import { Download, SECTION_CLASS } from "./demography-helpers";
 import { PopulationPyramid } from "./population-pyramid";
 
-/** The rule and spacing every part of the page opens with, shared with the regional glance below it. */
-export const SECTION_CLASS = "mt-16 border-t-2 border-[var(--ink)] pt-[22px]";
 const percent = (value: number | null) => formatShare(value === null ? null : value / 100);
 
 /** Georgia's age structure on 1 January of every year: the pyramid and the age-by-year heat map. */

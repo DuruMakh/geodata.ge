@@ -12,6 +12,7 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -83,7 +84,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-view={state.view} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">
           <div className={`flex flex-wrap ${views.length > 1 ? "items-center" : "items-end"} justify-between gap-3`}>
-            <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
+            <ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} />
             <div className="flex items-center gap-3.5">
               <span data-testid="money-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
               {views.length > 1 ? <SegmentedTabs ariaLabel={t("measure")} value={state.view} onChange={changeView} options={views.map(view => ({

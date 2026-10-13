@@ -9,12 +9,13 @@ import { formatDisplayDate } from "../../lib/explorer/format";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
-import { Callout, SegmentedTabs, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
+import { Callout, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
 import { ExplorerTable } from "./explorer-table";
 import { Indicators } from "./indicators";
 import { RangeStrip } from "./range-strip";
 import { SeriesPanel } from "./series-panel";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
@@ -133,15 +134,7 @@ export function ExplorerView({
               </TextTabGroup>
             ) : null}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs<ChartMode>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={chartMode}
-                onChange={onChartModeChange}
-                options={[
-                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
+              <ModeTabs value={chartMode} onChange={onChartModeChange} />
               <div className="flex items-center gap-3.5">
                 {share ? null : (
                   <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{message(messages, "format.bnGel")}</span>

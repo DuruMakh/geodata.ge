@@ -13,6 +13,7 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -25,7 +26,7 @@ import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SourceNote } from "../ui/editorial";
 import { MeasureTabs } from "./household-measure-tabs";
 import { useHashState } from "../explorer-shell/use-hash-state";
 
@@ -87,7 +88,7 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
       <div className="flex min-w-0 flex-col">
         <section aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={area} data-unit="gel" data-measure={state.measure} className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
+            <ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} />
             <MeasureTabs value={state.measure} onChange={measure => update(s => changeHouseholdMeasure(s, section, area, measure, facts), true)} />
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>

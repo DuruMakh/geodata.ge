@@ -24,6 +24,7 @@ import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -97,8 +98,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-indicator={state.indicator} data-breakdown={state.breakdown} data-unit={model.percent ? "percent" : "thousand_persons"} className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")}
-              options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
+            <ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")} />
             {section === "age" ? <label className="min-w-0 w-full text-[11px] min-[768px]:text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("indicator")}</span>
                 <select data-testid="unemployment-indicator" value={state.indicator} className={SELECT_CLASS}
                   onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>

@@ -26,9 +26,10 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SourceNote } from "../ui/editorial";
 import { DebtSeriesPanel } from "./debt-series-panel";
 import { useDebtExplorerState } from "./use-debt-explorer-state";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -167,15 +168,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
             className="border-t border-[var(--ink)] pt-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs<ChartMode>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={props.chartMode}
-                onChange={props.onChartModeChange}
-                options={[
-                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
+              <ModeTabs value={props.chartMode} onChange={props.onChartModeChange} />
               <div className="flex items-center gap-3.5">
                 {props.family === "stock" && props.shareOfGdp ? null : (
                   <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">

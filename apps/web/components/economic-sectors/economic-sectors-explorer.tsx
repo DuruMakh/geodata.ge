@@ -27,6 +27,7 @@ import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { SectorSeriesPanel } from "./sector-series-panel";
 import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -122,23 +123,7 @@ export function EconomicSectorsExplorer({
             className="border-t border-[var(--ink)] pt-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={state.mode}
-                onChange={(mode) => update((s) => ({ ...s, mode }), "push")}
-                options={[
-                  {
-                    value: "line",
-                    label: message(messages, "controls.chart"),
-                    testId: "chart-mode-line",
-                  },
-                  {
-                    value: "table",
-                    label: message(messages, "controls.table"),
-                    testId: "chart-mode-table",
-                  },
-                ]}
-              />
+              <ModeTabs value={state.mode} onChange={(mode) => update((s) => ({ ...s, mode }), "push")} />
               <SegmentedTabs
                 ariaLabel={t("measure")}
                 value={state.measure}

@@ -15,13 +15,14 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { useI18n } from "../../lib/i18n/provider";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
-import { Callout, SegmentedTabs, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
+import { Callout, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
 import { TradePartnersRanking } from "./trade-partners-ranking";
 import { TradeProductsPicker } from "./trade-products-picker";
 import { useTradeProductsState } from "./use-trade-products-state";
@@ -58,7 +59,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
     {selectionReset ? <p role="status" data-testid="trade-products-selection-reset" className="mb-3 text-xs text-[var(--accent)]">{t("selectionReset")}</p> : null}
     <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" data-selected-count={model.selectedCount} className="border-t border-[var(--ink)] pt-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(previous => ({ ...previous, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
+        <ModeTabs value={state.mode} onChange={mode => update(previous => ({ ...previous, mode }), true)} />
         <div className="flex flex-wrap items-center gap-3"><span data-testid="trade-products-unit" className="text-[11px] text-[var(--muted)]">{measureLabel} · {model.unit.label}</span><ExcelDownloadButton compact testId="trade-products-excel-download" disabled={!model.selectedCount} onDownload={async () => {
           const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
           await downloadWorkbook(buildTradeProductsWorkbookModel({ data, state, sources, siteOrigin }, presentation));

@@ -21,7 +21,8 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { PageHeader } from "../shell/page-header";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SourceNote } from "../ui/editorial";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
@@ -136,15 +137,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
             className="border-t border-[var(--ink)] pt-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs<ChartMode>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={chartMode}
-                onChange={setChartMode}
-                options={[
-                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
+              <ModeTabs value={chartMode} onChange={setChartMode} />
               <div className="flex items-center gap-3.5">
                 {percentage ? null : (
                   <span data-testid="deficit-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">

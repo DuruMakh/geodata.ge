@@ -8,6 +8,7 @@ import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
 import { latestEntry } from "../../lib/explorer/latestValue";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
   INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
@@ -24,7 +25,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
-import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SourceNote, TextTab } from "../ui/editorial";
 import { InflationIndicators } from "./inflation-indicators";
 import { InflationSeriesPanel } from "./inflation-series-panel";
 import { InflationTable } from "./inflation-table";
@@ -129,15 +130,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} className="border-t border-[var(--ink)] pt-3">
-            <SegmentedTabs<InflationState["mode"]>
-              ariaLabel={message(messages, "controls.viewMode")}
-              value={state.mode}
-              onChange={(mode) => update((current) => ({ ...current, mode }))}
-              options={[
-                { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-              ]}
-            />
+            <ModeTabs value={state.mode} onChange={(mode) => update((current) => ({ ...current, mode }))} />
             {!hasSeries ? (
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>

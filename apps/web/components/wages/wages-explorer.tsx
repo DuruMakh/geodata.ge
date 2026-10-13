@@ -12,6 +12,7 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -26,7 +27,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
-import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SELECT_CLASS, SourceNote } from "../ui/editorial";
 
 
 type WagesHashData = { section: WagesSectionId; facts: ClientWagesFact[] };
@@ -86,7 +87,7 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-view={state.view} data-unit="gel" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
+            <ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} />
             {section === "industries" ? <label className="min-w-0 w-full text-[11px] min-[768px]:text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("groupLabel")}</span>
               <select data-testid="wages-group" value={state.view} className={SELECT_CLASS} onChange={event => changeView(event.target.value as WagesView)}>
                 {wagesViews(section).map(view => <option key={view} value={view}>{t(`group.${view}`)}</option>)}

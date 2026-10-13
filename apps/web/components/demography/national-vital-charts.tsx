@@ -7,50 +7,21 @@ import { AGE_GROUPS, ageCurves, LIFE_SERIES, nationalYears, seriesByYear, UNIT_R
 import { buildFertilityWorkbookExportModel, buildLifeWorkbookExportModel } from "../../lib/explorer/demographyNationalWorkbook";
 import { formatInUnit, UNIT_DENSITY } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
-import type { WorkbookExportModel, WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientNationalFact } from "../../lib/servedRows";
-import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
-import { SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { SectionTitle, SourceNote } from "../ui/editorial";
+import { Download, SECTION_CLASS } from "./demography-helpers";
 
 /** The first year of the fertility curve; the last is ACCENT. Distinct from the grey of the years between. */
 const FIRST_YEAR_COLOR = SERIES_COLORS["fertility.first_year"]!;
-
-export function ModeTabs({ value, onChange, testId, lineLabel }: { value: ChartMode; onChange: (mode: ChartMode) => void; testId: string; lineLabel?: string }) {
-  const { messages } = useI18n();
-  return (
-    <SegmentedTabs<ChartMode>
-      ariaLabel={message(messages, "controls.viewMode")}
-      value={value}
-      onChange={onChange}
-      options={[
-        { value: "line", label: lineLabel ?? message(messages, "municipal.line"), testId: `${testId}-mode-line` },
-        { value: "table", label: message(messages, "controls.table"), testId: `${testId}-mode-table` },
-      ]}
-    />
-  );
-}
-
-export function Download({ testId, build }: { testId: string; build: () => WorkbookExportModel }) {
-  return (
-    <div className="mt-4 w-full max-w-[260px]">
-      <ExcelDownloadButton
-        testId={testId}
-        disabled={false}
-        onDownload={async () => {
-          const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-          await downloadWorkbook(build());
-        }}
-      />
-    </div>
-  );
-}
 
 export function NationalVitalCharts({
   facts,
@@ -87,7 +58,7 @@ export function NationalVitalCharts({
 
   return (
     <>
-      <section data-testid="fertility-section" className="mt-16 border-t-2 border-[var(--ink)] pt-[22px]">
+      <section data-testid="fertility-section" className={SECTION_CLASS}>
         <SectionTitle>{t("fertilityTitle")}</SectionTitle>
         <h3 className="mt-6 mb-3 text-[15px] text-[var(--ink)]">{`${t("tfrLabel")} (${t("tfrUnit")})`}</h3>
         <ModeTabs value={tfrMode} onChange={setTfrMode} testId="tfr" />
@@ -183,7 +154,7 @@ export function NationalVitalCharts({
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="asfr-note">{t("asfrNote")}</SourceNote></div>
         <Download testId="fertility-excel-download" build={() => buildFertilityWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
-      <section data-testid="life-section" className="mt-16 border-t-2 border-[var(--ink)] pt-[22px]">
+      <section data-testid="life-section" className={SECTION_CLASS}>
         <SectionTitle>{t("lifeTitle")}</SectionTitle>
         <div className="mt-5"><ModeTabs value={lifeMode} onChange={setLifeMode} testId="life" /></div>
         <div className="mt-5">

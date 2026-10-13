@@ -28,6 +28,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { GdpSummary } from "./gdp-summary";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { formatGdpLatestValue } from "../../lib/explorer/latestValue";
@@ -172,23 +173,7 @@ export function GdpOverview({
         className="border-t border-[var(--ink)] pt-3"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <SegmentedTabs
-            ariaLabel={message(messages, "controls.viewMode")}
-            value={state.mode}
-            onChange={(mode) => setState((s) => ({ ...s, mode }))}
-            options={[
-              {
-                value: "line",
-                label: message(messages, "controls.chart"),
-                testId: "chart-mode-line",
-              },
-              {
-                value: "table",
-                label: message(messages, "controls.table"),
-                testId: "chart-mode-table",
-              },
-            ]}
-          />
+          <ModeTabs value={state.mode} onChange={(mode) => setState((s) => ({ ...s, mode }))} />
           {state.indicator === "nominal" ||
           state.indicator === "per_capita" ? (
             <div data-testid="gdp-currency" className="[&_button]:min-w-[40px]">

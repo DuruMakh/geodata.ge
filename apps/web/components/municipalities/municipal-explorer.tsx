@@ -22,7 +22,6 @@ import {
   municipalShareValueForYear,
 } from "../../lib/explorer/municipalData";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
-import type { ChartMode } from "../../lib/explorer/types";
 import {
   buildWorkbookExportModel,
   type WorkbookExportInput,
@@ -31,7 +30,7 @@ import {
 } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -41,6 +40,7 @@ import type { EntityPickerCountry, EntityPickerGroup } from "./entity-picker";
 import { EntityWorkspaceShell } from "./entity-workspace-shell";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 
@@ -276,15 +276,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               className="mb-[18px] flex flex-wrap items-center justify-between gap-x-5 gap-y-3"
             >
               <span className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 [&_button]:min-h-9">
-                <SegmentedTabs<ChartMode>
-                  ariaLabel={message(messages, "municipal.viewMode")}
-                  value={state.chartMode}
-                  onChange={state.setChartMode}
-                  options={[
-                    { value: "line", label: message(messages, "municipal.line"), testId: "municipal-mode-line" },
-                    { value: "table", label: message(messages, "municipal.table"), testId: "municipal-mode-table" },
-                  ]}
-                />
+                <ModeTabs value={state.chartMode} onChange={state.setChartMode} testId="municipal" />
                 {/* Phones keep the pill on this row: the caption shortens to the unit, and
                     in share mode the pressed "% წილი" pill names the unit itself. */}
                 <span data-testid="municipal-measure-label" className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
