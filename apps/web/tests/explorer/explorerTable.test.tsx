@@ -40,8 +40,6 @@ describe("ExplorerTable year-columns layout", () => {
       const firstCell = /^<(th|td)\b([^>]*)>([\s\S]*?)<\/\1>/.exec(rows[index]!)!;
       expect(firstCell[1], label).toBe("th");
       expect(firstCell[2], label).toContain('scope="row"');
-      // U25-07: a year cell scrolled under the sticky label fades out behind it instead of showing half a figure.
-      expect(firstCell[2], label).toContain("after:bg-[linear-gradient(to_right,var(--paper),transparent)]");
       expect(firstCell[3], label).toContain(label);
       // Year, change and share values stay data cells.
       expect(rows[index]!.match(/<td\b/g), label).toHaveLength(4);

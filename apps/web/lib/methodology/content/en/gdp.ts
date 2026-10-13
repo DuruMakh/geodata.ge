@@ -10,7 +10,7 @@ export const GDP_METHODOLOGY_CONTENT: MethodologyContent = {
     kind: "archive",
   },
   canonicalDocuments: ["docs/data-methodology/gdp-overview.md"],
-  disclosure: "Official published figures: real GDP (constant 2015 US dollars) and real growth from the World Bank; nominal GDP and GDP per person, in lari and US dollars, from Geostat. Fiscal.ge shows them unchanged: it does not splice, rebase or convert any series.",
+  disclosure: "Official published figures: real GDP (constant 2015 US dollars) and real growth from the World Bank; nominal GDP and GDP per person, in lari and US dollars, from Geostat. Fiscal.ge does not splice or rebase real GDP. Nominal GDP joins Geostat’s SNA 1993 series (through 2009) and its SNA 2008 series (from 2010) as Geostat published them; the US dollar and per-person figures are Geostat’s published cells, not a new conversion.",
   keyFacts: [
     {
       label: "Coverage",

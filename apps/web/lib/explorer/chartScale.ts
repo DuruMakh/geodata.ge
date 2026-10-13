@@ -5,7 +5,8 @@ export type NiceScale = { top: number; bottom: number; step: number };
 const HEADROOM = 1.05;
 const NICE_MULTIPLIERS = [1, 2, 2.5, 5];
 // 4–7 gridline intervals: enough labels to read a value against, and at 7 the
-// lattice's three rows per step still clear its 12-unit density floor.
+// lattice's three rows per step still clear its 12-unit density floor. One
+// exception allows 8: a dip less than one step below zero (see niceScale).
 const MIN_INTERVALS = 4;
 const MAX_INTERVALS = 7;
 

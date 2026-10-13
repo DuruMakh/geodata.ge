@@ -451,3 +451,16 @@ it.each(["ka", "en"] as const)("every %s methodology disclosure says something i
     expect(content.disclosure, id).not.toBe(content.summary);
   }
 });
+
+// Task 48 fix round: nominal GDP joins Geostat's SNA 1993 and SNA 2008 series (docs/data-methodology/gdp-overview.md);
+// the disclosure says so rather than claiming no series is spliced.
+it.each([
+  ["ka", /SNA 1993/, /SNA 2008/, /არცერთი სერია არ არის გადაბმული/],
+  ["en", /SNA 1993/, /SNA 2008/, /does not splice, rebase or convert any series/],
+] as const)("the %s GDP disclosure names the nominal SNA join", async (locale, older, newer, wrong) => {
+  const { getMethodologyContent } = await import("../../lib/methodology/catalog");
+  const { disclosure } = getMethodologyContent("gdp", locale);
+  expect(disclosure).toMatch(older);
+  expect(disclosure).toMatch(newer);
+  expect(disclosure).not.toMatch(wrong);
+});

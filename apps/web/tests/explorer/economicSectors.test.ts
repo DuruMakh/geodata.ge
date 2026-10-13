@@ -38,8 +38,8 @@ test("shares are selection-independent and percent boundaries are correct", () =
   const model = buildEconomicSectorsModel(facts,registry,state,sourceIdByMeasure(facts));
   expect(model.series[0].vals).toEqual([12.5]);
   expect(model.rows[0].valuesByYear[2010]).toBe(0.125);
-  // U11-01: Total GDP is 100% of itself; the share headline is the amount the shares divide, nominal GDP.
-  expect(model.headline).toMatchObject({ seriesId: "economy.gdp_total", measure: "nominal", value: 120 });
+  // U11-01: Total GDP is 100% of itself; the share headline is the largest sector's share in the latest year.
+  expect(model.headline).toMatchObject({ seriesId: "sector.b", measure: "share_of_gdp", value: 37.5 });
   const growth=buildEconomicSectorsModel(facts,registry,{...state,measure:"real_growth"},sourceIdByMeasure(facts));
   expect(growth.series[0].vals).toEqual([7.5]);
   expect(growth.rows[0].valuesByYear[2011]).toBe(0.075);

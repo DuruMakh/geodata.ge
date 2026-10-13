@@ -105,11 +105,11 @@ export function buildEconomicSectorsModel(facts: readonly ClientSectorObservatio
       preliminary: years.map(year => byCell.get(`${r.id}:${year}`)?.status === "preliminary"),
     })),
     endValues,
-    // Total GDP's own share is always 100%: the share view's headline is the amount the shares divide, nominal GDP,
-    // in the same one line the nominal view prints, so switching the measure never moves the chart (U11-01).
+    // Total GDP's own share is always 100%: the share view's headline is the largest sector's share in the latest
+    // year (U11-01). The ranked list and the chart name it; the line itself stays one line at 375px.
     headline: (state.measure === "share_of_gdp"
-      ? facts.filter(f => f.measure === "nominal" && f.seriesId === SECTOR_GDP && f.year >= range.start && f.year <= range.end)
-      : active.filter(f => f.seriesId === SECTOR_GDP)).toSorted((a,b)=>a.year-b.year).at(-1) ?? null,
+      ? active.filter(f => f.seriesId !== SECTOR_GDP).toSorted((a,b)=>a.year-b.year || a.value-b.value)
+      : active.filter(f => f.seriesId === SECTOR_GDP).toSorted((a,b)=>a.year-b.year)).at(-1) ?? null,
     sourceIds: hasData && sourceIdByMeasure[state.measure] ? [sourceIdByMeasure[state.measure]!] : [],
     hasData,
   };

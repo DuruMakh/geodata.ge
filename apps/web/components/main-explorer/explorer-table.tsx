@@ -64,10 +64,11 @@ export const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-m
 const MOBILE_LABEL_CLASS =
   "@max-[768px]:pr-1.5 @max-[768px]:w-[40cqw] @max-[768px]:min-w-[40cqw] @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:break-words";
 const PIN_RIGHT_CLASS = "sticky @max-[768px]:static";
-// A short paper fade on the sticky label column's right edge, so a year cell scrolled under it reads as passing
-// behind the column rather than as a figure cut in half (U25-07).
-const STICKY_FADE_CLASS =
-  "after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-2.5 after:bg-[linear-gradient(to_right,var(--paper),transparent)] after:content-['']";
+// A solid paper margin with a hairline edge on the sticky label column's right side, so a year cell scrolled under
+// it reads as passing behind the column rather than as a figure cut in half (U25-07). Solid, not a fade: DESIGN.md
+// §17 has no gradients. The 10px fall in the empty left part of a right-aligned 78px year column.
+const STICKY_EDGE_CLASS =
+  "after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-2.5 after:border-r after:border-[var(--hairline)] after:bg-[var(--paper)] after:content-['']";
 // A value cell of the year-rows layout: flush right under its series header.
 const ROWS_VALUE_CELL_CLASS = "pl-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
 
@@ -258,7 +259,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
 
   const total = showTotal && totalRow ? (
     <tr className="border-t-2 border-[var(--ink)]">
-      <th scope="row" className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35] ${STICKY_FADE_CLASS} ${labelClass}`} style={cellPad}>
+      <th scope="row" className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35] ${STICKY_EDGE_CLASS} ${labelClass}`} style={cellPad}>
         {rowLabel(totalRow)}
       </th>
       {years.map((year) => (
@@ -333,7 +334,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
             <tr key={row.itemId} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
               <th
                 scope="row"
-                className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left font-normal shadow-[1px_0_0_var(--hairline-soft)] ${STICKY_FADE_CLASS} ${labelClass}`}
+                className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left font-normal shadow-[1px_0_0_var(--hairline-soft)] ${STICKY_EDGE_CLASS} ${labelClass}`}
                 style={cellPad}
                 title={rowLabel(row)}
               >

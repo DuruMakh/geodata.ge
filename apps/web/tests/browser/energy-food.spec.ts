@@ -130,3 +130,24 @@ test("switching to English keeps range, selection and table mode (Review Focus 5
   await expect(page.getByTestId("year-range-strip")).toContainText("2018–2022");
   await expect(page).toHaveURL(/start=2018/);
 });
+
+// U25-07: on a phone a year cell scrolled under the sticky label column passes behind a solid paper margin with a
+// hairline edge, not a gradient (DESIGN.md §17), so no half figure shows against the label.
+test("the table's sticky label column ends in a solid edge on a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  // Four series: from four rows a phone table lists series as rows with a sticky label column (DESIGN.md §12).
+  await page.goto("/explorer/energy-food/energy-supply#view=table&sel=energy.supply.total,energy.supply.natural_gas,energy.supply.oil_products,energy.supply.hydro");
+  await ready(page);
+  const label = page.getByTestId("explorer-table").locator("tbody th[scope='row']").first();
+  await expect(label).toBeVisible();
+  const edge = await label.evaluate((cell) => {
+    const after = getComputedStyle(cell, "::after");
+    return { image: after.backgroundImage, color: after.backgroundColor, border: after.borderRightWidth, width: after.width, left: after.left, cellWidth: `${cell.getBoundingClientRect().width}px` };
+  });
+  expect(edge.image).toBe("none");
+  expect(edge.color).toBe(await page.evaluate(() => getComputedStyle(document.body).backgroundColor));
+  expect(edge.border).toBe("1px");
+  // A 10px opaque margin starting at the label column's right edge.
+  expect(edge.width).toBe("10px");
+  expect(parseFloat(edge.left)).toBeCloseTo(parseFloat(edge.cellWidth), 0);
+});

@@ -4,7 +4,6 @@ import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useMemo } from "react";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import { publicLabel } from "../../lib/i18n/labels";
 import type { Presentation } from "../../lib/i18n/types";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { PublicGlossaryEntry } from "../../lib/data/glossary";
@@ -130,13 +129,12 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     const previousTotal = previousYear === undefined ? null : totals.get(previousYear) ?? null;
     const yoy = latestTotal !== null && previousTotal ? (latestTotal - previousTotal) / previousTotal : null;
 
-    // Named like the debt and deficit decks ("{year}: {series} · {value}"), so the line says what the figure is (U04-11).
-    const total = model.items.find((item) => item.level === "total");
-    const label = total ? ` ${publicLabel(locale, total.id, total.kaLabel, presentation.englishLabels)} ·` : "";
+    // The line says what the figure is (U04-11): "2025: Total 32.4 bn GEL +8.8% year on year". The heading names the
+    // side, so "Total" is enough, and the line stays one line at 375px in both languages (DESIGN.md §17).
     return latestTotal === null
       ? { lead: "", yoy }
-      : { measure: `${latestYear}:${label}`, lead: formatAmount(latestTotal, locale), yoy };
-  }, [totalsByScope, scope, scopeYears, locale, model.items, presentation.englishLabels]);
+      : { measure: `${latestYear}: ${message(messages, "main.total")}`, lead: formatAmount(latestTotal, locale), yoy };
+  }, [totalsByScope, scope, scopeYears, locale, messages]);
 
   const screenTitle = nav === "expenditure"
     ? message(messages, "main.expenditureHeading")

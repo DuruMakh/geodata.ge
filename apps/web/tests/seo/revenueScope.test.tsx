@@ -34,8 +34,9 @@ test.each(["ka", "en"] as const)("the revenue deck states the latest receipts an
   const [previous, latest] = [...totals.keys()].sort((a, b) => a - b).slice(-2);
   const messages = await getMessages(locale, ["main"]);
   expect(parts).toEqual([
-    // The words in the body face, the figure in mono, as on LatestValueLine: in mono the Georgian label wrapped to three lines on a phone.
-    `${latest}: ${locale === "en" ? "Total receipts" : "მთლიანი შემოსავლები"} ·`,
+    // The words in the body face, the figure in mono. "Total" (the heading names the side) keeps the line to one line
+    // at 375px; "Total receipts" wrapped it (DESIGN.md §17).
+    `${latest}: ${locale === "en" ? "Total" : "სულ"}`,
     formatAmount(totals.get(latest!)!, locale),
     formatShare((totals.get(latest!)! - totals.get(previous!)!) / totals.get(previous!)!, true),
     message(messages, "main.previousYear"),
@@ -59,7 +60,7 @@ test("the analysis deck does not repeat the first headline card", async () => {
   const html = renderPageMarkup("en", await renderAnalysisPage("en"));
   const deck = html.match(/<p data-testid="budget-deck"[^>]*>([\s\S]*?)<\/p>/)![1]!.replace(/<[^>]+>/g, " ");
   expect(deck).not.toMatch(/categories|Total/);
-  expect(deck).toMatch(/^\s*[+−]\d+\.\d%\s+from the previous year\s*$/);
+  expect(deck).toMatch(/^\s*[+−]\d+\.\d%\s+year on year\s*$/);
 });
 
 // U03-14: in the line view the phone chart's own axis caption names the unit, so the mode row's caption is desktop-only;

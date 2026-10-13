@@ -61,14 +61,20 @@ test("compact sector descriptions keep the chart still and clicked hints disappe
   await page.goto("/explorer/economy/sectors");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const panel = page.getByTestId("chart-panel");
+  // The chart keeps its place under the latest-value line: no hint or description pushes it down. The line itself may
+  // change height with the measure, since the Georgian national line wraps at 390px (registered in mobile-fit-charts)
+  // while the share line is one line (U11-01).
+  const gap = async () => (await panel.boundingBox())!.y - (await page.getByTestId("sectors-headline").boundingBox())!.y;
   for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
-    const top = (await panel.boundingBox())!.y;
+    const lineHeight = await page.getByTestId("sectors-headline").evaluate((line) => parseFloat(getComputedStyle(line).lineHeight));
+    const lines = async () => Math.round((await page.getByTestId("sectors-headline").boundingBox())!.height / lineHeight);
+    const top = (await gap()) - (await lines()) * lineHeight;
     for (const name of ["% მშპ-ში", "რეალური ზრდა %", "ნომინალური ღირებულება ლარში"]) {
       await page.getByRole("button", { name, exact: true }).click();
       await page.getByRole("heading", { level: 1 }).hover();
       await expect(page.getByRole("tooltip")).toHaveCount(0);
-      expect((await panel.boundingBox())!.y).toBe(top);
+      expect((await gap()) - (await lines()) * lineHeight).toBeCloseTo(top, 0);
     }
   }
   await expect(page.getByTestId("sectors-unit")).toHaveCount(0);
@@ -87,11 +93,17 @@ test.describe("touch measure controls", () => {
     await page.getByRole("button", { name: "% მშპ-ში", exact: true }).tap();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "share_of_gdp");
     await expect(page.getByText("სექტორის დამატებული ღირებულების წილი მთლიან მშპ-ში.", { exact: true })).toBeVisible();
-    // U11-01 (Q6): Total GDP alone is a flat 100% line; the share view opens on the five largest sectors, and the
-    // headline is nominal GDP, the amount the shares divide, not Total GDP's own 100%.
+    // U11-01: Total GDP alone is a flat 100% line; the share view opens on the five largest sectors (plan default Q6),
+    // and the headline is the largest sector's share, on one line, not Total GDP's own 100%.
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(5);
-    await expect(page.getByTestId("sectors-headline")).toContainText("₾");
-    await expect(page.getByTestId("sectors-headline")).not.toContainText("100.0%");
+    const headline = page.getByTestId("sectors-headline");
+    await expect(headline).toHaveText(/^უმსხვილესი სექტორი · \d{4}: \d+\.\d%( · წინასწარი)?$/);
+    await expect(headline).not.toContainText("100.0%");
+    expect(await headline.evaluate((line) => line.getBoundingClientRect().height / parseFloat(getComputedStyle(line).lineHeight))).toBeLessThanOrEqual(1.1);
+    // The figure is the first (largest) selected sector's latest share in the table.
+    const share = (await headline.textContent())!.match(/(\d+\.\d)%/)![1]!;
+    await page.getByTestId("chart-mode-table").tap();
+    await expect(page.getByTestId("explorer-table").locator("tbody tr").first().locator("td").last()).toContainText(share);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 });
@@ -234,4 +246,14 @@ test("announces the period when the measure changes, not on every range change",
 
   await page.getByRole("button", { name: "Real growth %", exact: true }).click();
   await expect(status).toHaveText(/^Period: \d{4}–\d{4}$/);
+});
+
+// U11-01: a shared share-of-GDP link without sectors opens on the five largest, as the toggle does, not a flat 100% line.
+test("a share-of-GDP link without sectors opens on the five largest", async ({ page }) => {
+  await page.goto("/en/explorer/economy/sectors#measure=share_of_gdp");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "share_of_gdp");
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(5);
+  await expect(page.locator('[data-series-id="economy.gdp_total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("sectors-headline")).toHaveText(/^Largest sector · \d{4}: \d+\.\d%( · Preliminary)?$/);
 });

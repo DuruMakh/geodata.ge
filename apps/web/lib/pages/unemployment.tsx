@@ -57,7 +57,11 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   const lastReviewedAt = facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: message(presentation.messages, "unemployment.title"), href: pageHref("/explorer/unemployment", locale) }, { label: region ? regionName : title }];
   if (region) crumbs.splice(3, 0, { label: message(presentation.messages, "unemployment.page.regions.title"), href: pageHref("/explorer/unemployment/regions", locale) });
-  const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_REGISTRY, sources, lastReviewedAt, siteOrigin: origin };
+  // A region first published later than the regional series starts was split out of a combined group: its page
+  // carries the split-region note (U17-11). Read from the facts, not listed.
+  const regionFirstYear = (id?: string) => Math.min(...data.facts.filter(f => f.dimension === "region" && (!id || f.groupId === id)).map(f => f.year));
+  const regionSplit = regionId ? regionFirstYear(regionId) > regionFirstYear() : undefined;
+  const explorer = { section, regionId, regionSplit, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_REGISTRY, sources, lastReviewedAt, siteOrigin: origin };
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: sectionPath, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,

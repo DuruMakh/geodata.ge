@@ -277,9 +277,6 @@ const bareHeadingPages = [
 // asserts they still wrap, so a page that gets fixed fails here until its
 // entry is removed, and a broken page (404, no heading) fails too.
 const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
-  // U04-11: the deck now names its total, as the debt and deficit decks do ("2025: Total receipts · 32.4 bn GEL +8.8% …").
-  "/explorer/expenditure": ["ka", "en"],
-  "/explorer/revenue": ["ka", "en"],
   "/explorer/debt": ["ka", "en"],
   "/explorer/municipalities/georgia": ["ka", "en"],
   "/explorer/municipalities/[slug]": ["ka"],
