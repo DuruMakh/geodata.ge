@@ -1,6 +1,6 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import type { PeriodRange } from "./periodRange";
-import type { ChartMode, ExpenditureGrouping, ExplorerNav, ExplorerScope } from "./types";
+import type { ChartMode, ExpenditureGrouping, ExplorerNav, ExplorerScope, ExplorerSide } from "./types";
 
 // Shareable screen state, serialized into the URL hash (DESIGN.md §6.3). The
 // section lives in the route, not the hash:
@@ -146,30 +146,33 @@ export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlSt
 }
 
 export type SerializeExplorerInput = {
-  nav: ExplorerNav;
+  nav: ExplorerSide;
   grouping: ExpenditureGrouping;
   chartMode: ChartMode;
   share: boolean;
   rangeStart: number;
   rangeEnd: number;
   selectedIds: string[];
-  analysisSide: "expenditure" | "revenue";
-  analysisGrouping: ExpenditureGrouping;
-  analysisYear: number | null;
 };
 
 export function serializeExplorerHash(input: SerializeExplorerInput): string {
   const params = new URLSearchParams();
 
-  if (input.nav === "analysis") {
-    params.set("as", input.analysisSide);
-    if (input.analysisSide === "expenditure") params.set("ag", input.analysisGrouping);
-    if (input.analysisYear !== null) params.set("ay", String(input.analysisYear));
-    return params.toString();
-  }
-
   if (input.nav === "expenditure") params.set("g", input.grouping);
   writeSharedHashKeys(params, input);
+  return params.toString();
+}
+
+export function serializeAnalysisHash(input: {
+  analysisSide: ExplorerSide;
+  analysisGrouping: ExpenditureGrouping;
+  analysisYear: number | null;
+}): string {
+  const params = new URLSearchParams();
+
+  params.set("as", input.analysisSide);
+  if (input.analysisSide === "expenditure") params.set("ag", input.analysisGrouping);
+  if (input.analysisYear !== null) params.set("ay", String(input.analysisYear));
   return params.toString();
 }
 

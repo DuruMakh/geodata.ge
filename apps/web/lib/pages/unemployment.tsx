@@ -1,6 +1,5 @@
 import path from "node:path";
 import { UnemploymentExplorer } from "../../components/unemployment/unemployment-explorer";
-import { UnemploymentLegacyLink } from "../../components/unemployment/unemployment-legacy-link";
 import { UnemploymentRegionsIndex } from "../../components/unemployment/unemployment-regions-index";
 import { buildUnemploymentRegionMapModel, UNEMPLOYMENT_REGIONS } from "../explorer/unemploymentRegionMap";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
@@ -21,23 +20,10 @@ import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { resolveSiteUrl } from "../siteUrl";
-import { buildUnemploymentHubCards } from "../explorer/unemploymentHubCards";
 import { unemploymentIndicators } from "../data/unemployment/types";
 import { unemploymentOverviewIndicators } from "../explorer/unemploymentOverview";
 import { UNEMPLOYMENT_SECTIONS, unemploymentBreakdownsForSection, type UnemploymentSectionId } from "../explorer/unemploymentSections";
 import { UNEMPLOYMENT_AGE_FIRST_YEAR } from "../explorer/unemploymentAge";
-import { TopicHub } from "./hub";
-
-export async function unemploymentHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["unemployment"]);
-  return fiscalMetadata({ locale, path: "/explorer/unemployment", title: message(messages, "unemployment.metaTitle"), description: message(messages, "unemployment.metaDescription") });
-}
-
-export async function renderUnemploymentHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "common"], [])]);
-  const title = message(presentation.messages, "unemployment.title");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "unemployment.hubSummary")} path={"/explorer/unemployment"} coverage={coverageLabel(presentation.messages, locale, Math.min(...facts.map(f => f.year)), Math.max(...facts.map(f => f.year)), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildUnemploymentHubCards(facts, presentation)} testId="unemployment-hub" after={<UnemploymentLegacyLink locale={locale} />} />;
-}
 
 export async function unemploymentPageMetadata(locale: Locale, section: UnemploymentSectionId) {
   const messages = await getMessages(locale, ["unemployment"]);

@@ -4,7 +4,7 @@ import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
 import { getPresentation } from "../i18n/presentation.server";
-import { MainExplorer } from "../../components/main-explorer/main-explorer";
+import { AnalysisExplorer } from "../../components/analysis/analysis-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { publicGlossaryEntry } from "../data/glossary";
 import { loadServedExplorerData } from "../data/servedData";
@@ -49,9 +49,8 @@ export async function renderAnalysisPage(locale: Locale) {
   return (
     <>
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.analysis"), path: pageHref("/explorer/analysis", locale) }]} />
-      <MainExplorer
+      <AnalysisExplorer
         presentation={presentation}
-        nav="analysis"
         facts={facts.map(projectBudgetFact)}
         adminFacts={ownAdminFacts.map(projectAdminFact)}
         adminCategories={adminCategories}

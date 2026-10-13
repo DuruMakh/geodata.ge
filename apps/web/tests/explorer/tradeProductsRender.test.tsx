@@ -48,7 +48,7 @@ test("Products metadata and page publish the reviewed bilingual dataset coverage
 });
 
 test("the Trade hub shows Products coverage from 2020 while retaining full partner coverage", async () => {
-  const { renderTradeHub } = await import("../../lib/pages/trade");
+  const { renderTradeHub } = await import("../../lib/pages/hubs/trade");
   const html = renderToStaticMarkup(await renderTradeHub("en"));
   expect(html).toContain("2020–2025");
   expect(html).toContain("1995–2025");

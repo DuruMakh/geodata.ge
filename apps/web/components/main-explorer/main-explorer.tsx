@@ -14,16 +14,11 @@ import type {
   ClientBudgetFact,
   ClientNationalGdpFact,
 } from "../../lib/explorer/clientData";
-import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
-import { buildExplorerModel, isDerivedTotalItemId, type ExplorerModel } from "../../lib/explorer/explorerData";
-import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
-import { formatAmount, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
-import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { ExplorerHeading } from "../explorer-shell/explorer-heading";
-import { ExplorerPage } from "../explorer-shell/explorer-page";
+import { buildExplorerModel, type ExplorerModel } from "../../lib/explorer/explorerData";
+import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
 import { useAppReady } from "../explorer-shell/use-app-ready";
-import type { ExplorerNav, ExplorerScope } from "../../lib/explorer/types";
+import type { ExplorerSide } from "../../lib/explorer/types";
 import {
   buildWorkbookExportModel,
   type WorkbookExportInput,
@@ -31,15 +26,15 @@ import {
   type WorkbookSeries,
 } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
-import { AnalysisView } from "../analysis/analysis-view";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { PageHeader } from "../shell/page-header";
+import { BudgetExplorerFrame, budgetTotalsByScope } from "./budget-explorer-frame";
 import { ExplorerView } from "./explorer-view";
 import { useExplorerState } from "./use-explorer-state";
 
 type MainExplorerProps = {
   presentation: Presentation;
-  nav: ExplorerNav;
+  /** The route: /explorer/analysis has its own client entry (AnalysisExplorer). */
+  nav: ExplorerSide;
   facts: FactsInput<ClientBudgetFact>;
   // Optional because the ministries scope is unreachable on the revenue route:
   // scopeFor() returns "revenue" before it consults grouping (urlState.ts), so
@@ -85,35 +80,9 @@ function MainExplorerContent({ presentation, nav, facts: shippedFacts, adminFact
     setSelectedSeries,
     handleGroupingChange,
     handleChartModeChange,
-    analysisSide,
-    setAnalysisSide,
-    analysisGrouping,
-    setAnalysisGrouping,
-    analysisYears,
-    analysisYear,
-    setAnalysisYear,
   } = state;
 
-  // Full-history totals per scope, for the deck line under the page title.
-  const totalsByScope = useMemo(() => {
-    const totals: Record<ExplorerScope, Map<number, number>> = {
-      fields: new Map(),
-      ministries: new Map(),
-      revenue: new Map(),
-    };
-
-    for (const fact of chooseActivePublicFacts(facts)) {
-      if (isDerivedTotalItemId(fact.itemId)) continue;
-      const scopeKey: ExplorerScope = fact.side === "revenue" ? "revenue" : "fields";
-      totals[scopeKey].set(fact.year, (totals[scopeKey].get(fact.year) ?? 0) + fact.amountGel);
-    }
-    for (const fact of adminFacts) {
-      if (fact.level !== "admin_category") continue;
-      totals.ministries.set(fact.year, (totals.ministries.get(fact.year) ?? 0) + fact.amountGel);
-    }
-
-    return totals;
-  }, [facts, adminFacts]);
+  const totalsByScope = useMemo(() => budgetTotalsByScope(facts, adminFacts), [facts, adminFacts]);
 
   // Decided once per scope from the whole corpus, not from the visible range or
   // the selection: the chart axis and every table cell share one unit, so the
@@ -140,74 +109,21 @@ function MainExplorerContent({ presentation, nav, facts: shippedFacts, adminFact
     [facts, adminFacts, scope, explorerSide, locale],
   );
 
-  // Mirror of the analysisModel optimisation below: nav is fixed by the route, so
-  // on /explorer/analysis the only consumer of this model — ExplorerView, and
-  // buildWorkbookInput inside it — never renders, yet the full multi-year model
-  // rebuilt on every side, grouping and year change. Null off-route; the render
-  // narrows on the model itself.
-  const isAnalysis = nav === "analysis";
-  const model = useMemo(() => {
-    if (isAnalysis) return null;
-
-    return buildExplorerModel({
-      facts,
-      gdpFacts,
-      adminFacts,
-      adminCategories: adminCategoryMap,
-      expenditureGrouping: grouping,
-      glossary,
-      side: explorerSide,
-      selectedItemIds: selectedIds,
-      startYear: range.start,
-      endYear: range.end,
-      measure: share ? "share_of_gdp" : "nominal",
-    }, presentation);
-  }, [isAnalysis, facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, explorerSide, selectedIds, range.start, range.end, share, presentation]);
-
-  // Years whose ACTIVE values are planned (actual wins over planned), for the
-  // analysis year selector's გეგმა tags. Admin facts are actual-only by contract,
-  // so the ministries grouping never has planned years.
-  const analysisPlannedYears = useMemo(() => {
-    const planned = new Set<number>();
-    if (analysisSide === "expenditure" && analysisGrouping === "ministries") return planned;
-    for (const fact of chooseActivePublicFacts(facts)) {
-      if (fact.side === analysisSide && fact.basis === "planned") planned.add(fact.year);
-    }
-    return planned;
-  }, [facts, analysisSide, analysisGrouping]);
-
-  // Only the analysis route renders this, and nav is a prop fixed by the route,
-  // so the other two sections were building and discarding a full snapshot model
-  // on every mount. Null off-route; every read below narrows on the model itself.
-  const analysisModel = useMemo(
-    () =>
-      isAnalysis
-        ? buildSingleYearSnapshotModel({
-            facts,
-            adminFacts,
-            adminCategories: adminCategoryMap,
-            grouping: analysisGrouping,
-            glossary,
-            side: analysisSide,
-            year: analysisYear ?? analysisYears.at(-1) ?? 0,
-          }, presentation)
-        : null,
-    [isAnalysis, facts, adminFacts, adminCategoryMap, analysisGrouping, glossary, analysisSide, analysisYear, analysisYears, presentation],
-  );
+  const model = useMemo(() => buildExplorerModel({
+    facts,
+    gdpFacts,
+    adminFacts,
+    adminCategories: adminCategoryMap,
+    expenditureGrouping: grouping,
+    glossary,
+    side: explorerSide,
+    selectedItemIds: selectedIds,
+    startYear: range.start,
+    endYear: range.end,
+    measure: share ? "share_of_gdp" : "nominal",
+  }, presentation), [facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, explorerSide, selectedIds, range.start, range.end, share, presentation]);
 
   const deck = useMemo(() => {
-    if (analysisModel) {
-      const totals = totalsByScope[analysisSide === "revenue" ? "revenue" : analysisGrouping === "ministries" ? "ministries" : "fields"];
-      const year = analysisModel.year;
-      const previousTotal = totals.get(year - 1) ?? null;
-      const yoy = previousTotal ? (analysisModel.totalGel - previousTotal) / previousTotal : null;
-
-      return {
-        lead: message(messages, "analysis.deck", { year, count: analysisModel.items.length, amount: formatAmount(analysisModel.totalGel, locale) }),
-        yoy,
-      };
-    }
-
     const totals = totalsByScope[scope];
     const latestYear = scopeYears.at(-1);
     const previousYear = scopeYears.at(-2);
@@ -220,16 +136,13 @@ function MainExplorerContent({ presentation, nav, facts: shippedFacts, adminFact
       lead: latestTotal === null ? "" : `${latestYear}: ${formatAmount(latestTotal, locale)}`,
       yoy,
     };
-  }, [totalsByScope, scope, scopeYears, analysisSide, analysisGrouping, analysisModel, locale, messages]);
+  }, [totalsByScope, scope, scopeYears, locale]);
 
-  const screenTitle = analysisModel
-    ? message(messages, analysisSide === "expenditure" ? "analysis.expenditureHeading" : "analysis.revenueHeading", { year: analysisModel.year })
-    : nav === "expenditure"
-      ? message(messages, "main.expenditureHeading")
-      : message(messages, "main.revenueHeading");
-  const sectionLabel = message(messages, isAnalysis ? "common.analysis" : nav === "revenue" ? "common.revenue" : "common.expenditure");
-  const coverageYears = isAnalysis ? analysisYears : scopeYears;
-  const coverage = coverageLabel(messages, locale, coverageYears[0], coverageYears.at(-1), lastUpdatedAt || undefined);
+  const screenTitle = nav === "expenditure"
+    ? message(messages, "main.expenditureHeading")
+    : message(messages, "main.revenueHeading");
+  const sectionLabel = message(messages, nav === "revenue" ? "common.revenue" : "common.expenditure");
+  const coverage = coverageLabel(messages, locale, scopeYears[0], scopeYears.at(-1), lastUpdatedAt || undefined);
   function buildWorkbookInput(model: ExplorerModel): WorkbookExportInput {
     const labelById = new Map(model.items.map((item) => [item.id, publicLabel(locale, item.id, item.kaLabel, presentation.englishLabels)]));
     const series = model.tableRows.map<WorkbookSeries>((row) => {
@@ -275,77 +188,35 @@ function MainExplorerContent({ presentation, nav, facts: shippedFacts, adminFact
   }
 
   return (
-    <ExplorerPage testId="explorer-shell" repeatDesktopBottomPadding>
-      <PageHeader
-        crumbs={[
-          { label: message(messages, "common.home"), href: "/" },
-          { label: message(messages, "common.data") },
-          { label: message(messages, "common.budget"), href: "/explorer" },
-          { label: sectionLabel },
-        ]}
-        coverage={coverage}
+    <BudgetExplorerFrame messages={messages} sectionLabel={sectionLabel} coverage={coverage} title={screenTitle} deck={deck}>
+      <ExplorerView
+        model={model}
+        scope={scope}
+        unit={unit}
+        showGrouping={nav === "expenditure"}
+        grouping={grouping}
+        chartMode={chartMode}
+        share={share}
+        range={range}
+        scopeYears={scopeYears}
+        selectedIds={selectedIds}
+        expandedMinistries={expandedMinistries}
+        lastUpdatedAt={lastUpdatedAt}
+        onGroupingChange={handleGroupingChange}
+        onChartModeChange={handleChartModeChange}
+        onShareChange={setShare}
+        onRangeChange={(patch) => setRange(scope, patch)}
+        onSelectionChange={setSelectedSeries}
+        onToggleSeries={toggleSeries}
+        onToggleExpanded={toggleMinistryExpanded}
+        downloadAction={
+          <ExcelDownloadButton
+            testId="series-excel"
+            disabled={model.tableRows.length === 0}
+            onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput(model)))}
+          />
+        }
       />
-
-      <ExplorerHeading>{screenTitle}</ExplorerHeading>
-
-      <p className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
-        <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{deck.lead}</span>
-        {deck.yoy !== null ? (
-          <>
-            <span
-              className="font-[family-name:var(--font-numeric)] text-[13px]"
-              style={{ color: deck.yoy < 0 ? NEGATIVE : POSITIVE }}
-            >
-              {formatShare(deck.yoy, true)}
-            </span>
-            <span>{message(messages, "main.previousYear")}</span>
-          </>
-        ) : null}
-      </p>
-
-      {analysisModel ? (
-        <AnalysisView
-          model={analysisModel}
-          years={analysisYears}
-          plannedYears={analysisPlannedYears}
-          side={analysisSide}
-          grouping={analysisGrouping}
-          year={analysisYear}
-          lastUpdatedAt={lastUpdatedAt}
-          onSideChange={setAnalysisSide}
-          onGroupingChange={setAnalysisGrouping}
-          onYearChange={setAnalysisYear}
-        />
-      ) : model ? (
-        <ExplorerView
-          model={model}
-          scope={scope}
-          unit={unit}
-          showGrouping={nav === "expenditure"}
-          grouping={grouping}
-          chartMode={chartMode}
-          share={share}
-          range={range}
-          scopeYears={scopeYears}
-          selectedIds={selectedIds}
-          expandedMinistries={expandedMinistries}
-          lastUpdatedAt={lastUpdatedAt}
-          onGroupingChange={handleGroupingChange}
-          onChartModeChange={handleChartModeChange}
-          onShareChange={setShare}
-          onRangeChange={(patch) => setRange(scope, patch)}
-          onSelectionChange={setSelectedSeries}
-          onToggleSeries={toggleSeries}
-          onToggleExpanded={toggleMinistryExpanded}
-          downloadAction={
-            <ExcelDownloadButton
-              testId="series-excel"
-              disabled={model.tableRows.length === 0}
-              onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput(model)))}
-            />
-          }
-        />
-      ) : null}
-    </ExplorerPage>
+    </BudgetExplorerFrame>
   );
 }

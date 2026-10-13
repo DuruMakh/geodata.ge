@@ -6,7 +6,6 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedEnergyFoodData, toClientEnergyFoodFact } from "../data/energyFood/importEnergyFood";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyFoodSeries, type EnergyFoodSectionId } from "../explorer/energyFood";
-import { buildEnergyFoodHubCards } from "../explorer/energyFoodHubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { I18nProvider } from "../i18n/provider";
@@ -20,18 +19,6 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
-
-export async function energyFoodHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["energyFood"]);
-  return fiscalMetadata({ locale, path: ENERGY_FOOD_HUB_PATH, title: message(messages, "energyFood.metaTitle"), description: message(messages, "energyFood.metaDescription") });
-}
-
-export async function renderEnergyFoodHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedEnergyFoodData(), getPresentation(locale, ["energyFood", "common"], [])]);
-  const title = message(presentation.messages, "energyFood.title"), years = facts.map(f => f.year);
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "energyFood.hubSummary")} path={ENERGY_FOOD_HUB_PATH} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildEnergyFoodHubCards(facts.map(toClientEnergyFoodFact), presentation)} testId="energy-food-hub" />;
-}
 
 export async function energyFoodPageMetadata(locale: Locale, section: EnergyFoodSectionId) {
   const messages = await getMessages(locale, ["energyFood"]);

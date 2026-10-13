@@ -8,7 +8,6 @@ import { loadServedMoneyBanksData, toClientMoneyBanksFact } from "../data/moneyB
 import { loadServedExplorerData } from "../data/servedData";
 import { projectGdpFact } from "../explorer/clientData";
 import { MONEY_BANKS_SECTIONS, moneyBanksCoverage, moneyBanksViewSeries, moneyBanksViews, type MoneyBanksSectionId } from "../explorer/moneyBanks";
-import { buildMoneyBanksHubCards } from "../explorer/moneyBanksHubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
@@ -22,18 +21,6 @@ import { loadGdpWorkbookSources } from "../methodology/workbookSources";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
-
-export async function moneyBanksHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["moneyBanks"]);
-  return fiscalMetadata({ locale, path: "/explorer/money", title: message(messages, "moneyBanks.metaTitle"), description: message(messages, "moneyBanks.metaDescription") });
-}
-
-export async function renderMoneyBanksHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedMoneyBanksData(), getPresentation(locale, ["moneyBanks", "common"], [])]);
-  const title = message(presentation.messages, "moneyBanks.title"), years = facts.map(f => f.year);
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "moneyBanks.hubSummary")} path={"/explorer/money"} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildMoneyBanksHubCards(facts.map(toClientMoneyBanksFact), presentation)} testId="money-hub" />;
-}
 
 export async function moneyBanksPageMetadata(locale: Locale, section: MoneyBanksSectionId) {
   const messages = await getMessages(locale, ["moneyBanks"]);

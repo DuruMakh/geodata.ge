@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { inflationProductsMetadata } from "../../lib/pages/inflation";
+import { inflationProductsMetadata } from "../../lib/pages/inflation-products";
 import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
 import sitemap from "../../lib/seo/sitemap";

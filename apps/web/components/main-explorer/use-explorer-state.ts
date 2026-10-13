@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ClientAdminFact, ClientBudgetFact } from "../../lib/explorer/clientData";
-import { getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
-import { type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
+import { getDefaultSelection } from "../../lib/explorer/explorerData";
+import { type ChartMode, type ExpenditureGrouping, type ExplorerScope, type ExplorerSide } from "../../lib/explorer/types";
 import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { toggleId } from "../../lib/explorer/selection";
+import { budgetYearsByScope } from "./budget-explorer-frame";
 
 type UseExplorerStateInput = {
   facts: ClientBudgetFact[];
   adminFacts: ClientAdminFact[];
-  nav: ExplorerNav;
+  nav: ExplorerSide;
 };
 
 type RangePatch = { start?: number; end?: number };
@@ -23,21 +24,7 @@ function clampYear(year: number, min: number, max: number): number {
 }
 
 export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInput) {
-  const yearsByScope = useMemo<Record<ExplorerScope, number[]>>(() => {
-    const collect = (values: Iterable<number>) => Array.from(new Set(values)).sort((a, b) => a - b);
-
-    return {
-      // Chartable field/revenue years follow category-detail coverage. Derived
-      // totals remain selectable, but total-only years are not offered.
-      fields: collect(
-        facts.filter((fact) => fact.side === "expenditure" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
-      ),
-      revenue: collect(
-        facts.filter((fact) => fact.side === "revenue" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
-      ),
-      ministries: collect(adminFacts.map((fact) => fact.year)),
-    };
-  }, [facts, adminFacts]);
+  const yearsByScope = useMemo(() => budgetYearsByScope(facts, adminFacts), [facts, adminFacts]);
 
   const idsByScope = useMemo<Record<ExplorerScope, Set<string>>>(
     () => ({
@@ -63,19 +50,10 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
   const [ranges, setRanges] = useState<Partial<Record<ExplorerScope, RangePatch>>>({});
   const [selections, setSelections] = useState<Partial<Record<ExplorerScope, string[]>>>({});
   const [expandedMinistries, setExpandedMinistries] = useState<string[]>([]);
-  const [analysisSide, setAnalysisSide] = useState<"expenditure" | "revenue">("expenditure");
-  const [analysisGrouping, setAnalysisGrouping] = useState<ExpenditureGrouping>("fields");
-  const [analysisYear, setAnalysisYear] = useState<number | null>(null);
   const hashAppliedRef = useRef(false);
 
-  const explorerSide: "expenditure" | "revenue" = nav === "revenue" ? "revenue" : "expenditure";
-  const scope = scopeFor(explorerSide, grouping);
+  const scope = scopeFor(nav, grouping);
   const scopeYears = yearsByScope[scope];
-
-  const analysisScope = scopeFor(analysisSide, analysisGrouping);
-  const analysisYears = yearsByScope[analysisScope];
-  const resolvedAnalysisYear =
-    analysisYear !== null && analysisYears.includes(analysisYear) ? analysisYear : analysisYears.at(-1) ?? null;
 
   function rangeOf(targetScope: ExplorerScope): ResolvedRange {
     const years = yearsByScope[targetScope];
@@ -135,9 +113,6 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     if (parsed.grouping) setGrouping(parsed.grouping);
     if (parsed.chartMode) setChartMode(parsed.chartMode);
     if (parsed.share) setShare(true);
-    if (parsed.analysisSide) setAnalysisSide(parsed.analysisSide);
-    if (parsed.analysisGrouping) setAnalysisGrouping(parsed.analysisGrouping);
-    if (parsed.analysisYear !== undefined) setAnalysisYear(parsed.analysisYear);
     if (parsed.range) setRanges((current) => ({ ...current, [parsed.range!.scope]: { start: parsed.range!.start, end: parsed.range!.end } }));
     if (parsed.selection) {
       const knownIds = parsed.selection.ids.filter((id) => idsByScope[parsed.selection!.scope].has(id));
@@ -174,15 +149,12 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     rangeStart: activeRange.start,
     rangeEnd: activeRange.end,
     selectedIds,
-    analysisSide,
-    analysisGrouping,
-    analysisYear: resolvedAnalysisYear,
   });
 
   useReplaceHash(serializedHash);
 
   return {
-    explorerSide,
+    explorerSide: nav,
     scope,
     grouping,
     chartMode,
@@ -198,12 +170,5 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     setSelectedSeries,
     handleGroupingChange,
     handleChartModeChange,
-    analysisSide,
-    setAnalysisSide,
-    analysisGrouping,
-    setAnalysisGrouping,
-    analysisYears,
-    analysisYear: resolvedAnalysisYear,
-    setAnalysisYear,
   };
 }

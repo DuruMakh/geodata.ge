@@ -12,7 +12,6 @@ import { loadServedForeignInvestmentData, toClientForeignInvestmentData } from "
 import { loadServedMoneyTransfersData, toClientMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
 import { packFacts } from "../data/packedFacts";
 import { CURRENT_ACCOUNT_SERIES, CURRENT_ACCOUNT_SOURCE, FOREIGN_INVESTMENT_SOURCES, MONEY_TRANSFER_SOURCES } from "../data/externalFlows/types";
-import { buildExternalHubCards } from "../explorer/externalHubCards";
 import { moneyTransfersCoverage } from "../explorer/moneyTransfersState";
 import { foreignInvestmentCoverage } from "../explorer/foreignInvestmentState";
 import { currentAccountCoverage } from "../explorer/currentAccountState";
@@ -28,7 +27,6 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { loadGdpWorkbookSources, projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
 
 async function loadClientMoneyTransfers() {
   const data = await loadServedMoneyTransfersData();
@@ -41,17 +39,6 @@ async function loadClientCurrentAccount() {
 async function loadClientForeignInvestment() {
   const data = await loadServedForeignInvestmentData();
   return { data, client: toClientForeignInvestmentData(data) };
-}
-
-export async function externalHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["external"]);
-  return fiscalMetadata({ locale, path: "/explorer/external", title: message(messages, "external.metaTitle"), description: message(messages, "external.metaDescription") });
-}
-
-export async function renderExternalHub(locale: Locale) {
-  const [{ client }, { client: investment }, { client: account }, presentation] = await Promise.all([loadClientMoneyTransfers(), loadClientForeignInvestment(), loadClientCurrentAccount(), getPresentation(locale, ["external", "common"], [])]);
-  const title = message(presentation.messages, "external.hubTitle");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "external.hubSummary")} path={"/explorer/external"} coverage="" cards={buildExternalHubCards(client, investment, account, presentation)} testId="external-hub" />;
 }
 
 export async function moneyFromAbroadMetadata(locale: Locale) {

@@ -1,51 +1,26 @@
-import path from "node:path";
 import { notFound } from "next/navigation";
-import { WagesExplorer, WagesRegionsIndex } from "../../components/wages/wages-explorer";
+import { WagesExplorer } from "../../components/wages/wages-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { packFacts } from "../data/packedFacts";
 import { loadServedWagesData, toClientWagesFact } from "../data/wages/importWages";
-import { WAGES_GROUPS, WAGES_REGIONS, WAGES_SECTORS, type ClientWagesFact } from "../data/wages/types";
+import { WAGES_GROUPS, WAGES_REGIONS, WAGES_SECTORS } from "../data/wages/types";
 import { ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { WAGES_SECTIONS, wagesCoverage, wagesRegionHref, wagesSummaryValues, wagesViews, type WagesSectionId } from "../explorer/wages";
-import { buildWagesRegionMapModel } from "../explorer/wagesRegionMap";
-import { buildWagesHubCards } from "../explorer/wagesHubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
-import { getMessages } from "../i18n/messages.server";
-import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
-import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
-
-const LABEL_IDS = [...WAGES_SECTORS, ...WAGES_REGIONS];
-
-export async function wagesHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["wages"]);
-  return fiscalMetadata({ locale, path: "/explorer/wages", title: message(messages, "wages.metaTitle"), description: message(messages, "wages.metaDescription") });
-}
-
-export async function renderWagesHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedWagesData(), getPresentation(locale, ["wages", "common"], [])]);
-  const title = message(presentation.messages, "wages.title"), years = facts.map(f => f.year);
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "wages.hubSummary")} path={"/explorer/wages"} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildWagesHubCards(facts.map(toClientWagesFact), presentation)} testId="wages-hub" />;
-}
-
-export async function wagesPageMetadata(locale: Locale, section: WagesSectionId) {
-  const [messages, data] = await Promise.all([getMessages(locale, ["wages"]), loadServedWagesData()]);
-  const values = wagesSummaryValues(data.facts.map(toClientWagesFact));
-  return fiscalMetadata({ locale, path: WAGES_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `wages.page.${section}.title`), description: message(messages, `wages.page.${section}.summary`, values) });
-}
+import { loadWagesPage } from "./wages-shared";
 
 /** Display names for every series id a wages page can show, in the page's language. */
 function wagesLabels(presentation: Presentation): Record<string, string> {
@@ -71,17 +46,8 @@ export async function wagesRegionPageMetadata(slug: string, locale: Locale) {
 export const renderWagesRegionPage = (slug: string, locale: Locale) => renderWagesPage(locale, "regions", regionForSlug(slug).id);
 
 export async function renderWagesPage(locale: Locale, section: WagesSectionId, regionId?: string) {
-  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedWagesData(), getPresentation(locale, ["wages", "regionalEconomies", "common", "controls", "format", "main", "workbook"], LABEL_IDS, WAGES_REGIONS),
-    loadReviewedSourceManifest(root, "wages"), loadEnglishCatalogue(root),
-  ]);
-  const allFacts = data.facts.map(toClientWagesFact);
-  // Each page receives only the observations its views can show.
-  const dimensions = { overview: ["national", "ownership", "sex"], industries: ["national", "sex", "ownership", "business_sector"], regions: ["national", "region"] }[section];
-  const facts = allFacts.filter(f => dimensions.includes(f.dimension) && (section === "industries" || f.sectorId === "total" && (section === "overview" || f.indicatorId === "average_monthly_nominal_earnings")));
-  // The Regions index is the map and list; a region page serves its own region beside Georgia.
-  if (section === "regions" && !regionId) return renderWagesRegionsIndex(locale, presentation, facts, data.facts.map(f => f.lastReviewedAt).sort().at(-1)!);
+  const { data, presentation, manifest, catalogue, facts } = await loadWagesPage(locale, section);
+  // The Regions index (wages-regions-index.tsx) is the map and list; a region page serves its own region beside Georgia.
   if (regionId) facts.splice(0, facts.length, ...facts.filter(f => f.dimension !== "region" || f.groupId === regionId));
   const years = [...new Set(wagesViews(section).flatMap(view => wagesCoverage(section, view, facts).years))];
   const firstYear = Math.min(...years), lastYear = Math.max(...years);
@@ -112,20 +78,6 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       <WagesExplorer key={regionId ?? section} section={section} facts={packFacts(facts)} labels={labels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} regionId={regionId} regions={regionId ? REGIONAL_ECONOMY_REGIONS : undefined} />
-    </ExplorerPage>
-  </I18nProvider>;
-}
-
-function renderWagesRegionsIndex(locale: Locale, presentation: Presentation, facts: readonly ClientWagesFact[], lastReviewedAt: string) {
-  const t = (key: string) => message(presentation.messages, `wages.${key}`), title = t("page.regions.title");
-  const regionMap = buildWagesRegionMapModel(facts);
-  const national = facts.filter(f => f.dimension === "national" && f.value !== null).sort((a, b) => a.year - b.year).at(-1)!;
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/wages", locale) }, { label: title }];
-  return <I18nProvider {...presentation}>
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/wages", locale) }, { name: title, path: pageHref("/explorer/wages/regions", locale) }]} />
-    <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, regionMap.firstYear, regionMap.year, lastReviewedAt)} />
-      <WagesRegionsIndex regionMap={regionMap} national={{ year: national.year, value: national.value! }} />
     </ExplorerPage>
   </I18nProvider>;
 }

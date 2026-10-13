@@ -1,4 +1,4 @@
-import { inflationProductsMetadata, renderInflationProducts } from "../../../../../../lib/pages/inflation";
+import { inflationProductsMetadata, renderInflationProducts } from "../../../../../../lib/pages/inflation-products";
 
 export function generateMetadata() {
   return inflationProductsMetadata("en");

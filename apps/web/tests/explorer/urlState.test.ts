@@ -4,6 +4,7 @@ import {
   parseMunicipalHash,
   parseMunicipalLevel,
   readLegacyNav,
+  serializeAnalysisHash,
   serializeExplorerHash,
   serializeMunicipalHash,
   stripNavFromHash,
@@ -19,9 +20,6 @@ describe("serializeExplorerHash", () => {
       rangeStart: 2010,
       rangeEnd: 2020,
       selectedIds: ["revenue.vat"],
-      analysisSide: "expenditure",
-      analysisGrouping: "fields",
-      analysisYear: null,
     });
 
     expect(hash).not.toContain("nav=");
@@ -29,6 +27,13 @@ describe("serializeExplorerHash", () => {
     expect(hash).toContain("sh=1");
     expect(hash).toContain("r=2010-2020");
     expect(hash).toContain("sel=revenue.vat");
+  });
+});
+
+describe("serializeAnalysisHash", () => {
+  it("writes the side, the grouping on expenditure only, and the year", () => {
+    expect(serializeAnalysisHash({ analysisSide: "expenditure", analysisGrouping: "ministries", analysisYear: 2024 })).toBe("as=expenditure&ag=ministries&ay=2024");
+    expect(serializeAnalysisHash({ analysisSide: "revenue", analysisGrouping: "ministries", analysisYear: null })).toBe("as=revenue");
   });
 });
 
@@ -163,9 +168,6 @@ describe("shared hash vocabulary", () => {
       serializeExplorerHash({
         nav: "revenue",
         grouping: "fields",
-        analysisSide: "expenditure",
-        analysisGrouping: "fields",
-        analysisYear: null,
         ...shared,
       }),
     );

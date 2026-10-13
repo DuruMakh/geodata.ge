@@ -20,7 +20,6 @@ import { TRADE_PRODUCT_MEASURES, TRADE_PRODUCT_SOURCES } from "../data/tradeProd
 import { tradeProductsCoverage } from "../explorer/tradeProductsState";
 import { tradePartnersCoverage } from "../explorer/tradePartnersState";
 import { TRADE_OVERVIEW_INDICATORS, TRADE_OVERVIEW_SOURCE } from "../data/tradeOverview/types";
-import { buildTradeHubCards } from "../explorer/tradeHubCards";
 import { tradeOverviewCoverage } from "../explorer/tradeOverviewState";
 import { formatDisplayDate } from "../explorer/format";
 import { I18nProvider } from "../i18n/provider";
@@ -34,24 +33,13 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
+import { PRODUCT_SOURCE_BLOCK } from "./hubs/trade";
 
-const PRODUCT_SOURCE_BLOCK = "2020-2025";
-
-export async function tradeHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["trade"]);
-  return fiscalMetadata({ locale, path: "/explorer/trade", title: message(messages, "trade.hubMetaTitle"), description: message(messages, "trade.hubMetaDescription") });
-}
 export async function tradeOverviewMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["trade"]);
   const { facts } = await loadServedTradeOverviewData();
   const { min, max } = tradeOverviewCoverage(facts.map(toClientTradeOverviewFact));
   return fiscalMetadata({ locale, path: "/explorer/trade/overview", title: message(messages, "trade.title"), description: `${message(messages, "trade.metaDescription")} ${min}–${max}.` });
-}
-export async function renderTradeHub(locale: Locale) {
-  const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade", "common"], [])]);
-  const title = message(presentation.messages, "trade.hubTitle");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage="" cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} testId="trade-hub" />;
 }
 export async function tradeProductsMetadata(locale: Locale) {
   const [products, messages] = await Promise.all([loadServedTradeProductsData(), getMessages(locale, ["trade"])]);

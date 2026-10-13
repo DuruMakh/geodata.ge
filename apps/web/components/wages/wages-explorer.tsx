@@ -8,7 +8,6 @@ import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, se
 import { buildWagesWorkbookExportModel } from "../../lib/explorer/wagesWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -18,7 +17,6 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
@@ -26,7 +24,6 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { RegionIndex } from "../regional-economies/regional-economies-index";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { UnemploymentAgeHeatmap } from "../unemployment/unemployment-age-heatmap";
@@ -36,30 +33,6 @@ import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote } from "../ui/editoria
 type WagesHashData = { section: WagesSectionId; facts: ClientWagesFact[] };
 const parseWages = (hash: string, { section, facts }: WagesHashData) => parseWagesHash(hash, section, facts);
 const serializeWages = (state: WagesState, { section }: WagesHashData) => serializeWagesHash(state, section);
-
-/** The Regions index: the map and ranked list only; each region opens its own page. */
-export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMapModel; national: { year: number; value: number } }) {
-  const { messages } = useI18n();
-  const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
-  const amount = (value: number) => `${formatInUnit(value, { divisor: 1, label: t("unit"), decimals: 1 })} ${t("unit")}`;
-  useAppReady();
-  return <div data-testid="wages-regions" className="@container">
-    <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
-    <LatestValueLine testId="wages-latest" measure={t("series.average")} period={national.year} value={amount(national.value)} />
-    <div data-testid="wages-regions-index">
-      <RegionIndex model={regionMap} sourceNote={t("sourceNote")} metric={{
-        hrefForRegion: wagesRegionHref, formatValue: amount,
-        mapAria: t("regionMapAria", { year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: amount(value), year }),
-        legend: t("series.average"), testId: "wages-region-map",
-      }} summary={[
-        { label: message(messages, "regionalEconomies.regionCount"), value: String(regionMap.regions.length), detail: `${t("series.average")} · ${regionMap.year}` },
-        { label: t("series.average"), value: amount(national.value), detail: String(national.year) },
-        { label: message(messages, "regionalEconomies.period"), value: `${regionMap.firstYear}–${regionMap.year}`, detail: t("annual") },
-      ]} />
-      <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p>
-    </div>
-  </div>;
-}
 
 export type WagesExplorerProps = {
   section: WagesSectionId; facts: FactsInput<ClientWagesFact>; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];

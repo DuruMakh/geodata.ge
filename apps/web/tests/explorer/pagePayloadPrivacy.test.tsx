@@ -16,9 +16,10 @@ import { renderMunicipalIndex } from "../../lib/pages/municipal-index";
 import { renderRegionalEconomiesPage } from "../../lib/pages/regional-economies";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { RegionalEconomyExplorer } from "../../components/regional-economies/regional-economy-explorer";
-import { WagesExplorer, WagesRegionsIndex } from "../../components/wages/wages-explorer";
+import { WagesExplorer } from "../../components/wages/wages-explorer";
+import { WagesRegionsIndex } from "../../components/wages/wages-regions-index";
 import { AgeSexRegions } from "../../components/demography/age-sex-regions";
-import { HouseholdIndex } from "../../components/household/household-explorer";
+import { HouseholdIndex } from "../../components/household/household-index";
 import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
 import { RegionalEconomiesIndex } from "../../components/regional-economies/regional-economies-index";
@@ -42,7 +43,8 @@ import { renderPopulationPlacePage } from "../../lib/pages/demography-population
 import { renderEconomicSectorsPage } from "../../lib/pages/economic-sectors";
 import { renderExpenditurePage } from "../../lib/pages/expenditure";
 import { renderForeignInvestmentPage, renderMoneyFromAbroadPage } from "../../lib/pages/external";
-import { renderHouseholdPage } from "../../lib/pages/household";
+import { renderHouseholdRegionPage } from "../../lib/pages/household";
+import { renderHouseholdIndexPage } from "../../lib/pages/household-index";
 import { renderMethodologyArticle } from "../../lib/pages/methodology-article";
 import { renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
 import { renderMunicipalCountry } from "../../lib/pages/municipal-country";
@@ -53,6 +55,7 @@ import { renderRevenuePage } from "../../lib/pages/revenue";
 import { renderTradeDomesticPage, renderTradeOverviewPage, renderTradePartnersPage, renderTradeProductsPage } from "../../lib/pages/trade";
 import { renderUnemploymentPage } from "../../lib/pages/unemployment";
 import { renderWagesPage } from "../../lib/pages/wages";
+import { renderWagesRegionsIndexPage } from "../../lib/pages/wages-regions-index";
 
 // A page ships two things: its markup and, in the RSC payload, every prop a server page hands a client component.
 // The payload is not in renderToStaticMarkup's output, so the props of every element in the tree are read as well.
@@ -152,10 +155,10 @@ describe("English names on Georgian pages", () => {
     ["regional economy page", () => renderRegionalEconomyPage("tbilisi", "ka"), [RegionalEconomyExplorer]],
     ["unemployment regions index", () => renderUnemploymentPage("ka", "regions"), [UnemploymentRegionsIndex]],
     ["unemployment region page", () => renderUnemploymentPage("ka", "regions", "region.imereti"), [UnemploymentExplorer]],
-    ["wages regions index", () => renderWagesPage("ka", "regions"), [WagesRegionsIndex]],
+    ["wages regions index", () => renderWagesRegionsIndexPage("ka"), [WagesRegionsIndex]],
     ["wages region page", () => renderWagesPage("ka", "regions", "region.imereti"), [WagesExplorer]],
-    ["household index", () => renderHouseholdPage("ka", "income"), [HouseholdIndex]],
-    ["household area page", () => renderHouseholdPage("ka", "income", "region.imereti"), [HouseholdExplorer]],
+    ["household index", () => renderHouseholdIndexPage("ka", "income"), [HouseholdIndex]],
+    ["household area page", () => renderHouseholdRegionPage("income", "imereti", "ka"), [HouseholdExplorer]],
     ["municipal index", () => renderMunicipalIndex("ka"), [MunicipalitiesIndex]],
     ["municipality", () => renderMunicipality("tbilisi", "ka"), [MunicipalExplorer]],
     ["population index", () => renderDemographyPopulationPage("ka"), [MunicipalitiesIndex]],
@@ -243,8 +246,8 @@ const factsProp = <P extends { facts: PackedProp }>(type: unknown) => async (pag
 const heaviestPages: [string, number, () => Promise<PackedProp[]>][] = [
   ["money from abroad (U23-01)", 1_224_713, async () => [propsOf<{ data: { facts: PackedProp } }>(await renderMoneyFromAbroadPage("ka"), MoneyFromAbroad)[0]!.data.facts]],
   ["wages industries (U18-01)", 383_860, () => factsProp(WagesExplorer)(renderWagesPage("ka", "industries"))],
-  ["household income, Georgia (U19-03)", 171_734, () => factsProp(HouseholdExplorer)(renderHouseholdPage("ka", "income", "georgia"))],
-  ["household spending, Georgia (U19-03)", 216_231, () => factsProp(HouseholdExplorer)(renderHouseholdPage("ka", "spending", "georgia"))],
+  ["household income, Georgia (U19-03)", 171_734, () => factsProp(HouseholdExplorer)(renderHouseholdRegionPage("income", "georgia", "ka"))],
+  ["household spending, Georgia (U19-03)", 216_231, () => factsProp(HouseholdExplorer)(renderHouseholdRegionPage("spending", "georgia", "ka"))],
   ["regional economy, Imereti (U12-08)", 86_918, () => factsProp(RegionalEconomyExplorer)(renderRegionalEconomyPage("imereti", "ka"))],
   ["economic sectors (U11-03)", 105_126, () => factsProp(EconomicSectorsExplorer)(renderEconomicSectorsPage("ka"))],
   ["population and sex by age (U27-08)", 75_430, () => factsProp(AgeSexExplorer)(renderDemographyAgeSexPage("ka"))],
@@ -276,7 +279,7 @@ describe.each(["ka", "en"] as const)("%s: a packed page renders as its facts do"
   test.each([
     ["money from abroad", () => renderMoneyFromAbroadPage(locale)],
     ["wages industries", () => renderWagesPage(locale, "industries")],
-    ["household spending, Georgia", () => renderHouseholdPage(locale, "spending", "georgia")],
+    ["household spending, Georgia", () => renderHouseholdRegionPage("spending", "georgia", locale)],
     ["regional economy, Imereti", () => renderRegionalEconomyPage("imereti", locale)],
     ["economic sectors", () => renderEconomicSectorsPage(locale)],
     ["population and sex by age", () => renderDemographyAgeSexPage(locale)],

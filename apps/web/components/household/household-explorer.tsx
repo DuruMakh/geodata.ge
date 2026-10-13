@@ -1,15 +1,14 @@
 "use client";
 import Link from "next/link";
-import { ChevronDown, User } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useCallback, useState, type ReactNode } from "react";
-import type { ClientHouseholdFact, HouseholdArea, HouseholdMeasure } from "../../lib/data/household/types";
+import type { ClientHouseholdFact, HouseholdArea } from "../../lib/data/household/types";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, parseHouseholdMeasure, sectionTotal, serializeHouseholdHash, serializeHouseholdMeasure, type HouseholdSectionId, type HouseholdSeriesModel } from "../../lib/explorer/household";
+import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -25,58 +24,11 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { RegionIndex } from "../regional-economies/regional-economies-index";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
-import { HouseholdIcon } from "../ui/household-icon";
+import { MeasureTabs } from "./household-measure-tabs";
 import { useHashState } from "../explorer-shell/use-hash-state";
-
-/** The per household / per person icon switch. */
-function MeasureTabs({ value, onChange }: { value: HouseholdMeasure; onChange: (measure: HouseholdMeasure) => void }) {
-  const { messages } = useI18n();
-  const t = (key: string) => message(messages, `household.${key}`);
-  return <SegmentedTabs<HouseholdMeasure> ariaLabel={t("measureLabel")} value={value} onChange={onChange} options={[
-    { value: "per_household", label: t("measure.per_household"), testId: "household-measure-per_household", icon: <HouseholdIcon aria-hidden="true" size={18} strokeWidth={1.5} /> },
-    { value: "per_capita", label: t("measure.per_capita"), testId: "household-measure-per_capita", icon: <User aria-hidden="true" size={18} strokeWidth={1.5} /> },
-  ]} />;
-}
-
-/**
- * The Income or Spending index: Georgia's latest value, the measure switch and the map and ranked list of the section total.
- * Georgia (the list's first row) and each region open their own page, carrying the per person choice.
- */
-export function HouseholdIndex({ section, facts, regionMaps }: {
-  section: HouseholdSectionId;
-  /** Georgia's section total, both measures. */
-  facts: ClientHouseholdFact[];
-  regionMaps: Record<HouseholdMeasure, RegionMapModel>;
-}) {
-  const { messages } = useI18n();
-  const t = (key: string, values?: Record<string, string | number>) => message(messages, `household.${key}`, values);
-  const { state: measure, update } = useHashState(section, parseHouseholdMeasure, serializeHouseholdMeasure);
-  const unitLabel = t(`unitLong.${measure}`);
-  const valueLabel = (value: number) => `${formatInUnit(value, { divisor: 1, label: t("unitGel"), decimals: 1 })} ${t("unitGel")}`;
-  const georgia = (m: HouseholdMeasure) => facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === "georgia" && f.measure === m).sort((a, b) => a.year - b.year);
-  // The latest-value line is the page's headline: Georgia per household, whichever measure the map shows.
-  const latest = georgia("per_household").at(-1)!;
-  // The map of the section total, in the latest year every region has, for the chosen measure.
-  const regionMap = regionMaps[measure];
-  const totalLabel = t(`series.${sectionTotal(section)}`);
-  const georgiaValue = georgia(measure).find(f => f.year === regionMap.year)?.value;
-  return <div data-testid={`household-${section}`} className="@container">
-    <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>
-    <LatestValueLine testId="household-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />
-    <section data-testid="household-regions" data-measure={measure} className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNote")} · ${unitLabel} · ${regionMap.year}.`}
-        mapControls={<MeasureTabs value={measure} onChange={next => update(() => next, true)} />}
-        leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
-          hrefForRegion: id => `${householdRegionHref(section, id)}${householdMeasureHash(measure)}`, formatValue: valueLabel, legend: `${totalLabel} · ${unitLabel}`, testId: "household-region-map",
-          mapAria: t("regionMapAria", { total: totalLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
-        }} />
-    </section>
-  </div>;
-}
 
 export type HouseholdExplorerProps = {
   section: HouseholdSectionId; facts: FactsInput<ClientHouseholdFact>;

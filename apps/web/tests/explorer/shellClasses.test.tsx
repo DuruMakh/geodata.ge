@@ -12,9 +12,9 @@ const PAGES: ReadonlyArray<{ name: string; render: (locale: Locale) => Promise<u
   { name: "gdp", render: async (l) => (await import("../../lib/pages/gdp")).renderGdpPage(l) },
   { name: "sectors", render: async (l) => (await import("../../lib/pages/economic-sectors")).renderEconomicSectorsPage(l) },
   { name: "economy", render: async (l) => (await import("../../lib/pages/economy")).renderEconomyPage(l) },
-  { name: "inflation", render: async (l) => (await import("../../lib/pages/inflation")).renderInflationHub(l) },
-  { name: "inflation-overview", render: async (l) => (await import("../../lib/pages/inflation")).renderInflationOverview(l) },
-  { name: "inflation-categories", render: async (l) => (await import("../../lib/pages/inflation")).renderInflationCategories(l) },
+  { name: "inflation", render: async (l) => (await import("../../lib/pages/hubs/inflation")).renderInflationHub(l) },
+  { name: "inflation-overview", render: async (l) => (await import("../../lib/pages/inflation-overview")).renderInflationOverview(l) },
+  { name: "inflation-categories", render: async (l) => (await import("../../lib/pages/inflation-categories")).renderInflationCategories(l) },
   { name: "regions", render: async (l) => (await import("../../lib/pages/regional-economies")).renderRegionalEconomiesPage(l) },
   { name: "region", render: async (l) => (await import("../../lib/pages/regional-economy")).renderRegionalEconomyPage("imereti", l) },
 ];
