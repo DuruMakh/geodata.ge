@@ -40,8 +40,8 @@ test("language selection remains available in the collapsed desktop sidebar and 
   await page.goto("/explorer/expenditure");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await page.getByTestId("sidebar-toggle").click();
-  // The rail shows "EN", and the link's name is what it shows (WCAG 2.5.3).
-  await expect(page.getByTestId("language-switch").getByRole("link", { name: "EN", exact: true })).toBeVisible();
+  // The rail shows "EN"; the link's name starts with that and adds the full language name.
+  await expect(page.getByTestId("language-switch").getByRole("link", { name: "EN English", exact: true })).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByTestId("sidebar-toggle").click();
   await expect(page.getByTestId("language-switch").getByRole("link", { name: "English", exact: true })).toBeVisible();

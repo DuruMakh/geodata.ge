@@ -35,6 +35,8 @@ export type MunicipalitiesIndexOverrides = {
   mapWording?: { groupAria: string; legendCaption: string };
   /** A note under the map. */
   mapNote?: ReactNode;
+  /** Visually hidden h2s over the map and over the ranked list, so heading navigation reaches both; none by default. */
+  headings?: { map: string; list: string };
 };
 
 type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResidentGel" | "legendMaxPerResidentGel"> & {
@@ -201,6 +203,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     <>
       <div data-testid="municipal-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
         <div className="min-w-0">
+          {overrides?.headings ? <h2 className="sr-only">{overrides.headings.map}</h2> : null}
           <div>
             <MunicipalityMap
               viewBox={props.viewBox}
@@ -241,6 +244,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         </div>
 
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
+          {overrides?.headings ? <h2 className="sr-only">{overrides.headings.list}</h2> : null}
           {/* A unit label of its own (`overrides.unitLabel`) wraps under the tabs when the column is too narrow for both: Georgian tab
               labels fill a 310px column, and the Georgian word for "persons" does not fit beside them. The Budget index keeps its row. */}
           <div

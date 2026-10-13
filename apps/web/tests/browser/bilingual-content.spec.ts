@@ -41,8 +41,8 @@ test("homepage and hub figures stay identical when switching languages", async (
   const figures = () => page.locator('[data-testid="landing-data"] table td, [data-testid="landing-dataset-total"] p, [data-testid="landing-debt"] dd, [data-testid="landing-deficit-history"] strong').evaluateAll(elements => elements.map(element => element.textContent?.match(/[−+]?\d[\d,.]*%?/g) ?? []));
   const before = await figures();
   await page.getByTestId("landing-header").getByRole("button", { name: "Menu", exact: true }).click();
-  // On a phone the link shows "KA", and its name is what it shows (WCAG 2.5.3).
-  await page.getByTestId("landing-header").getByTestId("language-switch").getByRole("link", { name: "KA", exact: true }).click();
+  // On a phone the link shows "KA"; its name starts with that and adds the full language name.
+  await page.getByTestId("landing-header").getByTestId("language-switch").getByRole("link", { name: "KA ქართული", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ka");
   expect(new URL(page.url()).hash).toBe("#data");
   expect(await figures()).toEqual(before);

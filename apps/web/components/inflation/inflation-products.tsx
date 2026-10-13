@@ -123,13 +123,14 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
               </h2>
               <p className="mt-0.5 text-[11px] text-[var(--muted)]">{state.indicator === "annual" ? t("productsAnnualUnit") : t("productsCumulativeUnit")}</p>
             </div>
-            {/* An action button, not a pressed toggle: its name and tooltip say what a press shows, and a
-                pressed state on top would announce the view twice ("Show annual inflation, pressed"). */}
+            {/* A toggle with a constant name and its state in aria-pressed, matching the filled "on" look; the
+                tooltip says what a press shows. */}
             <ControlTooltip label={toggleAction}>
               <button
                 type="button"
                 data-testid="product-cumulative-toggle"
-                aria-label={toggleAction}
+                aria-label={t("productsCumulativeTitle")}
+                aria-pressed={state.indicator === "cumulative"}
                 onClick={() => update((current) => ({ ...current, indicator: current.indicator === "annual" ? "cumulative" : "annual" }))}
                 className={`flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-[2px] border border-[var(--control)] transition-[background-color,color] duration-150 ${state.indicator === "cumulative" ? "bg-[var(--ink)] text-[var(--paper)]" : "bg-transparent text-[var(--ink)] hover:bg-[var(--tint)]"}`}
               >

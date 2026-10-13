@@ -111,6 +111,7 @@ export async function renderDemographyBirthsDeathsPage(locale: Locale) {
             countrySubtitle: message(messages, "municipal.members", { count: index.municipalityCount }),
             unitLabel: t("ratioUnit"),
             mapWording: { groupAria: t("ratioMapAria", { year: index.year }), legendCaption: t("ratioLegend", { year: index.year }) },
+            headings: { map: t("ratioMapAria", { year: index.year }), list: t("ratioListTitle", { year: index.year }) },
             mapNote: <p data-testid="ratio-map-note" className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("ratioMapNote")}</p>,
           }}
         />

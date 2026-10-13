@@ -172,6 +172,7 @@
   "demography.birthsLead": "Births and deaths",
   "demography.ratioUnit": "births per 100 deaths",
   "demography.ratioMapAria": "Municipalities by births per 100 deaths, {year}",
+  "demography.ratioListTitle": "Ranking by births per 100 deaths, {year}",
   "demography.ratioLegend": "Births per 100 deaths, {year}",
   "demography.ratioMapNote": "Under 100: more people died than were born. The ratio uses registered counts and does not change at the census re-base.",
   "demography.ratioCounts": "{births} births · {deaths} deaths",

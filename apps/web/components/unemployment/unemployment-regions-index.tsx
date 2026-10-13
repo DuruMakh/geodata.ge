@@ -26,7 +26,8 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
   }, []);
   useAppReady();
   const t = (key: string) => message(messages, `unemployment.${key}`);
-  if (comparison) return <><a href={pageHref("/explorer/unemployment/regions", locale)} className="mb-4 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{message(messages, "regionalEconomies.allRegions")}</a><UnemploymentExplorer {...explorer} /></>;
+  // An in-app move to the same path drops the hash without a hashchange event, so the click leaves comparison itself.
+  if (comparison) return <><Link href={pageHref("/explorer/unemployment/regions", locale)} prefetch={false} onClick={() => setComparison(false)} className="mb-4 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{message(messages, "regionalEconomies.allRegions")}</Link><UnemploymentExplorer {...explorer} /></>;
   const national = explorer.facts.find(fact => fact.dimension === "national" && fact.indicatorId === "unemployment_rate" && fact.year === model.year);
   const percent = (value: number) => formatShare(value / 100);
   return <div data-testid="unemployment-regions-index" className="@container">

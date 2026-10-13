@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useMemo, useRef, useState, type RefObject } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type MouseEvent, type RefObject } from "react";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -100,10 +100,12 @@ export function PickerDialog({
   if (!open) return null;
   const trigger = `${testIdPrefix}-trigger`;
   const focusTrigger = () => document.querySelector<HTMLButtonElement>(`[data-testid='${trigger}']`)?.focus();
-  // Leaving for another page hands focus to that page's trigger; staying on this one keeps it here.
-  const leave = (href: string) => {
+  // Leaving for another page hands focus to that page's trigger; staying on this one keeps it here. A modifier
+  // or non-primary click opens the page in another tab or window, so this page stays and nothing is handed on.
+  const leave = (href: string, event: MouseEvent<HTMLAnchorElement>) => {
     onClose();
-    if (new URL(href, window.location.href).pathname === window.location.pathname) focusTrigger();
+    const elsewhere = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
+    if (elsewhere || new URL(href, window.location.href).pathname === window.location.pathname) focusTrigger();
     else markRefocus(trigger, href);
   };
   const optionId = (index: number) => index === 0 && includeAll ? `${baseId}-all` : `${baseId}-${filtered[index - optionOffset]?.id}`;
@@ -146,7 +148,7 @@ export function PickerDialog({
         </div>
         <div id={listboxId} role="listbox" aria-label={text.results} className="max-h-[340px] overflow-y-auto">
           {includeAll ? (
-            <Link id={`${baseId}-all`} data-testid={allOption.testId} href={allOption.href} prefetch={false} role="option" aria-selected={activeIndex === 0} aria-current={allOption.current ? "page" : undefined} tabIndex={-1} onClick={() => leave(allOption.href)} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
+            <Link id={`${baseId}-all`} data-testid={allOption.testId} href={allOption.href} prefetch={false} role="option" aria-selected={activeIndex === 0} aria-current={allOption.current ? "page" : undefined} tabIndex={-1} onClick={(event) => leave(allOption.href, event)} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
               {allOption.label}
             </Link>
           ) : null}
@@ -161,7 +163,7 @@ export function PickerDialog({
               aria-current={option.id === activeId ? "page" : undefined}
               tabIndex={-1}
               data-testid={`${testIdPrefix}-option`}
-              onClick={() => leave(option.href)}
+              onClick={(event) => leave(option.href, event)}
               className={`block border-b border-l-2 border-b-[var(--row-border)] px-3 py-2 text-[13px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center ${index + optionOffset === activeIndex ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"} ${option.id === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
             >
               {option.label}

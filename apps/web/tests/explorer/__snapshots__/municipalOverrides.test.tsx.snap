@@ -216,7 +216,7 @@ exports[`the place-page shell pieces > EntityHeading's markup is the Budget head
 exports[`the place-page shell pieces > EntityMemberList's markup is the Budget region page's list (snapshot) 1`] = `
 "<div class="mt-11 border-t-2 border-[var(--ink)] pt-[22px]">
 <h2 class="mb-3.5 font-[family-name:var(--font-display)] text-[22px] font-semibold">Municipalities in this region</h2>
-<a href="/en/x/batumi" data-testid="region-member-row" class="grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-[var(--hairline-soft)] py-2 text-[var(--ink)] no-underline hover:bg-[var(--tint)]">
+<a data-testid="region-member-row" class="grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-[var(--hairline-soft)] py-2 text-[var(--ink)] no-underline hover:bg-[var(--tint)]" href="/en/x/batumi">
 <span class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">01</span>
 <span class="truncate text-[12.5px]">Batumi</span>
 <span class="font-[family-name:var(--font-numeric)] text-[11.5px]">246,267</span>

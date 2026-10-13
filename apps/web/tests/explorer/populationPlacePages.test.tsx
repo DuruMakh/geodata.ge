@@ -226,8 +226,9 @@ describe("what each page hands on", () => {
 
   it("lists a region's municipalities largest first, numbered from 01, each with its persons", async () => {
     const html = await page({ kind: "region", id: "adjara" });
-    const rows = [...html.matchAll(/<a[^>]*href="([^"]*)"[^>]*data-testid="region-member-row"[^>]*>(.*?)<\/a>/g)].map((row) => [
-      row[1],
+    // Each row is a next/link Link, which writes its href after the other attributes.
+    const rows = [...html.matchAll(/<a([^>]*data-testid="region-member-row"[^>]*)>(.*?)<\/a>/g)].map((row) => [
+      row[1]!.match(/href="([^"]*)"/)?.[1],
       row[2]!.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
     ]);
     expect(rows).toEqual([

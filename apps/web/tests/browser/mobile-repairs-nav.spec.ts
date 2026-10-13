@@ -70,8 +70,8 @@ test("tapping a menu link from mid-page closes the menu on arrival", async ({ pa
 });
 
 for (const { path, menu, datasets, other } of [
-  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "დემოგრაფია"], other: "EN" },
-  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Trade", "External flows", "Energy and food", "Demography"], other: "KA" },
+  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "დემოგრაფია"], other: "EN English" },
+  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Trade", "External flows", "Energy and food", "Demography"], other: "KA ქართული" },
 ]) {
   test(`${path} ☰ menu lists every dataset as 44px rows`, async ({ page }) => {
     await page.goto(path);
@@ -83,7 +83,7 @@ for (const { path, menu, datasets, other } of [
     const prefix = path === "/en" ? "/en" : "";
     expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/demography"].map((href) => `${prefix}${href}`));
     for (const row of await heights(header.getByRole("navigation").getByRole("link"))) expect(row.height, row.text).toBeGreaterThanOrEqual(44);
-    // On a phone the link shows "EN"/"KA", and its name is what it shows (WCAG 2.5.3).
+    // On a phone the link shows "EN"/"KA"; its name starts with that and adds the full language name.
     const switchBox = await header.getByRole("group").getByRole("link", { name: other, exact: true }).boundingBox();
     expect(switchBox?.width ?? 0).toBeGreaterThanOrEqual(44);
     expect(switchBox?.height ?? 0).toBeGreaterThanOrEqual(44);

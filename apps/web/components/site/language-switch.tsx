@@ -26,17 +26,20 @@ export function LanguageSwitch({ compact = false, abbreviatedOnMobile = false }:
     return () => window.removeEventListener("hashchange", refresh);
   }, [pathname, target]);
 
+  // The abbreviation is followed by the full name, visually hidden: the link's name starts with what it
+  // shows, so a voice-control user can say "KA" (WCAG 2.5.3), and a screen reader still hears "ქართული".
+  const abbreviation = (language: Locale) => <>{language.toUpperCase()}<span className="sr-only"> {labels[language]}</span></>;
+
   function displayLabel(language: Locale) {
     return abbreviatedOnMobile ? (
       <>
-        <span className="min-[900px]:hidden">{language.toUpperCase()}</span>
+        <span className="min-[900px]:hidden">{abbreviation(language)}</span>
         <span className="hidden min-[900px]:inline">{labels[language]}</span>
       </>
     ) : labels[language];
   }
 
-  // No aria-label: the link's name is the text it shows ("EN" on a phone, "English" from 900px), so a
-  // voice-control user can say what they see (WCAG 2.5.3); `lang` already marks the language.
+  // No aria-label: the link is named by its own text, "EN English" on a phone or in the rail and "English" from 900px.
   const otherLanguage = (
     <a
       ref={linkRef}
@@ -49,7 +52,7 @@ export function LanguageSwitch({ compact = false, abbreviatedOnMobile = false }:
       onClick={refreshHref}
       className="inline-flex min-h-8 items-center px-1 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
     >
-      {compact ? target.toUpperCase() : displayLabel(target)}
+      {compact ? abbreviation(target) : displayLabel(target)}
     </a>
   );
 

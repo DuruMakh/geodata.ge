@@ -172,6 +172,7 @@
   "demography.birthsLead": "დაბადებები და გარდაცვალებები",
   "demography.ratioUnit": "დაბადება 100 გარდაცვალებაზე",
   "demography.ratioMapAria": "მუნიციპალიტეტები დაბადებების მიხედვით 100 გარდაცვალებაზე, {year}",
+  "demography.ratioListTitle": "რეიტინგი დაბადებების მიხედვით 100 გარდაცვალებაზე, {year}",
   "demography.ratioLegend": "დაბადება 100 გარდაცვალებაზე, {year}",
   "demography.ratioMapNote": "100-ზე ნაკლები: გარდაიცვალა მეტი, ვიდრე დაიბადა. შეფარდება რეგისტრირებულ რიცხვებს ეფუძნება და აღწერით გადათვლისას არ იცვლება.",
   "demography.ratioCounts": "{births} დაბადება · {deaths} გარდაცვალება",

@@ -36,6 +36,46 @@ test("a place heading's picker names its popup, and Enter moves to the next page
   await expect(page.getByTestId("region-picker-trigger")).not.toHaveText("Imereti");
 });
 
+test("a modifier-click on a picker option opens a tab and leaves no focus jump for a later visit", async ({ page, context }) => {
+  await page.goto("/en/explorer/economy/regions/imereti");
+  await ready(page);
+  const next = page.getByTestId("regional-entity-navigation").getByRole("link").last();
+  const href = (await next.getAttribute("href"))!;
+  await page.getByTestId("region-picker-trigger").click();
+  const opened = context.waitForEvent("page");
+  await page.getByRole("dialog").locator(`a[href="${href}"]`).click({ modifiers: ["ControlOrMeta"] });
+  await (await opened).close();
+  await expect(page).toHaveURL(/\/imereti$/);
+  // A later in-app visit to the same page does not pull focus to its picker.
+  await next.click();
+  await expect(page).toHaveURL(new RegExp(`${href}$`));
+  await ready(page);
+  await expect(page.getByTestId("region-picker-trigger")).not.toBeFocused();
+});
+
+test("a region's member list and the comparison view's way back move in the app", async ({ page }) => {
+  const mark = () => page.evaluate(() => { (window as unknown as { linkMarker: boolean }).linkMarker = true; });
+  const marked = () => page.evaluate(() => (window as unknown as { linkMarker?: boolean }).linkMarker);
+
+  await page.goto("/en/explorer/demography/population/region/imereti");
+  await ready(page);
+  await mark();
+  const member = page.getByTestId("region-member-row").first();
+  const href = (await member.getAttribute("href"))!;
+  await member.click();
+  await expect(page).toHaveURL(new RegExp(`${href}$`));
+  await ready(page);
+  expect(await marked()).toBe(true);
+
+  await page.goto("/en/explorer/unemployment/regions#breakdown=region");
+  await ready(page);
+  await mark();
+  await page.getByRole("link", { name: "All regions", exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/explorer\/unemployment\/regions$/);
+  await expect(page.getByTestId("unemployment-regions-index")).toBeVisible();
+  expect(await marked()).toBe(true);
+});
+
 test("the household area trigger says it opens a dialog and names it while open", async ({ page }) => {
   await page.goto("/en/explorer/living-standards/income/regions/imereti");
   await ready(page);
@@ -73,11 +113,25 @@ test("heading navigation reaches the series panel and the region lists, nested u
 test("a population place page names its series column and ties each section to its title", async ({ page }) => {
   await page.goto("/en/explorer/demography/population/region/imereti");
   await ready(page);
-  await expect(page.getByTestId("population-place-workspace").getByRole("complementary")).toHaveAccessibleName("Series");
+  const aside = page.getByTestId("population-place-workspace").getByRole("complementary");
+  await expect(aside).toHaveAccessibleName("Series");
+  await expect(aside.getByRole("heading", { level: 2, name: "Series" })).toBeAttached();
   for (const [testId, name] of [["population-highlights", "Key indicators"], ["vital-section", "Births and deaths"], ["age-sex-section", /^Age and sex/]] as const) {
     await expect(page.getByTestId(testId)).toHaveRole("region");
     await expect(page.getByTestId(testId)).toHaveAccessibleName(name);
   }
+});
+
+test("the births-deaths map and its ranked list each sit under a heading of their own", async ({ page }) => {
+  await page.goto("/en/explorer/demography/births-deaths");
+  await ready(page);
+  const headings = (await outline(page.locator("main"))).slice(0, 4);
+  expect(headings[0]).toMatch(/^1:/);
+  expect(headings.slice(1)).toEqual([
+    expect.stringMatching(/^2:Municipalities by births per 100 deaths, \d{4}$/),
+    "2:Key indicators",
+    expect.stringMatching(/^2:Ranking by births per 100 deaths, \d{4}$/),
+  ]);
 });
 
 test("the methodology archive names its year buttons, says how many sources it shows and nests the appendix", async ({ page }) => {
@@ -119,8 +173,12 @@ test("product toggles are named once, the product table is named by its caption 
   await page.goto("/en/explorer/inflation/products");
   await ready(page);
   const toggle = page.getByTestId("product-cumulative-toggle");
-  await expect(toggle).toHaveAccessibleName("Show cumulative price change");
-  await expect(toggle).not.toHaveAttribute("aria-pressed");
+  await expect(toggle).toHaveAccessibleName("Cumulative price change");
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await toggle.click();
+  await expect(toggle).toHaveAccessibleName("Cumulative price change");
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await toggle.click();
 
   const row = page.getByTestId("product-table").locator("tbody tr").first();
   const name = (await row.locator("[data-original-language]").evaluate((element) => element.previousElementSibling!.textContent))!;
@@ -141,6 +199,21 @@ test("product toggles are named once, the product table is named by its caption 
 });
 
 // U07-12: the sign note is the source note's first sentence; the deck under the heading states the value only.
+test("the product table is still watched for a sideways scroll after the search empties and refills", async ({ page }) => {
+  await page.goto("/en/explorer/inflation/products");
+  await ready(page);
+  const search = page.getByTestId("product-list-search");
+  await search.fill("zzzzqqq");
+  await expect(page.getByTestId("product-list-empty")).toBeVisible();
+  await search.fill("");
+  const table = page.getByTestId("product-table");
+  await expect(table).not.toHaveAttribute("tabindex");
+  // Make the refilled table overflow, then resize its frame so a live observer re-measures.
+  await page.addStyleTag({ content: '[data-testid="product-table"] table { min-width: 3000px !important; }' });
+  await page.setViewportSize({ width: 1300, height: 900 });
+  await expect(table).toHaveAttribute("tabindex", "0");
+});
+
 test("the deficit deck reads its value alone", async ({ page }) => {
   await page.goto("/en/explorer/deficit");
   await ready(page);
@@ -191,13 +264,22 @@ test("the services overview's two chart regions have different names", async ({ 
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test("the language link is named by the text it shows", async ({ page }) => {
+  test("the language link's name starts with the text it shows", async ({ page }) => {
     await page.goto("/en");
     const header = page.getByTestId("landing-header");
     await header.getByRole("button", { name: "Menu", exact: true }).click();
     const link = header.getByTestId("language-switch").getByRole("link");
-    await expect(link).toHaveText("KA", { useInnerText: true });
-    await expect(link).toHaveAccessibleName("KA");
+    // It shows "KA"; its name starts with that and goes on with the full language name.
+    const shown = await link.evaluate((element) => {
+      const copy = element.cloneNode(true) as HTMLElement;
+      copy.querySelectorAll(".sr-only").forEach((hidden) => hidden.remove());
+      element.after(copy);
+      const text = copy.innerText;
+      copy.remove();
+      return text.trim();
+    });
+    expect(shown).toBe("KA");
+    await expect(link).toHaveAccessibleName("KA ქართული");
     await expect(link).toHaveAttribute("lang", "ka");
   });
 

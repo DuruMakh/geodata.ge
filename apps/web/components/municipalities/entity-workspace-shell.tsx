@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 
-/** The Budget place page's two columns: the chart column and a sticky 340px aside (named `asideLabel`) from 1100px of column width. */
+/**
+ * The Budget place page's two columns: the chart column and a sticky 340px aside from 1100px of column width.
+ * A given `asideLabel` names the aside and is also a visually hidden h2, so heading navigation reaches it.
+ */
 export function EntityWorkspaceShell({ testId, main, aside, asideLabel }: { testId: string; main: ReactNode; aside: ReactNode; asideLabel?: string }) {
   return (
     <div
@@ -9,6 +12,7 @@ export function EntityWorkspaceShell({ testId, main, aside, asideLabel }: { test
     >
       <div data-chart-panel className="min-w-0">{main}</div>
       <aside aria-label={asideLabel} className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
+        {asideLabel === undefined ? null : <h2 className="sr-only">{asideLabel}</h2>}
         <div className="sticky top-5">{aside}</div>
       </aside>
     </div>

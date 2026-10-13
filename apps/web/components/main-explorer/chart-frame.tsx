@@ -82,14 +82,16 @@ export const MOBILE_ONLY = "hidden max-[768px]:block";
 
 /**
  * Whether a sideways scroller's content is wider than it, and its visible width, re-measured as it resizes.
- * Both start false and 0 on the server and the client alike, so hydration matches.
+ * Both start false and 0 on the server and the client alike, so hydration matches. A scroller that mounts
+ * and unmounts is passed as the element itself (kept by a callback ref), so each new one is observed and
+ * the observer lets go of the old one; an always-mounted one can be passed as its ref.
  */
-export function useHorizontalOverflow(scroller: RefObject<HTMLElement | null>) {
+export function useHorizontalOverflow(scroller: RefObject<HTMLElement | null> | HTMLElement | null) {
   const [overflowing, setOverflowing] = useState(false);
   const [visibleWidth, setVisibleWidth] = useState(0);
 
   useEffect(() => {
-    const element = scroller.current;
+    const element = scroller !== null && "current" in scroller ? scroller.current : scroller;
     if (!element) return;
     const measure = () => {
       setOverflowing(element.scrollWidth > element.clientWidth + 1);

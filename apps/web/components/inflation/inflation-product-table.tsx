@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { periodKey } from "../../lib/data/inflation/periods";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
@@ -30,7 +30,8 @@ export function InflationProductTable({ index, state, onToggle }: {
   const [query, setQuery] = useState("");
   const [shown, setShown] = useState(Math.min(BATCH_SIZE, index.products.length));
   const captionId = useId();
-  const scroller = useRef<HTMLDivElement>(null);
+  // A callback ref: the scroller unmounts while a search matches nothing, and the one that comes back is a new node.
+  const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
   const { overflowing } = useHorizontalOverflow(scroller);
   const endPeriod = productEndPeriod(index, state.range.endYear);
   const matches = filteredProductIds(index, query, productsByCumulative(index, state.range.startYear, endPeriod));
@@ -54,7 +55,7 @@ export function InflationProductTable({ index, state, onToggle }: {
     {ids.length === 0 ? <p data-testid="product-list-empty" className="mt-6 text-[13px] text-[var(--muted)]">{t("productsNoMatches")}</p> : <div className="mt-[18px]">
       {/* Named by its caption; a keyboard stop only while there is a sideways scroll to operate. */}
       <div
-        ref={scroller}
+        ref={setScroller}
         data-testid="product-table"
         role="region"
         tabIndex={overflowing ? 0 : undefined}
