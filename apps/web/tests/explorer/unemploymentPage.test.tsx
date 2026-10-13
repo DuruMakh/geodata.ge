@@ -93,3 +93,17 @@ test.each(["ka", "en"] as const)("renders the existing workspace, two chart type
   expect(markup).not.toMatch(/Amount \(GEL\)|თანხა \(₾\)/);
   expect(markup).toContain(locale === "en" ? "Survey estimates" : "კვლევის შეფასებები");
 });
+
+// U16-16: English age bands are number ranges with an en dash, as the Georgian labels and every year range print them.
+test("the English age page prints its age bands with an en dash", async () => {
+  const markup = renderPageMarkup("en", await renderUnemploymentPage("en", "age"));
+  expect(markup).toContain(">15–19<");
+  expect(markup).not.toMatch(/>\d+-\d+</);
+});
+
+// U17-11: the split-region note names five regions; the other regions' pages do not carry it.
+test("a region page states the split-region note only where it applies", async () => {
+  const note = "Separate Imereti and Racha-Lechkhumi";
+  expect(renderPageMarkup("en", await renderUnemploymentPage("en", "regions", "region.imereti"))).toContain(note);
+  expect(renderPageMarkup("en", await renderUnemploymentPage("en", "regions", "region.tbilisi"))).not.toContain(note);
+});

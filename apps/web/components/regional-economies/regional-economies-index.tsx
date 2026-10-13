@@ -35,8 +35,8 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
  * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
  * headingLevel 3 nests the overview and list titles under a section title of the page's own.
  */
-export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapControls, headingLevel = 2 }: {
-  model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>;
+export function RegionIndex({ model, sourceNote, metric, summary = [], leadRow, mapControls, headingLevel = 2 }: {
+  model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary?: Array<{ label: string; value: string; detail: string }>;
   leadRow?: { id: string; label: string; value: number };
   mapControls?: ReactNode;
   headingLevel?: 2 | 3;

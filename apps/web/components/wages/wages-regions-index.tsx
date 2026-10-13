@@ -19,15 +19,13 @@ export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMa
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="wages-latest" measure={t("series.average")} period={national.year} value={amount(national.value)} />
     <div data-testid="wages-regions-index">
-      <RegionIndex model={regionMap} sourceNote={t("sourceNote")} metric={{
+      {/* The note ends its sentence before the map-boundaries credit (U18-10). No overview tiles: the Georgia average is
+          the line under the heading, and DESIGN.md §31 keeps the page to the map and the list (U18-11). */}
+      <RegionIndex model={regionMap} sourceNote={`${t("sourceNote")}.`} metric={{
         hrefForRegion: wagesRegionHref, formatValue: amount,
         mapAria: t("regionMapAria", { year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: amount(value), year }),
         legend: t("series.average"), testId: "wages-region-map",
-      }} summary={[
-        { label: message(messages, "regionalEconomies.regionCount"), value: String(regionMap.regions.length), detail: `${t("series.average")} · ${regionMap.year}` },
-        { label: t("series.average"), value: amount(national.value), detail: String(national.year) },
-        { label: message(messages, "regionalEconomies.period"), value: `${regionMap.firstYear}–${regionMap.year}`, detail: t("annual") },
-      ]} />
+      }} />
       <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p>
     </div>
   </div>;

@@ -31,6 +31,10 @@ export async function unemploymentPageMetadata(locale: Locale, section: Unemploy
   return fiscalMetadata({ locale, path: UNEMPLOYMENT_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `unemployment.page.${section}.title`), description: message(messages, `unemployment.page.${section}.summary`) });
 }
 
+// The reviewed registry spells English age bands with a hyphen ("15-19"); the page prints a number range with an en
+// dash, as the Georgian labels and every year range do (U16-16). The taxonomy stays as reviewed.
+const UNEMPLOYMENT_REGISTRY = UNEMPLOYMENT_GROUPS.map((group) => ({ ...group, labelEn: group.labelEn.replace(/(\d)-(\d)/g, "$1–$2") }));
+
 export async function renderUnemploymentPage(locale: Locale, section: UnemploymentSectionId, regionId?: string) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
@@ -53,7 +57,7 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   const lastReviewedAt = facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: message(presentation.messages, "unemployment.title"), href: pageHref("/explorer/unemployment", locale) }, { label: region ? regionName : title }];
   if (region) crumbs.splice(3, 0, { label: message(presentation.messages, "unemployment.page.regions.title"), href: pageHref("/explorer/unemployment/regions", locale) });
-  const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_GROUPS, sources, lastReviewedAt, siteOrigin: origin };
+  const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_REGISTRY, sources, lastReviewedAt, siteOrigin: origin };
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: sectionPath, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,

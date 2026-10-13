@@ -39,6 +39,8 @@ test.each(["ka", "en"] as const)("writes native %s count/rate workbooks with cor
       expect(cell.value).toBeCloseTo(224, 1); expect(cell.numFmt).toContain("0.0");
       expect(model.analysis.headers[2]).toBe(locale === "en" ? "Number (thousand persons)" : "რაოდენობა (ათასი ადამიანი)");
     }
+    // U16-16: the Data sheet names the row column as the Summary sheet does.
+    expect(model.analysis.headers[1]).toBe(locale === "en" ? "Category" : "კატეგორია");
     const sourceCell = excel.worksheets[2].getCell("D4").value;
     expect(sourceCell).toMatchObject({ hyperlink: "https://fiscal.ge/downloads/methodology/unemployment/files/01-labour-force-indicators.xlsx" });
   }

@@ -37,6 +37,9 @@ import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-
 import { useUnemploymentState } from "./use-unemployment-state";
 import { UnemploymentAgeHeatmap } from "./unemployment-age-heatmap";
 
+// The regions Geostat published only in combined groups before 2017 or 2019 (`unemployment.regionNote`).
+const SPLIT_REGIONS: ReadonlySet<string> = new Set(["region.imereti", "region.racha_lechkhumi_kvemo_svaneti", "region.samtskhe_javakheti", "region.guria", "region.mtskheta_mtianeti"]);
+
 export type UnemploymentExplorerProps = { section: UnemploymentSectionId; regionId?: string; regions?: MunicipalRegion[]; facts: ClientUnemploymentObservation[]; registry: UnemploymentGroupDefinition[]; sources: (WorkbookPublicSource & { sourceId: string })[]; lastReviewedAt: string; siteOrigin: string };
 export function UnemploymentExplorer({ section, regionId, regions, facts, registry, sources, lastReviewedAt, siteOrigin }: UnemploymentExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
@@ -72,7 +75,9 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
     const next = update(transform, "push"), nextModel = buildUnemploymentModel(facts, registry, next);
     setAnnouncement(`${t(`indicator.${next.indicator}`)} · ${nextModel.range.start}–${nextModel.range.end}`);
   };
-  const noteKey = ({ age: "ageNote", region: "regionNote", education: "educationNote", long_term: "longTermNote" } as Partial<Record<UnemploymentBreakdown, string>>)[state.breakdown];
+  // A region page states the split-region note only on the five regions it is about (U17-11).
+  const regionNote = !regionId || SPLIT_REGIONS.has(regionId) ? "regionNote" : undefined;
+  const noteKey = ({ age: "ageNote", region: regionNote, education: "educationNote", long_term: "longTermNote" } as Partial<Record<UnemploymentBreakdown, string>>)[state.breakdown];
   const downloadAction = <ExcelDownloadButton testId="unemployment-excel-download" disabled={!state.selectedIds.length || !model.hasData} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildUnemploymentWorkbookExportModel(facts, registry, state, presentation, sources, siteOrigin));

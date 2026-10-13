@@ -22,6 +22,12 @@ describe("reviewed bilingual label search", () => {
     expect(matchesLabelQuery("Cote d'Ivoire", ["Côte d'Ivoire"])).toBe(true);
   });
 
+  // U16-16: number ranges are printed with an en dash; a reader types a hyphen.
+  it("folds dashes, so a typed 15-19 finds 15–19", () => {
+    expect(matchesLabelQuery("15-19", ["15–19"])).toBe(true);
+    expect(matchesLabelQuery("15–19", ["15-19"])).toBe(true);
+  });
+
   it("leaves Georgian matching as it was", () => {
     expect(matchesLabelQuery("თურქ", ["თურქეთი"])).toBe(true);
     expect(matchesLabelQuery("თურქეთ", ["თურქმენეთი"])).toBe(false);

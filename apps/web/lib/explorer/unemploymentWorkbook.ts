@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { buildUnemploymentModel } from "./unemployment";
-import { unemploymentFactSeriesId, unemploymentSeriesLabel, unemploymentUsesIndicatorSeries } from "./unemploymentOverview";
+import { unemploymentFactSeriesId, unemploymentSeriesLabel } from "./unemploymentOverview";
 import type { UnemploymentState } from "./unemploymentState";
 import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
@@ -36,7 +36,7 @@ export function buildUnemploymentWorkbookExportModel(facts: ClientUnemploymentOb
       })),
     },
     analysis: {
-      headers: [workbookMessage(locale, "workbook.year"), t(unemploymentUsesIndicatorSeries(state) ? "series" : "group"), model.percent ? state.breakdown === "long_term" && indicators.length === 1 ? indicator : t("rateHeader") : t("countHeader"), workbookMessage(locale, "workbook.status")],
+      headers: [workbookMessage(locale, "workbook.year"), workbookMessage(locale, "workbook.category"), model.percent ? state.breakdown === "long_term" && indicators.length === 1 ? indicator : t("rateHeader") : t("countHeader"), workbookMessage(locale, "workbook.status")],
       rows: model.years.flatMap(year => definitions.map(group => [year, name(group), valueAt(group.id, year), workbookMessage(locale, byCell.has(`${group.id}:${year}`) ? "workbook.actual" : "workbook.unavailable")])),
       numericFormats: { 3: numberFormat },
     },

@@ -45,3 +45,10 @@ test("a page cannot be changed into a different main section by editing its hash
 test("education restores its groups and years with unemployment rate as the only overview measure", () => {
   expect(parseUnemploymentHash("breakdown=education&sex=women&indicator=employment_rate&view=table&start=2021&end=2024&sel=education.higher", facts, UNEMPLOYMENT_GROUPS, "overview")).toMatchObject({ breakdown: "education", educationSex: "women", indicator: "unemployment_rate", mode: "table", range: { kind: "manual", start: 2021, end: 2024 }, selectedIds: ["education.higher"] });
 });
+
+// U16-06: an old or mistyped selection opens the page's default view, as on the age page; an explicit `sel=` stays empty.
+test("a selection with no known id falls back to the page's default view", () => {
+  expect(parseUnemploymentHash("sel=zzz", facts, UNEMPLOYMENT_GROUPS, "overview").selectedIds).toEqual(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "overview").selectedIds);
+  expect(parseUnemploymentHash("sel=zzz", facts, UNEMPLOYMENT_GROUPS, "gender").selectedIds).toEqual(parseUnemploymentHash("", facts, UNEMPLOYMENT_GROUPS, "gender").selectedIds);
+  expect(parseUnemploymentHash("sel=", facts, UNEMPLOYMENT_GROUPS, "overview").selectedIds).toEqual([]);
+});

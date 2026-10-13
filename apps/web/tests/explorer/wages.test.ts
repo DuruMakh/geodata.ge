@@ -157,3 +157,13 @@ test("the wages region map ranks the eleven regions by their latest average wage
   expect(model.occupiedAreas.map(area => area.key).sort()).toEqual(["abkhazia", "tskhinvali"]);
   expect([model.legendMin, model.legendMax]).toEqual([model.regions.at(-1)!.value, model.regions[0]!.value]);
 });
+
+// U18-10: the source note ends its sentence before the map-boundaries credit. U18-11: the Regions index is the map and
+// the ranked list (DESIGN.md §31): no overview tiles repeating the Georgia average under the heading.
+test("the wages Regions index is the map and list, its source note a full sentence", async () => {
+  const { renderWagesRegionsIndexPage } = await import("../../lib/pages/wages-regions-index");
+  const { renderPageMarkup } = await import("../helpers/render-localized");
+  const html = renderPageMarkup("en", await renderWagesRegionsIndexPage("en"));
+  expect(html).toContain("Source: Geostat · enterprise surveys · annual. Map boundaries");
+  expect(html).not.toContain("Regional overview");
+});
