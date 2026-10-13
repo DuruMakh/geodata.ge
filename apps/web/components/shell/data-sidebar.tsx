@@ -232,8 +232,9 @@ export function DataSidebar() {
           <p className="mb-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
             {message(messages, "common.dataSection")}
           </p>
-          <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5">
-            <Link href={pageHref("/explorer",locale)} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${budgetActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+          {/* Every link closes the sheet here, the current page's included: the pathname effect above never fires for it. */}
+          <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5" onClick={(event) => { if ((event.target as Element).closest("a")) setSheetOpen(false); }}>
+            <Link href={pageHref("/explorer",locale)} aria-current={pathname.endsWith("/explorer") ? "page" : undefined} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${budgetActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.budget")}
             </Link>
             {budgetActive ? <SectionNav /> : null}
@@ -331,7 +332,6 @@ export function DataSidebar() {
               return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`money-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (active) event.preventDefault();
-                  setSheetOpen(false);
                 }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -356,11 +356,11 @@ export function DataSidebar() {
               {message(messages, "common.wages")}
             </Link>
             {wagesActive ? WAGES_SECTIONS.map(section => {
-              const active = pathname.endsWith(section.href);
+              // Regions stays active on its region pages, from which the link still opens the regions index.
+              const current = pathname.endsWith(section.href), active = current || pathname.includes(`${section.href}/`);
               return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`wages-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
-                  if (active) event.preventDefault();
-                  setSheetOpen(false);
+                  if (current) event.preventDefault();
                 }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -377,7 +377,6 @@ export function DataSidebar() {
               return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (current) event.preventDefault();
-                  setSheetOpen(false);
                 }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -391,7 +390,6 @@ export function DataSidebar() {
             {tradeActive ? <Link href={pageHref("/explorer/trade/overview", locale)} data-testid="trade-overview-link" aria-current={tradeOverviewActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (tradeOverviewActive) event.preventDefault();
-                setSheetOpen(false);
               }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -400,7 +398,6 @@ export function DataSidebar() {
             {tradeActive ? <Link href={pageHref("/explorer/trade/partners", locale)} data-testid="trade-partners-link" aria-current={tradePartnersActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (tradePartnersActive) event.preventDefault();
-                setSheetOpen(false);
               }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradePartnersActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradePartnersActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -409,20 +406,19 @@ export function DataSidebar() {
             {tradeActive ? <Link href={pageHref("/explorer/trade/products", locale)} data-testid="trade-products-link" aria-current={tradeProductsActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (tradeProductsActive) event.preventDefault();
-                setSheetOpen(false);
               }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeProductsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeProducts")}
             </Link> : null}
             {tradeActive ? <Link href={pageHref("/explorer/trade/domestic-exports", locale)} data-testid="trade-domestic-link" aria-current={tradeDomesticActive ? "page" : undefined}
-              onNavigate={(event) => { if (tradeDomesticActive) event.preventDefault(); setSheetOpen(false); }}
+              onNavigate={(event) => { if (tradeDomesticActive) event.preventDefault(); }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeDomesticActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeDomesticActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeDomestic")}
             </Link> : null}
             {tradeActive ? <Link href={pageHref("/explorer/trade/services", locale)} data-testid="trade-services-link" aria-current={tradeServicesActive ? "page" : undefined}
-              onNavigate={(event) => { if (tradeServicesActive) event.preventDefault(); setSheetOpen(false); }}
+              onNavigate={(event) => { if (tradeServicesActive) event.preventDefault(); }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeServicesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeServicesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeServices")}
@@ -434,7 +430,6 @@ export function DataSidebar() {
             {externalActive ? <Link href={pageHref("/explorer/external/money-from-abroad", locale)} data-testid="money-from-abroad-link" aria-current={moneyFromAbroadActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (moneyFromAbroadActive) event.preventDefault();
-                setSheetOpen(false);
               }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${moneyFromAbroadActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${moneyFromAbroadActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -443,7 +438,6 @@ export function DataSidebar() {
             {externalActive ? <Link href={pageHref("/explorer/external/foreign-investment", locale)} data-testid="foreign-investment-link" aria-current={foreignInvestmentActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (foreignInvestmentActive) event.preventDefault();
-                setSheetOpen(false);
               }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${foreignInvestmentActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${foreignInvestmentActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -452,7 +446,6 @@ export function DataSidebar() {
             {externalActive ? <Link href={pageHref("/explorer/external/current-account", locale)} data-testid="current-account-link" aria-current={currentAccountActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (currentAccountActive) event.preventDefault();
-                setSheetOpen(false);
               }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${currentAccountActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${currentAccountActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
@@ -467,7 +460,6 @@ export function DataSidebar() {
               return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`energy-food-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (active) event.preventDefault();
-                  setSheetOpen(false);
                 }}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>

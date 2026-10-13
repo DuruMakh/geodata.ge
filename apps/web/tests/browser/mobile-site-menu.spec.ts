@@ -65,3 +65,35 @@ for (const locale of ["ka", "en"] as const) {
     await expect(header.getByRole("group")).toBeHidden();
   });
 }
+
+test.describe("explorer data sidebar", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("tapping the current page closes the menu", async ({ page }) => {
+    // Budget's hub, a dataset hub and a section page: the link to the page you are on must still close the sheet.
+    for (const path of ["/explorer", "/en/explorer/economy", "/explorer/economy/gdp"]) {
+      await page.goto(path);
+      const toggle = page.getByTestId("sidebar-toggle");
+      // Hubs do not mark data-app-ready; the toggle names the sheet it controls once hydrated below 900px.
+      await expect(toggle).toHaveAttribute("aria-controls", "data-sidebar-navigation");
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      await page.locator(`#data-sidebar-navigation nav a[href="${path}"]`).click();
+      await expect(toggle, path).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("#data-sidebar-navigation")).toBeHidden();
+      expect(new URL(page.url()).pathname).toBe(path);
+    }
+  });
+
+  test("Budget is current on /explorer", async ({ page }) => {
+    for (const prefix of ["", "/en"]) {
+      await page.goto(`${prefix}/explorer`);
+      const budget = page.locator(`#data-sidebar-navigation nav a[href="${prefix}/explorer"]`);
+      await expect(budget).toHaveAttribute("aria-current", "page");
+      await expect(page.locator('#data-sidebar-navigation nav a[aria-current="page"]')).toHaveCount(1);
+      // A section page is current in its own right; Budget then only stays highlighted.
+      await page.goto(`${prefix}/explorer/expenditure`);
+      await expect(page.locator(`#data-sidebar-navigation nav a[href="${prefix}/explorer"]`)).not.toHaveAttribute("aria-current", "page");
+    }
+  });
+});

@@ -88,6 +88,16 @@ test("the regions index opens each region's own page", async ({ page }) => {
   await expect(page).toHaveURL(/\/explorer\/wages\/regions\/imereti$/);
 });
 
+test("Regions stays current on a wages region page", async ({ page }) => {
+  await page.goto("/en/explorer/wages/regions/adjara");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("wages-regions-link")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("wages-overview-link")).not.toHaveAttribute("aria-current", "page");
+  // The link still leads back from a region to the regions index.
+  await page.getByTestId("wages-regions-link").click();
+  await expect(page).toHaveURL(/\/en\/explorer\/wages\/regions$/);
+});
+
 test("the median shows whole lari beside the average", async ({ page }) => {
   await page.goto("/en/explorer/wages/overview#view=table&sel=average,median");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
