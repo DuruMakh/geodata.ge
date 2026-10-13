@@ -7,7 +7,6 @@ import type { PublicGlossaryEntry } from "../../lib/data/glossary";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import type { ClientAdminFact, ClientBudgetFact } from "../../lib/explorer/clientData";
-import { formatAmount } from "../../lib/explorer/format";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import type { ExpenditureGrouping, ExplorerSide } from "../../lib/explorer/types";
 import { parseExplorerHash, scopeFor, serializeAnalysisHash } from "../../lib/explorer/urlState";
@@ -99,11 +98,10 @@ function AnalysisExplorerContent({ facts: shippedFacts, adminFacts: shippedAdmin
     const previousTotal = totals.get(model.year - 1) ?? null;
     const yoy = previousTotal ? (model.totalGel - previousTotal) / previousTotal : null;
 
-    return {
-      lead: message(messages, "analysis.deck", { year: model.year, count: model.items.length, amount: formatAmount(model.totalGel, locale) }),
-      yoy,
-    };
-  }, [totalsByScope, side, grouping, model, locale, messages]);
+    // Only the change on the year before: the year, category count and total are the first headline card,
+    // directly below (U05-14).
+    return { lead: "", yoy };
+  }, [totalsByScope, side, grouping, model]);
 
   return (
     <BudgetExplorerFrame

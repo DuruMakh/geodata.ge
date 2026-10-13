@@ -4,6 +4,7 @@ import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useMemo } from "react";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
+import { publicLabel } from "../../lib/i18n/labels";
 import type { Presentation } from "../../lib/i18n/types";
 import type { AdminSpendingCategory } from "../../lib/data/adminSpending/types";
 import type { PublicGlossaryEntry } from "../../lib/data/glossary";
@@ -84,15 +85,16 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
   // the selection: the chart axis and every table cell share one unit, so the
   // precision has to hold still while the reader drags the range strip.
   //
-  // Fields and revenue cap at one decimal: they are genuinely billions-scale, so
-  // a second decimal lengthens every cell to resolve a handful of outliers, and
-  // the smallest rows floor to "<0.1" instead — still legible as funded.
+  // Fields cap at one decimal: they are genuinely billions-scale, so a second
+  // decimal lengthens every cell to resolve a handful of outliers, and the
+  // smallest rows floor to "<0.1" instead — still legible as funded.
   //
-  // Ministries keeps two. Its drill-down programs are billions-scale only in
-  // name (most sit between 0.02 and 0.5), so one decimal collapses 45 of them
+  // Ministries and revenue keep two. Ministry programs are billions-scale only
+  // in name (most sit between 0.02 and 0.5), so one decimal collapses 45 of them
   // into 16 distinct values and floors 126 of 852 rows — a ranked table that
-  // cannot rank. The two scopes never share a table, so the difference is never
-  // visible side by side.
+  // cannot rank. Five of the eleven revenue lines sit under 1 bn, so one decimal
+  // showed grants and import tax as "0.1" and their changes as "−<0.1" beside a
+  // series list that reads "122 მლნ ₾" (U04-05).
   const unit = useMemo(
     () =>
       scope === "ministries"
@@ -100,7 +102,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
         : unitFor(
             facts.filter((fact) => fact.side === explorerSide).map((fact) => fact.amountGel),
             unitsFor(locale).bn,
-            1,
+            scope === "revenue" ? 2 : 1,
           ),
     [facts, adminFacts, scope, explorerSide, locale],
   );
@@ -128,11 +130,14 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     const previousTotal = previousYear === undefined ? null : totals.get(previousYear) ?? null;
     const yoy = latestTotal !== null && previousTotal ? (latestTotal - previousTotal) / previousTotal : null;
 
+    // Named like the debt and deficit decks ("{year}: {series} · {value}"), so the line says what the figure is (U04-11).
+    const total = model.items.find((item) => item.level === "total");
+    const label = total ? `${publicLabel(locale, total.id, total.kaLabel, presentation.englishLabels)} · ` : "";
     return {
-      lead: latestTotal === null ? "" : `${latestYear}: ${formatAmount(latestTotal, locale)}`,
+      lead: latestTotal === null ? "" : `${latestYear}: ${label}${formatAmount(latestTotal, locale)}`,
       yoy,
     };
-  }, [totalsByScope, scope, scopeYears, locale]);
+  }, [totalsByScope, scope, scopeYears, locale, model.items, presentation.englishLabels]);
 
   const screenTitle = nav === "expenditure"
     ? message(messages, "main.expenditureHeading")

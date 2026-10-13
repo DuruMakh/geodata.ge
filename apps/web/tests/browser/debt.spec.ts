@@ -59,7 +59,7 @@ test.describe("Government Debt explorer", () => {
 
       await expect(selector.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
       await expect(seriesRow(page, "debt.stock.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-      await expect(selector.getByTestId("series-status")).toContainText("1 / 9");
+      await expect(selector.getByTestId("series-status")).toContainText("1 / 3");
       await expect(page.getByTestId("year-range-strip")).toContainText("2013–2025");
       await expect(page.getByTestId("chart-mode-line")).toHaveAttribute("aria-pressed", "true");
       await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "false");
@@ -96,7 +96,7 @@ test.describe("Government Debt explorer", () => {
     await seriesRow(page, "debt.stock.domestic").getByTestId("series-row-toggle").click();
     await seriesRow(page, "debt.stock.external").getByTestId("series-row-toggle").click();
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(3);
-    await expect(page.getByTestId("series-status")).toContainText("3 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 3");
 
     await seriesRow(page, "debt.service.interest").getByTestId("series-row-toggle").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "service");
@@ -151,7 +151,7 @@ test.describe("Government Debt explorer", () => {
     await expectAppReady(page);
 
     await expect(seriesRow(page, "debt.rate.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByTestId("series-status")).toContainText("1 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
     await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
 
     // Change the document URL as well as the hash so this case exercises a fresh
@@ -159,7 +159,7 @@ test.describe("Government Debt explorer", () => {
     await page.goto(`${TEST_BASE_URL}/explorer/debt?case=empty#f=rate&m=line&r=2015-2025&sel=`);
     await expectAppReady(page);
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
-    await expect(page.getByTestId("series-status")).toContainText("0 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("0 / 3");
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
   });
 
@@ -303,7 +303,7 @@ test.describe("Government Debt explorer", () => {
       await expect(toggle(id)).toHaveAttribute("aria-pressed", "true");
     }
     await expect(bulk).toHaveAttribute("data-state", "true");
-    await expect(page.getByTestId("series-status")).toContainText("3 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 3");
   });
 
   // U06-04: the hash was read once on mount, so an address-bar edit left the URL and the view disagreeing.
@@ -330,15 +330,15 @@ test.describe("Government Debt explorer", () => {
     await expect(page).toHaveURL(/#f=stock&m=line&r=\d{4}-\d{4}&sel=$/);
 
     await page.evaluate(() => { window.location.hash = "f=stock&sel=debt.stock.domestic"; });
-    await expect(page.getByTestId("series-status")).toContainText("1 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
 
     await page.goBack();
     await expect(page).toHaveURL(/sel=$/);
-    await expect(page.getByTestId("series-status")).toContainText("0 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("0 / 3");
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 
     await page.goForward();
     await expect(seriesRow(page, "debt.stock.domestic").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByTestId("series-status")).toContainText("1 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
   });
 });

@@ -153,6 +153,8 @@ test("the census re-base is a gap in the chart and a rule in the table", async (
   await expect(header).toContainText("Census re-base");
   expect(await header.evaluate((cell) => getComputedStyle(cell).borderLeftWidth)).toBe("2px");
   await expect(page.getByTestId("population-census-note")).toContainText("re-based the population to the 2024 census");
+  // U26-12: the table's caption names the table and its period; the re-base sentence is the note above, once.
+  await expect(page.getByTestId("explorer-table").locator("caption")).not.toContainText("re-based");
 });
 
 // The range strip's marker prints the re-base label and no year: the year is where it stands on the rail, so the test reads the place.

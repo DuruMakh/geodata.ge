@@ -3,16 +3,13 @@ import type { Locale, Presentation } from "../i18n/types";
 import { getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { Message } from "../i18n/message";
 import { pageHref } from "../i18n/routes";
-import { updatedDate } from "../explorer/coverageLabel";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
-import { SourceNote } from "../../components/ui/editorial";
 import { buildHubCards, type HubCardModel } from "../explorer/hubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
@@ -68,16 +65,6 @@ export async function renderHubPage(locale: Locale) {
         {message(messages, "hub.introduction")}
       </p>
       <BudgetHub cards={cards} locale={locale} />
-      <div className="mt-[26px] max-w-[860px]">
-        <SourceNote>
-          {message(messages, "hub.source")}
-          {lastUpdatedAt ? (
-            <>
-              {" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(lastUpdatedAt, locale)}</span> }} />
-            </>
-          ) : null}
-        </SourceNote>
-      </div>
     </ExplorerPage>
   );
 }
@@ -85,7 +72,7 @@ export async function renderHubPage(locale: Locale) {
 /**
  * A topic hub (Economy, Inflation, Trade, …): breadcrumb, heading, one summary line and
  * the hub cards. `crumbLabel` names the hub in the breadcrumbs when it differs from the
- * heading (Inflation's). The Budget hub above keeps its own heading and source note.
+ * heading (Inflation's). The Budget hub above keeps its own heading.
  */
 export function TopicHub({ locale, presentation, title, crumbLabel = title, summary, path, coverage, cards, testId, breadcrumb = true, after }: {
   locale: Locale; presentation: Presentation; title: string; crumbLabel?: string; summary: string; path: `/${string}`;

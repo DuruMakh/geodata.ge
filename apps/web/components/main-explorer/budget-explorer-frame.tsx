@@ -13,6 +13,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { PageHeader } from "../shell/page-header";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
+import { withLari } from "../ui/lari";
 
 // The budget explorer (expenditure, revenue) and the single-year analysis are
 // separate client entries, so neither route ships the other's view; this is
@@ -82,8 +83,8 @@ export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, 
 
       <ExplorerHeading>{title}</ExplorerHeading>
 
-      <p className={DECK_LINE_CLASS}>
-        <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{deck.lead}</span>
+      <p data-testid="budget-deck" className={DECK_LINE_CLASS}>
+        {deck.lead ? <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{withLari(deck.lead)}</span> : null}
         {deck.yoy !== null ? (
           <>
             <span

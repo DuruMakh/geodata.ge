@@ -41,6 +41,17 @@ describe("general-government deficit route composition", () => {
     expect(marker).toContain('style="left:100.00%"');
   });
 
+  // U07-11 / U07-12: one series needs no bulk toggle or "1 / 1" count, and the sign note is the source note's first
+  // sentence, so the deck under the heading states only the value.
+  it("keeps the one-series panel and the deck to what they add", async () => {
+    const { renderDeficitPage } = await import("../../lib/pages/deficit");
+    const html = renderPageMarkup("en", await renderDeficitPage("en"));
+    const deck = html.match(/<p data-testid="deficit-deck"[^>]*>([\s\S]*?)<\/p>/)![1]!;
+    expect(deck).not.toContain("A negative value indicates a deficit");
+    expect(html).toContain("A negative value indicates a deficit and a positive value a surplus.");
+    expect(html).not.toContain('data-testid="series-actions"');
+  });
+
   it("names the reviewed IMF edition and actual/projection coverage", async () => {
     const { renderDeficitPage } = await import("../../lib/pages/deficit");
     const html = renderPageMarkup("en", await renderDeficitPage("en"));

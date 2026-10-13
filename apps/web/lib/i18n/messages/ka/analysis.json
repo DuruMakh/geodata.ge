@@ -7,7 +7,6 @@
   "analysis.fastestGrowth": "ყველაზე სწრაფი ზრდა",
   "analysis.largestIncrease": "ყველაზე დიდი მატება",
   "analysis.headlinePeriod": "{count} კატეგორია · {year}",
-  "analysis.deck": "{year} · {count} კატეგორია · სულ {amount}",
   "analysis.expenditureHeading": "{year} წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული",
   "analysis.revenueHeading": "{year} წლის ბიუჯეტის სურათი — საიდან მოდის საჯარო ფული",
   "analysis.structureRevenue": "სტრუქტურა კატეგორიების მიხედვით",

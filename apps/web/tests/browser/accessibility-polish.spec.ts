@@ -140,10 +140,12 @@ test("product toggles are named once, the product table is named by its caption 
   await expect(page.getByTestId("product-chart-summary")).toContainText(`Lines: ${selected.map((label) => label.trim()).join(", ")}.`);
 });
 
-test("the deficit deck reads its value and its note as two sentences", async ({ page }) => {
+// U07-12: the sign note is the source note's first sentence; the deck under the heading states the value only.
+test("the deficit deck reads its value alone", async ({ page }) => {
   await page.goto("/en/explorer/deficit");
   await ready(page);
-  await expect(page.getByTestId("deficit-deck")).toHaveText(/\d\S*\. A negative value indicates a deficit$/);
+  await expect(page.getByTestId("deficit-deck")).toHaveText(/^\d{4}: .+ · [−+]?\d\S*$/);
+  await expect(page.getByTestId("source-label")).toContainText("A negative value indicates a deficit");
 });
 
 test("hub cards are named by their title, described by the rest, and the hovered footer stays readable", async ({ page }) => {

@@ -105,7 +105,7 @@ describe("Government Debt route composition", () => {
     expect((markup.match(/data-testid="series-row"/g) ?? [])).toHaveLength(9);
     expect((markup.match(/aria-expanded="true"/g) ?? [])).toHaveLength(3);
     expect(selectedSeries(markup)).toEqual(["debt.stock.total"]);
-    expect(markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("სერიები 1 / 9");
+    expect(markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("სერიები 1 / 3"); // U06-09: the active family's three rows, not all nine
     expect(markup).toContain('aria-label="მთლიანი ვალი — ქვესერიების ჩაკეცვა"');
     expect(markup).toContain('aria-label="ვალის გადახდა — ქვესერიების ჩაკეცვა"');
     expect(markup).toContain('aria-label="საპროცენტო განაკვეთი — ქვესერიების ჩაკეცვა"');
@@ -357,7 +357,7 @@ describe("Government Debt route composition", () => {
     // An empty selection keeps the bulk control, so clearing can be undone.
     const markup = render("stock", []);
     const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-    expect(visibleText).toContain("სერიები 0 / 9");
+    expect(visibleText).toContain("სერიები 0 / 3");
     expect(visibleText).toContain("ყველას მონიშვნა");
     expect(markup).toMatch(/<button[^>]*data-testid="series-toggle-all"[^>]*data-state="false"/);
 

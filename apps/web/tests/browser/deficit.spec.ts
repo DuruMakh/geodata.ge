@@ -40,11 +40,14 @@ test.describe("General-government deficit explorer", () => {
     await page.getByTestId("measure-share-toggle").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "amount");
     await expect(page.getByTestId("deficit-measure-label")).toHaveText("მლრდ ₾");
-    await expect(page.getByTestId("series-row")).toContainText("−1.5 მლრდ ₾");
+    // U07-13: the deck and the series row at the table's two decimals, one figure on one screen.
+    await expect(page.getByTestId("series-row")).toContainText("−1.53 მლრდ ₾");
+    await expect(page.getByTestId("deficit-deck")).toContainText("−1.53 მლრდ ₾");
     await expect(page.getByTestId("series-row")).not.toContainText("−1.5%");
     await page.getByTestId("chart-mode-table").click();
     await expect(page.getByTestId("explorer-table")).toBeVisible();
     await expect(page.getByTestId("explorer-table").getByText("პროგნოზი", { exact: true })).toHaveCount(6);
+    await expect(page.getByTestId("explorer-table").locator("td").filter({ hasText: "−1.53" })).not.toHaveCount(0);
   });
 
   // U07-01/U07-16: the dashed segment was the only forecast cue, and a range of one projection point has none.

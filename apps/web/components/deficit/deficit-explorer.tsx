@@ -11,7 +11,8 @@ import { Message } from "../../lib/i18n/message";
 import { pageHref } from "../../lib/i18n/routes";
 import { publicLabel } from "../../lib/i18n/labels";
 import { useI18n } from "../../lib/i18n/provider";
-import { formatAmount, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
+import { formatInUnit, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
+import { withLari } from "../ui/lari";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ChartMode } from "../../lib/explorer/types";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -104,7 +105,8 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
   const headlineValue = latestActual
     ? percentage
       ? formatShare(latestActual.generalGovernmentBalancePctGdp / 100)
-      : formatAmount(latestActual.generalGovernmentBalanceGel, locale)
+      // The table's precision, so the deck, the series row and the table print one figure (U07-13).
+      : `${formatInUnit(latestActual.generalGovernmentBalanceGel, unit)} ${message(messages, "format.bnGel")}`
     : "—";
   const coverage = coverageLabel(messages, locale, years.length > 0 ? min : undefined, years.length > 0 ? max : undefined, lastUpdatedAt || undefined);
 
@@ -124,11 +126,8 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
       <ExplorerHeading>{message(messages, "deficit.heading")}</ExplorerHeading>
       <p data-testid="deficit-deck" className={DECK_LINE_CLASS}>
         <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
-          {latestActual?.year}: {label} · {headlineValue}
+          {latestActual?.year}: {label} · {withLari(headlineValue)}
         </span>
-        {/* The flex gap is the only visible break between the value and the note; a reader needs one too. */}
-        <span className="sr-only">. </span>
-        <span>{message(messages, "deficit.negative")}</span>
       </p>
 
       <ExplorerWorkspace>
@@ -227,6 +226,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
             allSelected={selected}
             onToggleAll={() => update((current) => ({ ...current, selected: false }))}
             allowSelectAll={false}
+            bulkActions={false}
           >
             <SeriesSelectorRow
               id={DEFICIT_ITEM.id}

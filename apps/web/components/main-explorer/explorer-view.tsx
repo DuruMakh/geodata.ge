@@ -11,6 +11,7 @@ import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
 import { Callout, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
+import { DESKTOP_ONLY } from "./chart-frame";
 import { ExplorerTable } from "./explorer-table";
 import { FIRST_COL_LABEL, Indicators } from "./indicators";
 import { RangeStrip } from "./range-strip";
@@ -19,6 +20,7 @@ import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { withLari } from "../ui/lari";
 import type { ResolvedRange } from "./use-explorer-state";
 
 // Multi-year explorer per DESIGN.md §8: mode/grouping tabs and the measure pill over
@@ -129,8 +131,9 @@ export function ExplorerView({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <ModeTabs value={chartMode} onChange={onChartModeChange} />
               <div className="flex items-center gap-3.5">
+                {/* On a phone the chart's own axis caption names the unit, so the line view does not repeat it here (U03-14). */}
                 {share ? null : (
-                  <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{message(messages, "format.bnGel")}</span>
+                  <span data-testid="explorer-unit-caption" className={`font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)] ${chartMode === "line" ? DESKTOP_ONLY : ""}`}>{withLari(message(messages, "format.bnGel"))}</span>
                 )}
                 <MeasurePill label={message(messages, "main.percentGdp")} pressed={share} onChange={onShareChange} />
               </div>
@@ -201,7 +204,7 @@ export function ExplorerView({
         />
       </ExplorerWorkspace>
 
-      <Indicators model={model} scope={scope} />
+      <Indicators model={model} scope={scope} unit={unit} />
     </>
   );
 }

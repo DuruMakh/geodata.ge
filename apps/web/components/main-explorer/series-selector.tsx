@@ -49,6 +49,8 @@ type SeriesSelectorProps = {
   hasVisibleMatches?: boolean;
   /** Optional visible names for the row values, shown above the list. */
   listHeader?: ReactNode;
+  /** False leaves out the bulk toggle and the count: a one-row list, where both would only repeat the row's own tick. */
+  bulkActions?: boolean;
   children: ReactNode;
 };
 
@@ -71,6 +73,7 @@ export function SeriesSelector({
   allowSelectAll = true,
   hasVisibleMatches = true,
   listHeader,
+  bulkActions = true,
   children,
 }: SeriesSelectorProps) {
   const { messages } = useI18n();
@@ -100,7 +103,7 @@ export function SeriesSelector({
 
       {controlsAfterSearch ? selectorControls : null}
 
-      <div
+      {bulkActions ? <div
         data-testid="series-actions"
         data-selector-section="actions"
         // The bulk toggle is the full 44px height of this row (D8 touch target); the
@@ -156,7 +159,7 @@ export function SeriesSelector({
             </>
           ) : null}
         </span>
-      </div>
+      </div> : null}
 
       {!hasVisibleMatches ? (
         <p className="border-b border-[var(--row-border)] px-1 py-3 text-xs text-[var(--muted)]">

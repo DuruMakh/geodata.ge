@@ -131,7 +131,9 @@ describe("place page body: a region, a municipality and Tbilisi", () => {
   test("Batumi: only itself in the tick-list, with its rank among 64 and its share of Adjara", () => {
     const html = render("06");
     expect(count(html, /data-testid="series-row"/g)).toBe(1);
-    expect(html).toMatch(/>1\s*\/\s*1</);
+    // U26-05: a one-place list has nothing to search, clear or count.
+    expect(html).not.toContain('data-testid="series-actions"');
+    expect(html).not.toContain('data-testid="series-search"');
     expect(html).toContain("Rank among municipalities");
     expect(html).toContain("/ 64");
     expect(html).toContain("246,267");

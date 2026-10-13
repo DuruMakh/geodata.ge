@@ -99,7 +99,7 @@ export function DebtSeriesPanel({
       <SeriesSelector
         searchable={false}
         selectedCount={selectedIds.length}
-        totalCount={items.length}
+        totalCount={familyIds.length}
         hasSelection={hasSelection}
         allSelected={allFamilySelected}
         onToggleAll={() => onSelectionChange(hasSelection ? [] : familyIds)}

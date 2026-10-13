@@ -9,7 +9,7 @@ import type { ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { ACCENT, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { compoundAnnualGrowth, isGrowthRankable, rankPeriodDeltas } from "../../lib/explorer/indicators";
 import { buildKpiShareSeries } from "../../lib/explorer/sparkline";
-import { formatAmount, formatAmountParts, formatBn, formatShare, MISSING } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { SectionTitle } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 import { HeroKpi, KPI_GRID_CLASS, MoverRow, PeriodComparisonTable, SideKpiList } from "./kpi-blocks";
@@ -20,6 +20,8 @@ import { HeroKpi, KPI_GRID_CLASS, MoverRow, PeriodComparisonTable, SideKpiList }
 type IndicatorsProps = {
   model: ExplorerModel;
   scope: ExplorerScope;
+  /** The table's unit, so the period comparison prints each amount at the table's precision. */
+  unit: ValueUnit;
 };
 
 /** The first table column's message key per scope; the explorer table uses it too. */
@@ -35,7 +37,7 @@ const SCOPE_LABEL: Record<ExplorerScope, string> = {
   revenue: "main.revenueScope",
 };
 
-export function Indicators({ model, scope }: IndicatorsProps) {
+export function Indicators({ model, scope, unit }: IndicatorsProps) {
   const { locale, messages, englishLabels } = useI18n();
   const rowLabel = (value: ExplorerTableRow) => publicLabel(locale, value.itemId, value.kaLabel, englishLabels);
   const { years, totalRow, comparisonRows, topGrowth, bottomGrowth } = model;
@@ -112,7 +114,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
     .filter((row) => row.level !== "major_program")
     .sort((a, b) => (b.valuesByYear[endYear] ?? 0) - (a.valuesByYear[endYear] ?? 0));
 
-  const comparisonCell = (value: number | null | undefined) => (value === null || value === undefined ? MISSING : formatBn(value));
+  const comparisonCell = (value: number | null | undefined) => (value === null || value === undefined ? MISSING : formatInUnit(value, unit));
 
   return (
     <section data-testid="period-indicators" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">
@@ -143,10 +145,10 @@ export function Indicators({ model, scope }: IndicatorsProps) {
             </div>
             <div className="mt-2 flex justify-between gap-4">
               <p className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-                {startYear} · {formatAmount(totalStart, locale)}
+                {startYear} · {withLari(formatAmount(totalStart, locale))}
               </p>
               <p className="font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]">
-                {endYear} · {formatAmount(totalEnd, locale)}
+                {endYear} · {withLari(formatAmount(totalEnd, locale))}
               </p>
             </div>
             {showSentence ? (
@@ -202,7 +204,7 @@ export function Indicators({ model, scope }: IndicatorsProps) {
             return {
               key: row.itemId, label, title: rowLabel(row), color, emphasis,
               start: comparisonCell(startValue),
-              change: delta === null ? MISSING : `${delta >= 0 ? "+" : "−"}${formatBn(Math.abs(delta))}`,
+              change: delta === null ? MISSING : `${delta >= 0 ? "+" : "−"}${formatInUnit(Math.abs(delta), unit)}`,
               changeColor: delta === null ? "var(--muted)" : delta >= 0 ? POSITIVE : NEGATIVE,
               end: comparisonCell(endValue),
             };

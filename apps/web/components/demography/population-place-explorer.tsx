@@ -147,7 +147,8 @@ export function PopulationPlaceExplorer({
                 />
               ) : (
                 <ExplorerTable
-                  caption={`${t("tableCaption")} · ${model.range.start}–${model.range.end} · ${t("censusNote", { count: rebase })}`}
+                  // The census re-base sentence is the note right under the chart panel, not repeated here (U26-12).
+                  caption={`${t("tableCaption")} · ${model.range.start}–${model.range.end}`}
                   rows={model.rows.filter((row) => row.itemId !== place.id)}
                   totalRow={placeRow}
                   showTotal={placeRow !== null}
@@ -192,6 +193,9 @@ export function PopulationPlaceExplorer({
               query={seriesQuery}
               onQueryChange={setSeriesQuery}
               searchPlaceholder={message(messages, "municipal.search")}
+              // A municipality lists only itself: no search, bulk toggle or "1 / 1" count (U26-05).
+              searchable={listed.length > 1}
+              bulkActions={listed.length > 1}
               selectedCount={state.selectedIds.length}
               totalCount={listed.length}
               hasSelection={hasSelection}

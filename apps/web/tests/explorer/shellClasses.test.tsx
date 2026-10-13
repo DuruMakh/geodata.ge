@@ -1,6 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Locale } from "../../lib/i18n/types";
 import { renderPageMarkup } from "../helpers/render-localized";
+
+// The budget hub's legacy-hash redirect reads the router; no other page here does.
+vi.mock("next/navigation", async (original) => ({ ...(await original<typeof import("next/navigation")>()), useRouter: () => ({ replace() {} }) }));
 
 // The class lists the explorer shell renders on each page, pinned before the
 // shell was consolidated into components/explorer-shell. A difference here is
@@ -34,4 +37,20 @@ describe.each(PAGES)("'$name' shell", ({ render }) => {
       pill: attributesOf(markup, /<button[^>]*data-testid="measure-share-toggle"[^>]*>/g),
     }).toMatchSnapshot();
   });
+
+  // U02-03: the explorer layout already fills the screen and pins the footer; a full-screen <main> on top
+  // of it left a blank band between the last section and the footer on every short page.
+  it("leaves the full-screen height to the layout", async () => {
+    const markup = renderPageMarkup("ka", (await render("ka")) as never);
+    for (const main of attributesOf(markup, /<main[^>]*>/g)) expect(main).not.toContain("min-h-screen");
+  });
+});
+
+// U02-04: the budget hub's source and update date live in the footer note and the header's coverage label; the page
+// repeated both in a source note of its own (and showed the date twice on one screen).
+it("the budget hub states its source and update date once", async () => {
+  const markup = renderPageMarkup("en", (await (await import("../../lib/pages/hub")).renderHubPage("en")) as never);
+  expect(markup).not.toContain("Last updated");
+  expect(markup).not.toContain("World Economic Outlook");
+  expect(markup).toMatch(/Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
 });
