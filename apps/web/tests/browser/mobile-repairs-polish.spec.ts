@@ -162,27 +162,38 @@ test.describe("phone", () => {
   });
 
   test("range chips, text tabs and the show-all button are 44px targets on phones", async ({ page }) => {
-    const heights = (locator: ReturnType<Page["locator"]>) => locator.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
+    // The count comes first, so a renamed test id fails instead of checking nothing.
+    const heights = async (locator: ReturnType<Page["locator"]>, count: number) => {
+      await expect(locator).toHaveCount(count);
+      return locator.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
+    };
     for (const path of ["/explorer/debt", "/explorer/municipalities/batumi"]) {
       await page.goto(path);
       await ready(page);
-      const chips = await heights(page.getByTestId("year-range-strip").locator("button[aria-pressed]"));
-      expect(chips.length).toBeGreaterThan(0);
-      for (const height of chips) expect(height).toBeGreaterThanOrEqual(44);
+      const chips = page.getByTestId("year-range-strip").locator("button[aria-pressed]");
+      for (const height of await heights(chips, 3)) expect(height).toBeGreaterThanOrEqual(44);
+      // The taller chip row must not reach the handles' tap areas on the rail below it.
+      const chipBoxes = await chips.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().toJSON()));
+      for (const handle of ["range-start-handle", "range-end-handle"]) {
+        const h = (await page.getByTestId(handle).boundingBox())!;
+        for (const c of chipBoxes) expect(c.right <= h.x || h.x + h.width <= c.left || c.bottom <= h.y || h.y + h.height <= c.top).toBe(true);
+      }
     }
     await page.goto("/explorer/inflation/overview");
     await ready(page);
-    for (const height of await heights(page.locator("[data-testid^='inflation-tab-']"))) expect(height).toBeGreaterThanOrEqual(44);
+    for (const height of await heights(page.locator("[data-testid^='inflation-tab-']"), 3)) expect(height).toBeGreaterThanOrEqual(44);
     await page.goto("/explorer/trade/products");
     await ready(page);
-    for (const height of await heights(page.locator("[data-testid^='trade-products-measure-']"))) expect(height).toBeGreaterThanOrEqual(44);
+    for (const height of await heights(page.locator("[data-testid^='trade-products-measure-']"), 2)) expect(height).toBeGreaterThanOrEqual(44);
     await page.goto("/explorer/trade/partners");
     await ready(page);
     expect((await page.getByTestId("trade-partners-show-all").boundingBox())!.height).toBeGreaterThanOrEqual(44);
     // The narrowest text tab on the site: "All" over the census pyramid.
     await page.goto("/en/explorer/demography/population/georgia");
     await ready(page);
-    for (const box of await page.locator("[data-testid^='age-sex-settlement-']").evaluateAll((tabs) => tabs.map((tab) => tab.getBoundingClientRect().toJSON()))) {
+    const settlements = page.locator("[data-testid^='age-sex-settlement-']");
+    await expect(settlements).toHaveCount(3);
+    for (const box of await settlements.evaluateAll((tabs) => tabs.map((tab) => tab.getBoundingClientRect().toJSON()))) {
       expect(box.width).toBeGreaterThanOrEqual(24);
       expect(box.height).toBeGreaterThanOrEqual(44);
     }
@@ -221,6 +232,7 @@ test.describe("phone", () => {
     await ready(page);
     await page.getByTestId("region-picker-trigger").click();
     const options = page.getByRole("listbox").getByRole("option");
+    expect(await options.count()).toBeGreaterThan(0);
     for (const height of await options.evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
     await expect(page.getByText("გადაადგილდით ისრებით", { exact: false })).toBeHidden();
 
@@ -229,6 +241,7 @@ test.describe("phone", () => {
     await ready(page);
     await page.getByTestId("entity-picker-trigger").click();
     const picker = page.getByTestId("entity-picker");
+    expect(await picker.getByRole("option").count()).toBeGreaterThan(0);
     for (const height of await picker.getByRole("option").evaluateAll((rows) => rows.slice(0, 5).map((row) => row.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
     const fit = await picker.evaluate((dialog) => {
       const input = dialog.querySelector("input")!;
@@ -267,9 +280,9 @@ test.describe("phone", () => {
             }
           }
         }
-        return { broken, sizes: [...new Set([...head.querySelectorAll("th")].map((cell) => getComputedStyle(cell).fontSize))] };
+        return { broken, cells: head.querySelectorAll("th").length > 0, sizes: [...new Set([...head.querySelectorAll("th")].map((cell) => getComputedStyle(cell).fontSize))] };
       });
-      expect(header).toEqual({ broken: [], sizes: ["11px"] });
+      expect(header).toEqual({ broken: [], cells: true, sizes: ["11px"] });
     }
   });
 
@@ -278,6 +291,8 @@ test.describe("phone", () => {
       await page.goto(path);
       await ready(page);
       const links = page.getByTestId("unemployment-region-navigation").locator("a");
+      await expect(links).toHaveCount(2);
+      await expect(links.locator("span")).toHaveCount(2);
       expect(await links.locator("span").evaluateAll((spans) => spans.filter((span) => span.scrollWidth > span.clientWidth).map((span) => span.textContent))).toEqual([]);
       for (const height of await links.evaluateAll((anchors) => anchors.map((anchor) => anchor.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
     }
@@ -317,9 +332,14 @@ test.describe("desktop", () => {
   });
 
   test("phone-only target sizes leave the desktop controls as they were", async ({ page }) => {
+    // These exact sizes are today's inherited ones: globals.css:95-100 gives buttons and
+    // selects `font: inherit; min-width: 0` outside a layer, which overrides their text-*
+    // utilities. They are expected to move if that rule is ever fixed.
     await page.goto("/explorer/debt");
     await ready(page);
-    for (const height of await page.getByTestId("year-range-strip").locator("button[aria-pressed]").evaluateAll((chips) => chips.map((chip) => chip.getBoundingClientRect().height))) expect(height).toBe(38);
+    const chips = page.getByTestId("year-range-strip").locator("button[aria-pressed]");
+    await expect(chips).toHaveCount(3);
+    for (const height of await chips.evaluateAll((elements) => elements.map((chip) => chip.getBoundingClientRect().height))) expect(height).toBe(38);
     await page.goto("/explorer/unemployment/age");
     await ready(page);
     const select = page.getByTestId("unemployment-indicator");
@@ -332,6 +352,12 @@ test.describe("desktop", () => {
     await ready(page);
     expect((await page.getByTestId("trade-partners-show-all").boundingBox())!.height).toBe(24);
     await expect(page.getByTestId("trade-partners-ranking").locator("thead th").nth(3)).toHaveText("წილი საქართველოს ჯამში", { useInnerText: true });
+    // The 40svh list cap is for phones only: a short desktop window keeps the 340px list.
+    await page.setViewportSize({ width: 1366, height: 700 });
+    await page.goto("/en/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti");
+    await ready(page);
+    await page.getByTestId("entity-picker-trigger").click();
+    expect(await page.getByTestId("entity-picker").getByRole("listbox").evaluate((list) => list.getBoundingClientRect().height)).toBe(340);
   });
 
   test("GDP and unemployment y labels fit without the old fixed padding", async ({ page }) => {

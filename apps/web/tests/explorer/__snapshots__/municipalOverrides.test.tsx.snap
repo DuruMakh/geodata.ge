@@ -8,7 +8,7 @@ exports[`EntityPicker overrides > without them its markup is the Budget picker's
 <div class="border-b border-[var(--hairline-soft)] p-3">
 <input role="combobox" aria-expanded="true" aria-controls="_R_0_-listbox" aria-autocomplete="list" placeholder="Search places" aria-label="Search Georgia, municipalities or regions" class="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none" value=""/>
 </div>
-<div id="_R_0_-listbox" role="listbox" aria-label="Results for Georgia, municipalities and regions" class="max-h-[min(340px,40svh)] overflow-y-auto">
+<div id="_R_0_-listbox" role="listbox" aria-label="Results for Georgia, municipalities and regions" class="max-h-[340px] overflow-y-auto max-[768px]:max-h-[min(340px,40svh)]">
 <a id="_R_0_-country" role="option" aria-selected="false" tabindex="-1" data-testid="picker-country" class="grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left max-[768px]:min-h-11 max-[768px]:content-center transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] border-l-transparent text-[var(--ink)]" href="/en/explorer/municipalities/georgia">
 <span class="min-w-0 break-words text-[12px] font-semibold">Georgia</span>
 <span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10px] text-[var(--muted)]">3.94 mln GEL · 64 municipal budgets</span>

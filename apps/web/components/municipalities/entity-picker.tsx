@@ -165,8 +165,8 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
     return list;
   }, [filteredCountry, filteredGroups, baseId]);
 
-  // The listbox is a capped, scrollable region (see max-h below; 40svh on short
-  // screens keeps the list above a phone's keyboard); with
+  // The listbox is a capped, scrollable region (see max-h below: 340px, and
+  // below 768px also at most 40% of the small viewport height); with
   // up to 75 options, arrowing past the visible edge must carry the highlight
   // into view or the active option becomes invisible.
   useEffect(() => {
@@ -247,7 +247,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
             className="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none"
           />
         </div>
-        <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[min(340px,40svh)] overflow-y-auto">
+        <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[340px] overflow-y-auto max-[768px]:max-h-[min(340px,40svh)]">
           {filteredCountry ? (
             <Link
               href={pageHref(hrefFor("country", country.id), locale)}
