@@ -1,4 +1,3 @@
-import path from "node:path";
 import type { ReactNode } from "react";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
@@ -8,7 +7,7 @@ import { loadServedHouseholdData, toClientHouseholdFact } from "../data/househol
 import { HOUSEHOLD_AREAS, type ClientHouseholdFact, type HouseholdArea } from "../data/household/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdCoverage, householdRegionHref, householdViewSeries, type HouseholdSectionId } from "../explorer/household";
-import { householdWorkbookSources } from "../explorer/householdWorkbook";
+import { isHouseholdWorkbookSource } from "../explorer/householdWorkbook";
 import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
@@ -18,9 +17,7 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
-import { loadEnglishCatalogue } from "../i18n/catalogue.server";
-import { projectPublicSources } from "../methodology/publicSources";
-import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
+import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 
@@ -44,16 +41,15 @@ type HouseholdPageBody = {
   facts: ClientHouseholdFact[];
   labels: Record<string, string>;
   areaLabels: Record<HouseholdArea, string>;
-  sources: ReturnType<typeof householdWorkbookSources>;
+  sources: SourcedWorkbookPublicSource[];
   origin: string;
 };
 
 /** A section's index page (household-index.tsx), or with regionId that area's page (household.tsx): the frame both share, around the page's own body. */
 export async function renderHouseholdPage(locale: Locale, section: HouseholdSectionId, regionId: HouseholdArea | undefined, body: (page: HouseholdPageBody) => ReactNode) {
-  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [data, presentation, manifest, catalogue] = await Promise.all([
+  const [data, presentation, sources] = await Promise.all([
     loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "format", "main", "workbook"], HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_PAGE_AREAS),
-    loadReviewedSourceManifest(root, "household-income"), loadEnglishCatalogue(root),
+    loadSourcedWorkbookSources("household-income", locale, isHouseholdWorkbookSource),
   ]);
   // Each page reads only its own section's observations, and an area page only its lines' (Georgia's include towns and villages).
   const areaIds = new Set<string>(regionId ? householdViewSeries(section, regionId).map(series => series.areaId) : []);
@@ -66,7 +62,6 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   // Line names; the towns and villages lines take their names from areaLabels.
   const labels = Object.fromEntries(householdViewSeries(section, "georgia").filter(series => series.indicatorId === series.id).map(series => [series.id, t(`series.${series.id}`)]));
   const areaLabels = householdAreaLabels(presentation);
-  const sources = householdWorkbookSources(manifest, projectPublicSources(manifest, locale, catalogue.documents));
   const regionName = regionId ? areaLabels[regionId] : "", sectionTitle = t(`page.${section}.title`);
   const title = regionId ? t(`page.${section}.regionTitle`, { region: regionName }) : sectionTitle;
   const description = regionId ? t(`page.${section}.regionSummary`, { region: regionName }) : t(`page.${section}.summary`), hubTitle = message(presentation.messages, "common.livingStandards");

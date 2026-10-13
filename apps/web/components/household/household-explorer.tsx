@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useState } from "react";
 import type { ClientHouseholdFact, HouseholdArea } from "../../lib/data/household/types";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId, type HouseholdSeriesModel } from "../../lib/explorer/household";
+import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -13,16 +13,15 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
-import { matchesLabelQuery } from "../../lib/i18n/search";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
-import { SeriesAside } from "../explorer-shell/series-aside";
+import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
-import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
@@ -48,7 +47,6 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
   const parse = useCallback((hash: string, f: ClientHouseholdFact[]) => parseHouseholdHash(hash, section, area, f), [section, area]);
   const { state, update } = useHashState(facts, parse, serializeHouseholdHash);
   const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [pickerOpen, setPickerOpen] = useState(false);
   const model = buildHouseholdModel(section, area, facts, state);
   const labels: Record<string, string> = { ...lineLabels, ...areaLabels };
@@ -56,28 +54,10 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
   const unitLabel = t(`unitLong.${state.measure}`);
   const format = (value: number | null | undefined) => formatInUnit(value, unit);
   const valueLabel = (value: number | null | undefined) => value == null ? "—" : `${format(value)} ${unit.label}`;
-  const matches = (id: string) => matchesLabelQuery(query, [labels[id]]);
   const reference = model.series[0];
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
   const total = rows.find(row => row.itemId === reference.id) ?? null;
-  const allIds = model.series.map(series => series.id);
-  // Parts nest under their total (as on the Poverty page): the count and bulk action cover the top-level rows, nested ticks are counted apart.
-  const topIds = model.series.filter(series => !series.parentId).map(series => series.id);
-  const selectedTop = topIds.filter(id => state.selectedIds.includes(id)).length;
-  const toggleSeries = (id: string) => update(s => ({ ...s, selectedIds: s.selectedIds.includes(id) ? s.selectedIds.filter(item => item !== id) : allIds.filter(item => item === id || s.selectedIds.includes(item)) }), true);
-  const hasNesting = model.series.some(series => series.parentId);
-  function renderRow(series: HouseholdSeriesModel): ReactNode {
-    const nested = model.series.filter(child => child.parentId === series.id);
-    if (!series.reference && !matches(series.id) && !nested.some(child => matches(child.id))) return null;
-    const open = Boolean(query.trim()) && nested.some(child => matches(child.id)) || (expanded[series.id] ?? nested.some(child => state.selectedIds.includes(child.id)));
-    return <div key={series.id} className={series.parentId ? "ml-4" : undefined}>
-      <SeriesSelectorRow id={series.id} label={labels[series.id]} color={series.color} value={format(series.endValue)} selected={state.selectedIds.includes(series.id)} level={series.reference ? "total" : "item"} parentId={series.parentId} isChild={Boolean(series.parentId)} childLabelSize="standard" wrapLabel
-        showCaretColumn={hasNesting} hasChildren={nested.length > 0} expanded={open} expansionLabel={t("subcategoriesFor", { label: labels[series.id] })}
-        onToggleExpanded={() => setExpanded(previous => ({ ...previous, [series.id]: !open }))} onToggle={() => toggleSeries(series.id)} />
-      {open ? nested.map(renderRow) : null}
-    </div>;
-  }
   // The latest-value line is the page's headline: its own area per household, whatever is chosen below.
   const latest = facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === area && f.measure === "per_household").sort((a, b) => a.year - b.year).at(-1)!;
   const areaName = areaLabels[area];
@@ -119,19 +99,16 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} · {unitLabel} · {model.range.start}–{model.range.end} · <Link href={pageHref("/methodology/household-income", locale)} prefetch={false} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      <SeriesAside label={message(messages, "controls.series")}>
-        <p className="mb-3 text-[11px] text-[var(--muted)]">{model.range.end} · {unitLabel}</p>
-        <SeriesSelector query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={allIds.length > SEARCHABLE_MIN_ROWS} selectedCount={selectedTop} totalCount={topIds.length}
-          supplementalSelected={model.selected.length > selectedTop ? { label: t("nestedSelected"), count: model.selected.length - selectedTop } : undefined}
-          hasSelection={model.selected.length > 0} allSelected={selectedTop === topIds.length}
-          onToggleAll={() => update(s => ({ ...s, selectedIds: s.selectedIds.length ? [] : [...topIds] }), true)} hasVisibleMatches={allIds.some(matches)}>
-          {model.series.filter(series => !series.parentId).map(renderRow)}
-        </SeriesSelector>
-        <ExcelDownloadButton testId="household-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {
+      {/* Parts nest under their total (as on the Poverty page). */}
+      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{model.range.end} · {unitLabel}</>}
+        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue), parentId: series.parentId }))}
+        totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)}
+        query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS}
+        nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }) }}
+        downloadAction={<ExcelDownloadButton testId="household-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {
           const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
           await downloadWorkbook(buildHouseholdWorkbookExportModel({ section, area, facts, state, labels, areaLabel: areaLabels[area], sources, siteOrigin, title }, presentation));
-        }} />
-      </SeriesAside>
+        }} />} />
     </ExplorerWorkspace>
   </div>;
 }
