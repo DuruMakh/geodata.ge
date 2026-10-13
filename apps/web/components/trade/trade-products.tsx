@@ -47,7 +47,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const pageIds = model.selectedIds.slice(page * 25, (page + 1) * 25);
   const rows = pageIds.map(id => ({ itemId: id, kaLabel: labels.get(id)!, color: tradeProductColor(id), valuesByYear: model.valuesByEntity[id] }));
   const total = rows.find(row => row.itemId === TRADE_PRODUCT_TOTAL_ID) ?? null;
-  const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) })), [model, labels]);
+  const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) })), [model, labels]);
   const valueLabel = useCallback((value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`, [model.unit]);
   const chart = useMemo(() => <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />, [model, lineSeries, measureLabel, valueLabel]);
   return <div data-testid="trade-products" className="@container">

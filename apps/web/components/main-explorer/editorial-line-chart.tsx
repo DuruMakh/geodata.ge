@@ -36,7 +36,8 @@ export type ChartSeries = {
   label: string;
   color: string;
   vals: (number | null)[];
-  planned: boolean[];
+  /** Planned (budget) values draw a hollow point; omitted, no value is planned. */
+  planned?: boolean[];
   preliminary?: boolean[];
   forecastFromYear?: number;
   /** Reference lines (the NBG target) draw dashed and without an end dot. */
@@ -123,7 +124,7 @@ export type SpokenLabels = { notAvailable: string; other: string; planned: strin
 /** The status a drawn value carries (hollow planned point, preliminary superscript), said in words. */
 function spokenStatus(line: ChartSeries, index: number, labels: SpokenLabels): string {
   const marks: string[] = [];
-  if (line.planned[index]) marks.push(labels.planned);
+  if (line.planned?.[index]) marks.push(labels.planned);
   if (labels.preliminary && line.preliminary?.[index]) marks.push(labels.preliminary);
   return marks.length === 0 ? "" : ` (${marks.join(", ")})`;
 }
@@ -529,7 +530,7 @@ export function EditorialLineChart({
               ))}
               {line.dashed ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
               {points
-                .filter(([, , index]) => line.planned[index] || (line.hollowPreliminary && line.preliminary?.[index]))
+                .filter(([, , index]) => line.planned?.[index] || (line.hollowPreliminary && line.preliminary?.[index]))
                 .map(([px, py, index]) => (
                   <circle key={`planned-${index}`} cx={px} cy={py} r={3} fill="#F7F2E9" stroke={line.color} strokeWidth={1.5} />
                 ))}

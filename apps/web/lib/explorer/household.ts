@@ -48,7 +48,7 @@ export function householdViewSeries(section: HouseholdSectionId, area: Household
   return area === "georgia" ? [...parts, ...SETTLEMENTS.map(areaId => ({ id: areaId, indicatorId: sectionTotal(section), areaId, reference: false }))] : parts;
 }
 
-export const householdSeriesColor = (series: HouseholdSeriesDefinition, index: number): string => topicSeriesColor(series, index);
+const householdSeriesColor = (series: HouseholdSeriesDefinition, index: number): string => topicSeriesColor(series, index);
 
 /** An area page's view; the area is the page's own (Georgia or a region) and is not part of it. */
 export type HouseholdState = TopicState & { measure: HouseholdMeasure };

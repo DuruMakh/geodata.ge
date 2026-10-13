@@ -44,7 +44,7 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
     await downloadWorkbook(buildTradePartnersWorkbookModel({ data, state, sources, siteOrigin }, presentation));
   }} />;
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
-  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: tradePartnerColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) }));
+  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: tradePartnerColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) }));
   return <div data-testid="trade-partners" className="@container">
     {!embedded ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}
     {navigation ? navigation(state.measure, measure => update(s => ({ ...s, measure }), true)) : !embedded ? measureControls : null}

@@ -175,7 +175,6 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
         const share = municipalShareValueForYear(model, row, year);
         return share === null ? null : share * 100;
       }),
-      planned: years.map(() => false),
     }));
 
   const noSelection = state.selectedIds.length === 0;

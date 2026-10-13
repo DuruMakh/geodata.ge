@@ -90,7 +90,6 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
     label: cityViewLineLabel(messages, view, line.key),
     color: cityViewLineColor(view, line.key),
     vals: line.values,
-    planned: line.values.map(() => false),
   }));
   const citiesCrumb = { label: t("citiesHeading"), ...(view.kind === "city" ? { href: pageHref(CITIES_PATH, locale) } : {}) };
 

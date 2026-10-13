@@ -103,7 +103,7 @@ export function buildStackReadout(
 ): { rows: TooltipRow[]; hidden: number } {
   const byId = new Map(segments.map((segment) => [segment.id, segment]));
   const ranked = buildTooltipRows(
-    segments.map((segment) => ({ id: segment.id, label: segment.label, color: segment.color, vals: segment.values, planned: [] })),
+    segments.map((segment) => ({ id: segment.id, label: segment.label, color: segment.color, vals: segment.values })),
     hover,
     order === "value" ? cap : Number.POSITIVE_INFINITY,
   );

@@ -58,7 +58,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const valueLabel = (value: number | null | undefined, id: string) => value == null ? "—" : percent ? `${format(value, id)}${unitLabel}` : `${format(value, id)} ${unitLabel}`;
   const reference = model.series[0];
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
-  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   const total = moneyBanksHasTotalRow(section) ? rows.find(row => row.itemId === reference.id) ?? null : null;
   // The latest-value line is the page's headline: the first series of the current view, in that series' own unit. A share
   // view names its series, so touch readers, who get no tooltip, see which measure the switch selected (DESIGN §7.2a).

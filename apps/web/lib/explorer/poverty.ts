@@ -34,7 +34,7 @@ export function povertyViewSeries(section: PovertySectionId, view: PovertyView):
   return withGroups("poverty.absolute", true, [...SETTLEMENTS, "age.0_17", "age.18_64", "age.65_plus", "sex.female", "sex.male"]);
 }
 
-export const povertySeriesColor = (series: PovertySeriesDefinition, index: number): string => topicSeriesColor(series, index);
+const povertySeriesColor = (series: PovertySeriesDefinition, index: number): string => topicSeriesColor(series, index);
 
 export type PovertyState = TopicState & { view: PovertyView };
 

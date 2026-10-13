@@ -16,7 +16,7 @@ export function foreignInvestmentCoverage(data: ClientForeignInvestmentData, dim
   return { min: years[0], max: years.at(-1)!, years };
 }
 /** Every id a saved view on this tab may select, in list order. */
-export function foreignInvestmentTabIds(data: ClientForeignInvestmentData, dimension: ForeignInvestmentDimension): string[] {
+function foreignInvestmentTabIds(data: ClientForeignInvestmentData, dimension: ForeignInvestmentDimension): string[] {
   return [FOREIGN_INVESTMENT_TOTAL_ID, ...data.entities.filter(entity => entity.dimension === dimension).map(entity => entity.id), ...(dimension === "country" ? [FOREIGN_INVESTMENT_OTHERS_ID] : [])];
 }
 export function switchForeignInvestmentTab(state: ForeignInvestmentState, dimension: ForeignInvestmentDimension, data: ClientForeignInvestmentData): ForeignInvestmentState {

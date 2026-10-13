@@ -52,7 +52,7 @@ export function wagesViewSeries(section: WagesSectionId, view: WagesView, facts:
   return ["total", ...WAGES_SECTORS].filter(sectorId => published.has(sectorId)).map(sectorId => ({ id: sectorId, indicatorId, dimension, groupId, sectorId, reference: sectorId === "total" }));
 }
 
-export const wagesSeriesColor = (series: WagesSeriesDefinition, index: number): string => topicSeriesColor(series, index, series.sectorId === "total" ? `wages.${series.groupId}` : series.sectorId);
+const wagesSeriesColor = (series: WagesSeriesDefinition, index: number): string => topicSeriesColor(series, index, series.sectorId === "total" ? `wages.${series.groupId}` : series.sectorId);
 
 export type WagesState = TopicState & { view: WagesView };
 

@@ -101,7 +101,6 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       const value = pointsBySeriesYear.get(`${item.id}:${year}`)?.value ?? null;
       return value === null ? null : props.family === "stock" && props.shareOfGdp ? value * 100 : value;
     }),
-    planned: model.years.map(() => false),
     ...(props.family === "service" && forecastStartYear !== null
       ? { forecastFromYear: forecastStartYear, preliminary: model.years.map((year) => year >= forecastStartYear) }
       : {}),

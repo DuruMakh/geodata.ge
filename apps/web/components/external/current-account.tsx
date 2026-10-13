@@ -43,7 +43,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildCurrentAccountWorkbookModel({ facts, gdp, state, sources, gdpSources, siteOrigin }, presentation));
   }} />;
-  const lineSeries = shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }));
+  const lineSeries = shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]) }));
   return <div data-testid="current-account" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
     <div role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{CURRENT_ACCOUNT_TABS.map(tab => <TextTab key={tab} label={t(`tab.${tab}`)} active={state.tab === tab} onClick={() => update(s => ({ ...s, tab }), true)} testId={`current-account-tab-${tab}`} />)}</div>

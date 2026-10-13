@@ -168,7 +168,6 @@ export function buildRegionalEconomyModel(
       label: definition.labelKa,
       color: regionalEconomyColor(definition.id),
       vals: years.map((year) => byCell.get(`${definition.id}:${year}`)?.value ?? null),
-      planned: years.map(() => false),
       preliminary: years.map(() => false),
     })),
     endValues,

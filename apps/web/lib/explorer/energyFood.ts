@@ -94,7 +94,7 @@ export function energyFoodUnit(section: EnergyFoodSectionId): EnergyFoodUnit {
 const ENERGY_FOOD_PALETTE = [...EDITORIAL_PALETTE, "#0D89C2", "#474A02"] as const;
 
 /** The reference is drawn in ink; `index` is the series' position among the non-reference series, so no colour repeats on a page. */
-export function energyFoodSeriesColor(series: EnergyFoodSeriesDefinition, index: number): string {
+function energyFoodSeriesColor(series: EnergyFoodSeriesDefinition, index: number): string {
   return series.reference ? INK : ENERGY_FOOD_PALETTE[index % ENERGY_FOOD_PALETTE.length];
 }
 

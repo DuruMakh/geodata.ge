@@ -149,7 +149,6 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
     label: categoryLabel(messages, line.key),
     color: categoryColor(line.key),
     vals: line.values,
-    planned: line.values.map(() => false),
   }));
 
   return (

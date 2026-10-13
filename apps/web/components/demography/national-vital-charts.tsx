@@ -43,7 +43,6 @@ export function NationalVitalCharts({
   const [first, last] = [years[0]!, years.at(-1)!];
   const breaks = [{ year: CENSUS_STEP.toYear, label: t("breakLabel") }];
   const flat = (record: Record<number, number | null>) => years.map((year) => record[year] ?? null);
-  const none = years.map(() => false);
   const tfr = seriesByYear(facts, SERIES.totalFertilityRate);
   const curves = ageCurves(facts);
   // x positions 1..7 stand for the seven age groups; the period label prints the group's name.
@@ -54,7 +53,7 @@ export function NationalVitalCharts({
   const ageOrder = [...curves.years.slice(1, -1), curves.years[0]!, curves.years.at(-1)!];
   const lifeColor = (colorKey: string | null) => (colorKey === null ? INK : SERIES_COLORS[colorKey]!);
   const rate1 = (value: number) => formatInUnit(value, UNIT_DENSITY);
-  const lifeSeries = LIFE_SERIES.map((line) => ({ id: line.seriesId, label: t(line.key), color: lifeColor(line.colorKey), vals: flat(seriesByYear(facts, line.seriesId)), planned: none }));
+  const lifeSeries = LIFE_SERIES.map((line) => ({ id: line.seriesId, label: t(line.key), color: lifeColor(line.colorKey), vals: flat(seriesByYear(facts, line.seriesId)) }));
 
   return (
     <>
@@ -66,7 +65,7 @@ export function NationalVitalCharts({
           {tfrMode === "line" ? (
             <EditorialLineChart
               years={years}
-              series={[{ id: SERIES.totalFertilityRate, label: t("tfrLabel"), color: INK, vals: flat(tfr), planned: none }]}
+              series={[{ id: SERIES.totalFertilityRate, label: t("tfrLabel"), color: INK, vals: flat(tfr) }]}
               share={false}
               unit={UNIT_RATE_2}
               shareLabel=""
@@ -117,7 +116,6 @@ export function NationalVitalCharts({
                   label: String(year),
                   color: ageColor(year),
                   vals: AGE_GROUPS.map((group) => curves.byYear[year]![group]),
-                  planned: AGE_GROUPS.map(() => false),
                 }))}
                 share={false}
                 unit={UNIT_DENSITY}

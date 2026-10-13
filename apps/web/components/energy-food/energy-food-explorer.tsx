@@ -52,7 +52,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   // The list nests plain names; the chart and table name a repeated child with its parent.
   const shown = energyFoodDisplayLabels(section, labels);
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: shown[series.id], color: series.color, valuesByYear: series.valuesByYear }));
-  const lineSeries = model.selected.map(series => ({ id: series.id, label: shown[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: shown[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   const total = rows.find(row => row.itemId === reference.id) ?? null;
   // The latest-value line is the page's total in its latest year; supply and electricity add that year's imports (and exports).
   const factFor = (id: string, year: number) => facts.find(f => f.indicatorId === id && f.year === year);

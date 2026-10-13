@@ -68,7 +68,7 @@ export function buildUnemploymentModel(facts: readonly ClientUnemploymentObserva
   }));
   return {
     range, availableYears: coverage.availableYears, years, definitions, referenceId, rows, percent,
-    series: selected.map(group => ({ id: group.id, label: group.labelKa, color: color(group), vals: years.map(year => byCell.get(`${group.id}:${year}`)?.value ?? null), planned: years.map(() => false) })),
+    series: selected.map(group => ({ id: group.id, label: group.labelKa, color: color(group), vals: years.map(year => byCell.get(`${group.id}:${year}`)?.value ?? null) })),
     endValues, headline: active.filter(f => unemploymentFactSeriesId(f, state) === referenceId).sort((a, b) => a.year - b.year).at(-1) ?? null,
     activeFacts, sourceIds: [...new Set(activeFacts.map(f => f.sourceId))], hasData: activeFacts.length > 0,
   };

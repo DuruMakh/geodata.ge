@@ -107,8 +107,7 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
     if (omittedIds.has(id)) return [];
     const vals = periods.map((period) => state.indicator === "annual" ?
       productAnnual(index, id, period) : productCumulative(index, id, state.range.startYear, period).value);
-    return [{ id, label: locale === "ka" ? item.labelKa : item.labelEn, color: productColor(id), vals,
-      planned: vals.map(() => false) }];
+    return [{ id, label: locale === "ka" ? item.labelKa : item.labelEn, color: productColor(id), vals }];
   });
   const hasValues = chartSeries.some((series) => series.vals.some((value) => value !== null));
   const toggleAction = state.indicator === "annual" ? t("productsShowCumulative") : t("productsShowAnnual");

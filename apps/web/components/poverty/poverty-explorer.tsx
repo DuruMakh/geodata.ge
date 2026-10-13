@@ -62,7 +62,7 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildPovertyWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
   }} />;
-  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   return <div data-testid={`poverty-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
     <LatestValueLine testId="poverty-latest" measure={t(`latest.${latestKey}`)} period={latest.year} value={valueLabel(latest.value)} />

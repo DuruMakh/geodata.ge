@@ -69,7 +69,7 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
     await downloadWorkbook(buildWagesWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title, regionId }, presentation));
   }} />;
   const heatmap = section === "industries" ? buildWagesHeatmap(model) : null;
-  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   return <div data-testid={`wages-${section}`} className="@container">
     {regionId ? <PlaceHeading
       lead={t("regionHeadingLead")}

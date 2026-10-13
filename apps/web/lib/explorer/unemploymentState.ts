@@ -8,7 +8,7 @@ import { unemploymentOverviewDefinitions, unemploymentOverviewIndicators, unempl
 
 export type UnemploymentState = { indicator: UnemploymentIndicator; breakdown: UnemploymentBreakdown; educationSex: UnemploymentSex; mode: "line" | "table"; range: PeriodRange; selectedIds: string[]; overview?: true; regional?: true; regionId?: string };
 export const DEFAULT_UNEMPLOYMENT_STATE: UnemploymentState = { indicator: "unemployment_rate", breakdown: "national", educationSex: "total", mode: "line", range: { kind: "all" }, selectedIds: ["georgia"] };
-export const UNEMPLOYMENT_BREAKDOWNS: UnemploymentBreakdown[] = ["national", "sex", "settlement", "age", "region", "education", "long_term"];
+const UNEMPLOYMENT_BREAKDOWNS: UnemploymentBreakdown[] = ["national", "sex", "settlement", "age", "region", "education", "long_term"];
 
 function fit(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): UnemploymentState {
   return { ...state, range: refitRange(state.range, unemploymentCoverage(facts, state), { collapseToAll: false }) };

@@ -101,7 +101,6 @@ export function GdpOverview({
       color: INK,
       // Shared chart percentages use points; table and workbook use fractions.
       vals: m.points.map((p) => d.growth ? p.value * 100 : p.value),
-      planned: m.years.map(() => false),
     },
   ];
   const currentSources = sources.filter((s) =>

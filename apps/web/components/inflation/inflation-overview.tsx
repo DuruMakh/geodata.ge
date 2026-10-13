@@ -84,7 +84,6 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
     label: seriesLabel(messages, line.key, state.tab),
     color: INFLATION_COLORS[line.key],
     vals: line.values,
-    planned: line.values.map(() => false),
     dashed: line.key === "target",
   }));
 

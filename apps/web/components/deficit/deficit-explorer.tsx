@@ -95,7 +95,6 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
         label,
         color: DEFICIT_ITEM.color,
         vals: model.points.map((point) => point.value),
-        planned: model.years.map(() => false),
         ...(forecastStartYear === null
           ? {}
           : { forecastFromYear: forecastStartYear, preliminary: model.years.map((year) => year >= forecastStartYear) }),

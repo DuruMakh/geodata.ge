@@ -61,7 +61,7 @@ const MEASURE_PAIRS: readonly (readonly [string, string])[] = [
 ];
 const counterpart = (id: string) => { const pair = MEASURE_PAIRS.find(([amount, share]) => amount === id || share === id); return pair ? (pair[0] === id ? pair[1] : pair[0]) : id; };
 
-export const moneyBanksSeriesColor = (series: MoneyBanksSeriesDefinition, index: number): string => topicSeriesColor(series, index);
+const moneyBanksSeriesColor = (series: MoneyBanksSeriesDefinition, index: number): string => topicSeriesColor(series, index);
 
 export type MoneyBanksState = TopicState & { view: MoneyBanksView };
 

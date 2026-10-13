@@ -11,7 +11,7 @@ import { withLari } from "../ui/lari";
  * viewport, so its results land above the on-screen keyboard instead of under it.
  * Wide layouts keep their position: the series aside is sticky there.
  */
-export function revealSearchField(event: FocusEvent<HTMLInputElement>) {
+function revealSearchField(event: FocusEvent<HTMLInputElement>) {
   if (!window.matchMedia("(max-width: 1099.98px)").matches) return;
   event.currentTarget.scrollIntoView({ block: "start" });
 }

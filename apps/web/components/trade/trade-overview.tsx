@@ -52,7 +52,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation));
   }} />;
-  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: TRADE_OVERVIEW_COLORS[id], vals: model.years.map(year => model.valuesByIndicator[id][year]), planned: model.years.map(() => false) }));
+  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: TRADE_OVERVIEW_COLORS[id], vals: model.years.map(year => model.valuesByIndicator[id][year]) }));
   return <div data-testid="trade-overview" className="@container">
     {!domestic && !services ? <ExplorerHeading>{title}</ExplorerHeading> : null}
     <ExplorerWorkspace>

@@ -39,7 +39,7 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
     await downloadWorkbook(buildForeignInvestmentWorkbookModel({ data, state, sources, siteOrigin }, presentation));
   }} />;
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
-  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false) }));
+  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesByEntity[id][year]) }));
   return <div data-testid="foreign-investment" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
     <div role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{FOREIGN_INVESTMENT_DIMENSIONS.map(dimension => <TextTab key={dimension} label={t(`tab.${dimension}`)} active={state.dimension === dimension} onClick={() => update(s => switchForeignInvestmentTab(s, dimension, data), true)} testId={`foreign-investment-tab-${dimension}`} />)}</div>

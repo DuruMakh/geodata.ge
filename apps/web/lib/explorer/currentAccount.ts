@@ -7,7 +7,7 @@ import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { currentAccountCoverage, type CurrentAccountState, type CurrentAccountTab } from "./currentAccountState";
 
-export const CURRENT_ACCOUNT_COLORS: Record<CurrentAccountSeriesId, string> = { "ca.balance": INK, "ca.goods": SERIES_COLORS["ca.goods"]!, "ca.services": SERIES_COLORS["ca.services"]!, "ca.primary_income": SERIES_COLORS["ca.primary_income"]!, "ca.secondary_income": SERIES_COLORS["ca.secondary_income"]! };
+const CURRENT_ACCOUNT_COLORS: Record<CurrentAccountSeriesId, string> = { "ca.balance": INK, "ca.goods": SERIES_COLORS["ca.goods"]!, "ca.services": SERIES_COLORS["ca.services"]!, "ca.primary_income": SERIES_COLORS["ca.primary_income"]!, "ca.secondary_income": SERIES_COLORS["ca.secondary_income"]! };
 const FLOW_BY_TAB: Record<CurrentAccountTab, CurrentAccountFlow> = { balance: "net", in: "credit", out: "debit" };
 export type CurrentAccountGdp = { year: number; valueUsd: number; preliminary: boolean };
 export type CurrentAccountSeries = { id: CurrentAccountSeriesId; label: string; color: string };

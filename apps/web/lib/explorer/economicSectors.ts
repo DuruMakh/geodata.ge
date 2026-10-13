@@ -88,7 +88,7 @@ export function buildEconomicSectorsModel(facts: readonly ClientSectorObservatio
   return {
     range, years, availableYears: range.availableYears, rows,
     series: selected.map(r => ({ id: r.id, label: r.labelKa, color: sectorColor(r.id),
-      vals: years.map(year => byCell.get(`${r.id}:${year}`)?.value ?? null), planned: years.map(() => false),
+      vals: years.map(year => byCell.get(`${r.id}:${year}`)?.value ?? null),
       preliminary: years.map(year => byCell.get(`${r.id}:${year}`)?.status === "preliminary"),
     })),
     endValues,

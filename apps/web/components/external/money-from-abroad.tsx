@@ -45,7 +45,7 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
     await downloadWorkbook(buildMoneyTransfersWorkbookModel({ data, state, sources, siteOrigin }, presentation));
   }} />;
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
-  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: model.colorById[id], vals: model.years.map(year => model.valuesByEntity[id][year]), planned: model.years.map(() => false), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true }));
+  const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: model.colorById[id], vals: model.years.map(year => model.valuesByEntity[id][year]), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true }));
   return <div data-testid="money-from-abroad" className="@container">
     <ExplorerHeading>{message(messages, "external.money.title")}</ExplorerHeading>
     <div role="group" aria-label={t("measure")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{MONEY_TRANSFER_MEASURES.map(measure => <TextTab key={measure} label={message(messages, `external.measure.${measure}`)} active={state.measure === measure} onClick={() => update(s => ({ ...s, measure }), true)} testId={`money-from-abroad-measure-${measure}`} />)}</div>

@@ -20,7 +20,7 @@ import { withLari } from "../ui/lari";
 export type AidSeries = { id: string; label: string; color: string; vals: (number | null)[]; forecastFromYear?: number };
 
 /** How long the pill waits for the next selection change before it leaves. */
-export const RETURN_PILL_MS = 4000;
+const RETURN_PILL_MS = 4000;
 const SWATCH_CAP = 6;
 
 /** Whether the legend lists `lines` lines: two or more, and no more than the cap (by default the tooltip's ten rows). */

@@ -75,7 +75,7 @@ export function seriesValues(index: InflationIndex, key: InflationSeriesKey, tab
   return index.values.get(seriesGroup(key, tab));
 }
 
-export function tabCoverage(index: InflationIndex, tab: InflationTab): { min: number; max: number } {
+function tabCoverage(index: InflationIndex, tab: InflationTab): { min: number; max: number } {
   return periodBounds(INFLATION_SERIES.map((key) => seriesValues(index, key, tab)), "Inflation data has no periods");
 }
 
