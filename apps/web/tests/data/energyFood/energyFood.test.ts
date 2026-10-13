@@ -9,7 +9,7 @@ import { assertEnergyFoodParity, loadEnergyFoodFacts, toClientEnergyFoodFact } f
 import { energyFoodMirrorCreateRows, loadEnergyFoodFactsFromMirror } from "../../../lib/db/mirrorRows";
 import type { Prisma } from "../../../lib/generated/prisma/client";
 import { readWorkbookCells } from "../../../lib/data/energyFood/prepareEnergyFood";
-import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_PUBLIC_SOURCES, ENERGY_FOOD_SOURCES, type EnergyFoodFact } from "../../../lib/data/energyFood/types";
+import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_PUBLIC_SOURCES, type EnergyFoodFact } from "../../../lib/data/energyFood/types";
 import { energyFoodDisplayDecimals, expectedEnergyFoodKeys, validateEnergyFoodFacts } from "../../../lib/data/energyFood/validation";
 
 const root = path.resolve(process.cwd(), "../..");
@@ -25,21 +25,24 @@ const find = (facts: readonly EnergyFoodFact[], indicatorId: string, year: numbe
 const general = (facts: readonly EnergyFoodFact[], unit: string) => facts.find(f => f.unit === unit && f.sourceNumberFormat === "General")!;
 const food = (facts: readonly EnergyFoodFact[]) => general(facts, "percent");
 
-test("serves all 681 reviewed values", () => {
+test("serves all 681 reviewed values", async () => {
   const facts = loadFacts();
   expect(facts).toHaveLength(681);
   expect(new Set(facts.map(f => f.indicatorId)).size).toBe(ENERGY_FOOD_INDICATORS.length);
   expect(facts.filter(f => f.valueStatus === "no_flow")).toHaveLength(3);
   expect(find(facts, "energy.supply.electricity", 2023).value).toBe("-58.3");
+  // The real negative electricity supply (net exports) passes validation.
+  expect(Number(find(facts, "energy.supply.electricity", 2016).value)).toBeLessThan(0);
   expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
+  // The loader serves the same 681 canonical rows.
+  const loaded = await loadEnergyFoodFacts();
+  expect(loaded).toHaveLength(681);
+  expect(find(loaded, "energy.supply.electricity", 2023).value).toBe("-58.3");
 });
 
 test("source inventories", () => {
-  expect(ENERGY_FOOD_INDICATORS).toHaveLength(57);
-  expect(ENERGY_FOOD_SOURCES).toHaveLength(26);
-  expect(ENERGY_FOOD_PUBLIC_SOURCES).toHaveLength(42);
-  expect(new Set(ENERGY_FOOD_PUBLIC_SOURCES).size).toBe(42);
-  expect(expectedEnergyFoodKeys().size).toBe(681);
+  expect(new Set(ENERGY_FOOD_PUBLIC_SOURCES).size).toBe(ENERGY_FOOD_PUBLIC_SOURCES.length);
+  expect(expectedEnergyFoodKeys().size).toBe(loadFacts().length);
 });
 
 describe("readWorkbookCells", () => {
@@ -107,19 +110,7 @@ test("General rows publish the stored value cut to 15 significant digits", () =>
   expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
 });
 
-test("validation accepts the real negative electricity supply", () => {
-  const facts = loadFacts();
-  for (const year of [2016, 2023]) expect(Number(find(facts, "energy.supply.electricity", year).value)).toBeLessThan(0);
-  expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
-});
-
 describe("loading and parity", () => {
-  test("loadEnergyFoodFacts serves the 681 canonical rows", async () => {
-    const facts = await loadEnergyFoodFacts();
-    expect(facts).toHaveLength(681);
-    expect(find(facts, "energy.supply.electricity", 2023).value).toBe("-58.3");
-  });
-
   test("loadEnergyFoodFacts rejects a canonical file that no longer matches its acceptance fingerprint", async () => {
     const copy = fs.mkdtempSync(path.join(os.tmpdir(), "energy-food-"));
     try {

@@ -19,6 +19,8 @@ describe("general-government deficit workbook", () => {
     expect(en.analysis.rows.map(row => [row[0], row[3], row[5]])).toEqual(ka.analysis.rows.map(row => [row[0], row[3], row[5]]));
     expect(en.analysis.rows.map(row => row[3])).toEqual([-1_526_000_000, -2_672_000_000]);
     expect(en.analysis.rows.map(row => row[4])).toEqual(["Actual", "Forecast"]);
+    // The reviewed English label for the published series id.
+    expect(en.analysis.rows.every(row => row.includes("General government balance"))).toBe(true);
     expect(en.sheetNames).toEqual(["Summary", "Data", "Sources"]);
     expect(JSON.stringify(en)).not.toMatch(/\p{Script=Georgian}/u);
     const workbook = new ExcelJS.Workbook();

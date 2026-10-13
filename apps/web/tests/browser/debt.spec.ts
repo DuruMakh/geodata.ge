@@ -236,6 +236,36 @@ test.describe("Government Debt explorer", () => {
     const summary = workbook.getWorksheet("მარტივი ცხრილი")!;
     expect(summary.getCell("C4").numFmt).not.toContain("პროგნოზი");
     expect(summary.getCell("D4").numFmt).toContain("პროგნოზი");
+    expect(workbook.getWorksheet("წყაროები")!.getCell("D4").value).toEqual(expect.objectContaining({
+      text: "ფაილის ჩამოტვირთვა",
+      hyperlink: expect.stringContaining("/downloads/methodology/debt/files/"),
+    }));
+  });
+
+  test("exports the rate family with its rate column and published gaps", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt?view=rate#f=rate&m=table&r=2019-2021&sel=debt.rate.external`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "rate");
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByTestId("debt-excel").click();
+    const download = await downloadPromise;
+    const path = await download.path();
+    if (!path) throw new Error("Expected a local XLSX download path");
+    const rateExport = new ExcelJS.Workbook();
+    await rateExport.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
+    const rateSheet = rateExport.getWorksheet("მონაცემები")!;
+    expect(rateSheet.getRow(1).values).toEqual([
+      undefined,
+      "წელი",
+      "მთავარი ჯგუფი",
+      "კატეგორია",
+      "თანხა (₾)",
+      "სტატუსი",
+      "საპროცენტო განაკვეთი (%)",
+    ]);
+    const rateRows = rateSheet.getRows(2, 10) ?? [];
+    expect(rateRows.some((row) => row.getCell(1).value === 2019 && row.getCell(4).value === null && row.getCell(5).value === "არ არის ხელმისაწვდომი")).toBe(true);
+    expect(rateRows.some((row) => row.getCell(1).value === 2021 && row.getCell(6).value === 0.0095)).toBe(true);
   });
 
   // U06-03: a projection year read like an actual one in the hover readout.

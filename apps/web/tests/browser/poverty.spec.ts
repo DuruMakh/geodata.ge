@@ -3,18 +3,18 @@ import ExcelJS from "exceljs";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`living standards hub and poverty pages render ${prefix || "ka"} at ${width}px`, async ({ page }) => {
+// One test per locale walks the review widths; the hub's links are checked in hubs.spec.ts.
+for (const prefix of ["", "/en"]) {
+  test(`poverty pages render ${prefix || "ka"} at 390, 768 and 1440px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`${prefix}/explorer/living-standards`);
-    const hub = page.getByTestId("living-standards-hub");
-    await expect(hub.locator("a")).toHaveCount(4);
-    await expect(hub.locator("a").nth(2)).toHaveAttribute("href", `${prefix}/explorer/living-standards/poverty`);
     for (const section of ["poverty", "inequality"]) {
       await page.goto(`${prefix}/explorer/living-standards/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-      await expect(page.getByTestId("series-status")).toContainText("1 /");
+      for (const width of [390, 768, 1440]) {
+        await page.setViewportSize({ width, height: 1000 });
+        await expect(page.getByTestId("series-status")).toContainText("1 /");
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${section} ${width}`).toBe(true);
+      }
     }
     expect(errors).toEqual([]);
   });
@@ -92,4 +92,13 @@ test("inequality shows the Gini coefficient with two decimals and no tabs, and e
   expect(download.suggestedFilename()).toMatch(/\.xlsx$/);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets).toHaveLength(3);
+});
+
+test("an old poverty bookmark lands on the new address with its tab", async ({ page }) => {
+  // Redirects come from next.config and next dev serves them too (the municipality redirect specs run there); this one is skipped on the default local dev webServer and runs against a served build (PLAYWRIGHT_BASE_URL) or in CI.
+  test.skip(!process.env.PLAYWRIGHT_BASE_URL && !process.env.CI, "redirects are checked against a served build");
+  await page.goto("/en/explorer/poverty/rates#tab=relative");
+  await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/poverty#tab=relative/);
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("poverty-tab-relative")).toHaveAttribute("aria-pressed", "true");
 });

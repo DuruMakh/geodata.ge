@@ -9,12 +9,7 @@ const toggle = (page: import("@playwright/test").Page, id: string) => page.locat
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Money from abroad defaults, Received/Sent, one series list, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
-    const cards = page.getByTestId("external-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(3);
-    await expect(cards.nth(1)).toHaveAttribute("href", new RegExp(`${prefix}/explorer/external/foreign-investment$`));
-    await expect(cards.nth(2)).toHaveAttribute("href", new RegExp(`${prefix}/explorer/external/current-account$`));
-    await cards.nth(0).click();
-    await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/money-from-abroad$`));
+    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external/money-from-abroad`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 12");
     await expect(toggle(page, "transfer.total")).toHaveAttribute("aria-pressed", "true");
@@ -27,6 +22,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(ranking.first()).toContainText("682.9");
     await expect(page.getByTestId("money-from-abroad-other-row")).toHaveCount(1);
     await expect(page.getByTestId("money-from-abroad-show-all")).toHaveCount(0);
+    if (width === 768) {
+      // The layout threshold: defaults and overflow only; the flow below is width-independent.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
     await page.getByTestId("money-from-abroad-measure-sent").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "sent");
@@ -94,16 +95,6 @@ test("Excel follows the selection and measure and links the untouched NBG origin
   }
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("2000/2025");
-});
-
-test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
-  await page.goto("/en/explorer/external/money-from-abroad#measure=received&view=line&sel=");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-  await page.locator('[data-series-id="transfer.total"]').getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-  await page.goBack();
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 });
 
 // DESIGN §7.7: a series list of ten rows or fewer is read at a glance and has no search field (U23-03, U21-09).

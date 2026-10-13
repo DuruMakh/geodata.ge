@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
 import { SourceArchive, type PublicSourceManifestRow } from "../../components/methodology/source-archive";
 import { METHODOLOGY_CONTENT } from "../../lib/methodology/catalog";
+import { resolveSiteUrl } from "../../lib/siteUrl";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 import common from "../../lib/i18n/messages/ka/common.json";
@@ -91,20 +92,18 @@ function renderArticle(dataset: "debt" | "expenditure") {
 }
 
 describe("methodology processed-download caption", () => {
-  it("describes the Debt CSV with neutral status metadata rather than fact/plan metadata", () => {
-    const markup = renderArticle("debt");
+  // Debt describes its CSV with neutral status metadata rather than fact/plan metadata; every category keeps
+  // its existing download link and the shared format/licence caption.
+  it.each([
+    ["debt", "/downloads/data/government-debt.csv"],
+    ["expenditure", "/downloads/data/national-expenditure.csv"],
+  ] as const)("the %s caption links %s with status metadata and the shared format/licence line", (dataset, href) => {
+    const markup = renderArticle(dataset);
 
-    expect(markup).toContain('href="/downloads/data/government-debt.csv"');
-    expect(markup).toContain("სტატუსის მეტამონაცემებით");
-    expect(markup).not.toContain("ფაქტი/გეგმის მეტამონაცემებით");
-  });
-
-  it("preserves the existing category download link and shared format/licence caption", () => {
-    const markup = renderArticle("expenditure");
-
-    expect(markup).toContain('href="/downloads/data/national-expenditure.csv"');
+    expect(markup).toContain(`href="${href}"`);
     expect(markup).toContain("UTF-8 / Excel თავსებადი · CC BY 4.0");
     expect(markup).toContain("სტატუსის მეტამონაცემებით");
+    if (dataset === "debt") expect(markup).not.toContain("ფაქტი/გეგმის მეტამონაცემებით");
   });
 });
 
@@ -225,4 +224,28 @@ describe("the source archive's year filter", () => {
     expect(markup).toContain('data-testid="archive-year-filter"');
     expect(markup).toContain(">1960</button>");
   });
+});
+
+// Moved from inflation-overview.spec.ts: the methodology Dataset is the node the catalog references.
+it("makes the inflation methodology Dataset the node the catalog references, in each language", async () => {
+  const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+  const { renderMethodologyPage } = await import("../../lib/pages/methodology");
+  const dataset = async (locale: "ka" | "en") => {
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "inflation" }) }));
+    return JSON.parse(markup.match(/<script data-testid="dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!);
+  };
+  const messages = await getMessages("ka", ["common", "methodology"]);
+  const hub = renderToStaticMarkup(<I18nProvider locale="ka" messages={messages}>{await renderMethodologyPage("ka")}</I18nProvider>);
+  const catalog = JSON.parse(hub.match(/<script data-testid="catalog-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!);
+  const origin = resolveSiteUrl();
+  const id = `${origin}/methodology/inflation`;
+  expect(catalog.dataset.map((entry: { "@id": string }) => entry["@id"])).toContain(id);
+  const georgian = await dataset("ka");
+  expect(georgian["@id"]).toBe(id);
+  expect(georgian.includedInDataCatalog["@id"]).toBe(`${origin}/methodology#catalog`);
+  expect(georgian.distribution[0].contentUrl).toBe(`${origin}/downloads/data/inflation-cpi-national.csv`);
+  // The English page is the English node, in the English catalog.
+  const english = await dataset("en");
+  expect(english["@id"]).toBe(`${origin}/en/methodology/inflation`);
+  expect(english.includedInDataCatalog["@id"]).toBe(`${origin}/en/methodology#catalog`);
 });

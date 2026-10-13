@@ -231,6 +231,55 @@ describe("EditorialLineChart monthly periods", () => {
   });
 });
 
+describe("EditorialLineChart dot lattice", () => {
+  const drawing = (years: number[]) =>
+    chartGeometry(
+      renderGeorgianMarkup(
+        createElement(EditorialLineChart, {
+          years,
+          series: [{ id: "total", label: "სერია", color: "#B3402A", vals: years.map((_, index) => (10 + index) * 1e9), planned: years.map(() => false) }],
+          share: false,
+          unit: UNIT_BN,
+          shareLabel: "% წილი",
+        }),
+      ),
+      "desktop",
+    );
+  const strokes = (markup: string) => [...markup.matchAll(/<line\b[^>]*\sstroke="([^"]+)"/g)].map((match) => match[1]);
+
+  it("draws a dot lattice instead of horizontal gridlines, keeping only the zero rule", () => {
+    const markup = drawing([2020, 2021, 2022, 2023, 2024]);
+    expect(markup).toContain('data-testid="chart-dot-lattice"');
+    expect(strokes(markup)).not.toContain("#E7DECF");
+    expect(strokes(markup)).toContain("#1E1B16");
+  });
+
+  it("offsets the pattern tile by half a pitch so the dots land on the chart's own grid", () => {
+    // editorial-line-chart.tsx: `x={PAD_L - lattice.colPitch / 2}`, `cx={lattice.colPitch / 2}`, so the
+    // dots sit at (PAD_L, PAD_T) rather than merely tiling the plot rect.
+    const markup = drawing([2020, 2021, 2022, 2023, 2024]);
+    const pattern = /<pattern id="chart-dot-lattice"[^>]*\sx="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"><circle cx="([\d.]+)" cy="([\d.]+)"/.exec(markup);
+    expect(pattern).not.toBeNull();
+    const [patternX, patternY, patternWidth, patternHeight, circleCx, circleCy] = pattern!.slice(1).map(Number) as [number, number, number, number, number, number];
+    // The left padding grows to fit the widest y label, so read the plot's left edge from the y-axis hairline.
+    const PAD_L = Number(/<line x1="([\d.]+)"[^>]*stroke="#D9CFBE"/.exec(markup)?.[1]);
+    expect(PAD_L).toBeGreaterThanOrEqual(74);
+    const PAD_T = 16;
+    expect(patternX + circleCx).toBeCloseTo(PAD_L, 5);
+    expect(patternY + circleCy).toBeCloseTo(PAD_T, 5);
+    expect(circleCx).toBeCloseTo(patternWidth / 2, 5);
+    expect(circleCy).toBeCloseTo(patternHeight / 2, 5);
+  });
+
+  it("drops the lattice for a single year and brings the hairline rules back", () => {
+    // A single-year range gives the lattice no interval to divide; without the hairlines
+    // the axis labels would sit against blank paper with nothing to read a value against.
+    const markup = drawing([2024]);
+    expect(markup).not.toContain("chart-dot-lattice");
+    expect(strokes(markup)).toContain("#E7DECF");
+  });
+});
+
 // D1 (2026-10-07): phones draw the chart at the frame's width instead of
 // scrolling a 920-unit drawing that rendered its 11-unit labels at 8.6px.
 describe("EditorialLineChart phone geometry", () => {

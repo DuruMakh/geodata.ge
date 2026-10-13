@@ -46,7 +46,7 @@ describe("place addresses", () => {
     expect(() => populationPlaceHref("99")).toThrow(/No population page/);
   });
 
-  test("75 pages: every place has one distinct address and every address is a route", () => {
+  test("75 pages: every place has one distinct address, every address is a route, and the address table covers every place and municipality 04", () => {
     const hrefs = places.map((p) => populationPlaceHref(p.id));
     expect(hrefs).toHaveLength(75);
     expect(new Set(hrefs).size).toBe(75);
@@ -54,6 +54,11 @@ describe("place addresses", () => {
     expect(paths).toHaveLength(75);
     expect(new Set(paths)).toEqual(new Set(hrefs));
     expect(hrefs.every((href) => href.startsWith(`${POPULATION_PATH}/`))).toBe(true);
+    // The address table covers every place and municipality 04.
+    const table = populationHrefById(places);
+    expect(Object.keys(table)).toHaveLength(76);
+    expect(table["04"]).toBe(table[TBILISI_PLACE_ID]);
+    expect(table[GEORGIA_PLACE_ID]).toBe("/explorer/demography/population/georgia");
   });
 
   test("the municipality slugs are the Budget ones without Tbilisi, and Tbilisi's slug is not a route", () => {
@@ -64,13 +69,6 @@ describe("place addresses", () => {
     expect(populationMunicipalityCodeForSlug("batumi")).toBe("06");
     expect(populationMunicipalityCodeForSlug("tbilisi")).toBeNull();
     expect(populationMunicipalityCodeForSlug("nonsense")).toBeNull();
-  });
-
-  test("the address table covers every place and municipality 04", () => {
-    const table = populationHrefById(places);
-    expect(Object.keys(table)).toHaveLength(76);
-    expect(table["04"]).toBe(table[TBILISI_PLACE_ID]);
-    expect(table[GEORGIA_PLACE_ID]).toBe("/explorer/demography/population/georgia");
   });
 });
 

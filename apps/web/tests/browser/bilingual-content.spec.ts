@@ -18,10 +18,8 @@ for (const route of ["/en", "/en/explorer", "/en/about", "/en/connect"]) test(`$
   } finally { await context.close(); }
 });
 
-test("the English reader journey keeps human pages English and copies the shared endpoint", async ({ page }) => {
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (value: string) => { document.documentElement.dataset.testClipboard = value; } } });
-  });
+// Copying the endpoint and the prompt, and the absent /en/mcp link, are checked in connect.spec.ts.
+test("the English reader journey keeps human pages English and reaches the shared endpoint", async ({ page }) => {
   await page.goto("/en");
   await page.getByTestId("landing-header").getByRole("link", { name: "Data", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/explorer$/);
@@ -35,15 +33,6 @@ test("the English reader journey keeps human pages English and copies the shared
   await expect(page).toHaveURL(/\/en\/connect$/);
   await expectEnglish(page);
   await expect(page.getByTestId("connect-endpoint")).toHaveText("https://fiscal.ge/mcp");
-  await expect(page.locator('a[href="/en/mcp"]')).toHaveCount(0);
-  const copy = page.getByTestId("connect-copy");
-  await copy.focus();
-  await copy.press("Enter");
-  await expect(copy).toHaveAttribute("aria-label", "Address copied");
-  await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", "https://fiscal.ge/mcp");
-  await page.getByTestId("connect-copy-prompt").click();
-  await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", "Answer my question using Fiscal.ge’s published data:");
-  await expectEnglish(page);
 });
 
 test("homepage and hub figures stay identical when switching languages", async ({ page }) => {

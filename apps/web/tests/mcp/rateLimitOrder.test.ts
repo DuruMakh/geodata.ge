@@ -11,15 +11,16 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 // offering no protection at all, because the very requests it denied were the
 // ones doing the spending.
 type Verdict = "allow" | "deny" | "unavailable";
-const state = vi.hoisted(() => ({ hits: [] as string[], perKeyVerdict: "allow" as Verdict, perKeyDailyVerdict: "allow" as Verdict, dailyVerdict: "allow" as Verdict }));
+const state = vi.hoisted(() => ({ hits: [] as string[], calls: [] as { key: string; windowSeconds: number; max: number }[], perKeyVerdict: "allow" as Verdict, perKeyDailyVerdict: "allow" as Verdict, dailyVerdict: "allow" as Verdict }));
 
 vi.mock("../../lib/mcp/limits", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../lib/mcp/limits")>();
   return {
     ...actual,
     createCounter: () => ({
-      hit: (key: string) => {
+      hit: (key: string, windowSeconds: number, max: number) => {
         state.hits.push(key);
+        state.calls.push({ key, windowSeconds, max });
         if (key.startsWith("mcp:rate:")) return Promise.resolve(state.perKeyVerdict);
         return Promise.resolve(key.startsWith("mcp:keyday:") ? state.perKeyDailyVerdict : state.dailyVerdict);
       },
@@ -45,6 +46,7 @@ afterAll(() => {
 
 beforeEach(() => {
   state.hits.length = 0;
+  state.calls.length = 0;
   state.perKeyVerdict = "allow";
   state.perKeyDailyVerdict = "allow";
   state.dailyVerdict = "allow";
@@ -131,6 +133,14 @@ function post(headers: Record<string, string> = {}): Request {
 const dailyHits = (): string[] => state.hits.filter((key) => key.startsWith("mcp:daily:"));
 
 describe("the order the request limits are charged in", () => {
+  // The real per-key limit wired into the route (moved from route.test.ts, which spent 61 requests on it):
+  // a keyed request charges a 60-second rolling window with an allowance of 60, and a denial says retry in 60.
+  it("charges a keyed request's minute counter with a 60-second window and 60 requests", async () => {
+    const allowed = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+    expect(allowed.status).toBe(200);
+    expect(state.calls.find((call) => call.key.startsWith("mcp:rate:"))).toEqual({ key: expect.stringMatching(/^mcp:rate:[0-9a-f]{32}$/), windowSeconds: 60, max: 60 });
+  });
+
   it("does not charge the shared daily budget for a request it has already refused", async () => {
     state.perKeyVerdict = "deny";
 

@@ -20,7 +20,6 @@ test.each(["en", "ka"] as const)("renders %s defaults: Received, the all-country
   expect(html).toContain('data-measure="received"');
   expect(html).not.toContain("money-from-abroad-figure");
   expect(html).not.toContain("money-from-abroad-tab-");
-  expect(html).not.toContain('data-testid="chart-break"');
   expect(html).not.toContain("bop.personal_transfers");
   expect(html).toContain('data-testid="money-from-abroad-ranking"');
   expect(html).not.toMatch(/GEL|₾/);

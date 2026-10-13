@@ -9,9 +9,7 @@ const toggle = (page: import("@playwright/test").Page, id: string) => page.locat
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Current account balance, money in and % of GDP ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
-    await page.getByTestId("external-hub").getByTestId("hub-card").nth(2).click();
-    await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/current-account$`));
+    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external/current-account`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     const panel = page.getByTestId("chart-panel");
     await expect(panel).toHaveAttribute("data-tab", "balance");
@@ -22,6 +20,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("series-row-toggle")).toHaveCount(0);
     // DESIGN §17 (owner, 2026-10-11): nothing but the heading above the controls.
     await expect(page.getByTestId("current-account").locator("h1 + p")).toHaveCount(0);
+    if (width === 768) {
+      // The layout threshold: defaults and overflow only; the flow below is width-independent.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
     await page.getByTestId("measure-share-toggle").click();
     await expect(panel).toHaveAttribute("data-unit", "gdp");

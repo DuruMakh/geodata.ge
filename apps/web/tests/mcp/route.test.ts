@@ -120,6 +120,8 @@ describe("/mcp route", () => {
     const response = await POST(post("{not json", { "mcp-protocol-version": PROTOCOL }));
 
     expect(response.status).toBeGreaterThanOrEqual(400);
+    // The protocol parse-error code (moved from reviewRegression.test.ts).
+    expect((await response.json()).error.code).toBe(-32700);
   });
 
   // Spec 11.1: no long-lived background subscriptions. Passed straight to the
@@ -179,8 +181,9 @@ describe("/mcp guards", () => {
 
   it("answers 503 while paused, and says where the data still is", async () => {
     process.env.MCP_ENABLED = "false";
+    process.env.MCP_ALLOWED_ORIGINS = "https://studio.example";
     try {
-      const response = await POST(post(initialize));
+      const response = await POST(post(initialize, { origin: "https://studio.example" }));
       const body = await response.text();
 
       expect(response.status).toBe(503);
@@ -189,8 +192,12 @@ describe("/mcp guards", () => {
       // published files are untouched, and the message says so in both languages.
       expect(body).toContain("/downloads/data/");
       expect(body).toMatch(/[Ⴀ-ჿ]/);
+      // It points at a real published file, readable to an approved browser (moved from reviewRegression.test.ts).
+      expect(body).toContain("/downloads/data/manifest.json");
+      expect(response.headers.get("access-control-allow-origin")).toBe("https://studio.example");
     } finally {
       process.env.MCP_ENABLED = "true";
+      delete process.env.MCP_ALLOWED_ORIGINS;
     }
   });
 
@@ -208,25 +215,6 @@ describe("/mcp guards", () => {
       expect(await response.text()).toContain("service_unavailable");
     } finally {
       process.env.MCP_RATE_LIMITER = "memory";
-      vi.resetModules();
-    }
-  });
-
-  it("denies once a client's rolling-minute allowance is spent", async () => {
-    process.env.MCP_RATE_LIMITER = "memory";
-    vi.resetModules();
-    try {
-      const { POST: freshPost } = await import("../../app/mcp/route");
-      // A trusted platform header, so the request is keyed and the per-key
-      // limit applies. A client-supplied X-Forwarded-For would not count.
-      const keyed = () => post(initialize, { "x-vercel-forwarded-for": "203.0.113.7" });
-
-      let last = await freshPost(keyed());
-      for (let i = 0; i < 61 && last.status !== 429; i += 1) last = await freshPost(keyed());
-
-      expect(last.status).toBe(429);
-      expect(last.headers.get("retry-after")).toBe("60");
-    } finally {
       vi.resetModules();
     }
   });

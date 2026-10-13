@@ -45,6 +45,15 @@ describe("demography hub page", () => {
     expect(html).not.toMatch(GEORGIAN);
   });
 
+  it("links the four pages in order in Georgian, without the /en prefix", async () => {
+    const html = renderPageMarkup("ka", await renderDemographyPage("ka"));
+    const hub = html.slice(html.indexOf('data-testid="demography-hub"'));
+    expect((hub.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
+    expect([...hub.matchAll(/href="([^"]+)"/g)].map((match) => match[1]).slice(0, 4)).toEqual(
+      ["population", "age-sex", "migration", "births-deaths"].map((page) => `/explorer/demography/${page}`),
+    );
+  });
+
   it("has metadata that is canonical to its own language and reciprocal", async () => {
     const metadata = await demographyPageMetadata("en");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography");
@@ -157,6 +166,13 @@ describe("migration page", () => {
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('"@type":"Dataset"');
     expect(html).toContain('href="/en/methodology/demography"');
+  });
+
+  it("renders in Georgian with its heading, coverage and net line", async () => {
+    const html = renderPageMarkup("ka", await renderDemographyMigrationPage("ka"));
+    expect(html).toContain(">მიგრაცია</h1>");
+    expect(html).toContain("2012–2025 · წლიური");
+    expect(html).toContain("წმინდა მიგრაცია");
   });
 
   it("has no Georgian in the English page or its metadata", async () => {

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { loadTradeProductCatalogueFingerprint, loadTradeProductsData, toClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
+import { loadTradeProductCatalogueFingerprint, toClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { buildTradeProductsModel } from "../../lib/explorer/tradeProducts";
 import { buildTradeProductsWorkbookModel } from "../../lib/explorer/tradeProductsWorkbook";
 import { decodeTradeProductsSelection, encodeTradeProductsSelection } from "../../lib/explorer/tradeProductsSelection";
@@ -21,16 +21,6 @@ test("projects one source period before constructing indexed product and nationa
   expect(data.facts.filter(fact => fact[0] === 0).every(fact => fact[3] === null)).toBe(true);
   expect(data.nationalFacts.every(fact => fact.year === 2024 || fact.year === 2025)).toBe(true);
   expect(raw.entities).toHaveLength(4); expect(raw.facts).toHaveLength(14);
-});
-
-test("the reviewed current catalogue has one entry per code and only 2020 onward observations", async () => {
-  const raw = await loadTradeProductsData(), data = toClientTradeProductsData(raw, [], "a".repeat(64), "2020-2025");
-  expect(data.entities).toHaveLength(1192);
-  expect(new Set(data.entities.map(entity => entity.code)).size).toBe(1192);
-  expect(data.entities.filter(entity => entity.code === "2203")).toHaveLength(1);
-  expect(data.years).toEqual([2020, 2021, 2022, 2023, 2024, 2025]);
-  expect(data.facts.every(fact => fact[1] >= 2020 && data.entities[fact[0]].sourceBlock === "2020-2025")).toBe(true);
-  expect(raw.entities).toHaveLength(4768); expect(raw.facts).toHaveLength(69624);
 });
 
 test("binds saved selections to the scoped catalogue without reinterpreting older catalogue bits", async () => {

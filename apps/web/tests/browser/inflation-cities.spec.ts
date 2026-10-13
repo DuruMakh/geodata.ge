@@ -4,9 +4,11 @@ const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data
 const CITIES = "/explorer/inflation/cities";
 const noOverflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 
+// 390px is checked once, on the Georgian Georgia page's month grid; chart fit on a
+// phone is in mobile-fit-charts.spec.ts and the row counts in inflationCitiesRender.
 for (const locale of ["ka", "en"] as const) {
   const prefix = locale === "en" ? "/en" : "";
-  for (const width of [390, 1440]) {
+  for (const width of locale === "ka" ? [390, 1440] : [1440]) {
     test(`Georgia page layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}${CITIES}`);
@@ -23,6 +25,7 @@ for (const locale of ["ka", "en"] as const) {
       expect(await noOverflow(page)).toBe(true);
     });
 
+    if (width === 390) continue;
     test(`city page layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}${CITIES}/batumi`);
@@ -35,40 +38,37 @@ for (const locale of ["ka", "en"] as const) {
   }
 }
 
-test("the heading picker searches and opens a city page", async ({ page }) => {
+test("the Georgia page picker shows an empty state, recovers, and a search opens a city page", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(CITIES);
   await ready(page);
   await page.getByTestId("city-picker-trigger").click();
   const dialog = page.getByRole("dialog", { name: "ქალაქის არჩევა" });
   await expect(dialog).toBeVisible();
+  await dialog.locator("input").fill("zzzz");
+  await expect(dialog.getByText("ქალაქი ვერ მოიძებნა")).toBeVisible();
+  await expect(page.getByTestId("city-picker-option")).toHaveCount(0);
+  await dialog.getByRole("button", { name: "ძიების გასუფთავება" }).click();
+  await expect(page.getByTestId("city-picker-option")).toHaveCount(6);
+
   await dialog.locator("input").fill("ბათ");
   await expect(page.getByTestId("city-picker-option")).toHaveCount(1);
   await page.getByTestId("city-picker-option").click();
   await expect(page).toHaveURL(/\/explorer\/inflation\/cities\/batumi$/);
 });
 
-test("the picker marks the current page", async ({ page }) => {
+test("the picker marks the current page, Escape returns focus and the keyboard reaches Georgia first", async ({ page }) => {
   await page.goto(`/en${CITIES}/gori`);
   await ready(page);
   await page.getByTestId("city-picker-trigger").click();
   await expect(page.getByRole("dialog", { name: "Choose a city" })).toBeVisible();
   await expect(page.getByTestId("city-picker-option").filter({ hasText: "Gori" })).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("city-picker-georgia-option")).not.toHaveAttribute("aria-current", "page");
-});
 
-test("Escape closes the picker and returns focus to the trigger", async ({ page }) => {
-  await page.goto(`/en${CITIES}/gori`);
-  await ready(page);
-  await page.getByTestId("city-picker-trigger").click();
-  await expect(page.getByRole("dialog", { name: "Choose a city" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "Choose a city" })).toHaveCount(0);
   await expect(page.getByTestId("city-picker-trigger")).toBeFocused();
-});
 
-test("the keyboard reaches Georgia first and opens the comparison page", async ({ page }) => {
-  await page.goto(`/en${CITIES}/telavi`);
-  await ready(page);
   await page.getByTestId("city-picker-trigger").click();
   const search = page.getByRole("combobox", { name: "Search cities" });
   await search.press("ArrowDown");
@@ -123,16 +123,14 @@ test("Zugdidi's annual series starts late and is never filled", async ({ page })
   await expect(page.getByTestId("explorer-header")).toContainText("Dec 2016–");
 });
 
-test("an old link with the retired tab and category keys still opens", async ({ page }) => {
+test("an old link with the retired keys still opens, and switching language keeps a city page's selection and table series", async ({ page }) => {
   await page.goto(`/en${CITIES}#i=mom&c=07`);
   await ready(page);
   await expect(page.getByTestId("series-status")).toContainText("7 / 7");
   await page.locator('[data-testid="series-row"][data-series-id="city.gori"] button').first().click();
   await expect(page).toHaveURL(/sel=/);
   await expect(page).not.toHaveURL(/[#&](i|c)=/);
-});
 
-test("switching language keeps a city page's selection and table series", async ({ page }) => {
   await page.goto(`${CITIES}/batumi#m=table&sel=total%2C01&t=01`);
   await ready(page);
   await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
@@ -191,14 +189,8 @@ test("the hub links the Georgia page and the sidebar stays on the section across
   await expect(page.getByTestId("inflation-cities-link")).toHaveAttribute("aria-current", "page");
 });
 
-test("every city page is statically available in both languages", async ({ request }) => {
-  for (const prefix of ["", "/en"]) {
-    for (const slug of ["tbilisi", "kutaisi", "batumi", "gori", "telavi", "zugdidi"]) {
-      const response = await request.get(`${prefix}${CITIES}/${slug}`);
-      expect(response.status(), `${prefix || "/ka"}:${slug}`).toBe(200);
-      await response.dispose();
-    }
-  }
+// bilingual-seo.spec.ts loads every city page in both languages; an unpublished city is a 404.
+test("a city outside Geostat's six is not found", async ({ request }) => {
   expect((await request.get(`${CITIES}/rustavi`)).status()).toBe(404);
 });
 
@@ -233,27 +225,6 @@ for (const { name, path, width, anchored } of pickerCases) {
     }
   });
 }
-
-test("the Georgia page picker shows an empty state for no match and recovers", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto(CITIES);
-  await ready(page);
-  await page.getByTestId("city-picker-trigger").click();
-  const dialog = page.getByRole("dialog", { name: "ქალაქის არჩევა" });
-  await dialog.locator("input").fill("zzzz");
-  await expect(dialog.getByText("ქალაქი ვერ მოიძებნა")).toBeVisible();
-  await expect(page.getByTestId("city-picker-option")).toHaveCount(0);
-  await dialog.getByRole("button", { name: "ძიების გასუფთავება" }).click();
-  await expect(page.getByTestId("city-picker-option")).toHaveCount(6);
-});
-
-test("page payloads carry yoy_pct and never mom_pct", async ({ request }) => {
-  for (const path of [CITIES, `${CITIES}/batumi`]) {
-    const html = await (await request.get(path)).text();
-    expect(html, path).toContain("|yoy_pct");
-    expect(html, path).not.toContain("|mom_pct");
-  }
-});
 
 // U15-01: thirteen wrapped line tabs pushed a city's table ~1,085px down a phone; the
 // Categories table already picks its series from a native select below 768px.

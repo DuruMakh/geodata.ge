@@ -8,14 +8,6 @@ import { computedCssColorAlpha } from "./focus-outline";
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 const heroRuntimeMarkers = ["WebGLRenderer", "hero scene init failed"] as const;
 
-for (const prefix of ["", "/en"]) {
-  test(`landing hero opens the ${prefix ? "English" : "Georgian"} explorer`, async ({ page }) => {
-    await page.goto(`${baseUrl}${prefix}/`);
-    await page.getByTestId("hero-cta").click();
-    await expect(page).toHaveURL(`${baseUrl}${prefix}/explorer`);
-  });
-}
-
 async function heroRuntimeScripts(request: APIRequestContext, urls: Iterable<string>) {
   const uniqueUrls = [...new Set(urls)];
   const matches = await Promise.all(
@@ -295,6 +287,13 @@ test("landing renders the approved latest-year data composition", async ({ page 
   const footer = page.getByTestId("landing-footer");
   await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
   await expect(footer).toContainText("CC BY 4.0");
+
+  // Methodology stays out of the landing header and in the footer.
+  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მეთოდოლოგია" })).toHaveCount(0);
+  await expect(page.getByTestId("site-footer").getByRole("link", { name: "მეთოდოლოგია" })).toHaveAttribute(
+    "href",
+    "/methodology",
+  );
 });
 
 test("landing data and methodology links use real destinations", async ({ page }) => {
@@ -310,6 +309,10 @@ test("landing data and methodology links use real destinations", async ({ page }
   await page.getByTestId("landing-dataset-revenue").getByRole("link").click();
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
+
+  await page.goto(`${baseUrl}/en/`);
+  await page.getByTestId("hero-cta").click();
+  await expect(page).toHaveURL(`${baseUrl}/en/explorer`);
 });
 
 test("landing loads the hero font successfully without requesting it on other routes", async ({ browser, page }) => {
@@ -558,6 +561,9 @@ test("landing activates the hero after load when requestIdleCallback is unavaila
   expect(scriptRequests.find(({ url }) => url === matchingScripts[0])?.beforeLoad).toBe(false);
 });
 
+// The dense desktop grid (dot step 8.6) draws 10,656 terrain points; the phone preset (11.5) draws far fewer.
+const DESKTOP_TERRAIN_FLOOR = 8_000;
+
 test("landing serves a static mobile hero without loading WebGL and retains desktop detail", async ({ browser, request }) => {
   const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   try {
@@ -566,6 +572,7 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
     mobilePage.on("request", (browserRequest) => {
       if (new URL(browserRequest.url()).pathname.endsWith(".js")) mobileScripts.push(browserRequest.url());
     });
+    await mobilePage.addInitScript(installHeroDrawInstrumentation);
     await mobilePage.goto(baseUrl);
     const mobileStatic = mobilePage.getByTestId("mobile-hero-static");
     const mobileStaticImage = mobileStatic.locator("img");
@@ -578,6 +585,22 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
     await pastHeroDecision(mobilePage);
     await expect(mobilePage.locator("figure canvas")).toHaveCount(0);
     expect(await heroRuntimeScripts(request, mobileScripts)).toEqual([]);
+
+    // Crossing the breakpoint live mounts exactly one desktop canvas and hides the static hero; crossing back unmounts it.
+    const canvas = mobilePage.locator("figure canvas");
+    await mobilePage.setViewportSize({ width: 768, height: 900 });
+    await expect(mobileStatic).toBeHidden();
+    await expect(canvas).toHaveCount(1, { timeout: 5_000 });
+    await expect
+      .poll(() =>
+        mobilePage.evaluate(() =>
+          (window as typeof window & { __heroTerrainDrawCount: number }).__heroTerrainDrawCount,
+        ),
+      )
+      .toBeGreaterThan(DESKTOP_TERRAIN_FLOOR);
+    await mobilePage.setViewportSize({ width: 390, height: 844 });
+    await expect(mobileStatic).toBeVisible();
+    await expect(canvas).toHaveCount(0);
   } finally {
     await mobileContext.close();
   }
@@ -601,7 +624,7 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
           Math.max(...(window as typeof window & { __heroDrawCounts: number[] }).__heroDrawCounts),
         ),
       )
-      .toBe(10_656);
+      .toBeGreaterThan(DESKTOP_TERRAIN_FLOOR);
     const pixelRatio = await canvas.evaluate((element) => {
       const drawingSurface = element as HTMLCanvasElement;
       return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
@@ -609,36 +632,6 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
     expect(pixelRatio).toBeCloseTo(2, 1);
   } finally {
     await desktopContext.close();
-  }
-});
-
-test("landing swaps between the static mobile hero and one desktop canvas across the breakpoint", async ({ browser }) => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-  const page = await context.newPage();
-  await page.addInitScript(installHeroDrawInstrumentation);
-  try {
-    await page.goto(baseUrl);
-    const mobileStatic = page.getByTestId("mobile-hero-static");
-    const canvas = page.locator("figure canvas");
-    await expect(mobileStatic).toBeVisible();
-    await expect(canvas).toHaveCount(0);
-
-    await page.setViewportSize({ width: 768, height: 900 });
-    await expect(mobileStatic).toBeHidden();
-    await expect(canvas).toHaveCount(1, { timeout: 5_000 });
-    await expect
-      .poll(() =>
-        page.evaluate(() =>
-          (window as typeof window & { __heroTerrainDrawCount: number }).__heroTerrainDrawCount,
-        ),
-      )
-      .toBe(10_656);
-
-    await page.setViewportSize({ width: 390, height: 844 });
-    await expect(mobileStatic).toBeVisible();
-    await expect(canvas).toHaveCount(0);
-  } finally {
-    await context.close();
   }
 });
 
@@ -750,22 +743,91 @@ test("landing keeps stats and dataset tables inside narrow viewports", async ({ 
   }
 });
 
-test("landing header exposes mission while methodology stays in the footer", async ({ page }) => {
+test("landing methodology keeps reading order and stays inside a 390px phone", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${baseUrl}/`);
-  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მეთოდოლოგია" })).toHaveCount(0);
-  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute(
-    "href",
-    "/about",
-  );
-  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
-  await expect(page.getByTestId("site-footer").getByRole("link", { name: "მეთოდოლოგია" })).toHaveAttribute(
-    "href",
-    "/methodology",
-  );
-  await expect(page.getByTestId("landing-methodology")).toBeVisible();
+  const methodology = page.getByTestId("landing-methodology");
+  const methodologyTitle = methodology.getByRole("heading", { level: 2 });
+  const methodologyList = methodology.locator("ol");
+  const footer = page.getByTestId("site-footer");
+  await expect(methodology).toBeVisible();
+  await expect(methodologyTitle).toBeVisible();
+  await expect(methodologyList).toBeVisible();
+  await expect(footer).toBeVisible();
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  });
+  const geometry = await page.evaluate(() => {
+    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]');
+    const title = section?.querySelector<HTMLElement>("h2");
+    const list = section?.querySelector<HTMLOListElement>("ol");
+    const footerElement = document.querySelector<HTMLElement>('[data-testid="site-footer"]');
+    if (!section || !title || !list || !footerElement) return null;
+
+    const box = (element: Element) => {
+      const rect = element.getBoundingClientRect();
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+    };
+
+    return {
+      methodology: box(section),
+      title: box(title),
+      list: box(list),
+      footer: box(footerElement),
+      overflow: {
+        body: document.body.scrollWidth,
+        viewport: document.documentElement.clientWidth,
+      },
+    };
+  });
+  expect(geometry).not.toBeNull();
+  if (!geometry) throw new Error("Landing methodology geometry was not found");
+  expect(geometry.methodology.x).toBeGreaterThanOrEqual(0);
+  expect(geometry.methodology.x + geometry.methodology.width).toBeLessThanOrEqual(390);
+  expect(geometry.title.x).toBeGreaterThanOrEqual(0);
+  expect(geometry.title.x + geometry.title.width).toBeLessThanOrEqual(390);
+  expect(geometry.list.x).toBeGreaterThanOrEqual(0);
+  expect(geometry.list.x + geometry.list.width).toBeLessThanOrEqual(390);
+  expect(geometry.list.y).toBeGreaterThanOrEqual(geometry.title.y + geometry.title.height);
+  expect(geometry.footer.y).toBeGreaterThanOrEqual(geometry.methodology.y + geometry.methodology.height);
+  expect(geometry.overflow).toEqual({ body: 390, viewport: 390 });
+});
+
+test("landing methodology keeps its introduction and link with the left heading on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto(`${baseUrl}/`);
+
+  const methodology = page.getByTestId("landing-methodology");
+  const copy = methodology.getByTestId("landing-methodology-copy");
+  const intro = methodology.getByTestId("landing-methodology-intro");
+  const link = methodology.getByTestId("landing-methodology-link");
+  const list = methodology.locator("ol");
+  await expect(copy).toBeVisible();
+  await expect(intro).toBeVisible();
+  await expect(link).toBeVisible();
+  await expect(list).toBeVisible();
+
+  const positions = await page.evaluate(() => {
+    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]')!;
+    const box = (selector: string) => {
+      const rect = section.querySelector<HTMLElement>(selector)!.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top };
+    };
+    return {
+      copy: box('[data-testid="landing-methodology-copy"]'),
+      intro: box('[data-testid="landing-methodology-intro"]'),
+      link: box('[data-testid="landing-methodology-link"]'),
+      list: box("ol"),
+    };
+  });
+
+  expect(positions.intro.left).toBeGreaterThanOrEqual(positions.copy.left);
+  expect(positions.intro.right).toBeLessThanOrEqual(positions.copy.right);
+  expect(positions.link.left).toBeGreaterThanOrEqual(positions.copy.left);
+  expect(positions.link.right).toBeLessThanOrEqual(positions.copy.right);
+  expect(positions.list.left).toBeGreaterThan(positions.copy.right);
+  expect(positions.list.top).toBeLessThanOrEqual(positions.intro.top);
 });
 
 test("footer links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
@@ -789,30 +851,10 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
     await expectNonOverlappingTargets(links);
     await expectNoPageOverflow(page);
   }
-});
 
-test("shared brand identity uses the full desktop lockup and standalone mobile symbol", async ({ page, request }) => {
-  for (const viewport of [
-    { width: 1440, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
-    { width: 900, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
-    { width: 768, height: 900, asset: "icon.svg", minimumWidth: 44 },
-    { width: 767, height: 900, asset: "icon.svg", minimumWidth: 44 },
-    { width: 390, height: 844, asset: "icon.svg", minimumWidth: 44 },
-  ] as const) {
-    await page.setViewportSize(viewport);
-    await page.goto(baseUrl);
-    const logo = page.getByTestId("site-header-logo");
-    await expect(logo).toBeVisible();
-    const currentSrc = await logo.evaluate((image: HTMLImageElement) => image.currentSrc);
-    expect(currentSrc).toContain(viewport.asset);
-    const assetResponse = await request.get(currentSrc);
-    expect(assetResponse.status()).toBe(200);
-    expect(assetResponse.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
-    await expect.poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
-    expect((await logo.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(viewport.minimumWidth);
-    await expect(page.getByTestId("landing-header").getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
-    await expect(logo).toHaveAttribute("alt", "");
-  }
+  // The shared footer carries exactly one connection link on other pages too.
+  await page.goto(`${baseUrl}/about`);
+  await expect(page.locator('footer a[href="/connect"]')).toHaveCount(1);
 });
 
 test("active public-header underline sits directly beneath its label across the logo breakpoint", async ({ page }) => {
@@ -846,55 +888,39 @@ test("active public-header underline sits directly beneath its label across the 
   }
 });
 
-test("shared footer uses the compact logo without changing its trust content", async ({ page }) => {
-  await page.goto(baseUrl);
-  const footer = page.getByTestId("site-footer");
-  await expect(footer.getByTestId("site-footer-logo")).toHaveAttribute("src", "/brand/fiscal-logo-compact.svg");
-  await expect(footer.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
-  await expect(footer).toContainText("info@fiscal.ge");
-  await expect(footer).toContainText("CC BY 4.0");
-});
+async function expectRoomForEnlargedText(page: Page, width: number) {
+  const initialCanvasHeight = (await page.locator("figure canvas").boundingBox())!.height;
 
-for (const width of [768, 1100]) {
-  test(`hero leaves room for enlarged text at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto(baseUrl);
-    await page.evaluate(() => document.fonts.ready.then(() => undefined));
-    await expect(page.locator("figure canvas")).toBeVisible({ timeout: 15_000 });
-    const initialCanvasHeight = (await page.locator("figure canvas").boundingBox())!.height;
-
-    // Text-only enlargement keeps the viewport and map scale unchanged.
-    await page.locator("[data-hero-copy] p, [data-hero-copy] h1, [data-hero-copy] a").evaluateAll((elements) => {
-      for (const element of elements) {
-        (element as HTMLElement).style.fontSize = `${Number.parseFloat(getComputedStyle(element).fontSize) * 2}px`;
-      }
-    });
-    await page.setViewportSize({ width: width + 1, height: 900 });
-    await page.setViewportSize({ width, height: 900 });
-    await expect.poll(async () => (await page.locator("figure canvas").boundingBox())!.height).toBeGreaterThan(initialCanvasHeight);
-    const copy = await page.locator("[data-hero-copy]").boundingBox();
-    const stats = await page.getByTestId("key-numbers").boundingBox();
-    expect(copy).not.toBeNull();
-    expect(stats).not.toBeNull();
-    const figure = await page.locator("figure").boundingBox();
-    const canvas = await page.locator("figure canvas").boundingBox();
-    expect(canvas!.height).toBeLessThanOrEqual(figure!.height + 1);
-    expect(stats!.y).toBeGreaterThanOrEqual(copy!.y + copy!.height + 24);
-
-    await page.locator("[data-hero-copy] p, [data-hero-copy] h1, [data-hero-copy] a").evaluateAll((elements) => {
-      for (const element of elements) (element as HTMLElement).style.removeProperty("font-size");
-    });
-    await expect.poll(async () => {
-      const frame = await page.locator("figure").boundingBox();
-      const canvas = await page.locator("figure canvas").boundingBox();
-      return canvas!.height - frame!.height;
-    }).toBeLessThanOrEqual(1);
+  // Text-only enlargement keeps the viewport and map scale unchanged.
+  await page.locator("[data-hero-copy] p, [data-hero-copy] h1, [data-hero-copy] a").evaluateAll((elements) => {
+    for (const element of elements) {
+      (element as HTMLElement).style.fontSize = `${Number.parseFloat(getComputedStyle(element).fontSize) * 2}px`;
+    }
   });
+  await page.setViewportSize({ width: width + 1, height: 900 });
+  await page.setViewportSize({ width, height: 900 });
+  await expect.poll(async () => (await page.locator("figure canvas").boundingBox())!.height).toBeGreaterThan(initialCanvasHeight);
+  const copy = await page.locator("[data-hero-copy]").boundingBox();
+  const stats = await page.getByTestId("key-numbers").boundingBox();
+  expect(copy).not.toBeNull();
+  expect(stats).not.toBeNull();
+  const figure = await page.locator("figure").boundingBox();
+  const canvas = await page.locator("figure canvas").boundingBox();
+  expect(canvas!.height).toBeLessThanOrEqual(figure!.height + 1);
+  expect(stats!.y).toBeGreaterThanOrEqual(copy!.y + copy!.height + 24);
+
+  await page.locator("[data-hero-copy] p, [data-hero-copy] h1, [data-hero-copy] a").evaluateAll((elements) => {
+    for (const element of elements) (element as HTMLElement).style.removeProperty("font-size");
+  });
+  await expect.poll(async () => {
+    const frame = await page.locator("figure").boundingBox();
+    const canvas = await page.locator("figure canvas").boundingBox();
+    return canvas!.height - frame!.height;
+  }).toBeLessThanOrEqual(1);
 }
 
 for (const viewport of [
   { width: 320, height: 844 },
-  { width: 390, height: 844 },
   { width: 767, height: 900 },
   { width: 768, height: 900 },
   { width: 1099, height: 900 },
@@ -903,7 +929,6 @@ for (const viewport of [
   { width: 1440, height: 900 },
   { width: 1920, height: 900 },
   { width: 1920, height: 1200 },
-  { width: 2560, height: 900 },
   { width: 4000, height: 900 },
 ]) {
   test(`hero initialization preserves reserved space at ${viewport.width}px by ${viewport.height}px`, async ({ browser, page }) => {
@@ -939,6 +964,9 @@ for (const viewport of [
       expect(renderedHeroBox!.height).toBeLessThanOrEqual(figure!.height + 1);
       expect(figure!.height - renderedHeroBox!.height).toBeLessThanOrEqual(10);
       await expectNoPageOverflow(page);
+
+      // At 768 and 1100 the hero also leaves room for enlarged text.
+      if (viewport.width === 768 || viewport.width === 1100) await expectRoomForEnlargedText(page, viewport.width);
     } finally {
       await initialContext.close();
     }

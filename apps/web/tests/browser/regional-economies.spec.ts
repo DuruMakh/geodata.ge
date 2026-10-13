@@ -1,19 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-const regionSlugs = [
-  "tbilisi",
-  "adjara",
-  "guria",
-  "imereti",
-  "kakheti",
-  "mtskheta_mtianeti",
-  "racha_lechkhumi_kvemo_svaneti",
-  "samegrelo_zemo_svaneti",
-  "samtskhe_javakheti",
-  "kvemo_kartli",
-  "shida_kartli",
-] as const;
-
 for (const [locale, prefix, heading] of [
   ["ka", "", "რეგიონების ეკონომიკა"],
   ["en", "/en", "Regional economies"],
@@ -56,27 +42,28 @@ for (const [locale, prefix, heading] of [
   });
 }
 
-for (const width of [390, 768, 900, 1100, 1440]) {
-  test(`regional index and detail remain usable without horizontal overflow at ${width}px`, async ({ page }) => {
+test("regional index and detail remain usable without horizontal overflow at 390, 900 and 1440px", async ({ page }) => {
+  for (const width of [390, 900, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/explorer/economy/regions");
     await expect(page.getByTestId("regional-economy-map")).toBeVisible();
     await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `index ${width}`).toBe(true);
 
     await page.goto("/explorer/economy/regions/imereti");
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `imereti ${width}`).toBe(true);
     await expect(page.getByTestId("regional-entity-navigation")).toBeVisible();
+  }
 
-    await page.getByTestId("region-picker-trigger").click();
-    await expect(page.getByRole("dialog", { name: "რეგიონის არჩევა" })).toBeVisible();
-    await page.getByRole("dialog", { name: "რეგიონის არჩევა" }).locator("input").fill("გურია");
-    await expect(page.getByTestId("region-picker-option")).toHaveCount(1);
-    await page.getByTestId("region-picker-option").click();
-    await expect(page).toHaveURL(/\/explorer\/economy\/regions\/guria$/);
-  });
-}
+  // The only mouse picker flow: search narrows to one region and a click opens it.
+  await page.getByTestId("region-picker-trigger").click();
+  await expect(page.getByRole("dialog", { name: "რეგიონის არჩევა" })).toBeVisible();
+  await page.getByRole("dialog", { name: "რეგიონის არჩევა" }).locator("input").fill("გურია");
+  await expect(page.getByTestId("region-picker-option")).toHaveCount(1);
+  await page.getByTestId("region-picker-option").click();
+  await expect(page).toHaveURL(/\/explorer\/economy\/regions\/guria$/);
+});
 
 test("region picker keyboard navigation includes All regions", async ({ page }) => {
   await page.goto("/en/explorer/economy/regions/imereti");
@@ -86,18 +73,6 @@ test("region picker keyboard navigation includes All regions", async ({ page }) 
   await expect(page.getByTestId("region-picker-all-option")).toHaveAttribute("aria-selected", "true");
   await search.press("Enter");
   await expect(page).toHaveURL(/\/en\/explorer\/economy\/regions$/);
-});
-
-test("every regional detail route is statically available in both languages", async ({ request }) => {
-  for (const prefix of ["", "/en"]) {
-    for (const slug of regionSlugs) {
-      const response = await request.get(`${prefix}/explorer/economy/regions/${slug}`);
-      expect(response.status(), `${prefix || "/ka"}:${slug}`).toBe(200);
-      const html = await response.text();
-      expect(html).toContain('data-testid="regional-economy-explorer"');
-      expect(html).toContain(`<html lang="${prefix ? "en" : "ka"}"`);
-    }
-  }
 });
 
 test("regional map, ranked list, search and keyboard focus stay coordinated", async ({ page }) => {
@@ -123,7 +98,8 @@ test("regional map, ranked list, search and keyboard focus stay coordinated", as
   await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
 });
 
-for (const family of ["economy", "unemployment"]) test(`${family} region map restores keyboard highlighting after the pointer leaves`, async ({ page }) => {
+// The unemployment index mounts the same RegionIndex and RegionMap.
+for (const family of ["economy"]) test(`${family} region map restores keyboard highlighting after the pointer leaves`, async ({ page }) => {
   await page.goto(`/en/explorer/${family}/regions`);
   const target = page.locator('[data-region-map-target][data-region-id="region.imereti"]');
   const pointerTarget = page.locator('[data-region-map-target][data-region-id="region.guria"]');

@@ -52,6 +52,9 @@ test("states where the index figures come from and what the map measures", async
   const attribution = note.getByRole("link", { name: /OpenStreetMap/ });
   await expect(attribution).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
   await expect(note).toContainText("ODbL");
+
+  // The review date of the consolidated Adjara source.
+  await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
 });
 
 test("renders 64 globally ordered accessible map targets behind one tab stop", async ({ page }) => {
@@ -203,12 +206,6 @@ test("occupied overlays expose no interaction or public explanation", async ({ p
     await expect(overlay).not.toHaveAttribute("role");
   }
   await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
-});
-
-test("keeps occupied-area and no-data wording out of the map itself", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-  await expectMunicipalAppReady(page);
-  await expect(page.getByTestId("municipality-map")).not.toContainText(/ოკუპირ|Russian/i);
   await expect(page.getByTestId("municipality-map")).not.toContainText(/მონაცემები არ არის|no data/i);
 });
 
@@ -268,9 +265,11 @@ test("Tbilisi path and marker activate together with one accessible target and n
   await expect(path).not.toHaveAttribute("aria-describedby");
 });
 
-test("list focus takes priority over a different map pointer target without a data popup", async ({ page }) => {
+test("map and list highlight each other, and focus wins over a pointer on the other side", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
   await expectMunicipalAppReady(page);
+
+  // List focus takes priority over a different map pointer target, without a data popup.
   const zugdidi = page.getByTestId("municipality-shape-33");
   const tbilisiPath = page.getByTestId("municipality-shape-04");
   const tbilisiMarker = page.getByTestId("municipality-marker-04");
@@ -287,11 +286,10 @@ test("list focus takes priority over a different map pointer target without a da
   await expect(page.getByTestId("municipality-map-tooltip")).toHaveCount(0);
   await expect(zugdidi).not.toHaveAttribute("aria-describedby");
   await expect(page.locator("[data-municipality-map-target][aria-describedby]")).toHaveCount(0);
-});
 
-test("municipality map and list highlight each other by exact code", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-  await expectMunicipalAppReady(page);
+  // Map and list highlight each other by exact code.
+  await page.locator('[data-municipality-row-code="04"]').evaluate((row) => (row as HTMLElement).blur());
+  await page.getByRole("heading", { level: 1 }).hover();
   const shape = page.getByTestId("municipality-shape-33");
   const row = page.locator('[data-municipality-row-code="33"]');
 
@@ -302,29 +300,16 @@ test("municipality map and list highlight each other by exact code", async ({ pa
   await page.getByRole("heading", { level: 1 }).hover();
   await row.focus();
   await expect(shape).toHaveAttribute("data-active", "true");
-});
 
-test("map keyboard focus wins over a simultaneous list pointer target", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-  await expectMunicipalAppReady(page);
+  // Map keyboard focus wins over a simultaneous list pointer target.
+  await row.blur();
+  await page.getByRole("heading", { level: 1 }).hover();
   const focusedShape = page.getByTestId("municipality-shape-33");
   const otherRow = page.locator('[data-municipality-row-code="04"]');
   await focusedShape.focus();
   await otherRow.hover();
   await expect(focusedShape).toHaveAttribute("data-active", "true");
   await expect(otherRow).not.toHaveAttribute("data-active", "true");
-});
-
-test("region rows do not activate municipality geometry", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-  await expectMunicipalAppReady(page);
-  await page.getByTestId("level-region").click();
-  const regionRow = page.getByTestId("municipal-list-row").first();
-  await expect(regionRow).toHaveCSS("transition-duration", "0.1s");
-  await regionRow.hover();
-  await expect(regionRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
-  await expect(page.locator('[data-municipality-code][data-active="true"]')).toHaveCount(0);
-  await expect(page.getByTestId("municipality-map").locator("[data-municipality-shape]")).toHaveCount(60);
 });
 
 test("focus uses the polygon or marker instead of a rectangular outline", async ({ page }) => {
@@ -364,13 +349,6 @@ test("focus uses the polygon or marker instead of a rectangular outline", async 
 });
 
 test.describe("municipalities index", () => {
-  test("shows the review date of the consolidated Adjara source", async ({ page }) => {
-    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-    await expectMunicipalAppReady(page);
-
-    await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
-  });
-
   test("lists all municipalities and the country-first region grain", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
@@ -378,6 +356,13 @@ test.describe("municipalities index", () => {
     await page.getByTestId("level-region").click();
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
     await expect(page).toHaveURL(/#lvl=region/);
+
+    // Region rows do not activate municipality geometry.
+    const regionRow = page.getByTestId("municipal-list-row").first();
+    await regionRow.hover();
+    await expect(regionRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+    await expect(page.locator('[data-municipality-code][data-active="true"]')).toHaveCount(0);
+    await expect(page.getByTestId("municipality-map").locator("[data-municipality-shape]")).toHaveCount(60);
   });
 
   test("puts Georgia first in the region list and routes it to the country explorer", async ({ page }) => {
@@ -413,15 +398,21 @@ test.describe("municipalities index", () => {
     await expect(regionRows.first().getByTestId("municipal-row-per-resident")).toHaveCount(0);
     await expect(regionRows.nth(1).getByTestId("municipal-row-per-resident")).toHaveText(/^\d{1,3}(?:,\d{3})* ერთ მოსახლეზე$/);
     await expect(regionRows.nth(1).getByTestId("municipal-row-per-resident")).toHaveCSS("font-size", "11px");
+    // One per-resident term on the index.
+    await expect(page.locator("body")).not.toContainText("ერთ სულზე");
   });
 
   test("filters and clears the search", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
+    // The same simple search label for municipalities and regions.
+    await expect(page.getByTestId("municipal-search")).toHaveAttribute("placeholder", "ძებნა");
     await page.getByTestId("municipal-search").fill("თელავი");
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(1);
     await page.getByTestId("municipal-search").fill("ზზზზ");
     await expect(page.getByTestId("municipal-empty")).toBeVisible();
+    await page.getByTestId("level-region").click();
+    await expect(page.getByTestId("municipal-search")).toHaveAttribute("placeholder", "ძებნა");
   });
 
   test("the index announces how many places match", async ({ page }) => {
@@ -438,16 +429,6 @@ test.describe("municipalities index", () => {
       await expect(status).toHaveText(none);
       await expect(page.getByTestId("municipal-empty").getByRole("status")).toHaveCount(1);
     }
-  });
-
-  test("uses the same simple search label for municipalities and regions", async ({ page }) => {
-    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-    await expectMunicipalAppReady(page);
-
-    const search = page.getByTestId("municipal-search");
-    await expect(search).toHaveAttribute("placeholder", "ძებნა");
-    await page.getByTestId("level-region").click();
-    await expect(search).toHaveAttribute("placeholder", "ძებნა");
   });
 
   test("keeps row bars normalized to the unfiltered leader while searching", async ({ page }) => {
@@ -483,11 +464,8 @@ test.describe("municipalities index", () => {
     await expect(kpis.nth(2)).toContainText("მედიანური ბიუჯეტი ერთ მოსახლეზე");
     await expect(kpis.nth(2)).toContainText("1,335 ₾");
     await expect(kpis.nth(2)).toContainText("2025 · 64 მუნიციპალიტეტი");
-  });
 
-  test("starts directly with the municipal comparison workspace", async ({ page }) => {
-    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
-    await expectMunicipalAppReady(page);
+    // The page starts directly with the comparison workspace: no intro paragraph (#68).
     await expect(page.getByTestId("municipal-index-workspace")).toBeVisible();
     await expect(page.getByText("საქართველოს მუნიციპალიტეტების ბიუჯეტები წარმოდგენილია", { exact: false })).toHaveCount(0);
   });

@@ -3,14 +3,11 @@ import ExcelJS from "exceljs";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`wages hub and pages render ${prefix || "ka"} at ${width}px`, async ({ page }) => {
+// 768px overflow is in the layout pass of mobile-fit-charts.spec.ts.
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
+  test(`wages pages render ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`${prefix}/explorer/wages`);
-    const hub = page.getByTestId("wages-hub");
-    await expect(hub.locator("a")).toHaveCount(3);
-    await expect(hub.locator("a").first()).toHaveAttribute("href", `${prefix}/explorer/wages/overview`);
     for (const section of ["overview", "industries", "regions"]) {
       await page.goto(`${prefix}/explorer/wages/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -31,7 +28,10 @@ test("overview defaults to the Georgia average with the 2025 figures from Geosta
   await expect(page.getByTestId("year-range-strip")).toContainText("1995–2025");
   await page.locator(pressed("median")).click();
   await page.getByTestId("chart-mode-table").click();
+  // The median shows whole lari beside the average.
+  await expect(page.getByTestId("explorer-table")).toContainText("2,165.2");
   await expect(page.getByTestId("explorer-table")).toContainText("1,531");
+  await expect(page.getByTestId("explorer-table")).not.toContainText("1,531.0");
   // Women, men, public and non-public open under the average; there are no tabs.
   await expect(page.locator('[data-testid^="wages-tab-"]')).toHaveCount(0);
   await expect(page.locator(pressed("women"))).toHaveCount(0);
@@ -96,21 +96,3 @@ test("Regions stays current on a wages region page", async ({ page }) => {
   await expect(page).toHaveURL(/\/en\/explorer\/wages\/regions$/);
 });
 
-test("the median shows whole lari beside the average", async ({ page }) => {
-  await page.goto("/en/explorer/wages/overview#view=table&sel=average,median");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  const table = page.getByTestId("explorer-table");
-  await expect(table).toContainText("2,165.2");
-  await expect(table).toContainText("1,531");
-  await expect(table).not.toContainText("1,531.0");
-});
-
-test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
-  await page.goto("/en/explorer/wages/overview#view=line&sel=");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-  await page.locator('[data-series-id="average"]').getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-  await page.goBack();
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-});

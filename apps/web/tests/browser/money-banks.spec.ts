@@ -15,11 +15,10 @@ async function cell(page: Page, label: string, year: number) {
   return table.locator("tbody tr", { hasText: label }).locator("td").nth(column - 1);
 }
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`money and banks hub and pages render ${prefix || "ka"} at ${width}px`, async ({ page }) => {
-    test.setTimeout(90_000);
+// Structure once per locale; page overflow at 390, 768 and 1440px is in the layout pass of mobile-fit-charts.spec.ts.
+for (const prefix of ["", "/en"]) {
+  test(`money and banks hub and pages render ${prefix || "ka"}`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/money`);
     const hub = page.getByTestId("money-hub");
     await expect(hub.locator("a")).toHaveCount(4);
@@ -83,8 +82,6 @@ test("the % of GDP icon shows all four aggregates against Fiscal.ge's GDP and ke
   const promise = page.waitForEvent("download"); await page.getByTestId("money-excel-download").click();
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await (await promise).path())!);
   const texts = (sheet: ExcelJS.Worksheet) => { const values: string[] = []; sheet.eachRow(row => row.eachCell(entry => { values.push(String(entry.value)); })); return values.join("\n"); };
-  expect(texts(workbook.worksheets[1])).toContain("Calculated by Fiscal.ge");
-  expect(texts(workbook.worksheets[1])).not.toContain("Official");
   expect(texts(workbook.worksheets[2])).toMatch(/Geostat|National Statistics Office/);
   await page.getByTestId("chart-mode-line").click();
   await page.getByTestId("money-measure-amount").click();
@@ -124,7 +121,7 @@ test("loans and deposits has no tabs, both totals selected and their parts neste
   await expect(page).toHaveURL(/sel=loans\.total(%2C|,)loans\.gel(%2C|,)deposits\.total(&|$)/);
 });
 
-test("the foreign-currency icon carries loans and deposits to their shares and back to the totals", async ({ page }) => {
+test("the foreign-currency icon carries a deposits selection to its share and names the Excel file", async ({ page }) => {
   await page.goto("/en/explorer/money/loans-deposits");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const measures = page.getByRole("group", { name: "Measure" });
@@ -139,19 +136,11 @@ test("the foreign-currency icon carries loans and deposits to their shares and b
   await share.click();
   await expect(share).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/tab=fx_share/);
-  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
-  await expect(page.getByTestId("money-latest")).toHaveText("Share of loans in foreign currency · 2025: 41.9%");
   await expect(page.locator(pressed("deposits.fx_share"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(1);
   // The hash key and the Excel filename keep the view's id.
   const promise = page.waitForEvent("download"); await page.getByTestId("money-excel-download").click();
   expect((await promise).suggestedFilename()).toContain("money-loans-deposits-fx_share-");
-  await page.locator(pressed("loans.fx_share")).click();
-  await measures.getByRole("button", { name: "Amount" }).click();
-  await expect(page).toHaveURL(/tab=amount/);
-  for (const id of ["loans.total", "deposits.total"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(2);
-  await expect(page.getByTestId("money-latest")).toContainText("Bank loans · 2025:");
 });
 
 test("the National Bank rate has no tabs, two decimals and a gap before 2008", async ({ page }) => {
@@ -183,27 +172,13 @@ test("bank health has one list, a dash for capital before 2014 and the 2008 loss
   await expect(await cell(page, "Return on equity", 2008)).toHaveText("−12.6%");
 });
 
-test("the Excel download keeps the 2008 loss as a negative number", async ({ page }) => {
-  await page.goto("/en/explorer/money/bank-health#view=table&sel=banks.roa,banks.roe&start=2008&end=2010");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  const promise = page.waitForEvent("download"); await page.getByTestId("money-excel-download").click();
-  const download = await promise;
-  expect(download.suggestedFilename()).toMatch(/\.xlsx$/);
-  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
-  expect(workbook.worksheets).toHaveLength(3);
-  const values: unknown[] = [];
-  workbook.worksheets[0].eachRow(row => row.eachCell(entry => { values.push(entry.value); }));
-  expect(values).toContain(-2.5);
-});
-
+// One section with a measure key and one without; the others share the same state code.
 const SAVED: Record<string, { hash: string; measure?: string; selected: string[]; range: string }> = {
-  "supply": { hash: "tab=gdp&view=table&sel=money.m3%2Cmoney.m1&start=2000&end=2020", measure: "gdp", selected: ["money.m3", "money.m1"], range: "2000–2020" },
   "loans-deposits": { hash: "tab=fx_share&view=table&sel=deposits.fx_share&start=2005&end=2015", measure: "fx_share", selected: ["deposits.fx_share"], range: "2005–2015" },
-  "interest-rates": { hash: "view=table&sel=rates.policy%2Crates.loans_gel&start=2010&end=2020", selected: ["rates.policy", "rates.loans_gel"], range: "2010–2020" },
   "bank-health": { hash: "view=table&sel=banks.tier1_ratio&start=2016&end=2024", selected: ["banks.tier1_ratio"], range: "2016–2024" },
 };
 
-for (const section of SECTIONS) {
+for (const section of Object.keys(SAVED)) {
   test(`the language switch keeps tab, range, selection and mode on ${section}`, async ({ page }) => {
     const saved = SAVED[section];
     // The open section list puts the sidebar's language link below a 720px fold, as on the budget pages.

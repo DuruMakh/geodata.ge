@@ -163,7 +163,8 @@ describe("MCP tool surface", () => {
     expect(text).toMatch(/[a-z]{4,}\s+[a-z]{4,}/i);
   });
 
-  it("refuses an oversized request rather than truncating it", async () => {
+  it("refuses an oversized request rather than truncating it, before running the query", async () => {
+    const run = vi.spyOn(TOOLS.find((tool) => tool.name === "query_municipal")!, "run");
     const result = await (await connected()).callTool({
       name: "query_municipal",
       arguments: {
@@ -181,6 +182,9 @@ describe("MCP tool surface", () => {
     expect(result.isError).toBe(true);
     expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
     expect((result.content as { text: string }[])[0]!.text).toContain("/downloads/data/");
+    // Rejected before the query runs (moved from reviewRegression.test.ts).
+    expect(run).not.toHaveBeenCalled();
+    run.mockRestore();
   });
 
   it("requires an all-regions regional request to be narrowed instead of truncating it", async () => {

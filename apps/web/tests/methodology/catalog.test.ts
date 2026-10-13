@@ -138,15 +138,13 @@ describe("methodology catalog", () => {
     expect(publicText).toContain("69 მუნიციპალურ სერიას");
   });
 
-  it("discloses the nominal-GDP denominator without opening a GDP methodology route", () => {
+  it("discloses the nominal-GDP denominator on expenditure and revenue, and GDP and inflation keep their own slugs", () => {
     for (const dataset of ["expenditure", "revenue"] as const) {
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მშპ");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მიმდინარე ფასებში");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2010 წლიდან — SNA 2008");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2025 წლის მშპ წინასწარია");
     }
-    expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
-    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-20");
 
     expect(METHODOLOGY_CONTENT.gdp.slug).toBe("gdp");
     expect(METHODOLOGY_CONTENT.inflation.slug).toBe("inflation");

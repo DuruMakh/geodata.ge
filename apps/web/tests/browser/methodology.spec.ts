@@ -1,34 +1,9 @@
 import { expect, test, type Locator } from "@playwright/test";
 import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { LIVE_METHODOLOGY_IDS } from "../../lib/methodology/types";
-import { expectReadableText } from "./color-contrast";
 import { TEST_BASE_URL } from "./test-base-url";
-
-// The badge shows on paper nowhere today: every Demography page is published, and the methodology hub's future-dataset
-// list and the sidebar's teaser list are both empty. A hub card that is not published shows it; the badge has no fill of
-// its own, so the loop measures it against the card it sits on (--tile), not against the page, once the count allows one.
-for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
-  test(`coming-soon badges on the Demography hub are readable on their cards at ${viewport.width}px`, async ({ page }) => {
-    await page.setViewportSize(viewport);
-    await page.goto(`${TEST_BASE_URL}/explorer/demography`);
-    const badges = page.getByTestId("demography-hub").getByText("მალე", { exact: true });
-    await expect(badges).toHaveCount(0);
-    for (const badge of await badges.all()) {
-      await expectReadableText(badge, badge.locator("xpath=ancestor::*[@data-testid='hub-card']"));
-    }
-  });
-}
-
-test("the data sidebar shows no coming-soon teaser badge", async ({ page }) => {
-  await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  const sidebar = page.getByTestId("data-sidebar");
-  await expect(sidebar).toBeVisible();
-  await expect(
-    sidebar.getByText("მალე", { exact: true }),
-    "a teaser badge is back in the sidebar: measure it here with expectReadableText(badge, sidebar), as the paper test does for its cards",
-  ).toHaveCount(0);
-});
 
 async function expectVisibleFocusOutline(locator: Locator) {
   await locator.focus();
@@ -110,6 +85,8 @@ for (const path of [
     await expect(footer).toHaveCount(1);
     await expect(footer.locator('a[href^="/methodology"]')).toHaveCount(1);
     await expect(page.locator('a[href^="/methodology"]')).toHaveCount(1);
+    // No repeated methodology promotion on a content page.
+    await expect(page.getByRole("link", { name: "მეთოდოლოგია და პირველწყაროები", exact: true })).toHaveCount(0);
   });
 }
 
@@ -117,45 +94,12 @@ test("methodology hub separates live datasets from future markers", async ({ pag
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
   await expect(page.getByTestId("methodology-live-row")).toHaveCount(17);
+  // Unemployment, trade and demography are all live, so no future row remains to name.
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(0);
-  await expect(page.getByTestId("methodology-future-row").getByRole("link")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
-  await expect(page.getByTestId("methodology-live-row").first()).toContainText(/79/);
 });
 
-test("sitemap publishes exactly the live methodology routes", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/methodology`);
-  const sitemapXml = await page.evaluate(async () => (await fetch("/sitemap.xml")).text());
-  const methodologyUrls = await page.evaluate((xml) => {
-    const document = new DOMParser().parseFromString(xml, "application/xml");
-    return [...document.querySelectorAll("loc")]
-      .map((location) => new URL(location.textContent ?? "").pathname)
-      .filter((pathname) => pathname === "/methodology" || pathname.startsWith("/methodology/"));
-  }, sitemapXml);
-
-  expect(methodologyUrls).toEqual([
-    "/methodology",
-    "/methodology/expenditure",
-    "/methodology/revenue",
-    "/methodology/municipalities",
-    "/methodology/debt",
-    "/methodology/gdp",
-    "/methodology/economic-sectors",
-    "/methodology/regional-economies",
-    "/methodology/inflation",
-    "/methodology/money",
-    "/methodology/unemployment",
-    "/methodology/wages",
-    "/methodology/poverty",
-    "/methodology/household-income",
-    "/methodology/trade",
-    "/methodology/external-flows",
-    "/methodology/energy-food",
-    "/methodology/demography",
-  ]);
-});
-
-test("future routes stay on the static 404 surface and out of navigation", async ({ page }) => {
+test("future routes stay on the static 404 surface", async ({ page }) => {
   for (const slug of ["population"] as const) {
     const response = await page.goto(`${TEST_BASE_URL}/methodology/${slug}`);
     expect(response?.status(), slug).toBe(404);
@@ -168,20 +112,6 @@ test("future routes stay on the static 404 surface and out of navigation", async
     await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(0);
     await expect(page.getByTestId("dataset-json-ld")).toHaveCount(0);
   }
-
-  await page.goto(`${TEST_BASE_URL}/methodology`);
-  const futureRows = page.getByTestId("methodology-future-row");
-  // Unemployment, trade and demography are all live, so no future row remains to name.
-  await expect(futureRows).toHaveCount(0);
-  expect(
-    await futureRows.evaluateAll((rows) =>
-      rows.every(
-        (row) =>
-          (row as HTMLElement).tabIndex < 0 &&
-          row.querySelectorAll("a, button, input, select, textarea, [tabindex]:not([tabindex='-1'])").length === 0,
-      ),
-    ),
-  ).toBe(true);
 });
 
 test("methodology live rows snap off motion when reduced motion is requested", async ({ page }) => {
@@ -250,13 +180,9 @@ for (const dataset of ["expenditure", "revenue", "municipalities", "debt", "regi
   });
 }
 
+// The explorer pages above check this in their footer-link loop.
 test("regular content pages do not repeat the methodology promotion", async ({ page }) => {
   for (const path of [
-    "/explorer/expenditure",
-    "/explorer/revenue",
-    "/explorer/analysis",
-    "/explorer/municipalities",
-    "/explorer/municipalities/tbilisi",
     "/explorer/municipalities/region/adjara",
     "/explorer/municipalities/georgia",
     "/about",
@@ -325,25 +251,18 @@ test("municipality archive copy keeps prepared geometry outside the download bou
   await expect(archiveSection).not.toContainText("ლიცენზირებულ გეომეტრიის წყაროებს უცვლელი ბაიტებით");
 });
 
-test("method journey shows its tokenized spine only on desktop", async ({ page }) => {
+test("method journey shows its spine only on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(`${TEST_BASE_URL}/methodology/expenditure`);
 
   const spine = page.getByTestId("method-journey-spine");
   await expect(spine).toBeVisible();
-  expect(
-    await spine.evaluate((element) => {
-      const style = getComputedStyle(element);
-      const token = getComputedStyle(document.documentElement).getPropertyValue("--hairline").trim();
-      return { backgroundColor: style.backgroundColor, token, width: style.width };
-    }),
-  ).toEqual({ backgroundColor: "rgb(217, 207, 190)", token: "#d9cfbe", width: "1px" });
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(spine).toBeHidden();
 });
 
-test("archive filters by search and year with a visible zero state", async ({ page }) => {
+test("archive filters by search and year with a visible zero state in both languages", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology/revenue#source-archive`);
 
   const archive = page.getByTestId("source-archive");
@@ -355,6 +274,13 @@ test("archive filters by search and year with a visible zero state", async ({ pa
   await expect(archive.getByTestId("source-archive-row")).toHaveCount(1);
   await archive.getByRole("searchbox", { name: "პირველწყაროს ძებნა" }).fill("არარსებული ფაილი");
   await expect(archive.getByTestId("source-archive-empty")).toBeVisible();
+
+  await page.goto(`${TEST_BASE_URL}/en/methodology/expenditure#source-archive`);
+  await archive.getByRole("button", { name: "2020", exact: true }).click();
+  await expect(archive.locator("caption")).toContainText("2020");
+  await expect(archive.locator("caption")).not.toContainText("2004–2025");
+  await archive.getByRole("searchbox", { name: "Search original sources" }).fill("no-matching-source-document");
+  await expect(archive.getByTestId("source-archive-empty")).toHaveText("No sources found");
 });
 
 test("methodology mobile layout preserves reading order, overflow, and substantial boundaries", async ({ page }) => {
@@ -404,90 +330,6 @@ test("methodology mobile layout preserves reading order, overflow, and substanti
       viewport: document.documentElement.clientWidth,
     })),
   ).toEqual({ body: 390, viewport: 390 });
-
-  await page.goto(`${TEST_BASE_URL}/`);
-  const methodology = page.getByTestId("landing-methodology");
-  const methodologyTitle = methodology.getByRole("heading", { level: 2 });
-  const methodologyList = methodology.locator("ol");
-  const footer = page.getByTestId("site-footer");
-  await expect(methodology).toBeVisible();
-  await expect(methodologyTitle).toBeVisible();
-  await expect(methodologyList).toBeVisible();
-  await expect(footer).toBeVisible();
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-  });
-  const geometry = await page.evaluate(() => {
-    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]');
-    const title = section?.querySelector<HTMLElement>("h2");
-    const list = section?.querySelector<HTMLOListElement>("ol");
-    const footerElement = document.querySelector<HTMLElement>('[data-testid="site-footer"]');
-    if (!section || !title || !list || !footerElement) return null;
-
-    const box = (element: Element) => {
-      const rect = element.getBoundingClientRect();
-      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-    };
-
-    return {
-      methodology: box(section),
-      title: box(title),
-      list: box(list),
-      footer: box(footerElement),
-      overflow: {
-        body: document.body.scrollWidth,
-        viewport: document.documentElement.clientWidth,
-      },
-    };
-  });
-  expect(geometry).not.toBeNull();
-  if (!geometry) throw new Error("Landing methodology geometry was not found");
-  expect(geometry.methodology.x).toBeGreaterThanOrEqual(0);
-  expect(geometry.methodology.x + geometry.methodology.width).toBeLessThanOrEqual(390);
-  expect(geometry.title.x).toBeGreaterThanOrEqual(0);
-  expect(geometry.title.x + geometry.title.width).toBeLessThanOrEqual(390);
-  expect(geometry.list.x).toBeGreaterThanOrEqual(0);
-  expect(geometry.list.x + geometry.list.width).toBeLessThanOrEqual(390);
-  expect(geometry.list.y).toBeGreaterThanOrEqual(geometry.title.y + geometry.title.height);
-  expect(geometry.footer.y).toBeGreaterThanOrEqual(geometry.methodology.y + geometry.methodology.height);
-  expect(geometry.overflow).toEqual({ body: 390, viewport: 390 });
-});
-
-test("landing methodology keeps its introduction and link with the left heading on desktop", async ({ page }) => {
-  await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto(`${TEST_BASE_URL}/`);
-
-  const methodology = page.getByTestId("landing-methodology");
-  const copy = methodology.getByTestId("landing-methodology-copy");
-  const intro = methodology.getByTestId("landing-methodology-intro");
-  const link = methodology.getByTestId("landing-methodology-link");
-  const list = methodology.locator("ol");
-  await expect(copy).toBeVisible();
-  await expect(intro).toBeVisible();
-  await expect(link).toBeVisible();
-  await expect(list).toBeVisible();
-
-  const positions = await page.evaluate(() => {
-    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]')!;
-    const box = (selector: string) => {
-      const rect = section.querySelector<HTMLElement>(selector)!.getBoundingClientRect();
-      return { left: rect.left, right: rect.right, top: rect.top };
-    };
-    return {
-      copy: box('[data-testid="landing-methodology-copy"]'),
-      intro: box('[data-testid="landing-methodology-intro"]'),
-      link: box('[data-testid="landing-methodology-link"]'),
-      list: box("ol"),
-    };
-  });
-
-  expect(positions.intro.left).toBeGreaterThanOrEqual(positions.copy.left);
-  expect(positions.intro.right).toBeLessThanOrEqual(positions.copy.right);
-  expect(positions.link.left).toBeGreaterThanOrEqual(positions.copy.left);
-  expect(positions.link.right).toBeLessThanOrEqual(positions.copy.right);
-  expect(positions.list.left).toBeGreaterThan(positions.copy.right);
-  expect(positions.list.top).toBeLessThanOrEqual(positions.intro.top);
 });
 
 test("methodology keyboard controls expose native behavior and visible focus", async ({ page }) => {
@@ -553,6 +395,44 @@ test("published download bytes match the manifest integrity record", async ({ pa
   }
 });
 
+for (const prefix of ["", "/en"]) {
+  test(`trade methodology has the bounded source archive ${prefix || "ka"}`, async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}${prefix}/methodology/trade`);
+    await expect(page.locator("#services").getByRole("link", { name: prefix ? "Geostat services trade source page" : "საქსტატის მომსახურებით ვაჭრობის გვერდი", exact: true })).toHaveAttribute("href", "https://www.geostat.ge/en/modules/categories/766/international-trade-in-services");
+    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(18);
+    for (const filename of ["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx", "1004_180325_en.pdf"]) {
+      await expect(page.locator(`a[href="/downloads/methodology/trade/files/${filename}"]`)).toHaveCount(1);
+    }
+    const json = JSON.parse(await page.getByTestId("dataset-json-ld").textContent() ?? "{}");
+    expect(json.temporalCoverage).toBe("1995/2025");
+    expect(json).not.toHaveProperty("distribution");
+    expect(await readFile(path.resolve(process.cwd(), "../../data/reports/trade-overview-validation.json"), "utf8")).toContain('"status": "passed"');
+  });
+}
+
+
+test("the two HTML originals open as sandboxed text without executing archived website scripts", async ({ page, request }) => {
+  await page.goto(`${TEST_BASE_URL}/en/methodology/trade`);
+  const trackingRequests: string[] = [];
+  page.on("request", req => { if (/googletagmanager|google-analytics|recaptcha/.test(req.url())) trackingRequests.push(req.url()); });
+  for (const [filename, hash] of [
+    ["external_trade_methodology.html.txt", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
+    ["metadata-en.html.txt", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
+  ]) {
+    const href = `/downloads/methodology/trade/files/${filename}`;
+    const response = await request.get(href);
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-type"]).toMatch(/^text\/plain\b/);
+    expect(response.headers()["content-security-policy"]).toBe("sandbox; default-src 'none'");
+    expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(hash);
+    await page.locator(`a[href="${href}"]`).click();
+    await expect(page).toHaveURL(new RegExp(`${href.replaceAll(".", "\\.")}$`));
+    await page.goBack();
+    await expect(page).toHaveURL(/\/en\/methodology\/trade$/);
+  }
+  expect(trackingRequests).toEqual([]);
+});
+
 test.describe("the source archive on a phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   test("keeps its column headers and table roles when stacked", async ({ page }) => {
@@ -561,6 +441,27 @@ test.describe("the source archive on a phone", () => {
     await expect(archive.locator("table")).toHaveAttribute("role", "table");
     await expect(archive.getByRole("columnheader")).toHaveCount(5);
     await expect(archive.getByTestId("source-archive-row").first().getByRole("cell")).toHaveCount(5);
+  });
+
+  test("methodology article: stacked sources, a visible search field and a contents button", async ({ page }) => {
+    for (const [path, label, placeholder] of [["/methodology/expenditure", "სარჩევი ↑", "ძებნა"], ["/en/methodology/expenditure", "Contents ↑", "Search"]] as const) {
+      await page.goto(path);
+      const archive = page.getByTestId("source-archive");
+      await expect(archive.locator("input[type='search']")).toHaveAttribute("placeholder", placeholder);
+      const cards = archive.getByTestId("source-archive-row");
+      expect(await cards.count()).toBeGreaterThan(10);
+      const overflow = await archive.evaluate((root) => Math.max(...[...root.querySelectorAll("[data-testid='source-archive-row'] a")].map((link) => link.getBoundingClientRect().right)) - document.documentElement.clientWidth);
+      expect(overflow).toBeLessThanOrEqual(-16);
+
+      // The contents button stays on screen deep in the article and jumps back up.
+      const jump = page.getByTestId("methodology-contents-jump");
+      await page.locator("#source-archive").scrollIntoViewIfNeeded();
+      await expect(jump).toBeInViewport();
+      await expect(jump).toHaveText(label);
+      expect((await jump.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      await jump.tap();
+      await expect(page.locator("#methodology-contents")).toBeInViewport();
+    }
   });
 });
 

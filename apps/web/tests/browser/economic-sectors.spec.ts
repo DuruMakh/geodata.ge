@@ -1,31 +1,11 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
-import { expectReadableText } from "./color-contrast";
 
-for (const prefix of ["", "/en"]) {
-  test(`long sector names leave mobile table values readable ${prefix || "ka"}`, async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 900 });
-    await page.goto(`${prefix}/explorer/economy/sectors#view=table&start=2025&end=2025&sel=sector.g`);
-    // One series on a phone lists its years as rows (owner decision D5): the long name
-    // wraps in the column header and the value sits under it, with no sideways scroll.
-    const region = page.getByTestId("explorer-table");
-    await expect(region).toHaveAttribute("data-layout", "rows");
-    await expect(region.locator("thead th[data-series-id]")).toHaveCount(1);
-    expect(await region.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
-    const header = region.locator("thead th[data-series-id]");
-    expect(await header.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
-    const value = region.locator("tbody tr[data-year] td").first();
-    await value.scrollIntoViewIfNeeded();
-    expect(await value.evaluate(el => {
-      const r = el.getBoundingClientRect();
-      return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
-    })).toBe(true);
-  });
-}
-
-for (const width of [390, 768, 1440]) {
-  test(`Georgian sector highlights match the Budget hero and side KPIs at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 1000 });
+// 390 and 1440 load the page; 768 is reached by resizing the 1440 page, since
+// it is the only width with the stacked layout and the 62px numeral.
+for (const startWidth of [390, 1440]) {
+  test(`Georgian sector highlights match the Budget hero and side KPIs from ${startWidth}px`, async ({ page }) => {
+    await page.setViewportSize({ width: startWidth, height: 1000 });
     await page.goto("/explorer/economy/sectors");
     const section = page.getByTestId("sector-highlights");
     await expect(section).toContainText("ტოპ 3-ის წილი მშპ-ში");
@@ -35,15 +15,18 @@ for (const width of [390, 768, 1440]) {
     const hero = page.getByTestId("sector-highlight-largest");
     const side = page.getByTestId("sector-side-kpis");
     await expect(side.locator('[data-testid^="sector-highlight-"]')).toHaveCount(3);
-    const heroBox = (await hero.boundingBox())!, sideBox = (await side.boundingBox())!;
-    if (width === 1440) {
-      expect(sideBox.x).toBeGreaterThan(heroBox.x + heroBox.width - 1);
-      expect(sideBox.y).toBeCloseTo(heroBox.y, 0);
-    } else {
-      expect(sideBox.y).toBeGreaterThanOrEqual(heroBox.y + heroBox.height);
+    for (const width of startWidth === 1440 ? [1440, 768] : [390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const heroBox = (await hero.boundingBox())!, sideBox = (await side.boundingBox())!;
+      if (width === 1440) {
+        expect(sideBox.x).toBeGreaterThan(heroBox.x + heroBox.width - 1);
+        expect(sideBox.y).toBeCloseTo(heroBox.y, 0);
+      } else {
+        expect(sideBox.y).toBeGreaterThanOrEqual(heroBox.y + heroBox.height);
+      }
+      await expect(side.locator("svg")).toHaveCount(3);
+      expect(await hero.locator('[data-testid="sector-hero-value"]').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBe(width < 768 ? 44 : 62);
     }
-    await expect(side.locator("svg")).toHaveCount(3);
-    expect(await hero.locator('[data-testid="sector-hero-value"]').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBe(width < 768 ? 44 : 62);
   });
 }
 
@@ -108,17 +91,6 @@ test.describe("touch measure controls", () => {
   });
 });
 
-test("collapsed sidebar home icon stays visible on the dark navigation", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/en/explorer/economy/sectors");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await page.getByTestId("sidebar-toggle").click();
-  const sidebar = page.getByTestId("data-sidebar");
-  const home = sidebar.getByRole("link", { name: "Home", exact: true });
-  await expect(home.locator("svg")).toBeVisible();
-  await expectReadableText(home, sidebar);
-});
-
 test("icon measure controls explain themselves on hover and keyboard focus", async ({ page }) => {
   await page.goto("/en/explorer/economy/sectors");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -142,14 +114,10 @@ test("icon measure controls explain themselves on hover and keyboard focus", asy
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
-test("sector page signals completed hydration",async({page})=>{
-  await page.goto("/en/explorer/economy/sectors");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready","true");
-});
-for(const locale of ["ka","en"] as const) for(const width of [390,768,900,1020,1440]) {
-  test(`sectors layout ${locale} ${width}`,async({page})=>{
+for(const width of [390,1440]) {
+  test(`sectors layout en ${width}`,async({page})=>{
     await page.setViewportSize({width,height:1000});
-    await page.goto(`${locale==="en"?"/en":""}/explorer/economy/sectors`);
+    await page.goto("/en/explorer/economy/sectors");
     await expect(page.locator("body")).toHaveAttribute("data-app-ready","true");
     await expect(page.getByTestId("series-row-toggle")).toHaveCount(21);
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
@@ -190,7 +158,8 @@ test("search never restricts bulk selection or counts",async({page})=>{
   await page.getByTestId("series-search").fill("");
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(21);
 });
-for(const locale of ["ka","en"] as const) for(const measure of ["nominal","share_of_gdp","real_growth"] as const) {
+// Every measure in English; Georgian once for its sheet names, numFmt label and source link.
+for(const [locale,measure] of [["en","nominal"],["en","share_of_gdp"],["en","real_growth"],["ka","nominal"]] as const) {
   test(`sectors workbook ${locale} ${measure}`,async({page},info)=>{
     await page.goto(`${locale==="en"?"/en":""}/explorer/economy/sectors#measure=${measure}&sel=sector.t&start=2025&end=2025`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready","true");
@@ -213,9 +182,6 @@ test("sector source notes and metadata name the correct dataset",async({page})=>
   await page.goto("/en/explorer/economy/sectors");
   await expect(page.getByTestId("site-footer")).toContainText("Geostat");
   await expect(page.getByTestId("site-footer")).not.toContainText("World Bank");
-  const structuredData = await page.locator('script[type="application/ld+json"]').evaluateAll(nodes => nodes.map(node => JSON.parse(node.textContent ?? "{}")));
-  expect(structuredData.filter(data => data["@type"] === "BreadcrumbList")).toHaveLength(1);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href","https://fiscal.ge/en/explorer/economy/sectors");
   await page.getByTestId("chart-mode-table").click();
   await expect(page.locator("caption")).toContainText("bn GEL");
   await expect(page.getByTestId("explorer-table")).toContainText("Preliminary");

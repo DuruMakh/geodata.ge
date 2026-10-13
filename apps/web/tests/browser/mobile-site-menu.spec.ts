@@ -57,6 +57,35 @@ for (const locale of ["ka", "en"] as const) {
   });
 }
 
+test("shared brand identity uses the full desktop lockup, the standalone mobile symbol and the compact footer logo", async ({ page, request }) => {
+  for (const viewport of [
+    { width: 1440, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
+    { width: 900, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
+    { width: 768, height: 900, asset: "icon.svg", minimumWidth: 44 },
+    { width: 767, height: 900, asset: "icon.svg", minimumWidth: 44 },
+    { width: 390, height: 844, asset: "icon.svg", minimumWidth: 44 },
+  ] as const) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const logo = page.getByTestId("site-header-logo");
+    await expect(logo).toBeVisible();
+    const currentSrc = await logo.evaluate((image: HTMLImageElement) => image.currentSrc);
+    expect(currentSrc).toContain(viewport.asset);
+    const assetResponse = await request.get(currentSrc);
+    expect(assetResponse.status()).toBe(200);
+    expect(assetResponse.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+    await expect.poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+    expect((await logo.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(viewport.minimumWidth);
+    await expect(page.getByTestId("landing-header").getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
+    await expect(logo).toHaveAttribute("alt", "");
+  }
+
+  // The shared footer uses the compact logo as its home link.
+  const footer = page.getByTestId("site-footer");
+  await expect(footer.getByTestId("site-footer-logo")).toHaveAttribute("src", "/brand/fiscal-logo-compact.svg");
+  await expect(footer.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
+});
+
 test.describe("explorer data sidebar", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 

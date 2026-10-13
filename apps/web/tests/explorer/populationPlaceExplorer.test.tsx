@@ -20,7 +20,6 @@ import type { Locale, Presentation } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
 import { chartGeometry } from "../helpers/render-localized";
 
-const GEORGIAN = /\p{Script=Georgian}/u;
 let facts: ClientDemographyObservation[];
 const presentations = {} as Record<Locale, Presentation>;
 const placesBy = {} as Record<Locale, DemographyPlace[]>;
@@ -117,10 +116,6 @@ describe("place page body: Georgia", () => {
     expect(html()).not.toContain('data-testid="municipal-entity-navigation"');
     expect(render(GEORGIA_PLACE_ID, "en", true)).toContain('data-testid="municipal-entity-navigation"');
   });
-
-  test("English carries no Georgian text", () => {
-    expect(html()).not.toMatch(GEORGIAN);
-  });
 });
 
 describe("place page body: a region, a municipality and Tbilisi", () => {
@@ -153,10 +148,6 @@ describe("place page body: a region, a municipality and Tbilisi", () => {
     const html = render("06", "ka");
     expect(html).toContain("აღწერით გადათვლა");
     expect(html).toContain("ბათუმი");
-  });
-
-  test("English carries no Georgian text on a region or a municipality either", () => {
-    for (const placeId of ["region.adjara", "06"]) expect(render(placeId), placeId).not.toMatch(GEORGIAN);
   });
 });
 

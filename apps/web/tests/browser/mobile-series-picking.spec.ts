@@ -204,17 +204,13 @@ test.describe("the phone legend", () => {
     ["Foreign investment", "/en/explorer/external/foreign-investment#tab=sector&view=line&sel=fdi.total,fdi.sector.k"],
     ["Current account", "/en/explorer/external/current-account#tab=in&unit=usd&sel=ca.balance,ca.services"],
     ["Wages", "/en/explorer/wages/overview#view=line&sel=average,median"],
+    ["Poverty rates", "/en/explorer/living-standards/poverty#tab=relative&view=line&sel=poverty.relative_60%7Cgeorgia%2Cpoverty.relative_40%7Cgeorgia"],
   ] as const) {
     test(`lists two lines on ${name}`, async ({ page }) => {
       await page.goto(url);
       await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
     });
   }
-
-  test("lists two lines on Poverty rates", async ({ page }) => {
-    await page.goto("/en/explorer/poverty/rates#tab=relative&view=line&sel=poverty.relative_60%7Cgeorgia%2Cpoverty.relative_40%7Cgeorgia");
-    await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
-  });
 
   // Pages that drew several lines without the legend until 2026-10 (X1-01): each lists every line.
   for (const [name, url, scope, ids] of [

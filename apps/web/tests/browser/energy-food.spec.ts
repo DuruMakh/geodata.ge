@@ -6,15 +6,10 @@ const toggle = (id: string) => `[data-series-id="${id}"] [data-testid="series-ro
 const caret = (id: string) => `[data-series-id="${id}"] [aria-expanded]`;
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-test("the hub shows one card per page, each linking to it", async ({ page }) => {
-  await page.goto("/explorer/energy-food");
-  const cards = page.getByTestId("energy-food-hub").locator("a");
-  await expect(cards).toHaveCount(4);
-  for (const [index, section] of SECTIONS.entries()) await expect(cards.nth(index)).toHaveAttribute("href", `/explorer/energy-food/${section}`);
-});
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`every ${prefix || "ka"} page shows no page tabs, selects only its total and fits ${width}px`, async ({ page }) => {
+// 768px (and page overflow at every width) is in the layout pass of mobile-fit-charts.spec.ts.
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
+  test(`every ${prefix || "ka"} page shows no page tabs and selects only its total at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 900 });
     for (const section of SECTIONS) {
@@ -24,6 +19,11 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await expect(page.locator('[data-testid^="energy-food-tab"]')).toHaveCount(0);
       await expect(page.getByTestId("series-status")).toContainText("1 /");
       await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+      // Energy use states the latest final use.
+      if (prefix && section === "energy-use") {
+        await expect(page.getByTestId("energy-food-latest")).toHaveText("Final energy use · 2024: 5,456.7");
+        await expect(page.getByTestId("series-status")).toContainText("1 / 7");
+      }
     }
     expect(errors).toEqual([]);
   });
@@ -75,13 +75,6 @@ test("electricity keeps the wind gap before 2016 as a chart, not the empty callo
   const wind = page.getByTestId("explorer-table").locator("tbody tr", { hasText: "Wind plants" });
   await expect(wind).toContainText("—");
   await expect(wind).not.toContainText(/\b0\.0\b/);
-});
-
-test("energy use states the latest final use", async ({ page }) => {
-  await page.goto("/en/explorer/energy-food/energy-use");
-  await ready(page);
-  await expect(page.getByTestId("energy-food-latest")).toHaveText("Final energy use · 2024: 5,456.7");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 7");
 });
 
 test("food shows whole-number wheat self-sufficiency and nests four meats under meat", async ({ page }) => {

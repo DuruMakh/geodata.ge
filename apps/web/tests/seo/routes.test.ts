@@ -144,6 +144,27 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/demography/age-sex");
     expect(urls).toContain("https://fiscal.ge/en/explorer/demography/age-sex");
     expect(urls.some((url) => url.includes("#") || url.includes("?"))).toBe(false);
+    // Exactly the live methodology routes, in the hub's order.
+    expect(urls.map((url) => new URL(url).pathname).filter((pathname) => pathname === "/methodology" || pathname.startsWith("/methodology/"))).toEqual([
+      "/methodology",
+      "/methodology/expenditure",
+      "/methodology/revenue",
+      "/methodology/municipalities",
+      "/methodology/debt",
+      "/methodology/gdp",
+      "/methodology/economic-sectors",
+      "/methodology/regional-economies",
+      "/methodology/inflation",
+      "/methodology/money",
+      "/methodology/unemployment",
+      "/methodology/wages",
+      "/methodology/poverty",
+      "/methodology/household-income",
+      "/methodology/trade",
+      "/methodology/external-flows",
+      "/methodology/energy-food",
+      "/methodology/demography",
+    ]);
   });
 
   it("publishes municipality slugs and never the numeric source identities", async () => {

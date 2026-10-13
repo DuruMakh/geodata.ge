@@ -5,32 +5,30 @@ import { gzipSync } from "node:zlib";
 const ROUTE = "/explorer/inflation/products";
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-for (const locale of ["ka", "en"] as const) {
-  for (const width of [390, 1440]) {
-    test(`product inflation layout ${locale} at ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 1000 });
-      await page.goto(`${locale === "en" ? "/en" : ""}${ROUTE}`);
-      await ready(page);
-      await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-indicator", "annual");
-      await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "false");
-      await expect(page.getByTestId("series-status")).toContainText("1 / 305");
-      await expect(page.getByTestId("product-indicators")).toBeVisible();
-      await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
-      await expect(page.getByTestId("product-list-search")).toBeVisible();
-      await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0058");
-      expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
-      await expect(page.locator('[data-series-id="cpi.product.p0058"]')).toHaveAttribute("data-series-id", "cpi.product.p0058");
-      await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
-      const icon = page.locator('[data-series-id="cpi.product.p0058"] img');
-      expect(await icon.evaluate((image) => Math.round(image.getBoundingClientRect().width))).toBe(32);
-      if (width === 390) {
-        const region = (await page.getByTestId("product-table").boundingBox())!;
-        const cumulativeCell = (await page.getByTestId("product-table").locator("tbody tr").first().locator("td").nth(1).boundingBox())!;
-        // A phone should show the product and its selected-years cumulative value before a horizontal swipe.
-        expect(cumulativeCell.x + cumulativeCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
-      }
-    });
-  }
+// Each locale once: the phone rate columns and chart fit are covered in the mobile-repairs and fit-charts specs.
+for (const [locale, width] of [["ka", 390], ["en", 1440]] as const) {
+  test(`product inflation layout ${locale} at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`${locale === "en" ? "/en" : ""}${ROUTE}`);
+    await ready(page);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-indicator", "annual");
+    await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+    await expect(page.getByTestId("product-indicators")).toBeVisible();
+    await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
+    await expect(page.getByTestId("product-list-search")).toBeVisible();
+    await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0058");
+    expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
+    await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
+    const icon = page.locator('[data-series-id="cpi.product.p0058"] img');
+    expect(await icon.evaluate((image) => Math.round(image.getBoundingClientRect().width))).toBe(32);
+    if (width === 390) {
+      const region = (await page.getByTestId("product-table").boundingBox())!;
+      const cumulativeCell = (await page.getByTestId("product-table").locator("tbody tr").first().locator("td").nth(1).boundingBox())!;
+      // A phone should show the product and its selected-years cumulative value before a horizontal swipe.
+      expect(cumulativeCell.x + cumulativeCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
+    }
+  });
 }
 
 test("annual default, bilingual search, multi-selection and icon-only cumulative toggle", async ({ page }) => {

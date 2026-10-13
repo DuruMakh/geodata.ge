@@ -64,7 +64,7 @@ test.each(["ka", "en"] as const)("the %s age page retains all eight indicators i
   expect(markup).toContain("39.0%");
 });
 
-test("the heatmap scale runs in six equal bins from zero to the accent, with readable text on every bin", () => {
+test("the heatmap scale runs in six equal bins from zero to the accent, with readable text on every bin, and the darkest cells render paper on the accent", async () => {
   expect([0, 9, 10, 25, 44, 59.9, 60].map(value => heatmapBin(value, 60, MAP_RAMP.length))).toEqual([0, 0, 1, 2, 4, 5, 5]);
   expect(heatmapBin(5, 0, MAP_RAMP.length)).toBe(0);
   expect(MAP_RAMP.at(-1)).toBe("#B3402A");
@@ -73,9 +73,8 @@ test("the heatmap scale runs in six equal bins from zero to the accent, with rea
   const contrast = (a: string, b: string) => { const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (high + 0.05) / (low + 0.05); };
   const ink = "#1E1B16", paper = "#F7F2E9";
   MAP_RAMP.forEach((fill, bin) => expect(contrast(fill, bin === MAP_RAMP.length - 1 ? paper : ink), fill).toBeGreaterThanOrEqual(4.5));
-});
 
-test("the darkest heatmap cells carry paper text on the accent", async () => {
+  // The rendered darkest cells: paper text on the accent, with no color-mix.
   const messages = await getMessages("ka", ["unemployment", "format", "controls"]);
   const model = buildUnemploymentAgeHeatmap(facts, UNEMPLOYMENT_GROUPS, "unemployment_rate", [2024, 2025]);
   const markup = renderToStaticMarkup(<I18nProvider locale="ka" messages={messages}><UnemploymentAgeHeatmap model={model} indicator="unemployment_rate" /></I18nProvider>);

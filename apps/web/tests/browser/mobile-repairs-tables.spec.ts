@@ -62,6 +62,12 @@ for (const { name, path, minYears } of columnCases) {
     const labelWidth = await scroller.locator("thead th").first().evaluate((th) => th.getBoundingClientRect().width);
     const frameWidth = await scroller.evaluate((element) => element.clientWidth);
     expect(labelWidth).toBeLessThanOrEqual(frameWidth * 0.41);
+    if (name === "expenditure with a long-label series") {
+      // The year columns are a contained, keyboard-scrollable region, and the page itself never scrolls sideways.
+      await expect(scroller).toHaveAttribute("tabindex", "0");
+      await expect(scroller).toHaveAttribute("aria-label", "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
   });
 }
 
@@ -72,7 +78,6 @@ const rowCases = [
   { name: "expenditure total", path: "/explorer/expenditure#m=table" },
   { name: "expenditure, three long-label series", path: `/explorer/expenditure${threeSeries}`, series: 3 },
   { name: "English expenditure, three long-label series", path: `/en/explorer/expenditure${threeSeries}`, series: 3 },
-  { name: "revenue", path: "/explorer/revenue#m=table" },
   { name: "debt", path: "/explorer/debt#m=table" },
   { name: "deficit", path: "/explorer/deficit#m=table", mark: "პროგნოზი" },
   { name: "Georgia municipal aggregate", path: "/explorer/municipalities/georgia#m=table", summary: "ცვლილება" },
@@ -80,6 +85,9 @@ const rowCases = [
   { name: "English Batumi", path: "/en/explorer/municipalities/batumi#m=table", summary: "Change" },
   { name: "GDP", path: "/explorer/economy/gdp" },
   { name: "economic sectors", path: "/explorer/economy/sectors", mark: "წინასწარი" },
+  // A long sector name wraps in its column header and the value under it stays readable.
+  { name: "economic sectors, a long sector name", path: "/explorer/economy/sectors#sel=sector.g", hitTest: true },
+  { name: "English economic sectors, a long sector name", path: "/en/explorer/economy/sectors#sel=sector.g", hitTest: true },
   { name: "Adjara economy", path: "/explorer/economy/regions/adjara" },
   { name: "unemployment", path: "/explorer/unemployment/overview" },
 ];
@@ -87,7 +95,7 @@ const rowCases = [
 for (const width of [390, 360]) {
   test.describe(`${width}px`, () => {
     test.use({ viewport: { width, height: 844 } });
-    for (const { name, path, series, mark, summary } of rowCases) {
+    for (const { name, path, series, mark, summary, hitTest } of rowCases) {
       test(`small tables list years as rows, newest first: ${name}`, async ({ page }) => {
         await page.goto(path);
         const scroller = page.getByTestId("explorer-table");
@@ -113,6 +121,14 @@ for (const width of [390, 360]) {
         await expect(scroller.locator("tbody tr[data-year]").first()).toBeInViewport();
         if (mark) await expect(scroller.locator("tbody tr[data-year]").getByText(mark, { exact: true }).first()).toBeVisible();
         if (summary) await expect(scroller.locator("tbody tr[data-summary='change'] th")).toHaveText(summary);
+        if (hitTest) {
+          const value = scroller.locator("tbody tr[data-year] td").first();
+          await value.scrollIntoViewIfNeeded();
+          expect(await value.evaluate((el) => {
+            const r = el.getBoundingClientRect();
+            return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+          })).toBe(true);
+        }
       });
     }
   });

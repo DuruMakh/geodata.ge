@@ -39,7 +39,8 @@ for (const prefix of ["", "/en"]) {
   });
 }
 
-for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
+// Both locales at 390; the wide layout in one locale.
+for (const [prefix, width] of [["", 1366], ["", 390], ["/en", 390]] as const) {
   test(`keeps selected product labels compact ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 768 });
     const ids = ["2204", "2603", "7108", "8403", "8703"].map(code => `goods.hs4.2020-2025.${code}`);
@@ -119,6 +120,8 @@ for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2020");
     const chartElement = await plot.locator("svg").elementHandle();
     await opener.click(); await expect(picker).toBeVisible();
+    // DESIGN §6.6: the Add products dialog casts no shadow.
+    expect(await picker.evaluate(element => getComputedStyle(element).boxShadow)).toBe("none");
     expect((await plot.boundingBox())!.y).toBeCloseTo(before!.y, 0);
     await expect(page.getByTestId("trade-products-close")).toBeFocused();
     await expect(page.getByTestId("trade-product-category")).toHaveCount(8);
@@ -176,6 +179,12 @@ for (const prefix of ["", "/en"]) {
     await page.goto(`${prefix}/explorer/trade/products${hash(ids, "&start=2018&end=2025")}`);
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
     await expect(page.getByTestId("trade-products-selected-label").first()).toContainText("2204");
+    // Removing a product and Back restore the same view.
+    const panel = page.getByTestId("chart-panel");
+    await page.locator('[data-testid="trade-products-selected-label"][data-series-id="goods.hs4.2020-2025.2204"]').click();
+    await expect(panel).toHaveAttribute("data-selected-count", "1");
+    await page.goBack();
+    await expect(panel).toHaveAttribute("data-selected-count", "2");
     await page.getByTestId("chart-mode-table").click();
     const table = page.getByTestId("explorer-table");
     expect(await tableSeriesCount(table)).toBe(2);
@@ -282,23 +291,4 @@ test.describe("the phone legend", () => {
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "11");
     await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
   });
-});
-
-test("removing a product and Back restore the same view", async ({ page }) => {
-  await page.goto(`/en/explorer/trade/products${hash(["goods.total", "goods.hs4.2020-2025.2204"])}`);
-  const panel = page.getByTestId("chart-panel");
-  await expect(panel).toHaveAttribute("data-selected-count", "2");
-  await page.locator('[data-testid="trade-products-selected-label"][data-series-id="goods.hs4.2020-2025.2204"]').click();
-  await expect(panel).toHaveAttribute("data-selected-count", "1");
-  await page.goBack();
-  await expect(panel).toHaveAttribute("data-selected-count", "2");
-});
-
-test("the Add products dialog casts no shadow (DESIGN §6.6)", async ({ page }) => {
-  await page.goto("/en/explorer/trade/products");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await page.getByTestId("trade-products-add").click();
-  const dialog = page.getByTestId("trade-products-picker");
-  await expect(dialog).toBeVisible();
-  expect(await dialog.evaluate(element => getComputedStyle(element).boxShadow)).toBe("none");
 });

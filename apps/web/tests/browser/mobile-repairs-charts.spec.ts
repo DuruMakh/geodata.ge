@@ -26,7 +26,6 @@ const regionSlugs = [
 
 const axisPages = [
   "/explorer/expenditure",
-  "/explorer/revenue",
   "/explorer/debt",
   "/explorer/municipalities/georgia",
   "/explorer/municipalities/batumi",

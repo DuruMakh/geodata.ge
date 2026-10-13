@@ -59,14 +59,4 @@ describe("general-government deficit explorer model", () => {
 
     expect(model.points).toEqual([]);
   });
-
-  it("uses the reviewed English label for the published series id", async () => {
-    const { getPresentation } = await import("../../lib/i18n/presentation.server");
-    const labels = (await import("../../../../data/localization/en/labels.json")).default;
-    const presentation = await getPresentation("en", [], ["deficit.general_government.balance"]);
-    const model = buildDeficitExplorerModel({ facts, range: { start: 2024, end: 2026 }, percentage: true, selected: true }, presentation);
-    expect(model.tableRow.itemId).toBe("deficit.general_government.balance");
-    expect(model.tableRow.enLabel).toBe("General government balance");
-    expect(labels).not.toHaveProperty("deficit.general_government_balance");
-  });
 });

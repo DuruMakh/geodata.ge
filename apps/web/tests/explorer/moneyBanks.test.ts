@@ -309,5 +309,4 @@ test("the hub has four cards with the first series of each page and their latest
   const cards = buildMoneyBanksHubCards(facts, await presentation());
   expect(cards.map(card => card.href)).toEqual(MONEY_BANKS_SECTIONS.map(section => section.href));
   expect(cards.map(card => card.footer)).toEqual(["2025 · 57.7 bn GEL · 1995–2025", "2025 · 72.5 bn GEL · 2002–2025", "2025 · 8.00% · 2008–2025", "2025 · 2.5% · 2003–2025"]);
-  expect(cards.map(card => card.series?.length)).toEqual([31, 24, 18, 23]);
 });

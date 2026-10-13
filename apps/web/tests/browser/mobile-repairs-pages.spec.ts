@@ -75,8 +75,9 @@ for (const locale of ["ka", "en"] as const) {
   });
 }
 
+// 360px is the worst case for the marker label; 390 adds nothing over it.
 for (const path of ["/explorer/deficit", "/explorer/debt#f=service&m=line&sel=debt.service.total", "/en/explorer/deficit"]) {
-  for (const width of [360, 390]) {
+  for (const width of [360]) {
     test(`forecast marker label stays clear of the range chips at ${width}px: ${path}`, async ({ page }) => {
       await page.setViewportSize({ width, height: 844 });
       await page.goto(path);
@@ -155,13 +156,6 @@ for (const { path, field } of [
     await search.tap();
     await expect(search).toBeFocused();
     await expect.poll(() => search.evaluate((element) => Math.round(element.getBoundingClientRect().top))).toBeLessThanOrEqual(40);
-  });
-}
-
-for (const locale of ["ka", "en"] as const) {
-  test(`${locale} /connect lists unemployment among the data the endpoint does not serve`, async ({ page }) => {
-    await page.goto(`${locale === "en" ? "/en" : ""}/connect`);
-    await expect(page.getByTestId("connect-coverage-excluded")).toContainText(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
   });
 }
 

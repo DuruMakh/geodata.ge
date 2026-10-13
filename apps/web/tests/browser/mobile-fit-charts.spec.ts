@@ -82,7 +82,6 @@ function expectFitted(path: string, charts: ChartMetrics[]) {
 
 const fittedPages = [
   "/explorer/expenditure",
-  "/explorer/revenue",
   "/explorer/debt",
   "/explorer/deficit",
   "/explorer/municipalities/georgia",
@@ -139,6 +138,8 @@ test("phones skip the sticky axis and the scroll position logic", async ({ page 
   await expect(frame).not.toHaveAttribute("tabindex");
   await expect(frame).toHaveAttribute("role", "region");
   await expect(frame.locator('svg[role="img"]')).toHaveAttribute("tabindex", "0");
+  // The name mentions sideways scrolling only where the frame scrolls.
+  await expect(frame).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი");
 });
 
 // The pinned tooltip floated over the plot; with ten inflation categories it

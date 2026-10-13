@@ -55,8 +55,9 @@ function attribute(markup: string, name: string): string {
 }
 
 describe("BudgetField", () => {
-  it("renders compact solid amount-scaled circles", () => {
-    const circles = [...chartGeometry(renderedChart(), "desktop").matchAll(/<circle\b[^>]*>/g)].map((match) => match[0]);
+  it("renders compact solid amount-scaled circles named in tooltips, not permanent chart labels", () => {
+    const markup = renderedChart();
+    const circles = [...chartGeometry(markup, "desktop").matchAll(/<circle\b[^>]*>/g)].map((match) => match[0]);
 
     expect(circles).toHaveLength(3);
     expect(circles.map((circle) => Number(attribute(circle, "r")))).toEqual([22, 14, 10]);
@@ -67,12 +68,9 @@ describe("BudgetField", () => {
       "var(--paper)",
     ]);
     expect(circles.map((circle) => Number(attribute(circle, "stroke-width")))).toEqual([2, 2, 2]);
-  });
 
-  it("keeps category names in circle tooltips instead of permanent chart labels", () => {
-    const markup = renderedChart();
+    // DESIGN §9.6: category names live in the circle tooltips, never beside the circles.
     const visibleText = [...markup.matchAll(/<text\b[^>]*>([^<]+)<\/text>/g)].map((match) => match[1]);
-
     expect(visibleText).not.toContain("ყველაზე დიდი");
     expect(visibleText).not.toContain("მეოთხედი");
     expect(visibleText).not.toContain("ყველაზე მცირე");

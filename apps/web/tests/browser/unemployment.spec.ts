@@ -6,7 +6,9 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+// Each locale once; page overflow at 390/768/1440 is in the layout pass of mobile-fit-charts.spec.ts,
+// and the regions index map and the 14 / 14 bulk check are in unemployment-regions.spec.ts.
+for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
   test(`four unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
@@ -21,29 +23,20 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await expect(cards.nth(index).getByRole("heading")).toHaveText(titles[index]);
       await cards.nth(index).click();
       await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/unemployment/${section}$`));
-      if (section === "regions") {
-        await expect(page.getByTestId("unemployment-region-map")).toBeVisible();
-        await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
-        await expect(page.getByTestId("chart-panel")).toHaveCount(0);
-      } else await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
+      if (section !== "regions") await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
       await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-breakdown")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByTestId("unemployment-national-tabs")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), section).toBe(true);
     }
-    await page.goto(`${prefix}/explorer/unemployment/regions#breakdown=region`);
-    await page.getByTestId("chart-mode-table").click();
-    await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
-    // §7.7: the bulk action selects the 14 top-level regional rates, not the rates under their carets.
-    await expect(page.getByTestId("series-status")).toContainText("14 / 14");
-    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(14);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });
 }
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+// 768 takes the same branch as 1440.
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`count chart scales remain readable ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/unemployment/overview#indicator=unemployed`);
@@ -97,7 +90,7 @@ test("national tabs keep valid metrics, coverage and reference selection", async
   await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
 });
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`gender indicators expand beneath Men and Women ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
@@ -343,7 +336,6 @@ for (const prefix of ["", "/en"]) test(`national export drops the remembered edu
   const downloadPromise = page.waitForEvent("download");
   await page.getByTestId("unemployment-excel-download").click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe(`fiscal-unemployment-national-unemployment_rate-2010-2025${prefix ? "-en" : ""}.xlsx`);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets[0].getCell("A4").value).toBe(prefix ? "Unemployment rate" : "უმუშევრობის დონე");
   expect(workbook.worksheets[0].getCell("Q4").value).toBeCloseTo(0.139, 3);
@@ -410,4 +402,18 @@ test("both methodology pages link nine byte-identical originals without a nonexi
     expect(response.ok(), published).toBe(true);
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(source.sha256.toLowerCase());
   }
+});
+
+test("Georgian employment child labels keep a clear gap before the value at desktop width", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/explorer/unemployment/overview#sel=georgia:employed,georgia:self_employed&range=all");
+  const row = page.locator('[data-series-id="georgia:self_employed"]');
+  await expect(row).toContainText("426.3");
+  await page.evaluate(async () => { await document.fonts.ready; });
+  const gap = await row.evaluate(element => {
+    const label = element.querySelector('[data-testid="series-label"]')!;
+    const value = element.querySelector('[data-testid="series-row-toggle"]')!.lastElementChild!;
+    return value.getBoundingClientRect().left - label.getBoundingClientRect().right;
+  });
+  expect(gap).toBeGreaterThanOrEqual(8);
 });

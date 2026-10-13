@@ -34,6 +34,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2021");
     await page.getByTestId("trade-partners-measure-trade.reexports").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.reexports");
+    if (width === 390) {
+      // The products half runs at 1440 only; the phone keeps overview, countries and overflow.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
 
     await section(page, "products").click();
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuemin", "2020");

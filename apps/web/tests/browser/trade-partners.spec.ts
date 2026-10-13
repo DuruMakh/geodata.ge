@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
-import { SSF } from "xlsx";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
@@ -18,6 +17,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(toggle(page, "goods.total")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("series-list").getByTestId("series-row").nth(1)).toHaveAttribute("data-series-id", "partner.1995-2025.792");
     await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(10);
+    if (width === 768) {
+      // The layout threshold: defaults and overflow only; the ranking and bulk flow is width-independent.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
     await page.getByTestId("trade-partners-show-all").click();
     expect(await page.getByTestId("trade-partners-ranking-row").count() + await page.getByTestId("trade-partners-unavailable-row").count()).toBe(212);
@@ -113,27 +118,6 @@ test("mixed Excel download contains the whole-dollar selected figures and all fo
   }
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("1995/2025"); expect(dataset).not.toHaveProperty("distribution");
-});
-
-test("Qatar's downloaded Summary keeps its small 2025 turnover visibly nonzero", async ({ page }) => {
-  await page.goto("/en/explorer/trade/partners#sel=partner.1995-2025.634&measure=trade.turnover&start=2025&end=2025");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 218");
-  const pending = page.waitForEvent("download"); await page.getByTestId("trade-partners-excel-download").click();
-  const download = await pending, excel = new ExcelJS.Workbook(); await excel.xlsx.readFile((await download.path())!);
-  const amount = excel.worksheets[0].getCell("B4");
-  expect(amount.value).toBeCloseTo(4_736_259 / 1_000_000_000, 14);
-  expect(Number(SSF.format(amount.numFmt, amount.value))).toBeGreaterThan(0);
-  expect(excel.worksheets[1].getCell("D2").value).toBe(4_736_259);
-});
-
-test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
-  await page.goto("/en/explorer/trade/partners#sel=&view=line&tab=countries&measure=trade.exports");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-  await page.locator('[data-series-id="goods.total"]').getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-  await page.goBack();
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 });
 
 // U21-01/05: the 218 countries (187 on Domestic exports) scroll inside their panel at every

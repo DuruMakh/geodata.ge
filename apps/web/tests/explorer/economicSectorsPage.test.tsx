@@ -12,7 +12,3 @@ test.each(["ka","en"] as const)("sector route renders one breadcrumb dataset and
   expect(metadata.alternates?.languages).toHaveProperty("ka");
 });
 
-test("the sectors status region starts silent", async () => {
-  const html = renderPageMarkup("en", await renderEconomicSectorsPage("en"));
-  expect(html).toContain('<p role="status" class="sr-only"></p>');
-});

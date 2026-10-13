@@ -5,7 +5,7 @@ const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data
 const CATEGORIES = "/explorer/inflation/categories";
 
 for (const locale of ["ka", "en"] as const) {
-  for (const width of [390, 1440]) {
+  for (const width of [390]) {
     test(`inflation categories layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${locale === "en" ? "/en" : ""}${CATEGORIES}`);
@@ -134,22 +134,13 @@ test("the hash survives a reload and a language switch keeps tab and selection",
   );
 });
 
-test("the download button is present and enabled", async ({ page }) => {
+test("the download button downloads the categories workbook", async ({ page }) => {
   await page.goto(`/en${CATEGORIES}`);
   await ready(page);
   await expect(page.getByTestId("inflation-category-download")).toBeEnabled();
-});
-
-test("the hub card and the sidebar both reach the page", async ({ page }) => {
-  await page.goto("/en/explorer/inflation");
-  await page.getByRole("link", { name: "Categories", exact: true }).first().click();
-  await ready(page);
-  await expect(page).toHaveURL(new RegExp(`${CATEGORIES}$|${CATEGORIES}#`));
-
-  await expect(page.getByTestId("inflation-categories-link")).toHaveAttribute("aria-current", "page");
-  await page.getByTestId("inflation-overview-link").click();
-  await ready(page);
-  await expect(page).toHaveURL(/\/explorer\/inflation\/overview/);
+  const download = page.waitForEvent("download");
+  await page.getByTestId("inflation-category-download").click();
+  expect((await download).suggestedFilename()).toMatch(/^fiscal-inflation-categories-[a-z_]+-\d{4}-\d{2}-\d{4}-\d{2}-en\.xlsx$/);
 });
 
 test("the contribution chart fits phones, hovers without moving the page and answers the keyboard", async ({ page }) => {

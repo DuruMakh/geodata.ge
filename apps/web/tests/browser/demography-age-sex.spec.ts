@@ -65,6 +65,11 @@ test.describe("the Age and sex page", () => {
     await page.keyboard.press("Escape");
     for (const gone of ["age-sex-year-row", "age-sex-compare-row", "age-sex-compare-toggle", "age-sex-pyramid-mode-table"]) await expect(page.getByTestId(gone)).toHaveCount(0);
     await expect(page.getByTestId("age-sex-pyramid-summary")).toContainText("65+: 18.1%");
+    // The Georgian page renders.
+    await page.goto(`${TEST_BASE_URL}/explorer/demography/age-sex`);
+    await expectAppReady(page);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("ასაკი და სქესი");
+    await expect(page.getByTestId("age-sex-heatmap")).toBeVisible();
   });
 
   test("a pyramid row moves focus to the next one with ArrowUp", async ({ page }) => {
@@ -233,23 +238,10 @@ test.describe("the Age and sex page", () => {
     await expect(page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /thousand/i })).toHaveCount(0);
   });
 
-  test("an old link to the removed pyramid table is ignored", async ({ page }) => {
-    await page.goto(`${NATIONAL}#pyramid=table`);
-    await expectAppReady(page);
-    await expect(page.getByTestId("age-sex-pyramid-figure")).toBeVisible();
-    await expect(page.getByTestId("age-sex-pyramid-panel").getByRole("table")).toHaveCount(0);
-  });
-
   test("the heat map carries the re-base label", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
     await expect(page.getByTestId("age-sex-heatmap").getByRole("columnheader", { name: /^2025.*Census re-base/ })).toBeVisible();
-  });
-
-  test("an old link to the removed age-groups table is ignored", async ({ page }) => {
-    await page.goto(`${NATIONAL}#bands=table`);
-    await expectAppReady(page);
-    await expect(page.getByTestId("age-sex-bands")).toHaveCount(0);
   });
 
   test("the regional glance has no links, no tab stops and no arrows, but still ranks and searches", async ({ page }) => {
@@ -273,13 +265,6 @@ test.describe("the Age and sex page", () => {
     // The search still narrows the list.
     await glance.locator("input").fill("Imereti");
     await expect(rows).toHaveCount(1);
-  });
-
-  test("the Georgian page renders", async ({ page }) => {
-    await page.goto(`${TEST_BASE_URL}/explorer/demography/age-sex`);
-    await expectAppReady(page);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("ასაკი და სქესი");
-    await expect(page.getByTestId("age-sex-heatmap")).toBeVisible();
   });
 });
 
@@ -374,11 +359,5 @@ test.describe("at 390px", () => {
     await expect
       .poll(() => scroller.evaluate((element) => ({ wide: element.scrollWidth > element.clientWidth, atEnd: element.scrollLeft + element.clientWidth >= element.scrollWidth - 2 })))
       .toEqual({ wide: true, atEnd: true });
-  });
-
-  test("Imereti has no sideways scroll", async ({ page }) => {
-    await page.goto(IMERETI);
-    await expectAppReady(page);
-    expect(await hasNoSidewaysScroll(page)).toBe(true);
   });
 });

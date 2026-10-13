@@ -1,11 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { TEST_BASE_URL } from "./test-base-url";
-
-async function expectEnglish(page: Page) {
-  expect((await page.locator("body").innerText()).replaceAll("ქართული", "")).not.toMatch(/\p{Script=Georgian}/u);
-  const descriptions = await page.locator("[aria-label], [title], svg title").evaluateAll(elements => elements.flatMap(element => [element.getAttribute("aria-label") ?? "", element.getAttribute("title") ?? "", element.tagName.toLowerCase() === "title" ? element.textContent ?? "" : ""]));
-  expect(descriptions.filter(text => text !== "ქართული").join(" ")).not.toMatch(/\p{Script=Georgian}/u);
-}
+import { expectEnglish } from "./expect-english";
 
 async function numericalPresentation(page: Page) {
   return {
@@ -17,22 +11,15 @@ async function numericalPresentation(page: Page) {
   };
 }
 
-test("English analysis is present in the initial HTML", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, baseURL: TEST_BASE_URL });
-  try {
-    const page = await context.newPage();
-    expect((await page.goto("/en/explorer/analysis"))?.status()).toBe(200);
-    await expect(page.locator("html")).toHaveAttribute("lang", "en");
-    await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-    for (const id of ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"]) await expect(page.getByTestId(id)).toBeVisible();
-    await expectEnglish(page);
-  } finally { await context.close(); }
-});
-
-for (const [side, grouping] of [["expenditure", "fields"], ["expenditure", "ministries"], ["revenue", "fields"]] as const) {
-  test(`${side} / ${grouping} retains its year, every plotted value and ranking through language changes`, async ({ page }) => {
+// One test walks the three dataset/grouping combinations: each compares a
+// different dataset's treemap, radar, field and ranking across languages.
+test("every analysis side and grouping retains its year, every plotted value and ranking through language changes", async ({ page }) => {
+  test.setTimeout(60_000);
+  for (const [side, grouping] of [["expenditure", "fields"], ["expenditure", "ministries"], ["revenue", "fields"]] as const) {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`/en/explorer/analysis#as=${side}&ag=${grouping}&ay=2024`);
+    // A hash-only change after the first combination is a same-document navigation; reload applies it.
+    await page.reload();
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("analysis-year-selector").getByRole("button", { name: "2024", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("every-100-grid").locator("[data-cell]")).toHaveCount(100);
@@ -56,8 +43,8 @@ for (const [side, grouping] of [["expenditure", "fields"], ["expenditure", "mini
     expect(new URL(page.url()).hash).toBe(hash);
     expect(await numericalPresentation(page)).toEqual(before);
     await expectEnglish(page);
-  });
-}
+  }
+});
 
 test("mobile analysis controls and the first-year growth explanation are fully English", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });

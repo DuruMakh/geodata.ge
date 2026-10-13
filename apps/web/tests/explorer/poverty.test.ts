@@ -2,7 +2,6 @@ import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadPovertyFacts, toClientPovertyFact } from "../../lib/data/poverty/importPoverty";
 import type { ClientPovertyFact } from "../../lib/data/poverty/types";
-import { buildPovertyHubCards } from "../../lib/explorer/povertyHubCards";
 import { buildPovertyWorkbookExportModel } from "../../lib/explorer/povertyWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -106,11 +105,4 @@ test("the inequality workbook keeps two decimals", async () => {
   expect(model.analysis.numericFormats).toEqual({ 3: "0.00" });
   expect(model.analysis.rows.at(-1)!.slice(0, 3)).toEqual([2025, "Total income", 0.34]);
   expect(model.sources.map(source => source.title)).toEqual(["geostat_gini"]);
-});
-
-test("the hub has two cards with national sparklines and their latest values", async () => {
-  const cards = buildPovertyHubCards(facts, await presentationFor("en"));
-  expect(cards.map(card => card.href)).toEqual(["/explorer/living-standards/poverty", "/explorer/living-standards/inequality"]);
-  expect(cards.map(card => card.footer)).toEqual(["2025 · 7.1% · 2004–2025", "2025 · 0.34 · 2006–2025"]);
-  expect(cards.map(card => card.series?.length)).toEqual([22, 20]);
 });

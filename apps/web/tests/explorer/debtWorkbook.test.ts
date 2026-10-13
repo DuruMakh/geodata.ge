@@ -62,16 +62,20 @@ const gdpSources: WorkbookPublicSource[] = [{
 }];
 
 describe("Debt workbook adapter", () => {
-  it.each(["stock", "service", "rate"] as const)("exports English %s without changing numbers, status flags or source links", async family => {
+  it.each([["stock", false], ["stock", true], ["service", false], ["rate", false]] as const)("exports English %s (share of GDP: %s) without changing numbers, status flags or source links", async (family, shareOfGdp) => {
     const presentation = await getPresentation("en", ["workbook"], facts.map(fact => fact.seriesId));
     const input = {
       facts, gdpFacts, family,
       selectedIds: [...new Set(facts.filter(fact => fact.family === family).map(fact => fact.seriesId))],
       range: { start: family === "stock" ? 2013 : family === "service" ? 2025 : 2019, end: family === "stock" ? 2014 : family === "service" ? 2026 : 2021 },
-      shareOfGdp: false, sources: debtSources, gdpSources, siteOrigin: "https://fiscal.ge",
+      shareOfGdp, sources: debtSources, gdpSources, siteOrigin: "https://fiscal.ge",
     };
     const ka = buildDebtWorkbookExportModel(input);
-    const en = buildDebtWorkbookExportModel({ ...input, sources: debtSources.map((source, index) => ({ ...source, title: `Official debt source ${index + 1}`, organization: "Ministry of Finance of Georgia" })) }, presentation);
+    const en = buildDebtWorkbookExportModel({
+      ...input,
+      sources: debtSources.map((source, index) => ({ ...source, title: `Official debt source ${index + 1}`, organization: "Ministry of Finance of Georgia" })),
+      gdpSources: gdpSources.map(source => ({ ...source, title: "GDP at current prices — SNA 2008", organization: "National Statistics Office of Georgia (Geostat)" })),
+    }, presentation);
     expect(en.sheetNames).toEqual(["Summary", "Data", "Sources"]);
     expect(en.analysis.rows.map(row => [row[0], row[3], row[5]])).toEqual(ka.analysis.rows.map(row => [row[0], row[3], row[5]]));
     expect(en.readable.rows.map(row => [row.valuesByYear, row.basisByYear])).toEqual(ka.readable.rows.map(row => [row.valuesByYear, row.basisByYear]));

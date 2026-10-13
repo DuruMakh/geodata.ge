@@ -87,12 +87,7 @@ test("archive searches both languages and retains identical files, downloads and
   expect(matching.length).toBeGreaterThan(0);
   await query.fill(originalTitle);
   expect(await archive.locator('[data-original-language="filename"]').evaluateAll(elements => elements.map(element => element.getAttribute("data-source-id")))).toEqual(matching);
-  await query.fill("");
-  await archive.getByRole("button", { name: "2020", exact: true }).click();
-  await expect(archive.locator("caption")).toContainText("2020");
-  await expect(archive.locator("caption")).not.toContainText("2004–2025");
-  await query.fill("no-matching-source-document");
-  await expect(archive.getByTestId("source-archive-empty")).toHaveText("No sources found");
+  // The English year filter and zero state are checked with the Georgian ones in methodology.spec.ts.
   const file = kaDownloads.find(href => href?.includes("/files/"));
   expect(file).toBeTruthy();
   expect((await request.get(file!)).status()).toBe(200);

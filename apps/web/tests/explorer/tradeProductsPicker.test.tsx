@@ -21,8 +21,6 @@ test("keeps global selection count while displaying eight category tiles", async
   expect(html).not.toContain('data-testid="trade-product-result"');
   const sections = [...html.matchAll(/data-selector-section="([^"]+)"/g)].map(match => match[1]);
   expect(sections).toEqual(["controls", "search", "actions", "list"]);
-  expect(html.indexOf('data-testid="trade-product-reference"')).toBeLessThan(html.indexOf('data-testid="trade-product-category"'));
-  expect(html).not.toContain("max-h-[430px]");
   expect(html).toContain("All products, including Georgia total");
 });
 

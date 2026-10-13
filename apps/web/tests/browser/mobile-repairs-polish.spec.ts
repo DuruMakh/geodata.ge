@@ -11,33 +11,6 @@ async function ready(page: Page) {
 test.describe("phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  test("analysis years sit on one scrolling row, opened at the active year", async ({ page }) => {
-    await page.goto("/explorer/analysis");
-    await ready(page);
-    const row = page.getByTestId("analysis-year-selector");
-    const geometry = await row.evaluate((element) => {
-      const box = element.getBoundingClientRect();
-      const buttons = [...element.querySelectorAll("button")].map((button) => button.getBoundingClientRect());
-      const active = element.querySelector("button[aria-pressed='true']")!.getBoundingClientRect();
-      return {
-        overflows: element.scrollWidth > element.clientWidth,
-        rows: new Set(buttons.map((button) => Math.round(button.top))).size,
-        minHeight: Math.min(...buttons.map((button) => button.height)),
-        minWidth: Math.min(...buttons.map((button) => button.width)),
-        activeInside: active.left >= box.left - 1 && active.right <= box.right + 1,
-        pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      };
-    });
-    expect(geometry).toMatchObject({ overflows: true, rows: 1, activeInside: true, pageOverflow: 0 });
-    expect(geometry.minHeight).toBeGreaterThanOrEqual(36);
-    expect(geometry.minWidth).toBeGreaterThanOrEqual(36);
-
-    // Picking an early year keeps it in view and still drives the page.
-    await row.evaluate((element) => { element.scrollLeft = 0; });
-    await row.getByRole("button", { name: "2010", exact: true }).click();
-    await expect(row.getByRole("button", { name: "2010", exact: true })).toHaveAttribute("aria-pressed", "true");
-  });
-
   test("range handles rest at least 12px from the screen edges", async ({ page }) => {
     for (const path of ["/explorer/expenditure", "/explorer/inflation/overview"]) {
       await page.goto(path);
@@ -172,17 +145,6 @@ test.describe("phone", () => {
     await expect(page.getByTestId("chart-frame")).toHaveAttribute("aria-label", "Multi-year chart");
   });
 
-  test("radar note points to the ranking and the index uses one per-resident term", async ({ page }) => {
-    await page.goto("/explorer/analysis");
-    await ready(page);
-    await expect(page.getByTestId("budget-radar")).toContainText("ზუსტი მნიშვნელობები — რეიტინგში ქვემოთ");
-    await expect(page.getByTestId("budget-radar")).not.toContainText("ვიზუალური");
-    await page.goto("/explorer/municipalities");
-    await ready(page);
-    await expect(page.getByTestId("municipal-row-per-resident").first()).toContainText("ერთ მოსახლეზე");
-    await expect(page.locator("body")).not.toContainText("ერთ სულზე");
-  });
-
   test("inflation overview eyebrow starts where the chart and range strip start", async ({ page }) => {
     await page.goto("/en/explorer/inflation/overview");
     await ready(page);
@@ -203,11 +165,7 @@ test.describe("phone", () => {
 test.describe("desktop", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("analysis years still wrap and range handles keep the full-width rail", async ({ page }) => {
-    await page.goto("/explorer/analysis");
-    await ready(page);
-    const row = page.getByTestId("analysis-year-selector");
-    expect(await row.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  test("range handles keep the full-width rail", async ({ page }) => {
     await page.goto("/explorer/expenditure");
     await ready(page);
     const rail = await page.getByRole("group", { name: "წლების დიაპაზონი" }).evaluate((element) => getComputedStyle(element).marginLeft);

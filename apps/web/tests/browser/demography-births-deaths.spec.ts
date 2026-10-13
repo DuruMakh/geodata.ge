@@ -41,9 +41,7 @@ test.describe("births, deaths and fertility page", () => {
     await page.locator('a[href="/en/explorer/demography/population/batumi#births-deaths"]').first().click();
     await expect(page).toHaveURL(/\/population\/batumi#births-deaths$/);
     await expect(page.getByTestId("vital-section")).toBeInViewport();
-  });
-
-  test("Georgian page renders", async ({ page }) => {
+    // The Georgian page renders.
     await page.goto(`${TEST_BASE_URL}/explorer/demography/births-deaths`);
     await expectAppReady(page);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("შობადობა და სიკვდილიანობა");

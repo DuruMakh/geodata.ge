@@ -149,7 +149,7 @@ describe("the density note", () => {
 });
 
 describe("place metadata", () => {
-  it("has the page's own canonical address and reciprocal alternates in both languages", async () => {
+  it("has the page's own canonical address, reciprocal alternates in both languages, and a title and description with the place's years", async () => {
     const en = await populationPlaceMetadata({ kind: "municipality", slug: "batumi" }, "en");
     expect(en.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography/population/batumi");
     expect(en.alternates?.languages).toMatchObject({
@@ -162,6 +162,14 @@ describe("place metadata", () => {
     expect(String(ka.title)).toContain("მოსახლეობა");
     const georgia = await populationPlaceMetadata({ kind: "country" }, "en");
     expect(georgia.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography/population/georgia");
+    // The title and description say what the page is, with the years the place has.
+    expect(en.title).toBe("Batumi — Population | Fiscal.ge");
+    expect(en.description).toBe("Batumi: population on 1 January, 2015–2026, from Geostat data.");
+    expect(georgia.title).toBe("Georgia — Population | Fiscal.ge");
+    expect(georgia.description).toBe("Georgia: population on 1 January, 2004–2026, from Geostat data.");
+    const adjara = await populationPlaceMetadata({ kind: "region", id: "adjara" }, "ka");
+    expect(adjara.title).toBe("აჭარა — მოსახლეობა | Fiscal.ge");
+    expect(adjara.description).toBe("აჭარა: მოსახლეობა 1 იანვრის მდგომარეობით, 2015–2026, საქსტატის მონაცემებით.");
   });
 
   it("carries no Georgian text in English, for a region or a municipality", async () => {
@@ -211,18 +219,6 @@ describe("what each page hands on", () => {
       expect(html, JSON.stringify(route)).toContain("2015–2026 · as of 1 January");
       expect(html, JSON.stringify(route)).toContain("density by region, 2015–2026.");
     }
-  });
-
-  it("says in its title and description what the page is, with the years the place has", async () => {
-    const batumi = await populationPlaceMetadata({ kind: "municipality", slug: "batumi" }, "en");
-    expect(batumi.title).toBe("Batumi — Population | Fiscal.ge");
-    expect(batumi.description).toBe("Batumi: population on 1 January, 2015–2026, from Geostat data.");
-    const georgia = await populationPlaceMetadata({ kind: "country" }, "en");
-    expect(georgia.title).toBe("Georgia — Population | Fiscal.ge");
-    expect(georgia.description).toBe("Georgia: population on 1 January, 2004–2026, from Geostat data.");
-    const adjara = await populationPlaceMetadata({ kind: "region", id: "adjara" }, "ka");
-    expect(adjara.title).toBe("აჭარა — მოსახლეობა | Fiscal.ge");
-    expect(adjara.description).toBe("აჭარა: მოსახლეობა 1 იანვრის მდგომარეობით, 2015–2026, საქსტატის მონაცემებით.");
   });
 
   it("lists a region's municipalities largest first, numbered from 01, each with its persons", async () => {

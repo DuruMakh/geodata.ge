@@ -32,6 +32,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("source-label").getByRole("link")).toHaveAttribute("href", `${prefix}/methodology/trade`);
     expect(await page.getByRole("heading", { level: 1 }).evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     expect(await page.getByTestId("chart-mode-line").evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(11);
+    if (width !== 390) {
+      // Width checks at every width; the selection logic below runs once per locale, at 390.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
     const axis = () => page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]').allTextContents();
     const scale = await axis();
@@ -90,7 +96,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });
+}
 
+// 390 takes the sidebar-toggle path, 1440 the desktop sidebar.
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`Services missingness, keyboard, view memory and navigation ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade/services#section=types&measure=trade.exports&sel=services.maintenance_repair&view=table&start=2020&end=2024`);

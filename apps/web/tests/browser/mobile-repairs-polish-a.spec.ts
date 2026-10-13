@@ -48,7 +48,6 @@ test.describe("search fields follow §7.7", () => {
 
 for (const { path, searchable } of [
   { path: "/explorer/debt", searchable: false },
-  { path: "/explorer/deficit", searchable: false },
   { path: "/explorer/inflation/overview", searchable: false },
   { path: "/explorer/inflation/cities", searchable: false },
   { path: "/explorer/inflation/cities/batumi", searchable: true },

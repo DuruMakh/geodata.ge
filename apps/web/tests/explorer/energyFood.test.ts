@@ -4,7 +4,7 @@ import { loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../lib/data/ener
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
 import {
   buildEnergyFoodModel, defaultEnergyFoodState, energyFoodCoverage, energyFoodDisplayLabels, energyFoodSeries, energyFoodUnit,
-  ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId,
+  ENERGY_FOOD_SECTIONS, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId,
 } from "../../lib/explorer/energyFood";
 import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
 import { buildEnergyFoodHubCards } from "../../lib/explorer/energyFoodHubCards";
@@ -16,17 +16,6 @@ import { contrastRatio } from "../helpers/contrast";
 
 let facts: ClientEnergyFoodFact[];
 beforeAll(async () => { facts = (await loadEnergyFoodFacts()).map(toClientEnergyFoodFact); });
-
-test("the hub has four sections with their routes, labels and units", () => {
-  expect(ENERGY_FOOD_HUB_PATH).toBe("/explorer/energy-food");
-  expect(ENERGY_FOOD_SECTIONS).toEqual([
-    { id: "energy-supply", href: "/explorer/energy-food/energy-supply", labelKey: "common.energySupply" },
-    { id: "electricity", href: "/explorer/energy-food/electricity", labelKey: "common.electricity" },
-    { id: "energy-use", href: "/explorer/energy-food/energy-use", labelKey: "common.energyUse" },
-    { id: "food-self-sufficiency", href: "/explorer/energy-food/food-self-sufficiency", labelKey: "common.foodSelfSufficiency" },
-  ]);
-  expect(ENERGY_FOOD_SECTIONS.map(s => energyFoodUnit(s.id))).toEqual(["ktoe", "gwh", "ktoe", "percent"]);
-});
 
 test("each page starts with only its reference selected and coverage taken from the facts", () => {
   expect(defaultEnergyFoodState("energy-supply")).toEqual({ mode: "line", range: { kind: "all" }, selectedIds: ["energy.supply.total"] });
@@ -152,16 +141,6 @@ test("a range outside the coverage is refitted and a full range collapses to all
   expect(parseEnergyFoodHash("#start=2016&end=2020", "energy-supply", facts).range).toEqual({ kind: "manual", start: 2016, end: 2020 });
 });
 
-test("end values are the published figures", () => {
-  const supply = buildEnergyFoodModel("energy-supply", facts, defaultEnergyFoodState("energy-supply"));
-  expect(supply.range).toMatchObject({ start: 2013, end: 2024 });
-  expect(supply.series.find(s => s.id === "energy.supply.total")!.endValue).toBe(5914.5);
-  const electricity = buildEnergyFoodModel("electricity", facts, defaultEnergyFoodState("electricity"));
-  expect(electricity.series.find(s => s.id === "electricity.production.total")!.endValue).toBe(14234.1);
-  const food = buildEnergyFoodModel("food-self-sufficiency", facts, defaultEnergyFoodState("food-self-sufficiency"));
-  expect(food.series.find(s => s.id === "food.self_sufficiency.wheat")!.endValue).toBe(19);
-});
-
 test("negative electricity supply passes through unclipped, in 2016 and 2023", () => {
   const model = buildEnergyFoodModel("energy-supply", facts, { mode: "line", range: { kind: "all" }, selectedIds: ["energy.supply.electricity"] });
   expect(model.selected.map(s => s.id)).toEqual(["energy.supply.electricity"]);
@@ -181,6 +160,7 @@ test("the model lists every series of the page, colours the reference ink and ta
   expect(model.decimals).toBe(1);
   expect(buildEnergyFoodModel("food-self-sufficiency", facts, defaultEnergyFoodState("food-self-sufficiency")).decimals).toBe(0);
   expect(buildEnergyFoodModel("food-self-sufficiency", facts, { ...defaultEnergyFoodState("food-self-sufficiency"), selectedIds: [] }).decimals).toBe(0);
+  expect(ENERGY_FOOD_SECTIONS.map(s => energyFoodUnit(s.id))).toEqual(["ktoe", "gwh", "ktoe", "percent"]);
 });
 
 test("within a page every non-reference series has its own readable colour, even with all selected", () => {

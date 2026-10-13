@@ -2,6 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { TEST_BASE_URL } from "./test-base-url";
 
+const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
+
 async function expectEnglish(page: Page) {
   expect((await page.locator("body").innerText()).replaceAll("ქართული", "")).not.toMatch(/\p{Script=Georgian}/u);
   const descriptions = await page.locator("[aria-label], [title], svg title").evaluateAll(elements => elements.flatMap(element => [element.getAttribute("aria-label") ?? "", element.getAttribute("title") ?? "", element.tagName.toLowerCase() === "title" ? element.textContent ?? "" : ""]));
@@ -135,6 +137,31 @@ for (const [name, path, share] of [["municipality", "/khulo", false], ["region",
     expect(sources(en)).toEqual(sources(ka));
     expect(sources(en).length).toBeGreaterThan(0);
     en.eachSheet(sheet => sheet.eachRow(row => row.eachCell(cell => expect(JSON.stringify(cell.value)).not.toMatch(/\p{Script=Georgian}/u))));
+    if (name === "country") {
+      // The Georgia aggregate's own workbook contract (moved from municipal-georgia.spec.ts). It runs after the
+      // en/ka comparison because getRows() adds rows to the sheet it reads.
+      expect(filenames[1]).toBe("fiscal-municipalities-georgia-2020-2024.xlsx");
+      expect(ka.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
+      const readable = ka.getWorksheet("მარტივი ცხრილი")!;
+      expect(readable.getCell("A1").value).toBe("საქართველო");
+      expect(readable.getRow(3).values).toEqual([undefined, "კატეგორია", 2020, 2021, 2022, 2023, 2024, "ცვლილება 2020–2024"]);
+      const analysis = ka.getWorksheet("მონაცემები")!;
+      const analysisYears = (analysis.getRows(2, 20) ?? []).filter((row) => row.getCell(1).value !== null).map((row) => row.getCell(1).value);
+      expect([...new Set(analysisYears)]).toEqual([2020, 2021, 2022, 2023, 2024]);
+      const workbookJson = JSON.stringify(ka.worksheets.map((sheet) => sheet.getSheetValues()));
+      expect(workbookJson).not.toContain("country.georgia");
+      const hyperlinks = ka.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
+        Array.isArray(row)
+          ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
+          : [],
+      );
+      expect(hyperlinks.some((value) => value.includes("/downloads/methodology/municipalities/"))).toBe(true);
+      expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx`);
+      expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx`);
+      for (const code of ["05", "42", "43", "46", "64"]) {
+        expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-${code}.xlsx`);
+      }
+    }
     await page.goBack();
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");

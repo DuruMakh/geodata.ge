@@ -9,9 +9,7 @@ const toggle = (page: import("@playwright/test").Page, id: string) => page.locat
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Foreign investment defaults, tabs, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
-    await page.getByTestId("external-hub").getByTestId("hub-card").nth(1).click();
-    await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/foreign-investment$`));
+    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external/foreign-investment`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 12");
     await expect(toggle(page, "fdi.total")).toHaveAttribute("aria-pressed", "true");
@@ -21,6 +19,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(ranking.first()).toHaveAttribute("data-entity-id", "fdi.country.m49_826");
     await expect(ranking.first()).toContainText("426.6");
     await expect(page.getByTestId("foreign-investment-other-row")).toHaveCount(1);
+    if (width === 768) {
+      // The layout threshold: defaults and overflow only; the flow below is width-independent.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
     await toggle(page, "fdi.country.m49_826").click();
     await page.getByTestId("foreign-investment-tab-region").click();

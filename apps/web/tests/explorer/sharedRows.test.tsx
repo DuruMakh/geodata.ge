@@ -21,12 +21,24 @@ test("the Unemployment age heat map markup is recorded", async () => {
   expect(markup).toMatchSnapshot();
 });
 
-test("the Analysis year row markup is recorded", async () => {
+test("the Analysis year row tags the planned year, presses only the value and keeps the tag when active", async () => {
   const messages = await getMessages("ka", ["analysis", "common", "controls"]);
-  const markup = renderToStaticMarkup(<I18nProvider locale="ka" messages={messages}>
-    <AnalysisView model={{ emptyReason: "x", hasPlannedValues: false } as unknown as SingleYearSnapshotModel} years={[2023, 2024, 2025]} plannedYears={new Set([2025])} side="expenditure" grouping="fields" year={2024} lastUpdatedAt="2026-01-01" onSideChange={() => {}} onGroupingChange={() => {}} onYearChange={() => {}} />
-  </I18nProvider>);
-  expect(markup).toMatchSnapshot();
+  const yearRow = (year: number) => {
+    const markup = renderToStaticMarkup(<I18nProvider locale="ka" messages={messages}>
+      <AnalysisView model={{ emptyReason: "x", hasPlannedValues: false } as unknown as SingleYearSnapshotModel} years={[2023, 2024, 2025]} plannedYears={new Set([2025])} side="expenditure" grouping="fields" year={year} lastUpdatedAt="2026-01-01" onSideChange={() => {}} onGroupingChange={() => {}} onYearChange={() => {}} />
+    </I18nProvider>);
+    const row = markup.match(/<div data-testid="analysis-year-selector"[\s\S]*?<\/div>/)![0];
+    return [...row.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].map(([, attributes, content]) => ({ attributes: attributes!, content: content! }));
+  };
+  const buttons = yearRow(2024);
+  expect(buttons.map((button) => button.content.replace(/<[^>]+>[^<]*<\/[^>]+>/g, ""))).toEqual(["2023", "2024", "2025"]);
+  expect(buttons.map((button) => button.content.includes("გეგმა"))).toEqual([false, false, true]);
+  expect(buttons.map((button) => button.attributes.includes('aria-pressed="true"'))).toEqual([false, true, false]);
+  for (const button of buttons) expect(button.attributes).toContain("min-h-9");
+  // The tag stays when the planned year is the active one.
+  const active = yearRow(2025);
+  expect(active[2]!.attributes).toContain('aria-pressed="true"');
+  expect(active[2]!.content).toContain("გეგმა");
 });
 
 test("HeatmapTable draws the break rule and label on the break year only", () => {

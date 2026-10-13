@@ -18,9 +18,9 @@ const buttonsAroundMap = (page: Page) =>
     return { before: before.length, after: outside.length - before.length };
   });
 
-for (const [locale, prefix, heading, coverage] of [
-  ["ka", "", "მოსახლეობა", "2004–2026 · 1 იანვრის მდგომარეობით"],
-  ["en", "/en", "Population", "2004–2026 · as of 1 January"],
+for (const [locale, prefix, heading, coverage, khulo, batumi] of [
+  ["ka", "", "მოსახლეობა", "2004–2026 · 1 იანვრის მდგომარეობით", "ხულო", "ბათუმი"],
+  ["en", "/en", "Population", "2004–2026 · as of 1 January", "Khulo", "Batumi"],
 ] as const) {
   test(`${locale}: the index opens on the municipalities with the map, four key figures and no button row`, async ({ page }) => {
     await page.goto(`${prefix}/explorer/demography/population`);
@@ -43,52 +43,27 @@ for (const [locale, prefix, heading, coverage] of [
     expect(population.before, "buttons before the map, against the Budget index").toBe((await buttonsAroundMap(page)).before);
   });
 
-  test(`${locale}: the hub lists four pages and links all four`, async ({ page }) => {
-    await page.goto(`${prefix}/explorer/demography`);
-    await expect(page.getByTestId("demography-hub").getByTestId("hub-card")).toHaveCount(4);
-    await expect(page.getByTestId("demography-hub").locator("a")).toHaveCount(4);
-    await expect(page.getByTestId("demography-hub").locator("a").nth(0)).toHaveAttribute("href", `${prefix}/explorer/demography/population`);
-    await expect(page.getByTestId("demography-hub").locator("a").nth(1)).toHaveAttribute("href", `${prefix}/explorer/demography/age-sex`);
-    await expect(page.getByTestId("demography-hub").locator("a").nth(2)).toHaveAttribute("href", `${prefix}/explorer/demography/migration`);
-    await expect(page.getByTestId("demography-hub").locator("a").nth(3)).toHaveAttribute("href", `${prefix}/explorer/demography/births-deaths`);
-    await expect(page.getByTestId("demography-link")).toHaveAttribute("aria-current", "page");
+  // The anchored address is the locale's own, not the other language's page.
+  test(`${locale}: clicking a municipality on the map opens its page`, async ({ page }) => {
+    await page.goto(`${prefix}/explorer/demography/population`);
+    await ready(page);
+    await page.getByTestId("municipality-shape-11").click();
+    await expect(page).toHaveURL(new RegExp(`^https?://[^/]+${prefix}/explorer/demography/population/khulo$`));
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(khulo);
+    if (locale === "en") {
+      await expect(page.getByTestId("explorer-header")).toContainText("Adjara");
+      await expect(page.getByTestId("population-highlights")).toContainText("16,098");
+    }
+  });
+
+  test(`${locale}: a list row opens its page`, async ({ page }) => {
+    await page.goto(`${prefix}/explorer/demography/population`);
+    await ready(page);
+    await page.getByTestId("municipal-list-row").filter({ hasText: batumi }).click();
+    await expect(page).toHaveURL(new RegExp(`^https?://[^/]+${prefix}/explorer/demography/population/batumi$`));
+    await expect(page.getByTestId("population-highlights")).toContainText("246,267");
   });
 }
-
-test("clicking a municipality on the map opens its page", async ({ page }) => {
-  await page.goto("/en/explorer/demography/population");
-  await ready(page);
-  await page.getByTestId("municipality-shape-11").click();
-  await expect(page).toHaveURL(/\/en\/explorer\/demography\/population\/khulo$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Khulo");
-  await expect(page.getByTestId("explorer-header")).toContainText("Adjara");
-  await expect(page.getByTestId("population-highlights")).toContainText("16,098");
-});
-
-test("a list row opens its page", async ({ page }) => {
-  await page.goto("/en/explorer/demography/population");
-  await ready(page);
-  await page.getByTestId("municipal-list-row").filter({ hasText: "Batumi" }).click();
-  await expect(page).toHaveURL(/\/population\/batumi$/);
-  await expect(page.getByTestId("population-highlights")).toContainText("246,267");
-});
-
-// The Georgian twins of the two tests above. The anchored address is the Georgian one, not the /en page.
-test("ka: clicking a municipality on the map opens its page", async ({ page }) => {
-  await page.goto("/explorer/demography/population");
-  await ready(page);
-  await page.getByTestId("municipality-shape-11").click();
-  await expect(page).toHaveURL(/^https?:\/\/[^/]+\/explorer\/demography\/population\/khulo$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("ხულო");
-});
-
-test("ka: a list row opens its page", async ({ page }) => {
-  await page.goto("/explorer/demography/population");
-  await ready(page);
-  await page.getByTestId("municipal-list-row").filter({ hasText: "ბათუმი" }).click();
-  await expect(page).toHaveURL(/^https?:\/\/[^/]+\/explorer\/demography\/population\/batumi$/);
-  await expect(page.getByTestId("population-highlights")).toContainText("246,267");
-});
 
 test("the Regions tab lists Georgia and the 11 regions, with density, and a region row opens its page", async ({ page }) => {
   await page.goto("/en/explorer/demography/population");
@@ -101,14 +76,6 @@ test("the Regions tab lists Georgia and the 11 regions, with density, and a regi
   await expect(page).toHaveURL(/\/population\/region\/imereti$/);
   await expect(page.getByTestId("series-row")).toHaveCount(13);
   await expect(page.getByTestId("region-member-row")).toHaveCount(12);
-});
-
-test("Georgia's page lists Georgia and the 11 regions (12 rows) and has no previous or next", async ({ page }) => {
-  await page.goto("/en/explorer/demography/population/georgia");
-  await ready(page);
-  await expect(page.getByTestId("series-row")).toHaveCount(12);
-  await expect(page.getByTestId("municipal-entity-navigation")).toHaveCount(0);
-  await expect(page.getByTestId("population-highlights")).toContainText("3,941,103");
 });
 
 // A page that shows a density says which area it uses (docs/data-methodology/demography.md): Georgia's shows the densest region's, a region's its own.
@@ -362,14 +329,6 @@ test("the sidebar keeps Population current on a place page", async ({ page }) =>
   await expect(page.getByTestId("demography-population-link")).toHaveAttribute("aria-current", "page");
 });
 
-test("English pages have no Georgian text on the index or on a place page", async ({ page }) => {
-  for (const path of ["/en/explorer/demography/population", "/en/explorer/demography/population/region/adjara", "/en/explorer/demography/population/batumi"]) {
-    await page.goto(path);
-    await ready(page);
-    expect(await page.locator("main").innerText(), path).not.toMatch(/[Ⴀ-ჿ]/);
-  }
-});
-
 // URL state: loading never writes the URL (DESIGN.md section 6.3; pristine-urls.spec.ts covers a clean load); only a later change does.
 test("a shared link restores a place page's view and the address stays exactly as shared", async ({ page }) => {
   const hash = "#m=table&r=2018-2024&sel=region.adjara%2C06";
@@ -391,6 +350,7 @@ test("a shared link restores the index's Regions tab and the address stays as sh
 
 // At 390, 768 and 1440 the layout pass in mobile-fit-charts.spec.ts loads the hub, the
 // index, Georgia and Batumi in both languages; Adjara is not the region page it loads.
+// Imereti, whose Age and sex block switches settlement types, joins from 390px (moved from demography-age-sex.spec.ts).
 for (const width of [320, 390, 768, 900, 1100, 1440]) {
   test(`the hub, the index and the place pages have no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -402,6 +362,7 @@ for (const width of [320, 390, 768, 900, 1100, 1440]) {
       "/explorer/demography/population/region/adjara",
       "/en/explorer/demography/population/batumi",
     ];
+    if (width >= 390) paths.push("/en/explorer/demography/population/region/imereti");
     for (const path of [390, 768, 1440].includes(width) ? paths.filter((path) => path.includes("/region/")) : paths) {
       await page.goto(path);
       if (path.endsWith("/population") || path.includes("/population/")) await ready(page);

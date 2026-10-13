@@ -125,3 +125,20 @@ test("every page family has one skip target and a skip link that points to it", 
     expect(html.slice(html.indexOf("<body")).match(/<(?:a|button|input|select|summary)\b[^>]*>/)?.[0], path).toContain('href="#content"');
   }
 });
+
+// Moved from household.spec.ts.
+test("the sidebar lists Living standards after Wages, with its four pages and the current one active", async ({ page }) => {
+  await page.goto("/en/explorer/living-standards/spending");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const entry = page.getByTestId("living-standards-link");
+  await expect(entry).toHaveText("Living standards");
+  expect(await page.getByTestId("wages-link").evaluate((wages, living) => Boolean(wages.compareDocumentPosition(living!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+  for (const id of ["income", "spending", "rates", "inequality"]) await expect(page.getByTestId(`living-standards-${id}-link`)).toBeVisible();
+  await expect(page.getByTestId("living-standards-spending-link")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("living-standards-income-link")).not.toHaveAttribute("aria-current", "page");
+  // Spending stays active on its region pages.
+  await page.goto("/en/explorer/living-standards/spending/regions/kakheti");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("living-standards-spending-link")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("living-standards-income-link")).not.toHaveAttribute("aria-current", "page");
+});

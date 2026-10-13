@@ -1,15 +1,14 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+// Each locale once, for its accessible name; the eight options in two groups are pinned in unemploymentAge.test.tsx.
+for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
   test(`age dropdown and heatmap stay in sync ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/unemployment/age`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     const selector = page.getByTestId("unemployment-indicator"), heatmap = page.getByTestId("unemployment-age-heatmap");
-    await expect(selector.locator("option")).toHaveCount(8);
-    await expect(selector.locator("optgroup")).toHaveCount(2);
     await expect(selector).toHaveAccessibleName(prefix ? "Indicator" : "მაჩვენებელი");
     await expect(page.locator('[data-series-id="georgia"]')).toHaveCount(0);
     await expect(page.locator('[data-series-id="age.15_24"]')).toHaveCount(0);

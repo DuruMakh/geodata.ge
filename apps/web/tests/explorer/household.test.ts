@@ -9,6 +9,8 @@ import {
 } from "../../lib/explorer/household";
 import { householdRegionPageMetadata, householdRegionStaticParams } from "../../lib/pages/household";
 import { buildHouseholdHubCards } from "../../lib/explorer/householdHubCards";
+import { buildPovertyHubCards } from "../../lib/explorer/povertyHubCards";
+import { loadPovertyFacts, toClientPovertyFact } from "../../lib/data/poverty/importPoverty";
 import { buildHouseholdRegionMapModel } from "../../lib/explorer/householdRegionMap";
 import { buildHouseholdWorkbookExportModel, householdWorkbookSources } from "../../lib/explorer/householdWorkbook";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
@@ -297,6 +299,16 @@ test("the hub has an income and a spending card with Georgia per-household spark
   expect(cards.map(card => card.footer)).toEqual(["2025 · 2,025.8 ₾ · 2002–2025", "2025 · 1,438.7 ₾ · 2002–2025"]);
   expect(cards.map(card => card.series?.length)).toEqual([24, 24]);
   expect(cards.map(card => card.index)).toEqual(["01", "02"]);
+});
+
+// Moved from poverty.test.ts: the hub's other two cards.
+test("the hub has a poverty and an inequality card with national sparklines and their latest values", async () => {
+  const povertyFacts = (await loadPovertyFacts()).map(toClientPovertyFact);
+  const presentation: Presentation = { locale: "en", englishLabels: {}, messages: await getMessages("en", ["poverty", "workbook", "format", "common"]) };
+  const cards = buildPovertyHubCards(povertyFacts, presentation);
+  expect(cards.map(card => card.href)).toEqual(["/explorer/living-standards/poverty", "/explorer/living-standards/inequality"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 7.1% · 2004–2025", "2025 · 0.34 · 2006–2025"]);
+  expect(cards.map(card => card.series?.length)).toEqual([22, 20]);
 });
 
 // U19-04: on a budget site "Spending — Tbilisi" reads as the municipality's budget, so the area pages' titles say "household".

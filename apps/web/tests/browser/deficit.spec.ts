@@ -4,29 +4,33 @@ import ExcelJS from "exceljs";
 import { TEST_BASE_URL } from "./test-base-url";
 
 test.describe("General-government deficit explorer", () => {
-  for (const viewport of [
-    { name: "mobile", width: 390, height: 844 },
-    { name: "desktop", width: 1366, height: 768 },
-  ] as const) {
-    test(`renders the percentage-first actual and projection series on ${viewport.name}`, async ({ page }) => {
-      await page.setViewportSize(viewport);
-      await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
-      await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  // The 390px page overflow is checked by the layout pass in mobile-fit-charts.spec.ts.
+  test("renders the percentage-first actual and projection series on desktop", async ({ page }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto(`${TEST_BASE_URL}/explorer/deficit`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("რამდენია საქართველოს ბიუჯეტის დეფიციტი");
-      await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "percent");
-      await expect(page.getByTestId("deficit-deck")).toContainText("2025: ზოგადი მთავრობის ბალანსი · −1.5%");
-      await expect(page.getByTestId("series-row")).toHaveCount(1);
-      await expect(page.getByTestId("chart-series-deficit.general_government.balance-actual")).toBeVisible();
-      await expect(page.getByTestId("chart-series-deficit.general_government.balance-forecast")).toHaveAttribute("stroke-dasharray", "6 5");
-      await expect(page.getByTestId("range-marker")).toContainText("პროგნოზი");
-      const overflow = await page.evaluate(() => ({
-        body: document.body.scrollWidth,
-        viewport: document.documentElement.clientWidth,
-      }));
-      expect(overflow.body).toBeLessThanOrEqual(overflow.viewport + 2);
-    });
-  }
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("რამდენია საქართველოს ბიუჯეტის დეფიციტი");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "percent");
+    await expect(page.getByTestId("deficit-deck")).toContainText("2025: ზოგადი მთავრობის ბალანსი · −1.5%");
+    await expect(page.getByTestId("series-row")).toHaveCount(1);
+    // One series: no search field.
+    await expect(page.getByTestId("series-search")).toHaveCount(0);
+    await expect(page.getByTestId("chart-series-deficit.general_government.balance-actual")).toBeVisible();
+    await expect(page.getByTestId("chart-series-deficit.general_government.balance-forecast")).toHaveAttribute("stroke-dasharray", "6 5");
+    await expect(page.getByTestId("range-marker")).toContainText("პროგნოზი");
+    // The projection, actual-period and sign notes; the explorer renders no footer of its own.
+    const explorer = page.getByTestId("deficit-explorer");
+    await expect(explorer).toContainText("2026–2031 წლები IMF-ის პროგნოზია");
+    await expect(explorer).toContainText("1995–2025 წლები ამ WEO გამოცემაში ფაქტობრივ პერიოდადაა მონიშნული");
+    await expect(explorer).toContainText("უარყოფითი მნიშვნელობა დეფიციტია");
+    await expect(explorer.getByTestId("site-footer")).toHaveCount(0);
+    const overflow = await page.evaluate(() => ({
+      body: document.body.scrollWidth,
+      viewport: document.documentElement.clientWidth,
+    }));
+    expect(overflow.body).toBeLessThanOrEqual(overflow.viewport + 2);
+  });
 
   test("switches between GDP percentage, nominal GEL and the forecast-labelled table", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/deficit`);

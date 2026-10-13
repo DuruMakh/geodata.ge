@@ -127,6 +127,16 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
   }
 });
 
+test("GDP explorer Dataset metadata names its six measures in both languages", async ({ page }) => {
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${BASE_URL}${prefix}/explorer/economy/gdp`);
+    const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
+    expect(dataset["@id"]).toBe(`https://fiscal.ge${prefix}/explorer/economy/gdp#dataset`);
+    expect(dataset.variableMeasured).toHaveLength(6);
+    expect(dataset.variableMeasured.map((v: { unitText: string }) => v.unitText)).toContain("USD_2015");
+  }
+});
+
 test("Government Debt Dataset metadata includes the service projection horizon", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer/debt`);
   const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
@@ -371,6 +381,13 @@ test("municipality navigation uses crawlable links", async ({ page }) => {
   );
 });
 
+test("municipality metadata description uses reviewed punctuation", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/municipalities/tbilisi`);
+  const description = page.locator('meta[name="description"]');
+  await expect(description).toHaveAttribute("content", /ქალაქ თბილისის მუნიციპალიტეტის ფაქტობრივი ბიუჯეტი/);
+  await expect(description).not.toHaveAttribute("content", /მუნიციპალიტეტიის/);
+});
+
 test("legacy municipality codes redirect directly to their canonical slugs and keep browser hash state", async ({ page, request }) => {
   test.setTimeout(60_000);
 
@@ -407,15 +424,8 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
+  // The sitemap builder's URLs, the trade pages among them, are asserted in tests/seo/routes.test.ts.
   expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(580);
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/partners</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/partners</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/products</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/products</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/domestic-exports</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/domestic-exports</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/services</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/services</loc>");
 
   const consoleIssues: string[] = [];
   page.on("console", (message) => {

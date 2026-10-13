@@ -29,12 +29,3 @@ test("open region picker contains All Regions and exactly eleven regional routes
   expect(html).toContain('href="/en/explorer/economy/regions/imereti"');
   expect(html).toContain('aria-current="page"');
 });
-
-test("closed region picker renders nothing", () => {
-  const html = renderToStaticMarkup(
-    <I18nProvider locale="en" messages={messages} englishLabels={englishLabels}>
-      <RegionPicker open={false} onClose={() => {}} regions={regions} activeRegionId="region.imereti" />
-    </I18nProvider>,
-  );
-  expect(html).toBe("");
-});

@@ -1,8 +1,11 @@
+import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
 import registry from "../../../../data/taxonomy/economic-sectors.json";
 import type { ServedRegionalEconomyObservation } from "../../lib/data/regionalEconomies/types";
 import { REGIONAL_GDP_TOTAL } from "../../lib/data/regionalEconomies/types";
 import { buildRegionalEconomyHighlights } from "../../lib/explorer/regionalEconomyHighlights";
+import { RegionHighlights } from "../../components/regional-economies/region-highlights";
+import { I18nProvider } from "../../lib/i18n/provider";
 
 const fact = (seriesId: string, measure: ServedRegionalEconomyObservation["measure"], value: number, year = 2024): ServedRegionalEconomyObservation => ({
   regionId: "region.imereti", seriesId, year, measure, value,
@@ -45,4 +48,28 @@ test("does not invent growth or a summary when the requested year is unavailable
   expect(summary.total).toBeNull();
   expect(summary.topThreeSharePct).toBeNull();
   expect(Object.keys(summary)).not.toContain("growth");
+});
+
+// Moved from regionalEconomyPage.test.tsx: the rendered highlight labels, and no growth claim.
+test("approved highlights show largest activity, total GDP, top-three share and sector count", () => {
+  const html = renderToStaticMarkup(
+    <I18nProvider locale="en" messages={{
+      "regionalEconomies.highlights": "Regional structure",
+      "regionalEconomies.largest": "Largest activity",
+      "regionalEconomies.totalKpi": "Total regional GDP",
+      "regionalEconomies.topThree": "Top three share",
+      "regionalEconomies.sectorCount": "Published activities",
+      "regionalEconomies.ofRegionalGdp": "of regional GDP",
+      "regionalEconomies.highlightsScope": "All activities",
+      "regionalEconomies.unavailable": "Unavailable",
+      "regionalEconomies.rowYear": "Values for {year}",
+    }}>
+      <RegionHighlights facts={facts} registry={registry} year={2024} />
+    </I18nProvider>,
+  );
+  expect(html).toContain("Largest activity");
+  expect(html).toContain("Total regional GDP");
+  expect(html).toContain("Top three share");
+  expect(html).toContain("Published activities");
+  expect(html).not.toMatch(/growth/i);
 });

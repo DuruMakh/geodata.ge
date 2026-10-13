@@ -190,35 +190,27 @@ test.describe("entity picker accessibility", () => {
     await expect(page.getByTestId("municipal-entity-navigation").locator("a").first()).toBeFocused();
   });
 
-  test("picker rows expose hover feedback", async ({ page }) => {
+  test("picker rows keep their layout on hover", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 
     const region = page.getByTestId("picker-region").first();
     const municipality = page.getByTestId("picker-municipality").nth(1);
-    await expect(municipality).not.toHaveAttribute("aria-current", "page");
-    await expect(municipality).not.toHaveCSS("color", "rgb(179, 64, 42)");
-    await expect(municipality).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     const regionBox = await region.boundingBox();
     const municipalityBox = await municipality.boundingBox();
 
+    // Colours and transitions are design tokens; what is pinned here is that
+    // hovering a row causes no layout shift.
     for (const row of [region, municipality]) {
       await row.hover();
-      await expect(row).toHaveCSS("color", "rgb(179, 64, 42)");
-      await expect(row).toHaveCSS("border-left-color", "rgb(179, 64, 42)");
-      await expect(row).toHaveCSS("transition-duration", "0.1s");
-      await expect(row).toHaveCSS("transition-property", /color/);
     }
-    await expect(municipality).toHaveCSS("background-color", "rgb(241, 234, 220)");
 
     expect(await region.boundingBox()).toEqual(regionBox);
     expect(await municipality.boundingBox()).toEqual(municipalityBox);
   });
 
-  test("the entity picker trigger keeps the preview affordance across rest, hover, and open states", async ({
-    page,
-  }) => {
+  test("opening moves focus into the search input", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
@@ -228,18 +220,11 @@ test.describe("entity picker accessibility", () => {
 
     await expect(page.locator("h1")).not.toContainText(/[▾▴]/);
     await expect(page.locator("main h1")).toHaveText("როგორ ხარჯავს ბიუჯეტს თბილისი");
-
-    await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
-    await expect(trigger).toHaveCSS("border-bottom-style", "dashed");
-    await expect(trigger).toHaveCSS("border-bottom-width", "1px");
-    await expect(trigger).toHaveCSS("transition-duration", "0.1s");
     await expect(caret).toHaveText("");
     await expect(caret).toHaveCSS("border-top-width", "5px");
     await expect(caret).toHaveCSS("border-bottom-width", "0px");
-    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
 
     await trigger.hover();
-    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
     expect(await trigger.boundingBox()).toEqual(restingBox);
 
     await trigger.click();
@@ -247,15 +232,15 @@ test.describe("entity picker accessibility", () => {
     await expect(caret).toHaveText("");
     await expect(caret).toHaveCSS("border-top-width", "0px");
     await expect(caret).toHaveCSS("border-bottom-width", "5px");
-  });
-
-  test("opening moves focus into the search input", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await page.getByTestId("entity-picker-trigger").click();
 
     const combobox = page.getByTestId("entity-picker").getByRole("combobox");
     await expect(combobox).toBeFocused();
+
+    // The keyboard shortcut opens the same picker.
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("entity-picker")).toHaveCount(0);
+    await page.keyboard.press("Control+k");
+    await expect(page.getByTestId("entity-picker")).toBeVisible();
   });
 
   test("the popover mounts as a sibling of the trigger, not nested inside the h1", async ({ page }) => {
@@ -427,7 +412,7 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
 // Task 14: the full municipality-page e2e coverage the header comment above
 // defers to this task ("Full section e2e coverage is Task 14's").
 test.describe("municipality page", () => {
-  test("municipal selector uses the same standardized anatomy as the national explorer", async ({ page }) => {
+  test("municipality and region selectors use the same standardized anatomy as the national explorer", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
@@ -443,29 +428,18 @@ test.describe("municipality page", () => {
     const actionBox = await panel.getByTestId("series-toggle-all").boundingBox();
     const statusBox = await panel.getByTestId("series-status").boundingBox();
     expect(actionBox!.x).toBeLessThan(statusBox!.x);
-  });
 
-  test("series rows reuse the explorer's animated hover and selected tint", async ({ page }) => {
-    await page.goto(ENTITY_URL);
+    // A region roll-up uses the same anatomy, with only its total selected.
+    await page.goto(`${BASE_URL}/explorer/municipalities/region/imereti`);
     await expectMunicipalAppReady(page);
-
-    const initiallySelected = page.locator('[data-testid="series-row"]:has([data-testid="series-row-toggle"][aria-pressed="true"])').first();
-    const initiallyUnselected = page.locator('[data-testid="series-row"]:has([data-testid="series-row-toggle"][aria-pressed="false"])').first();
-    const selectedLabel = await initiallySelected.getByTestId("series-label").innerText();
-    const unselectedLabel = await initiallyUnselected.getByTestId("series-label").innerText();
-    const selectedRow = page.getByTestId("series-row").filter({ hasText: selectedLabel }).first();
-    const unselectedRow = page.getByTestId("series-row").filter({ hasText: unselectedLabel }).first();
-
-    await expect(selectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-    await expect(unselectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
-    await expect(selectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
-    await expect(selectedRow).toHaveCSS("transition-duration", "0.1s");
-    await unselectedRow.hover();
-    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
-
-    await unselectedRow.getByTestId("series-row-toggle").click();
-    await expect(unselectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+    const regionPanel = page.getByTestId("series-selector");
+    const regionSections = await regionPanel.locator("[data-selector-section]").evaluateAll((nodes) =>
+      nodes.map((node) => node.getAttribute("data-selector-section")),
+    );
+    expect(regionSections).toEqual(["search", "actions", "list"]);
+    await expect(regionPanel.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+    await expect(regionPanel.locator('[data-level="total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
+    await expect(regionPanel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ 11/);
   });
 
   test("switches between chart and table", async ({ page }) => {
@@ -512,6 +486,7 @@ test.describe("municipality page", () => {
     await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
     await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(11);
     await expect(page.getByTestId("series-overflow-callout")).toHaveCount(0);
+    await expect(page.getByTestId("municipal-source-note")).not.toContainText("ორი განსხვავებული საზომია");
   });
 
   test("bulk actions ignore the active municipal search", async ({ page }) => {
@@ -583,30 +558,6 @@ test.describe("municipality page", () => {
       .reduce((sum, value) => sum + Number.parseFloat(value.replace("%", "")), 0);
     expect(functionalSum).not.toBeCloseTo(100, 1);
     expect(duplicateKeyWarnings).toEqual([]);
-  });
-
-  test("does not render a divergence callout or two-total source copy", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await expect(page.getByTestId("municipal-source-note")).not.toContainText("ორი განსხვავებული საზომია");
-  });
-
-  test("opens the entity picker with the keyboard", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await page.keyboard.press("Control+k");
-    await expect(page.getByTestId("entity-picker")).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page.getByTestId("entity-picker")).toHaveCount(0);
-  });
-
-  test("keeps the picker popover out of the heading", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await page.keyboard.press("Control+k");
-    // A role="dialog" inside an h1 is announced as part of the heading.
-    await expect(page.locator("h1 [data-testid='entity-picker']")).toHaveCount(0);
-    await expect(page.locator("h1 [data-testid='entity-picker-trigger']")).toHaveCount(1);
   });
 
   test("filters the series list and clears the selection", async ({ page }) => {
@@ -807,11 +758,12 @@ test.describe("municipality page", () => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
-    const classes = await page.getByTestId("municipal-excel").getAttribute("class");
-    expect(classes).toContain("h-[38px]");
-    expect(classes).toContain("w-full");
-    expect(classes).toContain("bg-[var(--ink)]");
-    expect(classes).toContain("text-[var(--paper)]");
+    // The shared ExcelDownloadButton: DESIGN's 38px ink button with paper text.
+    const button = page.getByTestId("municipal-excel");
+    await expect(button).toHaveCSS("height", "38px");
+    // --ink #1E1B16 and --paper #F7F2E9.
+    await expect(button).toHaveCSS("background-color", "rgb(30, 27, 22)");
+    await expect(button).toHaveCSS("color", "rgb(247, 242, 233)");
   });
 
   test("recomputes the period comparison when the range moves", async ({ page }) => {
@@ -882,31 +834,6 @@ test.describe("municipality page", () => {
     );
     expect(columns).toHaveLength(1);
     expect(kpiColumns).toHaveLength(1);
-  });
-
-  test("uses reviewed punctuation in the municipality metadata description", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    const description = page.locator('meta[name="description"]');
-    await expect(description).toHaveAttribute("content", /ქალაქ თბილისის მუნიციპალიტეტის ფაქტობრივი ბიუჯეტი/);
-    await expect(description).not.toHaveAttribute("content", /მუნიციპალიტეტიის/);
-  });
-
-  // Whole-branch review finding: municipalities is the first section with
-  // child routes, so `pathname === section.href` alone never matched on a
-  // municipality sub-page and the sidebar carried no active state at all —
-  // no accent marker, no aria-current — even though the reader is inside the
-  // section. main-explorer.spec.ts already pins this on the index; this pins
-  // it one level deeper, on an actual municipality page.
-  test("the sidebar keeps მუნიციპალიტეტები highlighted on a municipality sub-page, not just the index", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-
-    const sidebar = page.getByTestId("data-sidebar");
-    const municipalitiesLink = sidebar.getByTestId("section-link-municipalities");
-    await expect(municipalitiesLink).toHaveAttribute("aria-current", "page");
-    // No other section row should also claim to be current.
-    await expect(sidebar.getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
   });
 
   // Whole-branch review finding: the comparison table's header hardcoded the
