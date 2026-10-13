@@ -15,7 +15,7 @@ export async function renderExplorerLayout(locale: Locale, children: ReactNode) 
         <div className="flex min-w-0 flex-1 flex-col">
           <div id="content" tabIndex={-1} className="flex-1 outline-none">{children}</div>
           <div className="px-5 min-[768px]:px-[34px]">
-            <div className="mx-auto max-w-[1180px]"><ExplorerFooter locale={locale} /></div>
+            <div className="mx-auto max-w-[1180px]"><ExplorerFooter locale={locale} year={new Date().getFullYear()} /></div>
           </div>
         </div>
       </div>

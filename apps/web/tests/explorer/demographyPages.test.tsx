@@ -212,7 +212,7 @@ describe("births and deaths page", () => {
   it("has its own canonical address and title", async () => {
     const metadata = await demographyBirthsDeathsPageMetadata("ka");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/births-deaths");
-    expect(String(metadata.title)).toBe("შობადობა და სიკვდილიანობა — დემოგრაფია | Fiscal.ge");
+    expect(String(metadata.title)).toBe("შობადობა, სიკვდილიანობა და ნაყოფიერება — დემოგრაფია | Fiscal.ge");
   });
 });
 

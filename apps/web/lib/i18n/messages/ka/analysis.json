@@ -51,5 +51,7 @@
   "analysis.budgetFieldNote": "x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა",
   "analysis.budgetFieldEmpty": "წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.",
   "analysis.metadataTitle": "საქართველოს ბიუჯეტის ანალიზი — {year} ფაქტი | Fiscal.ge",
-  "analysis.metadataDescription": "{year} წლის ბიუჯეტის ფაქტობრივი სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."
+  "analysis.metadataDescription": "{year} წლის ბიუჯეტის ფაქტობრივი სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾.",
+  "analysis.metadataTitlePlanned": "საქართველოს ბიუჯეტის ანალიზი — {year} გეგმა | Fiscal.ge",
+  "analysis.metadataDescriptionPlanned": "{year} წლის ბიუჯეტის დაგეგმილი სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."
 }

@@ -206,7 +206,7 @@ describe.each(["ka", "en"] as const)("%s small payload rules", (locale) => {
   });
 
   test("the footer logo is lazy, so React does not preload it ahead of the header logo (U01-11)", async () => {
-    const html = renderToStaticMarkup(<SiteFooterView locale={locale} messages={await getMessages(locale, ["common"])} />);
+    const html = renderToStaticMarkup(<SiteFooterView locale={locale} messages={await getMessages(locale, ["common"])} year={new Date().getFullYear()} />);
     expect(html).toMatch(/<img[^>]*data-testid="site-footer-logo"[^>]*loading="lazy"/);
   });
 });

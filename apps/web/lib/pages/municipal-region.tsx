@@ -134,7 +134,10 @@ export async function municipalRegionMetadata(id: string, locale: Locale): Promi
         }, presentation);
 
   return fiscalMetadata({ locale,
-    title: regionBudgetTitle(name, facts.firstYear, facts.latestYear, presentation),
+    // Adjara's figure folds in the republican budget, so it is a consolidated budget, not a sum of municipal ones.
+    title: regionId === ADJARA_REGION_ID
+      ? message(presentation.messages, "municipal.metaAdjaraTitle", { name, first: facts.firstYear, last: facts.latestYear })
+      : regionBudgetTitle(name, facts.firstYear, facts.latestYear, presentation),
     description,
     path: `/explorer/municipalities/region/${id}`,
   });

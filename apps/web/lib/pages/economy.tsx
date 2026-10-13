@@ -13,8 +13,8 @@ export async function economyPageMetadata(locale: Locale) {
   return fiscalMetadata({
     locale,
     path: "/explorer/economy",
-    title: `${message(p.messages, "gdp.economy")} | Fiscal.ge`,
-    description: message(p.messages, "gdp.hubDescription"),
+    title: message(p.messages, "gdp.economy"),
+    description: message(p.messages, "gdp.hubMetaDescription"),
   });
 }
 export async function renderEconomyPage(locale: Locale) {

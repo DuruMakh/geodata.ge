@@ -10,7 +10,7 @@
   "unemployment.page.regions.summary": "Select a region on the map or in the list to explore its unemployment and labour-force trends. The map shows the latest published unemployment rates.",
   "unemployment.regionTitle": "Unemployment — {region}",
   "unemployment.regionHeadingLead": "Unemployment —",
-  "unemployment.regionSummary": "Explore {region} unemployment and labour-force trends. Select indicators to compare rates or people counts over the region’s published years.",
+  "unemployment.regionSummary": "{region}: unemployment and labour-force trends. Compare rates or people counts over the region’s published years.",
   "unemployment.regionMapAria": "Regional unemployment-rate map for {year}",
   "unemployment.regionMapEntityAria": "{name}: unemployment rate {rate}, {year}",
   "unemployment.nationalRate": "National unemployment rate",
@@ -81,5 +81,5 @@
   "unemployment.sourceNote": "Source: Geostat Labour Force Survey. Survey estimates, not census counts; displayed differences do not establish statistical significance.",
   "unemployment.methodology": "Definitions and original sources",
   "unemployment.metaTitle": "Unemployment in Georgia",
-  "unemployment.metaDescription": "Explore Georgia’s official annual unemployment, employment and participation rates and counts by sex, age, settlement, region and education, with sources and Excel downloads."
+  "unemployment.metaDescription": "Georgia’s official annual unemployment, employment and participation rates and counts by sex, age, settlement, region and education, with Excel downloads."
 }

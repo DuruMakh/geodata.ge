@@ -12,7 +12,7 @@ export async function demographyPageMetadata(locale: Locale) {
   return fiscalMetadata({
     locale,
     path: DEMOGRAPHY_HUB_PATH,
-    title: `${message(p.messages, "demography.title")} | Fiscal.ge`,
+    title: message(p.messages, "demography.title"),
     description: message(p.messages, "demography.hubDescription"),
   });
 }

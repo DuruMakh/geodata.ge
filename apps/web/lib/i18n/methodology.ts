@@ -1,6 +1,6 @@
 import type { MethodologyContent } from "../methodology/types";
 
-const proseKeys = new Set(["title", "summary", "disclosure", "label", "value", "paragraphs", "detail", "group", "statusLabel", "hiddenDecisionGroups"]);
+const proseKeys = new Set(["title", "summary", "metaDescription", "disclosure", "label", "value", "paragraphs", "detail", "group", "statusLabel", "hiddenDecisionGroups"]);
 const statusTranslations = {
   "ოფიციალური ფაქტი": "Official fact",
   "Fiscal.ge-ის გადაწყვეტილება": "Fiscal.ge decision",

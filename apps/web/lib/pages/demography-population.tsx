@@ -34,7 +34,7 @@ export async function demographyPopulationPageMetadata(locale: Locale) {
   return fiscalMetadata({
     locale,
     path: POPULATION_PATH,
-    title: `${message(p.messages, "demography.populationMetaTitle")} | Fiscal.ge`,
+    title: message(p.messages, "demography.populationMetaTitle"),
     description: message(p.messages, "demography.populationDescription"),
   });
 }

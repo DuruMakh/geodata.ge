@@ -182,9 +182,9 @@ async function expectDatasetTableFits(page: Page, testId: string) {
 const LANDING_COPY = {
   ka: {
     prefix: "",
-    title: "საქართველოს ბიუჯეტი, ვალი და დეფიციტი | Fiscal.ge",
+    title: "საქართველოს საჯარო ფინანსებისა და ეკონომიკის მონაცემები | Fiscal.ge",
     description:
-      "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და დეფიციტის გადამოწმებული მონაცემები, მეთოდოლოგია და ჩამოსატვირთი Excel ფაილები.",
+      "საქართველოს ბიუჯეტი, ვალი, მშპ, ინფლაცია, უმუშევრობა, ხელფასები, ვაჭრობა და მოსახლეობა — გადამოწმებული ოფიციალური მონაცემები, წყაროები და Excel ფაილები.",
     heading: "საქართველო ციფრებში",
     portal: "საქართველოს მონაცემების პორტალი",
     cta: "გაეცანი მონაცემებს",
@@ -214,9 +214,9 @@ const LANDING_COPY = {
   },
   en: {
     prefix: "/en",
-    title: "Georgia’s budget, debt and deficit | Fiscal.ge",
+    title: "Georgia’s public finance and economy data | Fiscal.ge",
     description:
-      "Verified data on Georgia’s state and municipal budgets, government debt and deficit, with methodology and downloadable Excel files.",
+      "Georgia’s budget, debt, GDP, inflation, unemployment, wages, trade and population — reviewed official data with sources and Excel downloads.",
     heading: "Georgia in numbers",
     portal: "Georgia’s data portal",
     cta: "Explore the data",

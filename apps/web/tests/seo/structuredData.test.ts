@@ -1,8 +1,8 @@
-import { readdirSync } from "node:fs";
 import path from "node:path";
 import { isValidElement, type ReactNode } from "react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { JsonLd } from "../../components/seo/json-ld";
+import { appRoutes, routeFor } from "../helpers/appRoutes";
 import { DEMOGRAPHY_HUB_PATH } from "../../lib/explorer/demographyRoutes";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
 import { NAV_TREE, openHub } from "../../lib/navigation/navTree";
@@ -42,7 +42,7 @@ describe("Fiscal.ge structured data", () => {
       url: "https://fiscal.ge",
       email: "info@fiscal.ge",
       description:
-        "Fiscal.ge საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების გადამოწმებულ მონაცემებს ქართულად და ინგლისურად აქვეყნებს.",
+        "Fiscal.ge საქართველოს საჯარო ფინანსებისა და ეკონომიკის გადამოწმებულ ოფიციალურ მონაცემებს ქართულად და ინგლისურად აქვეყნებს.",
       logo: {
         "@type": "ImageObject",
         url: "https://fiscal.ge/fiscal-ge-logo.svg",
@@ -569,35 +569,6 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     ).toMatchObject({ publisher: { "@id": "https://fiscal.ge/#organization" } });
   });
 });
-
-/** Every app route file, as the URL pattern it serves: `app/(en)/en/explorer/wages/regions/[id]/page.tsx` → `/en/explorer/wages/regions/[id]`. */
-function appRoutes() {
-  const app = path.resolve(__dirname, "../../app");
-  return readdirSync(app, { recursive: true, encoding: "utf8" })
-    .filter((file) => path.basename(file) === "page.tsx")
-    .map((file) => ({
-      file: path.join(app, file),
-      segments: path.dirname(file).split(path.sep).filter((segment) => segment !== "." && !/^\(.+\)$/.test(segment)),
-    }));
-}
-
-/** The route file serving a pathname and its dynamic params; a static segment beats a dynamic one (`georgia` over `[slug]`). */
-function routeFor(routes: ReturnType<typeof appRoutes>, pathname: string) {
-  const parts = pathname.split("/").filter(Boolean);
-  const matches = routes.flatMap((route) => {
-    if (route.segments.length !== parts.length) return [];
-    const params: Record<string, string> = {};
-    for (const [index, segment] of route.segments.entries()) {
-      const dynamic = /^\[(.+)\]$/.exec(segment);
-      if (dynamic) params[dynamic[1]] = parts[index];
-      else if (segment !== parts[index]) return [];
-    }
-    return [{ file: route.file, params, staticSegments: route.segments.length - Object.keys(params).length }];
-  });
-  const route = matches.sort((a, b) => b.staticSegments - a.staticSegments)[0];
-  if (!route) throw new Error(`No app route serves ${pathname}`);
-  return route;
-}
 
 /** The data of every JsonLd element in a rendered page tree, wherever a page module placed it. */
 function jsonLdNodes(node: unknown): Record<string, unknown>[] {

@@ -5,7 +5,15 @@ import kaCommon from "../../lib/i18n/messages/ka/common.json";
 import enCommon from "../../lib/i18n/messages/en/common.json";
 import sitemap from "../../lib/seo/sitemap";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
-import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedRegionalEconomyData } from "../../lib/data/regionalEconomies/importRegionalEconomies";
+import { loadServedTradeOverviewData } from "../../lib/data/tradeOverview/importTradeOverview";
+import { loadServedTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
+import { loadServedTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
+import { loadServedTradeDomesticData } from "../../lib/data/tradeDomestic/importTradeDomestic";
+import { loadServedTradeServicesData } from "../../lib/data/tradeServices/importTradeServices";
+import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
+import { loadServedProductData } from "../../lib/data/inflation/importProducts";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import { loadServedGdpOverviewData } from "../../lib/data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../../lib/data/economicSectors/importEconomicSectors";
@@ -460,13 +468,27 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
 
     expect(dates.get(`${SITE}/explorer/economy/gdp`)).toBe(gdp);
     expect(dates.get(`${SITE}/explorer/economy/sectors`)).toBe(sectors);
-    // The hub shows both, so it moves when either refreshes.
-    expect(dates.get(`${SITE}/explorer/economy`)).toBe([gdp!, sectors!].sort().at(-1));
   });
+
+  // U28-13: a hub moves when any dataset one of its cards reads is refreshed, as the date in its header does.
+  it("dates each hub by the newest dataset its cards read", async () => {
+    const latest = (...datasets: { facts: readonly { lastReviewedAt: string }[] }[]) =>
+      datasets.flatMap(({ facts }) => facts.map((fact) => fact.lastReviewedAt)).sort().at(-1);
+    const [dates, gdp, sectors, regional, trade, partners, products, domestic, services, inflation, inflationProducts, { sourceDocuments }, debt, balance] = await Promise.all([
+      sitemapDates(), loadServedGdpOverviewData(), loadServedEconomicSectorsData(), loadServedRegionalEconomyData(),
+      loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(),
+      loadServedInflationData(), loadServedProductData(), loadServedLandingData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
+    ]);
+    expect(dates.get(`${SITE}/explorer/economy`)).toBe(latest(gdp, sectors, regional));
+    expect(dates.get(`${SITE}/explorer/trade`)).toBe(latest(trade, partners, products, domestic, services));
+    expect(dates.get(`${SITE}/explorer/inflation`)).toBe(latest(inflation, inflationProducts));
+    expect(dates.get(`${SITE}/explorer`)).toBe(latest({ facts: sourceDocuments }, debt, balance));
+  });
+
   it("includes both Products routes with their own review date", async () => {
     const dates = await sitemapDates();
     expect(dates.get(`${SITE}/explorer/trade/products`)).toBe("2026-10-09");
-    expect(dates.get(`${SITE}/en/explorer/trade/products`)).toBe("2026-10-10");
+    expect(dates.get(`${SITE}/en/explorer/trade/products`)).toBe("2026-10-09");
   });
 });
 
@@ -484,11 +506,12 @@ describe("served translation inventory", () => {
 });
 
 // From tests/i18n/pageRevisions.test.ts.
-describe("reviewed English page dates", () => {
-  it("pairs every sitemap URL and keeps English dates at least as recent as facts and translation", async () => {
+describe("paired page dates", () => {
+  // U10-15: both languages show the same figures, so a page pair carries one lastmod, the date of those figures.
+  it("pairs every sitemap URL and gives both languages one lastmod", async () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
     try {
-      const [paths, revisions, entries] = await Promise.all([listPublicPagePaths(), loadPageRevisions(), sitemap()]);
+      const [paths, entries] = await Promise.all([listPublicPagePaths(), sitemap()]);
       expect(entries).toHaveLength(paths.length * 2);
       for (const path of paths) {
         const ka = new URL(path, "https://fiscal.ge").href;
@@ -497,8 +520,8 @@ describe("reviewed English page dates", () => {
         const english = entries.find(entry => entry.url === en)!;
         expect(original.alternates?.languages).toEqual({ ka, en, "x-default": ka });
         expect(english.alternates).toEqual(original.alternates);
-        const oldDate = original.lastModified ? new Date(original.lastModified).toISOString().slice(0, 10) : "";
-        expect(new Date(english.lastModified!).toISOString().slice(0, 10)).toBe([oldDate, revisions[path]].sort().at(-1));
+        expect(original.lastModified, path).toBeDefined();
+        expect(english.lastModified, path).toEqual(original.lastModified);
       }
     } finally { vi.unstubAllEnvs(); }
   });

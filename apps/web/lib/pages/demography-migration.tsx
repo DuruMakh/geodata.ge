@@ -20,12 +20,13 @@ import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationSources } from "./demography-population";
 
 export async function demographyMigrationPageMetadata(locale: Locale) {
-  const p = await getPresentation(locale, ["demography"], []);
+  const [{ facts: served }, p] = await Promise.all([loadServedDemographyData(), getPresentation(locale, ["demography"], [])]);
+  const { min: first, max: last } = migrationCoverage(served.filter((fact) => MIGRATION_SERIES.includes(fact.seriesId)).map(projectMigrationObservation));
   return fiscalMetadata({
     locale,
     path: MIGRATION_PATH,
-    title: `${message(p.messages, "demography.migrationMetaTitle")} | Fiscal.ge`,
-    description: message(p.messages, "demography.migrationDescription"),
+    title: message(p.messages, "demography.migrationMetaTitle"),
+    description: message(p.messages, "demography.migrationMetaDescription", { first, last }),
   });
 }
 

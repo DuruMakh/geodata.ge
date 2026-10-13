@@ -41,6 +41,21 @@ describe("dataset footer attribution", () => {
     expect(footer).not.toContain("ფინანსთა სამინისტრო");
   });
 
+  // U01-21: the year is the build's, in the server footer and in the explorer layout's client footer alike.
+  it("dates the copyright line by the build, not a literal year", async () => {
+    route.pathname = "/explorer/unemployment";
+    // A build some years on: only the clock moves, so the footer must follow it.
+    const later = new Date().getFullYear() + 5;
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(later, 5, 1));
+    try {
+      expect(footerText(renderToStaticMarkup(<SiteFooter locale="ka" />))).toContain(`© ${later} Fiscal.ge`);
+      expect(footerText(renderPageMarkup("en", await renderExplorerLayout("en", null)))).toContain(`© ${later} Fiscal.ge`);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("labels the generic footer date as a site-wide source review", () => {
     const footer = footerText(renderToStaticMarkup(<SiteFooter locale="en" updatedAt="2026-09-13" />));
     expect(footer).toContain("Latest source review across Fiscal.ge:");

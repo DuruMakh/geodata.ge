@@ -66,11 +66,16 @@ export async function populationPlaceMetadata(route: PopulationPlaceRoute, local
   const years = placeYears(clientFacts, place);
   const t = (key: string, values?: TemplateValues) => message(presentation.messages, `demography.${key}`, values);
   const name = placeLabel(place, locale);
+  const span = { name, first: years[0]!, last: years.at(-1)! };
+  // A municipality's page names its region and has no census age section; Georgia's and a region's carry both.
+  const region = places.find((candidate) => candidate.id === place.regionId);
   return fiscalMetadata({
     locale,
     path: populationPlaceHref(place.id),
-    title: `${t("placeMetaTitle", { name })} | Fiscal.ge`,
-    description: t("placeMetaDescription", { name, first: years[0]!, last: years.at(-1)! }),
+    title: t("placeMetaTitle", { name }),
+    description: region
+      ? t("placeMunicipalityMetaDescription", { ...span, region: placeLabel(region, locale) })
+      : t("placeMetaDescription", span),
   });
 }
 

@@ -11,6 +11,7 @@ import {
   currentAccountMetadata, foreignInvestmentMetadata, moneyFromAbroadMetadata,
   renderCurrentAccountPage, renderForeignInvestmentPage, renderMoneyFromAbroadPage,
 } from "../../lib/pages/external";
+import { externalHubMetadata } from "../../lib/pages/hubs/external";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
@@ -47,4 +48,12 @@ describe.each(["ka", "en"] as const)("External flows pages name themselves and t
     expect(dataset).toMatchObject({ name: message(messages, `external.${key}.title`), url, temporalCoverage: `${min}/${max}` });
     expect(dataset.variableMeasured.length).toBeGreaterThan(0);
   });
+});
+
+// U23-10: the hub's search description names all three of its pages, the current account included.
+it.each(["ka", "en"] as const)("the External flows hub description names its three pages: %s", async (locale) => {
+  const { description } = await externalHubMetadata(locale);
+  for (const term of locale === "en" ? ["money transfers", "foreign direct investment", "current account"] : ["ფულადი გზავნილები", "პირდაპირი უცხოური ინვესტიციები", "მიმდინარე ანგარიშ"]) {
+    expect(description).toContain(term);
+  }
 });

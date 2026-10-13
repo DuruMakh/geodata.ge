@@ -40,7 +40,7 @@ export async function tradeOverviewMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["trade"]);
   const { facts } = await loadServedTradeOverviewData();
   const { min, max } = tradeOverviewCoverage(facts.map(toClientTradeOverviewFact));
-  return fiscalMetadata({ locale, path: "/explorer/trade/overview", title: message(messages, "trade.title"), description: `${message(messages, "trade.metaDescription")} ${min}–${max}.` });
+  return fiscalMetadata({ locale, path: "/explorer/trade/overview", title: message(messages, "trade.metaTitle"), description: `${message(messages, "trade.metaDescription")} ${min}–${max}.` });
 }
 export async function tradeProductsMetadata(locale: Locale) {
   const [products, messages] = await Promise.all([loadServedTradeProductsData(), getMessages(locale, ["trade"])]);

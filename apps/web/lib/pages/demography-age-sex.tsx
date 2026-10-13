@@ -21,12 +21,13 @@ import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources } from "./demography-population";
 
 export async function demographyAgeSexPageMetadata(locale: Locale) {
-  const p = await getPresentation(locale, ["demography"], []);
+  const [{ facts: served }, p] = await Promise.all([loadServedDemographyData(), getPresentation(locale, ["demography"], [])]);
+  const years = ageYears(annualAgeFacts(served));
   return fiscalMetadata({
     locale,
     path: AGE_SEX_PATH,
-    title: `${message(p.messages, "demography.ageSexMetaTitle")} | Fiscal.ge`,
-    description: message(p.messages, "demography.ageSexDescription"),
+    title: message(p.messages, "demography.ageSexMetaTitle"),
+    description: message(p.messages, "demography.ageSexMetaDescription", { first: years[0]!, last: years.at(-1)! }),
   });
 }
 

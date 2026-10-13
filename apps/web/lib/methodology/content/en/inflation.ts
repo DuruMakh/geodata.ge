@@ -5,6 +5,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   slug: "inflation",
   title: "Inflation",
   summary: "Georgia's consumer price index, inflation categories, city inflation and individual-product price changes, alongside the National Bank of Georgia's inflation target.",
+  metaDescription: "Georgia’s consumer price index, inflation categories, city inflation and product price changes, with the National Bank of Georgia’s inflation target.",
   reviewedAt: "2026-10-01",
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },

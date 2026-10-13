@@ -15,9 +15,11 @@ import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 export async function analysisPageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedExplorerData(), getMessages(locale, ["analysis"])]);
   const { lastYear } = coverageFromYears(facts);
+  // The page opens on the last year. Actual wins over planned, so it reads as actuals only when it has an actual row.
+  const planned = !facts.some((fact) => fact.year === lastYear && fact.basis === "actual");
   return fiscalMetadata({ locale,
-    title: message(messages, "analysis.metadataTitle", { year: lastYear }),
-    description: message(messages, "analysis.metadataDescription", { year: lastYear }),
+    title: message(messages, planned ? "analysis.metadataTitlePlanned" : "analysis.metadataTitle", { year: lastYear }),
+    description: message(messages, planned ? "analysis.metadataDescriptionPlanned" : "analysis.metadataDescription", { year: lastYear }),
     path: "/explorer/analysis",
   });
 }

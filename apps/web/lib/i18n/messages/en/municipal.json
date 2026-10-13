@@ -84,7 +84,8 @@
   "municipal.metaIndexDescription": "Actual municipal budgets in Georgia by function, {first}–{last}.",
   "municipal.indexDatasetName": "Municipal budgets in Georgia",
   "municipal.metaMunicipalityTitle": "{name} budget {first}–{last} | Fiscal.ge",
-  "municipal.metaRegionTitle": "{name} regional budget {first}–{last} | Fiscal.ge",
+  "municipal.metaRegionTitle": "{name} municipal budgets {first}–{last} | Fiscal.ge",
+  "municipal.metaAdjaraTitle": "{name} consolidated budget {first}–{last} | Fiscal.ge",
   "municipal.metaCountryTitle": "Georgia municipal budget total {first}–{last} | Fiscal.ge",
   "municipal.municipalityDatasetName": "{name} budget",
   "municipal.regionDatasetName": "{name} regional budget",
@@ -92,6 +93,6 @@
   "municipal.georgia": "Georgia",
   "municipal.metaMunicipalityDescription": "Actual budget of {name} in {latest}: {amount}; rank {rank}/{count}. Largest function: {function} ({share}). {first}–{latest}.",
   "municipal.metaRegionDescription": "Municipal budget in {name} in {latest}: {amount}; rank {rank} of {count}. Largest function: {function} ({share}). {first}–{latest}.",
-  "municipal.metaAdjaraDescription": "Adjara’s consolidated budget in {latest}: {amount}; rank {rank} of {count}. Includes {members} municipalities and Adjara’s republican budget, with internal transfers deducted. {first}–{latest}.",
+  "municipal.metaAdjaraDescription": "Adjara’s consolidated budget in {latest}: {amount}; rank {rank} of {count}. {members} municipalities plus the republican budget, net of internal transfers. {first}–{latest}.",
   "municipal.metaCountryDescription": "Georgia’s municipal budgets in {latest}: {amount}. The total includes {count} units and Adjara’s republican payments, with internal transfers deducted. {first}–{latest}."
 }

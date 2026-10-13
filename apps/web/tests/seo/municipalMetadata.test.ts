@@ -194,9 +194,9 @@ describe("municipal entity SEO copy", () => {
     ).toContain(`${alternateBudgetUnitCount} ერთეულ`);
   });
 
-  it("uses a shorter unique region title", () => {
+  it("names a region's figure as its municipal budget (U09-12)", () => {
     expect(regionBudgetTitle("იმერეთის", 2015, 2025)).toBe(
-      "იმერეთის ბიუჯეტი 2015–2025 | Fiscal.ge",
+      "იმერეთის მუნიციპალური ბიუჯეტი 2015–2025 | Fiscal.ge",
     );
   });
 });

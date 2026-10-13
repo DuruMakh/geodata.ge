@@ -23,12 +23,14 @@ import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources } from "./demography-population";
 
 export async function demographyBirthsDeathsPageMetadata(locale: Locale) {
-  const p = await getPresentation(locale, ["demography"], []);
+  const [{ facts: served }, p] = await Promise.all([loadServedDemographyData(), getPresentation(locale, ["demography"], [])]);
+  // The page header's span: the years with live births.
+  const birthYears = served.filter((fact) => fact.seriesId === SERIES.liveBirths).map((fact) => fact.year);
   return fiscalMetadata({
     locale,
     path: BIRTHS_DEATHS_PATH,
-    title: `${message(p.messages, "demography.birthsMetaTitle")} | Fiscal.ge`,
-    description: message(p.messages, "demography.birthsDeathsDescription"),
+    title: message(p.messages, "demography.birthsMetaTitle"),
+    description: message(p.messages, "demography.birthsDeathsMetaDescription", { first: Math.min(...birthYears), last: Math.max(...birthYears) }),
   });
 }
 

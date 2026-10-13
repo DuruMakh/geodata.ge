@@ -51,5 +51,7 @@
   "analysis.budgetFieldNote": "x — share of total · y — growth from the previous year · size — amount",
   "analysis.budgetFieldEmpty": "Previous-year data is unavailable, so growth cannot be shown for this year. Choose a later year.",
   "analysis.metadataTitle": "Georgia budget analysis — {year} actuals | Fiscal.ge",
-  "analysis.metadataDescription": "Actual budget results for {year} — composition, rankings and every 100 GEL."
+  "analysis.metadataDescription": "Actual budget results for {year} — composition, rankings and every 100 GEL.",
+  "analysis.metadataTitlePlanned": "Georgia budget analysis — {year} plan | Fiscal.ge",
+  "analysis.metadataDescriptionPlanned": "Planned budget for {year} — composition, rankings and every 100 GEL."
 }

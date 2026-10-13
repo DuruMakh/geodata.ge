@@ -58,7 +58,7 @@ export async function renderGdpPage(locale: Locale) {
           datasetId: "gdp-overview",
           origin: resolveSiteUrl(),
           path: "/explorer/economy/gdp",
-          name: message(presentation.messages, "gdp.heading"),
+          name: message(presentation.messages, "gdp.metaTitle"),
           description: message(presentation.messages, "gdp.description"),
           firstYear: Math.min(...years),
           lastYear: Math.max(...years),

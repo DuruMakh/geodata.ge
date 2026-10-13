@@ -41,7 +41,6 @@ import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demograp
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../siteUrl";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
-import { loadPageRevisions } from "../i18n/page-revisions.server";
 import { pageHref } from "../i18n/routes";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
@@ -105,13 +104,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tradeProductsModified = new Date(tradeProductFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeServicesModified = new Date(tradeServicesFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeDomesticModified = new Date(tradeDomesticFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
-  const economyModified = gdpModified > sectorsModified ? gdpModified : sectorsModified;
+  // A hub is dated by the latest of every dataset its cards read.
+  const tradeHubModified = new Date(Math.max(tradeModified.getTime(), tradePartnersModified.getTime(), tradeProductsModified.getTime(), tradeDomesticModified.getTime(), tradeServicesModified.getTime()));
+  const economyModified = new Date(Math.max(gdpModified.getTime(), sectorsModified.getTime(), regionalModified.getTime()));
+  const inflationHubModified = productModified > inflationModified ? productModified : inflationModified;
   const demographyModified = new Date(demographyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const lastReviewedAt = sourceDocuments
     .map((source) => source.lastReviewedAt)
     .sort()
     .at(-1);
   const lastModified = lastReviewedAt ? new Date(lastReviewedAt) : undefined;
+  // The budget hub shows the debt and deficit cards beside the budget ones, and dates itself by all three.
+  const budgetHubReviewedAt = [lastReviewedAt, ...debtFacts.map((fact) => fact.lastReviewedAt), ...balanceFacts.map((fact) => fact.lastReviewedAt)]
+    .filter(Boolean)
+    .sort()
+    .at(-1);
   const methodologyLastModified = LIVE_METHODOLOGY_IDS.map(
     (id) => METHODOLOGY_CONTENT[id].reviewedAt,
   )
@@ -140,7 +147,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/connect`, lastModified },
     // /mcp itself is never listed: a POST-only protocol endpoint answers a
     // crawler's GET with 405, so it is not a page to index.
-    { url: `${siteUrl}/explorer`, lastModified },
+    { url: `${siteUrl}/explorer`, lastModified: budgetHubReviewedAt ? new Date(budgetHubReviewedAt) : undefined },
     { url: `${siteUrl}/explorer/economy`, lastModified: economyModified },
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified: sectorsModified },
@@ -154,7 +161,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...POVERTY_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: povertyModified })),
     { url: `${siteUrl}${ENERGY_FOOD_HUB_PATH}`, lastModified: energyFoodModified },
     ...ENERGY_FOOD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: energyFoodModified })),
-    { url: `${siteUrl}/explorer/trade`, lastModified: tradeModified },
+    { url: `${siteUrl}/explorer/trade`, lastModified: tradeHubModified },
     { url: `${siteUrl}/explorer/trade/overview`, lastModified: tradeModified },
     { url: `${siteUrl}/explorer/trade/partners`, lastModified: tradePartnersModified },
     { url: `${siteUrl}/explorer/external`, lastModified: externalModified },
@@ -171,7 +178,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/explorer/economy/regions/${region.id.replace("region.", "")}`,
       lastModified: regionalModified,
     })),
-    { url: `${siteUrl}/explorer/inflation`, lastModified: inflationModified },
+    { url: `${siteUrl}/explorer/inflation`, lastModified: inflationHubModified },
     { url: `${siteUrl}/explorer/inflation/overview`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/categories`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/products`, lastModified: productModified },
@@ -241,17 +248,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     }),
   ];
-  const revisions = await loadPageRevisions();
+  // The two languages show the same figures, so a page pair carries one lastmod: the date of the data it shows.
   return georgian.flatMap(entry => {
-    const path = new URL(entry.url).pathname;
-    const reviewedAt = revisions[path];
-    if (!reviewedAt) throw new Error(`Missing English page revision: ${path}`);
-    const en = new URL(pageHref(path, "en"), siteUrl).href;
+    const en = new URL(pageHref(new URL(entry.url).pathname, "en"), siteUrl).href;
     const languages = { ka: entry.url, en, "x-default": entry.url };
-    const originalDate = entry.lastModified ? new Date(entry.lastModified).toISOString().slice(0, 10) : "";
     return [
       { ...entry, alternates: { languages } },
-      { url: en, lastModified: new Date([originalDate, reviewedAt].sort().at(-1)!), alternates: { languages } },
+      { url: en, lastModified: entry.lastModified, alternates: { languages } },
     ];
   });
 }

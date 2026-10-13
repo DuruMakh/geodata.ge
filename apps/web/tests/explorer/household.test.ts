@@ -319,6 +319,7 @@ test.each([
   ["ka", "income", "georgia", "შინამეურნეობების შემოსავლები — საქართველო"],
 ] as const)("the %s %s page for %s is titled as household data", async (locale, section, slug, title) => {
   const metadata = await householdRegionPageMetadata(section, slug, locale);
-  expect(metadata.title).toBe(title);
-  expect(metadata.openGraph?.title).toBe(title);
+  // The brand is appended once, by fiscalMetadata (U28-11).
+  expect(metadata.title).toBe(`${title} | Fiscal.ge`);
+  expect(metadata.openGraph?.title).toBe(`${title} | Fiscal.ge`);
 });

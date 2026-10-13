@@ -158,16 +158,19 @@ const DATASET_JSON_DISTRIBUTIONS = {
   money: [],
 } as const;
 
+const METHODOLOGY_WORD = /methodology|მეთოდოლოგია/i;
+
 export async function methodologyArticleMetadata(locale: Locale, { params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
   const content = getMethodologyContent(dataset, locale);
   const messages = await getMessages(locale, ["common", "methodology"]);
-  const title = message(messages, "methodology.articleMetaTitle", { title: content.title });
+  // "Expenditure methodology" already says what the suffix would add.
+  const title = METHODOLOGY_WORD.test(content.title) ? content.title : message(messages, "methodology.articleMetaTitle", { title: content.title });
   const canonical = `/methodology/${dataset}` as const;
 
   return fiscalMetadata({ locale,
     title,
-    description: content.summary,
+    description: content.metaDescription ?? content.summary,
     path: canonical,
     type: "article",
   });

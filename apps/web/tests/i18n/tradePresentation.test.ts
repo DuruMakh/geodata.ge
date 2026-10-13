@@ -67,14 +67,15 @@ test("Services metadata and page inputs use accepted services coverage, labels a
   for (const locale of ["ka", "en"] as const) {
     const metadata = await tradeServicesMetadata(locale);
     const href = locale === "en" ? "/en/explorer/trade/services" : "/explorer/trade/services";
-    expect(metadata.title).toBe(locale === "en" ? "Services trade" : "მომსახურებით ვაჭრობა");
+    const title = locale === "en" ? "Services trade" : "მომსახურებით ვაჭრობა";
+    expect(metadata.title).toBe(`${title} | Fiscal.ge`);
     expect(metadata.description).toContain("2020–2024");
     expect(metadata.alternates?.canonical).toMatch(new RegExp(`${href}$`));
     expect(metadata.alternates?.languages?.en).toMatch(/\/en\/explorer\/trade\/services$/);
     expect(metadata.alternates?.languages?.ka).toMatch(/\/explorer\/trade\/services$/);
     const page = await renderTradeServicesPage(locale), elements = pageElements(page);
     const dataset = elements.find(element => element.props.testId === "explorer-dataset-json-ld")!.props.data as Record<string, unknown>;
-    expect(dataset).toMatchObject({ "@type": "Dataset", name: metadata.title, temporalCoverage: "2020/2024", dateModified: "2026-10-11" });
+    expect(dataset).toMatchObject({ "@type": "Dataset", name: title, temporalCoverage: "2020/2024", dateModified: "2026-10-11" });
     expect(dataset.url).toMatch(new RegExp(`${href}$`));
     const workspace = elements.find(element => element.type === TradeServices)!;
     const props = workspace.props as unknown as Parameters<typeof TradeServices>[0];

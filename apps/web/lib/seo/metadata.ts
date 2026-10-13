@@ -15,8 +15,11 @@ import enDeficit from "../i18n/messages/en/deficit.json";
 const DEBT_MESSAGES = { ka: kaDebt, en: enDebt };
 const DEFICIT_MESSAGES = { ka: kaDeficit, en: enDeficit };
 
+const BRAND = "Fiscal.ge";
+
 type FiscalMetadataInput = {
   locale: Locale;
+  /** The page's own title; the brand is appended here when the title does not already end with it. */
   title: string;
   description: string;
   path: `/${string}` | "/";
@@ -36,11 +39,12 @@ export function coverageFromYears(rows: readonly { year: number }[]): {
 
 export function fiscalMetadata({
   locale,
-  title,
+  title: pageTitle,
   description,
   path,
   type = "website",
 }: FiscalMetadataInput): Metadata {
+  const title = pageTitle.endsWith(BRAND) ? pageTitle : `${pageTitle} | ${BRAND}`;
   const origin = resolveSiteUrl();
   const ka = new URL(pageHref(path, "ka"), origin).href;
   const en = new URL(pageHref(path, "en"), origin).href;
