@@ -17,7 +17,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       // DESIGN §17: only the one-line latest value sits under the heading.
       expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.getAttribute("data-testid"))).toBe("wages-latest");
       if (section !== "regions") await expect(page.getByTestId("series-status")).toContainText("1 /");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     expect(errors).toEqual([]);
   });

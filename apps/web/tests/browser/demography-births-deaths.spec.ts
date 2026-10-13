@@ -48,13 +48,4 @@ test.describe("births, deaths and fertility page", () => {
     await expectAppReady(page);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("შობადობა და სიკვდილიანობა");
   });
-
-  for (const path of ["/en/explorer/demography/births-deaths", "/explorer/demography/population/batumi"]) {
-    test(`${path} has no sideways scroll at 390px`, async ({ page }) => {
-      await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto(`${TEST_BASE_URL}${path}`);
-      await expectAppReady(page);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    });
-  }
 });

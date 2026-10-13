@@ -24,7 +24,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await expect(page.locator('[data-testid^="energy-food-tab"]')).toHaveCount(0);
       await expect(page.getByTestId("series-status")).toContainText("1 /");
       await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     expect(errors).toEqual([]);
   });

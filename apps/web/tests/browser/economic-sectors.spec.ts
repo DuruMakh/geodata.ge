@@ -44,7 +44,6 @@ for (const width of [390, 768, 1440]) {
     }
     await expect(side.locator("svg")).toHaveCount(3);
     expect(await hero.locator('[data-testid="sector-hero-value"]').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBe(width < 768 ? 44 : 62);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }
 

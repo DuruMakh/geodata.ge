@@ -14,7 +14,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) test(`re
   await expect(page.getByTestId("unemployment-indicator")).toHaveCount(0);
   await expect(page.getByTestId("regional-map-legend")).toContainText("7.0%");
   await expect(page.getByTestId("regional-map-legend")).toContainText("17.5%");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.locator('[data-testid="regional-list-row"][data-region-id="region.imereti"]').click();
   await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/unemployment/regions/imereti$`));
   await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");

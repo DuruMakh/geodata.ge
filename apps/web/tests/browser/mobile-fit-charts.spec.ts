@@ -303,13 +303,33 @@ test("every explorer route template has a published page to check", () => {
   expect(routes.pages.length).toBeGreaterThan(60);
 });
 
-test.describe("one short line under the heading at 375px (DESIGN §17)", () => {
-  test.use({ viewport: { width: 375, height: 812 } });
+// The layout pass after §17: the same page load is resized to the review widths
+// (DESIGN.md: 390, 768 and 1440) and must show no sideways page scroll, no chart
+// label cut off at the chart's left edge, and no page error. Page specs keep the
+// layout checks this does not cover: other widths, other places, other states.
+const layoutWidths = [390, 768, 1440] as const;
+
+/** Sideways page overflow and the chart labels that start left of their drawing. */
+function measureLayout(page: Page) {
+  return page.evaluate(() => ({
+    overflow: Math.max(0, document.documentElement.scrollWidth - innerWidth),
+    clipped: [...document.querySelectorAll('[data-testid="chart-panel"] svg text, [data-testid$="chart-frame"] svg[role="img"] text')]
+      .filter((text) => (text as SVGGraphicsElement).getBBox().x < 0)
+      .map((text) => text.textContent),
+  }));
+}
+
+test.describe("one layout pass per explorer route: one short line under the heading at 375px (DESIGN §17), then 390, 768 and 1440px", () => {
+  // Desktop browser emulation, as the page specs this replaces used, so 768 and 1440 are real desktop widths.
+  test.use({ viewport: { width: 375, height: 812 }, isMobile: false, hasTouch: false });
   for (const locale of ["ka", "en"] as const) {
     for (const { template, path: route } of routes.pages) {
       test(`${locale} ${route}`, async ({ page }) => {
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(error.message));
         // Hubs are static and never mark the app ready; the lines are in the served HTML.
-        await page.goto(`${TEST_BASE_URL}${locale === "en" ? "/en" : ""}${route}`);
+        const response = await page.goto(`${TEST_BASE_URL}${locale === "en" ? "/en" : ""}${route}`);
+        expect(response?.ok(), `${route}: HTTP ${response?.status()}`).toBe(true);
         // A page whose data is fetched after load (products) shows a loading status where its workspace will be.
         await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
         await page.evaluate(() => document.fonts.ready);
@@ -342,16 +362,27 @@ test.describe("one short line under the heading at 375px (DESIGN §17)", () => {
         if (bareHeadingPages.includes(route)) {
           expect(line?.text ?? false, `${route}: ${line?.content}`).toBe(false);
           expect(line?.tag).not.toBe("P");
-          return;
+        } else {
+          expect(then?.text ?? false, `${route}, second text under the heading: ${then?.content}`).toBe(false);
+          if (wrappingLines[template]?.includes(locale)) {
+            // Known: wraps at 375px, owner wording pending.
+            expect(line?.text, `${route}: ${line?.content}`).toBe(true);
+            expect(line!.lines, `${route}: ${line?.content}`).toBeGreaterThan(1.6);
+          } else if (line?.text) {
+            expect(line.lines, `${route}: ${line.content}`).toBeLessThanOrEqual(1.6);
+          }
         }
-        expect(then?.text ?? false, `${route}, second text under the heading: ${then?.content}`).toBe(false);
-        if (wrappingLines[template]?.includes(locale)) {
-          // Known: wraps at 375px, owner wording pending.
-          expect(line?.text, `${route}: ${line?.content}`).toBe(true);
-          expect(line!.lines, `${route}: ${line?.content}`).toBeGreaterThan(1.6);
-        } else if (line?.text) {
-          expect(line.lines, `${route}: ${line.content}`).toBeLessThanOrEqual(1.6);
+
+        // Resizing re-renders only a hydrated page.
+        await expect.poll(() => page.locator("h1").first().evaluate((heading) => Object.keys(heading).some((key) => key.startsWith("__reactFiber")))).toBe(true);
+        for (const width of layoutWidths) {
+          await page.setViewportSize({ width, height: 900 });
+          // Charts swap to their phone drawing below 768px; measure the drawing this width shows.
+          await expect.poll(() => page.locator("svg[data-geometry]").evaluateAll((drawings, phone) =>
+            drawings.filter((drawing) => drawing.checkVisibility()).every((drawing) => drawing.getAttribute("data-geometry") === (phone ? "mobile" : "desktop")), width < 768)).toBe(true);
+          await expect.poll(() => measureLayout(page), { message: `${route} at ${width}px` }).toEqual({ overflow: 0, clipped: [] });
         }
+        expect(errors, route).toEqual([]);
       });
     }
   }

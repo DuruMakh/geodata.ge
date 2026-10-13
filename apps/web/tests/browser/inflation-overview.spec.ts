@@ -10,7 +10,6 @@ for (const locale of ["ka", "en"] as const) {
       await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/overview`);
       await ready(page);
       await expect(page.getByTestId("inflation-tabs").getByRole("button")).toHaveCount(3);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -138,18 +137,6 @@ test("the methodology Dataset is the node the catalog references", async ({ page
   expect(english["@id"]).toBe("https://fiscal.ge/en/methodology/inflation");
   expect(english.includedInDataCatalog["@id"]).toBe("https://fiscal.ge/en/methodology#catalog");
 });
-
-for (const locale of ["ka", "en"] as const) {
-  test(`chart axis labels stay inside the frame in ${locale}`, async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/overview`);
-    await ready(page);
-    await page.evaluate(() => document.fonts.ready);
-    for (const label of await page.getByTestId("chart-panel").locator("svg text").all()) {
-      expect(await label.evaluate((element) => (element as SVGGraphicsElement).getBBox().x)).toBeGreaterThanOrEqual(0);
-    }
-  });
-}
 
 // U13-05: the facts travelled as 1,960 verbose objects (46.7 KB gzip Georgian page); they now use the categories page's
 // run-length form.

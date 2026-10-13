@@ -255,12 +255,13 @@ test("the sidebar lists Living standards after Wages, with its four pages and th
   await expect(page.getByTestId("living-standards-income-link")).not.toHaveAttribute("aria-current", "page");
 });
 
+// The hub, Income, Spending and Georgia's Income page at their defaults: the layout pass in mobile-fit-charts.spec.ts.
 for (const prefix of ["", "/en"]) test(`household pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 900 });
-  for (const path of ["/explorer/living-standards", "/explorer/living-standards/income", "/explorer/living-standards/spending", "/explorer/living-standards/spending/regions/georgia#sel=spending.consumption,settlement.urban,settlement.rural", "/explorer/living-standards/income/regions/georgia", "/explorer/living-standards/income/regions/racha_lechkhumi_kvemo_svaneti", "/explorer/living-standards/spending/regions/samegrelo_zemo_svaneti#per=person"]) {
+  for (const path of ["/explorer/living-standards/spending/regions/georgia#sel=spending.consumption,settlement.urban,settlement.rural", "/explorer/living-standards/income/regions/racha_lechkhumi_kvemo_svaneti", "/explorer/living-standards/spending/regions/samegrelo_zemo_svaneti#per=person"]) {
     await page.goto(`${prefix}${path}`);
-    if (path !== "/explorer/living-standards") await ready(page);
+    await ready(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), path).toBe(true);
   }
   expect(errors).toEqual([]);

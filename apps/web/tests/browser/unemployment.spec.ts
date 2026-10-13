@@ -31,7 +31,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByTestId("unemployment-national-tabs")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     await page.goto(`${prefix}/explorer/unemployment/regions#breakdown=region`);
     await page.getByTestId("chart-mode-table").click();

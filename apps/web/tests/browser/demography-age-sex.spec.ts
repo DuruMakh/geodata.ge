@@ -353,7 +353,6 @@ test.describe("at 390px", () => {
   test("the national page has no sideways scroll, and its heat map scrolls from the newest years", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
-    expect(await hasNoSidewaysScroll(page)).toBe(true);
     // The open year grid fits the phone and adds no sideways scroll.
     for (const picker of ["age-sex-year-select", "age-sex-compare-select"]) {
       await openPicker(page, picker);

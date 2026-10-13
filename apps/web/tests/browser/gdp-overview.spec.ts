@@ -5,7 +5,6 @@ for (const locale of ['ka','en']) for (const width of [390,768,1440]) {
     await page.goto(`${locale==='en'?'/en':''}/explorer/economy/gdp`);
     await expect(page.locator('body')).toHaveAttribute('data-app-ready','true');
     await expect(page.getByTestId('gdp-indicators').getByRole('button')).toHaveCount(4);
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   });
 }
 test('Economy footer identifies its actual sources',async({page})=>{

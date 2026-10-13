@@ -227,7 +227,8 @@ test("English page has no Georgian text", async ({ page }) => {
   expect(await page.locator("main").innerText()).not.toMatch(/\p{Script=Georgian}/u);
 });
 
-for (const width of [390, 768, 1100, 1440]) {
+// 390, 768 and 1440: the layout pass in mobile-fit-charts.spec.ts.
+for (const width of [1100]) {
   test(`no horizontal page overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     for (const path of [PATH, `/en${PATH}`]) {

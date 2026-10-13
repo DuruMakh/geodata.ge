@@ -35,7 +35,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.evaluate(() => document.fonts.ready);
     const axis = () => page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]').allTextContents();
     const scale = await axis();
-    expect(Math.min(...await page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]').evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x)))).toBeGreaterThanOrEqual(0);
     // Four rows are read at a glance: no search field (DESIGN §7.7, U21-09).
     await expect(page.getByTestId("series-search")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click();

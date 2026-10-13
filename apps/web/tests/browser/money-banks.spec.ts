@@ -24,7 +24,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     const hub = page.getByTestId("money-hub");
     await expect(hub.locator("a")).toHaveCount(4);
     expect(await hub.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/money/${section}`));
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     for (const section of SECTIONS) {
       await page.goto(`${prefix}/explorer/money/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -32,7 +31,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       // No money page has a tab row: two of them switch measures with icons on the chart toolbar.
       await expect(page.getByTestId("money-tabs")).toHaveCount(0);
       await expect(page.locator('[data-testid^="money-measure-"]')).toHaveCount(section === "supply" || section === "loans-deposits" ? 2 : 0);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     expect(errors).toEqual([]);
   });

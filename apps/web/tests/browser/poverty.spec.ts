@@ -15,7 +15,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await page.goto(`${prefix}/explorer/living-standards/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
       await expect(page.getByTestId("series-status")).toContainText("1 /");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     expect(errors).toEqual([]);
   });

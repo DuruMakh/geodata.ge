@@ -22,8 +22,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("trade-balance-context").getByRole("img").getByText("1995", { exact: true })).toHaveCount(1);
     await expect(page.getByTestId("trade-balance-context").getByRole("img").getByText("2025", { exact: true })).toHaveCount(1);
     await expect(page.getByTestId("trade-summary").locator('[data-indicator="trade.balance"]')).toContainText("−11.4");
-    const ticks = page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]');
-    expect(Math.min(...await ticks.evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x)))).toBeGreaterThanOrEqual(0);
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("4 / 4");
     await toggle("trade.turnover").click();

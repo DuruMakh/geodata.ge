@@ -16,7 +16,6 @@ for (const locale of ["ka", "en"] as const) {
       await expect(page.locator("select:not([data-testid='year-range-strip'] select)")).toHaveCount(0);
       await expect(page.getByTestId("series-row")).toHaveCount(7);
       await expect(page.getByTestId("series-status")).toContainText("7 / 7");
-      expect(await noOverflow(page)).toBe(true);
 
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();

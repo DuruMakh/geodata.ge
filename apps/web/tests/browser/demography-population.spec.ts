@@ -389,17 +389,20 @@ test("a shared link restores the index's Regions tab and the address stays as sh
   expect(new URL(page.url()).hash).toBe("#lvl=region");
 });
 
+// At 390, 768 and 1440 the layout pass in mobile-fit-charts.spec.ts loads the hub, the
+// index, Georgia and Batumi in both languages; Adjara is not the region page it loads.
 for (const width of [320, 390, 768, 900, 1100, 1440]) {
   test(`the hub, the index and the place pages have no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of [
+    const paths = [
       "/explorer/demography",
       "/explorer/demography/population",
       "/en/explorer/demography/population",
       "/en/explorer/demography/population/georgia",
       "/explorer/demography/population/region/adjara",
       "/en/explorer/demography/population/batumi",
-    ]) {
+    ];
+    for (const path of [390, 768, 1440].includes(width) ? paths.filter((path) => path.includes("/region/")) : paths) {
       await page.goto(path);
       if (path.endsWith("/population") || path.includes("/population/")) await ready(page);
       expect.soft(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${path} at ${width}px`).toBe(true);

@@ -21,7 +21,6 @@ for (const locale of ["ka", "en"] as const) {
       expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
       await expect(page.locator('[data-series-id="cpi.product.p0058"]')).toHaveAttribute("data-series-id", "cpi.product.p0058");
       await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const icon = page.locator('[data-series-id="cpi.product.p0058"] img');
       expect(await icon.evaluate((image) => Math.round(image.getBoundingClientRect().width))).toBe(32);
       if (width === 390) {

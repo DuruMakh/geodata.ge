@@ -14,7 +14,6 @@ for (const locale of ["ka", "en"] as const) {
       // The stack must close on the published headline, so both are drawn.
       await expect(page.locator('rect[data-segment="cpi.cat.residual"]').first()).toBeAttached();
       await expect(page.locator("path[data-overlay]")).toHaveCount(1);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();

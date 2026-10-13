@@ -407,7 +407,6 @@ test.describe("municipalities index", () => {
     await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveText(/^\d{1,3}(?:,\d{3})* ერთ მოსახლეზე$/);
     // D8: no informational text below 11px on phones.
     await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveCSS("font-size", "11px");
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
     await page.getByTestId("level-region").click();
     const regionRows = page.getByTestId("municipal-list-row");
