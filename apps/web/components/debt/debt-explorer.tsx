@@ -13,7 +13,8 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { buildDebtDeck, buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { formatAmount, formatPoints, formatShare, unitFor, unitsFor, formatDisplayDate } from "../../lib/explorer/format";
+import { formatAmount, formatPoints, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ChartMode } from "../../lib/explorer/types";
 import type {
   DebtFamily,
@@ -247,7 +248,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
               {preliminaryGdpYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") }) : null}
               {props.family === "rate" ? message(messages, "debt.missingRates") : null}
               {props.lastUpdatedAt ? (
-                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt}</span> }} /></>
+                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(props.lastUpdatedAt, locale)}</span> }} /></>
               ) : null}
             </SourceNote>
           </div>

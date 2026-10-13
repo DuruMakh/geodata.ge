@@ -5,7 +5,7 @@ import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { makePeriod, periodKey, periodMonth, periodYear } from "../../lib/data/inflation/periods";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { buildProductIndex, productAnnual, productColor, productCumulative, type ClientProduct, type PackedProductSeries, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import { parseProductHash, serializeProductHash, toggleProduct } from "../../lib/explorer/inflationProductState";
@@ -112,7 +112,7 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
   });
   const hasValues = chartSeries.some((series) => series.vals.some((value) => value !== null));
   const toggleAction = state.indicator === "annual" ? t("productsShowCumulative") : t("productsShowAnnual");
-  const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
+  const displayDate = updatedDate(lastReviewedAt, locale);
 
   return <>
     <ExplorerWorkspace>

@@ -4,7 +4,7 @@ import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useMemo } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import {
   buildCityIndex,
   buildCityLines,
@@ -81,7 +81,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   // The place's own total: Georgia on the Georgia page, the city on a city page.
   const latest = latestEntry(cityValues(index, view.kind === "city" ? view.cityId : GEORGIA_LINE_ID, HEADLINE_ID, "yoy_pct"));
   const periods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
+  const displayDate = updatedDate(lastReviewedAt, locale);
   const lines = buildCityLines(index, view, state, range);
   const hasSeries = lines.lines.length > 0;
 

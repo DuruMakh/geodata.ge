@@ -5,7 +5,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
 import { publicLabel } from "../../lib/i18n/labels";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
@@ -184,7 +184,7 @@ export function ExplorerView({
               {scope === "revenue" ? " " + message(messages, "main.missing2004Liabilities") : null}
               {Object.keys(model.gdpByYear).length > 0 ? " " + message(messages, "main.gdpSource") : null}
               {preliminaryYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryYears.join(", ") }) : null}
-              {lastUpdatedAt ? <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} /></> : null}
+              {lastUpdatedAt ? <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(lastUpdatedAt, locale)}</span> }} /></> : null}
               {model.hasPlannedValues ? " " + message(messages, "main.activePlanned") : null}
             </SourceNote>
           </div>

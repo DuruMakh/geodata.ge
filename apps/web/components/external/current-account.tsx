@@ -6,7 +6,8 @@ import { buildCurrentAccountModel, type CurrentAccountGdp } from "../../lib/expl
 import { CURRENT_ACCOUNT_TABS, currentAccountCoverage, parseCurrentAccountHash, serializeCurrentAccountHash } from "../../lib/explorer/currentAccountState";
 import { buildCurrentAccountWorkbookModel } from "../../lib/explorer/currentAccountWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import { formatDisplayDate, formatInUnit } from "../../lib/explorer/format";
+import { formatInUnit } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -64,7 +65,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={balance ? 0 : undefined} />
           <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildCurrentAccountModel(facts, gdp, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           {percent ? ` · ${message(messages, "main.gdpSource")}` : null}
           {model.preliminaryGdpYears.length ? ` · ${message(messages, "main.preliminaryGdp", { years: model.preliminaryGdpYears.join(", ") })}` : null}
           <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>

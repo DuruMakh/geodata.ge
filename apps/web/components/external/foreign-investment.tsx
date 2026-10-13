@@ -6,7 +6,8 @@ import { buildForeignInvestmentModel } from "../../lib/explorer/foreignInvestmen
 import { foreignInvestmentCoverage, parseForeignInvestmentHash, serializeForeignInvestmentHash, switchForeignInvestmentTab } from "../../lib/explorer/foreignInvestmentState";
 import { buildForeignInvestmentWorkbookModel } from "../../lib/explorer/foreignInvestmentWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import { formatDisplayDate, formatInUnit } from "../../lib/explorer/format";
+import { formatInUnit } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -52,7 +53,7 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={foreignInvestmentCoverage(data, state.dimension).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildForeignInvestmentModel(data, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
       </div>

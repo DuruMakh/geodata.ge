@@ -6,7 +6,8 @@ import { useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
-import { formatDisplayDate, formatPoints } from "../../lib/explorer/format";
+import { formatPoints } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import {
@@ -109,7 +110,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const coverage = categoryCoverage(index, view.tab);
 
-  const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
+  const displayDate = updatedDate(lastReviewedAt, locale);
 
   const stack = buildStackModel(index, view, range, headlineByPeriod);
   const lines = buildCategoryLines(index, view, range);

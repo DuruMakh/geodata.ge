@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
@@ -77,7 +77,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   const coverage = { min: range.min, max: range.max };
   // The headline CPI's latest published month on the active tab.
   const latest = latestEntry(index.values.get(seriesGroup("cpi", state.tab)));
-  const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
+  const displayDate = updatedDate(lastReviewedAt, locale);
   const hasSeries = lines.some((line) => line.key !== "target");
   const chartSeries: ChartSeries[] = lines.map((line) => ({
     id: line.key,

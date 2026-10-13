@@ -5,7 +5,7 @@ import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { Message } from "../i18n/message";
 import { pageHref } from "../i18n/routes";
-import { formatDisplayDate } from "../explorer/format";
+import { updatedDate } from "../explorer/coverageLabel";
 import { BudgetHub } from "../../components/hub/budget-hub";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
@@ -75,7 +75,7 @@ export async function renderHubPage(locale: Locale) {
           {message(messages, "hub.source")}
           {lastUpdatedAt ? (
             <>
-              {" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} />
+              {" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(lastUpdatedAt, locale)}</span> }} />
             </>
           ) : null}
         </SourceNote>

@@ -2,7 +2,7 @@ import type { MunicipalData } from "../data/servedData";
 import { getPresentation } from "../i18n/presentation.server";
 import type { Locale, Messages } from "../i18n/types";
 import { message } from "../i18n/messages";
-import { formatDisplayDate } from "../explorer/format";
+import { updatedDate } from "../explorer/coverageLabel";
 
 export function getMunicipalPresentation(data: MunicipalData, locale: Locale, officialCode?: string) {
   // The place, region and function searches match English names on the Georgian pages too.
@@ -15,5 +15,5 @@ export function getMunicipalPresentation(data: MunicipalData, locale: Locale, of
 /** The "· updated {date}" suffix every municipal page adds to its source note; empty without a review date. */
 export function municipalUpdatedNote(messages: Messages, locale: Locale, lastUpdatedAt: string | undefined): string {
   if (!lastUpdatedAt) return "";
-  return message(messages, "municipal.updatedNote", { date: locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt });
+  return message(messages, "municipal.updatedNote", { date: updatedDate(lastUpdatedAt, locale) });
 }

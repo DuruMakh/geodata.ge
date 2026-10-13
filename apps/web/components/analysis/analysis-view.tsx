@@ -3,7 +3,7 @@
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
 import { NEGATIVE } from "../../lib/explorer/colors";
@@ -124,7 +124,7 @@ export function AnalysisView({
                 : null}
               {lastUpdatedAt ? (
                 <>
-                  <Message messages={messages} id="analysis.updated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} />
+                  <Message messages={messages} id="analysis.updated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(lastUpdatedAt, locale)}</span> }} />
                 </>
               ) : null}
             </SourceNote>

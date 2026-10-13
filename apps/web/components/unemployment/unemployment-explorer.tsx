@@ -9,7 +9,8 @@ import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, changeUnem
 import { unemploymentSeriesLabel, unemploymentUsesIndicatorSeries } from "../../lib/explorer/unemploymentOverview";
 import { NATIONAL_UNEMPLOYMENT_VIEWS, type UnemploymentSectionId } from "../../lib/explorer/unemploymentSections";
 import { buildUnemploymentWorkbookExportModel } from "../../lib/explorer/unemploymentWorkbook";
-import { formatDisplayDate, formatInUnit, formatShare } from "../../lib/explorer/format";
+import { formatInUnit, formatShare } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
@@ -116,7 +117,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
           <ChartSelectionAids series={model.series.map(series => ({ ...series, label: labels.get(series.id)! }))} chartShown={state.mode === "line"} share={model.percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={model.availableYears} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildUnemploymentModel(facts, registry, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           <Link href={pageHref("/methodology/unemployment", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {(section === "overview" || section === "regions") && noteKey ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t(noteKey)}</p> : null}

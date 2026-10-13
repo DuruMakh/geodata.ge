@@ -11,7 +11,8 @@ import { Message } from "../../lib/i18n/message";
 import { pageHref } from "../../lib/i18n/routes";
 import { publicLabel } from "../../lib/i18n/labels";
 import { useI18n } from "../../lib/i18n/provider";
-import { formatAmount, formatShare, unitFor, unitsFor, formatDisplayDate } from "../../lib/explorer/format";
+import { formatAmount, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ChartMode } from "../../lib/explorer/types";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -209,7 +210,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
               {message(messages, "deficit.source", { edition })}
               {" "}{message(messages, "deficit.definition")}
               {lastUpdatedAt ? (
-                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} /></>
+                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(lastUpdatedAt, locale)}</span> }} /></>
               ) : null}
             </SourceNote>
           </div>
