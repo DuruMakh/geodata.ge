@@ -30,4 +30,4 @@
 - Processing: `fonttools varLib.instancer` pinned `wdth=100` and limited `wght` to 400–700 (Geist Mono 400–600), then `pyftsubset --unicodes='*' --glyphs='*' --layout-features='*' --flavor=woff2`; every glyph is kept.
 - SHA-256: `72d15828444dd4007e9e5f31e212b52e92af834db8f194bab267a5c7aa67923d` (Noto Sans Georgian), `e24a340babc302db1fff2b74f9d3903eae0110b2c6daca5585eb606cdcd7b75f` (Noto Serif Georgian), `a00979ae945b142cb54e87617e1facb16bf1913bc9e5c2cc60195b4813450cf8` (Geist Mono)
 - Copyright: 2022 The Noto Project Authors (both Noto faces); 2024 The Geist Project Authors (Geist Mono)
-- License: SIL Open Font License 1.1; see `OFL-NotoSansGeorgian.txt` (same text for both Noto faces) and `OFL-GeistMono.txt`
+- License: SIL Open Font License 1.1; see `OFL-NotoSansGeorgian.txt`, `OFL-NotoSerifGeorgian.txt` and `OFL-GeistMono.txt`. `OFL-NotoSerifGeorgian.txt` is the `ofl/notoserifgeorgian/OFL.txt` file of the `google/fonts` repository, retrieved 2026-10-13; its copyright line matches the font's own `name` table (ID 0): `Copyright 2022 The Noto Project Authors (https://github.com/notofonts/georgian)`.

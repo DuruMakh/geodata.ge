@@ -18,7 +18,7 @@ successful build or deployment.
 The two social images at `/opengraph-image` and `/en/opengraph-image` use explicit
 `force-static` GET routes, avoiding Next.js route-group filename suffixes. Both
 are generated at build time. All human pages remain prerendered and `/mcp` remains
-the sole request-time route; the older all-static description below predates MCP.
+the sole request-time route.
 
 Data schema **1.5.0** includes current-product inflation and reviewed language
 companions. The authoritative tool inventory is `tools/list`; dataset families
@@ -75,11 +75,11 @@ The repo clone on the build machine includes the repo root, so the build can
 read `data/` via the `../../` relative paths in `apps/web/lib/data/servedData.ts`.
 Before Next.js builds, `prebuild` deterministically prepares the ignored public
 methodology downloads from the reviewed manifests and immutable originals; see
-`docs/data-methodology/public-methodology-and-source-archives.md`. All app
-routes—including `/`, the explorer hub/sections and municipal detail pages,
-the methodology hub and its three live category pages, `/robots.txt`,
-`/sitemap.xml`, and the 404 page—are prerendered at build time; nothing runs
-server-side at request time.
+`docs/data-methodology/public-methodology-and-source-archives.md`. Every
+human page—`/`, every explorer hub, section and place page, the methodology
+hub and its category pages, `/about` and `/connect`—and `/robots.txt`,
+`/sitemap.xml` and the 404 page are prerendered at build time. The only
+request-time route is `/mcp` (see "The `/mcp` runtime" below).
 
 ## How deploys happen
 
@@ -645,19 +645,25 @@ no budget data and require no migration when a code release is rolled back.
   archive file still receives the sandbox policy.
 
 
-## GDP dataset release checks
+## Dataset release checks
 
 ### National sectors release checks
 
 For the sectors release, require the Actions-owned pipeline to apply `20260912000000_economic_sectors`, import all 987 exact-decimal observations with parity, and pass the database-mode build before triggering Vercel. Preserve the already deployed inflation migration and import in the combined release. After Vercel is READY at the merge commit, verify both language sector pages, methodology/originals, all three measures and native Excel downloads. Check the central sector CSV/JSON against their manifest hashes and exercise `query_economic_sectors`, including missing 2010 growth and the bilingual stale-version error. Source-exact sector GDP may differ in the final decimal digits from the unchanged GDP overview representation; the sector validation report documents the difference. Local preview checks do not establish production delivery.
 
+### GDP release checks
+
 The Economy/GDP addition has 94 bilingual page identities (188 sitemap URLs), ten MCP tools including `query_gdp`, and seven datasets. It adds `gdp-overview.json` and `gdp-overview.csv` to the central publication manifest. Before release, validate all six GDP series against their source data, confirm exact CSV/database parity and source-status semantics, and check both language overview/methodology pages. Apply the GDP migration through the existing pipeline only; verify the deployed commit and a real `query_gdp` response after deployment. Growth MCP values are percent, not fractions; preliminary values are not forecasts or planned budgets.
+
+For an authorized GDP release, require the pipeline to apply `20260911000000_gdp_overview`, import 251 GDP observations with field parity, and pass the database-mode build before triggering Vercel. After the deployment is READY at the merged SHA, verify the Georgian and English Economy hub, GDP overview and GDP methodology URLs; all four tabs and summaries; nominal GEL/USD controls; and a native Excel download in each language. Check the overview Dataset metadata and all six route URLs in the sitemap. Query all six GDP series for 2025 and one early real-GDP year through the live MCP endpoint, verify original-source links, and compare the public GDP JSON/CSV bytes with their central manifest hashes. These live checks are separate from local disposable-database evidence and do not establish search indexing.
+
+### Inflation MCP release checks
 
 The inflation MCP addition (`docs/superpowers/specs/2026-09-14-inflation-mcp-design.md`) brings the endpoint to twelve tools with `query_inflation`, moves the schema to 1.2.0 (an additive `period` on monthly observations, comparison endpoints and ranking entries), and adds `inflation-national.json`, `inflation-categories.csv` and `inflation-categories.json` to the manifest. The packaged snapshot grows from about 4.4 MB to about 15.5 MB, measured on 2026-09-14, most of it the monthly category table. After deployment, verify the deployed commit; that `tools/list` on `https://fiscal.ge/mcp` includes `query_inflation`; one real call each of `query_inflation`, `compare` with an inflation target and `rank` with `datasetId: "inflation"`; and that the three files are served with the manifest's hashes.
 
-The regional-economies addition (`docs/superpowers/specs/2026-09-13-regional-economies-design.md`) brings the endpoint to thirteen tools with `query_regional_economies`, moves the schema to 1.3.0, and adds `regional-economies.json` and `regional-economies.csv` to the manifest. After deployment, verify the deployed commit; both language route families; one real `query_regional_economies` call for Imereti nominal GDP and one sector share; and both files against the manifest hashes.
+### Regional economies release checks
 
-For an authorized GDP release, require the pipeline to apply `20260911000000_gdp_overview`, import 251 GDP observations with field parity, and pass the database-mode build before triggering Vercel. After the deployment is READY at the merged SHA, verify the Georgian and English Economy hub, GDP overview and GDP methodology URLs; all four tabs and summaries; nominal GEL/USD controls; and a native Excel download in each language. Check the overview Dataset metadata and all six route URLs in the sitemap. Query all six GDP series for 2025 and one early real-GDP year through the live MCP endpoint, verify original-source links, and compare the public GDP JSON/CSV bytes with their central manifest hashes. These live checks are separate from local disposable-database evidence and do not establish search indexing.
+The regional-economies addition (`docs/superpowers/specs/2026-09-13-regional-economies-design.md`) brings the endpoint to thirteen tools with `query_regional_economies`, moves the schema to 1.3.0, and adds `regional-economies.json` and `regional-economies.csv` to the manifest. After deployment, verify the deployed commit; both language route families; one real `query_regional_economies` call for Imereti nominal GDP and one sector share; and both files against the manifest hashes.
 
 ### Demography release checks
 
@@ -669,16 +675,30 @@ For the Births, deaths and fertility release there is again no new demography mi
 
 For the Age and sex release there is again no new demography migration, and the import replaces `DemographyFact` with 9,740 rows (5,525 as before, 1,587 age-structure and 2,628 census rows); the workflow log must show `[OK ] DemographyFact: csv=9740 db=9740`. After Vercel is READY, open `/explorer/demography/age-sex` and `/en/explorer/demography/age-sex` (the pyramid opens first, the heat map follows, and the regional glance at the foot ranks Racha-Lechkhumi and Kvemo Svaneti first at 31.2% aged 65+ with no region linking anywhere; the pyramid opens on 2026 with 18.1% aged 65+, and the 2025 option of the Year menu carries the census label, and the Compared with menu starts on None), open one place page's `#age-sex` section in each language (Imereti's page shows 510,741 people counted) and confirm a municipality's page has none, download the section's workbook and the national page's two workbooks (pyramid and heat map), check that the hub links four pages, and open the two new originals (population on 1 January by five-year age group and sex, and the 2024 census by age and settlement) on `/methodology/demography`.
 
+### Wages release checks
+
 For the Wages release, require the Actions-owned pipeline to apply `20261010060000_wages` and fill `WagesFact` with the 1,929 rows of `data/imports/wages-annual.csv` (1,917 published values and 12 unavailable cells), with parity checked inside the import transaction, and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the wages migration and import. After Vercel is READY, open `/explorer/wages`, `/explorer/wages/overview` (2025 Georgia average 2,165.2 GEL), `/explorer/wages/industries`, `/explorer/wages/regions`, one region page (for example `/explorer/wages/regions/adjara`) and `/methodology/wages` in Georgian and under `/en`, download one workbook in each language, and open one original Geostat workbook from the methodology page. Wages has no `/mcp` tool or central JSON/CSV file.
+
+### Current account release checks
 
 For the Current account release, require the Actions-owned pipeline to apply `20261010160000_current_account` and fill `CurrentAccountFact` with the 390 rows of `data/imports/current-account-annual.csv` (five series, credit, debit and net, 2000–2025), with parity checked inside the import transaction; the workflow log must show `[OK ] CurrentAccountFact: csv=390 db=390`. CI has no Postgres, so this deploy is the first real run of the migration and import. After Vercel is READY, open `/explorer/external`, `/explorer/external/current-account` (2025 balance −1.12 billion USD, −2.9% of GDP) and `/methodology/external-flows` in Georgian and under `/en`, and download one workbook in each language. Current account has no `/mcp` tool or central JSON/CSV file.
 
+### Poverty and inequality release checks
+
 For the Poverty and inequality release, require the Actions-owned pipeline to apply `20261010180000_poverty` and fill `PovertyFact` with the 491 rows of `data/imports/poverty-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] PovertyFact: csv=491 db=491`), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the poverty migration and import. After Vercel is READY, open `/explorer/living-standards`, `/explorer/living-standards/poverty` (2025 poverty-line rate 7.1%, then the Relative poverty and International lines tabs), `/explorer/living-standards/inequality` (2025 Gini by total income 0.34) and `/methodology/poverty` in Georgian and under `/en`, download one workbook in each language, and open one original Geostat workbook from the methodology page. Poverty has no `/mcp` tool or central JSON/CSV file.
+
+### Living standards release checks
 
 For the Living standards release, require the Actions-owned pipeline to apply `20261012090000_household_income_spending` and fill `HouseholdIncomeSpendingFact` with the 10,638 rows of `data/imports/household-income-spending-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] HouseholdIncomeSpendingFact: csv=10638 db=10638`), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the household migration and import. After Vercel is READY, open `/explorer/living-standards`, `/explorer/living-standards/income` (2025 Georgia total income per household 2,025.8 ₾ and the per person switch recolouring the map, then Georgia in the list opening `/explorer/living-standards/income/regions/georgia` with years from 2002 and Towns ticked, and a region on the map and one in the list each opening its own page, such as `/explorer/living-standards/income/regions/guria` with years from 2019), `/explorer/living-standards/spending` (2025 consumption spending per household 1,438.7 ₾) and `/methodology/household-income` in Georgian and under `/en`, download one workbook in each language from Income or Spending, and open one original Geostat workbook from the methodology page. Confirm that `/explorer/poverty`, `/explorer/poverty/rates` and `/explorer/poverty/inequality` (and their `/en` twins) answer with a permanent redirect to the hub, Poverty and Inequality. Household income and spending has no `/mcp` tool or central JSON/CSV file.
 
+### Energy and food release checks
+
 For the Energy and food release, require the Actions-owned pipeline to apply `20261011120000_energy_food` (RLS on, public grants revoked) and fill `EnergyFoodFact` with the 681 rows of `data/imports/energy-food-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] EnergyFoodFact: csv=681 db=681`), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the energy and food migration and import. After Vercel is READY, open `/explorer/energy-food`, `/explorer/energy-food/energy-supply` (2024 domestic supply 5,914.5 thousand tonnes of oil equivalent), `/explorer/energy-food/electricity` (2024 production 14,234.1 GWh), `/explorer/energy-food/energy-use`, `/explorer/energy-food/food-self-sufficiency` (2025 wheat 19%) and `/methodology/energy-food` in Georgian and under `/en`, download one workbook in each language, and open one original Geostat workbook from the methodology page. Energy and food has no `/mcp` tool or central JSON/CSV file.
 
+### Money and banks release checks
+
 For the Money and banks release, require the Actions-owned pipeline to apply `20261011130000_money_banks` and fill `MoneyBanksFact` with the 730 rows of `data/imports/money-banks-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] MoneyBanksFact: csv=730 db=730`; 730 is the expected count, to be confirmed by that first run), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the money migration and import. After Vercel is READY, open `/explorer/money`, `/explorer/money/supply` (2025 broad money 57.7 billion GEL), `/explorer/money/loans-deposits` (2025 bank loans 72.5 billion GEL with deposits beside them, then the foreign-currency share icon), `/explorer/money/interest-rates` (2025 National Bank rate 8.00%), `/explorer/money/bank-health` (2025 bad loans 2.5% of all loans) and `/methodology/money` in Georgian and under `/en`, download one workbook in each language, and open one original NBG workbook from the methodology page. Money and banks has no `/mcp` tool or central JSON/CSV file.
+
+### When a release step fails
 
 A failing step stops the job before the deploy hook, so Vercel builds nothing and production keeps serving its previous deploy. A failed import rolls back completely: fix the cause and rerun *Deploy production*. A migration that fails while running is recorded by Prisma as failed, and every later run then stops at `prisma:deploy` with P3009 until `npx prisma migrate resolve --rolled-back 20261008100000_demography` (after removing any half-made table; `--applied` only if the table was completed by hand) is run from `apps/web` with `DIRECT_URL` set. To undo a release use Vercel's Instant Rollback (see Manual operations), not a git revert of the merge: the reverted importer no longer deletes `DemographyFact`, so its `SourceDocument` delete hits the table's `ON DELETE RESTRICT` foreign key and every later deploy fails at the import until someone empties the table by hand. After a rollback Vercel stops assigning new production deployments to the domain until one is promoted (for example with `vercel promote`).

@@ -1,6 +1,6 @@
 # Fiscal.ge
 
-Fiscal.ge is a Georgian-first explorer of reviewed Georgian public-finance and economy data, with an English mirror under `/en`: national expenditure and revenue, municipal budgets, government debt, the general-government balance, GDP, national economic sectors, regional economies, and monthly national inflation. Each explorer downloads as an Excel workbook; the same figures are published as static data files under `/downloads/data/` and through a read-only MCP connection for AI clients at `/mcp`.
+Fiscal.ge is a Georgian-first explorer of reviewed Georgian public-finance and economy data, with an English mirror under `/en`, in eleven dataset hubs: budget (national expenditure and revenue, municipal budgets, government debt and the general-government balance), economy, inflation, money and banks, unemployment, wages, living standards, trade, external flows, energy and food, and demography. `Project_Definition.md` section 2 owns the authoritative list. Each explorer downloads as an Excel workbook; several datasets are also published as static data files under `/downloads/data/` (listed in its `catalogue.json`) and through a read-only MCP connection for AI clients at `/mcp`.
 
 Read first:
 
@@ -35,7 +35,7 @@ Root data files live under `data/`.
 
 - `data/taxonomy`: stable public category IDs.
 - `data/glossary`: Georgian-first labels.
-- `data/mappings`: reviewed mappings from official rows to public spending fields.
+- `data/mappings`: reviewed mapping and review files the data generators read: `review/` (official expenditure rows to public spending fields, institutions and major programs), `demography/` and `inflation-products/`.
 - `data/imports`: reviewed import files and sample imports.
 - `data/sources`: source document metadata.
 - `data/methodology`: the public methodology decision register and archived original source files.
