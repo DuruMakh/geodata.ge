@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { gzipSync } from "node:zlib";
 
 const ROUTE = "/explorer/inflation/products";
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -202,3 +203,44 @@ test("all 305 selected products produce a complete full-history workbook", async
   expect(workbook.worksheets[0]!.rowCount).toBeGreaterThan(305);
   expect(workbook.worksheets[1]!.rowCount).toBeGreaterThan(40_000);
 });
+
+// U14-01: the 610 index runs were about 250 KB gzip inline in every page view (295 KB gzip in all), re-sent for each
+// language and visit. They now come from one content-hashed file both languages share and a browser keeps for a year.
+test("the page HTML stays light and its product runs come from one long-cached file", async ({ request }) => {
+  const urls = new Set<string>();
+  for (const prefix of ["", "/en"]) {
+    const html = await (await request.get(`${prefix}${ROUTE}`)).text();
+    expect(gzipSync(html).length).toBeLessThan(120_000);
+    const url = /\/page-data\/inflation-products\.[0-9a-f]{16}\.json/.exec(html)?.[0];
+    expect(url).toBeDefined();
+    urls.add(url!);
+  }
+  expect(urls.size).toBe(1);
+  const data = await request.get([...urls][0]!);
+  expect(data.ok()).toBe(true);
+  expect(data.headers()["cache-control"]).toBe("public, max-age=31536000, immutable");
+  expect(await data.json()).toHaveLength(610);
+});
+
+test("while the product runs load the page shows its heading and a loading status, and a failed load says so", async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>((resolve) => { release = resolve; });
+  await page.route("**/page-data/inflation-products.*.json", async (route) => { await held; await route.continue(); });
+  await page.goto(`/en${ROUTE}`);
+  await expect(page.getByRole("heading", { level: 1, name: "Product inflation" })).toBeVisible();
+  await expect(page.getByTestId("page-data-loading")).toHaveText("Loading the data…");
+  await expect(page.getByRole("status").filter({ has: page.getByTestId("page-data-loading") })).toBeVisible();
+  await expect(page.getByTestId("chart-panel")).toHaveCount(0);
+  release();
+  await ready(page);
+  await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
+  await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+
+  await page.unroute("**/page-data/inflation-products.*.json");
+  await page.route("**/page-data/inflation-products.*.json", (route) => route.fulfill({ status: 500, body: "" }));
+  await page.goto(`${ROUTE}#i=cumulative`);
+  await expect(page.getByRole("alert").getByTestId("page-data-error")).toHaveText("მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან.");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByTestId("chart-panel")).toHaveCount(0);
+});
+

@@ -10,10 +10,12 @@ import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedProductData } from "../data/inflation/importProducts";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { CITY_FIRST_PERIOD, CPI_CITY_IDS, categoryFactInput, cityFactInput, type CityFactInput, type CpiCityId, type CpiCityMeasure } from "../data/inflation/types";
+import { packFacts } from "../data/packedFacts";
 import { packCategoryFacts } from "../explorer/inflationCategories";
 import { GEORGIA_LINE_ID, packCityFacts } from "../explorer/inflationCities";
 import { CITIES_PATH, GEORGIA_VIEW, cityIdForSlug, cityPageHref, citySlug, type CityView } from "../explorer/inflationCityRoutes";
-import { packProductFacts } from "../explorer/inflationProducts";
+import { packCpiFacts } from "../explorer/inflationOverview";
+import { productRunBounds } from "../explorer/inflationProducts";
 import {
   projectBasketWeight,
   projectCpiFact,
@@ -37,6 +39,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { inflationProductDatasetJsonLd } from "../seo/inflationProductDataset";
 import { resolveSiteUrl } from "../siteUrl";
 import { TopicHub } from "./hub";
+import { loadInflationPageData } from "./inflationPageData";
 
 const HUB_PATH = "/explorer/inflation";
 const OVERVIEW_PATH = "/explorer/inflation/overview";
@@ -149,7 +152,7 @@ export async function renderInflationOverview(locale: Locale) {
         ]}
       />
       <InflationOverview
-        facts={facts.map(projectCpiFact)}
+        facts={packCpiFacts(facts.map(projectCpiFact))}
         sourceIdBySeriesMeasure={sourceIdBySeriesMeasure(facts)}
         lastReviewedAt={facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
         targets={targets.map(projectInflationTarget)}
@@ -173,8 +176,9 @@ export async function inflationCategoriesMetadata(locale: Locale) {
 
 export async function renderInflationCategories(locale: Locale) {
   const root = repositoryRoot();
-  const [{ facts, categories, weights }, presentation, manifest, catalogue] = await Promise.all([
+  const [{ facts, categories, weights }, pageData, presentation, manifest, catalogue] = await Promise.all([
     loadServedInflationData(),
+    loadInflationPageData(),
     getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
@@ -198,8 +202,9 @@ export async function renderInflationCategories(locale: Locale) {
         ]}
       />
       <InflationCategories
-        facts={packCategoryFacts(categories.map(categoryFactInput))}
-        weights={weights.map(projectBasketWeight)}
+        facts={packCategoryFacts(categories.filter((fact) => fact.measure === "yoy_pct").map(categoryFactInput))}
+        monthlyUrl={pageData.categoryMonthly.url}
+        weights={packFacts(weights.map(projectBasketWeight))}
         headline={headline}
         headlineMom={headlineMom}
         lastReviewedAt={categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
@@ -287,8 +292,9 @@ export async function inflationProductsMetadata(locale: Locale) {
 
 export async function renderInflationProducts(locale: Locale) {
   const root = repositoryRoot();
-  const [{ catalogue: products, facts }, presentation, manifest, languageCatalogue] = await Promise.all([
+  const [{ catalogue: products, facts }, pageData, presentation, manifest, languageCatalogue] = await Promise.all([
     loadServedProductData(),
+    loadInflationPageData(),
     getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
@@ -312,7 +318,8 @@ export async function renderInflationProducts(locale: Locale) {
     ]} />
     <InflationProducts
       products={products.map(({ productId, labelEn, labelKa, firstPeriod }) => ({ productId, labelEn, labelKa, firstPeriod }))}
-      facts={packProductFacts(facts)}
+      dataUrl={pageData.products.url}
+      coverage={productRunBounds(pageData.productRuns)}
       lastReviewedAt={reviewedAt}
       sources={sources}
       siteOrigin={origin}

@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
-import { sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
+import { projectCpiFact, sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
 import { makePeriod, periodFromKey } from "../../lib/data/inflation/periods";
 import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import {
   DEFAULT_INFLATION_STATE, buildInflationLines, changeInflationTab, drawableKeys, drawableSelection, effectiveTableSeries, indexInflationFacts,
-  latestIndicators, panelValue, parseInflationHash, resolveInflationRange, serializeInflationHash, targetForPeriod, toggleSelection,
+  latestIndicators, packCpiFacts, panelValue, parseInflationHash, unpackCpiFacts, resolveInflationRange, serializeInflationHash, targetForPeriod, toggleSelection,
   type InflationIndex, type InflationState,
 } from "../../lib/explorer/inflationOverview";
 import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
@@ -105,5 +105,17 @@ describe("inflation labels", () => {
     expect(formatInflationValue(0.4049, "mom")).toBe("+0.4%");
     expect(formatInflationValue(-0.31, "mom")).toBe("−0.3%");
     expect(formatInflationValue(196.1968, "index")).toBe("196.2");
+  });
+});
+
+// U13-05: the overview sent 1,960 verbose fact objects; it now uses the categories page's run-length form.
+describe("overview facts on the wire", () => {
+  it("round-trip the run-length packing unchanged and build the same index", () => {
+    const plain = facts.map(projectCpiFact);
+    const packed = packCpiFacts(plain);
+    const key = (fact: (typeof plain)[number]) => `${fact.seriesId}:${fact.measure}:${fact.period}`;
+    expect(unpackCpiFacts(packed).sort((a, b) => key(a).localeCompare(key(b)))).toEqual([...plain].sort((a, b) => key(a).localeCompare(key(b))));
+    expect(indexInflationFacts(unpackCpiFacts(packed), sourceIdBySeriesMeasure(facts))).toEqual(index);
+    expect(JSON.stringify(packed).length).toBeLessThan(JSON.stringify(plain).length / 5);
   });
 });

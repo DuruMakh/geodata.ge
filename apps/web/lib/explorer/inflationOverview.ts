@@ -2,6 +2,7 @@ import { periodFromKey } from "../data/inflation/periods";
 import type { CpiMeasure, CpiSeriesId } from "../data/inflation/types";
 import type { ClientCpiFact, ClientInflationTargetRow } from "../servedRows";
 import { ACCENT, INK } from "./colors";
+import { packMonthlyRuns, unpackMonthlyRuns, type PackedCategorySeries } from "./inflationCategories";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
@@ -44,6 +45,15 @@ export type { ResolvedPeriodRange };
 
 export function seriesGroup(key: InflationSeriesKey, tab: InflationTab): string {
   return `${SERIES_DATA_ID[key]}:${TAB_MEASURE[tab]}`;
+}
+
+/** The overview's facts on the wire: the categories page's run-length form, one dense run per series and measure (U13-05). */
+export function packCpiFacts(facts: readonly ClientCpiFact[]): PackedCategorySeries[] {
+  return packMonthlyRuns(facts, (fact) => fact.seriesId);
+}
+
+export function unpackCpiFacts(packed: readonly PackedCategorySeries[]): ClientCpiFact[] {
+  return unpackMonthlyRuns(packed).map(({ series: seriesId, measure, period, value }) => ({ seriesId, measure, period, value }));
 }
 
 export function indexInflationFacts(

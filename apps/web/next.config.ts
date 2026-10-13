@@ -60,6 +60,14 @@ const nextConfig: NextConfig = {
         source: "/downloads/methodology/:dataset/files/:path((?!.*\\.pdf$).*)",
         headers: [{ key: "Content-Security-Policy", value: "sandbox; default-src 'none'" }],
       },
+      // Page data (lib/data/pageDataFiles.ts) is named by a hash of its content, so a published file never changes.
+      {
+        source: "/page-data/:file*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+          { key: "X-Robots-Tag", value: "noindex" },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { gzipSync } from "node:zlib";
 
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
@@ -146,3 +147,14 @@ for (const locale of ["ka", "en"] as const) {
     }
   });
 }
+
+// U13-05: the facts travelled as 1,960 verbose objects (46.7 KB gzip Georgian page); they now use the categories page's
+// run-length form.
+test("the overview facts travel as run-length runs", async ({ request }) => {
+  for (const [prefix, limit] of [["", 42_000], ["/en", 37_000]] as const) {
+    const html = await (await request.get(`${prefix}/explorer/inflation/overview`)).text();
+    expect(html.includes('\\"seriesId\\"'), "a verbose fact object in the HTML").toBe(false);
+    expect(gzipSync(html).length).toBeLessThan(limit);
+  }
+});
+

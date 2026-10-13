@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { formatDisplayDate, formatPoints } from "../../lib/explorer/format";
 
 import { periodLabel } from "../../lib/explorer/inflationLabels";
@@ -16,6 +17,7 @@ import {
   buildCategoryLines,
   buildStackModel,
   categoryCoverage,
+  categoryTabLoaded,
   changeCategoryTab,
   parseCategoryHash,
   unpackCategoryFacts,
@@ -52,7 +54,9 @@ import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
+import { usePageData } from "../explorer-shell/use-page-data";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
@@ -61,16 +65,19 @@ import { useHashState } from "../explorer-shell/use-hash-state";
 
 const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
-// A restored hash keeps its range only where the tab has data.
+// A restored hash keeps its range only where the tab has data. While the monthly runs load, the
+// range waits as written; the hash is parsed again when they arrive (useHashState re-reads it).
 function parseCategoriesHash(hash: string, index: CategoryIndex): CategoryState {
   const parsed = parseCategoryHash(hash);
-  return changeCategoryTab(parsed, parsed.tab, index);
+  return categoryTabLoaded(index, parsed.tab) ? changeCategoryTab(parsed, parsed.tab, index) : parsed;
 }
 
 export type InflationCategoriesProps = {
-  /** Packed on the server: 27,668 rows cross the wire, so they travel as dense runs. */
+  /** Packed on the server: 27,668 rows cross the wire, so they travel as dense runs. Annual changes only. */
   facts: PackedCategorySeries[];
-  weights: ClientBasketWeightRow[];
+  /** The monthly-change runs (lib/pages/inflationPageData.ts), fetched only when the monthly tab opens (U13-03). */
+  monthlyUrl: string;
+  weights: FactsInput<ClientBasketWeightRow>;
   headline: Array<{ period: number; value: number }>;
   /** The national monthly change, for the latest-value line on the monthly tab only. */
   headlineMom: Array<{ period: number; value: number }>;
@@ -79,24 +86,34 @@ export type InflationCategoriesProps = {
   siteOrigin: string;
 };
 
-export function InflationCategories({ facts, weights, headline, headlineMom, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
+export function InflationCategories({ facts, monthlyUrl, weights, headline, headlineMom, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
-  const index = useMemo(() => buildCategoryIndex(unpackCategoryFacts(facts), weights), [facts, weights]);
+  const [monthlyWanted, setMonthlyWanted] = useState(false);
+  const monthly = usePageData<PackedCategorySeries[]>(monthlyUrl, monthlyWanted);
+  const index = useMemo(
+    () => buildCategoryIndex(unpackCategoryFacts(monthly.status === "ready" ? [...facts, ...monthly.data] : facts), unpackFacts(weights)),
+    [facts, monthly, weights],
+  );
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
   const { state, update } = useHashState(index, parseCategoriesHash, serializeCategoryHash);
   const [announcement, setAnnouncement] = useState("");
+  if (state.tab === "mom" && !monthlyWanted) setMonthlyWanted(true);
 
-  const range = resolveCategoryRange(state, index);
+  // Until the monthly runs arrive, the monthly tab shows their loading (or failure) status in place of the
+  // chart, and the rest of the page reads the annual tab, whose data is here.
+  const pending = !categoryTabLoaded(index, state.tab);
+  const view: CategoryState = pending ? { ...state, tab: "yoy" } : state;
+  const range = resolveCategoryRange(view, index);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const coverage = categoryCoverage(index, state.tab);
+  const coverage = categoryCoverage(index, view.tab);
 
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
 
-  const stack = buildStackModel(index, state, range, headlineByPeriod);
-  const lines = buildCategoryLines(index, state, range);
-  const hasSeries = state.tab === "contrib" ? stack.segments.length > 0 : lines.lines.length > 0;
+  const stack = buildStackModel(index, view, range, headlineByPeriod);
+  const lines = buildCategoryLines(index, view, range);
+  const hasSeries = !pending && (state.tab === "contrib" ? stack.segments.length > 0 : lines.lines.length > 0);
 
   // The contribution tab decomposes the annual rate, so it states the annual headline.
   const latestTab = state.tab === "mom" ? "mom" : "yoy";
@@ -111,6 +128,10 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
       : t(`categoryUnit.${state.tab}`);
 
   function selectTab(tab: CategoryTab) {
+    if (!categoryTabLoaded(index, tab)) {
+      update((current) => ({ ...current, tab }));
+      return;
+    }
     const next = changeCategoryTab(state, tab, index);
     const nextRange = resolveCategoryRange(next, index);
     update(() => next);
@@ -189,7 +210,9 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
                 { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
               ]}
             />
-            {!hasSeries ? (
+            {pending ? (
+              <PageDataStatus status={monthly.status === "error" ? "error" : "loading"} />
+            ) : !hasSeries ? (
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
               </div>
@@ -244,15 +267,17 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
                 />
               </div>
             )}
-            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} legendCap={DIVISION_IDS.length} formatValue={state.tab === "contrib" ? (value) => `${formatContribution(value)} ${t("pp")}` : undefined} />
-            <RangeStrip
-              years={tabPeriods}
-              range={range}
-              periodsPerYear={12}
-              formatPeriod={(period) => periodLabel(messages, period, "short")}
-              formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
-              onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
-            />
+            {pending ? null : <>
+              <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} legendCap={DIVISION_IDS.length} formatValue={state.tab === "contrib" ? (value) => `${formatContribution(value)} ${t("pp")}` : undefined} />
+              <RangeStrip
+                years={tabPeriods}
+                range={range}
+                periodsPerYear={12}
+                formatPeriod={(period) => periodLabel(messages, period, "short")}
+                formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
+                onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+              />
+            </>}
           </section>
           <div className="mt-[18px] space-y-2">
             <SourceNote testId="source-label">
@@ -278,7 +303,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
 
         <InflationCategoryPanel
           index={index}
-          state={state}
+          state={view}
           range={range}
           onToggle={(categoryId) => update((current) => toggleCategory(current, categoryId, index))}
           onToggleExpanded={(categoryId) => update((current) => toggleExpanded(current, categoryId))}

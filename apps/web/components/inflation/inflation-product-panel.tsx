@@ -1,7 +1,7 @@
 "use client";
 
-import { Fragment, useState, type ReactNode } from "react";
-import { productAnnual, productColor, rankProducts, type ProductIndex } from "../../lib/explorer/inflationProducts";
+import { Fragment, memo, useState, type ReactNode } from "react";
+import { productColor, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -17,9 +17,10 @@ function normalized(value: string): string {
   return value.normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase();
 }
 
-export function filteredProductIds(index: ProductIndex, query: string): string[] {
+/** The products a query matches, in `order` (the latest annual ranking unless given). */
+export function filteredProductIds(index: ProductIndex, query: string, order: readonly string[] = index.ranked): string[] {
   const needle = normalized(query);
-  return rankProducts(index).filter((id) => {
+  return order.filter((id) => {
     const item = index.productById.get(id)!;
     return needle === "" || normalized(item.labelKa).includes(needle) || normalized(item.labelEn).includes(needle);
   });
@@ -64,18 +65,13 @@ export function InflationProductPanel({ index, state, onToggle, onClear, downloa
     >
       {visible.map((id, rank) => {
         const item = index.productById.get(id)!;
-        const annual = productAnnual(index, id, index.latestPeriod);
-        const focused = state.selected.at(-1) === id;
-        const row = <SeriesSelectorRow
+        const row = <ProductSelectorRow
           id={id}
           label={locale === "ka" ? item.labelKa : item.labelEn}
-          color={productColor(id)}
-          art={<InflationProductArt productId={id} />}
-          meta={focused ? message(messages, "inflation.productsFocusedTag") : undefined}
-          value={annual === null ? MISSING : formatShare(annual / 100, true)}
+          annual={index.latestAnnual.get(id) ?? null}
           selected={state.selected.includes(id)}
-          showRail={focused}
-          onToggle={() => onToggle(id)}
+          focused={state.selected.at(-1) === id}
+          onToggle={onToggle}
         />;
         return phoneHidden(id, rank)
           ? <div key={id} data-phone-hidden className="contents @max-[1100px]:hidden">{row}</div>
@@ -94,3 +90,26 @@ export function InflationProductPanel({ index, state, onToggle, onClear, downloa
     {downloadAction}
   </SeriesAside>;
 }
+
+/** One selector row. Memoised, so a click re-renders only the rows whose selection or focus changed (U14-03). */
+const ProductSelectorRow = memo(function ProductSelectorRow({ id, label, annual, selected, focused, onToggle }: {
+  id: string;
+  label: string;
+  annual: number | null;
+  selected: boolean;
+  focused: boolean;
+  onToggle: (id: string) => void;
+}) {
+  const { messages } = useI18n();
+  return <SeriesSelectorRow
+    id={id}
+    label={label}
+    color={productColor(id)}
+    art={<InflationProductArt productId={id} />}
+    meta={focused ? message(messages, "inflation.productsFocusedTag") : undefined}
+    value={annual === null ? MISSING : formatShare(annual / 100, true)}
+    selected={selected}
+    showRail={focused}
+    onToggle={() => onToggle(id)}
+  />;
+});

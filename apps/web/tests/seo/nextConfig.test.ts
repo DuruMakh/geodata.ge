@@ -27,6 +27,19 @@ it("noindexes only third-party methodology source originals", async () => {
   );
 });
 
+// U14-01: page data is fetched by the page after load; its name carries a hash of its content, so it is cached for good.
+it("lets browsers keep content-hashed page data for a year, out of search results", async () => {
+  const headers = await nextConfig.headers?.();
+
+  expect(headers).toContainEqual({
+    source: "/page-data/:file*",
+    headers: [
+      { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+      { key: "X-Robots-Tag", value: "noindex" },
+    ],
+  });
+});
+
 it("retains the general security headers on every route", async () => {
   const headers = await nextConfig.headers?.();
 

@@ -3,11 +3,11 @@
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { makePeriod, periodKey, periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
-import { buildProductIndex, productAnnual, productColor, productCumulative, type ClientProduct, type PackedProductSeries } from "../../lib/explorer/inflationProducts";
+import { buildProductIndex, productAnnual, productColor, productCumulative, type ClientProduct, type PackedProductSeries, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import { parseProductHash, serializeProductHash, toggleProduct } from "../../lib/explorer/inflationProductState";
 import { buildInflationProductWorkbookExportModel } from "../../lib/explorer/inflationProductWorkbook";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -20,7 +20,9 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
+import { usePageData } from "../explorer-shell/use-page-data";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
@@ -34,18 +36,50 @@ const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 export type InflationProductsProps = {
   products: ClientProduct[];
-  facts: PackedProductSeries[];
+  /** The packed index runs (lib/pages/inflationPageData.ts), fetched after load rather than carried in the HTML (U14-01). */
+  dataUrl: string;
+  /** The months the runs cover, so the header states them before the runs arrive. */
+  coverage: { earliestYear: number; latestPeriod: number };
   lastReviewedAt: string;
   sources: InflationWorkbookSource[];
   siteOrigin: string;
 };
 
-export function InflationProducts({ products, facts, lastReviewedAt, sources, siteOrigin }: InflationProductsProps) {
+export function InflationProducts({ products, dataUrl, coverage, lastReviewedAt, sources, siteOrigin }: InflationProductsProps) {
+  const { locale, messages } = useI18n();
+  const t = (key: string) => message(messages, `inflation.${key}`);
+  const runs = usePageData<PackedProductSeries[]>(dataUrl);
+  const index = useMemo(() => runs.status === "ready" ? buildProductIndex(products, runs.data) : null, [products, runs]);
+
+  return <ExplorerPage testId="inflation-products">
+    <PageHeader
+      crumbs={[
+        { label: message(messages, "common.home"), href: pageHref("/", locale) },
+        { label: message(messages, "common.data") },
+        { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
+        { label: t("productsHeading") },
+      ]}
+      coverage={coverageLabel(messages, locale, coverage.earliestYear, periodLabel(messages, coverage.latestPeriod, "short"), lastReviewedAt)}
+    />
+    <ExplorerHeading>{t("productsHeading")}</ExplorerHeading>
+    <p className="mb-4 text-[13px] text-[var(--muted)]">{t("productsUnit")}</p>
+    {index ? <ProductExplorer index={index} lastReviewedAt={lastReviewedAt} sources={sources} siteOrigin={siteOrigin} /> :
+      <PageDataStatus status={runs.status === "error" ? "error" : "loading"} />}
+  </ExplorerPage>;
+}
+
+export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: {
+  index: ProductIndex;
+  lastReviewedAt: string;
+  sources: InflationWorkbookSource[];
+  siteOrigin: string;
+}) {
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `inflation.${key}`, values);
-  const index = useMemo(() => buildProductIndex(products, facts), [products, facts]);
   const { state, update } = useHashState(index, parseProductHash, serializeProductHash);
+  // Stable, so a click re-renders only the selector rows whose selection changed.
+  const toggle = useCallback((id: string) => update((current) => toggleProduct(current, id)), [update]);
 
   const minYear = index.earliestYear;
   const maxYear = periodYear(index.latestPeriod);
@@ -78,19 +112,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
   const toggleAction = state.indicator === "annual" ? t("productsShowCumulative") : t("productsShowAnnual");
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
 
-  return <ExplorerPage testId="inflation-products">
-    <PageHeader
-      crumbs={[
-        { label: message(messages, "common.home"), href: pageHref("/", locale) },
-        { label: message(messages, "common.data") },
-        { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
-        { label: t("productsHeading") },
-      ]}
-      coverage={coverageLabel(messages, locale, minYear, periodLabel(messages, index.latestPeriod, "short"), lastReviewedAt)}
-    />
-    <ExplorerHeading>{t("productsHeading")}</ExplorerHeading>
-    <p className="mb-4 text-[13px] text-[var(--muted)]">{t("productsUnit")}</p>
-
+  return <>
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-indicator={state.indicator} className="border-t border-[var(--ink)] pt-3">
@@ -159,7 +181,7 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
       <InflationProductPanel
         index={index}
         state={state}
-        onToggle={(id) => update((current) => toggleProduct(current, id))}
+        onToggle={toggle}
         onClear={() => update((current) => ({ ...current, selected: [] }))}
         downloadAction={<ExcelDownloadButton
           testId="inflation-product-download"
@@ -169,6 +191,6 @@ export function InflationProducts({ products, facts, lastReviewedAt, sources, si
       />
     </ExplorerWorkspace>
     <InflationProductIndicators index={index} state={state} />
-    <InflationProductTable index={index} state={state} onToggle={(id) => update((current) => toggleProduct(current, id))} />
-  </ExplorerPage>;
+    <InflationProductTable index={index} state={state} onToggle={toggle} />
+  </>;
 }

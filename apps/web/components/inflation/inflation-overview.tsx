@@ -5,16 +5,16 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
-import type { ClientCpiFact } from "../../lib/servedRows";
 import { formatDisplayDate } from "../../lib/explorer/format";
 import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
   INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
-  parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection,
+  parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection, unpackCpiFacts,
   type InflationIndex, type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
+import type { PackedCategorySeries } from "../../lib/explorer/inflationCategories";
 import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
@@ -46,7 +46,8 @@ function parseOverviewHash(hash: string, index: InflationIndex): InflationState 
 }
 
 export type InflationOverviewProps = {
-  facts: ClientCpiFact[];
+  /** Packed on the server (packCpiFacts): one dense run per series and measure. */
+  facts: PackedCategorySeries[];
   // One entry per series and measure: every CPI row of a group comes from the
   // same Geostat publication, and the workbook cites it.
   sourceIdBySeriesMeasure: Record<string, string>;
@@ -61,7 +62,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
   const index = useMemo(
-    () => indexInflationFacts(facts, sourceIdBySeriesMeasure),
+    () => indexInflationFacts(unpackCpiFacts(facts), sourceIdBySeriesMeasure),
     [facts, sourceIdBySeriesMeasure],
   );
   const { state, update } = useHashState(index, parseOverviewHash, serializeInflationHash);

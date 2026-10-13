@@ -9,6 +9,7 @@ import { renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props = {
   facts: packCategoryFacts(fixtureFacts),
+  monthlyUrl: "/page-data/inflation-category-mom.0123456789abcdef.json",
   weights: fixtureWeights,
   headline: [...fixtureHeadline].map(([period, value]) => ({ period, value })),
   headlineMom: [],

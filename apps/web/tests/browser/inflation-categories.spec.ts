@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { gzipSync } from "node:zlib";
 
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const CATEGORIES = "/explorer/inflation/categories";
@@ -190,3 +191,39 @@ test("the contribution chart fits phones, hovers without moving the page and ans
   await page.keyboard.press("Escape");
   await expect(page.getByTestId("stack-chart-tooltip")).toHaveCount(0);
 });
+
+// U13-03: the monthly-change runs (about half the facts) shipped with every page view although only the monthly tab
+// reads them; they now load from a long-cached file when that tab opens.
+test("the monthly runs load only for the monthly tab", async ({ page, request }) => {
+  for (const prefix of ["", "/en"]) {
+    const html = await (await request.get(`${prefix}${CATEGORIES}`)).text();
+    expect(html.includes("mom_pct"), "a monthly run in the HTML").toBe(false);
+    expect(gzipSync(html).length).toBeLessThan(135_000);
+  }
+  const requested: string[] = [];
+  page.on("request", (sent) => { if (sent.url().includes("/page-data/")) requested.push(new URL(sent.url()).pathname); });
+  await page.goto(`/en${CATEGORIES}`);
+  await ready(page);
+  await page.getByTestId("inflation-category-tab-yoy").click();
+  await expect(page.locator("path[data-overlay]")).toHaveCount(0);
+  expect(requested).toEqual([]);
+  await page.getByTestId("inflation-category-tab-mom").click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-tab", "mom");
+  await expect(page.getByTestId("year-range-strip")).toBeVisible();
+  expect(requested).toHaveLength(1);
+  expect(requested[0]).toMatch(/^\/page-data\/inflation-category-mom\.[0-9a-f]{16}\.json$/);
+  const data = await request.get(requested[0]!);
+  expect(data.headers()["cache-control"]).toBe("public, max-age=31536000, immutable");
+});
+
+test("a failed monthly load shows the error in place of the chart and keeps the other tabs", async ({ page }) => {
+  await page.route("**/page-data/inflation-category-mom.*.json", (route) => route.fulfill({ status: 500, body: "" }));
+  await page.goto(`/en${CATEGORIES}#i=mom`);
+  await ready(page);
+  await expect(page.getByRole("alert").getByTestId("page-data-error")).toHaveText("The data could not be loaded. Reload the page to try again.");
+  await expect(page.getByTestId("inflation-category-download")).toBeDisabled();
+  await page.getByTestId("inflation-category-tab-contrib").click();
+  await expect(page.getByTestId("page-data-error")).toHaveCount(0);
+  await expect(page.locator("path[data-overlay]")).toHaveCount(1);
+});
+

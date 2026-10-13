@@ -97,5 +97,7 @@
   "common.dataWages": "Data · Wages",
   "common.dataLivingStandards": "Data · Living standards",
   "common.dataEnergyFood": "Data · Energy and food",
-  "common.dataMoneyBanks": "Data · Money and banks"
+  "common.dataMoneyBanks": "Data · Money and banks",
+  "common.dataLoading": "Loading the data…",
+  "common.dataLoadError": "The data could not be loaded. Reload the page to try again."
 }

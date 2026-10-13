@@ -4,7 +4,7 @@ import { useState } from "react";
 import { makePeriod, periodKey } from "../../lib/data/inflation/periods";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
-import { productAnnual, productCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
+import { productCumulative, productsByCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -29,15 +29,7 @@ export function InflationProductTable({ index, state, onToggle }: {
   const [query, setQuery] = useState("");
   const [shown, setShown] = useState(Math.min(BATCH_SIZE, index.products.length));
   const endPeriod = Math.min(makePeriod(state.range.endYear, 12), index.latestPeriod);
-  const matches = filteredProductIds(index, query);
-  const cumulativeById = new Map(matches.map((id) => [id, productCumulative(index, id, state.range.startYear, endPeriod)] as const));
-  matches.sort((a, b) => {
-    const left = cumulativeById.get(a)!.value;
-    const right = cumulativeById.get(b)!.value;
-    if (left === null) return right === null ? 0 : 1;
-    if (right === null) return -1;
-    return right - left;
-  });
+  const matches = filteredProductIds(index, query, productsByCumulative(index, state.range.startYear, endPeriod));
   const ids = matches.slice(0, shown);
   const latestLabel = periodLabel(messages, index.latestPeriod, "long");
   const endLabel = periodLabel(messages, endPeriod, "long");
@@ -91,8 +83,8 @@ export function InflationProductTable({ index, state, onToggle }: {
               const primary = locale === "ka" ? product.labelKa : product.labelEn;
               const secondary = locale === "ka" ? product.labelEn : product.labelKa;
               const selected = state.selected.includes(id);
-              const annual = productAnnual(index, id, index.latestPeriod);
-              const cumulative = cumulativeById.get(id)!;
+              const annual = index.latestAnnual.get(id) ?? null;
+              const cumulative = productCumulative(index, id, state.range.startYear, endPeriod);
               const missing = cumulative.reason === "late_start" ? t("productsLateStart", { period: product.firstPeriod }) :
                 cumulative.reason === "missing_month" && cumulative.missingPeriod !== null ?
                   t("productsMissingMonth", { period: periodKey(cumulative.missingPeriod) }) : null;

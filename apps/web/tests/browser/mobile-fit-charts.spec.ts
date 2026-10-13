@@ -310,6 +310,8 @@ test.describe("one short line under the heading at 375px (DESIGN §17)", () => {
       test(`${locale} ${route}`, async ({ page }) => {
         // Hubs are static and never mark the app ready; the lines are in the served HTML.
         await page.goto(`${TEST_BASE_URL}${locale === "en" ? "/en" : ""}${route}`);
+        // A page whose data is fetched after load (products) shows a loading status where its workspace will be.
+        await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
         await page.evaluate(() => document.fonts.ready);
         const under = await page.getByRole("heading", { level: 1 }).first().evaluate((heading) => {
           // A place heading wraps the h1 with its closed picker and its previous/next

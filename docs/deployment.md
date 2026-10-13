@@ -566,6 +566,14 @@ no budget data and require no migration when a code release is rolled back.
 - Security headers (nosniff, `X-Frame-Options: DENY`, referrer policy,
   permissions policy) are set in `apps/web/next.config.ts` `headers()`;
   Vercel adds HSTS itself.
+- Page data under `/page-data/` (`apps/web/lib/data/pageDataFiles.ts`): JSON a
+  page fetches after load instead of carrying it in its HTML, today the
+  inflation products runs and the categories' monthly runs. Each name carries a
+  hash of its content, so the rule in `headers()` sends
+  `Cache-Control: public, max-age=31536000, immutable` and
+  `X-Robots-Tag: noindex`. `prebuild` writes the files and `postbuild` checks
+  them (`data:prepare-inflation-public`, `data:check-inflation-public`); they
+  are not publications and appear in no manifest, `llms.txt` or sitemap.
 - Every response also carries a `Content-Security-Policy-Report-Only` header
   (the `contentSecurityPolicy` constant in `apps/web/next.config.ts`): only the
   site itself, plus Google Analytics (`www.googletagmanager.com`,

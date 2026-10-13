@@ -75,6 +75,8 @@ test.describe("desktop", () => {
 for (const locale of ["ka", "en"] as const) {
   test(`${locale} products list shows the top ten and a "more products" button`, async ({ page }) => {
     await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/products`);
+    // The rows render once the product runs are fetched (U14-01).
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     const rows = page.getByTestId("series-list").getByTestId("series-row");
     const total = await rows.count();
     expect(total).toBeGreaterThan(100);

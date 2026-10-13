@@ -97,5 +97,7 @@
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე",
   "common.dataEnergyFood": "მონაცემები · ენერგეტიკა და სურსათი",
-  "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები"
+  "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები",
+  "common.dataLoading": "მონაცემები იტვირთება…",
+  "common.dataLoadError": "მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან."
 }
