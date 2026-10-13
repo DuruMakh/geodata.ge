@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { MAP_RAMP } from "../../lib/explorer/colors";
-import { unemploymentAgeHeatmapBin } from "../../lib/explorer/unemploymentAge";
+import { heatmapBin } from "../../lib/explorer/heatmap";
 import { STATUS_MARK_CLASS } from "./explorer-table";
 import { SectionTitle } from "../ui/editorial";
 
@@ -45,7 +45,7 @@ export function HeatmapTable({ caption, rowHeader, years, rows, maximum, format,
         <tbody>{rows.map(row => <tr key={row.id} data-heatmap-group={row.id}>
           <th scope="row" className={`sticky left-0 z-10 ${wrapRowLabels ? "min-w-[150px] max-w-[240px] text-[12px] leading-snug" : "whitespace-nowrap"} bg-[var(--paper)] px-3 py-2 text-left font-normal text-[var(--ink)]`}>{row.label}</th>
           {row.values.map((value, index) => {
-            const bin = value === null ? null : unemploymentAgeHeatmapBin(value, maximum, MAP_RAMP.length);
+            const bin = value === null ? null : heatmapBin(value, maximum, MAP_RAMP.length);
             return <td key={years[index]} data-heatmap-cell={`${row.id}:${years[index]}`} data-value={value ?? ""} data-bin={bin ?? ""} className="px-3 py-2 text-center font-[family-name:var(--font-numeric)] tabular-nums"
               style={{ ...(bin === null ? { color: "var(--ink)" } : { backgroundColor: MAP_RAMP[bin], color: bin === MAP_RAMP.length - 1 ? "var(--paper)" : "var(--ink)" }), ...breakStyle(years[index]) }}>{format(value)}</td>;
           })}

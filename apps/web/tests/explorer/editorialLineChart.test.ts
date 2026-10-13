@@ -354,4 +354,17 @@ describe("EditorialLineChart text for assistive technology", () => {
     expect(caption).toContain("მშპ, 2025: 90.0 მლრდ (წინასწ.)");
     expect(caption).toContain("გეგმა, 2025: 30.0 მლრდ (გეგმა)");
   });
+
+  // X1-17: a series with no planned values leaves `planned` out instead of passing an all-false array.
+  it("treats a series without planned flags as having no planned value", () => {
+    const formatValue = (value: number) => (value / 1e9).toFixed(1);
+    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა", planned: "გეგმა" };
+    const plain: ChartSeries[] = [{ id: "a", label: "ა", color: "#B3402A", vals: [5_000_000_000, 7_000_000_000] }];
+    expect(periodReadoutText(plain, 1, "2025", formatValue, labels)).toBe("2025: ა 7.0");
+    const hollow = (series: ChartSeries[]) =>
+      renderGeorgianMarkup(createElement(EditorialLineChart, { years: [2024, 2025], series, share: false, unit: UNIT_BN, shareLabel: "% წილი" })).match(/fill="#F7F2E9"/g)?.length ?? 0;
+    expect(hollow(plain)).toBe(0);
+    // The same line with its last value planned draws the hollow point, so the check above can fail.
+    expect(hollow([{ ...plain[0]!, planned: [false, true] }])).toBeGreaterThan(0);
+  });
 });

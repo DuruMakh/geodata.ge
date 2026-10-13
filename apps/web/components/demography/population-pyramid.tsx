@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { axisLabelWidth, decimalsFor } from "../../lib/explorer/chartScale";
 import { INK, SERIES_COLORS } from "../../lib/explorer/colors";
 import { ageGroupLabel, bandShares, shareOf, type AgeMeasure, type Pyramid } from "../../lib/explorer/demographyAgeSex";
-import { formatInUnit, formatShare, thousandsUnit, UNIT_PERSONS } from "../../lib/explorer/format";
+import { formatInUnit, formatShare, thousandsUnit } from "../../lib/explorer/format";
 import { PYRAMID, pyramidLayout } from "../../lib/explorer/pyramidLayout";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -12,6 +12,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import { ChartTooltip, MOBILE_CHART_QUERY } from "../main-explorer/chart-frame";
 import type { TooltipRow } from "../main-explorer/editorial-line-chart";
 import { SwatchBar } from "../ui/editorial";
+import { persons } from "./demography-helpers";
 
 const MALE = SERIES_COLORS["sex.male"]!;
 const FEMALE = SERIES_COLORS["sex.female"]!;
@@ -80,7 +81,6 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
   const { width, height, centreLeft, centreRight } = layout;
   const plotBottom = PYRAMID.header + pyramid.rows.length * PYRAMID.rowPitch;
 
-  const persons = (value: number) => formatInUnit(value, UNIT_PERSONS);
   const percent = (value: number) => formatShare(value / 100);
   const formatValue = measure === "share" ? percent : persons;
 
@@ -284,7 +284,7 @@ export function PyramidTable({ pyramid, caption }: { pyramid: Pyramid; caption: 
   const cells = (male: number, female: number, bold: boolean) =>
     [male, female, male + female].map((value, column) => (
       <td key={column} className={NUMBER_CELL} style={{ ...CELL_PAD, fontWeight: bold ? 600 : 400 }}>
-        {formatInUnit(value, UNIT_PERSONS)}
+        {persons(value)}
       </td>
     )).concat(
       <td key="share" className={NUMBER_CELL} style={{ ...CELL_PAD, fontWeight: bold ? 600 : 400 }}>

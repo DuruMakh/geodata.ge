@@ -4,7 +4,8 @@ import { UnemploymentExplorer } from "../../components/unemployment/unemployment
 import { UnemploymentAgeHeatmap } from "../../components/unemployment/unemployment-age-heatmap";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/unemployment/importUnemployment";
 import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/types";
-import { buildUnemploymentAgeHeatmap, unemploymentAgeHeatmapBin } from "../../lib/explorer/unemploymentAge";
+import { heatmapBin } from "../../lib/explorer/heatmap";
+import { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
 import { MAP_RAMP } from "../../lib/explorer/colors";
 import { buildUnemploymentModel } from "../../lib/explorer/unemployment";
 import { parseUnemploymentHash } from "../../lib/explorer/unemploymentState";
@@ -64,8 +65,8 @@ test.each(["ka", "en"] as const)("the %s age page retains all eight indicators i
 });
 
 test("the heatmap scale runs in six equal bins from zero to the accent, with readable text on every bin", () => {
-  expect([0, 9, 10, 25, 44, 59.9, 60].map(value => unemploymentAgeHeatmapBin(value, 60, MAP_RAMP.length))).toEqual([0, 0, 1, 2, 4, 5, 5]);
-  expect(unemploymentAgeHeatmapBin(5, 0, MAP_RAMP.length)).toBe(0);
+  expect([0, 9, 10, 25, 44, 59.9, 60].map(value => heatmapBin(value, 60, MAP_RAMP.length))).toEqual([0, 0, 1, 2, 4, 5, 5]);
+  expect(heatmapBin(5, 0, MAP_RAMP.length)).toBe(0);
   expect(MAP_RAMP.at(-1)).toBe("#B3402A");
   const channel = (hex: string, index: number) => { const c = parseInt(hex.slice(1 + index * 2, 3 + index * 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
   const luminance = (hex: string) => 0.2126 * channel(hex, 0) + 0.7152 * channel(hex, 1) + 0.0722 * channel(hex, 2);
