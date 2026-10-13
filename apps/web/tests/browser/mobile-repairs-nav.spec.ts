@@ -112,7 +112,9 @@ for (const { path, titles, measures } of [
   });
 }
 
-test("landing calls to action are 44px tap targets", async ({ page }) => {
+// The hero CTA kept its 44px target only below 768px (U01-03); touch tablets sit above it.
+for (const width of [390, 768, 1280]) test(`landing calls to action are 44px tap targets at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
   await page.goto("/");
   const targets = [
     page.getByTestId("hero-cta"),

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
-import { mapTouchTargets, pathBounds } from "../../lib/explorer/mapTouchTargets";
+import { pathBounds } from "../../lib/explorer/mapTouchTargets";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { formatAmount } from "../../lib/explorer/format";
@@ -11,7 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
 import { pageHref } from "../../lib/i18n/routes";
-import { useTouchPreview } from "../explorer-shell/use-touch-preview";
+import { useMapTouchDisks, useTouchPreview } from "../explorer-shell/use-touch-preview";
 
 export type RegionMapMetric = {
   /** Absent, the regions are plain shapes and rows: no links, no tab stops, no touch preview (used only by Age and sex). */
@@ -52,10 +52,9 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
   const linkFor = metric.hrefForRegion;
   const hrefFor = (regionId: string) => pageHref(linkFor!(regionId), locale);
   const labelFor = (region: RegionMapModel["regions"][number]) => publicLabel(locale, region.regionId, region.nameKa, englishLabels);
-  const touchTargets = useMemo(
-    () => mapTouchTargets(model.regions.map((region) => ({ id: region.regionId, bounds: pathBounds(region.pathD) })), Number(model.viewBox.split(" ")[2])),
-    [model.regions, model.viewBox],
-  );
+  const svgRef = useRef<SVGSVGElement>(null);
+  const targetBounds = useMemo(() => model.regions.map((region) => ({ id: region.regionId, bounds: pathBounds(region.pathD) })), [model.regions]);
+  const touchTargets = useMapTouchDisks(svgRef, targetBounds, model.viewBox).disks;
   const previewRegion = model.regions.find((region) => region.regionId === preview.previewId) ?? null;
   const move = (index: number, key: string) => {
     if (key === "ArrowRight" || key === "ArrowDown") return (index + 1) % model.regions.length;
@@ -68,6 +67,7 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
   return (
     <div data-testid={metric.testId}>
       <svg
+        ref={svgRef}
         viewBox={model.viewBox}
         role="group"
         aria-label={metric.mapAria}

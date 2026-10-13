@@ -75,3 +75,57 @@ test("mobile analysis controls and the first-year growth explanation are fully E
   expect(params.get("as")).toBe("revenue");
   expect(params.get("ay")).toBe("2024");
 });
+
+// U05-03: circles drawn under a larger neighbour, or under 24px, must still be
+// reachable by a tap and by the mouse. The pointer reads the nearest centre.
+async function fieldCircles(page: Page) {
+  const field = page.getByTestId("budget-field");
+  await field.locator("svg").scrollIntoViewIfNeeded();
+  return field.locator("circle").evaluateAll((circles) =>
+    circles.map((circle) => {
+      const box = circle.getBoundingClientRect();
+      return { name: circle.getAttribute("aria-label")!.split(" · ")[0]!, x: box.x + box.width / 2, y: box.y + box.height / 2, diameter: box.width };
+    }),
+  );
+}
+
+test.describe("phone", () => {
+  test.use({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
+
+  test("every budget-field circle can be tapped, and a small one from 11px away", async ({ page }) => {
+    await page.goto("/en/explorer/analysis");
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const circles = await fieldCircles(page);
+    expect(circles.length).toBeGreaterThan(5);
+    const readout = page.getByTestId("budget-field-tooltip");
+    for (const circle of circles) {
+      await page.touchscreen.tap(circle.x, circle.y);
+      await expect(readout, circle.name).toContainText(circle.name);
+    }
+
+    await page.getByRole("heading", { level: 1 }).tap();
+    await expect(readout).toHaveCount(0);
+
+    // The smallest circle answers a tap 11px from its centre, in a direction where no other centre is nearer.
+    const placed = await fieldCircles(page);
+    const smallest = placed.toSorted((a, b) => a.diameter - b.diameter)[0]!;
+    expect(smallest.diameter).toBeLessThan(24);
+    const point = [[11, 0], [-11, 0], [0, 11], [0, -11]]
+      .map(([dx, dy]) => ({ x: smallest.x + dx!, y: smallest.y + dy! }))
+      .find((candidate) => placed.every((other) => other === smallest || Math.hypot(other.x - candidate.x, other.y - candidate.y) > 11));
+    expect(point).toBeDefined();
+    await page.touchscreen.tap(point!.x, point!.y);
+    await expect(readout).toContainText(smallest.name);
+  });
+});
+
+test("the mouse reads every budget-field circle, including one drawn under another", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/en/explorer/analysis");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const tooltip = page.getByTestId("budget-field-tooltip");
+  for (const circle of await fieldCircles(page)) {
+    await page.mouse.move(circle.x, circle.y);
+    await expect(tooltip, circle.name).toContainText(circle.name);
+  }
+});

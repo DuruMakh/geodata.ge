@@ -694,12 +694,25 @@ test("landing calls to action have visible keyboard focus", async ({ page }) => 
 });
 
 test("landing keeps stats and dataset tables inside narrow viewports", async ({ page }) => {
-  for (const width of [390, 320]) {
+  // 768 and 820: tablet portrait, where the five dataset columns are narrowest (U01-23).
+  for (const width of [390, 320, 768, 820]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto(baseUrl);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByTestId("key-numbers").locator("[data-country-stat]")).toHaveCount(3);
     await expectNoPageOverflow(page);
+    expect((await page.getByTestId("hero-cta").boundingBox())?.height ?? 0, `hero CTA at ${width}px`).toBeGreaterThanOrEqual(44);
+    // Nothing in a dataset link (a long value such as "25.9 მლრდ აშშ დოლარი") runs past the link's own box.
+    const overruns = await page.getByTestId("landing-datasets").getByRole("link").evaluateAll((links) =>
+      links.flatMap((link) => {
+        const box = link.getBoundingClientRect();
+        return [...link.querySelectorAll("*")]
+          .map((element) => element.getBoundingClientRect())
+          .filter((inner) => inner.right > box.right + 0.5 || inner.left < box.left - 0.5)
+          .map((inner) => `${link.textContent?.trim()}: ${Math.round(inner.right - box.right)}px`);
+      }),
+    );
+    expect(overruns, `dataset links at ${width}px`).toEqual([]);
 
     for (const testId of [
       "landing-dataset-expenditure",

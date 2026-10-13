@@ -74,11 +74,11 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
               >
                 {message(messages, "landing.heading")}
               </h1>
-              <div className="mt-1 min-[768px]:pointer-events-auto min-[768px]:mt-5">
+              <div className="mt-1 min-[768px]:pointer-events-auto min-[768px]:mt-2">
                 <Link
                   href={pageHref("/explorer", locale)}
                   data-testid="hero-cta"
-                  className="inline-flex min-h-11 items-center text-[0.75rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:min-h-0 min-[768px]:text-[0.78125rem]"
+                  className="inline-flex min-h-11 items-center text-[0.75rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[#8F3222] min-[768px]:text-[0.78125rem]"
                 >
                   {message(messages, "landing.explore")}
                 </Link>
@@ -140,7 +140,8 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
                 </span>
                 <span className="text-[0.71875rem] leading-snug text-[var(--muted)]">
                   {dataset.measure} · {dataset.period}:{" "}
-                  <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-[var(--ink)]">{withLari(dataset.value)}</span>
+                  {/* Five columns from 768px leave a long value too little room until 900px; there it wraps. */}
+                  <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-[var(--ink)] min-[768px]:max-[900px]:whitespace-normal">{withLari(dataset.value)}</span>
                 </span>
               </Link>
             ))}

@@ -160,7 +160,7 @@ test.describe("phone", () => {
     expect(scroll.client).toBe(scroll.scroll);
 
     const disk = page.locator("[data-map-touch-target='04']");
-    expect(Math.min(...Object.values((await disk.boundingBox())!).slice(2))).toBeGreaterThanOrEqual(15);
+    expect(Math.min(...Object.values((await disk.boundingBox())!).slice(2))).toBeGreaterThanOrEqual(24);
     await disk.tap();
     const strip = page.getByTestId("map-touch-preview");
     await expect(strip).toContainText(/^თბილისი · .+ ₾ ერთ მოსახლეზე/);
@@ -174,9 +174,23 @@ test.describe("phone", () => {
     await rustavi.tap();
     await page.waitForURL("**/explorer/municipalities/rustavi");
   });
+
+  test("municipal map: every city marker's touch disk is at least 24px at the map's drawn width (U08-02)", async ({ page }) => {
+    await page.goto("/explorer/municipalities");
+    await ready(page);
+    // 320px is the narrowest phone: a disk sized for an assumed 350px map would be 19px there.
+    for (const width of [390, 320]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const code of ["04", "06", "20", "32", "48"]) {
+        await expect.poll(async () => (await page.locator(`[data-map-touch-target='${code}']`).boundingBox())?.width ?? 0, `${code} at ${width}px`).toBeGreaterThanOrEqual(23.9);
+      }
+    }
+  });
 });
 
 test("mouse clicks still open a map place at once and the touch disks ignore the mouse", async ({ page }) => {
+  // Disks are sized at the map's drawn width: a desktop-wide map has none, so a phone-wide window with a mouse.
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/explorer/economy/regions");
   await mapHydrated(page);
   expect(await page.locator("[data-map-touch-target='region.tbilisi']").evaluate((element) => getComputedStyle(element).pointerEvents)).toBe("none");

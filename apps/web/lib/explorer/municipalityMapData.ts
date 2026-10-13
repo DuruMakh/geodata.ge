@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { Municipality } from "../data/municipal/types";
 import type { MunicipalListRow } from "./municipalData";
-import { mapTouchTargets, pathBounds, type MapTouchTarget } from "./mapTouchTargets";
+import { pathBounds, type MapTargetBounds } from "./mapTouchTargets";
 
 export type MunicipalityMapShape = {
   code: string;
@@ -34,8 +34,8 @@ export type MunicipalityMapModel = {
   shapes: MunicipalityMapShape[];
   markers: MunicipalityMapMarker[];
   occupiedAreas: MunicipalityMapOccupiedArea[];
-  /** Touch hit areas for map targets under a fingertip on a phone, keyed by code. */
-  touchTargets: MapTouchTarget[];
+  /** Every map target's bounds, keyed by code; the map sizes touch hit areas from them at its drawn width. */
+  touchTargets: MapTargetBounds[];
   legendMinPerResidentGel: number;
   legendMaxPerResidentGel: number;
 };
@@ -217,15 +217,16 @@ function assembleMunicipalityMapModel(
   const bucketOf = quantileBucket(polygonValues);
   // Tbilisi's polygon is decoration under its marker, so the marker is the target.
   const markerCodes = new Set(MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => marker.code));
-  const touchTargets = mapTouchTargets([
+  const touchTargets: MapTargetBounds[] = [
     ...MUNICIPALITY_MAP_ARTIFACT.municipalityPaths
       .filter((shape) => !markerCodes.has(shape.code))
       .map((shape) => ({ id: shape.code, bounds: pathBounds(shape.d) })),
     ...MUNICIPALITY_MAP_ARTIFACT.cityMarkers.map((marker) => ({
       id: marker.code,
+      marker: true,
       bounds: { minX: marker.x - MUNICIPALITY_MARKER_RADIUS, minY: marker.y - MUNICIPALITY_MARKER_RADIUS, maxX: marker.x + MUNICIPALITY_MARKER_RADIUS, maxY: marker.y + MUNICIPALITY_MARKER_RADIUS },
     })),
-  ], Number(MUNICIPALITY_MAP_ARTIFACT.viewBox.split(" ")[2]));
+  ];
 
   return {
     viewBox: MUNICIPALITY_MAP_ARTIFACT.viewBox,
