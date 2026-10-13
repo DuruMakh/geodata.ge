@@ -24,7 +24,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
         <div className="flex flex-col gap-4 min-[768px]:grid min-[768px]:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] min-[768px]:gap-9">
           {/* Phones: lockup and address share one row. */}
           <div className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-x-4 gap-y-2 min-[768px]:flex min-[768px]:flex-col min-[768px]:items-stretch min-[768px]:gap-2.5">
-            <Link href={pageHref("/", locale)} aria-label={message(messages, "common.brandHome")} className="block w-[150px]">
+            <Link href={pageHref("/", locale)} prefetch={false} aria-label={message(messages, "common.brandHome")} className="block w-[150px]">
               {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -49,7 +49,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
             <ul className="grid list-none grid-cols-2 gap-x-4 min-[768px]:flex min-[768px]:flex-col min-[768px]:gap-[9px]">
               {FOOTER_LINKS.map(({ href, labelKey }) => (
                 <li key={href}>
-                  <Link href={pageHref(href, locale)} className="flex min-h-11 items-center text-[0.78125rem] text-[var(--body)] hover:text-[var(--ink)] min-[768px]:inline min-[768px]:min-h-0">
+                  <Link href={pageHref(href, locale)} prefetch={false} className="flex min-h-11 items-center text-[0.78125rem] text-[var(--body)] hover:text-[var(--ink)] min-[768px]:inline min-[768px]:min-h-0">
                     {message(messages, labelKey)}
                   </Link>
                 </li>

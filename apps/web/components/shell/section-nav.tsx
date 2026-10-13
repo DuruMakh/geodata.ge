@@ -51,6 +51,7 @@ export function SectionNav() {
           <li key={id}>
             <Link
               href={pageHref(section.href, locale)}
+              prefetch={false}
               data-testid={`section-link-${section.href.split("/").at(-1)}`}
               aria-current={active ? "page" : undefined}
               className={`flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${

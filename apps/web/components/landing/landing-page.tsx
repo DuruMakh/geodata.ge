@@ -133,6 +133,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
               <Link
                 key={dataset.href}
                 href={pageHref(dataset.href, locale)}
+                prefetch={false}
                 className="group flex min-h-11 min-w-0 flex-col justify-center gap-1 border-b border-[var(--hairline-soft)] py-3 pr-3 text-[var(--ink)] no-underline"
               >
                 <span className="text-[0.875rem] font-semibold group-hover:text-[var(--accent)]">
@@ -211,6 +212,7 @@ export function LandingPage({ model, datasets, presentation }: { model: LandingM
                 <Link
                   data-testid="landing-methodology-link"
                   href={pageHref("/methodology", locale)}
+                  prefetch={false}
                   className="mt-1 inline-flex min-h-11 items-center text-[0.78125rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
                 >
                   {message(messages, "landing.methodologyLink")}

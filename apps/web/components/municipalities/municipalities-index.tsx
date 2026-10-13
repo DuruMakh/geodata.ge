@@ -129,6 +129,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           <Link
             key={row.id}
             href={pageHref(hrefFor(row.kind, row.id), locale)}
+            prefetch={false}
             data-testid={activePanel ? "municipal-list-row" : undefined}
             data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
             data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}

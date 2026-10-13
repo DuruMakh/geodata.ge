@@ -44,7 +44,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
             <span key={crumb.label}>
               {index > 0 ? <span aria-hidden="true" className="mx-1.5 text-[var(--accent)]">/</span> : null}
               {crumb.href ? (
-                <Link href={pageHref(crumb.href, locale)} className="text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
+                <Link href={pageHref(crumb.href, locale)} prefetch={false} className="text-[var(--muted)] no-underline hover:text-[var(--ink)] hover:underline">
                   {crumb.label}
                 </Link>
               ) : (
@@ -60,6 +60,7 @@ export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
         <nav aria-label={landmark} data-testid="explorer-back-crumb" className="min-[768px]:hidden">
           <Link
             href={pageHref(parent.href, locale)}
+            prefetch={false}
             className="inline-flex min-h-11 items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
           >
             <span aria-hidden="true" className="text-[var(--accent)]">←</span>

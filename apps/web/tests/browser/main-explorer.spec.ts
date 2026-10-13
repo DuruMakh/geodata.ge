@@ -376,6 +376,36 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
   expect(consoleProblems).toEqual([]);
 });
 
+// Next prefetches a <Link> as soon as it enters the viewport (production only), so
+// every sidebar, footer and list row used to pull its page's data in the background.
+test("opening an explorer page fetches no other page's data", async ({ page }) => {
+  const prefetched: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.searchParams.has("_rsc")) prefetched.push(url.pathname);
+  });
+
+  // The municipal index also at phone width, where the whole 64-row list is in the page.
+  for (const [path, width] of [["/explorer/municipalities", 390], ["/explorer/municipalities", 1280], ["/explorer/expenditure", 1280]] as const) {
+    prefetched.length = 0;
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(`${TEST_BASE_URL}${path}`);
+    await expectAppReady(page);
+    // Bring the footer and every list row into view, then let the page sit idle.
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1_000);
+    expect(prefetched, `${path} at ${width}px`).toEqual([]);
+  }
+
+  // Without a prefetch the sidebar still navigates in-app, not by a full reload.
+  await page.evaluate(() => ((window as unknown as { stillHere?: boolean }).stillHere = true));
+  await page.getByTestId("data-sidebar").getByTestId("section-link-revenue").click();
+  await expect(page).toHaveURL(/\/explorer\/revenue$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
+  expect(await page.evaluate(() => (window as unknown as { stillHere?: boolean }).stillHere)).toBe(true);
+});
+
 test("ministries grouping expands nested programs by name only", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 

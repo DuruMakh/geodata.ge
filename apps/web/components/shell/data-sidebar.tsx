@@ -211,6 +211,7 @@ export function DataSidebar() {
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
             href={pageHref("/", locale)}
+            prefetch={false}
             aria-label={message(messages, "common.home")}
             title={message(messages, "common.home")}
             className="mt-auto flex size-[26px] items-center justify-center self-center text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)]"
@@ -234,16 +235,17 @@ export function DataSidebar() {
           </p>
           {/* Every link closes the sheet here, the current page's included: the pathname effect above never fires for it. */}
           <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5" onClick={(event) => { if ((event.target as Element).closest("a")) setSheetOpen(false); }}>
-            <Link href={pageHref("/explorer",locale)} aria-current={pathname.endsWith("/explorer") ? "page" : undefined} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${budgetActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+            <Link href={pageHref("/explorer",locale)} prefetch={false} aria-current={pathname.endsWith("/explorer") ? "page" : undefined} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${budgetActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.budget")}
             </Link>
             {budgetActive ? <SectionNav /> : null}
-            <Link href={pageHref("/explorer/economy",locale)} data-testid="economy-link" aria-current={pathname.endsWith('/economy')?'page':undefined} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${economyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
+            <Link href={pageHref("/explorer/economy",locale)} prefetch={false} data-testid="economy-link" aria-current={pathname.endsWith('/economy')?'page':undefined} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${economyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages,"common.economy")}
             </Link>
             {economyActive ? (
               <Link
                 href={pageHref("/explorer/economy/gdp", locale)}
+                prefetch={false}
                 aria-current={gdpActive ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${gdpActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
               >
@@ -254,6 +256,7 @@ export function DataSidebar() {
             {economyActive ? (
               <Link
                 href={pageHref("/explorer/economy/sectors", locale)}
+                prefetch={false}
                 aria-current={sectorsActive ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${sectorsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
               >
@@ -264,6 +267,7 @@ export function DataSidebar() {
             {economyActive ? (
               <Link
                 href={pageHref("/explorer/economy/regions", locale)}
+                prefetch={false}
                 aria-current={regionsActive ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${regionsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
               >
@@ -273,6 +277,7 @@ export function DataSidebar() {
             ) : null}
             <Link
               href={pageHref("/explorer/inflation", locale)}
+              prefetch={false}
               data-testid="inflation-link"
               aria-current={pathname.endsWith("/explorer/inflation") ? "page" : undefined}
               className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${inflationActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
@@ -282,6 +287,7 @@ export function DataSidebar() {
             {inflationActive ? (
               <Link
                 href={pageHref("/explorer/inflation/overview", locale)}
+                prefetch={false}
                 data-testid="inflation-overview-link"
                 aria-current={inflationOverviewActive ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
@@ -293,6 +299,7 @@ export function DataSidebar() {
             {inflationActive ? (
               <Link
                 href={pageHref("/explorer/inflation/categories", locale)}
+                prefetch={false}
                 data-testid="inflation-categories-link"
                 aria-current={inflationCategoriesActive ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationCategoriesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
@@ -304,6 +311,7 @@ export function DataSidebar() {
             {inflationActive ? (
               <Link
                 href={pageHref("/explorer/inflation/products", locale)}
+                prefetch={false}
                 data-testid="inflation-products-link"
                 aria-current={inflationProductsActive ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationProductsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
@@ -315,6 +323,7 @@ export function DataSidebar() {
             {inflationActive ? (
               <Link
                 href={pageHref("/explorer/inflation/cities", locale)}
+                prefetch={false}
                 data-testid="inflation-cities-link"
                 aria-current={inflationCitiesActive ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationCitiesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
@@ -323,13 +332,13 @@ export function DataSidebar() {
                 {message(messages, "common.inflationCities")}
               </Link>
             ) : null}
-            <Link href={pageHref("/explorer/money", locale)} data-testid="money-link" aria-current={pathname.endsWith("/explorer/money") ? "page" : undefined}
+            <Link href={pageHref("/explorer/money", locale)} prefetch={false} data-testid="money-link" aria-current={pathname.endsWith("/explorer/money") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${moneyBanksActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.moneyBanks")}
             </Link>
             {moneyBanksActive ? MONEY_BANKS_SECTIONS.map(section => {
               const active = pathname.endsWith(section.href);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`money-${section.id}-link`} aria-current={active ? "page" : undefined}
+              return <Link key={section.id} href={pageHref(section.href, locale)} prefetch={false} data-testid={`money-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (active) event.preventDefault();
                 }}
@@ -339,26 +348,26 @@ export function DataSidebar() {
               </Link>;
             }) : null}
 
-            <Link href={pageHref("/explorer/unemployment", locale)} data-testid="unemployment-link" aria-current={pathname.endsWith("/explorer/unemployment") ? "page" : undefined}
+            <Link href={pageHref("/explorer/unemployment", locale)} prefetch={false} data-testid="unemployment-link" aria-current={pathname.endsWith("/explorer/unemployment") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${unemploymentActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.unemployment")}
             </Link>
             {unemploymentActive ? UNEMPLOYMENT_SECTIONS.map(section => {
               const active = pathname.endsWith(section.href) || section.id === "regions" && pathname.includes(`${section.href}/`);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`unemployment-${section.id}-link`} aria-current={active ? "page" : undefined}
+              return <Link key={section.id} href={pageHref(section.href, locale)} prefetch={false} data-testid={`unemployment-${section.id}-link`} aria-current={active ? "page" : undefined}
                 className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
                 <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
                 {message(messages, section.labelKey)}
               </Link>;
             }) : null}
-            <Link href={pageHref("/explorer/wages", locale)} data-testid="wages-link" aria-current={pathname.endsWith("/explorer/wages") ? "page" : undefined}
+            <Link href={pageHref("/explorer/wages", locale)} prefetch={false} data-testid="wages-link" aria-current={pathname.endsWith("/explorer/wages") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${wagesActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.wages")}
             </Link>
             {wagesActive ? WAGES_SECTIONS.map(section => {
               // Regions stays active on its region pages, from which the link still opens the regions index.
               const current = pathname.endsWith(section.href), active = current || pathname.includes(`${section.href}/`);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`wages-${section.id}-link`} aria-current={active ? "page" : undefined}
+              return <Link key={section.id} href={pageHref(section.href, locale)} prefetch={false} data-testid={`wages-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (current) event.preventDefault();
                 }}
@@ -367,14 +376,14 @@ export function DataSidebar() {
                 {message(messages, section.labelKey)}
               </Link>;
             }) : null}
-            <Link href={pageHref(LIVING_STANDARDS_HUB_PATH, locale)} data-testid="living-standards-link" aria-current={pathname.endsWith(LIVING_STANDARDS_HUB_PATH) ? "page" : undefined}
+            <Link href={pageHref(LIVING_STANDARDS_HUB_PATH, locale)} prefetch={false} data-testid="living-standards-link" aria-current={pathname.endsWith(LIVING_STANDARDS_HUB_PATH) ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${livingStandardsActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.livingStandards")}
             </Link>
             {livingStandardsActive ? LIVING_STANDARDS_SECTIONS.map(section => {
               // Income and Spending stay active on their region pages, from which the link still opens the section page.
               const current = pathname.endsWith(section.href), active = current || pathname.includes(`${section.href}/`);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
+              return <Link key={section.id} href={pageHref(section.href, locale)} prefetch={false} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (current) event.preventDefault();
                 }}
@@ -383,11 +392,11 @@ export function DataSidebar() {
                 {message(messages, section.labelKey)}
               </Link>;
             }) : null}
-            <Link href={pageHref("/explorer/trade", locale)} data-testid="trade-link" aria-current={pathname.endsWith("/explorer/trade") ? "page" : undefined}
+            <Link href={pageHref("/explorer/trade", locale)} prefetch={false} data-testid="trade-link" aria-current={pathname.endsWith("/explorer/trade") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${tradeActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.trade")}
             </Link>
-            {tradeActive ? <Link href={pageHref("/explorer/trade/overview", locale)} data-testid="trade-overview-link" aria-current={tradeOverviewActive ? "page" : undefined}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/overview", locale)} prefetch={false} data-testid="trade-overview-link" aria-current={tradeOverviewActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (tradeOverviewActive) event.preventDefault();
               }}
@@ -395,7 +404,7 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeOverview")}
             </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/partners", locale)} data-testid="trade-partners-link" aria-current={tradePartnersActive ? "page" : undefined}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/partners", locale)} prefetch={false} data-testid="trade-partners-link" aria-current={tradePartnersActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (tradePartnersActive) event.preventDefault();
               }}
@@ -403,7 +412,7 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradePartnersActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradePartners")}
             </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/products", locale)} data-testid="trade-products-link" aria-current={tradeProductsActive ? "page" : undefined}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/products", locale)} prefetch={false} data-testid="trade-products-link" aria-current={tradeProductsActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (tradeProductsActive) event.preventDefault();
               }}
@@ -411,23 +420,23 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeProducts")}
             </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/domestic-exports", locale)} data-testid="trade-domestic-link" aria-current={tradeDomesticActive ? "page" : undefined}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/domestic-exports", locale)} prefetch={false} data-testid="trade-domestic-link" aria-current={tradeDomesticActive ? "page" : undefined}
               onNavigate={(event) => { if (tradeDomesticActive) event.preventDefault(); }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeDomesticActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeDomesticActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeDomestic")}
             </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/services", locale)} data-testid="trade-services-link" aria-current={tradeServicesActive ? "page" : undefined}
+            {tradeActive ? <Link href={pageHref("/explorer/trade/services", locale)} prefetch={false} data-testid="trade-services-link" aria-current={tradeServicesActive ? "page" : undefined}
               onNavigate={(event) => { if (tradeServicesActive) event.preventDefault(); }}
               className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeServicesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeServicesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.tradeServices")}
             </Link> : null}
-            <Link href={pageHref("/explorer/external", locale)} data-testid="external-link" aria-current={pathname.endsWith("/explorer/external") ? "page" : undefined}
+            <Link href={pageHref("/explorer/external", locale)} prefetch={false} data-testid="external-link" aria-current={pathname.endsWith("/explorer/external") ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${externalActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.external")}
             </Link>
-            {externalActive ? <Link href={pageHref("/explorer/external/money-from-abroad", locale)} data-testid="money-from-abroad-link" aria-current={moneyFromAbroadActive ? "page" : undefined}
+            {externalActive ? <Link href={pageHref("/explorer/external/money-from-abroad", locale)} prefetch={false} data-testid="money-from-abroad-link" aria-current={moneyFromAbroadActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (moneyFromAbroadActive) event.preventDefault();
               }}
@@ -435,7 +444,7 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${moneyFromAbroadActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.moneyFromAbroad")}
             </Link> : null}
-            {externalActive ? <Link href={pageHref("/explorer/external/foreign-investment", locale)} data-testid="foreign-investment-link" aria-current={foreignInvestmentActive ? "page" : undefined}
+            {externalActive ? <Link href={pageHref("/explorer/external/foreign-investment", locale)} prefetch={false} data-testid="foreign-investment-link" aria-current={foreignInvestmentActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (foreignInvestmentActive) event.preventDefault();
               }}
@@ -443,7 +452,7 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${foreignInvestmentActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.foreignInvestment")}
             </Link> : null}
-            {externalActive ? <Link href={pageHref("/explorer/external/current-account", locale)} data-testid="current-account-link" aria-current={currentAccountActive ? "page" : undefined}
+            {externalActive ? <Link href={pageHref("/explorer/external/current-account", locale)} prefetch={false} data-testid="current-account-link" aria-current={currentAccountActive ? "page" : undefined}
               onNavigate={(event) => {
                 if (currentAccountActive) event.preventDefault();
               }}
@@ -451,13 +460,13 @@ export function DataSidebar() {
               <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${currentAccountActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
               {message(messages, "common.currentAccount")}
             </Link> : null}
-            <Link href={pageHref(ENERGY_FOOD_HUB_PATH, locale)} data-testid="energy-food-link" aria-current={pathname.endsWith(ENERGY_FOOD_HUB_PATH) ? "page" : undefined}
+            <Link href={pageHref(ENERGY_FOOD_HUB_PATH, locale)} prefetch={false} data-testid="energy-food-link" aria-current={pathname.endsWith(ENERGY_FOOD_HUB_PATH) ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${energyFoodActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
               {message(messages, "common.energyFood")}
             </Link>
             {energyFoodActive ? ENERGY_FOOD_SECTIONS.map(section => {
               const active = pathname.endsWith(section.href);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`energy-food-${section.id}-link`} aria-current={active ? "page" : undefined}
+              return <Link key={section.id} href={pageHref(section.href, locale)} prefetch={false} data-testid={`energy-food-${section.id}-link`} aria-current={active ? "page" : undefined}
                 onNavigate={(event) => {
                   if (active) event.preventDefault();
                 }}
@@ -468,6 +477,7 @@ export function DataSidebar() {
             }) : null}
             <Link
               href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}
+              prefetch={false}
               data-testid="demography-link"
               aria-current={pathname.endsWith(DEMOGRAPHY_HUB_PATH) ? "page" : undefined}
               className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${demographyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
@@ -482,6 +492,7 @@ export function DataSidebar() {
                     <Link
                       key={page.id}
                       href={pageHref(page.path, locale)}
+                      prefetch={false}
                       data-testid={`demography-${page.id}-link`}
                       aria-current={active ? "page" : undefined}
                       className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
@@ -512,7 +523,7 @@ export function DataSidebar() {
           </nav>
           <div className="mt-auto border-t border-[rgba(247,242,233,0.12)] pt-3">
             <div className="mb-2 text-[var(--ink-fg-muted)] max-[900px]:mb-0 max-[900px]:[&_a]:min-h-11"><LanguageSwitch /></div>
-            <Link href={pageHref("/", locale)} data-testid="sidebar-back-home" className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)] max-[900px]:flex max-[900px]:min-h-11 max-[900px]:w-full max-[900px]:items-center max-[900px]:px-2.5 max-[900px]:text-[12.5px]">
+            <Link href={pageHref("/", locale)} prefetch={false} data-testid="sidebar-back-home" className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)] max-[900px]:flex max-[900px]:min-h-11 max-[900px]:w-full max-[900px]:items-center max-[900px]:px-2.5 max-[900px]:text-[12.5px]">
               {message(messages, "common.backHome")}
             </Link>
           </div>
