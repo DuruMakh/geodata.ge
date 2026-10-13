@@ -6,6 +6,8 @@ import {
   keywordsFor,
   measurementTechniqueFor,
   type SeoDatasetId,
+  type SourceAgencyId,
+  sourceAgenciesFor,
   variableMeasuredFor,
 } from "./datasetVocabulary";
 import { seoMessage } from "./strings";
@@ -15,7 +17,7 @@ export type BreadcrumbItem = {
   path: `/${string}` | "/";
 };
 
-export type DatasetJsonLdInput = {
+export type DatasetJsonLdInput = SourceCreditInput & {
   locale: Locale;
   origin: string;
   path: `/methodology/${string}` | `/en/methodology/${string}`;
@@ -33,7 +35,17 @@ export type DatasetJsonLdInput = {
   jsonDownloadPaths?: readonly `/downloads/data/${string}.json`[];
 };
 
-export type ExplorerDatasetJsonLdInput = {
+/** Fiscal.ge is the creator of every dataset it compiles; the official producers it reads from are credited here. */
+type SourceCreditInput = {
+  /** The official producers this page's figures come from, when they differ from its dataset's (`TOPIC_DATASETS`). */
+  sources?: readonly SourceAgencyId[];
+  /** Also name the producers as `provider`, for a page that has always credited them that way. */
+  creditSourcesAsProvider?: boolean;
+  /** The source files the figures were read from, listed after the producers. */
+  isBasedOn?: readonly string[];
+};
+
+export type ExplorerDatasetJsonLdInput = SourceCreditInput & {
   locale: Locale;
   origin: string;
   path: `/${string}`;
@@ -70,8 +82,6 @@ export type ExplorerDatasetJsonLdInput = {
    * instead; a topic dataset (`TopicDatasetId`) names its series here or claims none.
    */
   variableMeasured?: readonly string[];
-  /** The source files the figures were read from. */
-  isBasedOn?: readonly string[];
 };
 
 function absoluteUrl(origin: string, path: string): string {
@@ -128,6 +138,16 @@ function datasetVocabulary(
     ...(variableMeasured ? { variableMeasured } : {}),
     measurementTechnique: measurementTechniqueFor(datasetId, locale),
     isAccessibleForFree: true,
+  };
+}
+
+/** `isBasedOn` (and `provider` where asked) naming the official producers, then any source files. */
+function sourceCredit(datasetId: SeoDatasetId, locale: Locale, input: SourceCreditInput) {
+  const agencies = sourceAgenciesFor(datasetId, locale, input.sources);
+  const isBasedOn = [...agencies, ...(input.isBasedOn ?? [])];
+  return {
+    ...(isBasedOn.length > 0 ? { isBasedOn } : {}),
+    ...(input.creditSourcesAsProvider && agencies.length > 0 ? { provider: agencies.length === 1 ? agencies[0] : agencies } : {}),
   };
 }
 
@@ -233,6 +253,7 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
     includedInDataCatalog: catalogReference(input.origin, input.locale),
     license: "https://creativecommons.org/licenses/by/4.0/",
     ...datasetVocabulary(input.datasetId, input.locale, input.omitMeasures),
+    ...sourceCredit(input.datasetId, input.locale, input),
     ...(input.downloadPath === null ? {} : {
       distribution: [
         {
@@ -295,7 +316,7 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
     publisher: { "@id": `${input.origin}/#organization` },
     license: "https://creativecommons.org/licenses/by/4.0/",
     ...datasetVocabulary(input.datasetId, input.locale, input.omitMeasures, input.variableMeasured),
-    ...(input.isBasedOn ? { isBasedOn: input.isBasedOn } : {}),
+    ...sourceCredit(input.datasetId, input.locale, input),
     ...(input.sameAsPath
       ? { sameAs: localizedUrl(input.origin, input.sameAsPath, input.locale) }
       : {}),

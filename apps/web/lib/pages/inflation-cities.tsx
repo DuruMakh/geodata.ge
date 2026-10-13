@@ -82,7 +82,7 @@ async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactI
   return (
     <I18nProvider {...clientPresentation(presentation)}>
       <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-        locale, origin: resolveSiteUrl(), datasetId: "inflation", firstYear: periods[0], lastYear: periods.at(-1)!, dateModified: lastReviewedAt,
+        locale, origin: resolveSiteUrl(), datasetId: "inflation", sources: ["geostat"], firstYear: periods[0], lastYear: periods.at(-1)!, dateModified: lastReviewedAt,
         variableMeasured: [t("inflation.tab.yoy"), t("inflation.annualAverage")],
         // A city page is a slice of the cities dataset, whose file is the cities CSV.
         ...(view.kind === "city"

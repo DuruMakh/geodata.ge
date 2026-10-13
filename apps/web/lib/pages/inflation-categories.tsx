@@ -58,7 +58,7 @@ export async function renderInflationCategories(locale: Locale) {
       <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
         locale, origin: resolveSiteUrl(), path: CATEGORIES_PATH, datasetId: "inflation",
         name: `${t("common.inflation")}: ${t("inflation.categoriesHeading")}`, description: t("inflation.categoriesDescription"),
-        firstYear: periods[0], lastYear: periods.at(-1)!, dateModified: lastReviewedAt, downloadPath: "/downloads/data/inflation-categories.csv",
+        firstYear: periods[0], lastYear: periods.at(-1)!, dateModified: lastReviewedAt, downloadPath: "/downloads/data/inflation-categories.csv", sources: ["geostat"],
         variableMeasured: [t("inflation.categoryTab.yoy"), t("inflation.categoryTab.mom"), t("inflation.categoryTab.contrib"), t("inflation.weightColumn")],
       })} />
       <BreadcrumbJsonLd

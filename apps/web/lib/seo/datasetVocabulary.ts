@@ -23,6 +23,7 @@ import type { InflationMeasure } from "../factQuery/inflationSeries";
 import type { ProductQueryMeasure } from "../factQuery/inflationProductSeries";
 import type { DatasetId, Measure } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
+import type { MethodologyDatasetId } from "../methodology/types";
 
 /**
  * Every published dataset except `ministries`, which has no page of its own,
@@ -36,8 +37,24 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  * `variableMeasured` comes from the page (`explorerDatasetJsonLd`), which knows its series' labels.
  */
 export type TopicDatasetId =
-  | "inflation" | "inflation-products" | "trade" | "external" | "money" | "unemployment" | "wages" | "poverty"
-  | "household" | "energy-food";
+  | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
+  | "inflation-products";
+
+/** An official statistics producer whose published figures a dataset is read from. */
+export type SourceAgencyId = "geostat" | "nbg";
+
+const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> = {
+  geostat: {
+    name: { ka: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)", en: "National Statistics Office of Georgia (Geostat)" },
+    url: "https://www.geostat.ge",
+  },
+  nbg: {
+    name: { ka: "საქართველოს ეროვნული ბანკი", en: "National Bank of Georgia" },
+    url: "https://nbg.gov.ge",
+  },
+};
+
+export type SourceAgencyJsonLd = { "@type": "Organization"; name: string; url: string };
 
 /** Every dataset a page can render Dataset JSON-LD for. */
 export type SeoDatasetId = FiscalDatasetId | TopicDatasetId;
@@ -219,7 +236,11 @@ export const DATASETS: Record<
   },
 };
 
-const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly string[]>; measurementTechnique: Localized }> = {
+/**
+ * `sources` credits the official producers a topic's figures are read from; a page whose figures come from a
+ * different set (a % of GDP view, one external-flows page) names its own.
+ */
+const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly string[]>; measurementTechnique: Localized; sources: readonly SourceAgencyId[] }> = {
   inflation: {
     keywords: {
       ka: ["ინფლაცია", "სამომხმარებლო ფასების ინდექსი", "საქართველო"],
@@ -229,6 +250,8 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქსტატის ყოველთვიური სამომხმარებლო ფასების ინდექსის ოფიციალური გამოქვეყნებული ფაილებიდან.",
       en: "Reviewed extraction from Geostat's official published monthly consumer price index files.",
     },
+    // Geostat's CPI and the National Bank of Georgia's inflation target.
+    sources: ["geostat", "nbg"],
   },
   "inflation-products": {
     keywords: {
@@ -239,6 +262,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "წლიური ცვლილება არის საქსტატის წინა წლის იმავე თვესთან შედარებული ინდექსი გამოკლებული 100. დაგროვილ ცვლილებას Fiscal.ge ითვლის თითოეული გამოქვეყნებული თვიური ინდექსის გამრავლებით არჩეული საწყისი წლის წინა დეკემბრიდან; გამოტოვებული თვე სრულ პერიოდს მიუწვდომელს ხდის.",
       en: "Annual change is Geostat's same-month-of-prior-year index minus 100. Cumulative change is compounded by Fiscal.ge from every published previous-month index since December before the selected first year; missing months leave the full span unavailable.",
     },
+    sources: ["geostat"],
   },
   trade: {
     keywords: {
@@ -249,8 +273,9 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქსტატის საგარეო ვაჭრობის ოფიციალური გამოქვეყნებული მონაცემებიდან.",
       en: "Reviewed extraction from Geostat's official published external trade data.",
     },
+    sources: ["geostat"],
   },
-  external: {
+  "external-flows": {
     keywords: {
       ka: ["ფულადი გზავნილები", "პირდაპირი უცხოური ინვესტიციები", "მიმდინარე ანგარიში", "საქართველო"],
       en: ["Georgia", "money transfers", "foreign direct investment", "current account"],
@@ -259,6 +284,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქართველოს ეროვნული ბანკისა და საქსტატის ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
       en: "Reviewed extraction from the official published statistics of the National Bank of Georgia and Geostat.",
     },
+    sources: ["nbg", "geostat"],
   },
   money: {
     keywords: {
@@ -269,6 +295,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქართველოს ეროვნული ბანკის ოფიციალური გამოქვეყნებული მონეტარული და საფინანსო სტატისტიკიდან.",
       en: "Reviewed extraction from the National Bank of Georgia's official published monetary and financial statistics.",
     },
+    sources: ["nbg"],
   },
   unemployment: {
     keywords: {
@@ -279,6 +306,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქსტატის სამუშაო ძალის გამოკვლევის ოფიციალური გამოქვეყნებული შედეგებიდან.",
       en: "Reviewed extraction from the official published results of Geostat's Labour Force Survey.",
     },
+    sources: ["geostat"],
   },
   wages: {
     keywords: {
@@ -289,6 +317,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქსტატის ხელფასების ოფიციალური გამოქვეყნებული წლიური სტატისტიკიდან.",
       en: "Reviewed extraction from Geostat's official published annual earnings statistics.",
     },
+    sources: ["geostat"],
   },
   poverty: {
     keywords: {
@@ -299,8 +328,9 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქსტატის სიღარიბისა და უთანასწორობის ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
       en: "Reviewed extraction from Geostat's official published poverty and inequality statistics.",
     },
+    sources: ["geostat"],
   },
-  household: {
+  "household-income": {
     keywords: {
       ka: ["შინამეურნეობები", "შემოსავლები", "ხარჯები", "საქართველო"],
       en: ["Georgia", "household income", "household spending"],
@@ -309,6 +339,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქსტატის შინამეურნეობების შემოსავლებისა და ხარჯების ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
       en: "Reviewed extraction from Geostat's official published household income and spending statistics.",
     },
+    sources: ["geostat"],
   },
   "energy-food": {
     keywords: {
@@ -319,8 +350,14 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება საქსტატის ოფიციალური გამოქვეყნებული ენერგეტიკული ბალანსებიდან და სასურსათო ბალანსებიდან.",
       en: "Reviewed extraction from Geostat's official published energy balances and food balance sheets.",
     },
+    sources: ["geostat"],
   },
 };
+
+/** A dataset whose figures are official statistics Fiscal.ge reads from a named producer (`sourceAgenciesFor`). */
+export function isTopicDatasetId(id: string): id is TopicDatasetId {
+  return id in TOPIC_DATASETS;
+}
 
 export function isFiscalDatasetId(datasetId: SeoDatasetId): datasetId is FiscalDatasetId {
   return datasetId in DATASETS;
@@ -357,6 +394,12 @@ export function variableMeasuredFor(
 
 export function keywordsFor(datasetId: SeoDatasetId, locale: Locale): readonly string[] {
   return (isFiscalDatasetId(datasetId) ? DATASETS[datasetId] : TOPIC_DATASETS[datasetId]).keywords[locale];
+}
+
+/** The official producers a dataset's figures are read from, as schema.org Organizations; none for the fiscal datasets. */
+export function sourceAgenciesFor(datasetId: SeoDatasetId, locale: Locale, override?: readonly SourceAgencyId[]): readonly SourceAgencyJsonLd[] {
+  const ids = override ?? (isFiscalDatasetId(datasetId) ? [] : TOPIC_DATASETS[datasetId].sources);
+  return ids.map((id) => ({ "@type": "Organization", name: SOURCE_AGENCIES[id].name[locale], url: SOURCE_AGENCIES[id].url }));
 }
 
 export function measurementTechniqueFor(datasetId: SeoDatasetId, locale: Locale): string {

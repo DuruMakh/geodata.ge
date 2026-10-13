@@ -70,7 +70,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ label: sectionTitle, href: pageHref(sectionHref, locale) }] : []), { label: regionId ? regionName : title }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-      locale, origin, path: href, datasetId: "household", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      locale, origin, path: href, datasetId: "household-income", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
       // An area page is a slice of its section's dataset.
       ...(regionId ? { spatialCoverageName: regionName, withinGeorgia: regionId !== "georgia", partOf: { path: sectionHref, name: sectionTitle, description: t(`page.${section}.summary`) } } : {}),
       variableMeasured: Object.values(labels),

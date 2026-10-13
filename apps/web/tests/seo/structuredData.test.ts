@@ -5,7 +5,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { JsonLd } from "../../components/seo/json-ld";
 import { DEMOGRAPHY_HUB_PATH } from "../../lib/explorer/demographyRoutes";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
-import { NAV_TREE } from "../../lib/navigation/navTree";
+import { NAV_TREE, openHub } from "../../lib/navigation/navTree";
+import { isTopicDatasetId } from "../../lib/seo/datasetVocabulary";
 import sitemap from "../../lib/seo/sitemap";
 import {
   breadcrumbJsonLd,
@@ -640,6 +641,37 @@ describe("Dataset nodes per language and without a bulk file", () => {
   });
 });
 
+describe("Dataset nodes credit the official producer beside Fiscal.ge", () => {
+  const base = {
+    locale: "en" as const, origin: "https://fiscal.ge", name: "Money supply",
+    description: "Georgia's money supply, loans, deposits and interest rates from the National Bank of Georgia.",
+    firstYear: 2000, lastYear: 2025, dateModified: "2026-10-01",
+  };
+  const geostat = { "@type": "Organization", name: "National Statistics Office of Georgia (Geostat)", url: "https://www.geostat.ge" };
+  const nbg = { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" };
+
+  it("names the topic's producer, or the page's own when it differs, and keeps Fiscal.ge the creator", () => {
+    const money = explorerDatasetJsonLd({ ...base, path: "/explorer/money/supply", datasetId: "money" });
+    expect(money).toMatchObject({ creator: { "@id": "https://fiscal.ge/#organization" }, isBasedOn: [nbg] });
+    expect(money).not.toHaveProperty("provider");
+    expect(explorerDatasetJsonLd({ ...base, path: "/explorer/money/supply", datasetId: "money", sources: ["nbg", "geostat"] })).toMatchObject({ isBasedOn: [nbg, geostat] });
+    expect(datasetJsonLd({ ...base, path: "/en/methodology/trade", datasetId: "trade", downloadPath: null })).toMatchObject({ isBasedOn: [geostat] });
+    const ka = explorerDatasetJsonLd({ ...base, locale: "ka", path: "/explorer/trade/overview", datasetId: "trade" });
+    expect(ka).toMatchObject({ isBasedOn: [{ name: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)" }] });
+  });
+
+  it("lists source files after the producer and names it as provider where the page always has", () => {
+    expect(explorerDatasetJsonLd({
+      ...base, path: "/explorer/inflation/products", datasetId: "inflation-products", creditSourcesAsProvider: true,
+      isBasedOn: ["https://fiscal.ge/downloads/methodology/inflation/files/products-yoy.xlsx"],
+    })).toMatchObject({ provider: geostat, isBasedOn: [geostat, "https://fiscal.ge/downloads/methodology/inflation/files/products-yoy.xlsx"] });
+  });
+
+  it("leaves the budget datasets, which name no statistics producer, as they were", () => {
+    expect(explorerDatasetJsonLd({ ...base, path: "/explorer/debt", datasetId: "government-debt" })).not.toHaveProperty("isBasedOn");
+  });
+});
+
 describe("Dataset nodes across the sitemap", () => {
   beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
   afterAll(() => vi.unstubAllEnvs());
@@ -649,19 +681,35 @@ describe("Dataset nodes across the sitemap", () => {
   const hubs = new Set<string>(NAV_TREE.map((hub) => hub.href));
   const carriesDataset = (page: string) =>
     (page.startsWith("/explorer/") || page.startsWith("/methodology/")) && !hubs.has(page) &&
-    page !== "/methodology/demography" && page !== "/explorer/analysis";
+    !page.startsWith(`${DEMOGRAPHY_HUB_PATH}/`) && page !== "/methodology/demography" && page !== "/explorer/analysis";
+  // Official statistics read from Geostat or the NBG: every page outside the Budget and Economy hubs, and the
+  // methodology article of each such dataset. Those name their producer beside Fiscal.ge, the creator.
+  const creditsSource = (page: string) =>
+    page.startsWith("/methodology/") ? isTopicDatasetId(page.slice("/methodology/".length)) : !["/explorer", "/explorer/economy"].includes(openHub(page).href);
 
   it("every explorer page's Dataset has license, creator and a per-language @id", async () => {
     const routes = appRoutes();
     const pathnames = (await sitemap()).map((entry) => new URL(entry.url).pathname);
     expect(new Set(pathnames.map((pathname) => splitLanguagePath(pathname).locale))).toEqual(new Set(["ka", "en"]));
-    let checked = 0;
-    for (const pathname of pathnames) {
-      const { locale, pathname: page } = splitLanguagePath(pathname);
-      // Demography's 150 place pages are most of this test's render time, and its own page tests already assert that
-      // no demography page carries a Dataset; the site pages are not explorer pages.
-      if (page.startsWith(`${DEMOGRAPHY_HUB_PATH}/`) || !(page.startsWith("/explorer") || page.startsWith("/methodology"))) continue;
+    // Every sitemap URL must resolve to a route file. An explorer or methodology page is rendered when its route is static or a methodology
+    // article; a dynamic route file (one per locale) is rendered for its first sitemap URL only, as the others share
+    // its code. Every route family keeps a rendered page in both languages.
+    const sampledFiles = new Set<string>();
+    const rendered = pathnames.flatMap((pathname) => {
       const route = routeFor(routes, pathname);
+      // The site pages (home, about, connect) are not explorer or methodology pages and carry no Dataset.
+      if (!/^(\/en)?\/(explorer|methodology)(\/|$)/.test(pathname)) return [];
+      const dynamic = Object.keys(route.params).length > 0 && !route.file.includes(`${path.sep}methodology${path.sep}`);
+      if (dynamic && sampledFiles.has(route.file)) return [];
+      sampledFiles.add(route.file);
+      return [{ pathname, route }];
+    });
+    expect(new Set(rendered.map(({ route }) => route.file)).size).toBe(
+      new Set(pathnames.filter((pathname) => /^(\/en)?\/(explorer|methodology)(\/|$)/.test(pathname)).map((pathname) => routeFor(routes, pathname).file)).size,
+    );
+    let checked = 0;
+    for (const { pathname, route } of rendered) {
+      const { locale, pathname: page } = splitLanguagePath(pathname);
       const pageModule = (await import(route.file)) as { default: (props: { params: Promise<Record<string, string>> }) => Promise<ReactNode> };
       const datasets = jsonLdNodes(await pageModule.default({ params: Promise.resolve(route.params) })).filter((node) => node["@type"] === "Dataset");
       expect(datasets, pathname).toHaveLength(carriesDataset(page) ? 1 : 0);
@@ -671,7 +719,13 @@ describe("Dataset nodes across the sitemap", () => {
         // An explorer page carries other content beside its Dataset, so its node takes a fragment.
         expect(dataset["@id"], pathname).toBe(page.startsWith("/explorer/") ? `${url}#dataset` : url);
         expect(dataset.license, pathname).toBe("https://creativecommons.org/licenses/by/4.0/");
+        // Fiscal.ge compiles the dataset; the official producer it reads from is credited beside it.
         expect(dataset.creator, pathname).toEqual({ "@id": "https://fiscal.ge/#organization" });
+        if (creditsSource(page)) {
+          const producers = ((dataset.isBasedOn as unknown[] | undefined) ?? []).filter((source) => (source as { "@type"?: string })["@type"] === "Organization");
+          expect(producers.length, `${pathname} credits its source`).toBeGreaterThan(0);
+          for (const producer of producers) expect(producer, pathname).toEqual({ "@type": "Organization", name: expect.any(String), url: expect.stringMatching(/^https:\/\/(www\.geostat\.ge|nbg\.gov\.ge)$/) });
+        }
         expect(String(dataset.description).length, pathname).toBeGreaterThanOrEqual(50);
         // Every node it points at is the same language's: its parent, its subsets and the catalog.
         const related = [dataset.isPartOf, dataset.includedInDataCatalog, ...((dataset.hasPart as unknown[] | undefined) ?? [])]
@@ -682,6 +736,10 @@ describe("Dataset nodes across the sitemap", () => {
         checked += 1;
       }
     }
-    expect(checked).toBeGreaterThan(300);
-  }, 600_000);
+    // Poverty and inequality (U20-14) are static routes, so both are rendered in both languages.
+    for (const page of ["/explorer/living-standards/poverty", "/explorer/living-standards/inequality"]) {
+      for (const locale of ["ka", "en"] as const) expect(rendered.map(({ pathname }) => pathname)).toContain(pageHref(page, locale));
+    }
+    expect(checked).toBeGreaterThan(80);
+  }, 300_000);
 });

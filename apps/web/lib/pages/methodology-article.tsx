@@ -54,10 +54,10 @@ const DATASET_SCHEMA_IDS = {
   inflation: "inflation",
   unemployment: "unemployment",
   trade: "trade",
-  "external-flows": "external",
+  "external-flows": "external-flows",
   wages: "wages",
   poverty: "poverty",
-  "household-income": "household",
+  "household-income": "household-income",
   "energy-food": "energy-food",
   money: "money",
 } as const;

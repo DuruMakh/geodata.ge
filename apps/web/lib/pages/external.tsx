@@ -65,8 +65,8 @@ export async function renderMoneyFromAbroadPage(locale: Locale) {
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("money.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-      locale, origin, path: "/explorer/external/money-from-abroad", datasetId: "external", name: t("money.title"), description: t("money.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
-      variableMeasured: [t("measure.received"), t("measure.sent")],
+      locale, origin, path: "/explorer/external/money-from-abroad", datasetId: "external-flows", name: t("money.title"), description: t("money.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      variableMeasured: [t("measure.received"), t("measure.sent")], sources: ["nbg"],
     })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("money.title"), path: pageHref("/explorer/external/money-from-abroad", locale) }]} />
     <ExplorerPage containerQueries={false}>
@@ -97,9 +97,9 @@ export async function renderForeignInvestmentPage(locale: Locale) {
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("investment.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-      locale, origin, path: "/explorer/external/foreign-investment", datasetId: "external", name: t("investment.title"), description: t("investment.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      locale, origin, path: "/explorer/external/foreign-investment", datasetId: "external-flows", name: t("investment.title"), description: t("investment.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       // The page's measures are the investment itself and each item's share of the year's total; country, sector and region are its breakdowns.
-      variableMeasured: [publicLabel(locale, total.id, total.labelKa, presentation.englishLabels), t("investment.share")],
+      variableMeasured: [publicLabel(locale, total.id, total.labelKa, presentation.englishLabels), t("investment.share")], sources: ["geostat"],
     })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("investment.title"), path: pageHref("/explorer/external/foreign-investment", locale) }]} />
     <ExplorerPage containerQueries={false}>
@@ -131,8 +131,10 @@ export async function renderCurrentAccountPage(locale: Locale) {
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("account.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-      locale, origin, path: "/explorer/external/current-account", datasetId: "external", name: t("account.title"), description: t("account.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      locale, origin, path: "/explorer/external/current-account", datasetId: "external-flows", name: t("account.title"), description: t("account.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: CURRENT_ACCOUNT_SERIES.map(id => t(`account.series.${id}`)),
+      // The NBG's balance of payments; the % of GDP view divides by Geostat's GDP.
+      sources: ["nbg", "geostat"],
     })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("account.title"), path: pageHref("/explorer/external/current-account", locale) }]} />
     <ExplorerPage containerQueries={false}>

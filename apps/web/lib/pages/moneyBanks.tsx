@@ -63,6 +63,8 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "money", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
       variableMeasured: sectionSeriesIds(section).map(id => labels[id]),
+      // The NBG's statistics; a % of GDP view divides by Geostat's GDP.
+      ...(gdp ? { sources: ["nbg", "geostat"] as const } : {}),
     })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/money", locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
