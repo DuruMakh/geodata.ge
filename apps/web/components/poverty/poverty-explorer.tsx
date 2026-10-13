@@ -101,7 +101,7 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
           <RangeStrip years={povertyCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildPovertyModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "international" ? "sourceNoteInternational" : "sourceNote")} · {unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
-          <Link href={pageHref("/methodology/poverty", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+          <Link href={pageHref("/methodology/poverty", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}>

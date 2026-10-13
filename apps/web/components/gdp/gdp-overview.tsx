@@ -281,6 +281,7 @@ export function GdpOverview({
         </SourceNote>
         <Link
           href={pageHref("/methodology/gdp", locale)}
+          prefetch={false}
           className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4"
         >
           {t("methodology")}

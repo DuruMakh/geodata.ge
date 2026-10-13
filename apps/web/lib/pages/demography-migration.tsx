@@ -54,7 +54,7 @@ export async function renderDemographyMigrationPage(locale: Locale) {
   const sourceNote = (
     <>
       {t("migrationSource", { start: first, end: last })}{" "}
-      <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
+      <Link href={pageHref("/methodology/demography", locale)} prefetch={false} className="underline underline-offset-2">
         {message(messages, "common.methodology")}
       </Link>.
     </>

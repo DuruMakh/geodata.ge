@@ -238,6 +238,7 @@ export function PopulationPlaceExplorer({
             />
             <Link
               href={pageHref(backHref, locale)}
+              prefetch={false}
               data-testid="population-back-link"
               className="mt-1.5 flex min-h-11 items-center text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
             >

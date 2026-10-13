@@ -119,7 +119,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")}
           {state.view === "gdp" ? <> · {message(messages, "main.gdpSource")}{preliminaryGdpYears.length ? ` ${message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") })}` : null}</> : null}
           {" · "}{unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
-          <Link href={pageHref("/methodology/money", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+          <Link href={pageHref("/methodology/money", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}>

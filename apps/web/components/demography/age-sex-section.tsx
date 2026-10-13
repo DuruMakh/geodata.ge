@@ -106,6 +106,7 @@ export function AgeSexSection({
       </div>
       <Link
         href={pageHref(nationalHref, locale)}
+        prefetch={false}
         data-testid="age-sex-national-link"
         className="mt-6 flex min-h-11 items-center text-[13px] text-[var(--ink)] underline underline-offset-2"
       >

@@ -104,7 +104,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
           ) : (
             <div className="mt-1.5 max-h-[620px] overflow-y-auto">
               {lead ? (linkFor ? (
-                <Link href={pageHref(linkFor(lead.id), locale)} data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
+                <Link href={pageHref(linkFor(lead.id), locale)} prefetch={false} data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
                   <span aria-hidden />
                   <span className="min-w-0 text-[12.5px] font-medium">{lead.label}</span>
                   <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(lead.value)}</span>
@@ -139,6 +139,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
                   <Link
                     key={region.regionId}
                     href={pageHref(linkFor(region.regionId), locale)}
+                    prefetch={false}
                     {...rowProps}
                     onFocus={() => setFocusActive(region.regionId)}
                     onBlur={() => setFocusActive(null)}

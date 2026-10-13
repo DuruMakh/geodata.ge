@@ -12,12 +12,14 @@ const linkClass = "flex min-h-11 min-w-0 items-center font-[family-name:var(--fo
  */
 export function EntityNeighbourLinks({ testId, previous, next, className = "", plainAnchors = false }: { testId: string; previous: Neighbour; next: Neighbour; className?: string; plainAnchors?: boolean }) {
   const Anchor = plainAnchors ? "a" : Link;
+  // `prefetch` is a Link prop; a plain <a> must not receive it.
+  const linkProps = plainAnchors ? {} : { prefetch: false };
   return (
     <span data-testid={testId} className={`grid w-full min-w-0 grid-cols-2 items-center gap-4 min-[768px]:flex min-[768px]:w-auto min-[768px]:max-w-[40%] min-[768px]:shrink ${className}`}>
-      <Anchor href={previous.href} className={linkClass}>
+      <Anchor href={previous.href} {...linkProps} className={linkClass}>
         <span className="min-w-0 truncate">← {previous.label}</span>
       </Anchor>
-      <Anchor href={next.href} className={`${linkClass} justify-end text-right`}>
+      <Anchor href={next.href} {...linkProps} className={`${linkClass} justify-end text-right`}>
         <span className="min-w-0 truncate">{next.label} →</span>
       </Anchor>
     </span>

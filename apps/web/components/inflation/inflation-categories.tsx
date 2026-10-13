@@ -268,6 +268,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
             ) : null}
             <Link
               href={pageHref("/methodology/inflation", locale)}
+              prefetch={false}
               className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4"
             >
               {t("methodology")}

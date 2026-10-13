@@ -176,6 +176,7 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
         {linkFor && previewRegion ? (
           <Link
             href={hrefFor(previewRegion.regionId)}
+            prefetch={false}
             data-testid="map-touch-preview"
             className="mt-2 flex min-h-11 items-center justify-between gap-3 border-t border-[var(--hairline-soft)] text-[13px] text-[var(--ink)]"
           >

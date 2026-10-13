@@ -302,6 +302,7 @@ export function MunicipalityMap({
         {previewTarget ? (
           <Link
             href={pageHref((hrefForCode ?? municipalityHrefForCode)(previewTarget.code), locale)}
+            prefetch={false}
             data-testid="map-touch-preview"
             className="mt-2 flex min-h-11 items-center justify-between gap-3 border-t border-[var(--hairline-soft)] text-[13px] text-[var(--ink)]"
           >

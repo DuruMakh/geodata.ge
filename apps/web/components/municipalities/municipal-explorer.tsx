@@ -383,6 +383,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
 
             <Link
               href={pageHref("/explorer/municipalities", locale)}
+              prefetch={false}
               className="mt-1.5 flex min-h-11 items-center text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
             >
               {message(messages, "municipal.allMunicipalities")}

@@ -71,7 +71,7 @@ export function AgeSexExplorer({
   const source = (
     <>
       {t("annualSource", { first, last })}{" "}
-      <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
+      <Link href={pageHref("/methodology/demography", locale)} prefetch={false} className="underline underline-offset-2">
         {message(messages, "common.methodology")}
       </Link>
       .

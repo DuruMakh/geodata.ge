@@ -52,7 +52,7 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
           <RangeStrip years={foreignInvestmentCoverage(data, state.dimension).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildForeignInvestmentModel(data, s, presentation).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
-          <Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
+          <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel key={state.dimension} model={model} totalId={FOREIGN_INVESTMENT_TOTAL_ID} searchPlaceholder={t(`search.${state.dimension}`)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>

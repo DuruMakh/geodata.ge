@@ -102,7 +102,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
           <RangeStrip years={energyFoodCoverage(section, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildEnergyFoodModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(percent ? "sourceNote.food" : "sourceNote.energy")} · {unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
-          <Link href={pageHref("/methodology/energy-food", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+          <Link href={pageHref("/methodology/energy-food", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}>

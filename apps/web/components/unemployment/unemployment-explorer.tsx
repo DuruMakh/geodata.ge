@@ -117,7 +117,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
           <RangeStrip years={model.availableYears} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildUnemploymentModel(facts, registry, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
-          <Link href={pageHref("/methodology/unemployment", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+          <Link href={pageHref("/methodology/unemployment", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {(section === "overview" || section === "regions") && noteKey ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t(noteKey)}</p> : null}
         {(section === "overview" && ["national", "settlement"].includes(state.breakdown) || regionalStatusYears.length > 0) ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("employmentStatusNote")}{regionalStatusYears.length > 0 ? ` ${message(messages, "unemployment.regionalEmploymentStatusNote", { start: Math.min(...regionalStatusYears), end: Math.max(...regionalStatusYears) })}` : null}</p> : null}

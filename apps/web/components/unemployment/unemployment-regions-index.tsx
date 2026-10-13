@@ -40,7 +40,7 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
       { label: t("nationalRate"), value: national ? percent(national.value) : "—", detail: String(model.year) },
       { label: message(messages, "regionalEconomies.period"), value: `${model.firstYear}–${model.year}`, detail: t("annual") },
     ]} />
-    <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")} <Link href={pageHref("/methodology/unemployment", locale)} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link></p>
+    <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")} <Link href={pageHref("/methodology/unemployment", locale)} prefetch={false} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link></p>
     <a href="#breakdown=region" className="mt-3 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{t("regionalComparison")}</a>
   </div>;
 }

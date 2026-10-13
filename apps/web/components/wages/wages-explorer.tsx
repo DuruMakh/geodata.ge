@@ -145,7 +145,7 @@ export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt,
           <RangeStrip years={wagesCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildWagesModel(section, facts, s).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || section === "overview" ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
-          <Link href={pageHref("/methodology/wages", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+          <Link href={pageHref("/methodology/wages", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {regionId ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p> : null}
         {state.view === "business" || state.view === "non_business" ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("nonBusinessNote")}</p> : null}

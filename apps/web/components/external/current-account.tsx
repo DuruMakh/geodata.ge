@@ -66,7 +66,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
         <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
           {percent ? ` · ${message(messages, "main.gdpSource")}` : null}
           {model.preliminaryGdpYears.length ? ` · ${message(messages, "main.preliminaryGdp", { years: model.preliminaryGdpYears.join(", ") })}` : null}
-          <Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
+          <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}>

@@ -68,7 +68,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
           <RangeStrip years={tradeOverviewCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradeOverviewModel(facts, s, presentation).range, patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t(services ? "services.sourceNote" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
-          <Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+          <Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote>{domestic ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("domestic.definitions")}</p> : null}</div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}>

@@ -250,6 +250,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
           {filteredCountry ? (
             <Link
               href={pageHref(hrefFor("country", country.id), locale)}
+              prefetch={false}
               id={countryOptionId(baseId)}
               role="option"
               aria-selected={countryOptionId(baseId) === activeOptionId}
@@ -275,6 +276,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
               <div key={group.regionId}>
                 <Link
                   href={pageHref(hrefFor("region", group.regionId), locale)}
+                  prefetch={false}
                   id={regionId}
                   role="option"
                   aria-selected={regionActive}
@@ -299,6 +301,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
                     <Link
                       key={member.code}
                       href={pageHref(hrefFor("municipality", member.code), locale)}
+                      prefetch={false}
                       id={memberId}
                       role="option"
                       aria-selected={memberActive}

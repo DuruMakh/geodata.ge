@@ -64,6 +64,7 @@ export function BudgetHub({ cards, locale = "ka", testId = "budget-hub" }: { car
           <Link
             key={card.index}
             href={pageHref(card.href, locale)}
+            prefetch={false}
             data-testid="hub-card"
             className="flex flex-col gap-2 border border-[var(--hairline)] bg-[var(--tile)] px-[18px] pt-[18px] pb-[15px] no-underline transition-colors duration-150 hover:bg-[var(--tint)]"
           >
