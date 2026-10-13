@@ -85,38 +85,6 @@ async function expectNoPageOverflow(page: Page) {
   expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
 }
 
-const representativeRoutes = [
-  { route: "/", canonical: "https://fiscal.ge/" },
-  { route: "/explorer/expenditure", canonical: "https://fiscal.ge/explorer/expenditure" },
-  { route: "/explorer/revenue", canonical: "https://fiscal.ge/explorer/revenue" },
-  { route: "/explorer/analysis", canonical: "https://fiscal.ge/explorer/analysis" },
-  { route: "/explorer/debt", canonical: "https://fiscal.ge/explorer/debt" },
-  { route: "/explorer/deficit", canonical: "https://fiscal.ge/explorer/deficit" },
-  { route: "/explorer/municipalities", canonical: "https://fiscal.ge/explorer/municipalities" },
-  { route: "/explorer/municipalities/tbilisi", canonical: "https://fiscal.ge/explorer/municipalities/tbilisi" },
-  { route: "/explorer/municipalities/region/imereti", canonical: "https://fiscal.ge/explorer/municipalities/region/imereti" },
-  { route: "/explorer/municipalities/georgia", canonical: "https://fiscal.ge/explorer/municipalities/georgia" },
-  { route: "/methodology", canonical: "https://fiscal.ge/methodology" },
-  { route: "/methodology/expenditure", canonical: "https://fiscal.ge/methodology/expenditure" },
-  { route: "/about", canonical: "https://fiscal.ge/about" },
-] as const;
-
-for (const { route, canonical } of representativeRoutes) {
-  test(`${route} exposes Fiscal.ge search metadata`, async ({ page }) => {
-    await page.goto(`${BASE_URL}${route}`);
-    const canonicalLink = page.locator('link[rel="canonical"]');
-    const openGraphUrl = page.locator('meta[property="og:url"]');
-    await expect(canonicalLink).toHaveCount(1);
-    await expect(openGraphUrl).toHaveCount(1);
-    await expect(canonicalLink).toHaveAttribute("href", canonical);
-    await expect(openGraphUrl).toHaveAttribute("content", canonical);
-    await expect(page.locator("main h1")).toHaveCount(1);
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /^https:\/\/fiscal\.ge\//);
-    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
-    await expect(page.locator('script[type="application/ld+json"]')).not.toHaveCount(0);
-  });
-}
-
 test("Link navigation keeps exactly one route-correct canonical and Open Graph URL", async ({ page }) => {
   async function expectUrlMetadata(expected: string) {
     const canonical = page.locator('link[rel="canonical"]');

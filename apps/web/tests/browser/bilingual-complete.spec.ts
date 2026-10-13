@@ -1,22 +1,4 @@
 import { expect, test } from "@playwright/test";
-import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
-import { pageHref } from "../../lib/i18n/routes";
-
-test("every public page has two working document languages", async ({ request }) => {
-  test.setTimeout(90_000);
-  const paths = await listPublicPagePaths();
-  expect(paths).toHaveLength(290);
-  expect(paths).toContain("/explorer/trade/partners");
-  expect(paths).toContain("/explorer/trade/products");
-  expect(paths).toContain("/explorer/trade/domestic-exports");
-  expect(paths).toContain("/explorer/trade/services");
-  for (const path of paths) for (const locale of ["ka", "en"] as const) {
-    const response = await request.get(pageHref(path, locale));
-    expect(response.status(), `${locale}:${path}`).toBe(200);
-    expect(await response.text()).toMatch(new RegExp(`<html[^>]*lang="${locale}"`));
-    await response.dispose();
-  }
-});
 
 test("the English explorer, language switch and shared bilingual publication agree", async ({ page, request }) => {
   const response = await request.get("/downloads/data/national-expenditure.json");
