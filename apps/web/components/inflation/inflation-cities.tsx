@@ -110,9 +110,6 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
       {latest ? (
         <LatestValueLine testId="inflation-city-latest" measure={t("tab.yoy")} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, "yoy")} />
       ) : null}
-      <p data-testid="inflation-city-unit" className="mb-4 text-[13px] text-[var(--muted)]">
-        {t("categoryUnit.yoy")}
-      </p>
 
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
@@ -159,6 +156,9 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
           </section>
           <div className="mt-[18px] space-y-2">
             <SourceNote testId="source-label">
+              {/* The unit sits with the source, not as a second line under the heading (DESIGN §17). */}
+              <span data-testid="inflation-city-unit">{t("categoryUnit.yoy")}</span>
+              {" · "}
               {t("citySource")} {message(messages, "main.lastUpdated", { date: displayDate })}
             </SourceNote>
             <p data-testid="inflation-city-central-prices" className="text-xs text-[var(--muted)]">

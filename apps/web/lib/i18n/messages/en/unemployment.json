@@ -15,7 +15,6 @@
   "unemployment.regionMapEntityAria": "{name}: unemployment rate {rate}, {year}",
   "unemployment.nationalRate": "National unemployment rate",
   "unemployment.regionalComparison": "Compare regions and historical groupings",
-  "unemployment.regionalComparisonSummary": "Select regions and indicators to compare rates or people counts. Historical combined regions remain separate, with unavailable years shown as gaps.",
   "unemployment.page.age.title": "Unemployment by age group",
   "unemployment.page.age.summary": "Compare unemployment, employment and labour-force participation across age groups from 2020 onward.",
   "unemployment.page.gender.title": "Unemployment by gender",

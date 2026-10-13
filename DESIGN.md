@@ -902,7 +902,7 @@ Do:
 - Keep the Excel button visible and bound to the active range and selection.
 - Show source/update context on every analytical view.
 - Derive every year range from loaded data.
-- Under a page's H1 show only one small one-line text (the latest-value line, or the hub's lead line). No summary paragraph, nominal/inflation note or other explanatory text goes between the heading and the workspace; disclosures belong in the source note, below-chart notes, methodology and Excel (owner rule, 2026-10-10, first applied to Wages; Trade and External flows follow it since 2026-10-11 at the owner's request; other existing pages are unchanged until the owner asks).
+- Under a page's H1 show only one small one-line text (the latest-value line, or the hub's lead line). No summary paragraph, nominal/inflation note or other explanatory text goes between the heading and the workspace; disclosures belong in the source note, below-chart notes, methodology and Excel (owner rule, 2026-10-10, first applied to Wages; it applies to every explorer and hub page). The line fits one line at 375px; unit and price-basis wording ("Current prices", "Percent · …") opens the chart's source note instead of a second line under the heading. `tests/browser/mobile-fit-charts.spec.ts` checks every explorer route; the lines that still wrap there await the owner's wording.
 
 Do not:
 

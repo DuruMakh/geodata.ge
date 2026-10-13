@@ -20,7 +20,8 @@ test.each(["ka", "en"] as const)("renders the existing workspace, two chart type
   expect(markup).not.toContain('data-testid="unemployment-headline"');
   const heading = markup.slice(0, markup.indexOf('data-testid="unemployment-national-tabs"'));
   expect(heading).toContain(messages["unemployment.page.overview.title"]);
-  expect(heading).toContain(messages["unemployment.page.overview.summary"]);
+  // Only the latest-value line sits under the heading; the summary stays the meta description (DESIGN §17).
+  expect(heading).not.toContain(messages["unemployment.page.overview.summary"]);
   expect(heading).not.toContain(messages["unemployment.surveyEstimate"]);
   // Before the browser measures, each chart renders its desktop and its phone drawing (D1).
   expect(markup.match(/<svg[^>]*data-geometry="desktop"[^>]*role="img"/g)).toHaveLength(2);

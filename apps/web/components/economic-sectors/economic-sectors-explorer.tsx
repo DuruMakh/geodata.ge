@@ -108,14 +108,6 @@ export function EconomicSectorsExplorer({
         }
         note={model.headline?.status === "preliminary" ? t("preliminary") : undefined}
       />
-      <div className="mb-[30px] grid text-[13px] text-[var(--muted)]">
-        {(["nominal", "share_of_gdp", "real_growth"] as const).map(measure => (
-          <p key={measure} aria-hidden={measure !== state.measure}
-            className={`[grid-area:1/1] ${measure !== state.measure ? "invisible" : ""}`}>
-            {t(measure === "nominal" ? "nominalContext" : measure === "share_of_gdp" ? "shareContext" : "growthContext")}
-          </p>
-        ))}
-      </div>
       <p role="status" className="sr-only">
         {announcement}
       </p>
@@ -220,6 +212,9 @@ export function EconomicSectorsExplorer({
           </section>
           <div className="mt-[18px]">
             <SourceNote testId="source-label">
+              {/* The measure's price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
+              <span data-testid="sectors-context">{t(state.measure === "nominal" ? "nominalContext" : state.measure === "share_of_gdp" ? "shareContext" : "growthContext")}</span>
+              {" "}
               {t("source")} {model.range.start}–{model.range.end}
               {activeSources.length
                 ? ` · ${[...new Set(activeSources.map((s) => s.title))].join("; ")}`

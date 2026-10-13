@@ -145,9 +145,6 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
       {latest ? (
         <LatestValueLine testId="inflation-category-latest" measure={t(`categoryTab.${latestTab}`)} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, latestTab)} />
       ) : null}
-      <p data-testid="inflation-category-unit" className="mb-4 text-[13px] text-[var(--muted)]">
-        {unitLine}
-      </p>
 
       <div
         data-testid="inflation-category-tabs"
@@ -259,6 +256,9 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
           </section>
           <div className="mt-[18px] space-y-2">
             <SourceNote testId="source-label">
+              {/* The unit sits with the source, not as a second line under the heading (DESIGN §17). */}
+              <span data-testid="inflation-category-unit">{unitLine}</span>
+              {" · "}
               {t("categorySource")} {message(messages, "main.lastUpdated", { date: displayDate })}
             </SourceNote>
             {state.tab === "contrib" ? (

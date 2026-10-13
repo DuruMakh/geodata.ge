@@ -108,7 +108,6 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
       {latest ? (
         <LatestValueLine testId="inflation-latest" measure={t(`tab.${state.tab}`)} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, state.tab)} />
       ) : null}
-      <p data-testid="inflation-unit" className="mb-4 text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
 
       <div
         data-testid="inflation-tabs"
@@ -169,6 +168,9 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
           </section>
           <div className="mt-[18px] space-y-2">
             <SourceNote testId="source-label">
+              {/* The unit sits with the source, not as a second line under the heading (DESIGN §17). */}
+              <span data-testid="inflation-unit">{t(`unit.${state.tab}`)}</span>
+              {" · "}
               {t("source")} {message(messages, "main.lastUpdated", { date: displayDate })}
             </SourceNote>
             <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">

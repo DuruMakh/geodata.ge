@@ -174,12 +174,13 @@ test("all eleven regional routes are static and unknown regions return 404", asy
   expect((await request.get("/explorer/unemployment/regions/unknown")).status()).toBe(404);
 });
 
-for (const prefix of ["", "/en"]) test(`historical comparison gives series instructions without an absent map ${prefix || "ka"}`, async ({ page }) => {
+for (const prefix of ["", "/en"]) test(`historical comparison explains the combined regions without an absent map ${prefix || "ka"}`, async ({ page }) => {
   await page.goto(`${prefix}/explorer/unemployment/regions#breakdown=region`);
   await expect(page.getByTestId("unemployment-explorer")).toBeVisible();
   await expect(page.getByTestId("unemployment-region-map")).toHaveCount(0);
   await expect(page.getByText(prefix ? "Select a region on the map" : "აირჩიეთ რეგიონი რუკაზე", { exact: false })).toHaveCount(0);
-  await expect(page.getByText(prefix ? "Select regions and indicators to compare rates or people counts." : "აირჩიეთ რეგიონები და მაჩვენებლები პროცენტული მონაცემების ან ადამიანთა რაოდენობის შესადარებლად.", { exact: false })).toBeVisible();
+  // No instruction paragraph under the heading (DESIGN §17); the combined-region disclosure sits under the chart.
+  await expect(page.getByText(prefix ? "Earlier combined regions remain distinct." : "ადრინდელი გაერთიანებული რეგიონები ცალკე რჩება.", { exact: false })).toBeVisible();
 });
 
 test("Georgian employment child labels keep a clear gap before the value at desktop width", async ({ page }, info) => {

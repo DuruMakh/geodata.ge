@@ -271,9 +271,10 @@ const bareHeadingPages = [
   "/explorer/external/current-account",
 ];
 
-// Latest-value, deck and place lines that still wrap at 375px. Shortening them
-// is the owner's wording call (Task 18 report); each entry is an expected failure,
-// so fixing a page fails its test until the entry is removed here.
+// Latest-value, deck and place lines that still wrap at 375px. Fitting them
+// drops content, which is the owner's wording call (Task 18 report). The test
+// asserts they still wrap, so a page that gets fixed fails here until its
+// entry is removed, and a broken page (404, no heading) fails too.
 const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
   "/explorer/analysis": ["ka", "en"],
   "/explorer/debt": ["ka", "en"],
@@ -287,6 +288,8 @@ const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
   "/explorer/energy-food/energy-supply": ["ka"],
   "/explorer/energy-food/electricity": ["ka", "en"],
   "/explorer/money/bank-health": ["ka"],
+  "/explorer/living-standards/poverty": ["ka"],
+  "/explorer/living-standards/inequality": ["ka"],
   "/explorer/living-standards/income": ["ka", "en"],
   "/explorer/living-standards/income/regions/[id]": ["ka", "en"],
   "/explorer/living-standards/spending": ["ka", "en"],
@@ -300,37 +303,54 @@ test("every explorer route template has a published page to check", () => {
   expect(routes.pages.length).toBeGreaterThan(60);
 });
 
-for (const locale of ["ka", "en"] as const) {
-  for (const { template, path: route } of routes.pages) {
-    test(`one short line under the heading at 375px (DESIGN §17): ${locale} ${route}`, async ({ page }) => {
-      test.fail(wrappingLines[template]?.includes(locale) ?? false, "the line under the heading still wraps at 375px; wording awaits the owner");
-      await page.setViewportSize({ width: 375, height: 812 });
-      // Hubs are static and never mark the app ready; the line is in the served HTML.
-      await page.goto(`${TEST_BASE_URL}${locale === "en" ? "/en" : ""}${route}`);
-      await page.evaluate(() => document.fonts.ready);
-      const after = await page.getByRole("heading", { level: 1 }).first().evaluate((heading) => {
-        // A place heading wraps the h1 with its closed picker and its previous/next
-        // links; the line under the heading follows that block.
-        const skipped = (element: Element) => element.matches('[data-testid$="-navigation"], .sr-only');
-        let block: Element = heading;
-        let next = block.nextElementSibling;
-        for (;;) {
-          while (next && skipped(next)) next = next.nextElementSibling;
-          if (next || !block.parentElement || block.parentElement.tagName === "MAIN") break;
-          block = block.parentElement;
-          next = block.nextElementSibling;
+test.describe("one short line under the heading at 375px (DESIGN §17)", () => {
+  test.use({ viewport: { width: 375, height: 812 } });
+  for (const locale of ["ka", "en"] as const) {
+    for (const { template, path: route } of routes.pages) {
+      test(`${locale} ${route}`, async ({ page }) => {
+        // Hubs are static and never mark the app ready; the lines are in the served HTML.
+        await page.goto(`${TEST_BASE_URL}${locale === "en" ? "/en" : ""}${route}`);
+        await page.evaluate(() => document.fonts.ready);
+        const under = await page.getByRole("heading", { level: 1 }).first().evaluate((heading) => {
+          // A place heading wraps the h1 with its closed picker and its previous/next
+          // links; the line under the heading follows that block.
+          const skipped = (element: Element) => element.matches('[data-testid$="-navigation"], .sr-only');
+          const following = (element: Element | null) => {
+            while (element && skipped(element)) element = element.nextElementSibling;
+            return element;
+          };
+          let block: Element = heading;
+          let first = following(block.nextElementSibling);
+          while (!first && block.parentElement && block.parentElement.tagName !== "MAIN") {
+            block = block.parentElement;
+            first = following(block.nextElementSibling);
+          }
+          // Text is a line to measure; anything holding controls or a chart is the workspace.
+          const describe = (element: Element | null) => element instanceof HTMLElement ? {
+            tag: element.tagName,
+            text: !element.querySelector("button, input, select, svg, table, section, canvas"),
+            lines: element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight),
+            content: element.textContent,
+          } : null;
+          const line = describe(first);
+          // The workspace follows the one line directly: no unit line, note or summary under it.
+          return { line, then: line?.text ? describe(following(first!.nextElementSibling)) : null };
+        });
+        const { line, then } = under;
+        if (bareHeadingPages.includes(route)) {
+          expect(line?.text ?? false, `${route}: ${line?.content}`).toBe(false);
+          expect(line?.tag).not.toBe("P");
+          return;
         }
-        if (!(next instanceof HTMLElement)) return null;
-        // Text is a line to measure; anything holding controls or a chart is the workspace.
-        const text = !next.querySelector("button, input, select, svg, table, section, div");
-        return { tag: next.tagName, text, lines: next.getBoundingClientRect().height / parseFloat(getComputedStyle(next).lineHeight), content: next.textContent };
+        expect(then?.text ?? false, `${route}, second text under the heading: ${then?.content}`).toBe(false);
+        if (wrappingLines[template]?.includes(locale)) {
+          // Known: wraps at 375px, owner wording pending.
+          expect(line?.text, `${route}: ${line?.content}`).toBe(true);
+          expect(line!.lines, `${route}: ${line?.content}`).toBeGreaterThan(1.6);
+        } else if (line?.text) {
+          expect(line.lines, `${route}: ${line.content}`).toBeLessThanOrEqual(1.6);
+        }
       });
-      if (bareHeadingPages.includes(route)) {
-        expect(after?.text ?? false, `${route}: ${after?.content}`).toBe(false);
-        expect(after?.tag).not.toBe("P");
-      } else if (after?.text) {
-        expect(after.lines, `${route}: ${after.content}`).toBeLessThanOrEqual(1.6);
-      }
-    });
+    }
   }
-}
+});

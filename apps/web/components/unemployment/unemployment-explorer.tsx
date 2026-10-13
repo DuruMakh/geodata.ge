@@ -89,7 +89,6 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       } : undefined}
     /> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
     {latest ? <LatestValueLine testId="unemployment-latest" measure={latestMeasure} period={latest.year} value={valueLabel(latest.value)} /> : null}
-    <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
     <p role="status" className="sr-only">{announcement}</p>
     {section === "overview" ? <div data-testid="unemployment-national-tabs" role="group" aria-label={t("nationalViews")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
       {NATIONAL_UNEMPLOYMENT_VIEWS.map(breakdown => <TextTab key={breakdown} label={t(breakdown === "national" ? "overviewTab" : `breakdown.${breakdown}`)} active={state.breakdown === breakdown} testId={`unemployment-tab-${breakdown}`} onClick={() => { if (breakdown === state.breakdown) return; setQuery(""); change(s => changeUnemploymentBreakdown(s, breakdown, facts)); }} />)}

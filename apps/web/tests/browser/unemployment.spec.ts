@@ -71,15 +71,14 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 test("national tabs keep valid metrics, coverage and reference selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment/overview"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const title = await page.getByRole("heading", { level: 1 }).textContent();
-  // The page summary; the latest-value line above it (owner decision D2) follows the tab.
-  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p:not([data-testid])").first();
-  const description = await subtitle.textContent();
+  // Only the latest-value line (owner decision D2) sits under the heading on every tab: no summary paragraph (DESIGN §17).
+  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p:not([data-testid]):not(.sr-only)");
   for (const breakdown of ["national", "settlement", "education", "long_term"]) {
     await page.getByTestId(`unemployment-tab-${breakdown}`).click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdown);
     await expect(page.getByTestId(`unemployment-tab-${breakdown}`)).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title!);
-    await expect(subtitle).toHaveText(description!);
+    await expect(subtitle).toHaveCount(0);
     await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
     await expect(page.getByTestId("source-label")).toBeVisible();
     await expect(page.getByTestId("unemployment-composition")).toHaveCount(breakdown === "national" ? 1 : 0);

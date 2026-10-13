@@ -87,10 +87,6 @@ export function RegionalEconomyExplorer({
         }}
       />
       <LatestValueLine testId="regional-headline" measure={t("total")} period={model.headline?.year ?? "—"} value={share ? formatShare(model.headline ? model.headline.value / 100 : null) : formatAmount(model.headline?.value, locale)} />
-      <div className="mb-[30px] grid text-[13px] text-[var(--muted)]">
-        <p aria-hidden={share} className={`[grid-area:1/1] ${share ? "invisible" : ""}`}>{t("contextNominal")}</p>
-        <p aria-hidden={!share} className={`[grid-area:1/1] ${share ? "" : "invisible"}`}>{t("contextShare")}</p>
-      </div>
       <p role="status" className="sr-only">{message(messages, "regionalEconomies.rangeChanged", { start: model.range.start, end: model.range.end })}</p>
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
@@ -112,7 +108,11 @@ export function RegionalEconomyExplorer({
             <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={share} unit={unit} formatValue={share ? undefined : (value) => formatAmount(value, locale)} />
             <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
           </section>
-          <div className="mt-[18px]"><SourceNote testId="regional-source-label">{t("source")} {model.range.start}–{model.range.end}</SourceNote></div>
+          <div className="mt-[18px]"><SourceNote testId="regional-source-label">
+            {/* The price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
+            <span data-testid="regional-context">{t(share ? "contextShare" : "contextNominal")}</span>{" "}
+            {t("source")} {model.range.start}–{model.range.end}
+          </SourceNote></div>
           <div className="mt-3 border-l-2 border-[var(--accent)] bg-[var(--tint)] px-3.5 py-3"><SourceNote>{t("accountingNote")}</SourceNote></div>
         </div>
         <RegionalEconomySeriesPanel registry={registry} selectedIds={state.selectedIds} endYear={model.range.end} endValues={model.endValues} measure={state.measure} onSelectionChange={(selectedIds) => update((previous) => ({ ...previous, selectedIds }))} downloadAction={

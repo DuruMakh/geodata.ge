@@ -15,7 +15,6 @@
   "unemployment.regionMapEntityAria": "{name}: უმუშევრობის დონე {rate}, {year} წელი",
   "unemployment.nationalRate": "უმუშევრობის დონე საქართველოში",
   "unemployment.regionalComparison": "რეგიონებისა და ისტორიული გაერთიანებების შედარება",
-  "unemployment.regionalComparisonSummary": "აირჩიეთ რეგიონები და მაჩვენებლები პროცენტული მონაცემების ან ადამიანთა რაოდენობის შესადარებლად. ისტორიული გაერთიანებული რეგიონები ცალკე რჩება; გამოუქვეყნებელი წლები ნაჩვენებია წყვეტებით.",
   "unemployment.page.age.title": "უმუშევრობა ასაკობრივი ჯგუფების მიხედვით",
   "unemployment.page.age.summary": "უმუშევრობის, დასაქმებისა და შრომის ძალაში მონაწილეობის შედარება ასაკობრივ ჯგუფებს შორის, 2020 წლიდან.",
   "unemployment.page.gender.title": "უმუშევრობა სქესის მიხედვით",
