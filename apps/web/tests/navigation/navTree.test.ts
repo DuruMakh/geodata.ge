@@ -3,7 +3,7 @@ import kaCommon from "../../lib/i18n/messages/ka/common.json";
 import enCommon from "../../lib/i18n/messages/en/common.json";
 import sitemap from "../../lib/seo/sitemap";
 import { splitLanguagePath } from "../../lib/i18n/routes";
-import { NAV_TREE, isActivePath, openHub, sourceNoteKey } from "../../lib/navigation/navTree";
+import { NAV_TREE, currentEntry, isActivePath, openHub, sourceNoteKey } from "../../lib/navigation/navTree";
 
 const originalEnv = { ...process.env };
 afterEach(() => {
@@ -23,15 +23,20 @@ describe("the navigation tree", () => {
     const routes = await explorerRoutes();
     expect(routes.length).toBeGreaterThan(500);
     for (const route of routes) {
-      // aria-current: a hub on its own page, a section row on its page and the pages below it.
-      const active = NAV_TREE.flatMap((hub) => [
-        ...(hub.href === route ? [hub.href] : []),
-        ...hub.sections.filter((section) => isActivePath(route, section.href)).map((section) => section.href),
-      ]);
-      expect(active, route).toHaveLength(1);
+      // The sidebar marks currentEntry's row; it must exist, sit in the open hub and be the only row there that matches.
       const hub = openHub(route);
-      expect([hub.href, ...hub.sections.map((section) => section.href)], route).toContain(active[0]);
+      const entry = currentEntry(route);
+      expect([hub.href, ...hub.sections.map((section) => section.href)], route).toContain(entry);
+      expect(hub.sections.filter((section) => isActivePath(route, section.href)).length, route).toBeLessThanOrEqual(1);
     }
+  });
+
+  it("marks the hub on its own page and a row on its page and the pages below it", () => {
+    expect(currentEntry("/explorer")).toBe("/explorer");
+    expect(currentEntry("/explorer/expenditure")).toBe("/explorer/expenditure");
+    expect(currentEntry("/explorer/municipalities/region/kakheti")).toBe("/explorer/municipalities");
+    expect(currentEntry("/explorer/wages")).toBe("/explorer/wages");
+    expect(currentEntry("/explorer/wages/regions/adjara")).toBe("/explorer/wages/regions");
   });
 
   it("opens the hub a page sits under and Budget for the budget sections", () => {

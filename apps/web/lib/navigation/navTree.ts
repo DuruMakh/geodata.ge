@@ -50,11 +50,11 @@ export const NAV_TREE: readonly NavHub[] = [
     labelKey: "common.economy",
     railLabelKey: "common.dataEconomy",
     testId: "economy-link",
-    sections: [
-      { href: "/explorer/economy/gdp", labelKey: "common.gdpOverview" },
-      { href: "/explorer/economy/sectors", labelKey: "common.economicSectors" },
-      { href: "/explorer/economy/regions", labelKey: "common.regionalEconomies" },
-    ],
+    sections: sectionRows([
+      { id: "gdp", href: "/explorer/economy/gdp", labelKey: "common.gdpOverview" },
+      { id: "sectors", href: "/explorer/economy/sectors", labelKey: "common.economicSectors" },
+      { id: "regions", href: "/explorer/economy/regions", labelKey: "common.regionalEconomies" },
+    ], "economy"),
   },
   {
     href: "/explorer/inflation",
@@ -152,6 +152,16 @@ export function isActivePath(pathname: string, href: string): boolean {
 /** The hub whose rows are open: the longest hub address the page sits under; Budget (`/explorer`) holds the rest. */
 export function openHub(pathname: string): NavHub {
   return NAV_TREE.reduce((open, hub) => (isActivePath(pathname, hub.href) && hub.href.length > open.href.length ? hub : open));
+}
+
+/**
+ * The address of the one sidebar row marked current (`aria-current`) on a page: the open hub on its own page, else
+ * the open hub's row the page sits on or under. A page outside every row has none.
+ */
+export function currentEntry(pathname: string): string | undefined {
+  const hub = openHub(pathname);
+  if (pathname === hub.href) return hub.href;
+  return hub.sections.find((section) => isActivePath(pathname, section.href))?.href;
 }
 
 /** Footer source notes that belong to one page only. */

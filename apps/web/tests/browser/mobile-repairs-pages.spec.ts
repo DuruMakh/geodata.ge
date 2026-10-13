@@ -184,6 +184,7 @@ test("the unemployment dataset row keeps the menu rhythm below 900px", async ({ 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/explorer/unemployment/overview");
   await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
-  const marginTop = await page.locator("#data-sidebar-navigation nav > a[href$=\"/explorer/unemployment\"]").evaluate((link) => getComputedStyle(link).marginTop);
+  // The dataset's list item carries the desktop gap since the hubs became a list (U02-09).
+  const marginTop = await page.locator("#data-sidebar-navigation nav li:has(> a[href$=\"/explorer/unemployment\"])").evaluate((row) => getComputedStyle(row).marginTop);
   expect(marginTop).toBe("0px");
 });

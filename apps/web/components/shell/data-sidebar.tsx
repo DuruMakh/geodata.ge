@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronsLeft, ChevronsRight, House, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,7 +10,7 @@ import { LanguageSwitch } from "../site/language-switch";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
-import { BUDGET_HUB_PATH, NAV_TREE, isActivePath, openHub } from "../../lib/navigation/navTree";
+import { BUDGET_HUB_PATH, NAV_TREE, currentEntry, openHub } from "../../lib/navigation/navTree";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
 // 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
@@ -34,6 +34,7 @@ export function DataSidebar() {
   // The navigation tree's addresses carry no language prefix.
   const page = splitLanguagePath(pathname).pathname;
   const activeHub = openHub(page);
+  const current = currentEntry(page);
 
   // Read after mount: the server render cannot see localStorage, and guessing
   // would flash the wrong width on every load.
@@ -207,37 +208,42 @@ export function DataSidebar() {
           </p>
           {/* Every link closes the sheet here, the current page's included: the pathname effect above never fires for it. */}
           <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5" onClick={(event) => { if ((event.target as Element).closest("a")) setSheetOpen(false); }}>
-            {NAV_TREE.map((hub) => {
-              const open = hub === activeHub;
-              return (
-                <Fragment key={hub.href}>
-                  <Link
-                    href={pageHref(hub.href, locale)}
-                    prefetch={false}
-                    data-testid={hub.testId}
-                    aria-current={page === hub.href ? "page" : undefined}
-                    className={`${hub.spaced ? "mt-2 " : ""}flex items-baseline gap-2 ${hub.spaced ? "max-[900px]:mt-0 " : ""}border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${open ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
-                  >
-                    {message(messages, hub.labelKey)}
-                  </Link>
-                  {/* Budget's sections render as SectionNav's list, with its coming-soon rows. */}
-                  {open && hub.href === BUDGET_HUB_PATH ? <SectionNav /> : null}
-                  {open && hub.href !== BUDGET_HUB_PATH
-                    ? hub.sections.map((section) => (
-                        <SidebarSectionLink
-                          key={section.href}
-                          href={pageHref(section.href, locale)}
-                          testId={section.testId}
-                          label={message(messages, section.labelKey)}
-                          active={isActivePath(page, section.href)}
-                          current={page === section.href}
-                          indented
-                        />
-                      ))
-                    : null}
-                </Fragment>
-              );
-            })}
+            {/* Each hub is a list item and its pages a nested list (U02-09); the list boxes carry the gaps the rows had as siblings. */}
+            <ul className="flex list-none flex-col gap-0.5">
+              {NAV_TREE.map((hub) => {
+                const open = hub === activeHub;
+                return (
+                  <li key={hub.href} className={`${hub.spaced ? "mt-2 max-[900px]:mt-0 " : ""}flex flex-col gap-0.5`}>
+                    <Link
+                      href={pageHref(hub.href, locale)}
+                      prefetch={false}
+                      data-testid={hub.testId}
+                      aria-current={current === hub.href ? "page" : undefined}
+                      className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${open ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
+                    >
+                      {message(messages, hub.labelKey)}
+                    </Link>
+                    {/* Budget's sections render as SectionNav's list, with its coming-soon rows. */}
+                    {open && hub.href === BUDGET_HUB_PATH ? <SectionNav /> : null}
+                    {open && hub.href !== BUDGET_HUB_PATH ? (
+                      <ul className="flex list-none flex-col gap-0.5 pl-[18px]">
+                        {hub.sections.map((section) => (
+                          <li key={section.href}>
+                            <SidebarSectionLink
+                              href={pageHref(section.href, locale)}
+                              testId={section.testId}
+                              label={message(messages, section.labelKey)}
+                              active={current === section.href}
+                              current={page === section.href}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
             {/* No aria-disabled on the rows: the listitem role ignores it (jsx-a11y
                 flags it), and the ComingSoonBadge text already reads out. */}
             {TEASERS.length > 0 ? (
