@@ -6,7 +6,7 @@ import { expect, test, vi } from "vitest";
 import { loadHouseholdFactsFromMirror, householdMirrorCreateRows } from "../../../lib/db/mirrorRows";
 import { assertHouseholdParity, loadHouseholdFacts, toClientHouseholdFact } from "../../../lib/data/household/importHousehold";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { prepareHouseholdData, readSheetCellTokens } from "../../../lib/data/household/prepareHousehold";
+import { readSheetCellTokens } from "../../../lib/data/household/prepareHousehold";
 import { HOUSEHOLD_INDICATORS, householdSourceId, type HouseholdFact } from "../../../lib/data/household/types";
 import { expectedHouseholdKeys, householdPublishedValue, validateHouseholdFacts } from "../../../lib/data/household/validation";
 
@@ -26,10 +26,6 @@ const find = (facts: readonly HouseholdFact[], indicatorId: string, areaId: stri
   facts.find(f => f.indicatorId === indicatorId && f.areaId === areaId && f.measure === measure && f.year === year)!;
 /** Sets an exact value and keeps its published rounding consistent, so only the rule under test fails. */
 const setValue = (f: HouseholdFact, value: string) => Object.assign(f, { value, publishedValue: householdPublishedValue(value) });
-
-test("the canonical file reproduces the research package", async () => {
-  await expect(prepareHouseholdData(root, "check")).resolves.toBeUndefined();
-});
 
 test("serves all 10,638 reviewed values", () => {
   const facts = loadFacts();

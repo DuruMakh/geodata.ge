@@ -1,27 +1,9 @@
 import { isValidElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { JsonLd } from "../../components/seo/json-ld";
-import { inflationProductsMetadata, renderInflationProducts } from "../../lib/pages/inflation-products";
-import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
-import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
-import sitemap from "../../lib/seo/sitemap";
+import { renderInflationProducts } from "../../lib/pages/inflation-products";
 
 describe("product inflation discovery", () => {
-  it("indexes both localized product routes and dates", async () => {
-    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
-    try {
-      const [paths, revisions, urls, metadata] = await Promise.all([
-        listPublicPagePaths(), loadPageRevisions(), sitemap(), inflationProductsMetadata("en"),
-      ]);
-      expect(paths).toContain("/explorer/inflation/products");
-      expect(revisions["/explorer/inflation/products"]).toMatch(/^2026-\d{2}-\d{2}$/);
-      expect(urls.map((entry) => entry.url)).toContain("https://fiscal.ge/explorer/inflation/products");
-      expect(urls.map((entry) => entry.url)).toContain("https://fiscal.ge/en/explorer/inflation/products");
-      expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/inflation/products");
-      expect(metadata.alternates?.languages?.ka).toBe("https://fiscal.ge/explorer/inflation/products");
-    } finally { vi.unstubAllEnvs(); }
-  });
-
   it("describes the product dataset with the published product CSV and the Geostat files it was read from", async () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
     try {

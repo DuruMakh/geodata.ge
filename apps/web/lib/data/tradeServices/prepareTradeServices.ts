@@ -4,7 +4,7 @@ import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import { readVerifiedPackageFile } from "../sourcePackage";
-import { readTradeSourceWorksheet } from "../parsing/tradeSourceWorkbook";
+import { parseOnce, readTradeSourceWorksheet, type TradeParseCache } from "../parsing/tradeSourceWorkbook";
 import { assertSameServedRows } from "../servedDataParity";
 import { TRADE_SERVICE_IDS, TRADE_SERVICES_RESEARCH, TRADE_SERVICES_SOURCES, tradeServicesFactKey, type TradeServiceEntity, type TradeServiceFact, type TradeServicesAcceptance, type TradeServicesData } from "./types";
 import { tradeServicesCatalogue, tradeServicesCsv, tradeServicesEnglishHash, tradeServicesHash as hash, validateTradeServicesData } from "./validation";
@@ -20,10 +20,11 @@ const csv = (bytes: Buffer): Row[] => parse(bytes, { columns: true, bom: true, s
 const sourceKey = (row: Row) => JSON.stringify([row.source_id, row.source_sheet, row.source_cell]);
 const digest = (values: unknown[]) => hash(JSON.stringify(values.sort((a, b) => JSON.stringify(a) < JSON.stringify(b) ? -1 : JSON.stringify(a) > JSON.stringify(b) ? 1 : 0)));
 
-export async function buildTradeServicesData(root: string): Promise<{ data: TradeServicesData; report: TradeServicesAcceptance }> {
+export async function buildTradeServicesData(root: string, cache?: TradeParseCache): Promise<{ data: TradeServicesData; report: TradeServicesAcceptance }> {
   const directory = path.join(root, RESEARCH), inputSha256: Record<string, string> = {}, sourceSha256: Record<string, string> = {};
   const read = async (name: string) => { const bytes = await fs.readFile(path.join(root, name)); inputSha256[name] = hash(bytes); return bytes; };
   const research = (name: string) => read(`${RESEARCH}/${name}`);
+  const parsedResearch = <T>(name: string, bytes: Buffer, parse: (bytes: Buffer) => T): T => parseOnce(cache, `${name}:${inputSha256[`${RESEARCH}/${name}`]}`, () => parse(bytes));
   const independent = JSON.parse((await research("independent-verification.json")).toString()) as { status: string; input_artifact_sha256: Row };
   const verified = async (name: string) => {
     const bytes = await research(name);
@@ -38,11 +39,11 @@ export async function buildTradeServicesData(root: string): Promise<{ data: Trad
     return bytes;
   };
   const sources = JSON.parse((await frozen("full-source-manifest.json")).toString()) as Source[];
-  const layouts = JSON.parse((await frozen("source-layouts.json")).toString()) as Layout[];
+  const layouts = parsedResearch("source-layouts.json", await frozen("source-layouts.json"), bytes => JSON.parse(bytes.toString()) as Layout[]);
   const inventory = JSON.parse((await frozen("expected-observation-inventory.json")).toString()) as { full_manifest_sha256: string; layout_sha256: string; blocks: Block[] };
   if (inventory.full_manifest_sha256 !== inputSha256[`${RESEARCH}/full-source-manifest.json`] || inventory.layout_sha256 !== inputSha256[`${RESEARCH}/source-layouts.json`]) throw new Error("Services source/layout inventory fingerprint mismatch");
   const issues = JSON.parse((await frozen("unresolved-source-issues.json")).toString()).issues as Row[];
-  const reconciliation = csv(await verified("prepared-reconciliation.csv")), coverage = csv(await verified("coverage.csv"));
+  const reconciliation = parsedResearch("prepared-reconciliation.csv", await verified("prepared-reconciliation.csv"), csv), coverage = csv(await verified("coverage.csv"));
   const selectedSource = (source: string) => Object.values(TRADE_SERVICES_SOURCES).some(id => id === source);
   const affectsSubset = (row: Row) => selectedSource(row.source_id) || JSON.parse(row.source_refs || "[]").some((ref: string[]) => selectedSource(ref[0])) || row.item_id?.startsWith("services.");
   if ([...issues, ...packageReport.unresolved_source_issues, ...reconciliation.filter(row => row.status === "fail")].some(affectsSubset)) throw new Error("Services subset source acceptance hold requires resolution");
@@ -50,7 +51,7 @@ export async function buildTradeServicesData(root: string): Promise<{ data: Trad
   const holdKey = (row: Row) => `${row.check}:${row.flow}:${row.year}:${row.item_id}`;
   assertSameServedRows("Services unchanged outside-scope holds", issues, packageReport.unresolved_source_issues, holdKey);
   assertSameServedRows("Services unchanged failed evidence", issues, reconciliation.filter(row => row.status === "fail"), holdKey);
-  const rows = csv(await verified("services-annual.csv")).filter(row => row.dimension === "type");
+  const rows = parsedResearch("services-annual.csv", await verified("services-annual.csv"), csv).filter(row => row.dimension === "type");
   if (rows.length !== 130 || new Set(rows.map(sourceKey)).size !== 130) throw new Error("Services source coverage/duplicate inventory mismatch");
   const catalogueBytes = await fs.readFile(path.join(root, "data/taxonomy/trade-services.json")), entities = JSON.parse(catalogueBytes.toString()) as TradeServiceEntity[];
   const translations = JSON.parse(await fs.readFile(path.join(root, "data/localization/en/labels.json"), "utf8")) as Record<string, { text: string; reviewedAt: string }>;
@@ -104,8 +105,8 @@ export async function buildTradeServicesData(root: string): Promise<{ data: Trad
   validateTradeServicesData(data, report, englishLabels);
   return { data, report };
 }
-export async function prepareTradeServicesData(root: string, mode: "write" | "check"): Promise<void> {
-  const { data, report } = await buildTradeServicesData(root);
+export async function prepareTradeServicesData(root: string, mode: "write" | "check", cache?: TradeParseCache): Promise<void> {
+  const { data, report } = await buildTradeServicesData(root, cache);
   for (const [name, content] of [["data/imports/trade-services-annual.csv", tradeServicesCsv(data)], ["data/taxonomy/trade-services.json", tradeServicesCatalogue(data)], ["data/reports/trade-services-validation.json", JSON.stringify(report, null, 2) + "\n"]]) {
     const target = path.join(root, name);
     if (mode === "check") await assertGeneratedArtifactMatches("services trade", target, content);

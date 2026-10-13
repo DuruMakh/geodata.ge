@@ -793,7 +793,7 @@ describe("government debt research package", () => {
     }
 
     const vitestConfig = fs.readFileSync(
-      path.join(repoRoot, "apps/web/vitest.config.ts"),
+      path.join(repoRoot, "apps/web/vitest.config.mts"),
       "utf8",
     );
     expect(vitestConfig).toContain(

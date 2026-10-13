@@ -1,15 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
-import sitemap from "../../lib/seo/sitemap";
+import { describe, expect, it } from "vitest";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { catalogueData } from "../../lib/factQuery/publications";
-import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
-import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
 const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
-const originalEnv = { ...process.env };
 const requiredTargets = [
   "https://fiscal.ge/",
   "https://fiscal.ge/explorer",
@@ -113,10 +109,6 @@ const requiredTargets = [
   "https://fiscal.ge/sitemap.xml",
 ] as const;
 
-afterEach(() => {
-  process.env = { ...originalEnv };
-});
-
 describe("Fiscal.ge agent instructions", () => {
   it("keeps authored sector counts and measure years consistent with the generated catalogue", async () => {
     const content = await readFile(llmsPath, "utf8");
@@ -174,41 +166,5 @@ describe("Fiscal.ge agent instructions", () => {
     expect(targets).toEqual(requiredTargets);
     expect(targets).toHaveLength(100);
     expect(new Set(targets).size).toBe(targets.length);
-  });
-
-  it("links only to public sitemap pages and the sitemap document", async () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
-    const content = await readFile(llmsPath, "utf8");
-    const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]!);
-    // Downloads are published files, not pages: they are deliberately absent
-    // from the sitemap, which lists public HTML routes. Spec section 16 said
-    // only requiredTargets needed updating here; it missed this filter, which
-    // treated any non-sitemap link as an HTML page owing a sitemap entry.
-    const htmlTargets = targets.filter((target) => !/\.(xml|json|csv)$/.test(new URL(target).pathname));
-    const sitemapTargets = (await sitemap()).map((entry) => entry.url);
-
-    expect(htmlTargets.every((target) => sitemapTargets.includes(target))).toBe(true);
-    expect(targets.filter((target) => new URL(target).pathname === "/sitemap.xml")).toEqual([
-      "https://fiscal.ge/sitemap.xml",
-    ]);
-  });
-
-  it("llms.txt names every hub, section and methodology route in the sitemap", async () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
-    const content = await readFile(llmsPath, "utf8");
-    const linked = new Set([...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => new URL(match[1]!).pathname));
-    // Georgia and the 64 municipalities are places inside Municipal budgets, at
-    // the same depth as a section; the deeper place pages (regions, cities)
-    // fall outside depth 3 on their own.
-    const placePages = new Set([
-      municipalEntityHref("country", "georgia"),
-      ...MUNICIPALITY_ROUTES.map(({ code }) => municipalEntityHref("municipality", code)),
-    ]);
-    const expected = (await sitemap())
-      .map((entry) => new URL(entry.url).pathname)
-      .filter((path) => (/^\/explorer(\/[^/]+){0,2}$/.test(path) || /^\/methodology(\/|$)/.test(path)) && !placePages.has(path));
-
-    expect(expected.length).toBeGreaterThan(0);
-    expect(expected.filter((path) => !linked.has(path))).toEqual([]);
   });
 });

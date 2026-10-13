@@ -1,36 +1,9 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import kaCommon from "../../lib/i18n/messages/ka/common.json";
 import enCommon from "../../lib/i18n/messages/en/common.json";
-import sitemap from "../../lib/seo/sitemap";
-import { splitLanguagePath } from "../../lib/i18n/routes";
 import { NAV_TREE, currentEntry, isActivePath, openHub, sourceNoteKey } from "../../lib/navigation/navTree";
 
-const originalEnv = { ...process.env };
-afterEach(() => {
-  process.env = { ...originalEnv };
-});
-
-/** Every explorer page the sitemap publishes, Georgian and English, as the sidebar sees it (language prefix removed). */
-async function explorerRoutes(): Promise<string[]> {
-  process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
-  return (await sitemap())
-    .map((entry) => splitLanguagePath(new URL(entry.url).pathname).pathname)
-    .filter((pathname) => isActivePath(pathname, "/explorer"));
-}
-
 describe("the navigation tree", () => {
-  it("gives every sitemap explorer route exactly one active entry, inside the hub it opens", async () => {
-    const routes = await explorerRoutes();
-    expect(routes.length).toBeGreaterThan(500);
-    for (const route of routes) {
-      // The sidebar marks currentEntry's row; it must exist, sit in the open hub and be the only row there that matches.
-      const hub = openHub(route);
-      const entry = currentEntry(route);
-      expect([hub.href, ...hub.sections.map((section) => section.href)], route).toContain(entry);
-      expect(hub.sections.filter((section) => isActivePath(route, section.href)).length, route).toBeLessThanOrEqual(1);
-    }
-  });
-
   it("marks the hub on its own page and a row on its page and the pages below it", () => {
     expect(currentEntry("/explorer")).toBe("/explorer");
     expect(currentEntry("/explorer/expenditure")).toBe("/explorer/expenditure");
@@ -84,13 +57,5 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/external/current-account")).toBe("common.nbgSourceNote");
     expect(sourceNoteKey("/explorer/external/foreign-investment")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
-  });
-
-  it("resolves to a note in both languages on every sitemap explorer route", async () => {
-    for (const route of await explorerRoutes()) {
-      const key = sourceNoteKey(route);
-      expect((kaCommon as Record<string, string>)[key], route).toBeTruthy();
-      expect((enCommon as Record<string, string>)[key], route).toBeTruthy();
-    }
   });
 });

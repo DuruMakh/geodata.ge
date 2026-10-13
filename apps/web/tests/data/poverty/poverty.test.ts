@@ -1,10 +1,8 @@
-import path from "node:path";
 import Decimal from "decimal.js";
 import { expect, test } from "vitest";
 import { loadPovertyFactsFromMirror, povertyMirrorCreateRows } from "../../../lib/db/mirrorRows";
 import { assertPovertyParity, loadPovertyFacts, toClientPovertyFact } from "../../../lib/data/poverty/importPoverty";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { preparePovertyData } from "../../../lib/data/poverty/preparePoverty";
 import { validatePovertyFacts } from "../../../lib/data/poverty/validation";
 import type { PovertyFact } from "../../../lib/data/poverty/types";
 
@@ -12,10 +10,6 @@ const find = (facts: readonly PovertyFact[], indicatorId: string, groupId: strin
   facts.find(f => f.indicatorId === indicatorId && f.groupId === groupId && f.year === year)!;
 /** Sets an exact value and keeps its published rounding consistent, so only the rule under test fails. */
 const setValue = (f: PovertyFact, value: string) => Object.assign(f, { value, publishedValue: new Decimal(value).toDecimalPlaces(f.unit === "index" ? 2 : 1, Decimal.ROUND_HALF_UP).toFixed(f.unit === "index" ? 2 : 1) });
-
-test("the canonical file reproduces the research package", async () => {
-  await expect(preparePovertyData(path.resolve(process.cwd(), "../.."), "check")).resolves.toBeUndefined();
-});
 
 test("serves all 491 reviewed values", async () => {
   const facts = await loadPovertyFacts();

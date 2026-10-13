@@ -1,12 +1,22 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { afterAll, expect, test } from "vitest";
+import { afterAll, beforeAll, expect, test } from "vitest";
 import { serializeBomCsvRows } from "../../../lib/data/csvEscape";
+import type { TradeParseCache } from "../../../lib/data/parsing/tradeSourceWorkbook";
 import { cleanupTradeProductsFixtures, createTradeProductsPackageFixture, readTradeProductsReport, TRADE_RESEARCH } from "./fixtures";
 
 const modulePath = "../../../lib/data/tradeProducts/prepareTradeProducts";
-const prepare = async () => (await import(modulePath)).prepareTradeProductsData as (root: string, mode: "write" | "check") => Promise<void>;
+// Every case reruns the preparation over a copy of the package with one file changed. Unchanged inputs (the 70 MB
+// reconciliation, the layouts, the HS4 files and workbooks) are parsed once and shared through this cache; a changed
+// file has a new hash and is parsed again, so each case still runs the whole preparation over its own bytes.
+const parsed: TradeParseCache = new Map();
+const prepare = async () => {
+  const run = (await import(modulePath)).prepareTradeProductsData as (root: string, mode: "write" | "check", cache: TradeParseCache) => Promise<void>;
+  return (root: string, mode: "write" | "check") => run(root, mode, parsed);
+};
+let historicalRows: Record<string, string>[];
+beforeAll(async () => { historicalRows = parse(await readFile(path.join(process.cwd(), "../..", TRADE_RESEARCH, "goods-products-annual/hs4-1995-1999.csv")), { columns: true, bom: true }) as Record<string, string>[]; });
 afterAll(cleanupTradeProductsFixtures);
 
 test("accepts every separate HS4 source identity without rounding or accepting services", async () => {
@@ -38,7 +48,7 @@ test.each([
 ] as const)("rejects %s in the frozen historical input", async (_name, mutate) => {
   const run = await prepare(), directory = await createTradeProductsPackageFixture();
   const filename = path.join(directory, TRADE_RESEARCH, "goods-products-annual/hs4-1995-1999.csv");
-  const rows = parse(await readFile(filename), { columns: true, bom: true }) as Record<string, string>[];
+  const rows = historicalRows.map(row => ({ ...row }));
   const headers = Object.keys(rows[0]); mutate(rows);
   await writeFile(filename, serializeBomCsvRows([headers, ...rows.map(row => headers.map(header => row[header]))]));
   await expect(run(directory, "write")).rejects.toThrow(/source|coverage|identity|duplicate|unit|value|status/i);

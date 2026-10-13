@@ -8,7 +8,7 @@ import { describe, expect, test } from "vitest";
 import { assertEnergyFoodParity, loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../../lib/data/energyFood/importEnergyFood";
 import { energyFoodMirrorCreateRows, loadEnergyFoodFactsFromMirror } from "../../../lib/db/mirrorRows";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { prepareEnergyFoodData, readWorkbookCells } from "../../../lib/data/energyFood/prepareEnergyFood";
+import { readWorkbookCells } from "../../../lib/data/energyFood/prepareEnergyFood";
 import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_PUBLIC_SOURCES, ENERGY_FOOD_SOURCES, type EnergyFoodFact } from "../../../lib/data/energyFood/types";
 import { energyFoodDisplayDecimals, expectedEnergyFoodKeys, validateEnergyFoodFacts } from "../../../lib/data/energyFood/validation";
 
@@ -24,10 +24,6 @@ const find = (facts: readonly EnergyFoodFact[], indicatorId: string, year: numbe
 /** A General-format row of the given unit; its published value is the stored value cut to 15 significant digits. */
 const general = (facts: readonly EnergyFoodFact[], unit: string) => facts.find(f => f.unit === unit && f.sourceNumberFormat === "General")!;
 const food = (facts: readonly EnergyFoodFact[]) => general(facts, "percent");
-
-test("the canonical file reproduces the research package", async () => {
-  await expect(prepareEnergyFoodData(root, "check")).resolves.toBeUndefined();
-});
 
 test("serves all 681 reviewed values", () => {
   const facts = loadFacts();

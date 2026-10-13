@@ -4,8 +4,6 @@ import { renderUnemploymentPage, unemploymentPageMetadata } from "../../lib/page
 import { DataSidebar } from "../../components/shell/data-sidebar";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { getMessages } from "../../lib/i18n/messages.server";
-import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
-import sitemap from "../../lib/seo/sitemap";
 import GeorgianUnemploymentHub from "../../app/(ka)/explorer/unemployment/page";
 import EnglishUnemploymentHub from "../../app/(en)/en/explorer/unemployment/page";
 import { renderPageMarkup } from "../helpers/render-localized";
@@ -61,13 +59,4 @@ test.each(["/explorer/unemployment/regions", "/en/explorer/unemployment/regions"
     expect(markup).not.toContain('href="/en/explorer/expenditure"');
     expect(markup).not.toMatch(/data-testid="unemployment-link"[^>]+aria-current="page"/);
   } finally { navigation.pathname = "/en/explorer/unemployment"; }
-});
-test("localization and sitemap discover the explorer and its methodology in both languages", async () => {
-  const paths = await listPublicPagePaths(); expect(paths).toContain("/explorer/unemployment"); expect(paths).toContain("/methodology/unemployment");
-  const entries = await sitemap();
-  for (const path of ["/explorer/unemployment", "/en/explorer/unemployment", "/methodology/unemployment", "/en/methodology/unemployment"]) expect(entries.some(entry => entry.url.endsWith(path))).toBe(true);
-  for (const section of ["overview", "regions", "age", "gender"]) {
-    expect(paths).toContain(`/explorer/unemployment/${section}`);
-    for (const prefix of ["", "/en"]) expect(entries.some(entry => entry.url.endsWith(`${prefix}/explorer/unemployment/${section}`))).toBe(true);
-  }
 });

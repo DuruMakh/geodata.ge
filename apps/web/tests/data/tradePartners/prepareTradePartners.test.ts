@@ -1,16 +1,26 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { afterAll, expect, test } from "vitest";
+import { afterAll, beforeAll, expect, test } from "vitest";
 import { serializeBomCsvRows } from "../../../lib/data/csvEscape";
+import type { TradeParseCache } from "../../../lib/data/parsing/tradeSourceWorkbook";
 import { cleanupTradePartnersFixtures, createTradePartnersPackageFixture, readTradePartnersReport, TRADE_RESEARCH } from "./fixtures";
 
 const modulePath = "../../../lib/data/tradePartners/prepareTradePartners";
-const prepare = async () => (await import(modulePath)).prepareTradePartnersData as (root: string, mode: "write" | "check") => Promise<void>;
+// Every case reruns the preparation over a copy of the package with one file changed. Unchanged inputs (the 70 MB
+// reconciliation, the layouts, the country rows and the workbooks) are parsed once and shared through this cache; a
+// changed file has a new hash and is parsed again, so each case still runs the whole preparation over its own bytes.
+const parsed: TradeParseCache = new Map();
+const prepare = async () => {
+  const run = (await import(modulePath)).prepareTradePartnersData as (root: string, mode: "write" | "check", cache: TradeParseCache) => Promise<void>;
+  return (root: string, mode: "write" | "check") => run(root, mode, parsed);
+};
+let countryRows: Record<string, string>[];
+beforeAll(async () => { countryRows = parse(await readFile(path.join(process.cwd(), "../..", TRADE_RESEARCH, "goods-countries-annual.csv")), { columns: true, bom: true }) as Record<string, string>[]; });
 afterAll(cleanupTradePartnersFixtures);
 
-async function mutateCsv(directory: string, name: string, mutate: (rows: Record<string, string>[]) => void) {
-  const file = path.join(directory, TRADE_RESEARCH, name), rows = parse(await readFile(file), { columns: true, bom: true }) as Record<string, string>[];
+async function mutateCountryRows(directory: string, mutate: (rows: Record<string, string>[]) => void) {
+  const file = path.join(directory, TRADE_RESEARCH, "goods-countries-annual.csv"), rows = countryRows.map(row => ({ ...row }));
   const headers = Object.keys(rows[0]); mutate(rows);
   await writeFile(file, serializeBomCsvRows([headers, ...rows.map(row => headers.map(header => row[header]))]));
 }
@@ -49,7 +59,7 @@ test.each([
   ["invented zero", (r: Record<string, string>[]) => { const x = r.find(x => x.value_status === "not_applicable")!; x.value_status = "numeric"; x.value_usd = "0"; x.source_value = "0"; }],
 ] as const)("rejects an altered %s instead of publishing a coherent but false CSV", async (_name, mutate) => {
   const run = await prepare(), directory = await createTradePartnersPackageFixture();
-  await mutateCsv(directory, "goods-countries-annual.csv", mutate);
+  await mutateCountryRows(directory, mutate);
   await expect(run(directory, "write")).rejects.toThrow(/source|coverage|identity|duplicate|role|unit|format|status/i);
 }, 30_000);
 
