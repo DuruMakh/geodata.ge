@@ -72,10 +72,12 @@ function methodNotAllowed(): Response {
   return new Response(
     JSON.stringify({
       jsonrpc: "2.0",
-      error: { code: -32000, message: "Method not allowed. This endpoint accepts POST only." },
+      // People open this address in a browser to test it; /connect is where
+      // connecting an assistant is explained.
+      error: { code: -32000, message: "Method not allowed. This endpoint accepts POST only. To connect an AI assistant, see https://fiscal.ge/connect." },
       id: null,
     }),
-    { status: 405, headers: { "content-type": "application/json", allow: "POST" } },
+    { status: 405, headers: { "content-type": "application/json", allow: "POST", link: '<https://fiscal.ge/connect>; rel="help"' } },
   );
 }
 
@@ -105,17 +107,15 @@ function toolNameOf(body: unknown): string {
   return PROTOCOL_METHODS.has(message.method) ? message.method : "unknown_method";
 }
 
-/** The response a counter verdict demands, or null to carry on. */
-function refusalFor(verdict: CounterVerdict): Response | null {
-  if (verdict === "deny") {
-    return rpcError(
-      429,
-      "rate_limited",
-      "მოთხოვნების რაოდენობა ლიმიტს გადააჭარბა. სცადეთ ერთი წუთის შემდეგ, ან ჩამოტვირთეთ ფაილები.",
-      "Rate limit exceeded. Retry in a minute, or download the published files at https://fiscal.ge/downloads/data/manifest.json.",
-      { "retry-after": String(RATE_WINDOW_SECONDS) },
-    );
-  }
+/** What a refused caller is told for one limit. */
+type Denial = { messageKa: string; messageEn: string; retryAfter: () => string };
+
+/**
+ * The response a counter verdict demands, or null to carry on. Carries the
+ * request's id, so a client can match the refusal to the call it refused.
+ */
+function refusalFor(verdict: CounterVerdict, denial: Denial, id: string | number | null): Response | null {
+  if (verdict === "deny") return rpcError(429, "rate_limited", denial.messageKa, denial.messageEn, { "retry-after": denial.retryAfter() }, -32000, id);
   if (verdict === "unavailable") {
     // No configured shared limiter, or the limiter itself failed. Serving
     // unlimited public traffic is a section 18 stop condition, so this fails
@@ -126,10 +126,30 @@ function refusalFor(verdict: CounterVerdict): Response | null {
       "სერვისი დროებით მიუწვდომელია.",
       "Request limiting is unavailable, so the service is not accepting requests. Try again later.",
       { "retry-after": "60" },
+      -32000,
+      id,
     );
   }
   return null;
 }
+
+const untilMidnight = (): string => String(DAY_SECONDS - Math.floor(Date.now() / 1000) % DAY_SECONDS);
+
+const MINUTE_DENIAL: Denial = {
+  messageKa: "მოთხოვნების რაოდენობა ლიმიტს გადააჭარბა. სცადეთ ერთი წუთის შემდეგ, ან ჩამოტვირთეთ ფაილები.",
+  messageEn: "Rate limit exceeded. Retry in a minute, or download the published files at https://fiscal.ge/downloads/data/manifest.json.",
+  retryAfter: () => String(RATE_WINDOW_SECONDS),
+};
+const KEY_DAY_DENIAL: Denial = {
+  messageKa: "თქვენი დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.",
+  messageEn: "Your daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.",
+  retryAfter: untilMidnight,
+};
+const SHARED_DAY_DENIAL: Denial = {
+  messageKa: "დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.",
+  messageEn: "The daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.",
+  retryAfter: untilMidnight,
+};
 
 /**
  * CORS preflight.
@@ -160,15 +180,7 @@ function preflight(request: Request): Response {
   });
 }
 
-/**
- * Nothing thrown here reaches the caller or the log.
- *
- * Without this, an unexpected throw - an unreadable snapshot, a transport
- * fault - returns Next's default 500 instead of the bilingual envelope every
- * other failure uses, emits no log record at all, and writes a stack
- * containing absolute bundle paths to the platform log. Sections 11.2 and 11.5
- * forbid publishing both. The caught value is deliberately never inspected.
- */
+/** Headers every answer carries, whatever produced it. */
 function withResponseHeaders(request: Request, response: Response): Response {
   response.headers.append("vary", "origin");
   response.headers.set("cache-control", "no-store");
@@ -184,6 +196,15 @@ const LOG_ERROR_CODES = new Set<string>([...errorCodeSchema.options, "request_to
 
 type RequestContext = { tool: string; dataVersion: string; id?: string | number };
 
+/**
+ * Nothing thrown inside `serve` reaches the caller or the log.
+ *
+ * Without the catch below, an unexpected throw - an unreadable snapshot, a
+ * transport fault - returns Next's default 500 instead of the bilingual
+ * envelope every other failure uses, emits no log record at all, and writes a
+ * stack containing absolute bundle paths to the platform log. Sections 11.2 and
+ * 11.5 forbid publishing both. The caught value is deliberately never inspected.
+ */
 async function handle(request: Request): Promise<Response> {
   const startedAt = Date.now();
   const context: RequestContext = { tool: "unparsed", dataVersion: "unavailable" };
@@ -203,7 +224,9 @@ async function handle(request: Request): Promise<Response> {
   const body = text.length === 0 ? null : JSON.parse(text);
   const failed = response.status >= 400 || body?.error !== undefined || body?.result?.isError === true;
   const toolText = body?.result?.content?.find((item: { type: string }) => item.type === "text")?.text ?? "";
-  const code = body?.error?.data?.code ?? /^error ([a-z_]+)/m.exec(toolText)?.[1];
+  // The SDK rejects a schema-shape mistake itself, in English and without the
+  // core's `error <code>` line; it is still the caller's bad arguments.
+  const code = body?.error?.data?.code ?? /^error ([a-z_]+)/m.exec(toolText)?.[1] ?? (/^Input validation error/.test(toolText) ? "invalid_parameters" : undefined);
   logToolCall({
     ...context,
     resultBytes: Buffer.byteLength(text, "utf8"),
@@ -301,25 +324,18 @@ async function serve(request: Request, context: RequestContext): Promise<Respons
   // share one bucket rather than skipping the limit. Every request on Vercel is
   // keyed; anywhere else this fails towards refusing rather than towards
   // serving, which is the posture the rest of this module takes.
+  const id = context.id ?? null;
   const perKey = await counter().hit(`mcp:rate:${key ?? "unkeyed"}`, RATE_WINDOW_SECONDS, RATE_MAX_REQUESTS);
-  const perKeyRefusal = refusalFor(perKey);
+  const perKeyRefusal = refusalFor(perKey, MINUTE_DENIAL, id);
   if (perKeyRefusal !== null) return perKeyRefusal;
 
   const today = new Date().toISOString().slice(0, 10);
-  const untilMidnight = (): HeadersInit => ({ "retry-after": String(DAY_SECONDS - Math.floor(Date.now() / 1000) % DAY_SECONDS) });
-
-  const perKeyDaily = await counter().hit(`mcp:keyday:${key ?? "unkeyed"}:${today}`, DAY_SECONDS, RATE_PER_KEY_DAILY_MAX);
-  if (perKeyDaily === "deny") {
-    return rpcError(429, "rate_limited", "თქვენი დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.", "Your daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.", untilMidnight());
-  }
-  const perKeyDailyRefusal = refusalFor(perKeyDaily);
+  const perKeyDaily = await counter().hit(`mcp:keyday:${key ?? "unkeyed"}:${today}`, DAY_SECONDS, RATE_PER_KEY_DAILY_MAX, "fixed");
+  const perKeyDailyRefusal = refusalFor(perKeyDaily, KEY_DAY_DENIAL, id);
   if (perKeyDailyRefusal !== null) return perKeyDailyRefusal;
 
-  const daily = await counter().hit(`mcp:daily:${today}`, DAY_SECONDS, DAILY_MAX);
-  if (daily === "deny") {
-    return rpcError(429, "rate_limited", "დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.", "The daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.", untilMidnight());
-  }
-  const dailyRefusal = refusalFor(daily);
+  const daily = await counter().hit(`mcp:daily:${today}`, DAY_SECONDS, DAILY_MAX, "fixed");
+  const dailyRefusal = refusalFor(daily, SHARED_DAY_DENIAL, id);
   if (dailyRefusal !== null) return dailyRefusal;
 
   // 5. The SDK classifies protocol eras. Its default legacy adapter streams

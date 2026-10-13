@@ -34,8 +34,14 @@ export function isPaused(): boolean {
 
 export type CounterVerdict = "allow" | "deny" | "unavailable";
 
+/**
+ * `rolling` counts the last `windowSeconds`; `fixed` counts from the first hit
+ * until the key expires, which is what a date-stamped daily key needs.
+ */
+export type CounterWindow = "rolling" | "fixed";
+
 export type Counter = {
-  hit(key: string, windowSeconds: number, max: number): Promise<CounterVerdict>;
+  hit(key: string, windowSeconds: number, max: number, window?: CounterWindow): Promise<CounterVerdict>;
 };
 
 /**

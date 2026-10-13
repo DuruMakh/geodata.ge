@@ -26,7 +26,9 @@ async function main() {
 
   if (write) {
     await mkdir(path.dirname(OUTPUT), { recursive: true });
-    await writeFile(OUTPUT, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+    // Minified: the function reads and parses this file on every cold start,
+    // and indentation made it about 45% larger for no reader's benefit.
+    await writeFile(OUTPUT, `${JSON.stringify(snapshot)}\n`, "utf8");
     process.stdout.write(`wrote ${OUTPUT} dataVersion=${snapshot.dataVersion}\n`);
     return;
   }

@@ -371,7 +371,10 @@ There is no session store, model invocation, authentication, or write tool.
 ### Snapshot and network boundary
 
 All MCP data answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
-at build time and cached once per function instance. The sole runtime network
+at build time and cached once per function instance. It is written minified: 32.1 MB
+on 2026-10-13 (46.3 MB indented), about 0.2 s to read and 0.3 s to parse on the first
+request of each instance. The server text built from it (coverage, tool descriptions,
+instructions) and the tools' JSON Schemas are also built once per instance. The sole runtime network
 exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
 commands to the configured Upstash endpoint. It never sends query arguments,
 figures, source documents, prompts, or raw client addresses. There is no runtime
@@ -414,17 +417,20 @@ counter, so they cannot drain it. They are not free: every refusal still costs
 Upstash commands (below). Both daily keys are date-keyed integers that expire
 automatically.
 
-Each hit is an atomic Lua operation. Counters are shared across function
+Each hit is an atomic Lua operation; the route tells it whether the window is
+rolling (the minute) or fixed (the date-stamped daily keys). Counters are shared across function
 instances. Production and preview counter namespaces are separate. A limit
 reached returns 429 and Retry-After; either daily refusal points to the next UTC day.
 These are request allowances, so initialization and discovery also count.
 
 The free service has its own monthly quota (500,000 commands at setup).
 [Upstash counts EVAL and its nested Redis commands](https://upstash.com/docs/redis/sdks/ratelimit-ts/costs):
-the current successful request uses six for the minute bucket and four for each
-of the two daily buckets, fourteen in all. That allows roughly 35,000 accepted
-requests per month before other usage. Refused requests also consume commands:
-about four for a minute refusal and eight for a per-client daily refusal. The
+the current successful request uses six for the minute bucket and three for each
+of the two daily buckets (a daily key's expiry is set once, by the first hit of
+the day), twelve in all. That allows roughly 41,000 accepted requests per month
+before other usage. Refused requests also consume commands: about four for a
+minute refusal, eight for a per-client daily refusal and eleven for a global
+daily refusal, which passes both per-client checks first. The
 10,000/day application ceiling is not guaranteed sustainable daily capacity on
 the free plan. It does
 not guarantee continuous availability under an attack or sustained maximum

@@ -7,6 +7,7 @@ import { CopyEndpoint } from "../../components/connect/copy-endpoint";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { describeCoverage } from "../factQuery/describeCoverage";
+import { sectorMeasureYearSpans } from "../factQuery/economicSectorsSeries";
 import type { CoverageData } from "../factQuery/describeCoverage";
 import { inflationCatalogueSeries, inflationDatasetPeriods, inflationEntityPeriods } from "../factQuery/inflationData";
 import { inflationProductIndex } from "../factQuery/inflationProductData";
@@ -62,10 +63,7 @@ function coverage(): {
   return {
     ranges,
     sectorCount: snapshot.economicSectors.registry.filter(series => series.classificationCode !== null).length,
-    sectorRanges: Object.fromEntries(["nominal", "share_of_gdp", "real_growth"].map(measure => {
-      const years = snapshot.economicSectors.facts.filter(fact => fact.measure === measure).map(fact => fact.year);
-      return [measure, `${Math.min(...years)}–${Math.max(...years)}`];
-    })),
+    sectorRanges: Object.fromEntries(Object.entries(sectorMeasureYearSpans(snapshot)).map(([measure, [first, last]]) => [measure, `${first}–${last}`])),
     inflation: (() => {
       const series = inflationCatalogueSeries(snapshot);
       const firstOf = (measure: string) =>
@@ -206,7 +204,7 @@ export async function renderConnectPage(locale: Locale) {
               >
                 {endpoint}
               </code>
-              <CopyEndpoint endpoint={endpoint} copyLabel={message(messages, "connect.copyEndpoint")} copiedLabel={message(messages, "connect.copiedEndpoint")} copyText={message(messages, "connect.copy")} copiedText={message(messages, "connect.copied")} />
+              <CopyEndpoint value={endpoint} copyLabel={message(messages, "connect.copyEndpoint")} copiedLabel={message(messages, "connect.copiedEndpoint")} copyText={message(messages, "connect.copy")} copiedText={message(messages, "connect.copied")} />
             </div>
             <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[0.78125rem] text-[var(--body)]">
               <li>{message(messages, "connect.free")}</li>
@@ -254,7 +252,7 @@ export async function renderConnectPage(locale: Locale) {
                 {message(messages, "connect.quotedPrompt", { prompt: message(messages, CHAT_PROMPT) })}
               </p>
               <CopyEndpoint
-                endpoint={message(messages, CHAT_PROMPT)}
+                value={message(messages, CHAT_PROMPT)}
                 testId="connect-copy-prompt"
                 copyLabel={message(messages, "connect.copyPrompt")}
                 copyText={message(messages, "connect.copy")}
@@ -384,6 +382,7 @@ export async function renderConnectPage(locale: Locale) {
               {message(messages, "connect.technical")}
             </p>
             <p className="mt-3 max-w-[900px] text-[0.75rem] leading-[1.9] text-[var(--muted)]">{message(messages, "connect.languageContract")}</p>
+            <p className="mt-3 max-w-[900px] text-[0.75rem] leading-[1.9] text-[var(--muted)]" data-testid="connect-fair-use">{message(messages, "connect.fairUse")}</p>
           </section>
         </main>
         <SiteFooter locale={locale} updatedAt={model.updatedAt} />

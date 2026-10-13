@@ -27,11 +27,24 @@ export type SectorMeasureYears = Partial<Record<keyof typeof SECTOR_QUERY_MEASUR
  */
 export function serverInstructions(
   coverage: Partial<Record<DatasetId, string>>,
-  entities: { municipalities: number; regions: number },
+  entities: {
+    municipalities: number;
+    regions: number;
+    regionalEconomyRegions?: number;
+    regionalActivities?: number;
+    regionalLastYear?: number;
+    sectorActivities?: number;
+    cities?: number;
+    cityDivisions?: number;
+    cityFirstPeriod?: string;
+  },
   sectorMeasureYears: SectorMeasureYears = {},
 ): string {
   const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
   const sectorRange = (measure: keyof SectorMeasureYears) => sectorMeasureYears[measure] ?? "see describe_coverage";
+  // Counts read from the snapshot like the ranges; without one the sentence
+  // still reads, it just states no number.
+  const counted = (count: number | undefined) => (count === undefined ? "" : `${count} `);
 
   return `Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government
 debt and fiscal balance, GDP and national economic sectors (all annual), and monthly
@@ -39,12 +52,12 @@ consumer-price inflation.
 
 WHAT IS SERVED
 - Regional economies, ${range("regional-economies")}, through query_regional_economies.
-  Eleven regions, Total regional GDP and twenty NACE Rev.2 activities. Values
+  ${counted(entities.regionalEconomyRegions)}regions, Total regional GDP and ${counted(entities.regionalActivities)}NACE Rev.2 activities. Values
   are current-price GEL; activity shares divide basic-price GVA by the same
-  region's complete market-price GDP. No 2025, real growth, per-capita value or
+  region's complete market-price GDP. No ${entities.regionalLastYear === undefined ? "" : `year after ${entities.regionalLastYear}, `}real growth, per-capita value or
   region share of Georgia's GDP is served. Do not imply a multi-region chart.
 - National economic sectors, ${range("economic-sectors")}, through query_economic_sectors.
-  Twenty NACE Rev.2 activities and a separately published Total GDP reference.
+  ${counted(entities.sectorActivities)}NACE Rev.2 activities and a separately published Total GDP reference.
   Nominal GEL and GDP shares cover ${sectorRange("amount_gel")}; annual real growth covers ${sectorRange("real_growth_pct")}.
   Inspect yearsByMeasure in describe_coverage. Sectors are GVA at basic prices;
   shares divide by market-price GDP and need not sum to 100%. Growth 7.5 means 7.5%.
@@ -166,8 +179,8 @@ INFLATION
   two published numbers; it is not a verdict on the central bank. No target
   before the first reviewed month is verified; do not say none existed.
 - City figures (query_inflation entityIds, rank dimension entities with entityType
-  city) cover the six cities where Geostat records prices, from 2016-01, for the
-  total and the 12 divisions. A city's inflation is not its region's, nor that
+  city) cover the ${counted(entities.cities)}cities where Geostat records prices, from ${entities.cityFirstPeriod ?? "the first period describe_coverage reports"}, for the
+  total and the ${counted(entities.cityDivisions)}divisions. A city's inflation is not its region's, nor that
   city's cost of living or price level. Some prices are recorded once and applied
   to every city; say so when a city difference in a division is the point.
 - The national CPI is a weighted mean of the city indices. Geostat does not publish

@@ -893,10 +893,19 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       }
     }
 
+    // A search is a lookup, so it answers with what matched: the datasets the
+    // matches belong to and any excluded code it names, not the whole
+    // catalogue, which the no-argument call already returns.
+    const matchedDatasets = new Set<DatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
     return {
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
-      data: { datasets, series: foundSeries, entities: foundEntities, exclusions },
+      data: {
+        datasets: datasets.filter((dataset) => matchedDatasets.has(dataset.datasetId)),
+        series: foundSeries,
+        entities: foundEntities,
+        exclusions: exclusions.filter((exclusion) => matchesSearch(input.search!, [exclusion.entityId])),
+      },
       meta,
     };
   }

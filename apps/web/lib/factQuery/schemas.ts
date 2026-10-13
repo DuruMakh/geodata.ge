@@ -20,8 +20,17 @@ const uniqueSortedYears = z
   .max(INPUT_LIMITS.years)
   .transform((years) => Array.from(new Set(years)).sort((a, b) => a - b));
 
+/**
+ * The longest id served is 78 characters. An unknown id is echoed back in the
+ * error (in both languages and among the valid choices), so without a bound a
+ * caller could reflect up to the 32 KiB body limit, doubled, into the text a
+ * model reads. tests/mcp/tools.test.ts fails if a served id ever outgrows it.
+ */
+export const ID_MAX_LENGTH = 100;
+export const idString = z.string().min(1).max(ID_MAX_LENGTH);
+
 const boundedIds = (max: number) =>
-  z.array(z.string().min(1)).min(1).max(max).transform((ids) => Array.from(new Set(ids)));
+  z.array(idString).min(1).max(max).transform((ids) => Array.from(new Set(ids)));
 
 const seriesIdList = boundedIds(INPUT_LIMITS.series);
 const entityIdList = boundedIds(INPUT_LIMITS.entities);
@@ -48,7 +57,7 @@ export const economicSectorMeasure = z.enum(["amount_gel", "share_of_gdp_pct", "
 export const queryEconomicSectorsInput = z.strictObject({ seriesIds: seriesIdList, years: uniqueSortedYears, measure: economicSectorMeasure, expectedDataVersion });
 export const inflationMeasure = z.enum(INFLATION_MEASURES);
 export const queryInflationProductsInput = z.strictObject({
-  seriesIds: z.array(z.string().min(1)).min(1).max(INPUT_LIMITS.series).refine(ids => new Set(ids).size === ids.length, "seriesIds must be unique"),
+  seriesIds: z.array(idString).min(1).max(INPUT_LIMITS.series).refine(ids => new Set(ids).size === ids.length, "seriesIds must be unique"),
   measure: z.enum(PRODUCT_QUERY_MEASURES),
   fromPeriod: periodKeySchema,
   toPeriod: periodKeySchema,
@@ -167,10 +176,10 @@ export const rankInput = z
     datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation", "inflation-products"]),
     dimension: z.enum(["series", "entities"]),
     level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),
-    parentSeriesId: z.string().optional().describe("For ministries with level major_program, or inflation with level subgroup: filters to that parent."),
+    parentSeriesId: idString.optional().describe("For ministries with level major_program, or inflation with level subgroup: filters to that parent."),
     entityType: z.enum(["municipality", "region", "city"]).optional(),
-    seriesId: z.string().optional(),
-    withinRegionId: z.string().optional().describe("Only for municipal rankings with entityType municipality; obtain the region id from describe_coverage."),
+    seriesId: idString.optional(),
+    withinRegionId: idString.optional().describe("Only for municipal rankings with entityType municipality; obtain the region id from describe_coverage."),
     year: z.number().int().optional(),
     startYear: z.number().int().optional().describe("inflation-products cumulative_pct only: first calendar year of compounding."),
     fromYear: z.number().int().optional(),

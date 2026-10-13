@@ -21,6 +21,19 @@ describe("production shared counter", () => {
     expect(command[3]).toBe("production:mcp:rate:test");
     expect(fetcher.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
   });
+  // The script used to recognise a daily key by its window being exactly 86400
+  // seconds, a number coupled to the route's own constant (U30-11).
+  it("tells the script which kind of window it is counting", async () => {
+    configure();
+    const fetcher = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ result: 1 })));
+    vi.stubGlobal("fetch", fetcher);
+    await createCounter().hit("mcp:rate:test", 60, 60);
+    await createCounter().hit("mcp:daily:test", 86_400, 10_000, "fixed");
+    const [rolling, fixed] = fetcher.mock.calls.map((call) => JSON.parse(call[1].body));
+    expect(rolling[7]).toBe("rolling");
+    expect(fixed[7]).toBe("fixed");
+    expect(fixed[1]).not.toContain("86400");
+  });
   it.each([{ result: null }, { error: "unavailable" }, { result: "unexpected" }])("fails closed on an unusable response %#", async (body) => {
     configure();
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json(body)));

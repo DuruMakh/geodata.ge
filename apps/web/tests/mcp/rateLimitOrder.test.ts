@@ -89,6 +89,16 @@ describe.each(["legacy", "modern"])("%s rate-limit failures", era => {
     expect(await response.text()).toContain("/downloads/data/manifest.json");
     expect(dailyHits()).toEqual([]);
   });
+  // A JSON-RPC client matches a reply to its request by id; with null it cannot
+  // tell which call was refused, and a retry layer reads a transport fault (U30-05).
+  it.each([["minute", "deny"], ["per-key daily", "deny"], ["daily", "deny"], ["minute", "unavailable"], ["daily", "unavailable"]] as const)("answers a %s %s with the request's own id", async (limit, verdict) => {
+    if (limit === "minute") state.perKeyVerdict = verdict;
+    else if (limit === "per-key daily") state.perKeyDailyVerdict = verdict;
+    else state.dailyVerdict = verdict;
+    const response = await POST(request());
+    expect(response.status).toBe(verdict === "deny" ? 429 : 503);
+    expect((await response.json()).id).toBe(era === "legacy" ? 1 : 61);
+  });
   it.each([["minute", 1], ["per-key daily", 2], ["daily", 3]] as const)("fails closed if the %s limiter is unavailable", async (limit, hits) => {
     if (limit === "minute") state.perKeyVerdict = "unavailable";
     else if (limit === "per-key daily") state.perKeyDailyVerdict = "unavailable";

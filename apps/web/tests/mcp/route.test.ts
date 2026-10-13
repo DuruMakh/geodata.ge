@@ -135,7 +135,11 @@ describe("/mcp route", () => {
     expect(response.headers.get("allow")).toBe("POST");
     expect(response.headers.get("content-type")).toContain("application/json");
     // Not a stream: the body is finite and readable in one go.
-    expect(await response.text()).toContain("POST only");
+    const text = await response.text();
+    expect(text).toContain("POST only");
+    // Someone who opens the address in a browser to test it is shown where to start (U30-13).
+    expect(text).toContain("https://fiscal.ge/connect");
+    expect(response.headers.get("link")).toBe('<https://fiscal.ge/connect>; rel="help"');
   });
 
   it("refuses a session DELETE, having no sessions", () => {
@@ -295,6 +299,20 @@ describe("what the log is allowed to say", () => {
 
     expect(JSON.parse(logs.at(-1)!).tool).toBe("unknown_method");
     expect(logs.join("")).not.toContain("nonsense/method");
+  });
+
+  // The SDK rejects a schema-shape mistake in English with no error code line,
+  // so the log called the commonest client mistake a protocol fault (U30-06).
+  it("logs a malformed argument as invalid parameters, not a protocol error", async () => {
+    const logs = captureLogs();
+    await POST(
+      post(
+        { jsonrpc: "2.0", id: 23, method: "tools/call", params: { name: "get_sources", arguments: { bogus: 1 } } },
+        { "mcp-protocol-version": PROTOCOL },
+      ),
+    );
+
+    expect(JSON.parse(logs.at(-1)!)).toMatchObject({ tool: "get_sources", outcome: "error", errorCode: "invalid_parameters" });
   });
 
   it("records a genuine tool call under its own name", async () => {

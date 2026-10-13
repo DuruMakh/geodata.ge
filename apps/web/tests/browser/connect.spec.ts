@@ -22,6 +22,7 @@ for (const prefix of ["", "/en"]) {
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
     await expect(page.getByTestId("connect-technical")).toContainText("2026-07-28");
     await expect(page.getByTestId("connect-technical")).toContainText("2025-11-25");
+    await expect(page.getByTestId("connect-fair-use")).toContainText(prefix ? "Fair-use limits" : "სამართლიანი გამოყენების ლიმიტები");
     const catalogue = await (await page.request.get(`${BASE_URL}/downloads/data/catalogue.json`)).json();
     const products = catalogue.datasets.find((dataset: { datasetId: string }) => dataset.datasetId === "inflation-products");
     await expect(page.getByTestId("connect-product-coverage")).toContainText(products.periods.join("–"));
