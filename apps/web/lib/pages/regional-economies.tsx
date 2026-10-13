@@ -88,7 +88,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
       <ExplorerPage testId="explorer-shell">
         <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, model.firstYear, model.year, reviewedAt)} />
         <ExplorerHeading>{title}</ExplorerHeading>
-        <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{description}</p>
+        <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{message(presentation.messages, "regionalEconomies.lead")}</p>
         <RegionalEconomiesIndex model={model} sourceNote={message(presentation.messages, "regionalEconomies.sourceNote")} />
       </ExplorerPage>
     </I18nProvider>

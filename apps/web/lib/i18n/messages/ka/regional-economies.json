@@ -1,6 +1,7 @@
 {
   "regionalEconomies.heading": "რეგიონების ეკონომიკა",
   "regionalEconomies.description": "საქართველოს 11 გამოქვეყნებული რეგიონის მშპ და ეკონომიკური საქმიანობები მიმდინარე ფასებში, 2010–2024.",
+  "regionalEconomies.lead": "რეგიონების მშპ და ეკონომიკური საქმიანობები",
   "regionalEconomies.indexMetaTitle": "საქართველოს რეგიონების ეკონომიკა, 2010–2024",
   "regionalEconomies.detailMetaTitle": "{region} — რეგიონის ეკონომიკა, 2010–2024",
   "regionalEconomies.detailMetaDescription": "გაეცანით {region} მშპ-სა და 20 ეკონომიკურ საქმიანობას მიმდინარე ფასებში 2010–2024 წლებში, ლარში და რეგიონის მშპ-ში წილის სახით.",

@@ -39,6 +39,25 @@ test("rates default to Georgia's poverty line and tabs keep the clamped years", 
   await expect(page.getByTestId("series-status")).toContainText("1 / 3");
 });
 
+// U20-02: the one line under the heading describes the chart below it, not the
+// national poverty-line rate on every tab (DESIGN §17).
+test("the poverty lead names the series of the active tab", async ({ page }) => {
+  await page.goto("/en/explorer/living-standards/poverty");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const lead = page.getByTestId("poverty-latest");
+  await expect(lead).toHaveText("Share of people below the poverty line · 2025: 7.1%");
+  for (const [tab, id, measure, year] of [
+    ["relative", "poverty.relative_60|georgia", "Below 60% of median consumption", "2025"],
+    // The international lines stop a year earlier; the lead quotes their own latest year.
+    ["international", "poverty.international_300|georgia", "Below $3.00 a day", "2024"],
+  ] as const) {
+    await page.getByTestId(`poverty-tab-${tab}`).click();
+    await expect(lead).toContainText(`${measure} · ${year}: `);
+    const value = (await lead.locator("span").textContent())!;
+    await expect(page.locator(`[data-series-id="${id}"]`).first()).toContainText(value.replace("%", ""));
+  }
+});
+
 test("a series caret is a full 24px target named after its row", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto("/en/explorer/living-standards/poverty#tab=relative");

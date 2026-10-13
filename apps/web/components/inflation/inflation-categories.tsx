@@ -90,7 +90,7 @@ export function InflationCategories({ facts, weights, headline, headlineMom, las
 
   const range = resolveCategoryRange(state, index);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const coverage = categoryCoverage(index, "mom");
+  const coverage = categoryCoverage(index, state.tab);
 
   const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
 

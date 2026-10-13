@@ -94,8 +94,3 @@ test("Excel follows the tab and selection and links the untouched Geostat origin
   const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
   expect(dataset.temporalCoverage).toBe("1996/2025");
 });
-
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/external/foreign-investment");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
-});

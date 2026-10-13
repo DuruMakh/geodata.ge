@@ -1,6 +1,7 @@
 {
   "regionalEconomies.heading": "Regional economies",
   "regionalEconomies.description": "GDP and economic activities for Georgia’s 11 published regions at current prices, 2010–2024.",
+  "regionalEconomies.lead": "GDP and economic activities by region",
   "regionalEconomies.indexMetaTitle": "Regional economies of Georgia, 2010–2024",
   "regionalEconomies.detailMetaTitle": "{region} regional economy, 2010–2024",
   "regionalEconomies.detailMetaDescription": "Explore {region} GDP and 20 economic activities at current prices from 2010 through 2024, in GEL and as shares of regional GDP.",

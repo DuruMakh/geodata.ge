@@ -104,11 +104,6 @@ test("% of GDP names the GDP source in the source line", async ({ page }) => {
   await expect(line).not.toContainText("nominal USD");
 });
 
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/external/current-account");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
-});
-
 test.describe("the return pill on a phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   test("names the chart, not the table, over the Balance stack", async ({ page }) => {

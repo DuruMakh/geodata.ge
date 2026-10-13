@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -232,3 +234,103 @@ test("rotating a phone swaps the drawing without a reload", async ({ page }) => 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(svg).toHaveAttribute("data-geometry", "mobile");
 });
+
+// DESIGN.md §17: under a page's H1 only one small one-line text. One page per
+// explorer route: the published page list (page-revisions.json, the set
+// sitemap.ts publishes) collapsed to one path per app route, so a new page or
+// a new region family is covered without editing this list.
+function explorerRoutes(): { missing: string[]; pages: Array<{ template: string; path: string }> } {
+  const templates: string[] = [];
+  const walk = (dir: string, route: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(join(dir, entry.name), `${route}/${entry.name}`);
+      else if (entry.name === "page.tsx") templates.push(route);
+    }
+  };
+  walk(resolve(process.cwd(), "app/(ka)/explorer"), "/explorer");
+  const published = Object.keys(JSON.parse(readFileSync(resolve(process.cwd(), "../../data/localization/en/page-revisions.json"), "utf8")))
+    .filter((page) => page === "/explorer" || page.startsWith("/explorer/"));
+  const matches = (template: string, page: string) => new RegExp(`^${template.replace(/\[[^\]]+\]/g, "[^/]+")}$`).test(page);
+  const chosen = new Map<string, string>();
+  for (const page of published) {
+    const template = templates.find((item) => item === page) ?? templates.find((item) => matches(item, page));
+    if (template && !chosen.has(template)) chosen.set(template, page);
+  }
+  return { missing: templates.filter((template) => !chosen.has(template)), pages: [...chosen].map(([template, path]) => ({ template, path })) };
+}
+
+// Trade and External flows show nothing between the heading and the controls (D188).
+const bareHeadingPages = [
+  "/explorer/trade/overview",
+  "/explorer/trade/partners",
+  "/explorer/trade/products",
+  "/explorer/trade/domestic-exports",
+  "/explorer/trade/services",
+  "/explorer/external/money-from-abroad",
+  "/explorer/external/foreign-investment",
+  "/explorer/external/current-account",
+];
+
+// Latest-value, deck and place lines that still wrap at 375px. Shortening them
+// is the owner's wording call (Task 18 report); each entry is an expected failure,
+// so fixing a page fails its test until the entry is removed here.
+const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
+  "/explorer/analysis": ["ka", "en"],
+  "/explorer/debt": ["ka", "en"],
+  "/explorer/deficit": ["ka", "en"],
+  "/explorer/municipalities/georgia": ["ka", "en"],
+  "/explorer/municipalities/[slug]": ["ka"],
+  "/explorer/municipalities/region/[id]": ["ka", "en"],
+  "/explorer/demography/population/region/[id]": ["ka"],
+  "/explorer/economy/sectors": ["ka", "en"],
+  "/explorer/wages/regions/[id]": ["ka"],
+  "/explorer/energy-food/energy-supply": ["ka"],
+  "/explorer/energy-food/electricity": ["ka", "en"],
+  "/explorer/money/bank-health": ["ka"],
+  "/explorer/living-standards/income": ["ka", "en"],
+  "/explorer/living-standards/income/regions/[id]": ["ka", "en"],
+  "/explorer/living-standards/spending": ["ka", "en"],
+  "/explorer/living-standards/spending/regions/[id]": ["ka", "en"],
+};
+
+const routes = explorerRoutes();
+
+test("every explorer route template has a published page to check", () => {
+  expect(routes.missing).toEqual([]);
+  expect(routes.pages.length).toBeGreaterThan(60);
+});
+
+for (const locale of ["ka", "en"] as const) {
+  for (const { template, path: route } of routes.pages) {
+    test(`one short line under the heading at 375px (DESIGN §17): ${locale} ${route}`, async ({ page }) => {
+      test.fail(wrappingLines[template]?.includes(locale) ?? false, "the line under the heading still wraps at 375px; wording awaits the owner");
+      await page.setViewportSize({ width: 375, height: 812 });
+      // Hubs are static and never mark the app ready; the line is in the served HTML.
+      await page.goto(`${TEST_BASE_URL}${locale === "en" ? "/en" : ""}${route}`);
+      await page.evaluate(() => document.fonts.ready);
+      const after = await page.getByRole("heading", { level: 1 }).first().evaluate((heading) => {
+        // A place heading wraps the h1 with its closed picker and its previous/next
+        // links; the line under the heading follows that block.
+        const skipped = (element: Element) => element.matches('[data-testid$="-navigation"], .sr-only');
+        let block: Element = heading;
+        let next = block.nextElementSibling;
+        for (;;) {
+          while (next && skipped(next)) next = next.nextElementSibling;
+          if (next || !block.parentElement || block.parentElement.tagName === "MAIN") break;
+          block = block.parentElement;
+          next = block.nextElementSibling;
+        }
+        if (!(next instanceof HTMLElement)) return null;
+        // Text is a line to measure; anything holding controls or a chart is the workspace.
+        const text = !next.querySelector("button, input, select, svg, table, section, div");
+        return { tag: next.tagName, text, lines: next.getBoundingClientRect().height / parseFloat(getComputedStyle(next).lineHeight), content: next.textContent };
+      });
+      if (bareHeadingPages.includes(route)) {
+        expect(after?.text ?? false, `${route}: ${after?.content}`).toBe(false);
+        expect(after?.tag).not.toBe("P");
+      } else if (after?.text) {
+        expect(after.lines, `${route}: ${after.content}`).toBeLessThanOrEqual(1.6);
+      }
+    });
+  }
+}

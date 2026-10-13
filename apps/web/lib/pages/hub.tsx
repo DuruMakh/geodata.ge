@@ -64,10 +64,9 @@ export async function renderHubPage(locale: Locale) {
       </h1>
       <p
         data-testid="explorer-hub-introduction"
-        className="mb-[26px] max-w-[640px] text-[13.5px] leading-relaxed text-[var(--body)]"
+        className="mb-[26px] max-w-[640px] text-[13px] text-[var(--body)]"
       >
         {message(messages, "hub.introduction")}
-        {" "}{message(messages, "hub.explore")}
       </p>
       <BudgetHub cards={cards} locale={locale} />
       <div className="mt-[26px] max-w-[860px]">

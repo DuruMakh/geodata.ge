@@ -573,13 +573,11 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
   );
 });
 
-test("explorer hub explains the reviewed data scope and available actions", async ({ page }) => {
+test("explorer hub states its data scope in one lead line", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer`);
 
   const introduction = page.getByTestId("explorer-hub-introduction");
-  await expect(introduction).toHaveText(
-    "Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და ზოგადი მთავრობის დეფიციტის გადამოწმებულ მონაცემებს. შეადარეთ წლები და მაჩვენებლები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.",
-  );
+  await expect(introduction).toHaveText("ბიუჯეტის, ვალისა და დეფიციტის მონაცემები");
 });
 
 test("methodology exposes a stable processed-data download", async ({ page, request }) => {

@@ -32,7 +32,6 @@ export function TradeServices({ data, sources, lastReviewedAt, siteOrigin }: { d
   </div>;
   return <div data-testid="trade-services" data-section={section} className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
-    <p className="mb-4 max-w-[850px] text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p>
     {section === "overview" ? <>{tabs()}<TradeOverview facts={data.national} {...props} /></> : <TradePartners data={data.types} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={siteOrigin} navigation={tabs} />}
   </div>;
 }

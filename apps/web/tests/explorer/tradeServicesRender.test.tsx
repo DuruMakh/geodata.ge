@@ -18,7 +18,6 @@ test.each(["en", "ka"] as const)("services %s has one heading, overview and four
   for (const measure of ["trade.turnover", "trade.exports", "trade.imports", "trade.balance"]) {
     expect(page).toContain(`data-testid="trade-services-section-${measure}"`);
   }
-  if (locale === "en") expect(page).toContain("Georgia&#x27;s annual services trade, in nominal US dollars.");
   const html = renderToStaticMarkup(<I18nProvider {...presentation}><TradePartners data={data.types} {...props} /></I18nProvider>);
   expect(html.match(/data-testid="trade-partners-ranking-row"/g)).toHaveLength(12);
   expect(html).toContain('data-series-id="services.total"');

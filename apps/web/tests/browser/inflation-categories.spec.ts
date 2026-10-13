@@ -45,6 +45,25 @@ test("lands on the contribution tab and swaps the stack for lines on a rate tab"
   await expect(page.locator('rect[data-segment="cpi.cat.residual"]').first()).toBeAttached();
 });
 
+// U13-01: the header coverage followed the monthly tab on every tab, so the
+// default contribution view claimed nine more years than it draws (DESIGN §25).
+test("the categories header states the active tab's months", async ({ page }) => {
+  await page.goto(`/en${CATEGORIES}`);
+  await ready(page);
+  const coverage = page.getByTestId("explorer-header").locator("p");
+  const strip = page.getByTestId("year-range-strip");
+  for (const tab of ["contrib", "mom"] as const) {
+    await page.getByTestId(`inflation-category-tab-${tab}`).click();
+    await page.getByRole("button", { name: "All", exact: true }).click();
+    const [start, end] = (await coverage.textContent())!.split(" · ")[0]!.split("–");
+    await expect(strip).toContainText(start!);
+    await expect(strip).toContainText(end!);
+  }
+  await expect(coverage).toContainText("Jan 2004");
+  await page.getByTestId("inflation-category-tab-contrib").click();
+  await expect(coverage).not.toContainText("Jan 2004");
+});
+
 // Clearing used to be a one-way door: with 55 rows and the bulk button hidden
 // while nothing is selected, the only way back was ticking twelve boxes.
 test("clearing the selection can be undone from the same control", async ({ page }) => {

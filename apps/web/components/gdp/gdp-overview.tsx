@@ -144,16 +144,6 @@ export function GdpOverview({
           note={latest.status === "preliminary" ? t("preliminary") : undefined}
         />
       ) : null}
-      <p
-        data-testid="gdp-unit"
-        className="mb-4 text-[13px] text-[var(--muted)]"
-      >
-        {state.indicator === "real" || d.growth
-          ? d.fullUnitLabel
-          : state.indicator === "per_capita"
-            ? `${t("perPerson")} · ${t("current")}`
-            : t("current")}
-      </p>
       <div
         data-testid="gdp-indicators"
         className="mb-3 py-2"
@@ -267,6 +257,9 @@ export function GdpOverview({
       />
       <div className="mt-5 space-y-2">
         <SourceNote>
+          {/* The price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
+          <span data-testid="gdp-unit">{state.indicator === "real" ? t("constant") : d.growth ? t("percent") : t("current")}</span>
+          {" · "}
           {state.indicator === "real" || state.indicator === "growth" ? (
             <>
               {t("wbNote")} {" "}

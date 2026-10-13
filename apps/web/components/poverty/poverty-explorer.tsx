@@ -69,8 +69,10 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
       {open ? nested.map(renderRow) : null}
     </div>;
   }
-  // The latest-value line is the page's headline: Georgia's poverty-line rate, or the Gini coefficient by total income.
-  const latest = facts.filter(f => f.indicatorId === (percent ? "poverty.absolute" : "gini.total_income") && f.groupId === "georgia").sort((a, b) => a.year - b.year).at(-1)!;
+  // The latest-value line names the active tab's reference series (DESIGN §17): Georgia's poverty-line,
+  // relative or $3.00 rate, or the Gini coefficient by total income, at that series' own latest year.
+  const latest = facts.filter(f => f.indicatorId === reference.indicatorId && f.groupId === reference.groupId).sort((a, b) => a.year - b.year).at(-1)!;
+  const latestKey = state.view === "relative" || state.view === "international" ? state.view : section;
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
   const changeView = (view: PovertyView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changePovertyView(s, section, view, facts), true); };
@@ -81,7 +83,7 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
   return <div data-testid={`poverty-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
-    <LatestValueLine testId="poverty-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />
+    <LatestValueLine testId="poverty-latest" measure={t(`latest.${latestKey}`)} period={latest.year} value={valueLabel(latest.value)} />
     {povertyViews(section).length > 1 ? <div data-testid="poverty-tabs" role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
       {povertyViews(section).map(view => <TextTab key={view} label={t(`tab.${view}`)} active={state.view === view} testId={`poverty-tab-${view}`} onClick={() => changeView(view)} />)}
     </div> : null}

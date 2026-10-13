@@ -124,11 +124,6 @@ test("an explicitly empty selection and Back restore the same view", async ({ pa
   await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 });
 
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/trade/partners");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
-});
-
 // U21-01/05: the 218 countries (187 on Domestic exports) scroll inside their panel at every
 // width, the Excel button sits above them, and a skip button leads past them to the ranking.
 for (const path of ["/explorer/trade/partners", "/en/explorer/trade/domestic-exports#section=countries"]) {

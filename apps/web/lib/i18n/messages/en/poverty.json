@@ -38,6 +38,8 @@
   "poverty.unitIndex": "Gini coefficient (0–1)",
   "poverty.latest.rates": "Share of people below the poverty line",
   "poverty.latest.inequality": "Gini coefficient by total income",
+  "poverty.latest.relative": "Below 60% of median consumption",
+  "poverty.latest.international": "Below $3.00 a day",
   "poverty.sourceNote": "Source: Geostat · household survey",
   "poverty.sourceNoteInternational": "Source: Geostat, from World Bank estimates · 2021 purchasing power parity",
   "poverty.methodology": "Methodology and sources",

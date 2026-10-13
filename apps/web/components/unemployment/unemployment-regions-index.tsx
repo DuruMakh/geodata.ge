@@ -31,7 +31,6 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
   const percent = (value: number) => formatShare(value / 100);
   return <div data-testid="unemployment-regions-index" className="@container">
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
-    <p className="mb-8 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("page.regions.summary")}</p>
     <RegionIndex model={model} sourceNote={t("sourceNote")} metric={{
       hrefForRegion: unemploymentRegionHref, formatValue: percent, mapAria: message(messages, "unemployment.regionMapAria", { year: model.year }),
       entityAria: (name, value, year) => message(messages, "unemployment.regionMapEntityAria", { name, rate: percent(value), year }),

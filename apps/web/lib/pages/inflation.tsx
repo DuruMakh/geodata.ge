@@ -114,7 +114,7 @@ export async function renderInflationHub(locale: Locale) {
     facts.map((fact) => fact.lastReviewedAt).sort().at(-1),
   );
   return (
-    <TopicHub locale={locale} presentation={presentation} title={t("inflation.hubHeading")} crumbLabel={t("common.inflation")} summary={t("inflation.hubDescription")} path={HUB_PATH} coverage={coverage} cards={buildInflationHubCards(facts, presentation, categories, weights, buildLatestProductHubSummary(productData), cities.map(cityFactInput))} testId="inflation-hub" />
+    <TopicHub locale={locale} presentation={presentation} title={t("inflation.hubHeading")} crumbLabel={t("common.inflation")} summary={t("inflation.hubLead")} path={HUB_PATH} coverage={coverage} cards={buildInflationHubCards(facts, presentation, categories, weights, buildLatestProductHubSummary(productData), cities.map(cityFactInput))} testId="inflation-hub" />
   );
 }
 

@@ -24,6 +24,6 @@ export async function renderDemographyPage(locale: Locale) {
   ]);
   const title = message(p.messages, "demography.title");
   return (
-    <TopicHub locale={locale} presentation={p} title={title} summary={message(p.messages, "demography.hubDescription")} path={DEMOGRAPHY_HUB_PATH} coverage="" cards={buildDemographyHubCards(facts, p)} testId="demography-hub" />
+    <TopicHub locale={locale} presentation={p} title={title} summary={message(p.messages, "demography.hubLead")} path={DEMOGRAPHY_HUB_PATH} coverage="" cards={buildDemographyHubCards(facts, p)} testId="demography-hub" />
   );
 }

@@ -103,8 +103,3 @@ test("Domestic Excel preserves the national split, unavailable country match and
     expect(response.ok()).toBe(true); expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(hash);
   }
 });
-
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/trade/domestic-exports");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
-});

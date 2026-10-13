@@ -37,6 +37,7 @@ it("renders centered four indicator controls and the existing chart", async () =
   expect(html).not.toContain('data-testid="gdp-currency"');
   expect(html).not.toContain(">Display<");
   expect(html).not.toContain('data-testid="gdp-headline"');
-  expect(html).toContain("bn · Constant 2015 USD");
+  // The price basis moved from a second line under the heading into the source note (DESIGN §17).
+  expect(html).toContain('<span data-testid="gdp-unit">Constant 2015 USD</span>');
   expect(html).toContain("rest on Geostat national accounts that are still preliminary");
 });
