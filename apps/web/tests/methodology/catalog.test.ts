@@ -442,3 +442,12 @@ describe("methodology catalog", () => {
     expect(() => buildMethodologyHubEntries({ budgetFacts, municipalFacts, debtFacts, archives })).toThrow(/validated archive/i);
   });
 });
+
+// U29-10: the disclosure says what is official and what is Fiscal.ge's method (DESIGN.md §21); it never repeats the lead.
+it.each(["ka", "en"] as const)("every %s methodology disclosure says something its summary does not", async (locale) => {
+  const { getMethodologyContent } = await import("../../lib/methodology/catalog");
+  for (const id of LIVE_METHODOLOGY_IDS) {
+    const content = getMethodologyContent(id, locale);
+    expect(content.disclosure, id).not.toBe(content.summary);
+  }
+});

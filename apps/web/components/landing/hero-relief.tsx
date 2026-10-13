@@ -892,7 +892,8 @@ export function HeroRelief({ locale, copy }: HeroReliefProps) {
           {copy.peakShkhara}
           <span className="absolute -left-2 top-[3px] h-2 w-px bg-[var(--muted)] opacity-70" />
         </span>
-        <span data-gid="mkin" className="absolute left-0 top-0 text-[10px] text-[var(--muted)] opacity-0 will-change-transform">
+        {/* Between 768 and 1099px the Kazbek label lands on the eyebrow line (U01-06). */}
+        <span data-gid="mkin" className="absolute left-0 top-0 text-[10px] max-[1099px]:hidden text-[var(--muted)] opacity-0 will-change-transform">
           {copy.peakKazbek}
           <span className="absolute -left-2 top-[3px] h-2 w-px bg-[var(--muted)] opacity-70" />
         </span>

@@ -160,8 +160,9 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                 <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
                   {name}
                 </span>
-                {/* Tbilisi is its own region: its subtitle would repeat the name. A cut subtitle can be read in full on hover. */}
-                {subtitle === name ? null : (
+                {/* Tbilisi is its own region: its subtitle would repeat the name, so an empty line keeps its row as tall as
+                    the others. A cut subtitle can be read in full on hover. */}
+                {subtitle === name ? <span aria-hidden="true" className="block text-[11px] min-[768px]:text-[10.5px]">{"\u00a0"}</span> : (
                   <span data-testid="municipal-row-subtitle" title={subtitle} className="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">{subtitle}</span>
                 )}
                 <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">

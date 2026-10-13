@@ -34,11 +34,13 @@ test.each(["ka", "en"] as const)("the revenue deck states the latest receipts an
   const [previous, latest] = [...totals.keys()].sort((a, b) => a - b).slice(-2);
   const messages = await getMessages(locale, ["main"]);
   expect(parts).toEqual([
-    `${latest}: ${locale === "en" ? "Total receipts" : "მთლიანი შემოსავლები"} · ${formatAmount(totals.get(latest!)!, locale)}`,
+    // The words in the body face, the figure in mono, as on LatestValueLine: in mono the Georgian label wrapped to three lines on a phone.
+    `${latest}: ${locale === "en" ? "Total receipts" : "მთლიანი შემოსავლები"} ·`,
+    formatAmount(totals.get(latest!)!, locale),
     formatShare((totals.get(latest!)! - totals.get(previous!)!) / totals.get(previous!)!, true),
     message(messages, "main.previousYear"),
   ]);
-  expect(parts[1]).toMatch(/^[+−]\d+\.\d%$/);
+  expect(parts[2]).toMatch(/^[+−]\d+\.\d%$/);
   if (locale === "ka") expect(deck).toContain('<span data-lari="" class="font-[family-name:var(--font-ui)]">₾</span>');
 });
 

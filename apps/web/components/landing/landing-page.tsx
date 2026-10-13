@@ -108,7 +108,7 @@ export function LandingPage({ model, datasets, gdpFigure, presentation }: { mode
                   {entry.value}{" "}
                   <span
                     data-testid={entry.unitTestId}
-                    className="mt-1 block text-[clamp(11px,3vw,25px)] min-[768px]:mt-0 min-[768px]:inline"
+                    className="mt-1 block whitespace-nowrap text-[clamp(11px,3vw,25px)] min-[768px]:mt-0 min-[768px]:inline"
                   >
                     {entry.unit}
                   </span>
@@ -136,7 +136,7 @@ export function LandingPage({ model, datasets, gdpFigure, presentation }: { mode
                 key={dataset.href}
                 href={pageHref(dataset.href, locale)}
                 prefetch={false}
-                className="group flex min-h-11 min-w-0 flex-col justify-center gap-1 border-b border-[var(--hairline-soft)] py-3 pr-3 text-[var(--ink)] no-underline"
+                className="group flex min-h-11 min-w-0 flex-col justify-start gap-1 border-b border-[var(--hairline-soft)] py-3 pr-3 text-[var(--ink)] no-underline"
               >
                 <span className="text-[0.875rem] font-semibold group-hover:text-[var(--accent)]">
                   {dataset.title} <span aria-hidden="true" className="text-[var(--accent)]">→</span>

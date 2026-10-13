@@ -228,6 +228,7 @@ test.describe("region page", () => {
     await expect(caret).toHaveText("");
     await expect(caret).toHaveCSS("border-top-width", "5px");
 
-    await expect(page.getByTestId("municipal-source-note").first()).toContainText("ოკუპირებულ ტერიტორიებთან");
+    // U09-11: Imereti has no occupied-territory units; the exclusion note belongs to Shida Kartli and Mtskheta-Mtianeti.
+    await expect(page.getByTestId("municipal-source-note").first()).not.toContainText("ოკუპირებულ ტერიტორიებთან");
   });
 });

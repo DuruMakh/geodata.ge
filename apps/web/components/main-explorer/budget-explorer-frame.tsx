@@ -64,7 +64,8 @@ export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, 
   sectionLabel: string;
   coverage: string;
   title: string;
-  deck: { lead: string; yoy: number | null };
+  /** `measure` ("{year}: {series} ·") is set in the body face; only the figure is set in mono, as on `LatestValueLine`. */
+  deck: { measure?: string; lead: string; yoy: number | null };
   children: ReactNode;
 }) {
   return (
@@ -84,6 +85,7 @@ export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, 
       <ExplorerHeading>{title}</ExplorerHeading>
 
       <p data-testid="budget-deck" className={DECK_LINE_CLASS}>
+        {deck.measure && deck.lead ? <span>{deck.measure}</span> : null}
         {deck.lead ? <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">{withLari(deck.lead)}</span> : null}
         {deck.yoy !== null ? (
           <>

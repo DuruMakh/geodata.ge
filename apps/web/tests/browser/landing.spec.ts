@@ -666,6 +666,8 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
         ),
       )
       .toBeGreaterThan(DESKTOP_TERRAIN_FLOOR);
+    // U01-06: at tablet width the Kazbek label landed on the eyebrow line; it shows from 1100px.
+    await expect(mobilePage.locator('[data-gid="mkin"]')).toHaveCSS("display", "none");
     await mobilePage.setViewportSize({ width: 390, height: 844 });
     await expect(mobileStatic).toBeVisible();
     await expect(canvas).toHaveCount(0);
@@ -698,6 +700,7 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
       return drawingSurface.width / drawingSurface.getBoundingClientRect().width;
     });
     expect(pixelRatio).toBeCloseTo(2, 1);
+    await expect(desktopPage.locator('[data-gid="mkin"]')).toHaveCSS("display", "block");
   } finally {
     await desktopContext.close();
   }

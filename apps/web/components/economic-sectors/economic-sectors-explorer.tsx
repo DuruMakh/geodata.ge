@@ -102,10 +102,10 @@ export function EconomicSectorsExplorer({
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
       <LatestValueLine
         testId="sectors-headline"
-        measure={state.measure === "share_of_gdp" && model.headline ? `${t("largest")} · ${labels.get(model.headline.seriesId)}` : t("reference")}
+        measure={t("reference")}
         period={model.headline?.year ?? "—"}
         value={
-          percent
+          state.measure === "real_growth"
             ? formatShare(model.headline ? model.headline.value / 100 : null)
             : formatAmount(model.headline?.value, locale)
         }

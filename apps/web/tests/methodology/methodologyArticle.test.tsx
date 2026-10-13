@@ -224,6 +224,19 @@ describe("the source archive's year filter", () => {
     expect(markup).toContain('data-testid="archive-year-filter"');
     expect(markup).toContain(">1960</button>");
   });
+
+  // U29-16, U29-17: a row's title and publisher are readable at body size, and a year range takes one dash everywhere.
+  it("prints a year range with an en dash and the title and publisher at body size", () => {
+    const markup = renderToStaticMarkup(
+      <I18nProvider locale="ka" messages={{ ...common, ...methodology }}>
+        <SourceArchive datasetId="gdp" datasetLabel="მშპ" rows={[{ ...sourceRow(0), year: "2019-2024" }]} summary={archiveSummary} />
+      </I18nProvider>,
+    );
+    expect(markup).toContain(">2019–2024</td>");
+    expect(markup).not.toContain("2019-2024");
+    expect(markup).toMatch(/<span class="block text-\[0.8125rem\] font-semibold[^"]*">ფაილი 0<\/span>/);
+    expect(markup).toMatch(/<span class="mt-1 block text-\[0.75rem\][^"]*">საქსტატი<\/span>/);
+  });
 });
 
 // Moved from inflation-overview.spec.ts: the methodology Dataset is the node the catalog references.
@@ -248,4 +261,18 @@ it("makes the inflation methodology Dataset the node the catalog references, in 
   const english = await dataset("en");
   expect(english["@id"]).toBe(`${origin}/en/methodology/inflation`);
   expect(english.includedInDataCatalog["@id"]).toBe(`${origin}/en/methodology#catalog`);
+});
+
+// U29-13: the unused document-stack figure and the LINEAGE re-export are gone; only the open-document figure is drawn.
+it("document visuals export only the figure a page draws", async () => {
+  expect(Object.keys(await import("../../components/methodology/document-visuals"))).toEqual(["OpenDocumentVisual"]);
+});
+
+// U29-18: the English GDP archive named three World Bank files by their file name twice; they get reviewed titles.
+it("titles every English GDP source document, not by its file name", async () => {
+  const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+  const messages = await getMessages("en", ["common", "methodology"]);
+  const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={messages}>{await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "gdp" }) })}</I18nProvider>);
+  for (const title of ["World Bank · Real GDP", "World Bank · Annual GDP growth", "World Bank · GDP indicator metadata"]) expect(markup).toContain(`>${title}</span>`);
+  expect(markup).not.toMatch(/font-semibold[^"]*">[^<]*\.json<\/span>/);
 });

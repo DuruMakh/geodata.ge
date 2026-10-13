@@ -132,11 +132,10 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
 
     // Named like the debt and deficit decks ("{year}: {series} · {value}"), so the line says what the figure is (U04-11).
     const total = model.items.find((item) => item.level === "total");
-    const label = total ? `${publicLabel(locale, total.id, total.kaLabel, presentation.englishLabels)} · ` : "";
-    return {
-      lead: latestTotal === null ? "" : `${latestYear}: ${label}${formatAmount(latestTotal, locale)}`,
-      yoy,
-    };
+    const label = total ? ` ${publicLabel(locale, total.id, total.kaLabel, presentation.englishLabels)} ·` : "";
+    return latestTotal === null
+      ? { lead: "", yoy }
+      : { measure: `${latestYear}:${label}`, lead: formatAmount(latestTotal, locale), yoy };
   }, [totalsByScope, scope, scopeYears, locale, model.items, presentation.englishLabels]);
 
   const screenTitle = nav === "expenditure"

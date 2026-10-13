@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { buildLandingDatasetLinks, landingGdpFigure } from "../../lib/landing/landingDatasets";
 
@@ -84,5 +84,21 @@ describe("landingGdpFigure", () => {
   it("refuses to render without a served nominal GDP fact", async () => {
     const en = await getMessages("en", ["landing"]);
     expect(() => landingGdpFigure(gdpFacts.slice(2), en)).toThrow();
+  });
+});
+
+// U01-05, U01-07: small tablet layout fixes on the landing page (U01-06, the client-only hero, is in landing.spec.ts).
+// The page's language switch reads the current path.
+vi.mock("next/navigation", async (original) => ({ ...(await original<typeof import("next/navigation")>()), usePathname: () => "/" }));
+describe("landing page layout", () => {
+  it("keeps a key number's unit on one line and tops the dataset titles", async () => {
+    const { renderPageMarkup } = await import("../helpers/render-localized");
+    const { renderHomePage } = await import("../../lib/pages/home");
+    const markup = renderPageMarkup("ka", await renderHomePage("ka"));
+    // U01-05: "მლრდ ₾" never splits into a stranded currency sign.
+    expect(markup).toMatch(/<span data-testid="[^"]+" class="[^"]*whitespace-nowrap[^"]*">[^<]*₾<\/span>/);
+    // U01-07: titles share a top line whether or not their measure wraps.
+    expect(markup).toMatch(/class="group flex min-h-11 min-w-0 flex-col justify-start/);
+    expect(markup).not.toContain("flex-col justify-center gap-1 border-b");
   });
 });

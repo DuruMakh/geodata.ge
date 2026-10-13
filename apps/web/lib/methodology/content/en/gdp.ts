@@ -10,7 +10,7 @@ export const GDP_METHODOLOGY_CONTENT: MethodologyContent = {
     kind: "archive",
   },
   canonicalDocuments: ["docs/data-methodology/gdp-overview.md"],
-  disclosure: "Georgia’s annual GDP, real growth and nominal GDP per person.",
+  disclosure: "Official published figures: real GDP (constant 2015 US dollars) and real growth from the World Bank; nominal GDP and GDP per person, in lari and US dollars, from Geostat. Fiscal.ge shows them unchanged: it does not splice, rebase or convert any series.",
   keyFacts: [
     {
       label: "Coverage",

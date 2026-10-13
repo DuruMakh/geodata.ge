@@ -29,31 +29,3 @@ export function OpenDocumentVisual({ messages }: { messages: Messages }) {
     </figure>
   );
 }
-
-export function SourceDocumentStack({ messages }: { messages: Messages }) {
-  return (
-    <figure
-      role="img"
-      aria-label={message(messages, "methodology.documentStack")}
-      className="m-0 text-[var(--ink)]"
-    >
-      <svg aria-hidden="true" viewBox="0 0 430 270" className="block h-auto w-full">
-        <g transform="translate(50 35) rotate(-7 120 90)">
-          <rect width="238" height="180" fill="var(--tint)" stroke="currentColor" strokeWidth="1.4" />
-          <path d="M25 43h158M25 67h178M25 91h139M25 115h170M25 139h112" stroke="var(--hairline)" />
-        </g>
-        <g transform="translate(116 20) rotate(5 120 90)">
-          <rect width="238" height="180" fill="var(--tint)" stroke="currentColor" strokeWidth="1.4" />
-          <path d="M25 43h158M25 67h178M25 91h139M25 115h170M25 139h112" stroke="var(--hairline)" />
-        </g>
-        <g transform="translate(94 61)">
-          <rect width="238" height="180" fill="var(--tint)" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M25 43h158M25 67h178M25 91h139M25 115h170M25 139h112" stroke="var(--hairline)" />
-          <path d="M25 155h102" stroke="var(--accent)" strokeWidth="3" />
-        </g>
-      </svg>
-    </figure>
-  );
-}
-
-export { LINEAGE };

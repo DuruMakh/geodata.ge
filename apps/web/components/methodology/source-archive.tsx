@@ -133,13 +133,14 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
               const format = formatLabel(row);
               return (
                 <tr key={row.source_id} role="row" data-testid="source-archive-row" className="border-b border-[var(--hairline-soft)] align-top max-[759px]:block max-[759px]:py-4">
-                  <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[0.6875rem] max-[759px]:text-[var(--muted)]">{row.year}</td>
+                  <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[0.6875rem] max-[759px]:text-[var(--muted)]">{row.year.replace(/(\d{4})-(\d{4})/g, "$1–$2")}</td>
                   <td role="cell" className="max-w-[320px] px-2 py-4 max-[759px]:block max-[759px]:max-w-none max-[759px]:p-0 max-[759px]:pt-1">
-                    <span className="block font-semibold text-[var(--ink)] max-[759px]:text-[0.8125rem] max-[759px]:leading-snug">{row.title}</span>
+                    {/* The title and publisher are what the reader is looking for: body size, not metadata size (U29-16, DESIGN.md §13). */}
+                    <span className="block text-[0.8125rem] font-semibold text-[var(--ink)] max-[759px]:leading-snug">{row.title}</span>
                     <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9.5px] text-[var(--muted)]">
                       {row.official_filename}
                     </span>
-                    <span className="mt-1 block text-[0.6875rem] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[0.6875rem]">{row.publisher}</span>
+                    <span className="mt-1 block text-[0.75rem] text-[var(--faint)]">{row.publisher}</span>
                     {row.documentLanguage ? <span className="mt-1 block text-[0.6875rem] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[0.6875rem]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
                   </td>
                   <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:sr-only">{format}</td>

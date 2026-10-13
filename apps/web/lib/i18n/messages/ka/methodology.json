@@ -14,7 +14,6 @@
   "methodology.gdp": "მშპ",
   "methodology.unemployment": "უმუშევრობა",
   "methodology.openDocument": "ღია დოკუმენტი, რომელიც პირველწყაროდან შემოწმებულ მონაცემებამდე გზას აჩვენებს",
-  "methodology.documentStack": "სამი გადაფარული პირველწყაროს დოკუმენტი",
   "methodology.articleOverline": "მონაცემთა ტექნიკური საველე წიგნი",
   "methodology.methodologyReviewed": "ბოლო მეთოდოლოგიური განხილვა · {date}",
   "methodology.translationReviewed": "ინგლისური თარგმანის განხილვა · {date}",
