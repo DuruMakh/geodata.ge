@@ -1,11 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { preparePublicDatasets } from "../lib/data/publicDatasetExports";
 
-async function main() {
-  const write = process.argv.includes("--write");
-  const check = process.argv.includes("--check");
-  const checkOutput = process.argv.includes("--check-output");
+export async function main(args: readonly string[]) {
+  const write = args.includes("--write");
+  const check = args.includes("--check");
+  const checkOutput = args.includes("--check-output");
   if ([write, check, checkOutput].filter(Boolean).length !== 1) {
     throw new Error("Pass exactly one of --write, --check or --check-output");
   }
@@ -26,7 +27,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main(process.argv.slice(2)).catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

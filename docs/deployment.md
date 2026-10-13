@@ -34,7 +34,7 @@ ranking, byte, duration, rate and pause limits. Large bilingual evidence respons
 can require narrower queries; never trim evidence or increase limits to fit.
 
 The existing `npm run check` includes translation validation; `prebuild` prepares
-the snapshot/publications, and `postbuild` verifies publication hashes. Before
+the snapshot/publications and verifies the written publication hashes. Before
 release, run the full browser suite against the new build and inspect both image
 URLs, language-switch state, original archives and English workbook sheets.
 `scripts/measure-bilingual-output.ts` records decoded HTML/asset bytes separately
@@ -118,6 +118,36 @@ server-side at request time.
   A data loader that reads files under `public/` or `docs/Raw Data/` at
   request time, without a `/* turbopackIgnore: true */` path hint, is the
   usual cause.
+- **CI** (`.github/workflows/ci.yml`, every PR and every push to `main`):
+  the `checks` job builds the site once (with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`)
+  and uploads the build and the files `prebuild` generates as the `next-build`
+  artifact; the `e2e` job downloads it, starts `next start` on port 3100, waits
+  until it answers and runs the browser suite against it. `.next/cache` and the
+  Playwright browsers are cached. Job limits: 30 minutes (`checks`) and 45
+  (`e2e`). Both jobs fail if they wrote into the repository. Playwright retries
+  a failed test once in CI and reports it as flaky. Still to measure on the
+  first CI run: both jobs' step times, and the browser suite at two against
+  four workers; then pin `PW_WORKERS` in the `e2e` job.
+- **Known flaky tests.** Record each one here with its cause; a retry is not a fix.
+  - `main-explorer.spec.ts` "opening … fetches no other page's data" (seen on
+    `/explorer/expenditure` at 1280px). Fixed 2026-10-13. The test waited for
+    Playwright's `networkidle` twice. Under load Playwright reports it before
+    `DOMContentLoaded`. A request after that point (the sidebar's compact logo),
+    followed by the `load` event, clears it for good (Playwright 1.63), so the
+    second wait hung until the 30 s timeout. The test now waits until React
+    has hydrated every link.
+  - `main-explorer.spec.ts` "legacy nav hashes redirect to their route". Fixed
+    2026-10-13. The hub redirects from an effect, so only after it hydrates. The
+    test gave the hub's hydration and the redirect one 5 s window from the `load`
+    event. It now waits for the hub's `data-app-ready` first.
+  - `mobile-series-picking.spec.ts` phone-legend deep link (worked around in the
+    test in `a1574bb1`, not fixed in the app). An address-bar change to the hash
+    alone leaves a history entry without the Next.js router's state. The router
+    ignores it, and its next history write can put the old URL back, which drops
+    the hash.
+  - Load-dependent, cause not established: `municipal-entity.spec.ts` "sourced
+    percentage workbook", download or request specs under a loaded machine, and
+    the unit test `tests/seo/opengraphImage.test.ts`.
 - **Previews**: unchanged — every push to any other branch (and every PR)
   gets its own preview deployment, always CSV-mode (the database env vars
   are scoped to Production only), so data-PR previews never depend on the
@@ -577,9 +607,10 @@ no budget data and require no migration when a code release is rolled back.
   inflation products runs and the categories' monthly runs. Each name carries a
   hash of its content, so the rule in `headers()` sends
   `Cache-Control: public, max-age=31536000, immutable` and
-  `X-Robots-Tag: noindex`. `prebuild` writes the files and `postbuild` checks
-  them (`data:prepare-inflation-public`, `data:check-inflation-public`); they
-  are not publications and appear in no manifest, `llms.txt` or sitemap.
+  `X-Robots-Tag: noindex`. `prebuild` writes the files and reads them back
+  (`data:prepare-inflation-public`; `data:check-inflation-public` repeats that
+  check on its own); they are not publications and appear in no manifest,
+  `llms.txt` or sitemap.
 - Every response also carries a `Content-Security-Policy-Report-Only` header
   (the `contentSecurityPolicy` constant in `apps/web/next.config.ts`): only the
   site itself, plus Google Analytics (`www.googletagmanager.com`,

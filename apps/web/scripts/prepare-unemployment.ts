@@ -1,12 +1,19 @@
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { prepareUnemploymentData } from "../lib/data/unemployment/prepareUnemployment";
 import { loadUnemploymentFacts } from "../lib/data/unemployment/importUnemployment";
 
-const args = process.argv.slice(2);
-if (args.length !== 1 || !["--write", "--check"].includes(args[0])) {
-  console.error("Usage: prepare-unemployment.ts --write | --check"); process.exitCode = 1;
-} else {
-  prepareUnemploymentData(path.resolve(process.cwd(), "../.."), args[0] === "--write" ? "write" : "check")
-    .then(async () => console.log(JSON.stringify({ status: "passed", primaryObservations: (await loadUnemploymentFacts()).length })))
-    .catch(error => { console.error(error); process.exitCode = 1; });
+export async function main(args: readonly string[]) {
+  if (args.length !== 1 || !["--write", "--check"].includes(args[0])) {
+    throw new Error("Usage: prepare-unemployment.ts --write | --check");
+  }
+  await prepareUnemploymentData(path.resolve(process.cwd(), "../.."), args[0] === "--write" ? "write" : "check");
+  console.log(JSON.stringify({ status: "passed", primaryObservations: (await loadUnemploymentFacts()).length }));
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main(process.argv.slice(2)).catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
 }

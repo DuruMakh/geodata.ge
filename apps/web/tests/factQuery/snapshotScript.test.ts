@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { DATA_VALIDATE_CHECKS } from "../../scripts/validate-all";
 
 describe("fact query snapshot script", () => {
   it("is registered in both the prepare and validate chains", async () => {
@@ -8,7 +9,7 @@ describe("fact query snapshot script", () => {
 
     expect(pkg.scripts["data:prepare-fact-query-snapshot"]).toContain("prepare-fact-query-snapshot.ts");
     expect(pkg.scripts["data:check-fact-query-snapshot"]).toContain("--check");
-    expect(pkg.scripts["data:validate"]).toContain("data:check-fact-query-snapshot");
+    expect(DATA_VALIDATE_CHECKS).toContain("data:check-fact-query-snapshot");
     expect(pkg.scripts.prebuild).toContain("data:prepare-fact-query-snapshot");
   });
 

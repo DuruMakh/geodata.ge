@@ -2,6 +2,7 @@ import { findSourceProvenanceFailures, type SourceProvenanceFailure } from "../l
 import { execFileSync } from "node:child_process";
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { buildFactQuerySnapshot } from "../lib/factQuery/buildSnapshot";
 
 const OUTPUT = path.join(process.cwd(), "lib", "factQuery", "generated", "snapshot.json");
@@ -14,9 +15,9 @@ function releaseCommit(): string {
   }
 }
 
-async function main() {
-  const write = process.argv.includes("--write");
-  const check = process.argv.includes("--check");
+export async function main(args: readonly string[]) {
+  const write = args.includes("--write");
+  const check = args.includes("--check");
   if (write === check) throw new Error("Pass exactly one of --write or --check");
 
   const snapshot = await buildFactQuerySnapshot({
@@ -71,7 +72,9 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main(process.argv.slice(2)).catch((error) => {
+    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  });
+}

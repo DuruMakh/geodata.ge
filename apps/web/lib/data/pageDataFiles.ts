@@ -4,8 +4,8 @@ import path from "node:path";
 
 /**
  * Page data: the part of a page's own data that its browser code fetches after load instead of carrying it inline in
- * every prerendered HTML file. Written under `public/page-data/` by the prebuild step that owns the data and checked
- * after the build, like the publications under `public/downloads/data/` (scripts/prepare-fact-query-publications.ts).
+ * every prerendered HTML file. Written under `public/page-data/` by the prebuild step that owns the data, which reads
+ * it back, like the publications under `public/downloads/data/` (scripts/prepare-fact-query-publications.ts).
  * It is not one of those publications: no manifest, llms.txt, sitemap or methodology link names it, and /mcp never
  * reads it. The name carries a hash of the content, so a file never changes once published and next.config.ts lets
  * browsers keep it for a year; Georgian and English pages share it.

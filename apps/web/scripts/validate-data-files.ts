@@ -1,5 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { loadAdminSpendingFacts } from "../lib/data/adminSpending/importAdminSpendingFacts";
 import { ADMIN_SPENDING_YEARS, EXPENDITURE_YEARS, MUNICIPAL_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
 import { validateFoundationReferences } from "../lib/data/foundationValidation";
@@ -55,7 +56,7 @@ function composedFactsMatchSideFiles(
   return JSON.stringify(budgetRowsToCsvRows([...expenditureRows, ...revenueRows])) === JSON.stringify(budgetRowsToCsvRows(facts));
 }
 
-async function main() {
+export async function main() {
   const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
   // The served datasets come from SERVED_DATA_FILES so this gate, the site and
   // the database import all read the same served-data paths. The two side
@@ -304,7 +305,9 @@ async function main() {
   console.log(`Report written: ${reportPath}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

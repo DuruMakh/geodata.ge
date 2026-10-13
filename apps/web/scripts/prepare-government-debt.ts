@@ -1,8 +1,8 @@
+import { pathToFileURL } from "node:url";
 import { buildGovernmentDebtPackage } from "../lib/data/governmentDebt/prepareGovernmentDebtPackage";
 import { prepareGovernmentDebtFacts } from "../lib/data/governmentDebt/importGovernmentDebtFacts";
 
-async function main() {
-  const args = process.argv.slice(2);
+export async function main(args: readonly string[]) {
   if (args.length !== 1 || !["--write", "--check"].includes(args[0])) {
     throw new Error("Usage: prepare-government-debt.ts --write|--check");
   }
@@ -21,7 +21,9 @@ async function main() {
   console.log(`Validation: ${result.validation.status}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main(process.argv.slice(2)).catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

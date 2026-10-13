@@ -44,12 +44,12 @@ async function main() {
       process.stdout.write(`${artifact.fileName}: ${artifact.rowCount} rows, ${artifact.bytes.byteLength} bytes\n`);
     }
     process.stdout.write(`wrote ${artifacts.length} publications dataVersion=${snapshot.dataVersion}\n`);
-    return;
   }
 
   // Check: the files on disk must be the files this snapshot produces. A stale
   // publication would let a download disagree with the explorer and with any
-  // MCP answer built from the same release.
+  // MCP answer built from the same release. --write runs it over what it has
+  // just written, so the build needs no separate re-check after it.
   //
   // Two separate things are verified, because neither alone is sufficient:
   //

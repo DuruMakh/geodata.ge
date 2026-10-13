@@ -392,19 +392,24 @@ for (const [path, width] of [
     });
 
     await page.setViewportSize({ width, height: 844 });
-    // Not every page here marks itself ready (the methodology hub does not); networkidle
-    // is past hydration, after which visible links would start prefetching.
-    await page.goto(`${TEST_BASE_URL}${path}`, { waitUntil: "networkidle" });
+    await page.goto(`${TEST_BASE_URL}${path}`);
+    // A link starts prefetching once it has hydrated and enters the viewport, so wait until
+    // React has hydrated every link (not every page here marks itself ready: the methodology
+    // hub does not). networkidle is not that signal: under load Playwright reports it before
+    // DOMContentLoaded, and a request after it (the sidebar's compact logo) followed by the
+    // load event clears it for good, so a second wait for it hung until the test timed out.
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("a[href]")].every((link) => Object.keys(link).some((key) => key.startsWith("__reactFiber$"))),
+    );
     // Scroll the page down half a screen at a time so every link in the page flow passes
     // through the viewport (a list in its own scroll box, as the municipal index is from
-    // 768px, shows only its first screen), then let the page sit idle.
+    // 768px, shows only its first screen), then give any prefetch a second to start.
     await page.evaluate(async () => {
       for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight / 2) {
         window.scrollTo(0, y);
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       }
     });
-    await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1_000);
     expect(prefetched).toEqual([]);
 
@@ -1504,12 +1509,16 @@ test("hub lists six cards, all six live", async ({ page }) => {
 test("legacy nav hashes redirect to their route", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
+  // The hub redirects from an effect, so only once it has hydrated; it raises data-app-ready in
+  // that same commit. Waiting for it first keeps the hub's hydration out of the redirect's budget.
   await page.goto(`${TEST_BASE_URL}/explorer#nav=analysis&ay=2024`);
+  await expectAppReady(page);
   await expect(page).toHaveURL(/\/explorer\/analysis/);
   await expect(page).toHaveURL(/ay=2024/);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
 
   await page.goto(`${TEST_BASE_URL}/explorer#nav=revenue&m=table`);
+  await expectAppReady(page);
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-table")).toBeVisible();
 
