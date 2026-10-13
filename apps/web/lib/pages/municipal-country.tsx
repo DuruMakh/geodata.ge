@@ -23,6 +23,7 @@ import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 import { georgiaDescription } from "../seo/municipalMetadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { clientPresentation } from "../i18n/presentation.server";
 
 const ROUTE = "/explorer/municipalities/georgia";
 
@@ -118,6 +119,8 @@ export async function renderMunicipalCountry(locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name: message(messages, "municipal.georgia"), path: pageHref(ROUTE, locale) }]} />
       <PageHeader
+        locale={locale}
+        messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -129,7 +132,7 @@ export async function renderMunicipalCountry(locale: Locale) {
       />
 
       <MunicipalExplorer
-        presentation={presentation}
+        presentation={clientPresentation(presentation)}
         title={message(messages, "municipal.howCountrySpent")}
         triggerLabel={message(messages, "municipal.countryTrigger")}
         entityId={MUNICIPAL_COUNTRY_ID}

@@ -21,7 +21,7 @@ export async function tradeHubMetadata(locale: Locale) {
   return fiscalMetadata({ locale, path: "/explorer/trade", title: message(messages, "trade.hubMetaTitle"), description: message(messages, "trade.hubMetaDescription") });
 }
 export async function renderTradeHub(locale: Locale) {
-  const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade", "common"], [])]);
+  const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade"], [])]);
   const title = message(presentation.messages, "trade.hubTitle");
   return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage="" cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} testId="trade-hub" />;
 }

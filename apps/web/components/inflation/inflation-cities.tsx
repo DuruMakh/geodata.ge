@@ -97,6 +97,8 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   return (
     <ExplorerPage testId="inflation-cities">
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },

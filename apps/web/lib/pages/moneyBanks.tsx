@@ -10,7 +10,7 @@ import { projectGdpFact } from "../explorer/clientData";
 import { MONEY_BANKS_SECTIONS, moneyBanksCoverage, moneyBanksViewSeries, moneyBanksViews, type MoneyBanksSectionId } from "../explorer/moneyBanks";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
@@ -52,7 +52,7 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
   // The % of GDP view divides by the national GDP the debt page uses, and its Excel cites the same Geostat files.
   const gdp = moneyBanksViews(section).includes("gdp");
   const [data, presentation, sources, gdpFacts, gdpSources] = await Promise.all([
-    loadServedMoneyBanksData(), getPresentation(locale, ["moneyBanks", "common", "controls", "format", "main", "workbook"], []), loadMoneyBanksWorkbookSources(locale),
+    loadServedMoneyBanksData(), getPresentation(locale, ["moneyBanks", "format", "main", "workbook"], []), loadMoneyBanksWorkbookSources(locale),
     gdp ? loadServedExplorerData().then(explorer => explorer.gdpFacts.map(projectGdpFact)) : [], gdp ? loadGdpWorkbookSources(locale) : [],
   ]);
   // Each page receives only the observations its views can show.
@@ -68,7 +68,7 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/money", locale) }, { label: title }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${href}#dataset`, name: title, description, url: `${origin}${pageHref(href, locale)}`,
       temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
@@ -78,7 +78,7 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/money", locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       <MoneyBanksExplorer key={section} section={section} facts={facts} labels={labels} sources={sources.filter(source => sourceIds.has(source.sourceId))} gdpFacts={gdpFacts} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;

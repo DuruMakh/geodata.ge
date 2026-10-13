@@ -1,6 +1,6 @@
 import type { Locale } from "../i18n/types";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
@@ -33,7 +33,7 @@ export async function renderDebtPage(locale: Locale) {
   ]);
   // The debt model builds each series' English name beside the Georgian on both pages.
   const seriesIds = [...new Set(facts.map(fact => fact.seriesId))];
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "debt"], seriesIds, seriesIds);
+  const presentation = await getPresentation(locale, ["format", "main", "debt"], seriesIds, seriesIds);
   const { messages } = presentation;
   const stockFacts = facts.filter((fact) => fact.family === "stock" && fact.status === "actual");
   const { firstYear, lastYear } = coverageFromYears(stockFacts);
@@ -65,7 +65,7 @@ export async function renderDebtPage(locale: Locale) {
         { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) },
         { name: message(messages, "common.debt"), path: pageHref(DEBT_EXPLORER_PATH, locale) },
       ]} />
-      <I18nProvider {...presentation}>
+      <I18nProvider {...clientPresentation(presentation)}>
       <DebtExplorer
         facts={facts.map(projectDebtFact)}
         gdpFacts={gdpFacts.filter((fact) => fact.year >= datasetFirstYear && fact.year <= datasetLastYear).map(projectGdpFact)}

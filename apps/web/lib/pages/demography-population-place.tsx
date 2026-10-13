@@ -30,6 +30,7 @@ import { pickerGroupsFromRows } from "../explorer/municipalData";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import { message } from "../i18n/messages";
 import { I18nProvider } from "../i18n/provider";
+import { clientPresentation } from "../i18n/presentation.server";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
@@ -148,7 +149,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
       : [];
 
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
@@ -159,7 +160,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
         ]}
       />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={t("coverage", { first, last })} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={t("coverage", { first, last })} />
         <PopulationPlaceExplorer
           key={place.id}
           place={place}

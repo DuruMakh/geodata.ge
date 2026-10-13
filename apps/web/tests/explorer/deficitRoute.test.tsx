@@ -9,6 +9,7 @@ import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
 
 import * as sources from "../../lib/methodology/workbookSources";
 import * as servedData from "../../lib/data/servedData";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -76,7 +77,7 @@ describe("general-government deficit route composition", () => {
 
   it("names the reviewed IMF edition and actual/projection coverage", async () => {
     const { renderDeficitPage } = await import("../../lib/pages/deficit");
-    const html = renderToStaticMarkup(await renderDeficitPage("en"));
+    const html = renderPageMarkup("en", await renderDeficitPage("en"));
     expect(html).toContain("World Economic Outlook, April 2026");
     expect(html).toContain("The IMF projects the figures for 2026–2031");
     expect(html).toContain("This WEO edition identifies 1995–2025 as the actual-data period");
@@ -96,7 +97,7 @@ describe("general-government deficit route composition", () => {
     ] });
     const { renderDeficitPage } = await import("../../lib/pages/deficit");
     const page = await renderDeficitPage(locale);
-    const html = renderToStaticMarkup(page);
+    const html = renderPageMarkup(locale, page);
     expect(html).toContain(edition);
     expect(html).toContain(description);
     expect(html).toContain("2024–2026");

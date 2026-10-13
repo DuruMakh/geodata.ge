@@ -1,5 +1,4 @@
 import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src: "/definitions.svg" } }));
@@ -18,6 +17,7 @@ import {
   populationRegionParams,
   renderPopulationPlacePage,
 } from "../../lib/pages/demography-population-place";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
 const original = process.env.NEXT_PUBLIC_SITE_URL;
@@ -25,7 +25,7 @@ beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
 const page = async (route: Parameters<typeof renderPopulationPlacePage>[0], locale: "ka" | "en" = "en") =>
-  renderToStaticMarkup(await renderPopulationPlacePage(route, locale));
+  renderPageMarkup(locale, await renderPopulationPlacePage(route, locale));
 
 describe("route parameters", () => {
   it("are the 11 regions and the 63 municipalities, closed sets", async () => {

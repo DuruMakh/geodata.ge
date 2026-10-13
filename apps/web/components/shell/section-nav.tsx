@@ -36,7 +36,7 @@ export function SectionNav() {
                 ▸
               </span>
               <span className="min-w-0 flex-1 truncate">{label}</span>
-              <ComingSoonBadge />
+              <ComingSoonBadge label={message(messages, "common.comingSoon")} />
             </li>
           );
         }

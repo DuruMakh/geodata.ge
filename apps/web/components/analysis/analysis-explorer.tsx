@@ -12,7 +12,7 @@ import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import type { ExpenditureGrouping, ExplorerSide } from "../../lib/explorer/types";
 import { parseExplorerHash, scopeFor, serializeAnalysisHash } from "../../lib/explorer/urlState";
 import { message } from "../../lib/i18n/messages";
-import { I18nProvider } from "../../lib/i18n/provider";
+import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import type { Presentation } from "../../lib/i18n/types";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
@@ -33,8 +33,10 @@ export function AnalysisExplorer(props: AnalysisExplorerProps) {
   return <I18nProvider {...props.presentation}><AnalysisExplorerContent {...props} /></I18nProvider>;
 }
 
-function AnalysisExplorerContent({ presentation, facts: shippedFacts, adminFacts: shippedAdminFacts, adminCategories, glossaryEntries, lastUpdatedAt }: AnalysisExplorerProps) {
+function AnalysisExplorerContent({ facts: shippedFacts, adminFacts: shippedAdminFacts, adminCategories, glossaryEntries, lastUpdatedAt }: AnalysisExplorerProps) {
   const facts = unpackFacts(shippedFacts), adminFacts = unpackFacts(shippedAdminFacts);
+  // The provider adds the layout's namespaces to the page's: read them from it, not from the prop.
+  const presentation = useI18n();
   const { locale, messages } = presentation;
   useAppReady();
 
@@ -105,6 +107,7 @@ function AnalysisExplorerContent({ presentation, facts: shippedFacts, adminFacts
 
   return (
     <BudgetExplorerFrame
+      locale={locale}
       messages={messages}
       sectionLabel={message(messages, "common.analysis")}
       coverage={coverageLabel(messages, locale, years[0], years.at(-1), lastUpdatedAt || undefined)}

@@ -1,7 +1,7 @@
 import { DEFICIT_SERIES_ID } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
@@ -53,7 +53,7 @@ export async function renderDeficitPage(locale: Locale) {
     loadServedGeneralGovernmentBalanceData(),
     loadImfWeoManifest(),
   ]);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "deficit"], [DEFICIT_SERIES_ID], [DEFICIT_SERIES_ID]);
+  const presentation = await getPresentation(locale, ["format", "main", "deficit"], [DEFICIT_SERIES_ID], [DEFICIT_SERIES_ID]);
   const { messages } = presentation;
   const { firstYear, lastYear } = coverageFromYears(facts);
   const lastUpdatedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
@@ -88,7 +88,7 @@ export async function renderDeficitPage(locale: Locale) {
         { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) },
         { name: message(messages, "common.deficit"), path: pageHref(DEFICIT_EXPLORER_PATH, locale) },
       ]} />
-      <I18nProvider {...presentation}>
+      <I18nProvider {...clientPresentation(presentation)}>
       <DeficitExplorer
         facts={facts.map(projectBalanceFact)}
         workbookSources={workbookSourcesFor(messages, manifest, edition)}

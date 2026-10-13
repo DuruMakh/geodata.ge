@@ -1,4 +1,3 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src: "/definitions.svg" } }));
@@ -20,6 +19,7 @@ import {
   loadPopulationSources,
   renderDemographyPopulationPage,
 } from "../../lib/pages/demography-population";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
 // The methodology link closes the source sentence with a full stop, so the Boundaries credit the index appends starts a new one.
@@ -31,7 +31,7 @@ afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 
 describe("demography hub page", () => {
   it("renders the four cards with a breadcrumb and no Georgian text in English", async () => {
-    const html = renderToStaticMarkup(await renderDemographyPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyPage("en"));
     expect(html).toContain('data-testid="demography-hub"');
     expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
     expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(0);
@@ -62,7 +62,7 @@ describe("population index page", () => {
   });
 
   it("is the Budget index layout with population: map, four key figures, 64 and 12 rows, links to place pages, no button row", async () => {
-    const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="municipal-index-workspace"');
     expect(html).toContain('data-testid="municipality-map"');
     expect(count(html, /data-testid="index-kpi"/g)).toBe(4);
@@ -82,7 +82,7 @@ describe("population index page", () => {
   });
 
   it("links every row and the map to its own page, Tbilisi to the region page", async () => {
-    const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyPopulationPage("en"));
     for (const href of [
       "/en/explorer/demography/population/batumi",
       "/en/explorer/demography/population/khulo",
@@ -110,7 +110,7 @@ describe("population index page", () => {
   });
 
   it("shows density under the region rows and the two notes under the map", async () => {
-    const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyPopulationPage("en"));
     expect(html).toContain("2,715.7/km²");
     expect(html).toContain("142.5/km²");
     expect(html).toContain("the map shows the latest year only");
@@ -119,7 +119,7 @@ describe("population index page", () => {
   });
 
   it("has a breadcrumb, the methodology link and no dataset markup, download or Georgian text in English", async () => {
-    const html = renderToStaticMarkup(await renderDemographyPopulationPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
@@ -129,7 +129,7 @@ describe("population index page", () => {
   });
 
   it("renders in Georgian with the same structure", async () => {
-    const html = renderToStaticMarkup(await renderDemographyPopulationPage("ka"));
+    const html = renderPageMarkup("ka", await renderDemographyPopulationPage("ka"));
     expect(html).toContain('data-testid="municipal-index-workspace"');
     expect(html).toContain("2004–2026 · 1 იანვრის მდგომარეობით");
     expect(html).toContain("64 მუნიციპალიტეტი");
@@ -148,7 +148,7 @@ describe("population index page", () => {
 
 describe("migration page", () => {
   it("renders the heading, coverage, breadcrumb and the explorer, with no dataset markup", async () => {
-    const html = renderToStaticMarkup(await renderDemographyMigrationPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyMigrationPage("en"));
     expect(html).toContain(">Migration</h1>");
     expect(html).toContain("2012–2025 · annual");
     expect(html).toContain("Annual migration by citizenship");
@@ -160,7 +160,7 @@ describe("migration page", () => {
   });
 
   it("has no Georgian in the English page or its metadata", async () => {
-    const html = renderToStaticMarkup(await renderDemographyMigrationPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyMigrationPage("en"));
     expect(html).not.toMatch(GEORGIAN);
     const metadata = await demographyMigrationPageMetadata("en");
     expect(String(metadata.title)).not.toMatch(GEORGIAN);
@@ -176,7 +176,7 @@ describe("migration page", () => {
 
 describe("births and deaths page", () => {
   it("renders the places block, fertility and life expectancy, with no dataset markup", async () => {
-    const html = renderToStaticMarkup(await renderDemographyBirthsDeathsPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyBirthsDeathsPage("en"));
     expect(html).toContain(">Births, deaths and fertility</h1>");
     expect(html).toContain("2014–2025 · annual");
     expect(html).toContain("Births per 100 deaths, 2025");
@@ -202,7 +202,7 @@ describe("births and deaths page", () => {
 
 describe("age and sex page", () => {
   it("renders the pyramid, the heat map and a regional glance, in that order, with no dataset markup or Georgian in English", async () => {
-    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyAgeSexPage("en"));
     expect(html).toContain(">Age and sex</h1>");
     expect(html).toContain("2004–2026 · annual, and the 2024 census");
     expect(html).toContain("31.2%");
@@ -219,7 +219,7 @@ describe("age and sex page", () => {
   });
 
   it("opens on two year pickers, the latest year and no comparison, with no year rows and no pyramid table switch", async () => {
-    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyAgeSexPage("en"));
     const trigger = (testId: string) => html.match(new RegExp(`<button[^>]*data-testid="${testId}"[^>]*>.*?</button>`, "s"))?.[0] ?? "";
     const year = trigger("age-sex-year-select");
     expect(year).toContain('aria-haspopup="listbox"');
@@ -237,7 +237,7 @@ describe("age and sex page", () => {
   });
 
   it("shows the regional glance without a single link to a region page", async () => {
-    const html = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+    const html = renderPageMarkup("en", await renderDemographyAgeSexPage("en"));
     expect(html).not.toContain('#age-sex"');
     expect(html).not.toContain("/explorer/demography/population/region/");
   });

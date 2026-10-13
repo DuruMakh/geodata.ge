@@ -27,6 +27,7 @@ import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { REGION_GENITIVE_KA } from "../explorer/municipalLabels";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { clientPresentation } from "../i18n/presentation.server";
 
 export async function municipalIndexMetadata(locale: Locale): Promise<Metadata> {
   const data = await loadServedMunicipalData();
@@ -109,6 +110,8 @@ export async function renderMunicipalIndex(locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }]} />
       <PageHeader
+        locale={locale}
+        messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -120,7 +123,7 @@ export async function renderMunicipalIndex(locale: Locale) {
       <h1 className="mt-[34px] mb-2.5 max-w-[640px] font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">
         {message(messages, "municipal.indexTitle")}
       </h1>
-      <I18nProvider {...presentation}>
+      <I18nProvider {...clientPresentation(presentation)}>
       <MunicipalitiesIndex
         viewBox={map.viewBox}
         shapes={map.shapes}

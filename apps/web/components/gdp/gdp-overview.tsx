@@ -120,6 +120,8 @@ export function GdpOverview({
   return (
     <ExplorerPage testId="gdp-overview" containerQueries={false}>
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           {
             label: message(messages, "common.home"),

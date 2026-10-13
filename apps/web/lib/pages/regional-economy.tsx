@@ -14,7 +14,7 @@ import {
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { packFacts } from "../data/packedFacts";
 import { message } from "../i18n/messages";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
@@ -47,7 +47,7 @@ function regionForSlug(slug: string) {
 async function regionalPresentation(locale: Locale) {
   return getPresentation(
     locale,
-    ["regionalEconomies", "common", "controls", "format", "main", "workbook"],
+    ["regionalEconomies", "format", "main", "workbook"],
     [REGIONAL_GDP_TOTAL, ...REGIONAL_ECONOMY_REGIONS.map((region) => region.id), ...REGIONAL_ECONOMY_SECTORS.map((sector) => sector.id)],
     REGIONAL_ECONOMY_REGIONS.map((region) => region.id),
   );
@@ -107,7 +107,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
     { label: regionName },
   ];
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
         { name: crumbs[2].label, path: pageHref("/explorer/economy", locale) },
@@ -133,7 +133,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
         },
       })} />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, reviewedAt)} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, reviewedAt)} />
         <RegionalEconomyExplorer
           facts={packFacts(regionalFacts.map(projectRegionalObservation))}
           registry={REGIONAL_ECONOMY_SECTORS}

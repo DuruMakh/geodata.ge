@@ -1,5 +1,4 @@
 import { beforeAll, expect, test, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/unemployment/importUnemployment";
 import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/types";
 import { buildUnemploymentRegionMapModel } from "../../lib/explorer/unemploymentRegionMap";
@@ -8,6 +7,7 @@ import { parseUnemploymentHash, changeUnemploymentOverviewSelection, serializeUn
 import { buildUnemploymentModel } from "../../lib/explorer/unemployment";
 import { buildUnemploymentWorkbookExportModel } from "../../lib/explorer/unemploymentWorkbook";
 import { getPresentation } from "../../lib/i18n/presentation.server";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 vi.mock("next/navigation", async original => ({ ...await original<typeof import("next/navigation")>(), notFound: () => { throw new Error("not found"); } }));
 let facts: ClientUnemploymentObservation[];
@@ -27,7 +27,7 @@ test("map ranks eleven modern regions by the latest official rate with separate 
 });
 
 test.each(["ka", "en"] as const)("regional %s index reuses the map and linked list with percentage labels", async locale => {
-  const markup = renderToStaticMarkup(await renderUnemploymentRegionsPage(locale));
+  const markup = renderPageMarkup(locale, await renderUnemploymentRegionsPage(locale));
   expect(markup).toContain('data-testid="unemployment-region-map"');
   expect((markup.match(/data-region-map-target=""/g) ?? [])).toHaveLength(11);
   expect((markup.match(/data-testid="regional-list-row"/g) ?? [])).toHaveLength(11);
@@ -46,7 +46,7 @@ test.each([["tbilisi", 2010], ["imereti", 2019], ["guria", 2017]] as const)("%s 
   expect(model.range).toMatchObject({ start: firstYear, end: 2025 });
   expect(model.definitions).toHaveLength(9);
   expect(model.activeFacts.every(fact => fact.groupId === `region.${slug}` && fact.dimension === "region")).toBe(true);
-  const markup = renderToStaticMarkup(await renderUnemploymentRegionPage(slug, "en"));
+  const markup = renderPageMarkup("en", await renderUnemploymentRegionPage(slug, "en"));
   const heading = /<h1\b[^>]*>(.*?)<\/h1>/.exec(markup)![1];
   expect(heading).toContain('data-testid="region-picker-trigger"');
   expect(heading).toContain("text-[var(--accent)]");
@@ -95,7 +95,7 @@ test("regional comparison keeps Georgia and region parent histories when their c
 });
 
 test.each(["ka", "en"] as const)("regional %s pages and workbooks expose the source categories without inventing earlier values", async locale => {
-  const markup = renderToStaticMarkup(await renderUnemploymentRegionPage("tbilisi", locale));
+  const markup = renderPageMarkup(locale, await renderUnemploymentRegionPage("tbilisi", locale));
   const dataset = JSON.parse(/data-testid="explorer-dataset-json-ld"[^>]*>(.*?)<\/script>/.exec(markup)![1]);
   expect(dataset.variableMeasured).toContain(locale === "en" ? "Hired employees" : "დაქირავებული");
   expect(markup).toContain("2020–2025");

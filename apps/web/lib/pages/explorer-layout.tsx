@@ -6,7 +6,8 @@ import { ExplorerFooter } from "../../components/shell/explorer-footer";
 import type { Locale } from "../i18n/types";
 
 export async function renderExplorerLayout(locale: Locale, children: ReactNode) {
-  const messages = await getMessages(locale, ["common", "controls"]);
+  // The root layout's provider holds `common`; this one adds `controls` to it (lib/i18n/provider.tsx).
+  const messages = await getMessages(locale, ["controls"]);
   return (
     <I18nProvider locale={locale} messages={messages}>
       <div className="flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">

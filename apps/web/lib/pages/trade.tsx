@@ -23,7 +23,7 @@ import { TRADE_OVERVIEW_INDICATORS, TRADE_OVERVIEW_SOURCE } from "../data/tradeO
 import { tradeOverviewCoverage } from "../explorer/tradeOverviewState";
 import { formatDisplayDate } from "../explorer/format";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
@@ -56,7 +56,7 @@ export async function tradeDomesticMetadata(locale: Locale) {
 export async function renderTradeDomesticPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [domestic, national, presentation, manifest, catalogue] = await Promise.all([
-    loadServedTradeDomesticData(), loadServedTradeOverviewData(), getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], []), loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
+    loadServedTradeDomesticData(), loadServedTradeOverviewData(), getPresentation(locale, ["trade", "main", "format", "workbook"], []), loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
   ]);
   const { englishLabels, ...data } = toClientTradeDomesticData(domestic, national.facts), { min, max } = tradeOverviewCoverage(data.national);
   // A Georgian page reads only the countries' English names, for the partner search; the product search reads its own.
@@ -65,11 +65,11 @@ export async function renderTradeDomesticPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => row.source_id in TRADE_DOMESTIC_DOCUMENT_IDS), locale, catalogue.documents);
   const lastReviewedAt = domestic.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
-  return <I18nProvider {...presentation} englishLabels={{ ...presentation.englishLabels, ...pageLabels }}>
+  return <I18nProvider {...clientPresentation(presentation)} englishLabels={{ ...presentation.englishLabels, ...pageLabels }}>
     <JsonLd testId="explorer-dataset-json-ld" data={{ "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/trade/domestic-exports#dataset`, name: title, description: t("domestic.summary"), url: `${origin}${pageHref("/explorer/trade/domestic-exports", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"], spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: [t("indicator.trade.domestic_exports"), t("indicator.trade.reexports")] }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/domestic-exports", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <TradeDomesticExports data={{ ...data, products: projectTradeProductsForPage(data.products, locale) }} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
@@ -80,7 +80,7 @@ export async function renderTradeProductsPage(locale: Locale) {
   const [products, national, fingerprint] = await Promise.all([loadServedTradeProductsData(), loadServedTradeOverviewData(), loadTradeProductCatalogueFingerprint(PRODUCT_SOURCE_BLOCK)]);
   const data = projectTradeProductsForPage(toClientTradeProductsData(products, national.facts, fingerprint, PRODUCT_SOURCE_BLOCK), locale), { min, max } = tradeProductsCoverage(data);
   const [presentation, manifest, catalogue] = await Promise.all([
-    getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], data.entities.map(entity => entity.id)),
+    getPresentation(locale, ["trade", "main", "format", "workbook"], data.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
   ]);
   const sourceIds = new Set<string>(Object.values(TRADE_PRODUCT_SOURCES[PRODUCT_SOURCE_BLOCK])); sourceIds.add(TRADE_OVERVIEW_SOURCE);
@@ -88,14 +88,14 @@ export async function renderTradeProductsPage(locale: Locale) {
   const lastReviewedAt = [...products.facts.filter(fact => fact.sourceBlock === PRODUCT_SOURCE_BLOCK), ...national.facts.filter(fact => data.years.includes(fact.year))].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: t("products.title") }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/trade/products#dataset`, name: t("products.title"), description: t("products.summary"), url: `${origin}${pageHref("/explorer/trade/products", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
       spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: TRADE_PRODUCT_MEASURES.map(id => t(`indicator.${id}`)),
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: t("products.title"), path: pageHref("/explorer/trade/products", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <TradeProducts data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
@@ -112,7 +112,7 @@ export async function renderTradePartnersPage(locale: Locale) {
   const [partners, national] = await Promise.all([loadServedTradePartnersData(), loadServedTradeOverviewData()]);
   const [presentation, manifest, catalogue] = await Promise.all([
     // The partner search matches English names on the Georgian page too.
-    getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], partners.entities.map(entity => entity.id), partners.entities.map(entity => entity.id)),
+    getPresentation(locale, ["trade", "main", "format", "workbook"], partners.entities.map(entity => entity.id), partners.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
   ]);
   const data = toClientTradePartnersData(partners, national.facts), { min, max } = tradePartnersCoverage(data);
@@ -122,14 +122,14 @@ export async function renderTradePartnersPage(locale: Locale) {
   const lastReviewedAt = [...partners.facts, ...national.facts].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: t("partners.title") }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/trade/partners#dataset`, name: t("partners.title"), description: t("partners.summary"), url: `${origin}${pageHref("/explorer/trade/partners", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
       spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: TRADE_OVERVIEW_INDICATORS.map(id => t(`indicator.${id}`)),
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: t("partners.title"), path: pageHref("/explorer/trade/partners", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <TradePartners data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
@@ -137,7 +137,7 @@ export async function renderTradePartnersPage(locale: Locale) {
 export async function renderTradeOverviewPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedTradeOverviewData(), getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], []),
+    loadServedTradeOverviewData(), getPresentation(locale, ["trade", "main", "format", "workbook"], []),
     loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
   ]);
   const facts = data.facts.map(toClientTradeOverviewFact), { min, max } = tradeOverviewCoverage(facts);
@@ -145,7 +145,7 @@ export async function renderTradeOverviewPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => row.source_id === TRADE_OVERVIEW_SOURCE), locale, catalogue.documents);
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: t("title") }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/trade/overview#dataset`, name: t("title"), description: t("summary"),
       url: `${origin}${pageHref("/explorer/trade/overview", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
@@ -154,7 +154,7 @@ export async function renderTradeOverviewPage(locale: Locale) {
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: t("title"), path: pageHref("/explorer/trade/overview", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <TradeOverview facts={facts} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
@@ -170,7 +170,7 @@ export async function tradeServicesMetadata(locale: Locale) {
 export async function renderTradeServicesPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [services, presentation, manifest, catalogue] = await Promise.all([
-    loadServedTradeServicesData(), getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], []),
+    loadServedTradeServicesData(), getPresentation(locale, ["trade", "main", "format", "workbook"], []),
     loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
   ]);
   const { englishLabels, ...data } = toClientTradeServicesData(services), { min, max } = tradeOverviewCoverage(data.national);
@@ -180,14 +180,14 @@ export async function renderTradeServicesPage(locale: Locale) {
   const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("services.title");
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
   // The service-type search matches English names on the Georgian page too.
-  return <I18nProvider {...presentation} englishLabels={{ ...presentation.englishLabels, ...englishLabels }}>
+  return <I18nProvider {...clientPresentation(presentation)} englishLabels={{ ...presentation.englishLabels, ...englishLabels }}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/trade/services#dataset`, name: title, description: t("services.summary"), url: `${origin}${pageHref("/explorer/trade/services", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
       spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: TRADE_OVERVIEW_INDICATORS.map(id => t(`services.indicator.${id}`)),
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/services", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <TradeServices data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;

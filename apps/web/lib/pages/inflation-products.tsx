@@ -6,7 +6,7 @@ import { productRunBounds } from "../explorer/inflationProducts";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
@@ -36,7 +36,7 @@ export async function renderInflationProducts(locale: Locale) {
   const [{ catalogue: products, facts }, pageData, presentation, manifest, languageCatalogue] = await Promise.all([
     loadServedProductData(),
     loadInflationPageData(),
-    getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
+    getPresentation(locale, ["inflation", "format", "main"], []),
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
@@ -47,7 +47,7 @@ export async function renderInflationProducts(locale: Locale) {
   const firstPeriod = products.map((row) => row.firstPeriod).sort()[0]!;
   const lastPeriod = facts.map((fact) => fact.period).sort().at(-1)!;
   const reviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!;
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="product-dataset-json-ld" data={inflationProductDatasetJsonLd({
       locale, origin, firstPeriod, lastPeriod, reviewedAt,
       sourceUrls: sources.map((row) => new URL(row.downloadHref, origin).href),

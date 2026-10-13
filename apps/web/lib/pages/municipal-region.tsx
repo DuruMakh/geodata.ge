@@ -38,6 +38,7 @@ import {
 } from "../seo/municipalMetadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { clientPresentation } from "../i18n/presentation.server";
 
 // The 11 region ids are the complete, closed set.
 
@@ -237,6 +238,8 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name, path: pageHref(`/explorer/municipalities/region/${id}`, locale) }]} />
       <PageHeader
+        locale={locale}
+        messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -248,7 +251,7 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
       />
 
       <MunicipalExplorer
-        presentation={presentation}
+        presentation={clientPresentation(presentation)}
         title={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraHeading" : "municipal.howSpent")}
         triggerLabel={name}
         entityId={regionId}

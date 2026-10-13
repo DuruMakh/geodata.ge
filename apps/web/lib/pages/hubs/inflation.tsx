@@ -20,7 +20,7 @@ export async function inflationHubMetadata(locale: Locale) {
 
 export async function renderInflationHub(locale: Locale) {
   const [{ facts, categories, weights, cities }, productData, presentation] = await Promise.all([
-    loadServedInflationData(), loadServedProductData(), getPresentation(locale, ["inflation", "common"], []),
+    loadServedInflationData(), loadServedProductData(), getPresentation(locale, ["inflation"], []),
   ]);
   const t = (key: string) => message(presentation.messages, key);
   const periods = facts.map((fact) => fact.period).sort();

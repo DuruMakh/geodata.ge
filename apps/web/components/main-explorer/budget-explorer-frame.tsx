@@ -8,7 +8,7 @@ import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { formatShare } from "../../lib/explorer/format";
 import type { ExplorerScope } from "../../lib/explorer/types";
 import { message } from "../../lib/i18n/messages";
-import type { Messages } from "../../lib/i18n/types";
+import type { Locale, Messages } from "../../lib/i18n/types";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { PageHeader } from "../shell/page-header";
@@ -56,7 +56,8 @@ export function budgetTotalsByScope(facts: ClientBudgetFact[], adminFacts: Clien
 }
 
 /** The page header, title and deck line every budget route opens with. */
-export function BudgetExplorerFrame({ messages, sectionLabel, coverage, title, deck, children }: {
+export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, title, deck, children }: {
+  locale: Locale;
   messages: Messages;
   sectionLabel: string;
   coverage: string;
@@ -67,6 +68,8 @@ export function BudgetExplorerFrame({ messages, sectionLabel, coverage, title, d
   return (
     <ExplorerPage testId="explorer-shell" repeatDesktopBottomPadding>
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: "/" },
           { label: message(messages, "common.data") },

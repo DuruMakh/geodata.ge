@@ -97,6 +97,8 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   return (
     <ExplorerPage testId="inflation-overview">
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },

@@ -39,6 +39,7 @@ import {
 import { municipalityDescription } from "../seo/municipalMetadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { clientPresentation } from "../i18n/presentation.server";
 
 // The 64 public slugs are the complete, closed set. Without this, an unknown
 // slug is left to request-time rendering instead of failing at build.
@@ -201,6 +202,8 @@ export async function renderMunicipality(slug: string, locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name: regionBreadcrumbLabel, path: pageHref(regionPath, locale) }, { name, path: pageHref(municipalityHrefForCode(code), locale) }]} />
       <PageHeader
+        locale={locale}
+        messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -213,7 +216,7 @@ export async function renderMunicipality(slug: string, locale: Locale) {
       />
 
       <MunicipalExplorer
-        presentation={presentation}
+        presentation={clientPresentation(presentation)}
         title={message(messages, "municipal.howSpent")}
         triggerLabel={name}
         entityId={code}

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import type { Locale, Presentation } from "../i18n/types";
-import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
@@ -30,7 +29,7 @@ export async function hubPageMetadata(locale: Locale) {
 }
 
 export async function renderHubPage(locale: Locale) {
-  const presentation = await getPresentation(locale, ["common", "main", "hub"], []);
+  const presentation = await getPresentation(locale, ["main", "hub"], []);
   const { messages } = presentation;
   const [{ facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }] = await Promise.all([
     loadServedLandingData(),
@@ -56,6 +55,8 @@ export async function renderHubPage(locale: Locale) {
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }]} />
       <LegacyHashRedirect />
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[{ label: message(messages, "common.home"), href: pageHref("/", locale) }, { label: message(messages, "common.data") }, { label: message(messages, "common.budget") }]}
         coverage={coverage}
       />
@@ -93,16 +94,17 @@ export function TopicHub({ locale, presentation, title, crumbLabel = title, summ
   coverage: string; cards: HubCardModel[]; testId: string; breadcrumb?: boolean; after?: ReactNode;
 }) {
   const home = message(presentation.messages, "common.home");
+  // Rendered on the server, with no client component that reads a page provider: the hub ships no messages (U28-02).
   return (
-    <I18nProvider {...presentation}>
+    <>
       {breadcrumb ? <BreadcrumbJsonLd items={[{ name: home, path: pageHref("/", locale) }, { name: crumbLabel, path: pageHref(path, locale) }]} /> : null}
       <ExplorerPage containerQueries={false}>
-        <PageHeader crumbs={[{ label: home, href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: crumbLabel }]} coverage={coverage} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={[{ label: home, href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: crumbLabel }]} coverage={coverage} />
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] max-w-[640px] text-[13px] text-[var(--body)]">{summary}</p>
         <BudgetHub cards={cards} locale={locale} testId={testId} />
         {after}
       </ExplorerPage>
-    </I18nProvider>
+    </>
   );
 }

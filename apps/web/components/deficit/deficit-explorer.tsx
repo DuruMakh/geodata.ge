@@ -109,6 +109,8 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
   return (
     <ExplorerPage testId="deficit-explorer" repeatDesktopBottomPadding>
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },

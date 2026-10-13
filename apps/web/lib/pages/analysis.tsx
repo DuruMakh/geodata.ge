@@ -3,7 +3,7 @@ import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { AnalysisExplorer } from "../../components/analysis/analysis-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { publicGlossaryEntry } from "../data/glossary";
@@ -44,13 +44,13 @@ export async function renderAnalysisPage(locale: Locale) {
     ...glossary.keys(), ...adminCategories.map(category => category.id),
     "snapshot.other", "expenditure.total", "revenue.total", "admin_spending.total",
   ];
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "analysis"], labelIds, labelIds);
+  const presentation = await getPresentation(locale, ["format", "main", "analysis"], labelIds, labelIds);
   const { messages } = presentation;
   return (
     <>
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.analysis"), path: pageHref("/explorer/analysis", locale) }]} />
       <AnalysisExplorer
-        presentation={presentation}
+        presentation={clientPresentation(presentation)}
         facts={facts.map(projectBudgetFact)}
         adminFacts={ownAdminFacts.map(projectAdminFact)}
         adminCategories={adminCategories}

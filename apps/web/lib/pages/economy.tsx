@@ -20,7 +20,7 @@ export async function economyPageMetadata(locale: Locale) {
 export async function renderEconomyPage(locale: Locale) {
   const [{ facts }, p, sectors, regional] = await Promise.all([
     loadServedGdpOverviewData(),
-    getPresentation(locale, ["gdp", "common", "sectors", "regionalEconomies"], REGIONAL_ECONOMY_REGIONS.map((region) => region.id)),
+    getPresentation(locale, ["gdp", "sectors", "regionalEconomies"], REGIONAL_ECONOMY_REGIONS.map((region) => region.id)),
     loadServedEconomicSectorsData(),
     loadServedRegionalEconomyData(),
   ]);

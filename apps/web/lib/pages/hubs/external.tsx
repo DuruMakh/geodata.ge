@@ -15,7 +15,7 @@ export async function externalHubMetadata(locale: Locale) {
 }
 
 export async function renderExternalHub(locale: Locale) {
-  const [transfers, investment, account, presentation] = await Promise.all([loadServedMoneyTransfersData(), loadServedForeignInvestmentData(), loadServedCurrentAccountFacts(), getPresentation(locale, ["external", "common"], [])]);
+  const [transfers, investment, account, presentation] = await Promise.all([loadServedMoneyTransfersData(), loadServedForeignInvestmentData(), loadServedCurrentAccountFacts(), getPresentation(locale, ["external"], [])]);
   const title = message(presentation.messages, "external.hubTitle");
   return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "external.hubSummary")} path={"/explorer/external"} coverage="" cards={buildExternalHubCards(toClientMoneyTransfersData(transfers), toClientForeignInvestmentData(investment), toClientCurrentAccountFacts(account), presentation)} testId="external-hub" />;
 }

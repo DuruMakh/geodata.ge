@@ -1,4 +1,5 @@
 import { I18nProvider } from "../../lib/i18n/provider";
+import { withoutLayoutMessages } from "../../lib/i18n/presentation.server";
 import type { Locale } from "../../lib/i18n/types";
 import { METHODOLOGY_TRANSLATION_REVIEWED_AT } from "../../lib/methodology/content/en/revisions";
 import { message } from "../../lib/i18n/messages";
@@ -163,7 +164,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
                 />
               ) : null}
               {section.kind === "archive" ? (
-                <I18nProvider locale={locale} messages={messages}>
+                <I18nProvider locale={locale} messages={withoutLayoutMessages(messages)}>
                   <SourceArchive datasetId={content.archiveManifestId} datasetLabel={content.title} rows={rows} summary={archiveSummary} />
                 </I18nProvider>
               ) : null}

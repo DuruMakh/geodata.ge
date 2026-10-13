@@ -1,9 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import type { Locale, Messages } from "../../lib/i18n/types";
 
 // Breadcrumb row above every explorer surface (DESIGN.md §6.7). The right-hand
 // label is dataset COVERAGE, not the user's selection — the range strip owns that.
@@ -16,16 +14,21 @@ import { pageHref } from "../../lib/i18n/routes";
 // title, so phones get one back-crumb to the parent instead (owner decision
 // D10, 2026-10-07). The BreadcrumbList JSON-LD is rendered by each route and
 // is the same at every width.
+//
+// It takes the language as props, not from the I18nProvider, so a server page
+// renders it on the server and a client explorer passes what it read (X1-12).
 
 export type Crumb = { label: string; href?: string };
 
 type PageHeaderProps = {
+  locale: Locale;
+  /** Holds `common.breadcrumb`, the trail's landmark name. */
+  messages: Messages;
   crumbs: Crumb[];
   coverage: string;
 };
 
-export function PageHeader({ crumbs, coverage }: PageHeaderProps) {
-  const { locale, messages } = useI18n();
+export function PageHeader({ locale, messages, crumbs, coverage }: PageHeaderProps) {
   const landmark = message(messages, "common.breadcrumb");
   const parent = crumbs.slice(0, -1).findLast((crumb) => crumb.href);
   return (

@@ -5,6 +5,7 @@ import { DEFAULT_TRADE_PRODUCTS_STATE } from "../../lib/explorer/tradeProductsSt
 import { getMessages } from "../../lib/i18n/messages.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { productData, productPresentation } from "./tradeProductsFixtures";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 async function presentation(locale: "en" | "ka") { return { ...productPresentation(locale), messages: await getMessages(locale, ["trade", "controls", "common", "main", "format", "workbook"]) }; }
 test.each(["en", "ka"] as const)("%s starts with the national export chart and a closed picker", async locale => {
@@ -40,7 +41,7 @@ test("Products metadata and page publish the reviewed bilingual dataset coverage
   expect(en.title).toBe("Trade products");
   expect(en.alternates?.canonical).toContain("/en/explorer/trade/products");
   expect(en.alternates?.languages).toHaveProperty("ka");
-  const html = renderToStaticMarkup(await renderTradeProductsPage("en"));
+  const html = renderPageMarkup("en", await renderTradeProductsPage("en"));
   expect(html).toContain('"temporalCoverage":"2020/2025"');
   expect(html).toContain('"dateModified":"2026-10-09"');
   expect(html).toContain('"inLanguage":["ka","en"]');
@@ -49,7 +50,7 @@ test("Products metadata and page publish the reviewed bilingual dataset coverage
 
 test("the Trade hub shows Products coverage from 2020 while retaining full partner coverage", async () => {
   const { renderTradeHub } = await import("../../lib/pages/hubs/trade");
-  const html = renderToStaticMarkup(await renderTradeHub("en"));
+  const html = renderPageMarkup("en", await renderTradeHub("en"));
   expect(html).toContain("2020–2025");
   expect(html).toContain("1995–2025");
 });

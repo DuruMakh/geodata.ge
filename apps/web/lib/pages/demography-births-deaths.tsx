@@ -14,7 +14,7 @@ import { NATIONAL_SERIES, nationalYears } from "../explorer/demographyNational";
 import { buildVitalIndexModel } from "../explorer/demographyVitalIndex";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { message } from "../i18n/messages";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
@@ -67,7 +67,7 @@ export async function renderDemographyBirthsDeathsPage(locale: Locale) {
     </Link>
   );
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
@@ -76,7 +76,7 @@ export async function renderDemographyBirthsDeathsPage(locale: Locale) {
         ]}
       />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={t("birthsCoverage", { first, last })} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={t("birthsCoverage", { first, last })} />
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("birthsLead")}</p>
         <MunicipalitiesIndex

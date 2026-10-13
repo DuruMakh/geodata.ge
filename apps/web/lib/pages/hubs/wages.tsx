@@ -14,7 +14,7 @@ export async function wagesHubMetadata(locale: Locale) {
 }
 
 export async function renderWagesHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedWagesData(), getPresentation(locale, ["wages", "common"], [])]);
+  const [{ facts }, presentation] = await Promise.all([loadServedWagesData(), getPresentation(locale, ["wages"], [])]);
   const title = message(presentation.messages, "wages.title"), years = facts.map(f => f.year);
   return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "wages.hubSummary")} path={"/explorer/wages"} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildWagesHubCards(facts.map(toClientWagesFact), presentation)} testId="wages-hub" />;
 }

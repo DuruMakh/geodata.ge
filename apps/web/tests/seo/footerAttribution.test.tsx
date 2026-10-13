@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { renderExplorerLayout } from "../../lib/pages/explorer-layout";
 import { SiteFooter } from "../../components/site/site-footer";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const route = vi.hoisted(() => ({ pathname: "/en/explorer/deficit" }));
 vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
@@ -26,7 +27,7 @@ describe("dataset footer attribution", () => {
     ["/en/explorer/demography/population", "Geostat", "Ministry of Finance"],
   ])("uses the sources for %s without an unrelated site-wide date", async (pathname, source, unrelatedSource) => {
     route.pathname = pathname;
-    const footer = footerText(renderToStaticMarkup(await renderExplorerLayout("en", null)));
+    const footer = footerText(renderPageMarkup("en", await renderExplorerLayout("en", null)));
     expect(footer).toContain(source);
     expect(footer).not.toContain(unrelatedSource);
     expect(footer).not.toMatch(/\d{4}-\d{2}-\d{2}/);
@@ -35,7 +36,7 @@ describe("dataset footer attribution", () => {
 
   it("uses Georgian deficit attribution after removing the language prefix", async () => {
     route.pathname = "/explorer/deficit";
-    const footer = footerText(renderToStaticMarkup(await renderExplorerLayout("ka", null)));
+    const footer = footerText(renderPageMarkup("ka", await renderExplorerLayout("ka", null)));
     expect(footer).toContain("IMF");
     expect(footer).not.toContain("ფინანსთა სამინისტრო");
   });
@@ -49,7 +50,7 @@ describe("dataset footer attribution", () => {
 
   it("credits the Georgian unemployment survey to Geostat", async () => {
     route.pathname = "/explorer/unemployment";
-    const footer = footerText(renderToStaticMarkup(await renderExplorerLayout("ka", null)));
+    const footer = footerText(renderPageMarkup("ka", await renderExplorerLayout("ka", null)));
     expect(footer).toContain("საქსტატი");
     expect(footer).not.toContain("ფინანსთა სამინისტრო");
   });

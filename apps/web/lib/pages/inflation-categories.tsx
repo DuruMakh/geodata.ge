@@ -9,7 +9,7 @@ import { projectBasketWeight } from "../explorer/clientData";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
@@ -37,7 +37,7 @@ export async function renderInflationCategories(locale: Locale) {
   const [{ facts, categories, weights }, pageData, presentation, manifest, catalogue] = await Promise.all([
     loadServedInflationData(),
     loadInflationPageData(),
-    getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
+    getPresentation(locale, ["inflation", "format", "main"], []),
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
@@ -51,7 +51,7 @@ export async function renderInflationCategories(locale: Locale) {
     .map((fact) => ({ period: periodFromKey(fact.period), value: fact.value }));
   const t = (key: string) => message(presentation.messages, key);
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd
         items={[
           { name: t("common.home"), path: pageHref("/", locale) },

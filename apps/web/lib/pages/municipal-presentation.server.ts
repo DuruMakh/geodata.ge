@@ -7,7 +7,7 @@ import { formatDisplayDate } from "../explorer/format";
 export function getMunicipalPresentation(data: MunicipalData, locale: Locale, officialCode?: string) {
   // The place, region and function searches match English names on the Georgian pages too.
   const searchIds = ["country.georgia", "municipal.total", ...data.functions.map(fn => fn.id), ...data.municipalities.map(entity => entity.code), ...data.regions.map(region => region.id)];
-  return getPresentation(locale, ["common", "controls", "format", "main", "municipal"], [
+  return getPresentation(locale, ["format", "main", "municipal"], [
     ...searchIds, ...(officialCode ? [`${officialCode}.official-name`] : []),
   ], searchIds);
 }

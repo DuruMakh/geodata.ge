@@ -1,13 +1,13 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { renderExplorerLayout } from "../../lib/pages/explorer-layout";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const route = vi.hoisted(() => ({ pathname: "/en/explorer/demography/population" }));
 vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
 
 const render = async (pathname: string, locale: "ka" | "en" = "en") => {
   route.pathname = pathname;
-  return renderToStaticMarkup(await renderExplorerLayout(locale, null));
+  return renderPageMarkup(locale, await renderExplorerLayout(locale, null));
 };
 
 describe("sidebar demography group", () => {

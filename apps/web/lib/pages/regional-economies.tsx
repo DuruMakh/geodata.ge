@@ -11,7 +11,7 @@ import {
 import { buildRegionalEconomyMapModel } from "../explorer/regionalEconomyMap";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
@@ -38,7 +38,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
     loadServedMunicipalData(),
     getPresentation(
       locale,
-      ["regionalEconomies", "common", "format"],
+      ["regionalEconomies", "format"],
       [...REGIONAL_ECONOMY_REGIONS.map((region) => region.id), ...REGIONAL_ECONOMY_SECTORS.map((sector) => sector.id)],
       REGIONAL_ECONOMY_REGIONS.map((region) => region.id),
     ),
@@ -57,7 +57,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
     { label: title },
   ];
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
         { name: crumbs[2].label, path: pageHref("/explorer/economy", locale) },
@@ -87,7 +87,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
         }),
       })} />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, model.firstYear, model.year, reviewedAt)} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, model.firstYear, model.year, reviewedAt)} />
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{message(presentation.messages, "regionalEconomies.lead")}</p>
         <RegionalEconomiesIndex model={model} sourceNote={message(presentation.messages, "regionalEconomies.sourceNote")} />

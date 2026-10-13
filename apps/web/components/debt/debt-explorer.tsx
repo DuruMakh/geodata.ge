@@ -127,6 +127,8 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   return (
     <ExplorerPage testId="debt-explorer" repeatDesktopBottomPadding>
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },

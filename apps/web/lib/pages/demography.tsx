@@ -20,7 +20,7 @@ export async function demographyPageMetadata(locale: Locale) {
 export async function renderDemographyPage(locale: Locale) {
   const [{ facts }, p] = await Promise.all([
     loadServedDemographyData(),
-    getPresentation(locale, ["demography", "common"], []),
+    getPresentation(locale, ["demography"], []),
   ]);
   const title = message(p.messages, "demography.title");
   return (

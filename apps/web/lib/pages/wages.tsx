@@ -12,7 +12,7 @@ import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegion
 import { WAGES_SECTIONS, wagesCoverage, wagesRegionHref, wagesSummaryValues, wagesViews, type WagesSectionId } from "../explorer/wages";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
@@ -66,7 +66,7 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
   const description = message(presentation.messages, regionId ? "wages.regionSummary" : `wages.page.${section}.summary`, regionId ? { region: regionName, ...summaryValues } : summaryValues);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/wages", locale) }, ...(regionId ? [{ label: t("page.regions.title"), href: pageHref("/explorer/wages/regions", locale) }] : []), { label: regionId ? regionName : title }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${href}#dataset`, name: title, description, url: `${origin}${pageHref(href, locale)}`,
       temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
@@ -76,7 +76,7 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/wages", locale) }, ...(regionId ? [{ name: t("page.regions.title"), path: pageHref("/explorer/wages/regions", locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       <WagesExplorer key={regionId ?? section} section={section} facts={packFacts(facts)} labels={labels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} regionId={regionId} regions={regionId ? REGIONAL_ECONOMY_REGIONS : undefined} />
     </ExplorerPage>
   </I18nProvider>;

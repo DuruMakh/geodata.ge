@@ -8,6 +8,7 @@ import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import sitemap from "../../lib/seo/sitemap";
 import GeorgianUnemploymentHub from "../../app/(ka)/explorer/unemployment/page";
 import EnglishUnemploymentHub from "../../app/(en)/en/explorer/unemployment/page";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const navigation = vi.hoisted(() => ({ pathname: "/en/explorer/unemployment" }));
 vi.mock("next/navigation", async importOriginal => ({ ...await importOriginal<typeof import("next/navigation")>(), usePathname: () => navigation.pathname, useRouter: () => ({ replace: () => {} }) }));
@@ -21,7 +22,7 @@ test.each(["ka", "en"] as const)("the %s landing page offers four cards in the a
 });
 
 for (const [section, breakdown] of [["overview", "national"], ["age", "age"], ["gender", "sex"]] as const) test.each(["ka", "en"] as const)(`renders a static %s ${section} explorer with its own scope and metadata`, async locale => {
-  const markup = renderToStaticMarkup(await renderUnemploymentPage(locale, section));
+  const markup = renderPageMarkup(locale, await renderUnemploymentPage(locale, section));
   expect(markup).toContain('data-testid="unemployment-explorer"');
   expect(markup).toContain(`data-breakdown="${breakdown}"`);
   expect(markup).not.toContain('data-testid="unemployment-breakdown"');

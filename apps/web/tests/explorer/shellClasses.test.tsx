@@ -1,6 +1,6 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { Locale } from "../../lib/i18n/types";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 // The class lists the explorer shell renders on each page, pinned before the
 // shell was consolidated into components/explorer-shell. A difference here is
@@ -24,7 +24,7 @@ const attributesOf = (markup: string, pattern: RegExp): string[] =>
 
 describe.each(PAGES)("'$name' shell", ({ render }) => {
   it("keeps its wrapper, heading, workspace, aside and measure pill", async () => {
-    const markup = renderToStaticMarkup((await render("ka")) as never);
+    const markup = renderPageMarkup("ka", (await render("ka")) as never);
 
     expect({
       main: attributesOf(markup, /<main[^>]*>(?:<div[^>]*>)?/g),

@@ -9,7 +9,7 @@ import { CITIES_PATH, GEORGIA_VIEW, cityIdForSlug, cityPageHref, citySlug, type 
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
@@ -63,7 +63,7 @@ export async function inflationCitiesMetadata(locale: Locale) {
 async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactInput[], lastReviewedAt: string) {
   const root = inflationRepositoryRoot();
   const [presentation, manifest, catalogue] = await Promise.all([
-    getPresentation(locale, ["inflation", "common", "controls", "format", "main"], []),
+    getPresentation(locale, ["inflation", "format", "main"], []),
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
   ]);
@@ -76,7 +76,7 @@ async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactI
     ...(view.kind === "city" ? [{ name: t(`inflation.city.${view.cityId}`), path: pageHref(cityPageHref(view.cityId), locale) }] : []),
   ];
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd items={crumbs} />
       <InflationCities view={view} facts={packCityFacts(facts)} lastReviewedAt={lastReviewedAt} sources={sources} siteOrigin={resolveSiteUrl()} />
     </I18nProvider>

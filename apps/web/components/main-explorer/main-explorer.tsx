@@ -2,7 +2,7 @@
 
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useMemo } from "react";
-import { I18nProvider } from "../../lib/i18n/provider";
+import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import type { Presentation } from "../../lib/i18n/types";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -55,8 +55,10 @@ export function MainExplorer(props: MainExplorerProps) {
   return <I18nProvider {...props.presentation}><MainExplorerContent {...props} /></I18nProvider>;
 }
 
-function MainExplorerContent({ presentation, nav, facts: shippedFacts, adminFacts: shippedAdminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
   const facts = unpackFacts(shippedFacts), adminFacts = unpackFacts(shippedAdminFacts);
+  // The provider adds the layout's namespaces to the page's: read them from it, not from the prop.
+  const presentation = useI18n();
   const { locale, messages } = presentation;
   useAppReady();
 
@@ -188,7 +190,7 @@ function MainExplorerContent({ presentation, nav, facts: shippedFacts, adminFact
   }
 
   return (
-    <BudgetExplorerFrame messages={messages} sectionLabel={sectionLabel} coverage={coverage} title={screenTitle} deck={deck}>
+    <BudgetExplorerFrame locale={locale} messages={messages} sectionLabel={sectionLabel} coverage={coverage} title={screenTitle} deck={deck}>
       <ExplorerView
         model={model}
         scope={scope}

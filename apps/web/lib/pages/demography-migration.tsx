@@ -11,7 +11,7 @@ import { MIGRATION_SERIES, migrationCoverage, migrationSearchLabels } from "../e
 import { DEMOGRAPHY_HUB_PATH, MIGRATION_PATH } from "../explorer/demographyRoutes";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
@@ -33,7 +33,7 @@ export async function renderDemographyMigrationPage(locale: Locale) {
   const [{ facts: served }, sources, presentation, kaMessages, enMessages] = await Promise.all([
     loadServedDemographyData(),
     loadPopulationSources(locale),
-    getPresentation(locale, ["demography", "common", "controls", "format", "main", "workbook"], []),
+    getPresentation(locale, ["demography", "format", "main", "workbook"], []),
     getMessages("ka", ["demography"]),
     getMessages("en", ["demography"]),
   ]);
@@ -60,7 +60,7 @@ export async function renderDemographyMigrationPage(locale: Locale) {
     </>
   );
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
@@ -69,7 +69,7 @@ export async function renderDemographyMigrationPage(locale: Locale) {
         ]}
       />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={t("migrationCoverage", { first, last })} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={t("migrationCoverage", { first, last })} />
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("migrationLead")}</p>
         <MigrationExplorer

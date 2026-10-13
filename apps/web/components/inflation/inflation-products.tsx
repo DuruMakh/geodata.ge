@@ -53,6 +53,8 @@ export function InflationProducts({ products, dataUrl, coverage, lastReviewedAt,
 
   return <ExplorerPage testId="inflation-products">
     <PageHeader
+      locale={locale}
+      messages={messages}
       crumbs={[
         { label: message(messages, "common.home"), href: pageHref("/", locale) },
         { label: message(messages, "common.data") },

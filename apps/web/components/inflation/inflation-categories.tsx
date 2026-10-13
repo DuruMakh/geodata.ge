@@ -154,6 +154,8 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
   return (
     <ExplorerPage testId="inflation-categories">
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },

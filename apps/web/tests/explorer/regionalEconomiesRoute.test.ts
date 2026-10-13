@@ -1,10 +1,10 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
 import {
   regionalEconomyStaticParams,
   renderRegionalEconomiesPage,
   renderRegionalEconomyPage,
 } from "../../lib/pages/regional-economy";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 test("regional economy routes expose exactly eleven stable region IDs", () => {
   expect(regionalEconomyStaticParams()).toEqual([
@@ -15,8 +15,8 @@ test("regional economy routes expose exactly eleven stable region IDs", () => {
 });
 
 test.each(["ka", "en"] as const)("All Regions and Imereti pages render in %s", async (locale) => {
-  const index = renderToStaticMarkup(await renderRegionalEconomiesPage(locale));
-  const detail = renderToStaticMarkup(await renderRegionalEconomyPage("imereti", locale));
+  const index = renderPageMarkup(locale, await renderRegionalEconomiesPage(locale));
+  const detail = renderPageMarkup(locale, await renderRegionalEconomyPage("imereti", locale));
   expect(index).toContain(locale === "en" ? "Regional economies" : "რეგიონების ეკონომიკა");
   expect(index).toContain(`${locale === "en" ? "/en" : ""}/explorer/economy/regions/imereti`);
   expect(detail).toContain(locale === "en" ? "Imereti" : "იმერეთი");

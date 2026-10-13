@@ -56,6 +56,7 @@ import { renderTradeDomesticPage, renderTradeOverviewPage, renderTradePartnersPa
 import { renderUnemploymentPage } from "../../lib/pages/unemployment";
 import { renderWagesPage } from "../../lib/pages/wages";
 import { renderWagesRegionsIndexPage } from "../../lib/pages/wages-regions-index";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 // A page ships two things: its markup and, in the RSC payload, every prop a server page hands a client component.
 // The payload is not in renderToStaticMarkup's output, so the props of every element in the tree are read as well.
@@ -91,7 +92,7 @@ const municipalPages: PageRender[] = [
 describe.each(["ka", "en"] as const)("%s", (locale) => {
   test.each(budgetPages)("budget pages ship no glossary notes: %s", async (_name, renderPage) => {
     const page = await renderPage(locale);
-    const html = renderToStaticMarkup(page) + shippedProps(page);
+    const html = renderPageMarkup(locale, page) + shippedProps(page);
     expect(["Confirm against source", "Temporary source aggregate", "by user decision"].filter((note) => html.includes(note))).toEqual([]);
   });
 
@@ -287,8 +288,8 @@ describe.each(["ka", "en"] as const)("%s: a packed page renders as its facts do"
     ["expenditure", () => renderExpenditurePage(locale)],
   ] as const)("%s", async (_name, renderPage) => {
     const page = await renderPage();
-    const shipped = renderToStaticMarkup(withFacts(page, (facts) => JSON.parse(JSON.stringify(facts))));
-    expect(shipped).toBe(renderToStaticMarkup(withFacts(page, (facts) => unpackFacts(facts).map((fact) => ({ ...fact })))));
+    const shipped = renderPageMarkup(locale, withFacts(page, (facts) => JSON.parse(JSON.stringify(facts))));
+    expect(shipped).toBe(renderPageMarkup(locale, withFacts(page, (facts) => unpackFacts(facts).map((fact) => ({ ...fact })))));
     expect(shipped).toContain('data-testid="');
   });
 });

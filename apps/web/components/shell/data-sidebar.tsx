@@ -515,7 +515,7 @@ export function DataSidebar() {
                   className="flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center border-transparent px-2.5 py-2 text-[12.5px] font-medium text-[var(--ink-fg-muted)] opacity-60"
                 >
                   <span className="min-w-0 flex-1 truncate">{message(messages, `common.${label}`)}</span>
-                  <ComingSoonBadge />
+                  <ComingSoonBadge label={message(messages, "common.comingSoon")} />
                 </li>
               ))}
             </ul>

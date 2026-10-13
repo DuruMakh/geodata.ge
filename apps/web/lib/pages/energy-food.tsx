@@ -9,7 +9,7 @@ import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyF
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
@@ -50,7 +50,7 @@ async function energyFoodSources(root: string, locale: Locale, facts: readonly {
 export async function renderEnergyFoodPage(locale: Locale, section: EnergyFoodSectionId) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation] = await Promise.all([
-    loadServedEnergyFoodData(), getPresentation(locale, ["energyFood", "common", "controls", "format", "main", "workbook"], []),
+    loadServedEnergyFoodData(), getPresentation(locale, ["energyFood", "format", "main", "workbook"], []),
   ]);
   // Each page receives only the observations its series show.
   const ids = new Set<string>(energyFoodSeries(section).map(series => series.id));
@@ -63,7 +63,7 @@ export async function renderEnergyFoodPage(locale: Locale, section: EnergyFoodSe
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref(ENERGY_FOOD_HUB_PATH, locale) }, { label: title }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${href}#dataset`, name: title, description, url: `${origin}${pageHref(href, locale)}`,
       temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
@@ -73,7 +73,7 @@ export async function renderEnergyFoodPage(locale: Locale, section: EnergyFoodSe
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref(ENERGY_FOOD_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       <EnergyFoodExplorer key={section} section={section} facts={facts} labels={labels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;

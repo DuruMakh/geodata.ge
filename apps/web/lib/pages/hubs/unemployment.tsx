@@ -15,7 +15,7 @@ export async function unemploymentHubMetadata(locale: Locale) {
 }
 
 export async function renderUnemploymentHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "common"], [])]);
+  const [{ facts }, presentation] = await Promise.all([loadServedUnemploymentData(), getPresentation(locale, ["unemployment"], [])]);
   const title = message(presentation.messages, "unemployment.title");
   return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "unemployment.hubSummary")} path={"/explorer/unemployment"} coverage={coverageLabel(presentation.messages, locale, Math.min(...facts.map(f => f.year)), Math.max(...facts.map(f => f.year)), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildUnemploymentHubCards(facts, presentation)} testId="unemployment-hub" after={<UnemploymentLegacyLink locale={locale} />} />;
 }

@@ -27,7 +27,7 @@ export async function renderHomePage(locale: Locale) {
     loadServedGdpOverviewData(), loadServedInflationData(), loadServedUnemploymentData(), loadServedTradeOverviewData(),
   ]);
   // "inflation" supplies the short month names of the inflation figure's period.
-  const presentation = await getPresentation(locale, ["common", "landing", "inflation", "trade"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
+  const presentation = await getPresentation(locale, ["landing", "inflation", "trade"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
   const model = buildLandingModel({
     ...landingData,
     municipalities: municipalData.municipalities,

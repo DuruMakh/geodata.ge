@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { Locale } from "../i18n/types";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -42,7 +42,7 @@ export async function renderRevenuePage(locale: Locale) {
   const { firstYear, lastYear } = coverageFromYears(ownFacts);
   // The series search matches English names on the Georgian page too.
   const labelIds = ["revenue.total", ...ownFacts.map(fact => fact.itemId)];
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main"], labelIds, labelIds);
+  const presentation = await getPresentation(locale, ["format", "main"], labelIds, labelIds);
   const { messages } = presentation;
 
   // No adminFacts/adminCategories: the ministries scope cannot be reached from
@@ -67,7 +67,7 @@ export async function renderRevenuePage(locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.revenue"), path: pageHref("/explorer/revenue", locale) }]} />
       <MainExplorer
-        presentation={presentation}
+        presentation={clientPresentation(presentation)}
         nav="revenue"
         facts={ownFacts.map(projectBudgetFact)}
         glossaryEntries={Array.from(glossary.values(), publicGlossaryEntry)}

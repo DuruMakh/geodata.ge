@@ -12,7 +12,7 @@ import { householdWorkbookSources } from "../explorer/householdWorkbook";
 import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
@@ -52,7 +52,7 @@ type HouseholdPageBody = {
 export async function renderHouseholdPage(locale: Locale, section: HouseholdSectionId, regionId: HouseholdArea | undefined, body: (page: HouseholdPageBody) => ReactNode) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "common", "controls", "format", "main", "workbook"], HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_PAGE_AREAS),
+    loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "format", "main", "workbook"], HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_PAGE_AREAS),
     loadReviewedSourceManifest(root, "household-income"), loadEnglishCatalogue(root),
   ]);
   // Each page reads only its own section's observations, and an area page only its lines' (Georgia's include towns and villages).
@@ -72,7 +72,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   const description = regionId ? t(`page.${section}.regionSummary`, { region: regionName }) : t(`page.${section}.summary`), hubTitle = message(presentation.messages, "common.livingStandards");
   const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`) && (!regionId || areaIds.has(f.areaId))).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ label: sectionTitle, href: pageHref(sectionHref, locale) }] : []), { label: regionId ? regionName : title }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${href}#dataset`, name: title, description, url: `${origin}${pageHref(href, locale)}`,
       temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
@@ -82,7 +82,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ name: sectionTitle, path: pageHref(sectionHref, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {body({ facts, labels, areaLabels, sources, origin })}
     </ExplorerPage>
   </I18nProvider>;

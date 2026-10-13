@@ -17,7 +17,7 @@ import { foreignInvestmentCoverage } from "../explorer/foreignInvestmentState";
 import { currentAccountCoverage } from "../explorer/currentAccountState";
 import { formatDisplayDate } from "../explorer/format";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
@@ -52,7 +52,7 @@ export async function renderMoneyFromAbroadPage(locale: Locale) {
   const { data, client } = await loadClientMoneyTransfers();
   const [presentation, manifest, catalogue] = await Promise.all([
     // Only the entities the page serves; the Georgian page's country search reads Georgian names only.
-    getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], client.entities.map(entity => entity.id)),
+    getPresentation(locale, ["external", "main", "format", "workbook"], client.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "external-flows"), loadEnglishCatalogue(root),
   ]);
   const { min, max } = moneyTransfersCoverage(client);
@@ -61,14 +61,14 @@ export async function renderMoneyFromAbroadPage(locale: Locale) {
   const lastReviewedAt = data.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("money.title") }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/external/money-from-abroad#dataset`, name: t("money.title"), description: t("money.summary"), url: `${origin}${pageHref("/explorer/external/money-from-abroad", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
       spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: [t("measure.received"), t("measure.sent")],
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("money.title"), path: pageHref("/explorer/external/money-from-abroad", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <MoneyFromAbroad data={{ ...client, facts: packFacts(client.facts) }} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
@@ -84,7 +84,7 @@ export async function renderForeignInvestmentPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const { data, client } = await loadClientForeignInvestment();
   const [presentation, manifest, catalogue] = await Promise.all([
-    getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], client.entities.map(entity => entity.id)),
+    getPresentation(locale, ["external", "main", "format", "workbook"], client.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "external-flows"), loadEnglishCatalogue(root),
   ]);
   const { min, max } = foreignInvestmentCoverage(client, "country");
@@ -93,14 +93,14 @@ export async function renderForeignInvestmentPage(locale: Locale) {
   const lastReviewedAt = data.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("investment.title") }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/external/foreign-investment#dataset`, name: t("investment.title"), description: t("investment.summary"), url: `${origin}${pageHref("/explorer/external/foreign-investment", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
       spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "National Statistics Office of Georgia (Geostat)", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: [t("investment.tab.country"), t("investment.tab.sector"), t("investment.tab.region")],
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("investment.title"), path: pageHref("/explorer/external/foreign-investment", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <ForeignInvestment data={client} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
@@ -116,7 +116,7 @@ export async function renderCurrentAccountPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [{ facts, client }, { facts: gdpFacts }, gdpSources] = await Promise.all([loadClientCurrentAccount(), loadServedGdpOverviewData(), loadGdpWorkbookSources(locale)]);
   const [presentation, manifest, catalogue] = await Promise.all([
-    getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], []),
+    getPresentation(locale, ["external", "main", "format", "workbook"], []),
     loadReviewedSourceManifest(root, "external-flows"), loadEnglishCatalogue(root),
   ]);
   const { min, max } = currentAccountCoverage(client);
@@ -126,14 +126,14 @@ export async function renderCurrentAccountPage(locale: Locale) {
   const lastReviewedAt = facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("account.title") }];
-  return <I18nProvider {...presentation}>
+  return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/external/current-account#dataset`, name: t("account.title"), description: t("account.summary"), url: `${origin}${pageHref("/explorer/external/current-account", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
       spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: CURRENT_ACCOUNT_SERIES.map(id => t(`account.series.${id}`)),
     }} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("account.title"), path: pageHref("/explorer/external/current-account", locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <CurrentAccount facts={client} gdp={gdp} sources={sources} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;

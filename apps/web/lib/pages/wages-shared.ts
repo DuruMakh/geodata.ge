@@ -25,7 +25,7 @@ export async function wagesPageMetadata(locale: Locale, section: WagesSectionId)
 export async function loadWagesPage(locale: Locale, section: WagesSectionId) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedWagesData(), getPresentation(locale, ["wages", "regionalEconomies", "common", "controls", "format", "main", "workbook"], LABEL_IDS, WAGES_REGIONS),
+    loadServedWagesData(), getPresentation(locale, ["wages", "regionalEconomies", "format", "main", "workbook"], LABEL_IDS, WAGES_REGIONS),
     loadReviewedSourceManifest(root, "wages"), loadEnglishCatalogue(root),
   ]);
   const allFacts = data.facts.map(toClientWagesFact);

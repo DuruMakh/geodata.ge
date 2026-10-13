@@ -15,7 +15,7 @@ export async function energyFoodHubMetadata(locale: Locale) {
 }
 
 export async function renderEnergyFoodHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedEnergyFoodData(), getPresentation(locale, ["energyFood", "common"], [])]);
+  const [{ facts }, presentation] = await Promise.all([loadServedEnergyFoodData(), getPresentation(locale, ["energyFood"], [])]);
   const title = message(presentation.messages, "energyFood.title"), years = facts.map(f => f.year);
   return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "energyFood.hubSummary")} path={ENERGY_FOOD_HUB_PATH} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildEnergyFoodHubCards(facts.map(toClientEnergyFoodFact), presentation)} testId="energy-food-hub" />;
 }
