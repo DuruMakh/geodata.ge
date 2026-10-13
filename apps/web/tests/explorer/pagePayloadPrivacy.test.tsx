@@ -7,9 +7,24 @@ import { PopulationPlaceExplorer } from "../../components/demography/population-
 import { EconomicSectorsExplorer } from "../../components/economic-sectors/economic-sectors-explorer";
 import { MoneyFromAbroad } from "../../components/external/money-from-abroad";
 import { HouseholdExplorer } from "../../components/household/household-explorer";
+import { loadServedTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
+import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
+import { getMessages } from "../../lib/i18n/messages.server";
+import { renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
+import { renderDemographyPopulationPage } from "../../lib/pages/demography-population";
+import { renderMunicipalIndex } from "../../lib/pages/municipal-index";
+import { renderRegionalEconomiesPage } from "../../lib/pages/regional-economies";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { RegionalEconomyExplorer } from "../../components/regional-economies/regional-economy-explorer";
-import { WagesExplorer } from "../../components/wages/wages-explorer";
+import { WagesExplorer, WagesRegionsIndex } from "../../components/wages/wages-explorer";
+import { AgeSexRegions } from "../../components/demography/age-sex-regions";
+import { HouseholdIndex } from "../../components/household/household-explorer";
+import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
+import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
+import { RegionalEconomiesIndex } from "../../components/regional-economies/regional-economies-index";
+import { SiteFooterView } from "../../components/site/site-footer-view";
+import { UnemploymentExplorer } from "../../components/unemployment/unemployment-explorer";
+import { UnemploymentRegionsIndex } from "../../components/unemployment/unemployment-regions-index";
 import { MoneyBanksExplorer } from "../../components/money-banks/money-banks-explorer";
 import { TradeDomesticExports } from "../../components/trade/trade-domestic-exports";
 import { TradeProducts } from "../../components/trade/trade-products";
@@ -126,6 +141,69 @@ describe("English names on Georgian pages", () => {
     const shipped = shippedProps(await renderMoneyFromAbroadPage("en"));
     expect(shipped).not.toContain("bop.personal_transfers");
     expect(shipped).not.toContain("Personal transfers");
+  });
+
+  // The region and place searches (RegionIndex, RegionPicker, MunicipalitiesIndex, EntityPicker) look an English name
+  // up only once someone types or opens the picker, so a name missing from a Georgian page's list would not fail the
+  // build: it would throw "Missing English label" at the first search. Every place a search component receives (a row
+  // with a Georgian name: its id, code and region) must have its English name in what the Georgian page ships.
+  const searchedPages: [string, () => Promise<ReactNode>, unknown[]][] = [
+    ["regional economies index", () => renderRegionalEconomiesPage("ka"), [RegionalEconomiesIndex]],
+    ["regional economy page", () => renderRegionalEconomyPage("tbilisi", "ka"), [RegionalEconomyExplorer]],
+    ["unemployment regions index", () => renderUnemploymentPage("ka", "regions"), [UnemploymentRegionsIndex]],
+    ["unemployment region page", () => renderUnemploymentPage("ka", "regions", "region.imereti"), [UnemploymentExplorer]],
+    ["wages regions index", () => renderWagesPage("ka", "regions"), [WagesRegionsIndex]],
+    ["wages region page", () => renderWagesPage("ka", "regions", "region.imereti"), [WagesExplorer]],
+    ["household index", () => renderHouseholdPage("ka", "income"), [HouseholdIndex]],
+    ["household area page", () => renderHouseholdPage("ka", "income", "region.imereti"), [HouseholdExplorer]],
+    ["municipal index", () => renderMunicipalIndex("ka"), [MunicipalitiesIndex]],
+    ["municipality", () => renderMunicipality("tbilisi", "ka"), [MunicipalExplorer]],
+    ["population index", () => renderDemographyPopulationPage("ka"), [MunicipalitiesIndex]],
+    ["population place page", () => renderPopulationPlacePage({ kind: "region", id: "imereti" }, "ka"), [PopulationPlaceExplorer]],
+    ["births and deaths index", () => renderDemographyBirthsDeathsPage("ka"), [MunicipalitiesIndex]],
+    ["age and sex regions", () => renderDemographyAgeSexPage("ka"), [AgeSexRegions]],
+  ];
+  /** The ids, codes and regions of every place row (an object with a Georgian name) in a component's props. */
+  function placeIds(value: unknown, ids = new Set<string>(), seen = new WeakSet<object>()): Set<string> {
+    if (!value || typeof value !== "object" || seen.has(value)) return ids;
+    seen.add(value);
+    if (Array.isArray(value)) value.forEach((item) => placeIds(item, ids, seen));
+    else {
+      const row = value as Record<string, unknown>;
+      if (typeof row.nameKa === "string" || typeof row.kaLabel === "string") for (const key of ["id", "code", "regionId"]) if (typeof row[key] === "string") ids.add(row[key]);
+      Object.values(row).forEach((item) => placeIds(item, ids, seen));
+    }
+    return ids;
+  }
+  test.each(searchedPages)("the Georgian %s ships the English name of every place its search can match", async (_name, renderPage, types) => {
+    const page = await renderPage();
+    const hosts = types.flatMap((type) => propsOf<Record<string, unknown> & { presentation?: Presentation }>(page, type));
+    expect(hosts.length).toBeGreaterThan(0);
+    const shipped = new Set([...propsOf<Presentation>(page, I18nProvider), ...hosts.flatMap((host) => host.presentation ? [host.presentation] : [])].flatMap((p) => Object.keys(p.englishLabels)));
+    const ids = placeIds(hosts);
+    expect(ids.size).toBeGreaterThanOrEqual(11);
+    expect([...ids].filter((id) => !shipped.has(id))).toEqual([]);
+  });
+
+  // The English page's search reads the curated English label in place of the Geostat English name it no longer ships;
+  // they agree today (trailing spaces aside), and a rewording of either becomes a reviewed decision here.
+  test("the curated English name of every shipped product is its Geostat English name", async () => {
+    const [{ entities }, catalogue] = await Promise.all([loadServedTradeProductsData(), loadEnglishCatalogue(process.cwd() + "/../..")]);
+    const shipped = entities.filter((entity) => entity.sourceBlock === "2020-2025");
+    expect(shipped.length).toBeGreaterThan(1000);
+    expect(shipped.filter((entity) => catalogue.labels[entity.id]?.text.trim() !== entity.sourceLabelEn.trim()).map((entity) => entity.id)).toEqual([]);
+  });
+});
+
+describe.each(["ka", "en"] as const)("%s small payload rules", (locale) => {
+  test("products ship no empty alias lists (U22-03)", async () => {
+    const shipped = shippedProps(await renderTradeProductsPage(locale)) + shippedProps(await renderTradeDomesticPage(locale));
+    expect(shipped).not.toMatch(/"aliases(Ka|En)":\[\]/);
+  });
+
+  test("the footer logo is lazy, so React does not preload it ahead of the header logo (U01-11)", async () => {
+    const html = renderToStaticMarkup(<SiteFooterView locale={locale} messages={await getMessages(locale, ["common"])} />);
+    expect(html).toMatch(/<img[^>]*data-testid="site-footer-logo"[^>]*loading="lazy"/);
   });
 });
 
