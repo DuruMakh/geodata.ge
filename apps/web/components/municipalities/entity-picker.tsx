@@ -57,6 +57,8 @@ type EntityPickerProps = {
   groups: EntityPickerGroup[];
   activeId: string;
   overrides?: EntityPickerOverrides;
+  /** Carry the page's view hash to the place picked (see EntityHeading). */
+  carryHash?: boolean;
 };
 
 type PickerOption =
@@ -85,7 +87,7 @@ function focusTrigger() {
   document.querySelector<HTMLButtonElement>("[data-testid='entity-picker-trigger']")?.focus();
 }
 
-export function EntityPicker({ open, onClose, country, groups, activeId, overrides }: EntityPickerProps) {
+export function EntityPicker({ open, onClose, country, groups, activeId, overrides, carryHash = false }: EntityPickerProps) {
   const { locale, messages, englishLabels } = useI18n();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -175,13 +177,15 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
   }, [activeOptionId]);
 
   const hrefFor = (kind: "country" | "region" | "municipality", id: string) => overrides?.hrefById?.[id] ?? municipalEntityHref(kind, id);
+  // The popover only renders once opened, in the browser, so the hash is read at that point (U09-17).
+  const placeHref = (kind: "country" | "region" | "municipality", id: string) => `${pageHref(hrefFor(kind, id), locale)}${carryHash ? window.location.hash : ""}`;
   const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : formatAmount(value, locale));
 
   function selectOption(option: PickerOption) {
     onClose();
-    if (option.kind === "country") router.push(pageHref(hrefFor("country", country.id), locale));
-    else if (option.kind === "region") router.push(pageHref(hrefFor("region", option.regionId), locale));
-    else router.push(pageHref(hrefFor("municipality", option.code), locale));
+    if (option.kind === "country") router.push(placeHref("country", country.id));
+    else if (option.kind === "region") router.push(placeHref("region", option.regionId));
+    else router.push(placeHref("municipality", option.code));
   }
 
   function moveActive(delta: 1 | -1) {
@@ -250,7 +254,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
         <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[340px] overflow-y-auto max-[768px]:max-h-[min(340px,40svh)]">
           {filteredCountry ? (
             <Link
-              href={pageHref(hrefFor("country", country.id), locale)}
+              href={placeHref("country", country.id)}
               prefetch={false}
               id={countryOptionId(baseId)}
               role="option"
@@ -276,7 +280,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
             return (
               <div key={group.regionId}>
                 <Link
-                  href={pageHref(hrefFor("region", group.regionId), locale)}
+                  href={placeHref("region", group.regionId)}
                   prefetch={false}
                   id={regionId}
                   role="option"
@@ -301,7 +305,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
                   return (
                     <Link
                       key={member.code}
-                      href={pageHref(hrefFor("municipality", member.code), locale)}
+                      href={placeHref("municipality", member.code)}
                       prefetch={false}
                       id={memberId}
                       role="option"

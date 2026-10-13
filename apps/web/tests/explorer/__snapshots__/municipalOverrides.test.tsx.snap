@@ -108,11 +108,10 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 <span data-testid="municipal-search-status" role="status" class="sr-only">2 of 2 shown</span>
 </div>
 <div data-testid="municipal-list-muni" class="mt-1.5 @min-[768px]:max-h-[620px] @min-[768px]:overflow-y-auto">
-<a data-testid="municipal-list-row" data-municipality-row-code="04" class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/tbilisi">
+<a data-testid="municipal-list-row" data-municipality-row-code="04" class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] min-[768px]:grid-cols-[22px_minmax(0,1fr)_140px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/tbilisi">
 <span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">01</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Tbilisi</span>
-<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">Tbilisi</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:100.0%">
 </span>
@@ -120,15 +119,15 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </span>
 <span class="min-w-0 text-right font-[family-name:var(--font-numeric)]">
 <span data-testid="municipal-row-primary-amount" class="block text-[11.5px]">1.37 mln GEL</span>
-<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,141 per resident</span>
+<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:whitespace-nowrap min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,141 per resident</span>
 </span>
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>
-<a data-testid="municipal-list-row" data-municipality-row-code="06" class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/batumi">
+<a data-testid="municipal-list-row" data-municipality-row-code="06" class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] min-[768px]:grid-cols-[22px_minmax(0,1fr)_140px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/batumi">
 <span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">02</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Batumi</span>
-<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">Adjara</span>
+<span data-testid="municipal-row-subtitle" title="Adjara" class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">Adjara</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:18.0%">
 </span>
@@ -136,17 +135,17 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </span>
 <span class="min-w-0 text-right font-[family-name:var(--font-numeric)]">
 <span data-testid="municipal-row-primary-amount" class="block text-[11.5px]">0.25 mln GEL</span>
-<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,368 per resident</span>
+<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:whitespace-nowrap min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,368 per resident</span>
 </span>
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>
 </div>
 <div data-testid="municipal-list-region" hidden="" class="mt-1.5 @min-[768px]:max-h-[620px] @min-[768px]:overflow-y-auto">
-<a class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/georgia">
+<a class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] min-[768px]:grid-cols-[22px_minmax(0,1fr)_140px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/georgia">
 <span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">—</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Georgia</span>
-<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">69 municipal budgets</span>
+<span data-testid="municipal-row-subtitle" title="69 municipal budgets" class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">69 municipal budgets</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:100.0%">
 </span>
@@ -157,11 +156,11 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </span>
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>
-<a class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/region/adjara">
+<a class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] min-[768px]:grid-cols-[22px_minmax(0,1fr)_140px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/region/adjara">
 <span class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">01</span>
 <span class="min-w-0">
 <span data-testid="municipal-row-name" class="block truncate text-[12.5px] font-medium">Adjara</span>
-<span class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">1 municipality</span>
+<span data-testid="municipal-row-subtitle" title="1 municipality" class="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">1 municipality</span>
 <span class="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
 <span data-testid="municipal-row-bar" class="block h-[3px] bg-[var(--accent)]" style="width:10.5%">
 </span>
@@ -169,7 +168,7 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </span>
 <span class="min-w-0 text-right font-[family-name:var(--font-numeric)]">
 <span data-testid="municipal-row-primary-amount" class="block text-[11.5px]">0.41 mln GEL</span>
-<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,148 per resident</span>
+<span data-testid="municipal-row-per-resident" class="mt-0.5 block text-[11px] min-[768px]:whitespace-nowrap min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">1,148 per resident</span>
 </span>
 <span aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">→</span>
 </a>

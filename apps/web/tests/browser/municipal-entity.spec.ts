@@ -132,6 +132,26 @@ test.describe("hash sanitising", () => {
   });
 });
 
+// U09-17: moving to another place keeps the view (mode, range, functions, share), as the language switch does.
+test("the neighbour links and the picker keep the view hash", async ({ page }) => {
+  await page.goto(`${ENTITY_URL}#m=table&r=2018-2022&sel=municipal.total,municipal.health&sh=1`);
+  await expectMunicipalAppReady(page);
+  const hash = new URL(page.url()).hash;
+  expect(hash).toContain("m=table");
+
+  await page.getByTestId("municipal-entity-navigation").locator("a").last().click();
+  await page.waitForURL((url) => !url.pathname.endsWith("/tbilisi"));
+  await expectMunicipalAppReady(page);
+  expect(new URL(page.url()).hash).toBe(hash);
+  const stepped = new URL(page.url()).pathname;
+
+  await page.getByTestId("entity-picker-trigger").click();
+  await page.locator("[data-testid='picker-municipality']:not([aria-current])").first().click();
+  await page.waitForURL((url) => url.pathname !== stepped);
+  await expectMunicipalAppReady(page);
+  expect(new URL(page.url()).hash).toBe(hash);
+});
+
 test.describe("entity picker accessibility", () => {
   test("answers a non-matching query instead of collapsing to a 0px void", async ({ page }) => {
     await page.goto(ENTITY_URL);
@@ -528,12 +548,27 @@ test.describe("municipality page", () => {
     await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(0);
   });
 
-  test("an explicitly empty selection renders no table rows", async ({ page }) => {
+  // U09-10: the table view says what to do with nothing selected, as the line view does, instead of a header-only table.
+  test("an explicitly empty selection shows the guidance in the table view too", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#m=table&sel=`);
     await expectMunicipalAppReady(page);
 
-    await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(0);
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+    await expect(page.getByTestId("explorer-table")).toHaveCount(0);
+  });
+
+  // U09-16: the phone legend prints each amount as the series panel does, not at the table's precision.
+  test("the phone legend prints amounts as the series panel does", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(`${ENTITY_URL}#sel=municipal.total,municipal.health`);
+    await expectMunicipalAppReady(page);
+
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend.locator("li")).toHaveCount(2);
+    for (const id of ["municipal.total", "municipal.health"]) {
+      const panelValue = (await page.locator(`[data-testid='series-row'][data-series-id='${id}'] [data-testid='series-row-toggle'] > span:last-child`).textContent())!.trim();
+      await expect(legend.locator(`[data-legend-series-id='${id}'] > span:last-child`)).toHaveText(panelValue);
+    }
   });
 
   test("uses the official municipal total as 100% without normalizing functions", async ({ page }) => {

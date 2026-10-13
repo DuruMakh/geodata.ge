@@ -125,65 +125,73 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         // Below 768px the page scrolls the list; an inner 620px box trapped the swipe.
         className="mt-1.5 @min-[768px]:max-h-[620px] @min-[768px]:overflow-y-auto"
       >
-        {panelRows.map((row) => (
-          <Link
-            key={row.id}
-            href={pageHref(hrefFor(row.kind, row.id), locale)}
-            prefetch={false}
-            data-testid={activePanel ? "municipal-list-row" : undefined}
-            data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
-            data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
-            onMouseEnter={() => {
-              if (row.kind === "municipality") setListPointerCode(row.id);
-            }}
-            onMouseLeave={() => {
-              if (row.kind === "municipality") setListPointerCode(null);
-            }}
-            onFocus={() => {
-              if (row.kind === "municipality") setListFocusCode(row.id);
-            }}
-            onBlur={() => {
-              if (row.kind === "municipality") setListFocusCode(null);
-            }}
-            className={`grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
-              row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : "bg-transparent"
-            }`}
-          >
-            <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
-              {row.rank === null ? "—" : String(row.rank).padStart(2, "0")}
-            </span>
-            <span className="min-w-0">
-              <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
-                {publicLabel(locale, row.id, row.nameKa, englishLabels)}
+        {panelRows.map((row) => {
+          const name = publicLabel(locale, row.id, row.nameKa, englishLabels);
+          const subtitle = subtitleFor(row);
+          return (
+            <Link
+              key={row.id}
+              href={pageHref(hrefFor(row.kind, row.id), locale)}
+              prefetch={false}
+              data-testid={activePanel ? "municipal-list-row" : undefined}
+              data-municipality-row-code={row.kind === "municipality" ? row.id : undefined}
+              data-active={row.kind === "municipality" && row.id === activeMunicipalityCode ? "true" : undefined}
+              onMouseEnter={() => {
+                if (row.kind === "municipality") setListPointerCode(row.id);
+              }}
+              onMouseLeave={() => {
+                if (row.kind === "municipality") setListPointerCode(null);
+              }}
+              onFocus={() => {
+                if (row.kind === "municipality") setListFocusCode(row.id);
+              }}
+              onBlur={() => {
+                if (row.kind === "municipality") setListFocusCode(null);
+              }}
+              // From 768px the amount column fits a four-digit per-resident line on one row, so every row keeps one height (U08-09).
+              className={`grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] min-[768px]:grid-cols-[22px_minmax(0,1fr)_140px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] ${
+                row.kind === "municipality" && row.id === activeMunicipalityCode ? "bg-[var(--tint)]" : "bg-transparent"
+              }`}
+            >
+              <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
+                {row.rank === null ? "—" : String(row.rank).padStart(2, "0")}
               </span>
-              <span className="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">{subtitleFor(row)}</span>
-              <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
-                <span
-                  data-testid="municipal-row-bar"
-                  className="block h-[3px] bg-[var(--accent)]"
-                  style={{ width: `${((row.valueGel / max) * 100).toFixed(1)}%` }}
-                />
-              </span>
-            </span>
-            <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
-              <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
-                {formatValue(row.valueGel)}
-              </span>
-              {overrides?.secondaryById?.[row.id] !== undefined ? (
-                <span data-testid="municipal-row-secondary" className="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">
-                  {overrides.secondaryById[row.id]}
+              <span className="min-w-0">
+                <span data-testid="municipal-row-name" className="block truncate text-[12.5px] font-medium">
+                  {name}
                 </span>
-              ) : row.budgetPerResidentGel !== null ? (
-                <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">
-                  {message(messages, "municipal.perResidentShort", { amount: formatPerResidentGel(row.budgetPerResidentGel, locale).replace(locale === "ka" ? " ₾" : " GEL", "") })}
+                {/* Tbilisi is its own region: its subtitle would repeat the name. A cut subtitle can be read in full on hover. */}
+                {subtitle === name ? null : (
+                  <span data-testid="municipal-row-subtitle" title={subtitle} className="block text-[11px] min-[768px]:truncate min-[768px]:text-[10.5px] text-[var(--faint)]">{subtitle}</span>
+                )}
+                <span className="mt-[5px] block h-[3px] bg-[var(--hairline-soft)]">
+                  <span
+                    data-testid="municipal-row-bar"
+                    className="block h-[3px] bg-[var(--accent)]"
+                    style={{ width: `${((row.valueGel / max) * 100).toFixed(1)}%` }}
+                  />
                 </span>
-              ) : null}
-            </span>
-            <span aria-hidden className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
-              →
-            </span>
-          </Link>
-        ))}
+              </span>
+              <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
+                <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
+                  {formatValue(row.valueGel)}
+                </span>
+                {overrides?.secondaryById?.[row.id] !== undefined ? (
+                  <span data-testid="municipal-row-secondary" className="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">
+                    {overrides.secondaryById[row.id]}
+                  </span>
+                ) : row.budgetPerResidentGel !== null ? (
+                  <span data-testid="municipal-row-per-resident" className="mt-0.5 block text-[11px] min-[768px]:whitespace-nowrap min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">
+                    {message(messages, "municipal.perResidentShort", { amount: formatPerResidentGel(row.budgetPerResidentGel, locale).replace(locale === "ka" ? " ₾" : " GEL", "") })}
+                  </span>
+                ) : null}
+              </span>
+              <span aria-hidden className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">
+                →
+              </span>
+            </Link>
+          );
+        })}
       </div>
     );
   }

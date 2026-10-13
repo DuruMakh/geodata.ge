@@ -406,6 +406,23 @@ test.describe("municipalities index", () => {
     await expect(page.locator("body")).not.toContainText("ერთ სულზე");
   });
 
+  // U08-09: on a wide screen every row is one height (a four-digit per-resident line stays on one line), a cut
+  // region name can be read on hover, and Tbilisi does not repeat its own name as its region.
+  test("keeps the list rows even and their subtitles readable", async ({ page }) => {
+    await page.setViewportSize({ width: 1700, height: 1000 });
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
+    await expectMunicipalAppReady(page);
+
+    const rows = page.getByTestId("municipal-list-row");
+    const heights = await rows.evaluateAll((items) => items.filter((item) => item.querySelector("[data-testid='municipal-row-per-resident']")).map((item) => Math.round(item.getBoundingClientRect().height)));
+    expect(new Set(heights).size).toBe(1);
+    for (const subtitle of await page.getByTestId("municipal-row-subtitle").all()) {
+      expect(await subtitle.getAttribute("title")).toBe((await subtitle.textContent())!.trim());
+    }
+    const tbilisi = rows.filter({ has: page.getByTestId("municipal-row-name").getByText("თბილისი", { exact: true }) });
+    await expect(tbilisi.getByTestId("municipal-row-subtitle")).toHaveCount(0);
+  });
+
   test("filters and clears the search", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);

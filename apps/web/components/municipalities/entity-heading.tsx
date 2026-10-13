@@ -15,10 +15,12 @@ type EntityHeadingProps = {
   pickerCountry: EntityPickerCountry;
   pickerGroups: EntityPickerGroup[];
   pickerOverrides?: EntityPickerOverrides;
+  /** Carry the page's view hash to the place picked or stepped to; only pages whose hash means the same on every place. */
+  carryHash?: boolean;
 };
 
 /** The place page's heading: the title, the place picker (also on ⌘K), the meta line and, when given, previous/next. */
-export function EntityHeading({ title, triggerLabel, metaLine, entityId, navigation, pickerCountry, pickerGroups, pickerOverrides }: EntityHeadingProps) {
+export function EntityHeading({ title, triggerLabel, metaLine, entityId, navigation, pickerCountry, pickerGroups, pickerOverrides, carryHash = false }: EntityHeadingProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
@@ -68,12 +70,13 @@ export function EntityHeading({ title, triggerLabel, metaLine, entityId, navigat
           groups={pickerGroups}
           activeId={entityId}
           overrides={pickerOverrides}
+          carryHash={carryHash}
         />
         <div className="text-[12.5px] text-[var(--muted)]">{metaLine}</div>
       </div>
       {navigation ? (
         // Plain <a> on purpose (full page load).
-        <EntityNeighbourLinks testId="municipal-entity-navigation" plainAnchors previous={navigation.prev} next={navigation.next} />
+        <EntityNeighbourLinks testId="municipal-entity-navigation" plainAnchors carryHash={carryHash} previous={navigation.prev} next={navigation.next} />
       ) : null}
     </div>
   );

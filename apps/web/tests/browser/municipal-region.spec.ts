@@ -71,14 +71,19 @@ test.describe("region header responsiveness", () => {
 });
 
 test.describe("region source note", () => {
-  test("keeps the occupied-territory exclusions on ordinary regional roll-ups", async ({ page }) => {
+  // U09-11: the occupied-territory exclusion is said on the two regions it applies to, not on the other nine.
+  test("states the occupied-territory exclusions only where they apply", async ({ page }) => {
     const response = await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
     expect(response?.status()).toBe(200);
 
     const note = page.getByTestId("municipal-source-note");
     await expect(note).toContainText("რეგიონის ჯამი მხოლოდ საჯაროდ მოწოდებულ მუნიციპალურ ბიუჯეტებს აერთიანებს");
-    await expect(note).toContainText("შიდა ქართლსა და მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია");
+    await expect(note).not.toContainText("ოკუპირებულ ტერიტორიებთან");
+
+    await page.goto(`${BASE_URL}/explorer/municipalities/region/shida_kartli`);
+    await expectMunicipalAppReady(page);
+    await expect(page.getByTestId("municipal-source-note")).toContainText("შიდა ქართლსა და მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია");
   });
 
   test("identifies Adjara's consolidated total and removed internal transfers", async ({ page }) => {

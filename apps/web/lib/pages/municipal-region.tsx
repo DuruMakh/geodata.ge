@@ -42,6 +42,14 @@ import { clientPresentation } from "../i18n/presentation.server";
 
 // The 11 region ids are the complete, closed set.
 
+// The occupied-territory exclusion is said only on the two regions it applies to (U09-11).
+const OCCUPIED_EXCLUSION_REGIONS: ReadonlySet<string> = new Set(["region.shida_kartli", "region.mtskheta_mtianeti"]);
+
+function regionSourceKey(regionId: string): string {
+  if (regionId === ADJARA_REGION_ID) return "municipal.adjaraSource";
+  return OCCUPIED_EXCLUSION_REGIONS.has(regionId) ? "municipal.regionSource" : "municipal.regionSourceGeneral";
+}
+
 export async function municipalRegionStaticParams() {
   const { regions } = await loadServedMunicipalData();
   return regions.map((region) => ({ id: region.id.replace("region.", "") }));
@@ -282,7 +290,7 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
           next: { label: publicLabel(locale, next.id, next.kaLabel, englishLabels), href: hrefFor(next) },
         }}
         summary={summary}
-        sourceNote={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraSource" : "municipal.regionSource") + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
+        sourceNote={message(messages, regionSourceKey(regionId)) + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
       >
         <EntityMemberList
           heading={message(messages, "municipal.regionMembers")}

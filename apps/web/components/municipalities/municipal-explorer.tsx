@@ -264,6 +264,8 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
         navigation={navigation}
         pickerCountry={props.pickerCountry}
         pickerGroups={props.pickerGroups}
+        // The view hash means the same on every place page (functions, mode, range, share): keep it (U09-17).
+        carryHash
       />
 
       <EntityWorkspaceShell
@@ -299,7 +301,8 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               </button>
             </div>
 
-            {state.chartMode === "line" && noSelection ? (
+            {/* Both views say what to do with nothing selected, as the national and wages explorers do (U09-10). */}
+            {noSelection ? (
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "municipal.noSelection")}</Callout>
               </div>
@@ -319,7 +322,14 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
                 shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
               />
             )}
-            <ChartSelectionAids series={series} chartShown={state.chartMode === "line"} share={state.share} unit={unit} />
+            <ChartSelectionAids
+              series={series}
+              chartShown={state.chartMode === "line"}
+              share={state.share}
+              unit={unit}
+              // The phone legend prints each amount as the series panel does (U09-16).
+              formatValue={state.share ? undefined : (value) => formatAmount(value, locale)}
+            />
 
             {/* allYears, never model.years — the strip must offer the full span
                 even when the selection has narrowed it. The strip draws its own rule. */}
