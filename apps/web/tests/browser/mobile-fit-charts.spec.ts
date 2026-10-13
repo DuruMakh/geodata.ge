@@ -297,6 +297,35 @@ const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
   "/explorer/living-standards/spending/regions/[id]": ["ka", "en"],
 };
 
+/** The first block under the page heading, and the one after it when that is a text line. */
+function underHeading(page: Page) {
+  return page.getByRole("heading", { level: 1 }).first().evaluate((heading) => {
+    // A place heading wraps the h1 with its closed picker and its previous/next
+    // links; the line under the heading follows that block.
+    const skipped = (element: Element) => element.matches('[data-testid$="-navigation"], .sr-only');
+    const following = (element: Element | null) => {
+      while (element && skipped(element)) element = element.nextElementSibling;
+      return element;
+    };
+    let block: Element = heading;
+    let first = following(block.nextElementSibling);
+    while (!first && block.parentElement && block.parentElement.tagName !== "MAIN") {
+      block = block.parentElement;
+      first = following(block.nextElementSibling);
+    }
+    // Text is a line to measure; anything holding controls or a chart is the workspace.
+    const describe = (element: Element | null) => element instanceof HTMLElement ? {
+      tag: element.tagName,
+      text: !element.querySelector("button, input, select, svg, table, section, canvas"),
+      lines: element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight),
+      content: element.textContent,
+    } : null;
+    const line = describe(first);
+    // The workspace follows the one line directly: no unit line, note or summary under it.
+    return { line, then: line?.text ? describe(following(first!.nextElementSibling)) : null };
+  });
+}
+
 const routes = explorerRoutes();
 
 test("every explorer route template has a published page to check", () => {
@@ -309,6 +338,22 @@ test("every explorer route template has a published page to check", () => {
 // label cut off at the chart's left edge, and no page error. Page specs keep the
 // layout checks this does not cover: other widths, other places, other states.
 const layoutWidths = [390, 768, 1440] as const;
+
+/**
+ * After a resize, wait until the page has re-rendered for the new width: the
+ * sidebar keeps its desktop state (900px) in React and the charts swap to their
+ * phone drawing below 768px, both on a media-query change; ResizeObserver widths
+ * (the phone chart, the table layout) land in the frames after.
+ */
+async function settleAt(page: Page, width: number) {
+  await expect.poll(() => page.evaluate((width) => {
+    const toggles = [...document.querySelectorAll('[data-testid="sidebar-toggle"]')];
+    const drawings = [...document.querySelectorAll("svg[data-geometry]")].filter((drawing) => drawing.checkVisibility());
+    return toggles.every((toggle) => toggle.getAttribute("aria-expanded") === String(width >= 900))
+      && drawings.every((drawing) => drawing.getAttribute("data-geometry") === (width < 768 ? "mobile" : "desktop"));
+  }, width), { message: `rendered for ${width}px` }).toBe(true);
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve)))));
+}
 
 /** Sideways page overflow and the chart labels that start left of their drawing. */
 function measureLayout(page: Page) {
@@ -334,31 +379,7 @@ test.describe("one layout pass per explorer route: one short line under the head
         // A page whose data is fetched after load (products) shows a loading status where its workspace will be.
         await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
         await page.evaluate(() => document.fonts.ready);
-        const under = await page.getByRole("heading", { level: 1 }).first().evaluate((heading) => {
-          // A place heading wraps the h1 with its closed picker and its previous/next
-          // links; the line under the heading follows that block.
-          const skipped = (element: Element) => element.matches('[data-testid$="-navigation"], .sr-only');
-          const following = (element: Element | null) => {
-            while (element && skipped(element)) element = element.nextElementSibling;
-            return element;
-          };
-          let block: Element = heading;
-          let first = following(block.nextElementSibling);
-          while (!first && block.parentElement && block.parentElement.tagName !== "MAIN") {
-            block = block.parentElement;
-            first = following(block.nextElementSibling);
-          }
-          // Text is a line to measure; anything holding controls or a chart is the workspace.
-          const describe = (element: Element | null) => element instanceof HTMLElement ? {
-            tag: element.tagName,
-            text: !element.querySelector("button, input, select, svg, table, section, canvas"),
-            lines: element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight),
-            content: element.textContent,
-          } : null;
-          const line = describe(first);
-          // The workspace follows the one line directly: no unit line, note or summary under it.
-          return { line, then: line?.text ? describe(following(first!.nextElementSibling)) : null };
-        });
+        const under = await underHeading(page);
         const { line, then } = under;
         if (bareHeadingPages.includes(route)) {
           expect(line?.text ?? false, `${route}: ${line?.content}`).toBe(false);
@@ -378,9 +399,12 @@ test.describe("one layout pass per explorer route: one short line under the head
         await expect.poll(() => page.locator("h1").first().evaluate((heading) => Object.keys(heading).some((key) => key.startsWith("__reactFiber")))).toBe(true);
         for (const width of layoutWidths) {
           await page.setViewportSize({ width, height: 900 });
-          // Charts swap to their phone drawing below 768px; measure the drawing this width shows.
-          await expect.poll(() => page.locator("svg[data-geometry]").evaluateAll((drawings, phone) =>
-            drawings.filter((drawing) => drawing.checkVisibility()).every((drawing) => drawing.getAttribute("data-geometry") === (phone ? "mobile" : "desktop")), width < 768)).toBe(true);
+          await settleAt(page, width);
+          if (bareHeadingPages.includes(route)) {
+            const { line } = await underHeading(page);
+            expect(line?.text ?? false, `${route} at ${width}px: ${line?.content}`).toBe(false);
+            expect(line?.tag, `${route} at ${width}px`).not.toBe("P");
+          }
           await expect.poll(() => measureLayout(page), { message: `${route} at ${width}px` }).toEqual({ overflow: 0, clipped: [] });
         }
         expect(errors, route).toEqual([]);

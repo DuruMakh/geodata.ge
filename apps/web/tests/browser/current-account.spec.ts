@@ -18,8 +18,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     const key = page.getByTestId("current-account-key");
     await expect(key.locator("[data-series-id]")).toHaveCount(5);
     await expect(page.getByTestId("series-row-toggle")).toHaveCount(0);
-    // DESIGN §17 (owner, 2026-10-11): nothing but the heading above the controls.
-    await expect(page.getByTestId("current-account").locator("h1 + p")).toHaveCount(0);
     if (width === 768) {
       // The layout threshold: defaults and overflow only; the flow below is width-independent.
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
