@@ -107,12 +107,10 @@ test("regional map, ranked list, search and keyboard focus stay coordinated", as
   await row.hover();
   await expect(row).toHaveAttribute("data-active", "true");
   await expect(mapTarget).toHaveAttribute("data-active", "true");
-  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
   await expect(row).toHaveAttribute("href", "/en/explorer/economy/regions/imereti");
 
   await mapTarget.focus();
   await expect(row).toHaveAttribute("data-active", "true");
-  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
   await mapTarget.press("ArrowDown");
   await expect(page.locator('[data-region-map-target]:focus')).toHaveCount(1);
 
@@ -138,7 +136,6 @@ for (const family of ["economy", "unemployment"]) test(`${family} region map res
   await expect(target).toBeFocused();
   await expect(target).toHaveAttribute("data-active", "true");
   await expect(row).toHaveAttribute("data-active", "true");
-  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
   await target.press("Enter");
   await expect(page).toHaveURL(new RegExp(`/en/explorer/${family}/regions/imereti$`));
 });

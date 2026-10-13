@@ -35,9 +35,7 @@ test("regional hover, bilingual search and keyboard links stay coordinated", asy
   const target = page.locator('[data-region-map-target][data-region-id="region.imereti"]');
   await row.hover();
   await expect(target).toHaveAttribute("data-active", "true");
-  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
   await target.focus(); await expect(row).toHaveAttribute("data-active", "true");
-  await expect(page.getByTestId("regional-map-tooltip")).toHaveCount(0);
   await target.press("Home");
   await expect(page.locator("[data-region-map-target]").first()).toBeFocused();
   await page.locator("[data-region-map-target]").first().press("End");

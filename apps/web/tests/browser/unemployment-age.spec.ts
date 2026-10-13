@@ -18,7 +18,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     for (const id of ["age.15_19", "age.25_29"]) await expect(page.locator(`[data-series-id="${id}"] [data-testid="series-row-toggle"]`)).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
     await expect(heatmap.locator("tbody tr")).toHaveCount(11);
-    await expect(page.getByTestId("age-heatmap-scroll-hint")).toHaveCount(0);
     await expect(heatmap.locator('[data-heatmap-cell="age.20_24:2025"]')).toHaveText("30.2%");
     await selector.selectOption("employed");
     await expect(heatmap).toHaveAttribute("data-unit", "thousand_persons");

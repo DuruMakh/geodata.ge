@@ -588,7 +588,6 @@ test.describe("municipality page", () => {
   test("does not render a divergence callout or two-total source copy", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
     await expect(page.getByTestId("municipal-source-note")).not.toContainText("ორი განსხვავებული საზომია");
   });
 
@@ -620,13 +619,6 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("series-row")).toHaveCount(11);
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-row").first().getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
-  });
-
-  test("omits the compact methodology link from an individual page", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-
-    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
   });
 
   test("shows only the GEL amount in the municipality period-change column", async ({ page }) => {

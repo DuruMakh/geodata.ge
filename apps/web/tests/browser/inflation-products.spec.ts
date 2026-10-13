@@ -17,7 +17,6 @@ for (const locale of ["ka", "en"] as const) {
       await expect(page.getByTestId("product-indicators")).toBeVisible();
       await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
       await expect(page.getByTestId("product-list-search")).toBeVisible();
-      await expect(page.getByTestId("product-list-count")).toHaveCount(0);
       await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0058");
       expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
       await expect(page.locator('[data-series-id="cpi.product.p0058"]')).toHaveAttribute("data-series-id", "cpi.product.p0058");

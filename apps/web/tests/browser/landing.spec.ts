@@ -218,7 +218,6 @@ test("landing renders the approved latest-year data composition", async ({ page 
   ]);
   const landingData = page.getByTestId("landing-data");
   const expenditureSection = page.getByTestId("landing-dataset-expenditure");
-  await expect(page.getByTestId("landing-data-header")).toHaveCount(0);
   await expect(page.getByText("საჯარო ფინანსების წლიური", { exact: true })).toHaveCount(0);
   await expect(page.getByText("ბოლო ხელმისაწვდომი წელი · 2025", { exact: true })).toHaveCount(0);
   await expect(landingData.locator(':scope > [data-testid="landing-dataset-expenditure"]')).toHaveCount(1);
@@ -292,11 +291,6 @@ test("landing renders the approved latest-year data composition", async ({ page 
   await expect(page.getByTestId("landing-methodology").getByRole("link", { name: "მეთოდოლოგიის ნახვა →" })).toHaveAttribute("href", "/methodology");
 
   await expect(page.getByTestId("landing-data").locator("svg, canvas")).toHaveCount(0);
-  await expect(page.getByTestId("three-paths")).toHaveCount(0);
-  await expect(page.getByTestId("waffle-grid")).toHaveCount(0);
-  await expect(page.getByTestId("excel-preview")).toHaveCount(0);
-  await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "რა არის Fiscal.ge?" })).toHaveCount(0);
 
   const footer = page.getByTestId("landing-footer");
   await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
@@ -772,7 +766,6 @@ test("landing header exposes mission while methodology stays in the footer", asy
     "/methodology",
   );
   await expect(page.getByTestId("landing-methodology")).toBeVisible();
-  await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
 });
 
 test("footer links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {

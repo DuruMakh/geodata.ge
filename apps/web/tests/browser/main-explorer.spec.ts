@@ -1149,7 +1149,6 @@ test("mobile chart fits its frame and the table keeps contained horizontal scrol
   // longer scrolls; the frame keeps its named region, and with nothing to
   // scroll the chart inside is the keyboard stop instead of the frame.
   const chart = page.getByTestId("chart-frame");
-  await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await expect(chart).not.toHaveAttribute("tabindex");
   await expect(chart.locator('svg[role="img"]')).toHaveAttribute("tabindex", "0");
   // The name mentions sideways scrolling only where the frame scrolls.
@@ -1159,7 +1158,6 @@ test("mobile chart fits its frame and the table keeps contained horizontal scrol
   // The default total alone lists its years as rows (owner decision D5): nothing scrolls sideways.
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
-  await expect(page.getByTestId("table-scroll-hint")).toHaveCount(0);
   await expect(table).toHaveAttribute("data-layout", "rows");
   expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(false);
 

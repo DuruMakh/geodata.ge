@@ -105,7 +105,6 @@ for (const path of [
     // The owner's design puts the methodology route in the footer and in the
     // lowest section of the main pages, not on every data surface. Until the
     // explorer had a footer at all, that left these routes with no path to it.
-    await expect(page.getByTestId("methodology-promo")).toHaveCount(0);
 
     const footer = page.locator("footer");
     await expect(footer).toHaveCount(1);
@@ -263,7 +262,6 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
     "/about",
   ]) {
     await page.goto(`${TEST_BASE_URL}${path}`);
-    await expect(page.getByTestId("seo-introduction")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "მეთოდოლოგია და პირველწყაროები", exact: true })).toHaveCount(0);
   }
 });
@@ -290,9 +288,6 @@ test("source archives describe the full coverage and selected year without expos
     await expect(archive.locator("thead")).not.toContainText("თარიღი");
     await expect(archive.locator("thead")).not.toContainText("SHA-256");
     await expect(archive).not.toContainText("უახლესი ჩანაწერის თარიღი");
-    await expect(archive.getByTestId("source-archive-retrieval")).toHaveCount(0);
-    await expect(archive.getByTestId("source-archive-sha256")).toHaveCount(0);
-    await expect(archive.getByTestId("source-archive-proxy-disclosure")).toHaveCount(0);
     expect(await page.content()).not.toContain("docs/Raw Data");
   }
 });

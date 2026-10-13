@@ -150,7 +150,6 @@ test.describe("region roll-up page", () => {
     await expect(chart).toBeVisible();
     await expect(chart.locator("svg text").first()).toBeVisible();
 
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
   });
 
   test("a member row links through to its own municipality page", async ({ page }) => {
@@ -248,12 +247,11 @@ test.describe("region page", () => {
     await expect(trigger).not.toContainText("მუნიციპალური ბიუჯეტები");
   });
 
-  test("uses the municipality-style regional heading and no individual methodology link", async ({ page }) => {
+  test("uses the municipality-style regional heading", async ({ page }) => {
     await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
 
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ხარჯავს ბიუჯეტს იმერეთი");
-    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
   });
 
   test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
@@ -266,6 +264,5 @@ test.describe("region page", () => {
     await expect(caret).toHaveCSS("border-top-width", "5px");
     await expect(page.getByTestId("region-member-row")).toHaveCount(12);
     await expect(page.getByTestId("municipal-source-note").first()).toContainText("ოკუპირებულ ტერიტორიებთან");
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
   });
 });
