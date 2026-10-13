@@ -128,7 +128,7 @@ export function PickerDialog({
         </div>
         <div id={listboxId} role="listbox" aria-label={text.results} className="max-h-[340px] overflow-y-auto">
           {includeAll ? (
-            <Link id={`${baseId}-all`} data-testid={allOption.testId} href={allOption.href} prefetch={false} role="option" aria-selected={activeIndex === 0} aria-current={allOption.current ? "page" : undefined} tabIndex={-1} onClick={onClose} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
+            <Link id={`${baseId}-all`} data-testid={allOption.testId} href={allOption.href} prefetch={false} role="option" aria-selected={activeIndex === 0} aria-current={allOption.current ? "page" : undefined} tabIndex={-1} onClick={onClose} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
               {allOption.label}
             </Link>
           ) : null}
@@ -144,7 +144,7 @@ export function PickerDialog({
               tabIndex={-1}
               data-testid={`${testIdPrefix}-option`}
               onClick={onClose}
-              className={`block border-b border-l-2 border-b-[var(--row-border)] px-3 py-2 text-[13px] ${index + optionOffset === activeIndex ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"} ${option.id === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
+              className={`block border-b border-l-2 border-b-[var(--row-border)] px-3 py-2 text-[13px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center ${index + optionOffset === activeIndex ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"} ${option.id === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
             >
               {option.label}
             </Link>
@@ -156,7 +156,8 @@ export function PickerDialog({
             <button type="button" onClick={() => { setQuery(""); inputRef.current?.focus(); }} className="mt-3 block w-full text-[12px] text-[var(--accent)]">{text.clear}</button>
           </div>
         ) : null}
-        <div className="border-t border-[var(--hairline-soft)] px-3 py-2 text-[11px] text-[var(--faint)]">{text.hint}</div>
+        {/* The hint names the arrow keys and Enter, which a touch screen does not have. */}
+        <div className="border-t border-[var(--hairline-soft)] px-3 py-2 text-[11px] text-[var(--faint)] pointer-coarse:hidden">{text.hint}</div>
       </div>
     </div>
   );

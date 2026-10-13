@@ -42,7 +42,7 @@
   "municipal.share": "წილი",
   "municipal.allMunicipalities": "← ყველა მუნიციპალიტეტი",
   "municipal.pickerTitle": "აირჩიე საქართველო, მუნიციპალიტეტი ან რეგიონი",
-  "municipal.pickerPlaceholder": "ძებნა — საქართველო, მუნიციპალიტეტი ან რეგიონი",
+  "municipal.pickerPlaceholder": "ადგილის ძებნა",
   "municipal.pickerSearch": "ძებნა საქართველოში, მუნიციპალიტეტებში ან რეგიონებში",
   "municipal.pickerResults": "საქართველოს, მუნიციპალიტეტებისა და რეგიონების შედეგები",
   "municipal.pickerCountry": "{amount} · {count} მუნიციპალური ბიუჯეტი",

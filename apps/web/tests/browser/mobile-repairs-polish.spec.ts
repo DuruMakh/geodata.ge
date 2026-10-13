@@ -145,6 +145,150 @@ test.describe("phone", () => {
     await expect(page.getByTestId("chart-frame")).toHaveAttribute("aria-label", "Multi-year chart");
   });
 
+  // Touch targets at the site's own sizes (DESIGN.md §12: text controls 44px on
+  // phones; WCAG 2.5.8: nothing tappable under 24px). Native selects take 16px
+  // text on phones so iOS Safari does not zoom the page on focus (Q5).
+  test("native selects are 16px and 44px tall on phones", async ({ page }) => {
+    for (const [path, testId] of [["/explorer/unemployment/age", "unemployment-indicator"], ["/explorer/wages/industries", "wages-group"]] as const) {
+      await page.goto(path);
+      await ready(page);
+      const select = page.getByTestId(testId);
+      expect(await select.evaluate((element) => getComputedStyle(element).fontSize)).toBe("16px");
+      expect((await select.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    }
+    await page.goto("/explorer/inflation/overview");
+    await ready(page);
+    expect(await page.getByTestId("range-start-picker").locator("select").evaluateAll((selects) => selects.map((select) => getComputedStyle(select).fontSize))).toEqual(["16px", "16px"]);
+  });
+
+  test("range chips, text tabs and the show-all button are 44px targets on phones", async ({ page }) => {
+    const heights = (locator: ReturnType<Page["locator"]>) => locator.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
+    for (const path of ["/explorer/debt", "/explorer/municipalities/batumi"]) {
+      await page.goto(path);
+      await ready(page);
+      const chips = await heights(page.getByTestId("year-range-strip").locator("button[aria-pressed]"));
+      expect(chips.length).toBeGreaterThan(0);
+      for (const height of chips) expect(height).toBeGreaterThanOrEqual(44);
+    }
+    await page.goto("/explorer/inflation/overview");
+    await ready(page);
+    for (const height of await heights(page.locator("[data-testid^='inflation-tab-']"))) expect(height).toBeGreaterThanOrEqual(44);
+    await page.goto("/explorer/trade/products");
+    await ready(page);
+    for (const height of await heights(page.locator("[data-testid^='trade-products-measure-']"))) expect(height).toBeGreaterThanOrEqual(44);
+    await page.goto("/explorer/trade/partners");
+    await ready(page);
+    expect((await page.getByTestId("trade-partners-show-all").boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    // The narrowest text tab on the site: "All" over the census pyramid.
+    await page.goto("/en/explorer/demography/population/georgia");
+    await ready(page);
+    for (const box of await page.locator("[data-testid^='age-sex-settlement-']").evaluateAll((tabs) => tabs.map((tab) => tab.getBoundingClientRect().toJSON()))) {
+      expect(box.width).toBeGreaterThanOrEqual(24);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test("links in fine print are at least 24px targets that do not overlap on phones", async ({ page }) => {
+    const atLeast24 = async (links: ReturnType<Page["locator"]>) => {
+      // One box per line a link occupies: a link that wraps is two targets side by side.
+      const boxes = await links.evaluateAll((elements) => elements.flatMap((element) => [...element.getClientRects()].map((rect) => rect.toJSON())));
+      expect(boxes.length).toBeGreaterThan(0);
+      for (const box of boxes) {
+        expect(box.width).toBeGreaterThanOrEqual(24);
+        expect(box.height).toBeGreaterThanOrEqual(24);
+      }
+      for (const [index, a] of boxes.entries()) {
+        for (const b of boxes.slice(index + 1)) expect(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top).toBe(true);
+      }
+    };
+    for (const path of ["/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account"]) {
+      await page.goto(path);
+      await ready(page);
+      await atLeast24(page.getByTestId("source-label").locator("a"));
+    }
+    await page.goto("/en/explorer/demography/population/georgia");
+    await ready(page);
+    await atLeast24(page.getByTestId("population-source-note").locator("a"));
+    await page.goto("/methodology/expenditure");
+    await atLeast24(page.getByTestId("processed-dataset-json").locator("a"));
+    await page.goto("/connect");
+    await page.getByTestId("connect-developer-details").locator("summary").click();
+    for (const block of ["connect-sector-discovery", "connect-regional-discovery", "connect-inflation-discovery", "connect-product-discovery"]) await atLeast24(page.getByTestId(block).locator("a"));
+  });
+
+  test("picker rows are 44px on phones, touch hides the arrow-key hint and the municipal picker fits the screen", async ({ page }) => {
+    await page.goto("/explorer/economy/regions/imereti");
+    await ready(page);
+    await page.getByTestId("region-picker-trigger").click();
+    const options = page.getByRole("listbox").getByRole("option");
+    for (const height of await options.evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
+    await expect(page.getByText("გადაადგილდით ისრებით", { exact: false })).toBeHidden();
+
+    await page.setViewportSize({ width: 390, height: 700 });
+    await page.goto("/en/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti");
+    await ready(page);
+    await page.getByTestId("entity-picker-trigger").click();
+    const picker = page.getByTestId("entity-picker");
+    for (const height of await picker.getByRole("option").evaluateAll((rows) => rows.slice(0, 5).map((row) => row.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
+    const fit = await picker.evaluate((dialog) => {
+      const input = dialog.querySelector("input")!;
+      const style = getComputedStyle(input);
+      const context = document.createElement("canvas").getContext("2d")!;
+      context.font = `${style.fontSize} ${style.fontFamily}`;
+      return {
+        list: dialog.querySelector("[role='listbox']")!.getBoundingClientRect().height,
+        bottom: dialog.getBoundingClientRect().bottom,
+        placeholder: context.measureText(input.placeholder).width <= input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight),
+      };
+    });
+    expect(fit.list).toBeLessThanOrEqual(700 * 0.4 + 1);
+    expect(fit.bottom).toBeLessThanOrEqual(700);
+    expect(fit.placeholder).toBe(true);
+  });
+
+  test("ranking headers are 11px and the trade share header breaks only between words", async ({ page }) => {
+    for (const [path, testId] of [["/explorer/trade/partners", "trade-partners-ranking"], ["/en/explorer/trade/products", "trade-partners-ranking"], ["/explorer/external/money-from-abroad", "money-from-abroad-ranking"]] as const) {
+      await page.goto(path);
+      await ready(page);
+      const header = await page.getByTestId(testId).locator("thead").evaluate((head) => {
+        const broken: string[] = [];
+        for (const cell of head.querySelectorAll("th")) {
+          const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            let index = 0;
+            for (const word of node.textContent!.split(/(\s+)/)) {
+              if (word.trim()) {
+                const range = document.createRange();
+                range.setStart(node, index);
+                range.setEnd(node, index + word.length);
+                if (new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size > 1) broken.push(word);
+              }
+              index += word.length;
+            }
+          }
+        }
+        return { broken, sizes: [...new Set([...head.querySelectorAll("th")].map((cell) => getComputedStyle(cell).fontSize))] };
+      });
+      expect(header).toEqual({ broken: [], sizes: ["11px"] });
+    }
+  });
+
+  test("neighbour region names wrap instead of being cut on phones", async ({ page }) => {
+    for (const path of ["/explorer/unemployment/regions/mtskheta_mtianeti", "/en/explorer/unemployment/regions/samegrelo_zemo_svaneti"]) {
+      await page.goto(path);
+      await ready(page);
+      const links = page.getByTestId("unemployment-region-navigation").locator("a");
+      expect(await links.locator("span").evaluateAll((spans) => spans.filter((span) => span.scrollWidth > span.clientWidth).map((span) => span.textContent))).toEqual([]);
+      for (const height of await links.evaluateAll((anchors) => anchors.map((anchor) => anchor.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test("the pinned bar's brand link is a 44px row", async ({ page }) => {
+    await page.goto("/explorer/unemployment/overview");
+    await ready(page);
+    expect((await page.getByTestId("data-sidebar").locator("a").first().boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  });
+
   test("inflation overview eyebrow starts where the chart and range strip start", async ({ page }) => {
     await page.goto("/en/explorer/inflation/overview");
     await ready(page);
@@ -170,6 +314,24 @@ test.describe("desktop", () => {
     await ready(page);
     const rail = await page.getByRole("group", { name: "წლების დიაპაზონი" }).evaluate((element) => getComputedStyle(element).marginLeft);
     expect(rail).toBe("0px");
+  });
+
+  test("phone-only target sizes leave the desktop controls as they were", async ({ page }) => {
+    await page.goto("/explorer/debt");
+    await ready(page);
+    for (const height of await page.getByTestId("year-range-strip").locator("button[aria-pressed]").evaluateAll((chips) => chips.map((chip) => chip.getBoundingClientRect().height))) expect(height).toBe(38);
+    await page.goto("/explorer/unemployment/age");
+    await ready(page);
+    const select = page.getByTestId("unemployment-indicator");
+    expect(await select.evaluate((element) => getComputedStyle(element).fontSize)).toBe("10px");
+    expect((await select.boundingBox())!.height).toBeLessThan(36);
+    await page.goto("/explorer/inflation/overview");
+    await ready(page);
+    expect((await page.getByTestId("inflation-tab-index").boundingBox())!.height).toBe(36);
+    await page.goto("/explorer/trade/partners");
+    await ready(page);
+    expect((await page.getByTestId("trade-partners-show-all").boundingBox())!.height).toBe(24);
+    await expect(page.getByTestId("trade-partners-ranking").locator("thead th").nth(3)).toHaveText("წილი საქართველოს ჯამში", { useInnerText: true });
   });
 
   test("GDP and unemployment y labels fit without the old fixed padding", async ({ page }) => {

@@ -85,7 +85,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
         {/* A dataset with no JSON publication would otherwise render this
             as a bare " - JSON: ..." trailer with nothing before the dash. */}
         {processedDataJsonLinks.length > 0 ? (
-        <p data-testid="processed-dataset-json" className="mt-3 text-[0.71875rem] leading-relaxed text-[var(--muted)]">
+        <p data-testid="processed-dataset-json" className="mt-3 text-[0.71875rem] leading-relaxed text-[var(--muted)] max-[768px]:leading-[2.25] max-[768px]:[&_a]:py-[5px]">
           {processedDataJsonLinks.map((link, index) => (
             <span key={link.href}>
               {index > 0 ? " · " : null}

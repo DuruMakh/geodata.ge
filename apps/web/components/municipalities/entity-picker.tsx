@@ -165,7 +165,8 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
     return list;
   }, [filteredCountry, filteredGroups, baseId]);
 
-  // The listbox is a capped, scrollable region (see max-h-[340px] below); with
+  // The listbox is a capped, scrollable region (see max-h below; 40svh on short
+  // screens keeps the list above a phone's keyboard); with
   // up to 75 options, arrowing past the visible edge must carry the highlight
   // into view or the active option becomes invisible.
   useEffect(() => {
@@ -246,7 +247,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
             className="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none"
           />
         </div>
-        <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[340px] overflow-y-auto">
+        <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[min(340px,40svh)] overflow-y-auto">
           {filteredCountry ? (
             <Link
               href={pageHref(hrefFor("country", country.id), locale)}
@@ -258,7 +259,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
               tabIndex={-1}
               data-testid="picker-country"
               onClick={onClose}
-              className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
+              className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left max-[768px]:min-h-11 max-[768px]:content-center transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
                 countryOptionId(baseId) === activeOptionId ? "border-l-[var(--ink)]" : "border-l-transparent"
               } ${country.id === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
             >
@@ -284,7 +285,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
                   tabIndex={-1}
                   data-testid="picker-region"
                   onClick={onClose}
-                  className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
+                  className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left max-[768px]:min-h-11 max-[768px]:content-center transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
                     regionActive ? "border-l-[var(--ink)]" : "border-l-transparent"
                   } ${group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
                 >
@@ -309,7 +310,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
                       tabIndex={-1}
                       data-testid="picker-municipality"
                       onClick={onClose}
-                      className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:bg-[var(--tint)] hover:text-[var(--accent)] ${
+                      className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left max-[768px]:min-h-11 max-[768px]:content-center transition-colors duration-100 hover:border-l-[var(--accent)] hover:bg-[var(--tint)] hover:text-[var(--accent)] ${
                         memberActive ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"
                       } ${member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
                     >

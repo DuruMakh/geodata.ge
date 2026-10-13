@@ -89,6 +89,7 @@
   "trade.partners.rankingTitle": "{measure} · {kind} · {year}",
   "trade.partners.rank": "#",
   "trade.partners.share": "Share of Georgia total",
+  "trade.partners.shareShort": "Share",
   "trade.partners.shareNote": "Shares use Georgia’s national total for the same year and measure. Country groups overlap.",
   "trade.partners.balanceRankingNote": "Ranked by the size of the balance, regardless of sign. Negative values mean imports exceed exports.",
   "trade.partners.showAll": "Show all countries",

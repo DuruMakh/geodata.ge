@@ -194,7 +194,7 @@ export function RangeStrip({ years, range, onChange, marker, periodsPerYear = 1,
                 type="button"
                 aria-pressed={active}
                 onClick={() => onChange({ start: chip.start, end: max })}
-                className={`-mx-1.5 -my-[7px] min-w-8 cursor-pointer px-1.5 py-[7px] text-center font-[family-name:var(--font-numeric)] text-[11px] ${
+                className={`-mx-1.5 -my-[7px] min-w-8 cursor-pointer px-1.5 py-[7px] text-center max-[768px]:my-0 max-[768px]:min-h-11 font-[family-name:var(--font-numeric)] text-[11px] ${
                   active
                     ? "font-semibold text-[var(--ink)] underline decoration-[var(--accent)] underline-offset-4"
                     : "font-normal text-[var(--muted)] hover:text-[var(--ink)]"
@@ -305,7 +305,8 @@ function PeriodPicker({ handle, value, lo, hi, periods, periodsPerYear, formatMo
     if (next !== value) onChange(handle === "start" ? { start: next } : { end: next });
   };
   // The select reaches 14px above and below the token, so a finger gets a ~44px-tall target.
-  const selectClass = "absolute -inset-x-1 -inset-y-3.5 cursor-pointer appearance-none opacity-0";
+  // 16px on phones so iOS does not zoom on focus (see SELECT_CLASS for the `!`).
+  const selectClass = "absolute -inset-x-1 -inset-y-3.5 cursor-pointer appearance-none opacity-0 max-[768px]:text-base!";
   const tokenClass =
     "relative inline-block underline decoration-[var(--faint)] decoration-dotted underline-offset-[3px] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--accent)]";
 

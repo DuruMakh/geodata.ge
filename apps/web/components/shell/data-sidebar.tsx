@@ -130,7 +130,7 @@ export function DataSidebar() {
           <a
             href={pageHref("/", locale)}
             aria-label={message(messages, "common.brandHome")}
-            className="flex min-w-0 items-center gap-2.5 no-underline"
+            className="flex min-w-0 items-center gap-2.5 no-underline max-[900px]:min-h-11"
           >
             {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}

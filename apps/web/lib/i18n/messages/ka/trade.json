@@ -89,6 +89,7 @@
   "trade.partners.rankingTitle": "{measure} · {kind} · {year}",
   "trade.partners.rank": "#",
   "trade.partners.share": "წილი საქართველოს ჯამში",
+  "trade.partners.shareShort": "წილი",
   "trade.partners.shareNote": "წილი იმავე წლისა და მაჩვენებლის საქართველოს ეროვნულ ჯამს ეფუძნება. ქვეყნების ჯგუფები ერთმანეთს გადაფარავს.",
   "trade.partners.balanceRankingNote": "დალაგებულია სალდოს სიდიდით, ნიშნის მიუხედავად. უარყოფითი მნიშვნელობა ნიშნავს, რომ იმპორტი ექსპორტს აღემატება.",
   "trade.partners.showAll": "ყველა ქვეყნის ჩვენება",

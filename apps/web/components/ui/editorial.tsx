@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { ControlTooltip } from "./control-tooltip";
 
 // Small shared pieces of the editorial system (DESIGN.md §7): text tabs with an
-// accent underline, the tint callout, and the 14×3px swatch bar.
+// accent underline, the tint callout, and the 14×3px swatch bar. Below 768px a
+// text tab is a 44px-tall, at least 24px-wide target; the width needs `!` because
+// globals.css gives every button `min-width: 0` outside a layer.
 
 type TextTabProps = {
   label: string;
@@ -20,7 +22,7 @@ export function TextTab({ label, active, onClick, id, testId }: TextTabProps) {
       data-testid={testId}
       aria-pressed={active}
       onClick={onClick}
-      className={`-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[0.78125rem] transition-colors duration-150 ${
+      className={`-mx-0.5 -my-1.5 cursor-pointer px-0.5 py-1.5 text-[0.78125rem] transition-colors duration-150 max-[768px]:my-0 max-[768px]:min-h-11 max-[768px]:min-w-6! ${
         active
           ? "font-semibold text-[var(--ink)] underline decoration-[var(--accent)] decoration-2 underline-offset-4"
           : "font-medium text-[var(--muted)] hover:text-[var(--ink)]"
@@ -47,8 +49,12 @@ export function TextTabGroup({ ariaLabel, children, className, testId }: TextTab
   );
 }
 
-/** The underlined native select look of Unemployment's indicator menu; the year picker's button trigger matches it with its own classes. */
-export const SELECT_CLASS = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)]";
+/**
+ * The underlined native select look of Unemployment's indicator menu; the year picker's button trigger matches it with its own classes.
+ * Below 768px it is 16px and 44px tall, so iOS Safari does not zoom the page on focus. The size needs `!`: globals.css gives
+ * every select `font: inherit` outside a layer, which beats a plain utility.
+ */
+export const SELECT_CLASS = "min-w-0 w-full rounded-none border-0 border-b border-[var(--control)] bg-transparent py-2 text-[12px] text-[var(--ink)] max-[768px]:min-h-11 max-[768px]:text-base!";
 
 export function TabDivider() {
   return <span aria-hidden className="h-[13px] w-px bg-[var(--control)]" />;
@@ -106,9 +112,11 @@ type SourceNoteProps = {
   testId?: string;
 };
 
+// Below 768px each link in the note answers taps 4px above and below its text
+// (24px, WCAG 2.5.8) without moving a line.
 export function SourceNote({ children, testId }: SourceNoteProps) {
   return (
-    <p data-testid={testId} className="text-xs leading-relaxed text-[var(--muted)]">
+    <p data-testid={testId} className="text-xs leading-relaxed text-[var(--muted)] max-[768px]:[&_a]:py-1">
       {children}
     </p>
   );

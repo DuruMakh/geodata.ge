@@ -324,22 +324,23 @@ export async function renderConnectPage(locale: Locale) {
                 </ul>
                 {/* Tool and field names (query_inflation, yoy_pct, entityIds...) answer a
                     developer's question; DESIGN.md §24 says the page is not written for
-                    one, so they and the raw files sit behind a toggle. */}
+                    one, so they and the raw files sit behind a toggle. Below 768px each
+                    file link is a 24px target (WCAG 2.5.8) on lines spaced so none overlap. */}
                 <details data-testid="connect-developer-details" className="mt-3">
                   <summary className="inline-flex min-h-11 cursor-pointer items-center text-[0.78125rem] font-semibold text-[var(--muted)]">{message(messages, "connect.developerDetails")}</summary>
-                <p className="mt-1 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-sector-discovery">
+                <p className="mt-1 text-[0.75rem] leading-[1.8] text-[var(--muted)] max-[768px]:leading-[2.25] max-[768px]:[&_a]:px-0.5 max-[768px]:[&_a]:py-1" data-testid="connect-sector-discovery">
                   {message(messages, "connect.sectorQuery")} {" "}
                   <a className="underline" href="/downloads/data/economic-sectors.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/economic-sectors.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/economic-sectors", locale)}>{message(messages, "connect.sectorMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-regional-discovery">
+                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)] max-[768px]:leading-[2.25] max-[768px]:[&_a]:px-0.5 max-[768px]:[&_a]:py-1" data-testid="connect-regional-discovery">
                   {message(messages, "connect.regionalQuery")} {" "}
                   <a className="underline" href="/downloads/data/regional-economies.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/regional-economies.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/regional-economies", locale)}>{message(messages, "connect.regionalMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-inflation-discovery">
+                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)] max-[768px]:leading-[2.25] max-[768px]:[&_a]:px-0.5 max-[768px]:[&_a]:py-1" data-testid="connect-inflation-discovery">
                   {message(messages, "connect.inflationQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-national.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-categories.csv">CSV</a>{" · "}
@@ -348,7 +349,7 @@ export async function renderConnectPage(locale: Locale) {
                   <a className="underline" href="/downloads/data/inflation-cities.json">{message(messages, "connect.inflationCitiesMetadata")}</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-product-discovery">
+                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)] max-[768px]:leading-[2.25] max-[768px]:[&_a]:px-0.5 max-[768px]:[&_a]:py-1" data-testid="connect-product-discovery">
                   {message(messages, "connect.productQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-products.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-products.csv">CSV</a>{" · "}

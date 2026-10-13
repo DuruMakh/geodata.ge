@@ -42,7 +42,7 @@
   "municipal.share": "Share",
   "municipal.allMunicipalities": "← All municipalities",
   "municipal.pickerTitle": "Choose Georgia, a municipality or a region",
-  "municipal.pickerPlaceholder": "Search — Georgia, municipality or region",
+  "municipal.pickerPlaceholder": "Search places",
   "municipal.pickerSearch": "Search Georgia, municipalities or regions",
   "municipal.pickerResults": "Results for Georgia, municipalities and regions",
   "municipal.pickerCountry": "{amount} · {count} municipal budgets",
