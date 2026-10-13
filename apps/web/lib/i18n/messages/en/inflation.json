@@ -47,6 +47,7 @@
   "inflation.annualAverage": "Annual average",
   "inflation.tableCaption": "{series} · {tab} · {unit}, {start} – {end}",
   "inflation.tableSeries": "Table series",
+  "inflation.notOnTab": "Not published for this indicator",
   "inflation.legend": "Colour scale",
   "inflation.rangeChanged": "Period: {start} – {end}",
   "inflation.source": "Data: National Statistics Office of Georgia (Geostat), consumer price index; inflation target — National Bank of Georgia.",

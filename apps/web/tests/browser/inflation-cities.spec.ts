@@ -257,3 +257,28 @@ test("page payloads carry yoy_pct and never mom_pct", async ({ request }) => {
     expect(html, path).not.toContain("|mom_pct");
   }
 });
+
+// U15-01: thirteen wrapped line tabs pushed a city's table ~1,085px down a phone; the
+// Categories table already picks its series from a native select below 768px.
+test.describe("city table on a phone", () => {
+  test.use({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
+  test("a city table on a phone picks its line from a select", async ({ page }) => {
+    await page.goto(`/en${CITIES}/tbilisi#m=table&sel=total,01,02,03,04,05,06,07,08,09,10,11,12`);
+    await ready(page);
+    const select = page.getByTestId("inflation-city-table-select");
+    await expect(select).toBeVisible();
+    await expect(page.getByTestId("inflation-city-table-series")).toBeHidden();
+    await expect(select.locator("option")).toHaveCount(13);
+    const box = (await select.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(await select.evaluate((element) => getComputedStyle(element).fontSize)).toBe("16px");
+    const grid = (await page.getByTestId("month-grid").boundingBox())!;
+    expect(grid.y - (box.y + box.height), "the table follows the picker").toBeLessThan(120);
+
+    await select.selectOption("cpi.cat.07");
+    await expect(page).toHaveURL(/[#&]t=07(&|$)/);
+    await expect(select).toHaveValue("cpi.cat.07");
+    await expect(page.getByTestId("month-grid")).toContainText("Transport");
+    expect(await noOverflow(page)).toBe(true);
+  });
+});

@@ -219,6 +219,8 @@ type SeriesSelectorRowProps = {
   childLabelSize?: "compact" | "standard";
   wrapLabel?: boolean;
   swatch?: "solid" | "dashed";
+  /** Keeps the row listed but inert and unticked (`aria-disabled`, no toggle); the reason is its tooltip. */
+  disabledReason?: string;
   onToggle: () => void;
   onToggleExpanded?: () => void;
 };
@@ -245,17 +247,20 @@ export function SeriesSelectorRow({
   childLabelSize = "compact",
   wrapLabel = false,
   swatch = "solid",
+  disabledReason,
   onToggle,
   onToggleExpanded,
 }: SeriesSelectorRowProps) {
   const { messages } = useI18n();
+  const disabled = disabledReason !== undefined;
+  const ticked = selected && !disabled;
   return (
     <div
       data-testid="series-row"
       data-series-id={id}
       data-level={level}
       data-parent-id={parentId ?? undefined}
-      className={`relative flex items-stretch border-b border-[var(--row-border)] transition-colors duration-100 hover:bg-[var(--tint)] ${selected ? "bg-[var(--tint)]" : "bg-transparent"}`}
+      className={`relative flex items-stretch border-b border-[var(--row-border)] transition-colors duration-100 ${disabled ? "" : "hover:bg-[var(--tint)]"} ${ticked ? "bg-[var(--tint)]" : "bg-transparent"}`}
     >
       <span
         aria-hidden
@@ -287,19 +292,20 @@ export function SeriesSelectorRow({
       <button
         type="button"
         data-testid="series-row-toggle"
-        onClick={onToggle}
+        onClick={disabled ? undefined : onToggle}
         role={selectionRole === "checkbox" ? "checkbox" : undefined}
-        aria-checked={selectionRole === "checkbox" ? selected : undefined}
-        aria-pressed={selectionRole === "button" ? selected : undefined}
-        title={label}
-        className={`flex min-w-0 flex-1 cursor-pointer items-start gap-2.5 py-[7px] pr-1.5 text-left ${isChild ? "pl-0.5" : "pl-1"}`}
+        aria-checked={selectionRole === "checkbox" ? ticked : undefined}
+        aria-pressed={selectionRole === "button" ? ticked : undefined}
+        aria-disabled={disabled || undefined}
+        title={disabledReason ?? label}
+        className={`flex min-w-0 flex-1 ${disabled ? "cursor-default opacity-55" : "cursor-pointer"} items-start gap-2.5 py-[7px] pr-1.5 text-left ${isChild ? "pl-0.5" : "pl-1"}`}
       >
         <span
           aria-hidden
           className="mt-0.5 inline-flex size-3.5 flex-none items-center justify-center border-[1.5px] text-[9.5px] leading-none text-[var(--paper)]"
-          style={{ borderColor: selected ? color : "var(--control)", background: selected ? color : "transparent" }}
+          style={{ borderColor: ticked ? color : "var(--control)", background: ticked ? color : "transparent" }}
         >
-          {selected ? "✓" : ""}
+          {ticked ? "✓" : ""}
         </span>
         <span className="flex min-w-0 flex-1 items-start gap-2">
           <span data-testid="series-swatch" className="mt-[7px] flex-none">

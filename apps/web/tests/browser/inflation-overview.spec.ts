@@ -39,6 +39,14 @@ test("tabs switch units, series and the target together", async ({ page }) => {
 
   await page.getByTestId("inflation-tab-mom").click();
   await expect(page.getByTestId("inflation-unit")).toHaveText("Percent · change on the previous month");
+  // U13-04: the target draws on annual inflation only, so here its row is inert and not counted.
+  await expect(page.getByTestId("series-status")).toContainText("1 / 3");
+  const target = page.locator('[data-series-id="target"]').getByTestId("series-row-toggle");
+  await expect(target).toHaveAttribute("aria-disabled", "true");
+  await expect(target).toHaveAttribute("aria-pressed", "false");
+  await page.getByTestId("inflation-tab-yoy").click();
+  await expect(page.getByTestId("series-status")).toContainText("2 / 4");
+  await expect(target).toHaveAttribute("aria-pressed", "true");
 });
 
 test("range chips, keyboard steps and tab switches keep a consistent period", async ({ page }) => {

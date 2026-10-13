@@ -47,6 +47,7 @@
   "inflation.annualAverage": "წლის საშუალო",
   "inflation.tableCaption": "{series} · {tab} · {unit}, {start} – {end}",
   "inflation.tableSeries": "ცხრილის სერია",
+  "inflation.notOnTab": "ამ მაჩვენებლისთვის არ ქვეყნდება",
   "inflation.legend": "ფერის სკალა",
   "inflation.rangeChanged": "პერიოდი: {start} – {end}",
   "inflation.source": "მონაცემები: საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი), სამომხმარებლო ფასების ინდექსი; მიზნობრივი მაჩვენებელი — საქართველოს ეროვნული ბანკი.",

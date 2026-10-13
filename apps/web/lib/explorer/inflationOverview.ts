@@ -85,6 +85,17 @@ export function targetForPeriod(targets: ClientInflationTargetRow[], period: num
   return row ? row.targetPct : null;
 }
 
+/** The rows that draw on a tab: the NBG target is an annual-inflation reference, and core has no published index. */
+export function drawableKeys(index: InflationIndex, tab: InflationTab): InflationSelectionKey[] {
+  return SELECTION_ORDER.filter((key) => (key === "target" ? tab === "yoy" : seriesValues(index, key, tab) !== undefined));
+}
+
+/** What the panel counts: the selection still holds the other rows, ready for the tab that draws them. */
+export function drawableSelection(index: InflationIndex, state: InflationState): InflationSelectionKey[] {
+  const drawable = drawableKeys(index, state.tab);
+  return state.selected.filter((key) => drawable.includes(key));
+}
+
 export function buildInflationLines(index: InflationIndex, targets: ClientInflationTargetRow[], state: InflationState, range: ResolvedPeriodRange) {
   const periods = Array.from({ length: range.end - range.start + 1 }, (_, offset) => range.start + offset);
   const lines = state.selected.flatMap((key) => {

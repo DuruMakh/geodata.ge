@@ -4,7 +4,7 @@ import { sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
 import { makePeriod, periodFromKey } from "../../lib/data/inflation/periods";
 import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import {
-  DEFAULT_INFLATION_STATE, buildInflationLines, changeInflationTab, effectiveTableSeries, indexInflationFacts,
+  DEFAULT_INFLATION_STATE, buildInflationLines, changeInflationTab, drawableKeys, drawableSelection, effectiveTableSeries, indexInflationFacts,
   latestIndicators, panelValue, parseInflationHash, resolveInflationRange, serializeInflationHash, targetForPeriod, toggleSelection,
   type InflationIndex, type InflationState,
 } from "../../lib/explorer/inflationOverview";
@@ -50,6 +50,19 @@ describe("inflation overview state", () => {
     const indexState = { ...DEFAULT_INFLATION_STATE, tab: "index" as const, selected: ["cpi", "core", "target"] as InflationState["selected"] };
     expect(buildInflationLines(index, targets, indexState, resolveInflationRange(indexState, index)).lines.map((line) => line.key)).toEqual(["cpi"]);
     expect(panelValue(index, targets, "core", indexState, resolveInflationRange(indexState, index))).toBeNull();
+  });
+
+  // U13-04: the panel read "Series 2 / 4" on monthly inflation with only the headline drawn.
+  it("the target row is not counted on the monthly tab", () => {
+    const monthly = { ...DEFAULT_INFLATION_STATE, tab: "mom" as const };
+    expect(drawableKeys(index, "mom")).toEqual(["cpi", "core", "core_ex_tobacco"]);
+    expect(drawableSelection(index, monthly)).toEqual(["cpi"]);
+    expect(drawableSelection(index, { ...monthly, selected: ["target"] })).toEqual([]);
+    expect(monthly.selected).toEqual(["cpi", "target"]);
+    expect(drawableSelection(index, DEFAULT_INFLATION_STATE)).toEqual(["cpi", "target"]);
+    expect(drawableKeys(index, "yoy")).toEqual(["cpi", "core", "core_ex_tobacco", "target"]);
+    // Core has no published index either, so the index tab counts the headline alone.
+    expect(drawableKeys(index, "index")).toEqual(["cpi"]);
   });
 
   it("toggles selection, keeps the table series among selected series, and round-trips the hash", () => {

@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import { makePeriod, periodFromKey, periodYear } from "../data/inflation/periods";
 import type { ProductCatalogueRow } from "../data/inflation/productIdentity";
 import type { ProductFactRow } from "../data/inflation/productTypes";
-import { EDITORIAL_PALETTE } from "./colors";
+import { colorForProgram, EDITORIAL_PALETTE } from "./colors";
 
 export type ClientProduct = Pick<ProductCatalogueRow, "productId" | "labelEn" | "labelKa" | "firstPeriod">;
 
@@ -148,8 +148,23 @@ export function rankProducts(index: ProductIndex): string[] {
   });
 }
 
+// Product numbers run far past the 14 palette colours. Products 1–14 wear the palette; each later run of 14
+// wears the next colorForProgram shade of the same palette colour, so p0015 is a lighter #B3402A rather than a
+// second copy of it (U14-06). Colours resolve in product-number order and skip a shade an earlier product already
+// wears, so a colour depends only on the product number: adding a product never recolours another.
+const productColors: string[] = [];
+const wornProductColors = new Set<string>();
+
 export function productColor(id: string): string {
   const ordinal = Number(id.split(".").at(-1)?.slice(1));
   if (!Number.isInteger(ordinal) || ordinal < 1) throw new Error(`Invalid product colour ID ${id}`);
-  return EDITORIAL_PALETTE[(ordinal - 1) % EDITORIAL_PALETTE.length]!;
+  for (let next = productColors.length; next < ordinal; next += 1) {
+    const base = EDITORIAL_PALETTE[next % EDITORIAL_PALETTE.length]!;
+    let shade = Math.floor(next / EDITORIAL_PALETTE.length) - 1;
+    let color = shade < 0 ? base : colorForProgram(base, shade);
+    while (wornProductColors.has(color)) color = colorForProgram(base, ++shade);
+    productColors.push(color);
+    wornProductColors.add(color);
+  }
+  return productColors[ordinal - 1]!;
 }

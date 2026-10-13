@@ -17,7 +17,7 @@ import { MONTH_NUMBERS, periodLabel } from "../../lib/explorer/inflationLabels";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { MonthGridTable } from "../main-explorer/month-grid-table";
-import { TextTab } from "../ui/editorial";
+import { TableSeriesPicker } from "./table-series-picker";
 
 // ცხრილი: one line at a time. წლის საშუალო appears for a total line only —
 // Geostat publishes no division average (spec 2026-09-30 §4–§5).
@@ -62,17 +62,13 @@ export function InflationCityTable({
       legendLabel={t("legend")}
       picker={
         options.length > 1 ? (
-          <div role="group" aria-label={t("tableSeries")} data-testid="inflation-city-table-series" className="flex flex-wrap gap-5">
-            {options.map((lineId) => (
-              <TextTab
-                key={lineId}
-                testId={`inflation-city-table-series-${lineId}`}
-                label={cityViewLineLabel(messages, view, lineId)}
-                active={lineId === active}
-                onClick={() => onTableSeriesChange(lineId)}
-              />
-            ))}
-          </div>
+          <TableSeriesPicker
+            testId="inflation-city-table"
+            label={t("tableSeries")}
+            options={options.map((lineId) => ({ id: lineId, label: cityViewLineLabel(messages, view, lineId) }))}
+            active={active}
+            onChange={onTableSeriesChange}
+          />
         ) : null
       }
     />
