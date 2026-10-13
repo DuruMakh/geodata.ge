@@ -16,6 +16,7 @@ import {
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
+  buildPickerCountry,
 } from "../explorer/municipalData";
 import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { loadWorkbookSources, scopeMunicipalWorkbookSources } from "../methodology/workbookSources";
@@ -146,12 +147,7 @@ export async function renderMunicipalCountry(locale: Locale) {
         functionalWorkbookSources={functionalWorkbookSources}
         supplementalWorkbookSources={adjustmentWorkbookSources}
         siteOrigin={resolveSiteUrl()}
-        pickerCountry={{
-          id: MUNICIPAL_COUNTRY_ID,
-          nameKa: "საქართველო",
-          valueGel: nationalTotalByYear[latestYear] ?? 0,
-          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-        }}
+        pickerCountry={buildPickerCountry(nationalTotalByYear[latestYear] ?? 0)}
         pickerGroups={pickerGroups}
         sourceNote={message(messages, "municipal.countrySource", { count: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
       />

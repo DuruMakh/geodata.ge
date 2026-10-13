@@ -6,6 +6,7 @@ import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
+import { matchesLabelQuery } from "../../lib/i18n/search";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { InflationProductArt } from "./inflation-product-art";
@@ -13,16 +14,11 @@ import { InflationProductArt } from "./inflation-product-art";
 /** Rows a stacked (phone) list shows before its "more products" button. */
 export const PHONE_PRODUCT_ROWS = 10;
 
-function normalized(value: string): string {
-  return value.normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase();
-}
-
 /** The products a query matches, in `order` (the latest annual ranking unless given). */
 export function filteredProductIds(index: ProductIndex, query: string, order: readonly string[] = index.ranked): string[] {
-  const needle = normalized(query);
   return order.filter((id) => {
     const item = index.productById.get(id)!;
-    return needle === "" || normalized(item.labelKa).includes(needle) || normalized(item.labelEn).includes(needle);
+    return matchesLabelQuery(query, [item.labelKa, item.labelEn]);
   });
 }
 

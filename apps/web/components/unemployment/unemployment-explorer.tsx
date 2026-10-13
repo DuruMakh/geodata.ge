@@ -3,13 +3,13 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ClientUnemploymentObservation, UnemploymentBreakdown, UnemploymentGroupDefinition, UnemploymentIndicator, UnemploymentSex } from "../../lib/data/unemployment/types";
 import { unemploymentIndicators, unemploymentIsRate } from "../../lib/data/unemployment/types";
-import { buildUnemploymentModel, buildUnemploymentComposition } from "../../lib/explorer/unemployment";
+import { buildUnemploymentModel, buildUnemploymentComposition, formatUnemploymentValue, unemploymentCountUnit } from "../../lib/explorer/unemployment";
 import { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
 import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, changeUnemploymentIndicator, changeUnemploymentOverviewSelection, type UnemploymentState } from "../../lib/explorer/unemploymentState";
 import { unemploymentSeriesLabel, unemploymentUsesIndicatorSeries } from "../../lib/explorer/unemploymentOverview";
 import { NATIONAL_UNEMPLOYMENT_VIEWS, type UnemploymentSectionId } from "../../lib/explorer/unemploymentSections";
 import { buildUnemploymentWorkbookExportModel } from "../../lib/explorer/unemploymentWorkbook";
-import { formatInUnit, formatShare } from "../../lib/explorer/format";
+import { formatInUnit } from "../../lib/explorer/format";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -57,8 +57,8 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
   const regionalStatusYears = section === "regions" ? facts.filter(f => f.dimension === "region" && ["hired", "self_employed"].includes(f.indicatorId)).map(f => f.year) : [];
   const labels = new Map(model.definitions.map(group => [group.id, unemploymentSeriesLabel(group, state, presentation)]));
   const selectedIndicators = [...new Set(model.definitions.filter(group => state.selectedIds.includes(group.id)).map(group => group.indicatorId))];
-  const indicatorLabel = (selectedIndicators.length ? selectedIndicators : [state.indicator]).map(indicator => t(`indicator.${indicator}`)).join(" · "), unit = { divisor: 1, label: t("thousandPersons"), decimals: 1 };
-  const valueLabel = (value: number | null | undefined) => model.percent ? formatShare(value == null ? null : value / 100) : `${formatInUnit(value, unit)} ${unit.label}`;
+  const indicatorLabel = (selectedIndicators.length ? selectedIndicators : [state.indicator]).map(indicator => t(`indicator.${indicator}`)).join(" · "), unit = unemploymentCountUnit(messages);
+  const valueLabel = (value: number | null | undefined) => model.percent ? formatUnemploymentValue(value, true, messages) : `${formatUnemploymentValue(value, false, messages)} ${unit.label}`;
   // Latest value of the active indicator for the page's own place (Georgia, or the region).
   // The age page carries no national rows, so it states its first selected group instead.
   const placeFacts = facts.filter(f => f.dimension === (regionId ? "region" : "national") && (!regionId || f.groupId === regionId) && f.indicatorId === state.indicator && f.value != null);

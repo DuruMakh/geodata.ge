@@ -1,11 +1,10 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { unemploymentIsRate } from "../../lib/data/unemployment/types";
-import { unemploymentGroupColor } from "../../lib/explorer/unemployment";
+import { formatUnemploymentValue, unemploymentCountUnit, unemploymentGroupColor } from "../../lib/explorer/unemployment";
 import { INK } from "../../lib/explorer/colors";
 import { unemploymentSeriesLabel, type UnemploymentSeriesDefinition } from "../../lib/explorer/unemploymentOverview";
 import type { UnemploymentState } from "../../lib/explorer/unemploymentState";
-import { formatInUnit, formatShare } from "../../lib/explorer/format";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -30,7 +29,7 @@ export function UnemploymentOverviewSeriesPanel({ definitions, referenceId, stat
     onSelectionChange(adding ? [...state.selectedIds, row.seriesId] : state.selectedIds.filter(id => id !== row.seriesId));
   };
   const t = (key: string) => message(messages, `unemployment.${key}`);
-  const unit = { divisor: 1, decimals: 1, label: t("thousandPersons") };
+  const unit = unemploymentCountUnit(messages);
   const rows: Row[] = definitions.filter(definition => state.breakdown !== "long_term" || definition.groupId !== "georgia").map(definition => ({ id: definition.id, seriesId: definition.id, label: unemploymentSeriesLabel(definition, state, presentation, true), definition, parentId: definition.parentId }));
   if (state.breakdown === "long_term") for (const definition of definitions.filter(item => item.groupId === "georgia")) {
     rows.push({ id: `metric.${definition.indicatorId}`, seriesId: definition.id, label: t(`indicator.${definition.indicatorId}`), definition });
@@ -54,7 +53,7 @@ export function UnemploymentOverviewSeriesPanel({ definitions, referenceId, stat
     const color = row.seriesId === referenceId ? INK : unemploymentGroupColor(row.definition);
     const value = endValues[row.seriesId];
     return <div key={row.id} className={depth ? "ml-4" : undefined}>
-      <SeriesSelectorRow id={row.id} label={row.label} color={color} value={unemploymentIsRate(row.definition.indicatorId) ? formatShare(value == null ? null : value / 100) : `${formatInUnit(value, unit)} ${t("thousandShort")}`}
+      <SeriesSelectorRow id={row.id} label={row.label} color={color} value={unemploymentIsRate(row.definition.indicatorId) ? formatUnemploymentValue(value, true, messages) : `${formatUnemploymentValue(value, false, messages)} ${t("thousandShort")}`}
         selected={state.selectedIds.includes(row.seriesId)} level={row.seriesId === referenceId && !row.parentId ? "total" : "item"} parentId={row.parentId} isChild={Boolean(row.parentId)} childLabelSize="standard" wrapLabel
         showCaretColumn hasChildren={nested.length > 0} expanded={open} expansionLabel={message(messages, "unemployment.subcategoriesFor", { label: row.label })}
         onToggleExpanded={() => setExpanded(previous => ({ ...previous, [row.id]: !open }))}

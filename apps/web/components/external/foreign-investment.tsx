@@ -5,7 +5,7 @@ import { FOREIGN_INVESTMENT_DIMENSIONS, FOREIGN_INVESTMENT_TOTAL_ID } from "../.
 import { buildForeignInvestmentModel } from "../../lib/explorer/foreignInvestment";
 import { foreignInvestmentCoverage, parseForeignInvestmentHash, serializeForeignInvestmentHash, switchForeignInvestmentTab } from "../../lib/explorer/foreignInvestmentState";
 import { buildForeignInvestmentWorkbookModel } from "../../lib/explorer/foreignInvestmentWorkbook";
-import { rangeFromPatch } from "../../lib/explorer/periodRange";
+import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
 import { formatInUnit } from "../../lib/explorer/format";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -51,7 +51,7 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== FOREIGN_INVESTMENT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
-          <RangeStrip years={foreignInvestmentCoverage(data, state.dimension).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildForeignInvestmentModel(data, s, presentation).range, patch) }))} />
+          <RangeStrip years={foreignInvestmentCoverage(data, state.dimension).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, foreignInvestmentCoverage(data, s.dimension)), patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>

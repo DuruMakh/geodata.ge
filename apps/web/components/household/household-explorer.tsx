@@ -30,7 +30,7 @@ import { Callout, SourceNote } from "../ui/editorial";
 import { MeasureTabs } from "./household-measure-tabs";
 import { useHashState } from "../explorer-shell/use-hash-state";
 
-export type HouseholdExplorerProps = {
+type HouseholdExplorerProps = {
   section: HouseholdSectionId; facts: FactsInput<ClientHouseholdFact>;
   /** Names of the section's lines; areaLabels names Georgia, towns, villages and the regions. */
   labels: Record<string, string>; areaLabels: Record<HouseholdArea, string>;

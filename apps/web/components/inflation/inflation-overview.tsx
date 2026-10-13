@@ -3,10 +3,9 @@
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
-import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
+import { formatInflationValue, periodLabel, seriesLabel, monthlyChartPeriod } from "../../lib/explorer/inflationLabels";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -74,7 +73,6 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   // The eyebrow states the active tab's span — the same months the chart and range strip offer
   // (the index series starts years before the annual and monthly change series).
-  const coverage = { min: range.min, max: range.max };
   // The headline CPI's latest published month on the active tab.
   const latest = latestEntry(index.values.get(seriesGroup("cpi", state.tab)));
   const displayDate = updatedDate(lastReviewedAt, locale);
@@ -105,7 +103,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
           { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
           { label: t("heading") },
         ]}
-        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, range.min, "short"), periodLabel(messages, range.max, "short"), lastReviewedAt)}
       />
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
       {latest ? (
@@ -145,9 +143,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
                   unit={INDEX_UNIT}
                   shareLabel={t(`tab.${state.tab}`)}
                   periodsPerYear={12}
-                  formatPeriod={(period, kind) =>
-                    kind === "axis" && periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, kind === "axis" ? "short" : "long")
-                  }
+                  formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
                 />
               </div>
             )}

@@ -13,7 +13,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
-import { ADJARA_REGION_ID, MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { ADJARA_REGION_ID } from "../data/municipal/types";
 import {
   applyAdjaraBudgetAdjustment,
   aggregateFactsForEntity,
@@ -21,8 +21,8 @@ import {
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
-  MUNICIPAL_COUNTRY_BUDGET_COUNT,
   regionFactsFor,
+  buildPickerCountry,
 } from "../explorer/municipalData";
 import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { municipalRankLabel, REGION_GENITIVE_KA } from "../explorer/municipalLabels";
@@ -272,12 +272,7 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
         functionalWorkbookSources={functionalWorkbookSources}
         supplementalWorkbookSources={regionId === ADJARA_REGION_ID ? adjustmentWorkbookSources : []}
         siteOrigin={resolveSiteUrl()}
-        pickerCountry={{
-          id: MUNICIPAL_COUNTRY_ID,
-          nameKa: "საქართველო",
-          valueGel: nationalTotalByYear[latestYear] ?? 0,
-          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-        }}
+        pickerCountry={buildPickerCountry(nationalTotalByYear[latestYear] ?? 0)}
         pickerGroups={buildPickerGroups(listInput)}
         navigation={{
           prev: { label: publicLabel(locale, prev.id, prev.kaLabel, englishLabels), href: hrefFor(prev) },

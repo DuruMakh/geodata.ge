@@ -9,7 +9,7 @@ import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { formatPoints } from "../../lib/explorer/format";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 
-import { periodLabel } from "../../lib/explorer/inflationLabels";
+import { periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
 import {
   CATEGORY_TABS,
   DIVISION_IDS,
@@ -64,7 +64,6 @@ import { usePageData } from "../explorer-shell/use-page-data";
 // headline. Under the H1 the published national headline's latest month on the
 // active rate (owner decision D2, 2026-10-07), then the unit line.
 
-const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 // A restored hash keeps its range only where the tab has data. While the monthly runs load, the
 // range waits as written; the hash is parsed again when they arrive (useHashState re-reads it).
@@ -261,11 +260,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
                   unit={PCT_UNIT}
                   shareLabel={t(`categoryTab.${state.tab}`)}
                   periodsPerYear={12}
-                  formatPeriod={(period, kind) =>
-                    kind === "axis" && periodMonth(period) === 1
-                      ? String(periodYear(period))
-                      : periodLabel(messages, period, kind === "axis" ? "short" : "long")
-                  }
+                  formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
                 />
               </div>
             )}

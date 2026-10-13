@@ -308,6 +308,11 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
   return { municipalities: municipalityRows, regions: regionRows };
 }
 
+/** Georgia as the entity picker's first option: its total for the shown year and how many budgets it sums. */
+export function buildPickerCountry(valueGel: number, budgetCount: number = MUNICIPAL_COUNTRY_BUDGET_COUNT) {
+  return { id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო" as const, valueGel, budgetCount };
+}
+
 export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: number): MunicipalListRow {
   const totalByYear = buildCountryTotalByYear(totalFacts);
 

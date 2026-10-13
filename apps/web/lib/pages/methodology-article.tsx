@@ -178,16 +178,16 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   const content = getMethodologyContent(dataset, locale);
   const messages = await getMessages(locale, ["common", "methodology"]);
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  // Only an article whose coverage line is drawn from served facts loads them,
+  // and only the facts its coverage source names; a build renders every article
+  // in two locales. The kind is not hard-coded here: this reads the same record
+  // deriveMethodologyCoverage reads — the Georgian one, whatever the locale — so
+  // the two cannot drift.
+  const coverageKind = METHODOLOGY_CONTENT[dataset].coverageSource.kind;
   const [landingData, municipalData, debtData, archiveSummaries, rows, catalogue] = await Promise.all([
-    loadServedLandingData(),
-    loadServedMunicipalData(),
-    // Only an article whose coverage line is drawn from the debt facts needs
-    // them, and a build renders eight articles in two locales. The id is not
-    // hard-coded here: this reads the same record deriveMethodologyCoverage
-    // reads — the Georgian one, whatever the locale — so the two cannot drift.
-    METHODOLOGY_CONTENT[dataset].coverageSource.kind === "governmentDebt"
-      ? loadServedGovernmentDebtData()
-      : Promise.resolve({ facts: [] }),
+    coverageKind === "budgetSide" ? loadServedLandingData() : Promise.resolve({ facts: [] }),
+    coverageKind === "municipalTotals" ? loadServedMunicipalData() : Promise.resolve({ totalFacts: [] }),
+    coverageKind === "governmentDebt" ? loadServedGovernmentDebtData() : Promise.resolve({ facts: [] }),
     loadGeneratedArchiveSummaries(repositoryRoot),
     loadReviewedSourceManifest(repositoryRoot, content.archiveManifestId),
     loadEnglishCatalogue(repositoryRoot),

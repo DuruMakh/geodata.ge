@@ -148,6 +148,11 @@ export type ProductCumulative = {
   missingPeriod: number | null;
 };
 
+/** The last month a products view covers: December of its end year, or the latest published month before that. */
+export function productEndPeriod(index: Pick<ProductIndex, "latestPeriod">, endYear: number): number {
+  return Math.min(makePeriod(endYear, 12), index.latestPeriod);
+}
+
 export function productCumulative(index: ProductIndex, id: string, startYear: number, endPeriod: number): ProductCumulative {
   const start = makePeriod(startYear, 1);
   const run = index.monthly.get(id);

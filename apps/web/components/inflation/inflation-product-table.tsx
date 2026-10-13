@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { makePeriod, periodKey } from "../../lib/data/inflation/periods";
+import { periodKey } from "../../lib/data/inflation/periods";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
-import { productCumulative, productsByCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
+import { productCumulative, productEndPeriod, productsByCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -28,7 +28,7 @@ export function InflationProductTable({ index, state, onToggle }: {
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `inflation.${key}`, values);
   const [query, setQuery] = useState("");
   const [shown, setShown] = useState(Math.min(BATCH_SIZE, index.products.length));
-  const endPeriod = Math.min(makePeriod(state.range.endYear, 12), index.latestPeriod);
+  const endPeriod = productEndPeriod(index, state.range.endYear);
   const matches = filteredProductIds(index, query, productsByCumulative(index, state.range.startYear, endPeriod));
   const ids = matches.slice(0, shown);
   const latestLabel = periodLabel(messages, index.latestPeriod, "long");

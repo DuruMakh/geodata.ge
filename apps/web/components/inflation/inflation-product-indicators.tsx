@@ -3,7 +3,7 @@
 import { makePeriod, periodKey } from "../../lib/data/inflation/periods";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
-import { productAnnual, productColor, productCumulative, type ProductCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
+import { productAnnual, productColor, productCumulative, productEndPeriod, type ProductCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -34,7 +34,7 @@ export function productIndicatorSummary(index: ProductIndex, state: ProductState
   const min = lowestId ? index.latestAnnual.get(lowestId)! : null;
   const heroProductId = state.selected.at(-1) ?? null;
   const heroAnnual = heroProductId ? productAnnual(index, heroProductId, index.latestPeriod) : null;
-  const endPeriod = Math.min(makePeriod(state.range.endYear, 12), index.latestPeriod);
+  const endPeriod = productEndPeriod(index, state.range.endYear);
   const cumulative = heroProductId ? productCumulative(index, heroProductId, state.range.startYear, endPeriod) :
     { value: null, reason: null, missingPeriod: null } as ProductCumulative;
   const cumulativeSpark = heroProductId && cumulative.value !== null ?

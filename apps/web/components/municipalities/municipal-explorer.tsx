@@ -181,8 +181,8 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
   const [seriesQuery, setSeriesQuery] = useState("");
   const visibleRows = useMemo(() => {
     const needle = seriesQuery.trim();
-    const functions = needle === "" ? model.rows : model.rows.filter((row) => matchesLabelQuery(needle, [row.kaLabel, row.enLabel]));
-    return [model.totalRow, ...functions];
+    const matchingRows = needle === "" ? model.rows : model.rows.filter((row) => matchesLabelQuery(needle, [row.kaLabel, row.enLabel]));
+    return [model.totalRow, ...matchingRows];
   }, [model.rows, model.totalRow, seriesQuery]);
   const normalizedSeriesQuery = seriesQuery.trim().toLowerCase();
   const hasVisibleMatches =

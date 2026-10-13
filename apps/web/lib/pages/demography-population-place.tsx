@@ -8,7 +8,6 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
-import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { packFacts } from "../data/packedFacts";
 import { loadServedMunicipalData } from "../data/servedData";
 import { ageYears, annualAgeFacts, censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
@@ -26,7 +25,7 @@ import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex
 import { AGE_SEX_PATH, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { vitalFactsForPlace } from "../explorer/demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
-import { pickerGroupsFromRows } from "../explorer/municipalData";
+import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import { message } from "../i18n/messages";
 import { I18nProvider } from "../i18n/provider";
@@ -169,7 +168,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
           title={t("placeHeading")}
           metaLine={metaLine}
           navigation={navigation}
-          pickerCountry={{ id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო", valueGel: index.country.valueGel, budgetCount: georgia.municipalityCount }}
+          pickerCountry={buildPickerCountry(index.country.valueGel, georgia.municipalityCount)}
           pickerGroups={pickerGroupsFromRows(index)}
           pickerOverrides={{
             hrefById: populationHrefById(places),

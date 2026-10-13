@@ -12,14 +12,13 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
-import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import {
   buildCountryTotalByYear,
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
-  MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PUBLIC_PAGE_COUNT,
+  buildPickerCountry,
 } from "../explorer/municipalData";
 import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { formatAmount, formatShare } from "../explorer/format";
@@ -236,12 +235,7 @@ export async function renderMunicipality(slug: string, locale: Locale) {
         workbookSources={entityWorkbookSources}
         functionalWorkbookSources={functionalWorkbookSources}
         siteOrigin={resolveSiteUrl()}
-        pickerCountry={{
-          id: MUNICIPAL_COUNTRY_ID,
-          nameKa: "საქართველო",
-          valueGel: nationalTotalByYear[latestYear] ?? 0,
-          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-        }}
+        pickerCountry={buildPickerCountry(nationalTotalByYear[latestYear] ?? 0)}
         pickerGroups={buildPickerGroups(listInput)}
         navigation={{
           prev: { label: publicLabel(locale, prev.code, prev.displayNameKa, englishLabels), href: pageHref(municipalityHrefForCode(prev.code), locale) },

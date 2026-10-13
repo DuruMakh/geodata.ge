@@ -212,8 +212,6 @@ export function parseMunicipalHash(hash: string): MunicipalUrlState {
   } catch {
     return state;
   }
-
-  return state;
 }
 
 export function serializeMunicipalHash(input: {

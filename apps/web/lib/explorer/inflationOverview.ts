@@ -28,7 +28,7 @@ export const INFLATION_COLORS: Record<InflationSelectionKey, string> = {
   target: ACCENT,
 };
 
-export type InflationRange = PeriodRange;
+type InflationRange = PeriodRange;
 export type InflationState = {
   tab: InflationTab;
   mode: "line" | "table";

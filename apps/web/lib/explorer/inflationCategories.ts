@@ -17,7 +17,7 @@ export const DIVISION_IDS = Array.from({ length: 12 }, (_, index) => `cpi.cat.${
 /** The residual segment's id. Not a category: it is what the selection leaves over. */
 export const RESIDUAL_ID = "cpi.cat.residual";
 
-export type CategoryRange = PeriodRange;
+type CategoryRange = PeriodRange;
 export type CategoryState = {
   tab: CategoryTab;
   mode: "chart" | "table";
@@ -39,7 +39,7 @@ export const DEFAULT_CATEGORY_STATE: CategoryState = {
   tableSeries: null,
 };
 
-export type CategoryNode = { categoryId: string; level: 2 | 3; children: string[] };
+type CategoryNode = { categoryId: string; level: 2 | 3; children: string[] };
 export type CategoryIndex = {
   /** `${categoryId}:${measure}` → period → published change. */
   values: Map<string, Map<number, number>>;
@@ -342,7 +342,7 @@ export type CategoryIndicatorEntry = {
   spark: Array<number | null>;
 };
 
-export type CategoryIndicators = {
+type CategoryIndicators = {
   period: number;
   /**
    * Null when the newest published month has no contribution yet. Weights refresh

@@ -5,7 +5,7 @@ import { CURRENT_ACCOUNT_PARTS, CURRENT_ACCOUNT_SERIES, type CurrentAccountSerie
 import { buildCurrentAccountModel, type CurrentAccountGdp } from "../../lib/explorer/currentAccount";
 import { CURRENT_ACCOUNT_TABS, currentAccountCoverage, parseCurrentAccountHash, serializeCurrentAccountHash } from "../../lib/explorer/currentAccountState";
 import { buildCurrentAccountWorkbookModel } from "../../lib/explorer/currentAccountWorkbook";
-import { rangeFromPatch } from "../../lib/explorer/periodRange";
+import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
 import { formatInUnit } from "../../lib/explorer/format";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -63,7 +63,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
               : <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>}
           {/* The Balance stack is a chart (the return pill says so) but has its own key, so it gets no legend. */}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={balance ? 0 : undefined} />
-          <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildCurrentAccountModel(facts, gdp, s, presentation).range, patch) }))} />
+          <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, currentAccountCoverage(facts)), patch) }))} />
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           {percent ? ` · ${message(messages, "main.gdpSource")}` : null}

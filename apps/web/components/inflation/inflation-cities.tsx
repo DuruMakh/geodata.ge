@@ -3,7 +3,6 @@
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useMemo } from "react";
-import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import {
   buildCityIndex,
@@ -27,7 +26,7 @@ import {
 import { cityLineLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
 import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
-import { formatInflationValue, periodLabel } from "../../lib/explorer/inflationLabels";
+import { formatInflationValue, periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -54,7 +53,6 @@ import { InflationCityTable } from "./inflation-city-table";
 // total; a city page shows that city's total and divisions. Annual inflation only.
 // No headline value line under the H1 (DESIGN.md §25).
 
-const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 type CityHashData = { index: CityIndex; view: CityView };
 const parseCityState = (hash: string, { index, view }: CityHashData) => restoreCityState(hash, index, view);
@@ -139,9 +137,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
                   unit={PCT_UNIT}
                   shareLabel={t("categoryTab.yoy")}
                   periodsPerYear={12}
-                  formatPeriod={(period, kind) =>
-                    kind === "axis" && periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, kind === "axis" ? "short" : "long")
-                  }
+                  formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
                 />
               </div>
             )}

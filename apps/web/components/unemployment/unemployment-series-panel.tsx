@@ -2,8 +2,7 @@
 import type { ReactNode } from "react";
 import type { UnemploymentGroupDefinition, UnemploymentIndicator } from "../../lib/data/unemployment/types";
 import { unemploymentIsRate } from "../../lib/data/unemployment/types";
-import { unemploymentGroupColor } from "../../lib/explorer/unemployment";
-import { formatInUnit, formatShare } from "../../lib/explorer/format";
+import { formatUnemploymentValue, unemploymentCountUnit, unemploymentGroupColor } from "../../lib/explorer/unemployment";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -13,10 +12,10 @@ export function UnemploymentSeriesPanel({ definitions, referenceId, selectedIds,
   indicator: UnemploymentIndicator; query: string; onQueryChange: (query: string) => void; onSelectionChange: (ids: string[]) => void; controls: ReactNode; downloadAction: ReactNode;
 }) {
   const { locale, messages } = useI18n();
-  const unit = { divisor: 1, decimals: 1, label: message(messages, "unemployment.thousandPersons") };
+  const unit = unemploymentCountUnit(messages);
   return <FlatSeriesPanel
     rows={definitions.map(group => ({ id: group.id, label: locale === "en" ? group.labelEn : group.labelKa, color: unemploymentGroupColor(group),
-      value: unemploymentIsRate(indicator) ? formatShare(endValues[group.id] == null ? null : endValues[group.id]! / 100) : formatInUnit(endValues[group.id], unit),
+      value: formatUnemploymentValue(endValues[group.id], unemploymentIsRate(indicator), messages),
       searchTerms: [group.labelKa, group.labelEn] }))}
     selectedIds={selectedIds} onSelectionChange={onSelectionChange} totalId={referenceId} pinTotal
     asideLabel={message(messages, "controls.series")} caption={`${endYear} · ${unemploymentIsRate(indicator) ? "%" : unit.label}`}

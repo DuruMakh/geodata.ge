@@ -4,10 +4,10 @@ import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { TrendingUp } from "lucide-react";
 import { useCallback, useMemo } from "react";
-import { makePeriod, periodKey, periodMonth, periodYear } from "../../lib/data/inflation/periods";
+import { makePeriod, periodKey, periodYear } from "../../lib/data/inflation/periods";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
-import { periodLabel } from "../../lib/explorer/inflationLabels";
-import { buildProductIndex, productAnnual, productColor, productCumulative, type ClientProduct, type PackedProductSeries, type ProductIndex } from "../../lib/explorer/inflationProducts";
+import { periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
+import { buildProductIndex, productAnnual, productColor, productCumulative, productEndPeriod, type ClientProduct, type PackedProductSeries, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import { parseProductHash, serializeProductHash, toggleProduct } from "../../lib/explorer/inflationProductState";
 import { buildInflationProductWorkbookExportModel } from "../../lib/explorer/inflationProductWorkbook";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -32,7 +32,6 @@ import { InflationProductPanel } from "./inflation-product-panel";
 import { InflationProductIndicators } from "./inflation-product-indicators";
 import { InflationProductTable } from "./inflation-product-table";
 
-const PCT_UNIT = { divisor: 1, label: "", decimals: 1 };
 
 export type InflationProductsProps = {
   products: ClientProduct[];
@@ -86,7 +85,7 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
   const minYear = index.earliestYear;
   const maxYear = periodYear(index.latestPeriod);
   const range = { min: minYear, max: maxYear, start: state.range.startYear, end: state.range.endYear };
-  const endPeriod = Math.min(makePeriod(state.range.endYear, 12), index.latestPeriod);
+  const endPeriod = productEndPeriod(index, state.range.endYear);
   const periods = Array.from({ length: endPeriod - makePeriod(state.range.startYear, 1) + 1 },
     (_, offset) => makePeriod(state.range.startYear, 1) + offset);
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, offset) => minYear + offset);
@@ -149,8 +148,7 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
               unit={PCT_UNIT}
               shareLabel={state.indicator === "annual" ? t("productsAnnualTitle") : t("productsCumulativeTitle")}
               periodsPerYear={12}
-              formatPeriod={(period, kind) => kind === "axis" && periodMonth(period) === 1 ? String(periodYear(period)) :
-                periodLabel(messages, period, kind === "axis" ? "short" : "long")}
+              formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
             />
           </div> : <div className="mt-5"><Callout testId="no-selection-callout">
             {state.selected.length === 0 ? message(messages, "main.noSelection") : t("productsNoCompleteSeries")}

@@ -1,6 +1,9 @@
 import type { ClientUnemploymentObservation, UnemploymentGroupDefinition } from "../data/unemployment/types";
 import { unemploymentIsRate } from "../data/unemployment/types";
 import { colorForItem, colorForProgram, EDITORIAL_PALETTE, INK } from "./colors";
+import { formatInUnit, formatShare, type ValueUnit } from "./format";
+import { message } from "../i18n/messages";
+import type { Messages } from "../i18n/types";
 import { resolveRange } from "./periodRange";
 import type { UnemploymentState } from "./unemploymentState";
 import { unemploymentFactSeriesId, unemploymentOverviewDefinitions, unemploymentOverviewIndicators, unemploymentUsesIndicatorSeries } from "./unemploymentOverview";
@@ -37,6 +40,16 @@ export function unemploymentScopeFacts(facts: readonly ClientUnemploymentObserva
   const reference = facts.filter(f => f.dimension === (referenceId === "georgia" ? "national" : "sex") && f.groupId === referenceId && f.indicatorId === state.indicator && years.has(f.year));
   return [...primary, ...reference];
 }
+/** Unemployment counts are published in thousand persons, shown with one decimal. */
+export function unemploymentCountUnit(messages: Messages): ValueUnit {
+  return { divisor: 1, decimals: 1, label: message(messages, "unemployment.thousandPersons") };
+}
+
+/** A rate as a percentage, a count in thousand persons; the number only, callers add the unit where they show one. */
+export function formatUnemploymentValue(value: number | null | undefined, rate: boolean, messages: Messages): string {
+  return rate ? formatShare(value == null ? null : value / 100) : formatInUnit(value, unemploymentCountUnit(messages));
+}
+
 export function unemploymentGroupColor(group: UnemploymentGroupDefinition): string {
   if (group.id === "georgia") return INK;
   // Use the existing editorial shade helper when this registry exceeds the palette.
