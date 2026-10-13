@@ -8,7 +8,7 @@ import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Partners defaults, full ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Partners defaults, full ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/trade`);
     const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(5); await cards.nth(1).click();
@@ -19,7 +19,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("series-list").getByTestId("series-row").nth(1)).toHaveAttribute("data-series-id", "partner.1995-2025.792");
     await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(10);
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`partners-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("trade-partners-show-all").click();
     expect(await page.getByTestId("trade-partners-ranking-row").count() + await page.getByTestId("trade-partners-unavailable-row").count()).toBe(212);
     await page.getByTestId("trade-partners-tab-groups").click();
@@ -57,7 +56,7 @@ for (const prefix of ["", "/en"]) {
 }
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
-  test(`Mixed partners survive active navigation, keyboard range and language ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Mixed partners survive active navigation, keyboard range and language ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade/partners#sel=partner.1995-2025.643,group.eu&view=table&tab=countries&measure=trade.exports&start=2023&end=2025`);
     await expect(page.getByTestId("series-status")).toContainText("2 / 218");
@@ -84,7 +83,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("2 / 218");
     await expect(page.getByTestId("trade-partners-tab-groups")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("trade-partners-ranking")).toHaveAttribute("data-end-year", "2024");
-    await page.screenshot({ path: info.outputPath(`partners-mixed-balance-${prefix ? "ka" : "en"}-${width}.png`), fullPage: true });
     await toggle(page, "partner.1995-2025.643").focus(); await toggle(page, "partner.1995-2025.643").press("Space");
     await expect(page.getByTestId("series-status")).toContainText("1 / 218");
     await page.goBack(); await expect(page.getByTestId("series-status")).toContainText("2 / 218");

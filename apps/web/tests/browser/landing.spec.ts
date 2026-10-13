@@ -1,13 +1,10 @@
 import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
-import { join } from "node:path";
 import { computedCssColorAlpha } from "./focus-outline";
 
 // Landing page (GeoData Site v2 design): structure, live data blocks, and the
 // paths into the explorer. The hero is a static image below 768px and WebGL at
 // wider sizes; tests assert the matching visual mounts rather than pixel content.
 
-const artifactDir = join(process.cwd(), "test-results", "visual-reference");
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 const heroRuntimeMarkers = ["WebGLRenderer", "hero scene init failed"] as const;
 
@@ -57,11 +54,16 @@ function installHeroDrawInstrumentation() {
   if (typeof WebGL2RenderingContext !== "undefined") wrap(WebGL2RenderingContext.prototype);
 }
 
-async function capture(page: Page, name: string) {
-  await mkdir(artifactDir, { recursive: true });
-  await page.waitForTimeout(2500); // let the hero's geological entry settle
-  // Viewport capture: full-page stitching drops the WebGL hero layer.
-  await page.screenshot({ path: join(artifactDir, `${name}.png`), caret: "hide" });
+// Below 768px the hero loader decides on mount and schedules nothing; from 768px
+// it would wait for one idle period after load. Once the page has hydrated and two
+// idle periods have passed, a scene that was going to load has requested its chunk.
+async function pastHeroDecision(page: Page) {
+  await expect
+    .poll(() =>
+      page.getByTestId("mobile-hero-static").evaluate((element) => Object.keys(element).some((key) => key.startsWith("__reactFiber"))),
+    )
+    .toBe(true);
+  await page.evaluate(() => new Promise((resolve) => requestIdleCallback(() => requestIdleCallback(resolve))));
 }
 
 async function expectNoPageOverflow(page: Page) {
@@ -299,7 +301,6 @@ test("landing renders the approved latest-year data composition", async ({ page 
   const footer = page.getByTestId("landing-footer");
   await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
   await expect(footer).toContainText("CC BY 4.0");
-  await capture(page, "landing-desktop");
 });
 
 test("landing data and methodology links use real destinations", async ({ page }) => {
@@ -580,7 +581,7 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
       /\/landing\/hero-relief-mobile-390\.webp$/,
     );
     expect(await mobileStaticImage.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(780);
-    await mobilePage.waitForTimeout(3_500);
+    await pastHeroDecision(mobilePage);
     await expect(mobilePage.locator("figure canvas")).toHaveCount(0);
     expect(await heroRuntimeScripts(request, mobileScripts)).toEqual([]);
   } finally {
@@ -655,9 +656,16 @@ test("landing hero has no browser runtime warnings or errors", async ({ page }) 
   });
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
+  await page.addInitScript(installHeroDrawInstrumentation);
   await page.goto(baseUrl);
-  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
-  await capture(page, "landing-runtime");
+  const canvas = page.locator("figure canvas");
+  await expect(canvas.or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
+  // The scene has drawn its terrain, so start-up and first-frame warnings are already logged.
+  if (await canvas.isVisible()) {
+    await expect
+      .poll(() => page.evaluate(() => (window as typeof window & { __heroTerrainDrawCount: number }).__heroTerrainDrawCount))
+      .toBeGreaterThan(0);
+  }
 
   expect(consoleIssues).toEqual([]);
   expect(pageErrors).toEqual([]);
@@ -745,7 +753,6 @@ test("landing keeps stats and dataset tables inside narrow viewports", async ({ 
         ).toBeLessThan(1.2);
       }
     }
-    await capture(page, `landing-${width}`);
   }
 });
 

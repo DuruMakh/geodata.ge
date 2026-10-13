@@ -7,7 +7,7 @@ import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Money from abroad defaults, Received/Sent, one series list, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Money from abroad defaults, Received/Sent, one series list, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
     const cards = page.getByTestId("external-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(3);
@@ -28,7 +28,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("money-from-abroad-other-row")).toHaveCount(1);
     await expect(page.getByTestId("money-from-abroad-show-all")).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`money-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("money-from-abroad-measure-sent").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "sent");
     await expect(page.getByTestId("money-from-abroad-ranking")).toHaveAttribute("data-measure", "sent");
@@ -48,7 +47,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 }
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
-  test(`A table with partial 2019 values survives sidebar, reload, language and history ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`A table with partial 2019 values survives sidebar, reload, language and history ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/external/money-from-abroad#measure=received&view=table&sel=transfer.total,transfer.greece,transfer.others&start=2009&end=2019`);
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
@@ -67,7 +66,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
     await expect(page.getByTestId("money-from-abroad-ranking")).toHaveAttribute("data-end-year", "2019");
-    await page.screenshot({ path: info.outputPath(`money-mixed-${prefix ? "ka" : "en"}-${width}.png`), fullPage: true });
     await toggle(page, "transfer.greece").focus(); await toggle(page, "transfer.greece").press("Space");
     await expect(page.getByTestId("series-status")).toContainText("2 / 12");
     await page.goBack(); await expect(page.getByTestId("series-status")).toContainText("3 / 12");

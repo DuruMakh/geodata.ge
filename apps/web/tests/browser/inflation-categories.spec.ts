@@ -6,7 +6,7 @@ const CATEGORIES = "/explorer/inflation/categories";
 
 for (const locale of ["ka", "en"] as const) {
   for (const width of [390, 1440]) {
-    test(`inflation categories layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+    test(`inflation categories layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${locale === "en" ? "/en" : ""}${CATEGORIES}`);
       await ready(page);
@@ -15,7 +15,6 @@ for (const locale of ["ka", "en"] as const) {
       await expect(page.locator('rect[data-segment="cpi.cat.residual"]').first()).toBeAttached();
       await expect(page.locator("path[data-overlay]")).toHaveCount(1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`categories-${locale}-${width}.png`), fullPage: true });
 
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();
@@ -24,7 +23,6 @@ for (const locale of ["ka", "en"] as const) {
       const legend = (await page.getByTestId("month-grid").innerText()).normalize();
       expect(/[Ⴀ-ჿ]/.test(legend)).toBe(locale === "ka");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`categories-table-${locale}-${width}.png`), fullPage: true });
     });
   }
 }

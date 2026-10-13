@@ -1,15 +1,11 @@
 import { expect, test } from "@playwright/test";
 for (const locale of ['ka','en']) for (const width of [390,768,1440]) {
-  test(`GDP layout ${locale} at ${width}px`,async({page},testInfo)=>{
+  test(`GDP layout ${locale} at ${width}px`,async({page})=>{
     await page.setViewportSize({width,height:1000});
     await page.goto(`${locale==='en'?'/en':''}/explorer/economy/gdp`);
     await expect(page.locator('body')).toHaveAttribute('data-app-ready','true');
     await expect(page.getByTestId('gdp-indicators').getByRole('button')).toHaveCount(4);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    await page.screenshot({path:testInfo.outputPath(`gdp-${locale}-${width}.png`),fullPage:true});
-    await page.goto(`${locale==='en'?'/en':''}/explorer/deficit`);
-    await expect(page.locator('body')).toHaveAttribute('data-app-ready','true');
-    await page.screenshot({path:testInfo.outputPath(`reference-deficit-${locale}-${width}.png`),fullPage:true});
   });
 }
 test('Economy footer identifies its actual sources',async({page})=>{
@@ -93,14 +89,13 @@ test("Economy links the delivered overview, national sectors and regional econom
 });
 
 for (const locale of ['ka', 'en']) {
-  test(`GDP axes use readable currencies and percentage points in ${locale}`, async ({ page }, testInfo) => {
+  test(`GDP axes use readable currencies and percentage points in ${locale}`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`${locale === 'en' ? '/en' : ''}/explorer/economy/gdp#indicator=growth&start=2015&end=2025`);
     await expect(page.locator('body')).toHaveAttribute('data-app-ready', 'true');
     const axis = page.getByTestId('chart-panel').locator('svg text');
     await expect(axis.filter({ hasText: /^15%$/ })).toHaveCount(1);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(locale === 'en' ? 'Economy overview' : 'ეკონომიკის მიმოხილვა');
-    await page.screenshot({ path: testInfo.outputPath(`growth-${locale}.png`), fullPage: true });
     await page.getByTestId('gdp-tab-per_capita').click();
     for (const currency of ['GEL', 'USD']) {
       // The symbol is the visible face; the accessible name is the localized currency name (U10-01).
@@ -112,7 +107,6 @@ for (const locale of ['ka', 'en']) {
       for (const tick of await ticks.all()) {
         expect(await tick.evaluate(el => (el as SVGGraphicsElement).getBBox().x)).toBeGreaterThanOrEqual(0);
       }
-      await page.screenshot({ path: testInfo.outputPath(`per-capita-${locale}-${currency}.png`), fullPage: true });
     }
   });
 }

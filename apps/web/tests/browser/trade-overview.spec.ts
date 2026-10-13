@@ -6,7 +6,7 @@ import path from "node:path";
 import { tableSeriesCount } from "./explorer-table";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Trade hub and Overview compare four indicators ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+  test(`Trade hub and Overview compare four indicators ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
@@ -24,7 +24,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("trade-summary").locator('[data-indicator="trade.balance"]')).toContainText("−11.4");
     const ticks = page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]');
     expect(Math.min(...await ticks.evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x)))).toBeGreaterThanOrEqual(0);
-    await page.screenshot({ path: info.outputPath(`trade-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("4 / 4");
     await toggle("trade.turnover").click();
@@ -46,7 +45,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("0 / 4");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.screenshot({ path: info.outputPath(`trade-empty-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     expect(errors).toEqual([]);
   });
 }

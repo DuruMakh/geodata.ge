@@ -3,7 +3,7 @@ import ExcelJS from "exceljs";
 import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 import { REGIONAL_ECONOMY_REGIONS as UNEMPLOYMENT_REGIONS } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) test(`region map opens separate pages ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) test(`region map opens separate pages ${prefix || "ka"} at ${width}px`, async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width, height: 1000 });
   await page.goto(`${prefix}/explorer/unemployment/regions`);
@@ -15,7 +15,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) test(`re
   await expect(page.getByTestId("regional-map-legend")).toContainText("7.0%");
   await expect(page.getByTestId("regional-map-legend")).toContainText("17.5%");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: info.outputPath(`unemployment-map-${width}.png`), fullPage: true });
   await page.locator('[data-testid="regional-list-row"][data-region-id="region.imereti"]').click();
   await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/unemployment/regions/imereti$`));
   await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
@@ -27,7 +26,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) test(`re
   await expect(page.getByRole("heading", { level: 1 }).getByTestId("region-picker-trigger")).toHaveCount(1);
   await expect(page.getByTestId("unemployment-regions-link")).toHaveAttribute("aria-current", "page");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: info.outputPath(`unemployment-region-${width}.png`), fullPage: true });
   expect(errors).toEqual([]);
 });
 
@@ -89,7 +87,7 @@ for (const prefix of ["", "/en"]) test(`regional indicators, units and workbook 
   await expect(page.getByTestId("series-status")).toContainText("5 / 5");
 });
 
-for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regional employed children preserve source coverage and Excel values ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regional employed children preserve source coverage and Excel values ${prefix || "ka"} at ${width}px`, async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width, height: 1000 });
   await page.goto(`${prefix}/explorer/unemployment/regions/tbilisi`);
@@ -107,7 +105,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) test(`regiona
   await expect(page.getByTestId("series-status")).toContainText("1 / 5");
   await expect(page.getByTestId("series-status")).toContainText(prefix ? "Subcategories 2" : "ქვეკატეგორიები 2");
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");
-  await page.screenshot({ path: info.outputPath(`regional-employment-${width}.png`), fullPage: true });
   await page.getByTestId("chart-mode-table").click();
   const table = page.getByTestId("explorer-table");
   await expect.poll(() => tableSeriesCount(table)).toBe(3);
@@ -183,7 +180,7 @@ for (const prefix of ["", "/en"]) test(`historical comparison explains the combi
   await expect(page.getByText(prefix ? "Earlier combined regions remain distinct." : "ადრინდელი გაერთიანებული რეგიონები ცალკე რჩება.", { exact: false })).toBeVisible();
 });
 
-test("Georgian employment child labels keep a clear gap before the value at desktop width", async ({ page }, info) => {
+test("Georgian employment child labels keep a clear gap before the value at desktop width", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/explorer/unemployment/overview#sel=georgia:employed,georgia:self_employed&range=all");
   const row = page.locator('[data-series-id="georgia:self_employed"]');
@@ -195,5 +192,4 @@ test("Georgian employment child labels keep a clear gap before the value at desk
     return value.getBoundingClientRect().left - label.getBoundingClientRect().right;
   });
   expect(gap).toBeGreaterThanOrEqual(8);
-  await page.screenshot({ path: info.outputPath("georgian-employment-label.png"), fullPage: true });
 });

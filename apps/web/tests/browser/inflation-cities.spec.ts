@@ -7,7 +7,7 @@ const noOverflow = (page: Page) => page.evaluate(() => document.documentElement.
 for (const locale of ["ka", "en"] as const) {
   const prefix = locale === "en" ? "/en" : "";
   for (const width of [390, 1440]) {
-    test(`Georgia page layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+    test(`Georgia page layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}${CITIES}`);
       await ready(page);
@@ -17,7 +17,6 @@ for (const locale of ["ka", "en"] as const) {
       await expect(page.getByTestId("series-row")).toHaveCount(7);
       await expect(page.getByTestId("series-status")).toContainText("7 / 7");
       expect(await noOverflow(page)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`cities-${locale}-${width}.png`), fullPage: true });
 
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();
@@ -25,7 +24,7 @@ for (const locale of ["ka", "en"] as const) {
       expect(await noOverflow(page)).toBe(true);
     });
 
-    test(`city page layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+    test(`city page layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${prefix}${CITIES}/batumi`);
       await ready(page);
@@ -33,7 +32,6 @@ for (const locale of ["ka", "en"] as const) {
       await expect(page.getByTestId("series-status")).toContainText("1 / 13");
       await expect(page.getByTestId("city-entity-navigation")).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`city-batumi-${locale}-${width}.png`), fullPage: true });
     });
   }
 }

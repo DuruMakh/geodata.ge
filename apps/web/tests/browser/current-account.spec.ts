@@ -7,7 +7,7 @@ import { tableSeriesCount } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Current account balance, money in and % of GDP ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Current account balance, money in and % of GDP ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
     await page.getByTestId("external-hub").getByTestId("hub-card").nth(2).click();
@@ -23,7 +23,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     // DESIGN §17 (owner, 2026-10-11): nothing but the heading above the controls.
     await expect(page.getByTestId("current-account").locator("h1 + p")).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`balance-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("measure-share-toggle").click();
     await expect(panel).toHaveAttribute("data-unit", "gdp");
     await expect(key.locator('[data-series-id="ca.balance"]')).toContainText(/[−-]2\.9/);

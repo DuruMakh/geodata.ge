@@ -7,7 +7,7 @@ const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data
 
 for (const locale of ["ka", "en"] as const) {
   for (const width of [390, 1440]) {
-    test(`product inflation layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+    test(`product inflation layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${locale === "en" ? "/en" : ""}${ROUTE}`);
       await ready(page);
@@ -31,7 +31,6 @@ for (const locale of ["ka", "en"] as const) {
         // A phone should show the product and its selected-years cumulative value before a horizontal swipe.
         expect(cumulativeCell.x + cumulativeCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
       }
-      await page.screenshot({ path: testInfo.outputPath(`products-${locale}-${width}.png`), fullPage: true });
     });
   }
 }

@@ -7,7 +7,7 @@ import path from "node:path";
 import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`four unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+  test(`four unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     const sections = ["overview", "regions", "age", "gender"], breakdowns = ["national", "region", "age", "sex"];
@@ -19,7 +19,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await expect(cards).toHaveCount(4);
       await expect(cards.nth(index)).toHaveAttribute("href", `${prefix}/explorer/unemployment/${section}`);
       await expect(cards.nth(index).getByRole("heading")).toHaveText(titles[index]);
-      if (index === 0) await page.screenshot({ path: info.outputPath(`unemployment-hub-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
       await cards.nth(index).click();
       await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/unemployment/${section}$`));
       if (section === "regions") {
@@ -33,7 +32,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await expect(page.getByTestId("unemployment-national-tabs")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: info.outputPath(`unemployment-${section}-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     }
     await page.goto(`${prefix}/explorer/unemployment/regions#breakdown=region`);
     await page.getByTestId("chart-mode-table").click();
@@ -101,7 +99,7 @@ test("national tabs keep valid metrics, coverage and reference selection", async
 });
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`gender indicators expand beneath Men and Women ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+  test(`gender indicators expand beneath Men and Women ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/unemployment/gender`);
@@ -143,7 +141,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(2);
     await expect(page.getByTestId("explorer-table")).toContainText("79.4");
     await expect(page.getByTestId("explorer-table")).toContainText("770.2");
-    await page.screenshot({ path: info.outputPath(`unemployment-gender-expanded-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("series-search").fill("participation");
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("10 / 10");

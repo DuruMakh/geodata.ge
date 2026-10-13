@@ -1,14 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { createHash } from "node:crypto";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 import { workbookMessage } from "../../lib/i18n/workbook";
 
 const toggle = (page: Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 const section = (page: Page, id: string) => page.getByTestId(`trade-services-section-${id}`);
-const reviewDirectory = "../../docs/superpowers/reviews/2026-10-11-trade-services";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Services defaults, independent ranking and complete selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
@@ -34,8 +33,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     expect(await page.getByRole("heading", { level: 1 }).evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     expect(await page.getByTestId("chart-mode-line").evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(11);
     await page.evaluate(() => document.fonts.ready);
-    await mkdir(reviewDirectory, { recursive: true });
-    await page.screenshot({ path: `${reviewDirectory}/services-overview-${prefix ? "en" : "ka"}-${width}.png`, fullPage: true });
     const axis = () => page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]').allTextContents();
     const scale = await axis();
     expect(Math.min(...await page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]').evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x)))).toBeGreaterThanOrEqual(0);
@@ -70,7 +67,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     const amount = (id: string) => Number(facts.find(row => row.entity_id === id && row.year === "2024" && row.indicator_id === "trade.turnover")!.value_usd);
     const travelRow = page.locator('[data-testid="trade-partners-ranking-row"][data-entity-id="services.travel"]');
     await expect(travelRow.locator("td").last()).toHaveText(`${(amount("services.travel") / amount("services.total") * 100).toFixed(1)}%`);
-    await page.screenshot({ path: `${reviewDirectory}/services-types-${prefix ? "en" : "ka"}-${width}.png`, fullPage: true });
     const typeScale = await axis();
     await page.getByTestId("series-search").fill(prefix ? "Travel" : "მოგზაურობა");
     await expect(toggle(page, "services.travel")).toBeVisible();

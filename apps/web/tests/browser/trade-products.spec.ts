@@ -58,7 +58,6 @@ for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
     const selection = await page.getByTestId("trade-products-selection").boundingBox();
     expect(selection!.height).toBeLessThanOrEqual(width === 390 ? 80 : 30);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.getByTestId("trade-products-selection").screenshot({ path: path.join(output, `compact-${prefix ? "en" : "ka"}-${width}.png`) });
   });
 }
 
@@ -118,15 +117,12 @@ for (const prefix of ["", "/en"]) for (const width of [1366, 390]) {
     const before = await plot.boundingBox(); expect(before!.y).toBeLessThan(page.viewportSize()!.height);
     await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuenow", "2025");
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2020");
-    await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-page.png`), fullPage: true });
-    await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-preview.png`) });
     const chartElement = await plot.locator("svg").elementHandle();
     await opener.click(); await expect(picker).toBeVisible();
     expect((await plot.boundingBox())!.y).toBeCloseTo(before!.y, 0);
     await expect(page.getByTestId("trade-products-close")).toBeFocused();
     await expect(page.getByTestId("trade-product-category")).toHaveCount(8);
     await expect(page.getByTestId("trade-product-result")).toHaveCount(0);
-    await page.screenshot({ path: path.join(output, `${prefix ? "en" : "ka"}-${width}-picker.png`) });
     for (let i = 0; i < 12; i++) {
       await page.keyboard.press("Tab");
       expect(await picker.evaluate(element => element.contains(document.activeElement))).toBe(true);

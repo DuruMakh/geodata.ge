@@ -5,19 +5,17 @@ const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data
 
 for (const locale of ["ka", "en"] as const) {
   for (const width of [390, 768, 1440]) {
-    test(`inflation overview layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
+    test(`inflation overview layout ${locale} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/overview`);
       await ready(page);
       await expect(page.getByTestId("inflation-tabs").getByRole("button")).toHaveCount(3);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`inflation-${locale}-${width}.png`), fullPage: true });
       await page.getByTestId("chart-mode-table").click();
       await expect(page.getByTestId("month-grid")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       // Desktop shows every month and the annual average without a hidden scroll.
       if (width === 1440) expect(await page.getByTestId("month-grid").evaluate((grid) => grid.scrollWidth <= grid.clientWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`inflation-table-${locale}-${width}.png`), fullPage: true });
     });
   }
 }

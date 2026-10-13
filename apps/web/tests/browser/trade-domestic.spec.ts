@@ -6,7 +6,7 @@ import { tableSeriesCount } from "./explorer-table";
 const section = (page: Page, name: string) => page.getByTestId(`trade-domestic-section-${name}`);
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
-  test(`Domestic views retain comparisons, range and language ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Domestic views retain comparisons, range and language ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
@@ -18,7 +18,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("trade-balance-context")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`domestic-overview-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("chart-mode-table").click();
     expect(await tableSeriesCount(page.getByTestId("explorer-table"))).toBe(3);
 
@@ -35,7 +34,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2021");
     await page.getByTestId("trade-partners-measure-trade.reexports").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.reexports");
-    await page.screenshot({ path: info.outputPath(`domestic-countries-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
 
     await section(page, "products").click();
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuemin", "2020");
@@ -48,7 +46,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("101 / 101");
     await page.getByTestId("trade-products-compare").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "101");
-    await page.screenshot({ path: info.outputPath(`domestic-products-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     if (width < 900) await page.getByTestId("sidebar-toggle").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("trade-domestic")).toHaveAttribute("data-section", "products");

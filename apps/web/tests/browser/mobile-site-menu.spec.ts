@@ -12,10 +12,6 @@ for (const locale of ["ka", "en"] as const) {
       await expect(header.getByRole("navigation")).toBeHidden();
       await expect(header.getByRole("group")).toBeHidden();
       expect((await header.boundingBox())!.height).toBeLessThanOrEqual(64);
-      if (width === 390) {
-        await page.evaluate(() => window.scrollTo(0, 0));
-        await page.screenshot({ path: `../../.tmp/bilingual/mobile-menu-${locale}-closed.png` });
-      }
       await toggle.focus();
       await page.keyboard.press("Enter");
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
@@ -27,10 +23,6 @@ for (const locale of ["ka", "en"] as const) {
       await expect(languages).toBeVisible();
       await expect(languages).toContainText("KA");
       await expect(languages).toContainText("EN");
-      if (width === 390) {
-        await page.evaluate(() => window.scrollTo(0, 0));
-        await page.screenshot({ path: `../../.tmp/bilingual/mobile-menu-${locale}-open.png` });
-      }
       await page.keyboard.press("Tab");
       await expect(nav.getByRole("link").first()).toBeFocused();
       await page.keyboard.press("Escape");
@@ -55,7 +47,6 @@ for (const locale of ["ka", "en"] as const) {
       const nav = (await header.getByRole("navigation").boundingBox())!;
       expect(Math.abs(nav.x + nav.width / 2 - box.x - box.width / 2)).toBeLessThan(1);
     }
-    await page.screenshot({ path: `../../.tmp/bilingual/mobile-menu-${locale}-desktop.png` });
     await page.setViewportSize({ width: 390, height: 900 });
     await header.getByRole("button").click();
     await expect(header.getByRole("button")).toHaveAttribute("aria-expanded", "true");

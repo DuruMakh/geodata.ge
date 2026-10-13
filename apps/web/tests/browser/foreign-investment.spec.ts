@@ -7,7 +7,7 @@ import { tableSeriesCount } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Foreign investment defaults, tabs, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Foreign investment defaults, tabs, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
     await page.getByTestId("external-hub").getByTestId("hub-card").nth(1).click();
@@ -22,7 +22,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(ranking.first()).toContainText("426.6");
     await expect(page.getByTestId("foreign-investment-other-row")).toHaveCount(1);
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`fdi-country-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await toggle(page, "fdi.country.m49_826").click();
     await page.getByTestId("foreign-investment-tab-region").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-dimension", "region");
@@ -32,7 +31,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(ranking.first()).toHaveAttribute("data-entity-id", "fdi.region.tbilisi");
     await expect(ranking.last()).toHaveAttribute("data-entity-id", "fdi.region.imereti");
     await expect(ranking.last()).toContainText("−64.2");
-    await page.screenshot({ path: info.outputPath(`fdi-region-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("foreign-investment-tab-sector").click();
     await expect(page.getByTestId("series-status")).toContainText("1 / 19");
     await expect(ranking).toHaveCount(18);

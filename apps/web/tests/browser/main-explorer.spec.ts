@@ -1200,23 +1200,6 @@ test("a chart frame that still overflows accepts a horizontal touch drag", async
   await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeLessThan(maxScroll - 1);
 });
 
-test("captures editorial desktop and mobile screenshots", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-  await expectLineChartRendered(page);
-  await page.screenshot({ path: "test-results/geodata-editorial-desktop.png", fullPage: true, caret: "initial" });
-
-  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
-  await expectAppReady(page);
-  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-  await page.screenshot({ path: "test-results/geodata-editorial-analysis.png", fullPage: true, caret: "initial" });
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-  await page.screenshot({ path: "test-results/geodata-editorial-mobile.png", fullPage: true, caret: "initial" });
-});
-
 test("every side KPI carries a sparkline", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);

@@ -3,7 +3,7 @@ import ExcelJS from "exceljs";
 import { expectReadableText } from "./color-contrast";
 
 for (const prefix of ["", "/en"]) {
-  test(`long sector names leave mobile table values readable ${prefix || "ka"}`, async ({ page }, info) => {
+  test(`long sector names leave mobile table values readable ${prefix || "ka"}`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 900 });
     await page.goto(`${prefix}/explorer/economy/sectors#view=table&start=2025&end=2025&sel=sector.g`);
     // One series on a phone lists its years as rows (owner decision D5): the long name
@@ -20,12 +20,11 @@ for (const prefix of ["", "/en"]) {
       const r = el.getBoundingClientRect();
       return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
     })).toBe(true);
-    await region.screenshot({ path: info.outputPath("mobile-sector-table.png") });
   });
 }
 
 for (const width of [390, 768, 1440]) {
-  test(`Georgian sector highlights match the Budget hero and side KPIs at ${width}px`, async ({ page }, info) => {
+  test(`Georgian sector highlights match the Budget hero and side KPIs at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/explorer/economy/sectors");
     const section = page.getByTestId("sector-highlights");
@@ -46,11 +45,10 @@ for (const width of [390, 768, 1440]) {
     await expect(side.locator("svg")).toHaveCount(3);
     expect(await hero.locator('[data-testid="sector-hero-value"]').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBe(width < 768 ? 44 : 62);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await section.screenshot({ path: info.outputPath(`highlights-ka-${width}.png`) });
   });
 }
 
-test("four national highlights ignore chart selection and measure and explain missing 2010 growth", async ({ page }, info) => {
+test("four national highlights ignore chart selection and measure and explain missing 2010 growth", async ({ page }) => {
   await page.goto("/en/explorer/economy/sectors");
   const highlights = page.getByTestId("sector-highlights");
   await expect(highlights).toBeVisible();
@@ -70,7 +68,6 @@ test("four national highlights ignore chart selection and measure and explain mi
   await expect(highlights).not.toContainText("Preliminary");
   await page.setViewportSize({ width: 390, height: 900 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await highlights.screenshot({ path: info.outputPath("sector-highlights-mobile.png") });
 });
 
 test("ranked sector table keeps the GDP reference first", async ({ page }) => {
@@ -123,7 +120,7 @@ test("collapsed sidebar home icon stays visible on the dark navigation", async (
   await expectReadableText(home, sidebar);
 });
 
-test("icon measure controls explain themselves on hover and keyboard focus", async ({ page }, info) => {
+test("icon measure controls explain themselves on hover and keyboard focus", async ({ page }) => {
   await page.goto("/en/explorer/economy/sectors");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const share = page.getByRole("button", { name: "% of GDP", exact: true });
@@ -144,7 +141,6 @@ test("icon measure controls explain themselves on hover and keyboard focus", asy
   await expect(page.getByText("Annual growth, adjusted for price changes.", { exact: true })).toBeVisible();
   await page.setViewportSize({ width: 390, height: 900 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: info.outputPath("lucide-controls-mobile.png"), fullPage: true });
 });
 
 test("sector page signals completed hydration",async({page})=>{
@@ -152,7 +148,7 @@ test("sector page signals completed hydration",async({page})=>{
   await expect(page.locator("body")).toHaveAttribute("data-app-ready","true");
 });
 for(const locale of ["ka","en"] as const) for(const width of [390,768,900,1020,1440]) {
-  test(`sectors layout ${locale} ${width}`,async({page},info)=>{
+  test(`sectors layout ${locale} ${width}`,async({page})=>{
     await page.setViewportSize({width,height:1000});
     await page.goto(`${locale==="en"?"/en":""}/explorer/economy/sectors`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready","true");
@@ -160,7 +156,6 @@ for(const locale of ["ka","en"] as const) for(const width of [390,768,900,1020,1
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
     await expect(page.getByTestId("economic-sectors-explorer").getByRole("tablist")).toHaveCount(0);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    await page.screenshot({path:info.outputPath(`sectors-${locale}-${width}.png`),fullPage:true});
   });
 }
 test("sector selections, measures and manual period survive history and language changes",async({page})=>{

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`age dropdown and heatmap stay in sync ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+  test(`age dropdown and heatmap stay in sync ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/unemployment/age`);
@@ -20,7 +20,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(heatmap.locator("tbody tr")).toHaveCount(11);
     await expect(page.getByTestId("age-heatmap-scroll-hint")).toHaveCount(0);
     await expect(heatmap.locator('[data-heatmap-cell="age.20_24:2025"]')).toHaveText("30.2%");
-    await page.screenshot({ path: info.outputPath(`age-heatmap-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await selector.selectOption("employed");
     await expect(heatmap).toHaveAttribute("data-unit", "thousand_persons");
     await expect(heatmap.locator('[data-heatmap-cell="age.20_24:2025"]')).toHaveText("70.0");
