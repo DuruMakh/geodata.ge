@@ -652,23 +652,25 @@ describe("Dataset nodes credit the official producer beside Fiscal.ge", () => {
 
   it("names the topic's producer, or the page's own when it differs, and keeps Fiscal.ge the creator", () => {
     const money = explorerDatasetJsonLd({ ...base, path: "/explorer/money/supply", datasetId: "money" });
-    expect(money).toMatchObject({ creator: { "@id": "https://fiscal.ge/#organization" }, isBasedOn: [nbg] });
-    expect(money).not.toHaveProperty("provider");
-    expect(explorerDatasetJsonLd({ ...base, path: "/explorer/money/supply", datasetId: "money", sources: ["nbg", "geostat"] })).toMatchObject({ isBasedOn: [nbg, geostat] });
-    expect(datasetJsonLd({ ...base, path: "/en/methodology/trade", datasetId: "trade", downloadPath: null })).toMatchObject({ isBasedOn: [geostat] });
+    expect(money).toMatchObject({ creator: { "@id": "https://fiscal.ge/#organization" }, provider: nbg });
+    expect(money).not.toHaveProperty("isBasedOn");
+    expect(explorerDatasetJsonLd({ ...base, path: "/explorer/money/supply", datasetId: "money", sources: ["nbg", "geostat"] })).toMatchObject({ provider: [nbg, geostat] });
+    expect(datasetJsonLd({ ...base, path: "/en/methodology/trade", datasetId: "trade", downloadPath: null })).toMatchObject({ provider: geostat });
     const ka = explorerDatasetJsonLd({ ...base, locale: "ka", path: "/explorer/trade/overview", datasetId: "trade" });
-    expect(ka).toMatchObject({ isBasedOn: [{ name: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)" }] });
+    expect(ka).toMatchObject({ provider: { name: "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)" } });
   });
 
-  it("lists source files after the producer and names it as provider where the page always has", () => {
+  it("keeps isBasedOn for the source files alone, beside the producer as provider", () => {
     expect(explorerDatasetJsonLd({
-      ...base, path: "/explorer/inflation/products", datasetId: "inflation-products", creditSourcesAsProvider: true,
+      ...base, path: "/explorer/inflation/products", datasetId: "inflation-products",
       isBasedOn: ["https://fiscal.ge/downloads/methodology/inflation/files/products-yoy.xlsx"],
-    })).toMatchObject({ provider: geostat, isBasedOn: [geostat, "https://fiscal.ge/downloads/methodology/inflation/files/products-yoy.xlsx"] });
+    })).toMatchObject({ provider: geostat, isBasedOn: ["https://fiscal.ge/downloads/methodology/inflation/files/products-yoy.xlsx"] });
   });
 
   it("leaves the budget datasets, which name no statistics producer, as they were", () => {
-    expect(explorerDatasetJsonLd({ ...base, path: "/explorer/debt", datasetId: "government-debt" })).not.toHaveProperty("isBasedOn");
+    const debt = explorerDatasetJsonLd({ ...base, path: "/explorer/debt", datasetId: "government-debt" });
+    expect(debt).not.toHaveProperty("provider");
+    expect(debt).not.toHaveProperty("isBasedOn");
   });
 });
 
@@ -722,7 +724,7 @@ describe("Dataset nodes across the sitemap", () => {
         // Fiscal.ge compiles the dataset; the official producer it reads from is credited beside it.
         expect(dataset.creator, pathname).toEqual({ "@id": "https://fiscal.ge/#organization" });
         if (creditsSource(page)) {
-          const producers = ((dataset.isBasedOn as unknown[] | undefined) ?? []).filter((source) => (source as { "@type"?: string })["@type"] === "Organization");
+          const producers = [dataset.provider ?? []].flat();
           expect(producers.length, `${pathname} credits its source`).toBeGreaterThan(0);
           for (const producer of producers) expect(producer, pathname).toEqual({ "@type": "Organization", name: expect.any(String), url: expect.stringMatching(/^https:\/\/(www\.geostat\.ge|nbg\.gov\.ge)$/) });
         }

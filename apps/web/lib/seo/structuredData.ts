@@ -39,9 +39,7 @@ export type DatasetJsonLdInput = SourceCreditInput & {
 type SourceCreditInput = {
   /** The official producers this page's figures come from, when they differ from its dataset's (`TOPIC_DATASETS`). */
   sources?: readonly SourceAgencyId[];
-  /** Also name the producers as `provider`, for a page that has always credited them that way. */
-  creditSourcesAsProvider?: boolean;
-  /** The source files the figures were read from, listed after the producers. */
+  /** The source files the figures were read from. */
   isBasedOn?: readonly string[];
 };
 
@@ -141,13 +139,15 @@ function datasetVocabulary(
   };
 }
 
-/** `isBasedOn` (and `provider` where asked) naming the official producers, then any source files. */
+/**
+ * The official producers as `provider`, an Organization property; `isBasedOn` keeps only the source files, as its
+ * schema.org range is a work or a URL.
+ */
 function sourceCredit(datasetId: SeoDatasetId, locale: Locale, input: SourceCreditInput) {
   const agencies = sourceAgenciesFor(datasetId, locale, input.sources);
-  const isBasedOn = [...agencies, ...(input.isBasedOn ?? [])];
   return {
-    ...(isBasedOn.length > 0 ? { isBasedOn } : {}),
-    ...(input.creditSourcesAsProvider && agencies.length > 0 ? { provider: agencies.length === 1 ? agencies[0] : agencies } : {}),
+    ...(agencies.length > 0 ? { provider: agencies.length === 1 ? agencies[0] : agencies } : {}),
+    ...(input.isBasedOn ? { isBasedOn: input.isBasedOn } : {}),
   };
 }
 

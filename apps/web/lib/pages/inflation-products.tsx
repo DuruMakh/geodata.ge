@@ -52,7 +52,7 @@ export async function renderInflationProducts(locale: Locale) {
       locale, origin, path: PRODUCTS_PATH, datasetId: "inflation-products", name: t("inflation.productsWorkbookTitle"), description: t("inflation.productsDescription"),
       firstYear: firstPeriod, lastYear: lastPeriod, dateModified: reviewedAt, downloadPath: "/downloads/data/inflation-products.csv",
       variableMeasured: [t("inflation.productsAnnualIndexColumn"), t("inflation.productsCumulativeDataColumn")],
-      creditSourcesAsProvider: true, isBasedOn: sources.map((row) => new URL(row.downloadHref, origin).href),
+      isBasedOn: sources.map((row) => new URL(row.downloadHref, origin).href),
     })} />
     <BreadcrumbJsonLd items={[
       { name: t("common.home"), path: pageHref("/", locale) },
