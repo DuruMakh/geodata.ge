@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, X } from "lucide-react";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { TRADE_PRODUCT_MEASURES } from "../../lib/data/tradeProducts/types";
 import { buildTradeProductsModel, tradeProductColor, tradeProductLabel } from "../../lib/explorer/tradeProducts";
@@ -23,6 +24,7 @@ import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { Callout, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
+import { TablePager, useTablePage } from "./table-pager";
 import { TradePartnersRanking } from "./trade-partners-ranking";
 import { TradeProductsPicker } from "./trade-products-picker";
 import { useTradeProductsState } from "./use-trade-products-state";
@@ -36,15 +38,14 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const entities = useMemo(() => new Map(data.entities.map(entity => [entity.id, entity])), [data]);
   const labels = useMemo(() => new Map([[TRADE_PRODUCT_TOTAL_ID, message(messages, "trade.partners.total")], ...data.entities.map(entity => [entity.id, tradeProductLabel(entity, presentation, !data.sourceBlock)] as const)]), [data, presentation, messages]);
   const [picker, setPicker] = useState<{ view: "categories" | "selected"; opener: HTMLElement } | null>(null);
-  const [paging, setPaging] = useState<{ selection: readonly string[]; page: number }>({ selection: [], page: 0 });
   useEffect(() => {
     const close = () => setPicker(null);
     window.addEventListener("popstate", close); window.addEventListener("hashchange", close);
     return () => { window.removeEventListener("popstate", close); window.removeEventListener("hashchange", close); };
   }, []);
   const measureLabel = message(messages, `trade.indicator.${state.measure}`);
-  const pageCount = Math.ceil(model.selectedCount / 25), page = Math.min(paging.selection === state.selectedIds ? paging.page : 0, Math.max(0, pageCount - 1));
-  const pageIds = model.selectedIds.slice(page * 25, (page + 1) * 25);
+  const { page, pageCount, setPage, pageItems } = useTablePage(state.selectedIds, model.selectedCount);
+  const pageIds = pageItems(model.selectedIds);
   const rows = pageIds.map(id => ({ itemId: id, kaLabel: labels.get(id)!, color: tradeProductColor(id), valuesByYear: model.valuesByEntity[id] }));
   const total = rows.find(row => row.itemId === TRADE_PRODUCT_TOTAL_ID) ?? null;
   const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) })), [model, labels]);
@@ -68,7 +69,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
       {!model.selectedCount ? <div className="my-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
         : state.mode === "line" ? <div className="mt-4" data-testid="trade-products-plot">{chart}</div>
         : <div data-testid="trade-products-table" data-page={page + 1}><ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== TRADE_PRODUCT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
-          <nav aria-label={t("tablePages")} className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--muted)]"><span>{t("selected")} · {model.selectedCount} · {page + 1} / {pageCount}</span>{pageCount > 1 ? <div className="flex gap-5"><button type="button" data-testid="trade-products-table-previous" disabled={page === 0} onClick={() => setPaging({ selection: state.selectedIds, page: page - 1 })} className="min-h-11 cursor-pointer disabled:opacity-35">{t("previous")}</button><button type="button" data-testid="trade-products-table-next" disabled={page + 1 === pageCount} onClick={() => setPaging({ selection: state.selectedIds, page: page + 1 })} className="min-h-11 cursor-pointer disabled:opacity-35">{t("next")}</button></div> : null}</nav>
+          <TablePager label={t("tablePages")} summary={`${t("selected")} · ${model.selectedCount}`} page={page} pageCount={pageCount} onPage={setPage} previous={t("previous")} next={t("next")} testIdPrefix="trade-products-table" />
         </div>}
       {/* Directly after the plot, before the chips: the readout CSS and the return pill look for the chart as the previous sibling. With more than ten products the chips name the selection, so the legend is left out. */}
       <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
@@ -83,7 +84,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
       </div>
       <RangeStrip years={data.years.filter(year => year >= model.range.min && year <= model.range.max)} range={model.range} onChange={patch => update(previous => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
     </section>
-    <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.productDefinitions") : `${data.sourceBlock ? "" : `${t("historicalNote")} `}${t("definitions")}`}</p></div>
+    <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.productDefinitions") : `${data.sourceBlock ? "" : `${t("historicalNote")} `}${t("definitions")}`}</p></div>
     <TradePartnersRanking key={`${state.measure}:${model.range.end}`} model={model} tab="products" measure={state.measure} pageSize={25} />
     {picker ? <TradeProductsPicker data={data} model={model} selectedIds={state.selectedIds} initialView={picker.view} returnFocusTo={picker.opener} onApply={selectedIds => update(previous => ({ ...previous, selectedIds }), true)} onClose={() => setPicker(null)} /> : null}
   </div>;

@@ -57,7 +57,7 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
           <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
       </div>
-      <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel key={state.dimension} model={model} totalId={FOREIGN_INVESTMENT_TOTAL_ID} searchPlaceholder={t(`search.${state.dimension}`)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
+      <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel key={state.dimension} model={model} totalId={FOREIGN_INVESTMENT_TOTAL_ID} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <ExternalRanking key={`${state.dimension}:${model.range.end}`} testId="foreign-investment" data={{ "end-year": model.range.end, dimension: state.dimension }} title={t(`ranking.${state.dimension}`, { year: model.range.end })} itemLabel={t(`item.${state.dimension}`)} shareLabel={t("share")} note={t("shareNote")} empty={t("noRanking")} rows={model.ranking} other={model.other} />
   </div>;

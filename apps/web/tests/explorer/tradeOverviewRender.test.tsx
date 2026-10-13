@@ -12,3 +12,11 @@ test.each(["en", "ka"] as const)("renders %s four ordered checkboxes without lar
   expect(positions).toEqual([...positions].sort((a, b) => a - b));
   expect(html).not.toMatch(/GEL|₾|GDP/);
 });
+
+// U21-08: line-chart amount ticks show numbers only (DESIGN.md §28.1), as on Partners; the unit is said once above.
+test("the overview line chart's ticks print numbers only", async () => {
+  const html = renderToStaticMarkup(<I18nProvider locale="en" englishLabels={{}} messages={await getMessages("en", ["trade", "controls", "format", "main"])}><TradeOverview facts={tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) }))} sources={[]} lastReviewedAt="2026-10-08" siteOrigin="https://fiscal.ge" /></I18nProvider>);
+  expect(html).toContain('data-geometry="desktop"');
+  // The phone chart keeps its one axis caption naming the unit.
+  expect(html).not.toMatch(/<text(?![^>]*data-unit-caption)[^>]*>[^<]*USD<\/text>/);
+});

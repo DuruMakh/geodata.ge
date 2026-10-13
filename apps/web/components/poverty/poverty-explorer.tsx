@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientPovertyFact } from "../../lib/data/poverty/types";
 import { buildPovertyModel, changePovertyView, parsePovertyHash, povertyCoverage, povertyViews, serializePovertyHash, type PovertySectionId, type PovertyState, type PovertyView } from "../../lib/explorer/poverty";
 import { buildPovertyWorkbookExportModel } from "../../lib/explorer/povertyWorkbook";
@@ -82,7 +83,7 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={povertyCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildPovertyModel(section, facts, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "international" ? "sourceNoteInternational" : "sourceNote")} · {unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "international" ? "sourceNoteInternational" : "sourceNote")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/poverty", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>

@@ -82,7 +82,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
             </li>)}
           </ul>
           {downloadAction}
-        </> : <MoneyFromAbroadSeriesPanel model={{ ...model, valuesByEntity: model.valuesById, selectedCount: model.selectedIds.length, totalCount: CURRENT_ACCOUNT_SERIES.length }} totalId="ca.balance" searchPlaceholder={t("search")} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: CURRENT_ACCOUNT_SERIES.filter(id => selectedIds.includes(id)) }), true)} downloadAction={downloadAction} />}
+        </> : <MoneyFromAbroadSeriesPanel model={{ ...model, valuesByEntity: model.valuesById, selectedCount: model.selectedIds.length, totalCount: CURRENT_ACCOUNT_SERIES.length }} totalId="ca.balance" onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: CURRENT_ACCOUNT_SERIES.filter(id => selectedIds.includes(id)) }), true)} downloadAction={downloadAction} />}
       </SeriesAside>
     </ExplorerWorkspace>
   </div>;

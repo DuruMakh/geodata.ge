@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
 import { buildEnergyFoodModel, energyFoodCoverage, energyFoodDisplayLabels, energyFoodUnit, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodState } from "../../lib/explorer/energyFood";
 import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
@@ -82,7 +83,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={value => valueLabel(value)} />
           <RangeStrip years={energyFoodCoverage(section, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, energyFoodCoverage(section, facts)), patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(percent ? "sourceNote.food" : "sourceNote.energy")} · {unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t(percent ? "sourceNote.food" : "sourceNote.energy")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/energy-food", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>

@@ -346,3 +346,11 @@ test.each(["ka", "en"] as const)("each %s page names itself in its metadata and 
     vi.unstubAllEnvs();
   }
 });
+
+// U24-09: the deposits row says "individuals" as its id and the Georgian do, and the line under the heading names the
+// loans series as its series row does.
+test.each(["ka", "en"] as const)("the %s loans and deposits labels match their rows", async (locale) => {
+  const messages = await getMessages(locale, ["moneyBanks"]);
+  expect(messages["moneyBanks.latest.loans-deposits"]).toBe(messages["moneyBanks.series.loans.total"]);
+  if (locale === "en") expect(messages["moneyBanks.series.deposits.individuals"]).toBe("Deposits of individuals");
+});

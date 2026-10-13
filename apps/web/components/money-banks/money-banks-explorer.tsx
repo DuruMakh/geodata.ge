@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ChartPie, CircleDollarSign } from "lucide-react";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
 import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
@@ -102,7 +103,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")}
           {state.view === "gdp" ? <> · {message(messages, "main.gdpSource")}{preliminaryGdpYears.length ? ` ${message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") })}` : null}</> : null}
-          {" · "}{unitLabel} · {model.range.start}–{model.range.end} · {lastReviewedAt}
+          {" · "}{unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/money", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>

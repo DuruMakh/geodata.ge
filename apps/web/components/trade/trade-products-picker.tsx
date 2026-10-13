@@ -65,15 +65,16 @@ export function TradeProductsPicker({ data, model, selectedIds, initialView, ret
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 min-[768px]:px-6">
         <SeriesSelector controls={<div role="group" aria-label={t("browse")} className="flex flex-wrap items-center gap-3">
-          <TextTab label={t("categories")} active={view === "categories"} onClick={() => changeView("categories")} testId="trade-products-tab-categories" /><TabDivider />
-          <TextTab label={t("all")} active={view === "all"} onClick={() => changeView("all")} testId="trade-products-tab-all" /><TabDivider />
+          {/* A divider is left out below 480px, where the row can wrap and leave it dangling at a line end (U22-17). */}
+          <TextTab label={t("categories")} active={view === "categories"} onClick={() => changeView("categories")} testId="trade-products-tab-categories" /><span className="hidden min-[480px]:inline"><TabDivider /></span>
+          <TextTab label={t("all")} active={view === "all"} onClick={() => changeView("all")} testId="trade-products-tab-all" /><span className="hidden min-[480px]:inline"><TabDivider /></span>
           <TextTab label={t("selected")} active={view === "selected"} onClick={() => changeView("selected")} testId="trade-products-tab-selected" />
         </div>} query={query} onQueryChange={value => { setQuery(value); setPage(0); }} searchPlaceholder={t("search")} searchFocus="local" listLayout="flow" selectedCount={draft.length} totalCount={model.totalCount} hasSelection={draft.length > 0} allSelected={draft.length === model.totalCount} onToggleAll={() => setDraft(draft.length ? [] : tradeProductsBulkSelection(data))} hasVisibleMatches>
           <p className="mb-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("bulkScope")}</p>
           <p className="mb-1 text-[11px] text-[var(--muted)]">{model.range.end} · {model.unit.label}</p>
           <div data-testid="trade-product-reference">{row(TRADE_PRODUCT_TOTAL_ID, message(presentation.messages, "trade.partners.total"))}</div>
           {showCategories ? <div className="mt-4 grid grid-cols-2 gap-2 min-[768px]:grid-cols-4">
-            {TRADE_PRODUCT_CATEGORIES.map(id => <button key={id} type="button" data-testid="trade-product-category" data-category={id} onClick={() => changeCategory(id)} className="flex min-h-28 cursor-pointer flex-col justify-between gap-3 border border-[var(--control)] p-3 text-left hover:bg-[var(--tint)]"><span className="text-[0.8125rem] font-medium leading-snug">{t(`category.${id}`)}</span><span className="font-[family-name:var(--font-numeric)] text-xs text-[var(--muted)]">{results.categoryCounts[id]}</span></button>)}
+            {TRADE_PRODUCT_CATEGORIES.map(id => <button key={id} type="button" data-testid="trade-product-category" data-category={id} onClick={() => changeCategory(id)} className="flex min-h-28 cursor-pointer flex-col justify-between gap-3 border border-[var(--control)] p-3 text-left hover:bg-[var(--tint)]"><span className="text-[0.8125rem] font-medium leading-snug">{t(`category.${id}`)}</span><span data-testid="trade-product-category-count" className="font-[family-name:var(--font-numeric)] text-xs text-[var(--muted)]">{message(presentation.messages, "trade.products.categoryCount", { count: results.categoryCounts[id] })}</span></button>)}
           </div> : <>
             {categoryId ? <button type="button" onClick={() => changeCategory(null)} className="my-2 flex min-h-11 cursor-pointer items-center gap-2 text-xs"><ArrowLeft size={14} aria-hidden />{t("categories")} · {t(`category.${categoryId}`)}</button> : null}
             <p data-testid="trade-products-match-count" className="my-3 text-xs text-[var(--muted)]">{t("matches")} {results.totalMatches}</p>

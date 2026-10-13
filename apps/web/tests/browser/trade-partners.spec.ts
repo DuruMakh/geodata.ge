@@ -120,6 +120,21 @@ test("mixed Excel download contains the whole-dollar selected figures and all fo
   expect(dataset.temporalCoverage).toBe("1995/2025"); expect(dataset).not.toHaveProperty("distribution");
 });
 
+// U21-17: with every partner ticked the table pages 25 rows at a time, like Products, instead of one 219-row table.
+test("the partners table pages a long selection", async ({ page }) => {
+  await page.goto("/en/explorer/trade/partners#view=table&tab=countries");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await page.getByTestId("series-toggle-all").click();
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page.getByTestId("series-status")).toContainText("218 / 218");
+  const table = page.getByTestId("explorer-table");
+  expect(await tableSeriesCount(table)).toBeLessThanOrEqual(25);
+  await expect(page.getByTestId("trade-partners-table-previous")).toBeDisabled();
+  await page.getByTestId("trade-partners-table-next").click();
+  await expect(page.getByTestId("trade-partners-table-previous")).toBeEnabled();
+  expect(await tableSeriesCount(table)).toBe(25);
+});
+
 // U21-01/05: the 218 countries (187 on Domestic exports) scroll inside their panel at every
 // width, the Excel button sits above them, and a skip button leads past them to the ranking.
 for (const path of ["/explorer/trade/partners", "/en/explorer/trade/domestic-exports#section=countries"]) {

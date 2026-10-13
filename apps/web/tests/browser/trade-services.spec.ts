@@ -21,6 +21,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Services trade" : "მომსახურებით ვაჭრობა");
     const tabs = page.getByTestId("trade-services-tabs");
     await expect(tabs.getByRole("button")).toHaveCount(5);
+    // U22-14: the five tabs are one row at every width; on a phone the row scrolls sideways.
+    expect((await tabs.boundingBox())!.height).toBeLessThan(60);
     await expect(section(page, "overview")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 4");
     await expect(toggle(page, "trade.turnover")).toHaveAttribute("aria-pressed", "true");

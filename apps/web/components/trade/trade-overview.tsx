@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { type ClientTradeOverviewFact, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import { buildTradeOverviewModel, TRADE_OVERVIEW_COLORS } from "../../lib/explorer/tradeOverview";
 import { parseTradeOverviewHash, serializeTradeOverviewHash, tradeOverviewCoverage, tradeOverviewIndicators, type TradeOverviewState } from "../../lib/explorer/tradeOverviewState";
@@ -63,12 +64,12 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
             <span className="text-[11px] text-[var(--muted)]">{model.unit.label}</span>
           </div>
           {!model.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t(domestic ? "domestic.emptySelection" : "emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={t("title")} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={t("title")} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${title} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradeOverviewCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradeOverviewModel(facts, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(services ? "services.sourceNote" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t(services ? "services.sourceNote" : "sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote>{domestic ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("domestic.definitions")}</p> : null}</div>
       </div>

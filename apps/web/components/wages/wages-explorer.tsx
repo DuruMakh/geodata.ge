@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
@@ -100,7 +101,7 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={(value, id) => valueLabel(value, id)} />
           <RangeStrip years={wagesCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildWagesModel(section, facts, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || section === "overview" ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || section === "overview" ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/wages", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {regionId ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p> : null}

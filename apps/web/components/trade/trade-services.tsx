@@ -26,7 +26,8 @@ export function TradeServices({ data, sources, lastReviewedAt, siteOrigin }: { d
     changeSection(next, measure ? { measure } : undefined);
   };
   const props = { sources, lastReviewedAt, siteOrigin, dataset: "services" as const };
-  const tabs = (measure?: TradeChartIndicator, changeMeasure?: (next: TradeChartIndicator) => void) => <div role="group" aria-label={t("views")} data-testid="trade-services-tabs" className="mb-5 flex flex-wrap items-center gap-5">
+  // Below 768px the five tabs are one row that scrolls sideways instead of five stacked rows above the chart (U22-14).
+  const tabs = (measure?: TradeChartIndicator, changeMeasure?: (next: TradeChartIndicator) => void) => <div role="group" aria-label={t("views")} data-testid="trade-services-tabs" className="mb-5 flex flex-wrap items-center gap-5 max-[768px]:flex-nowrap max-[768px]:overflow-x-auto max-[768px]:whitespace-nowrap">
     <TextTab label={t("overview")} active={section === "overview"} onClick={() => changeView("overview")} id="trade-services-section-overview" testId="trade-services-section-overview" />
     {(data.types.measures ?? TRADE_OVERVIEW_INDICATORS).map(id => <TextTab key={id} label={t(`indicator.${id}`)} active={section === "types" && measure === id} onClick={() => changeMeasure ? changeMeasure(id) : changeView("types", id)} id={`trade-services-section-${id}`} testId={`trade-services-section-${id}`} />)}
   </div>;

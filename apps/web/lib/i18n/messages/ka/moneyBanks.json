@@ -49,7 +49,7 @@
   "moneyBanks.unitMlnGel": "მლნ ლარი",
   "moneyBanks.unitPercent": "%",
   "moneyBanks.latest.supply": "ფართო ფული (M3)",
-  "moneyBanks.latest.loans-deposits": "ბანკების სესხები",
+  "moneyBanks.latest.loans-deposits": "ყველა სესხი",
   "moneyBanks.latest.interest-rates": "ეროვნული ბანკის განაკვეთი",
   "moneyBanks.latest.bank-health": "უმოქმედო სესხების წილი ყველა სესხში",
   "moneyBanks.latest.gdp": "ფართო ფული (M3), მშპ-ის %",

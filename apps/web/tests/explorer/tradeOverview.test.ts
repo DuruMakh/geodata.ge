@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import type { Presentation } from "../../lib/i18n/types";
 import { tradeFixtureFacts } from "../data/tradeOverview/fixtures";
 import { TRADE_OVERVIEW_INDICATORS } from "../../lib/data/tradeOverview/types";
-import { buildTradeOverviewModel } from "../../lib/explorer/tradeOverview";
+import { buildTradeOverviewModel, TRADE_OVERVIEW_COLORS } from "../../lib/explorer/tradeOverview";
 import { DEFAULT_TRADE_OVERVIEW_STATE } from "../../lib/explorer/tradeOverviewState";
 const facts = tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) * 1_000_000 }));
 const presentation: Presentation = { locale: "en", messages: { "trade.unit.million": "million USD", "trade.unit.billion": "billion USD" }, englishLabels: {} };
@@ -29,4 +29,12 @@ test("the active end year controls all context values independently of selection
   expect(model.years).toEqual([2024]);
   expect(model.endValues["trade.turnover"]).toBe(230_000_000);
   expect(model.balanceValues).toEqual([-70_000_000]);
+});
+
+// U21-10: a colour means one thing across the trade pages: the domestic series do not borrow Imports blue or Balance brown.
+test("domestic exports and re-exports wear their own colours", () => {
+  const { "trade.domestic_exports": domestic, "trade.reexports": reexports, ...overview } = TRADE_OVERVIEW_COLORS;
+  expect(Object.values(overview)).not.toContain(domestic);
+  expect(Object.values(overview)).not.toContain(reexports);
+  expect(domestic).not.toBe(reexports);
 });
