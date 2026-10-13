@@ -35,3 +35,32 @@ test.each(["en", "ka"] as const)("domestic %s workbooks keep complete selections
   const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(oneYear));
   expect(excel.worksheets[0].getRow(2).height).toBeGreaterThan(15);
 });
+
+test("client trade values are whole dollars", async () => {
+  const [domestic, national] = await Promise.all([loadTradeDomesticData(), loadTradeOverviewFacts()]);
+  const data = toClientTradeDomesticData(domestic, national);
+  const values = [...data.national, ...data.countries.nationalFacts, ...data.products.nationalFacts].map(fact => fact.valueUsd).concat([...data.countries.facts, ...data.products.facts].map(fact => fact[3]!));
+  expect(values.length).toBeGreaterThan(5000);
+  expect(values.filter(value => !Number.isInteger(value))).toEqual([]);
+  // National re-exports follow the rounded totals, as the workbook's formula states.
+  const amount = (year: number, indicator: string) => data.national.find(fact => fact.year === year && fact.indicatorId === indicator)!.valueUsd;
+  for (const fact of data.national.filter(fact => fact.indicatorId === "trade.reexports")) expect(fact.valueUsd).toBe(amount(fact.year, "trade.exports") - amount(fact.year, "trade.domestic_exports"));
+});
+
+test("a workbook total equals the sum of its rows", async () => {
+  const [domestic, national, messages] = await Promise.all([loadTradeDomesticData(), loadTradeOverviewFacts(), getMessages("ka", ["trade", "workbook", "format"])]);
+  const data = toClientTradeDomesticData(domestic, national), presentation = { locale: "ka" as const, messages, englishLabels: data.englishLabels }, siteOrigin = "https://fiscal.ge";
+  const countryIds = ["goods.total", ...data.countries.entities.map(entity => entity.id)];
+  const models = [
+    buildTradePartnersWorkbookModel({ data: data.countries, state: { ...parseTradePartnersHash("", data.countries), measure: "trade.domestic_exports", selectedIds: countryIds }, sources: [], siteOrigin }, presentation),
+    buildTradeProductsWorkbookModel({ data: data.products, state: { ...parseTradeProductsHash("", data.products), selectedIds: tradeProductsBulkSelection(data.products) }, sources: [], siteOrigin }, presentation),
+  ];
+  for (const model of models) {
+    const totalLabel = model.readable.rows.find(row => row.kind === "total")!.label;
+    expect(model.readable.years.length).toBeGreaterThan(5);
+    for (const year of model.readable.years) {
+      const rows = model.analysis.rows.filter(row => row[0] === year), total = rows.find(row => row[2] === totalLabel)![3];
+      expect(rows.filter(row => row[2] !== totalLabel).reduce((sum, row) => sum + (row[3] as number | null ?? 0), 0), `${model.filename} ${year}`).toBe(total);
+    }
+  }
+});

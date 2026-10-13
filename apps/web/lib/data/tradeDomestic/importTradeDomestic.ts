@@ -6,8 +6,8 @@ import Decimal from "decimal.js";
 import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
-import type { ClientTradeOverviewFact, TradeOverviewFact } from "../tradeOverview/types";
-import { packTradePartnerFacts, type ClientTradePartnersData } from "../tradePartners/importTradePartners";
+import { TRADE_CHART_INDICATORS, type ClientTradeOverviewFact, type TradeOverviewFact } from "../tradeOverview/types";
+import { packTradePartnerFacts, roundTradeFactsToWholeDollars, roundTradeTotalsToWholeDollars, type ClientTradePartnersData } from "../tradePartners/importTradePartners";
 import type { ClientTradeProductsData, ClientTradeProductFact } from "../tradeProducts/importTradeProducts";
 import { TRADE_DOMESTIC_DOCUMENT_IDS, TRADE_DOMESTIC_MEASURES, tradeDomesticFactKey, type TradeDomesticData, type TradeDomesticEntity, type TradeDomesticFact, type TradeDomesticAcceptance } from "./types";
 
@@ -51,16 +51,21 @@ export function loadServedTradeDomesticData(): Promise<TradeDomesticData> {
   })(); return served;
 }
 export function toClientTradeDomesticData(data: TradeDomesticData, national: readonly TradeOverviewFact[]): { national: ClientTradeOverviewFact[]; countries: ClientTradePartnersData; products: ClientTradeProductsData; englishLabels: Record<string, string> } {
-  const nationalFacts: ClientTradeOverviewFact[] = data.facts.filter(f => f.entityId === "goods.total").map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd), sourceId: f.sourceId, publicationStatus: f.publicationStatus, role: f.role === "derived" ? "derived" : "total", lastReviewedAt: f.lastReviewedAt }));
+  const totals: ClientTradeOverviewFact[] = data.facts.filter(f => f.entityId === "goods.total").map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd), sourceId: f.sourceId, publicationStatus: f.publicationStatus, role: f.role === "derived" ? "derived" : "total", lastReviewedAt: f.lastReviewedAt }));
+  const nationalYears = new Set(totals.map(f => f.year));
+  // Rounded together, so the national re-exports stay total exports minus domestic exports to the dollar.
+  const allNational = roundTradeTotalsToWholeDollars([...national.filter(f => f.indicatorId === "trade.exports" && nationalYears.has(f.year)).map(toClientTradeOverviewFact), ...totals]);
+  const nationalFacts = allNational.filter(f => f.indicatorId !== "trade.exports");
   const countryEntities = data.entities.filter(e => e.kind === "country"), countryIds = new Set(countryEntities.map(e => e.id));
   const productEntities = data.entities.filter(e => e.kind === "product").map(e => ({ id: e.id, sourceBlock: "2020-2025" as const, code: e.code ?? "", labelKa: e.labelKa, sourceLabelEn: e.labelEn, categoryId: e.categoryId!, aliasesKa: e.aliasesKa, aliasesEn: e.aliasesEn }));
   const indices = new Map(productEntities.map((e, index) => [e.id, index]));
-  const productFacts: ClientTradeProductFact[] = data.facts.filter(f => indices.has(f.entityId)).map(f => [indices.get(f.entityId)!, f.year, 0, Number(f.valueUsd)]);
+  // Products with the remainder, and countries' domestic exports, each add up to the national total of a year.
+  const productFacts = roundTradeFactsToWholeDollars(data.facts.filter(f => indices.has(f.entityId)).map((f): ClientTradeProductFact => [indices.get(f.entityId)!, f.year, 0, Number(f.valueUsd)]), ([, year]) => `${year}`);
+  const domesticExports = TRADE_CHART_INDICATORS.indexOf("trade.domestic_exports");
   const productYears = [...new Set(productFacts.map(f => f[1]))].sort((a, b) => a - b);
-  const nationalYears = new Set(nationalFacts.map(f => f.year));
   return {
-    national: [...national.filter(f => f.indicatorId === "trade.exports" && nationalYears.has(f.year)).map(toClientTradeOverviewFact), ...nationalFacts],
-    countries: { entities: countryEntities.map(e => ({ id: e.id, kind: "country", sourceCode: e.code, labelKa: e.labelKa })), facts: packTradePartnerFacts(countryEntities, data.facts.filter(f => countryIds.has(f.entityId))), nationalFacts, measures: TRADE_DOMESTIC_MEASURES },
+    national: allNational,
+    countries: { entities: countryEntities.map(e => ({ id: e.id, kind: "country", sourceCode: e.code, labelKa: e.labelKa })), facts: roundTradeFactsToWholeDollars(packTradePartnerFacts(countryEntities, data.facts.filter(f => countryIds.has(f.entityId))), ([, year, measure]) => measure === domesticExports ? `${year}` : null), nationalFacts, measures: TRADE_DOMESTIC_MEASURES },
     products: { entities: productEntities, years: productYears, facts: productFacts, nationalFacts: nationalFacts.filter(f => f.indicatorId === "trade.domestic_exports" && productYears.includes(f.year)), sourceBlock: "2020-2025", catalogueFingerprint: hash(JSON.stringify({ scope: "domestic-exports", entities: productEntities })), measures: ["trade.domestic_exports"] },
     englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])),
   };

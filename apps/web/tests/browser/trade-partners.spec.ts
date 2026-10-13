@@ -102,7 +102,7 @@ test("mixed Excel download contains the exact selected figures and all four unto
   expect(excel.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
   const data = excel.getWorksheet("Data")!;
   expect(data.getCell("C2").value).toBe("Russia");
-  expect(data.getCell("D2").value).toBeCloseTo(-1191302071.08252312, 5);
+  expect(data.getCell("D2").value).toBe(-1191302071);
   expect(data.getCell("C3").value).toContain("European Union");
   expect(data.getCell("E2").value).toBe("Actual"); expect(data.getCell("F2").value).toBe("Unspecified");
   const rows = parse(await readFile("../../data/methodology/source-archives/trade.csv"), { columns: true, bom: true }) as Record<string, string>[];
@@ -123,9 +123,9 @@ test("Qatar's downloaded Summary keeps its small 2025 turnover visibly nonzero",
   const pending = page.waitForEvent("download"); await page.getByTestId("trade-partners-excel-download").click();
   const download = await pending, excel = new ExcelJS.Workbook(); await excel.xlsx.readFile((await download.path())!);
   const amount = excel.worksheets[0].getCell("B4");
-  expect(amount.value).toBeCloseTo(4_736_258.239671868 / 1_000_000_000, 14);
+  expect(amount.value).toBeCloseTo(4_736_259 / 1_000_000_000, 14);
   expect(Number(SSF.format(amount.numFmt, amount.value))).toBeGreaterThan(0);
-  expect(excel.worksheets[1].getCell("D2").value).toBeCloseTo(4_736_258.239671868, 6);
+  expect(excel.worksheets[1].getCell("D2").value).toBe(4_736_259);
 });
 
 test("an explicitly empty selection and Back restore the same view", async ({ page }) => {

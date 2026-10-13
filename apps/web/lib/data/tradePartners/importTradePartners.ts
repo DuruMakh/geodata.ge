@@ -61,11 +61,64 @@ export function loadServedTradePartnersData(): Promise<TradePartnersData> {
 }
 
 export function toClientTradePartnersData(data: TradePartnersData, nationalFacts: readonly TradeOverviewFact[]): ClientTradePartnersData {
-  return { entities: data.entities, facts: packTradePartnerFacts(data.entities, data.facts), nationalFacts: nationalFacts.map(toClientTradeOverviewFact) };
+  // Countries' exports and imports add up to the national total of each year; groups overlap.
+  const flows = [TRADE_CHART_INDICATORS.indexOf("trade.exports"), TRADE_CHART_INDICATORS.indexOf("trade.imports")];
+  const rounded = roundTradeFactsToWholeDollars(packTradePartnerFacts(data.entities, data.facts), ([entity, year, measure]) => data.entities[entity]!.kind === "country" && flows.includes(measure) ? `${year}:${measure}` : null);
+  const facts = deriveFromRoundedInputs(rounded, ([entity, year, measure, valueUsd]) => [`${entity}:${year}`, TRADE_CHART_INDICATORS[measure]!, valueUsd], ([entity, year, measure], valueUsd): ClientTradePartnerFact => [entity, year, measure, valueUsd]);
+  return { entities: data.entities, facts, nationalFacts: roundTradeTotalsToWholeDollars(nationalFacts.map(toClientTradeOverviewFact)) };
 }
 
 /** Packs partner facts into the compact client shape; the entities' order is the index the facts refer to. */
 export function packTradePartnerFacts(entities: readonly { id: string }[], facts: readonly { entityId: string; year: number; indicatorId: TradeChartIndicator; valueUsd: string | number | null }[]): ClientTradePartnerFact[] {
   const indices = new Map(entities.map((entity, index) => [entity.id, index]));
   return facts.map(fact => [indices.get(fact.entityId)!, fact.year, TRADE_CHART_INDICATORS.indexOf(fact.indicatorId), fact.valueUsd === null ? null : Number(fact.valueUsd)]);
+}
+
+/**
+ * Rounds packed facts to whole US dollars, the precision pages and their Excel workbooks receive (platform-review
+ * decision Q1, 2026-10-12); the reviewed CSVs and the database mirror keep the exact decimals. Facts that share a
+ * `partition` key add up to a published total (one year's countries for one flow): they are rounded together by largest
+ * remainder, so they still add up to the rounded total. Every value moves by less than a dollar; null stays null.
+ */
+export function roundTradeFactsToWholeDollars<T extends ClientTradePartnerFact>(facts: readonly T[], partition: (fact: T) => string | null): T[] {
+  const rounded = facts.map(fact => fact[3] === null ? null : Math.floor(fact[3])), groups = new Map<string, number[]>();
+  facts.forEach((fact, index) => {
+    if (fact[3] === null) return;
+    const key = partition(fact) ?? `fact:${index}`, group = groups.get(key);
+    if (group) group.push(index); else groups.set(key, [index]);
+  });
+  for (const indices of groups.values()) {
+    let missing = Math.round(indices.reduce((sum, index) => sum + facts[index]![3]!, 0)) - indices.reduce((sum, index) => sum + rounded[index]!, 0);
+    const remainder = (index: number) => facts[index]![3]! - rounded[index]!;
+    for (const index of [...indices].sort((a, b) => remainder(b) - remainder(a) || a - b)) {
+      if (missing-- <= 0) break;
+      rounded[index]! += 1;
+    }
+  }
+  return facts.map((fact, index) => [fact[0], fact[1], fact[2], rounded[index]] as T);
+}
+
+/** National totals at the whole-dollar precision of the detail facts beside them; derived totals follow their rounded inputs. */
+export function roundTradeTotalsToWholeDollars(facts: readonly ClientTradeOverviewFact[]): ClientTradeOverviewFact[] {
+  const rounded = facts.map(fact => ({ ...fact, valueUsd: Math.round(fact.valueUsd) }));
+  return deriveFromRoundedInputs(rounded, fact => [String(fact.year), fact.indicatorId, fact.valueUsd], (fact, valueUsd) => ({ ...fact, valueUsd }));
+}
+
+/** The formulas the workbooks state for derived amounts: [first input, second input, sign of the second]. */
+const DERIVED_AMOUNTS: Partial<Record<TradeChartIndicator, readonly [TradeChartIndicator, TradeChartIndicator, 1 | -1]>> = {
+  "trade.turnover": ["trade.exports", "trade.imports", 1], "trade.balance": ["trade.exports", "trade.imports", -1], "trade.reexports": ["trade.exports", "trade.domestic_exports", -1],
+};
+/**
+ * Recomputes each derived amount from its rounded inputs of the same `key` (entity and year), so "turnover = exports +
+ * imports" and the like hold to the dollar in a workbook. A derived amount whose inputs are not shipped beside it keeps
+ * its own rounding.
+ */
+function deriveFromRoundedInputs<T>(items: readonly T[], read: (item: T) => [key: string, indicator: TradeChartIndicator, valueUsd: number | null], write: (item: T, valueUsd: number) => T): T[] {
+  const amounts = new Map(items.map(item => { const [key, indicator, valueUsd] = read(item); return [`${key}:${indicator}`, valueUsd]; }));
+  return items.map(item => {
+    const [key, indicator, valueUsd] = read(item), formula = DERIVED_AMOUNTS[indicator];
+    if (!formula || valueUsd === null) return item;
+    const first = amounts.get(`${key}:${formula[0]}`), second = amounts.get(`${key}:${formula[1]}`);
+    return typeof first === "number" && typeof second === "number" ? write(item, first + formula[2] * second) : item;
+  });
 }

@@ -72,8 +72,8 @@ test("Domestic Excel preserves the national split, unavailable country match and
   await expect(page.getByTestId("series-status")).toContainText("3 / 3");
   const national = await download("trade-excel-download");
   expect(national.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
-  for (const [index, amount] of [7287805027.574291, 3360329267.0083367, 3927475760.5659541].entries()) {
-    expect(national.getWorksheet("Data")!.getCell(index + 2, 4).value).toBeCloseTo(amount, 5);
+  for (const [index, amount] of [7287805028, 3360329267, 3927475761].entries()) {
+    expect(national.getWorksheet("Data")!.getCell(index + 2, 4).value).toBe(amount);
   }
   expect(national.getWorksheet("Summary")!.getRow(2).height).toBeGreaterThan(15);
 
@@ -94,7 +94,7 @@ test("Domestic Excel preserves the national split, unavailable country match and
   const remainder: ExcelJS.Row[] = [];
   products.getWorksheet("Data")!.eachRow(row => { if (row.getCell(3).value === "Other commodities" && row.getCell(1).value === 2025) remainder.push(row); });
   expect(remainder).toHaveLength(1);
-  expect(remainder[0].getCell(4).value).toBeCloseTo(429174637.2342389, 5);
+  expect(remainder[0].getCell(4).value).toBe(429174637);
   for (const [filename, hash] of [
     ["domestic-export-country-2014-2026.xlsx", "c4591642eb78303086d4e1538aed31615e8b612b74b203bbbfcda98f826d972c"],
     ["domestic-exports-by-4-digit-2014-2026.xlsx", "512d7a9511a0312b3c184b57e05862e414f737d663d1b02cb1941df435248679"],

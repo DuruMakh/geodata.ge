@@ -7,6 +7,7 @@ import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
 import type { ClientTradeOverviewFact, TradeOverviewFact, TradeChartIndicator } from "../tradeOverview/types";
+import { roundTradeFactsToWholeDollars, roundTradeTotalsToWholeDollars } from "../tradePartners/importTradePartners";
 import { readTradeProductCatalogue } from "./catalogue";
 import { tradeProductFactKey, type TradeProductEntity, type TradeProductFact, type TradeProductSourceBlock, type TradeProductsData, type TradeProductsAcceptance } from "./types";
 import { tradeProductsEnglishLabels, validateTradeProductsData } from "./validation";
@@ -61,5 +62,7 @@ export function toClientTradeProductsData(data: TradeProductsData, nationalFacts
   const indices = new Map(entities.map((entity, index) => [entity.id, index]));
   const facts = sourceBlock ? data.facts.filter(fact => indices.has(fact.entityId)) : data.facts;
   const years = [...new Set(facts.map(fact => fact.year))].sort((a, b) => a - b);
-  return { entities, years, facts: facts.map(fact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), nationalFacts: nationalFacts.filter(fact => !sourceBlock || years.includes(fact.year)).map(toClientTradeOverviewFact), catalogueFingerprint, ...(sourceBlock ? { sourceBlock } : {}) };
+  // One block's products add up to the national total of each year and flow.
+  const clientFacts = roundTradeFactsToWholeDollars(facts.map((fact): ClientTradeProductFact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), ([entity, year, measure]) => `${entities[entity]!.sourceBlock}:${year}:${measure}`);
+  return { entities, years, facts: clientFacts, nationalFacts: roundTradeTotalsToWholeDollars(nationalFacts.filter(fact => !sourceBlock || years.includes(fact.year)).map(toClientTradeOverviewFact)), catalogueFingerprint, ...(sourceBlock ? { sourceBlock } : {}) };
 }
