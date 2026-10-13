@@ -1,6 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import type { ClientTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
+import { TRADE_PARTNER_SEARCH_ALIASES } from "../../lib/data/tradePartners/types";
 import { tradePartnerColor, type TradePartnersModel } from "../../lib/explorer/tradePartners";
 import { tradePartnersTotalId, tradePartnersBulkSelection, type TradePartnersState, type TradePartnersTab } from "../../lib/explorer/tradePartnersState";
 import { formatInUnit } from "../../lib/explorer/format";
@@ -18,7 +19,8 @@ export function TradePartnersSeriesPanel({ data, state, model, onTabChange, onSe
   const { locale, englishLabels, messages } = useI18n();
   const t = (key: string) => message(messages, `trade.partners.${key}`);
   const label = (entity: (typeof data.entities)[number]) => publicLabel(locale, entity.id, entity.labelKa, englishLabels);
-  const visible = model.activeEntities.filter(entity => matchesLabelQuery(query, services ? [entity.labelKa, publicLabel("en", entity.id, entity.labelKa, englishLabels)] : [label(entity), entity.sourceCode ?? ""]));
+  // Both languages in either UI, Geostat's partner code and a few common names (U21-06); services have no code.
+  const visible = model.activeEntities.filter(entity => matchesLabelQuery(query, [entity.labelKa, publicLabel("en", entity.id, entity.labelKa, englishLabels), entity.sourceCode ?? "", ...(entity.sourceCode ? TRADE_PARTNER_SEARCH_ALIASES[entity.sourceCode] ?? [] : [])]));
   const toggle = (id: string) => onSelectionChange(toggleId(state.selectedIds, id));
   // The 218 partners (187 domestic-export countries) scroll inside the panel, with Excel above them (U21-01, U21-05).
   const long = data.entities.length > LONG_LIST_ROWS;

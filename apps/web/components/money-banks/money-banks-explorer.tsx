@@ -12,7 +12,6 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
-import { matchesLabelQuery } from "../../lib/i18n/search";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -22,7 +21,7 @@ import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
-import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
@@ -46,7 +45,6 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `moneyBanks.${key}`, values);
   const { state, update } = useMoneyBanksState(section, facts, gdpFacts);
-  const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildMoneyBanksModel(section, facts, state, gdpFacts);
   // Each view has one unit. Amounts share the site's billion-GEL scale, its decimals read from every value the view can show;
@@ -58,7 +56,6 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const decimalsOf = (id: string) => model.series.find(series => series.id === id)?.decimals ?? 1;
   const format = (value: number | null | undefined, id: string) => formatInUnit(value, percent ? { divisor: 1, label: "", decimals: decimalsOf(id) } : unit);
   const valueLabel = (value: number | null | undefined, id: string) => value == null ? "—" : percent ? `${format(value, id)}${unitLabel}` : `${format(value, id)} ${unitLabel}`;
-  const matches = (id: string) => matchesLabelQuery(query, [labels[id]]);
   const reference = model.series[0];
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]), planned: model.years.map(() => false) }));
@@ -71,8 +68,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const hasNesting = model.series.some(series => series.parentId);
   function renderRow(series: MoneyBanksSeriesModel): ReactNode {
     const nested = model.series.filter(child => child.parentId === series.id);
-    if (!series.reference && !matches(series.id) && !nested.some(child => matches(child.id))) return null;
-    const open = Boolean(query.trim()) && nested.some(child => matches(child.id)) || (expanded[series.id] ?? nested.some(child => state.selectedIds.includes(child.id)));
+    const open = expanded[series.id] ?? nested.some(child => state.selectedIds.includes(child.id));
     return <div key={series.id} className={series.parentId ? "ml-4" : undefined}>
       <SeriesSelectorRow id={series.id} label={labels[series.id]} color={series.color} value={format(series.endValue, series.id)} selected={state.selectedIds.includes(series.id)} level={series.reference ? "total" : "item"} parentId={series.parentId} isChild={Boolean(series.parentId)} childLabelSize="standard" wrapLabel
         showCaretColumn={hasNesting} hasChildren={nested.length > 0} expanded={open} expansionLabel={t("subcategoriesFor", { label: labels[series.id] })}
@@ -92,7 +88,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
   // Money supply and Loans and deposits switch between their amounts and a share with the icon measure switch (DESIGN §7.2a), not tabs.
-  const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts, gdpFacts), true); };
+  const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts, gdpFacts), true); };
   const downloadAction = <ExcelDownloadButton testId="money-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildMoneyBanksWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation));
@@ -128,10 +124,11 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
       </div>
       <SeriesAside label={message(messages, "controls.series")}>
         <p className="mb-3 text-[11px] text-[var(--muted)]">{model.range.end} · {unitLabel}</p>
-        <SeriesSelector query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={allIds.length > SEARCHABLE_MIN_ROWS} selectedCount={selectedTop} totalCount={topIds.length}
+        {/* Every money list has ten rows or fewer, so none has a search field (DESIGN §7.7). */}
+        <SeriesSelector searchable={false} selectedCount={selectedTop} totalCount={topIds.length}
           supplementalSelected={model.selected.length > selectedTop ? { label: t("nestedSelected"), count: model.selected.length - selectedTop } : undefined}
           hasSelection={model.selected.length > 0} allSelected={selectedTop === topIds.length}
-          onToggleAll={() => update(s => ({ ...s, selectedIds: s.selectedIds.length ? [] : [...topIds] }), true)} hasVisibleMatches={allIds.some(matches)}>
+          onToggleAll={() => update(s => ({ ...s, selectedIds: s.selectedIds.length ? [] : [...topIds] }), true)}>
           {model.series.filter(series => !series.parentId).map(renderRow)}
         </SeriesSelector>
         {downloadAction}

@@ -107,3 +107,18 @@ test("an explicitly empty selection and Back restore the same view", async ({ pa
   await page.goBack();
   await expect(page.getByTestId("no-selection-callout")).toBeVisible();
 });
+
+// DESIGN §7.7: a series list of ten rows or fewer is read at a glance and has no search field (U23-03, U21-09).
+for (const { path, rows, searchable } of [
+  { path: "/explorer/external/current-account#tab=in", rows: 5, searchable: false },
+  { path: "/explorer/external/current-account#tab=out", rows: 5, searchable: false },
+  { path: "/explorer/trade/overview", rows: 4, searchable: false },
+  { path: "/explorer/external/money-from-abroad", rows: 12, searchable: true },
+]) {
+  test(`no search box on lists of ten rows or fewer: ${path}`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("series-status")).toContainText(`/ ${rows}`);
+    await expect(page.getByTestId("series-search")).toHaveCount(searchable ? 1 : 0);
+  });
+}

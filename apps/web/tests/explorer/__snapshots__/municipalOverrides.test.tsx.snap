@@ -104,7 +104,8 @@ exports[`MunicipalitiesIndex overrides > without them its markup is the Budget i
 </div>
 <div class="flex items-center gap-2 pt-3 pb-1">
 <input data-testid="municipal-search" type="search" enterKeyHint="search" placeholder="Search" aria-label="Search" class="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]" value=""/>
-<span data-testid="row-count" class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--faint)]">2</span>
+<span data-testid="row-count" aria-hidden="true" class="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--faint)]">2</span>
+<span data-testid="municipal-search-status" role="status" class="sr-only">2 of 2 shown</span>
 </div>
 <div data-testid="municipal-list-muni" class="mt-1.5 @min-[768px]:max-h-[620px] @min-[768px]:overflow-y-auto">
 <a data-testid="municipal-list-row" data-municipality-row-code="04" class="grid w-full grid-cols-[22px_minmax(0,1fr)_122px_12px] items-center gap-[9px] border-b border-[var(--row-border)] py-[7px] pr-1 text-left transition-colors duration-100 hover:bg-[var(--tint)] bg-transparent" href="/en/explorer/municipalities/tbilisi">

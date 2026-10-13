@@ -1,12 +1,11 @@
 "use client";
 
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { ClientGeneralGovernmentBalanceFact } from "../../lib/explorer/clientData";
 import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
 import { parseDeficitHash, serializeDeficitHash } from "../../lib/explorer/deficitUrlState";
 import { buildDeficitWorkbookExportModel } from "../../lib/explorer/deficitWorkbook";
-import { matchesLabelQuery } from "../../lib/i18n/search";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
 import { pageHref } from "../../lib/i18n/routes";
@@ -73,7 +72,6 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
   const range = useMemo(() => ({ ...state.range, min, max }), [state.range, min, max]);
   const setChartMode = (mode: ChartMode) => update((current) => ({ ...current, chartMode: mode }));
   const setPercentage = (share: boolean) => update((current) => ({ ...current, percentage: share }));
-  const [query, setQuery] = useState("");
   const model = useMemo(
     () => buildDeficitExplorerModel({ facts, range, percentage, selected }, presentation),
     [facts, range, percentage, selected, presentation],
@@ -101,7 +99,6 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
           : { forecastFromYear: forecastStartYear, preliminary: model.years.map((year) => year >= forecastStartYear) }),
       }]
     : [];
-  const queryMatches = matchesLabelQuery(query, [DEFICIT_ITEM.kaLabel, model.tableRow.enLabel, DEFICIT_ITEM.id]);
   const headlineValue = latestActual
     ? percentage
       ? formatShare(latestActual.generalGovernmentBalancePctGdp / 100)
@@ -225,9 +222,6 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
 
         <SeriesAside label={message(messages, "controls.series")}>
           <SeriesSelector
-            query={query}
-            onQueryChange={setQuery}
-            searchPlaceholder={message(messages, "controls.search")}
             searchable={false}
             selectedCount={selected ? 1 : 0}
             totalCount={1}
@@ -235,19 +229,16 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
             allSelected={selected}
             onToggleAll={() => update((current) => ({ ...current, selected: false }))}
             allowSelectAll={false}
-            hasVisibleMatches={queryMatches}
           >
-            {queryMatches ? (
-              <SeriesSelectorRow
-                id={DEFICIT_ITEM.id}
-                label={label}
-                color={DEFICIT_ITEM.color}
-                value={headlineValue}
-                selected={selected}
-                level="total"
-                onToggle={() => update((current) => ({ ...current, selected: !current.selected }))}
-              />
-            ) : null}
+            <SeriesSelectorRow
+              id={DEFICIT_ITEM.id}
+              label={label}
+              color={DEFICIT_ITEM.color}
+              value={headlineValue}
+              selected={selected}
+              level="total"
+              onToggle={() => update((current) => ({ ...current, selected: !current.selected }))}
+            />
           </SeriesSelector>
           <ExcelDownloadButton
             testId="deficit-excel"

@@ -260,14 +260,18 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               aria-label={message(messages, "municipal.search")}
               className="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]"
             />
-            <span data-testid="row-count" className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--faint)]">
+            <span data-testid="row-count" aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--faint)]">
               {rows.length === source.length ? `${source.length}` : `${rows.length} / ${source.length}`}
+            </span>
+            {/* The bare count names nothing for a screen reader: this polite live region says it in words as the list narrows (DESIGN §20). */}
+            <span data-testid="municipal-search-status" role="status" className="sr-only">
+              {message(messages, "municipal.resultCount", { count: rows.length, total: source.length })}
             </span>
           </div>
 
           {rows.length === 0 ? (
             <div data-testid="municipal-empty" className="px-1 py-[26px] text-center">
-              <div className="text-[13px] text-[var(--body)]">{message(messages, "municipal.empty")}</div>
+              <div role="status" className="text-[13px] text-[var(--body)]">{message(messages, "municipal.empty")}</div>
               <button
                 type="button"
                 onClick={() => setQuery("")}

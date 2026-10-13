@@ -42,6 +42,20 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   });
 }
 
+for (const prefix of ["", "/en"]) {
+  test(`Turkey finds Türkiye in English and Georgian ${prefix || "ka"}`, async ({ page }) => {
+    await page.goto(`${prefix}/explorer/trade/partners`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const search = page.getByTestId("series-search"), list = page.getByTestId("series-list");
+    // An English name, its unaccented spelling, the Georgian name and a common short name each find the partner in either language.
+    for (const [query, code] of [["Turkey", "792"], ["turkiye", "792"], ["თურქეთი", "792"], ["Türkiye", "792"], ["USA", "840"], ["UK", "826"], ["Russia", "643"]]) {
+      await search.fill(query);
+      await expect(list.locator(`[data-series-id="partner.1995-2025.${code}"]`)).toHaveCount(1);
+    }
+    await expect(page.getByTestId("series-status")).toContainText("1 / 218");
+  });
+}
+
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`Mixed partners survive active navigation, keyboard range and language ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
     await page.setViewportSize({ width, height: 1000 });

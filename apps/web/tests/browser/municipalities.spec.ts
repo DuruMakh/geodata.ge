@@ -425,6 +425,22 @@ test.describe("municipalities index", () => {
     await expect(page.getByTestId("municipal-empty")).toBeVisible();
   });
 
+  test("the index announces how many places match", async ({ page }) => {
+    for (const [prefix, all, one, none] of [["", "ნაჩვენებია 64-დან 64", "ნაჩვენებია 64-დან 1", "ნაჩვენებია 64-დან 0"], ["/en", "64 of 64 shown", "1 of 64 shown", "0 of 64 shown"]]) {
+      await page.goto(`${TEST_BASE_URL}${prefix}/explorer/municipalities`);
+      await expectMunicipalAppReady(page);
+      // A polite live region beside the search field: a screen reader hears the count change as the list narrows (DESIGN §20).
+      const status = page.getByTestId("municipal-search-status");
+      await expect(status).toHaveAttribute("role", "status");
+      await expect(status).toHaveText(all);
+      await page.getByTestId("municipal-search").fill(prefix ? "Telavi" : "თელავი");
+      await expect(status).toHaveText(one);
+      await page.getByTestId("municipal-search").fill("ზზზზ");
+      await expect(status).toHaveText(none);
+      await expect(page.getByTestId("municipal-empty").getByRole("status")).toHaveCount(1);
+    }
+  });
+
   test("uses the same simple search label for municipalities and regions", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);

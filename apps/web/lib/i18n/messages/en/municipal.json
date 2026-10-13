@@ -16,6 +16,7 @@
   "municipal.countryStanding": "{publicCount} public pages · {aggregateCount} included only in the Georgia total",
   "municipal.search": "Search",
   "municipal.empty": "No results found",
+  "municipal.resultCount": "{count} of {total} shown",
   "municipal.clearSearch": "Clear search",
   "municipal.municipalities": "Municipalities",
   "municipal.regions": "Regions",

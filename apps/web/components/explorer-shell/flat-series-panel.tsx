@@ -28,6 +28,7 @@ export function FlatSeriesPanel({
   controls,
   query: controlledQuery,
   onQueryChange,
+  searchable = true,
   selectedCount = selectedIds.length,
   totalCount = rows.length,
 }: {
@@ -44,6 +45,8 @@ export function FlatSeriesPanel({
   controls?: ReactNode;
   query?: string;
   onQueryChange?: (query: string) => void;
+  /** False hides the search field (a list of `SEARCHABLE_MIN_ROWS` rows or fewer). */
+  searchable?: boolean;
   selectedCount?: number;
   totalCount?: number;
 }) {
@@ -54,7 +57,7 @@ export function FlatSeriesPanel({
   const visible = rows.filter((row) => (pinTotal && row.id === totalId) || matches(row));
   const panel = <>
     <p className="mb-3 text-[11px] text-[var(--muted)]">{caption}</p>
-    <SeriesSelector controls={controls} query={query} onQueryChange={setQuery} searchPlaceholder={searchPlaceholder} selectedCount={selectedCount} totalCount={totalCount} hasSelection={selectedCount > 0} allSelected={selectedCount === totalCount} onToggleAll={() => onSelectionChange(selectedCount ? [] : rows.map((row) => row.id))} hasVisibleMatches={rows.some(matches)}>
+    <SeriesSelector controls={controls} query={query} onQueryChange={setQuery} searchPlaceholder={searchPlaceholder} searchable={searchable} selectedCount={selectedCount} totalCount={totalCount} hasSelection={selectedCount > 0} allSelected={selectedCount === totalCount} onToggleAll={() => onSelectionChange(selectedCount ? [] : rows.map((row) => row.id))} hasVisibleMatches={rows.some(matches)}>
       {visible.map((row) => <SeriesSelectorRow key={row.id} id={row.id} label={row.label} color={row.color} value={row.value} selected={selectedIds.includes(row.id)} level={row.id === totalId ? "total" : "item"} wrapLabel={wrapLabel} onToggle={() => onSelectionChange(toggleId(selectedIds, row.id))} />)}
     </SeriesSelector>
     {downloadAction}

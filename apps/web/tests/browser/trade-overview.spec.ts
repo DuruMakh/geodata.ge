@@ -32,12 +32,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     // Phones list years as rows (owner decision D5), so count series in either layout.
     await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(3);
     await expect(page.getByTestId("trade-balance-context")).toBeVisible();
-    await page.getByTestId("series-search").fill(prefix ? "Exports" : "ექსპორტი");
+    // Four rows are read at a glance: no search field (DESIGN §7.7, U21-09).
+    await expect(page.getByTestId("series-search")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("0 / 4");
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("4 / 4");
-    await page.getByTestId("series-search").fill("");
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
     await expect(page.getByTestId("trade-balance-context")).toBeVisible();

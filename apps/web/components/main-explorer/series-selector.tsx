@@ -28,9 +28,10 @@ export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFo
 type SeriesSelectorProps = {
   controls?: ReactNode;
   controlsAfterSearch?: boolean;
-  query: string;
-  onQueryChange: (query: string) => void;
-  searchPlaceholder: string;
+  /** The search props; a list that is never searchable (`searchable={false}`) can leave them out. */
+  query?: string;
+  onQueryChange?: (query: string) => void;
+  searchPlaceholder?: string;
   /** False hides the search field: a list of ten rows or fewer is read at a glance. */
   searchable?: boolean;
   searchFocus?: "page" | "local";
@@ -44,7 +45,8 @@ type SeriesSelectorProps = {
   allSelected: boolean;
   onToggleAll: () => void;
   allowSelectAll?: boolean;
-  hasVisibleMatches: boolean;
+  /** False shows the no-matches line; it defaults to true, as a list without search always has its rows. */
+  hasVisibleMatches?: boolean;
   /** Optional visible names for the row values, shown above the list. */
   listHeader?: ReactNode;
   children: ReactNode;
@@ -53,7 +55,7 @@ type SeriesSelectorProps = {
 export function SeriesSelector({
   controls,
   controlsAfterSearch = false,
-  query,
+  query = "",
   onQueryChange,
   searchPlaceholder,
   searchable = true,
@@ -67,7 +69,7 @@ export function SeriesSelector({
   allSelected,
   onToggleAll,
   allowSelectAll = true,
-  hasVisibleMatches,
+  hasVisibleMatches = true,
   listHeader,
   children,
 }: SeriesSelectorProps) {
@@ -89,7 +91,7 @@ export function SeriesSelector({
           {...SEARCH_FIELD_PROPS}
           onFocus={searchFocus === "page" ? revealSearchField : undefined}
           value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
+          onChange={(event) => onQueryChange?.(event.target.value)}
           placeholder={searchPlaceholder}
           aria-label={message(messages, "controls.searchSeries")}
           className={`${controls && !controlsAfterSearch ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}

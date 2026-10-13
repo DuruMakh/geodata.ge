@@ -16,6 +16,7 @@
   "municipal.countryStanding": "{publicCount} საჯარო გვერდი · {aggregateCount} მხოლოდ საქართველოს ჯამში",
   "municipal.search": "ძებნა",
   "municipal.empty": "ვერაფერი მოიძებნა",
+  "municipal.resultCount": "ნაჩვენებია {total}-დან {count}",
   "municipal.clearSearch": "ძებნის გასუფთავება",
   "municipal.municipalities": "მუნიციპალიტეტები",
   "municipal.regions": "რეგიონები",

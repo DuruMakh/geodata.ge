@@ -36,7 +36,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await toggle(page, "ca.services").click();
     await page.getByTestId("current-account-tab-out").click();
     await expect(page.getByTestId("series-status")).toContainText("2 / 5");
-    await page.getByTestId("series-search").fill("no-matching-series-xyz");
+    // Five rows are read at a glance: no search field (DESIGN §7.7, U23-03).
+    await expect(page.getByTestId("series-search")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("0 / 5");
     await page.getByTestId("chart-mode-table").click(); await page.reload();
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
