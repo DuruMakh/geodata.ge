@@ -21,6 +21,9 @@ function formatLabel(row: PublicSourceManifestRow) {
   return extension ? extension.toUpperCase() : row.media_type;
 }
 
+/** Up to this many files the year filter is hidden: it would offer more years than there are rows to filter. */
+const YEAR_FILTER_MIN_ROWS = 13;
+
 function formatBytes(bytes: number) {
   if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
   if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(1)} KB`;
@@ -77,7 +80,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
           />
         </label>
         {/* Below 760px the years wrap onto more rows instead of scrolling sideways. */}
-        <div data-testid="archive-year-filter" className="pb-1 min-[760px]:overflow-x-auto" aria-label={message(messages, "methodology.yearFilter")}>
+        {rows.length >= YEAR_FILTER_MIN_ROWS ? <div data-testid="archive-year-filter" className="pb-1 min-[760px]:overflow-x-auto" aria-label={message(messages, "methodology.yearFilter")}>
           <div className="flex flex-wrap gap-2 min-[760px]:min-w-max min-[760px]:flex-nowrap">
             <button
               type="button"
@@ -99,7 +102,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
               </button>
             ))}
           </div>
-        </div>
+        </div> : null}
       </div>
 
       {/* Below 760px the same rows render as stacked blocks — year, title, file

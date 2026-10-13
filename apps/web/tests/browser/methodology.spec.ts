@@ -269,19 +269,24 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
 });
 
 test("source archives describe the full coverage and selected year without exposing provenance metadata", async ({ page }) => {
+  // Regional economies has two files, too few for a year filter (U29-02): its caption keeps the full coverage.
   for (const [dataset, datasetTitle, coverage, selectedYear] of [
     ["expenditure", "ხარჯების მეთოდოლოგია", "2004–2025", "2025"],
     ["revenue", "შემოსავლების მეთოდოლოგია", "2004–2025", "2025"],
     ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია", "2015–2025", "2025"],
-    ["regional-economies", "რეგიონების ეკონომიკა", "2010–2024", "2024"],
+    ["regional-economies", "რეგიონების ეკონომიკა", "2010–2024", null],
   ] as const) {
     await page.goto(`${TEST_BASE_URL}/methodology/${dataset}#source-archive`);
     const archive = page.getByTestId("source-archive");
     const caption = archive.locator("table caption");
 
     await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, ${coverage} წლები`);
-    await archive.getByRole("button", { name: selectedYear, exact: true }).click();
-    await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, ${selectedYear} წელი`);
+    if (selectedYear === null) {
+      await expect(archive.getByTestId("archive-year-filter")).toHaveCount(0);
+    } else {
+      await archive.getByRole("button", { name: selectedYear, exact: true }).click();
+      await expect(caption).toHaveText(`${datasetTitle} — პირველწყაროების არქივი, ${selectedYear} წელი`);
+    }
     await expect(archive.locator("thead")).not.toContainText("თარიღი");
     await expect(archive.locator("thead")).not.toContainText("SHA-256");
     await expect(archive).not.toContainText("უახლესი ჩანაწერის თარიღი");

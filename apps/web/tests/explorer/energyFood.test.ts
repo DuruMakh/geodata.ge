@@ -211,7 +211,7 @@ const COPY: Record<Locale, Record<string, string>> = {
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} title`], [`energyFood.page.${id}.summary`, `${id} summary`]])),
   },
   ka: {
-    "energyFood.unit.ktoe": "ktoe", "energyFood.unit.gwh": "GWh", "energyFood.unit.percent": "%", "energyFood.series": "სერია",
+    "energyFood.unit.ktoe": "ათასი ტ.ნ.ე.", "energyFood.unit.gwh": "გვტ.სთ", "energyFood.unit.percent": "%", "energyFood.series": "სერია",
     "energyFood.status.published": "გამოქვეყნებული", "energyFood.status.no_flow": "ნაკადი არ არის",
     "common.energySupply": "ენერგიის მიწოდება", "common.electricity": "ელექტროენერგია", "common.energyUse": "ენერგიის მოხმარება", "common.foodSelfSufficiency": "სურსათის თვითუზრუნველყოფა",
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} სათაური`], [`energyFood.page.${id}.summary`, `${id} აღწერა`]])),
@@ -315,16 +315,16 @@ test("the food workbook is whole numbers with the published wheat ratios, and a 
   }, { locale: "en", englishLabels: {}, messages: COPY.en })).toThrow(/geostat_food_balance_sheets/);
 });
 
-test("the hub has four cards with sparklines and the latest published values", async () => {
+test("the hub has four cards with sparklines and the latest published values in their units", async () => {
   const cards = buildEnergyFoodHubCards(facts, await presentationFor("en"));
   expect(cards.map(card => card.href)).toEqual(ENERGY_FOOD_SECTIONS.map(s => s.href));
   expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04"]);
   expect(cards.map(card => card.title)).toEqual(["Energy supply", "Electricity", "Energy use", "Food self-sufficiency"]);
-  expect(cards.map(card => card.footer)).toEqual(["2024 · 5,914.5 · 2013–2024", "2024 · 14,234.1 · 2013–2024", "2024 · 5,456.7 · 2013–2024", "2025 · 19% · 2014–2025"]);
+  expect(cards.map(card => card.footer)).toEqual(["2024 · 5,914.5 ktoe · 2013–2024", "2024 · 14,234.1 GWh · 2013–2024", "2024 · 5,456.7 ktoe · 2013–2024", "2025 · 19% · 2014–2025"]);
   expect(cards.map(card => card.series?.length)).toEqual([12, 12, 12, 12]);
   expect(cards.map(card => card.series!.at(-1))).toEqual([5914.5, 14234.1, 5456.7, 19]);
   expect(cards.every(card => card.comingSoon === false && card.seriesColor === INK)).toBe(true);
   expect(cards.map(card => card.description)).toEqual(ENERGY_FOOD_SECTIONS.map(s => `${s.id} summary`));
   const ka = buildEnergyFoodHubCards(facts, await presentationFor("ka"));
-  expect(ka.map(card => card.footer)).toEqual(cards.map(card => card.footer));
+  expect(ka.map(card => card.footer)).toEqual(["2024 · 5,914.5 ათასი ტ.ნ.ე. · 2013–2024", "2024 · 14,234.1 გვტ.სთ · 2013–2024", "2024 · 5,456.7 ათასი ტ.ნ.ე. · 2013–2024", "2025 · 19% · 2014–2025"]);
 });

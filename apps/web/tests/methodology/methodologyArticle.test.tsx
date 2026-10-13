@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
+import { SourceArchive, type PublicSourceManifestRow } from "../../components/methodology/source-archive";
 import { METHODOLOGY_CONTENT } from "../../lib/methodology/catalog";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { I18nProvider } from "../../lib/i18n/provider";
@@ -185,5 +186,44 @@ describe("methodology without bulk files", () => {
     expect(catalog).toContain('/methodology/inflation"');
     expect(catalog).not.toContain("/methodology/demography");
     expect(markup).toContain('href="/en/methodology/demography"');
+  });
+});
+
+// U29-04: the debt data is government debt, not the wider state debt the page's own caveat rules out.
+it.each([
+  ["ka", "მთავრობის ვალი"],
+  ["en", "Government debt"],
+] as const)("names the %s debt JSON download government debt", async (locale, label) => {
+  const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+  const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "debt" }) }));
+  expect(markup).toMatch(new RegExp(`<a href="/downloads/data/government-debt.json"[^>]*>${label}</a>`));
+});
+
+// U29-02: a year filter with more chips than files pushed a short table far down a phone screen.
+describe("the source archive's year filter", () => {
+  const sourceRow = (index: number): PublicSourceManifestRow => ({
+    source_id: `source-${index}`, year: "1960–2025", years: Array.from({ length: 66 }, (_, offset) => 1960 + offset),
+    official_filename: `file-${index}.xlsx`, media_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    byte_size: 1000, downloadHref: `/downloads/methodology/gdp/files/file-${index}.xlsx`,
+    title: `ფაილი ${index}`, publisher: "საქსტატი", searchLabels: [], documentLanguage: "ka",
+  });
+  const render = (count: number) => renderToStaticMarkup(
+    <I18nProvider locale="ka" messages={{ ...common, ...methodology }}>
+      <SourceArchive datasetId="gdp" datasetLabel="მშპ" rows={Array.from({ length: count }, (_, index) => sourceRow(index))} summary={archiveSummary} />
+    </I18nProvider>,
+  );
+
+  it("is hidden for twelve files or fewer, keeping the search box", () => {
+    const markup = render(12);
+    expect(markup).not.toContain('data-testid="archive-year-filter"');
+    expect(markup).toContain('type="search"');
+    expect(markup.match(/data-testid="source-archive-row"/g)).toHaveLength(12);
+    expect(markup).toContain("1960–2025");
+  });
+
+  it("is shown for thirteen files", () => {
+    const markup = render(13);
+    expect(markup).toContain('data-testid="archive-year-filter"');
+    expect(markup).toContain(">1960</button>");
   });
 });

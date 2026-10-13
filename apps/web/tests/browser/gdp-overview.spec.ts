@@ -103,8 +103,10 @@ for (const locale of ['ka', 'en']) {
     await page.screenshot({ path: testInfo.outputPath(`growth-${locale}.png`), fullPage: true });
     await page.getByTestId('gdp-tab-per_capita').click();
     for (const currency of ['GEL', 'USD']) {
-      await page.getByRole('button', { name: currency, exact: true }).click();
-      await expect(page.getByRole('button', { name: currency, exact: true })).toHaveText(currency === 'GEL' ? '₾' : '$');
+      // The symbol is the visible face; the accessible name is the localized currency name (U10-01).
+      const name = locale === 'en' ? currency : currency === 'GEL' ? '₾' : 'აშშ დოლარი';
+      await page.getByRole('button', { name, exact: true }).click();
+      await expect(page.getByRole('button', { name, exact: true })).toHaveText(currency === 'GEL' ? '₾' : '$');
       const ticks = axis.filter({ hasText: currency === 'GEL' ? /₾$/ : /\$$/ });
       expect(await ticks.count()).toBeGreaterThan(2);
       for (const tick of await ticks.all()) {

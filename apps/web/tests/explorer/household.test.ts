@@ -7,7 +7,7 @@ import {
   buildHouseholdModel, changeHouseholdMeasure, defaultHouseholdState, HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS,
   householdCoverage, householdMeasureHash, householdRegionHref, householdViewSeries, parseHouseholdHash, parseHouseholdMeasure, serializeHouseholdHash, serializeHouseholdMeasure, type HouseholdState,
 } from "../../lib/explorer/household";
-import { householdRegionStaticParams } from "../../lib/pages/household";
+import { householdRegionPageMetadata, householdRegionStaticParams } from "../../lib/pages/household";
 import { buildHouseholdHubCards } from "../../lib/explorer/householdHubCards";
 import { buildHouseholdRegionMapModel } from "../../lib/explorer/householdRegionMap";
 import { buildHouseholdWorkbookExportModel, householdWorkbookSources } from "../../lib/explorer/householdWorkbook";
@@ -297,4 +297,16 @@ test("the hub has an income and a spending card with Georgia per-household spark
   expect(cards.map(card => card.footer)).toEqual(["2025 · 2,025.8 ₾ · 2002–2025", "2025 · 1,438.7 ₾ · 2002–2025"]);
   expect(cards.map(card => card.series?.length)).toEqual([24, 24]);
   expect(cards.map(card => card.index)).toEqual(["01", "02"]);
+});
+
+// U19-04: on a budget site "Spending — Tbilisi" reads as the municipality's budget, so the area pages' titles say "household".
+test.each([
+  ["en", "spending", "tbilisi", "Household spending — Tbilisi"],
+  ["en", "income", "georgia", "Household income — Georgia"],
+  ["ka", "spending", "tbilisi", "შინამეურნეობების ხარჯები — თბილისი"],
+  ["ka", "income", "georgia", "შინამეურნეობების შემოსავლები — საქართველო"],
+] as const)("the %s %s page for %s is titled as household data", async (locale, section, slug, title) => {
+  const metadata = await householdRegionPageMetadata(section, slug, locale);
+  expect(metadata.title).toBe(title);
+  expect(metadata.openGraph?.title).toBe(title);
 });

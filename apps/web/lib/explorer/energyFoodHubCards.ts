@@ -16,7 +16,8 @@ export function buildEnergyFoodHubCards(facts: readonly ClientEnergyFoodFact[], 
     const { years } = energyFoodCoverage(section.id, facts);
     const headline = facts.filter(f => f.indicatorId === HEADLINE[section.id]).sort((a, b) => a.year - b.year);
     const last = headline.at(-1)!;
-    const value = `${formatInUnit(last.value, { divisor: 1, label: "", decimals: last.decimals })}${energyFoodUnit(section.id) === "percent" ? "%" : ""}`;
+    const unit = energyFoodUnit(section.id);
+    const value = `${formatInUnit(last.value, { divisor: 1, label: "", decimals: last.decimals })}${unit === "percent" ? "%" : ` ${message(presentation.messages, `energyFood.unit.${unit}`)}`}`;
     return {
       index: String(index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: message(presentation.messages, `energyFood.page.${section.id}.summary`),
       href: section.href, comingSoon: false, series: headline.map(f => f.value), seriesColor: INK,

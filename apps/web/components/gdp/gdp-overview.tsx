@@ -195,8 +195,8 @@ export function GdpOverview({
                 value={state.currency}
                 onChange={(currency) => setState((s) => ({ ...s, currency }))}
                 options={[
-                  { value: "gel", label: "₾", ariaLabel: "GEL" },
-                  { value: "usd", label: "$", ariaLabel: "USD" },
+                  { value: "gel", label: t("gel"), icon: <span aria-hidden="true" className="text-base">₾</span> },
+                  { value: "usd", label: t("usd"), icon: <span aria-hidden="true" className="text-base">$</span> },
                 ]}
               />
             </div>
