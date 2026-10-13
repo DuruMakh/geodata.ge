@@ -93,7 +93,6 @@ export function buildEconomicSectorsModel(facts: readonly ClientSectorObservatio
     })),
     endValues,
     headline: active.filter(f => f.seriesId === SECTOR_GDP).sort((a,b)=>a.year-b.year).at(-1) ?? null,
-    preliminaryYears: [...new Set(active.filter(f => f.status === "preliminary").map(f=>f.year))],
     sourceIds: hasData && sourceIdByMeasure[state.measure] ? [sourceIdByMeasure[state.measure]!] : [],
     hasData,
   };

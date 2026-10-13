@@ -5,10 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import { pathBounds } from "../../lib/explorer/mapTouchTargets";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
-import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
-import { formatAmount } from "../../lib/explorer/format";
 import { useI18n } from "../../lib/i18n/provider";
-import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
 import { pageHref } from "../../lib/i18n/routes";
 import { useMapTouchDisks, useTouchPreview } from "../explorer-shell/use-touch-preview";
@@ -31,15 +28,6 @@ type Props = {
 
 export function regionalEconomyMapData(model: RegionalEconomyMapModel): RegionMapModel {
   return { ...model, regions: model.regions.map(region => ({ ...region, value: region.totalGdpGel })), legendMin: model.legendMinGel, legendMax: model.legendMaxGel };
-}
-
-export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange }: Omit<Props, "model" | "metric"> & { model: RegionalEconomyMapModel }) {
-  const { locale, messages } = useI18n();
-  return <RegionMap model={regionalEconomyMapData(model)} activeRegionId={activeRegionId} onActiveRegionChange={onActiveRegionChange} metric={{
-    hrefForRegion: regionalEconomyHref, formatValue: value => formatAmount(value, locale), mapAria: message(messages, "regionalEconomies.mapAria", { year: model.year }),
-    entityAria: (name, value, year) => message(messages, "regionalEconomies.mapEntityAria", { name, amount: formatAmount(value, locale), year }),
-    legend: message(messages, "regionalEconomies.legend"), testId: "regional-economy-map",
-  }} />;
 }
 
 export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric }: Props) {

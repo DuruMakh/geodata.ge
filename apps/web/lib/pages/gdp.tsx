@@ -47,9 +47,26 @@ export async function renderGdpPage(locale: Locale) {
     catalogue.documents,
   );
   const sources = sourcedWorkbookSources(manifest, publicSources, () => true);
+  const years = facts.map((f) => f.year);
+  const lastReviewedAt = facts.map((f) => f.lastReviewedAt).sort().at(-1)!;
   return (
     <I18nProvider {...clientPresentation(presentation)}>
-      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"gdp-overview",origin:resolveSiteUrl(),path:"/explorer/economy/gdp",name:message(presentation.messages,"gdp.heading"),description:message(presentation.messages,"gdp.description"),firstYear:Math.min(...facts.map(f=>f.year)),lastYear:Math.max(...facts.map(f=>f.year)),dateModified:facts.map(f=>f.lastReviewedAt).sort().at(-1)!,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/gdp-overview.csv"})}/>
+      <JsonLd
+        testId="explorer-dataset-json-ld"
+        data={explorerDatasetJsonLd({
+          locale,
+          datasetId: "gdp-overview",
+          origin: resolveSiteUrl(),
+          path: "/explorer/economy/gdp",
+          name: message(presentation.messages, "gdp.heading"),
+          description: message(presentation.messages, "gdp.description"),
+          firstYear: Math.min(...years),
+          lastYear: Math.max(...years),
+          dateModified: lastReviewedAt,
+          spatialCoverageName: locale === "ka" ? "საქართველო" : "Georgia",
+          downloadPath: "/downloads/data/gdp-overview.csv",
+        })}
+      />
 
       <BreadcrumbJsonLd
         items={[
@@ -70,7 +87,7 @@ export async function renderGdpPage(locale: Locale) {
       <GdpOverview
         facts={facts.map(projectGdpObservation)}
         sourceIdRanges={sourceIdRangesBySeries(facts)}
-        lastReviewedAt={facts.map((f) => f.lastReviewedAt).sort().at(-1)!}
+        lastReviewedAt={lastReviewedAt}
         sources={sources}
         siteOrigin={resolveSiteUrl()}
       />

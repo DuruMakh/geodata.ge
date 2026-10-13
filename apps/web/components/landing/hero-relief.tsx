@@ -122,6 +122,8 @@ type HeroOpts = {
   marginY: number;
 };
 
+const [SHKHARA, KAZBEK] = GEORGIA_GEO.peaks;
+
 const WAVE_EVERY = 2;
 
 // The camX/camY/camZ preset defines the VIEWING ANGLE only (the design's tilt);
@@ -432,7 +434,7 @@ export function HeroRelief({ locale, copy }: HeroReliefProps) {
       }
       if (O.peaks) {
         // The peak labels float above the summits; keep them in frame too.
-        for (const [lon, lat] of [[43.11, 43.005], [44.521, 42.699]] as const) {
+        for (const { lon, lat } of GEORGIA_GEO.peaks) {
           const [x, y] = geoProj().toPx(lon, lat);
           fitSamples.push(new THREE.Vector3(x - 620, elevGe(lon, lat) * HREL + 42, y - 320));
         }
@@ -558,8 +560,8 @@ export function HeroRelief({ locale, copy }: HeroReliefProps) {
       };
       const labelDefs: Record<string, THREE.Vector3> = O.peaks
         ? {
-            shkh: mkWorld(43.11, 43.005, 14),
-            mkin: mkWorld(44.521, 42.699, 14),
+            shkh: mkWorld(SHKHARA.lon, SHKHARA.lat, 14),
+            mkin: mkWorld(KAZBEK.lon, KAZBEK.lat, 14),
           }
         : {};
       const labelEls: Record<string, HTMLElement> = {};
