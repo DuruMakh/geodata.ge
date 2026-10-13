@@ -1,19 +1,21 @@
 // apps/web/tests/factQuery/buildSnapshot.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
-import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "../../lib/factQuery/types";
+import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import { MONEY_BANKS_PUBLIC_SOURCES, moneyBanksSourceDocumentId } from "../../lib/data/moneyBanks/types";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
 
+// Every test but the determinism one reads the shared snapshot; that one builds twice on purpose.
+let snapshot: FactQuerySnapshot;
+beforeAll(() => { snapshot = testSnapshot(OPTIONS); });
+
 describe("buildFactQuerySnapshot", () => {
   it("preserves approved query sources, including the sector growth and volume originals", async () => {
-    const [snapshot, sources] = await Promise.all([
-      buildFactQuerySnapshot(OPTIONS),
-      loadSourceDocuments("../../data/sources/source-documents.csv"),
-    ]);
+    const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
     // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 42 Energy and food sources and the twenty Money and banks documents and the two Services trade workbooks are registered sources of human explorers only.
@@ -35,8 +37,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("carries the national, ministries, municipal and gdp facts", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
-
     expect(snapshot.national.facts.length).toBe(527);
     expect(snapshot.ministries.facts.length).toBe(852);
     expect(snapshot.municipal.functionFacts.length).toBe(7040);
@@ -45,8 +45,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("carries the debt and balance facts", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
-
     expect(new Set(snapshot.debt.facts.map((f) => f.seriesId))).toEqual(
       new Set([
         "debt.stock.total",
@@ -76,8 +74,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("exposes a url slug for every municipality and none for excluded codes", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
-
     expect(Object.keys(snapshot.municipal.slugByCode)).toHaveLength(64);
     expect(snapshot.municipal.slugByCode["11"]).toBe("khulo");
     for (const code of AGGREGATE_ONLY_MUNICIPAL_CODES) {
@@ -102,7 +98,6 @@ describe("buildFactQuerySnapshot", () => {
   // exact totals here is what keeps program_historical_join honest: a derivation that
   // silently widened to whole series would blow past 190.
   it("resolves historical joins to the exact served cells that came in through a join", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     const servedProgramCells = new Set(
       snapshot.ministries.facts.filter((f) => f.level === "major_program").map((f) => `${f.itemId}:${f.year}`),
     );
@@ -124,7 +119,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("leaves a joined series' native years out of the join list", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     // Common courts: 2006-2011 arrive through the legacy "09 02" lines, 2012-2025 are
     // served natively under the series' own code 09 01.
     const seriesId = "admin_program.09_01.f5bec61a";
@@ -147,7 +141,6 @@ describe("buildFactQuerySnapshot", () => {
   // against a fresh, independent load of the taxonomy files (not the snapshot's own
   // computation) is mode-invariant by construction and needs no database.
   it("takes each item's sortOrder from the taxonomy files, not glossary order", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
     const taxonomySortOrderById = new Map(taxonomy.map((item) => [item.id, item.sortOrder]));
 
@@ -194,42 +187,34 @@ function expectPinnedOrder<T>(rows: T[], keyOf: (row: T) => readonly (string | n
 
 describe("hashed array order is pinned to each dataset's canonical sort keys", () => {
   it("national.facts: year, side, itemId, basis", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.national.facts, (f) => [f.year, f.side, f.itemId, f.basis]);
   });
 
   it("ministries.facts: year, itemId", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.ministries.facts, (f) => [f.year, f.itemId]);
   });
 
   it("ministries.categories: sortOrder, id", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.ministries.categories, (c) => [c.sortOrder, c.id]);
   });
 
   it("municipal.functions: sortOrder, id", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.functions, (f) => [f.sortOrder, f.id]);
   });
 
   it("municipal.regions: sortOrder, id", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.regions, (r) => [r.sortOrder, r.id]);
   });
 
   it("municipal.municipalities: sortId, code", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.municipalities, (m) => [m.sortId, m.code]);
   });
 
   it("municipal.functionFacts: year, municipalityCode, categoryId", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.functionFacts, (f) => [f.year, f.municipalityCode, f.categoryId]);
   });
 
   it("municipal.totalFacts: year, municipalityCode", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.totalFacts, (f) => [f.year, f.municipalityCode]);
   });
 
@@ -239,28 +224,23 @@ describe("hashed array order is pinned to each dataset's canonical sort keys", (
   // (lib/db/mirrorRows.ts) copies row.scopeId into the served municipalityCode
   // field, so municipalityCode is where the mirror's scopeId ordering lands here.
   it("municipal.countryFunctionFacts: year, municipalityCode (mirror's scopeId), categoryId", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.countryFunctionFacts, (f) => [f.year, f.municipalityCode, f.categoryId]);
   });
 
   // Same scopeId -> municipalityCode translation as countryFunctionFacts above.
   it("municipal.countryTotalFacts: year, municipalityCode (mirror's scopeId)", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.countryTotalFacts, (f) => [f.year, f.municipalityCode]);
   });
 
   it("municipal.populationFacts: year, municipalityCode", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.populationFacts, (f) => [f.year, f.municipalityCode]);
   });
 
   it("municipal.adjaraBudgetAdjustments: year", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.adjaraBudgetAdjustments, (a) => [a.year]);
   });
 
   it("gdpFacts: year", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.gdpFacts, (f) => [f.year]);
   });
 });

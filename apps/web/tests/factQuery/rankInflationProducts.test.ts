@@ -1,12 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { rank, type RankData } from "../../lib/factQuery/rank";
 import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
 import { queryInflationProductsInput, rankInput } from "../../lib/factQuery/schemas";
 import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let real: FactQuerySnapshot;
-beforeAll(async () => { real = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
+beforeAll(async () => { real = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
 const request = { datasetId: "inflation-products", dimension: "series", metric: "value", measure: "yoy_pct", period: "2026-02" };
 const id = (n: number) => `cpi.product.p${String(n).padStart(4, "0")}`;
 function fixture(): FactQuerySnapshot {

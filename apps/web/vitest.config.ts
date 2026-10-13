@@ -51,6 +51,8 @@ const shared = {
 
 export default defineConfig({
   test: {
+    // Runs once per run, not per project: makes sure the shared fact-query snapshot exists and is current.
+    globalSetup: ["./tests/setup/freshFactQuerySnapshot.ts"],
     projects: [
       {
         test: {

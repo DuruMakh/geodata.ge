@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { buildCatalogueFile } from "../../lib/factQuery/publications";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -8,7 +8,7 @@ import { toolResult } from "../../lib/mcp/result";
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00.000Z" });
 });
 
 const cases = [

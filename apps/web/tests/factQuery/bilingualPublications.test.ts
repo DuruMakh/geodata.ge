@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { buildAllPublications, type PublicationArtifact } from "../../lib/factQuery/publications";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import type { Observation } from "../../lib/factQuery/observations";
@@ -8,7 +8,7 @@ import type { Observation } from "../../lib/factQuery/observations";
 let snapshot: FactQuerySnapshot;
 let artifacts: PublicationArtifact[];
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" });
   artifacts = buildAllPublications(snapshot);
 });
 const read = (name: string) => JSON.parse(artifacts.find(file => file.fileName === name)!.bytes.toString("utf8"));

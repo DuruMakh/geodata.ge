@@ -8,7 +8,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import { CAVEAT_RULES } from "../../../lib/factQuery/caveats";
-import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../../helpers/factQuerySnapshot";
 import { serviceMessage } from "../../../lib/factQuery/localization";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 
@@ -19,7 +19,7 @@ let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
   doc = await readFile(DOC_PATH, "utf8");
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" });
 });
 
 describe("caveat catalogue documentation", () => {

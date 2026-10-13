@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import type { FactQuerySnapshot, FactQueryResponse } from "../../lib/factQuery/types";
 import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 import { toolResult } from "../../lib/mcp/result";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 const run = (name: string, input: unknown) => TOOLS.find(tool => tool.name === name)!.run(snapshot, input);
 
 function verifyEnglishText(response: FactQueryResponse) {

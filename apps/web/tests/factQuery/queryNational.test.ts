@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/queryNational.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { envelopeSchema, observationSchema } from "../../lib/factQuery/schemas";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -8,7 +8,7 @@ import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
 });
 
 type ObservationRow = {

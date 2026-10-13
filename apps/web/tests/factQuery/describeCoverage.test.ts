@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/describeCoverage.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
@@ -9,7 +9,7 @@ import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../li
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
 });
 
 type CoverageData = {

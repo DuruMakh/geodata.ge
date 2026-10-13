@@ -10,7 +10,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../../helpers/factQuerySnapshot";
 import { CAVEAT_RULES } from "../../../lib/factQuery/caveats";
 import { SECTOR_QUERY_MEASURES } from "../../../lib/factQuery/economicSectorsSeries";
 import { GDP_QUERY_SERIES } from "../../../lib/factQuery/gdpSeries";
@@ -25,7 +25,7 @@ const FACT_QUERY_DIR = path.join(process.cwd(), "lib", "factQuery");
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
 });
 
 function expectRegistered(response: FactQueryResponse, label: string): Caveat[] {

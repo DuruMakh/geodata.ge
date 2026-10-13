@@ -1,17 +1,23 @@
-import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { buildFactQuerySnapshot } from "../lib/factQuery/buildSnapshot";
 import { buildAllPublications } from "../lib/factQuery/publications";
+import type { FactQuerySnapshot } from "../lib/factQuery/types";
+import { loadPackagedSnapshot } from "../lib/mcp/snapshot";
 
 const OUTPUT_DIR = path.join(process.cwd(), "public", "downloads", "data");
 
-function releaseCommit(): string {
+// The publications are cut from the snapshot the route serves, which
+// data:prepare-fact-query-snapshot has just written earlier in the same chain
+// (prebuild, predev). Rebuilding it here would cost a second full build; a
+// missing or unreadable file stops the step instead of falling back to one.
+function packagedSnapshot(): FactQuerySnapshot {
   try {
-    return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-  } catch {
-    return "unknown";
+    return loadPackagedSnapshot();
+  } catch (error) {
+    throw new Error(
+      `lib/factQuery/generated/snapshot.json is missing or unreadable (${error instanceof Error ? error.message : String(error)}). Run npm run data:prepare-fact-query-snapshot first.`,
+    );
   }
 }
 
@@ -20,10 +26,7 @@ async function main() {
   const check = process.argv.includes("--check");
   if (write === check) throw new Error("Pass exactly one of --write or --check");
 
-  const snapshot = await buildFactQuerySnapshot({
-    releaseCommit: releaseCommit(),
-    generatedAt: new Date().toISOString(),
-  });
+  const snapshot = packagedSnapshot();
   const artifacts = buildAllPublications(snapshot);
 
   if (write) {
