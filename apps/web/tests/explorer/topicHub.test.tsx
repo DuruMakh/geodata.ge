@@ -38,3 +38,30 @@ describe("TopicHub", () => {
     expect(html.match(/<script[^>]*application\/ld\+json[^>]*>[\s\S]*?<\/script>/)![0]).toContain('"Example"');
   });
 });
+
+// U28-06: every hub's header names its coverage and update date; trade, external and demography printed nothing there.
+it.each([
+  ["trade", async () => (await import("../../lib/pages/hubs/trade")).renderTradeHub("en")],
+  ["external", async () => (await import("../../lib/pages/hubs/external")).renderExternalHub("en")],
+  ["demography", async () => (await import("../../lib/pages/demography")).renderDemographyPage("en")],
+] as const)("the %s hub's header states its coverage", async (_name, render) => {
+  const { renderPageMarkup } = await import("../helpers/render-localized");
+  const html = renderPageMarkup("en", (await render()) as never);
+  expect(html).toMatch(/\d{4}–\d{4} · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
+});
+
+// U28-10: one wording for the hub cards' "annual" suffix, and the typographic apostrophe in the hub texts.
+it.each(["ka", "en"] as const)("the %s hub cards say \"annual data\" one way", async (locale) => {
+  const { getMessages } = await import("../../lib/i18n/messages.server");
+  const messages = await getMessages(locale, ["trade", "external", "wages", "unemployment", "inflation", "demography"]);
+  for (const key of ["trade.annual", "external.annual", "unemployment.annual"]) expect(messages[key], key).toBe(messages["wages.annual"]);
+  if (locale === "en") for (const key of ["trade.services.summary", "external.account.summary", "inflation.cardCitiesDescription", "demography.hubDescription"]) expect(messages[key], key).not.toContain("'");
+});
+
+// U28-19: the English trade heading names what the Georgian one does, and English says "sex" as demography does.
+it("English names trade and sex as the Georgian does", async () => {
+  const { getMessages } = await import("../../lib/i18n/messages.server");
+  const messages = await getMessages("en", ["trade", "unemployment", "wages", "common"]);
+  expect(messages["trade.hubTitle"]).toBe("External trade");
+  for (const key of ["common.unemploymentGender", "unemployment.hubSummary", "unemployment.page.gender.title", "wages.metaDescription"]) expect(messages[key], key).not.toMatch(/gender/i);
+});

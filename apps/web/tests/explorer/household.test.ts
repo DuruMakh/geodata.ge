@@ -218,7 +218,8 @@ test.each(["ka", "en"] as const)("the %s income workbook for Georgia with towns 
   expect(model.readable.years).toEqual([2019, 2020, 2021, 2022, 2023, 2024, 2025]);
   expect(model.readable.rows).toHaveLength(3);
   expect(model.readable.numberFormat).toBe("0.0");
-  expect(model.readable.unitLabel).toBe("₾");
+  // U28-09: English names the lari "GEL", as every other English page does.
+  expect(model.readable.unitLabel).toBe(locale === "en" ? "GEL" : "₾");
   expect(model.analysis.rows).toHaveLength(21);
   expect(model.analysis.numericFormats).toEqual({ 3: "0.0" });
   expect(model.analysis.headers.join(" ")).not.toMatch(/source_cell|sheet|source_id/i);
@@ -266,7 +267,7 @@ test("a missing early towns year is a blank cell, never zero, and the numeric fo
   const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
   const data = excel.getWorksheet("Data")!;
   const header = data.getRow(1).values as unknown[];
-  expect(header[3]).toBe("Amount (₾ a month)");
+  expect(header[3]).toBe("Amount (GEL a month)");
   for (let row = 2; row <= model.analysis.rows.length + 1; row++) expect(data.getCell(row, 3).numFmt).toBe("0.0");
   const gapRow = model.analysis.rows.indexOf(gap) + 2;
   expect(data.getCell(gapRow, 3).value).toBeNull();
@@ -296,7 +297,7 @@ test.each(["ka", "en"] as const)("the %s income workbook lists validated links t
 test("the hub has an income and a spending card with Georgia per-household sparklines", async () => {
   const cards = buildHouseholdHubCards(facts, await presentationFor("en"));
   expect(cards.map(card => card.href)).toEqual(["/explorer/living-standards/income", "/explorer/living-standards/spending"]);
-  expect(cards.map(card => card.footer)).toEqual(["2025 · 2,025.8 ₾ · 2002–2025", "2025 · 1,438.7 ₾ · 2002–2025"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 2,025.8 GEL · 2002–2025", "2025 · 1,438.7 GEL · 2002–2025"]);
   expect(cards.map(card => card.series?.length)).toEqual([24, 24]);
   expect(cards.map(card => card.index)).toEqual(["01", "02"]);
 });

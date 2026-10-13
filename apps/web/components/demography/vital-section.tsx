@@ -61,8 +61,8 @@ export function VitalSection({
   return (
     <section id="births-deaths" aria-labelledby="births-deaths-title" data-testid="vital-section" className={`@container ${SECTION_CLASS}`}>
       <SectionTitle id="births-deaths-title">{t("vitalTitle")}</SectionTitle>
-      <p className="mt-2 mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("vitalLead", { place: name, first, last })}</p>
-      <div data-testid="vital-chart-panel" data-mode={mode}>
+      {/* No lead line: it repeated the heading and the source note below (U26-13, DESIGN.md §29.2). */}
+      <div data-testid="vital-chart-panel" data-mode={mode} className="mt-5">
         <ModeTabs value={mode} onChange={setMode} testId="vital" lineLabel={t("columns")} />
         <div className="mt-5">
           {mode === "line" ? (

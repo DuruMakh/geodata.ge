@@ -40,7 +40,7 @@ test("Services routes, metadata and sidebar use bilingual services presentation"
   ]);
   expect(ka["trade.services.title"]).toBe("მომსახურებით ვაჭრობა");
   expect(en["trade.services.title"]).toBe("Services trade");
-  expect(en["trade.services.summary"]).toBe("Georgia's annual services trade, in nominal US dollars.");
+  expect(en["trade.services.summary"]).toBe("Georgia’s annual services trade, in nominal US dollars.");
   expect(ka["common.tradeServices"]).toBe(ka["trade.services.title"]);
   expect(en["common.tradeServices"]).toBe(en["trade.services.title"]);
   expect(JSON.parse(revisions)["/explorer/trade/services"]).toBe("2026-10-11");

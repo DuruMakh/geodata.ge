@@ -83,7 +83,8 @@ describe("place pages", () => {
 
   it("renders in Georgian with the Georgian ordinal", async () => {
     const html = await page({ kind: "municipality", slug: "batumi" }, "ka");
-    expect(html).toContain("მე-2 ადგილი 64-დან · 1 იანვარი 2026");
+    // U26-16: a word joiner keeps "64-დან" on one line on a phone.
+    expect(html).toContain("მე-2 ადგილი 64-\u2060დან · 1 იანვარი 2026");
     expect(html).toContain('href="/explorer/demography/population/region/adjara"');
   });
 
@@ -109,8 +110,9 @@ describe("place pages", () => {
       expect(html.indexOf('data-testid="population-highlights"')).toBeLessThan(html.indexOf('id="births-deaths"'));
     }
     const batumi = await page({ kind: "municipality", slug: "batumi" });
-    expect(batumi).toContain("Births and deaths registered in Batumi, 2015–2025.");
-    expect(batumi).not.toContain("Births and deaths registered in Georgia");
+    // The section's own chart names its place (U26-13 removed the lead line that used to).
+    expect(batumi).toContain("with natural increase, Batumi, 2015–2025");
+    expect(batumi).not.toContain("with natural increase, Georgia");
   });
 
   it("ends Georgia and every region page with the census age and sex block, after births and deaths, and no municipality page with one", async () => {

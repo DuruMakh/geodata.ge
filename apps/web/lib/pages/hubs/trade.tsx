@@ -4,6 +4,7 @@ import { loadServedTradePartnersData, toClientTradePartnersData } from "../../da
 import { loadServedTradeProductsData, toClientTradeProductsData } from "../../data/tradeProducts/importTradeProducts";
 import { loadServedTradeServicesData, toClientTradeServicesData } from "../../data/tradeServices/importTradeServices";
 import { buildTradeHubCards } from "../../explorer/tradeHubCards";
+import { coverageLabel } from "../../explorer/coverageLabel";
 import { tradePartnersCoverage } from "../../explorer/tradePartnersState";
 import { tradeProductsCoverage } from "../../explorer/tradeProductsState";
 import { getPresentation } from "../../i18n/presentation.server";
@@ -23,5 +24,9 @@ export async function tradeHubMetadata(locale: Locale) {
 export async function renderTradeHub(locale: Locale) {
   const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade"], [])]);
   const title = message(presentation.messages, "trade.hubTitle");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage="" cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} testId="trade-hub" />;
+  const all = [...facts, ...partners.facts, ...products.facts, ...domestic.facts, ...services.facts];
+  const years = [...new Set(all.map(f => f.year))];
+  // The header's coverage label spans every trade dataset the hub links to (U28-06).
+  const coverage = coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), all.reduce((latest, f) => f.lastReviewedAt > latest ? f.lastReviewedAt : latest, ""));
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage={coverage} cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} testId="trade-hub" />;
 }

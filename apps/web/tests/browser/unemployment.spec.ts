@@ -13,7 +13,8 @@ for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     const sections = ["overview", "regions", "age", "gender"], breakdowns = ["national", "region", "age", "sex"];
-    const titles = prefix ? ["Unemployment overview", "Regions", "Age groups", "Gender"] : ["უმუშევრობის მიმოხილვა", "რეგიონები", "ასაკობრივი ჯგუფები", "სქესი"];
+    // U28-19: English says "sex", as the Georgian "სქესი" and the demography pages do.
+    const titles = prefix ? ["Unemployment overview", "Regions", "Age groups", "Sex"] : ["უმუშევრობის მიმოხილვა", "რეგიონები", "ასაკობრივი ჯგუფები", "სქესი"];
     for (const [index, section] of sections.entries()) {
       await page.goto(`${prefix}/explorer/unemployment`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");

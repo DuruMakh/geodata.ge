@@ -204,7 +204,9 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
           {sideHeader("male", t("sexMale"), MALE, pyramid.male)}
           {sideHeader("female", t("sexFemale"), FEMALE, pyramid.female)}
         </div>
-        <svg viewBox={`0 ${PYRAMID.header - HEADER_GAP} ${width} ${height - PYRAMID.header + HEADER_GAP}`} role="group" aria-label={ariaLabel} className="block h-auto w-full">
+        {/* The drawing's height comes from its rows, not its width: a fixed CSS height keeps the server's 520px layout and
+            the measured one in the same box, so nothing below moves on hydration (U27-06). */}
+        <svg viewBox={`0 ${PYRAMID.header - HEADER_GAP} ${width} ${height - PYRAMID.header + HEADER_GAP}`} role="group" aria-label={ariaLabel} className="block w-full" style={{ height: height - PYRAMID.header + HEADER_GAP }}>
           <rect x={0} y={layout.oldBandY} width={width} height={layout.oldBandHeight} fill="var(--tint)" aria-hidden />
           <text x={PYRAMID.pad} y={layout.oldBandY + 15} fontSize={11} fill="var(--muted)" style={MONO} aria-hidden>
             {t("oldBand", { share: formatShare(bandShares(pyramid).old / 100) })}
