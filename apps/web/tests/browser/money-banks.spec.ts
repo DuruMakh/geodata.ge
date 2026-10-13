@@ -1,10 +1,18 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { moneyBanksViewSeries, type MoneyBanksSectionId } from "../../lib/explorer/moneyBanks";
+import { loadMoneyBanksCsv, yearSpan } from "../helpers/money-banks-csv";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const SECTIONS = ["supply", "loans-deposits", "interest-rates", "bank-health"];
 /** The initial count of each page: its first series, or both totals on Loans and deposits. */
 const INITIAL_COUNT: Record<string, string> = { "supply": "1 / 4", "loans-deposits": "2 / 4", "interest-rates": "1 / 3", "bank-health": "1 / 5" };
+
+// Latest values and year spans come from the reviewed CSV, so an NBG refresh does not fail these tests.
+let csv: Awaited<ReturnType<typeof loadMoneyBanksCsv>>;
+test.beforeAll(async () => { csv = await loadMoneyBanksCsv(); });
+/** The ids a page lists in one of its views. */
+const seriesOf = (section: MoneyBanksSectionId, view: Parameters<typeof moneyBanksViewSeries>[1]) => moneyBanksViewSeries(section, view).map(series => series.id);
 
 /** The table cell of the row labelled `label` in the `year` column (the wide, year-columns layout). */
 async function cell(page: Page, label: string, year: number) {
@@ -38,7 +46,8 @@ for (const prefix of ["", "/en"]) {
 test("money supply has no tabs and defaults to the amounts with broad money alone", async ({ page }) => {
   await page.goto("/explorer/money/supply");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("money-latest")).toContainText("57.7");
+  const latest = csv.latestYear("money.m3");
+  await expect(page.getByTestId("money-latest")).toContainText(`${latest}: ${csv.billions("money.m3", latest)}`);
   await expect(page.getByTestId("money-tabs")).toHaveCount(0);
   // The icon switch: ₾ for the amounts, a pie for % of GDP, each named for screen readers and in its tooltip.
   const measures = page.getByRole("group", { name: "მაჩვენებელი" });
@@ -50,7 +59,7 @@ test("money supply has no tabs and defaults to the amounts with broad money alon
   await expect(page.getByTestId("series-status")).toContainText("1 / 4");
   await expect(page.locator(pressed("money.m3"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(1);
-  await expect(page.getByTestId("year-range-strip")).toContainText("1995–2025");
+  await expect(page.getByTestId("year-range-strip")).toContainText(yearSpan(csv.yearsOf(seriesOf("supply", "amount"))));
   await expect(page.getByTestId("source-label")).toContainText("საქართველოს ეროვნული ბანკი");
 });
 
@@ -67,17 +76,19 @@ test("the % of GDP icon shows all four aggregates against Fiscal.ge's GDP and ke
   // The icon carries no text, so the unit caption beside it stays and names the percent.
   await expect(page.getByTestId("money-unit-label")).toHaveText("%");
   // Touch readers get no tooltip: the line under the heading names the selected measure.
-  await expect(page.getByTestId("money-latest")).toHaveText("Broad money (M3), % of GDP · 2025: 55.1%");
+  const years = csv.gdpYearsOf(seriesOf("supply", "gdp")), latest = years.at(-1)!;
+  await expect(page.getByTestId("money-latest")).toHaveText(`Broad money (M3), % of GDP · ${latest}: ${csv.shareOfGdp("money.m3", latest).toFixed(1)}%`);
   // The same four series, with the selection kept.
   await expect(page.getByTestId("series-status")).toContainText("3 / 4");
   for (const id of ["money.m3", "money.m2", "money.m1"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(pressed("money.m0"))).toHaveAttribute("aria-pressed", "false");
   await expect(page).toHaveURL(/tab=gdp/);
   await expect(page).toHaveURL(/sel=money\.m3(%2C|,)money\.m2(%2C|,)money\.m1(&|$)/);
-  await expect(page.getByTestId("year-range-strip")).toContainText("1996–2025");
-  await expect(page.getByTestId("source-label")).toContainText("GDP: Geostat, at current prices. GDP for 2025 is preliminary.");
+  await expect(page.getByTestId("year-range-strip")).toContainText(yearSpan(years));
+  const preliminary = years.filter(year => csv.isPreliminaryGdp(year));
+  await expect(page.getByTestId("source-label")).toContainText(`GDP: Geostat, at current prices.${preliminary.length ? ` GDP for ${preliminary.join(", ")} is preliminary.` : ""}`);
   await page.getByTestId("chart-mode-table").click();
-  await expect(await cell(page, "Narrow money (M1)", 2025)).toHaveText("19.8%");
+  await expect(await cell(page, "Narrow money (M1)", latest)).toHaveText(`${csv.shareOfGdp("money.m1", latest).toFixed(1)}%`);
   // Excel holds the calculated shares and cites Geostat's GDP beside the NBG file.
   const promise = page.waitForEvent("download"); await page.getByTestId("money-excel-download").click();
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await (await promise).path())!);
@@ -87,7 +98,8 @@ test("the % of GDP icon shows all four aggregates against Fiscal.ge's GDP and ke
   await page.getByTestId("money-measure-amount").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "gel");
   await expect(page.getByTestId("money-unit-label")).toHaveText("bn GEL");
-  await expect(page.getByTestId("money-latest")).toContainText("Broad money (M3) · 2025: 57.7");
+  const amountYear = csv.latestYear("money.m3");
+  await expect(page.getByTestId("money-latest")).toContainText(`Broad money (M3) · ${amountYear}: ${csv.billions("money.m3", amountYear)}`);
   for (const id of ["money.m3", "money.m2", "money.m1"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(3);
   await expect(page.getByTestId("source-label")).not.toContainText("GDP");
@@ -147,18 +159,20 @@ test("the National Bank rate has no tabs, two decimals and a gap before 2008", a
   await page.goto("/en/explorer/money/interest-rates#view=table");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("money-tabs")).toHaveCount(0);
-  await expect(page.getByTestId("money-latest")).toContainText("8.00");
-  await expect(page.getByTestId("year-range-strip")).toContainText("1996–2025");
-  await expect(await cell(page, "National Bank rate", 2025)).toHaveText("8.00%");
+  const latest = csv.latestYear("rates.policy");
+  await expect(page.getByTestId("money-latest")).toContainText(`${latest}: ${csv.percent("rates.policy", latest)}%`);
+  await expect(page.getByTestId("year-range-strip")).toContainText(yearSpan(csv.yearsOf(seriesOf("interest-rates", "main"))));
+  await expect(await cell(page, "National Bank rate", latest)).toHaveText(`${csv.percent("rates.policy", latest)}%`);
   await expect(await cell(page, "National Bank rate", 2007)).toHaveText("—");
 });
 
 test("bank health has one list, a dash for capital before 2014 and the 2008 losses below zero", async ({ page }) => {
   await page.goto("/en/explorer/money/bank-health");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("money-latest")).toContainText("2.5%");
+  const latest = csv.latestYear("banks.npl_ratio");
+  await expect(page.getByTestId("money-latest")).toContainText(`${latest}: ${csv.percent("banks.npl_ratio", latest)}%`);
   await expect(page.getByTestId("money-tabs")).toHaveCount(0);
-  await expect(page.getByTestId("year-range-strip")).toContainText("2001–2025");
+  await expect(page.getByTestId("year-range-strip")).toContainText(yearSpan(csv.yearsOf(seriesOf("bank-health", "main"))));
   await expect(page.getByTestId("series-status")).toContainText("1 / 5");
   await page.locator(pressed("banks.roa")).click();
   await page.locator(pressed("banks.roe")).click();
@@ -168,8 +182,20 @@ test("bank health has one list, a dash for capital before 2014 and the 2008 loss
   await page.getByTestId("chart-mode-table").click();
   await expect(await cell(page, "Capital to risk-weighted assets", 2013)).toHaveText("—");
   await expect(await cell(page, "Capital to risk-weighted assets", 2014)).not.toHaveText("—");
-  await expect(await cell(page, "Return on assets", 2008)).toHaveText("−2.5%");
-  await expect(await cell(page, "Return on equity", 2008)).toHaveText("−12.6%");
+  await expect(await cell(page, "Return on assets", 2008)).toHaveText(`${csv.percent("banks.roa", 2008)}%`);
+  await expect(await cell(page, "Return on equity", 2008)).toHaveText(`${csv.percent("banks.roe", 2008)}%`);
+});
+
+test("clearing the selection shows the empty callout and disables Excel", async ({ page }) => {
+  await page.goto("/explorer/money/supply");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await expect(page.getByTestId("money-excel-download")).toBeEnabled();
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await expect(page.getByTestId("money-excel-download")).toBeDisabled();
+  await expect(page).toHaveURL(/sel=(&|$)/);
 });
 
 // One section with a measure key and one without; the others share the same state code.

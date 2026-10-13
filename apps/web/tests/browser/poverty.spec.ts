@@ -57,6 +57,18 @@ test("the poverty lead names the series of the active tab", async ({ page }) => 
   }
 });
 
+// U20-16: the Georgian rates page with nothing selected.
+test("clearing the selection shows the empty callout and disables Excel", async ({ page }) => {
+  await page.goto("/explorer/living-standards/poverty");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
+  await expect(page.getByTestId("poverty-excel-download")).toBeEnabled();
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
+  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await expect(page.getByTestId("poverty-excel-download")).toBeDisabled();
+});
+
 test("a series caret is a full 24px target named after its row", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await page.goto("/en/explorer/living-standards/poverty#tab=relative");

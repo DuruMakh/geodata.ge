@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ClientAdminFact, ClientBudgetFact } from "../../lib/explorer/clientData";
 import { getDefaultSelection } from "../../lib/explorer/explorerData";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope, type ExplorerSide } from "../../lib/explorer/types";
-import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
+import { parseExplorerHash, restoreExplorerSelection, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { toggleId } from "../../lib/explorer/selection";
 import { budgetYearsByScope } from "./budget-explorer-frame";
@@ -107,26 +107,11 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     if (parsed.share) setShare(true);
     if (parsed.range) setRanges((current) => ({ ...current, [parsed.range!.scope]: { start: parsed.range!.start, end: parsed.range!.end } }));
     if (parsed.selection) {
-      const knownIds = parsed.selection.ids.filter((id) => idsByScope[parsed.selection!.scope].has(id));
-      // A deliberately-empty shared selection restores as empty; a selection whose
-      // ids are ALL unknown (renamed taxonomy, typos) falls back to the default.
-      if (knownIds.length > 0 || parsed.selection.ids.length === 0) {
-        setSelections((current) => ({ ...current, [parsed.selection!.scope]: knownIds }));
-      }
-      // A restored program selection must be visible in the panel: expand the
-      // parents of every selected major program, or the recipient sees a charted
-      // series with no checked row anywhere.
-      if (parsed.selection.scope === "ministries") {
-        const known = new Set(knownIds);
-        const parents = Array.from(
-          new Set(
-            adminFacts
-              .filter((fact) => fact.level === "major_program" && fact.parentItemId !== null && known.has(fact.itemId))
-              .map((fact) => fact.parentItemId as string),
-          ),
-        );
-        if (parents.length > 0) setExpandedMinistries(parents);
-      }
+      const { scope: selectionScope } = parsed.selection;
+      const { ids, expandedMinistries: parents } = restoreExplorerSelection(parsed.selection, idsByScope[selectionScope], adminFacts);
+      if (ids) setSelections((current) => ({ ...current, [selectionScope]: ids }));
+      // Without the open parents, a recipient would see a charted program with no checked row anywhere.
+      if (parents.length > 0) setExpandedMinistries(parents);
     }
     // The hook state is the source of truth after mount; the hash is write-only from here.
     // eslint-disable-next-line react-hooks/exhaustive-deps

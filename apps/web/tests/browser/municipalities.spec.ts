@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
-import { loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { latestReviewedAtForMunicipalFacts } from "../../lib/explorer/municipalData";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -53,8 +54,11 @@ test("states where the index figures come from and what the map measures", async
   await expect(attribution).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
   await expect(note).toContainText("ODbL");
 
-  // The review date of the consolidated Adjara source.
-  await expect(page.getByTestId("explorer-shell")).toContainText("განახლდა 2026-08-16");
+  // The review date of the latest-reviewed source the index cites, read the way the page reads it.
+  const [{ functionFacts, totalFacts, countryTotalFacts }, { sourceDocuments }] = await Promise.all([loadServedMunicipalData(), loadServedLandingData()]);
+  const reviewedAt = latestReviewedAtForMunicipalFacts(sourceDocuments, functionFacts, [...totalFacts, ...countryTotalFacts]);
+  expect(reviewedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  await expect(page.getByTestId("explorer-shell")).toContainText(`განახლდა ${reviewedAt}`);
 });
 
 test("renders 64 globally ordered accessible map targets behind one tab stop", async ({ page }) => {
@@ -411,6 +415,11 @@ test.describe("municipalities index", () => {
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(1);
     await page.getByTestId("municipal-search").fill("ზზზზ");
     await expect(page.getByTestId("municipal-empty")).toBeVisible();
+    // The empty state's own button clears the query and brings every row back.
+    await page.getByTestId("municipal-empty").getByRole("button", { name: "ძებნის გასუფთავება" }).click();
+    await expect(page.getByTestId("municipal-search")).toHaveValue("");
+    await expect(page.getByTestId("municipal-empty")).toHaveCount(0);
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
     await page.getByTestId("level-region").click();
     await expect(page.getByTestId("municipal-search")).toHaveAttribute("placeholder", "ძებნა");
   });

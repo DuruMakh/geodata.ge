@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Download, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 import { TEST_BASE_URL } from "./test-base-url";
 
 const NATIONAL = `${TEST_BASE_URL}/en/explorer/demography/age-sex`;
@@ -195,6 +196,32 @@ test.describe("the Age and sex page", () => {
     await page.keyboard.press("Escape");
     await expect(page.getByRole("listbox")).toHaveCount(0);
     await expect(page.getByTestId("age-sex-year-select")).toBeFocused();
+  });
+
+  // U27-15: the two national workbooks, clicked in a browser: their names carry the years shown, and each has the
+  // three public sheets with source links into the published demography archive.
+  test("the pyramid and heat map download their own workbooks", async ({ page }) => {
+    await page.goto(NATIONAL);
+    await expectAppReady(page);
+    const year = (await page.getByTestId("age-sex-year-select").textContent())!.trim();
+    const compareGrid = await openPicker(page, "age-sex-compare-select");
+    const compare = (await compareGrid.getByRole("option").last().textContent())!.match(/\d{4}/)![0];
+    await compareGrid.getByRole("option").last().click();
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveText(compare);
+    const workbook = async (testId: string) => {
+      const pending = page.waitForEvent("download");
+      await page.getByTestId(testId).click();
+      const download: Download = await pending;
+      const book = new ExcelJS.Workbook();
+      await book.xlsx.readFile((await download.path())!);
+      expect(book.worksheets.map((sheet) => sheet.name), testId).toEqual(["Summary", "Data", "Sources"]);
+      const sources: string[] = [];
+      book.worksheets[2]!.eachRow((row) => row.eachCell((cell) => { sources.push(JSON.stringify(cell.value)); }));
+      expect(sources.join("\n"), testId).toContain("/downloads/methodology/demography/files/");
+      return download.suggestedFilename();
+    };
+    expect(await workbook("age-sex-pyramid-excel-download")).toBe(`fiscal-demography-age-sex-georgia-${year}-${compare}-en.xlsx`);
+    expect(await workbook("age-sex-heatmap-excel-download")).toMatch(/^fiscal-demography-age-by-year-\d{4}-\d{4}-en\.xlsx$/);
   });
 
   test("choosing the compared year to be the shown year drops the comparison", async ({ page }) => {

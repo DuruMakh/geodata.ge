@@ -177,124 +177,192 @@ async function expectDatasetTableFits(page: Page, testId: string) {
   }
 }
 
-test("landing renders the approved latest-year data composition", async ({ page }) => {
-  await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto(baseUrl);
+// The copy each language must render. Figures are not listed: they come from the
+// served data, so the test checks their shape and that they agree with each other.
+const LANDING_COPY = {
+  ka: {
+    prefix: "",
+    title: "საქართველოს ბიუჯეტი, ვალი და დეფიციტი | Fiscal.ge",
+    description:
+      "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და დეფიციტის გადამოწმებული მონაცემები, მეთოდოლოგია და ჩამოსატვირთი Excel ფაილები.",
+    heading: "საქართველო ციფრებში",
+    portal: "საქართველოს მონაცემების პორტალი",
+    cta: "გაეცანი მონაცემებს",
+    heroFallback: "ვიზუალი ვერ ჩაიტვირთა",
+    population: "3.9",
+    populationCaption: "2026 წლის 1 იანვარი · საქსტატი",
+    area: "69.7",
+    sections: [
+      "როგორ იხარჯება საქართველოს ბიუჯეტი",
+      "როგორ ფინანსდება საქართველოს ბიუჯეტი",
+      "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები",
+      "რამდენია საქართველოს მთავრობის ვალი",
+      "რამდენია საქართველოს ბიუჯეტის დეფიციტი",
+      "მეთოდოლოგია და პირველწყაროები",
+    ],
+    caption: (heading: string, year: string) => `${heading} — ${year} წლის მონაცემები`,
+    amount: /^\d+\.\d მლრდ ₾$/,
+    domesticDebt: "საშინაო ვალი",
+    externalDebt: "საგარეო ვალი",
+    debtLink: "ვალის მონაცემები →",
+    deficitShare: "დეფიციტი მშპ-სთან მიმართებით",
+    actualData: "ფაქტობრივი მონაცემი",
+    deficitLink: "დეფიციტის მონაცემები →",
+    municipalColumn: "უდიდესი მუნიციპალური ბიუჯეტები",
+    methodologyLink: "მეთოდოლოგიის ნახვა →",
+    methodology: "მეთოდოლოგია",
+  },
+  en: {
+    prefix: "/en",
+    title: "Georgia’s budget, debt and deficit | Fiscal.ge",
+    description:
+      "Verified data on Georgia’s state and municipal budgets, government debt and deficit, with methodology and downloadable Excel files.",
+    heading: "Georgia in numbers",
+    portal: "Georgia’s data portal",
+    cta: "Explore the data",
+    heroFallback: "The visual could not load — data is available in the explorer",
+    population: "3.9",
+    populationCaption: "1 January 2026 · Geostat",
+    area: "69.7",
+    sections: [
+      "How Georgia’s budget is spent",
+      "How Georgia’s budget is financed",
+      "How Georgia’s municipalities spend their budgets",
+      "How much Georgia’s government owes",
+      "How large is Georgia’s budget deficit?",
+      "Methodology and original sources",
+    ],
+    caption: (heading: string, year: string) => `${heading} — data for ${year}`,
+    amount: /^\d+\.\d bn GEL$/,
+    domesticDebt: "Domestic debt",
+    externalDebt: "External debt",
+    debtLink: "Debt data →",
+    deficitShare: "Deficit as a share of GDP",
+    actualData: "Actual data",
+    deficitLink: "Deficit data →",
+    municipalColumn: "Largest municipal budgets",
+    methodologyLink: "View methodology →",
+    methodology: "Methodology",
+  },
+} as const;
 
-  await expect(page).toHaveTitle("საქართველოს ბიუჯეტი, ვალი და დეფიციტი | Fiscal.ge");
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-    "content",
-    "საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და დეფიციტის გადამოწმებული მონაცემები, მეთოდოლოგია და ჩამოსატვირთი Excel ფაილები.",
-  );
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("საქართველო ციფრებში");
-  await expect(page.getByText("საქართველოს მონაცემების პორტალი", { exact: true })).toBeVisible();
-  await expect(page.getByTestId("hero-cta")).toHaveText("გაეცანი მონაცემებს");
-  await expect(page.getByTestId("hero-cta")).toHaveAttribute("href", "/explorer");
-  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
+const SIGNED_PERCENT = /^[−+]?\d+\.\d%$/;
 
-  const figures = page.getByTestId("key-numbers");
-  await expect(figures).toContainText("3.9");
-  await expect(figures).toContainText("2026 წლის 1 იანვარი · საქსტატი");
-  await expect(figures).toContainText("69.7");
-  await expect(figures).toContainText("104.6");
-  await expectNoPageOverflow(page);
+for (const [locale, copy] of Object.entries(LANDING_COPY)) {
+  test(`landing renders the approved latest-year data composition: ${locale}`, async ({ page }) => {
+    const href = (path: string) => `${copy.prefix}${path}`;
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto(`${baseUrl}${copy.prefix}/`);
 
-  const orderedHeadings = await page.locator("#data h2").allTextContents();
-  expect(orderedHeadings).toEqual([
-    "როგორ იხარჯება საქართველოს ბიუჯეტი",
-    "როგორ ფინანსდება საქართველოს ბიუჯეტი",
-    "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები",
-    "რამდენია საქართველოს მთავრობის ვალი",
-    "რამდენია საქართველოს ბიუჯეტის დეფიციტი",
-    "მეთოდოლოგია და პირველწყაროები",
-  ]);
-  const landingData = page.getByTestId("landing-data");
-  const expenditureSection = page.getByTestId("landing-dataset-expenditure");
-  await expect(page.getByText("საჯარო ფინანსების წლიური", { exact: true })).toHaveCount(0);
-  await expect(page.getByText("ბოლო ხელმისაწვდომი წელი · 2025", { exact: true })).toHaveCount(0);
-  await expect(landingData.locator(':scope > [data-testid="landing-dataset-expenditure"]')).toHaveCount(1);
-  expect(
-    await landingData.locator(":scope > *").evaluateAll((elements) => elements.map((element) => element.getAttribute("data-testid"))),
-  ).toEqual([
-    "landing-dataset-expenditure",
-    "landing-dataset-revenue",
-    "landing-dataset-municipalities",
-    "landing-debt",
-    "landing-deficit",
-    "landing-methodology",
-  ]);
-  await expect(landingData).toHaveCSS("border-top-width", "0px");
-  await expect(expenditureSection).toHaveCSS("border-top-width", "0px");
+    await expect(page).toHaveTitle(copy.title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", copy.description);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(copy.heading);
+    await expect(page.getByText(copy.portal, { exact: true })).toBeVisible();
+    await expect(page.getByTestId("hero-cta")).toHaveText(copy.cta);
+    await expect(page.getByTestId("hero-cta")).toHaveAttribute("href", href("/explorer"));
+    await expect(page.locator("figure canvas").or(page.getByText(copy.heroFallback))).toBeVisible({ timeout: 15_000 });
 
-  for (const testId of [
-    "landing-dataset-expenditure",
-    "landing-dataset-revenue",
-    "landing-dataset-municipalities",
-  ]) {
-    const section = page.getByTestId(testId);
-    await expect(section.getByTestId("landing-dataset-total")).toBeVisible();
-    await expectDatasetTableFits(page, testId);
-    await expect(section.locator("tbody tr").first().getByRole("rowheader")).not.toBeEmpty();
-    await expect(section.locator("tbody tr").first().getByRole("cell")).toHaveCount(2);
-    const latestYear = await section.getByTestId("landing-dataset-total").locator("strong").textContent();
-    await expect(section.locator("thead th").nth(1)).toHaveText(latestYear!);
-  }
-  await expect(page.getByTestId("landing-dataset-expenditure").locator("table caption")).toHaveText(
-    "როგორ იხარჯება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
-  );
-  await expect(
-    page.getByTestId("landing-dataset-expenditure").getByRole("table", {
-      name: "როგორ იხარჯება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
-    }),
-  ).toHaveCount(1);
-  await expect(page.getByTestId("landing-dataset-revenue").locator("table caption")).toHaveText(
-    "როგორ ფინანსდება საქართველოს ბიუჯეტი — 2025 წლის მონაცემები",
-  );
-  await expect(page.getByTestId("landing-dataset-municipalities").locator("table caption")).toHaveText(
-    "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები — 2025 წლის მონაცემები",
-  );
+    // Population and area are maintained by hand; the economic size is the latest
+    // nominal GDP, the same figure and year as the Economy link in the dataset row.
+    const figures = page.getByTestId("key-numbers");
+    await expect(figures).toContainText(copy.population);
+    await expect(figures).toContainText(copy.populationCaption);
+    await expect(figures).toContainText(copy.area);
+    const economyLink = (await page.getByTestId("landing-datasets").locator(`a[href="${href("/explorer/economy")}"]`).textContent()) ?? "";
+    const [, gdpYear, gdpValue] = economyLink.match(/· (\d{4}): ([\d.,]+)/) ?? [];
+    expect(gdpYear, economyLink).toBeDefined();
+    const gdpFigure = figures.locator("[data-country-stat]").nth(2);
+    expect((await gdpFigure.locator(":scope > div").nth(1).textContent())?.trim().split(/\s/)[0]).toBe(gdpValue);
+    await expect(gdpFigure).toContainText(gdpYear!);
+    await expectNoPageOverflow(page);
 
-  await expect(page.getByTestId("landing-dataset-expenditure").getByRole("link")).toHaveAttribute("href", "/explorer/expenditure");
-  await expect(page.getByTestId("landing-dataset-revenue").getByRole("link")).toHaveAttribute("href", "/explorer/revenue");
-  await expect(page.getByTestId("landing-dataset-municipalities").getByRole("link")).toHaveAttribute("href", "/explorer/municipalities");
-  const debtSection = page.getByTestId("landing-debt");
-  await expect(debtSection).toContainText("35.9 მლრდ ₾");
-  await expect(debtSection).toContainText("საშინაო ვალი");
-  await expect(debtSection).toContainText("11.7 მლრდ ₾");
-  await expect(debtSection).toContainText("საგარეო ვალი");
-  await expect(debtSection).toContainText("24.2 მლრდ ₾");
-  await expect(debtSection.getByRole("link", { name: "ვალის მონაცემები →" })).toHaveAttribute("href", "/explorer/debt");
-  const deficitSection = page.getByTestId("landing-deficit");
-  await expect(deficitSection).toContainText("დეფიციტი მშპ-სთან მიმართებით");
-  await expect(deficitSection).toContainText("−1.5%");
-  const deficitHistory = deficitSection.getByTestId("landing-deficit-history");
-  await expect(deficitHistory.locator("li")).toHaveCount(3);
-  await expect(deficitHistory.locator("li").nth(0)).toContainText("2023");
-  await expect(deficitHistory.locator("li").nth(0)).toContainText("−2.3%");
-  await expect(deficitHistory.locator("li").nth(1)).toContainText("2024");
-  await expect(deficitHistory.locator("li").nth(1)).toContainText("−2.3%");
-  await expect(deficitHistory.locator("li").nth(2)).toContainText("2025");
-  await expect(deficitHistory.locator("li").nth(2)).toContainText("−1.5%");
-  await expect(deficitSection).toContainText("ფაქტობრივი მონაცემი");
-  await expect(deficitSection.getByText("როგორ წავიკითხოთ", { exact: true })).toHaveCount(0);
-  await expect(deficitSection.getByText("ნომინალური ბალანსი", { exact: true })).toHaveCount(0);
-  await expect(deficitSection.getByRole("link", { name: "დეფიციტის მონაცემები →" })).toHaveAttribute("href", "/explorer/deficit");
-  await expect(page.getByText("უდიდესი მუნიციპალური ბიუჯეტები", { exact: true })).toBeVisible();
-  await expect(page.getByTestId("landing-methodology").getByRole("link", { name: "მეთოდოლოგიის ნახვა →" })).toHaveAttribute("href", "/methodology");
+    expect(await page.locator("#data h2").allTextContents()).toEqual(copy.sections);
+    const landingData = page.getByTestId("landing-data");
+    const expenditureSection = page.getByTestId("landing-dataset-expenditure");
+    if (locale === "ka") {
+      await expect(page.getByText("საჯარო ფინანსების წლიური", { exact: true })).toHaveCount(0);
+      await expect(page.getByText(/^ბოლო ხელმისაწვდომი წელი · \d{4}$/)).toHaveCount(0);
+    }
+    await expect(landingData.locator(':scope > [data-testid="landing-dataset-expenditure"]')).toHaveCount(1);
+    expect(
+      await landingData.locator(":scope > *").evaluateAll((elements) => elements.map((element) => element.getAttribute("data-testid"))),
+    ).toEqual([
+      "landing-dataset-expenditure",
+      "landing-dataset-revenue",
+      "landing-dataset-municipalities",
+      "landing-debt",
+      "landing-deficit",
+      "landing-methodology",
+    ]);
+    await expect(landingData).toHaveCSS("border-top-width", "0px");
+    await expect(expenditureSection).toHaveCSS("border-top-width", "0px");
 
-  await expect(page.getByTestId("landing-data").locator("svg, canvas")).toHaveCount(0);
+    for (const [index, [testId, path]] of [
+      ["landing-dataset-expenditure", "/explorer/expenditure"],
+      ["landing-dataset-revenue", "/explorer/revenue"],
+      ["landing-dataset-municipalities", "/explorer/municipalities"],
+    ].entries()) {
+      const section = page.getByTestId(testId);
+      await expect(section.getByTestId("landing-dataset-total")).toBeVisible();
+      await expectDatasetTableFits(page, testId);
+      await expect(section.locator("tbody tr").first().getByRole("rowheader")).not.toBeEmpty();
+      await expect(section.locator("tbody tr").first().getByRole("cell")).toHaveCount(2);
+      // The table's year column, its caption and the total all name the section's latest year.
+      const latestYear = (await section.getByTestId("landing-dataset-total").locator("strong").textContent())!;
+      expect(latestYear).toMatch(/^\d{4}$/);
+      await expect(section.locator("thead th").nth(1)).toHaveText(latestYear);
+      const caption = copy.caption(copy.sections[index]!, latestYear);
+      await expect(section.locator("table caption")).toHaveText(caption);
+      await expect(section.getByRole("table", { name: caption })).toHaveCount(1);
+      await expect(section.getByRole("link")).toHaveAttribute("href", href(path));
+    }
 
-  const footer = page.getByTestId("landing-footer");
-  await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
-  await expect(footer).toContainText("CC BY 4.0");
+    // Debt: the total and both parts are amounts in billion lari for one latest actual year.
+    const debtSection = page.getByTestId("landing-debt");
+    await expect(debtSection.getByText(copy.amount)).toHaveCount(3);
+    await expect(debtSection.locator("strong")).toHaveText(/^\d{4}$/);
+    await expect(debtSection).toContainText(copy.domesticDebt);
+    await expect(debtSection).toContainText(copy.externalDebt);
+    await expect(debtSection).toContainText(copy.actualData);
+    await expect(debtSection.getByRole("link", { name: copy.debtLink })).toHaveAttribute("href", href("/explorer/debt"));
 
-  // Methodology stays out of the landing header and in the footer.
-  await expect(page.getByTestId("landing-header").getByRole("link", { name: "მეთოდოლოგია" })).toHaveCount(0);
-  await expect(page.getByTestId("site-footer").getByRole("link", { name: "მეთოდოლოგია" })).toHaveAttribute(
-    "href",
-    "/methodology",
-  );
-});
+    // Deficit: three consecutive actual years, the last of them the headline year and value.
+    const deficitSection = page.getByTestId("landing-deficit");
+    await expect(deficitSection).toContainText(copy.deficitShare);
+    await expect(deficitSection).toContainText(copy.actualData);
+    const headline = deficitSection.getByText(SIGNED_PERCENT).first();
+    const headlineYear = deficitSection.locator("strong").first();
+    await expect(headlineYear).toHaveText(/^\d{4}$/);
+    const history = deficitSection.getByTestId("landing-deficit-history").locator("li");
+    await expect(history).toHaveCount(3);
+    const latest = Number(await headlineYear.textContent());
+    for (let index = 0; index < 3; index += 1) {
+      await expect(history.nth(index).locator("span")).toHaveText(String(latest - 2 + index));
+      await expect(history.nth(index).locator("strong")).toHaveText(SIGNED_PERCENT);
+    }
+    await expect(history.nth(2).locator("strong")).toHaveText((await headline.textContent())!);
+    if (locale === "ka") {
+      await expect(deficitSection.getByText("როგორ წავიკითხოთ", { exact: true })).toHaveCount(0);
+      await expect(deficitSection.getByText("ნომინალური ბალანსი", { exact: true })).toHaveCount(0);
+    }
+    await expect(deficitSection.getByRole("link", { name: copy.deficitLink })).toHaveAttribute("href", href("/explorer/deficit"));
+    await expect(page.getByText(copy.municipalColumn, { exact: true })).toBeVisible();
+    await expect(page.getByTestId("landing-methodology").getByRole("link", { name: copy.methodologyLink })).toHaveAttribute("href", href("/methodology"));
+
+    await expect(page.getByTestId("landing-data").locator("svg, canvas")).toHaveCount(0);
+
+    const footer = page.getByTestId("landing-footer");
+    await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
+    await expect(footer).toContainText("CC BY 4.0");
+
+    // Methodology stays out of the landing header and in the footer.
+    await expect(page.getByTestId("landing-header").getByRole("link", { name: copy.methodology })).toHaveCount(0);
+    await expect(page.getByTestId("site-footer").getByRole("link", { name: copy.methodology })).toHaveAttribute(
+      "href",
+      href("/methodology"),
+    );
+  });
+}
 
 test("landing data and methodology links use real destinations", async ({ page }) => {
   await page.goto(baseUrl);
@@ -731,12 +799,14 @@ test("landing keeps stats and dataset tables inside narrow viewports", async ({ 
 
     if (width === 320) {
       await expect(page.getByTestId("population-unit")).toHaveCSS("display", "block");
-      for (const amount of ["35.9 მლრდ ₾", "11.7 მლრდ ₾", "24.2 მლრდ ₾"]) {
-        const value = page.getByText(amount, { exact: true });
+      // The debt total and its two parts, whatever the latest figures are.
+      const amounts = page.getByTestId("landing-debt").getByText(LANDING_COPY.ka.amount);
+      await expect(amounts).toHaveCount(3);
+      for (const value of await amounts.all()) {
         await expect(value).toBeVisible();
         expect(
           await value.evaluate((element) => element.getBoundingClientRect().height / Number.parseFloat(getComputedStyle(element).lineHeight)),
-          `${amount} should stay on one line`,
+          `${await value.textContent()} should stay on one line`,
         ).toBeLessThan(1.2);
       }
     }

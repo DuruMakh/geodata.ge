@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import english from "../../lib/i18n/messages/en/about.json";
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 
@@ -73,6 +74,24 @@ test("/about locks the approved mission contract", async ({ page }) => {
     finalLeftBorder: "4px",
     finalLeftBorderColor: "rgb(179, 64, 42)",
   });
+});
+
+// U29-21: the English page in the browser, not only its initial HTML (bilingual-content.spec.ts).
+test("/en/about renders the English mission with English navigation", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto(`${BASE_URL}/en/about`);
+
+  await expect(page).toHaveTitle("Our purpose — Fiscal.ge");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Our purpose");
+  const paragraphs = page.getByTestId("mission-copy").locator("p");
+  await expect(paragraphs).toHaveText([english["about.paragraph1"], english["about.paragraph2"], english["about.paragraph3"], `${english["about.closing"]} ${english["about.statement"]}`]);
+  await expect(page.getByTestId("mission-closing").locator("strong")).toHaveText(english["about.statement"]);
+  await expect(page.getByTestId("mission-explore")).toHaveAttribute("href", "/en/explorer");
+  await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(0);
+  const current = page.getByTestId("about-header").locator('a[aria-current="page"]');
+  await expect(current).toHaveAttribute("href", "/en/about");
+  await expect(page.getByTestId("site-footer").locator('a[href="/en/about"]')).toHaveCount(1);
+  await expectNoPageOverflow(page);
 });
 
 for (const viewport of [

@@ -145,6 +145,28 @@ export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlSt
   return state;
 }
 
+/**
+ * What a shared link's selection restores on the budget explorer: the ids this scope knows, or null to keep
+ * the default when every id is unknown (renamed taxonomy, typos); a deliberately empty selection stays empty.
+ * A restored major program must be visible in the panel, so the ministries above every selected one open.
+ */
+export function restoreExplorerSelection(
+  selection: { scope: ExplorerScope; ids: string[] },
+  knownIds: ReadonlySet<string>,
+  adminFacts: readonly { itemId: string; level: string; parentItemId: string | null }[],
+): { ids: string[] | null; expandedMinistries: string[] } {
+  const ids = selection.ids.filter((id) => knownIds.has(id));
+  const known = new Set(ids);
+  const expandedMinistries = selection.scope !== "ministries" ? [] : Array.from(
+    new Set(
+      adminFacts
+        .filter((fact) => fact.level === "major_program" && fact.parentItemId !== null && known.has(fact.itemId))
+        .map((fact) => fact.parentItemId as string),
+    ),
+  );
+  return { ids: ids.length > 0 || selection.ids.length === 0 ? ids : null, expandedMinistries };
+}
+
 export type SerializeExplorerInput = {
   nav: ExplorerSide;
   grouping: ExpenditureGrouping;
