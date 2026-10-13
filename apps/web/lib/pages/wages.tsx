@@ -19,8 +19,9 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
 import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadWagesPage } from "./wages-shared";
+import { loadWagesPage, wagesRegionsDataset } from "./wages-shared";
 
 /** Display names for every series id a wages page can show, in the page's language. */
 function wagesLabels(presentation: Presentation): Record<string, string> {
@@ -62,13 +63,11 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/wages", locale) }, ...(regionId ? [{ label: t("page.regions.title"), href: pageHref("/explorer/wages/regions", locale) }] : []), { label: regionId ? regionName : title }];
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${href}#dataset`, name: title, description, url: `${origin}${pageHref(href, locale)}`,
-      temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: regionId ? regionName : locale === "ka" ? "საქართველო" : "Georgia" },
-      creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` },
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: href, datasetId: "wages", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      ...(regionId ? { spatialCoverageName: regionName, withinGeorgia: true, partOf: wagesRegionsDataset(presentation.messages) } : {}),
       variableMeasured: [...new Set(facts.map(f => f.indicatorId))].map(id => t(id === "median_monthly_earnings" ? "series.median" : "series.average")),
-    }} />
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/wages", locale) }, ...(regionId ? [{ name: t("page.regions.title"), path: pageHref("/explorer/wages/regions", locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />

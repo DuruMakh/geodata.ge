@@ -1,4 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { readdirSync } from "node:fs";
+import path from "node:path";
+import { isValidElement, type ReactNode } from "react";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { JsonLd } from "../../components/seo/json-ld";
+import { DEMOGRAPHY_HUB_PATH } from "../../lib/explorer/demographyRoutes";
+import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
+import { NAV_TREE } from "../../lib/navigation/navTree";
+import sitemap from "../../lib/seo/sitemap";
 import {
   breadcrumbJsonLd,
   dataCatalogJsonLd,
@@ -299,7 +307,7 @@ describe("Dataset records carry the full Google Dataset property set", () => {
     expect(data).toMatchObject({
       hasPart: [{
         "@type": "Dataset",
-        "@id": "https://fiscal.ge/explorer/municipalities/tbilisi#dataset",
+        "@id": `https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/municipalities/tbilisi#dataset`,
         url: `https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/municipalities/tbilisi`,
         name: "Tbilisi budget",
         description: tbilisiSubset.description,
@@ -559,4 +567,121 @@ describe("Dataset records carry the full Google Dataset property set", () => {
       }),
     ).toMatchObject({ publisher: { "@id": "https://fiscal.ge/#organization" } });
   });
+});
+
+/** Every app route file, as the URL pattern it serves: `app/(en)/en/explorer/wages/regions/[id]/page.tsx` → `/en/explorer/wages/regions/[id]`. */
+function appRoutes() {
+  const app = path.resolve(__dirname, "../../app");
+  return readdirSync(app, { recursive: true, encoding: "utf8" })
+    .filter((file) => path.basename(file) === "page.tsx")
+    .map((file) => ({
+      file: path.join(app, file),
+      segments: path.dirname(file).split(path.sep).filter((segment) => segment !== "." && !/^\(.+\)$/.test(segment)),
+    }));
+}
+
+/** The route file serving a pathname and its dynamic params; a static segment beats a dynamic one (`georgia` over `[slug]`). */
+function routeFor(routes: ReturnType<typeof appRoutes>, pathname: string) {
+  const parts = pathname.split("/").filter(Boolean);
+  const matches = routes.flatMap((route) => {
+    if (route.segments.length !== parts.length) return [];
+    const params: Record<string, string> = {};
+    for (const [index, segment] of route.segments.entries()) {
+      const dynamic = /^\[(.+)\]$/.exec(segment);
+      if (dynamic) params[dynamic[1]] = parts[index];
+      else if (segment !== parts[index]) return [];
+    }
+    return [{ file: route.file, params, staticSegments: route.segments.length - Object.keys(params).length }];
+  });
+  const route = matches.sort((a, b) => b.staticSegments - a.staticSegments)[0];
+  if (!route) throw new Error(`No app route serves ${pathname}`);
+  return route;
+}
+
+/** The data of every JsonLd element in a rendered page tree, wherever a page module placed it. */
+function jsonLdNodes(node: unknown): Record<string, unknown>[] {
+  if (Array.isArray(node)) return node.flatMap(jsonLdNodes);
+  if (!isValidElement<Record<string, unknown>>(node)) return [];
+  if (node.type === JsonLd) return [node.props.data as Record<string, unknown>];
+  return Object.values(node.props).flatMap(jsonLdNodes);
+}
+
+describe("Dataset nodes per language and without a bulk file", () => {
+  const unemployment = {
+    origin: "https://fiscal.ge",
+    datasetId: "unemployment" as const,
+    name: "Unemployment",
+    description: "Annual unemployment, employment and labour-force figures for Georgia from Geostat.",
+    firstYear: 2010,
+    lastYear: 2025,
+    dateModified: "2026-10-03",
+    downloadPath: null,
+  };
+
+  it("claims no distribution for a methodology dataset with no bulk file", () => {
+    const data = datasetJsonLd({ ...unemployment, locale: "en", path: "/en/methodology/unemployment" });
+    expect(data).not.toHaveProperty("distribution");
+    expect(data).not.toHaveProperty("variableMeasured");
+    expect(data).toMatchObject({ "@id": "https://fiscal.ge/en/methodology/unemployment", license: "https://creativecommons.org/licenses/by/4.0/" });
+  });
+
+  it("names a topic dataset's series from the page and keys every related node by the page's language", () => {
+    const data = explorerDatasetJsonLd({ ...unemployment, locale: "en", path: "/explorer/unemployment/overview", downloadPath: undefined, variableMeasured: ["Unemployment rate"] });
+    expect(data).toMatchObject({
+      "@id": "https://fiscal.ge/en/explorer/unemployment/overview#dataset",
+      variableMeasured: ["Unemployment rate"],
+      spatialCoverage: { name: "Georgia" },
+      includedInDataCatalog: { "@id": "https://fiscal.ge/en/methodology#catalog", url: "https://fiscal.ge/en/methodology" },
+    });
+    expect(dataCatalogJsonLd("https://fiscal.ge", ["/en/methodology/unemployment"], "en", ["/explorer/debt"])).toMatchObject({
+      "@id": "https://fiscal.ge/en/methodology#catalog",
+      dataset: [{ "@id": "https://fiscal.ge/en/methodology/unemployment" }, { "@id": "https://fiscal.ge/en/explorer/debt#dataset" }],
+    });
+  });
+});
+
+describe("Dataset nodes across the sitemap", () => {
+  beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
+  afterAll(() => vi.unstubAllEnvs());
+
+  // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows), demography (spec section 10:
+  // no Dataset markup yet), the single-year analysis view, the methodology catalog page and the site pages.
+  const hubs = new Set<string>(NAV_TREE.map((hub) => hub.href));
+  const carriesDataset = (page: string) =>
+    (page.startsWith("/explorer/") || page.startsWith("/methodology/")) && !hubs.has(page) &&
+    page !== "/methodology/demography" && page !== "/explorer/analysis";
+
+  it("every explorer page's Dataset has license, creator and a per-language @id", async () => {
+    const routes = appRoutes();
+    const pathnames = (await sitemap()).map((entry) => new URL(entry.url).pathname);
+    expect(new Set(pathnames.map((pathname) => splitLanguagePath(pathname).locale))).toEqual(new Set(["ka", "en"]));
+    let checked = 0;
+    for (const pathname of pathnames) {
+      const { locale, pathname: page } = splitLanguagePath(pathname);
+      // Demography's 150 place pages are most of this test's render time, and its own page tests already assert that
+      // no demography page carries a Dataset; the site pages are not explorer pages.
+      if (page.startsWith(`${DEMOGRAPHY_HUB_PATH}/`) || !(page.startsWith("/explorer") || page.startsWith("/methodology"))) continue;
+      const route = routeFor(routes, pathname);
+      const pageModule = (await import(route.file)) as { default: (props: { params: Promise<Record<string, string>> }) => Promise<ReactNode> };
+      const datasets = jsonLdNodes(await pageModule.default({ params: Promise.resolve(route.params) })).filter((node) => node["@type"] === "Dataset");
+      expect(datasets, pathname).toHaveLength(carriesDataset(page) ? 1 : 0);
+      for (const dataset of datasets) {
+        const url = `https://fiscal.ge${pageHref(page, locale)}`;
+        expect(dataset.url, pathname).toBe(url);
+        // An explorer page carries other content beside its Dataset, so its node takes a fragment.
+        expect(dataset["@id"], pathname).toBe(page.startsWith("/explorer/") ? `${url}#dataset` : url);
+        expect(dataset.license, pathname).toBe("https://creativecommons.org/licenses/by/4.0/");
+        expect(dataset.creator, pathname).toEqual({ "@id": "https://fiscal.ge/#organization" });
+        expect(String(dataset.description).length, pathname).toBeGreaterThanOrEqual(50);
+        // Every node it points at is the same language's: its parent, its subsets and the catalog.
+        const related = [dataset.isPartOf, dataset.includedInDataCatalog, ...((dataset.hasPart as unknown[] | undefined) ?? [])]
+          .filter(Boolean).map((node) => (node as { "@id": string })["@id"]);
+        expect(related.length, pathname).toBeGreaterThan(0);
+        for (const id of related) expect(splitLanguagePath(new URL(id).pathname).locale, `${pathname} → ${id}`).toBe(locale);
+        if (locale === "en") expect(JSON.stringify(dataset), pathname).not.toMatch(/\p{Script=Georgian}/u);
+        checked += 1;
+      }
+    }
+    expect(checked).toBeGreaterThan(300);
+  }, 600_000);
 });

@@ -19,6 +19,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
 // Shared by the household page modules. The index and the area pages are separate
@@ -68,13 +69,12 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`) && (!regionId || areaIds.has(f.areaId))).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ label: sectionTitle, href: pageHref(sectionHref, locale) }] : []), { label: regionId ? regionName : title }];
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${href}#dataset`, name: title, description, url: `${origin}${pageHref(href, locale)}`,
-      temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: regionId ? regionName : locale === "ka" ? "საქართველო" : "Georgia" },
-      creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` },
-      variableMeasured: [t(`latest.${section}`)],
-    }} />
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: href, datasetId: "household", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      // An area page is a slice of its section's dataset.
+      ...(regionId ? { spatialCoverageName: regionName, withinGeorgia: regionId !== "georgia", partOf: { path: sectionHref, name: sectionTitle, description: t(`page.${section}.summary`) } } : {}),
+      variableMeasured: Object.values(labels),
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ name: sectionTitle, path: pageHref(sectionHref, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />

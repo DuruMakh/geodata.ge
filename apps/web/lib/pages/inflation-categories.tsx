@@ -1,5 +1,6 @@
 import { InflationCategories } from "../../components/inflation/inflation-categories";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { categoryFactInput } from "../data/inflation/types";
@@ -15,6 +16,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { INFLATION_HUB_PATH, inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
 import { loadInflationPageData } from "./inflationPageData";
@@ -50,8 +52,15 @@ export async function renderInflationCategories(locale: Locale) {
     .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "mom_pct")
     .map((fact) => ({ period: periodFromKey(fact.period), value: fact.value }));
   const t = (key: string) => message(presentation.messages, key);
+  const periods = categories.map((fact) => fact.period).sort(), lastReviewedAt = categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+        locale, origin: resolveSiteUrl(), path: CATEGORIES_PATH, datasetId: "inflation",
+        name: `${t("common.inflation")}: ${t("inflation.categoriesHeading")}`, description: t("inflation.categoriesDescription"),
+        firstYear: periods[0], lastYear: periods.at(-1)!, dateModified: lastReviewedAt, downloadPath: "/downloads/data/inflation-categories.csv",
+        variableMeasured: [t("inflation.categoryTab.yoy"), t("inflation.categoryTab.mom"), t("inflation.categoryTab.contrib"), t("inflation.weightColumn")],
+      })} />
       <BreadcrumbJsonLd
         items={[
           { name: t("common.home"), path: pageHref("/", locale) },
@@ -65,7 +74,7 @@ export async function renderInflationCategories(locale: Locale) {
         weights={packFacts(weights.map(projectBasketWeight))}
         headline={headline}
         headlineMom={headlineMom}
-        lastReviewedAt={categories.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? ""}
+        lastReviewedAt={lastReviewedAt}
         sources={sources}
         siteOrigin={resolveSiteUrl()}
       />

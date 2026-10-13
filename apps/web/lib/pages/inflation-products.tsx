@@ -12,7 +12,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
-import { inflationProductDatasetJsonLd } from "../seo/inflationProductDataset";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { INFLATION_HUB_PATH, inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
 import { loadInflationPageData } from "./inflationPageData";
@@ -48,9 +48,11 @@ export async function renderInflationProducts(locale: Locale) {
   const lastPeriod = facts.map((fact) => fact.period).sort().at(-1)!;
   const reviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!;
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="product-dataset-json-ld" data={inflationProductDatasetJsonLd({
-      locale, origin, firstPeriod, lastPeriod, reviewedAt,
-      sourceUrls: sources.map((row) => new URL(row.downloadHref, origin).href),
+    <JsonLd testId="product-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: PRODUCTS_PATH, datasetId: "inflation-products", name: t("inflation.productsWorkbookTitle"), description: t("inflation.productsDescription"),
+      firstYear: firstPeriod, lastYear: lastPeriod, dateModified: reviewedAt, downloadPath: "/downloads/data/inflation-products.csv",
+      variableMeasured: [t("inflation.productsAnnualIndexColumn"), t("inflation.productsCumulativeDataColumn")],
+      isBasedOn: sources.map((row) => new URL(row.downloadHref, origin).href),
     })} />
     <BreadcrumbJsonLd items={[
       { name: t("common.home"), path: pageHref("/", locale) },

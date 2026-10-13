@@ -18,6 +18,7 @@ import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { resolveSiteUrl } from "../siteUrl";
 import { unemploymentIndicators } from "../data/unemployment/types";
@@ -54,15 +55,12 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   if (region) crumbs.splice(3, 0, { label: message(presentation.messages, "unemployment.page.regions.title"), href: pageHref("/explorer/unemployment/regions", locale) });
   const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_GROUPS, sources, lastReviewedAt, siteOrigin: origin };
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${sectionPath}#dataset`, name: title,
-      description, url: `${origin}${pageHref(sectionPath, locale)}`,
-      temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: region ? regionName : locale === "ka" ? "საქართველო" : "Georgia" },
-      measurementTechnique: "Labour Force Survey", creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
-      publisher: { "@id": `${origin}/#organization` },
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: sectionPath, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      // A region page is a slice of the Regions page's dataset.
+      ...(region ? { spatialCoverageName: regionName, withinGeorgia: true, partOf: { path: "/explorer/unemployment/regions", name: message(presentation.messages, "unemployment.page.regions.title"), description: message(presentation.messages, "unemployment.page.regions.summary") } } : {}),
       variableMeasured: [...new Set(facts.map(f => f.indicatorId))].map(indicator => message(presentation.messages, `unemployment.indicator.${indicator}`)),
-    }} />
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: crumbs[2].label, path: pageHref("/explorer/unemployment", locale) }, ...(region ? [{ name: message(presentation.messages, "unemployment.page.regions.title"), path: pageHref("/explorer/unemployment/regions", locale) }] : []), { name: title, path: pageHref(sectionPath, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />

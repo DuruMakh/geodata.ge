@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { InflationCities } from "../../components/inflation/inflation-cities";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { periodFromKey, periodYear } from "../data/inflation/periods";
 import { CITY_FIRST_PERIOD, CPI_CITY_IDS, cityFactInput, type CityFactInput, type CpiCityId, type CpiCityMeasure } from "../data/inflation/types";
@@ -15,6 +16,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { INFLATION_HUB_PATH, inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
 
@@ -69,6 +71,8 @@ async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactI
   ]);
   const sources = inflationWorkbookSources(manifest, locale, catalogue.documents);
   const t = (key: string) => message(presentation.messages, key);
+  const periods = facts.map((fact) => fact.period).sort();
+  const parent = { path: CITIES_PATH, name: `${t("common.inflation")}: ${t("inflation.citiesHeading")}`, description: t("inflation.citiesDescription") };
   const crumbs = [
     { name: t("common.home"), path: pageHref("/", locale) },
     { name: t("common.inflation"), path: pageHref(INFLATION_HUB_PATH, locale) },
@@ -77,6 +81,17 @@ async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactI
   ];
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+        locale, origin: resolveSiteUrl(), datasetId: "inflation", firstYear: periods[0], lastYear: periods.at(-1)!, dateModified: lastReviewedAt,
+        variableMeasured: [t("inflation.tab.yoy"), t("inflation.annualAverage")],
+        // A city page is a slice of the cities dataset, whose file is the cities CSV.
+        ...(view.kind === "city"
+          ? {
+              path: cityPageHref(view.cityId), partOf: parent, spatialCoverageName: t(`inflation.city.${view.cityId}`), withinGeorgia: true,
+              name: `${t(`inflation.city.${view.cityId}`)}: ${t("common.inflation")}`, description: message(presentation.messages, "inflation.cityPageDescription", { city: t(`inflation.city.${view.cityId}`) }),
+            }
+          : { ...parent, downloadPath: "/downloads/data/inflation-cities.csv" }),
+      })} />
       <BreadcrumbJsonLd items={crumbs} />
       <InflationCities view={view} facts={packCityFacts(facts)} lastReviewedAt={lastReviewedAt} sources={sources} siteOrigin={resolveSiteUrl()} />
     </I18nProvider>

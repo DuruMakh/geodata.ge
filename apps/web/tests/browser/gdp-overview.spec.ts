@@ -127,7 +127,7 @@ for(const locale of ['ka','en']) test(`GDP real axis and dataset metadata are co
  expect(labelXs.length).toBeGreaterThan(0);
  for(const x of labelXs) expect(x).toBeGreaterThanOrEqual(0);
  const dataset=JSON.parse(await page.getByTestId('explorer-dataset-json-ld').textContent()??'{}');
- expect(dataset['@id']).toBe('https://fiscal.ge/explorer/economy/gdp#dataset');
+ expect(dataset['@id']).toBe(`https://fiscal.ge${locale==='en'?'/en':''}/explorer/economy/gdp#dataset`);
  expect(dataset.variableMeasured).toHaveLength(6);
  expect(dataset.variableMeasured.map((v:{unitText:string})=>v.unitText)).toContain('USD_2015');
 });

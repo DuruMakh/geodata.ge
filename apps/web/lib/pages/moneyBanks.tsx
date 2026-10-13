@@ -16,6 +16,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
 import { loadGdpWorkbookSources, loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
 export async function moneyBanksPageMetadata(locale: Locale, section: MoneyBanksSectionId) {
@@ -59,13 +60,10 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/money", locale) }, { label: title }];
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${href}#dataset`, name: title, description, url: `${origin}${pageHref(href, locale)}`,
-      temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: locale === "ka" ? "საქართველო" : "Georgia" },
-      creator: { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" }, publisher: { "@id": `${origin}/#organization` },
-      variableMeasured: sectionSeriesIds(section).map(id => t(`series.${id}`)),
-    }} />
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: href, datasetId: "money", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      variableMeasured: sectionSeriesIds(section).map(id => labels[id]),
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/money", locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />

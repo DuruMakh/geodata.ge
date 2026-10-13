@@ -129,11 +129,16 @@ test("the methodology Dataset is the node the catalog references", async ({ page
   const catalog = JSON.parse((await page.getByTestId("catalog-json-ld").textContent()) ?? "{}");
   const id = "https://fiscal.ge/methodology/inflation";
   expect(catalog.dataset.map((entry: { "@id": string }) => entry["@id"])).toContain(id);
-  await page.goto("/en/methodology/inflation");
+  await page.goto("/methodology/inflation");
   const dataset = JSON.parse((await page.getByTestId("dataset-json-ld").textContent()) ?? "{}");
   expect(dataset["@id"]).toBe(id);
   expect(dataset.includedInDataCatalog["@id"]).toBe("https://fiscal.ge/methodology#catalog");
-  expect(dataset.distribution.contentUrl).toBe("https://fiscal.ge/downloads/data/inflation-cpi-national.csv");
+  expect(dataset.distribution[0].contentUrl).toBe("https://fiscal.ge/downloads/data/inflation-cpi-national.csv");
+  // The English page is the English node, in the English catalog.
+  await page.goto("/en/methodology/inflation");
+  const english = JSON.parse((await page.getByTestId("dataset-json-ld").textContent()) ?? "{}");
+  expect(english["@id"]).toBe("https://fiscal.ge/en/methodology/inflation");
+  expect(english.includedInDataCatalog["@id"]).toBe("https://fiscal.ge/en/methodology#catalog");
 });
 
 for (const locale of ["ka", "en"] as const) {

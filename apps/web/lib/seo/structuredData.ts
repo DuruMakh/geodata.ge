@@ -1,10 +1,11 @@
 import type { Measure } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
-import { pageHref, splitLanguagePath } from "../i18n/routes";
+import { pageHref } from "../i18n/routes";
 import {
-  type FiscalDatasetId,
+  isFiscalDatasetId,
   keywordsFor,
   measurementTechniqueFor,
+  type SeoDatasetId,
   variableMeasuredFor,
 } from "./datasetVocabulary";
 import { seoMessage } from "./strings";
@@ -18,13 +19,14 @@ export type DatasetJsonLdInput = {
   locale: Locale;
   origin: string;
   path: `/methodology/${string}` | `/en/methodology/${string}`;
-  datasetId: FiscalDatasetId;
+  datasetId: SeoDatasetId;
   name: string;
   description: string;
   firstYear: number;
   lastYear: number;
   dateModified: string;
-  downloadPath: `/downloads/data/${string}.csv`;
+  /** Null for a dataset with no bulk file: its node then claims no distribution. */
+  downloadPath: `/downloads/data/${string}.csv` | null;
   /** Measures the published catalogue says this entity does not carry. */
   omitMeasures?: readonly Measure[];
   /** Published JSON companions to the CSV, in the order they should be listed. */
@@ -35,13 +37,15 @@ export type ExplorerDatasetJsonLdInput = {
   locale: Locale;
   origin: string;
   path: `/${string}`;
-  datasetId: FiscalDatasetId;
+  datasetId: SeoDatasetId;
   name: string;
   description: string;
-  firstYear: number;
-  lastYear: number;
+  /** A year, or a `YYYY-MM` month for a monthly dataset. */
+  firstYear: number | string;
+  lastYear: number | string;
   dateModified: string;
-  spatialCoverageName: string;
+  /** The place the data covers; Georgia when left out. */
+  spatialCoverageName?: string;
   downloadPath?: `/downloads/data/${string}.csv`;
   /**
    * Set on an entity page whose data is a slice of a larger published dataset.
@@ -61,6 +65,13 @@ export type ExplorerDatasetJsonLdInput = {
    * description page keeps a consumer from having to guess which is which.
    */
   sameAsPath?: `/methodology/${string}`;
+  /**
+   * The names of the series the page shows. A dataset with query-layer measures takes them from the vocabulary
+   * instead; a topic dataset (`TopicDatasetId`) names its series here or claims none.
+   */
+  variableMeasured?: readonly string[];
+  /** The source files the figures were read from. */
+  isBasedOn?: readonly string[];
 };
 
 function absoluteUrl(origin: string, path: string): string {
@@ -68,11 +79,22 @@ function absoluteUrl(origin: string, path: string): string {
 }
 
 /**
- * Dataset `@id`s are locale-independent: one dataset has one identity, and the
- * Georgian path is its canonical form. Only `url` follows the reader's locale.
+ * A node's `@id` follows the page's language, as its `url`, `name` and
+ * `description` do: the Georgian and English pages describe one dataset in two
+ * documents, and one `@id` carrying two names and two URLs would be merged or
+ * dropped by a consumer. An explorer page carries other content beside its
+ * Dataset, so its node takes a fragment; a methodology page's node is the page.
  */
-function explorerDatasetId(origin: string, path: string): string {
-  return `${absoluteUrl(origin, splitLanguagePath(path).pathname)}#dataset`;
+function localizedUrl(origin: string, path: string, locale: Locale): string {
+  return absoluteUrl(origin, pageHref(path, locale));
+}
+
+function explorerDatasetId(origin: string, path: string, locale: Locale): string {
+  return `${localizedUrl(origin, path, locale)}#dataset`;
+}
+
+function catalogId(origin: string, locale: Locale): string {
+  return `${localizedUrl(origin, "/methodology", locale)}#catalog`;
 }
 
 /**
@@ -83,9 +105,9 @@ function explorerDatasetId(origin: string, path: string): string {
 export function catalogReference(origin: string, locale: Locale) {
   return {
     "@type": "DataCatalog",
-    "@id": `${origin}/methodology#catalog`,
+    "@id": catalogId(origin, locale),
     name: seoMessage(locale, "seo.catalogName"),
-    url: absoluteUrl(origin, pageHref("/methodology", locale)),
+    url: localizedUrl(origin, "/methodology", locale),
   };
 }
 
@@ -95,13 +117,15 @@ export function catalogReference(origin: string, locale: Locale) {
  * that reading it costs nothing.
  */
 function datasetVocabulary(
-  datasetId: FiscalDatasetId,
+  datasetId: SeoDatasetId,
   locale: Locale,
   omitMeasures?: readonly Measure[],
+  pageMeasures?: readonly string[],
 ) {
+  const variableMeasured = pageMeasures ?? (isFiscalDatasetId(datasetId) ? variableMeasuredFor(datasetId, locale, omitMeasures) : null);
   return {
     keywords: keywordsFor(datasetId, locale),
-    variableMeasured: variableMeasuredFor(datasetId, locale, omitMeasures),
+    ...(variableMeasured ? { variableMeasured } : {}),
     measurementTechnique: measurementTechniqueFor(datasetId, locale),
     isAccessibleForFree: true,
   };
@@ -174,19 +198,17 @@ export function dataCatalogJsonLd(
   return {
     "@context": "https://schema.org",
     "@type": "DataCatalog",
-    "@id": `${origin}/methodology#catalog`,
+    "@id": catalogId(origin, locale),
     name: seoMessage(locale, "seo.catalogName"),
     description: seoMessage(locale, "seo.catalogDescription"),
-    url: absoluteUrl(origin, pageHref("/methodology", locale)),
+    url: localizedUrl(origin, "/methodology", locale),
     inLanguage: ["ka", "en"],
     publisher: { "@id": `${origin}/#organization` },
     dataset: [
       // A methodology dataset is identified by its page URL; an explorer
       // dataset shares its page with other content and carries a fragment.
-      ...datasetPaths.map((path) => ({
-        "@id": absoluteUrl(origin, splitLanguagePath(path).pathname),
-      })),
-      ...explorerDatasetPaths.map((path) => ({ "@id": explorerDatasetId(origin, path) })),
+      ...datasetPaths.map((path) => ({ "@id": localizedUrl(origin, path, locale) })),
+      ...explorerDatasetPaths.map((path) => ({ "@id": explorerDatasetId(origin, path, locale) })),
     ],
   };
 }
@@ -198,10 +220,10 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "@id": absoluteUrl(input.origin, splitLanguagePath(input.path).pathname),
+    "@id": localizedUrl(input.origin, input.path, input.locale),
     name: input.name,
     description: input.description,
-    url: absoluteUrl(input.origin, pageHref(input.path, input.locale)),
+    url: localizedUrl(input.origin, input.path, input.locale),
     inLanguage: ["ka", "en"],
     temporalCoverage: `${input.firstYear}/${input.lastYear}`,
     spatialCoverage: { "@type": "Place", name: seoMessage(input.locale, "seo.country") },
@@ -211,23 +233,25 @@ export function datasetJsonLd(input: DatasetJsonLdInput) {
     includedInDataCatalog: catalogReference(input.origin, input.locale),
     license: "https://creativecommons.org/licenses/by/4.0/",
     ...datasetVocabulary(input.datasetId, input.locale, input.omitMeasures),
-    distribution: [
-      {
-        "@type": "DataDownload",
-        encodingFormat: "text/csv",
-        contentUrl: absoluteUrl(input.origin, input.downloadPath),
-      },
-      // Only a different FORMAT of this same dataset belongs here. A related
-      // but distinct published dataset (ministries.json beside national
-      // expenditure) is linked for humans on the page instead: claiming it as
-      // a distribution would tell a machine the two are the same data.
-      ...(input.jsonDownloadPaths ?? []).map((jsonPath) => ({
-        "@type": "DataDownload" as const,
-        encodingFormat: "application/json",
-        inLanguage: ["ka", "en"],
-        contentUrl: absoluteUrl(input.origin, jsonPath),
-      })),
-    ],
+    ...(input.downloadPath === null ? {} : {
+      distribution: [
+        {
+          "@type": "DataDownload",
+          encodingFormat: "text/csv",
+          contentUrl: absoluteUrl(input.origin, input.downloadPath),
+        },
+        // Only a different FORMAT of this same dataset belongs here. A related
+        // but distinct published dataset (ministries.json beside national
+        // expenditure) is linked for humans on the page instead: claiming it as
+        // a distribution would tell a machine the two are the same data.
+        ...(input.jsonDownloadPaths ?? []).map((jsonPath) => ({
+          "@type": "DataDownload" as const,
+          encodingFormat: "application/json",
+          inLanguage: ["ka", "en"],
+          contentUrl: absoluteUrl(input.origin, jsonPath),
+        })),
+      ],
+    }),
   };
 }
 
@@ -235,11 +259,11 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
   if (input.description.length < 50) {
     throw new Error("Dataset description must contain at least 50 characters");
   }
-  const url = absoluteUrl(input.origin, pageHref(input.path, input.locale));
+  const url = localizedUrl(input.origin, input.path, input.locale);
   return {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    "@id": explorerDatasetId(input.origin, input.path),
+    "@id": explorerDatasetId(input.origin, input.path, input.locale),
     name: input.name,
     description: input.description,
     url,
@@ -247,7 +271,7 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
     temporalCoverage: `${input.firstYear}/${input.lastYear}`,
     spatialCoverage: {
       "@type": "Place",
-      name: input.spatialCoverageName,
+      name: input.spatialCoverageName ?? seoMessage(input.locale, "seo.country"),
       // Naming the country a municipality or region sits in is the only
       // geography we can state truthfully: the repository's map geometry is
       // SVG path data in a projected viewBox, not the WGS84 latitude and
@@ -270,9 +294,10 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
     creator: { "@id": `${input.origin}/#organization` },
     publisher: { "@id": `${input.origin}/#organization` },
     license: "https://creativecommons.org/licenses/by/4.0/",
-    ...datasetVocabulary(input.datasetId, input.locale, input.omitMeasures),
+    ...datasetVocabulary(input.datasetId, input.locale, input.omitMeasures, input.variableMeasured),
+    ...(input.isBasedOn ? { isBasedOn: input.isBasedOn } : {}),
     ...(input.sameAsPath
-      ? { sameAs: absoluteUrl(input.origin, pageHref(input.sameAsPath, input.locale)) }
+      ? { sameAs: localizedUrl(input.origin, input.sameAsPath, input.locale) }
       : {}),
     // A subset is reachable from the catalog through its parent, so it claims
     // one relationship or the other and never both.
@@ -280,8 +305,8 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
       ? {
           isPartOf: {
             "@type": "Dataset",
-            "@id": explorerDatasetId(input.origin, input.partOf.path),
-            url: absoluteUrl(input.origin, pageHref(input.partOf.path, input.locale)),
+            "@id": explorerDatasetId(input.origin, input.partOf.path, input.locale),
+            url: localizedUrl(input.origin, input.partOf.path, input.locale),
             name: input.partOf.name,
             description: input.partOf.description,
             license: "https://creativecommons.org/licenses/by/4.0/",
@@ -293,8 +318,8 @@ export function explorerDatasetJsonLd(input: ExplorerDatasetJsonLdInput) {
       ? {
           hasPart: input.hasParts.map((part) => ({
             "@type": "Dataset",
-            "@id": explorerDatasetId(input.origin, part.path),
-            url: absoluteUrl(input.origin, pageHref(part.path, input.locale)),
+            "@id": explorerDatasetId(input.origin, part.path, input.locale),
+            url: localizedUrl(input.origin, part.path, input.locale),
             name: part.name,
             description: part.description,
             license: "https://creativecommons.org/licenses/by/4.0/",

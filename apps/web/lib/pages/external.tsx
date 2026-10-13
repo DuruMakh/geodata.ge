@@ -26,6 +26,8 @@ import type { Locale } from "../i18n/types";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { loadGdpWorkbookSources, projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
+import { publicLabel } from "../i18n/labels";
 import { resolveSiteUrl } from "../siteUrl";
 
 async function loadClientMoneyTransfers() {
@@ -62,10 +64,10 @@ export async function renderMoneyFromAbroadPage(locale: Locale) {
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("money.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/external/money-from-abroad#dataset`, name: t("money.title"), description: t("money.summary"), url: `${origin}${pageHref("/explorer/external/money-from-abroad", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: [t("measure.received"), t("measure.sent")],
-    }} />
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: "/explorer/external/money-from-abroad", datasetId: "external", name: t("money.title"), description: t("money.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      variableMeasured: [t("measure.received"), t("measure.sent")],
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("money.title"), path: pageHref("/explorer/external/money-from-abroad", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
@@ -87,17 +89,18 @@ export async function renderForeignInvestmentPage(locale: Locale) {
     getPresentation(locale, ["external", "main", "format", "workbook"], client.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "external-flows"), loadEnglishCatalogue(root),
   ]);
-  const { min, max } = foreignInvestmentCoverage(client, "country");
+  const { min, max } = foreignInvestmentCoverage(client, "country"), total = client.entities.find(entity => entity.kind === "total")!;
   const sourceIds = new Set<string>([...Object.values(FOREIGN_INVESTMENT_SOURCES).map(id => id.replace(/^source\./, "")), "geostat_fdi_metadata"]);
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = data.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("investment.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/external/foreign-investment#dataset`, name: t("investment.title"), description: t("investment.summary"), url: `${origin}${pageHref("/explorer/external/foreign-investment", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "National Statistics Office of Georgia (Geostat)", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: [t("investment.tab.country"), t("investment.tab.sector"), t("investment.tab.region")],
-    }} />
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: "/explorer/external/foreign-investment", datasetId: "external", name: t("investment.title"), description: t("investment.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      // The page's measures are the investment itself and each item's share of the year's total; country, sector and region are its breakdowns.
+      variableMeasured: [publicLabel(locale, total.id, total.labelKa, presentation.englishLabels), t("investment.share")],
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("investment.title"), path: pageHref("/explorer/external/foreign-investment", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
@@ -127,10 +130,10 @@ export async function renderCurrentAccountPage(locale: Locale) {
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("account.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/external/current-account#dataset`, name: t("account.title"), description: t("account.summary"), url: `${origin}${pageHref("/explorer/external/current-account", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: CURRENT_ACCOUNT_SERIES.map(id => t(`account.series.${id}`)),
-    }} />
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: "/explorer/external/current-account", datasetId: "external", name: t("account.title"), description: t("account.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      variableMeasured: CURRENT_ACCOUNT_SERIES.map(id => t(`account.series.${id}`)),
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("account.title"), path: pageHref("/explorer/external/current-account", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />

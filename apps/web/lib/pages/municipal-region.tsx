@@ -227,6 +227,8 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
             description: message(messages, "municipal.metaIndexDescription", { first: firstYear, last: latestYear }),
           },
           withinGeorgia: true,
+          // The per-resident figure is shown on the municipal index only; this page does not carry it.
+          omitMeasures: ["gel_per_resident"],
           name: message(messages, "municipal.regionDatasetName", { name: grammaticalName }),
           description,
           firstYear,
