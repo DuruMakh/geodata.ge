@@ -386,10 +386,20 @@ for (const [path, width] of [
 ] as const) {
   test(`opening ${path} at ${width}px fetches no other page's data`, async ({ page }) => {
     const prefetched: string[] = [];
+    let inFlight = 0;
+    let lastActivity = Date.now();
     page.on("request", (request) => {
+      inFlight += 1;
+      lastActivity = Date.now();
       const url = new URL(request.url());
       if (url.searchParams.has("_rsc")) prefetched.push(url.pathname);
     });
+    const settled = () => {
+      inFlight -= 1;
+      lastActivity = Date.now();
+    };
+    page.on("requestfinished", settled);
+    page.on("requestfailed", settled);
 
     await page.setViewportSize({ width, height: 844 });
     await page.goto(`${TEST_BASE_URL}${path}`);
@@ -403,14 +413,17 @@ for (const [path, width] of [
     );
     // Scroll the page down half a screen at a time so every link in the page flow passes
     // through the viewport (a list in its own scroll box, as the municipal index is from
-    // 768px, shows only its first screen), then give any prefetch a second to start.
+    // 768px, shows only its first screen), then wait until nothing has been in flight for
+    // half a second, so a prefetch that starts late under load is still counted.
     await page.evaluate(async () => {
       for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight / 2) {
         window.scrollTo(0, y);
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       }
     });
-    await page.waitForTimeout(1_000);
+    await expect
+      .poll(() => inFlight === 0 && Date.now() - lastActivity >= 500, { intervals: [100], timeout: 15_000 })
+      .toBe(true);
     expect(prefetched).toEqual([]);
 
     if (path !== "/explorer/expenditure") return;

@@ -119,15 +119,24 @@ request-time route is `/mcp` (see "The `/mcp` runtime" below).
   request time, without a `/* turbopackIgnore: true */` path hint, is the
   usual cause.
 - **CI** (`.github/workflows/ci.yml`, every PR and every push to `main`):
-  the `checks` job builds the site once (with `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`)
-  and uploads the build and the files `prebuild` generates as the `next-build`
-  artifact; the `e2e` job downloads it, starts `next start` on port 3100, waits
-  until it answers and runs the browser suite against it. `.next/cache` and the
-  Playwright browsers are cached. Job limits: 30 minutes (`checks`) and 45
-  (`e2e`). Both jobs fail if they wrote into the repository. Playwright retries
-  a failed test once in CI and reports it as flaky. Still to measure on the
-  first CI run: both jobs' step times, and the browser suite at two against
-  four workers; then pin `PW_WORKERS` in the `e2e` job.
+  the `checks` job (lint, typecheck, unit tests, `data:validate`) and the `build`
+  job run in parallel. `build` builds the site once (with
+  `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`, and `GEODATA_TYPECHECK_GATED=1` so
+  `next build` skips the TypeScript pass `checks` already runs) and uploads the
+  build and the files `prebuild` generates as the `next-build` artifact, without
+  `.next/cache` or source maps. The `e2e` job waits for `build` only: it
+  downloads the artifact, starts `next start` on port 3100, waits until it
+  answers, runs the browser suite against it and prints the server log if
+  anything fails. `.next/cache` (keyed on the lockfile and the tracked source)
+  and the Playwright browsers are cached. Job limits: 30 minutes (`checks`), 20
+  (`build`) and 45 (`e2e`). Every job fails if it wrote into the repository.
+  Playwright retries a failed test once in CI and reports it as flaky. Still to
+  measure on the first CI runs: each job's step times and the critical path
+  (`build` then `e2e`) against the former layout; the browser suite at two
+  against four workers, then pin `PW_WORKERS` in the `e2e` job; the artifact's
+  size and transfer time; the `.next/cache` save time and size; the runner's
+  cores and memory; and whether a second run of the same PR restores both caches
+  exactly (caches saved on a PR are scoped to it, so its first run is cold).
 - **Known flaky tests.** Record each one here with its cause; a retry is not a fix.
   - `main-explorer.spec.ts` "opening … fetches no other page's data" (seen on
     `/explorer/expenditure` at 1280px). Fixed 2026-10-13. The test waited for
@@ -135,7 +144,8 @@ request-time route is `/mcp` (see "The `/mcp` runtime" below).
     `DOMContentLoaded`. A request after that point (the sidebar's compact logo),
     followed by the `load` event, clears it for good (Playwright 1.63), so the
     second wait hung until the 30 s timeout. The test now waits until React
-    has hydrated every link.
+    has hydrated every link and, after scrolling, until no request has been in
+    flight for half a second.
   - `main-explorer.spec.ts` "legacy nav hashes redirect to their route". Fixed
     2026-10-13. The hub redirects from an effect, so only after it hydrates. The
     test gave the hub's hydration and the redirect one 5 s window from the `load`

@@ -42,8 +42,15 @@ async function main() {
     // data:prepare-fact-query-publications rewrites this file later in the same chain from the snapshot
     // written just before this step; both paths must produce the same bytes. Checked here, before the build,
     // instead of re-reading the file after it.
-    if (!buildRegionalEconomiesCsv(loadPackagedSnapshot()).bytes.equals(bytes)) {
-      throw new Error("The snapshot's regional-economies.csv differs from the one built from the reviewed CSVs");
+    const rerun = "run `npm run data:prepare-fact-query-snapshot` first";
+    let snapshot: ReturnType<typeof loadPackagedSnapshot>;
+    try {
+      snapshot = loadPackagedSnapshot();
+    } catch (error) {
+      throw new Error(`The /mcp snapshot this step compares against could not be loaded; ${rerun}`, { cause: error });
+    }
+    if (!buildRegionalEconomiesCsv(snapshot).bytes.equals(bytes)) {
+      throw new Error(`The snapshot's regional-economies.csv differs from the one built from the reviewed CSVs; if a regional CSV changed since the snapshot was built, ${rerun}`);
     }
   }
   await assertGeneratedArtifactMatches("public regional economies", file, bytes.toString("utf8"));

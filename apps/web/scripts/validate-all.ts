@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { runAsCli } from "../lib/runAsCli";
 
 // `npm run data:validate`: every data check in one process, in this order, stopping at the first failure as the
 // `&&` chain of 30 `npm run` steps it replaces did (each step paid about a second of process start-up). Each entry
@@ -57,9 +58,4 @@ async function main() {
   console.log(`\n${DATA_VALIDATE_CHECKS.length} data checks passed in ${((performance.now() - started) / 1000).toFixed(1)}s`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+runAsCli(import.meta.url, main);

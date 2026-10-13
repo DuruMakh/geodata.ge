@@ -15,7 +15,7 @@ export default defineConfig({
   //
   // PLAYWRIGHT_BASE_URL is only ever pointed at a server someone already built
   // and started, so that is the one case where the fast default is provably
-  // safe. CI sets it (its browser job serves the checks job's build), so CI runs
+  // safe. CI sets it (its browser job serves the build job's output), so CI runs
   // four workers too. Measuring two against four on the GitHub runner is still
   // pending; pin PW_WORKERS in ci.yml once that is done. PW_WORKERS overrides
   // either way. Linux/cloud sessions have no Edge, so they need CI=1 (Chromium):

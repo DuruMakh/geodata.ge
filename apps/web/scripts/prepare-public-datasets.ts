@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { preparePublicDatasets } from "../lib/data/publicDatasetExports";
+import { runAsCli } from "../lib/runAsCli";
 
 export async function main(args: readonly string[]) {
   const write = args.includes("--write");
@@ -27,9 +27,4 @@ export async function main(args: readonly string[]) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2)).catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
-}
+runAsCli(import.meta.url, main);

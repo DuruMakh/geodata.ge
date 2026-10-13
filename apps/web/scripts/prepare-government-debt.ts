@@ -1,6 +1,6 @@
-import { pathToFileURL } from "node:url";
 import { buildGovernmentDebtPackage } from "../lib/data/governmentDebt/prepareGovernmentDebtPackage";
 import { prepareGovernmentDebtFacts } from "../lib/data/governmentDebt/importGovernmentDebtFacts";
+import { runAsCli } from "../lib/runAsCli";
 
 export async function main(args: readonly string[]) {
   if (args.length !== 1 || !["--write", "--check"].includes(args[0])) {
@@ -21,9 +21,4 @@ export async function main(args: readonly string[]) {
   console.log(`Validation: ${result.validation.status}`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2)).catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
-}
+runAsCli(import.meta.url, main);

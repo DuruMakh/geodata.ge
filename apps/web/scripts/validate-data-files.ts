@@ -1,6 +1,5 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { loadAdminSpendingFacts } from "../lib/data/adminSpending/importAdminSpendingFacts";
 import { ADMIN_SPENDING_YEARS, EXPENDITURE_YEARS, MUNICIPAL_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
 import { validateFoundationReferences } from "../lib/data/foundationValidation";
@@ -36,6 +35,7 @@ import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments, referencedSourceIds } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
 import { budgetRowsToCsvRows } from "./compose-budget-facts";
+import { runAsCli } from "../lib/runAsCli";
 
 function sortedYears(years: number[]): number[] {
   return Array.from(new Set(years)).sort((a, b) => a - b);
@@ -305,9 +305,4 @@ export async function main() {
   console.log(`Report written: ${reportPath}`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
-}
+runAsCli(import.meta.url, main);

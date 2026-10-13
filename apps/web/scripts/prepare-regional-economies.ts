@@ -1,6 +1,6 @@
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { writeRegionalEconomyArtifacts } from "../lib/data/regionalEconomies/prepareRegionalEconomies";
+import { runAsCli } from "../lib/runAsCli";
 
 export async function main(args: readonly string[]) {
   const write = args.includes("--write");
@@ -11,9 +11,4 @@ export async function main(args: readonly string[]) {
   console.log(JSON.stringify(report, null, 2));
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2)).catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+runAsCli(import.meta.url, main);

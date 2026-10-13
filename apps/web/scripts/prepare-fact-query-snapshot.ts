@@ -2,8 +2,8 @@ import { findSourceProvenanceFailures, type SourceProvenanceFailure } from "../l
 import { execFileSync } from "node:child_process";
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { buildFactQuerySnapshot } from "../lib/factQuery/buildSnapshot";
+import { runAsCli } from "../lib/runAsCli";
 
 const OUTPUT = path.join(process.cwd(), "lib", "factQuery", "generated", "snapshot.json");
 
@@ -72,9 +72,4 @@ export async function main(args: readonly string[]) {
   );
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2)).catch((error) => {
-    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-    process.exitCode = 1;
-  });
-}
+runAsCli(import.meta.url, main);

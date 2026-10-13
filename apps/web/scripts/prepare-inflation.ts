@@ -1,7 +1,7 @@
-import { pathToFileURL } from "node:url";
 import { writeInflationArtifacts, type InflationArtifactMode } from "../lib/data/inflation/prepareInflation";
 import { checkPageDataFiles, writePageDataFiles } from "../lib/data/pageDataFiles";
 import { INFLATION_PAGE_DATA_PREFIX, loadInflationPageData } from "../lib/pages/inflationPageData";
+import { runAsCli } from "../lib/runAsCli";
 
 // The public modes also own the pages' fetched data files (public/page-data/inflation-*), written before the build
 // beside the public CSV. "public" reads back what it wrote; "check-public" is that read on its own.
@@ -24,9 +24,4 @@ export async function main(args: readonly string[]) {
   await pageData(mode);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2)).catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-}
+runAsCli(import.meta.url, main);
