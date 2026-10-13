@@ -12,7 +12,7 @@ import { useTradeSectionsState } from "./use-trade-sections-state";
 
 type Section = "overview" | "countries" | "products";
 const sections: Section[] = ["overview", "countries", "products"];
-export function TradeDomesticExports({ data, sources, lastReviewedAt, siteOrigin }: { data: ReturnType<typeof toClientTradeDomesticData>; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+export function TradeDomesticExports({ data, sources, lastReviewedAt, siteOrigin }: { data: Omit<ReturnType<typeof toClientTradeDomesticData>, "englishLabels">; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const { messages } = useI18n(), t = (key: string) => message(messages, `trade.domestic.${key}`);
   const { section, changeSection } = useTradeSectionsState(sections, "overview", "trade-domestic-state");
   const props = { sources, lastReviewedAt, siteOrigin };

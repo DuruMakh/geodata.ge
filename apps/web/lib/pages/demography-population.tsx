@@ -50,7 +50,7 @@ export async function loadPopulationBasics(locale: Locale) {
   const facts = served.filter((fact) => fact.seriesId === SERIES.populationTotal || fact.seriesId === SERIES.populationDensity);
   const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map((region) => region.id), ...municipal.municipalities.map((m) => m.code)];
   // `municipal` is loaded for the map's legend text and the list's labels (tabs, search, boundaries).
-  const presentation = await getPresentation(locale, ["demography", "common", "controls", "format", "main", "workbook", "municipal"], ids);
+  const presentation = await getPresentation(locale, ["demography", "common", "controls", "format", "main", "workbook", "municipal"], ids, ids);
   const places = buildDemographyPlaces({
     regions: municipal.regions,
     municipalities: municipal.municipalities,

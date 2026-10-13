@@ -14,7 +14,7 @@ let en: Presentation;
 beforeAll(async () => {
   data = await loadServedMunicipalData();
   const ids = ["country.georgia", "municipal.total", ...data.municipalities.flatMap(entity => [entity.code, `${entity.code}.official-name`]), ...data.regions.map(region => region.id), ...data.functions.map(fn => fn.id)];
-  [ka, en] = await Promise.all([getPresentation("ka", ["municipal"], ids), getPresentation("en", ["municipal"], ids)]);
+  [ka, en] = await Promise.all([getPresentation("ka", ["municipal"], ids, ids), getPresentation("en", ["municipal"], ids)]);
 });
 
 function factsFor(id: string) {

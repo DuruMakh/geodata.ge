@@ -53,7 +53,7 @@ export async function renderDeficitPage(locale: Locale) {
     loadServedGeneralGovernmentBalanceData(),
     loadImfWeoManifest(),
   ]);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "deficit"], [DEFICIT_SERIES_ID]);
+  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "deficit"], [DEFICIT_SERIES_ID], [DEFICIT_SERIES_ID]);
   const { messages } = presentation;
   const { firstYear, lastYear } = coverageFromYears(facts);
   const lastUpdatedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";

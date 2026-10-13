@@ -40,6 +40,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
       locale,
       ["regionalEconomies", "common", "format"],
       [...REGIONAL_ECONOMY_REGIONS.map((region) => region.id), ...REGIONAL_ECONOMY_SECTORS.map((sector) => sector.id)],
+      REGIONAL_ECONOMY_REGIONS.map((region) => region.id),
     ),
   ]);
   const model = buildRegionalEconomyMapModel({

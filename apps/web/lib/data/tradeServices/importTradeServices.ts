@@ -37,7 +37,7 @@ export function loadServedTradeServicesData(): Promise<TradeServicesData> {
   })(); return served;
 }
 export function toClientTradeServicesData(data: TradeServicesData): { national: ClientTradeOverviewFact[]; types: ClientTradePartnersData; englishLabels: Record<string, string> } {
-  const national = data.facts.filter(f => f.entityId === "services.total" && f.valueUsd !== null).map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd), sourceId: f.sourceId, publicationStatus: f.publicationStatus, role: f.role === "derived" ? "derived" as const : "total" as const, lastReviewedAt: f.lastReviewedAt }));
+  const national = data.facts.filter(f => f.entityId === "services.total" && f.valueUsd !== null).map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd) }));
   const entities = data.entities.filter(e => e.kind === "service_type").map(e => ({ id: e.id, kind: "service_type" as const, sourceCode: null, labelKa: e.labelKa }));
   const ids = new Set(entities.map(e => e.id));
   return { national, types: { dataset: "services", entities, nationalFacts: national, facts: packTradePartnerFacts(entities, data.facts.filter(f => ids.has(f.entityId))) }, englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])) };

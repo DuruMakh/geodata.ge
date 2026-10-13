@@ -12,7 +12,7 @@ import { TradePartners } from "./trade-partners";
 import { useTradeSectionsState } from "./use-trade-sections-state";
 
 const sections = ["overview", "types"] as const;
-export function TradeServices({ data, sources, lastReviewedAt, siteOrigin }: { data: ReturnType<typeof toClientTradeServicesData>; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+export function TradeServices({ data, sources, lastReviewedAt, siteOrigin }: { data: Omit<ReturnType<typeof toClientTradeServicesData>, "englishLabels">; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const { messages } = useI18n(), t = (key: string) => message(messages, `trade.services.${key}`);
   const { section, changeSection } = useTradeSectionsState(sections, "overview", "trade-services-state");
   const pendingFocus = useRef<string | null>(null);

@@ -9,7 +9,7 @@ import type { Presentation } from "../../lib/i18n/types";
 import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
 
 let presentation: Presentation;
-beforeAll(async () => { presentation = await getPresentation("ka", [], [DEFICIT_SERIES_ID]); });
+beforeAll(async () => { presentation = await getPresentation("ka", [], [DEFICIT_SERIES_ID], [DEFICIT_SERIES_ID]); });
 
 const facts: ServedGeneralGovernmentBalanceFact[] = [
   { year: 2024, generalGovernmentBalancePctGdp: -2.267, generalGovernmentBalanceGel: -2_109_000_000, status: "actual", sourceId: "source.imf", lastReviewedAt: "2026-09-04" },

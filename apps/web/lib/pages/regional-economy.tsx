@@ -48,6 +48,7 @@ async function regionalPresentation(locale: Locale) {
     locale,
     ["regionalEconomies", "common", "controls", "format", "main", "workbook"],
     [REGIONAL_GDP_TOTAL, ...REGIONAL_ECONOMY_REGIONS.map((region) => region.id), ...REGIONAL_ECONOMY_SECTORS.map((sector) => sector.id)],
+    REGIONAL_ECONOMY_REGIONS.map((region) => region.id),
   );
 }
 

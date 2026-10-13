@@ -42,9 +42,9 @@ export async function renderExpenditurePage(locale: Locale) {
   // shows, not just what it ships.
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
   const { firstYear, lastYear } = coverageFromYears(ownFacts);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main"], [
-    "expenditure.total", ...ownFacts.map(fact => fact.itemId), "admin_spending.total", ...adminFacts.map(fact => fact.itemId),
-  ]);
+  // The series search matches English names on the Georgian page too.
+  const labelIds = ["expenditure.total", ...ownFacts.map(fact => fact.itemId), "admin_spending.total", ...adminFacts.map(fact => fact.itemId)];
+  const presentation = await getPresentation(locale, ["common", "controls", "format", "main"], labelIds, labelIds);
   const { messages } = presentation;
 
   return (

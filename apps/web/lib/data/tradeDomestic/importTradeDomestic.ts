@@ -51,7 +51,7 @@ export function loadServedTradeDomesticData(): Promise<TradeDomesticData> {
   })(); return served;
 }
 export function toClientTradeDomesticData(data: TradeDomesticData, national: readonly TradeOverviewFact[]): { national: ClientTradeOverviewFact[]; countries: ClientTradePartnersData; products: ClientTradeProductsData; englishLabels: Record<string, string> } {
-  const totals: ClientTradeOverviewFact[] = data.facts.filter(f => f.entityId === "goods.total").map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd), sourceId: f.sourceId, publicationStatus: f.publicationStatus, role: f.role === "derived" ? "derived" : "total", lastReviewedAt: f.lastReviewedAt }));
+  const totals: ClientTradeOverviewFact[] = data.facts.filter(f => f.entityId === "goods.total").map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd) }));
   const nationalYears = new Set(totals.map(f => f.year));
   // Rounded together, so the national re-exports stay total exports minus domestic exports to the dollar.
   const allNational = roundTradeTotalsToWholeDollars([...national.filter(f => f.indicatorId === "trade.exports" && nationalYears.has(f.year)).map(toClientTradeOverviewFact), ...totals]);

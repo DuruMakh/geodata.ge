@@ -15,7 +15,7 @@ import type {
 const reviewedAt = "2026-09-01";
 
 let presentation: Presentation;
-beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "debt"], [...new Set(facts.map(fact => fact.seriesId))]); });
+beforeAll(async () => { const ids = [...new Set(facts.map(fact => fact.seriesId))]; presentation = await getPresentation("ka", ["common", "controls", "format", "main", "debt"], ids, ids); });
 function renderGeorgianMarkup(children: ReactNode) { return renderToStaticMarkup(<I18nProvider {...presentation}>{children}</I18nProvider>); }
 
 function debtFact(

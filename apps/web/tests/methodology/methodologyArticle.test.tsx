@@ -203,8 +203,7 @@ it.each([
 describe("the source archive's year filter", () => {
   const sourceRow = (index: number): PublicSourceManifestRow => ({
     source_id: `source-${index}`, year: "1960–2025", years: Array.from({ length: 66 }, (_, offset) => 1960 + offset),
-    official_filename: `file-${index}.xlsx`, media_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    byte_size: 1000, downloadHref: `/downloads/methodology/gdp/files/file-${index}.xlsx`,
+    official_filename: `file-${index}.xlsx`, byte_size: 1000, downloadHref: `/downloads/methodology/gdp/files/file-${index}.xlsx`,
     title: `ფაილი ${index}`, publisher: "საქსტატი", searchLabels: [], documentLanguage: "ka",
   });
   const render = (count: number) => renderToStaticMarkup(

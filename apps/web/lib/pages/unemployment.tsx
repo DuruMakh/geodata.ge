@@ -47,7 +47,7 @@ export async function unemploymentPageMetadata(locale: Locale, section: Unemploy
 export async function renderUnemploymentPage(locale: Locale, section: UnemploymentSectionId, regionId?: string) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "regionalEconomies", "common", "controls", "format", "main", "workbook"], UNEMPLOYMENT_GROUPS.map(group => group.id)),
+    loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "regionalEconomies", "common", "controls", "format", "main", "workbook"], UNEMPLOYMENT_GROUPS.map(group => group.id), UNEMPLOYMENT_REGIONS.map(region => region.id)),
     loadReviewedSourceManifest(root, "unemployment"), loadEnglishCatalogue(root),
   ]);
   const dimensions = new Set([...unemploymentBreakdownsForSection(section), "national", ...(section === "overview" ? ["sex"] : [])]);
@@ -66,7 +66,7 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   const lastReviewedAt = facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: message(presentation.messages, "unemployment.title"), href: pageHref("/explorer/unemployment", locale) }, { label: region ? regionName : title }];
   if (region) crumbs.splice(3, 0, { label: message(presentation.messages, "unemployment.page.regions.title"), href: pageHref("/explorer/unemployment/regions", locale) });
-  const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, publishedValue, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, publishedValue, sourceId })), registry: UNEMPLOYMENT_GROUPS, sources, lastReviewedAt, siteOrigin: origin };
+  const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_GROUPS, sources, lastReviewedAt, siteOrigin: origin };
   return <I18nProvider {...presentation}>
     <JsonLd testId="explorer-dataset-json-ld" data={{
       "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${sectionPath}#dataset`, name: title,

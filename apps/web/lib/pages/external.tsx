@@ -63,7 +63,8 @@ export async function renderMoneyFromAbroadPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const { data, client } = await loadClientMoneyTransfers();
   const [presentation, manifest, catalogue] = await Promise.all([
-    getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], data.entities.map(entity => entity.id)),
+    // Only the entities the page serves; the Georgian page's country search reads Georgian names only.
+    getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], client.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "external-flows"), loadEnglishCatalogue(root),
   ]);
   const { min, max } = moneyTransfersCoverage(client);
@@ -95,7 +96,7 @@ export async function renderForeignInvestmentPage(locale: Locale) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const { data, client } = await loadClientForeignInvestment();
   const [presentation, manifest, catalogue] = await Promise.all([
-    getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], data.entities.map(entity => entity.id)),
+    getPresentation(locale, ["external", "common", "controls", "main", "format", "workbook"], client.entities.map(entity => entity.id)),
     loadReviewedSourceManifest(root, "external-flows"), loadEnglishCatalogue(root),
   ]);
   const { min, max } = foreignInvestmentCoverage(client, "country");

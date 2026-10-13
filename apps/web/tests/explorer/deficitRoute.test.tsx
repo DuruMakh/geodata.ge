@@ -13,7 +13,7 @@ import * as servedData from "../../lib/data/servedData";
 afterEach(() => vi.restoreAllMocks());
 
 let presentation: Presentation;
-beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "deficit"], ["deficit.general_government.balance"]); });
+beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "deficit"], ["deficit.general_government.balance"], ["deficit.general_government.balance"]); });
 function renderGeorgianMarkup(children: ReactNode) { return renderToStaticMarkup(<I18nProvider {...presentation}>{children}</I18nProvider>); }
 
 const facts: ServedGeneralGovernmentBalanceFact[] = [

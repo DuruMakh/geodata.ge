@@ -71,6 +71,8 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
   // Each page receives only the observations its views can show.
   const ids = new Set(sectionSeriesIds(section));
   const facts = data.facts.map(toClientMoneyBanksFact).filter(f => ids.has(f.indicatorId));
+  // The workbook cites only the files these observations come from.
+  const sourceIds = new Set(facts.map(f => f.sourceId));
   const years = [...new Set(moneyBanksViews(section).flatMap(view => moneyBanksCoverage(section, view, facts, gdpFacts).years))];
   const firstYear = Math.min(...years), lastYear = Math.max(...years);
   const href = MONEY_BANKS_SECTIONS.find(item => item.id === section)!.href;
@@ -90,7 +92,7 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSe
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/money", locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
-      <MoneyBanksExplorer key={section} section={section} facts={facts} labels={labels} sources={sources} gdpFacts={gdpFacts} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+      <MoneyBanksExplorer key={section} section={section} facts={facts} labels={labels} sources={sources.filter(source => sourceIds.has(source.sourceId))} gdpFacts={gdpFacts} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

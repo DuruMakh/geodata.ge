@@ -8,8 +8,8 @@ test("loads the complete accepted canonical subset and exposes numbers only to t
   expect(facts).toHaveLength(124);
   const latest = facts.find(f => f.year === 2025 && f.indicatorId === "trade.balance")!;
   expect(latest.valueUsd).toBe("-11360708279.6124982");
-  expect(toClientTradeOverviewFact(latest)).toMatchObject({ valueUsd: -11360708279.612497, publicationStatus: "unspecified", role: "derived" });
-  expect(toClientTradeOverviewFact(latest)).not.toHaveProperty("sourceRefs");
+  // Only what the trade pages read (platform review U21-15).
+  expect(toClientTradeOverviewFact(latest)).toEqual({ year: 2025, indicatorId: "trade.balance", valueUsd: -11360708279.612497 });
 });
 test("reuses the same validated build-time data promise", async () => {
   const { loadServedTradeOverviewData: load } = await import("../../../lib/data/tradeOverview/importTradeOverview");

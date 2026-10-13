@@ -25,13 +25,15 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
           {/* Phones: lockup and address share one row. */}
           <div className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-x-4 gap-y-2 min-[768px]:flex min-[768px]:flex-col min-[768px]:items-stretch min-[768px]:gap-2.5">
             <Link href={pageHref("/", locale)} prefetch={false} aria-label={message(messages, "common.brandHome")} className="block w-[150px]">
-              {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
+              {/* Local SVG brand asset; native img avoids adding a raster optimization path. Lazy, so React does not
+                  preload this below-the-fold logo ahead of the header logo and the hero. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 data-testid="site-footer-logo"
                 src={locale === "en" ? "/brand/fiscal-logo-compact-en.svg" : "/brand/fiscal-logo-compact.svg"}
                 width="1080"
                 height="340"
+                loading="lazy"
                 alt=""
                 className="block h-auto w-full"
               />

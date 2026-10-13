@@ -40,9 +40,9 @@ export async function renderRevenuePage(locale: Locale) {
   // shows, not just what it ships.
   const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
   const { firstYear, lastYear } = coverageFromYears(ownFacts);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main"], [
-    "revenue.total", ...ownFacts.map(fact => fact.itemId),
-  ]);
+  // The series search matches English names on the Georgian page too.
+  const labelIds = ["revenue.total", ...ownFacts.map(fact => fact.itemId)];
+  const presentation = await getPresentation(locale, ["common", "controls", "format", "main"], labelIds, labelIds);
   const { messages } = presentation;
 
   // No adminFacts/adminCategories: the ministries scope cannot be reached from

@@ -60,7 +60,7 @@ function householdAreaLabels(presentation: Presentation): Record<HouseholdArea, 
 export async function renderHouseholdPage(locale: Locale, section: HouseholdSectionId, regionId?: HouseholdArea) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "common", "controls", "format", "main", "workbook"], HOUSEHOLD_PAGE_AREAS),
+    loadServedHouseholdData(), getPresentation(locale, ["household", "regionalEconomies", "common", "controls", "format", "main", "workbook"], HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_PAGE_AREAS),
     loadReviewedSourceManifest(root, "household-income"), loadEnglishCatalogue(root),
   ]);
   // Each page reads only its own section's observations, and an area page only its lines' (Georgia's include towns and villages).

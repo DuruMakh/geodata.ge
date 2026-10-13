@@ -31,7 +31,7 @@ beforeAll(async () => {
   index = buildPopulationIndexModel({ facts: served, regions: municipal.regions, municipalities: municipal.municipalities });
   const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map((r) => r.id), ...municipal.municipalities.map((m) => m.code)];
   for (const locale of ["en", "ka"] as const) {
-    presentations[locale] = await getPresentation(locale, ["demography", "common", "controls", "main", "format", "workbook", "municipal"], ids);
+    presentations[locale] = await getPresentation(locale, ["demography", "common", "controls", "main", "format", "workbook", "municipal"], ids, ids);
     placesBy[locale] = buildDemographyPlaces({
       regions: municipal.regions,
       municipalities: municipal.municipalities,

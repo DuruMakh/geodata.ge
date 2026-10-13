@@ -12,7 +12,7 @@ export type UnemploymentObservation = {
   lastReviewedAt: string;
 };
 export type ServedUnemploymentObservation = Omit<UnemploymentObservation, "value" | "publishedValue"> & { value: number; publishedValue: number };
-export type ClientUnemploymentObservation = Pick<ServedUnemploymentObservation, "dimension" | "groupId" | "sex" | "indicatorId" | "year" | "value" | "publishedValue" | "sourceId">;
+export type ClientUnemploymentObservation = Pick<ServedUnemploymentObservation, "dimension" | "groupId" | "sex" | "indicatorId" | "year" | "value" | "sourceId">;
 export type UnemploymentGroupDefinition = { id: string; labelKa: string; labelEn: string; sortOrder: number };
 
 export const CORE_UNEMPLOYMENT_INDICATORS: UnemploymentIndicator[] = ["unemployment_rate", "unemployed", "employment_rate", "employed", "participation_rate", "labour_force", "outside_labour_force", "population_15_plus"];

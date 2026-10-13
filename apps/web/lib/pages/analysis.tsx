@@ -39,10 +39,12 @@ export async function renderAnalysisPage(locale: Locale) {
     .sort()
     .at(-1) ?? "";
 
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "analysis"], [
+  // The snapshot model builds each item's English name beside the Georgian on both pages.
+  const labelIds = [
     ...glossary.keys(), ...adminCategories.map(category => category.id),
     "snapshot.other", "expenditure.total", "revenue.total", "admin_spending.total",
-  ]);
+  ];
+  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "analysis"], labelIds, labelIds);
   const { messages } = presentation;
   return (
     <>

@@ -16,9 +16,9 @@ type SourceArchiveProps = {
   summary: MethodologyArchiveSummary;
 };
 
+/** The file's type, from its extension (every reviewed filename has one; the media type stays on the server). */
 function formatLabel(row: PublicSourceManifestRow) {
-  const extension = row.official_filename.split(".").at(-1);
-  return extension ? extension.toUpperCase() : row.media_type;
+  return row.official_filename.split(".").at(-1)!.toUpperCase();
 }
 
 /** Up to this many files the year filter is hidden: it would offer more years than there are rows to filter. */

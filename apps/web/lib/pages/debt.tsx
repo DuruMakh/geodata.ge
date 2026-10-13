@@ -31,7 +31,9 @@ export async function renderDebtPage(locale: Locale) {
     loadDebtWorkbookSources(locale),
     loadGdpWorkbookSources(locale),
   ]);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "debt"], [...new Set(facts.map(fact => fact.seriesId))]);
+  // The debt model builds each series' English name beside the Georgian on both pages.
+  const seriesIds = [...new Set(facts.map(fact => fact.seriesId))];
+  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "debt"], seriesIds, seriesIds);
   const { messages } = presentation;
   const stockFacts = facts.filter((fact) => fact.family === "stock" && fact.status === "actual");
   const { firstYear, lastYear } = coverageFromYears(stockFacts);
@@ -66,7 +68,7 @@ export async function renderDebtPage(locale: Locale) {
       <I18nProvider {...presentation}>
       <DebtExplorer
         facts={facts.map(projectDebtFact)}
-        gdpFacts={gdpFacts.map(projectGdpFact)}
+        gdpFacts={gdpFacts.filter((fact) => fact.year >= datasetFirstYear && fact.year <= datasetLastYear).map(projectGdpFact)}
         workbookSources={workbookSources}
         gdpWorkbookSources={gdpWorkbookSources}
         siteOrigin={resolveSiteUrl()}

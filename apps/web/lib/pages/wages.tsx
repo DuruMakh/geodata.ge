@@ -72,7 +72,7 @@ export const renderWagesRegionPage = (slug: string, locale: Locale) => renderWag
 export async function renderWagesPage(locale: Locale, section: WagesSectionId, regionId?: string) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedWagesData(), getPresentation(locale, ["wages", "regionalEconomies", "common", "controls", "format", "main", "workbook"], LABEL_IDS),
+    loadServedWagesData(), getPresentation(locale, ["wages", "regionalEconomies", "common", "controls", "format", "main", "workbook"], LABEL_IDS, WAGES_REGIONS),
     loadReviewedSourceManifest(root, "wages"), loadEnglishCatalogue(root),
   ]);
   const allFacts = data.facts.map(toClientWagesFact);
