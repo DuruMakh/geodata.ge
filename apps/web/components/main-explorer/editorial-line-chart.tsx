@@ -3,7 +3,7 @@
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { buildDotLattice, type DotLattice } from "../../lib/explorer/dotLattice";
-import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
+import { formatInUnit, formatShare, roundForDisplay, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
 import {
   AXIS_LABEL_GAP,
@@ -51,8 +51,8 @@ type EditorialLineChartProps = {
   shareLabel: string;
   preliminaryLabel?: string;
   showAxisUnit?: boolean;
-  /** `seriesId` lets a chart whose series differ in precision format each readout row on its own. */
-  formatTooltipValue?: (value: number, seriesId: string) => string;
+  /** `seriesId` and the hovered `year` (a period on monthly charts) let a chart whose values differ in precision format each readout row on its own. */
+  formatTooltipValue?: (value: number, seriesId: string, year: number) => string;
   /** Periods per calendar year on the x axis. Omit for years. */
   periodsPerYear?: number;
   /** Axis label or tooltip header for a period value. Omit to print the value. */
@@ -181,7 +181,7 @@ export function EditorialLineChart({
   const axisUnit = { ...unit, decimals: decimalsFor(step / unit.divisor, 4) };
   const formatAxis = (value: number, withUnit: boolean) =>
     (share
-      ? `${value.toFixed(shareDigits)}%`
+      ? `${roundForDisplay(value, shareDigits).toFixed(shareDigits)}%`
       : withUnit && showAxisUnit
         ? `${formatInUnit(value, axisUnit)} ${unit.label}`
         : formatInUnit(value, axisUnit)
@@ -189,8 +189,8 @@ export function EditorialLineChart({
   // The phone drawing prints the amount unit once, above the axis.
   const unitCaption = share || unit.label.trim() === "" ? null : unit.label;
 
-  const formatValue = (value: number | null, seriesId: string) =>
-    formatTooltipValue && value !== null ? formatTooltipValue(value, seriesId) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
+  const formatValue = (value: number | null, seriesId: string, year: number) =>
+    formatTooltipValue && value !== null ? formatTooltipValue(value, seriesId, year) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
   const axisPeriod = (index: number) => (formatPeriod ? formatPeriod(years[index]!, "axis") : String(years[index]));
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
@@ -267,7 +267,7 @@ export function EditorialLineChart({
         headerRight={share ? shareLabel : null}
         rows={tooltip.rows}
         hidden={tooltip.hidden}
-        formatValue={formatValue}
+        formatValue={(value, seriesId) => formatValue(value, seriesId, years[hover]!)}
         preliminaryLabel={preliminaryLabel}
         variant={active.mobile ? "panel" : "float"}
       />

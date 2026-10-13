@@ -62,6 +62,36 @@ const gdpSources: WorkbookPublicSource[] = [{
 }];
 
 describe("Debt workbook adapter", () => {
+  it("formats each rate cell at the decimals its source prints, never padding a one-decimal rate", async () => {
+    const rateFacts: ServedGovernmentDebtFact[] = [
+      { year: 2018, family: "rate", seriesId: "debt.rate.domestic", value: 8.3, valueKind: "percent", status: "actual", sourceId: "source.mof_debt_strategy_2019_2021", snapshotDate: null, lastReviewedAt: "2026-09-01" },
+      { year: 2022, family: "rate", seriesId: "debt.rate.domestic", value: 9.2, valueKind: "percent", status: "actual", sourceId: "source.mof_debt_strategy_2023_2026", snapshotDate: null, lastReviewedAt: "2026-09-01" },
+      { year: 2018, family: "rate", seriesId: "debt.rate.total", value: 3.3, valueKind: "percent", status: "actual", sourceId: "source.mof_monthly_debt_report_2026_07", snapshotDate: null, lastReviewedAt: "2026-09-01" },
+      { year: 2022, family: "rate", seriesId: "debt.rate.total", value: 3.9, valueKind: "percent", status: "actual", sourceId: "source.mof_monthly_debt_report_2026_07", snapshotDate: null, lastReviewedAt: "2026-09-01" },
+    ];
+    const model = buildDebtWorkbookExportModel({
+      facts: rateFacts, gdpFacts: [], family: "rate", selectedIds: ["debt.rate.total", "debt.rate.domestic"],
+      range: { start: 2018, end: 2022 }, shareOfGdp: false, sources: debtSources, gdpSources: [], siteOrigin: "https://fiscal.ge",
+    });
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await createWorkbookBuffer(model));
+    const readable = workbook.worksheets[0]!;
+    const shown = (label: string, year: number) => {
+      // Data rows start under the title, subtitle and header rows.
+      const row = readable.getRows(4, readable.rowCount - 3)!.find((candidate) => candidate.getCell(1).value === label || String(candidate.getCell(1).value).endsWith(`— ${label}`))!;
+      const column = model.readable.years.indexOf(year) + 2;
+      return row.getCell(column).numFmt;
+    };
+    expect(shown("საშინაო განაკვეთი", 2022)).toMatch(/^0\.00%/);
+    expect(shown("საშინაო განაკვეთი", 2018)).toMatch(/^0\.0%/);
+    expect(shown("საპროცენტო განაკვეთი", 2022)).toMatch(/^0\.0%/);
+    const analysis = workbook.worksheets[1]!;
+    const formats = analysis.getRows(2, analysis.rowCount - 1)!.map((row) => [row.getCell(1).value, row.getCell(3).value, row.getCell(6).numFmt]);
+    expect(formats).toContainEqual([2022, "საშინაო განაკვეთი", "0.00%"]);
+    expect(formats).toContainEqual([2018, "საშინაო განაკვეთი", "0.0%"]);
+    expect(formats).toContainEqual([2022, "საპროცენტო განაკვეთი", "0.0%"]);
+  });
+
   it.each(["stock", "service", "rate"] as const)("exports English %s without changing numbers, status flags or source links", async family => {
     const presentation = await getPresentation("en", ["workbook"], facts.map(fact => fact.seriesId));
     const input = {

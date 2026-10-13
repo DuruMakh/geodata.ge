@@ -29,6 +29,12 @@ Source publisher/attribution identities are preserved. Original files, official 
 
 The initial reviewed coverage comprises 264 display keys, 549 programme/year records across 48 programme series, 115 logical sources, and 195 original-document identities. These counts describe the initial catalogue and are not hardcoded limits. The validator derives required coverage from current served data and manifests.
 
+## Displayed numbers
+
+Both languages share one number format (DESIGN.md §11): en-US grouping, the `−` minus sign, and a last-digit 5 rounded up on the number's decimal form, as Excel and Geostat round, so a stored 0.95 shows as 1.0 and 1.65 as 1.7. Every displayed decimal goes through the shared Intl formatter in `apps/web/lib/explorer/format.ts` (`roundForDisplay`, `formatShare`, `formatPoints`), which first drops the float noise arithmetic adds (a fraction × 100 turns 1.65 into 1.6499999999999999). JavaScript `toFixed` rounds the binary value instead (`(0.95).toFixed(1)` is `0.9`, `(10.25).toFixed(1)` is `10.3`) and is not used for displayed figures. Until 2026-10-13 the share and point formatters, the inflation grid and the inflation labels used it: 51 values showed their last digit one too low (inflation national 1, categories 10, cities 11, product changes 28, and the 2021 external debt rate, 0.95% shown as 0.9%), and an inflation cell could read 1.6 on the page but 1.7 in Excel. Values the pages take from `published_value` were not affected.
+
+Percentages show one decimal. Interest rates show two, as the Ministry of Finance and NBG publish them; a rate whose source prints one decimal keeps one and is never padded (`government-debt-annual.md`, `money-banks-annual.md`). Inflation stays at one decimal, as Geostat prints it.
+
 ## Validation and updates
 
 Run from `apps/web`:

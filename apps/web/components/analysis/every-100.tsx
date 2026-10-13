@@ -1,6 +1,7 @@
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
+import { roundForDisplay } from "../../lib/explorer/format";
 import type { Every100Item } from "../../lib/explorer/types";
 import { SwatchBar } from "../ui/editorial";
 
@@ -18,7 +19,7 @@ export function Every100Gel({ items }: Every100Props) {
     Array.from({ length: item.gelFrom100 }, (_, index) => ({
       key: `${item.itemId}-${index}`,
       color: item.color,
-      title: message(messages, "analysis.every100Cell", { name: labelFor(item), amount: item.gelFrom100, share: item.exactShare.toFixed(1) }),
+      title: message(messages, "analysis.every100Cell", { name: labelFor(item), amount: item.gelFrom100, share: roundForDisplay(item.exactShare, 1).toFixed(1) }),
     })),
   );
   const zeroCount = items.filter((item) => item.gelFrom100 === 0).length;
@@ -50,7 +51,7 @@ export function Every100Gel({ items }: Every100Props) {
             .map((item) => (
               <div
                 key={item.itemId}
-                title={`${labelFor(item)} — ${item.exactShare.toFixed(1)}%`}
+                title={`${labelFor(item)} — ${roundForDisplay(item.exactShare, 1).toFixed(1)}%`}
                 className="grid grid-cols-[20px_minmax(0,1fr)_auto] items-center gap-2.5 border-t border-[var(--hairline-soft)] py-1.5"
               >
                 <SwatchBar color={item.color} />

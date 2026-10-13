@@ -3,6 +3,7 @@ import type { ClientNationalGdpFact } from "./clientData";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { INK } from "./colors";
+import { formatShare } from "./format";
 
 export const DEBT_FAMILIES = ["stock", "service", "rate"] as const satisfies readonly DebtFamily[];
 
@@ -114,6 +115,37 @@ export function debtRangeForFamily(
 ): { start: number; end: number } {
   const years = facts.filter((fact) => fact.family === family).map((fact) => fact.year);
   return { start: Math.min(...years), end: Math.max(...years) };
+}
+
+// Interest rates keep the decimals the Ministry printed (DESIGN.md §11): the monthly report's
+// chart labels and the 2019-2021 strategy show one ("3.1%", "8.3%"), the 2022-2025, 2023-2026
+// and 2025-2029 strategy tables two ("8.21%", "9.20%"). A rate is never padded to a decimal its
+// source does not print; a source missing here falls back to one.
+const RATE_SOURCE_DECIMALS: Record<string, 1 | 2> = {
+  mof_monthly_debt_report_2026_07: 1,
+  mof_debt_strategy_2019_2021: 1,
+  mof_debt_strategy_2022_2025: 2,
+  mof_debt_strategy_2023_2026: 2,
+  mof_debt_strategy_2025_2029: 2,
+};
+
+/** Decimals a rate from this source is shown with; takes the bare or the registry (`source.`) id. */
+export function debtRateDecimals(sourceId: string | null): 1 | 2 {
+  return RATE_SOURCE_DECIMALS[(sourceId ?? "").replace(/^source\./, "")] ?? 1;
+}
+
+type RateCellFact = Pick<ClientGovernmentDebtFact, "seriesId" | "year" | "sourceId">;
+
+/** Decimals of each rate cell, by series and year, from the source of its fact. */
+export function debtRateDecimalsFor(facts: readonly RateCellFact[]): (seriesId: string, year: number) => 1 | 2 {
+  const sourceByCell = new Map(facts.map((fact) => [`${fact.seriesId}:${fact.year}`, fact.sourceId]));
+  return (seriesId, year) => debtRateDecimals(sourceByCell.get(`${seriesId}:${year}`) ?? null);
+}
+
+/** Formats a rate (percent, e.g. 9.2) for its series and year at its source's decimals. */
+export function formatDebtRate(facts: readonly RateCellFact[]): (value: number, seriesId: string, year: number) => string {
+  const decimals = debtRateDecimalsFor(facts);
+  return (value, seriesId, year) => formatShare(value / 100, false, decimals(seriesId, year));
 }
 
 export type DebtDeckChange =

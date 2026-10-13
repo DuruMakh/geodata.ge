@@ -104,7 +104,7 @@ function writeReadableRow(
       const basis = row.basisByYear[year];
       const isPlanned = basis === "planned";
       const markerKey = isPlanned ? "workbook.planned" : basis === "forecast" ? "workbook.forecast" : null;
-      cell.numFmt = row.numberFormat ?? numberFormat ?? readableNumberFormat(isPercentage, markerKey, locale, amountDecimals);
+      cell.numFmt = row.numberFormatByYear?.[year] ?? row.numberFormat ?? numberFormat ?? readableNumberFormat(isPercentage, markerKey, locale, amountDecimals);
       if (row.basisByYear[year] === "preliminary") {
         const marker = workbookMessage(locale, "workbook.preliminary");
         cell.numFmt = isPercentage ? `0.0% "${marker}"` : `#,##0${amountDecimals ? `.${"0".repeat(amountDecimals)}` : ""} "${marker}"`;

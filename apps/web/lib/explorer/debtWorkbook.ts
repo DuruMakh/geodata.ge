@@ -9,7 +9,7 @@ import type { SourcedWorkbookPublicSource } from "../methodology/workbookSources
 import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 import { publicLabel } from "../i18n/labels";
-import { buildDebtExplorerModel } from "./debtExplorer";
+import { buildDebtExplorerModel, debtRateDecimalsFor } from "./debtExplorer";
 import {
   buildWorkbookExportModel,
   type WorkbookExportModel,
@@ -63,6 +63,28 @@ function debtSourcesFor(input: DebtWorkbookInput): WorkbookPublicSource[] {
   });
 }
 
+// A rate the Ministry printed with two decimals gets a two-decimal cell; every other rate keeps the
+// sheet's one-decimal format, so a one-decimal rate is never padded (debtRateDecimals).
+function applyRatePrecision(
+  model: WorkbookExportModel,
+  series: readonly WorkbookSeries[],
+  facts: readonly ClientGovernmentDebtFact[],
+): void {
+  const decimals = debtRateDecimalsFor(facts);
+  const twoDecimal = (id: string | undefined, year: number) => id !== undefined && decimals(id, year) === 2;
+  model.readable.rows.forEach((row, index) => {
+    const years = model.readable.years.filter((year) => row.valuesByYear[year] !== null && twoDecimal(series[index]?.id, year));
+    if (years.length > 0) row.numberFormatByYear = Object.fromEntries(years.map((year) => [year, "0.00%;[Red](0.00%);–"]));
+  });
+  const idByLabel = new Map(series.map((entry) => [entry.label, entry.id]));
+  const rateColumn = model.analysis.headers.length;
+  model.analysis.numericFormats = { [rateColumn]: "0.0%" };
+  model.analysis.rowNumberFormats = Object.fromEntries(
+    model.analysis.rows.flatMap((row, index) =>
+      row[rateColumn - 1] !== null && twoDecimal(idByLabel.get(String(row[2])), Number(row[0])) ? [[index, "0.00%"]] : []),
+  );
+}
+
 function workbookStatus(status: ClientGovernmentDebtFact["status"]) {
   if (status === "projection_existing_portfolio") return "forecast" as const;
   if (status === "not_available") return "not_available" as const;
@@ -112,7 +134,7 @@ export function buildDebtWorkbookExportModel(input: DebtWorkbookInput, presentat
   });
   const percentage = input.family === "rate" || (input.family === "stock" && input.shareOfGdp);
 
-  return buildWorkbookExportModel({
+  const exportModel = buildWorkbookExportModel({
     locale,
     filenameBase: `government-debt-${input.family}`,
     title: workbookMessage(locale, FAMILY_LABEL[input.family]),
@@ -135,4 +157,6 @@ export function buildDebtWorkbookExportModel(input: DebtWorkbookInput, presentat
     ],
     siteOrigin: input.siteOrigin,
   });
+  if (input.family === "rate") applyRatePrecision(exportModel, series, input.facts);
+  return exportModel;
 }

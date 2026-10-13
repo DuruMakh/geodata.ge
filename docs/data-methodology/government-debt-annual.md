@@ -76,7 +76,7 @@ The domestic rows in the annual flow tables are retained as 13 independent overl
 The rate measure is the published year-end weighted-average annual portfolio rate. It is not calculated as interest paid divided by debt stock, and total is not an arithmetic average of domestic and external rates.
 
 - Total 2015-2025 comes from the historical Government Debt chart in the July 2026 monthly report: `3.1, 3.3, 3.2, 3.3, 3.2, 2.8, 2.5, 3.9, 5.0, 4.9, 4.7` percent.
-- Domestic values are 2018 `8.30`, 2019 `8.21`, 2020 `8.59`, 2021 `8.83`, 2022 `9.20`, 2023 `9.06` and 2024 `8.84` percent.
+- Domestic values are 2018 `8.3`, 2019 `8.21`, 2020 `8.59`, 2021 `8.83`, 2022 `9.20`, 2023 `9.06` and 2024 `8.84` percent.
 - External values are 2021 `0.95`, 2022 `2.23`, 2023 `3.40` and 2024 `3.12` percent.
 
 The 11 documented gaps remain blank:
@@ -85,6 +85,12 @@ The 11 documented gaps remain blank:
 - external 2015-2020 and 2025.
 
 The 2018 strategy table reports External Debt and the Eurobond separately, while the 2019-2020 external rows explicitly exclude the Eurobond. Those values are not comparable with the full External Government Debt portfolio. No exact year-end 2025 component rate was found in the reviewed sources. Nothing is inferred from chart geometry, another rate or cash flows.
+
+### Displayed precision
+
+Each rate is shown with the decimals its source prints, never padded (`debtRateDecimals` in `apps/web/lib/explorer/debtExplorer.ts`, used by the table, chart readout, legend and Excel file): one for the monthly report's chart labels (every total 2015-2025) and the 2019-2021 strategy (domestic 2018, printed `8.3%`); two for the 2022-2025, 2023-2026 and 2025-2029 strategy tables (domestic 2019-2024 and external 2021-2024, including the printed zeros of `9.20` and `3.40`). Before 2026-10-13 every rate showed one decimal, so 0.95% read 0.9% and 8.21% read 8.2%.
+
+The totals were re-read on 2026-10-13 for a two-decimal print and stay at one decimal. No reviewed document prints the year-end General Government total to two decimals year by year. Bulletin N25 (page 28; N13 and N19 for earlier years) prints a two-decimal series (2013-2025: 2.88, 3.10, 3.15, 3.33, 3.22, 3.32, 3.21, 2.76, 2.42, 3.97, 4.94, 4.82, 4.67) under *Public Debt Indicators*, the broader Public Debt portfolio this series does not use; it differs from the General Government chart by more than rounding in 2021-2024 (for example 2.42 against 2.5). The 2023-2026 strategy calls the 2022 government-debt rate 3.97% "according to preliminary estimates", while the later monthly report charts 2022 at 3.9%; the published final value is kept, and 3.97 is not substituted for one year of a one-decimal series. A two-decimal total would need a newer document (for example the 2027-2030 strategy or Bulletin N26) to be archived and reviewed first.
 
 Rows with one explicit non-comparable table retain that strategy source. A gap found only after reviewing the complete source set leaves the row's single-source ID/table/label blank; the validation gap instead records the five reviewed rate-source IDs. The validator compares all 33 year/scope coordinates with an exact expected value/null, availability status and source ID and emits one deterministic pass/fail record per coordinate.
 

@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { axisLabelWidth, decimalsFor } from "../../lib/explorer/chartScale";
 import { INK, SERIES_COLORS } from "../../lib/explorer/colors";
 import { ageGroupLabel, bandShares, shareOf, type AgeMeasure, type Pyramid } from "../../lib/explorer/demographyAgeSex";
-import { formatInUnit, formatShare, thousandsUnit, UNIT_PERSONS } from "../../lib/explorer/format";
+import { formatInUnit, formatShare, roundForDisplay, thousandsUnit, UNIT_PERSONS } from "../../lib/explorer/format";
 import { PYRAMID, pyramidLayout } from "../../lib/explorer/pyramidLayout";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -88,9 +88,10 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
   const step = layout.ticks[1]!.value - layout.ticks[0]!.value;
   const thousands = thousandsUnit(locale);
   const tickUnit = { ...thousands, decimals: decimalsFor(step / thousands.divisor, 4) };
+  const shareDecimals = decimalsFor(step, 2);
   const tickText = (value: number, outermost: boolean) =>
     measure === "share"
-      ? `${value.toFixed(decimalsFor(step, 2))}%`
+      ? `${roundForDisplay(value, shareDecimals).toFixed(shareDecimals)}%`
       : outermost ? `${formatInUnit(value, tickUnit)} ${thousands.label}` : formatInUnit(value, tickUnit);
   const widest = Math.max(...layout.ticks.map((tick) => axisLabelWidth(tickText(tick.value, true))));
   const pixelStep = centreLeft - layout.ticks[1]!.leftX;

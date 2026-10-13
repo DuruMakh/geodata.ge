@@ -55,6 +55,29 @@ describe("editorial formatters", () => {
     expect(formatAmount(-1_295)).toBe(">−0.01 მლნ ₾");
   });
 
+  it("rounds a last-digit 5 up in percentages and points, as Excel and Geostat do", () => {
+    // toFixed rounds the binary value: (0.95).toFixed(1) is "0.9" but (10.25).toFixed(1) is "10.3".
+    expect(formatShare(0.0095)).toBe("1.0%");
+    expect(formatShare(0.0145)).toBe("1.5%");
+    expect(formatShare(0.0735)).toBe("7.4%");
+    expect(formatShare(0.0165)).toBe("1.7%");
+    expect(formatShare(0.1285)).toBe("12.9%");
+    expect(formatShare(-0.0095, true)).toBe("−1.0%");
+    expect(formatShare(0.1025)).toBe("10.3%");
+    expect(formatPoints(0.95)).toBe("1.0");
+    expect(formatPoints(1.65, true)).toBe("+1.7");
+    expect(formatPoints(-0.95, true)).toBe("−1.0");
+    expect(formatPoints(12.85)).toBe("12.9");
+    expect(formatShare(0.0097, false, 2)).toBe("0.97%");
+    expect(formatShare(0.03965, false, 2)).toBe("3.97%");
+    // Every x.x5 tie survives the fraction × 100 inside formatShare.
+    for (let tenths = -300; tenths <= 300; tenths += 1) {
+      const tie = (tenths * 10 + 5) / 100;
+      const expected = (Math.sign(tie) * Math.round(Math.abs(tie) * 10 + 1e-9)) / 10;
+      expect(formatShare(tie / 100), String(tie)).toBe(`${expected < 0 ? "−" : ""}${Math.abs(expected).toFixed(1)}%`);
+    }
+  });
+
   it("groups thousands in percentages and points like every other figure", () => {
     expect(formatShare(45.651, true)).toBe("+4,565.1%");
     expect(formatShare(-12.5)).toBe("−1,250.0%");

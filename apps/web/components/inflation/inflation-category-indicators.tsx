@@ -5,7 +5,7 @@ import { INK } from "../../lib/explorer/colors";
 import { formatShare } from "../../lib/explorer/format";
 import { displayedValue } from "../../lib/explorer/inflationGrid";
 import { latestCategoryIndicators, type CategoryIndex, type CategoryIndicatorEntry } from "../../lib/explorer/inflationCategories";
-import { categoryColor, categoryLabel, formatContribution } from "../../lib/explorer/inflationCategoryLabels";
+import { categoryColor, categoryLabel, formatContribution, formatWeight } from "../../lib/explorer/inflationCategoryLabels";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { Message } from "../../lib/i18n/message";
 import { message } from "../../lib/i18n/messages";
@@ -79,7 +79,7 @@ export function InflationCategoryIndicators({ index }: { index: CategoryIndex })
                   monthIn: message(messages, `inflation.monthIn.${month}`),
                   category: categoryLabel(messages, hero.categoryId),
                   change: mono(hero.changePct === null ? "—" : pct(Math.abs(hero.changePct))),
-                  share: mono(hero.weightPct === null ? "—" : `${hero.weightPct.toFixed(1)}%`),
+                  share: mono(formatWeight(hero.weightPct)),
                   value: mono(`${formatContribution(Math.abs(hero.value))} ${t("pp")}`),
                 }}
               />

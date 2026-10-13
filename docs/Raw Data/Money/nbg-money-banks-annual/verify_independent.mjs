@@ -41,7 +41,8 @@ const RANGES = {
   'banks.capital_ratio': [2014, 2025], 'banks.tier1_ratio': [2014, 2025],
 };
 const EXPECTED_TOTAL = 730;
-const PLACES = { 'rates.policy': 2 };
+// NBG prints every interest rate to two decimals; every other value is rounded to one.
+const PLACES = Object.fromEntries(['rates.policy', 'rates.loans_total', 'rates.loans_gel', 'rates.loans_fx', 'rates.deposits_total', 'rates.deposits_gel', 'rates.deposits_fx'].map(id => [id, 2]));
 const ARCHIVE_LAST = 2021;
 
 // What a cell must be: where its row gets its date, and what its column heading reads.

@@ -55,6 +55,8 @@ export type WorkbookReadableRow = {
   change: number | null;
   /** Replaces the sheet's `numberFormat` for this row, for a series shown to a different precision. */
   numberFormat?: string;
+  /** Replaces the row's format in single years, for a series whose values are published at different precisions. */
+  numberFormatByYear?: Record<number, string>;
 };
 
 export const SHEET_NAMES = {

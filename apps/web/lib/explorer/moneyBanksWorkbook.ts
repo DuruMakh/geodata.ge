@@ -31,7 +31,7 @@ export function buildMoneyBanksWorkbookExportModel(input: {
   const isGdp = state.view === "gdp";
   const unitLabel = isGdp ? workbookMessage(locale, "workbook.percentGdp") : t(isAmount ? "unitMlnGel" : "unitPercent");
   const numberFormat = isAmount ? "#,##0.0" : "0.0";
-  // The National Bank rate is the one series shown to two decimals.
+  // Interest rates are the series shown to two decimals.
   const rowFormat = (decimals: number) => !isAmount && decimals === 2 ? "0.00" : undefined;
   const toExport = (value: number | null) => value === null ? null : isAmount ? value / MILLION : value;
   const status = (id: string, year: number) => {

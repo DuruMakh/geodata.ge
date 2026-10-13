@@ -85,13 +85,24 @@ export function formatShare(fraction: number | null | undefined, signed = false,
   return formatSignedFixed(fraction * 100, signed, decimals) + "%";
 }
 
-// toFixed decides rounding and the sign (as it always has); the digits get the
-// same en-US grouping as every other figure, so a mover reads "+4,565.1%".
+// Rounds a displayed decimal as Excel and Geostat do: a last-digit 5 goes up (0.95 → 1.0).
+// toFixed rounds the binary value instead, so (0.95).toFixed(1) is "0.9" but (10.25).toFixed(1)
+// is "10.3". Twelve significant digits first drop the noise arithmetic adds (a fraction × 100
+// turns 1.65 into 1.6499999999999999); Intl then rounds the decimal half away from zero.
+function decimalFixed(value: number, decimals: number): string {
+  return fixed(Number(value.toPrecision(12)), decimals);
+}
+
+/** `value` rounded to `decimals` the way it is displayed (1.65 → 1.7); −0 comes back as 0. */
+export function roundForDisplay(value: number, decimals: number): number {
+  return Number(decimalFixed(value, decimals).replaceAll(",", "")) + 0;
+}
+
+// Any negative value keeps its minus (−0.0%); the digits get the same en-US
+// grouping as every other figure, so a mover reads "+4,565.1%".
 function formatSignedFixed(value: number, signed: boolean, decimals: number): string {
-  const rounded = value.toFixed(decimals);
-  const negative = rounded.startsWith("-");
-  const prefix = negative ? "−" : signed && value > 0 ? "+" : "";
-  return prefix + fixed(Math.abs(Number(rounded)), decimals);
+  const prefix = value < 0 ? "−" : signed && value > 0 ? "+" : "";
+  return prefix + decimalFixed(Math.abs(value), decimals);
 }
 
 /** Percentage-point difference, `decimals` digits (default 1); "−" minus; optional "+" for positives. */
