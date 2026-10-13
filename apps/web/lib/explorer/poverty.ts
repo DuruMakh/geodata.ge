@@ -1,7 +1,6 @@
 import type { ClientPovertyFact, PovertyGroup, PovertyIndicator } from "../data/poverty/types";
-import { colorForItem, INK } from "./colors";
-import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
-import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
+import { refitRange, type ResolvedPeriodRange } from "./periodRange";
+import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
 
 export const POVERTY_SECTIONS = [
   { id: "rates", href: "/explorer/living-standards/poverty", labelKey: "common.povertyRates" },
@@ -35,20 +34,16 @@ export function povertyViewSeries(section: PovertySectionId, view: PovertyView):
   return withGroups("poverty.absolute", true, [...SETTLEMENTS, "age.0_17", "age.18_64", "age.65_plus", "sex.female", "sex.male"]);
 }
 
-export function povertySeriesColor(series: PovertySeriesDefinition, index: number): string {
-  return series.reference ? INK : colorForItem(series.id, index);
-}
+export const povertySeriesColor = (series: PovertySeriesDefinition, index: number): string => topicSeriesColor(series, index);
 
-export type PovertyState = { mode: "line" | "table"; range: PeriodRange; view: PovertyView; selectedIds: string[] };
+export type PovertyState = TopicState & { view: PovertyView };
 
 const cellKey = (f: { indicatorId: string; groupId: string; year: number }) => `${f.indicatorId}:${f.groupId}:${f.year}`;
 
 /** A view's years: every year any of its series has a value. */
 export function povertyCoverage(section: PovertySectionId, view: PovertyView, facts: readonly ClientPovertyFact[]) {
   const ids = new Set(povertyViewSeries(section, view).map(s => s.id));
-  const years = [...new Set(facts.filter(f => ids.has(seriesId(f.indicatorId, f.groupId))).map(f => f.year))].sort((a, b) => a - b);
-  if (!years.length) throw new Error(`No poverty years for ${section}:${view}`);
-  return { min: years[0], max: years.at(-1)!, years };
+  return topicCoverage(facts.filter(f => ids.has(seriesId(f.indicatorId, f.groupId))).map(f => f.year), `No poverty years for ${section}:${view}`);
 }
 
 export function defaultPovertyState(section: PovertySectionId): PovertyState {
@@ -58,24 +53,15 @@ export function defaultPovertyState(section: PovertySectionId): PovertyState {
 
 export function parsePovertyHash(hash: string, section: PovertySectionId, facts: readonly ClientPovertyFact[]): PovertyState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
-  const views = povertyViews(section);
-  const view = views.find(item => item === p.get("tab")) ?? views[0];
+  const view = topicHashView(p, povertyViews(section));
   const series = povertyViewSeries(section, view);
-  const requested = p.has("sel") ? p.get("sel")!.split(",") : [series[0].id];
-  return {
-    mode: p.get("view") === "table" ? "table" : "line", view,
-    range: refitRange(parseYearRangeKeys(p), povertyCoverage(section, view, facts), { collapseToAll: true }),
-    selectedIds: series.map(s => s.id).filter(id => requested.includes(id)),
-  };
+  return { ...parseTopicHash(p, series, [series[0].id], povertyCoverage(section, view, facts)), view };
 }
 
 export function serializePovertyHash(state: PovertyState, section: PovertySectionId): string {
   const p = new URLSearchParams();
   if (povertyViews(section).length > 1) p.set("tab", state.view);
-  p.set("view", state.mode);
-  p.set("sel", state.selectedIds.join(","));
-  writeYearRangeKeys(p, state.range);
-  return p.toString();
+  return serializeTopicHash(state, p);
 }
 
 /**
@@ -87,16 +73,14 @@ export function changePovertyView(state: PovertyState, section: PovertySectionId
   return { ...state, view, selectedIds: [povertyViewSeries(section, view)[0].id], range: refitRange(state.range, povertyCoverage(section, view, facts), { collapseToAll: false }) };
 }
 
-export type PovertySeriesModel = PovertySeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null };
+export type PovertySeriesModel = TopicSeriesModel<PovertySeriesDefinition>;
 export type PovertyModel = { range: ResolvedPeriodRange; years: number[]; series: PovertySeriesModel[]; selected: PovertySeriesModel[]; decimals: number };
 
 export function buildPovertyModel(section: PovertySectionId, facts: readonly ClientPovertyFact[], state: PovertyState): PovertyModel {
-  const range = resolveRange(state.range, povertyCoverage(section, state.view, facts));
-  const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
   const byCell = new Map(facts.map(f => [cellKey(f), f]));
-  const series = povertyViewSeries(section, state.view).map((definition, index) => {
-    const valuesByYear = Object.fromEntries(years.map(year => [year, byCell.get(cellKey({ ...definition, year }))?.value ?? null]));
-    return { ...definition, color: povertySeriesColor(definition, index), valuesByYear, endValue: valuesByYear[range.end] };
-  });
-  return { range, years, series, selected: series.filter(s => state.selectedIds.includes(s.id)), decimals: state.view === "main" ? 2 : 1 };
+  return {
+    ...buildTopicModel({ range: state.range, coverage: povertyCoverage(section, state.view, facts), definitions: povertyViewSeries(section, state.view), selectedIds: state.selectedIds,
+      value: (definition, year) => byCell.get(cellKey({ ...definition, year }))?.value, color: povertySeriesColor }),
+    decimals: state.view === "main" ? 2 : 1,
+  };
 }

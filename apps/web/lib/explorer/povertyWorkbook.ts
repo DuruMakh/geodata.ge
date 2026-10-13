@@ -3,19 +3,14 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { buildPovertyModel, type PovertySectionId, type PovertyState } from "./poverty";
-import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 export function buildPovertyWorkbookExportModel(input: { section: PovertySectionId; facts: readonly ClientPovertyFact[]; state: PovertyState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
   const { section, facts, state, labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `poverty.${key}`);
   const model = buildPovertyModel(section, facts, state);
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.groupId}:${f.year}`, f]));
-  const neededYears = new Map<string, Set<number>>();
-  for (const series of model.selected) for (const year of model.years) {
-    const fact = byCell.get(`${series.indicatorId}:${series.groupId}:${year}`);
-    if (fact) neededYears.set(fact.sourceId, (neededYears.get(fact.sourceId) ?? new Set<number>()).add(year));
-  }
-  const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
+  const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) => byCell.get(`${series.indicatorId}:${series.groupId}:${year}`)?.sourceId));
   const unit = section === "inequality" ? "index" : "percent";
   const numberFormat = model.decimals === 2 ? "0.00" : "0.0";
   const status = (value: number | null) => value === null ? workbookMessage(locale, "workbook.unavailable") : t("status.survey_estimate");

@@ -148,6 +148,21 @@ export function mergeSourcesByHref<T extends WorkbookPublicSource>(
   return [...byHref.values()];
 }
 
+/** The years each source supplies to the selected series: `sourceOf` names the source of a series' value in a year, or nothing where it has none. */
+export function neededSourceYears<S>(selected: readonly S[], years: readonly number[], sourceOf: (series: S, year: number) => string | undefined): Map<string, Set<number>> {
+  const needed = new Map<string, Set<number>>();
+  for (const series of selected) for (const year of years) {
+    const sourceId = sourceOf(series, year);
+    if (sourceId !== undefined) needed.set(sourceId, (needed.get(sourceId) ?? new Set<number>()).add(year));
+  }
+  return needed;
+}
+
+/** The Sources sheet of a selection: each source with only the `needed` years it supplies, merged by link. */
+export function sourcesForNeededYears<T extends WorkbookPublicSource & { sourceId: string }>(sources: readonly T[], needed: ReadonlyMap<string, ReadonlySet<number>>): T[] {
+  return mergeSourcesByHref(sources, source => source.years.filter(year => needed.get(source.sourceId)?.has(year)));
+}
+
 function safeChange(start: number | null, end: number | null): number | null {
   if (start === null || end === null || start <= 0 || end < 0) return null;
   return end / start - 1;
