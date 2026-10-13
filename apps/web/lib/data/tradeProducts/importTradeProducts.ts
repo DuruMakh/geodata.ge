@@ -63,6 +63,6 @@ export function toClientTradeProductsData(data: TradeProductsData, nationalFacts
   const facts = sourceBlock ? data.facts.filter(fact => indices.has(fact.entityId)) : data.facts;
   const years = [...new Set(facts.map(fact => fact.year))].sort((a, b) => a - b);
   // One block's products add up to the national total of each year and flow.
-  const clientFacts = roundTradeFactsToWholeDollars(facts.map((fact): ClientTradeProductFact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), ([entity, year, measure]) => `${entities[entity]!.sourceBlock}:${year}:${measure}`);
+  const clientFacts = roundTradeFactsToWholeDollars(facts.map((fact): ClientTradeProductFact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), ([entity, year, measure]) => `${entities[entity]!.sourceBlock}:${year}:${measure}`, ([entity]) => entities[entity]!.id);
   return { entities, years, facts: clientFacts, nationalFacts: roundTradeTotalsToWholeDollars(nationalFacts.filter(fact => !sourceBlock || years.includes(fact.year)).map(toClientTradeOverviewFact)), catalogueFingerprint, ...(sourceBlock ? { sourceBlock } : {}) };
 }

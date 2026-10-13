@@ -60,12 +60,12 @@ export function toClientTradeDomesticData(data: TradeDomesticData, national: rea
   const productEntities = data.entities.filter(e => e.kind === "product").map(e => ({ id: e.id, sourceBlock: "2020-2025" as const, code: e.code ?? "", labelKa: e.labelKa, sourceLabelEn: e.labelEn, categoryId: e.categoryId!, aliasesKa: e.aliasesKa, aliasesEn: e.aliasesEn }));
   const indices = new Map(productEntities.map((e, index) => [e.id, index]));
   // Products with the remainder, and countries' domestic exports, each add up to the national total of a year.
-  const productFacts = roundTradeFactsToWholeDollars(data.facts.filter(f => indices.has(f.entityId)).map((f): ClientTradeProductFact => [indices.get(f.entityId)!, f.year, 0, Number(f.valueUsd)]), ([, year]) => `${year}`);
+  const productFacts = roundTradeFactsToWholeDollars(data.facts.filter(f => indices.has(f.entityId)).map((f): ClientTradeProductFact => [indices.get(f.entityId)!, f.year, 0, Number(f.valueUsd)]), ([, year]) => `${year}`, ([entity]) => productEntities[entity]!.id);
   const domesticExports = TRADE_CHART_INDICATORS.indexOf("trade.domestic_exports");
   const productYears = [...new Set(productFacts.map(f => f[1]))].sort((a, b) => a - b);
   return {
     national: allNational,
-    countries: { entities: countryEntities.map(e => ({ id: e.id, kind: "country", sourceCode: e.code, labelKa: e.labelKa })), facts: roundTradeFactsToWholeDollars(packTradePartnerFacts(countryEntities, data.facts.filter(f => countryIds.has(f.entityId))), ([, year, measure]) => measure === domesticExports ? `${year}` : null), nationalFacts, measures: TRADE_DOMESTIC_MEASURES },
+    countries: { entities: countryEntities.map(e => ({ id: e.id, kind: "country", sourceCode: e.code, labelKa: e.labelKa })), facts: roundTradeFactsToWholeDollars(packTradePartnerFacts(countryEntities, data.facts.filter(f => countryIds.has(f.entityId))), ([, year, measure]) => measure === domesticExports ? `${year}` : null, ([entity]) => countryEntities[entity]!.id), nationalFacts, measures: TRADE_DOMESTIC_MEASURES },
     products: { entities: productEntities, years: productYears, facts: productFacts, nationalFacts: nationalFacts.filter(f => f.indicatorId === "trade.domestic_exports" && productYears.includes(f.year)), sourceBlock: "2020-2025", catalogueFingerprint: hash(JSON.stringify({ scope: "domestic-exports", entities: productEntities })), measures: ["trade.domestic_exports"] },
     englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])),
   };

@@ -63,7 +63,7 @@ export function loadServedTradePartnersData(): Promise<TradePartnersData> {
 export function toClientTradePartnersData(data: TradePartnersData, nationalFacts: readonly TradeOverviewFact[]): ClientTradePartnersData {
   // Countries' exports and imports add up to the national total of each year; groups overlap.
   const flows = [TRADE_CHART_INDICATORS.indexOf("trade.exports"), TRADE_CHART_INDICATORS.indexOf("trade.imports")];
-  const rounded = roundTradeFactsToWholeDollars(packTradePartnerFacts(data.entities, data.facts), ([entity, year, measure]) => data.entities[entity]!.kind === "country" && flows.includes(measure) ? `${year}:${measure}` : null);
+  const rounded = roundTradeFactsToWholeDollars(packTradePartnerFacts(data.entities, data.facts), ([entity, year, measure]) => data.entities[entity]!.kind === "country" && flows.includes(measure) ? `${year}:${measure}` : null, ([entity]) => data.entities[entity]!.id);
   const facts = deriveFromRoundedInputs(rounded, ([entity, year, measure, valueUsd]) => [`${entity}:${year}`, TRADE_CHART_INDICATORS[measure]!, valueUsd], ([entity, year, measure], valueUsd): ClientTradePartnerFact => [entity, year, measure, valueUsd]);
   return { entities: data.entities, facts, nationalFacts: roundTradeTotalsToWholeDollars(nationalFacts.map(toClientTradeOverviewFact)) };
 }
@@ -75,12 +75,13 @@ export function packTradePartnerFacts(entities: readonly { id: string }[], facts
 }
 
 /**
- * Rounds packed facts to whole US dollars, the precision pages and their Excel workbooks receive (platform-review
- * decision Q1, 2026-10-12); the reviewed CSVs and the database mirror keep the exact decimals. Facts that share a
- * `partition` key add up to a published total (one year's countries for one flow): they are rounded together by largest
- * remainder, so they still add up to the rounded total. Every value moves by less than a dollar; null stays null.
+ * Rounds packed facts to whole US dollars, the precision pages and their Excel workbooks receive (the platform review's
+ * recommended default for Q1, pending owner confirmation); the reviewed CSVs and the database mirror keep the exact
+ * decimals. Facts that share a `partition` key add up to a published total (one year's countries for one flow): they are
+ * rounded together by largest remainder, so they still add up to the rounded total; an equal remainder goes to the
+ * smaller `entityId`, whatever the row order. Every value moves by less than a dollar; null stays null.
  */
-export function roundTradeFactsToWholeDollars<T extends ClientTradePartnerFact>(facts: readonly T[], partition: (fact: T) => string | null): T[] {
+export function roundTradeFactsToWholeDollars<T extends ClientTradePartnerFact>(facts: readonly T[], partition: (fact: T) => string | null, entityId: (fact: T) => string): T[] {
   const rounded = facts.map(fact => fact[3] === null ? null : Math.floor(fact[3])), groups = new Map<string, number[]>();
   facts.forEach((fact, index) => {
     if (fact[3] === null) return;
@@ -90,7 +91,8 @@ export function roundTradeFactsToWholeDollars<T extends ClientTradePartnerFact>(
   for (const indices of groups.values()) {
     let missing = Math.round(indices.reduce((sum, index) => sum + facts[index]![3]!, 0)) - indices.reduce((sum, index) => sum + rounded[index]!, 0);
     const remainder = (index: number) => facts[index]![3]! - rounded[index]!;
-    for (const index of [...indices].sort((a, b) => remainder(b) - remainder(a) || a - b)) {
+    const id = (index: number) => entityId(facts[index]!);
+    for (const index of [...indices].sort((a, b) => remainder(b) - remainder(a) || (id(a) < id(b) ? -1 : id(a) > id(b) ? 1 : 0))) {
       if (missing-- <= 0) break;
       rounded[index]! += 1;
     }

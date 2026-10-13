@@ -3,6 +3,7 @@ import ExcelJS from "exceljs";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { loadTradeDomesticData, toClientTradeDomesticData } from "../../lib/data/tradeDomestic/importTradeDomestic";
 import { loadTradeOverviewFacts } from "../../lib/data/tradeOverview/importTradeOverview";
+import { TRADE_CHART_INDICATORS } from "../../lib/data/tradeOverview/types";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { loadWorkbookSources } from "../../lib/methodology/workbookSources";
 import { buildTradeOverviewWorkbookExportModel } from "../../lib/explorer/tradeOverviewWorkbook";
@@ -42,6 +43,14 @@ test("client trade values are whole dollars", async () => {
   const values = [...data.national, ...data.countries.nationalFacts, ...data.products.nationalFacts].map(fact => fact.valueUsd).concat([...data.countries.facts, ...data.products.facts].map(fact => fact[3]!));
   expect(values.length).toBeGreaterThan(5000);
   expect(values.filter(value => !Number.isInteger(value))).toEqual([]);
+  // Each country and product value moves by less than a dollar.
+  const source = new Map(domestic.facts.map(fact => [`${fact.entityId}:${fact.year}:${fact.indicatorId}`, Number(fact.valueUsd)]));
+  const moves = [
+    ...data.countries.facts.map(([entity, year, measure, value]) => value! - source.get(`${data.countries.entities[entity]!.id}:${year}:${TRADE_CHART_INDICATORS[measure]}`)!),
+    ...data.products.facts.map(([entity, year, , value]) => value! - source.get(`${data.products.entities[entity]!.id}:${year}:trade.domestic_exports`)!),
+  ];
+  expect(moves).toHaveLength(data.countries.facts.length + data.products.facts.length);
+  expect(moves.filter(move => !(Math.abs(move) < 1))).toEqual([]);
   // National re-exports follow the rounded totals, as the workbook's formula states.
   const amount = (year: number, indicator: string) => data.national.find(fact => fact.year === year && fact.indicatorId === indicator)!.valueUsd;
   for (const fact of data.national.filter(fact => fact.indicatorId === "trade.reexports")) expect(fact.valueUsd).toBe(amount(fact.year, "trade.exports") - amount(fact.year, "trade.domestic_exports"));

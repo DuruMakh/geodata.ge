@@ -92,7 +92,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   });
 }
 
-test("mixed Excel download contains the exact selected figures and all four untouched originals", async ({ page, request }) => {
+test("mixed Excel download contains the whole-dollar selected figures and all four untouched originals", async ({ page, request }) => {
   await page.goto("/en/explorer/trade/partners#sel=partner.1995-2025.643,group.eu&view=table&tab=countries&measure=trade.balance&start=2025&end=2025");
   await expect(page.getByTestId("series-status")).toContainText("2 / 218");
   const pending = page.waitForEvent("download"); await page.getByTestId("trade-partners-excel-download").click();
