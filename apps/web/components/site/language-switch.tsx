@@ -35,13 +35,14 @@ export function LanguageSwitch({ compact = false, abbreviatedOnMobile = false }:
     ) : labels[language];
   }
 
+  // No aria-label: the link's name is the text it shows ("EN" on a phone, "English" from 900px), so a
+  // voice-control user can say what they see (WCAG 2.5.3); `lang` already marks the language.
   const otherLanguage = (
     <a
       ref={linkRef}
       href={pageHref(pathname, target)}
       lang={target}
       hrefLang={target}
-      aria-label={labels[target]}
       onFocus={refreshHref}
       onPointerDown={refreshHref}
       onContextMenu={refreshHref}

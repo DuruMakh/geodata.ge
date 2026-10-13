@@ -75,7 +75,7 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
       lead={t("regionHeadingLead")}
       placeLabel={regionName}
       triggerTestId="region-picker-trigger"
-      picker={(open, close) => <RegionPicker open={open} onClose={close} regions={ordered} activeRegionId={regionId} hrefForRegion={wagesRegionHref} indexHref="/explorer/wages/regions" />}
+      picker={(open, close, id) => <RegionPicker id={id} open={open} onClose={close} regions={ordered} activeRegionId={regionId} hrefForRegion={wagesRegionHref} indexHref="/explorer/wages/regions" />}
       neighbours={neighbours ? {
         testId: "wages-region-navigation",
         previous: { href: pageHref(wagesRegionHref(neighbours.previous.id), locale), label: labels[neighbours.previous.id] },

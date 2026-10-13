@@ -12,7 +12,7 @@ for (const [locale, width] of [["ka", 390], ["en", 1440]] as const) {
     await page.goto(`${locale === "en" ? "/en" : ""}${ROUTE}`);
     await ready(page);
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-indicator", "annual");
-    await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-label", locale === "en" ? "Show cumulative price change" : "დაგროვილი ცვლილების ჩვენება");
     await expect(page.getByTestId("series-status")).toContainText("1 / 305");
     await expect(page.getByTestId("product-indicators")).toBeVisible();
     await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
@@ -51,8 +51,9 @@ test("annual default, bilingual search, multi-selection and icon-only cumulative
   await expect(page.getByTestId("product-indicators")).toContainText("Rice");
   await expect(page.getByTestId("product-table").locator("tbody tr")).toHaveCount(40);
   await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  // An action button: the name says what the next press shows, with no pressed state on top.
   await expect(toggle).toHaveAttribute("aria-label", "Show annual inflation");
+  await expect(toggle).not.toHaveAttribute("aria-pressed");
   await expect(page.getByTestId("chart-panel")).toContainText("Cumulative price change");
   await expect(page).toHaveURL(/i=cumulative/);
 });
@@ -90,13 +91,13 @@ test("the lower list searches all products independently of the chart selector",
 test("year controls, late history, empty selection and language restoration", async ({ page }) => {
   await page.goto(`/en${ROUTE}#i=cumulative&r=2015-2026&sel=cpi.product.p0179`);
   await ready(page);
-  await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-label", "Show annual inflation");
   await expect(page.getByTestId("no-selection-callout")).toBeVisible();
   await expect(page.getByTestId("product-indicators")).toContainText("history starts 2019-01");
   await page.getByTestId("language-switch").first().getByRole("link", { name: "ქართული" }).click();
   await ready(page);
   await expect(page).toHaveURL(/\/explorer\/inflation\/products#.*i=cumulative/);
-  await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-label", "წლიური ინფლაციის ჩვენება");
   await page.getByTestId("product-cumulative-toggle").click();
   await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
   await page.getByRole("button", { name: "ყველა", exact: true }).click();

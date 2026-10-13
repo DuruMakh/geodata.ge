@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
-import { buildSeriesPanelRows, buildTreeRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
+import { buildSeriesPanelRows, buildTreeRows, nestTreeRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
 import { SeriesSelector, SeriesSelectorRow } from "../../components/main-explorer/series-selector";
 import type { ExplorerItem } from "../../lib/explorer/types";
 
@@ -241,6 +241,35 @@ describe("series lists for screen readers and fingers", () => {
     }));
     expect(ministries).toContain('aria-label="Education ministry — ქვეკატეგორიები"');
     expect(ministries).toContain('aria-label="Health ministry — ქვეკატეგორიები"');
+  });
+
+  it("an expanded ministry's programs are a group named after it, which its caret controls", () => {
+    const nested = nestTreeRows(buildSeriesPanelRows(items, "", ["admin_spending.education"]), (row) => row.isProgram);
+    expect(nested.map(({ row, children }) => [row.item.id, children.map((child) => child.item.id)])).toEqual([
+      ["admin_spending.total", []],
+      ["admin_spending.education", ["admin_program.general_education", "admin_program.school_infrastructure"]],
+      ["admin_spending.health", []],
+    ]);
+
+    const ministries = renderGeorgianMarkup(createElement(SeriesPanel, {
+      items,
+      rows: [],
+      scope: "ministries",
+      showGrouping: false,
+      grouping: "ministries",
+      selectedIds: [],
+      endYear: 2025,
+      expandedIds: ["admin_spending.education"],
+      onGroupingChange: () => {},
+      onSelectionChange: () => {},
+      onToggle: () => {},
+      onToggleExpanded: () => {},
+      downloadAction: createElement("div"),
+    }));
+    const groups = [...ministries.matchAll(/<div id="([^"]+)" role="group" aria-label="([^"]+)"[^>]*>/g)];
+    expect(groups.map((group) => group[2])).toEqual(["Education ministry"]);
+    expect(ministries).toMatch(new RegExp(`aria-expanded="true" aria-controls="${groups[0]![1]}"`));
+    expect(ministries.match(/aria-controls=/g)).toHaveLength(1);
   });
 
   it("the bulk control is a plain button named by its visible word in every state", () => {

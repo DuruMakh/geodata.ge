@@ -33,8 +33,8 @@ export function HeatmapTable({ caption, rowHeader, years, rows, maximum, format,
   return <>
     <div className="mt-5">
       <div ref={scroller} data-testid="age-heatmap-scroller" role="region" aria-label={caption} tabIndex={0} className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]">
+      {/* The caption is the visible line above and this region's name; a third, hidden copy as the table caption only repeated it. */}
       <table className="w-full border-separate border-spacing-1 text-[13px]">
-        <caption className="sr-only">{caption}</caption>
         <thead><tr>
           <th scope="col" className="sticky left-0 z-10 bg-[var(--paper)] px-3 py-2 text-left text-[11px] font-medium text-[var(--muted)]">{rowHeader}</th>
           {years.map(year => <th key={year} scope="col" style={breakStyle(year)} className="min-w-[78px] px-3 py-2 text-center font-[family-name:var(--font-numeric)] text-[11px] font-medium text-[var(--muted)]">

@@ -47,7 +47,8 @@ export async function renderAboutPage(locale: Locale) {
             >
               {message(messages, "about.heading")}
             </h1>
-            <span className="self-end font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
+            {/* Decorative, like the overline opposite: English on both pages, so hidden from screen readers. */}
+            <span aria-hidden="true" className="self-end font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
               {model.updatedAt.slice(0, 4)}
               <br />
               MISSION NOTE

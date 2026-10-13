@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { ClientHouseholdFact, HouseholdArea } from "../../lib/data/household/types";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
@@ -24,7 +24,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { RegionPicker } from "../regional-economies/region-picker";
+import { RegionPicker, useRefocusAfterPick } from "../regional-economies/region-picker";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { Callout, SourceNote } from "../ui/editorial";
 import { MeasureTabs } from "./household-measure-tabs";
@@ -49,6 +49,9 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
   const { state, update } = useHashState(facts, parse, serializeHouseholdHash);
   const [query, setQuery] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerId = useId();
+  const pickerTrigger = useRef<HTMLButtonElement>(null);
+  useRefocusAfterPick(pickerTrigger, "region-picker-trigger");
   const model = buildHouseholdModel(section, area, facts, state);
   const labels: Record<string, string> = { ...lineLabels, ...areaLabels };
   const unit: ValueUnit = { divisor: 1, label: t("unitGel"), decimals: 1 };
@@ -73,11 +76,11 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
     <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
       <div className="relative min-w-0 min-[768px]:flex-1">
         <ExplorerHeading>{t(`page.${section}.regionHeadingLead`)}{" "}
-          <button type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
+          <button ref={pickerTrigger} type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} aria-haspopup="dialog" aria-controls={pickerOpen ? pickerId : undefined} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
             {areaName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
           </button>
         </ExplorerHeading>
-        <RegionPicker open={pickerOpen} onClose={() => setPickerOpen(false)} regions={areas} activeRegionId={area} hrefForRegion={areaHref} indexHref={`${pagePath}${householdMeasureHash(state.measure)}`} />
+        <RegionPicker id={pickerId} open={pickerOpen} onClose={() => setPickerOpen(false)} regions={areas} activeRegionId={area} hrefForRegion={areaHref} indexHref={`${pagePath}${householdMeasureHash(state.measure)}`} />
       </div>
       <EntityNeighbourLinks testId="household-region-navigation" className="mb-3"
         previous={{ href: pageHref(areaHref(neighbours.previous.id), locale), label: areaLabels[neighbours.previous.id as HouseholdArea] }}

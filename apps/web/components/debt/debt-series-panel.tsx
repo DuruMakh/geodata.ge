@@ -10,7 +10,7 @@ import { formatAmount, formatShare, MISSING } from "../../lib/explorer/format";
 import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../../lib/servedRows";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
 import { SeriesAside } from "../explorer-shell/series-aside";
-import { buildTreeRows } from "../main-explorer/series-panel";
+import { buildTreeRows, nestTreeRows } from "../main-explorer/series-panel";
 
 type DebtSeriesPanelProps = {
   items: GovernmentDebtExplorerModel["items"];
@@ -66,6 +66,34 @@ export function DebtSeriesPanel({
   // active family's three rows: empty selects them, anything else clears.
   const familyIds = items.filter((item) => item.family === family).map((item) => item.id);
   const allFamilySelected = familyIds.every((id) => selectedIds.includes(id));
+  const renderRow = ({ item, isChild, hasChildren, expanded }: (typeof visibleRows)[number], members?: ReactNode) => (
+    <SeriesSelectorRow
+      key={item.id}
+      id={item.id}
+      label={publicLabel(locale, item.id, item.kaLabel, englishLabels)}
+      color={item.color}
+      value={formatSummary(summaryBySeries.get(item.id), latestYearBySeries.get(item.id), locale)}
+      selected={selectedIds.includes(item.id)}
+      level={isChild ? "debt_child" : "debt_parent"}
+      parentId={item.parentItemId}
+      showCaretColumn
+      hasChildren={hasChildren}
+      expanded={expanded}
+      expansionLabel={message(messages, expanded ? "debt.collapse" : "debt.expand", { name: publicLabel(locale, item.id, item.kaLabel, englishLabels) })}
+      showRail={isChild || expanded}
+      isChild={isChild}
+      childLabelSize="standard"
+      wrapLabel={locale === "en"}
+      onToggle={() => onToggle(item.id)}
+      onToggleExpanded={() => {
+        setExpandedIds((current) => current.includes(item.id)
+          ? current.filter((id) => id !== item.id)
+          : [...current, item.id]);
+      }}
+    >
+      {members}
+    </SeriesSelectorRow>
+  );
   return (
     <SeriesAside label={message(messages, "controls.series")}>
       <SeriesSelector
@@ -76,32 +104,8 @@ export function DebtSeriesPanel({
         allSelected={allFamilySelected}
         onToggleAll={() => onSelectionChange(hasSelection ? [] : familyIds)}
       >
-        {visibleRows.map(({ item, isChild, hasChildren, expanded }) => (
-          <SeriesSelectorRow
-            key={item.id}
-            id={item.id}
-            label={publicLabel(locale, item.id, item.kaLabel, englishLabels)}
-            color={item.color}
-            value={formatSummary(summaryBySeries.get(item.id), latestYearBySeries.get(item.id), locale)}
-            selected={selectedIds.includes(item.id)}
-            level={isChild ? "debt_child" : "debt_parent"}
-            parentId={item.parentItemId}
-            showCaretColumn
-            hasChildren={hasChildren}
-            expanded={expanded}
-            expansionLabel={message(messages, expanded ? "debt.collapse" : "debt.expand", { name: publicLabel(locale, item.id, item.kaLabel, englishLabels) })}
-            showRail={isChild || expanded}
-            isChild={isChild}
-            childLabelSize="standard"
-            wrapLabel={locale === "en"}
-            onToggle={() => onToggle(item.id)}
-            onToggleExpanded={() => {
-              setExpandedIds((current) => current.includes(item.id)
-                ? current.filter((id) => id !== item.id)
-                : [...current, item.id]);
-            }}
-          />
-        ))}
+        {nestTreeRows(visibleRows, (row) => row.isChild).map(({ row, children }) =>
+          renderRow(row, children.length ? children.map((child) => renderRow(child)) : undefined))}
       </SeriesSelector>
       {downloadAction}
     </SeriesAside>

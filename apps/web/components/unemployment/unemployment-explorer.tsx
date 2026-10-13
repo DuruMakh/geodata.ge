@@ -82,7 +82,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       lead={t("regionHeadingLead")}
       placeLabel={regionName}
       triggerTestId="region-picker-trigger"
-      picker={(open, close) => <RegionPicker open={open} onClose={close} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />}
+      picker={(open, close, id) => <RegionPicker id={id} open={open} onClose={close} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />}
       // Previous/next in the regions' fixed order, as on Economy region pages.
       neighbours={neighbours ? {
         testId: "unemployment-region-navigation",

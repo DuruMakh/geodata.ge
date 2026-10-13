@@ -59,8 +59,8 @@ export function VitalSection({
       : t(streak.kind === "even" ? "vitalEven" : "vitalBirthsAhead", { year: streak.year });
 
   return (
-    <section id="births-deaths" data-testid="vital-section" className={`@container ${SECTION_CLASS}`}>
-      <SectionTitle>{t("vitalTitle")}</SectionTitle>
+    <section id="births-deaths" aria-labelledby="births-deaths-title" data-testid="vital-section" className={`@container ${SECTION_CLASS}`}>
+      <SectionTitle id="births-deaths-title">{t("vitalTitle")}</SectionTitle>
       <p className="mt-2 mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("vitalLead", { place: name, first, last })}</p>
       <div data-testid="vital-chart-panel" data-mode={mode}>
         <ModeTabs value={mode} onChange={setMode} testId="vital" lineLabel={t("columns")} />

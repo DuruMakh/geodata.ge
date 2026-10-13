@@ -33,12 +33,15 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
 /**
  * An empty summary leaves out the overview block.
  * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
+ * headingLevel 3 nests the overview and list titles under a section title of the page's own.
  */
-export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapControls }: {
+export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapControls, headingLevel = 2 }: {
   model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>;
   leadRow?: { id: string; label: string; value: number };
   mapControls?: ReactNode;
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 3 ? "h3" : "h2";
   const { locale, messages, englishLabels } = useI18n();
   const [query, setQuery] = useState("");
   const [mapActive, setMapActive] = useState<string | null>(null);
@@ -65,9 +68,9 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
           {mapControls ? <div className="mb-4 flex justify-end">{mapControls}</div> : null}
           <RegionMap model={model} metric={metric} activeRegionId={activeRegionId} onActiveRegionChange={setMapActive} />
           {summary.length ? <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
-            <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
+            <Heading className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
               {message(messages, "regionalEconomies.summaryTitle")}
-            </h2>
+            </Heading>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
               {summary.map((item) => (
                 <div key={item.label} className="flex flex-col gap-[5px]">
@@ -82,7 +85,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
 
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
-            <span className="font-[family-name:var(--font-display)] text-[19px] font-semibold">{message(messages, "regionalEconomies.regions")}</span>
+            <Heading className="font-[family-name:var(--font-display)] text-[19px] font-semibold">{message(messages, "regionalEconomies.regions")}</Heading>
             <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{model.year}</span>
           </div>
           <div className="flex items-center gap-2 pt-3 pb-1">

@@ -23,7 +23,9 @@ export function DataSidebar() {
   const { locale, messages } = useI18n();
   const [collapsed, setCollapsed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(true);
+  // Unknown until mounted: the server cannot see the width, and the toggle's state and
+  // label differ by it (the rail on desktop, the closed sheet on a phone).
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
   const [animateWidth, setAnimateWidth] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const asideRef = useRef<HTMLElement>(null);
@@ -89,11 +91,12 @@ export function DataSidebar() {
 
   // Collapse is a desktop posture. A preference set on a laptop must not follow
   // the user to a phone, where it would render as a mystery-narrow rail.
-  const railed = collapsed && isDesktop;
+  const railed = collapsed && isDesktop === true;
   // One control, two jobs, so "expanded" means different things by width: the
   // rail on desktop, the sheet on mobile. The label, the glyph and aria-expanded
-  // must all describe whichever one the next click will change.
-  const navVisible = isDesktop ? !railed : sheetOpen;
+  // must all describe whichever one the next click will change. Before the width
+  // is known the toggle states nothing: a neutral "Menu" and no aria-expanded.
+  const navVisible = isDesktop === null ? undefined : isDesktop ? !railed : sheetOpen;
 
   function handleToggle() {
     if (!isDesktop) {
@@ -157,7 +160,7 @@ export function DataSidebar() {
           type="button"
           data-testid="sidebar-toggle"
           aria-expanded={navVisible}
-          aria-controls={!isDesktop ? MOBILE_NAV_ID : undefined}
+          aria-controls={isDesktop === false ? MOBILE_NAV_ID : undefined}
           aria-label={message(messages, isDesktop ? (navVisible ? "common.collapsePanel" : "common.expandPanel") : "common.menu")}
           onClick={handleToggle}
           className="-mr-2 flex size-11 flex-none cursor-pointer items-center justify-center rounded-[3px] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)] min-[900px]:mr-0 min-[900px]:size-[26px] min-[900px]:border min-[900px]:border-[rgba(247,242,233,0.18)]"

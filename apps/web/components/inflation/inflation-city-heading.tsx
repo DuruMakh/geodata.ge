@@ -23,8 +23,9 @@ export function InflationCityHeading({ view }: { view: CityView }) {
       lead={t("cityHeadingLead")}
       placeLabel={cityPlaceLabel(messages, view)}
       triggerTestId="city-picker-trigger"
-      picker={(open, close) => (
+      picker={(open, close, id) => (
         <PickerDialog
+          id={id}
           open={open}
           onClose={close}
           options={CPI_CITY_IDS.map((cityId) => ({ id: cityId, label: cityLineLabel(messages, cityId), href: pageHref(cityPageHref(cityId), locale), searchTerms: [cityLineLabel(messages, cityId), citySlug(cityId)] }))}

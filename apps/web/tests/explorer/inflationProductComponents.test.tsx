@@ -49,7 +49,9 @@ describe("individual-product inflation page", () => {
     const index = buildProductIndex(props.products, runs);
     const { lastReviewedAt, sources, siteOrigin } = props;
     const html = renderGeorgianMarkup(<ProductExplorer index={index} lastReviewedAt={lastReviewedAt} sources={sources} siteOrigin={siteOrigin} />, { ...common, ...controls, ...inflation, ...main });
-    expect(html).toMatch(/data-testid="product-cumulative-toggle"[^>]*aria-pressed="false"/);
+    // An action button named for what a press shows, with no pressed state to announce on top.
+    expect(html).toMatch(/data-testid="product-cumulative-toggle"[^>]*aria-label="დაგროვილი ცვლილების ჩვენება"/);
+    expect(html).not.toMatch(/data-testid="product-cumulative-toggle"[^>]*aria-pressed/);
     expect(html).toContain('data-testid="series-status"');
     expect(html).toContain("305");
     // The derived cumulative change is labelled as Fiscal.ge's own calculation.

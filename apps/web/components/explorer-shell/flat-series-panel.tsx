@@ -90,8 +90,9 @@ export function FlatSeriesPanel({
     return <div key={row.id} className={row.parentId ? "ml-4" : undefined}>
       <SeriesSelectorRow id={row.id} label={row.label} color={row.color} value={row.value} selected={selectedIds.includes(row.id)} level={row.id === totalId ? "total" : "item"} parentId={row.parentId} isChild={Boolean(row.parentId)} childLabelSize="standard" wrapLabel={wrapLabel}
         showCaretColumn={hasCarets} hasChildren={children.length > 0} expanded={open} expansionLabel={labels.expansionLabel(row.label)}
-        onToggleExpanded={() => setExpanded({ ...expanded, [row.id]: !open })} onToggle={() => toggle(row.id)} />
-      {open ? children.map((child) => nestedRow(child, labels)) : null}
+        onToggleExpanded={() => setExpanded({ ...expanded, [row.id]: !open })} onToggle={() => toggle(row.id)}>
+        {open && children.length ? children.map((child) => nestedRow(child, labels)) : undefined}
+      </SeriesSelectorRow>
     </div>;
   }
   const panel = <>

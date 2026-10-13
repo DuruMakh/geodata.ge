@@ -51,6 +51,8 @@ export type StackedColumnChartProps = {
   /** Tightens the float readout's rows so a dozen of them fit the plot's height. */
   compactReadout?: boolean;
   ariaLabel: string;
+  /** The scroll frame's landmark name, for a page whose other chart already has the default one. */
+  frameLabel?: string;
   /** Periods per calendar year on the x axis: 12 for months (default), 1 for years. */
   periodsPerYear?: number;
   /** A colour key drawn as a swatch row above the plot, so colour is never the only cue (DESIGN.md §13); none when absent or empty. */
@@ -145,6 +147,7 @@ export function StackedColumnChart({
   readoutRowCap = TOOLTIP_ROW_CAP,
   compactReadout = false,
   ariaLabel,
+  frameLabel,
   periodsPerYear = 12,
   legend,
 }: StackedColumnChartProps) {
@@ -443,6 +446,7 @@ export function StackedColumnChart({
       ) : null}
       <ChartScrollFrame
         testId="stack-chart-frame"
+        label={frameLabel}
         scrollKey={scrollKey}
         fit={active.mobile}
         yAxis={active.mobile ? undefined : stickyAxis}

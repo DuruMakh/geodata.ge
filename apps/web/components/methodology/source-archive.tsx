@@ -80,7 +80,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
           />
         </label>
         {/* Below 760px the years wrap onto more rows instead of scrolling sideways. */}
-        {rows.length >= YEAR_FILTER_MIN_ROWS ? <div data-testid="archive-year-filter" className="pb-1 min-[760px]:overflow-x-auto" aria-label={message(messages, "methodology.yearFilter")}>
+        {rows.length >= YEAR_FILTER_MIN_ROWS ? <div data-testid="archive-year-filter" role="group" className="pb-1 min-[760px]:overflow-x-auto" aria-label={message(messages, "methodology.yearFilter")}>
           <div className="flex flex-wrap gap-2 min-[760px]:min-w-max min-[760px]:flex-nowrap">
             <button
               type="button"
@@ -104,6 +104,11 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
           </div>
         </div> : null}
       </div>
+
+      {/* The table changes silently as the search and year narrow it: this polite live region says how far. */}
+      <p data-testid="source-archive-status" role="status" className="sr-only">
+        {message(messages, "methodology.resultCount", { count: filteredRows.length, total: rows.length })}
+      </p>
 
       {/* Below 760px the same rows render as stacked blocks — year, title, file
           name, publisher, then a full-width download link showing format and

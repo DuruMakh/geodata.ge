@@ -105,16 +105,20 @@ export function GdpOverview({
     },
   ];
   const currentSources = gdpSelectionSources(sources, m.sourceIds);
-  function select(indicator: GdpIndicator) {
-    const next = changeGdpIndicator(state, indicator, facts),
-      nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges);
+  // Says what the chart now shows: two indicators can share a period, so the period alone may not change.
+  function show(next: GdpState) {
+    const nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges),
+      nextDisplay = gdpDisplay(next, presentation);
     setState(next);
     setAnnouncement(
-      message(messages, "gdp.rangeChanged", {
+      `${nextDisplay.label} · ${nextDisplay.fullUnitLabel} · ${message(messages, "gdp.rangeChanged", {
         start: nextModel.range.start,
         end: nextModel.range.end,
-      }),
+      })}`,
     );
+  }
+  function select(indicator: GdpIndicator) {
+    show(changeGdpIndicator(state, indicator, facts));
   }
   return (
     <ExplorerPage testId="gdp-overview" containerQueries={false}>
@@ -178,7 +182,7 @@ export function GdpOverview({
               <SegmentedTabs
                 ariaLabel={t("currency")}
                 value={state.currency}
-                onChange={(currency) => setState((s) => ({ ...s, currency }))}
+                onChange={(currency) => show({ ...state, currency })}
                 options={[
                   { value: "gel", label: t("gel"), icon: <span aria-hidden="true" className="text-base">₾</span> },
                   { value: "usd", label: t("usd"), icon: <span aria-hidden="true" className="text-base">$</span> },

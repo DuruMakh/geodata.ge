@@ -48,6 +48,7 @@
   "methodology.downloadFile": "Download {title} — {format}",
   "methodology.downloadArrow": "Download ↓",
   "methodology.empty": "No sources found",
+  "methodology.resultCount": "{count} of {total} sources shown",
   "methodology.manifest": "Manifest:",
   "methodology.manifestDownload": "Download source manifest — {format}",
   "methodology.originalLanguageNote": "Descriptions are translated into English; original files and filenames are unchanged. Document language is unverified unless shown.",

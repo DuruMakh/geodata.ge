@@ -82,7 +82,7 @@ export function RegionalEconomyExplorer({
         lead={t("detailHeadingLead")}
         placeLabel={regionLabel}
         triggerTestId="region-picker-trigger"
-        picker={(open, close) => <RegionPicker open={open} onClose={close} regions={regions} activeRegionId={region.id} />}
+        picker={(open, close, id) => <RegionPicker id={id} open={open} onClose={close} regions={regions} activeRegionId={region.id} />}
         neighbours={{
           testId: "regional-entity-navigation",
           previous: { href: pageHref(regionalEconomyHref(previousRegion.id), locale), label: publicLabel(locale, previousRegion.id, previousRegion.kaLabel, englishLabels) },

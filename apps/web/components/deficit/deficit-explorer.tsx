@@ -126,6 +126,8 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
         <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
           {latestActual?.year}: {label} · {headlineValue}
         </span>
+        {/* The flex gap is the only visible break between the value and the note; a reader needs one too. */}
+        <span className="sr-only">. </span>
         <span>{message(messages, "deficit.negative")}</span>
       </p>
 

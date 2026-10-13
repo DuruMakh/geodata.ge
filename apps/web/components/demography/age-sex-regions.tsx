@@ -24,6 +24,7 @@ export function AgeSexRegions({ model, georgiaShare, sourceNote }: { model: Regi
       <SectionTitle>{t("regionsTitle")}</SectionTitle>
       <div className="mt-6">
         <RegionIndex
+          headingLevel={3}
           model={model}
           sourceNote={sourceNote}
           metric={{

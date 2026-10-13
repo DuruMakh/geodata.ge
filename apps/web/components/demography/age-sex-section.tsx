@@ -61,8 +61,8 @@ export function AgeSexSection({
   const isGeorgia = place.id === GEORGIA_PLACE_ID;
 
   return (
-    <section id="age-sex" data-testid="age-sex-section" className={`@container ${SECTION_CLASS}`}>
-      <SectionTitle>{t("ageSexCensusHeading")}</SectionTitle>
+    <section id="age-sex" aria-labelledby="age-sex-title" data-testid="age-sex-section" className={`@container ${SECTION_CLASS}`}>
+      <SectionTitle id="age-sex-title">{t("ageSexCensusHeading")}</SectionTitle>
       <div className="mt-4 mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <div className="flex flex-wrap items-center gap-x-7 gap-y-3">
           {SETTLEMENTS.map(({ id, key }) => (

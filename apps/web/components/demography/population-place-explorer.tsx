@@ -121,6 +121,7 @@ export function PopulationPlaceExplorer({
       <p role="status" className="sr-only">{t("rangeChanged", { start: model.range.start, end: model.range.end })}</p>
       <EntityWorkspaceShell
         testId="population-place-workspace"
+        asideLabel={message(messages, "controls.series")}
         main={
           <>
             <section data-testid="population-chart-panel" data-mode={state.chartMode}>

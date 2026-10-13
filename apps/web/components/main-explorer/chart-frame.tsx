@@ -8,6 +8,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
+  type RefObject,
 } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { nearestPeriodIndex } from "../../lib/explorer/chartNavigation";
@@ -80,6 +81,30 @@ export const DESKTOP_ONLY = "max-[768px]:hidden";
 export const MOBILE_ONLY = "hidden max-[768px]:block";
 
 /**
+ * Whether a sideways scroller's content is wider than it, and its visible width, re-measured as it resizes.
+ * Both start false and 0 on the server and the client alike, so hydration matches.
+ */
+export function useHorizontalOverflow(scroller: RefObject<HTMLElement | null>) {
+  const [overflowing, setOverflowing] = useState(false);
+  const [visibleWidth, setVisibleWidth] = useState(0);
+
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element) return;
+    const measure = () => {
+      setOverflowing(element.scrollWidth > element.clientWidth + 1);
+      setVisibleWidth(element.clientWidth);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [scroller]);
+
+  return { overflowing, visibleWidth };
+}
+
+/**
  * Scroll instead of shrink on narrow screens: an unbounded w-full SVG scales its
  * text below the DESIGN.md §13 legibility floor on phones.
  *
@@ -100,6 +125,7 @@ export const MOBILE_ONLY = "hidden max-[768px]:block";
 export function ChartScrollFrame({
   children,
   testId = "chart-frame",
+  label,
   scrollKey,
   yAxis,
   overlay,
@@ -107,6 +133,8 @@ export function ChartScrollFrame({
 }: {
   children: ReactNode;
   testId?: string;
+  /** Names this chart where a page has two (a landmark name must be unique); "Multi-year chart" without it. */
+  label?: string;
   scrollKey?: string;
   yAxis?: StickyYAxis;
   /** Drawn over the visible part of the frame, whatever its scroll position (a tapped readout). */
@@ -116,23 +144,8 @@ export function ChartScrollFrame({
 }) {
   const { messages } = useI18n();
   const scroller = useRef<HTMLDivElement>(null);
-  // Starts false on the server and the client alike, so hydration matches; the
-  // sticky axis only appears once the browser has measured an overflow.
-  const [overflowing, setOverflowing] = useState(false);
-  const [visibleWidth, setVisibleWidth] = useState(0);
-
-  useEffect(() => {
-    const element = scroller.current;
-    if (!element) return;
-    const measure = () => {
-      setOverflowing(element.scrollWidth > element.clientWidth + 1);
-      setVisibleWidth(element.clientWidth);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
+  // The sticky axis only appears once the browser has measured an overflow.
+  const { overflowing, visibleWidth } = useHorizontalOverflow(scroller);
 
   // Layout effect: the jump to the latest data lands before the first paint
   // after hydration, not as a visible slide. A frame that fits has nothing to do.
@@ -150,7 +163,9 @@ export function ChartScrollFrame({
       // the chart inside is the one keyboard stop.
       tabIndex={overflowing ? 0 : undefined}
       // Name the sideways scroll only when there is one (a phone chart fits its frame).
-      aria-label={message(messages, overflowing ? "controls.chartScrollable" : "controls.chartRegion")}
+      aria-label={label === undefined
+        ? message(messages, overflowing ? "controls.chartScrollable" : "controls.chartRegion")
+        : overflowing ? message(messages, "controls.chartScrollableNamed", { label }) : label}
       className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
     >
       <div className={fit ? "relative grid" : "relative grid min-w-[720px] max-[768px]:min-w-0 min-[900px]:max-[1020px]:min-w-0"}>

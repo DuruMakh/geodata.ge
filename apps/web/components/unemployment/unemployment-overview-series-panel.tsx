@@ -57,8 +57,9 @@ export function UnemploymentOverviewSeriesPanel({ definitions, referenceId, stat
         selected={state.selectedIds.includes(row.seriesId)} level={row.seriesId === referenceId && !row.parentId ? "total" : "item"} parentId={row.parentId} isChild={Boolean(row.parentId)} childLabelSize="standard" wrapLabel
         showCaretColumn hasChildren={nested.length > 0} expanded={open} expansionLabel={message(messages, "unemployment.subcategoriesFor", { label: row.label })}
         onToggleExpanded={() => setExpanded(previous => ({ ...previous, [row.id]: !open }))}
-        onToggle={() => toggle(row)} />
-      {open ? nested.map(child => renderRow(child, depth + 1)) : null}
+        onToggle={() => toggle(row)}>
+        {open && nested.length ? nested.map(child => renderRow(child, depth + 1)) : undefined}
+      </SeriesSelectorRow>
     </div>;
   }
   return <SeriesAside label={message(messages, "controls.series")}>

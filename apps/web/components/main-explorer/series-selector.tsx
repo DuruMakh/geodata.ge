@@ -2,7 +2,7 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import { useRef, type FocusEvent, type ReactNode } from "react";
+import { useId, useRef, type FocusEvent, type ReactNode } from "react";
 import { SwatchBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 
@@ -225,6 +225,8 @@ type SeriesSelectorRowProps = {
   disabledReason?: string;
   onToggle: () => void;
   onToggleExpanded?: () => void;
+  /** A parent's shown child rows: they follow it inside a group named after it, which its caret controls. */
+  children?: ReactNode;
 };
 
 export function SeriesSelectorRow({
@@ -252,11 +254,13 @@ export function SeriesSelectorRow({
   disabledReason,
   onToggle,
   onToggleExpanded,
+  children,
 }: SeriesSelectorRowProps) {
   const { messages } = useI18n();
+  const groupId = useId();
   const disabled = disabledReason !== undefined;
   const ticked = selected && !disabled;
-  return (
+  const row = (
     <div
       data-testid="series-row"
       data-series-id={id}
@@ -277,6 +281,7 @@ export function SeriesSelectorRow({
             if (!expansionLocked) onToggleExpanded?.();
           }}
           aria-expanded={hasChildren ? expanded : undefined}
+          aria-controls={children ? groupId : undefined}
           aria-label={expansionLabel ?? message(messages, "controls.subitemsFor", { label })}
           aria-disabled={expansionLocked || undefined}
           // The caret's own box is 24px wide (WCAG 2.5.8, which axe measures on the element), and
@@ -333,6 +338,13 @@ export function SeriesSelectorRow({
       </button>
     </div>
   );
+  // The hierarchy is not only visual: a screen reader hears the children as a group named after their parent.
+  return children ? (
+    <>
+      {row}
+      <div id={groupId} role="group" aria-label={label} data-testid="series-row-group">{children}</div>
+    </>
+  ) : row;
 }
 
 // Reference rows (a target, not a series) match their dashed chart line.

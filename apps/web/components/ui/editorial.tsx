@@ -97,11 +97,13 @@ export function Overline({ children }: OverlineProps) {
 
 type SectionTitleProps = {
   children: ReactNode;
+  /** For a section's `aria-labelledby`. */
+  id?: string;
 };
 
-export function SectionTitle({ children }: SectionTitleProps) {
+export function SectionTitle({ children, id }: SectionTitleProps) {
   return (
-    <h2 className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-[-0.01em] text-[var(--ink)]">
+    <h2 id={id} className="font-[family-name:var(--font-display)] text-[22px] font-semibold tracking-[-0.01em] text-[var(--ink)]">
       {children}
     </h2>
   );

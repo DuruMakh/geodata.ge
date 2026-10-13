@@ -94,7 +94,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
       <SectionTitle>{t(services ? "services.balanceTitle" : "balanceTitle")}</SectionTitle>
       <p className="mt-2 max-w-[900px] text-[12px] leading-relaxed text-[var(--muted)]">{t(services ? "services.balanceNote" : "balanceNote")}</p>
       <p className="my-4 text-[11px] text-[var(--muted)]">{model.unit.label} · {model.range.start}–{model.range.end}</p>
-      <StackedColumnChart periods={model.years} periodsPerYear={1} segments={[{ id: "trade.balance", label: label("trade.balance"), color: TRADE_OVERVIEW_COLORS["trade.balance"], values: model.balanceValues.map(value => value === null ? null : value / model.unit.divisor) }]} overlay={null} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} ariaLabel={t(services ? "services.balanceAria" : "balanceAria")} />
+      <StackedColumnChart periods={model.years} periodsPerYear={1} segments={[{ id: "trade.balance", label: label("trade.balance"), color: TRADE_OVERVIEW_COLORS["trade.balance"], values: model.balanceValues.map(value => value === null ? null : value / model.unit.divisor) }]} overlay={null} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} ariaLabel={t(services ? "services.balanceAria" : "balanceAria")} frameLabel={label("trade.balance")} />
     </section> : null}
   </div>;
 }

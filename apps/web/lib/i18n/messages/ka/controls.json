@@ -30,6 +30,7 @@
   "controls.ministries": "სამინისტროები",
   "controls.grouping": "დაჯგუფება",
   "controls.chartScrollable": "მრავალწლიანი გრაფიკი — ჰორიზონტალურად გადაადგილებადი",
+  "controls.chartScrollableNamed": "{label} — ჰორიზონტალურად გადაადგილებადი",
   "controls.chartRegion": "მრავალწლიანი გრაფიკი",
   "controls.chartTrend": "მრავალწლიანი დინამიკა",
   "controls.chartSummary": "{series}, {count} სერია, {start}–{end}",

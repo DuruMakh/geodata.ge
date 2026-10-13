@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { periodKey } from "../../lib/data/inflation/periods";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
@@ -12,6 +12,7 @@ import { SectionTitle } from "../ui/editorial";
 import { InflationProductArt } from "./inflation-product-art";
 import { filteredProductIds } from "./inflation-product-panel";
 import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
+import { useHorizontalOverflow } from "../main-explorer/chart-frame";
 
 const BATCH_SIZE = 40;
 
@@ -28,6 +29,9 @@ export function InflationProductTable({ index, state, onToggle }: {
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `inflation.${key}`, values);
   const [query, setQuery] = useState("");
   const [shown, setShown] = useState(Math.min(BATCH_SIZE, index.products.length));
+  const captionId = useId();
+  const scroller = useRef<HTMLDivElement>(null);
+  const { overflowing } = useHorizontalOverflow(scroller);
   const endPeriod = productEndPeriod(index, state.range.endYear);
   const matches = filteredProductIds(index, query, productsByCumulative(index, state.range.startYear, endPeriod));
   const ids = matches.slice(0, shown);
@@ -48,11 +52,13 @@ export function InflationProductTable({ index, state, onToggle }: {
       />
     </div>
     {ids.length === 0 ? <p data-testid="product-list-empty" className="mt-6 text-[13px] text-[var(--muted)]">{t("productsNoMatches")}</p> : <div className="mt-[18px]">
+      {/* Named by its caption; a keyboard stop only while there is a sideways scroll to operate. */}
       <div
+        ref={scroller}
         data-testid="product-table"
         role="region"
-        tabIndex={0}
-        aria-label={message(messages, "controls.tableScrollable")}
+        tabIndex={overflowing ? 0 : undefined}
+        aria-labelledby={captionId}
         className="max-w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
         {/* Short column headers with the periods in the visible caption: on a phone the name and
@@ -65,7 +71,7 @@ export function InflationProductTable({ index, state, onToggle }: {
             <col className="w-[85px] min-[768px]:w-[25%]" />
             <col className="w-[56px] min-[768px]:w-[30%]" />
           </colgroup>
-          <caption data-testid="product-table-caption" className="pb-2 text-left text-[12px] leading-[1.5] text-[var(--muted)]">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
+          <caption id={captionId} data-testid="product-table-caption" className="pb-2 text-left text-[12px] leading-[1.5] text-[var(--muted)]">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
           <thead><tr>
             <th scope="col" className="sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] py-2 pr-3 text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)]">
               {t("productsProductColumn")}
@@ -94,7 +100,7 @@ export function InflationProductTable({ index, state, onToggle }: {
                     type="button"
                     data-testid="product-row-toggle"
                     aria-pressed={selected}
-                    aria-label={`${t(selected ? "productsDeselect" : "productsSelect")} ${primary}`}
+                    aria-label={primary}
                     onClick={() => onToggle(id)}
                     className="flex min-h-9 w-full cursor-pointer items-center gap-2 text-left"
                   >

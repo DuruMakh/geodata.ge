@@ -268,6 +268,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
 
       <EntityWorkspaceShell
         testId="municipal-workspace"
+        asideLabel={message(messages, "controls.series")}
         main={
           <>
             <div

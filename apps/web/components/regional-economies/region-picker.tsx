@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type RefObject } from "react";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -15,6 +15,24 @@ export type PickerOption = { id: string; label: string; href: string; searchTerm
 export type PickerText = { title: string; placeholder: string; search: string; results: string; empty: string; clear: string; hint: string };
 type PickerAllOption = { label: string; href: string; searchTerms: string[]; testId: string; current?: boolean };
 
+// A pick swaps the page, and the trigger that held focus leaves with the old one: the new
+// page's trigger takes focus when it mounts (`useRefocusAfterPick`), so keyboard and
+// screen-reader users stay where they were instead of starting over at the top.
+let pendingRefocus: { trigger: string; pathname: string } | null = null;
+
+function markRefocus(trigger: string, href: string) {
+  pendingRefocus = { trigger, pathname: new URL(href, window.location.href).pathname };
+}
+
+/** Focuses this page's picker trigger when the page was opened from that picker. */
+export function useRefocusAfterPick(trigger: RefObject<HTMLButtonElement | null>, testId: string) {
+  useEffect(() => {
+    if (pendingRefocus?.trigger !== testId || pendingRefocus.pathname !== window.location.pathname) return;
+    pendingRefocus = null;
+    trigger.current?.focus();
+  }, [trigger, testId]);
+}
+
 /** The options a query keeps, in their given order; an empty query keeps all of them. */
 export function filterPickerOptions(options: readonly PickerOption[], query: string): PickerOption[] {
   const needle = query.trim();
@@ -25,8 +43,10 @@ export function filterPickerOptions(options: readonly PickerOption[], query: str
  * The heading picker shared by region and city pages: a search combobox over a listbox of
  * places, with the "all" row (the index or comparison page) first. Arrow keys and Enter move
  * and open; Escape or an outside click closes and returns focus to `${testIdPrefix}-trigger`.
+ * `id` names the dialog for the trigger's `aria-controls`.
  */
 export function PickerDialog({
+  id,
   open,
   onClose,
   options,
@@ -35,6 +55,7 @@ export function PickerDialog({
   text,
   testIdPrefix,
 }: {
+  id?: string;
   open: boolean;
   onClose: () => void;
   options: PickerOption[];
@@ -77,16 +98,17 @@ export function PickerDialog({
   }, [onClose, open, testIdPrefix]);
 
   if (!open) return null;
-  const focusTrigger = () => document.querySelector<HTMLButtonElement>(`[data-testid='${testIdPrefix}-trigger']`)?.focus();
-  const select = (index: number) => {
-    if (includeAll && index === 0) {
-      window.location.href = allOption.href;
-      return;
-    }
-    const option = filtered[index - optionOffset];
-    if (!option) return;
-    window.location.href = option.href;
+  const trigger = `${testIdPrefix}-trigger`;
+  const focusTrigger = () => document.querySelector<HTMLButtonElement>(`[data-testid='${trigger}']`)?.focus();
+  // Leaving for another page hands focus to that page's trigger; staying on this one keeps it here.
+  const leave = (href: string) => {
+    onClose();
+    if (new URL(href, window.location.href).pathname === window.location.pathname) focusTrigger();
+    else markRefocus(trigger, href);
   };
+  const optionId = (index: number) => index === 0 && includeAll ? `${baseId}-all` : `${baseId}-${filtered[index - optionOffset]?.id}`;
+  // Enter clicks the option's link, so it navigates in the app as a click does instead of reloading the document.
+  const select = (index: number) => document.getElementById(optionId(index))?.click();
   const move = (delta: 1 | -1) => {
     if (!optionCount) return;
     const next = activeIndex === null
@@ -95,16 +117,12 @@ export function PickerDialog({
     setActiveIndex(next);
   };
   const listboxId = `${baseId}-listbox`;
-  const activeOptionId = activeIndex === null
-    ? undefined
-    : activeIndex === 0 && includeAll
-      ? `${baseId}-all`
-      : `${baseId}-${filtered[activeIndex - optionOffset]?.id}`;
+  const activeOptionId = activeIndex === null ? undefined : optionId(activeIndex);
 
   return (
     <div className="relative">
       <div aria-hidden className="fixed inset-0 z-30" onClick={() => { onClose(); focusTrigger(); }} />
-      <div role="dialog" aria-label={text.title} className="absolute top-1 left-0 z-40 w-[360px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]">
+      <div id={id} role="dialog" aria-label={text.title} className="absolute top-1 left-0 z-40 w-[360px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]">
         <div className="border-b border-[var(--hairline-soft)] p-3">
           <input
             ref={inputRef}
@@ -128,7 +146,7 @@ export function PickerDialog({
         </div>
         <div id={listboxId} role="listbox" aria-label={text.results} className="max-h-[340px] overflow-y-auto">
           {includeAll ? (
-            <Link id={`${baseId}-all`} data-testid={allOption.testId} href={allOption.href} prefetch={false} role="option" aria-selected={activeIndex === 0} aria-current={allOption.current ? "page" : undefined} tabIndex={-1} onClick={onClose} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
+            <Link id={`${baseId}-all`} data-testid={allOption.testId} href={allOption.href} prefetch={false} role="option" aria-selected={activeIndex === 0} aria-current={allOption.current ? "page" : undefined} tabIndex={-1} onClick={() => leave(allOption.href)} className={`block border-b border-l-2 border-b-[var(--hairline-soft)] bg-[var(--tint)] px-3 py-2 text-[12px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center font-semibold text-[var(--accent)] ${activeIndex === 0 ? "border-l-[var(--ink)]" : "border-l-transparent"}`}>
               {allOption.label}
             </Link>
           ) : null}
@@ -143,7 +161,7 @@ export function PickerDialog({
               aria-current={option.id === activeId ? "page" : undefined}
               tabIndex={-1}
               data-testid={`${testIdPrefix}-option`}
-              onClick={onClose}
+              onClick={() => leave(option.href)}
               className={`block border-b border-l-2 border-b-[var(--row-border)] px-3 py-2 text-[13px] max-[768px]:flex max-[768px]:min-h-11 max-[768px]:items-center ${index + optionOffset === activeIndex ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"} ${option.id === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
             >
               {option.label}
@@ -164,6 +182,7 @@ export function PickerDialog({
 }
 
 export function RegionPicker({
+  id,
   open,
   onClose,
   regions,
@@ -171,6 +190,7 @@ export function RegionPicker({
   hrefForRegion = regionalEconomyHref,
   indexHref = "/explorer/economy/regions",
 }: {
+  id?: string;
   open: boolean;
   onClose: () => void;
   regions: readonly MunicipalRegion[];
@@ -191,6 +211,7 @@ export function RegionPicker({
   }));
   return (
     <PickerDialog
+      id={id}
       open={open}
       onClose={onClose}
       options={options}

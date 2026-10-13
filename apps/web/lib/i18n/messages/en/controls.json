@@ -30,6 +30,7 @@
   "controls.ministries": "Ministries",
   "controls.grouping": "Grouping",
   "controls.chartScrollable": "Multi-year chart — scroll horizontally",
+  "controls.chartScrollableNamed": "{label} — scroll horizontally",
   "controls.chartRegion": "Multi-year chart",
   "controls.chartTrend": "Multi-year trend",
   "controls.chartSummary": "{series}, {count} series, {start}–{end}",

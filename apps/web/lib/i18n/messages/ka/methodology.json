@@ -48,6 +48,7 @@
   "methodology.downloadFile": "{title} — {format} ჩამოტვირთვა",
   "methodology.downloadArrow": "ჩამოტვირთვა ↓",
   "methodology.empty": "ვერაფერი მოიძებნა",
+  "methodology.resultCount": "ნაჩვენებია {total}-დან {count} წყარო",
   "methodology.manifest": "მანიფესტი:",
   "methodology.manifestDownload": "პირველწყაროების მანიფესტი — {format} ჩამოტვირთვა",
   "methodology.originalLanguageNote": "აღწერები თარგმნილია ინგლისურად; პირველწყაროები და ფაილების სახელები უცვლელია. დოკუმენტის ენა დადასტურებული არ არის, თუ ცალკე არ არის მითითებული.",
