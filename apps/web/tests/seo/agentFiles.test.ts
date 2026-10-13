@@ -5,6 +5,8 @@ import sitemap from "../../lib/seo/sitemap";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { catalogueData } from "../../lib/factQuery/publications";
+import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
+import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
 const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
 const originalEnv = { ...process.env };
@@ -17,6 +19,7 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/municipalities",
   "https://fiscal.ge/explorer/debt",
   "https://fiscal.ge/explorer/deficit",
+  "https://fiscal.ge/explorer/economy",
   "https://fiscal.ge/explorer/economy/gdp",
   "https://fiscal.ge/explorer/economy/sectors",
   "https://fiscal.ge/explorer/economy/regions",
@@ -26,6 +29,11 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/inflation/categories",
   "https://fiscal.ge/explorer/inflation/cities",
   "https://fiscal.ge/explorer/inflation/products",
+  "https://fiscal.ge/explorer/money",
+  "https://fiscal.ge/explorer/money/supply",
+  "https://fiscal.ge/explorer/money/loans-deposits",
+  "https://fiscal.ge/explorer/money/interest-rates",
+  "https://fiscal.ge/explorer/money/bank-health",
   "https://fiscal.ge/explorer/unemployment",
   "https://fiscal.ge/explorer/unemployment/overview",
   "https://fiscal.ge/explorer/unemployment/regions",
@@ -45,10 +53,16 @@ const requiredTargets = [
   "https://fiscal.ge/explorer/trade/partners",
   "https://fiscal.ge/explorer/trade/products",
   "https://fiscal.ge/explorer/trade/domestic-exports",
+  "https://fiscal.ge/explorer/trade/services",
   "https://fiscal.ge/explorer/external",
   "https://fiscal.ge/explorer/external/money-from-abroad",
   "https://fiscal.ge/explorer/external/foreign-investment",
   "https://fiscal.ge/explorer/external/current-account",
+  "https://fiscal.ge/explorer/energy-food",
+  "https://fiscal.ge/explorer/energy-food/energy-supply",
+  "https://fiscal.ge/explorer/energy-food/electricity",
+  "https://fiscal.ge/explorer/energy-food/energy-use",
+  "https://fiscal.ge/explorer/energy-food/food-self-sufficiency",
   "https://fiscal.ge/explorer/demography",
   "https://fiscal.ge/explorer/demography/population",
   "https://fiscal.ge/explorer/demography/migration",
@@ -58,15 +72,19 @@ const requiredTargets = [
   "https://fiscal.ge/methodology/expenditure",
   "https://fiscal.ge/methodology/revenue",
   "https://fiscal.ge/methodology/municipalities",
+  "https://fiscal.ge/methodology/debt",
   "https://fiscal.ge/methodology/gdp",
   "https://fiscal.ge/methodology/economic-sectors",
   "https://fiscal.ge/methodology/regional-economies",
   "https://fiscal.ge/methodology/inflation",
+  "https://fiscal.ge/methodology/money",
   "https://fiscal.ge/methodology/unemployment",
   "https://fiscal.ge/methodology/wages",
+  "https://fiscal.ge/methodology/household-income",
   "https://fiscal.ge/methodology/poverty",
   "https://fiscal.ge/methodology/trade",
   "https://fiscal.ge/methodology/external-flows",
+  "https://fiscal.ge/methodology/energy-food",
   "https://fiscal.ge/methodology/demography",
   "https://fiscal.ge/downloads/data/gdp-overview.json",
   "https://fiscal.ge/downloads/data/gdp-overview.csv",
@@ -154,7 +172,7 @@ describe("Fiscal.ge agent instructions", () => {
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
     expect(targets).toEqual(requiredTargets);
-    expect(targets).toHaveLength(84);
+    expect(targets).toHaveLength(100);
     expect(new Set(targets).size).toBe(targets.length);
   });
 
@@ -173,5 +191,24 @@ describe("Fiscal.ge agent instructions", () => {
     expect(targets.filter((target) => new URL(target).pathname === "/sitemap.xml")).toEqual([
       "https://fiscal.ge/sitemap.xml",
     ]);
+  });
+
+  it("llms.txt names every hub, section and methodology route in the sitemap", async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
+    const content = await readFile(llmsPath, "utf8");
+    const linked = new Set([...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => new URL(match[1]!).pathname));
+    // Georgia and the 64 municipalities are places inside Municipal budgets, at
+    // the same depth as a section; the deeper place pages (regions, cities)
+    // fall outside depth 3 on their own.
+    const placePages = new Set([
+      municipalEntityHref("country", "georgia"),
+      ...MUNICIPALITY_ROUTES.map(({ code }) => municipalEntityHref("municipality", code)),
+    ]);
+    const expected = (await sitemap())
+      .map((entry) => new URL(entry.url).pathname)
+      .filter((path) => (/^\/explorer(\/[^/]+){0,2}$/.test(path) || /^\/methodology(\/|$)/.test(path)) && !placePages.has(path));
+
+    expect(expected.length).toBeGreaterThan(0);
+    expect(expected.filter((path) => !linked.has(path))).toEqual([]);
   });
 });
