@@ -4,6 +4,7 @@ import { Fragment, memo, useState, type ReactNode } from "react";
 import { productColor, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { formatShare, MISSING } from "../../lib/explorer/format";
+import { periodLabel } from "../../lib/explorer/inflationLabels";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
@@ -58,6 +59,15 @@ export function InflationProductPanel({ index, state, onToggle, onClear, downloa
       onToggleAll={onClear}
       allowSelectAll={false}
       hasVisibleMatches={visible.length > 0}
+      // The number beside each product is its annual rate in the latest month, whatever the chart shows (U14-11).
+      listHeader={
+        <p
+          data-testid="product-value-column"
+          className="border-b border-[var(--row-border)] pr-1.5 pb-1.5 text-right text-[11px] min-[768px]:text-[10.5px] leading-snug text-[var(--muted)]"
+        >
+          {message(messages, "inflation.productsAnnualTitle")} · {periodLabel(messages, index.latestPeriod, "short")}
+        </p>
+      }
     >
       {visible.map((id, rank) => {
         const item = index.productById.get(id)!;

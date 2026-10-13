@@ -4,11 +4,11 @@ import { useId, useRef, useState } from "react";
 import { periodKey } from "../../lib/data/inflation/periods";
 import { formatShare, MISSING } from "../../lib/explorer/format";
 import { periodLabel } from "../../lib/explorer/inflationLabels";
-import { productCumulative, productEndPeriod, productsByCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
+import { productColor, productCumulative, productEndPeriod, productsByCumulative, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import type { ProductState } from "../../lib/explorer/inflationProductState";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { SectionTitle } from "../ui/editorial";
+import { SectionTitle, SwatchBar } from "../ui/editorial";
 import { InflationProductArt } from "./inflation-product-art";
 import { filteredProductIds } from "./inflation-product-panel";
 import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
@@ -65,11 +65,12 @@ export function InflationProductTable({ index, state, onToggle }: {
             both rate columns fit without a horizontal swipe (DESIGN.md §25.2). */}
         <table className="w-full table-fixed border-collapse min-[768px]:min-w-[560px]">
           <colgroup>
-            <col className="min-[768px]:w-[45%]" />
+            {/* From 768px the rates sit nearer the name they belong to (U14-12). */}
+            <col className="min-[768px]:w-[60%]" />
             {/* Phones: rate columns sized to their headers (tracking normal, 6px padding) and the
                 names at 12px, so the longest product word fits whole at 390px (no mid-word break). */}
-            <col className="w-[85px] min-[768px]:w-[25%]" />
-            <col className="w-[56px] min-[768px]:w-[30%]" />
+            <col className="w-[85px] min-[768px]:w-[20%]" />
+            <col className="w-[56px] min-[768px]:w-[20%]" />
           </colgroup>
           <caption id={captionId} data-testid="product-table-caption" className="pb-2 text-left text-[12px] leading-[1.5] text-[var(--muted)]">{t("productsTableCaption", { latest: latestLabel, start: state.range.startYear, end: endLabel })}</caption>
           <thead><tr>
@@ -104,6 +105,10 @@ export function InflationProductTable({ index, state, onToggle }: {
                     onClick={() => onToggle(id)}
                     className="flex min-h-9 w-full cursor-pointer items-center gap-2 text-left"
                   >
+                    {/* A product on the chart shows its line colour, as in the panel: the tint alone is colour-only (U14-12). */}
+                    <span data-testid="product-row-swatch" className="flex w-3.5 flex-none justify-center">
+                      {selected ? <SwatchBar color={productColor(id)} /> : null}
+                    </span>
                     <InflationProductArt productId={id} />
                     <span className="min-w-0">
                       <span className="block break-words text-[12px] font-medium text-[var(--ink)] min-[768px]:text-[12.5px]">{primary}</span>

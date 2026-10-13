@@ -62,9 +62,22 @@ function resolveRange(state: SectorState, facts: readonly ClientSectorObservatio
   return { availableYears, ...resolvePeriodRange(state.range, { min, max }) };
 }
 
+/** How many sectors the share view opens with when only Total GDP was selected (owner decision Q6). */
+export const SHARE_DEFAULT_SECTORS = 5;
+
 export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, facts: readonly ClientSectorObservation[]): SectorState {
   const range = resolveRange({ ...state, measure }, facts);
-  return { ...state, measure, range: refitRange(state.range, range, { collapseToAll: false }) };
+  const next = { ...state, measure, range: refitRange(state.range, range, { collapseToAll: false }) };
+  // Total GDP is 100% of itself: alone in the share view it is one flat line. The view opens on the five
+  // largest sectors at the range's end instead (U11-01).
+  if (measure !== "share_of_gdp" || state.selectedIds.length !== 1 || state.selectedIds[0] !== SECTOR_GDP) return next;
+  const end = resolveRange(next, facts).end;
+  const largest = facts
+    .filter((f) => f.measure === measure && f.year === end && f.seriesId !== SECTOR_GDP)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, SHARE_DEFAULT_SECTORS)
+    .map((f) => f.seriesId);
+  return largest.length ? { ...next, selectedIds: largest } : next;
 }
 
 export function buildEconomicSectorsModel(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], state: SectorState, sourceIdByMeasure: Record<string, string>) {
@@ -92,7 +105,10 @@ export function buildEconomicSectorsModel(facts: readonly ClientSectorObservatio
       preliminary: years.map(year => byCell.get(`${r.id}:${year}`)?.status === "preliminary"),
     })),
     endValues,
-    headline: active.filter(f => f.seriesId === SECTOR_GDP).sort((a,b)=>a.year-b.year).at(-1) ?? null,
+    // Total GDP's own share is always 100%: the share view's headline is the largest sector in the latest year (U11-01).
+    headline: (state.measure === "share_of_gdp"
+      ? active.filter(f => f.seriesId !== SECTOR_GDP).sort((a,b)=>a.year-b.year || a.value-b.value)
+      : active.filter(f => f.seriesId === SECTOR_GDP).sort((a,b)=>a.year-b.year)).at(-1) ?? null,
     sourceIds: hasData && sourceIdByMeasure[state.measure] ? [sourceIdByMeasure[state.measure]!] : [],
     hasData,
   };

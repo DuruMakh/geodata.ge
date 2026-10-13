@@ -30,7 +30,8 @@ export function RegionHighlights({ facts, registry, year }: {
   const cards = [
     { id: "total", label: t("totalKpi"), value: formatAmount(model.total?.value, locale), detail: String(year), trend: model.trends.total, color: "var(--ink)" },
     { id: "top-three", label: t("topThree"), value: percent(model.topThreeSharePct), detail: model.topThree.map((row) => name(row.seriesId)).join(" · ") || t("unavailable"), trend: model.trends.topThreeShare, color: "var(--accent)" },
-    { id: "count", label: t("sectorCount"), value: String(model.publishedSectorCount), detail: scope, trend: [] as Array<number | null>, color: "var(--ink)" },
+    // The scope sentence is the section's source note below; the card states only its year (U12-06).
+    { id: "count", label: t("sectorCount"), value: String(model.publishedSectorCount), detail: String(year), trend: [] as Array<number | null>, color: "var(--ink)" },
   ];
   return (
     <section data-testid="regional-highlights" className="mt-12 border-t-2 border-[var(--ink)] pt-[22px]">

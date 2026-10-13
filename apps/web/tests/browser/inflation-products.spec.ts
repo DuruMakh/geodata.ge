@@ -110,6 +110,8 @@ test("year controls, late history, empty selection and language restoration", as
   await page.goto(`/en${ROUTE}#i=annual&r=2023-2026&sel=`);
   await ready(page);
   await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  // U14-10: the guidance names this page's Products panel, not a "series" panel it does not have.
+  await expect(page.getByTestId("no-selection-callout")).toHaveText("No product selected. Choose a product from the Products panel.");
   await expect(page.getByTestId("inflation-product-download")).toBeEnabled();
   expect(new URL(page.url()).hash).toContain("sel=");
 });

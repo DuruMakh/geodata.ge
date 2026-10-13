@@ -6,7 +6,6 @@ import { useMemo, useState } from "react";
 import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
-import { formatPoints } from "../../lib/explorer/format";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 
 import { periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
@@ -119,13 +118,8 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
   const latestTab = state.tab === "mom" ? "mom" : "yoy";
   const latest = latestEntry(new Map((latestTab === "mom" ? headlineMom : headline).map((row) => [row.period, row.value])));
 
-  // The unit line names the published headline the stack closes on.
-  const latestHeadline = [...stack.headline].reverse().find((value) => value !== null) ?? null;
-  const unitLine =
-    state.tab === "contrib"
-      ? // Two decimals, unrounded: displayedValue() would turn a published 5.65 into 5.70.
-        t("categoryUnit.contrib", { headline: formatPoints(latestHeadline, false, 2) })
-      : t(`categoryUnit.${state.tab}`);
+  // The latest-value line above states the headline; the unit line does not repeat it at another precision (U13-14).
+  const unitLine = t(`categoryUnit.${state.tab}`);
 
   function selectTab(tab: CategoryTab) {
     if (!categoryTabLoaded(index, tab)) {

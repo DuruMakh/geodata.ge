@@ -72,4 +72,6 @@ test("approved highlights show largest activity, total GDP, top-three share and 
   expect(html).toContain("Top three share");
   expect(html).toContain("Published activities");
   expect(html).not.toMatch(/growth/i);
+  // U12-06: the scope sentence is said once, as the source note, not again as the count card's detail.
+  expect(html.split("All activities")).toHaveLength(2);
 });

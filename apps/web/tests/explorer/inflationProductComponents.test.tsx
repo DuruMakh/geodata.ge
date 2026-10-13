@@ -60,6 +60,8 @@ describe("individual-product inflation page", () => {
     const clearAction = html.slice(html.indexOf('data-testid="series-toggle-all"'), html.indexOf('data-testid="series-toggle-all"') + 650);
     expect(clearAction).toContain("გასუფთავება");
     expect(clearAction).not.toContain("ყველას მონიშვნა");
+    // U14-11: the number beside each product is named: the annual rate in the latest month.
+    expect(html).toMatch(/data-testid="product-value-column"[^>]*>წლიური ინფლაცია · [^<]*\d{4}</);
   });
 
   // U14-03: the ranking and the lower list's order do not depend on the selection, yet a row click re-sorted all
@@ -129,6 +131,18 @@ describe("complete ranked product list", () => {
     expect(rowIds(recent)).toEqual(["cpi.product.p0002", "cpi.product.p0001", "cpi.product.p0003"]);
     expect(rowIds(render(2024))).toEqual(["cpi.product.p0001", "cpi.product.p0002", "cpi.product.p0003"]);
   });
+});
+
+// U14-12: a product on the chart shows its line colour in the table, not a tint alone; the rates sit near the name.
+it("marks the table's charted products with their swatch", () => {
+  const messages = { ...common, ...controls, ...inflation, ...main };
+  const render = (selected: string[]) => renderGeorgianMarkup(<InflationProductTable index={index} state={{ indicator: "annual", range: index.defaultRange, selected }} onToggle={() => {}} />, messages);
+  const [first, second] = [...render([]).matchAll(/<tr data-product-id="([^"]+)"/g)].map((match) => match[1]!);
+  const html = render([first!]);
+  const row = (id: string) => html.slice(html.indexOf(`<tr data-product-id="${id}"`), html.indexOf("</tr>", html.indexOf(`<tr data-product-id="${id}"`)));
+  expect(row(first!)).toMatch(/data-testid="product-row-swatch"[^>]*><span aria-hidden="true"[^>]*background-color:#/);
+  expect(row(second!)).toMatch(/data-testid="product-row-swatch"[^>]*><\/span>/);
+  expect(html).toContain("min-[768px]:w-[60%]");
 });
 
 describe("product inflation indicators", () => {

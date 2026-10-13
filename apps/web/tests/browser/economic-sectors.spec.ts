@@ -87,6 +87,11 @@ test.describe("touch measure controls", () => {
     await page.getByRole("button", { name: "% მშპ-ში", exact: true }).tap();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "share_of_gdp");
     await expect(page.getByText("სექტორის დამატებული ღირებულების წილი მთლიან მშპ-ში.", { exact: true })).toBeVisible();
+    // U11-01 (Q6): Total GDP alone is a flat 100% line; the share view opens on the five largest sectors, and the
+    // headline names the largest one.
+    await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(5);
+    await expect(page.getByTestId("sectors-headline")).toContainText("უმსხვილესი სექტორი · ");
+    await expect(page.getByTestId("sectors-headline")).not.toContainText("100.0%");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 });

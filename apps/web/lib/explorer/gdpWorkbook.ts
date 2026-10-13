@@ -31,7 +31,8 @@ export function gdpDisplay(state: GdpState, presentation: Presentation) {
   const unit = {
     divisor: capita ? 1 : 1e9,
     label: capita ? t(currency) : t("bn"),
-    decimals: 1,
+    // Per person in whole units, as the latest-value line prints it (U10-14).
+    decimals: capita ? 0 : 1,
   };
   const fullUnitLabel = growth
     ? t("percent")

@@ -153,7 +153,7 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
               formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
             />
           </div> : <div className="mt-5"><Callout testId="no-selection-callout">
-            {state.selected.length === 0 ? message(messages, "main.noSelection") : t("productsNoCompleteSeries")}
+            {state.selected.length === 0 ? t("productsNoSelection") : t("productsNoCompleteSeries")}
           </Callout></div>}
           <ChartSelectionAids series={chartSeries} chartShown share unit={PCT_UNIT} />
           {omitted.length > 0 ? <div data-testid="product-chart-omissions" className="mt-3 border-l-2 border-[var(--accent)] pl-3 text-[11px] leading-relaxed text-[var(--muted)]">
