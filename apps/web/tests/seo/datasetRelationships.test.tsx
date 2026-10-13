@@ -5,7 +5,7 @@ import { JsonLd } from "../../components/seo/json-ld";
 import type { Locale } from "../../lib/i18n/types";
 import { renderMunicipalCountry } from "../../lib/pages/municipal-country";
 import { renderMunicipalIndex } from "../../lib/pages/municipal-index";
-import { renderMunicipalRegion } from "../../lib/pages/municipal-region";
+import { municipalRegionMetadata, renderMunicipalRegion } from "../../lib/pages/municipal-region";
 import { renderMunicipality } from "../../lib/pages/municipality";
 import { renderRegionalEconomiesPage, renderRegionalEconomyPage } from "../../lib/pages/regional-economy";
 
@@ -51,6 +51,12 @@ describe.each(["ka", "en"] as const)("localized Dataset relationships: %s", (loc
     expect(subset).not.toHaveProperty("includedInDataCatalog");
     expect(subset).not.toHaveProperty("distribution");
     if (locale === "en") expect(JSON.stringify(subset.isPartOf)).not.toMatch(/\p{Script=Georgian}/u);
+  });
+
+  it.each(["imereti", "adjara"])("the %s region Dataset carries the same name as the page's search title", async (id) => {
+    const subset = datasetFromPage(await renderMunicipalRegion(id, locale));
+    const { title } = await municipalRegionMetadata(id, locale);
+    expect(String(title).startsWith(`${subset.name} `)).toBe(true);
   });
 
   it("a regional economy describes the complete all-regions parent", async () => {

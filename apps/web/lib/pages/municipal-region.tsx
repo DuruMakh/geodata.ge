@@ -232,7 +232,7 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
           withinGeorgia: true,
           // The per-resident figure is shown on the municipal index only; this page does not carry it.
           omitMeasures: ["gel_per_resident"],
-          name: message(messages, "municipal.regionDatasetName", { name: grammaticalName }),
+          name: message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraDatasetName" : "municipal.regionDatasetName", { name: grammaticalName }),
           description,
           firstYear,
           lastYear: latestYear,

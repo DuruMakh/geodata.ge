@@ -6,7 +6,7 @@ export const MUNICIPALITIES_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "municipalities",
   "title": "Municipalities methodology",
   "summary": "How expenditure for 64 public municipalities, Adjara’s republican payments and the 69-series Georgia total are combined without counting internal transfers twice.",
-  "metaDescription": "How spending by 64 public municipalities, Adjara’s republican payments and the Georgia total are combined without counting internal transfers twice.",
+  "metaDescription": "How spending by public municipalities, Adjara’s republican payments and the Georgia total are combined without counting internal transfers twice.",
   "reviewedAt": "2026-08-16",
   "archiveManifestId": "municipalities",
   "coverageSource": {

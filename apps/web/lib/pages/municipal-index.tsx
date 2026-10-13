@@ -1,3 +1,4 @@
+import { ADJARA_REGION_ID } from "../data/municipal/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import type { Locale } from "../i18n/types";
@@ -80,7 +81,8 @@ export async function renderMunicipalIndex(locale: Locale) {
     })),
     ...regions.map((region) => ({
       path: `/explorer/municipalities/region/${region.id.replace("region.", "")}` as const,
-      name: message(messages, "municipal.regionDatasetName", {
+      // Named as each region page names itself: Adjara's figure includes the republican budget.
+      name: message(messages, region.id === ADJARA_REGION_ID ? "municipal.adjaraDatasetName" : "municipal.regionDatasetName", {
         name: publicLabel(locale, region.id, REGION_GENITIVE_KA[region.id] ?? region.kaLabel, presentation.englishLabels),
       }),
     })),

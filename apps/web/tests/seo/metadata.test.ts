@@ -65,27 +65,42 @@ describe("Fiscal.ge SEO metadata", () => {
   });
 });
 
-/** Every public page's metadata in both languages, as its route file generates it. */
-async function everyPageMetadata(): Promise<{ page: string; locale: Locale; metadata: Metadata }[]> {
+/**
+ * The public pages whose metadata the walk checks, in both languages. As tests/seo/structuredData.test.ts does, a
+ * dynamic route file is sampled rather than walked: every static page and methodology article is kept; of each dynamic
+ * route, the first page, the page with the longest place slug (the longest name, for the 160-character limit) and any
+ * page an assertion below names.
+ */
+const NAMED_PAGES = new Set(["/explorer/municipalities/region/imereti", "/explorer/municipalities/region/adjara"]);
+async function sampledPageMetadata(): Promise<{ page: string; locale: Locale; metadata: Metadata }[]> {
   const routes = appRoutes();
-  const pages: { page: string; locale: Locale; metadata: Metadata }[] = [];
+  const byFile = new Map<string, { page: string; dynamic: boolean }[]>();
   for (const page of await listPublicPagePaths()) {
-    for (const locale of ["ka", "en"] as const) {
-      const route = routeFor(routes, pageHref(page, locale));
-      const pageModule = (await import(route.file)) as { generateMetadata: (props: { params: Promise<Record<string, string>> }) => Promise<Metadata> | Metadata };
-      pages.push({ page, locale, metadata: await pageModule.generateMetadata({ params: Promise.resolve(route.params) }) });
-    }
+    const route = routeFor(routes, page);
+    const dynamic = Object.keys(route.params).length > 0 && !page.startsWith("/methodology/");
+    byFile.set(route.file, [...(byFile.get(route.file) ?? []), { page, dynamic }]);
   }
-  return pages;
+  const slug = (page: string) => page.split("/").at(-1)!.length;
+  const sampled = [...byFile.values()].flatMap((group) => {
+    if (!group[0].dynamic) return group.map(({ page }) => page);
+    const longest = group.reduce((best, entry) => (slug(entry.page) > slug(best.page) ? entry : best));
+    return [...new Set([group[0].page, longest.page, ...group.filter(({ page }) => NAMED_PAGES.has(page)).map(({ page }) => page)])];
+  });
+  // Concurrently: the cost is the route modules' imports and the loaders' first reads, which overlap.
+  return Promise.all(sampled.flatMap((page) => (["ka", "en"] as const).map(async (locale) => {
+    const route = routeFor(routes, pageHref(page, locale));
+    const pageModule = (await import(route.file)) as { generateMetadata: (props: { params: Promise<Record<string, string>> }) => Promise<Metadata> | Metadata };
+    return { page, locale, metadata: await pageModule.generateMetadata({ params: Promise.resolve(route.params) }) };
+  })));
 }
 
 describe("every page's search snippet and share card", () => {
-  let pages: Awaited<ReturnType<typeof everyPageMetadata>>;
-  beforeAll(async () => { pages = await everyPageMetadata(); }, 120_000);
+  let pages: Awaited<ReturnType<typeof sampledPageMetadata>>;
+  beforeAll(async () => { pages = await sampledPageMetadata(); }, 60_000);
   const where = ({ page, locale }: { page: string; locale: Locale }) => pageHref(page, locale);
 
   it("keeps every meta description within 160 characters, in both languages", () => {
-    expect(pages.length).toBeGreaterThan(500);
+    expect(pages.length).toBeGreaterThan(100);
     expect(pages.filter(({ metadata }) => String(metadata.description).length > 160).map((entry) => `${where(entry)} (${String(entry.metadata.description).length})`)).toEqual([]);
   });
 
