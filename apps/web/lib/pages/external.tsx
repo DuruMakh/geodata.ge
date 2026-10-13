@@ -10,6 +10,7 @@ import { loadServedCurrentAccountFacts, toClientCurrentAccountFacts } from "../d
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedForeignInvestmentData, toClientForeignInvestmentData } from "../data/externalFlows/importForeignInvestment";
 import { loadServedMoneyTransfersData, toClientMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
+import { packFacts } from "../data/packedFacts";
 import { CURRENT_ACCOUNT_SERIES, CURRENT_ACCOUNT_SOURCE, FOREIGN_INVESTMENT_SOURCES, MONEY_TRANSFER_SOURCES } from "../data/externalFlows/types";
 import { buildExternalHubCards } from "../explorer/externalHubCards";
 import { moneyTransfersCoverage } from "../explorer/moneyTransfersState";
@@ -81,7 +82,7 @@ export async function renderMoneyFromAbroadPage(locale: Locale) {
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("money.title"), path: pageHref("/explorer/external/money-from-abroad", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
-      <MoneyFromAbroad data={client} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+      <MoneyFromAbroad data={{ ...client, facts: packFacts(client.facts) }} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

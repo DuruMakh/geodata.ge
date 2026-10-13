@@ -27,6 +27,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
@@ -41,14 +42,15 @@ const percent = (value: number | null) => formatShare(value === null ? null : va
 
 /** Georgia's age structure on 1 January of every year: the pyramid and the age-by-year heat map. */
 export function AgeSexExplorer({
-  facts,
+  facts: shippedFacts,
   sources,
   siteOrigin,
 }: {
-  facts: ClientAgeFact[];
+  facts: FactsInput<ClientAgeFact>;
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
 }) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);

@@ -5,6 +5,7 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { packFacts } from "../data/packedFacts";
 import { loadServedWagesData, toClientWagesFact } from "../data/wages/importWages";
 import { WAGES_GROUPS, WAGES_REGIONS, WAGES_SECTORS, type ClientWagesFact } from "../data/wages/types";
 import { ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
@@ -110,7 +111,7 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/wages", locale) }, ...(regionId ? [{ name: t("page.regions.title"), path: pageHref("/explorer/wages/regions", locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
-      <WagesExplorer key={regionId ?? section} section={section} facts={facts} labels={labels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} regionId={regionId} regions={regionId ? REGIONAL_ECONOMY_REGIONS : undefined} />
+      <WagesExplorer key={regionId ?? section} section={section} facts={packFacts(facts)} labels={labels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} regionId={regionId} regions={regionId ? REGIONAL_ECONOMY_REGIONS : undefined} />
     </ExplorerPage>
   </I18nProvider>;
 }

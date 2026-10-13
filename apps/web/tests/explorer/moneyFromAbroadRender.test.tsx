@@ -38,3 +38,11 @@ test("the ranking marks partial months and ends with Other countries, unranked, 
   expect(html).toContain("60.0%");
   expect(html).not.toContain("money-from-abroad-show-all");
 });
+
+test("the page's packed facts render the same page as the facts themselves", async () => {
+  const { MoneyFromAbroad } = await import("../../components/external/money-from-abroad");
+  const { packFacts } = await import("../../lib/data/packedFacts");
+  const presentation = await p("en");
+  const render = (input: Parameters<typeof MoneyFromAbroad>[0]["data"]) => renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroad data={input} sources={[]} lastReviewedAt="2026-10-10" siteOrigin="https://fiscal.ge" /></I18nProvider>);
+  expect(render(JSON.parse(JSON.stringify({ ...data, facts: packFacts(data.facts) })))).toBe(render(data));
+});

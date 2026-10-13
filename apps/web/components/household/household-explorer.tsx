@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronDown, User } from "lucide-react";
 import { useCallback, useState, type ReactNode } from "react";
 import type { ClientHouseholdFact, HouseholdArea, HouseholdMeasure } from "../../lib/data/household/types";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, parseHouseholdMeasure, sectionTotal, serializeHouseholdHash, serializeHouseholdMeasure, type HouseholdSectionId, type HouseholdSeriesModel } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
@@ -78,7 +79,7 @@ export function HouseholdIndex({ section, facts, regionMaps }: {
 }
 
 export type HouseholdExplorerProps = {
-  section: HouseholdSectionId; facts: ClientHouseholdFact[];
+  section: HouseholdSectionId; facts: FactsInput<ClientHouseholdFact>;
   /** Names of the section's lines; areaLabels names Georgia, towns, villages and the regions. */
   labels: Record<string, string>; areaLabels: Record<HouseholdArea, string>;
   sources: (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string;
@@ -87,7 +88,8 @@ export type HouseholdExplorerProps = {
 };
 
 /** An area's page: Georgia's or a region's chart, series list and Excel, with the area picker in the heading. */
-export function HouseholdExplorer({ section, facts, labels: lineLabels, areaLabels, sources, siteOrigin, area, areas }: HouseholdExplorerProps) {
+export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLabels, areaLabels, sources, siteOrigin, area, areas }: HouseholdExplorerProps) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `household.${key}`, values);
   // parse is an effect dependency of useHashState, so its identity changes only with the page.

@@ -5,6 +5,7 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { packFacts } from "../data/packedFacts";
 import { loadServedHouseholdData, toClientHouseholdFact } from "../data/household/importHousehold";
 import { HOUSEHOLD_AREAS, HOUSEHOLD_MEASURES, type HouseholdArea, type HouseholdMeasure } from "../data/household/types";
 import type { MunicipalRegion } from "../data/municipal/types";
@@ -91,7 +92,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ name: sectionTitle, path: pageHref(sectionHref, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
-      {regionId ? <HouseholdExplorer key={regionId} section={section} facts={facts} labels={labels} areaLabels={areaLabels} sources={sources} siteOrigin={origin} area={regionId} areas={AREA_PAGES} />
+      {regionId ? <HouseholdExplorer key={regionId} section={section} facts={packFacts(facts)} labels={labels} areaLabels={areaLabels} sources={sources} siteOrigin={origin} area={regionId} areas={AREA_PAGES} />
         // The index: the map for each measure is built on the server; the page itself receives only Georgia's section total.
         : <HouseholdIndex key={section} section={section} facts={facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === "georgia")}
           regionMaps={Object.fromEntries(HOUSEHOLD_MEASURES.map(measure => [measure, buildHouseholdRegionMapModel(section, measure, facts)])) as Record<HouseholdMeasure, RegionMapModel>} />}

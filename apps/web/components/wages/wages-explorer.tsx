@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
 import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesRegionHref, wagesViews, type WagesSectionId, type WagesSeriesModel, type WagesState, type WagesView } from "../../lib/explorer/wages";
 import { buildWagesWorkbookExportModel } from "../../lib/explorer/wagesWorkbook";
@@ -61,13 +62,14 @@ export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMa
 }
 
 export type WagesExplorerProps = {
-  section: WagesSectionId; facts: ClientWagesFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
+  section: WagesSectionId; facts: FactsInput<ClientWagesFact>; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
   lastReviewedAt: string; siteOrigin: string;
   /** Region pages: the region and the regions offered by the picker and previous/next links. */
   regionId?: string; regions?: readonly MunicipalRegion[];
 };
 
-export function WagesExplorer({ section, facts, labels, sources, lastReviewedAt, siteOrigin, regionId, regions }: WagesExplorerProps) {
+export function WagesExplorer({ section, facts: shippedFacts, labels, sources, lastReviewedAt, siteOrigin, regionId, regions }: WagesExplorerProps) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
   const hashData = useMemo(() => ({ section, facts }), [section, facts]);

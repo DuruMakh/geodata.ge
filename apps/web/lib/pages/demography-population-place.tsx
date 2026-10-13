@@ -9,6 +9,7 @@ import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { packFacts } from "../data/packedFacts";
 import { loadServedMunicipalData } from "../data/servedData";
 import { ageYears, annualAgeFacts, censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
@@ -163,7 +164,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
           key={place.id}
           place={place}
           places={places}
-          facts={clientFacts}
+          facts={packFacts(clientFacts)}
           title={t("placeHeading")}
           metaLine={metaLine}
           navigation={navigation}

@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
-import type { ClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
+import { useMemo } from "react";
+import type { ClientMoneyTransferFact, ClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { MONEY_TRANSFER_MEASURES, MONEY_TRANSFER_TOTAL_ID } from "../../lib/data/externalFlows/types";
 import { buildMoneyTransfersModel } from "../../lib/explorer/moneyTransfers";
 import { moneyTransfersCoverage, parseMoneyTransfersHash, serializeMoneyTransfersHash } from "../../lib/explorer/moneyTransfersState";
@@ -25,7 +27,8 @@ import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 import { MoneyFromAbroadRanking } from "./money-from-abroad-ranking";
 
 
-export function MoneyFromAbroad({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientMoneyTransfersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrigin }: { data: Omit<ClientMoneyTransfersData, "facts"> & { facts: FactsInput<ClientMoneyTransferFact> }; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+  const data = useMemo(() => ({ ...input, facts: unpackFacts(input.facts) }), [input]);
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
   const { state, update } = useHashState(data, parseMoneyTransfersHash, serializeMoneyTransfersHash), model = buildMoneyTransfersModel(data, state, presentation);

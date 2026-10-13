@@ -32,6 +32,7 @@ import { RegionPicker } from "./region-picker";
 import { RegionalEconomySeriesPanel } from "./regional-economy-series-panel";
 import { useRegionalEconomyState } from "./use-regional-economy-state";
 import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type RegionalEconomyIdentity = {
@@ -42,20 +43,21 @@ export type RegionalEconomyIdentity = {
 };
 
 export function RegionalEconomyExplorer({
-  facts,
+  facts: shippedFacts,
   registry,
   region,
   regions,
   sources,
   siteOrigin,
 }: {
-  facts: ClientRegionalEconomyObservation[];
+  facts: FactsInput<ClientRegionalEconomyObservation>;
   registry: SectorDefinition[];
   region: RegionalEconomyIdentity;
   regions: MunicipalRegion[];
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
 }) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `regionalEconomies.${key}`);

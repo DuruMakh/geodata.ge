@@ -15,6 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useAppReady } from "../explorer-shell/use-app-ready";
@@ -32,7 +33,7 @@ import { PopulationHighlightsSection } from "./population-highlights";
 export function PopulationPlaceExplorer({
   place,
   places,
-  facts,
+  facts: shippedFacts,
   title,
   metaLine,
   navigation,
@@ -49,7 +50,7 @@ export function PopulationPlaceExplorer({
 }: {
   place: DemographyPlace;
   places: DemographyPlace[];
-  facts: ClientDemographyObservation[];
+  facts: FactsInput<ClientDemographyObservation>;
   title: string;
   metaLine: string;
   navigation?: EntityNavigation;
@@ -67,6 +68,7 @@ export function PopulationPlaceExplorer({
   backHref: string;
   children?: ReactNode;
 }) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);

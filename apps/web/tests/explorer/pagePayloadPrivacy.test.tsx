@@ -1,10 +1,19 @@
-import { isValidElement, type ReactNode } from "react";
+import { cloneElement, isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import { DebtExplorer } from "../../components/debt/debt-explorer";
+import { AgeSexExplorer } from "../../components/demography/age-sex-explorer";
+import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
+import { EconomicSectorsExplorer } from "../../components/economic-sectors/economic-sectors-explorer";
+import { MoneyFromAbroad } from "../../components/external/money-from-abroad";
+import { HouseholdExplorer } from "../../components/household/household-explorer";
+import { MainExplorer } from "../../components/main-explorer/main-explorer";
+import { RegionalEconomyExplorer } from "../../components/regional-economies/regional-economy-explorer";
+import { WagesExplorer } from "../../components/wages/wages-explorer";
 import { MoneyBanksExplorer } from "../../components/money-banks/money-banks-explorer";
 import { TradeDomesticExports } from "../../components/trade/trade-domestic-exports";
 import { TradeProducts } from "../../components/trade/trade-products";
+import { packFacts, unpackFacts, type PackedFacts } from "../../lib/data/packedFacts";
 import type { ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { buildTradeProductsModel } from "../../lib/explorer/tradeProducts";
 import { findTradeProducts } from "../../lib/explorer/tradeProductsCatalogue";
@@ -13,16 +22,22 @@ import { I18nProvider } from "../../lib/i18n/provider";
 import type { Locale, Presentation } from "../../lib/i18n/types";
 import { renderAnalysisPage } from "../../lib/pages/analysis";
 import { renderDebtPage } from "../../lib/pages/debt";
+import { renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
+import { renderPopulationPlacePage } from "../../lib/pages/demography-population-place";
+import { renderEconomicSectorsPage } from "../../lib/pages/economic-sectors";
 import { renderExpenditurePage } from "../../lib/pages/expenditure";
 import { renderForeignInvestmentPage, renderMoneyFromAbroadPage } from "../../lib/pages/external";
+import { renderHouseholdPage } from "../../lib/pages/household";
 import { renderMethodologyArticle } from "../../lib/pages/methodology-article";
 import { renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
 import { renderMunicipalCountry } from "../../lib/pages/municipal-country";
 import { renderMunicipalRegion } from "../../lib/pages/municipal-region";
 import { renderMunicipality } from "../../lib/pages/municipality";
+import { renderRegionalEconomyPage } from "../../lib/pages/regional-economy";
 import { renderRevenuePage } from "../../lib/pages/revenue";
 import { renderTradeDomesticPage, renderTradeOverviewPage, renderTradePartnersPage, renderTradeProductsPage } from "../../lib/pages/trade";
 import { renderUnemploymentPage } from "../../lib/pages/unemployment";
+import { renderWagesPage } from "../../lib/pages/wages";
 
 // A page ships two things: its markup and, in the RSC payload, every prop a server page hands a client component.
 // The payload is not in renderToStaticMarkup's output, so the props of every element in the tree are read as well.
@@ -139,5 +154,60 @@ describe.each(["ka", "en"] as const)("%s pages ship only the fields they read", 
   test("a money and banks page ships only the source files its observations cite (U24-08)", async () => {
     const [{ facts, sources }] = propsOf<{ facts: { sourceId: string }[]; sources: { sourceId: string }[] }>(await renderMoneyBanksPage(locale, "loans-deposits"), MoneyBanksExplorer);
     expect(new Set(sources.map((source) => source.sourceId))).toEqual(new Set(facts.map((fact) => fact.sourceId)));
+  });
+});
+
+// Task 28: the heaviest topic pages ship their facts packed (lib/data/packedFacts.ts). Each payload is the facts prop
+// of the page's explorer, at least 30% smaller than the Georgian page's objects measured before (in characters of
+// JSON), and unpacks to facts that pack to the same payload again.
+type PackedProp = PackedFacts<object>;
+const factsProp = <P extends { facts: PackedProp }>(type: unknown) => async (page: Promise<ReactNode>) => [propsOf<P>(await page, type)[0]!.facts];
+const heaviestPages: [string, number, () => Promise<PackedProp[]>][] = [
+  ["money from abroad (U23-01)", 1_224_713, async () => [propsOf<{ data: { facts: PackedProp } }>(await renderMoneyFromAbroadPage("ka"), MoneyFromAbroad)[0]!.data.facts]],
+  ["wages industries (U18-01)", 383_860, () => factsProp(WagesExplorer)(renderWagesPage("ka", "industries"))],
+  ["household income, Georgia (U19-03)", 171_734, () => factsProp(HouseholdExplorer)(renderHouseholdPage("ka", "income", "georgia"))],
+  ["household spending, Georgia (U19-03)", 216_231, () => factsProp(HouseholdExplorer)(renderHouseholdPage("ka", "spending", "georgia"))],
+  ["regional economy, Imereti (U12-08)", 86_918, () => factsProp(RegionalEconomyExplorer)(renderRegionalEconomyPage("imereti", "ka"))],
+  ["economic sectors (U11-03)", 105_126, () => factsProp(EconomicSectorsExplorer)(renderEconomicSectorsPage("ka"))],
+  ["population and sex by age (U27-08)", 75_430, () => factsProp(AgeSexExplorer)(renderDemographyAgeSexPage("ka"))],
+  ["population, Lentekhi (U26-03)", 99_513, () => factsProp(PopulationPlaceExplorer)(renderPopulationPlacePage({ kind: "municipality", slug: "lentekhi" }, "ka"))],
+  ["expenditure, functions and ministries (U03-07)", 31_408 + 181_997, async () => { const [{ facts, adminFacts }] = propsOf<{ facts: PackedProp; adminFacts: PackedProp }>(await renderExpenditurePage("ka"), MainExplorer); return [facts, adminFacts]; }],
+];
+describe("the heaviest topic pages ship packed facts", () => {
+  test.each(heaviestPages)("%s", async (_name, before, payload) => {
+    const packed = await payload();
+    expect(JSON.stringify(packed).length).toBeLessThan(before * 0.7);
+    for (const facts of packed) expect(packFacts(unpackFacts(JSON.parse(JSON.stringify(facts)) as PackedProp))).toEqual(facts);
+  });
+});
+
+/** The page's tree with every packed facts prop replaced: as the browser receives it (through JSON) or as plain facts. */
+function withFacts(node: ReactNode, replace: (facts: PackedProp) => unknown): ReactNode {
+  if (Array.isArray(node)) return node.map((child) => withFacts(child, replace));
+  if (!isValidElement<Record<string, unknown> & { children?: ReactNode }>(node)) return node;
+  const packed = (value: unknown): value is PackedProp => typeof value === "object" && value !== null && "rows" in value && "fields" in value;
+  const props: Record<string, unknown> = { children: withFacts(node.props.children, replace) };
+  for (const [key, value] of Object.entries(node.props)) {
+    if (packed(value)) props[key] = replace(value);
+    else if (key === "data" && typeof value === "object" && value !== null && packed((value as { facts?: unknown }).facts)) props[key] = { ...value, facts: replace((value as { facts: PackedProp }).facts) };
+  }
+  return cloneElement(node, props);
+}
+
+describe.each(["ka", "en"] as const)("%s: a packed page renders as its facts do", (locale) => {
+  test.each([
+    ["money from abroad", () => renderMoneyFromAbroadPage(locale)],
+    ["wages industries", () => renderWagesPage(locale, "industries")],
+    ["household spending, Georgia", () => renderHouseholdPage(locale, "spending", "georgia")],
+    ["regional economy, Imereti", () => renderRegionalEconomyPage("imereti", locale)],
+    ["economic sectors", () => renderEconomicSectorsPage(locale)],
+    ["population and sex by age", () => renderDemographyAgeSexPage(locale)],
+    // The population place pages need the app router to render; populationPlaceExplorer.test.tsx renders their explorer.
+    ["expenditure", () => renderExpenditurePage(locale)],
+  ] as const)("%s", async (_name, renderPage) => {
+    const page = await renderPage();
+    const shipped = renderToStaticMarkup(withFacts(page, (facts) => JSON.parse(JSON.stringify(facts))));
+    expect(shipped).toBe(renderToStaticMarkup(withFacts(page, (facts) => unpackFacts(facts).map((fact) => ({ ...fact })))));
+    expect(shipped).toContain('data-testid="');
   });
 });

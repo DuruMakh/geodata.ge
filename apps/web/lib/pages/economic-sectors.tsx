@@ -5,6 +5,7 @@ import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedEconomicSectorsData, ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
+import { packFacts } from "../data/packedFacts";
 import { I18nProvider } from "../i18n/provider";
 import { getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
@@ -42,7 +43,7 @@ export async function renderEconomicSectorsPage(locale: Locale) {
     <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:crumbs[2].label,path:pageHref("/explorer/economy",locale)},{name:title,path:pageHref("/explorer/economy/sectors",locale)}]}/>
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, dateModified)}/>
-      <EconomicSectorsExplorer facts={facts.map(projectSectorObservation)} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
+      <EconomicSectorsExplorer facts={packFacts(facts.map(projectSectorObservation))} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
     </ExplorerPage>
   </I18nProvider>;
 }

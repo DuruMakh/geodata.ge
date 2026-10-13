@@ -12,6 +12,7 @@ import {
   REGIONAL_ECONOMY_SECTORS,
 } from "../data/regionalEconomies/importRegionalEconomies";
 import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
+import { packFacts } from "../data/packedFacts";
 import { message } from "../i18n/messages";
 import { getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
@@ -134,7 +135,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
       <ExplorerPage testId="explorer-shell">
         <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, reviewedAt)} />
         <RegionalEconomyExplorer
-          facts={regionalFacts.map(projectRegionalObservation)}
+          facts={packFacts(regionalFacts.map(projectRegionalObservation))}
           registry={REGIONAL_ECONOMY_SECTORS}
           region={identity}
           regions={REGIONAL_ECONOMY_REGIONS}

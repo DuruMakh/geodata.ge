@@ -8,6 +8,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { publicGlossaryEntry } from "../data/glossary";
 import { loadServedExplorerData, loadServedLandingData } from "../data/servedData";
+import { packFacts } from "../data/packedFacts";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 import { pageHref } from "../i18n/routes";
@@ -69,8 +70,8 @@ export async function renderExpenditurePage(locale: Locale) {
       <MainExplorer
         presentation={presentation}
         nav="expenditure"
-        facts={ownFacts.map(projectBudgetFact)}
-        adminFacts={adminFacts.map(projectAdminFact)}
+        facts={packFacts(ownFacts.map(projectBudgetFact))}
+        adminFacts={packFacts(adminFacts.map(projectAdminFact))}
         adminCategories={adminCategories}
         glossaryEntries={Array.from(glossary.values(), publicGlossaryEntry)}
         gdpFacts={gdpFacts.map(projectGdpFact)}

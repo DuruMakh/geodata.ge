@@ -6,6 +6,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES, SOURCE_ID } from "../data/demography/series";
+import { packFacts } from "../data/packedFacts";
 import { ageYears, annualAgeFacts } from "../explorer/demographyAgeSex";
 import { buildAgeSexRegionModel, georgiaOldShare } from "../explorer/demographyAgeSexRegions";
 import { AGE_SEX_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
@@ -68,7 +69,7 @@ export async function renderDemographyAgeSexPage(locale: Locale) {
         <PageHeader crumbs={crumbs} coverage={t("ageSexCoverage", { first, last })} />
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("ageSexLead")}</p>
-        <AgeSexExplorer facts={facts} sources={sources.filter((source) => source.sourceId === SOURCE_ID.ageSex)} siteOrigin={resolveSiteUrl()} />
+        <AgeSexExplorer facts={packFacts(facts)} sources={sources.filter((source) => source.sourceId === SOURCE_ID.ageSex)} siteOrigin={resolveSiteUrl()} />
         <AgeSexRegions model={model} georgiaShare={georgiaOldShare(served)} sourceNote={t("regionsSource")} />
       </ExplorerPage>
     </I18nProvider>

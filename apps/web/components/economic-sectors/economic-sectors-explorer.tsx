@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ChartPie, ChartNoAxesCombined } from "lucide-react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import type { ClientSectorObservation } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import {
   buildEconomicSectorsModel,
   changeSectorMeasure,
@@ -33,7 +34,7 @@ import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
-  facts: ClientSectorObservation[];
+  facts: FactsInput<ClientSectorObservation>;
   // One entry per measure: every row of a measure comes from one publication.
   sourceIdByMeasure: Record<string, string>;
   registry: SectorDefinition[];
@@ -42,12 +43,13 @@ export type EconomicSectorsExplorerProps = {
 };
 
 export function EconomicSectorsExplorer({
-  facts,
+  facts: shippedFacts,
   sourceIdByMeasure,
   registry,
   sources,
   siteOrigin,
 }: EconomicSectorsExplorerProps) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `sectors.${key}`);

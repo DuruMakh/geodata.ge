@@ -5,6 +5,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathnam
 
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
+import { packFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { SERIES } from "../../lib/data/demography/series";
 import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
@@ -41,7 +42,7 @@ beforeAll(async () => {
   }
 });
 
-function render(placeId: string, locale: Locale = "en", withNavigation = false, densityNote?: string, pageFacts: ClientDemographyObservation[] = facts): string {
+function render(placeId: string, locale: Locale = "en", withNavigation = false, densityNote?: string, pageFacts: FactsInput<ClientDemographyObservation> = facts): string {
   const places = placesBy[locale];
   const place = places.find((candidate) => candidate.id === placeId)!;
   return renderToStaticMarkup(
@@ -236,4 +237,9 @@ describe("place page body: the page describes its own place", () => {
     for (const text of ["Population · Batumi", "59.6% of the region", "(Adjara)", "6.2%"]) expect(batumi).toContain(text);
     expect(batumi).not.toContain("Population · Georgia");
   });
+});
+
+test("the page's packed facts render the same place as the facts themselves (Task 28)", () => {
+  const packed = JSON.parse(JSON.stringify(packFacts(facts)));
+  for (const place of [GEORGIA_PLACE_ID, "region.adjara", "06"]) expect(render(place, "ka", false, undefined, packed)).toBe(render(place, "ka"));
 });

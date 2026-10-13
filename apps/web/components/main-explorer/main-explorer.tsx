@@ -15,6 +15,7 @@ import type {
   ClientNationalGdpFact,
 } from "../../lib/explorer/clientData";
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { buildExplorerModel, isDerivedTotalItemId, type ExplorerModel } from "../../lib/explorer/explorerData";
 import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import { formatAmount, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
@@ -39,12 +40,12 @@ import { useExplorerState } from "./use-explorer-state";
 type MainExplorerProps = {
   presentation: Presentation;
   nav: ExplorerNav;
-  facts: ClientBudgetFact[];
+  facts: FactsInput<ClientBudgetFact>;
   // Optional because the ministries scope is unreachable on the revenue route:
   // scopeFor() returns "revenue" before it consults grouping (urlState.ts), so
   // not even a #g=ministries deep link can switch. Omitting them there keeps the
   // whole admin corpus out of that route's RSC payload.
-  adminFacts?: ClientAdminFact[];
+  adminFacts?: FactsInput<ClientAdminFact>;
   adminCategories?: AdminSpendingCategory[];
   glossaryEntries: PublicGlossaryEntry[];
   gdpFacts?: ClientNationalGdpFact[];
@@ -59,7 +60,8 @@ export function MainExplorer(props: MainExplorerProps) {
   return <I18nProvider {...props.presentation}><MainExplorerContent {...props} /></I18nProvider>;
 }
 
-function MainExplorerContent({ presentation, nav, facts, adminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+function MainExplorerContent({ presentation, nav, facts: shippedFacts, adminFacts: shippedAdminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+  const facts = unpackFacts(shippedFacts), adminFacts = unpackFacts(shippedAdminFacts);
   const { locale, messages } = presentation;
   useAppReady();
 
