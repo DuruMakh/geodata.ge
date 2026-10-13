@@ -17,7 +17,7 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
-import { projectPublicSources } from "../methodology/publicSources";
+import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadWagesPage } from "./wages-shared";
@@ -46,7 +46,7 @@ export async function wagesRegionPageMetadata(slug: string, locale: Locale) {
 export const renderWagesRegionPage = (slug: string, locale: Locale) => renderWagesPage(locale, "regions", regionForSlug(slug).id);
 
 export async function renderWagesPage(locale: Locale, section: WagesSectionId, regionId?: string) {
-  const { data, presentation, manifest, catalogue, facts } = await loadWagesPage(locale, section);
+  const [{ data, presentation, facts }, sources] = await Promise.all([loadWagesPage(locale, section), loadSourcedWorkbookSources("wages", locale)]);
   // The Regions index (wages-regions-index.tsx) is the map and list; a region page serves its own region beside Georgia.
   if (regionId) facts.splice(0, facts.length, ...facts.filter(f => f.dimension !== "region" || f.groupId === regionId));
   const years = [...new Set(wagesViews(section).flatMap(view => wagesCoverage(section, view, facts).years))];
@@ -55,11 +55,6 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
   const labels = wagesLabels(presentation), regionName = regionId ? labels[regionId] : "";
   // Beside a region, the national line is named as Georgia's.
   if (regionId) labels.average = message(presentation.messages, "wages.series.georgiaAverage");
-  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
-  const sources = manifest.filter(source => source.media_type.includes("spreadsheet")).map(source => {
-    const translated = publicSources.find(row => row.source_id === source.source_id)!;
-    return { sourceId: source.source_id, years: source.years, title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at };
-  });
   const t = (key: string) => message(presentation.messages, `wages.${key}`);
   const title = regionId ? message(presentation.messages, "wages.regionTitle", { region: regionName }) : t(`page.${section}.title`);
   const summaryValues = wagesSummaryValues(data.facts.map(toClientWagesFact));

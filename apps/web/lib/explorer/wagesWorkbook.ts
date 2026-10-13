@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { buildWagesModel, type WagesSectionId, type WagesState } from "./wages";
-import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; facts: readonly ClientWagesFact[]; state: WagesState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string; regionId?: string }, presentation: Presentation): WorkbookExportModel {
   const { section, facts, state, labels } = input, { locale, messages } = presentation;
@@ -11,12 +11,7 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
   const model = buildWagesModel(section, facts, state);
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.dimension}:${f.groupId}:${f.sectorId}:${f.year}`, f]));
   const cell = (series: typeof model.selected[number], year: number) => byCell.get(`${series.indicatorId}:${series.dimension}:${series.groupId}:${series.sectorId}:${year}`);
-  const neededYears = new Map<string, Set<number>>();
-  for (const series of model.selected) for (const year of model.years) {
-    const fact = cell(series, year);
-    if (fact) neededYears.set(fact.sourceId, (neededYears.get(fact.sourceId) ?? new Set<number>()).add(year));
-  }
-  const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
+  const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) => cell(series, year)?.sourceId));
   const numberFormat = model.decimals ? "#,##0.0" : "#,##0";
   const status = (fact: ClientWagesFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
   const view = state.view === "main" ? "" : ` · ${t(`group.${state.view}`)}`;
