@@ -42,5 +42,9 @@ describe("births per 100 deaths index", () => {
 
 it("the index rows are unchanged by the shared row builder (fingerprint recorded before the refactor)", async () => {
   const { createHash } = await import("node:crypto");
-  expect(createHash("sha256").update(JSON.stringify(index)).digest("hex")).toBe("4e08de4bc81aaf31c5d61dc651188e13ea7e3fdec414c91275ffc3ec9b963356");
+  // The map's touch targets are left out: since Task 23 they are target bounds the
+  // map sizes into disks at its drawn width, not index row data. Everything else
+  // is pinned; the hash below equals the pre-refactor model minus that one field.
+  const { touchTargets: _touchTargets, ...map } = index.map;
+  expect(createHash("sha256").update(JSON.stringify({ ...index, map })).digest("hex")).toBe("17e33bbb06d3af18e46d5927babd2165990ad7e0cab901e01bf94da3b3d16a18");
 });
