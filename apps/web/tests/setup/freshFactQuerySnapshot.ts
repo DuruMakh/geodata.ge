@@ -10,6 +10,10 @@
 //     and `@/` imports (lib/factQuery, the lib/data loaders, lib/i18n, ...);
 //   - the files those modules read at run time: the repository's data/ and
 //     docs/Raw Data/, and the message catalogues under lib/i18n/messages.
+//     data/reports/ is left out: it holds only outputs (data:validate and
+//     prebuild write their validation reports there), and no module in the
+//     snapshot's import graph reads it, so a validation run does not force a
+//     rebuild.
 // Directories are walked with their own mtimes as well, so a deleted or renamed
 // input marks the snapshot stale. A deleted or renamed module needs no such
 // check: the module that imported it changes too.
@@ -25,6 +29,7 @@ const DATA_ROOTS = [
   path.join(WEB_ROOT, "..", "..", "docs", "Raw Data"),
   path.join(WEB_ROOT, "lib", "i18n", "messages"),
 ];
+const NOT_INPUTS = new Set([path.join(WEB_ROOT, "..", "..", "data", "reports")]);
 const IMPORT_SPECIFIER = /(?:from|import)\s*\(?\s*["']([^"']+)["']/g;
 
 function resolveImport(importer: string, specifier: string): string | null {
@@ -52,6 +57,7 @@ function collectModules(file: string, modules: Set<string>): Set<string> {
 }
 
 function hasEntryNewerThan(directory: string, mtimeMs: number): boolean {
+  if (NOT_INPUTS.has(directory)) return false;
   if (statSync(directory).mtimeMs > mtimeMs) return true;
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const entryPath = path.join(directory, entry.name);

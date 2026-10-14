@@ -108,12 +108,14 @@ jobs:
       # the files prebuild generates (downloads, page data, the /mcp snapshot).
       # .next/cache stays out (it is cached above and next start never reads it),
       # and so do source maps, which no test reads, and a dev server's output.
+      # Kept 7 days so "Re-run failed jobs" on the browser job still finds it
+      # the next day; after a week, use "Re-run all jobs".
       - name: Upload the build for the browser tests
         uses: actions/upload-artifact@v4
         with:
           name: next-build
           include-hidden-files: true
-          retention-days: 1
+          retention-days: 7
           if-no-files-found: error
           path: |
             apps/web/.next

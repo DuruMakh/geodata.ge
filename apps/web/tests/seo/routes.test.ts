@@ -72,6 +72,7 @@ describe("indexable Fiscal.ge routes", () => {
     expect(deficitMetadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/deficit");
   });
 
+  // The first sitemap() call loads every dataset: about 8s alone, 39s once on a loaded 4-core box.
   it("publishes the exact unique Fiscal.ge HTML inventory", async () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
     const entries = await sitemap();
@@ -173,7 +174,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/energy-food",
       "/methodology/demography",
     ]);
-  });
+  }, 90_000);
 
   it("publishes municipality slugs and never the numeric source identities", async () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";

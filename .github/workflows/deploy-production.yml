@@ -70,8 +70,8 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npm run data:import
       # Prove the build Vercel is about to run, before triggering it. Nothing
-      # earlier exercises this path for this commit: PR CI builds only in csv
-      # mode (playwright.config.ts webServer), and db-health.yml runs weekly
+      # earlier exercises this path for this commit: CI builds only in csv
+      # mode (its separate Build job), and db-health.yml runs weekly
       # against whatever main happened to be. The db path differs in ways that
       # matter — it reads over the POOLED DATABASE_URL (the import above uses
       # DIRECT_URL) and runs the full row-by-row parity check in

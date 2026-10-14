@@ -34,13 +34,38 @@ const requiredFileTargets = [
 ] as const;
 
 type CsvRow = Record<string, string>;
+
+/** The per-measure first years on the Money sub-page lines ("bank loans from 2002", ...). */
+function moneyFirstYears() {
+  const indicator = (pattern: RegExp) => (row: CsvRow) => pattern.test(row.indicator_id);
+  const from = (prefix: string, suffix = "") => (first: number) => `${prefix} from ${first}${suffix}`;
+  const money = (url: string, pattern: RegExp, text: (first: number) => string, alsoIn?: string) =>
+    ({ url: `/explorer/money/${url}`, file: "money-banks-annual.csv", rows: indicator(pattern), text, alsoIn });
+  const supply = /^money\.m[0-3]$/;
+  return [
+    money("supply", supply, from("in million GEL")),
+    // The page divides each December amount by national GDP, so a share needs both years.
+    money("supply", supply, from("all four as a share of GDP"), "national-gdp-annual-1996-2025.csv"),
+    money("loans-deposits", /^loans\.(total|gel|fx)$/, from("bank loans")),
+    money("loans-deposits", /^deposits\.(total|gel|fx)$/, from("and deposits", ",")),
+    money("loans-deposits", /^deposits\.individuals$/, from("deposits of people")),
+    money("loans-deposits", /^deposits\.legal_entities$/, from("of companies and organisations")),
+    money("interest-rates", /^rates\.policy$/, from("policy rate")),
+    money("interest-rates", /^rates\.(loans|deposits)_/, from("on loans and on deposits")),
+    money("bank-health", /^banks\.npl_ratio$/, from("bad loans as a share of all loans")),
+    money("bank-health", /^banks\.ro[ae]$/, from("return on assets and on equity")),
+    money("bank-health", /^banks\.(capital|tier1)_ratio$/, from("the two capital ratios")),
+  ];
+}
 /**
  * Coverage years llms.txt states in prose, each checked against the reviewed CSV it describes: the line that
  * links `url` must contain the first and last year of the matching rows (Task 19 review follow-up, D283).
+ * `alsoIn` keeps only the years another CSV has too, for a value the page derives from both.
  */
-const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boolean; text?: (first: number, last: number) => string }[] = [
+const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boolean; alsoIn?: string; text?: (first: number, last: number) => string }[] = [
   { url: "/explorer/economy/regions", file: "regional-economies-annual.csv" },
   { url: "/explorer/money", file: "money-banks-annual.csv" },
+  ...moneyFirstYears(),
   { url: "/explorer/unemployment", file: "unemployment-annual.csv" },
   { url: "/explorer/living-standards", file: "household-income-spending-annual.csv", text: (first) => `household income and spending from ${first}` },
   { url: "/explorer/living-standards", file: "poverty-annual.csv", rows: (row) => row.indicator_id.startsWith("poverty."), text: (first) => `poverty rates from ${first}` },
@@ -65,10 +90,13 @@ describe("Fiscal.ge agent instructions", () => {
   it("states each dataset's coverage years as its reviewed CSV has them", async () => {
     const lines = (await readFile(llmsPath, "utf8")).split(/\r?\n/);
     const imports = fileURLToPath(new URL("../../../../data/imports/", import.meta.url));
-    for (const { url, file, rows = () => true, text = (first: number, last: number) => `${first}–${last}` } of statedCoverage) {
+    const readYears = async (file: string, rows: (row: CsvRow) => boolean = () => true) =>
+      (parse(await readFile(path.join(imports, file)), { columns: true, bom: true }) as CsvRow[]).filter(rows).map((row) => Number(row.year));
+    for (const { url, file, rows, alsoIn, text = (first: number, last: number) => `${first}–${last}` } of statedCoverage) {
       const line = lines.find((candidate) => candidate.includes(`](https://fiscal.ge${url})`));
       expect(line, url).toBeDefined();
-      const years = (parse(await readFile(path.join(imports, file)), { columns: true, bom: true }) as CsvRow[]).filter(rows).map((row) => Number(row.year));
+      const otherYears = alsoIn === undefined ? null : new Set(await readYears(alsoIn));
+      const years = (await readYears(file, rows)).filter((year) => otherYears === null || otherYears.has(year));
       expect(years.length, `${url} ${file}`).toBeGreaterThan(0);
       expect(line, `${url} ${file}`).toContain(text(Math.min(...years), Math.max(...years)));
     }
