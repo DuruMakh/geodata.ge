@@ -259,7 +259,7 @@
   "inflation.productsShowCumulative": "დაგროვილი ცვლილების ჩვენება",
   "inflation.productsShowAnnual": "წლიური ინფლაციის ჩვენება",
   "inflation.productsChartSummary": "{mode} {start} წლიდან {end}-მდე. გრაფიკზე ნაჩვენებია {count} პროდუქტის ხაზი. ზუსტი მნიშვნელობები მოცემულია პროდუქტების სიაში და Excel ფაილში.",
-  "inflation.productsChartLines": "ხაზები: {names}.",
+  "inflation.productsNoScript": "პროდუქტების მონაცემები JavaScript-ით იტვირთება. მის გარეშე ჩამოტვირთეთ ფაილი:",
   "inflation.productsChartOmitted": "დაგროვილი ცვლილების გრაფიკზე არ ჩანს",
   "inflation.productsNoCompleteSeries": "არჩეულ პროდუქტებს ამ ხედისა და პერიოდისთვის სრული მონაცემები არ აქვთ. ქვემოთ იხილეთ ისტორიის საწყისი თვე ან გამოტოვებული თვიური ინდექსი.",
   "inflation.productsSource": "მონაცემები: საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი), პროდუქტების დეტალური ფასების ინდექსები.",

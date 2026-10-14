@@ -169,7 +169,7 @@ test("the about page's decorative English note is hidden from screen readers", a
   await expect(page.getByTestId("mission-cover").getByText(/MISSION NOTE/)).toHaveAttribute("aria-hidden", "true");
 });
 
-test("product toggles are named once, the product table is named by its caption and the chart summary names its lines", async ({ page }) => {
+test("product toggles are named once, the product table is named by its caption and the chart caption names its lines", async ({ page }) => {
   await page.goto("/en/explorer/inflation/products");
   await ready(page);
   const toggle = page.getByTestId("product-cumulative-toggle");
@@ -195,7 +195,11 @@ test("product toggles are named once, the product table is named by its caption 
   const selected = await page.getByTestId("series-list").locator('[data-testid="series-row-toggle"][aria-pressed="true"]')
     .getByTestId("series-label").allTextContents();
   expect(selected.length).toBeGreaterThan(0);
-  await expect(page.getByTestId("product-chart-summary")).toContainText(`Lines: ${selected.map((label) => label.trim()).join(", ")}.`);
+  // The chart's own caption names each line with its latest value; the summary does not repeat the names.
+  const caption = await page.getByTestId("chart-panel").locator("figcaption li").allTextContents();
+  expect(caption).toHaveLength(selected.length);
+  for (const label of selected) expect(caption.some((item) => item.startsWith(`${label.trim()}, `))).toBe(true);
+  await expect(page.getByTestId("product-chart-summary")).not.toContainText(selected[0]!.trim());
 });
 
 // U07-12: the sign note is the source note's first sentence; the deck under the heading states the value only.

@@ -242,3 +242,30 @@ test("while the product runs load the page shows its heading and a loading statu
   await expect(page.getByTestId("chart-panel")).toHaveCount(0);
 });
 
+
+test("a page-data answer that fails once is asked for again past the browser cache", async ({ page }) => {
+  // A name asked for during a rollback can 404 under the year-long immutable header (use-page-data.ts retries once
+  // with cache: "reload", which an intercepted request does not show in its headers).
+  let requests = 0;
+  await page.route("**/page-data/inflation-products.*.json", async (route) => {
+    requests += 1;
+    if (requests === 1) await route.fulfill({ status: 404, body: "" });
+    else await route.continue();
+  });
+  await page.goto(`/en${ROUTE}`);
+  await ready(page);
+  await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+  await expect(page.getByTestId("page-data-error")).toHaveCount(0);
+  expect(requests).toBe(2);
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+  test("the products page points to the data downloads instead of loading for ever", async ({ page }) => {
+    await page.goto(`/en${ROUTE}`);
+    const fallback = page.getByTestId("products-noscript");
+    await expect(fallback).toBeVisible();
+    await expect(fallback.getByRole("link", { name: "CSV" })).toHaveAttribute("href", "/downloads/data/inflation-products.csv");
+    await expect(fallback.getByRole("link", { name: "JSON" })).toHaveAttribute("href", "/downloads/data/inflation-products.json");
+  });
+});

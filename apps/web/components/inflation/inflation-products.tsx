@@ -66,6 +66,14 @@ export function InflationProducts({ products, dataUrl, coverage, lastReviewedAt,
     <p className="mb-4 text-[13px] text-[var(--muted)]">{t("productsUnit")}</p>
     {index ? <ProductExplorer index={index} lastReviewedAt={lastReviewedAt} sources={sources} siteOrigin={siteOrigin} /> :
       <PageDataStatus status={runs.status === "error" ? "error" : "loading"} />}
+    {/* The runs arrive by fetch, so without JavaScript the page would only ever say it is loading. */}
+    {index ? null : <noscript>
+      <p data-testid="products-noscript" className="mt-3 text-[13px] text-[var(--muted)]">
+        {t("productsNoScript")}{" "}
+        <a className="underline" href="/downloads/data/inflation-products.csv">CSV</a>{" · "}
+        <a className="underline" href="/downloads/data/inflation-products.json">JSON</a>
+      </p>
+    </noscript>}
   </ExplorerPage>;
 }
 
@@ -141,7 +149,6 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
           <p className="sr-only" data-testid="product-chart-summary">
             {t("productsChartSummary", { mode: state.indicator === "annual" ? t("productsAnnualTitle") : t("productsCumulativeTitle"),
               start: state.range.startYear, end: periodLabel(messages, endPeriod, "long"), count: chartSeries.length })}
-            {chartSeries.length ? ` ${t("productsChartLines", { names: chartSeries.map((series) => series.label).join(", ") })}` : null}
           </p>
           {hasValues ? <div className="mt-5">
             <EditorialLineChart

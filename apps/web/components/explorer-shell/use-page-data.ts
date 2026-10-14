@@ -9,10 +9,15 @@ const requests = new Map<string, Promise<unknown>>();
 function request(url: string): Promise<unknown> {
   let pending = requests.get(url);
   if (!pending) {
-    pending = fetch(url).then((response) => {
-      if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
-      return response.json();
-    });
+    // The files are cached as immutable for a year (next.config.ts), and a browser may keep an error answer under
+    // the same header: a name asked for during a rollback or a deploy can 404 once and exist later. One retry that
+    // bypasses the cache keeps that visitor from being stuck on the error.
+    pending = fetch(url)
+      .then((response) => response.ok ? response : fetch(url, { cache: "reload" }))
+      .then((response) => {
+        if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
+        return response.json();
+      });
     // A failure is not remembered, so the next mount asks again.
     pending.catch(() => requests.delete(url));
     requests.set(url, pending);

@@ -30,6 +30,13 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
     expect(response?.status()).toBe(200);
     const initialHtml = await response!.text();
     const expected = { canonical: origin + target, ka: origin + route, en: origin + englishPath(route), locale };
+    if (locale === "en") {
+      // The rendered check must see a page whose series load after hydration (use-page-data.ts) once they have
+      // loaded, or it checks only the loading line. The product names prove it ran: each carries its Georgian original.
+      await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
+      await expect(page.getByTestId("page-data-error")).toHaveCount(0);
+      if (route === "/explorer/inflation/products") expect(await page.locator('[data-original-language="product"][lang="ka"]').count()).toBeGreaterThan(0);
+    }
     for (const initial of locale === "en" ? [true, false] : [true]) {
       const result = await page.evaluate(({ html, initial, originals, products, locale }) => {
         const root = initial ? new DOMParser().parseFromString(html, "text/html") : document;

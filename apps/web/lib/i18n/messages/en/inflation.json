@@ -259,7 +259,7 @@
   "inflation.productsShowCumulative": "Show cumulative price change",
   "inflation.productsShowAnnual": "Show annual inflation",
   "inflation.productsChartSummary": "{mode} from {start} through {end}. Product lines shown: {count}. Exact values are in the product list and Excel download.",
-  "inflation.productsChartLines": "Lines: {names}.",
+  "inflation.productsNoScript": "The product series load with JavaScript. Without it, download the data:",
   "inflation.productsChartOmitted": "Not shown in the cumulative chart",
   "inflation.productsNoCompleteSeries": "The selected products have no complete series for this view and range. Check their first available month or a missing monthly index below.",
   "inflation.productsSource": "Data: National Statistics Office of Georgia (Geostat), detailed product price indices.",
