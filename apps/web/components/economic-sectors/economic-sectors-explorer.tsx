@@ -97,6 +97,12 @@ export function EconomicSectorsExplorer({
         .map((f) => f.year),
     ),
   ].sort((a, b) => a - b);
+  // The longest of the three measures' lines, the national nominal one with its note, kept as the line's height so
+  // switching measure never moves the chart (DESIGN.md, sectors): the one-line share headline would otherwise lift it.
+  const latestNominal = facts.filter((f) => f.measure === "nominal" && f.seriesId === SECTOR_GDP).toSorted((a, b) => a.year - b.year).at(-1);
+  const nationalLine = latestNominal
+    ? { measure: t("reference"), period: latestNominal.year, value: formatAmount(latestNominal.value, locale), note: t("preliminary") }
+    : undefined;
   return (
     <div data-testid="economic-sectors-explorer" className="@container">
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
@@ -110,6 +116,7 @@ export function EconomicSectorsExplorer({
             : formatAmount(model.headline?.value, locale)
         }
         note={model.headline?.status === "preliminary" ? t("preliminary") : undefined}
+        reserve={nationalLine}
       />
       <p role="status" className="sr-only">
         {announcement}

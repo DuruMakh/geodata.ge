@@ -8,12 +8,39 @@ export const DECK_LINE_CLASS = "mb-[30px] flex min-h-[18px] flex-wrap items-base
  * the sectors page's headline line, so a phone reader sees "what is it now?"
  * on the first screen. The full indicators block further down is unchanged.
  */
-export function LatestValueLine({ testId, measure, period, value, note }: { testId: string; measure: string; period: string | number; value: string; note?: string }) {
+type LineParts = { measure: string; period: string | number; value: string; note?: string };
+
+function LineText({ measure, period, value, note }: LineParts) {
   return (
-    <p data-testid={testId} className="mb-2 text-[0.8125rem] text-[var(--body)]">
+    <>
       {measure} · {period}:{" "}
       <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{withLari(value)}</span>
       {note ? ` · ${note}` : ""}
-    </p>
+    </>
+  );
+}
+
+/**
+ * `reserve`, optional: a line the block keeps room for, stacked invisibly in the same grid cell, so a page whose
+ * line changes with a control (the sectors measures) keeps one height and never moves what follows. Without it the
+ * output is the plain paragraph.
+ */
+export function LatestValueLine({ testId, reserve, ...line }: LineParts & { testId: string; reserve?: LineParts }) {
+  if (!reserve) {
+    return (
+      <p data-testid={testId} className="mb-2 text-[0.8125rem] text-[var(--body)]">
+        <LineText {...line} />
+      </p>
+    );
+  }
+  return (
+    <div className="mb-2 grid text-[0.8125rem] text-[var(--body)]">
+      <p data-testid={testId} className="self-start [grid-area:1/1]">
+        <LineText {...line} />
+      </p>
+      <p aria-hidden="true" className="invisible [grid-area:1/1]">
+        <LineText {...reserve} />
+      </p>
+    </div>
   );
 }

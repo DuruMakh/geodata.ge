@@ -63,6 +63,12 @@ test("the analysis deck does not repeat the first headline card", async () => {
   expect(deck).toMatch(/^\s*[+−]\d+\.\d%\s+year on year\s*$/);
 });
 
+// The analysis page's bubble-chart note words the y axis as its deck does ("year on year" / "წინა წელთან").
+test.each(["ka", "en"] as const)("the analysis bubble note uses the deck's year-on-year phrase: %s", async (locale) => {
+  const messages = await getMessages(locale, ["main", "analysis"]);
+  expect(message(messages, "analysis.budgetFieldNote")).toContain(message(messages, "main.previousYear"));
+});
+
 // U03-14: in the line view the phone chart's own axis caption names the unit, so the mode row's caption is desktop-only;
 // U04-10: its lari sign is set in the UI face like every other ₾ on the page.
 test("the mode row's unit caption is desktop-only in the line view and sets ₾ in the UI face", async () => {

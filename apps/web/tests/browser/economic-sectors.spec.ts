@@ -57,29 +57,30 @@ test("ranked sector table keeps the GDP reference first", async ({ page }) => {
   await expect(page.getByTestId("explorer-table").locator("tbody tr").first()).toContainText("Total GDP");
 });
 
-test("compact sector descriptions keep the chart still and clicked hints disappear", async ({ page }) => {
-  await page.goto("/explorer/economy/sectors");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  const panel = page.getByTestId("chart-panel");
-  // The chart keeps its place under the latest-value line: no hint or description pushes it down. The line itself may
-  // change height with the measure, since the Georgian national line wraps at 390px (registered in mobile-fit-charts)
-  // while the share line is one line (U11-01).
-  const gap = async () => (await panel.boundingBox())!.y - (await page.getByTestId("sectors-headline").boundingBox())!.y;
-  for (const width of [390, 768, 1440]) {
-    await page.setViewportSize({ width, height: 1000 });
-    const lineHeight = await page.getByTestId("sectors-headline").evaluate((line) => parseFloat(getComputedStyle(line).lineHeight));
-    const lines = async () => Math.round((await page.getByTestId("sectors-headline").boundingBox())!.height / lineHeight);
-    const top = (await gap()) - (await lines()) * lineHeight;
-    for (const name of ["% მშპ-ში", "რეალური ზრდა %", "ნომინალური ღირებულება ლარში"]) {
-      await page.getByRole("button", { name, exact: true }).click();
-      await page.getByRole("heading", { level: 1 }).hover();
-      await expect(page.getByRole("tooltip")).toHaveCount(0);
-      expect((await gap()) - (await lines()) * lineHeight).toBeCloseTo(top, 0);
+// DESIGN.md (sectors): the line under the heading keeps one height across the three measures, so switching never
+// moves the chart, in both languages and at phone widths where the national line wraps but the share line does not.
+for (const { locale, heading, measures } of [
+  { locale: "ka", heading: "სექტორები", measures: ["% მშპ-ში", "რეალური ზრდა %", "ნომინალური ღირებულება ლარში"] },
+  { locale: "en", heading: "Sectors", measures: ["% of GDP", "Real growth %", "Nominal value in GEL"] },
+]) {
+  test(`compact sector descriptions keep the chart still and clicked hints disappear: ${locale}`, async ({ page }) => {
+    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/economy/sectors`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const panel = page.getByTestId("chart-panel");
+    for (const width of [375, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const top = (await panel.boundingBox())!.y;
+      for (const name of measures) {
+        await page.getByRole("button", { name, exact: true }).click();
+        await page.getByRole("heading", { level: 1 }).hover();
+        await expect(page.getByRole("tooltip")).toHaveCount(0);
+        expect((await panel.boundingBox())!.y, `${width}px, ${name}`).toBe(top);
+      }
     }
-  }
-  await expect(page.getByTestId("sectors-unit")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("სექტორები");
-});
+    await expect(page.getByTestId("sectors-unit")).toHaveCount(0);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+  });
+}
 
 test.describe("touch measure controls", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 900 } });

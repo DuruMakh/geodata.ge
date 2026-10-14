@@ -47,7 +47,7 @@
   "analysis.radar": "Budget radar",
   "analysis.radarNote": "Shares · leading categories · exact values in the ranking below",
   "analysis.budgetField": "Budget field",
-  "analysis.budgetFieldNote": "x — share of total · y — growth from the previous year · size — amount",
+  "analysis.budgetFieldNote": "x — share of total · y — growth year on year · size — amount",
   "analysis.budgetFieldEmpty": "Previous-year data is unavailable, so growth cannot be shown for this year. Choose a later year.",
   "analysis.metadataTitle": "Georgia budget analysis — {year} actuals | Fiscal.ge",
   "analysis.metadataDescription": "Actual budget results for {year} — composition, rankings and every 100 GEL.",

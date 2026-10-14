@@ -133,21 +133,37 @@ test("switching to English keeps range, selection and table mode (Review Focus 5
 
 // U25-07: on a phone a year cell scrolled under the sticky label column passes behind a solid paper margin with a
 // hairline edge, not a gradient (DESIGN.md §17), so no half figure shows against the label.
-test("the table's sticky label column ends in a solid edge on a phone", async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 });
-  // Four series: from four rows a phone table lists series as rows with a sticky label column (DESIGN.md §12).
-  await page.goto("/explorer/energy-food/energy-supply#view=table&sel=energy.supply.total,energy.supply.natural_gas,energy.supply.oil_products,energy.supply.hydro");
-  await ready(page);
-  const label = page.getByTestId("explorer-table").locator("tbody th[scope='row']").first();
-  await expect(label).toBeVisible();
-  const edge = await label.evaluate((cell) => {
-    const after = getComputedStyle(cell, "::after");
-    return { image: after.backgroundImage, color: after.backgroundColor, border: after.borderRightWidth, width: after.width, left: after.left, cellWidth: `${cell.getBoundingClientRect().width}px` };
-  });
-  expect(edge.image).toBe("none");
-  expect(edge.color).toBe(await page.evaluate(() => getComputedStyle(document.body).backgroundColor));
-  expect(edge.border).toBe("1px");
-  // A 10px opaque margin starting at the label column's right edge.
-  expect(edge.width).toBe("10px");
-  expect(parseFloat(edge.left)).toBeCloseTo(parseFloat(edge.cellWidth), 0);
+test("the table's sticky label column ends in a solid edge on a phone and on a desktop", async ({ page }) => {
+  for (const width of [375, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    // Four series: from four rows a phone table lists series as rows with a sticky label column (DESIGN.md §12).
+    await page.goto("/explorer/energy-food/energy-supply#view=table&sel=energy.supply.total,energy.supply.natural_gas,energy.supply.oil_products,energy.supply.hydro");
+    await ready(page);
+    const table = page.getByTestId("explorer-table");
+    const paper = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const soft = await page.evaluate(() => {
+      const probe = document.createElement("div");
+      probe.style.color = "var(--hairline-soft)";
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    });
+    // The header label cell and every body label cell: one straight rule, at the cell's right edge, in hairline-soft,
+    // then a 10px solid paper margin; no gradient.
+    for (const cell of [table.locator("thead th:first-child"), table.locator("tbody th[scope='row']").first(), table.locator("tbody th[scope='row']").last()]) {
+      const edge = await cell.evaluate((element) => {
+        const after = getComputedStyle(element, "::after");
+        return {
+          image: after.backgroundImage, color: after.backgroundColor, rule: after.borderLeftWidth, ruleColor: after.borderLeftColor,
+          right: after.borderRightWidth, width: after.width, left: parseFloat(after.left), cellWidth: element.getBoundingClientRect().width,
+          ruleX: element.getBoundingClientRect().right,
+        };
+      });
+      expect(edge, `${width}px`).toMatchObject({ image: "none", color: paper, rule: "1px", ruleColor: soft, right: "0px", width: "10px" });
+      expect(edge.left).toBeCloseTo(edge.cellWidth, 0);
+    }
+    const rules = await table.locator("thead th:first-child, tbody th[scope='row']").evaluateAll((cells) => cells.map((cell) => Math.round(cell.getBoundingClientRect().right)));
+    expect(new Set(rules).size, `${width}px: the header and body rules line up`).toBe(1);
+  }
 });

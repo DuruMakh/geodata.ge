@@ -64,11 +64,13 @@ export const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-m
 const MOBILE_LABEL_CLASS =
   "@max-[768px]:pr-1.5 @max-[768px]:w-[40cqw] @max-[768px]:min-w-[40cqw] @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:break-words";
 const PIN_RIGHT_CLASS = "sticky @max-[768px]:static";
-// A solid paper margin with a hairline edge on the sticky label column's right side, so a year cell scrolled under
-// it reads as passing behind the column rather than as a figure cut in half (U25-07). Solid, not a fade: DESIGN.md
-// §17 has no gradients. The 10px fall in the empty left part of a right-aligned 78px year column.
+// A solid 10px paper margin right of the sticky label column, on its header and body cells alike, so a year scrolled
+// under it passes behind the column instead of showing half a figure (U25-07). Solid, not a fade: DESIGN.md §17 has
+// no gradients. Its left border redraws the column rule where the cells' own 1px hairline-soft shadow sat (the margin
+// paints over that shadow), so the rule keeps its place and colour. 10px is within the empty left of a right-aligned
+// year cell: the 78px desktop column, and the 10px phone cell padding.
 const STICKY_EDGE_CLASS =
-  "after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-2.5 after:border-r after:border-[var(--hairline)] after:bg-[var(--paper)] after:content-['']";
+  "after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-2.5 after:border-l after:border-[var(--hairline-soft)] after:bg-[var(--paper)] after:content-['']";
 // A value cell of the year-rows layout: flush right under its series header.
 const ROWS_VALUE_CELL_CLASS = "pl-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
 
@@ -307,7 +309,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
-            <th scope="col" className={`sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`}>
+            <th scope="col" className={`sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)] ${STICKY_EDGE_CLASS} ${labelClass}`}>
               {firstColumnLabel}
             </th>
             {years.map((year, index) => (
