@@ -12,16 +12,19 @@ export function BreadcrumbJsonLd({ items }: { items: readonly BreadcrumbItem[] }
 
 export function BreadcrumbTrail({
   items,
+  label,
   className,
 }: {
   items: readonly BreadcrumbItem[];
+  /** The landmark's name in the page language (`common.breadcrumb`). */
+  label: string;
   className?: string;
 }) {
   return (
     <>
       <BreadcrumbJsonLd items={items} />
       <nav
-        aria-label="Breadcrumb"
+        aria-label={label}
         className={className ?? "border-t-2 border-[var(--ink)] pt-3 text-[11px] text-[var(--muted)]"}
       >
         {items.map((item, index) => {
@@ -35,6 +38,7 @@ export function BreadcrumbTrail({
                 <Link
                   data-breadcrumb-label
                   href={item.path}
+                  prefetch={false}
                   className="max-[768px]:inline-flex max-[768px]:min-h-11 max-[768px]:items-center underline underline-offset-4 hover:text-[var(--accent)]"
                 >
                   {item.name}

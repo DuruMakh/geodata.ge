@@ -45,7 +45,7 @@ export type BuildSnapshotOptions = { releaseCommit: string; generatedAt: string 
 // resolveSiteUrl(): that falls back to http://localhost:3000 whenever
 // NEXT_PUBLIC_SITE_URL/VERCEL_PROJECT_PRODUCTION_URL are unset, which is true
 // both for a local `npm test` and for CI's `checks` job (only the separate
-// `e2e` job sets NEXT_PUBLIC_SITE_URL — see .github/workflows/ci.yml).
+// `build` and `e2e` jobs set NEXT_PUBLIC_SITE_URL — see .github/workflows/ci.yml).
 // `sources` is hash-significant content (§4.3 of the query-core spec: "an
 // unchanged snapshot rebuilt later has the same dataVersion"), so an
 // env-dependent origin would make dataVersion depend on where the build ran

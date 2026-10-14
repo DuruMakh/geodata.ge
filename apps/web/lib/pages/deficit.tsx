@@ -1,8 +1,7 @@
 import { DEFICIT_SERIES_ID } from "../factQuery/types";
 import type { Locale } from "../i18n/types";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
-import { getMessages } from "../i18n/messages.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
@@ -11,7 +10,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedGeneralGovernmentBalanceData } from "../data/servedData";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
-import { coverageFromYears, fiscalMetadata, generalGovernmentDeficitMetadata } from "../seo/metadata";
+import { coverageFromYears, generalGovernmentDeficitMetadata } from "../seo/metadata";
 import { DEFICIT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { loadImfWeoManifest, type ImfWeoManifest } from "../methodology/workbookSources";
@@ -42,10 +41,7 @@ function workbookSourcesFor(
 
 export async function deficitPageMetadata(locale: Locale): Promise<Metadata> {
   const { facts } = await loadServedGeneralGovernmentBalanceData();
-  if (locale === "ka") return generalGovernmentDeficitMetadata(facts);
-  const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.status === "actual"));
-  const messages = await getMessages(locale, ["deficit"]);
-  return fiscalMetadata({ locale, title: message(messages, "deficit.metaTitle", { first: firstYear, last: lastYear }), description: message(messages, "deficit.description", { first: firstYear, last: lastYear }), path: DEFICIT_EXPLORER_PATH });
+  return generalGovernmentDeficitMetadata(facts, locale);
 }
 
 export async function renderDeficitPage(locale: Locale) {
@@ -53,7 +49,7 @@ export async function renderDeficitPage(locale: Locale) {
     loadServedGeneralGovernmentBalanceData(),
     loadImfWeoManifest(),
   ]);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "deficit"], [DEFICIT_SERIES_ID]);
+  const presentation = await getPresentation(locale, ["format", "main", "deficit"], [DEFICIT_SERIES_ID], [DEFICIT_SERIES_ID]);
   const { messages } = presentation;
   const { firstYear, lastYear } = coverageFromYears(facts);
   const lastUpdatedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "";
@@ -88,7 +84,7 @@ export async function renderDeficitPage(locale: Locale) {
         { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) },
         { name: message(messages, "common.deficit"), path: pageHref(DEFICIT_EXPLORER_PATH, locale) },
       ]} />
-      <I18nProvider {...presentation}>
+      <I18nProvider {...clientPresentation(presentation)}>
       <DeficitExplorer
         facts={facts.map(projectBalanceFact)}
         workbookSources={workbookSourcesFor(messages, manifest, edition)}

@@ -5,6 +5,7 @@ export const INFLATION_METHODOLOGY_CONTENT: MethodologyContent = {
   slug: "inflation",
   title: "ინფლაცია",
   summary: "საქართველოს სამომხმარებლო ფასების ინდექსი, ინფლაციის კატეგორიები, ქალაქების ინფლაცია და ცალკეული პროდუქტების ფასის ცვლილება, ეროვნული ბანკის მიზნობრივ მაჩვენებელთან ერთად.",
+  metaDescription: "საქართველოს სამომხმარებლო ფასების ინდექსი, ინფლაციის კატეგორიები, ქალაქები და პროდუქტები, ეროვნული ბანკის მიზნობრივ მაჩვენებელთან ერთად.",
   reviewedAt: "2026-10-01",
   archiveManifestId: "inflation",
   coverageSource: { kind: "archive" },

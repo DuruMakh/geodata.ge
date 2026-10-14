@@ -2,7 +2,6 @@ import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadPovertyFacts, toClientPovertyFact } from "../../lib/data/poverty/importPoverty";
 import type { ClientPovertyFact } from "../../lib/data/poverty/types";
-import { buildPovertyHubCards } from "../../lib/explorer/povertyHubCards";
 import { buildPovertyWorkbookExportModel } from "../../lib/explorer/povertyWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -108,9 +107,53 @@ test("the inequality workbook keeps two decimals", async () => {
   expect(model.sources.map(source => source.title)).toEqual(["geostat_gini"]);
 });
 
-test("the hub has two cards with national sparklines and their latest values", async () => {
-  const cards = buildPovertyHubCards(facts, await presentationFor("en"));
-  expect(cards.map(card => card.href)).toEqual(["/explorer/living-standards/poverty", "/explorer/living-standards/inequality"]);
-  expect(cards.map(card => card.footer)).toEqual(["2025 · 7.1% · 2004–2025", "2025 · 0.34 · 2006–2025"]);
-  expect(cards.map(card => card.series?.length)).toEqual([22, 20]);
+// U20-06 (Q8): a nested row read alone names its parent line on the Summary sheet, as the household workbooks do; a
+// relative-poverty row already names its line ("Below 40%: villages"), so it is not repeated.
+test.each(["ka", "en"] as const)("the %s workbook names the parent of a nested row once", async (locale) => {
+  const messages = await getMessages(locale, ["poverty"]);
+  const label = (id: string) => messages[`poverty.series.${id}`]!;
+  const build = async (view: "absolute" | "relative", ids: string[]) => buildPovertyWorkbookExportModel({
+    // The page passes a label for every series of the view.
+    section: "rates", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: Object.fromEntries(povertyViewSeries("rates", view).map(({ id }) => [id, label(id)])),
+    state: { mode: "table", view, range: { kind: "manual", start: 2024, end: 2025 }, selectedIds: ids },
+  }, await presentationFor(locale));
+  const absolute = await build("absolute", ["poverty.absolute|georgia", "poverty.absolute|settlement.rural"]);
+  expect(absolute.readable.rows.map(row => [row.parentLabel, row.label])).toEqual([
+    [null, label("poverty.absolute|georgia")],
+    [label("poverty.absolute|georgia"), label("poverty.absolute|settlement.rural")],
+  ]);
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(absolute));
+  expect(excel.worksheets[0].getCell("A5").value).toBe(`${label("poverty.absolute|georgia")} — ${label("poverty.absolute|settlement.rural")}`);
+  const relative = await build("relative", ["poverty.relative_60|georgia", "poverty.relative_40|settlement.rural"]);
+  expect(relative.readable.rows.map(row => [row.parentLabel, row.label])).toEqual([
+    [null, label("poverty.relative_60|georgia")],
+    [null, label("poverty.relative_40|settlement.rural")],
+  ]);
+});
+
+// U20-09 (owner review): the relative lines' Georgia rows read like their nested rows, so phone-legend entries line up;
+// "of median consumption" stays in the line under the heading.
+test.each(["ka", "en"] as const)("the %s relative-poverty Georgia rows are as short as their nested rows", async (locale) => {
+  const messages = await getMessages(locale, ["poverty"]);
+  for (const line of ["60", "40"]) {
+    const georgia = messages[`poverty.series.poverty.relative_${line}|georgia`]!;
+    const rural = messages[`poverty.series.poverty.relative_${line}|settlement.rural`]!;
+    expect(georgia.split(": ")[0]).toBe(rural.split(": ")[0]);
+  }
+  expect(messages["poverty.latest.relative"]).toContain(locale === "en" ? "median consumption" : "მედიანური მოხმარების");
+});
+
+// U20-10 and U23-05: the source note's update date is the site's date format (DESIGN.md §6.2), kept on one line; the
+// trade overview prints it the same way.
+test("the source notes print their update date as the header does, unbroken", async () => {
+  const { renderPovertyPage } = await import("../../lib/pages/poverty");
+  const { renderTradeOverviewPage } = await import("../../lib/pages/trade");
+  const { renderPageMarkup } = await import("../helpers/render-localized");
+  for (const html of [renderPageMarkup("en", await renderPovertyPage("en", "inequality")), renderPageMarkup("en", await renderTradeOverviewPage("en"))]) {
+    const note = html.match(/<p[^>]*data-testid="source-label"[^>]*>([\s\S]*?)<\/p>/)![1]!;
+    expect(note).toMatch(/<span class="whitespace-nowrap">\d{1,2} [A-Z][a-z]+ \d{4}<\/span>/);
+    expect(note).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+  }
+  const ka = renderPageMarkup("ka", await renderPovertyPage("ka", "inequality")).match(/<p[^>]*data-testid="source-label"[^>]*>([\s\S]*?)<\/p>/)![1]!;
+  expect(ka).toMatch(/<span class="whitespace-nowrap">\d{4}-\d{2}-\d{2}<\/span>/);
 });

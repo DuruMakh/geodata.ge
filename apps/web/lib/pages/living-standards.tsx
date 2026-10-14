@@ -17,7 +17,7 @@ export async function livingStandardsHubMetadata(locale: Locale) {
 }
 
 export async function renderLivingStandardsHub(locale: Locale) {
-  const [household, poverty, presentation] = await Promise.all([loadServedHouseholdData(), loadServedPovertyData(), getPresentation(locale, ["household", "poverty", "common"], [])]);
+  const [household, poverty, presentation] = await Promise.all([loadServedHouseholdData(), loadServedPovertyData(), getPresentation(locale, ["household", "poverty"], [])]);
   const title = message(presentation.messages, "household.hub.title");
   const years = [...household.facts, ...poverty.facts].map(f => f.year);
   const lastReviewedAt = [...household.facts, ...poverty.facts].map(f => f.lastReviewedAt).sort().at(-1);

@@ -71,14 +71,19 @@ test.describe("region header responsiveness", () => {
 });
 
 test.describe("region source note", () => {
-  test("keeps the occupied-territory exclusions on ordinary regional roll-ups", async ({ page }) => {
+  // U09-11: the occupied-territory exclusion is said on the two regions it applies to, not on the other nine.
+  test("states the occupied-territory exclusions only where they apply", async ({ page }) => {
     const response = await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
     expect(response?.status()).toBe(200);
 
     const note = page.getByTestId("municipal-source-note");
     await expect(note).toContainText("რეგიონის ჯამი მხოლოდ საჯაროდ მოწოდებულ მუნიციპალურ ბიუჯეტებს აერთიანებს");
-    await expect(note).toContainText("შიდა ქართლსა და მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია");
+    await expect(note).not.toContainText("ოკუპირებულ ტერიტორიებთან");
+
+    await page.goto(`${BASE_URL}/explorer/municipalities/region/shida_kartli`);
+    await expectMunicipalAppReady(page);
+    await expect(page.getByTestId("municipal-source-note")).toContainText("შიდა ქართლსა და მცხეთა-მთიანეთს ოკუპირებულ ტერიტორიებთან დაკავშირებული ერთეულები აკლია");
   });
 
   test("identifies Adjara's consolidated total and removed internal transfers", async ({ page }) => {
@@ -138,37 +143,6 @@ test.describe("region roll-up page", () => {
     expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/revenue/files/2021/mof-revenue-form-1.pdf`);
   });
 
-  test("renders every member, the roll-up chart, and suppresses the per-member divergence callout", async ({ page }) => {
-    const response = await page.goto(REGION_URL);
-    await expectMunicipalAppReady(page);
-    expect(response?.status()).toBe(200);
-
-    // 12 member rows, matching the taxonomy count for region.imereti.
-    await expect(page.getByTestId("region-member-row")).toHaveCount(12);
-
-    const chart = page.getByTestId("chart-frame");
-    await expect(chart).toBeVisible();
-    await expect(chart.locator("svg text").first()).toBeVisible();
-
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
-  });
-
-  test("a member row links through to its own municipality page", async ({ page }) => {
-    await page.goto(REGION_URL);
-    await expectMunicipalAppReady(page);
-
-    const first = page.getByTestId("region-member-row").first();
-    await expect(first).toHaveAttribute("href", /^\/explorer\/municipalities\/[^/]+$/);
-  });
-
-  test("meta line reports the member count and the region's rank out of 11, not 64", async ({ page }) => {
-    await page.goto(REGION_URL);
-    await expectMunicipalAppReady(page);
-
-    await expect(page.getByTestId("explorer-shell")).toContainText("12 მუნიციპალიტეტი");
-    await expect(page.getByTestId("explorer-shell")).toContainText("ადგილი 11-დან");
-  });
-
   test("places a region-specific summary below the chart source and before the indicators", async ({ page }) => {
     await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
@@ -225,47 +199,36 @@ test.describe("entity picker region options resolve (previously 404)", () => {
 // past defects (the source note and the picker's region options), this is the
 // page's general contract.
 test.describe("region page", () => {
-  test("uses the standardized selector structure with only its total selected by default", async ({ page }) => {
-    await page.goto(REGION_URL);
+  // One region page, one load: status, members, chart, meta line, heading,
+  // picker trigger and the roll-up caveats. The selector anatomy is pinned
+  // together with the municipality page in municipal-entity.spec.ts.
+  test("renders its members, roll-up chart, meta line, heading, trigger and caveats", async ({ page }) => {
+    const response = await page.goto(REGION_URL);
     await expectMunicipalAppReady(page);
+    expect(response?.status()).toBe(200);
 
-    const panel = page.getByTestId("series-selector");
-    const sections = await panel.locator("[data-selector-section]").evaluateAll((nodes) =>
-      nodes.map((node) => node.getAttribute("data-selector-section")),
-    );
-    expect(sections).toEqual(["search", "actions", "list"]);
-    await expect(panel.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
-    await expect(panel.locator('[data-level="total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
-    await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ 11/);
-  });
+    // 12 member rows, matching the taxonomy count for region.imereti.
+    await expect(page.getByTestId("region-member-row")).toHaveCount(12);
+    await expect(page.getByTestId("region-member-row").first()).toHaveAttribute("href", /^\/explorer\/municipalities\/[^/]+$/);
 
-  test("uses the plain region name in the picker trigger", async ({ page }) => {
-    await page.goto(REGION_URL);
-    await expectMunicipalAppReady(page);
+    const chart = page.getByTestId("chart-frame");
+    await expect(chart).toBeVisible();
+    await expect(chart.locator("svg text").first()).toBeVisible();
+
+    await expect(page.getByTestId("explorer-shell")).toContainText("12 მუნიციპალიტეტი");
+    await expect(page.getByTestId("explorer-shell")).toContainText("ადგილი 11-დან");
+
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ხარჯავს ბიუჯეტს იმერეთი");
 
     const trigger = page.getByTestId("entity-picker-trigger");
     await expect(trigger).toContainText("იმერეთი");
     await expect(trigger).not.toContainText("მუნიციპალური ბიუჯეტები");
-  });
-
-  test("uses the municipality-style regional heading and no individual methodology link", async ({ page }) => {
-    await page.goto(REGION_URL);
-    await expectMunicipalAppReady(page);
-
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ხარჯავს ბიუჯეტს იმერეთი");
-    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
-  });
-
-  test("lists its member municipalities and carries the roll-up caveats", async ({ page }) => {
-    await page.goto(REGION_URL);
-    await expectMunicipalAppReady(page);
-    const trigger = page.getByTestId("entity-picker-trigger");
     await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
     const caret = trigger.locator("span[aria-hidden='true']");
     await expect(caret).toHaveText("");
     await expect(caret).toHaveCSS("border-top-width", "5px");
-    await expect(page.getByTestId("region-member-row")).toHaveCount(12);
-    await expect(page.getByTestId("municipal-source-note").first()).toContainText("ოკუპირებულ ტერიტორიებთან");
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
+
+    // U09-11: Imereti has no occupied-territory units; the exclusion note belongs to Shida Kartli and Mtskheta-Mtianeti.
+    await expect(page.getByTestId("municipal-source-note").first()).not.toContainText("ოკუპირებულ ტერიტორიებთან");
   });
 });

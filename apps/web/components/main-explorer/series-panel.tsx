@@ -8,7 +8,7 @@ import { useState, type ReactNode } from "react";
 import type { ExplorerItem, ExplorerScope, ExplorerTableRow } from "../../lib/explorer/types";
 import { formatAmount } from "../../lib/explorer/format";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
-import { TextTab } from "../ui/editorial";
+import { TextTab, TextTabGroup } from "../ui/editorial";
 import { SeriesSelector, SeriesSelectorRow } from "./series-selector";
 import { SeriesAside } from "../explorer-shell/series-aside";
 
@@ -55,6 +55,17 @@ export function buildTreeRows<T>(parents: readonly T[], childrenOf: (parent: T) 
     }
   }
   return rows;
+}
+
+/** Tree rows in list order, each parent with the child rows that follow it (SeriesSelectorRow's `children`). */
+export function nestTreeRows<R>(rows: readonly R[], isChild: (row: R) => boolean): Array<{ row: R; children: R[] }> {
+  const nested: Array<{ row: R; children: R[] }> = [];
+  for (const row of rows) {
+    const parent = nested.at(-1);
+    if (isChild(row) && parent) parent.children.push(row);
+    else nested.push({ row, children: [] });
+  }
+  return nested;
 }
 
 export function buildSeriesPanelRows(items: ExplorerItem[], query: string, expandedIds: string[]): SeriesPanelRow[] {
@@ -143,16 +154,44 @@ export function SeriesPanel({
     panelRows.some((row) => row.item.level !== "total");
   const allSelected = bulkIds.every((itemId) => selectedIds.includes(itemId));
 
+  const renderRow = ({ item, isProgram, hasChildren, expanded, caretLocked }: SeriesPanelRow, programs?: ReactNode) => {
+    const selected = selectedIds.includes(item.id);
+    const latest = valuesByItem.get(item.id)?.valuesByYear[endYear] ?? null;
+
+    return (
+      <SeriesSelectorRow
+        key={item.id}
+        id={item.id}
+        label={publicLabel(locale, item.id, item.kaLabel, englishLabels)}
+        color={item.color}
+        value={formatAmount(latest, locale)}
+        selected={selected}
+        level={item.level}
+        parentId={item.parentItemId}
+        showCaretColumn={isMinistries}
+        hasChildren={hasChildren}
+        expanded={expanded}
+        expansionLocked={caretLocked}
+        showRail={isProgram || (hasChildren && expanded)}
+        isChild={isProgram}
+        onToggle={() => onToggle(item.id)}
+        onToggleExpanded={() => onToggleExpanded(item.id)}
+      >
+        {programs}
+      </SeriesSelectorRow>
+    );
+  };
+
   return (
     <SeriesAside label={message(messages, "controls.series")}>
       <SeriesSelector
         controls={
           showGrouping ? (
             // Two-column layout only: stacked, the chart panel carries these tabs (ExplorerView).
-            <div className="flex gap-[18px] border-b border-[var(--row-border)] pb-3 @max-[1100px]:hidden">
+            <TextTabGroup ariaLabel={message(messages, "controls.grouping")} className="flex gap-[18px] border-b border-[var(--row-border)] pb-3 @max-[1100px]:hidden">
               <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="aside-grouping-fields" />
               <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="aside-grouping-ministries" />
-            </div>
+            </TextTabGroup>
           ) : undefined
         }
         query={query}
@@ -167,31 +206,8 @@ export function SeriesPanel({
         onToggleAll={() => onSelectionChange(hasSelection ? [] : bulkIds)}
         hasVisibleMatches={hasVisibleMatches}
       >
-        {panelRows.map(({ item, isProgram, hasChildren, expanded, caretLocked }) => {
-          const selected = selectedIds.includes(item.id);
-          const latest = valuesByItem.get(item.id)?.valuesByYear[endYear] ?? null;
-
-          return (
-            <SeriesSelectorRow
-              key={item.id}
-              id={item.id}
-              label={publicLabel(locale, item.id, item.kaLabel, englishLabels)}
-              color={item.color}
-              value={formatAmount(latest, locale)}
-              selected={selected}
-              level={item.level}
-              parentId={item.parentItemId}
-              showCaretColumn={isMinistries}
-              hasChildren={hasChildren}
-              expanded={expanded}
-              expansionLocked={caretLocked}
-              showRail={isProgram || (hasChildren && expanded)}
-              isChild={isProgram}
-              onToggle={() => onToggle(item.id)}
-              onToggleExpanded={() => onToggleExpanded(item.id)}
-            />
-          );
-        })}
+        {nestTreeRows(panelRows, (row) => row.isProgram).map(({ row, children }) =>
+          renderRow(row, children.length ? children.map((child) => renderRow(child)) : undefined))}
       </SeriesSelector>
 
       {downloadAction}

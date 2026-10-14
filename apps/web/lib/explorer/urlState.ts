@@ -1,6 +1,6 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import type { PeriodRange } from "./periodRange";
-import type { ChartMode, ExpenditureGrouping, ExplorerNav, ExplorerScope } from "./types";
+import type { ChartMode, ExpenditureGrouping, ExplorerNav, ExplorerScope, ExplorerSide } from "./types";
 
 // Shareable screen state, serialized into the URL hash (DESIGN.md §6.3). The
 // section lives in the route, not the hash:
@@ -145,31 +145,56 @@ export function parseExplorerHash(hash: string, nav: ExplorerNav): ExplorerUrlSt
   return state;
 }
 
+/**
+ * What a shared link's selection restores on the budget explorer: the ids this scope knows, or null to keep
+ * the default when every id is unknown (renamed taxonomy, typos); a deliberately empty selection stays empty.
+ * A restored major program must be visible in the panel, so the ministries above every selected one open.
+ */
+export function restoreExplorerSelection(
+  selection: { scope: ExplorerScope; ids: string[] },
+  knownIds: ReadonlySet<string>,
+  adminFacts: readonly { itemId: string; level: string; parentItemId: string | null }[],
+): { ids: string[] | null; expandedMinistries: string[] } {
+  const ids = selection.ids.filter((id) => knownIds.has(id));
+  const known = new Set(ids);
+  const expandedMinistries = selection.scope !== "ministries" ? [] : Array.from(
+    new Set(
+      adminFacts
+        .filter((fact) => fact.level === "major_program" && fact.parentItemId !== null && known.has(fact.itemId))
+        .map((fact) => fact.parentItemId as string),
+    ),
+  );
+  return { ids: ids.length > 0 || selection.ids.length === 0 ? ids : null, expandedMinistries };
+}
+
 export type SerializeExplorerInput = {
-  nav: ExplorerNav;
+  nav: ExplorerSide;
   grouping: ExpenditureGrouping;
   chartMode: ChartMode;
   share: boolean;
   rangeStart: number;
   rangeEnd: number;
   selectedIds: string[];
-  analysisSide: "expenditure" | "revenue";
-  analysisGrouping: ExpenditureGrouping;
-  analysisYear: number | null;
 };
 
 export function serializeExplorerHash(input: SerializeExplorerInput): string {
   const params = new URLSearchParams();
 
-  if (input.nav === "analysis") {
-    params.set("as", input.analysisSide);
-    if (input.analysisSide === "expenditure") params.set("ag", input.analysisGrouping);
-    if (input.analysisYear !== null) params.set("ay", String(input.analysisYear));
-    return params.toString();
-  }
-
   if (input.nav === "expenditure") params.set("g", input.grouping);
   writeSharedHashKeys(params, input);
+  return params.toString();
+}
+
+export function serializeAnalysisHash(input: {
+  analysisSide: ExplorerSide;
+  analysisGrouping: ExpenditureGrouping;
+  analysisYear: number | null;
+}): string {
+  const params = new URLSearchParams();
+
+  params.set("as", input.analysisSide);
+  if (input.analysisSide === "expenditure") params.set("ag", input.analysisGrouping);
+  if (input.analysisYear !== null) params.set("ay", String(input.analysisYear));
   return params.toString();
 }
 
@@ -209,8 +234,6 @@ export function parseMunicipalHash(hash: string): MunicipalUrlState {
   } catch {
     return state;
   }
-
-  return state;
 }
 
 export function serializeMunicipalHash(input: {

@@ -7,49 +7,21 @@ import { AGE_GROUPS, ageCurves, LIFE_SERIES, nationalYears, seriesByYear, UNIT_R
 import { buildFertilityWorkbookExportModel, buildLifeWorkbookExportModel } from "../../lib/explorer/demographyNationalWorkbook";
 import { formatInUnit, UNIT_DENSITY } from "../../lib/explorer/format";
 import type { ChartMode } from "../../lib/explorer/types";
-import type { WorkbookExportModel, WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientNationalFact } from "../../lib/servedRows";
-import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
-import { SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { SectionTitle, SourceNote } from "../ui/editorial";
+import { Download, SECTION_CLASS } from "./demography-helpers";
 
 /** The first year of the fertility curve; the last is ACCENT. Distinct from the grey of the years between. */
 const FIRST_YEAR_COLOR = SERIES_COLORS["fertility.first_year"]!;
-
-export function ModeTabs({ value, onChange, testId, lineLabel }: { value: ChartMode; onChange: (mode: ChartMode) => void; testId: string; lineLabel?: string }) {
-  const { messages } = useI18n();
-  return (
-    <SegmentedTabs<ChartMode>
-      ariaLabel={message(messages, "controls.viewMode")}
-      value={value}
-      onChange={onChange}
-      options={[
-        { value: "line", label: lineLabel ?? message(messages, "municipal.line"), testId: `${testId}-mode-line` },
-        { value: "table", label: message(messages, "controls.table"), testId: `${testId}-mode-table` },
-      ]}
-    />
-  );
-}
-
-export function Download({ testId, build }: { testId: string; build: () => WorkbookExportModel }) {
-  return (
-    <div className="mt-4 w-full max-w-[260px]">
-      <ExcelDownloadButton
-        testId={testId}
-        disabled={false}
-        onDownload={async () => {
-          const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-          await downloadWorkbook(build());
-        }}
-      />
-    </div>
-  );
-}
 
 export function NationalVitalCharts({
   facts,
@@ -71,7 +43,6 @@ export function NationalVitalCharts({
   const [first, last] = [years[0]!, years.at(-1)!];
   const breaks = [{ year: CENSUS_STEP.toYear, label: t("breakLabel") }];
   const flat = (record: Record<number, number | null>) => years.map((year) => record[year] ?? null);
-  const none = years.map(() => false);
   const tfr = seriesByYear(facts, SERIES.totalFertilityRate);
   const curves = ageCurves(facts);
   // x positions 1..7 stand for the seven age groups; the period label prints the group's name.
@@ -82,10 +53,11 @@ export function NationalVitalCharts({
   const ageOrder = [...curves.years.slice(1, -1), curves.years[0]!, curves.years.at(-1)!];
   const lifeColor = (colorKey: string | null) => (colorKey === null ? INK : SERIES_COLORS[colorKey]!);
   const rate1 = (value: number) => formatInUnit(value, UNIT_DENSITY);
+  const lifeSeries = LIFE_SERIES.map((line) => ({ id: line.seriesId, label: t(line.key), color: lifeColor(line.colorKey), vals: flat(seriesByYear(facts, line.seriesId)) }));
 
   return (
     <>
-      <section data-testid="fertility-section" className="mt-16 border-t-2 border-[var(--ink)] pt-[22px]">
+      <section data-testid="fertility-section" className={SECTION_CLASS}>
         <SectionTitle>{t("fertilityTitle")}</SectionTitle>
         <h3 className="mt-6 mb-3 text-[15px] text-[var(--ink)]">{`${t("tfrLabel")} (${t("tfrUnit")})`}</h3>
         <ModeTabs value={tfrMode} onChange={setTfrMode} testId="tfr" />
@@ -93,7 +65,7 @@ export function NationalVitalCharts({
           {tfrMode === "line" ? (
             <EditorialLineChart
               years={years}
-              series={[{ id: SERIES.totalFertilityRate, label: t("tfrLabel"), color: INK, vals: flat(tfr), planned: none }]}
+              series={[{ id: SERIES.totalFertilityRate, label: t("tfrLabel"), color: INK, vals: flat(tfr) }]}
               share={false}
               unit={UNIT_RATE_2}
               shareLabel=""
@@ -144,7 +116,6 @@ export function NationalVitalCharts({
                   label: String(year),
                   color: ageColor(year),
                   vals: AGE_GROUPS.map((group) => curves.byYear[year]![group]),
-                  planned: AGE_GROUPS.map(() => false),
                 }))}
                 share={false}
                 unit={UNIT_DENSITY}
@@ -181,14 +152,14 @@ export function NationalVitalCharts({
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="asfr-note">{t("asfrNote")}</SourceNote></div>
         <Download testId="fertility-excel-download" build={() => buildFertilityWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
-      <section data-testid="life-section" className="mt-16 border-t-2 border-[var(--ink)] pt-[22px]">
+      <section data-testid="life-section" className={SECTION_CLASS}>
         <SectionTitle>{t("lifeTitle")}</SectionTitle>
         <div className="mt-5"><ModeTabs value={lifeMode} onChange={setLifeMode} testId="life" /></div>
         <div className="mt-5">
           {lifeMode === "line" ? (
             <EditorialLineChart
               years={years}
-              series={LIFE_SERIES.map((line) => ({ id: line.seriesId, label: t(line.key), color: lifeColor(line.colorKey), vals: flat(seriesByYear(facts, line.seriesId)), planned: none }))}
+              series={lifeSeries}
               share={false}
               unit={UNIT_DENSITY}
               shareLabel=""
@@ -215,6 +186,7 @@ export function NationalVitalCharts({
             />
           )}
         </div>
+        <ChartSelectionAids series={lifeSeries} chartShown={lifeMode === "line"} share={false} unit={UNIT_DENSITY} formatValue={rate1} />
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="national-source-note">{t("nationalSource", { first, last })}</SourceNote></div>
         <Download testId="life-excel-download" build={() => buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>

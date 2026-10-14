@@ -7,8 +7,10 @@ import {
   buildHouseholdModel, changeHouseholdMeasure, defaultHouseholdState, HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS,
   householdCoverage, householdMeasureHash, householdRegionHref, householdViewSeries, parseHouseholdHash, parseHouseholdMeasure, serializeHouseholdHash, serializeHouseholdMeasure, type HouseholdState,
 } from "../../lib/explorer/household";
-import { householdRegionStaticParams } from "../../lib/pages/household";
+import { householdRegionPageMetadata, householdRegionStaticParams } from "../../lib/pages/household";
 import { buildHouseholdHubCards } from "../../lib/explorer/householdHubCards";
+import { buildPovertyHubCards } from "../../lib/explorer/povertyHubCards";
+import { loadPovertyFacts, toClientPovertyFact } from "../../lib/data/poverty/importPoverty";
 import { buildHouseholdRegionMapModel } from "../../lib/explorer/householdRegionMap";
 import { buildHouseholdWorkbookExportModel, householdWorkbookSources } from "../../lib/explorer/householdWorkbook";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
@@ -212,11 +214,12 @@ test.each(["ka", "en"] as const)("the %s income workbook for Georgia with towns 
     section: "income", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
     state: { mode: "table", measure: "per_household", range: { kind: "manual", start: 2019, end: 2025 }, selectedIds: ids },
   }, presentation);
-  expect(model.filename).toBe(`fiscal-household-income-georgia-per_household-2019-2025${locale === "en" ? "-en" : ""}.xlsx`);
+  expect(model.filename).toBe(`fiscal-household-income-georgia-per-household-2019-2025${locale === "en" ? "-en" : ""}.xlsx`);
   expect(model.readable.years).toEqual([2019, 2020, 2021, 2022, 2023, 2024, 2025]);
   expect(model.readable.rows).toHaveLength(3);
   expect(model.readable.numberFormat).toBe("0.0");
-  expect(model.readable.unitLabel).toBe("₾");
+  // U28-09: English names the lari "GEL", as every other English page does.
+  expect(model.readable.unitLabel).toBe(locale === "en" ? "GEL" : "₾");
   expect(model.analysis.rows).toHaveLength(21);
   expect(model.analysis.numericFormats).toEqual({ 3: "0.0" });
   expect(model.analysis.headers.join(" ")).not.toMatch(/source_cell|sheet|source_id/i);
@@ -234,7 +237,7 @@ test("the workbook title names the page, its list, the area and the measure", as
     state: { ...defaultHouseholdState("income"), measure: "per_capita", range: { kind: "manual", start: 2020, end: 2021 } },
   }, presentation);
   expect(model.readable.title).toBe("Income · Where it comes from · Guria · Per person");
-  expect(model.filename).toBe("fiscal-household-income-region-guria-per_capita-2020-2021-en.xlsx");
+  expect(model.filename).toBe("fiscal-household-income-region-guria-per-capita-2020-2021-en.xlsx");
   const custom = buildHouseholdWorkbookExportModel({
     section: "spending", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["spending.consumption"]), areaLabel: "Georgia", title: "Custom",
     state: { ...defaultHouseholdState("spending"), range: { kind: "manual", start: 2020, end: 2021 } },
@@ -264,7 +267,7 @@ test("a missing early towns year is a blank cell, never zero, and the numeric fo
   const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
   const data = excel.getWorksheet("Data")!;
   const header = data.getRow(1).values as unknown[];
-  expect(header[3]).toBe("Amount (₾ a month)");
+  expect(header[3]).toBe("Amount (GEL a month)");
   for (let row = 2; row <= model.analysis.rows.length + 1; row++) expect(data.getCell(row, 3).numFmt).toBe("0.0");
   const gapRow = model.analysis.rows.indexOf(gap) + 2;
   expect(data.getCell(gapRow, 3).value).toBeNull();
@@ -294,7 +297,30 @@ test.each(["ka", "en"] as const)("the %s income workbook lists validated links t
 test("the hub has an income and a spending card with Georgia per-household sparklines", async () => {
   const cards = buildHouseholdHubCards(facts, await presentationFor("en"));
   expect(cards.map(card => card.href)).toEqual(["/explorer/living-standards/income", "/explorer/living-standards/spending"]);
-  expect(cards.map(card => card.footer)).toEqual(["2025 · 2,025.8 ₾ · 2002–2025", "2025 · 1,438.7 ₾ · 2002–2025"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 2,025.8 GEL · 2002–2025", "2025 · 1,438.7 GEL · 2002–2025"]);
   expect(cards.map(card => card.series?.length)).toEqual([24, 24]);
   expect(cards.map(card => card.index)).toEqual(["01", "02"]);
+});
+
+// Moved from poverty.test.ts: the hub's other two cards.
+test("the hub has a poverty and an inequality card with national sparklines and their latest values", async () => {
+  const povertyFacts = (await loadPovertyFacts()).map(toClientPovertyFact);
+  const presentation: Presentation = { locale: "en", englishLabels: {}, messages: await getMessages("en", ["poverty", "workbook", "format", "common"]) };
+  const cards = buildPovertyHubCards(povertyFacts, presentation);
+  expect(cards.map(card => card.href)).toEqual(["/explorer/living-standards/poverty", "/explorer/living-standards/inequality"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 7.1% · 2004–2025", "2025 · 0.34 · 2006–2025"]);
+  expect(cards.map(card => card.series?.length)).toEqual([22, 20]);
+});
+
+// U19-04: on a budget site "Spending — Tbilisi" reads as the municipality's budget, so the area pages' titles say "household".
+test.each([
+  ["en", "spending", "tbilisi", "Household spending — Tbilisi"],
+  ["en", "income", "georgia", "Household income — Georgia"],
+  ["ka", "spending", "tbilisi", "შინამეურნეობების ხარჯები — თბილისი"],
+  ["ka", "income", "georgia", "შინამეურნეობების შემოსავლები — საქართველო"],
+] as const)("the %s %s page for %s is titled as household data", async (locale, section, slug, title) => {
+  const metadata = await householdRegionPageMetadata(section, slug, locale);
+  // The brand is appended once, by fiscalMetadata (U28-11).
+  expect(metadata.title).toBe(`${title} | Fiscal.ge`);
+  expect(metadata.openGraph?.title).toBe(`${title} | Fiscal.ge`);
 });

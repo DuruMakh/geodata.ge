@@ -17,6 +17,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
+import { nestTreeRows } from "../main-explorer/series-panel";
 import { SeriesAside } from "../explorer-shell/series-aside";
 
 // A thin composition of the shared selector, like InflationSeriesPanel. The
@@ -62,6 +63,30 @@ export function InflationCategoryPanel({
   const selectedDivisions = state.selected.filter((categoryId) => !categoryId.includes("_")).length;
   const selectedSubgroups = state.selected.filter((categoryId) => categoryId.includes("_")).length;
 
+  const renderRow = (row: (typeof visible)[number], subgroups?: ReactNode) => (
+    <SeriesSelectorRow
+      key={row.categoryId}
+      id={row.categoryId}
+      label={row.label}
+      color={categoryColor(row.categoryId)}
+      value={row.value === null ? MISSING : formatCategoryValue(row.value, state.tab)}
+      meta={formatWeight(row.weight)}
+      metaLabel={message(messages, "inflation.basketShare")}
+      selected={state.selected.includes(row.categoryId)}
+      level={String(row.level)}
+      parentId={row.level === 3 ? row.categoryId.split("_")[0] : null}
+      showCaretColumn
+      hasChildren={row.hasChildren}
+      expanded={row.expanded}
+      expansionLocked={row.expansionLocked}
+      isChild={row.level === 3}
+      showRail={row.level === 3 && state.selected.includes(row.categoryId)}
+      onToggle={() => onToggle(row.categoryId)}
+      onToggleExpanded={() => onToggleExpanded(row.categoryId)}
+    >
+      {subgroups}
+    </SeriesSelectorRow>
+  );
   return (
     <SeriesAside label={message(messages, "controls.series")}>
       <SeriesSelector
@@ -92,29 +117,8 @@ export function InflationCategoryPanel({
           </p>
         }
       >
-        {visible.map((row) => (
-          <SeriesSelectorRow
-            key={row.categoryId}
-            id={row.categoryId}
-            label={row.label}
-            color={categoryColor(row.categoryId)}
-            value={row.value === null ? MISSING : formatCategoryValue(row.value, state.tab)}
-            meta={formatWeight(row.weight)}
-            metaLabel={message(messages, "inflation.basketShare")}
-            selected={state.selected.includes(row.categoryId)}
-            level={String(row.level)}
-            parentId={row.level === 3 ? row.categoryId.split("_")[0] : null}
-            showCaretColumn
-            hasChildren={row.hasChildren}
-            expanded={row.expanded}
-            expansionLocked={row.expansionLocked}
-            expansionLabel={message(messages, "inflation.categorySubgroups")}
-            isChild={row.level === 3}
-            showRail={row.level === 3 && state.selected.includes(row.categoryId)}
-            onToggle={() => onToggle(row.categoryId)}
-            onToggleExpanded={() => onToggleExpanded(row.categoryId)}
-          />
-        ))}
+        {nestTreeRows(visible, (row) => row.level === 3).map(({ row, children }) =>
+          renderRow(row, children.length ? children.map((child) => renderRow(child)) : undefined))}
       </SeriesSelector>
       {downloadAction}
     </SeriesAside>

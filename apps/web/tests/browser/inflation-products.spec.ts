@@ -1,45 +1,42 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { gzipSync } from "node:zlib";
 
 const ROUTE = "/explorer/inflation/products";
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-for (const locale of ["ka", "en"] as const) {
-  for (const width of [390, 1440]) {
-    test(`product inflation layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
-      await page.setViewportSize({ width, height: 1000 });
-      await page.goto(`${locale === "en" ? "/en" : ""}${ROUTE}`);
-      await ready(page);
-      await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-indicator", "annual");
-      await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "false");
-      await expect(page.getByTestId("series-status")).toContainText("1 / 305");
-      await expect(page.getByTestId("product-indicators")).toBeVisible();
-      await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
-      await expect(page.getByTestId("product-list-search")).toBeVisible();
-      await expect(page.getByTestId("product-list-count")).toHaveCount(0);
-      await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0058");
-      expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
-      await expect(page.locator('[data-series-id="cpi.product.p0058"]')).toHaveAttribute("data-series-id", "cpi.product.p0058");
-      await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      const icon = page.locator('[data-series-id="cpi.product.p0058"] img');
-      expect(await icon.evaluate((image) => Math.round(image.getBoundingClientRect().width))).toBe(32);
-      if (width === 390) {
-        const region = (await page.getByTestId("product-table").boundingBox())!;
-        const cumulativeCell = (await page.getByTestId("product-table").locator("tbody tr").first().locator("td").nth(1).boundingBox())!;
-        // A phone should show the product and its selected-years cumulative value before a horizontal swipe.
-        expect(cumulativeCell.x + cumulativeCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
-      }
-      await page.screenshot({ path: testInfo.outputPath(`products-${locale}-${width}.png`), fullPage: true });
-    });
-  }
+// Each locale once: the phone rate columns and chart fit are covered in the mobile-repairs and fit-charts specs.
+for (const [locale, width] of [["ka", 390], ["en", 1440]] as const) {
+  test(`product inflation layout ${locale} at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`${locale === "en" ? "/en" : ""}${ROUTE}`);
+    await ready(page);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-indicator", "annual");
+    await expect(page.getByTestId("product-cumulative-toggle")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+    await expect(page.getByTestId("product-indicators")).toBeVisible();
+    await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
+    await expect(page.getByTestId("product-list-search")).toBeVisible();
+    await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0058");
+    expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
+    await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
+    const icon = page.locator('[data-series-id="cpi.product.p0058"] img');
+    expect(await icon.evaluate((image) => Math.round(image.getBoundingClientRect().width))).toBe(32);
+    if (width === 390) {
+      const region = (await page.getByTestId("product-table").boundingBox())!;
+      const cumulativeCell = (await page.getByTestId("product-table").locator("tbody tr").first().locator("td").nth(1).boundingBox())!;
+      // A phone should show the product and its selected-years cumulative value before a horizontal swipe.
+      expect(cumulativeCell.x + cumulativeCell.width).toBeLessThanOrEqual(region.x + region.width + 1);
+    }
+  });
 }
 
 test("annual default, bilingual search, multi-selection and icon-only cumulative toggle", async ({ page }) => {
   await page.goto(`/en${ROUTE}`);
   await ready(page);
   const toggle = page.getByTestId("product-cumulative-toggle");
-  await expect(toggle).toHaveAttribute("aria-label", "Show cumulative price change");
+  // A constant name with the state in aria-pressed; the tooltip says what a press shows.
+  await expect(toggle).toHaveAttribute("aria-label", "Cumulative price change");
   expect((await toggle.textContent())?.trim()).toBe("");
   await toggle.hover();
   await expect(page.getByRole("tooltip")).toHaveText("Show cumulative price change");
@@ -56,7 +53,7 @@ test("annual default, bilingual search, multi-selection and icon-only cumulative
   await expect(page.getByTestId("product-table").locator("tbody tr")).toHaveCount(40);
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-pressed", "true");
-  await expect(toggle).toHaveAttribute("aria-label", "Show annual inflation");
+  await expect(toggle).toHaveAttribute("aria-label", "Cumulative price change");
   await expect(page.getByTestId("chart-panel")).toContainText("Cumulative price change");
   await expect(page).toHaveURL(/i=cumulative/);
 });
@@ -113,6 +110,8 @@ test("year controls, late history, empty selection and language restoration", as
   await page.goto(`/en${ROUTE}#i=annual&r=2023-2026&sel=`);
   await ready(page);
   await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  // U14-10: the guidance names this page's Products panel, not a "series" panel it does not have.
+  await expect(page.getByTestId("no-selection-callout")).toHaveText("No product selected. Choose a product from the Products panel.");
   await expect(page.getByTestId("inflation-product-download")).toBeEnabled();
   expect(new URL(page.url()).hash).toContain("sel=");
 });
@@ -201,4 +200,72 @@ test("all 305 selected products produce a complete full-history workbook", async
   await workbook.xlsx.readFile(output);
   expect(workbook.worksheets[0]!.rowCount).toBeGreaterThan(305);
   expect(workbook.worksheets[1]!.rowCount).toBeGreaterThan(40_000);
+});
+
+// U14-01: the 610 index runs were about 250 KB gzip inline in every page view (295 KB gzip in all), re-sent for each
+// language and visit. They now come from one content-hashed file both languages share and a browser keeps for a year.
+test("the page HTML stays light and its product runs come from one long-cached file", async ({ request }) => {
+  const urls = new Set<string>();
+  for (const prefix of ["", "/en"]) {
+    const html = await (await request.get(`${prefix}${ROUTE}`)).text();
+    expect(gzipSync(html).length).toBeLessThan(120_000);
+    const url = /\/page-data\/inflation-products\.[0-9a-f]{16}\.json/.exec(html)?.[0];
+    expect(url).toBeDefined();
+    urls.add(url!);
+  }
+  expect(urls.size).toBe(1);
+  const data = await request.get([...urls][0]!);
+  expect(data.ok()).toBe(true);
+  expect(data.headers()["cache-control"]).toBe("public, max-age=31536000, immutable");
+  expect(await data.json()).toHaveLength(610);
+});
+
+test("while the product runs load the page shows its heading and a loading status, and a failed load says so", async ({ page }) => {
+  let release = () => {};
+  const held = new Promise<void>((resolve) => { release = resolve; });
+  await page.route("**/page-data/inflation-products.*.json", async (route) => { await held; await route.continue(); });
+  await page.goto(`/en${ROUTE}`);
+  await expect(page.getByRole("heading", { level: 1, name: "Product inflation" })).toBeVisible();
+  await expect(page.getByTestId("page-data-loading")).toHaveText("Loading the data…");
+  await expect(page.getByRole("status").filter({ has: page.getByTestId("page-data-loading") })).toBeVisible();
+  await expect(page.getByTestId("chart-panel")).toHaveCount(0);
+  release();
+  await ready(page);
+  await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
+  await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+
+  await page.unroute("**/page-data/inflation-products.*.json");
+  await page.route("**/page-data/inflation-products.*.json", (route) => route.fulfill({ status: 500, body: "" }));
+  await page.goto(`${ROUTE}#i=cumulative`);
+  await expect(page.getByRole("alert").getByTestId("page-data-error")).toHaveText("მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან.");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByTestId("chart-panel")).toHaveCount(0);
+});
+
+
+test("a page-data answer that fails once is asked for again past the browser cache", async ({ page }) => {
+  // A name asked for during a rollback can 404 under the year-long immutable header (use-page-data.ts retries once
+  // with cache: "reload", which an intercepted request does not show in its headers).
+  let requests = 0;
+  await page.route("**/page-data/inflation-products.*.json", async (route) => {
+    requests += 1;
+    if (requests === 1) await route.fulfill({ status: 404, body: "" });
+    else await route.continue();
+  });
+  await page.goto(`/en${ROUTE}`);
+  await ready(page);
+  await expect(page.getByTestId("series-status")).toContainText("1 / 305");
+  await expect(page.getByTestId("page-data-error")).toHaveCount(0);
+  expect(requests).toBe(2);
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+  test("the products page points to the data downloads instead of loading for ever", async ({ page }) => {
+    await page.goto(`/en${ROUTE}`);
+    const fallback = page.getByTestId("products-noscript");
+    await expect(fallback).toBeVisible();
+    await expect(fallback.getByRole("link", { name: "CSV" })).toHaveAttribute("href", "/downloads/data/inflation-products.csv");
+    await expect(fallback.getByRole("link", { name: "JSON" })).toHaveAttribute("href", "/downloads/data/inflation-products.json");
+  });
 });

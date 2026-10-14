@@ -1,5 +1,5 @@
-import type { ClientTradeProductsData } from "../data/tradeProducts/importTradeProducts";
-import { TRADE_PRODUCT_MEASURES, type TradeProductEntity } from "../data/tradeProducts/types";
+import type { ClientTradeProductEntity, ClientTradeProductsData } from "../data/tradeProducts/importTradeProducts";
+import { TRADE_PRODUCT_MEASURES } from "../data/tradeProducts/types";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
@@ -9,7 +9,7 @@ import { tradePartnerColor } from "./tradePartners";
 import { TRADE_PRODUCT_TOTAL_ID, tradeProductsBulkSelection, tradeProductsCoverage, type TradeProductsState } from "./tradeProductsState";
 
 export const tradeProductColor = tradePartnerColor;
-export function tradeProductLabel(entity: TradeProductEntity, presentation: Presentation, includeSourceBlock = true): string {
+export function tradeProductLabel(entity: ClientTradeProductEntity, presentation: Presentation, includeSourceBlock = true): string {
   return `${publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels)}${entity.code ? ` · ${entity.code}` : ""}${includeSourceBlock ? ` · ${entity.sourceBlock.replace("-", "–")}` : ""}`;
 }
 export type TradeProductRankingRow = { entityId: string; label: string; valueUsd: number | null; shareOfNational: number | null; rank: number | null; color: string };

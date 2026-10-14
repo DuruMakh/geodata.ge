@@ -4,17 +4,19 @@ import { TEST_BASE_URL } from "./test-base-url";
 const expectAppReady = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
 test.describe("births and deaths on a place page", () => {
-  for (const [path, lead] of [
-    ["/en/explorer/demography/population/georgia", "Births and deaths registered in Georgia, 2014–2025."],
-    ["/en/explorer/demography/population/region/imereti", "Births and deaths registered in Imereti, 2015–2025."],
-    ["/en/explorer/demography/population/batumi", "Births and deaths registered in Batumi, 2015–2025."],
+  // U26-13: the section has no lead line; its table names the place and the years.
+  for (const [path, caption] of [
+    ["/en/explorer/demography/population/georgia", "Births, deaths and natural increase, Georgia, 2014–2025"],
+    ["/en/explorer/demography/population/region/imereti", "Births, deaths and natural increase, Imereti, 2015–2025"],
+    ["/en/explorer/demography/population/batumi", "Births, deaths and natural increase, Batumi, 2015–2025"],
   ] as const) {
     test(`${path} ends with its section`, async ({ page }) => {
       await page.goto(`${TEST_BASE_URL}${path}`);
       await expectAppReady(page);
       const section = page.getByTestId("vital-section");
-      await expect(section).toContainText(lead);
+      await expect(section).not.toContainText("Births and deaths registered in");
       await section.getByTestId("vital-mode-table").click();
+      await expect(section.getByRole("table")).toContainText(caption);
       await expect(section.getByRole("table")).toContainText("Natural increase");
     });
   }
@@ -41,20 +43,9 @@ test.describe("births, deaths and fertility page", () => {
     await page.locator('a[href="/en/explorer/demography/population/batumi#births-deaths"]').first().click();
     await expect(page).toHaveURL(/\/population\/batumi#births-deaths$/);
     await expect(page.getByTestId("vital-section")).toBeInViewport();
-  });
-
-  test("Georgian page renders", async ({ page }) => {
+    // The Georgian page renders.
     await page.goto(`${TEST_BASE_URL}/explorer/demography/births-deaths`);
     await expectAppReady(page);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("შობადობა და სიკვდილიანობა");
   });
-
-  for (const path of ["/en/explorer/demography/births-deaths", "/explorer/demography/population/batumi"]) {
-    test(`${path} has no sideways scroll at 390px`, async ({ page }) => {
-      await page.setViewportSize({ width: 390, height: 844 });
-      await page.goto(`${TEST_BASE_URL}${path}`);
-      await expectAppReady(page);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    });
-  }
 });

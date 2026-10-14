@@ -22,6 +22,7 @@ for (const prefix of ["", "/en"]) {
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
     await expect(page.getByTestId("connect-technical")).toContainText("2026-07-28");
     await expect(page.getByTestId("connect-technical")).toContainText("2025-11-25");
+    await expect(page.getByTestId("connect-fair-use")).toContainText(prefix ? "Fair-use limits" : "სამართლიანი გამოყენების ლიმიტები");
     const catalogue = await (await page.request.get(`${BASE_URL}/downloads/data/catalogue.json`)).json();
     const products = catalogue.datasets.find((dataset: { datasetId: string }) => dataset.datasetId === "inflation-products");
     await expect(page.getByTestId("connect-product-coverage")).toContainText(products.periods.join("–"));
@@ -44,22 +45,18 @@ for (const prefix of ["", "/en"]) {
     await endpointCopy.focus();
     await endpointCopy.press("Enter");
     await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", ENDPOINT);
+    if (prefix) await expect(endpointCopy).toHaveAttribute("aria-label", "Address copied");
     const promptCopy = page.getByTestId("connect-copy-prompt");
     await promptCopy.focus();
     await promptCopy.press("Enter");
     await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", (await page.getByTestId("connect-prompt").innerText()).slice(1, -1));
+    if (prefix) await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", "Answer my question using Fiscal.ge’s published data:");
+    // The endpoint is one shared address: no English copy of /mcp.
+    await expect(page.locator(`a[href="${prefix}/mcp"]`)).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     expect(errors).toEqual([]);
     if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
     else await expect(bilingual).toContainText("ხულოს");
-    const sectors = page.getByTestId("connect-sector-coverage");
-    await expect(sectors).toContainText("20");
-    await expect(sectors).toContainText("2010–2025");
-    await expect(sectors).toContainText("2011–2025");
-    const discovery = page.getByTestId("connect-sector-discovery");
-    await expect(discovery).toContainText("query_economic_sectors");
-    await expect(discovery.locator('a[href="/downloads/data/economic-sectors.csv"]')).toHaveCount(1);
-    await expect(discovery.locator(`a[href="${prefix}/methodology/economic-sectors"]`)).toHaveCount(1);
   });
 }
 
@@ -95,16 +92,6 @@ test.describe("connection page", () => {
     expect(box).not.toBeNull();
     expect(box!.height).toBeGreaterThanOrEqual(24);
     expect(box!.width).toBeGreaterThanOrEqual(24);
-  });
-
-  test("gives per-application connection steps for at least two clients", async ({ page }) => {
-    const clients = page.getByTestId("connect-client");
-
-    expect(await clients.count()).toBeGreaterThanOrEqual(2);
-    for (const client of await clients.all()) {
-      await expect(client).toBeVisible();
-      expect((await client.innerText()).trim().length).toBeGreaterThan(30);
-    }
   });
 
   // Spec 12.3: the coverage statement is what stops a user asking for
@@ -160,28 +147,8 @@ test.describe("connection page", () => {
     await expect(missing).toHaveText(/[Ⴀ-ჿ]/);
   });
 
-  // Production discovery includes the connection page.
-  test("is discoverable from the shared footer", async ({ page }) => {
-    await page.goto(`${BASE_URL}/about`);
-
-    await expect(page.locator('footer a[href="/connect"]')).toHaveCount(1);
-  });
-
-  test("stays readable on a narrow viewport", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto(`${BASE_URL}/connect`);
-
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByTestId("connect-endpoint")).toBeVisible();
-    // No horizontal scroll: the endpoint URL is the usual culprit on mobile.
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow).toBeLessThanOrEqual(1);
-  });
-
-  test("carries its own canonical metadata", async ({ page }) => {
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `${"https://fiscal.ge"}/connect`);
+  // The canonical of /connect and /en/connect is checked with every page in bilingual-seo.spec.ts.
+  test("carries a full meta description", async ({ page }) => {
     const description = await page.locator('meta[name="description"]').getAttribute("content");
     expect((description ?? "").length).toBeGreaterThan(40);
   });

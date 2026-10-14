@@ -4,7 +4,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { Locale, Messages } from "../../lib/i18n/types";
 import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 
-// The four datasets, then the site's own pages (owner decision D3, 2026-10-07).
+// Every dataset hub, then the site's own pages (owner decision D3, 2026-10-07; all hubs since Q3, 2026-10-12).
 const FOOTER_LINKS = [
   ...DATASET_HUBS,
   { href: "/methodology", labelKey: "common.methodology" },
@@ -16,7 +16,9 @@ const FOOTER_LINKS = [
 // lookup below because the explorer footer is a client component: importing
 // common.server.ts from here put BOTH locales' catalogue in every explorer
 // route's client bundle.
-export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages }: { updatedAt?: string; locale?: Locale; sourceNote?: string; messages: Messages }) {
+// `year` is the build's: the explorer footer is a client component, so its server layout passes it in rather than each
+// browser reading its own clock and disagreeing with the prerendered HTML.
+export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages, year }: { updatedAt?: string; locale?: Locale; sourceNote?: string; messages: Messages; year: number }) {
   const [sourcePrefix, sourceSuffix] = (sourceNote ?? messages["common.sourceNote"]).split("{updatedAt}");
   return (
     <footer data-testid="site-footer" className="mt-10 border-t-2 border-[var(--ink)] pb-5 pt-5 min-[768px]:mt-[72px] min-[768px]:pb-10 min-[768px]:pt-[26px]">
@@ -24,14 +26,16 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
         <div className="flex flex-col gap-4 min-[768px]:grid min-[768px]:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] min-[768px]:gap-9">
           {/* Phones: lockup and address share one row. */}
           <div className="grid grid-cols-[150px_minmax(0,1fr)] items-center gap-x-4 gap-y-2 min-[768px]:flex min-[768px]:flex-col min-[768px]:items-stretch min-[768px]:gap-2.5">
-            <Link href={pageHref("/", locale)} aria-label={message(messages, "common.brandHome")} className="block w-[150px]">
-              {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
+            <Link href={pageHref("/", locale)} prefetch={false} aria-label={message(messages, "common.brandHome")} className="block w-[150px]">
+              {/* Local SVG brand asset; native img avoids adding a raster optimization path. Lazy, so React does not
+                  preload this below-the-fold logo ahead of the header logo and the hero. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 data-testid="site-footer-logo"
                 src={locale === "en" ? "/brand/fiscal-logo-compact-en.svg" : "/brand/fiscal-logo-compact.svg"}
                 width="1080"
                 height="340"
+                loading="lazy"
                 alt=""
                 className="block h-auto w-full"
               />
@@ -49,7 +53,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
             <ul className="grid list-none grid-cols-2 gap-x-4 min-[768px]:flex min-[768px]:flex-col min-[768px]:gap-[9px]">
               {FOOTER_LINKS.map(({ href, labelKey }) => (
                 <li key={href}>
-                  <Link href={pageHref(href, locale)} className="flex min-h-11 items-center text-[0.78125rem] text-[var(--body)] hover:text-[var(--ink)] min-[768px]:inline min-[768px]:min-h-0">
+                  <Link href={pageHref(href, locale)} prefetch={false} className="flex min-h-11 items-center text-[0.78125rem] text-[var(--body)] hover:text-[var(--ink)] min-[768px]:inline min-[768px]:min-h-0">
                     {message(messages, labelKey)}
                   </Link>
                 </li>
@@ -64,7 +68,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages 
           </p>
         </div>
         <div className="mt-3 flex flex-wrap justify-between gap-4 border-t border-[var(--hairline-soft)] pt-2.5 min-[768px]:mt-[30px] min-[768px]:pt-3.5">
-          <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--faint)]">© 2026 Fiscal.ge</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--faint)]">© {year} Fiscal.ge</span>
           <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10.5px] text-[var(--faint)]">CC BY 4.0</span>
         </div>
       </div>

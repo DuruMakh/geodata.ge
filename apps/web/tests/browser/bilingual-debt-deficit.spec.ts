@@ -33,23 +33,21 @@ function sources(book: ExcelJS.Workbook) {
   }));
 }
 
+// The other families and measures keep their English workbook parity in
+// tests/explorer/debtWorkbook.test.ts and deficitWorkbook.test.ts; these two
+// cases keep the browser download, language switch and URL flow.
 for (const [name, scope, hash] of [
-  ["stock", "debt", "f=stock&m=table&r=2013-2025&sel=debt.stock.total,debt.stock.external"],
-  ["stock-gdp", "debt", "f=stock&m=table&sh=1&r=2013-2025&sel=debt.stock.total"],
   ["service", "debt", "f=service&m=table&r=2024-2030&sel=debt.service.total,debt.service.principal"],
-  ["rate", "debt", "f=rate&m=table&r=2015-2025&sel=debt.rate.total,debt.rate.domestic,debt.rate.external"],
   ["deficit-gel", "deficit", "m=table&sh=0&r=2024-2031&sel=deficit.general_government_balance"],
-  ["deficit-gdp", "deficit", "m=table&sh=1&r=2024-2031&sel=deficit.general_government_balance"],
 ] as const) test(`${name} retains values, status, sources and its URL across language changes`, async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(`/en/explorer/${scope}#${hash}`);
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await expect(page.getByTestId("chart-mode-table")).toHaveAttribute("aria-pressed", "true");
   await expectEnglish(page);
-  if (name === "rate") await expect(page.getByTestId("debt-measure-label")).toHaveText("%");
   if (name === "service") await expect(page.getByTestId("debt-forecast-note")).toContainText("portfolio outstanding on 31 December 2025");
   if (scope === "deficit") await expect(page.getByTestId("deficit-forecast-note")).toContainText("2026–2031");
-  const numbers = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].slice(1).map(cell => {
+  const numbers = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => [...row.querySelectorAll("td")].map(cell => {
     const copy = cell.cloneNode(true) as HTMLElement;
     const annotations = copy.querySelectorAll("sup").length;
     copy.querySelectorAll("sup").forEach(annotation => annotation.remove());
@@ -88,8 +86,8 @@ for (const [name, scope, hash] of [
     expect(JSON.stringify(cell.value)).not.toMatch(/\p{Script=Georgian}/u);
     expect(cell.numFmt ?? "").not.toMatch(/\p{Script=Georgian}/u);
   })));
-  const nominal = Array.from({ length: en.worksheets[1].rowCount - 1 }, (_, index) => en.worksheets[1].getCell(index + 2, 4).value);
-  if (name === "rate") expect(nominal.every(value => value === null)).toBe(true);
+  // The deficit's Data sheet has no Group column (one series), so its amount is the third column.
+  const nominal = Array.from({ length: en.worksheets[1].rowCount - 1 }, (_, index) => en.worksheets[1].getCell(index + 2, scope === "deficit" ? 3 : 4).value);
   if (scope === "deficit") expect(nominal.some(value => typeof value === "number" && value < 0)).toBe(true);
   await page.goBack();
   await page.reload();
@@ -107,8 +105,6 @@ test("English debt search and existing series controls explain rate gaps without
     const label = page.locator(`[data-series-id="${id}"]`).getByTestId("series-label");
     expect(await label.evaluate(element => element.scrollHeight <= element.clientHeight)).toBe(true);
   }
-  // Nine rows read at a glance: the debt list has no search field (lists of ten rows or fewer).
-  await expect(page.getByTestId("series-selector").getByRole("searchbox")).toHaveCount(0);
   await expect(page.locator('[data-series-id="debt.rate.total"]')).toBeVisible();
   await page.locator('[data-series-id="debt.rate.total"]').getByTestId("series-row-toggle").click();
   await expect(page.getByTestId("debt-measure-label")).toHaveText("%");
@@ -116,7 +112,6 @@ test("English debt search and existing series controls explain rate gaps without
   await page.goto("/en/explorer/debt#f=rate&r=2025-2025&sel=debt.rate.domestic");
   await page.reload();
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("no-range-data-callout")).toContainText("No data is available");
   await expect(page.getByTestId("source-label")).toContainText("have not been replaced with zero");
   await expect(page.getByTestId("debt-measure-label")).not.toContainText("GEL");
   await expectEnglish(page);

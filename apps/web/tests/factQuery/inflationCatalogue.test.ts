@@ -1,7 +1,7 @@
 // apps/web/tests/factQuery/inflationCatalogue.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage, type CoverageData } from "../../lib/factQuery/describeCoverage";
 import { getSources } from "../../lib/factQuery/getSources";
 import { serviceLabelEn } from "../../lib/factQuery/localization";
@@ -9,7 +9,7 @@ import { SCHEMA_VERSION, type FactQuerySnapshot } from "../../lib/factQuery/type
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
 });
 
 function catalogue(input: unknown): CoverageData {

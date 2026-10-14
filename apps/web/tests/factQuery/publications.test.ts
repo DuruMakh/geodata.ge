@@ -1,7 +1,7 @@
 // apps/web/tests/factQuery/publications.test.ts
 import { createHash } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import {
   buildAllPublications,
@@ -34,7 +34,7 @@ let catalogueFile: ReturnType<typeof buildCatalogueFile>;
 let sourcesFile: ReturnType<typeof buildSourcesFile>;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot(OPTIONS);
+  snapshot = testSnapshot(OPTIONS);
   allPublications = buildAllPublications(snapshot);
   catalogueFile = allPublications.find((file) => file.fileName === "catalogue.json")!;
   sourcesFile = allPublications.find((file) => file.fileName === "sources.json")!;

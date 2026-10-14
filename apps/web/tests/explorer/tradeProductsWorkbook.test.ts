@@ -27,7 +27,7 @@ test.each(["en", "ka"] as const)("%s exports all committed historical series bey
   const build = await builder(), p = await presentation(locale), data = productData();
   const base = data.entities[0];
   data.entities.push(...Array.from({ length: 26 }, (_, index) => ({ ...base, id: `fixture.${index}`, code: String(3000 + index), sourceLabelEn: `Product ${index}` })));
-  p.englishLabels = Object.fromEntries(data.entities.map(entity => [entity.id, entity.sourceLabelEn]));
+  p.englishLabels = Object.fromEntries(data.entities.map(entity => [entity.id, entity.sourceLabelEn!]));
   data.years = [2019, 2020, 2021];
   data.facts = data.entities.map((_, index) => [index, index === 1 ? 2021 : 2019, 0, index === 2 ? 0 : index === 3 ? -0.0056 : index + 1]);
   const state = { ...DEFAULT_TRADE_PRODUCTS_STATE, selectedIds: data.entities.map(entity => entity.id), range: { kind: "manual" as const, start: 2019, end: 2021 } };

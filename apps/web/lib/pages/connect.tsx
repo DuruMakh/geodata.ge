@@ -7,6 +7,7 @@ import { CopyEndpoint } from "../../components/connect/copy-endpoint";
 import { SiteFooter } from "../../components/site/site-footer";
 import { SiteHeader } from "../../components/site/site-header";
 import { describeCoverage } from "../factQuery/describeCoverage";
+import { sectorMeasureYearSpans } from "../factQuery/economicSectorsSeries";
 import type { CoverageData } from "../factQuery/describeCoverage";
 import { inflationCatalogueSeries, inflationDatasetPeriods, inflationEntityPeriods } from "../factQuery/inflationData";
 import { inflationProductIndex } from "../factQuery/inflationProductData";
@@ -62,10 +63,7 @@ function coverage(): {
   return {
     ranges,
     sectorCount: snapshot.economicSectors.registry.filter(series => series.classificationCode !== null).length,
-    sectorRanges: Object.fromEntries(["nominal", "share_of_gdp", "real_growth"].map(measure => {
-      const years = snapshot.economicSectors.facts.filter(fact => fact.measure === measure).map(fact => fact.year);
-      return [measure, `${Math.min(...years)}–${Math.max(...years)}`];
-    })),
+    sectorRanges: Object.fromEntries(Object.entries(sectorMeasureYearSpans(snapshot)).map(([measure, [first, last]]) => [measure, `${first}–${last}`])),
     inflation: (() => {
       const series = inflationCatalogueSeries(snapshot);
       const firstOf = (measure: string) =>
@@ -151,6 +149,10 @@ const NOT_SERVED = [
   "connect.notServed4",
 ] as const;
 
+// A developer-details line of file links. Below 768px each link is a 24px target
+// (WCAG 2.5.8) on lines spaced so none overlap.
+const DISCOVERY_LINE_CLASS = "text-[0.75rem] leading-[1.8] text-[var(--muted)] max-[768px]:leading-[2.25] max-[768px]:[&_a]:px-0.5 max-[768px]:[&_a]:py-1";
+
 export async function renderConnectPage(locale: Locale) {
   const messages = await getMessages(locale, ["common", "connect"]);
   const model = buildLandingContext(await loadServedLandingData());
@@ -177,8 +179,8 @@ export async function renderConnectPage(locale: Locale) {
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
       <div className="mx-auto max-w-[1240px]">
         <SiteHeader locale={locale} active="connect" testId="connect-header" />
-        <main className="pt-10 min-[768px]:pt-16">
-          <BreadcrumbTrail items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "connect.breadcrumb"), path: pageHref("/connect", locale) }]} />
+        <main id="content" tabIndex={-1} className="pt-10 outline-none min-[768px]:pt-16">
+          <BreadcrumbTrail items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "connect.breadcrumb"), path: pageHref("/connect", locale) }]} label={message(messages, "common.breadcrumb")} />
 
           <header className="border-t-2 border-[var(--ink)] pt-8">
             <h1 className="max-w-[860px] font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] min-[768px]:text-[52px]">
@@ -206,7 +208,7 @@ export async function renderConnectPage(locale: Locale) {
               >
                 {endpoint}
               </code>
-              <CopyEndpoint endpoint={endpoint} copyLabel={message(messages, "connect.copyEndpoint")} copiedLabel={message(messages, "connect.copiedEndpoint")} copyText={message(messages, "connect.copy")} copiedText={message(messages, "connect.copied")} />
+              <CopyEndpoint value={endpoint} copyLabel={message(messages, "connect.copyEndpoint")} copiedLabel={message(messages, "connect.copiedEndpoint")} copyText={message(messages, "connect.copy")} copiedText={message(messages, "connect.copied")} />
             </div>
             <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[0.78125rem] text-[var(--body)]">
               <li>{message(messages, "connect.free")}</li>
@@ -254,7 +256,7 @@ export async function renderConnectPage(locale: Locale) {
                 {message(messages, "connect.quotedPrompt", { prompt: message(messages, CHAT_PROMPT) })}
               </p>
               <CopyEndpoint
-                endpoint={message(messages, CHAT_PROMPT)}
+                value={message(messages, CHAT_PROMPT)}
                 testId="connect-copy-prompt"
                 copyLabel={message(messages, "connect.copyPrompt")}
                 copyText={message(messages, "connect.copy")}
@@ -329,19 +331,19 @@ export async function renderConnectPage(locale: Locale) {
                     one, so they and the raw files sit behind a toggle. */}
                 <details data-testid="connect-developer-details" className="mt-3">
                   <summary className="inline-flex min-h-11 cursor-pointer items-center text-[0.78125rem] font-semibold text-[var(--muted)]">{message(messages, "connect.developerDetails")}</summary>
-                <p className="mt-1 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-sector-discovery">
+                <p className={`mt-1 ${DISCOVERY_LINE_CLASS}`} data-testid="connect-sector-discovery">
                   {message(messages, "connect.sectorQuery")} {" "}
                   <a className="underline" href="/downloads/data/economic-sectors.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/economic-sectors.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/economic-sectors", locale)}>{message(messages, "connect.sectorMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-regional-discovery">
+                <p className={`mt-3 ${DISCOVERY_LINE_CLASS}`} data-testid="connect-regional-discovery">
                   {message(messages, "connect.regionalQuery")} {" "}
                   <a className="underline" href="/downloads/data/regional-economies.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/regional-economies.csv">CSV</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/regional-economies", locale)}>{message(messages, "connect.regionalMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-inflation-discovery">
+                <p className={`mt-3 ${DISCOVERY_LINE_CLASS}`} data-testid="connect-inflation-discovery">
                   {message(messages, "connect.inflationQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-national.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-categories.csv">CSV</a>{" · "}
@@ -350,7 +352,7 @@ export async function renderConnectPage(locale: Locale) {
                   <a className="underline" href="/downloads/data/inflation-cities.json">{message(messages, "connect.inflationCitiesMetadata")}</a>{" · "}
                   <a className="underline" href={pageHref("/methodology/inflation", locale)}>{message(messages, "connect.inflationMethodology")}</a>
                 </p>
-                <p className="mt-3 text-[0.75rem] leading-[1.8] text-[var(--muted)]" data-testid="connect-product-discovery">
+                <p className={`mt-3 ${DISCOVERY_LINE_CLASS}`} data-testid="connect-product-discovery">
                   {message(messages, "connect.productQuery")}{" "}
                   <a className="underline" href="/downloads/data/inflation-products.json">JSON</a>{" · "}
                   <a className="underline" href="/downloads/data/inflation-products.csv">CSV</a>{" · "}
@@ -384,6 +386,7 @@ export async function renderConnectPage(locale: Locale) {
               {message(messages, "connect.technical")}
             </p>
             <p className="mt-3 max-w-[900px] text-[0.75rem] leading-[1.9] text-[var(--muted)]">{message(messages, "connect.languageContract")}</p>
+            <p className="mt-3 max-w-[900px] text-[0.75rem] leading-[1.9] text-[var(--muted)]" data-testid="connect-fair-use">{message(messages, "connect.fairUse")}</p>
           </section>
         </main>
         <SiteFooter locale={locale} updatedAt={model.updatedAt} />

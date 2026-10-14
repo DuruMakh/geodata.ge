@@ -7,14 +7,9 @@ import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Money from abroad defaults, Received/Sent, one series list, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Money from abroad defaults, Received/Sent, one series list, ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
-    const cards = page.getByTestId("external-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(3);
-    await expect(cards.nth(1)).toHaveAttribute("href", new RegExp(`${prefix}/explorer/external/foreign-investment$`));
-    await expect(cards.nth(2)).toHaveAttribute("href", new RegExp(`${prefix}/explorer/external/current-account$`));
-    await cards.nth(0).click();
-    await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/money-from-abroad$`));
+    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external/money-from-abroad`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 12");
     await expect(toggle(page, "transfer.total")).toHaveAttribute("aria-pressed", "true");
@@ -27,8 +22,13 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(ranking.first()).toContainText("682.9");
     await expect(page.getByTestId("money-from-abroad-other-row")).toHaveCount(1);
     await expect(page.getByTestId("money-from-abroad-show-all")).toHaveCount(0);
+    if (width === 768) {
+      // The layout threshold: defaults and overflow only; the flow below is width-independent.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`money-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("money-from-abroad-measure-sent").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "sent");
     await expect(page.getByTestId("money-from-abroad-ranking")).toHaveAttribute("data-measure", "sent");
@@ -48,7 +48,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 }
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
-  test(`A table with partial 2019 values survives sidebar, reload, language and history ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`A table with partial 2019 values survives sidebar, reload, language and history ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/external/money-from-abroad#measure=received&view=table&sel=transfer.total,transfer.greece,transfer.others&start=2009&end=2019`);
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
@@ -67,7 +67,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
     await expect(page.getByTestId("money-from-abroad-ranking")).toHaveAttribute("data-end-year", "2019");
-    await page.screenshot({ path: info.outputPath(`money-mixed-${prefix ? "ka" : "en"}-${width}.png`), fullPage: true });
     await toggle(page, "transfer.greece").focus(); await toggle(page, "transfer.greece").press("Space");
     await expect(page.getByTestId("series-status")).toContainText("2 / 12");
     await page.goBack(); await expect(page.getByTestId("series-status")).toContainText("3 / 12");
@@ -98,17 +97,17 @@ test("Excel follows the selection and measure and links the untouched NBG origin
   expect(dataset.temporalCoverage).toBe("2000/2025");
 });
 
-test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
-  await page.goto("/en/explorer/external/money-from-abroad#measure=received&view=line&sel=");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-  await page.locator('[data-series-id="transfer.total"]').getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-  await page.goBack();
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-});
-
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/external/money-from-abroad");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
-});
+// DESIGN §7.7: a series list of ten rows or fewer is read at a glance and has no search field (U23-03, U21-09).
+for (const { path, rows, searchable } of [
+  { path: "/explorer/external/current-account#tab=in", rows: 5, searchable: false },
+  { path: "/explorer/external/current-account#tab=out", rows: 5, searchable: false },
+  { path: "/explorer/trade/overview", rows: 4, searchable: false },
+  { path: "/explorer/external/money-from-abroad", rows: 12, searchable: true },
+]) {
+  test(`no search box on lists of ten rows or fewer: ${path}`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("series-status")).toContainText(`/ ${rows}`);
+    await expect(page.getByTestId("series-search")).toHaveCount(searchable ? 1 : 0);
+  });
+}

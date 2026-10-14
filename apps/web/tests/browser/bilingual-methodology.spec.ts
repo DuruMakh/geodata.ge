@@ -57,12 +57,13 @@ for (const width of [390, 1440]) {
     await page.getByRole("navigation", { name: "Page contents" }).getByRole("link").last().click();
     expect(new URL(page.url()).hash).toBe("#source-archive");
     if (width < 900) await page.getByTestId("methodology-header").getByRole("button", { name: "Menu", exact: true }).click();
-    await page.getByTestId("language-switch").getByRole("link", { name: "ქართული", exact: true }).click();
+    // Below 900px the header link shows "KA"; its name starts with that and adds the full language name.
+    await page.getByTestId("language-switch").getByRole("link", { name: width < 900 ? "KA ქართული" : "ქართული", exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("lang", "ka");
     expect(new URL(page.url()).pathname).toBe("/methodology/expenditure");
     expect(new URL(page.url()).hash).toBe("#source-archive");
     if (width < 900) await page.getByTestId("methodology-header").getByRole("button", { name: "მენიუ", exact: true }).click();
-    await page.getByTestId("language-switch").getByRole("link", { name: "English", exact: true }).click();
+    await page.getByTestId("language-switch").getByRole("link", { name: width < 900 ? "EN English" : "English", exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Methodology", exact: true })).toHaveAttribute("href", "/en/methodology");
   });
@@ -87,12 +88,7 @@ test("archive searches both languages and retains identical files, downloads and
   expect(matching.length).toBeGreaterThan(0);
   await query.fill(originalTitle);
   expect(await archive.locator('[data-original-language="filename"]').evaluateAll(elements => elements.map(element => element.getAttribute("data-source-id")))).toEqual(matching);
-  await query.fill("");
-  await archive.getByRole("button", { name: "2020", exact: true }).click();
-  await expect(archive.locator("caption")).toContainText("2020");
-  await expect(archive.locator("caption")).not.toContainText("2004–2025");
-  await query.fill("no-matching-source-document");
-  await expect(archive.getByTestId("source-archive-empty")).toHaveText("No sources found");
+  // The English year filter and zero state are checked with the Georgian ones in methodology.spec.ts.
   const file = kaDownloads.find(href => href?.includes("/files/"));
   expect(file).toBeTruthy();
   expect((await request.get(file!)).status()).toBe(200);

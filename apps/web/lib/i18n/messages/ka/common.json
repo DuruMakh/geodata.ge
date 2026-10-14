@@ -15,6 +15,8 @@
   "common.about": "მიზანი",
   "common.menu": "მენიუ",
   "common.navigation": "ნავიგაცია",
+  "common.breadcrumb": "ნავიგაციის ბილიკი",
+  "common.skipToContent": "მთავარ შინაარსზე გადასვლა",
   "common.language": "ენა",
   "common.methodology": "მეთოდოლოგია",
   "common.aiConnection": "AI-კავშირი",
@@ -95,5 +97,7 @@
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე",
   "common.dataEnergyFood": "მონაცემები · ენერგეტიკა და სურსათი",
-  "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები"
+  "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები",
+  "common.dataLoading": "მონაცემები იტვირთება…",
+  "common.dataLoadError": "მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან."
 }

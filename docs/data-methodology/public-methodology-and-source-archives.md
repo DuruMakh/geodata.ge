@@ -61,6 +61,8 @@ Every status still requires non-empty `license_id` and `attribution_text`. Gener
 
 Validation rejects missing or extra inventory rows, duplicate IDs or public paths, path traversal, absolute or symlinked paths, paths outside the repository or category download root, non-ASCII/unstable public paths, missing files, byte-size or SHA-256 drift, blank attribution, unknown date bases, and unapproved redistribution statuses.
 
+Every archived web page (`text/html` or `application/xhtml+xml`, or any public path ending in `.html`, `.htm` or `.xhtml`) is published as `.html.txt`, which validation enforces, and every non-PDF archived original under `/downloads/methodology/:dataset/files/` is served sandboxed (`Content-Security-Policy: sandbox; default-src 'none'`), so a captured page's scripts never run on fiscal.ge. PDFs are left out of the sandbox so browser PDF viewers can still open them; every archived original stays `noindex, follow`.
+
 ## Deterministic generated outputs
 
 Run archive commands from `apps/web`:

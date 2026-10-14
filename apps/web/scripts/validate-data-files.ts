@@ -35,6 +35,7 @@ import { SERVED_DATA_FILES } from "../lib/data/servedData";
 import { loadSourceDocuments, referencedSourceIds } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
 import { budgetRowsToCsvRows } from "./compose-budget-facts";
+import { runAsCli } from "../lib/runAsCli";
 
 function sortedYears(years: number[]): number[] {
   return Array.from(new Set(years)).sort((a, b) => a - b);
@@ -55,7 +56,7 @@ function composedFactsMatchSideFiles(
   return JSON.stringify(budgetRowsToCsvRows([...expenditureRows, ...revenueRows])) === JSON.stringify(budgetRowsToCsvRows(facts));
 }
 
-async function main() {
+export async function main() {
   const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
   // The served datasets come from SERVED_DATA_FILES so this gate, the site and
   // the database import all read the same served-data paths. The two side
@@ -304,7 +305,4 @@ async function main() {
   console.log(`Report written: ${reportPath}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+runAsCli(import.meta.url, main);

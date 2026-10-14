@@ -16,7 +16,7 @@ const regionNames: Record<string, string> = {
   "region.shida_kartli": "Shida Kartli",
 };
 
-test("renders eleven linked map targets and ranked rows from one shared model", async () => {
+test("credits geoBoundaries, overlays the two occupied areas and claims no share of Georgia", async () => {
   const [regional, municipal] = await Promise.all([loadRegionalEconomyFacts(), loadServedMunicipalData()]);
   const model = buildRegionalEconomyMapModel({
     facts: regional.map((fact) => ({ ...fact, value: Number(fact.value) })),
@@ -48,12 +48,8 @@ test("renders eleven linked map targets and ranked rows from one shared model", 
     </I18nProvider>,
   );
 
-  expect((html.match(/data-region-map-target=""/g) ?? [])).toHaveLength(11);
-  expect((html.match(/data-testid="regional-list-row"/g) ?? [])).toHaveLength(11);
-  expect(html).toContain('href="/en/explorer/economy/regions/imereti"');
-  expect(html).toContain("Imereti");
+  // The 11 targets, rows and paths and the Imereti link are checked in regional-economies.spec.ts.
   expect(html).toContain("2024");
-  expect((html.match(/data-testid="regional-map-path"/g) ?? [])).toHaveLength(11);
   expect(html).toContain("geoBoundaries");
   expect((html.match(/data-occupied-overlay=""/g) ?? [])).toHaveLength(2);
   expect(html).not.toContain("share of Georgia");

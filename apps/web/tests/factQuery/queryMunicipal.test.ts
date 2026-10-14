@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/queryMunicipal.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -10,7 +10,7 @@ import type { Coverage } from "../../lib/factQuery/types";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
 });
 
 const TOTAL = "municipal.total";

@@ -5,7 +5,7 @@ import { JsonLd } from "../../components/seo/json-ld";
 import type { Locale } from "../../lib/i18n/types";
 import { renderMunicipalCountry } from "../../lib/pages/municipal-country";
 import { renderMunicipalIndex } from "../../lib/pages/municipal-index";
-import { renderMunicipalRegion } from "../../lib/pages/municipal-region";
+import { municipalRegionMetadata, renderMunicipalRegion } from "../../lib/pages/municipal-region";
 import { renderMunicipality } from "../../lib/pages/municipality";
 import { renderRegionalEconomiesPage, renderRegionalEconomyPage } from "../../lib/pages/regional-economy";
 
@@ -39,7 +39,7 @@ describe.each(["ka", "en"] as const)("localized Dataset relationships: %s", (loc
     const subset = datasetFromPage(await renderPage(locale));
     expect(subset.isPartOf).toEqual({
       "@type": "Dataset",
-      "@id": "https://fiscal.ge/explorer/municipalities#dataset",
+      "@id": `https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/municipalities#dataset`,
       url: `https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/municipalities`,
       name: parent.name,
       description: parent.description,
@@ -53,12 +53,18 @@ describe.each(["ka", "en"] as const)("localized Dataset relationships: %s", (loc
     if (locale === "en") expect(JSON.stringify(subset.isPartOf)).not.toMatch(/\p{Script=Georgian}/u);
   });
 
+  it.each(["imereti", "adjara"])("the %s region Dataset carries the same name as the page's search title", async (id) => {
+    const subset = datasetFromPage(await renderMunicipalRegion(id, locale));
+    const { title } = await municipalRegionMetadata(id, locale);
+    expect(String(title).startsWith(`${subset.name} `)).toBe(true);
+  });
+
   it("a regional economy describes the complete all-regions parent", async () => {
     const parent = datasetFromPage(await renderRegionalEconomiesPage(locale));
     const subset = datasetFromPage(await renderRegionalEconomyPage("tbilisi", locale));
     expect(subset.isPartOf).toEqual({
       "@type": "Dataset",
-      "@id": "https://fiscal.ge/explorer/economy/regions#dataset",
+      "@id": `https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/economy/regions#dataset`,
       url: `https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/economy/regions`,
       name: parent.name,
       description: parent.description,
@@ -74,7 +80,7 @@ describe.each(["ka", "en"] as const)("localized Dataset relationships: %s", (loc
     const parent = datasetFromPage(await renderRegionalEconomiesPage(locale));
     for (const slug of ["tbilisi", "adjara"]) {
       const subset = datasetFromPage(await renderRegionalEconomyPage(slug, locale));
-      expect(subset["@id"]).toBe(`https://fiscal.ge/explorer/economy/regions/${slug}#dataset`);
+      expect(subset["@id"]).toBe(`https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/economy/regions/${slug}#dataset`);
       expect(subset.url).toBe(`https://fiscal.ge${locale === "en" ? "/en" : ""}/explorer/economy/regions/${slug}`);
       expect(subset).not.toHaveProperty("sameAs");
       expect(subset.isPartOf["@id"]).toBe(parent["@id"]);

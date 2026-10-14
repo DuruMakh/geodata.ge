@@ -9,6 +9,7 @@ import { renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props = {
   facts: packCategoryFacts(fixtureFacts),
+  monthlyUrl: "/page-data/inflation-category-mom.0123456789abcdef.json",
   weights: fixtureWeights,
   headline: [...fixtureHeadline].map(([period, value]) => ({ period, value })),
   headlineMom: [],
@@ -38,6 +39,8 @@ describe("InflationCategories", () => {
     expect(block(markup, "inflation-category-latest")).toContain(`${latest[1].toFixed(1)}%`);
     expect(markup.indexOf('data-testid="inflation-category-latest"')).toBeLessThan(markup.indexOf('data-testid="inflation-category-unit"'));
     expect(block(markup, "inflation-category-unit")).toContain("პროცენტული პუნქტი");
+    // U13-14: the unit line names the unit only; the headline is the line above, at one precision.
+    expect(markup.match(/data-testid="inflation-category-unit">([^<]*)</)![1]).not.toMatch(/\d/);
   });
 
   it("names the largest contributor in the indicators hero", () => {

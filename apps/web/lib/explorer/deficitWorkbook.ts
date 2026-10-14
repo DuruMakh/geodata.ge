@@ -26,7 +26,6 @@ export function buildDeficitWorkbookExportModel(input: {
     locale,
     filenameBase: "general-government-deficit",
     title: workbookMessage(locale, "workbook.balance"),
-    groupLabel: workbookMessage(locale, "workbook.balance"),
     years,
     measure: input.percentage
       ? {
@@ -37,6 +36,7 @@ export function buildDeficitWorkbookExportModel(input: {
       : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.billionGel"), readableScale: 1_000_000_000 },
     totalId: DEFICIT_ITEM.id,
     includeTotalsInAnalysis: true,
+    omitGroupColumn: true,
     ...(input.percentage ? { showChangeColumn: false } : {}),
     series: [{
       id: DEFICIT_ITEM.id,

@@ -14,9 +14,11 @@ test("English selection controls keep their complete denominator while searching
   await search.fill("თავდაცვა");
   expect((await status.innerText()).replace(/\s+/g, " ")).toBe(before);
   const bulk = page.getByTestId("series-toggle-all");
+  // A plain action button: its name is the visible word, which names the action.
   await expect(bulk).toHaveAccessibleName("Clear");
   await bulk.click();
   await expect(bulk).toHaveAccessibleName("Select all");
+  await expect(bulk).toHaveAttribute("data-state", "false");
   await bulk.click();
   await expect(status).toContainText(`${denominator} / ${denominator}`);
   await expect(page.getByTestId("range-start-handle")).toHaveAccessibleName("Start year");
@@ -24,6 +26,8 @@ test("English selection controls keep their complete denominator while searching
   await expect(page.getByTestId("series-excel")).toHaveAccessibleName("Download");
   await expect(page.getByTestId("grouping-fields")).toHaveAccessibleName("Functions");
   await expect(page.getByTestId("grouping-ministries")).toHaveAccessibleName("Ministries");
+  await expect(page.getByTestId("chart-grouping")).toHaveAttribute("role", "group");
+  await expect(page.getByTestId("chart-grouping")).toHaveAttribute("aria-label", "Grouping");
   await expect(page.getByTestId("chart-mode-line")).toHaveAccessibleName("Line");
   await expect(page.getByTestId("chart-mode-table")).toHaveAccessibleName("Table");
 });
@@ -32,7 +36,6 @@ test("English mobile shared controls and coming-soon labels are readable", async
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en/explorer/expenditure");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
   await page.getByTestId("sidebar-toggle").click();
   await expect(page.getByTestId("data-sidebar").getByText("Coming soon", { exact: true })).toHaveCount(0);
 });

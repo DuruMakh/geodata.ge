@@ -1,7 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
 import { buildLandingModel } from "../../lib/landing/landingData";
-import { buildHubCards } from "../../lib/explorer/hubCards";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { Presentation } from "../../lib/i18n/types";
 import { GEORGIA_GEO } from "../../lib/landing/georgiaGeo";
@@ -31,15 +30,5 @@ describe("public content presentation", () => {
     }
     expect(english.debt.latestYear).toBe(Math.max(...input.debtFacts.filter(fact => fact.family === "stock" && fact.status === "actual").map(fact => fact.year)));
     expect(english.deficit.latestActualYear).toBe(Math.max(...input.balanceFacts.filter(fact => fact.status === "actual").map(fact => fact.year)));
-  });
-  it("keeps hub destinations, sparkline values, coverage and ordering unchanged", () => {
-    const totals = new Map(input.municipalCountryTotalFacts.map(fact => [fact.year, fact.publicTotalGel]));
-    const original = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, ka);
-    const english = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, en);
-    const data = (cards: typeof original) => cards.map(card => ({ ...card, title: undefined, description: undefined, footer: card.footer?.match(/[−+]?\d[\d,.]*%?/g) }));
-    expect(data(english)).toEqual(data(original));
-    expect(original).toEqual(buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts));
-    expect(english.flatMap(card => [card.title, card.description, card.footer ?? ""]).join(" ")).not.toMatch(/\p{Script=Georgian}/u);
-    expect(english.find(card => card.href === "/explorer/municipalities")?.description).toContain("69");
   });
 });

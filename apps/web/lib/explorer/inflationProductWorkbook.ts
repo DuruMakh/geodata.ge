@@ -3,7 +3,7 @@ import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { periodLabel } from "./inflationLabels";
 import { monthlyWorkbookSources, pickLocaleEditions, type InflationWorkbookSource } from "./inflationWorkbook";
-import { productAnnual, productAnnualIndex, productCumulative, rankProducts, type ProductIndex } from "./inflationProducts";
+import { productAnnual, productAnnualIndex, productCumulative, productEndPeriod, rankProducts, type ProductIndex } from "./inflationProducts";
 import type { ProductState } from "./inflationProductState";
 import { SHEET_NAMES, type WorkbookExportModel, type WorkbookReadableRow, workbookFilename } from "./workbookModel";
 
@@ -20,7 +20,7 @@ export function buildInflationProductWorkbookExportModel(input: {
   const { index, state, presentation, sources, siteOrigin } = input;
   const { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `inflation.${key}`, values);
-  const end = Math.min(makePeriod(state.range.endYear, 12), index.latestPeriod);
+  const end = productEndPeriod(index, state.range.endYear);
   const latestLabel = periodLabel(messages, index.latestPeriod, "long");
   const endLabel = periodLabel(messages, end, "long");
   const years = Array.from({ length: state.range.endYear - state.range.startYear + 1 }, (_, offset) => state.range.startYear + offset);

@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { buildEnergyFoodModel, energyFoodDisplayLabels, energyFoodUnit, type EnergyFoodSectionId, type EnergyFoodState } from "./energyFood";
-import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 /** The Data sheet's columns in order; the numeric format is keyed by the 1-based position of each `value` column. */
 const ANALYSIS_COLUMNS = ["year", "series", "value", "status"] as const;
@@ -14,15 +14,11 @@ export function buildEnergyFoodWorkbookExportModel(input: { section: EnergyFoodS
   const t = (key: string) => message(messages, `energyFood.${key}`);
   const model = buildEnergyFoodModel(section, facts, state);
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.year}`, f]));
-  const neededYears = new Map<string, Set<number>>();
-  for (const series of model.selected) for (const year of model.years) {
-    const fact = byCell.get(`${series.id}:${year}`);
-    if (fact) neededYears.set(fact.sourceId, (neededYears.get(fact.sourceId) ?? new Set<number>()).add(year));
-  }
+  const neededYears = neededSourceYears(model.selected, model.years, (series, year) => byCell.get(`${series.id}:${year}`)?.sourceId);
   // A value without its source link would leave the workbook uncited.
   const known = new Set(input.sources.map(source => source.sourceId));
   for (const sourceId of neededYears.keys()) if (!known.has(sourceId)) throw new Error(`Missing public source for energy and food source ${sourceId}`);
-  const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
+  const originals = sourcesForNeededYears(input.sources, neededYears);
   const unit = energyFoodUnit(section);
   const numberFormat = unit === "percent" ? "0" : "#,##0.0";
   const status = (fact: ClientEnergyFoodFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");

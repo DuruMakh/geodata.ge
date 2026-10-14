@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot, enrichSourceTranslations } from "../../lib/factQuery/buildSnapshot";
+import { enrichSourceTranslations } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage, type CoverageData } from "../../lib/factQuery/describeCoverage";
 import { getSources, type GetSourcesData } from "../../lib/factQuery/getSources";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
@@ -9,7 +10,7 @@ import { historicalProgrammeLabelEn, serviceLabelEn, serviceMessage } from "../.
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" }); });
 
 describe("snapshot-pinned translations", () => {
   it("covers every exposed catalogue identity, including excluded municipalities", () => {

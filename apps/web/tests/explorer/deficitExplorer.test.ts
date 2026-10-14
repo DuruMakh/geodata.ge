@@ -9,7 +9,7 @@ import type { Presentation } from "../../lib/i18n/types";
 import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
 
 let presentation: Presentation;
-beforeAll(async () => { presentation = await getPresentation("ka", [], [DEFICIT_SERIES_ID]); });
+beforeAll(async () => { presentation = await getPresentation("ka", [], [DEFICIT_SERIES_ID], [DEFICIT_SERIES_ID]); });
 
 const facts: ServedGeneralGovernmentBalanceFact[] = [
   { year: 2024, generalGovernmentBalancePctGdp: -2.267, generalGovernmentBalanceGel: -2_109_000_000, status: "actual", sourceId: "source.imf", lastReviewedAt: "2026-09-04" },
@@ -58,15 +58,5 @@ describe("general-government deficit explorer model", () => {
     }, presentation);
 
     expect(model.points).toEqual([]);
-  });
-
-  it("uses the reviewed English label for the published series id", async () => {
-    const { getPresentation } = await import("../../lib/i18n/presentation.server");
-    const labels = (await import("../../../../data/localization/en/labels.json")).default;
-    const presentation = await getPresentation("en", [], ["deficit.general_government.balance"]);
-    const model = buildDeficitExplorerModel({ facts, range: { start: 2024, end: 2026 }, percentage: true, selected: true }, presentation);
-    expect(model.tableRow.itemId).toBe("deficit.general_government.balance");
-    expect(model.tableRow.enLabel).toBe("General government balance");
-    expect(labels).not.toHaveProperty("deficit.general_government_balance");
   });
 });

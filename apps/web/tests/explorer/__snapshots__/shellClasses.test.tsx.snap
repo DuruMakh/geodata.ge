@@ -9,7 +9,7 @@ exports[`'debt' shell > keeps its wrapper, heading, workspace, aside and measure
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="debt-explorer" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
+    "<main data-testid="debt-explorer" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [
     "<button type="button" data-testid="measure-share-toggle" aria-pressed="false" class="h-9 min-[768px]:h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]">",
@@ -29,7 +29,7 @@ exports[`'deficit' shell > keeps its wrapper, heading, workspace, aside and meas
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="deficit-explorer" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
+    "<main data-testid="deficit-explorer" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [
     "<button type="button" data-testid="measure-share-toggle" aria-pressed="true" class="h-9 min-[768px]:h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] before:mr-1 before:content-[&#x27;✓&#x27;_/_&#x27;&#x27;]">",
@@ -47,7 +47,7 @@ exports[`'economy' shell > keeps its wrapper, heading, workspace, aside and meas
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+    "<main class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [],
@@ -63,7 +63,7 @@ exports[`'expenditure' shell > keeps its wrapper, heading, workspace, aside and 
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="explorer-shell" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
+    "<main data-testid="explorer-shell" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px] min-[768px]:pb-16"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [
     "<button type="button" data-testid="measure-share-toggle" aria-pressed="false" class="h-9 min-[768px]:h-[27px] flex-none cursor-pointer whitespace-nowrap rounded-full border px-3.5 text-xs font-medium transition-colors duration-150 border-[var(--control)] bg-transparent text-[var(--muted)] hover:text-[var(--ink)]">",
@@ -81,7 +81,7 @@ exports[`'gdp' shell > keeps its wrapper, heading, workspace, aside and measure 
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="gdp-overview" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+    "<main data-testid="gdp-overview" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [],
@@ -95,7 +95,7 @@ exports[`'inflation' shell > keeps its wrapper, heading, workspace, aside and me
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+    "<main class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [],
@@ -111,7 +111,7 @@ exports[`'inflation-categories' shell > keeps its wrapper, heading, workspace, a
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="inflation-categories" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+    "<main data-testid="inflation-categories" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [
@@ -129,7 +129,7 @@ exports[`'inflation-overview' shell > keeps its wrapper, heading, workspace, asi
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="inflation-overview" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+    "<main data-testid="inflation-overview" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [
@@ -147,7 +147,7 @@ exports[`'region' shell > keeps its wrapper, heading, workspace, aside and measu
     "<h1 class="font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="explorer-shell" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+    "<main data-testid="explorer-shell" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [
@@ -163,7 +163,7 @@ exports[`'regions' shell > keeps its wrapper, heading, workspace, aside and meas
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main data-testid="explorer-shell" class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
+    "<main data-testid="explorer-shell" class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="@container mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [],
@@ -179,7 +179,7 @@ exports[`'sectors' shell > keeps its wrapper, heading, workspace, aside and meas
     "<h1 class="mt-[34px] mb-3 font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[40px]">",
   ],
   "main": [
-    "<main class="min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
+    "<main class="bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]"><div class="mx-auto max-w-[1180px]">",
   ],
   "pill": [],
   "workspace": [

@@ -1,12 +1,12 @@
 import { beforeAll, expect, test } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { queryEconomicSectors } from "../../lib/factQuery/queryEconomicSectors";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import type { Observation } from "../../lib/factQuery/observations";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { errorCodeSchema } from "../../lib/factQuery/schemas";
 let snapshot: FactQuerySnapshot;
-beforeAll(async()=>{ snapshot=await buildFactQuerySnapshot({releaseCommit:"test",generatedAt:"2026-09-11T00:00:00Z"}); });
+beforeAll(async()=>{ snapshot=testSnapshot({releaseCommit:"test",generatedAt:"2026-09-11T00:00:00Z"}); });
 
 test("stale sector versions tell both languages to refresh coverage, not change valid parameters", () => {
   const result = queryEconomicSectors(snapshot, { seriesIds: ["sector.a"], years: [2025], measure: "amount_gel", expectedDataVersion: "0".repeat(64) });

@@ -5,6 +5,7 @@ export const WAGES_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "wages",
   "title": "Wages",
   "summary": "Georgia’s annual average and median gross monthly wages nationally, by sex, employer type, economic activity and region, in nominal lari.",
+  "metaDescription": "Georgia’s average and median gross monthly wages by sex, employer type, economic activity and region, in nominal lari.",
   "reviewedAt": "2026-10-10",
   "archiveManifestId": "wages",
   "coverageSource": {

@@ -2,6 +2,7 @@ import { message } from "../../lib/i18n/messages";
 import type { Messages } from "../../lib/i18n/types";
 const STEP_KEYS = ["preserve", "read", "apply", "validate"] as const;
 
+// Decorative English overlines in both languages, hidden from screen readers: the h3 beside each names the step.
 const STEP_LABELS = ["PRESERVE", "READ", "APPLY", "VALIDATE"] as const;
 
 export function MethodJourney({ descriptions, messages }: { descriptions: readonly string[]; messages: Messages }) {
@@ -27,12 +28,12 @@ export function MethodJourney({ descriptions, messages }: { descriptions: readon
               <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--ink)] bg-[var(--paper)] font-[family-name:var(--font-numeric)] text-[0.6875rem]">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9.5px] tracking-[0.08em] text-[var(--faint)] min-[700px]:hidden">
+              <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9.5px] tracking-[0.08em] text-[var(--faint)] min-[700px]:hidden">
                 {STEP_LABELS[index]}
               </span>
             </div>
             <div>
-              <span className="hidden font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9.5px] tracking-[0.08em] text-[var(--faint)] min-[700px]:block">
+              <span aria-hidden="true" className="hidden font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9.5px] tracking-[0.08em] text-[var(--faint)] min-[700px]:block">
                 {STEP_LABELS[index]}
               </span>
               <h3 className="mt-1 font-[family-name:var(--font-display)] text-[18px] font-semibold leading-snug">

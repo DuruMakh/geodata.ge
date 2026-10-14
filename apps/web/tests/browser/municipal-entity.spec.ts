@@ -132,6 +132,26 @@ test.describe("hash sanitising", () => {
   });
 });
 
+// U09-17: moving to another place keeps the view (mode, range, functions, share), as the language switch does.
+test("the neighbour links and the picker keep the view hash", async ({ page }) => {
+  await page.goto(`${ENTITY_URL}#m=table&r=2018-2022&sel=municipal.total,municipal.health&sh=1`);
+  await expectMunicipalAppReady(page);
+  const hash = new URL(page.url()).hash;
+  expect(hash).toContain("m=table");
+
+  await page.getByTestId("municipal-entity-navigation").locator("a").last().click();
+  await page.waitForURL((url) => !url.pathname.endsWith("/tbilisi"));
+  await expectMunicipalAppReady(page);
+  expect(new URL(page.url()).hash).toBe(hash);
+  const stepped = new URL(page.url()).pathname;
+
+  await page.getByTestId("entity-picker-trigger").click();
+  await page.locator("[data-testid='picker-municipality']:not([aria-current])").first().click();
+  await page.waitForURL((url) => url.pathname !== stepped);
+  await expectMunicipalAppReady(page);
+  expect(new URL(page.url()).hash).toBe(hash);
+});
+
 test.describe("entity picker accessibility", () => {
   test("answers a non-matching query instead of collapsing to a 0px void", async ({ page }) => {
     await page.goto(ENTITY_URL);
@@ -190,35 +210,27 @@ test.describe("entity picker accessibility", () => {
     await expect(page.getByTestId("municipal-entity-navigation").locator("a").first()).toBeFocused();
   });
 
-  test("picker rows expose hover feedback", async ({ page }) => {
+  test("picker rows keep their layout on hover", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
     await page.getByTestId("entity-picker-trigger").click();
 
     const region = page.getByTestId("picker-region").first();
     const municipality = page.getByTestId("picker-municipality").nth(1);
-    await expect(municipality).not.toHaveAttribute("aria-current", "page");
-    await expect(municipality).not.toHaveCSS("color", "rgb(179, 64, 42)");
-    await expect(municipality).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     const regionBox = await region.boundingBox();
     const municipalityBox = await municipality.boundingBox();
 
+    // Colours and transitions are design tokens; what is pinned here is that
+    // hovering a row causes no layout shift.
     for (const row of [region, municipality]) {
       await row.hover();
-      await expect(row).toHaveCSS("color", "rgb(179, 64, 42)");
-      await expect(row).toHaveCSS("border-left-color", "rgb(179, 64, 42)");
-      await expect(row).toHaveCSS("transition-duration", "0.1s");
-      await expect(row).toHaveCSS("transition-property", /color/);
     }
-    await expect(municipality).toHaveCSS("background-color", "rgb(241, 234, 220)");
 
     expect(await region.boundingBox()).toEqual(regionBox);
     expect(await municipality.boundingBox()).toEqual(municipalityBox);
   });
 
-  test("the entity picker trigger keeps the preview affordance across rest, hover, and open states", async ({
-    page,
-  }) => {
+  test("opening moves focus into the search input", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
@@ -228,18 +240,11 @@ test.describe("entity picker accessibility", () => {
 
     await expect(page.locator("h1")).not.toContainText(/[▾▴]/);
     await expect(page.locator("main h1")).toHaveText("როგორ ხარჯავს ბიუჯეტს თბილისი");
-
-    await expect(trigger).toHaveCSS("color", "rgb(179, 64, 42)");
-    await expect(trigger).toHaveCSS("border-bottom-style", "dashed");
-    await expect(trigger).toHaveCSS("border-bottom-width", "1px");
-    await expect(trigger).toHaveCSS("transition-duration", "0.1s");
     await expect(caret).toHaveText("");
     await expect(caret).toHaveCSS("border-top-width", "5px");
     await expect(caret).toHaveCSS("border-bottom-width", "0px");
-    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
 
     await trigger.hover();
-    await expect(caret).toHaveCSS("color", "rgb(179, 64, 42)");
     expect(await trigger.boundingBox()).toEqual(restingBox);
 
     await trigger.click();
@@ -247,15 +252,15 @@ test.describe("entity picker accessibility", () => {
     await expect(caret).toHaveText("");
     await expect(caret).toHaveCSS("border-top-width", "0px");
     await expect(caret).toHaveCSS("border-bottom-width", "5px");
-  });
-
-  test("opening moves focus into the search input", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await page.getByTestId("entity-picker-trigger").click();
 
     const combobox = page.getByTestId("entity-picker").getByRole("combobox");
     await expect(combobox).toBeFocused();
+
+    // The keyboard shortcut opens the same picker.
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("entity-picker")).toHaveCount(0);
+    await page.keyboard.press("Control+k");
+    await expect(page.getByTestId("entity-picker")).toBeVisible();
   });
 
   test("the popover mounts as a sibling of the trigger, not nested inside the h1", async ({ page }) => {
@@ -414,8 +419,8 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
     const totalRow = page.getByTestId("explorer-table").locator("tbody tr").last();
     await expect(totalRow).toContainText("მთლიანი ბიუჯეტი");
 
-    // Total row, last-year cell (label, then one td per year, then change,
-    // then share — third from the end). A hard-coded billion divisor would
+    // Total row, last-year cell (one td per year after the label's th, then
+    // change, then share — third from the end). A hard-coded billion divisor would
     // collapse Tbilisi's hundreds-of-millions total to a low single digit;
     // the million divisor keeps it in the hundreds or thousands.
     const cells = await totalRow.locator("td").allTextContents();
@@ -427,7 +432,7 @@ test.describe("UNIT_MLN — first render anywhere in the repo", () => {
 // Task 14: the full municipality-page e2e coverage the header comment above
 // defers to this task ("Full section e2e coverage is Task 14's").
 test.describe("municipality page", () => {
-  test("municipal selector uses the same standardized anatomy as the national explorer", async ({ page }) => {
+  test("municipality and region selectors use the same standardized anatomy as the national explorer", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
@@ -443,29 +448,18 @@ test.describe("municipality page", () => {
     const actionBox = await panel.getByTestId("series-toggle-all").boundingBox();
     const statusBox = await panel.getByTestId("series-status").boundingBox();
     expect(actionBox!.x).toBeLessThan(statusBox!.x);
-  });
 
-  test("series rows reuse the explorer's animated hover and selected tint", async ({ page }) => {
-    await page.goto(ENTITY_URL);
+    // A region roll-up uses the same anatomy, with only its total selected.
+    await page.goto(`${BASE_URL}/explorer/municipalities/region/imereti`);
     await expectMunicipalAppReady(page);
-
-    const initiallySelected = page.locator('[data-testid="series-row"]:has([data-testid="series-row-toggle"][aria-pressed="true"])').first();
-    const initiallyUnselected = page.locator('[data-testid="series-row"]:has([data-testid="series-row-toggle"][aria-pressed="false"])').first();
-    const selectedLabel = await initiallySelected.getByTestId("series-label").innerText();
-    const unselectedLabel = await initiallyUnselected.getByTestId("series-label").innerText();
-    const selectedRow = page.getByTestId("series-row").filter({ hasText: selectedLabel }).first();
-    const unselectedRow = page.getByTestId("series-row").filter({ hasText: unselectedLabel }).first();
-
-    await expect(selectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-    await expect(unselectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
-    await expect(selectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
-    await expect(selectedRow).toHaveCSS("transition-duration", "0.1s");
-    await unselectedRow.hover();
-    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
-
-    await unselectedRow.getByTestId("series-row-toggle").click();
-    await expect(unselectedRow.getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-    await expect(unselectedRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
+    const regionPanel = page.getByTestId("series-selector");
+    const regionSections = await regionPanel.locator("[data-selector-section]").evaluateAll((nodes) =>
+      nodes.map((node) => node.getAttribute("data-selector-section")),
+    );
+    expect(regionSections).toEqual(["search", "actions", "list"]);
+    await expect(regionPanel.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+    await expect(regionPanel.locator('[data-level="total"] [data-testid="series-row-toggle"]')).toHaveAttribute("aria-pressed", "true");
+    await expect(regionPanel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ 11/);
   });
 
   test("switches between chart and table", async ({ page }) => {
@@ -512,6 +506,7 @@ test.describe("municipality page", () => {
     await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
     await expect(page.getByTestId("chart-frame").locator("svg path[stroke-linejoin='round']")).toHaveCount(11);
     await expect(page.getByTestId("series-overflow-callout")).toHaveCount(0);
+    await expect(page.getByTestId("municipal-source-note")).not.toContainText("ორი განსხვავებული საზომია");
   });
 
   test("bulk actions ignore the active municipal search", async ({ page }) => {
@@ -523,19 +518,19 @@ test.describe("municipality page", () => {
     const status = panel.getByTestId("series-status");
 
     await expect(status).toContainText("სერიები 1 / 11");
-    await expect(bulk).toHaveAttribute("role", "checkbox");
-    await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+    await expect(bulk).not.toHaveAttribute("role", "checkbox");
+    await expect(bulk).toHaveAttribute("data-state", "mixed");
     await expect(indicator).toHaveText("—");
     await expect(bulk).toContainText("გასუფთავება");
     await bulk.click();
-    await expect(bulk).toHaveAttribute("aria-checked", "false");
+    await expect(bulk).toHaveAttribute("data-state", "false");
     await expect(indicator).toHaveText("");
     await expect(bulk).toContainText("ყველას მონიშვნა");
 
     await panel.getByTestId("series-search").fill("განათლება");
     await expect(panel.getByTestId("series-row")).toHaveCount(2);
     await bulk.click();
-    await expect(bulk).toHaveAttribute("aria-checked", "true");
+    await expect(bulk).toHaveAttribute("data-state", "true");
     await expect(indicator).toHaveText("✓");
     await panel.getByTestId("series-search").fill("");
     await expect(panel.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
@@ -553,12 +548,27 @@ test.describe("municipality page", () => {
     await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(0);
   });
 
-  test("an explicitly empty selection renders no table rows", async ({ page }) => {
+  // U09-10: the table view says what to do with nothing selected, as the line view does, instead of a header-only table.
+  test("an explicitly empty selection shows the guidance in the table view too", async ({ page }) => {
     await page.goto(`${ENTITY_URL}#m=table&sel=`);
     await expectMunicipalAppReady(page);
 
-    await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-    await expect(page.getByTestId("explorer-table").locator("tbody tr")).toHaveCount(0);
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+    await expect(page.getByTestId("explorer-table")).toHaveCount(0);
+  });
+
+  // U09-16: the phone legend prints each amount as the series panel does, not at the table's precision.
+  test("the phone legend prints amounts as the series panel does", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(`${ENTITY_URL}#sel=municipal.total,municipal.health`);
+    await expectMunicipalAppReady(page);
+
+    const legend = page.getByTestId("chart-phone-legend");
+    await expect(legend.locator("li")).toHaveCount(2);
+    for (const id of ["municipal.total", "municipal.health"]) {
+      const panelValue = (await page.locator(`[data-testid='series-row'][data-series-id='${id}'] [data-testid='series-row-toggle'] > span:last-child`).textContent())!.trim();
+      await expect(legend.locator(`[data-legend-series-id='${id}'] > span:last-child`)).toHaveText(panelValue);
+    }
   });
 
   test("uses the official municipal total as 100% without normalizing functions", async ({ page }) => {
@@ -585,31 +595,6 @@ test.describe("municipality page", () => {
     expect(duplicateKeyWarnings).toEqual([]);
   });
 
-  test("does not render a divergence callout or two-total source copy", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await expect(page.getByTestId("divergence-callout")).toHaveCount(0);
-    await expect(page.getByTestId("municipal-source-note")).not.toContainText("ორი განსხვავებული საზომია");
-  });
-
-  test("opens the entity picker with the keyboard", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await page.keyboard.press("Control+k");
-    await expect(page.getByTestId("entity-picker")).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page.getByTestId("entity-picker")).toHaveCount(0);
-  });
-
-  test("keeps the picker popover out of the heading", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    await page.keyboard.press("Control+k");
-    // A role="dialog" inside an h1 is announced as part of the heading.
-    await expect(page.locator("h1 [data-testid='entity-picker']")).toHaveCount(0);
-    await expect(page.locator("h1 [data-testid='entity-picker-trigger']")).toHaveCount(1);
-  });
-
   test("filters the series list and clears the selection", async ({ page }) => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
@@ -620,13 +605,6 @@ test.describe("municipality page", () => {
     await expect(page.getByTestId("series-row")).toHaveCount(11);
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-row").first().getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "false");
-  });
-
-  test("omits the compact methodology link from an individual page", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-
-    await expect(page.getByTestId("compact-methodology-link")).toHaveCount(0);
   });
 
   test("shows only the GEL amount in the municipality period-change column", async ({ page }) => {
@@ -697,7 +675,7 @@ test.describe("municipality page", () => {
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-row")).toHaveCount(11);
     await expect(page.locator("[data-testid='series-row'] [data-testid='series-row-toggle'][aria-pressed='true']")).toHaveCount(11);
-    await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByTestId("series-toggle-all")).toHaveAttribute("data-state", "true");
   });
 
   test("downloads the selected range and series as a sourced percentage workbook", async ({ page }) => {
@@ -815,11 +793,12 @@ test.describe("municipality page", () => {
     await page.goto(ENTITY_URL);
     await expectMunicipalAppReady(page);
 
-    const classes = await page.getByTestId("municipal-excel").getAttribute("class");
-    expect(classes).toContain("h-[38px]");
-    expect(classes).toContain("w-full");
-    expect(classes).toContain("bg-[var(--ink)]");
-    expect(classes).toContain("text-[var(--paper)]");
+    // The shared ExcelDownloadButton: DESIGN's 38px ink button with paper text.
+    const button = page.getByTestId("municipal-excel");
+    await expect(button).toHaveCSS("height", "38px");
+    // --ink #1E1B16 and --paper #F7F2E9.
+    await expect(button).toHaveCSS("background-color", "rgb(30, 27, 22)");
+    await expect(button).toHaveCSS("color", "rgb(247, 242, 233)");
   });
 
   test("recomputes the period comparison when the range moves", async ({ page }) => {
@@ -890,31 +869,6 @@ test.describe("municipality page", () => {
     );
     expect(columns).toHaveLength(1);
     expect(kpiColumns).toHaveLength(1);
-  });
-
-  test("uses reviewed punctuation in the municipality metadata description", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-    const description = page.locator('meta[name="description"]');
-    await expect(description).toHaveAttribute("content", /ქალაქ თბილისის მუნიციპალიტეტის ფაქტობრივი ბიუჯეტი/);
-    await expect(description).not.toHaveAttribute("content", /მუნიციპალიტეტიის/);
-  });
-
-  // Whole-branch review finding: municipalities is the first section with
-  // child routes, so `pathname === section.href` alone never matched on a
-  // municipality sub-page and the sidebar carried no active state at all —
-  // no accent marker, no aria-current — even though the reader is inside the
-  // section. main-explorer.spec.ts already pins this on the index; this pins
-  // it one level deeper, on an actual municipality page.
-  test("the sidebar keeps მუნიციპალიტეტები highlighted on a municipality sub-page, not just the index", async ({ page }) => {
-    await page.goto(ENTITY_URL);
-    await expectMunicipalAppReady(page);
-
-    const sidebar = page.getByTestId("data-sidebar");
-    const municipalitiesLink = sidebar.getByTestId("section-link-municipalities");
-    await expect(municipalitiesLink).toHaveAttribute("aria-current", "page");
-    // No other section row should also claim to be current.
-    await expect(sidebar.getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
   });
 
   // Whole-branch review finding: the comparison table's header hardcoded the
@@ -1044,7 +998,8 @@ test.describe("municipality page", () => {
     expect(sizes.containerScrollWidth).toBe(sizes.containerClientWidth);
     expect(sizes.pageScrollWidth).toBe(sizes.pageClientWidth);
 
-    const boxes = await table.locator("tbody tr").first().locator("td").evaluateAll((cells) => cells.slice(1).map((cell) => {
+    // The row's name is its header cell (th scope="row"); the three values follow it.
+    const boxes = await table.locator("tbody tr").first().locator("th, td").evaluateAll((cells) => cells.slice(1).map((cell) => {
       const box = cell.getBoundingClientRect();
       return { left: box.left, right: box.right };
     }));

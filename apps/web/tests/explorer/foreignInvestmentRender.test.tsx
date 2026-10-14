@@ -26,6 +26,16 @@ test.each(["en", "ka"] as const)("renders %s defaults: the country tab, the tota
   expect(html).not.toMatch(/GEL|₾/);
 });
 
+// U23-04: the external series panels search with the site's one placeholder word (DESIGN.md §7.7).
+test.each(["en", "ka"] as const)("the %s external series panel's search placeholder is the site's", async locale => {
+  const { MoneyFromAbroadSeriesPanel } = await import("../../components/external/money-from-abroad-series-panel");
+  const presentation = await p(locale);
+  const series = Array.from({ length: 12 }, (_, index) => ({ id: `fdi.s${index}`, label: `S${index}`, color: "#1E1B16" }));
+  const model = { series, selectedIds: [], valuesByEntity: Object.fromEntries(series.map(item => [item.id, { 2025: 1 }])), range: { start: 2025, end: 2025 }, unit: { divisor: 1, label: "USD", decimals: 0 }, selectedCount: 0, totalCount: 12 };
+  const html = renderToStaticMarkup(<I18nProvider {...presentation}><MoneyFromAbroadSeriesPanel model={model as never} totalId="fdi.s0" onSelectionChange={() => {}} downloadAction={null} /></I18nProvider>);
+  expect(html).toMatch(new RegExp(`data-testid="series-search"[^>]*placeholder="${presentation.messages["controls.search"]}"`));
+});
+
 test("a negative value is ranked last with its sign and an empty bar; Other countries ends the country ranking", async () => {
   const { ExternalRanking } = await import("../../components/external/external-ranking");
   const presentation = await p("en");

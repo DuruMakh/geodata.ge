@@ -6,12 +6,13 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES, SOURCE_ID } from "../data/demography/series";
+import { packFacts } from "../data/packedFacts";
 import { ageYears, annualAgeFacts } from "../explorer/demographyAgeSex";
 import { buildAgeSexRegionModel, georgiaOldShare } from "../explorer/demographyAgeSexRegions";
 import { AGE_SEX_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
@@ -20,12 +21,13 @@ import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources } from "./demography-population";
 
 export async function demographyAgeSexPageMetadata(locale: Locale) {
-  const p = await getPresentation(locale, ["demography"], []);
+  const [{ facts: served }, p] = await Promise.all([loadServedDemographyData(), getPresentation(locale, ["demography"], [])]);
+  const years = ageYears(annualAgeFacts(served));
   return fiscalMetadata({
     locale,
     path: AGE_SEX_PATH,
-    title: `${message(p.messages, "demography.ageSexMetaTitle")} | Fiscal.ge`,
-    description: message(p.messages, "demography.ageSexDescription"),
+    title: message(p.messages, "demography.ageSexMetaTitle"),
+    description: message(p.messages, "demography.ageSexMetaDescription", { first: years[0]!, last: years.at(-1)! }),
   });
 }
 
@@ -56,7 +58,7 @@ export async function renderDemographyAgeSexPage(locale: Locale) {
     { label: title },
   ];
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
@@ -65,10 +67,10 @@ export async function renderDemographyAgeSexPage(locale: Locale) {
         ]}
       />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={t("ageSexCoverage", { first, last })} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={t("ageSexCoverage", { first, last })} />
         <ExplorerHeading>{title}</ExplorerHeading>
-        <p className="mb-[30px] max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("ageSexLead", { first })}</p>
-        <AgeSexExplorer facts={facts} sources={sources.filter((source) => source.sourceId === SOURCE_ID.ageSex)} siteOrigin={resolveSiteUrl()} />
+        <p className="mb-[30px] max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("ageSexLead")}</p>
+        <AgeSexExplorer facts={packFacts(facts)} sources={sources.filter((source) => source.sourceId === SOURCE_ID.ageSex)} siteOrigin={resolveSiteUrl()} />
         <AgeSexRegions model={model} georgiaShare={georgiaOldShare(served)} sourceNote={t("regionsSource")} />
       </ExplorerPage>
     </I18nProvider>

@@ -9,6 +9,12 @@ import { upstashCounter } from "./upstashCounter";
 /** Requests per rolling window, per key. Spec 11.3: 60 in a rolling minute. */
 export const RATE_WINDOW_SECONDS = 60;
 export const RATE_MAX_REQUESTS = 60;
+/**
+ * Requests per key per UTC day. Without it one key at 60 a minute could spend
+ * the whole shared daily allowance on its own (the plan's recommended default
+ * for Q2, pending owner confirmation).
+ */
+export const RATE_PER_KEY_DAILY_MAX = 1_000;
 
 /**
  * Is /mcp switched off?
@@ -29,8 +35,14 @@ export function isPaused(): boolean {
 
 export type CounterVerdict = "allow" | "deny" | "unavailable";
 
+/**
+ * `rolling` counts the last `windowSeconds`; `fixed` counts from the first hit
+ * until the key expires, which is what a date-stamped daily key needs.
+ */
+export type CounterWindow = "rolling" | "fixed";
+
 export type Counter = {
-  hit(key: string, windowSeconds: number, max: number): Promise<CounterVerdict>;
+  hit(key: string, windowSeconds: number, max: number, window?: CounterWindow): Promise<CounterVerdict>;
 };
 
 /**

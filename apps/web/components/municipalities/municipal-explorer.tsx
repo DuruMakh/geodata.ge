@@ -9,7 +9,8 @@ import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { publicLabel } from "../../lib/i18n/labels";
 import { workbookMessage } from "../../lib/i18n/workbook";
 import { useMemo, useState, type ReactNode } from "react";
-import type { MunicipalFunction, MunicipalFunctionFact, MunicipalTotalFact } from "../../lib/data/municipal/types";
+import type { MunicipalFunction } from "../../lib/data/municipal/types";
+import type { ClientMunicipalFunctionFact, ClientMunicipalTotalFact } from "../../lib/explorer/clientData";
 import {
   buildComparisonRows,
   buildCountryKpis,
@@ -21,7 +22,6 @@ import {
   municipalShareValueForYear,
 } from "../../lib/explorer/municipalData";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
-import type { ChartMode } from "../../lib/explorer/types";
 import {
   buildWorkbookExportModel,
   type WorkbookExportInput,
@@ -30,7 +30,7 @@ import {
 } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SourceNote } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -40,6 +40,7 @@ import type { EntityPickerCountry, EntityPickerGroup } from "./entity-picker";
 import { EntityWorkspaceShell } from "./entity-workspace-shell";
 import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 
@@ -59,14 +60,15 @@ type MunicipalExplorerBaseProps = {
   metaLine: string;
   entityId: string;
 
-  // Raw facts, already narrowed (and, for a region, aggregated) by the route.
+  // Raw facts, already narrowed (and, for a region, aggregated) and projected to
+  // their public fields by the route.
   // NOT a prebuilt model: change, the share column, the KPIs, the movers and the
   // comparison table are all functions of the selected range, which is client
   // state. Handing over one full-span model and filtering its years array would
   // leave all five describing a period the reader is not looking at.
   functions: MunicipalFunction[];
-  functionFacts: MunicipalFunctionFact[];
-  totalFacts: MunicipalTotalFact[];
+  functionFacts: ClientMunicipalFunctionFact[];
+  totalFacts: ClientMunicipalTotalFact[];
 
   workbookBasename: string;
   workbookSources: WorkbookPublicSource[];
@@ -173,15 +175,14 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
         const share = municipalShareValueForYear(model, row, year);
         return share === null ? null : share * 100;
       }),
-      planned: years.map(() => false),
     }));
 
   const noSelection = state.selectedIds.length === 0;
   const [seriesQuery, setSeriesQuery] = useState("");
   const visibleRows = useMemo(() => {
     const needle = seriesQuery.trim();
-    const functions = needle === "" ? model.rows : model.rows.filter((row) => matchesLabelQuery(needle, [row.kaLabel, row.enLabel]));
-    return [model.totalRow, ...functions];
+    const matchingRows = needle === "" ? model.rows : model.rows.filter((row) => matchesLabelQuery(needle, [row.kaLabel, row.enLabel]));
+    return [model.totalRow, ...matchingRows];
   }, [model.rows, model.totalRow, seriesQuery]);
   const normalizedSeriesQuery = seriesQuery.trim().toLowerCase();
   const hasVisibleMatches =
@@ -263,10 +264,13 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
         navigation={navigation}
         pickerCountry={props.pickerCountry}
         pickerGroups={props.pickerGroups}
+        // The view hash means the same on every place page (functions, mode, range, share): keep it (U09-17).
+        carryHash
       />
 
       <EntityWorkspaceShell
         testId="municipal-workspace"
+        asideLabel={message(messages, "controls.series")}
         main={
           <>
             <div
@@ -274,15 +278,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               className="mb-[18px] flex flex-wrap items-center justify-between gap-x-5 gap-y-3"
             >
               <span className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 [&_button]:min-h-9">
-                <SegmentedTabs<ChartMode>
-                  ariaLabel={message(messages, "municipal.viewMode")}
-                  value={state.chartMode}
-                  onChange={state.setChartMode}
-                  options={[
-                    { value: "line", label: message(messages, "municipal.line"), testId: "municipal-mode-line" },
-                    { value: "table", label: message(messages, "municipal.table"), testId: "municipal-mode-table" },
-                  ]}
-                />
+                <ModeTabs value={state.chartMode} onChange={state.setChartMode} testId="municipal" />
                 {/* Phones keep the pill on this row: the caption shortens to the unit, and
                     in share mode the pressed "% წილი" pill names the unit itself. */}
                 <span data-testid="municipal-measure-label" className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">
@@ -305,7 +301,8 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               </button>
             </div>
 
-            {state.chartMode === "line" && noSelection ? (
+            {/* Both views say what to do with nothing selected, as the national and wages explorers do (U09-10). */}
+            {noSelection ? (
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "municipal.noSelection")}</Callout>
               </div>
@@ -325,7 +322,14 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
                 shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
               />
             )}
-            <ChartSelectionAids series={series} chartShown={state.chartMode === "line"} share={state.share} unit={unit} />
+            <ChartSelectionAids
+              series={series}
+              chartShown={state.chartMode === "line"}
+              share={state.share}
+              unit={unit}
+              // The phone legend prints each amount as the series panel does (U09-16).
+              formatValue={state.share ? undefined : (value) => formatAmount(value, locale)}
+            />
 
             {/* allYears, never model.years — the strip must offer the full span
                 even when the selection has narrowed it. The strip draws its own rule. */}
@@ -381,6 +385,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
 
             <Link
               href={pageHref("/explorer/municipalities", locale)}
+              prefetch={false}
               className="mt-1.5 flex min-h-11 items-center text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
             >
               {message(messages, "municipal.allMunicipalities")}

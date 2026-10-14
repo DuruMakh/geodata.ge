@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/rank.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { rank } from "../../lib/factQuery/rank";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -9,7 +9,7 @@ import type { RankData } from "../../lib/factQuery/rank";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
 });
 
 const data = (result: ReturnType<typeof rank>) => (result as { data: RankData }).data;

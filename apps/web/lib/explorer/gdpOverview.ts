@@ -21,7 +21,7 @@ export function seriesFor(state: GdpState) {
       ? "real_growth_percent"
       : `${state.indicator}_${state.currency}`;
 }
-export function resolveGdpRange(
+function resolveGdpRange(
   state: GdpState,
   facts: ClientGdpObservation[],
 ) {

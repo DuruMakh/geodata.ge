@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import { MISSING } from "../../lib/explorer/format";
 import { formatInflationValue, seriesLabel } from "../../lib/explorer/inflationLabels";
-import { INFLATION_COLORS, SELECTION_ORDER, panelValue, type InflationIndex, type InflationSelectionKey, type InflationState, type ResolvedPeriodRange } from "../../lib/explorer/inflationOverview";
+import { INFLATION_COLORS, SELECTION_ORDER, drawableKeys, drawableSelection, panelValue, type InflationIndex, type InflationSelectionKey, type InflationState, type ResolvedPeriodRange } from "../../lib/explorer/inflationOverview";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { matchesLabelQuery } from "../../lib/i18n/search";
@@ -13,6 +13,8 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 
 // A thin composition of the shared selector, as DebtSeriesPanel is. The target
 // is a reference row with a dashed swatch; values follow the active tab and range.
+// A row the active tab cannot draw (the target off annual inflation, core on the
+// index) stays listed but inert, and the count leaves it out (U13-04).
 
 type InflationSeriesPanelProps = {
   index: InflationIndex;
@@ -29,6 +31,8 @@ export function InflationSeriesPanel({ index, targets, state, range, onToggle, o
   const [query, setQuery] = useState("");
   const rows = SELECTION_ORDER.map((key) => ({ key, label: seriesLabel(messages, key, state.tab), value: panelValue(index, targets, key, state, range) }));
   const visible = rows.filter((row) => matchesLabelQuery(query, [row.label, row.key]));
+  const drawable = drawableKeys(index, state.tab);
+  const counted = drawableSelection(index, state);
 
   return (
     <SeriesAside label={message(messages, "controls.series")}>
@@ -37,9 +41,9 @@ export function InflationSeriesPanel({ index, targets, state, range, onToggle, o
         onQueryChange={setQuery}
         searchPlaceholder={message(messages, "controls.search")}
         searchable={rows.length > SEARCHABLE_MIN_ROWS}
-        selectedCount={state.selected.length}
-        totalCount={rows.length}
-        hasSelection={state.selected.length > 0}
+        selectedCount={counted.length}
+        totalCount={drawable.length}
+        hasSelection={counted.length > 0}
         allSelected={false}
         onToggleAll={onClear}
         allowSelectAll={false}
@@ -54,6 +58,7 @@ export function InflationSeriesPanel({ index, targets, state, range, onToggle, o
             value={row.value === null ? MISSING : formatInflationValue(row.value, state.tab)}
             selected={state.selected.includes(row.key)}
             swatch={row.key === "target" ? "dashed" : "solid"}
+            disabledReason={drawable.includes(row.key) ? undefined : message(messages, "inflation.notOnTab")}
             onToggle={() => onToggle(row.key)}
           />
         ))}

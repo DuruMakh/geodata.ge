@@ -1,12 +1,12 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test, vi } from "vitest";
 import { renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 vi.mock("next/navigation", async (original) => ({ ...(await original<typeof import("next/navigation")>()), notFound: () => { throw new Error("not found"); } }));
 
 // Age and sex shows the same index with no link metric: the regions are shapes and rows to look at, not doors.
 test("age and sex regional glance: no links, no arrows and no tab stops in the map or the list", async () => {
-  const page = renderToStaticMarkup(await renderDemographyAgeSexPage("en"));
+  const page = renderPageMarkup("en", await renderDemographyAgeSexPage("en"));
   // The section opens with the same ink rule as the pyramid and the heat map above it.
   expect(page).toMatch(/data-testid="age-sex-regions" class="[^"]*mt-16 border-t-2 border-\[var\(--ink\)\]/);
   const start = page.indexOf('data-testid="regional-index-workspace"');

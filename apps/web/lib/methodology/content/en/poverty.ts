@@ -5,6 +5,7 @@ export const POVERTY_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "poverty",
   "title": "Poverty and inequality",
   "summary": "The share of Georgia’s population below the absolute, relative and international poverty lines, by settlement type, age and sex, and Gini coefficients of income and expenditure, from Geostat’s household survey.",
+  "metaDescription": "Georgia’s population below the absolute, relative and international poverty lines by settlement, age and sex, and Gini coefficients, from Geostat.",
   "reviewedAt": "2026-10-10",
   "archiveManifestId": "poverty",
   "coverageSource": {

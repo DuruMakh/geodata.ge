@@ -4,7 +4,7 @@ import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import type { ClientNationalGdpFact } from "./clientData";
 import { buildMoneyBanksModel, moneyBanksHasTotalRow, moneyBanksViewFacts, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
-import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const MILLION = 1_000_000;
 
@@ -21,12 +21,7 @@ export function buildMoneyBanksWorkbookExportModel(input: {
   const model = buildMoneyBanksModel(section, input.facts, state, input.gdpFacts);
   const facts = moneyBanksViewFacts(state.view, input.facts, input.gdpFacts ?? []);
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.year}`, f]));
-  const neededYears = new Map<string, Set<number>>();
-  for (const series of model.selected) for (const year of model.years) {
-    const fact = byCell.get(`${series.id}:${year}`);
-    if (fact) neededYears.set(fact.sourceId, (neededYears.get(fact.sourceId) ?? new Set<number>()).add(year));
-  }
-  const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
+  const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) => byCell.get(`${series.id}:${year}`)?.sourceId));
   const isAmount = model.unit === "gel";
   const isGdp = state.view === "gdp";
   const unitLabel = isGdp ? workbookMessage(locale, "workbook.percentGdp") : t(isAmount ? "unitMlnGel" : "unitPercent");

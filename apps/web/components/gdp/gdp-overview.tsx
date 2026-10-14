@@ -18,16 +18,18 @@ import {
 import {
   buildGdpWorkbookExportModel,
   gdpDisplay,
+  gdpSelectionSources,
 } from "../../lib/explorer/gdpWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { PageHeader } from "../shell/page-header";
-import { TextTab, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { TextTab, TextTabGroup, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { GdpSummary } from "./gdp-summary";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { formatGdpLatestValue } from "../../lib/explorer/latestValue";
@@ -100,26 +102,29 @@ export function GdpOverview({
       color: INK,
       // Shared chart percentages use points; table and workbook use fractions.
       vals: m.points.map((p) => d.growth ? p.value * 100 : p.value),
-      planned: m.years.map(() => false),
     },
   ];
-  const currentSources = sources.filter((s) =>
-    m.sourceIds.includes(s.sourceId),
-  );
-  function select(indicator: GdpIndicator) {
-    const next = changeGdpIndicator(state, indicator, facts),
-      nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges);
+  const currentSources = gdpSelectionSources(sources, m.sourceIds);
+  // Says what the chart now shows: two indicators can share a period, so the period alone may not change.
+  function show(next: GdpState) {
+    const nextModel = buildGdpOverviewModel(facts, next, sourceIdRanges),
+      nextDisplay = gdpDisplay(next, presentation);
     setState(next);
     setAnnouncement(
-      message(messages, "gdp.rangeChanged", {
+      `${nextDisplay.label} · ${nextDisplay.fullUnitLabel} · ${message(messages, "gdp.rangeChanged", {
         start: nextModel.range.start,
         end: nextModel.range.end,
-      }),
+      })}`,
     );
+  }
+  function select(indicator: GdpIndicator) {
+    show(changeGdpIndicator(state, indicator, facts));
   }
   return (
     <ExplorerPage testId="gdp-overview" containerQueries={false}>
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           {
             label: message(messages, "common.home"),
@@ -144,21 +149,11 @@ export function GdpOverview({
           note={latest.status === "preliminary" ? t("preliminary") : undefined}
         />
       ) : null}
-      <p
-        data-testid="gdp-unit"
-        className="mb-4 text-[13px] text-[var(--muted)]"
-      >
-        {state.indicator === "real" || d.growth
-          ? d.fullUnitLabel
-          : state.indicator === "per_capita"
-            ? `${t("perPerson")} · ${t("current")}`
-            : t("current")}
-      </p>
       <div
         data-testid="gdp-indicators"
         className="mb-3 py-2"
       >
-        <div className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
+        <TextTabGroup ariaLabel={t("indicator")} className="flex flex-wrap justify-center gap-x-7 gap-y-3 px-1">
           {(["real", "nominal", "growth", "per_capita"] as const).map(
             (id) => (
               <TextTab
@@ -170,7 +165,7 @@ export function GdpOverview({
               />
             ),
           )}
-        </div>
+        </TextTabGroup>
       </div>
       <p role="status" className="sr-only">
         {announcement}
@@ -180,33 +175,17 @@ export function GdpOverview({
         className="border-t border-[var(--ink)] pt-3"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <SegmentedTabs
-            ariaLabel={message(messages, "controls.viewMode")}
-            value={state.mode}
-            onChange={(mode) => setState((s) => ({ ...s, mode }))}
-            options={[
-              {
-                value: "line",
-                label: message(messages, "controls.chart"),
-                testId: "chart-mode-line",
-              },
-              {
-                value: "table",
-                label: message(messages, "controls.table"),
-                testId: "chart-mode-table",
-              },
-            ]}
-          />
+          <ModeTabs value={state.mode} onChange={(mode) => setState((s) => ({ ...s, mode }))} />
           {state.indicator === "nominal" ||
           state.indicator === "per_capita" ? (
             <div data-testid="gdp-currency" className="[&_button]:min-w-[40px]">
               <SegmentedTabs
                 ariaLabel={t("currency")}
                 value={state.currency}
-                onChange={(currency) => setState((s) => ({ ...s, currency }))}
+                onChange={(currency) => show({ ...state, currency })}
                 options={[
-                  { value: "gel", label: "₾", ariaLabel: "GEL" },
-                  { value: "usd", label: "$", ariaLabel: "USD" },
+                  { value: "gel", label: t("gel"), icon: <span aria-hidden="true" className="text-base">₾</span> },
+                  { value: "usd", label: t("usd"), icon: <span aria-hidden="true" className="text-base">$</span> },
                 ]}
               />
             </div>
@@ -267,6 +246,9 @@ export function GdpOverview({
       />
       <div className="mt-5 space-y-2">
         <SourceNote>
+          {/* The price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
+          <span data-testid="gdp-unit">{state.indicator === "real" ? t("constant") : d.growth ? t("percent") : t("current")}</span>
+          {" · "}
           {state.indicator === "real" || state.indicator === "growth" ? (
             <>
               {t("wbNote")} {" "}
@@ -288,6 +270,7 @@ export function GdpOverview({
         </SourceNote>
         <Link
           href={pageHref("/methodology/gdp", locale)}
+          prefetch={false}
           className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4"
         >
           {t("methodology")}

@@ -1,5 +1,5 @@
 import { serviceMessage } from "../../../lib/factQuery/localization";
-import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../../helpers/factQuerySnapshot";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/engine.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
@@ -7,7 +7,7 @@ import { evaluateCaveats, type CaveatContext, type CaveatRule } from "../../../l
 import { CAVEAT_RULES } from "../../../lib/factQuery/caveats";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 const BASE: CaveatContext = {
   datasetId: "national-revenue",

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LIMITS } from "../../lib/mcp/result";
-import { createCounter, isPaused, memoryCounter } from "../../lib/mcp/limits";
+import { RATE_PER_KEY_DAILY_MAX, createCounter, isPaused, memoryCounter } from "../../lib/mcp/limits";
 import { logToolCall, type ToolCallLog } from "../../lib/mcp/log";
 
 const original = { ...process.env };
@@ -75,6 +75,8 @@ describe("the shared counter", () => {
     expect(LIMITS.cells).toBe(500);
     expect(LIMITS.resultBytes).toBe(512 * 1024);
     expect(LIMITS.durationMs).toBe(10_000);
+    // Owner decision 2026-10-12: one client key gets 1,000 requests per UTC day.
+    expect(RATE_PER_KEY_DAILY_MAX).toBe(1_000);
   });
 });
 

@@ -9,6 +9,7 @@ import {
 import { REGIONAL_GDP_TOTAL } from "../lib/data/regionalEconomies/types";
 import { assertGeneratedArtifactMatches } from "../lib/data/generatedArtifacts";
 import { buildRegionalEconomiesCsv } from "../lib/factQuery/publications";
+import { loadPackagedSnapshot } from "../lib/mcp/snapshot";
 
 async function main() {
   const repositoryRoot = path.resolve(process.cwd(), "../..");
@@ -35,12 +36,24 @@ async function main() {
     localization,
   });
   const file = path.resolve("public/downloads/data/regional-economies.csv");
-  if (process.argv.includes("--check")) {
-    await assertGeneratedArtifactMatches("public regional economies", file, bytes.toString("utf8"));
-  } else {
+  if (!process.argv.includes("--check")) {
     await fs.mkdir(path.dirname(file), { recursive: true });
     await fs.writeFile(file, bytes);
+    // data:prepare-fact-query-publications rewrites this file later in the same chain from the snapshot
+    // written just before this step; both paths must produce the same bytes. Checked here, before the build,
+    // instead of re-reading the file after it.
+    const rerun = "run `npm run data:prepare-fact-query-snapshot` first";
+    let snapshot: ReturnType<typeof loadPackagedSnapshot>;
+    try {
+      snapshot = loadPackagedSnapshot();
+    } catch (error) {
+      throw new Error(`The /mcp snapshot this step compares against could not be loaded; ${rerun}`, { cause: error });
+    }
+    if (!buildRegionalEconomiesCsv(snapshot).bytes.equals(bytes)) {
+      throw new Error(`The snapshot's regional-economies.csv differs from the one built from the reviewed CSVs; if a regional CSV changed since the snapshot was built, ${rerun}`);
+    }
   }
+  await assertGeneratedArtifactMatches("public regional economies", file, bytes.toString("utf8"));
   console.log(`Regional economies public CSV: ${facts.length} observations`);
 }
 

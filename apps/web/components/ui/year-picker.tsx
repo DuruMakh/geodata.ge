@@ -133,7 +133,10 @@ export function YearPicker({
         </button>
         {open ? (
           <>
-            <div aria-hidden className="fixed inset-0 z-30" onClick={close} />
+            {/* An outside press keeps the default focus move from happening (it would land on the #content skip target,
+                tabIndex -1, instead of the trigger) and closes on its click: the overlay stays until then and takes
+                that click, so a tap never also presses what lies beneath. */}
+            <div aria-hidden className="fixed inset-0 z-30" onMouseDown={(event) => event.preventDefault()} onClick={close} />
             {/* Mouse presses in the panel never take focus from the list, so Escape and the arrows keep working. */}
             <div ref={panelRef} data-testid={`${testId}-panel`} onMouseDown={(event) => event.preventDefault()} className="absolute top-full left-0 z-40 mt-1 w-[248px] max-w-[92vw] border border-[var(--control)] bg-[var(--tile)]">
               <div

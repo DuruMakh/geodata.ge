@@ -2,7 +2,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
+import { SourceArchive, type PublicSourceManifestRow } from "../../components/methodology/source-archive";
 import { METHODOLOGY_CONTENT } from "../../lib/methodology/catalog";
+import { resolveSiteUrl } from "../../lib/siteUrl";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 import common from "../../lib/i18n/messages/ka/common.json";
@@ -18,24 +20,9 @@ vi.mock("../../lib/data/governmentDebt/importGovernmentDebtFacts", async (import
   return { ...actual, loadServedGovernmentDebtData: vi.fn(actual.loadServedGovernmentDebtData) };
 });
 
-// The archive report is written by `prebuild`, and CI runs the tests before the
-// build, so a fresh checkout has no report to read. Nothing here is about the
-// archives: every live article gets the same validated summary.
-vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../lib/methodology/prepareArchives")>();
-  const { LIVE_METHODOLOGY_IDS } = await import("../../lib/methodology/catalog");
-  return {
-    ...actual,
-    loadGeneratedArchiveSummaries: vi.fn(async () =>
-      Object.fromEntries(
-        LIVE_METHODOLOGY_IDS.map((id) => [
-          id,
-          { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true, status: "PASS", minYear: 2004, maxYear: 2025 },
-        ]),
-      ),
-    ),
-  };
-});
+// Rendering a methodology page reads the archive report that only `prebuild` writes; see the helper.
+vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) =>
+  (await import("../helpers/archive-summaries")).withValidatedArchiveSummaries(importOriginal));
 
 const archiveSummary = {
   fileCount: 1,
@@ -90,20 +77,18 @@ function renderArticle(dataset: "debt" | "expenditure") {
 }
 
 describe("methodology processed-download caption", () => {
-  it("describes the Debt CSV with neutral status metadata rather than fact/plan metadata", () => {
-    const markup = renderArticle("debt");
+  // Debt describes its CSV with neutral status metadata rather than fact/plan metadata; every category keeps
+  // its existing download link and the shared format/licence caption.
+  it.each([
+    ["debt", "/downloads/data/government-debt.csv"],
+    ["expenditure", "/downloads/data/national-expenditure.csv"],
+  ] as const)("the %s caption links %s with status metadata and the shared format/licence line", (dataset, href) => {
+    const markup = renderArticle(dataset);
 
-    expect(markup).toContain('href="/downloads/data/government-debt.csv"');
-    expect(markup).toContain("სტატუსის მეტამონაცემებით");
-    expect(markup).not.toContain("ფაქტი/გეგმის მეტამონაცემებით");
-  });
-
-  it("preserves the existing category download link and shared format/licence caption", () => {
-    const markup = renderArticle("expenditure");
-
-    expect(markup).toContain('href="/downloads/data/national-expenditure.csv"');
+    expect(markup).toContain(`href="${href}"`);
     expect(markup).toContain("UTF-8 / Excel თავსებადი · CC BY 4.0");
     expect(markup).toContain("სტატუსის მეტამონაცემებით");
+    if (dataset === "debt") expect(markup).not.toContain("ფაქტი/გეგმის მეტამონაცემებით");
   });
 });
 
@@ -186,4 +171,93 @@ describe("methodology without bulk files", () => {
     expect(catalog).not.toContain("/methodology/demography");
     expect(markup).toContain('href="/en/methodology/demography"');
   });
+});
+
+// U29-04: the debt data is government debt, not the wider state debt the page's own caveat rules out.
+it.each([
+  ["ka", "მთავრობის ვალი"],
+  ["en", "Government debt"],
+] as const)("names the %s debt JSON download government debt", async (locale, label) => {
+  const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+  const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "debt" }) }));
+  expect(markup).toMatch(new RegExp(`<a href="/downloads/data/government-debt.json"[^>]*>${label}</a>`));
+});
+
+// U29-02: a year filter with more chips than files pushed a short table far down a phone screen.
+describe("the source archive's year filter", () => {
+  const sourceRow = (index: number): PublicSourceManifestRow => ({
+    source_id: `source-${index}`, year: "1960–2025", years: Array.from({ length: 66 }, (_, offset) => 1960 + offset),
+    official_filename: `file-${index}.xlsx`, byte_size: 1000, downloadHref: `/downloads/methodology/gdp/files/file-${index}.xlsx`,
+    title: `ფაილი ${index}`, publisher: "საქსტატი", searchLabels: [], documentLanguage: "ka",
+  });
+  const render = (count: number) => renderToStaticMarkup(
+    <I18nProvider locale="ka" messages={{ ...common, ...methodology }}>
+      <SourceArchive datasetId="gdp" datasetLabel="მშპ" rows={Array.from({ length: count }, (_, index) => sourceRow(index))} summary={archiveSummary} />
+    </I18nProvider>,
+  );
+
+  it("is hidden for twelve files or fewer, keeping the search box", () => {
+    const markup = render(12);
+    expect(markup).not.toContain('data-testid="archive-year-filter"');
+    expect(markup).toContain('type="search"');
+    expect(markup.match(/data-testid="source-archive-row"/g)).toHaveLength(12);
+    expect(markup).toContain("1960–2025");
+  });
+
+  it("is shown for thirteen files", () => {
+    const markup = render(13);
+    expect(markup).toContain('data-testid="archive-year-filter"');
+    expect(markup).toContain(">1960</button>");
+  });
+
+  // U29-16, U29-17: a row's title and publisher are readable at body size, and a year range takes one dash everywhere.
+  it("prints a year range with an en dash and the title and publisher at body size", () => {
+    const markup = renderToStaticMarkup(
+      <I18nProvider locale="ka" messages={{ ...common, ...methodology }}>
+        <SourceArchive datasetId="gdp" datasetLabel="მშპ" rows={[{ ...sourceRow(0), year: "2019-2024" }]} summary={archiveSummary} />
+      </I18nProvider>,
+    );
+    expect(markup).toContain(">2019–2024</td>");
+    expect(markup).not.toContain("2019-2024");
+    expect(markup).toMatch(/<span class="block text-\[0.8125rem\] font-semibold[^"]*">ფაილი 0<\/span>/);
+    expect(markup).toMatch(/<span class="mt-1 block text-\[0.75rem\][^"]*">საქსტატი<\/span>/);
+  });
+});
+
+// Moved from inflation-overview.spec.ts: the methodology Dataset is the node the catalog references.
+it("makes the inflation methodology Dataset the node the catalog references, in each language", async () => {
+  const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+  const { renderMethodologyPage } = await import("../../lib/pages/methodology");
+  const dataset = async (locale: "ka" | "en") => {
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "inflation" }) }));
+    return JSON.parse(markup.match(/<script data-testid="dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!);
+  };
+  const messages = await getMessages("ka", ["common", "methodology"]);
+  const hub = renderToStaticMarkup(<I18nProvider locale="ka" messages={messages}>{await renderMethodologyPage("ka")}</I18nProvider>);
+  const catalog = JSON.parse(hub.match(/<script data-testid="catalog-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!);
+  const origin = resolveSiteUrl();
+  const id = `${origin}/methodology/inflation`;
+  expect(catalog.dataset.map((entry: { "@id": string }) => entry["@id"])).toContain(id);
+  const georgian = await dataset("ka");
+  expect(georgian["@id"]).toBe(id);
+  expect(georgian.includedInDataCatalog["@id"]).toBe(`${origin}/methodology#catalog`);
+  expect(georgian.distribution[0].contentUrl).toBe(`${origin}/downloads/data/inflation-cpi-national.csv`);
+  // The English page is the English node, in the English catalog.
+  const english = await dataset("en");
+  expect(english["@id"]).toBe(`${origin}/en/methodology/inflation`);
+  expect(english.includedInDataCatalog["@id"]).toBe(`${origin}/en/methodology#catalog`);
+});
+
+// U29-13: the unused document-stack figure and the LINEAGE re-export are gone; only the open-document figure is drawn.
+it("document visuals export only the figure a page draws", async () => {
+  expect(Object.keys(await import("../../components/methodology/document-visuals"))).toEqual(["OpenDocumentVisual"]);
+});
+
+// U29-18: the English GDP archive named three World Bank files by their file name twice; they get reviewed titles.
+it("titles every English GDP source document, not by its file name", async () => {
+  const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+  const messages = await getMessages("en", ["common", "methodology"]);
+  const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={messages}>{await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "gdp" }) })}</I18nProvider>);
+  for (const title of ["World Bank · Real GDP", "World Bank · Annual GDP growth", "World Bank · GDP indicator metadata"]) expect(markup).toContain(`>${title}</span>`);
+  expect(markup).not.toMatch(/font-semibold[^"]*">[^<]*\.json<\/span>/);
 });

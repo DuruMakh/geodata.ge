@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-const PAGE_CLASS = "min-h-screen bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]";
+const PAGE_CLASS = "bg-[var(--paper)] px-5 pb-16 text-[var(--ink)] min-[768px]:px-[34px]";
 
 /**
  * The explorer page wrapper and its centred column (DESIGN.md §12).

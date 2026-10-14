@@ -4,6 +4,7 @@ import {
   buildCategoryIndex,
   buildStackModel,
   categoryCoverage,
+  categoryTabLoaded,
   changeCategoryTab,
   parseCategoryHash,
   resolveCategoryRange,
@@ -178,6 +179,22 @@ describe("packCategoryFacts", () => {
     expect(viaWire.order).toEqual(direct.order);
     expect(viaWire.tree).toEqual(direct.tree);
     expect([...viaWire.contributions]).toEqual([...direct.contributions]);
+  });
+});
+
+// U13-03: the monthly runs load only for the monthly tab, and the page reads this to know they are there.
+describe("categoryTabLoaded", () => {
+  it("knows the monthly tab has no data until its runs join the annual ones", () => {
+    const annualOnly = fixtureFacts.filter((entry) => entry.measure === "yoy_pct");
+    expect(fixtureFacts.some((entry) => entry.measure === "mom_pct")).toBe(true);
+    const before = buildCategoryIndex(unpackCategoryFacts(packCategoryFacts(annualOnly)), fixtureWeights);
+    expect(categoryTabLoaded(before, "contrib")).toBe(true);
+    expect(categoryTabLoaded(before, "yoy")).toBe(true);
+    expect(categoryTabLoaded(before, "mom")).toBe(false);
+    const monthly = packCategoryFacts(fixtureFacts.filter((entry) => entry.measure === "mom_pct"));
+    const after = buildCategoryIndex(unpackCategoryFacts([...packCategoryFacts(annualOnly), ...monthly]), fixtureWeights);
+    expect(categoryTabLoaded(after, "mom")).toBe(true);
+    expect(after.values).toEqual(buildCategoryIndex(fixtureFacts, fixtureWeights).values);
   });
 });
 

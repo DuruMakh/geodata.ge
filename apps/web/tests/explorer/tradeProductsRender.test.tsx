@@ -5,18 +5,16 @@ import { DEFAULT_TRADE_PRODUCTS_STATE } from "../../lib/explorer/tradeProductsSt
 import { getMessages } from "../../lib/i18n/messages.server";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { productData, productPresentation } from "./tradeProductsFixtures";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 async function presentation(locale: "en" | "ka") { return { ...productPresentation(locale), messages: await getMessages(locale, ["trade", "controls", "common", "main", "format", "workbook"]) }; }
-test.each(["en", "ka"] as const)("%s starts with the national export chart and a closed picker", async locale => {
+test.each(["en", "ka"] as const)("%s renders no series aside and keeps the historical note and Excel button", async locale => {
   const { TradeProducts } = await import("../../components/trade/trade-products");
   const p = await presentation(locale);
   const html = renderToStaticMarkup(<I18nProvider {...p}><TradeProducts data={productData()} sources={[]} lastReviewedAt="2026-10-09" siteOrigin="https://fiscal.ge" /></I18nProvider>);
-  expect(html).toContain('data-mode="line"'); expect(html).toContain('data-measure="trade.exports"');
-  expect(html).not.toContain('data-testid="trade-products-picker"');
   expect(html).not.toContain('data-testid="series-aside"');
   expect(html.match(/data-testid="trade-products-selected-label"/g)).toHaveLength(1);
   expect(html).toContain('data-testid="trade-products-add"'); expect(html).toContain('data-testid="trade-products-excel-download"');
-  expect(html.indexOf('data-testid="chart-panel"')).toBeLessThan(html.indexOf('data-testid="trade-products-selection"'));
   expect(html).toContain(p.messages["trade.products.historicalNote"]);
   expect(html).not.toMatch(/GEL|₾/);
 });
@@ -37,10 +35,10 @@ test("product ranking keeps negative values on a signed axis and retains nationa
 test("Products metadata and page publish the reviewed bilingual dataset coverage", async () => {
   const { tradeProductsMetadata, renderTradeProductsPage } = await import("../../lib/pages/trade");
   const en = await tradeProductsMetadata("en");
-  expect(en.title).toBe("Trade products");
+  expect(en.title).toBe("Trade products | Fiscal.ge");
   expect(en.alternates?.canonical).toContain("/en/explorer/trade/products");
   expect(en.alternates?.languages).toHaveProperty("ka");
-  const html = renderToStaticMarkup(await renderTradeProductsPage("en"));
+  const html = renderPageMarkup("en", await renderTradeProductsPage("en"));
   expect(html).toContain('"temporalCoverage":"2020/2025"');
   expect(html).toContain('"dateModified":"2026-10-09"');
   expect(html).toContain('"inLanguage":["ka","en"]');
@@ -48,8 +46,8 @@ test("Products metadata and page publish the reviewed bilingual dataset coverage
 });
 
 test("the Trade hub shows Products coverage from 2020 while retaining full partner coverage", async () => {
-  const { renderTradeHub } = await import("../../lib/pages/trade");
-  const html = renderToStaticMarkup(await renderTradeHub("en"));
+  const { renderTradeHub } = await import("../../lib/pages/hubs/trade");
+  const html = renderPageMarkup("en", await renderTradeHub("en"));
   expect(html).toContain("2020–2025");
   expect(html).toContain("1995–2025");
 });

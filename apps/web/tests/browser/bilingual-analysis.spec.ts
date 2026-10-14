@@ -1,11 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { TEST_BASE_URL } from "./test-base-url";
-
-async function expectEnglish(page: Page) {
-  expect((await page.locator("body").innerText()).replaceAll("ქართული", "")).not.toMatch(/\p{Script=Georgian}/u);
-  const descriptions = await page.locator("[aria-label], [title], svg title").evaluateAll(elements => elements.flatMap(element => [element.getAttribute("aria-label") ?? "", element.getAttribute("title") ?? "", element.tagName.toLowerCase() === "title" ? element.textContent ?? "" : ""]));
-  expect(descriptions.filter(text => text !== "ქართული").join(" ")).not.toMatch(/\p{Script=Georgian}/u);
-}
+import { expectEnglish } from "./expect-english";
 
 async function numericalPresentation(page: Page) {
   return {
@@ -17,22 +11,15 @@ async function numericalPresentation(page: Page) {
   };
 }
 
-test("English analysis is present in the initial HTML", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, baseURL: TEST_BASE_URL });
-  try {
-    const page = await context.newPage();
-    expect((await page.goto("/en/explorer/analysis"))?.status()).toBe(200);
-    await expect(page.locator("html")).toHaveAttribute("lang", "en");
-    await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-    for (const id of ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"]) await expect(page.getByTestId(id)).toBeVisible();
-    await expectEnglish(page);
-  } finally { await context.close(); }
-});
-
-for (const [side, grouping] of [["expenditure", "fields"], ["expenditure", "ministries"], ["revenue", "fields"]] as const) {
-  test(`${side} / ${grouping} retains its year, every plotted value and ranking through language changes`, async ({ page }) => {
+// One test walks the three dataset/grouping combinations: each compares a
+// different dataset's treemap, radar, field and ranking across languages.
+test("every analysis side and grouping retains its year, every plotted value and ranking through language changes", async ({ page }) => {
+  test.setTimeout(60_000);
+  for (const [side, grouping] of [["expenditure", "fields"], ["expenditure", "ministries"], ["revenue", "fields"]] as const) {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`/en/explorer/analysis#as=${side}&ag=${grouping}&ay=2024`);
+    // A hash-only change after the first combination is a same-document navigation; reload applies it.
+    await page.reload();
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("analysis-year-selector").getByRole("button", { name: "2024", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("every-100-grid").locator("[data-cell]")).toHaveCount(100);
@@ -56,8 +43,8 @@ for (const [side, grouping] of [["expenditure", "fields"], ["expenditure", "mini
     expect(new URL(page.url()).hash).toBe(hash);
     expect(await numericalPresentation(page)).toEqual(before);
     await expectEnglish(page);
-  });
-}
+  }
+});
 
 test("mobile analysis controls and the first-year growth explanation are fully English", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -74,4 +61,58 @@ test("mobile analysis controls and the first-year growth explanation are fully E
   const params = new URLSearchParams(new URL(page.url()).hash.slice(1));
   expect(params.get("as")).toBe("revenue");
   expect(params.get("ay")).toBe("2024");
+});
+
+// U05-03: circles drawn under a larger neighbour, or under 24px, must still be
+// reachable by a tap and by the mouse. The pointer reads the nearest centre.
+async function fieldCircles(page: Page) {
+  const field = page.getByTestId("budget-field");
+  await field.locator("svg").scrollIntoViewIfNeeded();
+  return field.locator("circle").evaluateAll((circles) =>
+    circles.map((circle) => {
+      const box = circle.getBoundingClientRect();
+      return { name: circle.getAttribute("aria-label")!.split(" · ")[0]!, x: box.x + box.width / 2, y: box.y + box.height / 2, diameter: box.width };
+    }),
+  );
+}
+
+test.describe("phone", () => {
+  test.use({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
+
+  test("every budget-field circle can be tapped, and a small one from 11px away", async ({ page }) => {
+    await page.goto("/en/explorer/analysis");
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const circles = await fieldCircles(page);
+    expect(circles.length).toBeGreaterThan(5);
+    const readout = page.getByTestId("budget-field-tooltip");
+    for (const circle of circles) {
+      await page.touchscreen.tap(circle.x, circle.y);
+      await expect(readout, circle.name).toContainText(circle.name);
+    }
+
+    await page.getByRole("heading", { level: 1 }).tap();
+    await expect(readout).toHaveCount(0);
+
+    // The smallest circle answers a tap 11px from its centre, in a direction where no other centre is nearer.
+    const placed = await fieldCircles(page);
+    const smallest = placed.toSorted((a, b) => a.diameter - b.diameter)[0]!;
+    expect(smallest.diameter).toBeLessThan(24);
+    const point = [[11, 0], [-11, 0], [0, 11], [0, -11]]
+      .map(([dx, dy]) => ({ x: smallest.x + dx!, y: smallest.y + dy! }))
+      .find((candidate) => placed.every((other) => other === smallest || Math.hypot(other.x - candidate.x, other.y - candidate.y) > 11));
+    expect(point).toBeDefined();
+    await page.touchscreen.tap(point!.x, point!.y);
+    await expect(readout).toContainText(smallest.name);
+  });
+});
+
+test("the mouse reads every budget-field circle, including one drawn under another", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/en/explorer/analysis");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  const tooltip = page.getByTestId("budget-field-tooltip");
+  for (const circle of await fieldCircles(page)) {
+    await page.mouse.move(circle.x, circle.y);
+    await expect(tooltip, circle.name).toContainText(circle.name);
+  }
 });

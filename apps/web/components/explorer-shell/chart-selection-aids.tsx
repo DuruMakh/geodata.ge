@@ -5,32 +5,64 @@ import { useEffect, useRef, useState } from "react";
 import { formatInUnit, formatShare, MISSING, type ValueUnit } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
+import { TOOLTIP_ROW_CAP } from "../main-explorer/editorial-line-chart";
 import { SwatchBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 
-// Owner decision D4 (2026-10-07), phones only. Rendered directly under the chart (or
+// Owner decision D4 (2026-10-07), stacked layouts only. Rendered directly under the chart (or
 // table) inside its chart panel (the nearest [data-chart-panel] or <section>):
 // - a compact legend of the selected lines, each with its latest value, when two or more
-//   lines are drawn (below 768px of column width);
+//   lines are drawn, up to the page's cap (ten by default) (below 1100px of column width, while the series list sits below the
+//   chart: owner decision Q4, 2026-10-12);
 // - a floating "↑ chart" pill that appears when the selection changes while the chart is
 //   off-screen (stacked layouts, below 1100px), and leads back to it.
 
-export type AidSeries = { id: string; label: string; color: string; vals: (number | null)[] };
+export type AidSeries = { id: string; label: string; color: string; vals: (number | null)[]; forecastFromYear?: number };
 
 /** How long the pill waits for the next selection change before it leaves. */
-export const RETURN_PILL_MS = 4000;
+const RETURN_PILL_MS = 4000;
 const SWATCH_CAP = 6;
 
-/** The legend's value for a line: its value in the last period drawn, formatted like the chart. */
+/** Whether the legend lists `lines` lines: two or more, and no more than the cap (by default the tooltip's ten rows). */
+export function legendShown(lines: number, legendCap: number = TOOLTIP_ROW_CAP): boolean {
+  return lines >= 2 && lines <= legendCap;
+}
+
+/**
+ * The legend's value for a line: its value in the last period drawn, formatted like the chart.
+ * A line with forecast years reads its last non-forecast period instead, with that period's year
+ * when later (forecast) years are drawn: a projection is never read as the latest value.
+ */
 export function legendValue(
   vals: readonly (number | null)[],
-  { share, unit, formatValue }: { share: boolean; unit: ValueUnit; formatValue?: (value: number, seriesId: string) => string },
+  {
+    share,
+    unit,
+    formatValue,
+    years,
+    forecastFromYear,
+  }: {
+    share: boolean;
+    unit: ValueUnit;
+    formatValue?: (value: number, seriesId: string) => string;
+    /** The periods drawn, one per value; needed with `forecastFromYear`. */
+    years?: readonly number[];
+    forecastFromYear?: number;
+  },
   seriesId = "",
 ): string {
-  const value = vals.at(-1);
+  const index =
+    forecastFromYear === undefined || years === undefined
+      ? vals.length - 1
+      : years.findLastIndex((year, period) => period < vals.length && year < forecastFromYear);
+  const value = vals[index];
   if (value === null || value === undefined) return MISSING;
-  if (formatValue) return formatValue(value, seriesId);
-  return share ? formatShare(value / 100) : `${formatInUnit(value, unit)} ${unit.label}`.trim();
+  const text = formatValue
+    ? formatValue(value, seriesId)
+    : share
+      ? formatShare(value / 100)
+      : `${formatInUnit(value, unit)} ${unit.label}`.trim();
+  return index < vals.length - 1 && years ? `${text} · ${years[index]}` : text;
 }
 
 /** Whether `visible` px of a `height` px element are enough to call it in view on a `viewport` px screen. */
@@ -55,6 +87,7 @@ export function ChartSelectionAids({
   unit,
   formatValue,
   legendCap,
+  years,
 }: {
   /** The selected series, in the chart's own units (shares ×100, as EditorialLineChart takes them). */
   series: AidSeries[];
@@ -64,8 +97,10 @@ export function ChartSelectionAids({
   unit: ValueUnit;
   /** Also given the line's series id, for pages whose series are published at different precisions. */
   formatValue?: (value: number, seriesId: string) => string;
-  /** Above this many lines the legend is left out (the return pill stays); for pages with unlimited selection. */
+  /** Above this many lines the legend is left out (the return pill stays); ten unless given. */
   legendCap?: number;
+  /** The periods drawn; a page whose series carry `forecastFromYear` passes them so the legend skips projections. */
+  years?: readonly number[];
 }) {
   const { messages } = useI18n();
   const anchor = useRef<HTMLDivElement>(null);
@@ -103,13 +138,13 @@ export function ChartSelectionAids({
 
   return (
     <div ref={anchor}>
-      {chartShown && series.length >= 2 && (legendCap === undefined || series.length <= legendCap) ? (
-        <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)] @min-[768px]:hidden">
+      {chartShown && legendShown(series.length, legendCap) ? (
+        <ul data-testid="chart-phone-legend" aria-label={message(messages, "controls.legend")} className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)] @min-[1100px]:hidden">
           {series.map((line) => (
             <li key={line.id} data-legend-series-id={line.id} className="flex min-w-0 items-center gap-2">
               <SwatchBar color={line.color} />
               <span className="min-w-0 break-words">{line.label}</span>
-              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{withLari(legendValue(line.vals, { share, unit, formatValue }, line.id))}</span>
+              <span className="font-[family-name:var(--font-numeric)] whitespace-nowrap text-[var(--ink)]">{withLari(legendValue(line.vals, { share, unit, formatValue, years, forecastFromYear: line.forecastFromYear }, line.id))}</span>
             </li>
           ))}
         </ul>

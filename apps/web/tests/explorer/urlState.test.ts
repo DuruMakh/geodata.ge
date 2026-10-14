@@ -4,6 +4,9 @@ import {
   parseMunicipalHash,
   parseMunicipalLevel,
   readLegacyNav,
+  restoreExplorerSelection,
+  scopeFor,
+  serializeAnalysisHash,
   serializeExplorerHash,
   serializeMunicipalHash,
   stripNavFromHash,
@@ -19,9 +22,6 @@ describe("serializeExplorerHash", () => {
       rangeStart: 2010,
       rangeEnd: 2020,
       selectedIds: ["revenue.vat"],
-      analysisSide: "expenditure",
-      analysisGrouping: "fields",
-      analysisYear: null,
     });
 
     expect(hash).not.toContain("nav=");
@@ -29,6 +29,13 @@ describe("serializeExplorerHash", () => {
     expect(hash).toContain("sh=1");
     expect(hash).toContain("r=2010-2020");
     expect(hash).toContain("sel=revenue.vat");
+  });
+});
+
+describe("serializeAnalysisHash", () => {
+  it("writes the side, the grouping on expenditure only, and the year", () => {
+    expect(serializeAnalysisHash({ analysisSide: "expenditure", analysisGrouping: "ministries", analysisYear: 2024 })).toBe("as=expenditure&ag=ministries&ay=2024");
+    expect(serializeAnalysisHash({ analysisSide: "revenue", analysisGrouping: "ministries", analysisYear: null })).toBe("as=revenue");
   });
 });
 
@@ -59,6 +66,56 @@ describe("parseExplorerHash", () => {
     );
 
     expect(state.selection?.ids).toEqual(["admin_spending.total", "admin_program.general_education"]);
+  });
+});
+
+// U05-15: the analysis keys; the year is checked against the scope's years by the page, not the parser.
+describe("parseExplorerHash on the analysis route", () => {
+  it("keeps a known side, grouping and year and drops an unknown side or grouping", () => {
+    expect(parseExplorerHash("#as=revenue&ag=fields&ay=2019", "analysis")).toMatchObject({ analysisSide: "revenue", analysisGrouping: "fields", analysisYear: 2019 });
+    const unknown = parseExplorerHash("#as=bogus&ag=bogus", "analysis");
+    expect(unknown).not.toHaveProperty("analysisSide");
+    expect(unknown).not.toHaveProperty("analysisGrouping");
+  });
+
+  it("reads the leading digits of a year and leaves an out-of-range year to the page", () => {
+    expect(parseExplorerHash("#ay=2025abc", "analysis").analysisYear).toBe(2025);
+    expect(parseExplorerHash("#ay=1999", "analysis").analysisYear).toBe(1999);
+    expect(parseExplorerHash("#ay=abc", "analysis")).not.toHaveProperty("analysisYear");
+  });
+
+  it("keeps a ministries grouping beside the revenue side, which has no grouping", () => {
+    expect(parseExplorerHash("#as=revenue&ag=ministries", "analysis")).toMatchObject({ analysisSide: "revenue", analysisGrouping: "ministries" });
+    expect(scopeFor("revenue", "ministries")).toBe("revenue");
+  });
+});
+
+// U03-15: the restore step of the budget explorer's hash, without a browser.
+describe("restoreExplorerSelection", () => {
+  const adminFacts = [
+    { itemId: "admin_spending.education", level: "admin_category", parentItemId: null },
+    { itemId: "admin_program.education.general", level: "major_program", parentItemId: "admin_spending.education" },
+    { itemId: "admin_program.health.primary", level: "major_program", parentItemId: "admin_spending.health" },
+  ];
+  const known = new Set(["admin_spending.total", "admin_spending.education", "admin_program.education.general", "admin_program.health.primary"]);
+
+  it("drops unknown ids and opens the ministry above each selected program", () => {
+    expect(restoreExplorerSelection({ scope: "ministries", ids: ["admin_program.education.general", "admin_program.gone", "admin_program.health.primary"] }, known, adminFacts)).toEqual({
+      ids: ["admin_program.education.general", "admin_program.health.primary"],
+      expandedMinistries: ["admin_spending.education", "admin_spending.health"],
+    });
+  });
+
+  it("keeps an explicitly empty selection empty", () => {
+    expect(restoreExplorerSelection({ scope: "fields", ids: [] }, known, adminFacts)).toEqual({ ids: [], expandedMinistries: [] });
+  });
+
+  it("keeps the default when every id is unknown", () => {
+    expect(restoreExplorerSelection({ scope: "ministries", ids: ["admin_program.gone"] }, known, adminFacts)).toEqual({ ids: null, expandedMinistries: [] });
+  });
+
+  it("opens no ministry outside the ministries scope", () => {
+    expect(restoreExplorerSelection({ scope: "fields", ids: ["admin_program.education.general"] }, known, adminFacts).expandedMinistries).toEqual([]);
   });
 });
 
@@ -163,9 +220,6 @@ describe("shared hash vocabulary", () => {
       serializeExplorerHash({
         nav: "revenue",
         grouping: "fields",
-        analysisSide: "expenditure",
-        analysisGrouping: "fields",
-        analysisYear: null,
         ...shared,
       }),
     );

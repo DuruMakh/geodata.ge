@@ -13,7 +13,8 @@ import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { buildDebtDeck, buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
-import { formatAmount, formatPoints, formatShare, unitFor, unitsFor, formatDisplayDate } from "../../lib/explorer/format";
+import { formatAmount, formatPoints, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ChartMode } from "../../lib/explorer/types";
 import type {
   DebtFamily,
@@ -26,15 +27,16 @@ import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SourceNote } from "../ui/editorial";
 import { DebtSeriesPanel } from "./debt-series-panel";
 import { useDebtExplorerState } from "./use-debt-explorer-state";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 
 type DebtRange = { start: number; end: number; min: number; max: number };
 
@@ -91,6 +93,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   const noSelection = props.selectedIds.length === 0;
   const noRangeData = !noSelection && !model.points.some((point) => point.value !== null);
   const pointsBySeriesYear = new Map(model.points.map((point) => [`${point.itemId}:${point.year}`, point]));
+  const forecastStartYear = model.forecastStartYear;
   const chartSeries: ChartSeries[] = model.selectedItems.map((item) => ({
     id: item.id,
     label: publicLabel(locale, item.id, item.kaLabel, englishLabels),
@@ -99,9 +102,8 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       const value = pointsBySeriesYear.get(`${item.id}:${year}`)?.value ?? null;
       return value === null ? null : props.family === "stock" && props.shareOfGdp ? value * 100 : value;
     }),
-    planned: model.years.map(() => false),
-    ...(props.family === "service" && model.forecastStartYear !== null
-      ? { forecastFromYear: model.forecastStartYear }
+    ...(props.family === "service" && forecastStartYear !== null
+      ? { forecastFromYear: forecastStartYear, preliminary: model.years.map((year) => year >= forecastStartYear) }
       : {}),
   }));
   const totalItemId = model.items.find((item) => item.family === props.family && item.parentItemId === null)?.id;
@@ -127,6 +129,8 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   return (
     <ExplorerPage testId="debt-explorer" repeatDesktopBottomPadding>
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -136,7 +140,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
         coverage={coverage}
       />
       <ExplorerHeading>{message(messages, "debt.heading")}</ExplorerHeading>
-      <p data-testid="debt-deck" className="mb-[30px] flex min-h-[18px] flex-wrap items-baseline gap-2 text-[13px] text-[var(--body)]">
+      <p data-testid="debt-deck" className={DECK_LINE_CLASS}>
         <span className="font-[family-name:var(--font-numeric)] text-[13px] font-medium text-[var(--ink)]">
           {deck?.year}: {message(messages, FAMILY_LABEL[props.family])} · {deckValue}
         </span>
@@ -165,15 +169,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
             className="border-t border-[var(--ink)] pt-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs<ChartMode>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={props.chartMode}
-                onChange={props.onChartModeChange}
-                options={[
-                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
+              <ModeTabs value={props.chartMode} onChange={props.onChartModeChange} />
               <div className="flex items-center gap-3.5">
                 {props.family === "stock" && props.shareOfGdp ? null : (
                   <span data-testid="debt-measure-label" className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
@@ -223,10 +219,11 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                   share={isPercent}
                   unit={unit}
                   shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
+                  preliminaryLabel={message(messages, "debt.forecast")}
                 />
               </div>
             )}
-            <ChartSelectionAids series={chartSeries} chartShown={props.chartMode === "line"} share={isPercent} unit={unit} />
+            <ChartSelectionAids series={chartSeries} chartShown={props.chartMode === "line"} share={isPercent} unit={unit} years={model.years} />
 
             <RangeStrip
               years={familyYears}
@@ -251,7 +248,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
               {preliminaryGdpYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") }) : null}
               {props.family === "rate" ? message(messages, "debt.missingRates") : null}
               {props.lastUpdatedAt ? (
-                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(props.lastUpdatedAt, locale) : props.lastUpdatedAt}</span> }} /></>
+                <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(props.lastUpdatedAt, locale)}</span> }} /></>
               ) : null}
             </SourceNote>
           </div>
@@ -290,8 +287,6 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
 
 export function DebtExplorer(props: DebtExplorerProps) {
   const state = useDebtExplorerState(props.facts);
-
-  useAppReady();
 
   return (
     <DebtExplorerSurface

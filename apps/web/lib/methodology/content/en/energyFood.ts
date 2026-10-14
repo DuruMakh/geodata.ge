@@ -5,6 +5,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "energy-food",
   "title": "Energy and food",
   "summary": "Georgia’s energy supply, electricity and final energy use from Geostat’s annual energy balance, and the share of twelve main foods that the country produces itself, from Geostat’s food balance sheets.",
+  "metaDescription": "Georgia’s energy supply, electricity and final energy use from Geostat’s energy balance, and self-sufficiency in twelve main foods from its food balance sheets.",
   "reviewedAt": "2026-10-11",
   "archiveManifestId": "energy-food",
   "coverageSource": {

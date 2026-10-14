@@ -1,7 +1,7 @@
 import { ENERGY_FOOD_UNIT_DECIMALS, type ClientEnergyFoodFact, type EnergyFoodFact, type EnergyFoodIndicator } from "../data/energyFood/types";
 import { EDITORIAL_PALETTE, INK } from "./colors";
-import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
-import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
+import type { ResolvedPeriodRange } from "./periodRange";
+import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
 
 export const ENERGY_FOOD_HUB_PATH = "/explorer/energy-food";
 export const ENERGY_FOOD_SECTIONS = [
@@ -94,20 +94,18 @@ export function energyFoodUnit(section: EnergyFoodSectionId): EnergyFoodUnit {
 const ENERGY_FOOD_PALETTE = [...EDITORIAL_PALETTE, "#0D89C2", "#474A02"] as const;
 
 /** The reference is drawn in ink; `index` is the series' position among the non-reference series, so no colour repeats on a page. */
-export function energyFoodSeriesColor(series: EnergyFoodSeriesDefinition, index: number): string {
+function energyFoodSeriesColor(series: EnergyFoodSeriesDefinition, index: number): string {
   return series.reference ? INK : ENERGY_FOOD_PALETTE[index % ENERGY_FOOD_PALETTE.length];
 }
 
-export type EnergyFoodState = { mode: "line" | "table"; range: PeriodRange; selectedIds: string[] };
+export type EnergyFoodState = TopicState;
 
 const cellKey = (f: { indicatorId: string; year: number }) => `${f.indicatorId}:${f.year}`;
 
 /** A section's years: every year any of its series has a value. */
 export function energyFoodCoverage(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[]) {
   const ids = new Set<string>(energyFoodSeries(section).map(s => s.id));
-  const years = [...new Set(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year))].sort((a, b) => a - b);
-  if (!years.length) throw new Error(`No energy and food years for ${section}`);
-  return { min: years[0], max: years.at(-1)!, years };
+  return topicCoverage(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year), `No energy and food years for ${section}`);
 }
 
 export function defaultEnergyFoodState(section: EnergyFoodSectionId): EnergyFoodState {
@@ -116,38 +114,23 @@ export function defaultEnergyFoodState(section: EnergyFoodSectionId): EnergyFood
 
 /** The hash carries no tab: a legacy `tab=` key is ignored. */
 export function parseEnergyFoodHash(hash: string, section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[]): EnergyFoodState {
-  const p = new URLSearchParams(hash.replace(/^#/, ""));
   const series = energyFoodSeries(section);
-  const requested = p.has("sel") ? p.get("sel")!.split(",") : [series[0].id];
-  return {
-    mode: p.get("view") === "table" ? "table" : "line",
-    range: refitRange(parseYearRangeKeys(p), energyFoodCoverage(section, facts), { collapseToAll: true }),
-    selectedIds: series.map(s => s.id).filter(id => requested.includes(id)),
-  };
+  return parseTopicHash(new URLSearchParams(hash.replace(/^#/, "")), series, [series[0].id], energyFoodCoverage(section, facts));
 }
 
 export function serializeEnergyFoodHash(state: EnergyFoodState, _section: EnergyFoodSectionId): string {
-  const p = new URLSearchParams();
-  p.set("view", state.mode);
-  p.set("sel", state.selectedIds.join(","));
-  writeYearRangeKeys(p, state.range);
-  return p.toString();
+  return serializeTopicHash(state);
 }
 
-export type EnergyFoodSeriesModel = EnergyFoodSeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null };
+export type EnergyFoodSeriesModel = TopicSeriesModel<EnergyFoodSeriesDefinition>;
 export type EnergyFoodModel = { range: ResolvedPeriodRange; years: number[]; series: EnergyFoodSeriesModel[]; selected: EnergyFoodSeriesModel[]; decimals: number };
 
 
 export function buildEnergyFoodModel(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[], state: EnergyFoodState): EnergyFoodModel {
-  const range = resolveRange(state.range, energyFoodCoverage(section, facts));
-  const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
   const byCell = new Map(facts.map(f => [cellKey(f), f]));
   let colorIndex = 0;
-  const series = energyFoodSeries(section).map(definition => {
-    const valuesByYear = Object.fromEntries(years.map(year => [year, byCell.get(cellKey({ indicatorId: definition.id, year }))?.value ?? null]));
-    return { ...definition, color: energyFoodSeriesColor(definition, definition.reference ? 0 : colorIndex++), valuesByYear, endValue: valuesByYear[range.end] };
-  });
-  const selected = series.filter(s => state.selectedIds.includes(s.id));
+  const { range, years, series, selected } = buildTopicModel({ range: state.range, coverage: energyFoodCoverage(section, facts), definitions: energyFoodSeries(section), selectedIds: state.selectedIds,
+    value: (definition, year) => byCell.get(cellKey({ indicatorId: definition.id, year }))?.value, color: definition => energyFoodSeriesColor(definition, definition.reference ? 0 : colorIndex++) });
   const selectedIds = new Set<string>(selected.map(s => s.id));
   const selectedDecimals = facts.filter(f => selectedIds.has(f.indicatorId)).map(f => f.decimals);
   const decimals = selectedDecimals.length ? Math.max(...selectedDecimals) : ENERGY_FOOD_UNIT_DECIMALS[energyFoodUnit(section)]; // an empty selection falls back to the unit's own precision

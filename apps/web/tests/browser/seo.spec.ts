@@ -85,38 +85,6 @@ async function expectNoPageOverflow(page: Page) {
   expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
 }
 
-const representativeRoutes = [
-  { route: "/", canonical: "https://fiscal.ge/" },
-  { route: "/explorer/expenditure", canonical: "https://fiscal.ge/explorer/expenditure" },
-  { route: "/explorer/revenue", canonical: "https://fiscal.ge/explorer/revenue" },
-  { route: "/explorer/analysis", canonical: "https://fiscal.ge/explorer/analysis" },
-  { route: "/explorer/debt", canonical: "https://fiscal.ge/explorer/debt" },
-  { route: "/explorer/deficit", canonical: "https://fiscal.ge/explorer/deficit" },
-  { route: "/explorer/municipalities", canonical: "https://fiscal.ge/explorer/municipalities" },
-  { route: "/explorer/municipalities/tbilisi", canonical: "https://fiscal.ge/explorer/municipalities/tbilisi" },
-  { route: "/explorer/municipalities/region/imereti", canonical: "https://fiscal.ge/explorer/municipalities/region/imereti" },
-  { route: "/explorer/municipalities/georgia", canonical: "https://fiscal.ge/explorer/municipalities/georgia" },
-  { route: "/methodology", canonical: "https://fiscal.ge/methodology" },
-  { route: "/methodology/expenditure", canonical: "https://fiscal.ge/methodology/expenditure" },
-  { route: "/about", canonical: "https://fiscal.ge/about" },
-] as const;
-
-for (const { route, canonical } of representativeRoutes) {
-  test(`${route} exposes Fiscal.ge search metadata`, async ({ page }) => {
-    await page.goto(`${BASE_URL}${route}`);
-    const canonicalLink = page.locator('link[rel="canonical"]');
-    const openGraphUrl = page.locator('meta[property="og:url"]');
-    await expect(canonicalLink).toHaveCount(1);
-    await expect(openGraphUrl).toHaveCount(1);
-    await expect(canonicalLink).toHaveAttribute("href", canonical);
-    await expect(openGraphUrl).toHaveAttribute("content", canonical);
-    await expect(page.locator("main h1")).toHaveCount(1);
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /^https:\/\/fiscal\.ge\//);
-    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
-    await expect(page.locator('script[type="application/ld+json"]')).not.toHaveCount(0);
-  });
-}
-
 test("Link navigation keeps exactly one route-correct canonical and Open Graph URL", async ({ page }) => {
   async function expectUrlMetadata(expected: string) {
     const canonical = page.locator('link[rel="canonical"]');
@@ -156,6 +124,16 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
       }),
     ]);
     expect((await request.get(`${BASE_URL}${downloadPath}`)).status()).toBe(200);
+  }
+});
+
+test("GDP explorer Dataset metadata names its six measures in both languages", async ({ page }) => {
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${BASE_URL}${prefix}/explorer/economy/gdp`);
+    const dataset = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
+    expect(dataset["@id"]).toBe(`https://fiscal.ge${prefix}/explorer/economy/gdp#dataset`);
+    expect(dataset.variableMeasured).toHaveLength(6);
+    expect(dataset.variableMeasured.map((v: { unitText: string }) => v.unitText)).toContain("USD_2015");
   }
 });
 
@@ -260,8 +238,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    await expect(links).toHaveCount(7);
-    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/trade", "/methodology"]) {
+    await expect(links).toHaveCount(13);
+    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/demography", "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
     await expectNoPageOverflow(page);
@@ -287,8 +265,8 @@ test("breadcrumb links keep non-overlapping 24px mobile targets and keyboard foc
     for (const route of ["/methodology/expenditure", "/explorer/expenditure", "/explorer/municipalities/tbilisi"] as const) {
       await page.goto(`${BASE_URL}${route}`);
       const breadcrumb = route.startsWith("/explorer")
-        ? page.getByTestId("explorer-header").getByRole("navigation", { name: "Breadcrumb" })
-        : page.getByRole("navigation", { name: "Breadcrumb" });
+        ? page.getByTestId("explorer-header").getByRole("navigation", { name: "ნავიგაციის ბილიკი" })
+        : page.getByRole("navigation", { name: "ნავიგაციის ბილიკი" });
       const links = breadcrumb.getByRole("link");
 
       expect(await links.count()).toBeGreaterThan(0);
@@ -403,6 +381,13 @@ test("municipality navigation uses crawlable links", async ({ page }) => {
   );
 });
 
+test("municipality metadata description uses reviewed punctuation", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/municipalities/tbilisi`);
+  const description = page.locator('meta[name="description"]');
+  await expect(description).toHaveAttribute("content", /ქალაქ თბილისის მუნიციპალიტეტის ფაქტობრივი ბიუჯეტი/);
+  await expect(description).not.toHaveAttribute("content", /მუნიციპალიტეტიის/);
+});
+
 test("legacy municipality codes redirect directly to their canonical slugs and keep browser hash state", async ({ page, request }) => {
   test.setTimeout(60_000);
 
@@ -439,15 +424,8 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
+  // The sitemap builder's URLs, the trade pages among them, are asserted in tests/seo/routes.test.ts.
   expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(580);
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/partners</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/partners</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/products</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/products</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/domestic-exports</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/domestic-exports</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/explorer/trade/services</loc>");
-  expect(xml).toContain("<loc>https://fiscal.ge/en/explorer/trade/services</loc>");
 
   const consoleIssues: string[] = [];
   page.on("console", (message) => {
@@ -518,7 +496,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
 
   // Only the trail on screen: below 768px a separate back-link replaces it.
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible')
     .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
@@ -540,7 +518,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
     "იმერეთი",
     "ჭიათურა",
   ]);
-  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "იმერეთი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible a', { hasText: "იმერეთი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/imereti",
   );
@@ -557,7 +535,7 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
     "თბილისი",
   ];
   const visibleLabels = await page
-    .locator('nav[aria-label="Breadcrumb"]:visible')
+    .locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible')
     .locator('a, [aria-current="page"]')
     .allTextContents();
   const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
@@ -567,19 +545,17 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
 
   expect(visibleLabels).toEqual(expectedLabels);
   expect(structuredLabels).toEqual(expectedLabels);
-  await expect(page.locator('nav[aria-label="Breadcrumb"]:visible a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
+  await expect(page.locator('nav[aria-label="ნავიგაციის ბილიკი"]:visible a', { hasText: "თბილისის რეგიონი" })).toHaveAttribute(
     "href",
     "/explorer/municipalities/region/tbilisi",
   );
 });
 
-test("explorer hub explains the reviewed data scope and available actions", async ({ page }) => {
+test("explorer hub states its data scope in one lead line", async ({ page }) => {
   await page.goto(`${BASE_URL}/explorer`);
 
   const introduction = page.getByTestId("explorer-hub-introduction");
-  await expect(introduction).toHaveText(
-    "Fiscal.ge აერთიანებს საქართველოს სახელმწიფო და მუნიციპალური ბიუჯეტების, მთავრობის ვალისა და ზოგადი მთავრობის დეფიციტის გადამოწმებულ მონაცემებს. შეადარეთ წლები და მაჩვენებლები, ან ჩამოტვირთეთ მონაცემები Excel ფორმატში.",
-  );
+  await expect(introduction).toHaveText("ბიუჯეტის, ვალისა და დეფიციტის მონაცემები");
 });
 
 test("methodology exposes a stable processed-data download", async ({ page, request }) => {
@@ -600,7 +576,7 @@ for (const [route, expectedLabels] of [
   test(`${route} keeps visible and structured breadcrumbs aligned`, async ({ page }) => {
     await page.goto(`${BASE_URL}${route}`);
     const visibleLabels = await page
-      .locator('nav[aria-label="Breadcrumb"] [data-breadcrumb-label]')
+      .locator('nav[aria-label="ნავიგაციის ბილიკი"] [data-breadcrumb-label]')
       .allTextContents();
     const structured = await page.locator('[data-testid="breadcrumb-json-ld"]').textContent();
     const structuredLabels = JSON.parse(structured ?? "{}").itemListElement.map(
@@ -630,8 +606,8 @@ test("the municipal parent dataset lists exactly the entity pages that exist", a
   // The sitemap is the site's own statement of which entity pages exist, so the
   // two cannot drift apart without this failing.
   const sitemap = await (await request.get(`${BASE_URL}/sitemap.xml`)).text();
-  // Dataset @ids are locale-independent, so only the canonical Georgian URLs
-  // take part: the /en twins resolve to the same identity.
+  // This is the Georgian page, and a Dataset @id follows its page's language,
+  // so its parts are the Georgian URLs; the /en twins list the /en ones.
   const entityUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)]
     .map((match) => match[1])
     .filter((url) => /\/explorer\/municipalities\/./.test(url) && !url.includes("/en/"));

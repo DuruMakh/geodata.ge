@@ -12,15 +12,15 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
-import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import {
   buildCountryTotalByYear,
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
-  MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PUBLIC_PAGE_COUNT,
+  buildPickerCountry,
 } from "../explorer/municipalData";
+import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { formatAmount, formatShare } from "../explorer/format";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import {
@@ -38,6 +38,7 @@ import {
 import { municipalityDescription } from "../seo/municipalMetadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { clientPresentation } from "../i18n/presentation.server";
 
 // The 64 public slugs are the complete, closed set. Without this, an unknown
 // slug is left to request-time rendering instead of failing at build.
@@ -189,6 +190,8 @@ export async function renderMunicipality(slug: string, locale: Locale) {
             description: message(messages, "municipal.metaIndexDescription", { first: firstYear, last: latestYear }),
           },
           withinGeorgia: true,
+          // The per-resident figure is shown on the municipal index only; this page does not carry it.
+          omitMeasures: ["gel_per_resident"],
           name: message(messages, "municipal.municipalityDatasetName", { name: officialName }),
           description,
           firstYear,
@@ -200,6 +203,8 @@ export async function renderMunicipality(slug: string, locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name: regionBreadcrumbLabel, path: pageHref(regionPath, locale) }, { name, path: pageHref(municipalityHrefForCode(code), locale) }]} />
       <PageHeader
+        locale={locale}
+        messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -212,14 +217,14 @@ export async function renderMunicipality(slug: string, locale: Locale) {
       />
 
       <MunicipalExplorer
-        presentation={presentation}
+        presentation={clientPresentation(presentation)}
         title={message(messages, "municipal.howSpent")}
         triggerLabel={name}
         entityId={code}
         metaLine={message(messages, "municipal.municipalityMeta", { region: regionName, rank: municipalRankLabel(rank, locale), count: municipalities.length, year: latestYear })}
         functions={functions}
-        functionFacts={own.functionFacts}
-        totalFacts={own.totalFacts}
+        functionFacts={own.functionFacts.map(projectMunicipalFunctionFact)}
+        totalFacts={own.totalFacts.map(projectMunicipalTotalFact)}
         metrics={{
           kind: "ranked",
           nationalTotalByYear,
@@ -230,12 +235,7 @@ export async function renderMunicipality(slug: string, locale: Locale) {
         workbookSources={entityWorkbookSources}
         functionalWorkbookSources={functionalWorkbookSources}
         siteOrigin={resolveSiteUrl()}
-        pickerCountry={{
-          id: MUNICIPAL_COUNTRY_ID,
-          nameKa: "საქართველო",
-          valueGel: nationalTotalByYear[latestYear] ?? 0,
-          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-        }}
+        pickerCountry={buildPickerCountry(nationalTotalByYear[latestYear] ?? 0)}
         pickerGroups={buildPickerGroups(listInput)}
         navigation={{
           prev: { label: publicLabel(locale, prev.code, prev.displayNameKa, englishLabels), href: pageHref(municipalityHrefForCode(prev.code), locale) },

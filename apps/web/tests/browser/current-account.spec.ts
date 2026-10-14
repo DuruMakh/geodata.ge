@@ -7,11 +7,9 @@ import { tableSeriesCount } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Current account balance, money in and % of GDP ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Current account balance, money in and % of GDP ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
-    await page.getByTestId("external-hub").getByTestId("hub-card").nth(2).click();
-    await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/current-account$`));
+    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external/current-account`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     const panel = page.getByTestId("chart-panel");
     await expect(panel).toHaveAttribute("data-tab", "balance");
@@ -20,10 +18,13 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     const key = page.getByTestId("current-account-key");
     await expect(key.locator("[data-series-id]")).toHaveCount(5);
     await expect(page.getByTestId("series-row-toggle")).toHaveCount(0);
-    // DESIGN §17 (owner, 2026-10-11): nothing but the heading above the controls.
-    await expect(page.getByTestId("current-account").locator("h1 + p")).toHaveCount(0);
+    if (width === 768) {
+      // The layout threshold: defaults and overflow only; the flow below is width-independent.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`balance-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("measure-share-toggle").click();
     await expect(panel).toHaveAttribute("data-unit", "gdp");
     await expect(key.locator('[data-series-id="ca.balance"]')).toContainText(/[−-]2\.9/);
@@ -36,7 +37,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await toggle(page, "ca.services").click();
     await page.getByTestId("current-account-tab-out").click();
     await expect(page.getByTestId("series-status")).toContainText("2 / 5");
-    await page.getByTestId("series-search").fill("no-matching-series-xyz");
+    // Five rows are read at a glance: no search field (DESIGN §7.7, U23-03).
+    await expect(page.getByTestId("series-search")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click(); await expect(page.getByTestId("series-status")).toContainText("0 / 5");
     await page.getByTestId("chart-mode-table").click(); await page.reload();
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
@@ -102,11 +104,6 @@ test("% of GDP names the GDP source in the source line", async ({ page }) => {
   const line = page.getByTestId("source-label");
   await expect(line).toContainText("GDP: Geostat");
   await expect(line).not.toContainText("nominal USD");
-});
-
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/external/current-account");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
 });
 
 test.describe("the return pill on a phone", () => {

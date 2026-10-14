@@ -3,13 +3,14 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ClientUnemploymentObservation, UnemploymentBreakdown, UnemploymentGroupDefinition, UnemploymentIndicator, UnemploymentSex } from "../../lib/data/unemployment/types";
 import { unemploymentIndicators, unemploymentIsRate } from "../../lib/data/unemployment/types";
-import { buildUnemploymentModel, buildUnemploymentComposition } from "../../lib/explorer/unemployment";
+import { buildUnemploymentModel, buildUnemploymentComposition, formatUnemploymentValue, unemploymentCountUnit } from "../../lib/explorer/unemployment";
 import { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
 import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, changeUnemploymentIndicator, changeUnemploymentOverviewSelection, type UnemploymentState } from "../../lib/explorer/unemploymentState";
 import { unemploymentSeriesLabel, unemploymentUsesIndicatorSeries } from "../../lib/explorer/unemploymentOverview";
 import { NATIONAL_UNEMPLOYMENT_VIEWS, type UnemploymentSectionId } from "../../lib/explorer/unemploymentSections";
 import { buildUnemploymentWorkbookExportModel } from "../../lib/explorer/unemploymentWorkbook";
-import { formatDisplayDate, formatInUnit, formatShare } from "../../lib/explorer/format";
+import { formatInUnit } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
@@ -24,6 +25,7 @@ import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -35,8 +37,8 @@ import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-
 import { useUnemploymentState } from "./use-unemployment-state";
 import { UnemploymentAgeHeatmap } from "./unemployment-age-heatmap";
 
-export type UnemploymentExplorerProps = { section: UnemploymentSectionId; regionId?: string; regions?: MunicipalRegion[]; facts: ClientUnemploymentObservation[]; registry: UnemploymentGroupDefinition[]; sources: (WorkbookPublicSource & { sourceId: string })[]; lastReviewedAt: string; siteOrigin: string };
-export function UnemploymentExplorer({ section, regionId, regions, facts, registry, sources, lastReviewedAt, siteOrigin }: UnemploymentExplorerProps) {
+export type UnemploymentExplorerProps = { section: UnemploymentSectionId; regionId?: string; regionSplit?: boolean; regions?: MunicipalRegion[]; facts: ClientUnemploymentObservation[]; registry: UnemploymentGroupDefinition[]; sources: (WorkbookPublicSource & { sourceId: string })[]; lastReviewedAt: string; siteOrigin: string };
+export function UnemploymentExplorer({ section, regionId, regionSplit, regions, facts, registry, sources, lastReviewedAt, siteOrigin }: UnemploymentExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string) => message(messages, `unemployment.${key}`);
   const { state, update } = useUnemploymentState(facts, registry, section, regionId);
@@ -55,8 +57,8 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
   const regionalStatusYears = section === "regions" ? facts.filter(f => f.dimension === "region" && ["hired", "self_employed"].includes(f.indicatorId)).map(f => f.year) : [];
   const labels = new Map(model.definitions.map(group => [group.id, unemploymentSeriesLabel(group, state, presentation)]));
   const selectedIndicators = [...new Set(model.definitions.filter(group => state.selectedIds.includes(group.id)).map(group => group.indicatorId))];
-  const indicatorLabel = (selectedIndicators.length ? selectedIndicators : [state.indicator]).map(indicator => t(`indicator.${indicator}`)).join(" · "), unit = { divisor: 1, label: t("thousandPersons"), decimals: 1 };
-  const valueLabel = (value: number | null | undefined) => model.percent ? formatShare(value == null ? null : value / 100) : `${formatInUnit(value, unit)} ${unit.label}`;
+  const indicatorLabel = (selectedIndicators.length ? selectedIndicators : [state.indicator]).map(indicator => t(`indicator.${indicator}`)).join(" · "), unit = unemploymentCountUnit(messages);
+  const valueLabel = (value: number | null | undefined) => model.percent ? formatUnemploymentValue(value, true, messages) : `${formatUnemploymentValue(value, false, messages)} ${unit.label}`;
   // Latest value of the active indicator for the page's own place (Georgia, or the region).
   // The age page carries no national rows, so it states its first selected group instead.
   const placeFacts = facts.filter(f => f.dimension === (regionId ? "region" : "national") && (!regionId || f.groupId === regionId) && f.indicatorId === state.indicator && f.value != null);
@@ -70,7 +72,9 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
     const next = update(transform, "push"), nextModel = buildUnemploymentModel(facts, registry, next);
     setAnnouncement(`${t(`indicator.${next.indicator}`)} · ${nextModel.range.start}–${nextModel.range.end}`);
   };
-  const noteKey = ({ age: "ageNote", region: "regionNote", education: "educationNote", long_term: "longTermNote" } as Partial<Record<UnemploymentBreakdown, string>>)[state.breakdown];
+  // A region page states the split-region note only on the five regions it is about (U17-11).
+  const regionNote = !regionId || regionSplit ? "regionNote" : undefined;
+  const noteKey = ({ age: "ageNote", region: regionNote, education: "educationNote", long_term: "longTermNote" } as Partial<Record<UnemploymentBreakdown, string>>)[state.breakdown];
   const downloadAction = <ExcelDownloadButton testId="unemployment-excel-download" disabled={!state.selectedIds.length || !model.hasData} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildUnemploymentWorkbookExportModel(facts, registry, state, presentation, sources, siteOrigin));
@@ -80,7 +84,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       lead={t("regionHeadingLead")}
       placeLabel={regionName}
       triggerTestId="region-picker-trigger"
-      picker={(open, close) => <RegionPicker open={open} onClose={close} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />}
+      picker={(open, close, id) => <RegionPicker id={id} open={open} onClose={close} regions={regions!} activeRegionId={region.id} hrefForRegion={unemploymentRegionHref} indexHref="/explorer/unemployment/regions" />}
       // Previous/next in the regions' fixed order, as on Economy region pages.
       neighbours={neighbours ? {
         testId: "unemployment-region-navigation",
@@ -89,7 +93,6 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       } : undefined}
     /> : <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>}
     {latest ? <LatestValueLine testId="unemployment-latest" measure={latestMeasure} period={latest.year} value={valueLabel(latest.value)} /> : null}
-    <p className="mb-5 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{region ? message(messages, "unemployment.regionSummary", { region: regionName }) : t(section === "regions" ? "regionalComparisonSummary" : `page.${section}.summary`)}</p>
     <p role="status" className="sr-only">{announcement}</p>
     {section === "overview" ? <div data-testid="unemployment-national-tabs" role="group" aria-label={t("nationalViews")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">
       {NATIONAL_UNEMPLOYMENT_VIEWS.map(breakdown => <TextTab key={breakdown} label={t(breakdown === "national" ? "overviewTab" : `breakdown.${breakdown}`)} active={state.breakdown === breakdown} testId={`unemployment-tab-${breakdown}`} onClick={() => { if (breakdown === state.breakdown) return; setQuery(""); change(s => changeUnemploymentBreakdown(s, breakdown, facts)); }} />)}
@@ -98,8 +101,7 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-indicator={state.indicator} data-breakdown={state.breakdown} data-unit={model.percent ? "percent" : "thousand_persons"} className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")}
-              options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
+            <ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), "push")} />
             {section === "age" ? <label className="min-w-0 w-full text-[11px] min-[768px]:text-[10px] font-semibold text-[var(--muted)] min-[768px]:max-w-[360px]"><span className="sr-only">{t("indicator")}</span>
                 <select data-testid="unemployment-indicator" value={state.indicator} className={SELECT_CLASS}
                   onChange={event => { const indicator = event.target.value as UnemploymentIndicator; change(s => changeUnemploymentIndicator(s, indicator, facts)); }}>
@@ -117,8 +119,8 @@ export function UnemploymentExplorer({ section, regionId, regions, facts, regist
           <ChartSelectionAids series={model.series.map(series => ({ ...series, label: labels.get(series.id)! }))} chartShown={state.mode === "line"} share={model.percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={model.availableYears} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildUnemploymentModel(facts, registry, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
-          <Link href={pageHref("/methodology/unemployment", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
+          <Link href={pageHref("/methodology/unemployment", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {(section === "overview" || section === "regions") && noteKey ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t(noteKey)}</p> : null}
         {(section === "overview" && ["national", "settlement"].includes(state.breakdown) || regionalStatusYears.length > 0) ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("employmentStatusNote")}{regionalStatusYears.length > 0 ? ` ${message(messages, "unemployment.regionalEmploymentStatusNote", { start: Math.min(...regionalStatusYears), end: Math.max(...regionalStatusYears) })}` : null}</p> : null}

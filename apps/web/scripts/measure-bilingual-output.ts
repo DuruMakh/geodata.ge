@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
 import { listPublicPagePaths } from "../lib/i18n/inventory.server";
 import { pageHref } from "../lib/i18n/routes";
+import { runAsCli } from "../lib/runAsCli";
 
 type Asset = { url: string; kind: "script" | "font"; decodedBytes: number; contentEncoding?: string | null; encodedLengthHeader?: number | null };
 type PageMeasurement = { path: string; locale: "ka" | "en"; status: number; htmlBytes: number; contentEncoding: string | null; encodedLengthHeader: number | null; scriptUrls: string[]; fontUrls: string[]; scriptBytes: number; fontBytes: number };
@@ -117,7 +117,7 @@ export async function measureBilingualOutput(baseUrl: string, outputDirectory: s
   console.log(`Measured ${pages.length} pages, ${assets.size} assets and ${publications.length} publications: ${outputDirectory}`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  const argument = (name: string) => { const index = process.argv.indexOf(name); if (index < 0 || !process.argv[index + 1]) throw new Error(`Missing ${name}`); return process.argv[index + 1]; };
-  measureBilingualOutput(argument("--base-url"), resolve(argument("--output"))).catch(error => { console.error(error); process.exitCode = 1; });
-}
+runAsCli(import.meta.url, async args => {
+  const argument = (name: string) => { const index = args.indexOf(name); if (index < 0 || !args[index + 1]) throw new Error(`Missing ${name}`); return args[index + 1]; };
+  await measureBilingualOutput(argument("--base-url"), resolve(argument("--output")));
+});

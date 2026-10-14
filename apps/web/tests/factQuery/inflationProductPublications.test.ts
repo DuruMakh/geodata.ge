@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import * as publications from "../../lib/factQuery/publications";
 import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -10,7 +10,7 @@ import type { Observation } from "../../lib/factQuery/observations";
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" });
 });
 
 const csv = () => publications.buildInflationProductsCsv(snapshot);

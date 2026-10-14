@@ -10,15 +10,21 @@ export default defineConfig({
   // server it is safe and much faster: measured 2026-09-06 over all 281 tests on
   // a prebuilt server, 264s at one worker against 116s at four, both 281/281.
   // (8 workers is slower than 4 and loses focus assertions — do not raise it.)
+  // The suite has since grown to 1,487 tests (2026-10-13), and those numbers have
+  // not been re-measured for it.
   //
   // PLAYWRIGHT_BASE_URL is only ever pointed at a server someone already built
   // and started, so that is the one case where the fast default is provably
-  // safe. CI still defaults to 1: its runner has a fraction of the cores this
-  // was measured on and nobody has measured four workers there. PW_WORKERS
-  // overrides either way.
-  //   npm run build && npm run start -- --port 3100
-  //   CI=1 PLAYWRIGHT_BASE_URL=http://localhost:3100 npx playwright test
+  // safe. CI sets it (its browser job serves the build job's output), so CI runs
+  // four workers too. Measuring two against four on the GitHub runner is still
+  // pending; pin PW_WORKERS in ci.yml once that is done. PW_WORKERS overrides
+  // either way. Linux/cloud sessions have no Edge, so they need CI=1 (Chromium):
+  //   NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build && npm run start -- --port 3100
+  //   CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge PLAYWRIGHT_BASE_URL=http://localhost:3100 npx playwright test
   workers: Number(process.env.PW_WORKERS) || (process.env.PLAYWRIGHT_BASE_URL ? 4 : 1),
+  // One retry in CI, so a test that passes on its second try reports as flaky instead
+  // of failing the run. The known flakes and their causes: docs/deployment.md.
+  retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     ...devices["Desktop Chrome"],

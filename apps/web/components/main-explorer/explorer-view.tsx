@@ -5,19 +5,22 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
 import { publicLabel } from "../../lib/i18n/labels";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import type { ValueUnit } from "../../lib/explorer/format";
 import { type ChartMode, type ExpenditureGrouping, type ExplorerScope } from "../../lib/explorer/types";
-import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
 import { EditorialLineChart, type ChartSeries } from "./editorial-line-chart";
+import { DESKTOP_ONLY } from "./chart-frame";
 import { ExplorerTable } from "./explorer-table";
-import { Indicators } from "./indicators";
+import { FIRST_COL_LABEL, Indicators } from "./indicators";
 import { RangeStrip } from "./range-strip";
 import { SeriesPanel } from "./series-panel";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { withLari } from "../ui/lari";
 import type { ResolvedRange } from "./use-explorer-state";
 
 // Multi-year explorer per DESIGN.md §8: mode/grouping tabs and the measure pill over
@@ -51,13 +54,6 @@ const COVERAGE_NOTE: Record<ExplorerScope, string> = {
   fields: "main.expenditureCoverage",
   ministries: "main.ministryCoverage",
   revenue: "main.revenueCoverage",
-};
-
-// Moved out of ExplorerTable so the table takes a label rather than a scope.
-const FIRST_COL_LABEL: Record<ExplorerScope, string> = {
-  fields: "main.field",
-  ministries: "main.institution",
-  revenue: "main.budgetItem",
 };
 
 // Classification-authorship disclosure (DESIGN.md §7.10): year totals are official;
@@ -99,7 +95,7 @@ export function ExplorerView({
 
     return {
       id: item.id,
-      label: label.length > 30 ? `${label.slice(0, 29)}…` : label,
+      label,
       color: item.color,
       vals: model.years.map((year) => {
         const value = pointsByYear.get(year)?.value ?? null;
@@ -127,24 +123,17 @@ export function ExplorerView({
                 from what they change, so below 1100px they lead the chart panel instead
                 (owner decision D4, 2026-10-07). Same state and URL key `g`. */}
             {showGrouping ? (
-              <div data-testid="chart-grouping" className="mb-3.5 flex gap-[18px] border-b border-[var(--row-border)] pb-3 @min-[1100px]:hidden">
+              <TextTabGroup ariaLabel={message(messages, "controls.grouping")} testId="chart-grouping" className="mb-3.5 flex gap-[18px] border-b border-[var(--row-border)] pb-3 @min-[1100px]:hidden">
                 <TextTab label={message(messages, "controls.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="grouping-fields" />
                 <TextTab label={message(messages, "controls.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="grouping-ministries" />
-              </div>
+              </TextTabGroup>
             ) : null}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs<ChartMode>
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={chartMode}
-                onChange={onChartModeChange}
-                options={[
-                  { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
+              <ModeTabs value={chartMode} onChange={onChartModeChange} />
               <div className="flex items-center gap-3.5">
+                {/* On a phone the chart's own axis caption names the unit, so the line view does not repeat it here (U03-14). */}
                 {share ? null : (
-                  <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{message(messages, "format.bnGel")}</span>
+                  <span data-testid="explorer-unit-caption" className={`font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)] ${chartMode === "line" ? DESKTOP_ONLY : ""}`}>{withLari(message(messages, "format.bnGel"))}</span>
                 )}
                 <MeasurePill label={message(messages, "main.percentGdp")} pressed={share} onChange={onShareChange} />
               </div>
@@ -191,7 +180,7 @@ export function ExplorerView({
               {scope === "revenue" ? " " + message(messages, "main.missing2004Liabilities") : null}
               {Object.keys(model.gdpByYear).length > 0 ? " " + message(messages, "main.gdpSource") : null}
               {preliminaryYears.length > 0 ? " " + message(messages, "main.preliminaryGdp", { years: preliminaryYears.join(", ") }) : null}
-              {lastUpdatedAt ? <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} /></> : null}
+              {lastUpdatedAt ? <>{" "}<Message messages={messages} id="main.lastUpdated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(lastUpdatedAt, locale)}</span> }} /></> : null}
               {model.hasPlannedValues ? " " + message(messages, "main.activePlanned") : null}
             </SourceNote>
           </div>
@@ -215,7 +204,7 @@ export function ExplorerView({
         />
       </ExplorerWorkspace>
 
-      <Indicators model={model} scope={scope} />
+      <Indicators model={model} scope={scope} unit={unit} />
     </>
   );
 }

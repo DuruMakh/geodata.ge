@@ -1,4 +1,4 @@
-import { inflationCitiesMetadata, renderInflationCities } from "../../../../../../lib/pages/inflation";
+import { inflationCitiesMetadata, renderInflationCities } from "../../../../../../lib/pages/inflation-cities";
 
 export function generateMetadata() {
   return inflationCitiesMetadata("en");

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { queryInflationProducts, productQueryCellCount } from "../../lib/factQuery/queryInflationProducts";
 import { productQueryCoverage } from "../../lib/factQuery/inflationProductData";
 import { observationSchema, queryInflationProductsInput, queryInflationInput } from "../../lib/factQuery/schemas";
@@ -9,7 +9,7 @@ import type { ProductSnapshotFact } from "../../lib/factQuery/inflationProductSe
 
 const id = "cpi.product.p0001";
 let real: FactQuerySnapshot;
-beforeAll(async () => { real = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
+beforeAll(async () => { real = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
 const fact = (period: string, index100: string | null, measure: ProductSnapshotFact["measure"] = "mom_index_100", productId = id): ProductSnapshotFact =>
   ({ productId, period, index100, measure, availability: index100 === null ? "not_published" : "published", sourceId: measure === "mom_index_100" ? "source.geostat_product_mom" : "source.geostat_product_yoy" });
 function synthetic(facts = [fact("2026-01", "101"), fact("2026-02", "102"), fact("2026-01", "150", "yoy_index_100"), fact("2026-02", "160", "yoy_index_100")], firstPeriod = "2026-01"): FactQuerySnapshot {

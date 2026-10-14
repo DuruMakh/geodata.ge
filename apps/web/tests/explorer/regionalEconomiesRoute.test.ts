@@ -1,10 +1,9 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vitest";
 import {
   regionalEconomyStaticParams,
-  renderRegionalEconomiesPage,
   renderRegionalEconomyPage,
 } from "../../lib/pages/regional-economy";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 test("regional economy routes expose exactly eleven stable region IDs", () => {
   expect(regionalEconomyStaticParams()).toEqual([
@@ -14,12 +13,9 @@ test("regional economy routes expose exactly eleven stable region IDs", () => {
   ].map((id) => ({ id })));
 });
 
-test.each(["ka", "en"] as const)("All Regions and Imereti pages render in %s", async (locale) => {
-  const index = renderToStaticMarkup(await renderRegionalEconomiesPage(locale));
-  const detail = renderToStaticMarkup(await renderRegionalEconomyPage("imereti", locale));
-  expect(index).toContain(locale === "en" ? "Regional economies" : "რეგიონების ეკონომიკა");
-  expect(index).toContain(`${locale === "en" ? "/en" : ""}/explorer/economy/regions/imereti`);
-  expect(detail).toContain(locale === "en" ? "Imereti" : "იმერეთი");
+// Heading, link and name are checked in regional-economies.spec.ts; the coverage is not.
+test.each(["ka", "en"] as const)("the Imereti page states its 2010–2024 coverage in %s", async (locale) => {
+  const detail = renderPageMarkup(locale, await renderRegionalEconomyPage("imereti", locale));
   expect(detail).toContain("2010–2024");
 });
 

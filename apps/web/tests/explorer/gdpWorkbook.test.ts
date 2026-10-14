@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { prepareGdpOverview } from "../../lib/data/gdpOverview/prepareGdpOverview";
 import { sourceIdRangesBySeries } from "../../lib/explorer/clientData";
 import { DEFAULT_GDP_STATE } from "../../lib/explorer/gdpOverview";
-import { buildGdpWorkbookExportModel } from "../../lib/explorer/gdpWorkbook";
+import { buildGdpWorkbookExportModel, gdpDisplay } from "../../lib/explorer/gdpWorkbook";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import ExcelJS from "exceljs";
@@ -128,4 +128,11 @@ it("names the workbook per reader language and links only the sources in range",
         absoluteUrl: "https://fiscal.ge/downloads/methodology/gdp/release.xlsx",
       },
     ]);
+});
+
+// U10-14: per-person GDP is printed in whole dollars or lari in the table, as the latest-value line and summary print it.
+it("prints per-person GDP in whole units and totals to one decimal", async () => {
+  const presentation = { locale: "en" as const, messages: await getMessages("en", ["gdp"]), englishLabels: {} };
+  expect(gdpDisplay({ ...DEFAULT_GDP_STATE, indicator: "per_capita", currency: "usd" }, presentation).unit.decimals).toBe(0);
+  expect(gdpDisplay({ ...DEFAULT_GDP_STATE, indicator: "nominal", currency: "usd" }, presentation).unit.decimals).toBe(1);
 });

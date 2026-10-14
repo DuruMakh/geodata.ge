@@ -8,7 +8,7 @@ import { unemploymentOverviewDefinitions, unemploymentOverviewIndicators, unempl
 
 export type UnemploymentState = { indicator: UnemploymentIndicator; breakdown: UnemploymentBreakdown; educationSex: UnemploymentSex; mode: "line" | "table"; range: PeriodRange; selectedIds: string[]; overview?: true; regional?: true; regionId?: string };
 export const DEFAULT_UNEMPLOYMENT_STATE: UnemploymentState = { indicator: "unemployment_rate", breakdown: "national", educationSex: "total", mode: "line", range: { kind: "all" }, selectedIds: ["georgia"] };
-export const UNEMPLOYMENT_BREAKDOWNS: UnemploymentBreakdown[] = ["national", "sex", "settlement", "age", "region", "education", "long_term"];
+const UNEMPLOYMENT_BREAKDOWNS: UnemploymentBreakdown[] = ["national", "sex", "settlement", "age", "region", "education", "long_term"];
 
 function fit(state: UnemploymentState, facts: readonly ClientUnemploymentObservation[]): UnemploymentState {
   return { ...state, range: refitRange(state.range, unemploymentCoverage(facts, state), { collapseToAll: false }) };
@@ -56,10 +56,13 @@ export function parseUnemploymentHash(hash: string, facts: readonly ClientUnempl
   if (unemploymentUsesIndicatorSeries(state)) {
     // Only a link with neither a selection nor an indicator gets the Gender
     // comparison; former single-indicator links keep their national reference.
-    const requested = p.has("sel") ? p.get("sel")!.split(",").map(id => id.includes(":") ? id : `${id}:${indicator}`)
-      : breakdown === "sex" && !p.has("indicator") ? GENDER_DEFAULT_SELECTION : [`${regionId ?? "georgia"}:${indicator}`];
+    const fallback = breakdown === "sex" && !p.has("indicator") ? GENDER_DEFAULT_SELECTION : [`${regionId ?? "georgia"}:${indicator}`];
+    const requested = p.has("sel") ? p.get("sel")!.split(",").map(id => id.includes(":") ? id : `${id}:${indicator}`) : fallback;
     const next = changeUnemploymentOverviewSelection(state, requested, facts, registry);
     if (breakdown === "sex" && !next.selectedIds.length && requested.includes(`georgia:${indicator}`)) return changeUnemploymentOverviewSelection(state, [unemploymentReferenceId(state)], facts, registry);
+    // A non-empty selection none of whose ids is known (an old or mistyped link) opens the default view, as on
+    // the age page; an explicitly empty `sel=` stays empty (U16-06).
+    if (p.get("sel") && !next.selectedIds.length) return changeUnemploymentOverviewSelection(state, fallback, facts, registry);
     return next;
   }
   const validIds = new Set(unemploymentScopeFacts(facts, state).map(f => f.groupId).filter(id => registry.some(group => group.id === id)));

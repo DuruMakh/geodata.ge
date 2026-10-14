@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { INPUT_LIMITS, expectedDataVersion } from "../factQuery/schemas";
+import { INPUT_LIMITS, expectedDataVersion, idString } from "../factQuery/schemas";
 
 const ids = (max: number) =>
-  z.array(z.string().min(1)).min(1).max(max).transform((values) => [...new Set(values)]);
+  z.array(idString).min(1).max(max).transform((values) => [...new Set(values)]);
 const years = z
   .array(z.number().int())
   .min(1)

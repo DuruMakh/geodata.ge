@@ -1,23 +1,25 @@
 import { beforeAll, expect, test } from "vitest";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/unemployment/importUnemployment";
-import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/types";
+import type { ClientUnemploymentObservation, ServedUnemploymentObservation } from "../../lib/data/unemployment/types";
 import { buildUnemploymentModel, buildUnemploymentComposition } from "../../lib/explorer/unemployment";
 import { DEFAULT_UNEMPLOYMENT_STATE } from "../../lib/explorer/unemploymentState";
 
 let facts: ClientUnemploymentObservation[];
 beforeAll(async () => { facts = (await loadServedUnemploymentData()).facts; });
+// The pages do not ship publishedValue (platform review U17-02); these served facts still carry it.
+const published = (fact: ClientUnemploymentObservation | null | undefined) => (fact as ServedUnemploymentObservation | null | undefined)?.publishedValue;
 const model = (patch = {}) => buildUnemploymentModel(facts, UNEMPLOYMENT_GROUPS, { ...DEFAULT_UNEMPLOYMENT_STATE, ...patch });
 test("default view shows only Georgia's comparable national unemployment rate", () => {
   const view = model();
   expect([view.range.start, view.range.end]).toEqual([2010, 2025]);
   expect(view.series.map(s => s.id)).toEqual(["georgia"]);
-  expect(view.headline?.publishedValue).toBe(13.9);
+  expect(published(view.headline)).toBe(13.9);
   expect(view.series[0].vals.at(-1)).toBeCloseTo(13.9, 1);
   expect(view.rows[0].valuesByYear[2025]).toBeCloseTo(0.139, 3);
 });
 test("count values stay in thousand persons instead of being divided as percentages", () => {
   const view = model({ indicator: "unemployed" });
-  expect(view.headline?.publishedValue).toBe(224);
+  expect(published(view.headline)).toBe(224);
   expect(view.rows[0].valuesByYear[2025]).toBe(view.series[0].vals.at(-1));
 });
 test.each(["total", "women", "men"] as const)("education %s coverage does not inherit the longer reference history", sex => {
@@ -25,7 +27,7 @@ test.each(["total", "women", "men"] as const)("education %s coverage does not in
   expect([view.range.min, view.range.max]).toEqual([2020, 2025]);
   expect(view.referenceId).toBe(sex === "total" ? "georgia" : sex);
   expect(view.definitions[0].id).toBe(view.referenceId);
-  expect(view.headline?.publishedValue).toBe(sex === "total" ? 13.9 : sex === "women" ? 11.4 : 15.8);
+  expect(published(view.headline)).toBe(sex === "total" ? 13.9 : sex === "women" ? 11.4 : 15.8);
   expect(view.activeFacts.every(f => f.year >= 2020)).toBe(true);
 });
 test("age display omits historical bands without modifying their source observations", () => {
@@ -47,8 +49,8 @@ test("empty selection and a selected historical group with no current values rem
   expect(view.rows).toHaveLength(0);
 });
 test("long-term rate and share retain the two different official percentages", () => {
-  expect(model({ breakdown: "long_term", indicator: "long_term_unemployment_rate" }).headline?.publishedValue).toBe(4.9);
-  expect(model({ breakdown: "long_term", indicator: "long_term_unemployed_share" }).headline?.publishedValue).toBe(35.5);
+  expect(published(model({ breakdown: "long_term", indicator: "long_term_unemployment_rate" }).headline)).toBe(4.9);
+  expect(published(model({ breakdown: "long_term", indicator: "long_term_unemployed_share" }).headline)).toBe(35.5);
 });
 test("colors remain stable across metrics and years and distinguish current age series", () => {
   const ids = facts.filter(f => f.dimension === "age" && f.year === 2025).map(f => f.groupId);

@@ -4,7 +4,6 @@ import { I18nProvider } from "../../lib/i18n/provider";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { Presentation } from "../../lib/i18n/types";
 import { beforeAll, describe, expect, it } from "vitest";
-import { selectDebtSeries } from "../../lib/explorer/debtExplorer";
 import { loadGovernmentDebtFacts } from "../../lib/data/governmentDebt/importGovernmentDebtFacts";
 import type {
   DebtSeriesId,
@@ -15,7 +14,7 @@ import type {
 const reviewedAt = "2026-09-01";
 
 let presentation: Presentation;
-beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "debt"], [...new Set(facts.map(fact => fact.seriesId))]); });
+beforeAll(async () => { const ids = [...new Set(facts.map(fact => fact.seriesId))]; presentation = await getPresentation("ka", ["common", "controls", "format", "main", "debt"], ids, ids); });
 function renderGeorgianMarkup(children: ReactNode) { return renderToStaticMarkup(<I18nProvider {...presentation}>{children}</I18nProvider>); }
 
 function debtFact(
@@ -82,11 +81,6 @@ function selectedSeries(markup: string): string[] {
     .map((match) => match[1]!);
 }
 
-function deckText(markup: string): string {
-  const match = markup.match(/<p data-testid="debt-deck"[^>]*>([\s\S]*?)<\/p>/);
-  return (match?.[1] ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-}
-
 function seriesRow(markup: string, id: DebtSeriesId): string {
   const start = markup.indexOf(`data-series-id="${id}"`);
   expect(start, `${id} row must exist`).toBeGreaterThan(-1);
@@ -111,7 +105,7 @@ describe("Government Debt route composition", () => {
     expect((markup.match(/data-testid="series-row"/g) ?? [])).toHaveLength(9);
     expect((markup.match(/aria-expanded="true"/g) ?? [])).toHaveLength(3);
     expect(selectedSeries(markup)).toEqual(["debt.stock.total"]);
-    expect(markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("სერიები 1 / 9");
+    expect(markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain("სერიები 1 / 3"); // U06-09: the active family's three rows, not all nine
     expect(markup).toContain('aria-label="მთლიანი ვალი — ქვესერიების ჩაკეცვა"');
     expect(markup).toContain('aria-label="ვალის გადახდა — ქვესერიების ჩაკეცვა"');
     expect(markup).toContain('aria-label="საპროცენტო განაკვეთი — ქვესერიების ჩაკეცვა"');
@@ -160,61 +154,6 @@ describe("Government Debt route composition", () => {
     expect(visibleText).not.toContain("2013: მთავრობის ვალი · 8.0 მლრდ ₾");
   });
 
-  it("leads the service deck with the latest actual total, never a projection", async () => {
-    const components = await loadDebtComponents();
-    expect(components).not.toBeNull();
-    if (!components) return;
-
-    const noop = () => {};
-    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
-      facts,
-      gdpFacts,
-      workbookSources: [],
-      lastUpdatedAt: reviewedAt,
-      family: "service",
-      chartMode: "line",
-      shareOfGdp: false,
-      range: { start: 2013, end: 2025, min: 2013, max: 2026 },
-      selectedIds: ["debt.service.total"],
-      onChartModeChange: noop,
-      onShareChange: noop,
-      onRangeChange: noop,
-      onSelectionChange: noop,
-      onToggleSeries: noop,
-    }));
-    const deck = deckText(markup);
-
-    // The fixture has no 2024 service total, so no change is shown.
-    expect(deck).toBe("2025: ვალის გადახდა · 4.3 მლრდ ₾");
-  });
-
-  it("reports the interest-rate deck change in percentage points", async () => {
-    const components = await loadDebtComponents();
-    expect(components).not.toBeNull();
-    if (!components) return;
-
-    const noop = () => {};
-    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
-      facts,
-      gdpFacts,
-      workbookSources: [],
-      lastUpdatedAt: reviewedAt,
-      family: "rate",
-      chartMode: "line",
-      shareOfGdp: false,
-      range: { start: 2015, end: 2025, min: 2015, max: 2025 },
-      selectedIds: ["debt.rate.total"],
-      onChartModeChange: noop,
-      onShareChange: noop,
-      onRangeChange: noop,
-      onSelectionChange: noop,
-      onToggleSeries: noop,
-    }));
-
-    // Fixture: 2024 = 5.0%, 2025 = 4.7%.
-    expect(deckText(markup)).toBe("2025: საპროცენტო განაკვეთი · 4.7% −0.3 პპ წინა წელთან");
-  });
-
   it("uses actual service and latest published rate facts in real-data selector summaries", async () => {
     const components = await loadDebtComponents();
     expect(components).not.toBeNull();
@@ -237,17 +176,6 @@ describe("Government Debt route composition", () => {
     expect(rowText("debt.service.interest")).not.toContain("832 მლნ ₾");
     expect(seriesRow(markup, "debt.rate.domestic")).toContain("8.8% · 2024");
     expect(seriesRow(markup, "debt.rate.external")).toContain("3.1% · 2024");
-  });
-
-  it("keeps multiple lines in one family and clears them on a cross-family choice", () => {
-    expect(selectDebtSeries(
-      ["debt.stock.total", "debt.stock.domestic"],
-      "debt.stock.external",
-    )).toEqual(["debt.stock.total", "debt.stock.domestic", "debt.stock.external"]);
-    expect(selectDebtSeries(
-      ["debt.stock.total", "debt.stock.domestic"],
-      "debt.service.interest",
-    )).toEqual(["debt.service.interest"]);
   });
 
   it("shows the stock GDP pill but hides it for service and rate measures", async () => {
@@ -401,60 +329,37 @@ describe("Government Debt route composition", () => {
     }
   });
 
-  it("offers the bulk control on an empty selection so clearing can be undone", async () => {
+  it("offers the bulk control on an empty selection and shows it full only when every row of the active family is selected", async () => {
     const components = await loadDebtComponents();
     expect(components).not.toBeNull();
     if (!components) return;
 
     const noop = () => {};
-    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
+    const render = (family: "stock" | "service", selectedIds: DebtSeriesId[]) => renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
       facts,
       gdpFacts,
       workbookSources: [],
       lastUpdatedAt: reviewedAt,
-      family: "stock",
+      family,
       chartMode: "line",
       shareOfGdp: false,
       range: { start: 2013, end: 2025, min: 2013, max: 2025 },
-      selectedIds: [],
+      selectedIds,
       onChartModeChange: noop,
       onShareChange: noop,
       onRangeChange: noop,
       onSelectionChange: noop,
       onToggleSeries: noop,
     }));
+    const bulkState = (family: "stock" | "service", selectedIds: DebtSeriesId[]) =>
+      render(family, selectedIds).match(/<button[^>]*data-testid="series-toggle-all"[^>]*data-state="([a-z]+)"/)?.[1];
+
+    // An empty selection keeps the bulk control, so clearing can be undone.
+    const markup = render("stock", []);
     const visibleText = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-
-    expect(visibleText).toContain("სერიები 0 / 9");
+    expect(visibleText).toContain("სერიები 0 / 3");
     expect(visibleText).toContain("ყველას მონიშვნა");
-    expect(markup).toMatch(/<button[^>]*data-testid="series-toggle-all"[^>]*aria-checked="false"/);
-  });
-
-  it("shows the bulk checkbox full only when every row of the active family is selected", async () => {
-    const components = await loadDebtComponents();
-    expect(components).not.toBeNull();
-    if (!components) return;
-
-    const noop = () => {};
-    const bulkState = (family: "stock" | "service", selectedIds: DebtSeriesId[]) => {
-      const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
-        facts,
-        gdpFacts,
-        workbookSources: [],
-        lastUpdatedAt: reviewedAt,
-        family,
-        chartMode: "line",
-        shareOfGdp: false,
-        range: { start: 2013, end: 2025, min: 2013, max: 2025 },
-        selectedIds,
-        onChartModeChange: noop,
-        onShareChange: noop,
-        onRangeChange: noop,
-        onSelectionChange: noop,
-        onToggleSeries: noop,
-      }));
-      return markup.match(/<button[^>]*data-testid="series-toggle-all"[^>]*aria-checked="([a-z]+)"/)?.[1];
-    };
+    expect(markup).toMatch(/<button[^>]*data-testid="series-toggle-all"[^>]*data-state="false"/);
 
     // The default total alone is a partial selection, as in every other explorer.
     expect(bulkState("stock", ["debt.stock.total"])).toBe("mixed");

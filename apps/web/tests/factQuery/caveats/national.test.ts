@@ -1,4 +1,4 @@
-import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../../helpers/factQuerySnapshot";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/national.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
@@ -6,7 +6,7 @@ import { evaluateCaveats, type CaveatContext } from "../../../lib/factQuery/cave
 import { NATIONAL_CAVEAT_RULES } from "../../../lib/factQuery/caveats/rules.national";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 function context(overrides: Partial<CaveatContext>): CaveatContext {
   return {

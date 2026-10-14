@@ -3,10 +3,11 @@
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import type { SnapshotItem } from "../../lib/explorer/types";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { axisLeftPaddingFor } from "../../lib/explorer/chartScale";
+import { nearestCircle } from "../../lib/explorer/mapTouchTargets";
 import { Callout } from "../ui/editorial";
 import {
   DESKTOP_ONLY,
@@ -32,8 +33,25 @@ const PAD_B = 36;
 // The phone drawing, one unit per CSS pixel, fits the frame instead of scrolling.
 const MOBILE_PAD_L = 36;
 const MOBILE_PAD_R = 12;
+// A pointer within this many drawing units of a circle's centre reaches it, so
+// a small circle is a 24px target on a phone (one unit per CSS pixel there).
+const MIN_REACH = 12;
 
 type Plot = { mobile: boolean; width: number; height: number; padLeft: number; padRight: number };
+type FieldCircle = { item: SnapshotItem; cx: number; cy: number; r: number };
+
+// The pointer reads the circle whose centre is nearest, not whichever circle is
+// drawn on top: a smaller circle under a larger one with a near-equal position
+// can still be hovered and tapped.
+function circleAt(event: ReactMouseEvent<SVGSVGElement>, circles: readonly FieldCircle[]): string | null {
+  const svg = event.currentTarget;
+  const box = svg.getBoundingClientRect();
+  const { width, height } = svg.viewBox.baseVal;
+  if (box.width === 0 || box.height === 0) return null;
+  const x = ((event.clientX - box.left) / box.width) * width;
+  const y = ((event.clientY - box.top) / box.height) * height;
+  return nearestCircle(circles, x, y, MIN_REACH)?.item.itemId ?? null;
+}
 
 export function BudgetField({ items }: BudgetFieldProps) {
   const { locale, messages, englishLabels } = useI18n();
@@ -142,6 +160,12 @@ export function BudgetField({ items }: BudgetFieldProps) {
   const renderSvg = (plot: Plot, className: string) => {
     const { x, y } = scales(plot);
     const { width, height, padLeft, padRight } = plot;
+    const circles: FieldCircle[] = byAmount.map((item) => ({
+      item,
+      cx: x(item.shareOfTotal * 100),
+      cy: y(item.changeFromPreviousYear * 100),
+      r: 6 + Math.sqrt(item.amountGel / maxAmount) * 16,
+    }));
     return (
       <svg
         key={plot.mobile ? "mobile" : "desktop"}
@@ -151,6 +175,26 @@ export function BudgetField({ items }: BudgetFieldProps) {
         role="group"
         aria-label={message(messages, "analysis.budgetField")}
         className={`h-auto w-full ${className}`}
+        onPointerDown={(event) => {
+          lastPointerType.current = event.pointerType;
+        }}
+        onPointerMove={(event) => {
+          if (event.pointerType !== "touch") setHoverId(circleAt(event, circles));
+        }}
+        onPointerLeave={(event) => {
+          if (event.pointerType !== "touch") setHoverId(null);
+        }}
+        onClick={(event) => {
+          if (lastPointerType.current !== "touch") return;
+          const id = circleAt(event, circles);
+          if (id === null) return;
+          if (pinnedId === id) {
+            setPinnedId(null);
+            setHoverId(null);
+          } else {
+            setPinnedId(id);
+          }
+        }}
       >
         {yTicks.map((tick) => (
           <g key={`y-${tick}`}>
@@ -166,10 +210,7 @@ export function BudgetField({ items }: BudgetFieldProps) {
           </text>
         ))}
         <line x1={padLeft} x2={padLeft} y1={PAD_T} y2={height - PAD_B} stroke="#D9CFBE" strokeWidth={1} />
-        {byAmount.map((item) => {
-          const radius = 6 + Math.sqrt(item.amountGel / maxAmount) * 16;
-          const cx = x(item.shareOfTotal * 100);
-          const cy = y(item.changeFromPreviousYear * 100);
+        {circles.map(({ item, cx, cy, r: radius }) => {
           // On a phone the readout sits under the field, so the circle it reads is ringed.
           const selected = plot.mobile && plot === active && item.itemId === activeId;
 
@@ -186,24 +227,6 @@ export function BudgetField({ items }: BudgetFieldProps) {
                 tabIndex={0}
                 aria-label={`${labelFor(item)} · ${formatAmount(item.amountGel, locale)}`}
                 className="[&:focus:not(:focus-visible)]:outline-none"
-                onPointerDown={(event) => {
-                  lastPointerType.current = event.pointerType;
-                }}
-                onPointerEnter={(event) => {
-                  if (event.pointerType !== "touch") setHoverId(item.itemId);
-                }}
-                onPointerLeave={(event) => {
-                  if (event.pointerType !== "touch") setHoverId(null);
-                }}
-                onClick={() => {
-                  if (lastPointerType.current !== "touch") return;
-                  if (pinnedId === item.itemId) {
-                    setPinnedId(null);
-                    setHoverId(null);
-                  } else {
-                    setPinnedId(item.itemId);
-                  }
-                }}
                 onFocus={() => setHoverId(item.itemId)}
                 onBlur={() => setHoverId(null)}
               >

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { TOOLS } from "../../lib/mcp/tools";
 import { outputSchemaFor, toolOutput } from "../../lib/mcp/outputSchema";
 import { toolResult } from "../../lib/mcp/result";
@@ -10,7 +10,7 @@ import { rank } from "../../lib/factQuery/rank";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-04T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-04T00:00:00.000Z" });
 });
 
 it("retains two-element period/year ranges with exact element types", () => {

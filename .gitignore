@@ -57,6 +57,8 @@ docs/Prototpy variatints experiments/
 # generated public methodology archives
 apps/web/public/downloads/methodology/
 apps/web/public/downloads/data/
+# generated page data (lib/data/pageDataFiles.ts)
+apps/web/public/page-data/
 
 # local Products verification evidence
 /apps/web/output/trade-products*

@@ -1,9 +1,10 @@
 import path from "node:path";
 import { prepareMethodologyArchives } from "../lib/methodology/prepareArchives";
+import { runAsCli } from "../lib/runAsCli";
 
-async function main() {
-  const write = process.argv.includes("--write");
-  const check = process.argv.includes("--check");
+export async function main(args: readonly string[]) {
+  const write = args.includes("--write");
+  const check = args.includes("--check");
   if (write === check) throw new Error("Pass exactly one of --write or --check");
 
   const repositoryRoot = path.resolve(process.cwd(), "../..");
@@ -18,7 +19,4 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+runAsCli(import.meta.url, main);

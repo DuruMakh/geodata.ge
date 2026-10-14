@@ -53,6 +53,8 @@ for (const [name, route, testId] of [
     expect(records).toEqual(sourceRecords(ka.workbook));
     expect(records.length).toBeGreaterThan(0);
     if (name.startsWith("regional-")) {
+      // One English-word stem for both languages, never the measure id.
+      expect(ka.filename).toMatch(new RegExp(`^fiscal-regional-economy-imereti-${name === "regional-share" ? "share-of-region-gdp" : "nominal"}-\\d{4}-\\d{4}\\.xlsx$`));
       expect(en.workbook.worksheets[1].getCell("A1").value).toBe("Region");
       expect(ka.workbook.worksheets[1].getCell("A1").value).toBe("რეგიონი");
       expect(en.workbook.worksheets[1].getCell("A2").value).toBe("Imereti");

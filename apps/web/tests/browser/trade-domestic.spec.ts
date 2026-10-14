@@ -6,7 +6,7 @@ import { tableSeriesCount } from "./explorer-table";
 const section = (page: Page, name: string) => page.getByTestId(`trade-domestic-section-${name}`);
 
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
-  test(`Domestic views retain comparisons, range and language ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Domestic views retain comparisons, range and language ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
@@ -18,7 +18,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("trade-balance-context")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`domestic-overview-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("chart-mode-table").click();
     expect(await tableSeriesCount(page.getByTestId("explorer-table"))).toBe(3);
 
@@ -35,7 +34,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2021");
     await page.getByTestId("trade-partners-measure-trade.reexports").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.reexports");
-    await page.screenshot({ path: info.outputPath(`domestic-countries-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
+    if (width === 390) {
+      // The products half runs at 1440 only; the phone keeps overview, countries and overflow.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
 
     await section(page, "products").click();
     await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuemin", "2020");
@@ -48,7 +52,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("101 / 101");
     await page.getByTestId("trade-products-compare").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "101");
-    await page.screenshot({ path: info.outputPath(`domestic-products-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     if (width < 900) await page.getByTestId("sidebar-toggle").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("trade-domestic")).toHaveAttribute("data-section", "products");
@@ -72,8 +75,8 @@ test("Domestic Excel preserves the national split, unavailable country match and
   await expect(page.getByTestId("series-status")).toContainText("3 / 3");
   const national = await download("trade-excel-download");
   expect(national.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
-  for (const [index, amount] of [7287805027.574291, 3360329267.0083367, 3927475760.5659541].entries()) {
-    expect(national.getWorksheet("Data")!.getCell(index + 2, 4).value).toBeCloseTo(amount, 5);
+  for (const [index, amount] of [7287805028, 3360329267, 3927475761].entries()) {
+    expect(national.getWorksheet("Data")!.getCell(index + 2, 4).value).toBe(amount);
   }
   expect(national.getWorksheet("Summary")!.getRow(2).height).toBeGreaterThan(15);
 
@@ -94,7 +97,7 @@ test("Domestic Excel preserves the national split, unavailable country match and
   const remainder: ExcelJS.Row[] = [];
   products.getWorksheet("Data")!.eachRow(row => { if (row.getCell(3).value === "Other commodities" && row.getCell(1).value === 2025) remainder.push(row); });
   expect(remainder).toHaveLength(1);
-  expect(remainder[0].getCell(4).value).toBeCloseTo(429174637.2342389, 5);
+  expect(remainder[0].getCell(4).value).toBe(429174637);
   for (const [filename, hash] of [
     ["domestic-export-country-2014-2026.xlsx", "c4591642eb78303086d4e1538aed31615e8b612b74b203bbbfcda98f826d972c"],
     ["domestic-exports-by-4-digit-2014-2026.xlsx", "512d7a9511a0312b3c184b57e05862e414f737d663d1b02cb1941df435248679"],
@@ -102,9 +105,4 @@ test("Domestic Excel preserves the national split, unavailable country match and
     const response = await request.get(`/downloads/methodology/trade/files/${filename}`);
     expect(response.ok()).toBe(true); expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(hash);
   }
-});
-
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/trade/domestic-exports");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
 });

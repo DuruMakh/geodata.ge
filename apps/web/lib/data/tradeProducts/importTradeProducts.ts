@@ -7,12 +7,16 @@ import { assertSameServedRows } from "../servedDataParity";
 import { resolveServedDataSource } from "../servedDataSource";
 import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview";
 import type { ClientTradeOverviewFact, TradeOverviewFact, TradeChartIndicator } from "../tradeOverview/types";
+import type { Locale } from "../../i18n/types";
+import { roundTradeFactsToWholeDollars, roundTradeTotalsToWholeDollars } from "../tradePartners/importTradePartners";
 import { readTradeProductCatalogue } from "./catalogue";
 import { tradeProductFactKey, type TradeProductEntity, type TradeProductFact, type TradeProductSourceBlock, type TradeProductsData, type TradeProductsAcceptance } from "./types";
 import { tradeProductsEnglishLabels, validateTradeProductsData } from "./validation";
 
 export type ClientTradeProductFact = [entityIndex: number, year: number, measureIndex: 0 | 1, valueUsd: number | null];
-export type ClientTradeProductsData = { entities: TradeProductEntity[]; years: number[]; facts: ClientTradeProductFact[]; nationalFacts: ClientTradeOverviewFact[]; catalogueFingerprint: string; sourceBlock?: TradeProductSourceBlock; measures?: readonly TradeChartIndicator[] };
+/** A product as a page ships it: see `projectTradeProductsForPage`. */
+export type ClientTradeProductEntity = Omit<TradeProductEntity, "sourceLabelEn" | "aliasesKa" | "aliasesEn"> & Partial<Pick<TradeProductEntity, "sourceLabelEn" | "aliasesKa" | "aliasesEn">>;
+export type ClientTradeProductsData = { entities: ClientTradeProductEntity[]; years: number[]; facts: ClientTradeProductFact[]; nationalFacts: ClientTradeOverviewFact[]; catalogueFingerprint: string; sourceBlock?: TradeProductSourceBlock; measures?: readonly TradeChartIndicator[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 export async function loadTradeProductsData(): Promise<TradeProductsData> {
@@ -61,5 +65,17 @@ export function toClientTradeProductsData(data: TradeProductsData, nationalFacts
   const indices = new Map(entities.map((entity, index) => [entity.id, index]));
   const facts = sourceBlock ? data.facts.filter(fact => indices.has(fact.entityId)) : data.facts;
   const years = [...new Set(facts.map(fact => fact.year))].sort((a, b) => a - b);
-  return { entities, years, facts: facts.map(fact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), nationalFacts: nationalFacts.filter(fact => !sourceBlock || years.includes(fact.year)).map(toClientTradeOverviewFact), catalogueFingerprint, ...(sourceBlock ? { sourceBlock } : {}) };
+  // One block's products add up to the national total of each year and flow.
+  const clientFacts = roundTradeFactsToWholeDollars(facts.map((fact): ClientTradeProductFact => [indices.get(fact.entityId)!, fact.year, fact.indicatorId === "trade.exports" ? 0 : 1, fact.valueUsd === null ? null : Number(fact.valueUsd)]), ([entity, year, measure]) => `${entities[entity]!.sourceBlock}:${year}:${measure}`, ([entity]) => entities[entity]!.id);
+  return { entities, years, facts: clientFacts, nationalFacts: roundTradeTotalsToWholeDollars(nationalFacts.filter(fact => !sourceBlock || years.includes(fact.year)).map(toClientTradeOverviewFact)), catalogueFingerprint, ...(sourceBlock ? { sourceBlock } : {}) };
+}
+/**
+ * The products as one page ships them. The search reads each product's Georgian and English name on either page: an
+ * English page's label already is the source English name, so only a Georgian page carries `sourceLabelEn`. Alias
+ * lists travel only when they hold a name.
+ */
+export function projectTradeProductsForPage(data: ClientTradeProductsData, locale: Locale): ClientTradeProductsData {
+  return { ...data, entities: data.entities.map(({ sourceLabelEn, aliasesKa, aliasesEn, ...entity }) => ({
+    ...entity, ...(locale === "ka" ? { sourceLabelEn } : {}), ...(aliasesKa?.length ? { aliasesKa } : {}), ...(aliasesEn?.length ? { aliasesEn } : {}),
+  })) };
 }

@@ -1,7 +1,7 @@
 // apps/web/tests/factQuery/queryInflation.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
 import { periodFromKey } from "../../lib/data/inflation/periods";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { contributionIndex } from "../../lib/factQuery/inflationData";
 import type { Observation } from "../../lib/factQuery/observations";
 import { inflationCellCount, queryInflation } from "../../lib/factQuery/queryInflation";
@@ -10,7 +10,7 @@ import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/t
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
 });
 
 function rows(response: FactQueryResponse): Observation[] {

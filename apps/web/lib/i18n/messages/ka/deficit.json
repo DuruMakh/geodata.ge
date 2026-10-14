@@ -1,6 +1,5 @@
 {
   "deficit.heading": "რამდენია საქართველოს ბიუჯეტის დეფიციტი",
-  "deficit.negative": "უარყოფითი მნიშვნელობა დეფიციტია",
   "deficit.caption": "ზოგადი მთავრობის ბალანსი, {start}–{end}",
   "deficit.forecast": "პროგნოზი",
   "deficit.forecastNote": "{projectionFirst}–{projectionLast} წლები IMF-ის პროგნოზია; {actualFirst}–{actualLast} წლები ამ WEO გამოცემაში ფაქტობრივ პერიოდადაა მონიშნული.",

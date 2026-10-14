@@ -30,6 +30,8 @@ export type MethodologyContent = {
   slug: MethodologyDatasetId;
   title: string;
   summary: string;
+  /** The search snippet when `summary` is longer than a meta description's 160 characters. */
+  metaDescription?: string;
   reviewedAt: string;
   archiveManifestId: MethodologyDatasetId;
   // Where this dataset's coverage years come from. Declared rather than inferred:

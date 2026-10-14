@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderGeorgianMarkup } from "../helpers/render-localized";
 import { describe, expect, it } from "vitest";
-import { buildSeriesPanelRows, buildTreeRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
+import { buildSeriesPanelRows, buildTreeRows, nestTreeRows, SeriesPanel, topLevelIds } from "../../components/main-explorer/series-panel";
 import { SeriesSelector, SeriesSelectorRow } from "../../components/main-explorer/series-selector";
 import type { ExplorerItem } from "../../lib/explorer/types";
 
@@ -179,7 +179,7 @@ describe("optional debt selector semantics", () => {
     expect(markup).not.toContain('data-testid="series-toggle-all"');
   });
 
-  it("keeps the existing ministry caret name by default and accepts a debt-specific name", () => {
+  it("accepts a debt-specific caret name", () => {
     const base = {
       id: "parent",
       label: "ვალი",
@@ -192,14 +192,119 @@ describe("optional debt selector semantics", () => {
       onToggle: () => {},
       onToggleExpanded: () => {},
     };
-    const existing = renderGeorgianMarkup(createElement(SeriesSelectorRow, base));
     const debt = renderGeorgianMarkup(createElement(SeriesSelectorRow, {
       ...base,
       expansionLabel: "ვალი — ქვესერიების ჩაკეცვა",
     }));
 
-    expect(existing).toContain('aria-label="ქვეპროგრამები"');
     expect(debt).toContain('aria-label="ვალი — ქვესერიების ჩაკეცვა"');
+  });
+});
+
+describe("series lists for screen readers and fingers", () => {
+  const caret = (markup: string) => markup.match(/<button[^>]*aria-expanded[^>]*>/)?.[0] ?? "";
+
+  it("a caret is at least 24px wide and named after its row", () => {
+    const row = renderGeorgianMarkup(createElement(SeriesSelectorRow, {
+      id: "parent",
+      label: "ვალი",
+      color: "#1E1B16",
+      value: "1.0 მლრდ ₾",
+      selected: false,
+      showCaretColumn: true,
+      hasChildren: true,
+      onToggle: () => {},
+    }));
+
+    expect(caret(row)).toContain('aria-label="ვალი — ქვეკატეგორიები"');
+    expect(caret(row)).toMatch(/class="[^"]*\bw-6\b/);
+    expect(caret(row)).not.toContain("w-[22px]");
+    // The invisible hit area no longer reaches past the box sideways; it still runs 12px below the row.
+    expect(caret(row)).not.toContain("before:-right-1");
+    expect(caret(row)).toContain("before:-bottom-3");
+
+    // The ministries list passes no name of its own: each caret is named after its ministry.
+    const ministries = renderGeorgianMarkup(createElement(SeriesPanel, {
+      items,
+      rows: [],
+      scope: "ministries",
+      showGrouping: false,
+      grouping: "ministries",
+      selectedIds: [],
+      endYear: 2025,
+      expandedIds: [],
+      onGroupingChange: () => {},
+      onSelectionChange: () => {},
+      onToggle: () => {},
+      onToggleExpanded: () => {},
+      downloadAction: createElement("div"),
+    }));
+    expect(ministries).toContain('aria-label="Education ministry — ქვეკატეგორიები"');
+    expect(ministries).toContain('aria-label="Health ministry — ქვეკატეგორიები"');
+  });
+
+  it("an expanded ministry's programs are a group named after it, which its caret controls", () => {
+    const nested = nestTreeRows(buildSeriesPanelRows(items, "", ["admin_spending.education"]), (row) => row.isProgram);
+    expect(nested.map(({ row, children }) => [row.item.id, children.map((child) => child.item.id)])).toEqual([
+      ["admin_spending.total", []],
+      ["admin_spending.education", ["admin_program.general_education", "admin_program.school_infrastructure"]],
+      ["admin_spending.health", []],
+    ]);
+
+    const ministries = renderGeorgianMarkup(createElement(SeriesPanel, {
+      items,
+      rows: [],
+      scope: "ministries",
+      showGrouping: false,
+      grouping: "ministries",
+      selectedIds: [],
+      endYear: 2025,
+      expandedIds: ["admin_spending.education"],
+      onGroupingChange: () => {},
+      onSelectionChange: () => {},
+      onToggle: () => {},
+      onToggleExpanded: () => {},
+      downloadAction: createElement("div"),
+    }));
+    const groups = [...ministries.matchAll(/<div id="([^"]+)" role="group" aria-label="([^"]+)"[^>]*>/g)];
+    expect(groups.map((group) => group[2])).toEqual(["Education ministry"]);
+    expect(ministries).toMatch(new RegExp(`aria-expanded="true" aria-controls="${groups[0]![1]}"`));
+    expect(ministries.match(/aria-controls=/g)).toHaveLength(1);
+  });
+
+  it("the bulk control is a plain button named by its visible word in every state", () => {
+    const bulk = (hasSelection: boolean, allSelected: boolean) => {
+      const props = {
+        query: "",
+        onQueryChange: () => {},
+        searchPlaceholder: "ძებნა",
+        selectedCount: 1,
+        totalCount: 3,
+        hasSelection,
+        allSelected,
+        onToggleAll: () => {},
+        hasVisibleMatches: true,
+        children: createElement("div"),
+      };
+      const markup = renderGeorgianMarkup(createElement(SeriesSelector, props));
+      return markup.match(/<button[^>]*data-testid="series-toggle-all"[^>]*>[^]*?<\/button>/)?.[0] ?? "";
+    };
+
+    for (const [hasSelection, allSelected, state, visible] of [
+      [false, false, "false", "ყველას მონიშვნა"],
+      [true, false, "mixed", "გასუფთავება"],
+      [true, true, "true", "გასუფთავება"],
+    ] as const) {
+      const control = bulk(hasSelection, allSelected);
+      // No role, aria-checked or aria-label: the accessible name is the visible word (WCAG 2.5.3).
+      expect(control).not.toContain("role=");
+      expect(control).not.toContain("aria-checked");
+      expect(control).not.toContain("aria-label");
+      expect(control).toContain(`data-state="${state}"`);
+      // The only text that is not aria-hidden is the visible action word.
+      const named = control.replace(/<span aria-hidden="true"[^>]*>[^<]*<\/span>/g, "").replace(/<[^>]+>/g, "");
+      expect(named).toBe(visible);
+    }
   });
 });
 

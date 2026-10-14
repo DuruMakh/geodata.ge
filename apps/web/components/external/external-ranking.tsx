@@ -9,6 +9,8 @@ export type ExternalRankingRow = { entityId: string; label: string; valueUsd: nu
 
 type ExternalRankingProps = {
   testId: string; data?: Record<string, string | number>; title: string; itemLabel: string; shareLabel: string; note: string; empty: string;
+  /** Heads the share column below 640px, where it is too narrow for a long `shareLabel`; the note above the table says what the share is of. */
+  shareShortLabel?: string;
   rows: ExternalRankingRow[]; other: ExternalRankingRow | null; monthsLabel?: (count: number) => string;
   /** Amount unit; USD millions by default. */
   unit?: ValueUnit;
@@ -27,7 +29,7 @@ type ExternalRankingProps = {
  * The end-year ranking under the External flows and Trade pages: ranked rows, then one unranked remainder row.
  * A negative value keeps its sign and gets an empty bar unless `signed` draws it left of the zero axis.
  */
-export function ExternalRanking({ testId, title, itemLabel, shareLabel, note, empty, rows, other, monthsLabel, data, unit: unitProp, signed = false, barMax, showShare = true, rankLabel = "#", unavailableLabel, footer }: ExternalRankingProps) {
+export function ExternalRanking({ testId, title, itemLabel, shareLabel, shareShortLabel, note, empty, rows, other, monthsLabel, data, unit: unitProp, signed = false, barMax, showShare = true, rankLabel = "#", unavailableLabel, footer }: ExternalRankingProps) {
   const { messages } = useI18n();
   // Amounts read in millions (USD 683 million), whatever scale the chart above uses.
   const unit = unitProp ?? { divisor: 1_000_000, decimals: 1, label: message(messages, "external.unit.million") };
@@ -41,7 +43,7 @@ export function ExternalRanking({ testId, title, itemLabel, shareLabel, note, em
     <th scope="row" className="py-3 pr-3 text-left align-top text-[12px] font-medium leading-relaxed text-[var(--ink)]">{item.label}
       {kind === "ranking" ? bar(item) : null}
     </th>
-    <td className="py-3 text-right align-top font-[family-name:var(--font-numeric)] text-[12px] whitespace-nowrap text-[var(--ink)]">{formatInUnit(item.valueUsd, unit)}{item.monthsReported != null && monthsLabel ? <span data-testid={`${testId}-partial`} className="block text-[10px] text-[var(--muted)]">{monthsLabel(item.monthsReported)}</span> : null}</td>
+    <td className="py-3 text-right align-top font-[family-name:var(--font-numeric)] text-[12px] whitespace-nowrap text-[var(--ink)]">{formatInUnit(item.valueUsd, unit)}{item.monthsReported != null && monthsLabel ? <span data-testid={`${testId}-partial`} className="block text-[11px] text-[var(--muted)] min-[768px]:text-[10px]">{monthsLabel(item.monthsReported)}</span> : null}</td>
     {showShare ? <td className="py-3 pl-3 text-right align-top font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">{formatShare(item.share)}</td> : null}
   </tr>;
   const heading = <tr><td colSpan={columns} className="pt-5 pb-2 text-[11px] font-semibold text-[var(--muted)]">{unavailableLabel}</td></tr>;
@@ -51,7 +53,7 @@ export function ExternalRanking({ testId, title, itemLabel, shareLabel, note, em
     <table className="mt-5 w-full table-fixed border-collapse">
       <caption className="sr-only">{title} · {unit.label}</caption>
       <colgroup><col className="w-[6%]" />{showShare ? <col className="w-[49%]" /> : <col style={{ width: "64%" }} />}<col className="w-[30%] min-[640px]:w-[23%]" />{showShare ? <col className="w-[15%] min-[640px]:w-[22%]" /> : null}</colgroup>
-      <thead><tr className="border-b border-[var(--ink)] text-[10px] text-[var(--muted)]"><th className="py-2 text-left font-normal">{rankLabel}</th><th className="py-2 text-left font-normal">{itemLabel}</th><th className="py-2 text-right font-normal">{unit.label}</th>{showShare ? <th className="py-2 pl-3 text-right font-normal leading-tight [overflow-wrap:anywhere]">{shareLabel}</th> : null}</tr></thead>
+      <thead><tr className="border-b border-[var(--ink)] text-[11px] text-[var(--muted)] min-[768px]:text-[10px]"><th className="py-2 text-left font-normal">{rankLabel}</th><th className="py-2 text-left font-normal">{itemLabel}</th><th className="py-2 text-right font-normal">{unit.label}</th>{showShare ? <th className="py-2 pl-3 text-right font-normal leading-tight [overflow-wrap:anywhere]">{shareShortLabel ? <><span className="min-[640px]:hidden">{shareShortLabel}</span><span className="max-[640px]:hidden">{shareLabel}</span></> : shareLabel}</th> : null}</tr></thead>
       <tbody>
         {unavailableLabel
           ? rows.map((item, index) => {

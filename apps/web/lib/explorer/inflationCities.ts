@@ -144,7 +144,7 @@ export function cityAnnualAverages(index: CityIndex, view: CityView, lineId: str
 }
 
 /** Short, stable hash values: place slugs on the Georgia page, `total` and COICOP codes on a city page. */
-export function cityLineSlug(view: CityView, lineId: string): string {
+function cityLineSlug(view: CityView, lineId: string): string {
   if (view.kind === "georgia") return lineId.split(".")[1]!;
   return lineId === HEADLINE_ID ? "total" : lineId.replace("cpi.cat.", "");
 }

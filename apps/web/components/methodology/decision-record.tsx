@@ -46,20 +46,24 @@ function DecisionDetails({ decision }: { decision: MethodologyDecision }) {
 function DecisionGroups({
   decisions,
   hiddenGroups = [],
+  headingLevel = 3,
 }: {
   decisions: readonly MethodologyDecision[];
   hiddenGroups?: readonly string[];
+  /** 4 inside the technical appendix, whose own title is the h3. */
+  headingLevel?: 3 | 4;
 }) {
+  const Heading = headingLevel === 4 ? "h4" : "h3";
   return grouped(decisions)
     .filter(([group]) => !hiddenGroups.includes(group))
     .map(([group, entries]) => (
     <section key={group} aria-labelledby={`decision-group-${entries[0].id}`} className="mt-8">
-      <h3
+      <Heading
         id={`decision-group-${entries[0].id}`}
         className="border-b border-[var(--ink)] pb-2 text-[0.6875rem] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]"
       >
         {group}
-      </h3>
+      </Heading>
       {entries.map((decision) => (
         <DecisionDetails key={decision.id} decision={decision} />
       ))}
@@ -94,7 +98,7 @@ export function DecisionRecord({
           <p className="mt-3 max-w-[760px] text-[0.8125rem] leading-[1.75] text-[var(--body)]">
             {message(messages, "methodology.appendixSummary")}
           </p>
-          <DecisionGroups decisions={technicalAppendix} hiddenGroups={hiddenGroups} />
+          <DecisionGroups decisions={technicalAppendix} hiddenGroups={hiddenGroups} headingLevel={4} />
         </section>
       ) : null}
     </div>

@@ -7,7 +7,6 @@
   "analysis.fastestGrowth": "ყველაზე სწრაფი ზრდა",
   "analysis.largestIncrease": "ყველაზე დიდი მატება",
   "analysis.headlinePeriod": "{count} კატეგორია · {year}",
-  "analysis.deck": "{year} · {count} კატეგორია · სულ {amount}",
   "analysis.expenditureHeading": "{year} წლის ბიუჯეტის სურათი — სად მიდის საჯარო ფული",
   "analysis.revenueHeading": "{year} წლის ბიუჯეტის სურათი — საიდან მოდის საჯარო ფული",
   "analysis.structureRevenue": "სტრუქტურა კატეგორიების მიხედვით",
@@ -15,6 +14,7 @@
   "analysis.structureFields": "სტრუქტურა სფეროების მიხედვით",
   "analysis.expenditure": "ხარჯები",
   "analysis.revenue": "შემოსავლები",
+  "analysis.sideLabel": "ბიუჯეტის მხარე",
   "analysis.fields": "სფეროები",
   "analysis.ministries": "უწყებები",
   "analysis.plannedBudget": "გეგმური ბიუჯეტის მონაცემები",
@@ -50,5 +50,7 @@
   "analysis.budgetFieldNote": "x — წილი მთლიანიდან · y — ზრდა წინა წელთან · ზომა — მოცულობა",
   "analysis.budgetFieldEmpty": "წინა წლის მონაცემები არ არის ხელმისაწვდომი — ზრდის მაჩვენებლები ამ წლისთვის ვერ გამოჩნდება. აირჩიე უფრო გვიანი წელი.",
   "analysis.metadataTitle": "საქართველოს ბიუჯეტის ანალიზი — {year} ფაქტი | Fiscal.ge",
-  "analysis.metadataDescription": "{year} წლის ბიუჯეტის ფაქტობრივი სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."
+  "analysis.metadataDescription": "{year} წლის ბიუჯეტის ფაქტობრივი სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾.",
+  "analysis.metadataTitlePlanned": "საქართველოს ბიუჯეტის ანალიზი — {year} გეგმა | Fiscal.ge",
+  "analysis.metadataDescriptionPlanned": "{year} წლის ბიუჯეტის დაგეგმილი სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."
 }

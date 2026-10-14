@@ -6,7 +6,7 @@ import { parse } from "csv-parse/sync";
 import { serializeBomCsvRows } from "../csvEscape";
 import { readVerifiedPackageFile } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
-import { readTradeSourceWorksheet } from "../parsing/tradeSourceWorkbook";
+import { parseOnce, readTradeSourceWorksheet, type TradeParseCache } from "../parsing/tradeSourceWorkbook";
 import { TRADE_PRODUCT_BLOCKS, TRADE_PRODUCT_SOURCES, tradeProductFactKey, type TradeProductFact, type TradeProductsAcceptance } from "./types";
 import { tradeProductsEnglishLabels, validateTradeProductsData } from "./validation";
 import { readTradeProductCatalogue } from "./catalogue";
@@ -20,11 +20,11 @@ type Layout = { family: string; flow: "export" | "import"; source_id: string; so
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 const fields = ["entity_id", "year", "indicator_id", "value_usd", "unit", "basis", "value_status", "publication_status", "role", "source_id", "source_refs", "source_value", "source_unit", "source_label", "source_number_format", "source_block", "last_reviewed_at"];
 
-export async function prepareTradeProductsData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
+export async function prepareTradeProductsData(repositoryRoot: string, mode: "write" | "check", cache?: TradeParseCache): Promise<void> {
   const directory = path.join(repositoryRoot, RESEARCH), inputSha256: Record<string, string> = {};
   const read = async (name: string) => { const bytes = await fs.readFile(path.join(directory, name)); inputSha256[name] = hash(bytes); return bytes; };
-  const json = async <T>(name: string): Promise<T> => JSON.parse((await read(name)).toString("utf8"));
-  const csv = async (name: string): Promise<Row[]> => parse(await read(name), { columns: true, bom: true, skip_empty_lines: true });
+  const json = async <T>(name: string): Promise<T> => { const bytes = await read(name); return parseOnce(cache, `${name}:${inputSha256[name]}`, () => JSON.parse(bytes.toString("utf8"))); };
+  const csv = async (name: string): Promise<Row[]> => { const bytes = await read(name); return parseOnce(cache, `${name}:${inputSha256[name]}`, () => parse(bytes, { columns: true, bom: true, skip_empty_lines: true })); };
   const sources = await json<Source[]>("full-source-manifest.json"), layouts = await json<Layout[]>("source-layouts.json");
   const inventory = await json<{ full_manifest_sha256: string; layout_sha256: string; blocks: { source_id: string; source_sheet: string; source_block: string; year: string; source_key_count: number; identity_count: number; key_sha256: string; status_counts: Record<string, number> }[] }>("expected-observation-inventory.json");
   if (inventory.full_manifest_sha256 !== inputSha256["full-source-manifest.json"] || inventory.layout_sha256 !== inputSha256["source-layouts.json"]) throw new Error("Trade products source inventory fingerprint mismatch");
@@ -56,7 +56,7 @@ export async function prepareTradeProductsData(repositoryRoot: string, mode: "wr
       const source = matchingSources[0], layout = matchingLayouts[0];
       const { bytes, sha256 } = await readVerifiedPackageFile(directory, source.local_file, source, "Trade products source capture/hash mismatch");
       sourceSha256[sourceId] = sha256;
-      const { sheet, storedValues } = readTradeSourceWorksheet(bytes, layout.source_sheet);
+      const { sheet, storedValues } = parseOnce(cache, `${source.local_file}#${layout.source_sheet}:${sha256}`, () => readTradeSourceWorksheet(bytes, layout.source_sheet));
       if (layout.source_unit !== "thousand_usd" || JSON.stringify(Object.keys(layout.year_columns).map(Number).sort((a, b) => a - b)) !== JSON.stringify(years)) throw new Error(`Trade products source unit/coverage mismatch: ${sourceId}`);
       for (const cell of [...layout.header_cells, ...layout.rows.flatMap(row => [...row.label_cells, ...row.code_cells])]) {
         if (String(sheet[cell.cell]?.v) !== cell.value || (sheet[cell.cell]?.z ?? "General") !== cell.format || (cell.stored_value !== undefined && storedValues.get(cell.cell) !== cell.stored_value)) throw new Error(`Trade products source label/code/header/format mismatch: ${sourceId}:${cell.cell}`);

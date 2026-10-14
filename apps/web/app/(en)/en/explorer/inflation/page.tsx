@@ -1,4 +1,4 @@
-import { inflationHubMetadata, renderInflationHub } from "../../../../../lib/pages/inflation";
+import { inflationHubMetadata, renderInflationHub } from "../../../../../lib/pages/hubs/inflation";
 
 export function generateMetadata() {
   return inflationHubMetadata("en");
