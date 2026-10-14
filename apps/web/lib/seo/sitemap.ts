@@ -1,3 +1,4 @@
+import { loadServedTradeCompositionData } from "../data/tradeComposition/importTradeComposition";
 import type { MetadataRoute } from "next";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { ADJARA_REGION_ID } from "../data/municipal/types";
@@ -55,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -80,6 +81,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedEnergyFoodData(),
     loadServedMoneyBanksData(),
     loadServedTradeServicesData(),
+    loadServedTradeCompositionData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -102,10 +104,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const currentAccountModified = new Date(currentAccountFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const externalModified = new Date(Math.max(moneyTransfersModified.getTime(), foreignInvestmentModified.getTime(), currentAccountModified.getTime()));
   const tradeProductsModified = new Date(tradeProductFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  const tradeCompositionModified = new Date(tradeCompositionFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeServicesModified = new Date(tradeServicesFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeDomesticModified = new Date(tradeDomesticFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   // A hub is dated by the latest of every dataset its cards read.
-  const tradeHubModified = new Date(Math.max(tradeModified.getTime(), tradePartnersModified.getTime(), tradeProductsModified.getTime(), tradeDomesticModified.getTime(), tradeServicesModified.getTime()));
+  const tradeHubModified = new Date(Math.max(tradeModified.getTime(), tradePartnersModified.getTime(), tradeProductsModified.getTime(), tradeDomesticModified.getTime(), tradeServicesModified.getTime(), tradeCompositionModified.getTime()));
   const economyModified = new Date(Math.max(gdpModified.getTime(), sectorsModified.getTime(), regionalModified.getTime()));
   const inflationHubModified = productModified > inflationModified ? productModified : inflationModified;
   const demographyModified = new Date(demographyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -171,6 +174,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/trade/products`, lastModified: tradeProductsModified },
     { url: `${siteUrl}/explorer/trade/domestic-exports`, lastModified: tradeDomesticModified },
     { url: `${siteUrl}/explorer/trade/services`, lastModified: tradeServicesModified },
+    { url: `${siteUrl}/explorer/trade/composition`, lastModified: tradeCompositionModified },
     ...UNEMPLOYMENT_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: unemploymentModified })),
     ...regions.map(region => ({ url: `${siteUrl}${unemploymentRegionHref(region.id)}`, lastModified: new Date(unemploymentFacts.filter(fact => fact.dimension === "region" && fact.groupId === region.id).map(fact => fact.lastReviewedAt).sort().at(-1)!) })),
     { url: `${siteUrl}/explorer/economy/regions`, lastModified: regionalModified },

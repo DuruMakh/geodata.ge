@@ -112,6 +112,7 @@ export const NAV_TREE: readonly NavHub[] = [
       { id: "products", href: "/explorer/trade/products", labelKey: "common.tradeProducts" },
       { id: "domestic", href: "/explorer/trade/domestic-exports", labelKey: "common.tradeDomestic" },
       { id: "services", href: "/explorer/trade/services", labelKey: "common.tradeServices" },
+      { id: "composition", href: "/explorer/trade/composition", labelKey: "common.tradeComposition" },
     ], "trade"),
   },
   {

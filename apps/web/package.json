@@ -26,6 +26,8 @@
     "i18n:check": "tsx scripts/check-localization.ts --check",
     "data:validate": "tsx scripts/validate-all.ts",
     "data:validate-files": "tsx scripts/validate-data-files.ts",
+    "data:prepare-trade-composition": "tsx scripts/prepare-trade-composition.ts --write",
+    "data:check-trade-composition": "tsx scripts/prepare-trade-composition.ts --check",
     "data:prepare-trade-services": "tsx scripts/prepare-trade-services.ts --write",
     "data:check-trade-services": "tsx scripts/prepare-trade-services.ts --check",
     "data:prepare-trade-domestic": "tsx scripts/prepare-trade-domestic.ts --write",

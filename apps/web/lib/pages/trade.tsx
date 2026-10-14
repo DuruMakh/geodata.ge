@@ -1,3 +1,6 @@
+import { TradeComposition } from "../../components/trade/trade-composition";
+import { loadServedTradeCompositionData, toClientTradeCompositionData } from "../data/tradeComposition/importTradeComposition";
+import { TRADE_COMPOSITION_SOURCES } from "../data/tradeComposition/types";
 import path from "node:path";
 import { TradeOverview } from "../../components/trade/trade-overview";
 import { TradePartners } from "../../components/trade/trade-partners";
@@ -192,6 +195,38 @@ export async function renderTradeServicesPage(locale: Locale) {
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <TradeServices data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+    </ExplorerPage>
+  </I18nProvider>;
+}
+
+
+export async function tradeCompositionMetadata(locale: Locale) {
+  const [composition, national, messages] = await Promise.all([loadServedTradeCompositionData(), loadServedTradeOverviewData(), getMessages(locale, ["trade"])]);
+  const { min, max } = tradePartnersCoverage(toClientTradeCompositionData(composition, national.facts).sitc);
+  return fiscalMetadata({ locale, path: "/explorer/trade/composition", title: message(messages, "trade.composition.title"), description: `${message(messages, "trade.composition.summary")} ${min}–${max}.` });
+}
+
+export async function renderTradeCompositionPage(locale: Locale) {
+  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const [composition, national, presentation, manifest, catalogue] = await Promise.all([
+    loadServedTradeCompositionData(), loadServedTradeOverviewData(), getPresentation(locale, ["trade", "main", "format", "workbook"], []), loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
+  ]);
+  const { englishLabels, ...data } = toClientTradeCompositionData(composition, national.facts), { min, max } = tradePartnersCoverage(data.sitc);
+  const sourceIds = new Set<string>(Object.values(TRADE_COMPOSITION_SOURCES).flatMap(sources => Object.values(sources)));
+  sourceIds.add(TRADE_OVERVIEW_SOURCE);
+  const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
+  const lastReviewedAt = [...composition.facts, ...national.facts.filter(fact => fact.year >= min && fact.year <= max && (fact.indicatorId === "trade.exports" || fact.indicatorId === "trade.imports"))].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
+  const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("composition.title");
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
+  return <I18nProvider {...clientPresentation(presentation)} englishLabels={{ ...presentation.englishLabels, ...englishLabels }}>
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: "/explorer/trade/composition", datasetId: "trade", name: title, description: t("composition.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      variableMeasured: [t("composition.indicator.trade.exports"), t("composition.indicator.trade.imports")],
+    })} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/composition", locale) }]} />
+    <ExplorerPage containerQueries={false}>
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
+      <TradeComposition data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

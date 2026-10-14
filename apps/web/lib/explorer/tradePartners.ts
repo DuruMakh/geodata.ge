@@ -4,7 +4,7 @@ import { TRADE_CHART_INDICATORS } from "../data/tradeOverview/types";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
-import { INK, SERIES_COLORS, stableSeriesColor } from "./colors";
+import { EDITORIAL_PALETTE, INK, SERIES_COLORS, stableSeriesColor } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { TRADE_PARTNER_TOTAL_ID, tradePartnersTotalId, tradePartnersBulkSelection, tradePartnersCoverage, type TradePartnersState } from "./tradePartnersState";
@@ -12,6 +12,8 @@ import { TRADE_PARTNER_TOTAL_ID, tradePartnersTotalId, tradePartnersBulkSelectio
 const servicePalette = [...new Set(Object.values(SERIES_COLORS))].filter(color => color !== INK);
 export function tradePartnerColor(id: string): string {
   if (id === TRADE_PARTNER_TOTAL_ID || id === "services.total") return INK;
+  const composition = /^trade\.(sitc|bec)1\.(\d)$/.exec(id);
+  if (composition) return EDITORIAL_PALETTE[Number(composition[2]) - (composition[1] === "bec" ? 1 : 0)];
   const serviceIndex = (TRADE_SERVICE_IDS as readonly string[]).indexOf(id);
   return serviceIndex > 0 ? servicePalette[serviceIndex - 1] : stableSeriesColor(id);
 }
@@ -31,7 +33,7 @@ export function buildTradePartnersModel(data: ClientTradePartnersData, state: Tr
   const billion = values.some(value => Math.abs(value) >= 1_000_000_000);
   const unit = unitFor(values, { divisor: billion ? 1_000_000_000 : 1_000_000, label: message(presentation.messages, billion ? "trade.unit.billion" : "trade.unit.million"), decimals: 1 });
   unit.decimals = Math.max(1, unit.decimals);
-  const kind = data.dataset === "services" ? "service_type" : state.tab === "countries" ? "country" : "group";
+  const kind = data.dataset === "composition" ? "commodity_group" : data.dataset === "services" ? "service_type" : state.tab === "countries" ? "country" : "group";
   const activeEntities = data.entities.filter(entity => entity.kind === kind);
   const offTabSelected = data.entities.filter(entity => entity.kind !== kind && selectedIds.includes(entity.id));
   const national = valuesByEntity[totalId][range.end];

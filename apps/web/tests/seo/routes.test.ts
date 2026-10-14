@@ -12,6 +12,7 @@ import { loadServedTradePartnersData } from "../../lib/data/tradePartners/import
 import { loadServedTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { loadServedTradeDomesticData } from "../../lib/data/tradeDomestic/importTradeDomestic";
 import { loadServedTradeServicesData } from "../../lib/data/tradeServices/importTradeServices";
+import { loadServedTradeCompositionData } from "../../lib/data/tradeComposition/importTradeComposition";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
 import { loadServedProductData } from "../../lib/data/inflation/importProducts";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
@@ -100,7 +101,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Energy and food adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Services trade adds one further bilingual pair.
-    expect(urls).toHaveLength(580);
+    // Trade composition adds one further bilingual pair.
+    expect(urls).toHaveLength(582);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -143,6 +145,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/domestic-exports");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/services");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/services");
+    expect(urls).toContain("https://fiscal.ge/explorer/trade/composition");
+    expect(urls).toContain("https://fiscal.ge/en/explorer/trade/composition");
     for (const route of ["/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account", "/methodology/external-flows"]) {
       expect(urls).toContain(`https://fiscal.ge${route}`);
       expect(urls).toContain(`https://fiscal.ge/en${route}`);
@@ -475,13 +479,13 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
   it("dates each hub by the newest dataset its cards read", async () => {
     const latest = (...datasets: { facts: readonly { lastReviewedAt: string }[] }[]) =>
       datasets.flatMap(({ facts }) => facts.map((fact) => fact.lastReviewedAt)).sort().at(-1);
-    const [dates, gdp, sectors, regional, trade, partners, products, domestic, services, inflation, inflationProducts, { sourceDocuments }, debt, balance] = await Promise.all([
+    const [dates, gdp, sectors, regional, trade, partners, products, domestic, services, composition, inflation, inflationProducts, { sourceDocuments }, debt, balance] = await Promise.all([
       sitemapDates(), loadServedGdpOverviewData(), loadServedEconomicSectorsData(), loadServedRegionalEconomyData(),
-      loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(),
+      loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), loadServedTradeCompositionData(),
       loadServedInflationData(), loadServedProductData(), loadServedLandingData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
     ]);
     expect(dates.get(`${SITE}/explorer/economy`)).toBe(latest(gdp, sectors, regional));
-    expect(dates.get(`${SITE}/explorer/trade`)).toBe(latest(trade, partners, products, domestic, services));
+    expect(dates.get(`${SITE}/explorer/trade`)).toBe(latest(trade, partners, products, domestic, services, composition));
     expect(dates.get(`${SITE}/explorer/inflation`)).toBe(latest(inflation, inflationProducts));
     expect(dates.get(`${SITE}/explorer`)).toBe(latest({ facts: sourceDocuments }, debt, balance));
   });
@@ -490,6 +494,11 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
     const dates = await sitemapDates();
     expect(dates.get(`${SITE}/explorer/trade/products`)).toBe("2026-10-09");
     expect(dates.get(`${SITE}/en/explorer/trade/products`)).toBe("2026-10-09");
+  });
+  it("dates both composition routes from the accepted data", async () => {
+    const dates = await sitemapDates();
+    expect(dates.get(`${SITE}/explorer/trade/composition`)).toBe("2026-10-14");
+    expect(dates.get(`${SITE}/en/explorer/trade/composition`)).toBe("2026-10-14");
   });
 });
 

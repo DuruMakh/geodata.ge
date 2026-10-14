@@ -5,7 +5,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "trade",
   "title": "External trade in goods and services",
   "summary": "Georgia’s annual goods trade and separately reviewed services trade in nominal USD.",
-  "reviewedAt": "2026-10-11",
+  "reviewedAt": "2026-10-14",
   "archiveManifestId": "trade",
   "coverageSource": {
     "kind": "archive"
@@ -131,11 +131,22 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       ]
     },
     {
+      "id": "composition",
+      "kind": "classification",
+      "title": "Trade composition: SITC and BEC",
+      "paragraphs": [
+        "Trade composition covers goods exports and imports for 2000–2025: ten SITC (Standard International Trade Classification) sections and seven published BEC (Broad Economic Categories) categories. In source labels, n.e.s. means ‘not elsewhere specified’. BEC is not a pure three-way capital/intermediate/consumer split. Capital goods includes its stated parts and accessories; transport equipment is separate.",
+        "Amounts are nominal USD. Exports include re-exports and use FOB valuation; imports use CIF. End-year category shares use the matching same-year national exports or imports. A missing or zero denominator yields no share. Missing amounts stay gaps, dashes and blank workbook cells; published zero and negative values retain their meaning.",
+        "The accepted subset has 17 identities and 884 original category observations (520 SITC and 364 BEC). Its 104 classification totals are validation controls, not selectable series. Four originals, exact source cells, years, codes, units and decimals are verified; category sums reconcile to classification totals and totals to national amounts within USD 1. Exact thousand-USD conversion uses Decimal precision 50. The private mirror preserves provenance and exact values through the parity-checked import.",
+        "The first release offers Exports and Imports in USD only. Excel includes all committed series and selected years with applicable native originals, and omits percentage, publication-status and internal metadata columns. The two UK services discrepancies and wider research package remain unresolved; no country-by-product join or additional measure is accepted."
+      ]
+    },
+    {
       "id": "archive",
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "Eighteen frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, two domestic-export workbooks, two services type workbooks, services metadata PDF, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
+        "Twenty-two frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, two domestic-export workbooks, two services type workbooks, four SITC/BEC workbooks, services metadata PDF, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
       ]
     }
   ],

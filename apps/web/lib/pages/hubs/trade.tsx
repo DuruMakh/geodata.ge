@@ -1,3 +1,4 @@
+import { loadServedTradeCompositionData, toClientTradeCompositionData } from "../../data/tradeComposition/importTradeComposition";
 import { loadServedTradeDomesticData, toClientTradeDomesticData } from "../../data/tradeDomestic/importTradeDomestic";
 import { loadServedTradeOverviewData, toClientTradeOverviewFact } from "../../data/tradeOverview/importTradeOverview";
 import { loadServedTradePartnersData, toClientTradePartnersData } from "../../data/tradePartners/importTradePartners";
@@ -22,11 +23,11 @@ export async function tradeHubMetadata(locale: Locale) {
   return fiscalMetadata({ locale, path: "/explorer/trade", title: message(messages, "trade.hubMetaTitle"), description: message(messages, "trade.hubMetaDescription") });
 }
 export async function renderTradeHub(locale: Locale) {
-  const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade"], [])]);
+  const [{ facts }, partners, products, domestic, services, composition, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), loadServedTradeCompositionData(), getPresentation(locale, ["trade"], [])]);
   const title = message(presentation.messages, "trade.hubTitle");
-  const all = [...facts, ...partners.facts, ...products.facts, ...domestic.facts, ...services.facts];
+  const all = [...facts, ...partners.facts, ...products.facts, ...domestic.facts, ...services.facts, ...composition.facts];
   const years = [...new Set(all.map(f => f.year))];
   // The header's coverage label spans every trade dataset the hub links to (U28-06).
   const coverage = coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), all.reduce((latest, f) => f.lastReviewedAt > latest ? f.lastReviewedAt : latest, ""));
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage={coverage} cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} testId="trade-hub" />;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage={coverage} cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national, toClientTradeCompositionData(composition, facts).sitc.nationalFacts.filter(fact => fact.indicatorId === "trade.exports"))} testId="trade-hub" />;
 }

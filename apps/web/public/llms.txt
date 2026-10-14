@@ -51,6 +51,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Products](https://fiscal.ge/explorer/trade/products) — exports and imports of 1,192 HS4 products, 2020–2025.
 - [Domestic exports](https://fiscal.ge/explorer/trade/domestic-exports) — total exports, domestic exports and re-exports, 2014–2025, by country and for 99 products plus Other commodities.
 - [Services trade](https://fiscal.ge/explorer/trade/services) — services exports, imports, turnover and balance, in total and for 12 service types, 2020–2024.
+- [Trade composition](https://fiscal.ge/explorer/trade/composition) — goods exports and imports by ten SITC goods groups or seven published BEC economic categories, 2000–2025; the two views are alternative classifications of the same trade.
 - [External flows](https://fiscal.ge/explorer/external) — the external-flows section: money transfers, foreign direct investment and the current account, in nominal USD. Browse-only: there is no MCP tool and no bulk file for external flows.
 - [Money from abroad](https://fiscal.ge/explorer/external/money-from-abroad) — the National Bank of Georgia's money transfers received and sent, in total and by country, 2000–2025; partial years are marked.
 - [Foreign investment](https://fiscal.ge/explorer/external/foreign-investment) — Geostat's foreign direct investment inflow by country (1996–2025), sector (2016–2025) and region (2009–2025).

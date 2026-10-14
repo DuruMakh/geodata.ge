@@ -22738,5 +22738,73 @@
   "services.government": {
     "text": "Government goods and services n.i.e.",
     "reviewedAt": "2026-10-11"
+  },
+  "trade.sitc1.0": {
+    "text": "Food and live animals",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.1": {
+    "text": "Beverages and tobacco",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.2": {
+    "text": "Crude materials, inedible, except fuels",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.3": {
+    "text": "Mineral fuels, lubricants and related materials",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.4": {
+    "text": "Animal and vegetable oils, fats and waxes",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.5": {
+    "text": "Chemicals and related products, n.e.s.",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.6": {
+    "text": "Manufactured goods classified chiefly by material",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.7": {
+    "text": "Machinery and transport equipment",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.8": {
+    "text": "Miscellaneous manufactured articles",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.sitc1.9": {
+    "text": "Commodities not classified elsewhere in the SITC",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.bec1.1": {
+    "text": "Food and beverages",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.bec1.2": {
+    "text": "Industrial supplies not elsewhere specified",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.bec1.3": {
+    "text": "Fuels and lubricants",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.bec1.4": {
+    "text": "Capital goods (except transport equipment), and parts and accessories thereof",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.bec1.5": {
+    "text": "Transport equipment and parts and accessories thereof",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.bec1.6": {
+    "text": "Consumer goods not elsewhere specified",
+    "reviewedAt": "2026-10-14"
+  },
+  "trade.bec1.7": {
+    "text": "Goods not elsewhere specified",
+    "reviewedAt": "2026-10-14"
   }
 }

@@ -21,6 +21,22 @@ describe("the navigation tree", () => {
     expect(openHub("/explorer/demography/population/region/imereti").href).toBe("/explorer/demography");
   });
 
+  it("appends Trade composition after the five existing Trade pages", () => {
+    const hub = NAV_TREE.find((entry) => entry.href === "/explorer/trade")!;
+    expect(hub.sections.map((section) => section.href)).toEqual([
+      "/explorer/trade/overview",
+      "/explorer/trade/partners",
+      "/explorer/trade/products",
+      "/explorer/trade/domestic-exports",
+      "/explorer/trade/services",
+      "/explorer/trade/composition",
+    ]);
+    expect(hub.sections.at(-1)).toMatchObject({ labelKey: "common.tradeComposition", testId: "trade-composition-link" });
+    expect(openHub("/explorer/trade/composition")).toBe(hub);
+    expect(currentEntry("/explorer/trade/composition")).toBe("/explorer/trade/composition");
+    expect(sourceNoteKey("/explorer/trade/composition")).toBe("common.geostatSourceNote");
+  });
+
   it("matches a row's own page and the pages below it, not a sibling that shares its start", () => {
     expect(isActivePath("/explorer/wages/regions", "/explorer/wages/regions")).toBe(true);
     expect(isActivePath("/explorer/wages/regions/adjara", "/explorer/wages/regions")).toBe(true);

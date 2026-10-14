@@ -73,6 +73,8 @@ Unemployment uses the existing single import transaction. Source IDs retain thei
 | `MunicipalCountryTotalFact` | `data/imports/municipal-georgia-total-facts-2015-2025.csv` (the Georgia aggregate's totals; see `municipal-functional-annual-2015-2025.md`) |
 | `MunicipalAdjaraBudgetAdjustment` | `data/imports/municipal-adjara-budget-adjustments-2015-2025.csv` (Adjara republican payments net of transfers; see `municipal-functional-annual-2015-2025.md`) |
 | `ImportRun` | one audit row per import run, including the full parity report |
+| `TradeCompositionEntity` | `data/taxonomy/trade-composition.json` (17 accepted SITC/BEC category identities) |
+| `TradeCompositionFact` | `data/imports/trade-composition-annual.csv` (884 original exports/imports observations, 2000–2025; exact decimals and complete provenance) |
 
 The sector and inflation migrations retain their separate directory names despite
 sharing the `20260912000000` timestamp. Both are required. Their datasets keep
@@ -325,3 +327,11 @@ which never uses a shadow database, so P3006 is not in the production path.
 ## Domestic exports mirror
 
 The domestic-export extension adds `TradeDomesticEntity` (287 rows) and `TradeDomesticFact` (5,076 rows) from the accepted domestic catalogue and CSV. Migration `20261010120000_trade_domestic_exports` adds only these tables, their entity/source/import relations, RLS and revoked public-role grants. It was generated offline by comparing the previous and current Prisma schemas; it does not assume live-database state. The existing import transaction clears the new facts before entities and source documents, imports facts in 1,000-row batches, and compares every field before committing. The serving reader repeats CSV/database parity checks. No live import or migration is part of local page implementation; an authorized release applies them through the existing Actions pipeline.
+
+## Trade composition mirror
+
+The composition extension mirrors 17 accepted category identities and 884 original observations (520 SITC, 364 BEC). Its 104 classification totals remain validation controls, outside the selectable catalogue and fact table. The accepted CSV, catalogue, acceptance report and English labels are hashed and validated before serving or import; raw workbooks and preparation code are never part of serving. The compact client projections keep SITC and BEC separate, with only exports/imports and national references for each classification's available years.
+
+Migration `20261014120000_trade_composition` is generated offline from the previous/current Prisma schema files. It adds only the two composition tables, exact nullable `Decimal(40,20)` values, entity/source/import relations and indexes. Both tables enable RLS, have no public policies and revoke all access from `PUBLIC`, `anon` and `authenticated`. There is no new public database access.
+
+The importer binds the four original source IDs to registered document identities by replacing hyphens with underscores and adding `source.`. It verifies those identities before opening the existing transaction, deletes composition facts before entities and source parents, inserts rows with the active import-run ID in the existing 1,000-row batches, then reloads and compares every entity/fact field and normalized exact decimal before commit. Counts for both tables appear in the parity report. The five-minute transaction and 30-second wait limits remain unchanged. DB-mode serving repeats full parity; CSV mode remains the static fallback. Local implementation does not apply migrations or run imports against a live database. Integration verification requires an explicitly configured disposable local test database; an authorized release uses the existing Actions pipeline.

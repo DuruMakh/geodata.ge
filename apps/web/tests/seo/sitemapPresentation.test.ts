@@ -1,6 +1,15 @@
 import type { MetadataRoute } from "next";
 import { describe, expect, it } from "vitest";
-import { serializeSitemapXml } from "../../lib/seo/sitemap";
+import sitemap, { serializeSitemapXml } from "../../lib/seo/sitemap";
+it("registers composition with both locale alternates", async () => {
+  const entries = await sitemap();
+  const entry = entries.find(row => row.url.endsWith("/explorer/trade/composition") && !row.url.includes("/en/"));
+  expect(entry?.alternates?.languages).toMatchObject({
+    ka: expect.stringMatching(/\/explorer\/trade\/composition$/),
+    en: expect.stringMatching(/\/en\/explorer\/trade\/composition$/),
+    "x-default": entry?.url,
+  });
+});
 
 describe("serializeSitemapXml", () => {
   it("adds the browser stylesheet without changing sitemap records", () => {

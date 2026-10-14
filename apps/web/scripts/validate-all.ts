@@ -30,6 +30,7 @@ export const DATA_VALIDATE_CHECKS = [
   "data:check-trade-products",
   "data:check-trade-domestic",
   "data:check-trade-services",
+  "data:check-trade-composition",
   "data:check-money-transfers",
   "data:check-foreign-investment",
   "data:check-wages",

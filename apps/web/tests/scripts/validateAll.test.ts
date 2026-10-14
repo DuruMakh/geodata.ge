@@ -10,6 +10,7 @@ describe("data:validate", () => {
   it("runs every check in one process", () => {
     expect(scripts["data:validate"]).toBe("tsx scripts/validate-all.ts");
     expect(new Set(DATA_VALIDATE_CHECKS).size).toBe(DATA_VALIDATE_CHECKS.length);
+    expect(DATA_VALIDATE_CHECKS).toContain("data:check-trade-composition");
   });
 
   // Importing the module, as the gate does, must hand back its main without running it: runAsCli runs main only

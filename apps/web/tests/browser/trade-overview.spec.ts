@@ -9,7 +9,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
     const card = page.getByTestId("trade-hub").getByTestId("hub-card");
-    await expect(card).toHaveCount(5); await card.first().click();
+    await expect(card).toHaveCount(6); await card.first().click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/overview$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await page.evaluate(() => document.fonts.ready);

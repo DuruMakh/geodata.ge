@@ -15,7 +15,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
     const cards = page.getByTestId("trade-hub").getByTestId("hub-card");
-    await expect(cards).toHaveCount(5); await cards.nth(4).click();
+    await expect(cards).toHaveCount(6); await cards.nth(4).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/services$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Services trade" : "მომსახურებით ვაჭრობა");
