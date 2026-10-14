@@ -1,0 +1,1151 @@
+{
+  "status": "passed",
+  "scope": "annual_goods_composition",
+  "years": [
+    2000,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "entities": 17,
+  "primaryObservations": 884,
+  "numericObservations": 884,
+  "unavailableObservations": 0,
+  "derivedObservations": 0,
+  "controlObservations": 104,
+  "classifications": {
+    "sitc": {
+      "entities": 10,
+      "primaryObservations": 520,
+      "controlObservations": 52
+    },
+    "bec": {
+      "entities": 7,
+      "primaryObservations": 364,
+      "controlObservations": 52
+    }
+  },
+  "reconciliation": [
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2000,
+      "detailSumUsd": "323938266.5899996462011",
+      "controlUsd": "323938266.58999966",
+      "nationalUsd": "323938266.59000024",
+      "detailDifferenceUsd": "-0.0000000137989",
+      "nationalDifferenceUsd": "-0.00000058"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2001,
+      "detailSumUsd": "317150882.329999912802",
+      "controlUsd": "317150882.32999993",
+      "nationalUsd": "317150882.32999989",
+      "detailDifferenceUsd": "-0.000000017198",
+      "nationalDifferenceUsd": "0.00000004"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2002,
+      "detailSumUsd": "345736068.185100093197",
+      "controlUsd": "345736068.1851001",
+      "nationalUsd": "345736068.18509995",
+      "detailDifferenceUsd": "-0.000000006803",
+      "nationalDifferenceUsd": "0.00000015"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2003,
+      "detailSumUsd": "461310038.12999942952",
+      "controlUsd": "461310038.12999936",
+      "nationalUsd": "461310038.13000024",
+      "detailDifferenceUsd": "0.00000006952",
+      "nationalDifferenceUsd": "-0.00000088"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2004,
+      "detailSumUsd": "646902962.53999925001",
+      "controlUsd": "646902962.53999928",
+      "nationalUsd": "646902962.53999963",
+      "detailDifferenceUsd": "-0.00000002999",
+      "nationalDifferenceUsd": "-0.00000035"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2005,
+      "detailSumUsd": "865455633.34075884139",
+      "controlUsd": "865455633.34075897",
+      "nationalUsd": "865455633.34075837",
+      "detailDifferenceUsd": "-0.00000012861",
+      "nationalDifferenceUsd": "0.0000006"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2006,
+      "detailSumUsd": "936374626.995838494716",
+      "controlUsd": "936374626.9958386",
+      "nationalUsd": "936374626.99584046",
+      "detailDifferenceUsd": "-0.000000105284",
+      "nationalDifferenceUsd": "-0.00000186"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2007,
+      "detailSumUsd": "1232110470.0131074701",
+      "controlUsd": "1232110470.0131076",
+      "nationalUsd": "1232110470.0131089",
+      "detailDifferenceUsd": "-0.0000001299",
+      "nationalDifferenceUsd": "-0.0000013"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2008,
+      "detailSumUsd": "1495345238.1093604912",
+      "controlUsd": "1495345238.1093604",
+      "nationalUsd": "1495345238.1093614",
+      "detailDifferenceUsd": "0.0000000912",
+      "nationalDifferenceUsd": "-0.000001"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2009,
+      "detailSumUsd": "1133630226.23493983067",
+      "controlUsd": "1133630226.2349408",
+      "nationalUsd": "1133630226.2349393",
+      "detailDifferenceUsd": "-0.00000096933",
+      "nationalDifferenceUsd": "0.0000015"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2010,
+      "detailSumUsd": "1677306898.473254698",
+      "controlUsd": "1677306898.4732544",
+      "nationalUsd": "1677306898.4732517",
+      "detailDifferenceUsd": "0.000000298",
+      "nationalDifferenceUsd": "0.0000027"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2011,
+      "detailSumUsd": "2186421208.8432984963",
+      "controlUsd": "2186421208.8432973",
+      "nationalUsd": "2186421208.8433037",
+      "detailDifferenceUsd": "0.0000011963",
+      "nationalDifferenceUsd": "-0.0000064"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2012,
+      "detailSumUsd": "2376635368.2062242274",
+      "controlUsd": "2376635368.206196",
+      "nationalUsd": "2376635368.2062258",
+      "detailDifferenceUsd": "0.0000282274",
+      "nationalDifferenceUsd": "-0.0000298"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2013,
+      "detailSumUsd": "2910314539.81670892",
+      "controlUsd": "2910314539.8167092",
+      "nationalUsd": "2910314539.8167098",
+      "detailDifferenceUsd": "-0.00000028",
+      "nationalDifferenceUsd": "-0.0000006"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2014,
+      "detailSumUsd": "2861045178.6708659835",
+      "controlUsd": "2861045178.6708655",
+      "nationalUsd": "2861045178.6708636",
+      "detailDifferenceUsd": "0.0000004835",
+      "nationalDifferenceUsd": "0.0000019"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2015,
+      "detailSumUsd": "2204182637.4688497913",
+      "controlUsd": "2204182637.4688498",
+      "nationalUsd": "2204182637.4688535",
+      "detailDifferenceUsd": "-0.0000000087",
+      "nationalDifferenceUsd": "-0.0000037"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2016,
+      "detailSumUsd": "2117136440.0444512212",
+      "controlUsd": "2117136440.044451",
+      "nationalUsd": "2117136440.0444522",
+      "detailDifferenceUsd": "0.0000002212",
+      "nationalDifferenceUsd": "-0.0000012"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2017,
+      "detailSumUsd": "2745667083.255662746",
+      "controlUsd": "2745667083.2556626",
+      "nationalUsd": "2745667083.2556579",
+      "detailDifferenceUsd": "0.000000146",
+      "nationalDifferenceUsd": "0.0000047"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2018,
+      "detailSumUsd": "3379656917.644020084",
+      "controlUsd": "3379656917.6440202",
+      "nationalUsd": "3379656917.6440134",
+      "detailDifferenceUsd": "-0.000000116",
+      "nationalDifferenceUsd": "0.0000068"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2019,
+      "detailSumUsd": "3797041208.503437665",
+      "controlUsd": "3797041208.5034377",
+      "nationalUsd": "3797041208.5034382",
+      "detailDifferenceUsd": "-0.000000035",
+      "nationalDifferenceUsd": "-0.0000005"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2020,
+      "detailSumUsd": "3340635707.415974387",
+      "controlUsd": "3340635707.4159742",
+      "nationalUsd": "3340635707.4159801",
+      "detailDifferenceUsd": "0.000000187",
+      "nationalDifferenceUsd": "-0.0000059"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2021,
+      "detailSumUsd": "4242456417.032543484",
+      "controlUsd": "4242456417.0325426",
+      "nationalUsd": "4242456417.0325648",
+      "detailDifferenceUsd": "0.000000884",
+      "nationalDifferenceUsd": "-0.0000222"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2022,
+      "detailSumUsd": "5582502216.697024713",
+      "controlUsd": "5582502216.6970251",
+      "nationalUsd": "5582502216.6970257",
+      "detailDifferenceUsd": "-0.000000387",
+      "nationalDifferenceUsd": "-0.0000006"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2023,
+      "detailSumUsd": "6085879620.548798317",
+      "controlUsd": "6085879620.5487978",
+      "nationalUsd": "6085879620.5488416",
+      "detailDifferenceUsd": "0.000000517",
+      "nationalDifferenceUsd": "-0.0000438"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2024,
+      "detailSumUsd": "6561882251.207548928",
+      "controlUsd": "6561882251.2075491",
+      "nationalUsd": "6561882251.2075549",
+      "detailDifferenceUsd": "-0.000000172",
+      "nationalDifferenceUsd": "-0.0000058"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.exports",
+      "year": 2025,
+      "detailSumUsd": "7287805027.574300419",
+      "controlUsd": "7287805027.5743008",
+      "nationalUsd": "7287805027.5742908",
+      "detailDifferenceUsd": "-0.000000381",
+      "nationalDifferenceUsd": "0.00001"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2000,
+      "detailSumUsd": "709509126.3180817803",
+      "controlUsd": "709509126.31808175",
+      "nationalUsd": "709509126.31808046",
+      "detailDifferenceUsd": "0.0000000303",
+      "nationalDifferenceUsd": "0.00000129"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2001,
+      "detailSumUsd": "752010911.6117006504",
+      "controlUsd": "752010911.61170066",
+      "nationalUsd": "752010911.61169973",
+      "detailDifferenceUsd": "-0.0000000096",
+      "nationalDifferenceUsd": "0.00000093"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2002,
+      "detailSumUsd": "794691603.4099998903",
+      "controlUsd": "794691603.40999987",
+      "nationalUsd": "794691603.41000043",
+      "detailDifferenceUsd": "0.0000000203",
+      "nationalDifferenceUsd": "-0.00000056"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2003,
+      "detailSumUsd": "1139039159.3499944071",
+      "controlUsd": "1139039159.3499945",
+      "nationalUsd": "1139039159.3500026",
+      "detailDifferenceUsd": "-0.0000000929",
+      "nationalDifferenceUsd": "-0.0000081"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2004,
+      "detailSumUsd": "1844342929.427927204",
+      "controlUsd": "1844342929.4279274",
+      "nationalUsd": "1844342929.4279874",
+      "detailDifferenceUsd": "-0.000000196",
+      "nationalDifferenceUsd": "-0.00006"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2005,
+      "detailSumUsd": "2487548345.906243587",
+      "controlUsd": "2487548345.9062437",
+      "nationalUsd": "2487548345.9062589",
+      "detailDifferenceUsd": "-0.000000113",
+      "nationalDifferenceUsd": "-0.0000152"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2006,
+      "detailSumUsd": "3674832445.449241414",
+      "controlUsd": "3674832445.4492414",
+      "nationalUsd": "3674832445.4492486",
+      "detailDifferenceUsd": "0.000000014",
+      "nationalDifferenceUsd": "-0.0000072"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2007,
+      "detailSumUsd": "5212150246.316152973",
+      "controlUsd": "5212150246.3161536",
+      "nationalUsd": "5212150246.3161623",
+      "detailDifferenceUsd": "-0.000000627",
+      "nationalDifferenceUsd": "-0.0000087"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2008,
+      "detailSumUsd": "6301540343.010073427",
+      "controlUsd": "6301540343.0100735",
+      "nationalUsd": "6301540343.0101805",
+      "detailDifferenceUsd": "-0.000000073",
+      "nationalDifferenceUsd": "-0.000107"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2009,
+      "detailSumUsd": "4475724508.792159116",
+      "controlUsd": "4475724508.7921005",
+      "nationalUsd": "4475724508.792171",
+      "detailDifferenceUsd": "0.000058616",
+      "nationalDifferenceUsd": "-0.0000705"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2010,
+      "detailSumUsd": "5235964558.711925071",
+      "controlUsd": "5235964558.7120485",
+      "nationalUsd": "5235964558.7119312",
+      "detailDifferenceUsd": "-0.000123429",
+      "nationalDifferenceUsd": "0.0001173"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2011,
+      "detailSumUsd": "7072259779.462368038",
+      "controlUsd": "7072259779.4625005",
+      "nationalUsd": "7072259779.4623662",
+      "detailDifferenceUsd": "-0.000132462",
+      "nationalDifferenceUsd": "0.0001343"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2012,
+      "detailSumUsd": "8056379015.907239928",
+      "controlUsd": "8056379015.9071693",
+      "nationalUsd": "8056379015.907256",
+      "detailDifferenceUsd": "0.000070628",
+      "nationalDifferenceUsd": "-0.0000867"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2013,
+      "detailSumUsd": "8022546397.886906247",
+      "controlUsd": "8022546397.8869058",
+      "nationalUsd": "8022546397.8869893",
+      "detailDifferenceUsd": "0.000000447",
+      "nationalDifferenceUsd": "-0.0000835"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2014,
+      "detailSumUsd": "8601814354.546998501",
+      "controlUsd": "8601814354.5469996",
+      "nationalUsd": "8601814354.5470193",
+      "detailDifferenceUsd": "-0.000001099",
+      "nationalDifferenceUsd": "-0.0000197"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2015,
+      "detailSumUsd": "7304152715.614734866",
+      "controlUsd": "7304152715.6147342",
+      "nationalUsd": "7304152715.6147458",
+      "detailDifferenceUsd": "0.000000666",
+      "nationalDifferenceUsd": "-0.0000116"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2016,
+      "detailSumUsd": "7341698114.489380015",
+      "controlUsd": "7341698114.4893803",
+      "nationalUsd": "7341698114.4893707",
+      "detailDifferenceUsd": "-0.000000285",
+      "nationalDifferenceUsd": "0.0000096"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2017,
+      "detailSumUsd": "8057082210.573657038",
+      "controlUsd": "8057082210.5736574",
+      "nationalUsd": "8057082210.5736943",
+      "detailDifferenceUsd": "-0.000000362",
+      "nationalDifferenceUsd": "-0.0000369"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2018,
+      "detailSumUsd": "9361247035.886254862",
+      "controlUsd": "9361247035.8862542",
+      "nationalUsd": "9361247035.8862593",
+      "detailDifferenceUsd": "0.000000662",
+      "nationalDifferenceUsd": "-0.0000051"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2019,
+      "detailSumUsd": "9517967520.38267956",
+      "controlUsd": "9517967520.38268",
+      "nationalUsd": "9517967520.3826791",
+      "detailDifferenceUsd": "-0.00000044",
+      "nationalDifferenceUsd": "0.0000009"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2020,
+      "detailSumUsd": "8048758483.040135482",
+      "controlUsd": "8048758483.0401354",
+      "nationalUsd": "8048758483.0401811",
+      "detailDifferenceUsd": "0.000000082",
+      "nationalDifferenceUsd": "-0.0000457"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2021,
+      "detailSumUsd": "10099041319.93872214",
+      "controlUsd": "10099041319.938723",
+      "nationalUsd": "10099041319.938764",
+      "detailDifferenceUsd": "-0.00000086",
+      "nationalDifferenceUsd": "-0.000041"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2022,
+      "detailSumUsd": "13539713872.844243293",
+      "controlUsd": "13539713872.844242",
+      "nationalUsd": "13539713872.844093",
+      "detailDifferenceUsd": "0.000001293",
+      "nationalDifferenceUsd": "0.000149"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2023,
+      "detailSumUsd": "15615270126.513825037",
+      "controlUsd": "15615270126.513826",
+      "nationalUsd": "15615270126.51411",
+      "detailDifferenceUsd": "-0.000000963",
+      "nationalDifferenceUsd": "-0.000284"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2024,
+      "detailSumUsd": "16916834845.710239313",
+      "controlUsd": "16916834845.71024",
+      "nationalUsd": "16916834845.710335",
+      "detailDifferenceUsd": "-0.000000687",
+      "nationalDifferenceUsd": "-0.000095"
+    },
+    {
+      "classification": "sitc",
+      "indicatorId": "trade.imports",
+      "year": 2025,
+      "detailSumUsd": "18648513307.186801397",
+      "controlUsd": "18648513307.186801",
+      "nationalUsd": "18648513307.186789",
+      "detailDifferenceUsd": "0.000000397",
+      "nationalDifferenceUsd": "0.000012"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2000,
+      "detailSumUsd": "323938266.5900000871",
+      "controlUsd": "323938266.58999984",
+      "nationalUsd": "323938266.59000024",
+      "detailDifferenceUsd": "0.0000002471",
+      "nationalDifferenceUsd": "-0.0000004"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2001,
+      "detailSumUsd": "317150882.3299999832",
+      "controlUsd": "317150882.33000005",
+      "nationalUsd": "317150882.32999989",
+      "detailDifferenceUsd": "-0.0000000668",
+      "nationalDifferenceUsd": "0.00000016"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2002,
+      "detailSumUsd": "345736068.1851000411",
+      "controlUsd": "345736068.18510056",
+      "nationalUsd": "345736068.18509995",
+      "detailDifferenceUsd": "-0.0000005189",
+      "nationalDifferenceUsd": "0.00000061"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2003,
+      "detailSumUsd": "461310038.13000016737",
+      "controlUsd": "461310038.12999977",
+      "nationalUsd": "461310038.13000024",
+      "detailDifferenceUsd": "0.00000039737",
+      "nationalDifferenceUsd": "-0.00000047"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2004,
+      "detailSumUsd": "646902962.53999997",
+      "controlUsd": "646902962.53999847",
+      "nationalUsd": "646902962.53999963",
+      "detailDifferenceUsd": "0.0000015",
+      "nationalDifferenceUsd": "-0.00000116"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2005,
+      "detailSumUsd": "865455633.3407580715",
+      "controlUsd": "865455633.34075676",
+      "nationalUsd": "865455633.34075837",
+      "detailDifferenceUsd": "0.0000013115",
+      "nationalDifferenceUsd": "-0.00000161"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2006,
+      "detailSumUsd": "936374626.9958388517",
+      "controlUsd": "936374626.99583685",
+      "nationalUsd": "936374626.99584046",
+      "detailDifferenceUsd": "0.0000020017",
+      "nationalDifferenceUsd": "-0.00000361"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2007,
+      "detailSumUsd": "1232110470.0131092698",
+      "controlUsd": "1232110470.0131104",
+      "nationalUsd": "1232110470.0131089",
+      "detailDifferenceUsd": "-0.0000011302",
+      "nationalDifferenceUsd": "0.0000015"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2008,
+      "detailSumUsd": "1495345238.1093633355",
+      "controlUsd": "1495345238.1093623",
+      "nationalUsd": "1495345238.1093614",
+      "detailDifferenceUsd": "0.0000010355",
+      "nationalDifferenceUsd": "0.0000009"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2009,
+      "detailSumUsd": "1133630226.2349398421",
+      "controlUsd": "1133630226.2349383",
+      "nationalUsd": "1133630226.2349393",
+      "detailDifferenceUsd": "0.0000015421",
+      "nationalDifferenceUsd": "-0.000001"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2010,
+      "detailSumUsd": "1677306898.4732544192",
+      "controlUsd": "1677306898.4732565",
+      "nationalUsd": "1677306898.4732517",
+      "detailDifferenceUsd": "-0.0000020808",
+      "nationalDifferenceUsd": "0.0000048"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2011,
+      "detailSumUsd": "2186421208.8432982734",
+      "controlUsd": "2186421208.8433001",
+      "nationalUsd": "2186421208.8433037",
+      "detailDifferenceUsd": "-0.0000018266",
+      "nationalDifferenceUsd": "-0.0000036"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2012,
+      "detailSumUsd": "2376635368.206224527",
+      "controlUsd": "2376635368.2062156",
+      "nationalUsd": "2376635368.2062258",
+      "detailDifferenceUsd": "0.000008927",
+      "nationalDifferenceUsd": "-0.0000102"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2013,
+      "detailSumUsd": "2910314539.8167126053",
+      "controlUsd": "2910314539.816712",
+      "nationalUsd": "2910314539.8167098",
+      "detailDifferenceUsd": "0.0000006053",
+      "nationalDifferenceUsd": "0.0000022"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2014,
+      "detailSumUsd": "2861045178.6708658022",
+      "controlUsd": "2861045178.6708659",
+      "nationalUsd": "2861045178.6708636",
+      "detailDifferenceUsd": "-0.0000000978",
+      "nationalDifferenceUsd": "0.0000023"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2015,
+      "detailSumUsd": "2204182637.4688496792",
+      "controlUsd": "2204182637.4688493",
+      "nationalUsd": "2204182637.4688535",
+      "detailDifferenceUsd": "0.0000003792",
+      "nationalDifferenceUsd": "-0.0000042"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2016,
+      "detailSumUsd": "2117136440.044451022",
+      "controlUsd": "2117136440.044451",
+      "nationalUsd": "2117136440.0444522",
+      "detailDifferenceUsd": "0.000000022",
+      "nationalDifferenceUsd": "-0.0000012"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2017,
+      "detailSumUsd": "2745667083.2556644458",
+      "controlUsd": "2745667083.2556644",
+      "nationalUsd": "2745667083.2556579",
+      "detailDifferenceUsd": "0.0000000458",
+      "nationalDifferenceUsd": "0.0000065"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2018,
+      "detailSumUsd": "3379656917.644020796",
+      "controlUsd": "3379656917.6440206",
+      "nationalUsd": "3379656917.6440134",
+      "detailDifferenceUsd": "0.000000196",
+      "nationalDifferenceUsd": "0.0000072"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2019,
+      "detailSumUsd": "3797041208.5034383198",
+      "controlUsd": "3797041208.5034382",
+      "nationalUsd": "3797041208.5034382",
+      "detailDifferenceUsd": "0.0000001198",
+      "nationalDifferenceUsd": "0"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2020,
+      "detailSumUsd": "3340635707.4159731868",
+      "controlUsd": "3340635707.4159738",
+      "nationalUsd": "3340635707.4159801",
+      "detailDifferenceUsd": "-0.0000006132",
+      "nationalDifferenceUsd": "-0.0000063"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2021,
+      "detailSumUsd": "4242456417.0325556354",
+      "controlUsd": "4242456417.0325557",
+      "nationalUsd": "4242456417.0325648",
+      "detailDifferenceUsd": "-0.0000000646",
+      "nationalDifferenceUsd": "-0.0000091"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2022,
+      "detailSumUsd": "5582502216.697002653",
+      "controlUsd": "5582502216.6970037",
+      "nationalUsd": "5582502216.6970257",
+      "detailDifferenceUsd": "-0.000001047",
+      "nationalDifferenceUsd": "-0.000022"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2023,
+      "detailSumUsd": "6085879620.548832957",
+      "controlUsd": "6085879620.5488332",
+      "nationalUsd": "6085879620.5488416",
+      "detailDifferenceUsd": "-0.000000243",
+      "nationalDifferenceUsd": "-0.0000084"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2024,
+      "detailSumUsd": "6561882251.2075212113",
+      "controlUsd": "6561882251.2075221",
+      "nationalUsd": "6561882251.2075549",
+      "detailDifferenceUsd": "-0.0000008887",
+      "nationalDifferenceUsd": "-0.0000328"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.exports",
+      "year": 2025,
+      "detailSumUsd": "7287805027.574277991",
+      "controlUsd": "7287805027.5742775",
+      "nationalUsd": "7287805027.5742908",
+      "detailDifferenceUsd": "0.000000491",
+      "nationalDifferenceUsd": "-0.0000133"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2000,
+      "detailSumUsd": "709509126.3180815848",
+      "controlUsd": "709509126.31808245",
+      "nationalUsd": "709509126.31808046",
+      "detailDifferenceUsd": "-0.0000008652",
+      "nationalDifferenceUsd": "0.00000199"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2001,
+      "detailSumUsd": "752010911.6116999272",
+      "controlUsd": "752010911.6117002",
+      "nationalUsd": "752010911.61169973",
+      "detailDifferenceUsd": "-0.0000002728",
+      "nationalDifferenceUsd": "0.00000047"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2002,
+      "detailSumUsd": "794691603.4099999823",
+      "controlUsd": "794691603.4099994",
+      "nationalUsd": "794691603.41000043",
+      "detailDifferenceUsd": "0.0000005823",
+      "nationalDifferenceUsd": "-0.00000103"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2003,
+      "detailSumUsd": "1139039159.3500001585",
+      "controlUsd": "1139039159.3500015",
+      "nationalUsd": "1139039159.3500026",
+      "detailDifferenceUsd": "-0.0000013415",
+      "nationalDifferenceUsd": "-0.0000011"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2004,
+      "detailSumUsd": "1844342929.427984402",
+      "controlUsd": "1844342929.4279856",
+      "nationalUsd": "1844342929.4279874",
+      "detailDifferenceUsd": "-0.000001198",
+      "nationalDifferenceUsd": "-0.0000018"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2005,
+      "detailSumUsd": "2487548345.906249241",
+      "controlUsd": "2487548345.906252",
+      "nationalUsd": "2487548345.9062589",
+      "detailDifferenceUsd": "-0.000002759",
+      "nationalDifferenceUsd": "-0.0000069"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2006,
+      "detailSumUsd": "3674832445.449236192",
+      "controlUsd": "3674832445.4492289",
+      "nationalUsd": "3674832445.4492486",
+      "detailDifferenceUsd": "0.000007292",
+      "nationalDifferenceUsd": "-0.0000197"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2007,
+      "detailSumUsd": "5212150246.31615586",
+      "controlUsd": "5212150246.316161",
+      "nationalUsd": "5212150246.3161623",
+      "detailDifferenceUsd": "-0.00000514",
+      "nationalDifferenceUsd": "-0.0000013"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2008,
+      "detailSumUsd": "6301540343.010241335",
+      "controlUsd": "6301540343.0102449",
+      "nationalUsd": "6301540343.0101805",
+      "detailDifferenceUsd": "-0.000003565",
+      "nationalDifferenceUsd": "0.0000644"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2009,
+      "detailSumUsd": "4475724508.7921616",
+      "controlUsd": "4475724508.7921536",
+      "nationalUsd": "4475724508.792171",
+      "detailDifferenceUsd": "0.000008",
+      "nationalDifferenceUsd": "-0.0000174"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2010,
+      "detailSumUsd": "5235964558.711926218",
+      "controlUsd": "5235964558.7119311",
+      "nationalUsd": "5235964558.7119312",
+      "detailDifferenceUsd": "-0.000004882",
+      "nationalDifferenceUsd": "-0.0000001"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2011,
+      "detailSumUsd": "7072259779.462369834",
+      "controlUsd": "7072259779.4623729",
+      "nationalUsd": "7072259779.4623662",
+      "detailDifferenceUsd": "-0.000003066",
+      "nationalDifferenceUsd": "0.0000067"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2012,
+      "detailSumUsd": "8056379015.907253635",
+      "controlUsd": "8056379015.9072969",
+      "nationalUsd": "8056379015.907256",
+      "detailDifferenceUsd": "-0.000043265",
+      "nationalDifferenceUsd": "0.0000409"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2013,
+      "detailSumUsd": "8022546397.8868946",
+      "controlUsd": "8022546397.8868946",
+      "nationalUsd": "8022546397.8869893",
+      "detailDifferenceUsd": "0",
+      "nationalDifferenceUsd": "-0.0000947"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2014,
+      "detailSumUsd": "8601814354.546991914",
+      "controlUsd": "8601814354.5469902",
+      "nationalUsd": "8601814354.5470193",
+      "detailDifferenceUsd": "0.000001714",
+      "nationalDifferenceUsd": "-0.0000291"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2015,
+      "detailSumUsd": "7304152715.61473728",
+      "controlUsd": "7304152715.614737",
+      "nationalUsd": "7304152715.6147458",
+      "detailDifferenceUsd": "0.00000028",
+      "nationalDifferenceUsd": "-0.0000088"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2016,
+      "detailSumUsd": "7341698114.489383472",
+      "controlUsd": "7341698114.4893821",
+      "nationalUsd": "7341698114.4893707",
+      "detailDifferenceUsd": "0.000001372",
+      "nationalDifferenceUsd": "0.0000114"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2017,
+      "detailSumUsd": "8057082210.573654008",
+      "controlUsd": "8057082210.5736537",
+      "nationalUsd": "8057082210.5736943",
+      "detailDifferenceUsd": "0.000000308",
+      "nationalDifferenceUsd": "-0.0000406"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2018,
+      "detailSumUsd": "9361247035.88625581",
+      "controlUsd": "9361247035.8862579",
+      "nationalUsd": "9361247035.8862593",
+      "detailDifferenceUsd": "-0.00000209",
+      "nationalDifferenceUsd": "-0.0000014"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2019,
+      "detailSumUsd": "9517967520.3826665284",
+      "controlUsd": "9517967520.3826707",
+      "nationalUsd": "9517967520.3826791",
+      "detailDifferenceUsd": "-0.0000041716",
+      "nationalDifferenceUsd": "-0.0000084"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2020,
+      "detailSumUsd": "8048758483.040146022",
+      "controlUsd": "8048758483.0401465",
+      "nationalUsd": "8048758483.0401811",
+      "detailDifferenceUsd": "-0.000000478",
+      "nationalDifferenceUsd": "-0.0000346"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2021,
+      "detailSumUsd": "10099041319.93871732",
+      "controlUsd": "10099041319.938717",
+      "nationalUsd": "10099041319.938764",
+      "detailDifferenceUsd": "0.00000032",
+      "nationalDifferenceUsd": "-0.000047"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2022,
+      "detailSumUsd": "13539713872.844050338",
+      "controlUsd": "13539713872.844052",
+      "nationalUsd": "13539713872.844093",
+      "detailDifferenceUsd": "-0.000001662",
+      "nationalDifferenceUsd": "-0.000041"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2023,
+      "detailSumUsd": "15615270126.514187846",
+      "controlUsd": "15615270126.514189",
+      "nationalUsd": "15615270126.51411",
+      "detailDifferenceUsd": "-0.000001154",
+      "nationalDifferenceUsd": "0.000079"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2024,
+      "detailSumUsd": "16916834845.71023171",
+      "controlUsd": "16916834845.710233",
+      "nationalUsd": "16916834845.710335",
+      "detailDifferenceUsd": "-0.00000129",
+      "nationalDifferenceUsd": "-0.000102"
+    },
+    {
+      "classification": "bec",
+      "indicatorId": "trade.imports",
+      "year": 2025,
+      "detailSumUsd": "18648513307.18671414",
+      "controlUsd": "18648513307.186715",
+      "nationalUsd": "18648513307.186789",
+      "detailDifferenceUsd": "-0.00000086",
+      "nationalDifferenceUsd": "-0.000074"
+    }
+  ],
+  "canonicalSha256": "3ac3b677ba5b43fcc563de6a08fc692761381171a8dccf9663dd934ff5af7498",
+  "catalogueSha256": "36e6c05c9710004abc250324ea7b8b7eb20f7a224f65dd6cd0e2fe9ba63179c9",
+  "englishLabelsSha256": "b359e2a0ab893ce9e3c9c08f1b421c3ebe90f66dbab53ea2105cb46282ffa05a",
+  "inputSha256": {
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/independent-verification.json": "536110aeb9761ee924044eed913fc4f0ea029892097c3be6a9354233c011077d",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/prepared-validation.json": "c12653a6a6a11f59b6eb105ff287fe867524b7e447196cc8bc89dce4756f489a",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/full-source-manifest.json": "c9b273fefe788c04240dc353cef46d9dbcc046a5294cfc498591c6e53cb189b2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-layouts.json": "607aea395fde2b71ae2f4f6545cdd2c8444eec4bf021b0bc84b2f1f71321a8dc",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/expected-observation-inventory.json": "803f873b2af1b22bb1c2b76061c03413a7dfe86cca5b931dee1369225c6610ad",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/unresolved-source-issues.json": "95473c512e6458a7da8491806ca318bde18b423e302da5756322d61248f6d8c2",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/prepared-reconciliation.csv": "57ac3302a548adde1aadce44c0f140804f33d2ded512469273bd460ad6981205",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/coverage.csv": "5a1ca76f67607b737004bcd01e2a345380b746f41e0795d2683543181e3755a2",
+    "data/imports/trade-overview-annual.csv": "924a939acda73809d019a17424106260cf57e787c5ad99d24f4cd38d2ec34c6d",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/goods-products-annual/sitc1-2000-2025.csv": "bf7829fce9ee9320a926ec3367254899d9b3d55c1294e17859e592aed874cb12",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_trade_export-sitc-2000-2026-02-2000-2025.csv": "3365f61c3f7a2946edc52f60343e0559d31aa41e95a4d4c772cb0637a69dcd7f",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_trade_import-sitc-2000-2026-02-2000-2025.csv": "96c1804b71a15c92b6d53850b1adfafcd26a323e135a1008e730741e9b0e5d0d",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/goods-products-annual/bec1-2000-2025.csv": "c13f434dcb9656553a9b8e37ceb1baa1ddf038aa3f58aa3fb06e25585d6b86a4",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_trade_export-bec-2000-2026-02-2000-2025.csv": "678a0f1168f0bf9db5b388a5e2e3b7790354d1ac3f914ab2b261807abec2281b",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_trade_import-bec-2000-2026-02-2000-2025.csv": "7066f013c3ffb0d807cbef12b633892e457b2d2ecf9aece2f079322ee3a1becb"
+  },
+  "sourceSha256": {
+    "geostat_trade_export-sitc-2000-2026": "71ba53f3c2e55cfb9bf08262582eb23d42e3752c04f4ac2e2c7c8cf90551bb12",
+    "geostat_trade_import-sitc-2000-2026": "bba9b1a1893287e17a1b3b623ec6b618ff86cb0839dd2ed437f02e97e2793508",
+    "geostat_trade_export-bec-2000-2026": "06328bbed108365194fab97679ef2ec147c4de8c0ffa956f9b1d665e515cab30",
+    "geostat_trade_import-bec-2000-2026": "de22fc331f67306855d32cbc31481d90b117d17ac8ae4b4b360a853643571ec4"
+  },
+  "researchPackageStatus": "requires_source_resolution",
+  "outsideScopeHoldCount": 2,
+  "outsideScopeHolds": [
+    {
+      "check": "service_country_matches_joint",
+      "family": "services",
+      "flow": "import",
+      "year": "2022",
+      "item_id": "partner.2020-2024.826",
+      "expected_usd": "32357843.120000005000",
+      "actual_usd": "32550080.1199999987351000",
+      "difference_usd": "192236.9999999937351000",
+      "tolerance_usd": "1",
+      "status": "fail",
+      "source_refs": "[[\"geostat_services_georgian-imports-of-services-by-countries\",\"Sheet1\",\"E116\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E13\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E71\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E180\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E251\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E290\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E382\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E449\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E519\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E610\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E710\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E772\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"E839\"]]",
+      "evidence": "All twelve numeric country/type counterparts are required; absent or symbolic country detail is not zero."
+    },
+    {
+      "check": "service_country_matches_joint",
+      "family": "services",
+      "flow": "import",
+      "year": "2024",
+      "item_id": "partner.2020-2024.826",
+      "expected_usd": "96175488.549999951000",
+      "actual_usd": "96555372.41999999725000",
+      "difference_usd": "379883.87000004625000",
+      "tolerance_usd": "1",
+      "status": "fail",
+      "source_refs": "[[\"geostat_services_georgian-imports-of-services-by-countries\",\"Sheet1\",\"G116\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G13\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G71\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G180\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G251\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G290\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G382\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G449\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G519\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G610\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G710\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G772\"],[\"geostat_services_georgian-imports-of-services-by-types-and-countries\",\"Sheet1\",\"G839\"]]",
+      "evidence": "All twelve numeric country/type counterparts are required; absent or symbolic country detail is not zero."
+    }
+  ],
+  "reviewedAt": "2026-10-14"
+}

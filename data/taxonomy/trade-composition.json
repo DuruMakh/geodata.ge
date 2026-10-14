@@ -1,0 +1,121 @@
+[
+  {
+    "id": "trade.sitc1.0",
+    "classification": "sitc",
+    "sourceCode": "0",
+    "labelKa": "სურსათი და ცოცხალი ცხოველები",
+    "labelEn": "Food and live animals"
+  },
+  {
+    "id": "trade.sitc1.1",
+    "classification": "sitc",
+    "sourceCode": "1",
+    "labelKa": "სასმელები და თამბაქო",
+    "labelEn": "Beverages and tobacco"
+  },
+  {
+    "id": "trade.sitc1.2",
+    "classification": "sitc",
+    "sourceCode": "2",
+    "labelKa": "არასასურსათო ნედლეული, საწვავის გარდა",
+    "labelEn": "Crude materials, inedible, except fuels"
+  },
+  {
+    "id": "trade.sitc1.3",
+    "classification": "sitc",
+    "sourceCode": "3",
+    "labelKa": "მინერალური საწვავი, საპოხი და მონათესავე მასალები",
+    "labelEn": "Mineral fuels, lubricants and related materials"
+  },
+  {
+    "id": "trade.sitc1.4",
+    "classification": "sitc",
+    "sourceCode": "4",
+    "labelKa": "ცხოველური და მცენარეული ზეთები, ცხიმები და ცვილები",
+    "labelEn": "Animal and vegetable oils, fats and waxes"
+  },
+  {
+    "id": "trade.sitc1.5",
+    "classification": "sitc",
+    "sourceCode": "5",
+    "labelKa": "ქიმიური და მონათესავე პროდუქცია, სხვაგან დაუსახელებელი",
+    "labelEn": "Chemicals and related products, n.e.s."
+  },
+  {
+    "id": "trade.sitc1.6",
+    "classification": "sitc",
+    "sourceCode": "6",
+    "labelKa": "მასალის მიხედვით კლასიფიცირებული სამრეწველო საქონელი",
+    "labelEn": "Manufactured goods classified chiefly by material"
+  },
+  {
+    "id": "trade.sitc1.7",
+    "classification": "sitc",
+    "sourceCode": "7",
+    "labelKa": "მანქანები და სატრანსპორტო მოწყობილობები",
+    "labelEn": "Machinery and transport equipment"
+  },
+  {
+    "id": "trade.sitc1.8",
+    "classification": "sitc",
+    "sourceCode": "8",
+    "labelKa": "სხვადასხვა სამრეწველო ნაწარმი",
+    "labelEn": "Miscellaneous manufactured articles"
+  },
+  {
+    "id": "trade.sitc1.9",
+    "classification": "sitc",
+    "sourceCode": "9",
+    "labelKa": "SITC-ში სხვაგან არაკლასიფიცირებული საქონელი",
+    "labelEn": "Commodities not classified elsewhere in the SITC"
+  },
+  {
+    "id": "trade.bec1.1",
+    "classification": "bec",
+    "sourceCode": "1",
+    "labelKa": "სურსათი და სასმელები",
+    "labelEn": "Food and beverages"
+  },
+  {
+    "id": "trade.bec1.2",
+    "classification": "bec",
+    "sourceCode": "2",
+    "labelKa": "სამრეწველო მარაგები, სხვაგან დაუსახელებელი",
+    "labelEn": "Industrial supplies not elsewhere specified"
+  },
+  {
+    "id": "trade.bec1.3",
+    "classification": "bec",
+    "sourceCode": "3",
+    "labelKa": "საწვავი და საპოხი მასალები",
+    "labelEn": "Fuels and lubricants"
+  },
+  {
+    "id": "trade.bec1.4",
+    "classification": "bec",
+    "sourceCode": "4",
+    "labelKa": "კაპიტალური საქონელი (ტრანსპორტის გარდა), მისი ნაწილები და აქსესუარები",
+    "labelEn": "Capital goods (except transport equipment), and parts and accessories thereof"
+  },
+  {
+    "id": "trade.bec1.5",
+    "classification": "bec",
+    "sourceCode": "5",
+    "labelKa": "სატრანსპორტო მოწყობილობები, მათი ნაწილები და აქსესუარები",
+    "labelEn": "Transport equipment and parts and accessories thereof"
+  },
+  {
+    "id": "trade.bec1.6",
+    "classification": "bec",
+    "sourceCode": "6",
+    "labelKa": "სამომხმარებლო საქონელი, სხვაგან დაუსახელებელი",
+    "labelEn": "Consumer goods not elsewhere specified"
+  },
+  {
+    "id": "trade.bec1.7",
+    "classification": "bec",
+    "sourceCode": "7",
+    "labelKa": "საქონელი, სხვაგან დაუსახელებელი",
+    "labelEn": "Goods not elsewhere specified"
+  }
+]
