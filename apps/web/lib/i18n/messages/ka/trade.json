@@ -1,6 +1,7 @@
 {
   "trade.composition.title": "საქონლით ვაჭრობის სტრუქტურა",
   "trade.composition.summary": "შეადარეთ საქართველოს საქონლის ექსპორტი და იმპორტი სასაქონლო ჯგუფებისა და ეკონომიკური კატეგორიების მიხედვით.",
+  "trade.composition.lead": "საქონლის ექსპორტი და იმპორტი",
   "trade.composition.views": "საქონლით ვაჭრობის სტრუქტურის ხედები",
   "trade.composition.sitc": "სასაქონლო ჯგუფები",
   "trade.composition.bec": "ეკონომიკური კატეგორიები",

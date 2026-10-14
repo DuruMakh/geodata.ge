@@ -142,6 +142,7 @@
   "trade.hubMetaDescription": "Explore Georgia’s annual goods trade and separately reviewed services trade in nominal US dollars.",
   "trade.composition.title": "Trade composition",
   "trade.composition.summary": "Compare Georgia's goods exports and imports by broad product groups and economic categories.",
+  "trade.composition.lead": "Goods exports and imports",
   "trade.composition.views": "Trade composition views",
   "trade.composition.sitc": "Goods groups",
   "trade.composition.bec": "Economic categories",

@@ -45,6 +45,9 @@ test.each(["en", "ka"] as const)("%s wrapper places flow above the workspace and
   expect(html.indexOf('data-testid="trade-composition-tabs"')).toBeLessThan(html.indexOf('data-testid="series-status"'));
   expect(html).toContain('data-testid="trade-composition" data-section="sitc"');
   expect(html.match(/<h1/g)).toHaveLength(1);
-  for (const key of ["title", "summary", "sitc", "bec"]) expect(html).toContain(p.messages[`trade.composition.${key}`].replaceAll("'", "&#x27;"));
+  for (const key of ["title", "lead", "sitc", "bec"]) expect(html).toContain(p.messages[`trade.composition.${key}`].replaceAll("'", "&#x27;"));
+  const headingLead = /<h1[^>]*>[\s\S]*?<\/h1><p[^>]*>([\s\S]*?)<\/p>/.exec(html)?.[1];
+  expect(headingLead).toBe(locale === "en" ? "Goods exports and imports" : "საქონლის ექსპორტი და იმპორტი");
+  expect(html).not.toContain(p.messages["trade.composition.summary"].replaceAll("'", "&#x27;"));
   expect(html).not.toMatch(/trade-partners-tab-|trade-partners-group-note|Domestic exports|Country groups/);
 });

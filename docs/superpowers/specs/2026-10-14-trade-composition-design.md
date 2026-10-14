@@ -26,7 +26,7 @@ Serve only Exports and Imports. Add no category turnover, balance or re-export d
 
 - Georgian route: `/explorer/trade/composition`; title: `საქონლით ვაჭრობის სტრუქტურა`.
 - English route: `/en/explorer/trade/composition`; title: `Trade composition`.
-- One short lead line: `Compare Georgia's goods exports and imports by broad product groups and economic categories.` Provide its Georgian translation.
+- One short lead line: `Goods exports and imports` / `საქონლის ექსპორტი და იმპორტი`. The longer comparison description remains in metadata and explanatory content; the visible lead must fit one phone line under `DESIGN.md` §17.
 - Owner-requested placement amendment (2026-10-14): one page-level **Exports | Imports** text-tab row above the workspace; **Goods groups | Economic categories** below search in the series panel, with localized labels and readable phone wrapping. Start with Goods groups.
 - Append the page as the sixth Trade hub card and the last Trade sidebar child, preserving the existing five entries' order. Use loaded coverage and a national goods-exports sparkline restricted to those years.
 - Reuse breadcrumbs, language links, metadata, Dataset JSON-LD, sitemap and the existing page shell.
