@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DATASETS } from "../../lib/seo/datasetVocabulary";
+import { DATASETS, isTopicDatasetId } from "../../lib/seo/datasetVocabulary";
 import {
   debtMeasure,
   deficitMeasure,
@@ -19,5 +19,12 @@ describe("SEO dataset measures match the measures the query layer serves", () =>
     ["general-government-balance", deficitMeasure],
   ] as const)("%s", (datasetId, enumeration) => {
     expect([...DATASETS[datasetId].measures]).toEqual([...enumeration.options]);
+  });
+});
+
+describe("isTopicDatasetId", () => {
+  it("knows only the topic datasets' own ids, never an object's inherited keys", () => {
+    expect(isTopicDatasetId("inflation")).toBe(true);
+    expect(["toString", "constructor", "__proto__", "hasOwnProperty"].filter(isTopicDatasetId)).toEqual([]);
   });
 });

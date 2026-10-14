@@ -933,6 +933,41 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   expect(consoleProblems).toEqual([]);
 });
 
+// U05-15: the side tabs, grouping tabs and year row are reached with Tab and pressed with Enter or Space.
+test("the analysis tabs and year row work from the keyboard", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
+  await expectAppReady(page);
+  const caption = page.getByTestId("single-year-ranking").locator("caption");
+  const expenditure = page.getByTestId("analysis-side-expenditure"), revenue = page.getByTestId("analysis-side-revenue");
+
+  await expenditure.focus();
+  await page.keyboard.press("Tab");
+  await expect(revenue).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(revenue).toHaveAttribute("aria-pressed", "true");
+  await expect(caption).toContainText("შემოსავლები კატეგორიების მიხედვით");
+
+  await page.keyboard.press("Shift+Tab");
+  await expect(expenditure).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(expenditure).toHaveAttribute("aria-pressed", "true");
+  // Revenue, then the grouping row's fields and ministries.
+  for (let press = 0; press < 3; press += 1) await page.keyboard.press("Tab");
+  const ministries = page.getByTestId("analysis-grouping-ministries");
+  await expect(ministries).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(ministries).toHaveAttribute("aria-pressed", "true");
+  await expect(caption).toContainText("ხარჯები უწყებების მიხედვით");
+
+  const years = page.getByTestId("analysis-year-selector").getByRole("button");
+  const earlier = years.nth((await years.count()) - 2);
+  const year = (await earlier.textContent())!.match(/\d{4}/)![0];
+  await earlier.focus();
+  await page.keyboard.press("Space");
+  await expect(earlier).toHaveAttribute("aria-pressed", "true");
+  await expect(caption).toContainText(year);
+});
+
 test("budget field identifies a circle with its category and amount on hover and focus", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);

@@ -4,6 +4,7 @@ import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { pageHref } from "../../lib/i18n/routes";
 import type { Locale } from "../../lib/i18n/types";
 import { NAV_TREE } from "../../lib/navigation/navTree";
+import { municipalPageMetadata, municipalRegionStaticParams, municipalityStaticParams } from "../../lib/pages/municipal";
 import {
   coverageFromYears,
   fiscalMetadata,
@@ -103,6 +104,19 @@ describe("every page's search snippet and share card", () => {
     expect(pages.length).toBeGreaterThan(100);
     expect(pages.filter(({ metadata }) => String(metadata.description).length > 160).map((entry) => `${where(entry)} (${String(entry.metadata.description).length})`)).toEqual([]);
   });
+
+  // A municipal description's length follows its place name and data, not its slug, so the sample above can miss the
+  // longest (Task 45: Georgian borjomi, 158 characters, has no long slug). Every municipality and region is checked.
+  it("keeps every municipality's and region's description within 160 characters, in both languages", async () => {
+    const [municipalities, regions] = await Promise.all([municipalityStaticParams(), municipalRegionStaticParams()]);
+    const places = [...municipalities.map(({ slug }) => ["municipality", slug] as const), ...regions.map(({ id }) => ["region", id] as const)];
+    expect(places.length).toBeGreaterThan(60);
+    const long = (await Promise.all(places.flatMap(([kind, id]) => (["ka", "en"] as const).map(async (locale) => {
+      const length = String((await municipalPageMetadata(kind, id, locale)).description).length;
+      return length > 160 ? `${locale} ${kind} ${id} (${length})` : null;
+    })))).filter(Boolean);
+    expect(long).toEqual([]);
+  }, 60_000);
 
   it("ends every title with the brand, the hubs' included, and shares it with the card", () => {
     expect(pages.filter(({ metadata }) => !String(metadata.title).endsWith("Fiscal.ge")).map(where)).toEqual([]);

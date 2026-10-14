@@ -1,6 +1,7 @@
 import { readCsvRecords } from "../../lib/data/csv";
 import { moneyBanksDisplayDecimals } from "../../lib/data/moneyBanks/validation";
 import { SERVED_DATA_FILES } from "../../lib/data/servedData";
+import { formatBn, formatInUnit } from "../../lib/explorer/format";
 
 /**
  * The reviewed Money and banks CSV and the national GDP its % of GDP view divides by, so the unit
@@ -27,13 +28,10 @@ export async function loadMoneyBanksCsv() {
     /** A December amount as a percent of the year's nominal GDP, both in million lari. */
     shareOfGdp: (id: string, year: number) => published(id, year) / Number(gdpRow(year)!.gdp_current_prices_million_gel) * 100,
     isPreliminaryGdp: (year: number) => gdpRow(year)?.status === "preliminary",
-    /** A million-lari amount as the pages print it in billions: `57.7`. */
-    billions: (id: string, year: number) => (published(id, year) / 1000).toFixed(1),
-    /** A percent series value at the page's precision, with a true minus sign: `−2.5`. */
-    percent: (id: string, year: number) => {
-      const value = published(id, year);
-      return `${value < 0 ? "−" : ""}${Math.abs(value).toFixed(moneyBanksDisplayDecimals(id))}`;
-    },
+    /** A million-lari amount as the pages print it in billions, through the site's formatter: `57.7`. */
+    billions: (id: string, year: number) => formatBn(published(id, year) * 1_000_000),
+    /** A percent series value at the page's precision, with a true minus sign, through the site's formatter: `−2.5`. */
+    percent: (id: string, year: number) => formatInUnit(published(id, year), { divisor: 1, label: "", decimals: moneyBanksDisplayDecimals(id) }),
     sourceYears: (sourceId: string) => [...new Set(money.filter(entry => entry.source_id === sourceId).map(entry => Number(entry.year)))].sort((a, b) => a - b),
   };
 }

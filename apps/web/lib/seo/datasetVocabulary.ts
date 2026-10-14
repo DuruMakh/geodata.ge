@@ -356,7 +356,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
 
 /** A dataset whose figures are official statistics Fiscal.ge reads from a named producer (`sourceAgenciesFor`). */
 export function isTopicDatasetId(id: string): id is TopicDatasetId {
-  return id in TOPIC_DATASETS;
+  return Object.hasOwn(TOPIC_DATASETS, id);
 }
 
 export function isFiscalDatasetId(datasetId: SeoDatasetId): datasetId is FiscalDatasetId {

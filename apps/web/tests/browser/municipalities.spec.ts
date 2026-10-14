@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
-import { latestReviewedAtForMunicipalFacts } from "../../lib/explorer/municipalData";
+import { latestReviewedAtForMunicipalFacts, MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -45,7 +45,7 @@ test("states where the index figures come from and what the map measures", async
   // in, so the measure and its year are stated here rather than reinstated
   // above the choropleth.
   await expect(note).toContainText("ერთ მოსახლეზე");
-  await expect(note).toContainText("2025");
+  await expect(note).toContainText(String(MUNICIPAL_PER_RESIDENT_YEAR));
 
   // The choropleth is a vendored OSM derivative, so ODbL §4.3 attribution rides
   // on the note wherever the map is publicly used — DESIGN.md §20 specifies the
@@ -220,11 +220,11 @@ test("map shows no data popup while its legend and accessible names retain the m
   await expect(page.getByTestId("municipality-map-legend")).toContainText("₾");
   await expect(page.getByTestId("municipality-map").locator("svg")).toHaveAttribute(
     "aria-label",
-    /2025.*ერთ მოსახლეზე/,
+    new RegExp(`${MUNICIPAL_PER_RESIDENT_YEAR}.*ერთ მოსახლეზე`),
   );
 
   const { totalFacts, populationFacts } = await loadServedMunicipalData();
-  const zugdidiTotal = totalFacts.find((row) => row.year === 2025 && row.municipalityCode === "33")!;
+  const zugdidiTotal = totalFacts.find((row) => row.year === MUNICIPAL_PER_RESIDENT_YEAR && row.municipalityCode === "33")!;
   const zugdidiPopulation = populationFacts.find((row) => row.municipalityCode === "33")!;
   const perResident = formatPerResidentGel(zugdidiTotal.publicTotalGel / zugdidiPopulation.populationPersons);
   const total = formatAmount(zugdidiTotal.publicTotalGel);

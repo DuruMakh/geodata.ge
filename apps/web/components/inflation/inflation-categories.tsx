@@ -61,7 +61,8 @@ import { usePageData } from "../explorer-shell/use-page-data";
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
 // headline. Under the H1 the published national headline's latest month on the
-// active rate (owner decision D2, 2026-10-07), then the unit line.
+// active rate (owner decision D2, 2026-10-07), the only line there; the unit sits
+// with the source note (DESIGN §17).
 
 
 // A restored hash keeps its range only where the tab has data. While the monthly runs load, the
