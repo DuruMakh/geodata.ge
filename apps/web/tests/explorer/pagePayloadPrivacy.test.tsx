@@ -1,6 +1,6 @@
 import { cloneElement, isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { DebtExplorer } from "../../components/debt/debt-explorer";
 import { AgeSexExplorer } from "../../components/demography/age-sex-explorer";
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
@@ -58,6 +58,10 @@ import { renderWagesPage } from "../../lib/pages/wages";
 import { renderWagesRegionsIndexPage } from "../../lib/pages/wages-regions-index";
 import { renderPageMarkup } from "../helpers/render-localized";
 
+// Rendering a methodology page reads the archive report that only `prebuild` writes; see the helper.
+vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) =>
+  (await import("../helpers/archive-summaries")).withValidatedArchiveSummaries(importOriginal));
+
 // A page ships two things: its markup and, in the RSC payload, every prop a server page hands a client component.
 // The payload is not in renderToStaticMarkup's output, so the props of every element in the tree are read as well.
 function shippedProps(node: ReactNode): string {
@@ -94,6 +98,8 @@ describe.each(["ka", "en"] as const)("%s", (locale) => {
     const page = await renderPage(locale);
     const html = renderPageMarkup(locale, page) + shippedProps(page);
     expect(["Confirm against source", "Temporary source aggregate", "by user decision"].filter((note) => html.includes(note))).toEqual([]);
+    // The glossary still ships, so the check above is not passing on an empty payload.
+    expect(html).toContain('"kaLabel":');
   });
 
   test.each(municipalPages)("municipal pages ship only public fact fields: %s", async (_name, renderPage) => {
@@ -101,6 +107,7 @@ describe.each(["ka", "en"] as const)("%s", (locale) => {
     // field names can reach the HTML only through the payload, never through the visible text.
     const html = shippedProps(await renderPage(locale));
     expect(["reconciliationDifferenceGel", "warningType", "sourceId"].filter((field) => html.includes(field))).toEqual([]);
+    expect(html).toContain('"publicTotalGel":');
   });
 });
 
@@ -223,7 +230,9 @@ describe.each(["ka", "en"] as const)("%s pages ship only the fields they read", 
   });
 
   test("the methodology archive rows carry no media type (U29-14)", async () => {
-    expect(shippedProps(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "expenditure" }) }))).not.toContain("media_type");
+    const shipped = shippedProps(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "expenditure" }) }));
+    expect(shipped).toContain('"official_filename":');
+    expect(shipped).not.toContain("media_type");
   });
 
   test("debt ships GDP only for the years debt covers (U06-17)", async () => {

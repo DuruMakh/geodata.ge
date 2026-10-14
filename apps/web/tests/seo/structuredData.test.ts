@@ -17,6 +17,10 @@ import {
   siteJsonLd,
 } from "../../lib/seo/structuredData";
 
+// Rendering a methodology page reads the archive report that only `prebuild` writes; see the helper.
+vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) =>
+  (await import("../helpers/archive-summaries")).withValidatedArchiveSummaries(importOriginal));
+
 describe("Fiscal.ge structured data", () => {
   it("links the website to the Fiscal.ge publisher", () => {
     const graph = siteJsonLd("https://fiscal.ge");

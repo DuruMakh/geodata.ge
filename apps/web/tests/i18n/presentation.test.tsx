@@ -1,5 +1,5 @@
 import { isValidElement, type ReactNode } from "react";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { AnalysisExplorer } from "../../components/analysis/analysis-explorer";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
@@ -51,6 +51,10 @@ import { renderTradeDomesticPage, renderTradeOverviewPage, renderTradePartnersPa
 import { renderUnemploymentPage } from "../../lib/pages/unemployment";
 import { renderWagesPage } from "../../lib/pages/wages";
 import { renderWagesRegionsIndexPage } from "../../lib/pages/wages-regions-index";
+
+// Rendering a methodology page reads the archive report that only `prebuild` writes; see the helper.
+vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) =>
+  (await import("../helpers/archive-summaries")).withValidatedArchiveSummaries(importOriginal));
 
 // Platform review X1-12 (Task 31): the root layout's I18nProvider holds `common` and the explorer layout's adds
 // `controls`. A page's own provider adds to them (lib/i18n/provider.tsx), so what a page hands its client components
