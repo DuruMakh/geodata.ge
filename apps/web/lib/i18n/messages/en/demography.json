@@ -93,6 +93,7 @@
   "demography.ageGroupHeader": "Age",
   "demography.totalHeader": "Total",
   "demography.shareHeader": "Share",
+  "demography.sharePercentHeader": "Share, %",
   "demography.group.citizenship.georgia": "Georgia",
   "demography.group.citizenship.russian_federation": "Russia",
   "demography.group.citizenship.turkey": "Turkey",

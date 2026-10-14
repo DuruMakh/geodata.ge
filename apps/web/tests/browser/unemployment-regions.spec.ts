@@ -103,7 +103,7 @@ for (const prefix of ["", "/en"]) for (const width of [1440]) test(`regional emp
   await expect(page.getByTestId("year-range-strip")).toContainText("2010–2025");
   const promise = page.waitForEvent("download"); await page.getByTestId("unemployment-excel-download").click();
   const download = await promise;
-  expect(download.suggestedFilename()).toContain("unemployment-tbilisi-people-2010-2025");
+  expect(download.suggestedFilename()).toContain(prefix ? "unemployment-tbilisi-number-thousand-persons-2010-2025-en" : "unemployment-tbilisi-raodenoba-atasi-adamiani-2010-2025");
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   const sheet = workbook.worksheets[0];
   const hiredRow = [4, 5, 6].find(index => sheet.getCell(`A${index}`).value === (prefix ? "Hired employees" : "დაქირავებული"))!;
@@ -130,7 +130,7 @@ for (const prefix of ["", "/en"]) for (const width of [1440]) test(`regional emp
   await expect(page.getByTestId("explorer-table")).toContainText("17.5%");
   const ratesPromise = page.waitForEvent("download"); await page.getByTestId("unemployment-excel-download").click();
   const ratesDownload = await ratesPromise;
-  expect(ratesDownload.suggestedFilename()).toContain("unemployment-tbilisi-rates-2025-2025");
+  expect(ratesDownload.suggestedFilename()).toContain(prefix ? "unemployment-tbilisi-rate-2025-2025-en" : "unemployment-tbilisi-done-2025-2025");
   const rates = new ExcelJS.Workbook(); await rates.xlsx.readFile((await ratesDownload.path())!);
   expect(rates.worksheets).toHaveLength(3);
   expect(rates.worksheets[0].getCell("A1").value).toEqual(expect.stringContaining(prefix ? "Tbilisi" : "თბილისი"));

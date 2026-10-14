@@ -86,7 +86,8 @@ for (const [name, scope, hash] of [
     expect(JSON.stringify(cell.value)).not.toMatch(/\p{Script=Georgian}/u);
     expect(cell.numFmt ?? "").not.toMatch(/\p{Script=Georgian}/u);
   })));
-  const nominal = Array.from({ length: en.worksheets[1].rowCount - 1 }, (_, index) => en.worksheets[1].getCell(index + 2, 4).value);
+  // The deficit's Data sheet has no Group column (one series), so its amount is the third column.
+  const nominal = Array.from({ length: en.worksheets[1].rowCount - 1 }, (_, index) => en.worksheets[1].getCell(index + 2, scope === "deficit" ? 3 : 4).value);
   if (scope === "deficit") expect(nominal.some(value => typeof value === "number" && value < 0)).toBe(true);
   await page.goBack();
   await page.reload();

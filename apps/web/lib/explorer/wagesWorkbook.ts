@@ -12,7 +12,11 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.dimension}:${f.groupId}:${f.sectorId}:${f.year}`, f]));
   const cell = (series: typeof model.selected[number], year: number) => byCell.get(`${series.indicatorId}:${series.dimension}:${series.groupId}:${series.sectorId}:${year}`);
   const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) => cell(series, year)?.sourceId));
-  const numberFormat = model.decimals ? "#,##0.0" : "#,##0";
+  // Averages carry one decimal and the median is whole lari, so a mixed selection formats each series at its own precision.
+  const formatOf = (decimals: number) => decimals ? "#,##0.0" : "#,##0";
+  const numberFormat = formatOf(model.decimals);
+  const rowFormat = (series: typeof model.selected[number]) => formatOf(series.decimals) === numberFormat ? undefined : formatOf(series.decimals);
+  const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series })));
   const status = (fact: ClientWagesFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
   const view = state.view === "main" ? "" : ` · ${t(`group.${state.view}`)}`;
   return {
@@ -21,14 +25,16 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
       title: `${input.title ?? t(`page.${section}.title`)}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${t("unitMonthly")} · ${t("nominalNote")}`,
       unitLabel: t("unit"), amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
       rows: model.selected.map(series => ({ kind: series.reference ? "total" : "item", parentLabel: null, label: labels[series.id], change: null,
+        ...(rowFormat(series) ? { numberFormat: rowFormat(series) } : {}),
         valuesByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year]])),
         basisByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year] === null ? null : "actual"])),
       })),
     },
     analysis: {
       headers: [workbookMessage(locale, "workbook.year"), t("series"), t("amountHeader"), workbookMessage(locale, "workbook.status")],
-      rows: model.years.flatMap(year => model.selected.map(series => [year, labels[series.id], series.valuesByYear[year], status(cell(series, year))])),
+      rows: cells.map(({ year, series }) => [year, labels[series.id], series.valuesByYear[year], status(cell(series, year))]),
       numericFormats: { 3: numberFormat },
+      rowNumberFormats: Object.fromEntries(cells.flatMap(({ series }, index) => rowFormat(series) ? [[index, rowFormat(series)!]] : [])),
     },
     sources: withAbsoluteUrls(originals, input.siteOrigin),
   };

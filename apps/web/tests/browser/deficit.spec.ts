@@ -134,8 +134,8 @@ test.describe("General-government deficit explorer", () => {
     await workbook.xlsx.load(Uint8Array.from(await readFile(downloadPath)).buffer);
     expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
     const dataRows = workbook.getWorksheet("მონაცემები")!.getRows(2, 50) ?? [];
-    expect(dataRows.find((row) => row.getCell(1).value === 2025)?.getCell(5).value).toBe("ფაქტი");
-    expect(dataRows.find((row) => row.getCell(1).value === 2026)?.getCell(5).value).toBe("პროგნოზი");
+    expect(dataRows.find((row) => row.getCell(1).value === 2025)?.getCell(4).value).toBe("ფაქტი");
+    expect(dataRows.find((row) => row.getCell(1).value === 2026)?.getCell(4).value).toBe("პროგნოზი");
     expect(workbook.getWorksheet("წყაროები")!.getCell("C4").value).toContain("IMF");
   });
 });

@@ -116,6 +116,19 @@ test("the Data sheet formats the amount column", async () => {
   expect(amount.numFmt).toBe("#,##0.0");
 });
 
+test("median stays whole when shown beside the average", async () => {
+  const model = await overviewWorkbook("en", { state: { mode: "table", view: "main", range: { kind: "manual", start: 2025, end: 2025 }, selectedIds: ["average", "median"] } });
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  const [summary, data] = excel.worksheets;
+  const summaryRow = (label: string) => [4, 5].find(row => summary.getCell(`A${row}`).value === label)!;
+  expect(summary.getCell(`B${summaryRow("Average")}`).numFmt).toBe("#,##0.0");
+  expect(summary.getCell(`B${summaryRow("Median")}`).numFmt).toBe("#,##0");
+  const dataRow = (label: string) => [2, 3].find(row => data.getCell(`B${row}`).value === label)!;
+  expect(data.getCell(`C${dataRow("Average")}`).numFmt).toBe("#,##0.0");
+  expect(data.getCell(`C${dataRow("Median")}`).value).toBe(1531);
+  expect(data.getCell(`C${dataRow("Median")}`).numFmt).toBe("#,##0");
+});
+
 test("a region workbook is named after its region", async () => {
   const state = { ...defaultWagesState("regions", facts), range: { kind: "manual" as const, start: 2024, end: 2025 } };
   const adjara = await overviewWorkbook("en", { section: "regions", state, regionId: "region.adjara" });

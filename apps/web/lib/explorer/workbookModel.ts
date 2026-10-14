@@ -42,6 +42,8 @@ export type WorkbookExportInput = {
   includeTotalsInAnalysis?: boolean;
   /** false drops the readable sheet's relative change column (percentage measures). */
   showChangeColumn?: boolean;
+  /** Drops the Data sheet's group column, for a one-series dataset whose group would repeat the category on every row. */
+  omitGroupColumn?: boolean;
   sources: WorkbookPublicSource[];
   siteOrigin: string;
 };
@@ -116,6 +118,18 @@ export function absoluteWorkbookSourceUrl(
 /** `fiscal-<stem>.xlsx`; only the English edition carries a language suffix. */
 export function workbookFilename(stem: string, locale: Locale): string {
   return `fiscal-${stem}${locale === "en" ? "-en" : ""}.xlsx`;
+}
+
+// Georgia's national romanization (2002) without its apostrophes. Chromium saves a download whose name is not ASCII as
+// "download", so a Georgian label reaches a file name in Latin letters.
+const GEORGIAN_LATIN: Readonly<Record<string, string>> = {
+  ა: "a", ბ: "b", გ: "g", დ: "d", ე: "e", ვ: "v", ზ: "z", თ: "t", ი: "i", კ: "k", ლ: "l", მ: "m", ნ: "n", ო: "o", პ: "p", ჟ: "zh", რ: "r",
+  ს: "s", ტ: "t", უ: "u", ფ: "p", ქ: "k", ღ: "gh", ყ: "q", შ: "sh", ჩ: "ch", ც: "ts", ძ: "dz", წ: "ts", ჭ: "ch", ხ: "kh", ჯ: "j", ჰ: "h",
+};
+
+/** A label as ASCII file-name words: lower case, Georgian romanized, each run of other characters one hyphen. */
+export function filenameWords(label: string): string {
+  return [...label.toLowerCase()].map(character => GEORGIAN_LATIN[character] ?? character).join("").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
 /** Adds the absolute link the Sources sheet prints for each source. */
@@ -200,6 +214,9 @@ function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: strin
   return `${period} · ${basis} · ${unitLabel}`;
 }
 
+/** The Data-sheet amount format of the year/group/category/amount/status layout. */
+const AMOUNT_FORMAT = "#,##0.00;[Red](#,##0.00);–";
+
 /** A Data-sheet format that keeps every stored digit, with a true minus sign rather than red. */
 export const EXACT_SIGNED_FORMAT = '#,##0.###############;"−"#,##0.###############';
 
@@ -237,14 +254,17 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
   const analysisSeries = input.includeTotalsInAnalysis
     ? input.series
     : input.series.filter((series) => !nonTotalsExist || series.kind !== "total");
-  const headers = (["workbook.year", "workbook.group", "workbook.category", "workbook.amountGel", "workbook.status"] as const).map(key => workbookMessage(input.locale, key));
+  const headerKeys = input.omitGroupColumn
+    ? (["workbook.year", "workbook.category", "workbook.amountGel", "workbook.status"] as const)
+    : (["workbook.year", "workbook.group", "workbook.category", "workbook.amountGel", "workbook.status"] as const);
+  const headers: string[] = headerKeys.map(key => workbookMessage(input.locale, key));
   if (input.measure.kind === "percentage") headers.push(input.measure.analysisHeader);
   const analysisRows: Array<Array<string | number | null>> = [];
   for (const year of years) {
     for (const series of analysisSeries) {
       const point = series.pointsByYear[year];
       if (!point) continue;
-      const row: Array<string | number | null> = [year, series.parentLabel ?? input.groupLabel, series.label, point.amountGel];
+      const row: Array<string | number | null> = [year, ...(input.omitGroupColumn ? [] : [series.parentLabel ?? input.groupLabel]), series.label, point.amountGel];
       row.push(statusLabel(point.basis, input.locale));
       if (input.measure.kind === "percentage") row.push(point.measureValue ?? null);
       analysisRows.push(row);
@@ -270,7 +290,13 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
       years,
       rows,
     },
-    analysis: { headers, rows: analysisRows },
+    analysis: {
+      headers,
+      rows: analysisRows,
+      // The amount column is the only one formatted here; the writer formats a "(%)" share column by its header.
+      numericFormats: { [headerKeys.indexOf("workbook.amountGel") + 1]: AMOUNT_FORMAT },
+      ...(input.omitGroupColumn ? { columnWidths: [10, 42, 18, 12, 16] } : {}),
+    },
     sources,
   };
 }

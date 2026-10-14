@@ -44,6 +44,28 @@ test("overview defaults to the Georgia average with the 2025 figures from Geosta
   await expect(page.locator(pressed("public"))).toHaveAttribute("aria-pressed", "true");
 });
 
+// U18-03 and U20-15: in the downloaded file the median keeps whole lari beside the one-decimal average, on both sheets,
+// and only the value column carries a number format.
+test("the workbook keeps the median whole beside the average", async ({ page }) => {
+  await page.goto("/en/explorer/wages/overview#view=table&sel=average,median&start=2025&end=2025");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("explorer-table")).toContainText("1,531");
+  const promise = page.waitForEvent("download"); await page.getByTestId("wages-excel-download").click();
+  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await (await promise).path())!);
+  const summary = workbook.getWorksheet("Summary")!, data = workbook.getWorksheet("Data")!;
+  const summaryRow = (label: string) => [4, 5].find(row => summary.getCell(`A${row}`).value === label)!;
+  expect(summary.getCell(`B${summaryRow("Average monthly wage")}`).numFmt).toBe("#,##0.0");
+  expect(summary.getCell(`B${summaryRow("Median monthly wage")}`).numFmt).toBe("#,##0");
+  const dataRow = (label: string) => [2, 3].find(row => data.getCell(`B${row}`).value === label)!;
+  expect(data.getCell(`C${dataRow("Average monthly wage")}`).numFmt).toBe("#,##0.0");
+  expect(data.getCell(`C${dataRow("Median monthly wage")}`).value).toBe(1531);
+  expect(data.getCell(`C${dataRow("Median monthly wage")}`).numFmt).toBe("#,##0");
+  for (const row of [2, 3]) {
+    expect(data.getCell(`B${row}`).numFmt).toBeUndefined();
+    expect(data.getCell(`D${row}`).numFmt).toBeUndefined();
+  }
+});
+
 test("industries group, heatmap, table and workbook agree", async ({ page }) => {
   await page.goto("/en/explorer/wages/industries#tab=public&view=table&sel=total,sector.b&start=2024&end=2025");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");

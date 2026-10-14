@@ -266,7 +266,7 @@ for (const prefix of ["", "/en"]) test(`overview checkboxes never mix rates and 
   await expect(page.getByTestId("explorer-table")).toContainText("961.1");
   const promise = page.waitForEvent("download"); await page.getByTestId("unemployment-excel-download").click();
   const download = await promise;
-  expect(download.suggestedFilename()).toContain("national-people-2025-2025");
+  expect(download.suggestedFilename()).toContain(prefix ? "national-number-thousand-persons-2025-2025-en" : "erovnuli-raodenoba-atasi-adamiani-2025-2025");
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets[0].getCell("B4").value).toBeCloseTo(426.2940841069528, 10);
   expect(workbook.worksheets[0].getCell("B5").value).toBeCloseTo(961.1005993998547, 10);

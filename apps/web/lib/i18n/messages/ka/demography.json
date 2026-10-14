@@ -93,6 +93,7 @@
   "demography.ageGroupHeader": "ასაკი",
   "demography.totalHeader": "სულ",
   "demography.shareHeader": "წილი",
+  "demography.sharePercentHeader": "წილი, %",
   "demography.group.citizenship.georgia": "საქართველო",
   "demography.group.citizenship.russian_federation": "რუსეთი",
   "demography.group.citizenship.turkey": "თურქეთი",

@@ -104,6 +104,14 @@ test("inequality shows the Gini coefficient with two decimals and no tabs, and e
   expect(download.suggestedFilename()).toMatch(/\.xlsx$/);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets).toHaveLength(3);
+  // U20-15: in the downloaded file the value column carries the number format; the name and status columns carry none.
+  const data = workbook.getWorksheet("Data")!;
+  expect(data.getRow(1).values).toEqual([undefined, "Year", "Series", expect.any(String), "Status"]);
+  expect(data.getCell("C2").value).toEqual(expect.any(Number));
+  expect(data.getCell("C2").numFmt).toBe("0.00");
+  expect(data.getCell("B2").value).toEqual(expect.any(String));
+  expect(data.getCell("B2").numFmt).toBeUndefined();
+  expect(data.getCell("D2").numFmt).toBeUndefined();
 });
 
 test("an old poverty bookmark lands on the new address with its tab", async ({ page }) => {

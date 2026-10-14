@@ -107,6 +107,24 @@ test("the inequality workbook keeps two decimals", async () => {
   expect(model.sources.map(source => source.title)).toEqual(["geostat_gini"]);
 });
 
+// U20-06 (Q8): a nested row read alone names its parent line, on the Summary sheet as the household workbooks do.
+test.each(["ka", "en"] as const)("the %s workbook names the parent of a nested row", async (locale) => {
+  const messages = await getMessages(locale, ["poverty"]);
+  const ids = ["poverty.relative_60|georgia", "poverty.relative_40|settlement.rural"];
+  // The page passes a label for every series of the view.
+  const labels = Object.fromEntries(povertyViewSeries("rates", "relative").map(({ id }) => [id, messages[`poverty.series.${id}`]!]));
+  const model = buildPovertyWorkbookExportModel({
+    section: "rates", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels,
+    state: { mode: "table", view: "relative", range: { kind: "manual", start: 2024, end: 2025 }, selectedIds: ids },
+  }, await presentationFor(locale));
+  expect(model.readable.rows.map(row => [row.parentLabel, row.label])).toEqual([
+    [null, labels["poverty.relative_60|georgia"]],
+    [messages["poverty.series.poverty.relative_40|georgia"], labels["poverty.relative_40|settlement.rural"]],
+  ]);
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  expect(excel.worksheets[0].getCell("A5").value).toBe(`${messages["poverty.series.poverty.relative_40|georgia"]} — ${labels["poverty.relative_40|settlement.rural"]}`);
+});
+
 // U20-09 (owner review): the relative lines' Georgia rows read like their nested rows, so phone-legend entries line up;
 // "of median consumption" stays in the line under the heading.
 test.each(["ka", "en"] as const)("the %s relative-poverty Georgia rows are as short as their nested rows", async (locale) => {

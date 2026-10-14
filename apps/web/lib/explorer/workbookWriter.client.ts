@@ -256,7 +256,6 @@ function writeAnalysisSheet(worksheet: Worksheet, analysis: WorkbookExportModel[
       for (let row = 2; row <= analysis.rows.length + 1; row += 1) worksheet.getCell(row, column).alignment = { vertical: "top", wrapText: true };
     }
   });
-  for (let row = 2; row <= analysis.rows.length + 1; row += 1) worksheet.getCell(row, 4).numFmt = "#,##0.00;[Red](#,##0.00);–";
 }
 
 export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<ArrayBuffer> {

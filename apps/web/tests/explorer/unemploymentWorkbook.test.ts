@@ -59,9 +59,36 @@ test.each(["ka", "en"] as const)("export filenames describe the active populatio
   const national = changeUnemploymentBreakdown(education, "national", facts);
   const suffix = locale === "en" ? "-en" : "";
   expect(national.educationSex).toBe("women");
-  expect((await workbook(locale, national)).filename).toBe(`fiscal-unemployment-national-unemployment_rate-2010-2025${suffix}.xlsx`);
+  expect((await workbook(locale, national)).filename).toBe(locale === "en"
+    ? "fiscal-unemployment-national-unemployment-rate-2010-2025-en.xlsx"
+    : "fiscal-unemployment-erovnuli-umushevrobis-done-2010-2025.xlsx");
   const returned = changeUnemploymentBreakdown(national, "education", facts);
-  expect((await workbook(locale, returned)).filename).toBe(`fiscal-unemployment-education-unemployment_rate-women-2020-2025${suffix}.xlsx`);
+  expect((await workbook(locale, returned)).filename).toBe(locale === "en"
+    ? `fiscal-unemployment-education-women-unemployment-rate-2020-2025${suffix}.xlsx`
+    : "fiscal-unemployment-ganatleba-kalebi-umushevrobis-done-2020-2025.xlsx");
+});
+
+// U16-17 and U17-10: file names are words of the workbook's language (Georgian romanized, as a browser saves a non-ASCII
+// name as "download"), never internal ids such as `labour_force`.
+test.each(["ka", "en"] as const)("export filenames carry readable %s words, not ids", async locale => {
+  const name = async (hash: string, section: Parameters<typeof parseUnemploymentHash>[3], regionId?: string) =>
+    (await workbook(locale, parseUnemploymentHash(hash, facts, UNEMPLOYMENT_GROUPS, section, regionId))).filename;
+  const gender = await name("sel=georgia:unemployment_rate,women:unemployment_rate&start=2010&end=2025", "gender");
+  const age = await name("breakdown=age&start=2020&end=2025", "age");
+  const labourForce = await name("sel=region.imereti:labour_force&start=2019&end=2025", "regions", "region.imereti");
+  const people = await name("sel=region.imereti:labour_force,region.imereti:employed&start=2019&end=2025", "regions", "region.imereti");
+  for (const filename of [gender, age, labourForce, people]) expect(filename).toMatch(/^[a-z0-9.-]+$/);
+  expect([gender, age, labourForce, people]).toEqual(locale === "en" ? [
+    "fiscal-unemployment-sex-unemployment-rate-2010-2025-en.xlsx",
+    "fiscal-unemployment-age-unemployment-rate-2020-2025-en.xlsx",
+    "fiscal-unemployment-imereti-labour-force-2019-2025-en.xlsx",
+    "fiscal-unemployment-imereti-number-thousand-persons-2019-2025-en.xlsx",
+  ] : [
+    "fiscal-unemployment-skesi-umushevrobis-done-2010-2025.xlsx",
+    "fiscal-unemployment-asaki-umushevrobis-done-2020-2025.xlsx",
+    "fiscal-unemployment-imereti-shromis-dzala-2019-2025.xlsx",
+    "fiscal-unemployment-imereti-raodenoba-atasi-adamiani-2019-2025.xlsx",
+  ]);
 });
 test("age exports omit removed historical bands and Georgia and use modern years and age-source links", async () => {
   const model = await workbook("en", { breakdown: "age", selectedIds: ["georgia", "age.15_24", "age.15_19"], range: { kind: "manual", start: 2010, end: 2025 } });

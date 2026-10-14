@@ -5,7 +5,7 @@ import { workbookMessage } from "../i18n/workbook";
 import { buildUnemploymentModel } from "./unemployment";
 import { unemploymentFactSeriesId, unemploymentSeriesLabel } from "./unemploymentOverview";
 import type { UnemploymentState } from "./unemploymentState";
-import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { SHEET_NAMES, filenameWords, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 export function buildUnemploymentWorkbookExportModel(facts: ClientUnemploymentObservation[], registry: UnemploymentGroupDefinition[], state: UnemploymentState, presentation: Presentation, sources: (WorkbookPublicSource & { sourceId: string })[], siteOrigin: string): WorkbookExportModel {
   const model = buildUnemploymentModel(facts, registry, state), { locale, messages } = presentation;
@@ -25,7 +25,8 @@ export function buildUnemploymentWorkbookExportModel(facts: ClientUnemploymentOb
   const valueAt = (id: string, year: number) => { const fact = byCell.get(`${id}:${year}`); return fact ? fact.value / (model.percent ? 100 : 1) : null; };
   const numberFormat = model.percent ? "0.0%" : "#,##0.0";
   return {
-    locale, filename: workbookFilename(`unemployment-${state.regionId?.replace(/^region\./, "") ?? state.breakdown}-${indicators.length > 1 ? model.percent ? "rates" : "people" : indicators[0] ?? state.indicator}${state.breakdown === "education" ? `-${state.educationSex}` : ""}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
+    // Named in the workbook's language from the labels its title uses; several indicators are named by their value column.
+    locale, filename: workbookFilename(`unemployment-${filenameWords(breakdown)}-${filenameWords(indicators.length > 1 ? t(model.percent ? "rateHeader" : "countHeader") : indicator)}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title: message(messages, "unemployment.workbookTitle", { indicator, breakdown }),
       subtitle: `${model.range.start}–${model.range.end} · ${unitLabel} · ${t("surveyEstimate")}`,

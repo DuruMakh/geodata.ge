@@ -77,7 +77,8 @@ describe.each(["en", "ka"] as const)("the age and sex workbooks (%s)", (locale) 
     for (const row of oldest) {
       expect(row[0]).toBe(2026);
       expect(row[3]).toEqual(expect.any(Number));
-      expect(row[4]).toBeCloseTo(((row[3] as number) / 3_941_103) * 100, 9);
+      // U26-14: the share is stored to the one decimal it shows, not as a long float.
+      expect(row[4]).toBe(Math.round(((row[3] as number) / 3_941_103) * 1000) / 10);
     }
     expect(sourceIds(model)).toEqual([`Title of ${SOURCE_ID.ageSex}`]);
     expect(model.sources[0]!.absoluteUrl.startsWith("https://fiscal.ge/")).toBe(true);
@@ -118,6 +119,8 @@ describe.each(["en", "ka"] as const)("the age and sex workbooks (%s)", (locale) 
     expect(row.valuesByYear[2004]!.toFixed(3)).toBe("8.232");
     expect(model.analysis.rows).toHaveLength(18 * 23);
     expect(model.analysis.headers).toHaveLength(5);
+    expect(model.analysis.headers[3]).toBe(locale === "en" ? "Share, %" : "წილი, %");
+    for (const dataRow of model.analysis.rows) expect(Math.round((dataRow[3] as number) * 10) / 10).toBe(dataRow[3]);
     expect(model.filename).toContain("demography-age-by-year-2004-2026");
     expect(sourceIds(model)).toEqual([`Title of ${SOURCE_ID.ageSex}`]);
     noInternalColumns(model);
@@ -137,6 +140,10 @@ describe.each(["en", "ka"] as const)("the age and sex workbooks (%s)", (locale) 
     expect(model.analysis.rows).toHaveLength(36);
     const censusBasis = presentation().messages["demography.censusBasis" as never] as string;
     expect(model.analysis.rows.every((row) => row[5] === censusBasis && row[0] === 2024)).toBe(true);
+    // U26-14: the share column names its unit, and holds the one decimal it shows.
+    expect(model.analysis.headers[4]).toBe(locale === "en" ? "Share, %" : "წილი, %");
+    expect(model.analysis.numericFormats![5]).toBe("0.0");
+    for (const row of model.analysis.rows) expect(Math.round((row[4] as number) * 10) / 10).toBe(row[4]);
     expect(model.filename).toContain("demography-age-sex-region-imereti-census-2024-total");
     noInternalColumns(model);
   });
