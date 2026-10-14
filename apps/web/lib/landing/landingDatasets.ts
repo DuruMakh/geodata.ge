@@ -3,10 +3,10 @@ import type { ServedCpiFact } from "../data/inflation/types";
 import { periodFromKey } from "../data/inflation/periods";
 import type { ClientUnemploymentObservation } from "../data/unemployment/types";
 import type { ClientTradeOverviewFact } from "../data/tradeOverview/types";
-import { formatAmount, formatInUnit, formatShare } from "../explorer/format";
+import { formatAmount, formatInUnit, formatShare, UNIT_BN } from "../explorer/format";
 import { periodLabel } from "../explorer/inflationLabels";
 import { message } from "../i18n/messages";
-import type { Presentation } from "../i18n/types";
+import type { Messages, Presentation } from "../i18n/types";
 
 // The landing's dataset row (owner decision D3, 2026-10-07): one link per
 // dataset hub, each with one latest figure computed from the served facts —
@@ -50,6 +50,26 @@ export function buildLandingDatasetLinks(
     { href: "/explorer/unemployment", title: t("common.unemployment"), measure: t("landing.datasetUnemploymentMeasure"), period: String(unemployment.year), value: formatShare(unemployment.value / 100) },
     { href: "/explorer/trade", title: t("common.trade"), measure: t("landing.datasetTradeMeasure"), period: String(trade.year), value: `${formatInUnit(trade.valueUsd, tradeUnit)} ${tradeUnit.label}` },
   ];
+}
+
+export type LandingGdpFigure = { value: string; caption: string; mobileCaption: string };
+
+/**
+ * The landing's "Economic size" key figure: the latest nominal GDP in billion
+ * GEL, with its year and preliminary status, read from the same served facts as
+ * the Economy row above, so the two cannot disagree after a GDP release.
+ */
+export function landingGdpFigure(
+  gdpFacts: readonly Pick<ServedGdpObservation, "seriesId" | "year" | "value" | "status">[],
+  messages: Messages,
+): LandingGdpFigure {
+  const gdp = latestBy(gdpFacts.filter((fact) => fact.seriesId === "nominal_gel"), (fact) => fact.year);
+  if (!gdp) throw new Error("Landing key figures need a served nominal GDP fact");
+  return {
+    value: formatInUnit(gdp.value, UNIT_BN),
+    caption: message(messages, gdp.status === "preliminary" ? "landing.economyCaption" : "landing.economyCaptionFinal", { year: gdp.year }),
+    mobileCaption: message(messages, "landing.economyMobile", { year: gdp.year }),
+  };
 }
 
 function latestBy<T, K extends number | string>(rows: readonly T[], key: (row: T) => K): T | undefined {

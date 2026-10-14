@@ -24,7 +24,8 @@ export type TradeOverviewFact = {
   sourceNumberFormat: string | null;
   lastReviewedAt: string;
 };
-export type ClientTradeOverviewFact = Pick<TradeOverviewFact, "year" | "publicationStatus" | "role" | "lastReviewedAt"> & { indicatorId: TradeChartIndicator; valueUsd: number; sourceId: string | null };
+/** What the trade pages read of a national total; source and review metadata stay on the server. */
+export type ClientTradeOverviewFact = Pick<TradeOverviewFact, "year"> & { indicatorId: TradeChartIndicator; valueUsd: number };
 export type TradeOverviewAcceptance = {
   status: "passed";
   scope: "national_goods_overview";

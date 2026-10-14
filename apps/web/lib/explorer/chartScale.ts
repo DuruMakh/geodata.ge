@@ -5,7 +5,8 @@ export type NiceScale = { top: number; bottom: number; step: number };
 const HEADROOM = 1.05;
 const NICE_MULTIPLIERS = [1, 2, 2.5, 5];
 // 4–7 gridline intervals: enough labels to read a value against, and at 7 the
-// lattice's three rows per step still clear its 12-unit density floor.
+// lattice's three rows per step still clear its 12-unit density floor. One
+// exception allows 8: a dip less than one step below zero (see niceScale).
 const MIN_INTERVALS = 4;
 const MAX_INTERVALS = 7;
 
@@ -43,7 +44,11 @@ export function niceScale(minValue: number, maxValue: number, quantum = 0): Nice
     }
   }
 
-  const inRange = candidates.filter((option) => option.intervals >= MIN_INTERVALS && option.intervals <= MAX_INTERVALS);
+  // A dip that fits in one step below zero may take an eighth interval: otherwise a −0.25 low
+  // under a 32.4 high forces a step of 10 and a −10 floor, a fifth of the plot left empty (U04-04).
+  const inRange = candidates.filter((option) =>
+    option.intervals >= MIN_INTERVALS &&
+    (option.intervals <= MAX_INTERVALS || (option.intervals === MAX_INTERVALS + 1 && option.bottom === -option.step && option.top > 0)));
   // Spans are float products (3 × 0.1), so equal spans can differ in the last bit.
   const spanOrder = (a: NiceScale, b: NiceScale) => {
     const difference = a.top - a.bottom - (b.top - b.bottom);

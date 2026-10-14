@@ -1,8 +1,9 @@
 import { findSourceProvenanceFailures, type SourceProvenanceFailure } from "../lib/factQuery/sources";
 import { execFileSync } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { buildFactQuerySnapshot } from "../lib/factQuery/buildSnapshot";
+import { runAsCli } from "../lib/runAsCli";
 
 const OUTPUT = path.join(process.cwd(), "lib", "factQuery", "generated", "snapshot.json");
 
@@ -14,9 +15,9 @@ function releaseCommit(): string {
   }
 }
 
-async function main() {
-  const write = process.argv.includes("--write");
-  const check = process.argv.includes("--check");
+export async function main(args: readonly string[]) {
+  const write = args.includes("--write");
+  const check = args.includes("--check");
   if (write === check) throw new Error("Pass exactly one of --write or --check");
 
   const snapshot = await buildFactQuerySnapshot({
@@ -26,7 +27,13 @@ async function main() {
 
   if (write) {
     await mkdir(path.dirname(OUTPUT), { recursive: true });
-    await writeFile(OUTPUT, `${JSON.stringify(snapshot, null, 2)}\n`, "utf8");
+    // Minified: the function reads and parses this file on every cold start,
+    // and indentation made it about 45% larger for no reader's benefit.
+    // Written beside the target and renamed into place, so a test run or a
+    // server reading the file never sees half of it.
+    const temporary = `${OUTPUT}.${process.pid}.tmp`;
+    await writeFile(temporary, `${JSON.stringify(snapshot)}\n`, "utf8");
+    await rename(temporary, OUTPUT);
     process.stdout.write(`wrote ${OUTPUT} dataVersion=${snapshot.dataVersion}\n`);
     return;
   }
@@ -65,7 +72,4 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-  process.exitCode = 1;
-});
+runAsCli(import.meta.url, main);

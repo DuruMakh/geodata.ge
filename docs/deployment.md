@@ -18,7 +18,7 @@ successful build or deployment.
 The two social images at `/opengraph-image` and `/en/opengraph-image` use explicit
 `force-static` GET routes, avoiding Next.js route-group filename suffixes. Both
 are generated at build time. All human pages remain prerendered and `/mcp` remains
-the sole request-time route; the older all-static description below predates MCP.
+the sole request-time route.
 
 Data schema **1.5.0** includes current-product inflation and reviewed language
 companions. The authoritative tool inventory is `tools/list`; dataset families
@@ -34,7 +34,7 @@ ranking, byte, duration, rate and pause limits. Large bilingual evidence respons
 can require narrower queries; never trim evidence or increase limits to fit.
 
 The existing `npm run check` includes translation validation; `prebuild` prepares
-the snapshot/publications, and `postbuild` verifies publication hashes. Before
+the snapshot/publications and verifies the written publication hashes. Before
 release, run the full browser suite against the new build and inspect both image
 URLs, language-switch state, original archives and English workbook sheets.
 `scripts/measure-bilingual-output.ts` records decoded HTML/asset bytes separately
@@ -75,11 +75,11 @@ The repo clone on the build machine includes the repo root, so the build can
 read `data/` via the `../../` relative paths in `apps/web/lib/data/servedData.ts`.
 Before Next.js builds, `prebuild` deterministically prepares the ignored public
 methodology downloads from the reviewed manifests and immutable originals; see
-`docs/data-methodology/public-methodology-and-source-archives.md`. All app
-routes—including `/`, the explorer hub/sections and municipal detail pages,
-the methodology hub and its three live category pages, `/robots.txt`,
-`/sitemap.xml`, and the 404 page—are prerendered at build time; nothing runs
-server-side at request time.
+`docs/data-methodology/public-methodology-and-source-archives.md`. Every
+human page—`/`, every explorer hub, section and place page, the methodology
+hub and its category pages, `/about` and `/connect`—and `/robots.txt`,
+`/sitemap.xml` and the 404 page are prerendered at build time. The only
+request-time route is `/mcp` (see "The `/mcp` runtime" below).
 
 ## How deploys happen
 
@@ -118,6 +118,46 @@ server-side at request time.
   A data loader that reads files under `public/` or `docs/Raw Data/` at
   request time, without a `/* turbopackIgnore: true */` path hint, is the
   usual cause.
+- **CI** (`.github/workflows/ci.yml`, every PR and every push to `main`):
+  the `checks` job (lint, typecheck, unit tests, `data:validate`) and the `build`
+  job run in parallel. `build` builds the site once (with
+  `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`, and `GEODATA_TYPECHECK_GATED=1` so
+  `next build` skips the TypeScript pass `checks` already runs) and uploads the
+  build and the files `prebuild` generates as the `next-build` artifact, without
+  `.next/cache` or source maps. The `e2e` job waits for `build` only: it
+  downloads the artifact, starts `next start` on port 3100, waits until it
+  answers, runs the browser suite against it and prints the server log if
+  anything fails. `.next/cache` (keyed on the lockfile and the tracked source)
+  and the Playwright browsers are cached. Job limits: 30 minutes (`checks`), 20
+  (`build`) and 45 (`e2e`). Every job fails if it wrote into the repository.
+  Playwright retries a failed test once in CI and reports it as flaky. Still to
+  measure on the first CI runs: each job's step times and the critical path
+  (`build` then `e2e`) against the former layout; the browser suite at two
+  against four workers, then pin `PW_WORKERS` in the `e2e` job; the artifact's
+  size and transfer time; the `.next/cache` save time and size; the runner's
+  cores and memory; and whether a second run of the same PR restores both caches
+  exactly (caches saved on a PR are scoped to it, so its first run is cold).
+- **Known flaky tests.** Record each one here with its cause; a retry is not a fix.
+  - `main-explorer.spec.ts` "opening … fetches no other page's data" (seen on
+    `/explorer/expenditure` at 1280px). Fixed 2026-10-13. The test waited for
+    Playwright's `networkidle` twice. Under load Playwright reports it before
+    `DOMContentLoaded`. A request after that point (the sidebar's compact logo),
+    followed by the `load` event, clears it for good (Playwright 1.63), so the
+    second wait hung until the 30 s timeout. The test now waits until React
+    has hydrated every link and, after scrolling, until no request has been in
+    flight for half a second.
+  - `main-explorer.spec.ts` "legacy nav hashes redirect to their route". Fixed
+    2026-10-13. The hub redirects from an effect, so only after it hydrates. The
+    test gave the hub's hydration and the redirect one 5 s window from the `load`
+    event. It now waits for the hub's `data-app-ready` first.
+  - `mobile-series-picking.spec.ts` phone-legend deep link (worked around in the
+    test in `a1574bb1`, not fixed in the app). An address-bar change to the hash
+    alone leaves a history entry without the Next.js router's state. The router
+    ignores it, and its next history write can put the old URL back, which drops
+    the hash.
+  - Load-dependent, cause not established: `municipal-entity.spec.ts` "sourced
+    percentage workbook", download or request specs under a loaded machine, and
+    the unit test `tests/seo/opengraphImage.test.ts`.
 - **Previews**: unchanged — every push to any other branch (and every PR)
   gets its own preview deployment, always CSV-mode (the database env vars
   are scoped to Production only), so data-PR previews never depend on the
@@ -371,7 +411,10 @@ There is no session store, model invocation, authentication, or write tool.
 ### Snapshot and network boundary
 
 All MCP data answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
-at build time and cached once per function instance. The sole runtime network
+at build time and cached once per function instance. It is written minified: 32.1 MB
+on 2026-10-13 (46.3 MB indented), about 0.2 s to read and 0.3 s to parse on the first
+request of each instance. The server text built from it (coverage, tool descriptions,
+instructions) and the tools' JSON Schemas are also built once per instance. The sole runtime network
 exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
 commands to the configured Upstash endpoint. It never sends query arguments,
 figures, source documents, prompts, or raw client addresses. There is no runtime
@@ -396,27 +439,40 @@ no automatic retry; an unavailable service, invalid response, or missing
 credentials fails closed with 503. Memory-only counters are refused in Vercel
 Production.
 
-Two limits are checked in order:
+Three limits are checked in order, each only after the one before it has
+allowed the request:
 
 1. **60 requests in a rolling minute per client key.** A Redis sorted set uses
    Redis server time and expires 60 seconds after the most recent accepted hit.
    The key is a hash of the trusted platform address header, not a stored raw IP.
    An unidentifiable caller shares one bucket.
-2. **10,000 accepted requests per UTC day globally.** The date-keyed integer is
-   checked only after the client limit allows the request, so per-client denials
-   cannot drain the global quota. The daily key expires automatically.
+2. **1,000 requests per UTC day per client key**, the same key as the minute
+   limit. Without it one key at 60 a minute could take the whole global
+   allowance in under three hours. Callers behind one shared address (one
+   connector's few outbound addresses, for example) share this cap.
+3. **10,000 accepted requests per UTC day globally.**
 
-Each hit is an atomic Lua operation. Counters are shared across function
+Per-client refusals (limits 1 and 2) never touch the application's global daily
+counter, so they cannot drain it. They are not free: every refusal still costs
+Upstash commands (below). Both daily keys are date-keyed integers that expire
+automatically.
+
+Each hit is an atomic Lua operation; the route tells it whether the window is
+rolling (the minute) or fixed (the date-stamped daily keys). Counters are shared across function
 instances. Production and preview counter namespaces are separate. A limit
-reached returns 429 and Retry-After; the daily refusal points to the next UTC day.
+reached returns 429 and Retry-After; either daily refusal points to the next UTC day.
 These are request allowances, so initialization and discovery also count.
 
 The free service has its own monthly quota (500,000 commands at setup).
 [Upstash counts EVAL and its nested Redis commands](https://upstash.com/docs/redis/sdks/ratelimit-ts/costs):
-the current successful request uses six for the minute bucket and four for the
-daily bucket. That allows roughly 50,000 accepted requests per month before
-other usage; refused requests also consume commands. The 10,000/day application
-ceiling is not guaranteed sustainable daily capacity on the free plan. It does
+the current successful request uses six for the minute bucket and three for each
+of the two daily buckets (a daily key's expiry is set once, by the first hit of
+the day), twelve in all. That allows roughly 41,000 accepted requests per month
+before other usage. Refused requests also consume commands: about four for a
+minute refusal, eight for a per-client daily refusal and eleven for a global
+daily refusal, which passes both per-client checks first. The
+10,000/day application ceiling is not guaranteed sustainable daily capacity on
+the free plan. It does
 not guarantee continuous availability under an attack or sustained maximum
 traffic. Provider quota exhaustion pauses MCP through the same fail-closed 503;
 static pages and bulk files continue working. Review usage before changing the
@@ -549,29 +605,75 @@ no budget data and require no migration when a code release is rolled back.
 
 - `apps/web/app/robots.ts` and `apps/web/app/sitemap.xml/route.ts` generate
   `/robots.txt` and `/sitemap.xml` at build time; the sitemap data and XML
-  serializer live in `apps/web/lib/seo/sitemap.ts` (sitemap `lastModified`
-  comes from the newest `lastReviewedAt` in `data/sources/source-documents.csv`).
+  serializer live in `apps/web/lib/seo/sitemap.ts`. Each URL's `lastModified`
+  is the newest `lastReviewedAt` of the data that page shows (a hub: of every
+  dataset its cards read), and a page's Georgian and English URLs share it.
 - Both pages set Georgian titles/descriptions, Open Graph tags, and canonical
   URLs; `metadataBase` comes from `resolveSiteUrl()`.
 - Security headers (nosniff, `X-Frame-Options: DENY`, referrer policy,
   permissions policy) are set in `apps/web/next.config.ts` `headers()`;
-  Vercel adds HSTS itself. There is deliberately no Content-Security-Policy
-  yet — adding one needs testing against the chart/canvas code first.
+  Vercel adds HSTS itself.
+- Page data under `/page-data/` (`apps/web/lib/data/pageDataFiles.ts`): JSON a
+  page fetches after load instead of carrying it in its HTML, today the
+  inflation products runs and the categories' monthly runs. Each name carries a
+  hash of its content, so the rule in `headers()` sends
+  `Cache-Control: public, max-age=31536000, immutable` and
+  `X-Robots-Tag: noindex`. `prebuild` writes the files and reads them back
+  (`data:prepare-inflation-public`; `data:check-inflation-public` repeats that
+  check on its own); they are not publications and appear in no manifest,
+  `llms.txt` or sitemap.
+- Every response also carries a `Content-Security-Policy-Report-Only` header
+  (the `contentSecurityPolicy` constant in `apps/web/next.config.ts`): only the
+  site itself, plus Google Analytics (`www.googletagmanager.com`,
+  `*.google-analytics.com`, `*.analytics.google.com`) and Microsoft Clarity
+  (`*.clarity.ms`, `c.bing.com`) as loaded by
+  `apps/web/components/site/site-analytics.tsx`, with `frame-ancestors 'none'`,
+  `object-src 'none'` and `base-uri 'self'`. It is report-only so a missed
+  source cannot break a page: browsers block nothing and print each violation
+  in the console as `[Report Only] Refused to …` (an info message). There is no
+  `report-uri`, because a collecting endpoint would be a second request-time
+  route, so watch the console on production pages. Pages are prerendered, so
+  Next.js's inline scripts cannot carry a per-request nonce and `script-src`
+  allows `'unsafe-inline'`; the policy therefore limits where scripts, images
+  and connections may come from and who may frame the site, but does not stop
+  an injected inline script. To enforce it, as a separate decision: confirm the
+  production console shows no reports on the landing page, an explorer page, a
+  methodology page and an Excel download in both languages, with analytics
+  loaded (judge this on the production domain: preview deployments also load
+  the Vercel toolbar from `vercel.live`, which shows up as reports there and is
+  not a site problem); keep the enforced site-wide policy off the archived
+  originals under `/downloads/methodology/:dataset/files/` by giving the
+  `/(.*)` source a negative lookahead for that path. This matters because while the policy is
+  report-only the archive rule's enforcing `sandbox; default-src 'none'` header
+  has a different key and is sent alongside it, but once both rules set
+  `Content-Security-Policy` Next.js keeps only the later rule's value, and the
+  site-wide rule comes later today, so it would silently replace the sandbox.
+  Keeping it off the archive also keeps `object-src 'none'` away from the
+  archived PDFs, which must still open in the browser's viewer. Then rename the
+  header key to `Content-Security-Policy`, update
+  `tests/seo/nextConfig.test.ts`, and confirm with `curl -sI` that a non-PDF
+  archive file still receives the sandbox policy.
 
 
-## GDP dataset release checks
+## Dataset release checks
 
 ### National sectors release checks
 
 For the sectors release, require the Actions-owned pipeline to apply `20260912000000_economic_sectors`, import all 987 exact-decimal observations with parity, and pass the database-mode build before triggering Vercel. Preserve the already deployed inflation migration and import in the combined release. After Vercel is READY at the merge commit, verify both language sector pages, methodology/originals, all three measures and native Excel downloads. Check the central sector CSV/JSON against their manifest hashes and exercise `query_economic_sectors`, including missing 2010 growth and the bilingual stale-version error. Source-exact sector GDP may differ in the final decimal digits from the unchanged GDP overview representation; the sector validation report documents the difference. Local preview checks do not establish production delivery.
 
+### GDP release checks
+
 The Economy/GDP addition has 94 bilingual page identities (188 sitemap URLs), ten MCP tools including `query_gdp`, and seven datasets. It adds `gdp-overview.json` and `gdp-overview.csv` to the central publication manifest. Before release, validate all six GDP series against their source data, confirm exact CSV/database parity and source-status semantics, and check both language overview/methodology pages. Apply the GDP migration through the existing pipeline only; verify the deployed commit and a real `query_gdp` response after deployment. Growth MCP values are percent, not fractions; preliminary values are not forecasts or planned budgets.
+
+For an authorized GDP release, require the pipeline to apply `20260911000000_gdp_overview`, import 251 GDP observations with field parity, and pass the database-mode build before triggering Vercel. After the deployment is READY at the merged SHA, verify the Georgian and English Economy hub, GDP overview and GDP methodology URLs; all four tabs and summaries; nominal GEL/USD controls; and a native Excel download in each language. Check the overview Dataset metadata and all six route URLs in the sitemap. Query all six GDP series for 2025 and one early real-GDP year through the live MCP endpoint, verify original-source links, and compare the public GDP JSON/CSV bytes with their central manifest hashes. These live checks are separate from local disposable-database evidence and do not establish search indexing.
+
+### Inflation MCP release checks
 
 The inflation MCP addition (`docs/superpowers/specs/2026-09-14-inflation-mcp-design.md`) brings the endpoint to twelve tools with `query_inflation`, moves the schema to 1.2.0 (an additive `period` on monthly observations, comparison endpoints and ranking entries), and adds `inflation-national.json`, `inflation-categories.csv` and `inflation-categories.json` to the manifest. The packaged snapshot grows from about 4.4 MB to about 15.5 MB, measured on 2026-09-14, most of it the monthly category table. After deployment, verify the deployed commit; that `tools/list` on `https://fiscal.ge/mcp` includes `query_inflation`; one real call each of `query_inflation`, `compare` with an inflation target and `rank` with `datasetId: "inflation"`; and that the three files are served with the manifest's hashes.
 
-The regional-economies addition (`docs/superpowers/specs/2026-09-13-regional-economies-design.md`) brings the endpoint to thirteen tools with `query_regional_economies`, moves the schema to 1.3.0, and adds `regional-economies.json` and `regional-economies.csv` to the manifest. After deployment, verify the deployed commit; both language route families; one real `query_regional_economies` call for Imereti nominal GDP and one sector share; and both files against the manifest hashes.
+### Regional economies release checks
 
-For an authorized GDP release, require the pipeline to apply `20260911000000_gdp_overview`, import 251 GDP observations with field parity, and pass the database-mode build before triggering Vercel. After the deployment is READY at the merged SHA, verify the Georgian and English Economy hub, GDP overview and GDP methodology URLs; all four tabs and summaries; nominal GEL/USD controls; and a native Excel download in each language. Check the overview Dataset metadata and all six route URLs in the sitemap. Query all six GDP series for 2025 and one early real-GDP year through the live MCP endpoint, verify original-source links, and compare the public GDP JSON/CSV bytes with their central manifest hashes. These live checks are separate from local disposable-database evidence and do not establish search indexing.
+The regional-economies addition (`docs/superpowers/specs/2026-09-13-regional-economies-design.md`) brings the endpoint to thirteen tools with `query_regional_economies`, moves the schema to 1.3.0, and adds `regional-economies.json` and `regional-economies.csv` to the manifest. After deployment, verify the deployed commit; both language route families; one real `query_regional_economies` call for Imereti nominal GDP and one sector share; and both files against the manifest hashes.
 
 ### Demography release checks
 
@@ -583,16 +685,30 @@ For the Births, deaths and fertility release there is again no new demography mi
 
 For the Age and sex release there is again no new demography migration, and the import replaces `DemographyFact` with 9,740 rows (5,525 as before, 1,587 age-structure and 2,628 census rows); the workflow log must show `[OK ] DemographyFact: csv=9740 db=9740`. After Vercel is READY, open `/explorer/demography/age-sex` and `/en/explorer/demography/age-sex` (the pyramid opens first, the heat map follows, and the regional glance at the foot ranks Racha-Lechkhumi and Kvemo Svaneti first at 31.2% aged 65+ with no region linking anywhere; the pyramid opens on 2026 with 18.1% aged 65+, and the 2025 option of the Year menu carries the census label, and the Compared with menu starts on None), open one place page's `#age-sex` section in each language (Imereti's page shows 510,741 people counted) and confirm a municipality's page has none, download the section's workbook and the national page's two workbooks (pyramid and heat map), check that the hub links four pages, and open the two new originals (population on 1 January by five-year age group and sex, and the 2024 census by age and settlement) on `/methodology/demography`.
 
+### Wages release checks
+
 For the Wages release, require the Actions-owned pipeline to apply `20261010060000_wages` and fill `WagesFact` with the 1,929 rows of `data/imports/wages-annual.csv` (1,917 published values and 12 unavailable cells), with parity checked inside the import transaction, and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the wages migration and import. After Vercel is READY, open `/explorer/wages`, `/explorer/wages/overview` (2025 Georgia average 2,165.2 GEL), `/explorer/wages/industries`, `/explorer/wages/regions`, one region page (for example `/explorer/wages/regions/adjara`) and `/methodology/wages` in Georgian and under `/en`, download one workbook in each language, and open one original Geostat workbook from the methodology page. Wages has no `/mcp` tool or central JSON/CSV file.
+
+### Current account release checks
 
 For the Current account release, require the Actions-owned pipeline to apply `20261010160000_current_account` and fill `CurrentAccountFact` with the 390 rows of `data/imports/current-account-annual.csv` (five series, credit, debit and net, 2000–2025), with parity checked inside the import transaction; the workflow log must show `[OK ] CurrentAccountFact: csv=390 db=390`. CI has no Postgres, so this deploy is the first real run of the migration and import. After Vercel is READY, open `/explorer/external`, `/explorer/external/current-account` (2025 balance −1.12 billion USD, −2.9% of GDP) and `/methodology/external-flows` in Georgian and under `/en`, and download one workbook in each language. Current account has no `/mcp` tool or central JSON/CSV file.
 
+### Poverty and inequality release checks
+
 For the Poverty and inequality release, require the Actions-owned pipeline to apply `20261010180000_poverty` and fill `PovertyFact` with the 491 rows of `data/imports/poverty-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] PovertyFact: csv=491 db=491`), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the poverty migration and import. After Vercel is READY, open `/explorer/living-standards`, `/explorer/living-standards/poverty` (2025 poverty-line rate 7.1%, then the Relative poverty and International lines tabs), `/explorer/living-standards/inequality` (2025 Gini by total income 0.34) and `/methodology/poverty` in Georgian and under `/en`, download one workbook in each language, and open one original Geostat workbook from the methodology page. Poverty has no `/mcp` tool or central JSON/CSV file.
+
+### Living standards release checks
 
 For the Living standards release, require the Actions-owned pipeline to apply `20261012090000_household_income_spending` and fill `HouseholdIncomeSpendingFact` with the 10,638 rows of `data/imports/household-income-spending-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] HouseholdIncomeSpendingFact: csv=10638 db=10638`), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the household migration and import. After Vercel is READY, open `/explorer/living-standards`, `/explorer/living-standards/income` (2025 Georgia total income per household 2,025.8 ₾ and the per person switch recolouring the map, then Georgia in the list opening `/explorer/living-standards/income/regions/georgia` with years from 2002 and Towns ticked, and a region on the map and one in the list each opening its own page, such as `/explorer/living-standards/income/regions/guria` with years from 2019), `/explorer/living-standards/spending` (2025 consumption spending per household 1,438.7 ₾) and `/methodology/household-income` in Georgian and under `/en`, download one workbook in each language from Income or Spending, and open one original Geostat workbook from the methodology page. Confirm that `/explorer/poverty`, `/explorer/poverty/rates` and `/explorer/poverty/inequality` (and their `/en` twins) answer with a permanent redirect to the hub, Poverty and Inequality. Household income and spending has no `/mcp` tool or central JSON/CSV file.
 
+### Energy and food release checks
+
 For the Energy and food release, require the Actions-owned pipeline to apply `20261011120000_energy_food` (RLS on, public grants revoked) and fill `EnergyFoodFact` with the 681 rows of `data/imports/energy-food-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] EnergyFoodFact: csv=681 db=681`), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the energy and food migration and import. After Vercel is READY, open `/explorer/energy-food`, `/explorer/energy-food/energy-supply` (2024 domestic supply 5,914.5 thousand tonnes of oil equivalent), `/explorer/energy-food/electricity` (2024 production 14,234.1 GWh), `/explorer/energy-food/energy-use`, `/explorer/energy-food/food-self-sufficiency` (2025 wheat 19%) and `/methodology/energy-food` in Georgian and under `/en`, download one workbook in each language, and open one original Geostat workbook from the methodology page. Energy and food has no `/mcp` tool or central JSON/CSV file.
 
+### Money and banks release checks
+
 For the Money and banks release, require the Actions-owned pipeline to apply `20261011130000_money_banks` and fill `MoneyBanksFact` with the 730 rows of `data/imports/money-banks-annual.csv`, with parity checked inside the import transaction (the workflow log must show `[OK ] MoneyBanksFact: csv=730 db=730`; 730 is the expected count, to be confirmed by that first run), and pass the database-mode build before triggering Vercel. CI has no Postgres, so this deploy is the first real run of the money migration and import. After Vercel is READY, open `/explorer/money`, `/explorer/money/supply` (2025 broad money 57.7 billion GEL), `/explorer/money/loans-deposits` (2025 bank loans 72.5 billion GEL with deposits beside them, then the foreign-currency share icon), `/explorer/money/interest-rates` (2025 National Bank rate 8.00%), `/explorer/money/bank-health` (2025 bad loans 2.5% of all loans) and `/methodology/money` in Georgian and under `/en`, download one workbook in each language, and open one original NBG workbook from the methodology page. Money and banks has no `/mcp` tool or central JSON/CSV file.
+
+### When a release step fails
 
 A failing step stops the job before the deploy hook, so Vercel builds nothing and production keeps serving its previous deploy. A failed import rolls back completely: fix the cause and rerun *Deploy production*. A migration that fails while running is recorded by Prisma as failed, and every later run then stops at `prisma:deploy` with P3009 until `npx prisma migrate resolve --rolled-back 20261008100000_demography` (after removing any half-made table; `--applied` only if the table was completed by hand) is run from `apps/web` with `DIRECT_URL` set. To undo a release use Vercel's Instant Rollback (see Manual operations), not a git revert of the merge: the reverted importer no longer deletes `DemographyFact`, so its `SourceDocument` delete hits the table's `ON DELETE RESTRICT` foreign key and every later deploy fails at the import until someone empties the table by hand. After a rollback Vercel stops assigning new production deployments to the domain until one is promoted (for example with `vercel promote`).

@@ -27,6 +27,42 @@ test("loads the complete accepted package and exposes null-preserving indexed cl
   expect(client.catalogueFingerprint).toBe("a".repeat(64));
 }, 30_000);
 
+test("client trade values are whole dollars", async () => {
+  const { loadTradeProductsData, toClientTradeProductsData } = await loader();
+  const { loadTradeOverviewFacts } = await import("../../../lib/data/tradeOverview/importTradeOverview");
+  const [data, national] = await Promise.all([loadTradeProductsData(), loadTradeOverviewFacts()]);
+  const client = toClientTradeProductsData(data, national, "a".repeat(64));
+  // Each value moves by less than a dollar and a missing value stays missing.
+  client.facts.forEach(([, , , value], index) => {
+    const source = data.facts[index]!.valueUsd;
+    if (source === null) expect(value).toBeNull();
+    else { expect(Number.isInteger(value)).toBe(true); expect(Math.abs(value! - Number(source))).toBeLessThan(1); }
+  });
+  client.nationalFacts.forEach((fact, index) => {
+    expect(Number.isInteger(fact.valueUsd)).toBe(true);
+    if (fact.indicatorId === "trade.exports" || fact.indicatorId === "trade.imports") expect(fact.valueUsd).toBe(Math.round(Number(national[index]!.valueUsd)));
+  });
+}, 30_000);
+
+test("a workbook total equals the sum of its rows", async () => {
+  const { loadTradeProductsData, toClientTradeProductsData } = await loader();
+  const { loadTradeOverviewFacts } = await import("../../../lib/data/tradeOverview/importTradeOverview");
+  const { buildTradeProductsWorkbookModel } = await import("../../../lib/explorer/tradeProductsWorkbook");
+  const { DEFAULT_TRADE_PRODUCTS_STATE, tradeProductsBulkSelection } = await import("../../../lib/explorer/tradeProductsState");
+  const { getMessages } = await import("../../../lib/i18n/messages.server");
+  const [data, national, messages] = await Promise.all([loadTradeProductsData(), loadTradeOverviewFacts(), getMessages("ka", ["workbook", "trade"])]);
+  const client = toClientTradeProductsData(data, national, "a".repeat(64), "2020-2025"), presentation = { locale: "ka" as const, messages, englishLabels: {} };
+  for (const measure of ["trade.exports", "trade.imports"] as const) {
+    const model = buildTradeProductsWorkbookModel({ data: client, state: { ...DEFAULT_TRADE_PRODUCTS_STATE, measure, selectedIds: tradeProductsBulkSelection(client) }, sources: [], siteOrigin: "https://fiscal.ge" }, presentation);
+    const totalLabel = model.readable.rows.find(row => row.kind === "total")!.label, years = model.readable.years;
+    expect(years).toEqual([2020, 2021, 2022, 2023, 2024, 2025]);
+    for (const year of years) {
+      const rows = model.analysis.rows.filter(row => row[0] === year), total = rows.find(row => row[2] === totalLabel)![3];
+      expect(rows.filter(row => row[2] !== totalLabel).reduce((sum, row) => sum + (row[3] as number | null ?? 0), 0), `${measure} ${year}`).toBe(total);
+    }
+  }
+}, 30_000);
+
 test.each(["trade-products-annual.csv", "trade-products-catalogue.csv", "labels.json", "trade-products-validation.json"])("rejects stale %s before serving any facts", async filename => {
   const original = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
   vi.mocked(readFile).mockImplementation((async (...args: Parameters<typeof readFile>) => {

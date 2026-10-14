@@ -47,6 +47,8 @@ const approvedModelFixture: WorkbookExportModel = {
   analysis: {
     headers: ["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი"],
     rows: [[2020, "გადასახადები", "დამატებული ღირებულების გადასახადი", 1_212_500_000, "ფაქტი"]],
+    // The amount column's format, as `buildWorkbookExportModel` sets it.
+    numericFormats: { 4: "#,##0.00;[Red](#,##0.00);–" },
   },
   sources: [{
     years: [2020],
@@ -206,6 +208,27 @@ describe("createWorkbookBuffer", () => {
     const table = analysis.getTable("FiscalExportData") as unknown as { table: { columns: Array<{ filterButton: boolean }> } };
     expect(table.table.columns.map((column) => column.filterButton)).toEqual([true, true, true, true, true]);
     expect(JSON.stringify(analysis.getSheetValues())).not.toMatch(/category_id|parent_id|source_id|docs\/Raw Data/);
+  });
+
+  it("the status column has no number format", async () => {
+    const workbook = await loadWorkbook({
+      ...approvedModelFixture,
+      analysis: {
+        headers: ["წელი", "სერია", "მნიშვნელობა", "სტატუსი"],
+        rows: [[2022, "საქართველო", 15.6, "გამოკვლევის შეფასება"]],
+        numericFormats: { 3: "0.0" },
+      },
+    });
+    const analysis = workbook.getWorksheet("მონაცემები")!;
+    expect(analysis.getCell("C2").numFmt).toBe("0.0");
+    expect(analysis.getCell("B2").numFmt).toBeUndefined();
+    expect(analysis.getCell("D2").value).toBe("გამოკვლევის შეფასება");
+    expect(analysis.getCell("D2").numFmt).toBeUndefined();
+    // The writer formats only the columns the model names; it no longer guesses that column 4 is an amount.
+    const { numericFormats: _amountFormat, ...unformatted } = approvedModelFixture.analysis;
+    const plain = (await loadWorkbook({ ...approvedModelFixture, analysis: unformatted })).getWorksheet("მონაცემები")!;
+    expect(plain.getCell("D2").value).toBe(1_212_500_000);
+    expect(plain.getCell("D2").numFmt).toBeUndefined();
   });
 
   it("adds the GDP-share header only to percentage analysis data", async () => {

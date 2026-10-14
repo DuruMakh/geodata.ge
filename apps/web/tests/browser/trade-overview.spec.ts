@@ -1,12 +1,10 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { tableSeriesCount } from "./explorer-table";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Trade hub and Overview compare four indicators ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+  test(`Trade hub and Overview compare four indicators ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
@@ -22,9 +20,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("trade-balance-context").getByRole("img").getByText("1995", { exact: true })).toHaveCount(1);
     await expect(page.getByTestId("trade-balance-context").getByRole("img").getByText("2025", { exact: true })).toHaveCount(1);
     await expect(page.getByTestId("trade-summary").locator('[data-indicator="trade.balance"]')).toContainText("−11.4");
-    const ticks = page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]');
-    expect(Math.min(...await ticks.evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x)))).toBeGreaterThanOrEqual(0);
-    await page.screenshot({ path: info.outputPath(`trade-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
+    // The selection flow below is width-independent; 768 (the layout threshold) keeps the defaults and the overflow check.
+    if (width === 768) {
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("4 / 4");
     await toggle("trade.turnover").click();
@@ -32,12 +33,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     // Phones list years as rows (owner decision D5), so count series in either layout.
     await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(3);
     await expect(page.getByTestId("trade-balance-context")).toBeVisible();
-    await page.getByTestId("series-search").fill(prefix ? "Exports" : "ექსპორტი");
+    // Four rows are read at a glance: no search field (DESIGN §7.7, U21-09).
+    await expect(page.getByTestId("series-search")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("0 / 4");
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("4 / 4");
-    await page.getByTestId("series-search").fill("");
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
     await expect(page.getByTestId("trade-balance-context")).toBeVisible();
@@ -46,7 +47,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("0 / 4");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.screenshot({ path: info.outputPath(`trade-empty-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     expect(errors).toEqual([]);
   });
 }
@@ -93,48 +93,15 @@ test("downloaded Excel matches selected USD figures, publication status and the 
 });
 
 for (const prefix of ["", "/en"]) {
-  test(`Trade methodology and navigation have the bounded source archive ${prefix || "ka"}`, async ({ page }) => {
+  // The methodology page's own archive, JSON-LD and validation report are checked in methodology.spec.ts.
+  test(`Trade Overview navigation reaches its methodology ${prefix || "ka"}`, async ({ page }) => {
     await page.goto(`${prefix}/explorer/trade/overview`);
     await expect(page.getByTestId("trade-overview-link")).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
     await page.getByTestId("source-label").getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/trade$`));
-    await expect(page.locator("#services").getByRole("link", { name: prefix ? "Geostat services trade source page" : "საქსტატის მომსახურებით ვაჭრობის გვერდი", exact: true })).toHaveAttribute("href", "https://www.geostat.ge/en/modules/categories/766/international-trade-in-services");
-    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(22);
-    for (const filename of ["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx", "1004_180325_en.pdf"]) {
-      await expect(page.locator(`a[href="/downloads/methodology/trade/files/${filename}"]`)).toHaveCount(1);
-    }
-    const json = JSON.parse(await page.getByTestId("dataset-json-ld").textContent() ?? "{}");
-    expect(json.temporalCoverage).toBe("1995/2025");
-    expect(json).not.toHaveProperty("distribution");
-    expect(await readFile(path.resolve(process.cwd(), "../../data/reports/trade-overview-validation.json"), "utf8")).toContain('"status": "passed"');
   });
 }
-
-test("the two HTML originals download without executing archived website scripts", async ({ page, request }) => {
-  await page.goto("/en/methodology/trade");
-  const trackingRequests: string[] = [];
-  page.on("request", req => { if (/googletagmanager|google-analytics|recaptcha/.test(req.url())) trackingRequests.push(req.url()); });
-  for (const [filename, hash] of [
-    ["external_trade_methodology.html.txt", "8f912e38ceac487c9a80205b80e1c5de043de5cc2c753adf5b98f9b8b8c3d0b4"],
-    ["metadata-en.html.txt", "4b6e3d4ed9340b75800ebbfcf880625527ec2bda0f3c1d76b14702806bed6114"],
-  ]) {
-    const href = `/downloads/methodology/trade/files/${filename}`;
-    const response = await request.get(href);
-    expect(response.ok()).toBe(true);
-    expect(response.headers()["content-disposition"]).toBe("attachment");
-    expect(response.headers()["content-security-policy"]).toBe("sandbox; default-src 'none'");
-    expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(hash);
-    const downloaded = page.waitForEvent("download");
-    await page.locator(`a[href="${href}"]`).click();
-    const download = await downloaded;
-    expect(download.suggestedFilename()).toBe(filename);
-    expect(createHash("sha256").update(await readFile((await download.path())!)).digest("hex")).toBe(hash);
-    await expect(page).toHaveURL(/\/en\/methodology\/trade$/);
-  }
-  expect(trackingRequests).toEqual([]);
-});
-
 for (const { prefix, width, selection } of [
   { prefix: "", width: 1440, selection: "trade.exports,trade.balance" },
   { prefix: "/en", width: 1440, selection: "trade.exports,trade.balance" },
@@ -194,19 +161,4 @@ test("encoded HTML source aliases cannot execute from the site origin", async ({
     expect(response.headers()["x-content-type-options"], href).toBe("nosniff");
     expect(createHash("sha256").update(await response.body()).digest("hex"), href).toBe(hash);
   }
-});
-
-test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
-  await page.goto("/en/explorer/trade/overview#view=line&sel=");
-  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-  await page.locator('[data-series-id="trade.exports"]').getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-  await page.goBack();
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-});
-
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/trade/overview");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
 });

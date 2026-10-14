@@ -1,4 +1,4 @@
-import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../../helpers/factQuerySnapshot";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/deficit.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
@@ -8,7 +8,7 @@ import { DEFICIT_CAVEAT_RULES } from "../../../lib/factQuery/caveats/rules.defic
 import { DEFICIT_SERIES_ID } from "../../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 function context(years: number[], basis: "actual" | "projection"): CaveatContext {
   return {

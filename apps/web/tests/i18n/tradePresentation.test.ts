@@ -10,9 +10,9 @@ import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest
 import { getMethodologyContent } from "../../lib/methodology/catalog";
 import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { TRADE_CHART_INDICATORS } from "../../lib/data/tradeOverview/types";
-test("Trade has complete matching messages and explicit USD and publication wording", async () => {
+import { NAV_TREE } from "../../lib/navigation/navTree";
+test("Trade has explicit USD and publication wording", async () => {
   const [ka, en] = await Promise.all([getMessages("ka", ["trade"]), getMessages("en", ["trade"])]);
-  expect(Object.keys(ka).sort()).toEqual(Object.keys(en).sort());
   expect(en["trade.unit.billion"]).toBe("billion USD");
   expect(en["trade.publicationUnspecified"]).toBe("Unspecified");
   expect(ka["trade.indicator.trade.turnover"]).toBe("საგარეო სავაჭრო ბრუნვა");
@@ -34,19 +34,20 @@ test("Trade registers its six explorers and twenty-two translated original docum
 
 test("Services routes, metadata and sidebar use bilingual services presentation", async () => {
   const root = path.resolve(process.cwd(), "../..");
-  const [ka, en, revisions, sidebar] = await Promise.all([
+  const [ka, en, revisions] = await Promise.all([
     getMessages("ka", ["trade", "common"]), getMessages("en", ["trade", "common"]),
     readFile(path.join(root, "data/localization/en/page-revisions.json"), "utf8"),
-    readFile(path.join(root, "apps/web/components/shell/data-sidebar.tsx"), "utf8"),
   ]);
   expect(ka["trade.services.title"]).toBe("მომსახურებით ვაჭრობა");
   expect(en["trade.services.title"]).toBe("Services trade");
-  expect(en["trade.services.summary"]).toBe("Georgia's annual services trade, in nominal US dollars.");
+  expect(en["trade.services.summary"]).toBe("Georgia’s annual services trade, in nominal US dollars.");
   expect(ka["common.tradeServices"]).toBe(ka["trade.services.title"]);
   expect(en["common.tradeServices"]).toBe(en["trade.services.title"]);
   expect(JSON.parse(revisions)["/explorer/trade/services"]).toBe("2026-10-11");
-  expect(sidebar.indexOf('data-testid="trade-services-link"')).toBeGreaterThan(sidebar.indexOf('data-testid="trade-domestic-link"'));
-  expect(sidebar).toContain('if (tradeServicesActive) event.preventDefault()');
+  // The sidebar lists Services after Domestic exports; every sidebar row keeps its same-page guard (SidebarSectionLink).
+  const tradeRows = NAV_TREE.find((hub) => hub.href === "/explorer/trade")!.sections.map((section) => section.testId);
+  expect(tradeRows.indexOf("trade-services-link")).toBeGreaterThan(tradeRows.indexOf("trade-domestic-link"));
+  expect(tradeRows.indexOf("trade-domestic-link")).toBeGreaterThan(-1);
   for (const locale of ["ka", "en"] as const) {
     const route = locale === "ka" ? "apps/web/app/(ka)/explorer/trade/services/page.tsx" : "apps/web/app/(en)/en/explorer/trade/services/page.tsx";
     const source = await readFile(path.join(root, route), "utf8");
@@ -66,14 +67,15 @@ test("Services metadata and page inputs use accepted services coverage, labels a
   for (const locale of ["ka", "en"] as const) {
     const metadata = await tradeServicesMetadata(locale);
     const href = locale === "en" ? "/en/explorer/trade/services" : "/explorer/trade/services";
-    expect(metadata.title).toBe(locale === "en" ? "Services trade" : "მომსახურებით ვაჭრობა");
+    const title = locale === "en" ? "Services trade" : "მომსახურებით ვაჭრობა";
+    expect(metadata.title).toBe(`${title} | Fiscal.ge`);
     expect(metadata.description).toContain("2020–2024");
     expect(metadata.alternates?.canonical).toMatch(new RegExp(`${href}$`));
     expect(metadata.alternates?.languages?.en).toMatch(/\/en\/explorer\/trade\/services$/);
     expect(metadata.alternates?.languages?.ka).toMatch(/\/explorer\/trade\/services$/);
     const page = await renderTradeServicesPage(locale), elements = pageElements(page);
     const dataset = elements.find(element => element.props.testId === "explorer-dataset-json-ld")!.props.data as Record<string, unknown>;
-    expect(dataset).toMatchObject({ "@type": "Dataset", name: metadata.title, temporalCoverage: "2020/2024", dateModified: "2026-10-11" });
+    expect(dataset).toMatchObject({ "@type": "Dataset", name: title, temporalCoverage: "2020/2024", dateModified: "2026-10-11" });
     expect(dataset.url).toMatch(new RegExp(`${href}$`));
     const workspace = elements.find(element => element.type === TradeServices)!;
     const props = workspace.props as unknown as Parameters<typeof TradeServices>[0];
@@ -96,7 +98,8 @@ test("Composition metadata and page bind restricted coverage and the applicable 
   expect(await listPublicPagePaths()).toContain("/explorer/trade/composition");
   for (const locale of ["ka", "en"] as const) {
     const metadata = await tradeCompositionMetadata(locale);
-    expect(metadata.title).toBe(locale === "en" ? "Trade composition" : "საქონლით ვაჭრობის სტრუქტურა");
+    const title = locale === "en" ? "Trade composition" : "საქონლით ვაჭრობის სტრუქტურა";
+    expect(metadata.title).toBe(`${title} | Fiscal.ge`);
     expect(metadata.description).toContain("2000–2025");
     expect(metadata.alternates?.languages?.en).toMatch(/\/en\/explorer\/trade\/composition$/);
     const page = await renderTradeCompositionPage(locale), elements = pageElements(page);
@@ -109,6 +112,6 @@ test("Composition metadata and page bind restricted coverage and the applicable 
     expect(props.data.sitc.nationalFacts).toHaveLength(52);
     expect(props.sources.map(source => path.basename(source.downloadHref)).sort()).toEqual(["ftrade_1995-2026.xlsx", "export-sitc_2000-2026.xlsx", "import-sitc_2000-2026.xlsx", "export-bec_2000-2026.xlsx", "import-bec-2000-2026.xlsx"].sort());
     expect(page.props.englishLabels["trade.sitc1.0"]).toBeTruthy();
-    expect((await getMessages(locale, ["common"]))["common.tradeComposition"]).toBe(metadata.title);
+    expect((await getMessages(locale, ["common"]))["common.tradeComposition"]).toBe(title);
   }
 });

@@ -1,6 +1,6 @@
 # Fiscal.ge Web App
 
-Next.js app for Fiscal.ge: the landing page at `/`, the data explorers behind the platform shell at `/explorer` (Budget, Economy and Inflation hubs and their sections), the methodology centre at `/methodology`, the `/about` and `/connect` pages, and the read-only MCP endpoint at `/mcp`. Georgian pages live in `app/(ka)`; the English mirror under `/en` lives in `app/(en)`. `../../DESIGN.md` §6.2 holds the full route map.
+Next.js app for Fiscal.ge: the landing page at `/`, the data explorers behind the platform shell at `/explorer` (the eleven dataset hubs and their sections), the methodology centre at `/methodology`, the `/about` and `/connect` pages, and the read-only MCP endpoint at `/mcp`. Georgian pages live in `app/(ka)`; the English mirror under `/en` lives in `app/(en)`. `../../DESIGN.md` §6.2 holds the full route map.
 
 Product scope, agent rules, data rules, and the design system live at the repo root — read those before changing this app:
 
@@ -31,8 +31,10 @@ npm run check          # lint + typecheck + unit tests + data validation + i18n 
 npm run test           # vitest unit tests
 npm run test:browser   # Playwright browser tests
 npm run prisma:generate
-npm run prisma:migrate
+npm run prisma:deploy  # apply committed migrations
 ```
+
+New migrations are written by hand, not with `prisma migrate dev`: see [Creating a migration](../../docs/data-methodology/database-import.md#creating-a-migration-prisma-migrate-dev-does-not-work-here).
 
 ## Data pipeline scripts
 

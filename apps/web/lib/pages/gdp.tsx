@@ -3,7 +3,7 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import path from "node:path";
 import { GdpOverview } from "../../components/gdp/gdp-overview";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
@@ -13,7 +13,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
-import { projectPublicSources } from "../methodology/publicSources";
+import { projectPublicSources, sourcedWorkbookSources } from "../methodology/publicSources";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { pageHref } from "../i18n/routes";
 export async function gdpPageMetadata(locale: Locale) {
@@ -30,7 +30,7 @@ export async function renderGdpPage(locale: Locale) {
     loadServedGdpOverviewData(),
     getPresentation(
       locale,
-      ["gdp", "common", "controls", "format", "main"],
+      ["gdp", "format", "main"],
       [],
     ),
     loadReviewedSourceManifest(
@@ -46,23 +46,27 @@ export async function renderGdpPage(locale: Locale) {
     locale,
     catalogue.documents,
   );
-  const sources = manifest.flatMap((s) => {
-    const translated = publicSources.find((p) => p.source_id === s.source_id)!;
-    const ids = s.source_id.includes("metadata")
-      ? ["source.wb_gdp_real_usd_2015", "source.wb_gdp_real_growth_percent"]
-      : [s.source_id];
-    return ids.map((sourceId) => ({
-      sourceId,
-      years: s.years,
-      title: translated.title,
-      organization: translated.publisher,
-      downloadHref: s.downloadHref,
-      retrievedAt: s.retrieved_at,
-    }));
-  });
+  const sources = sourcedWorkbookSources(manifest, publicSources, () => true);
+  const years = facts.map((f) => f.year);
+  const lastReviewedAt = facts.map((f) => f.lastReviewedAt).sort().at(-1)!;
   return (
-    <I18nProvider {...presentation}>
-      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"gdp-overview",origin:resolveSiteUrl(),path:"/explorer/economy/gdp",name:message(presentation.messages,"gdp.heading"),description:message(presentation.messages,"gdp.description"),firstYear:Math.min(...facts.map(f=>f.year)),lastYear:Math.max(...facts.map(f=>f.year)),dateModified:facts.map(f=>f.lastReviewedAt).sort().at(-1)!,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/gdp-overview.csv"})}/>
+    <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd
+        testId="explorer-dataset-json-ld"
+        data={explorerDatasetJsonLd({
+          locale,
+          datasetId: "gdp-overview",
+          origin: resolveSiteUrl(),
+          path: "/explorer/economy/gdp",
+          name: message(presentation.messages, "gdp.metaTitle"),
+          description: message(presentation.messages, "gdp.description"),
+          firstYear: Math.min(...years),
+          lastYear: Math.max(...years),
+          dateModified: lastReviewedAt,
+          spatialCoverageName: locale === "ka" ? "საქართველო" : "Georgia",
+          downloadPath: "/downloads/data/gdp-overview.csv",
+        })}
+      />
 
       <BreadcrumbJsonLd
         items={[
@@ -83,7 +87,7 @@ export async function renderGdpPage(locale: Locale) {
       <GdpOverview
         facts={facts.map(projectGdpObservation)}
         sourceIdRanges={sourceIdRangesBySeries(facts)}
-        lastReviewedAt={facts.map((f) => f.lastReviewedAt).sort().at(-1)!}
+        lastReviewedAt={lastReviewedAt}
         sources={sources}
         siteOrigin={resolveSiteUrl()}
       />

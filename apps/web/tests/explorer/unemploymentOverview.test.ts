@@ -59,5 +59,6 @@ test("removed rates normalize to unemployment rate and education keeps its group
   expect(parse("indicator=employment_rate&sel=georgia")).toMatchObject({ indicator: "unemployment_rate", selectedIds: ["georgia:unemployment_rate"] });
   expect(parse("breakdown=education&indicator=participation_rate&sex=women&sel=education.higher")).toMatchObject({ indicator: "unemployment_rate", selectedIds: ["education.higher"], educationSex: "women" });
   expect(parse("sel=").selectedIds).toEqual([]);
-  expect(parse("sel=unknown,georgia:employment_rate").selectedIds).toEqual([]);
+  // U16-06: a selection none of whose ids is known opens the default view instead of an empty chart.
+  expect(parse("sel=unknown,georgia:employment_rate").selectedIds).toEqual(["georgia:unemployment_rate"]);
 });

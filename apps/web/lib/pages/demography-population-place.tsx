@@ -8,7 +8,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
-import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { packFacts } from "../data/packedFacts";
 import { loadServedMunicipalData } from "../data/servedData";
 import { ageYears, annualAgeFacts, censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
@@ -25,10 +25,11 @@ import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex
 import { AGE_SEX_PATH, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { vitalFactsForPlace } from "../explorer/demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
-import { pickerGroupsFromRows } from "../explorer/municipalData";
+import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import { message } from "../i18n/messages";
 import { I18nProvider } from "../i18n/provider";
+import { clientPresentation } from "../i18n/presentation.server";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
@@ -65,11 +66,16 @@ export async function populationPlaceMetadata(route: PopulationPlaceRoute, local
   const years = placeYears(clientFacts, place);
   const t = (key: string, values?: TemplateValues) => message(presentation.messages, `demography.${key}`, values);
   const name = placeLabel(place, locale);
+  const span = { name, first: years[0]!, last: years.at(-1)! };
+  // A municipality's page names its region and has no census age section; Georgia's and a region's carry both.
+  const region = places.find((candidate) => candidate.id === place.regionId);
   return fiscalMetadata({
     locale,
     path: populationPlaceHref(place.id),
-    title: `${t("placeMetaTitle", { name })} | Fiscal.ge`,
-    description: t("placeMetaDescription", { name, first: years[0]!, last: years.at(-1)! }),
+    title: t("placeMetaTitle", { name }),
+    description: region
+      ? t("placeMunicipalityMetaDescription", { ...span, region: placeLabel(region, locale) })
+      : t("placeMetaDescription", span),
   });
 }
 
@@ -147,7 +153,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
       : [];
 
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
@@ -158,16 +164,16 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
         ]}
       />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={t("coverage", { first, last })} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={t("coverage", { first, last })} />
         <PopulationPlaceExplorer
           key={place.id}
           place={place}
           places={places}
-          facts={clientFacts}
+          facts={packFacts(clientFacts)}
           title={t("placeHeading")}
           metaLine={metaLine}
           navigation={navigation}
-          pickerCountry={{ id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო", valueGel: index.country.valueGel, budgetCount: georgia.municipalityCount }}
+          pickerCountry={buildPickerCountry(index.country.valueGel, georgia.municipalityCount)}
           pickerGroups={pickerGroupsFromRows(index)}
           pickerOverrides={{
             hrefById: populationHrefById(places),

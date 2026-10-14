@@ -500,13 +500,12 @@ export async function writeInflationArtifacts(mode: InflationArtifactMode) {
   if (mode === "public" || mode === "check-public") {
     // The processed-data download is the reviewed CSV itself (validated on load).
     await loadCpiFacts();
-    if (mode === "check-public") {
-      // After the build, like the GDP public CSV: the shipped copy is the reviewed file.
-      await assertGeneratedArtifactMatches("public inflation CPI", PUBLIC_FILE, await fs.readFile(CPI_FACTS_FILE, "utf8"));
-    } else {
+    if (mode === "public") {
       await fs.mkdir(path.dirname(PUBLIC_FILE), { recursive: true });
       await fs.copyFile(CPI_FACTS_FILE, PUBLIC_FILE);
     }
+    // Both modes, like the GDP public CSV: the shipped copy is the reviewed file. "public" reads back its own copy.
+    await assertGeneratedArtifactMatches("public inflation CPI", PUBLIC_FILE, await fs.readFile(CPI_FACTS_FILE, "utf8"));
     return null;
   }
   // One verified read of the workbooks for all three extractions: each workbook

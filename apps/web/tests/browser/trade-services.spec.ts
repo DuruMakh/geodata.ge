@@ -1,14 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { createHash } from "node:crypto";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 import { workbookMessage } from "../../lib/i18n/workbook";
 
 const toggle = (page: Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 const section = (page: Page, id: string) => page.getByTestId(`trade-services-section-${id}`);
-const reviewDirectory = "../../docs/superpowers/reviews/2026-10-11-trade-services";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Services defaults, independent ranking and complete selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
@@ -22,6 +21,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Services trade" : "მომსახურებით ვაჭრობა");
     const tabs = page.getByTestId("trade-services-tabs");
     await expect(tabs.getByRole("button")).toHaveCount(5);
+    // U22-14: the five tabs are one row at every width; on a phone the row scrolls sideways.
+    expect((await tabs.boundingBox())!.height).toBeLessThan(60);
     await expect(section(page, "overview")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 4");
     await expect(toggle(page, "trade.turnover")).toHaveAttribute("aria-pressed", "true");
@@ -33,13 +34,17 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("source-label").getByRole("link")).toHaveAttribute("href", `${prefix}/methodology/trade`);
     expect(await page.getByRole("heading", { level: 1 }).evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     expect(await page.getByTestId("chart-mode-line").evaluate(element => Number.parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(11);
+    if (width !== 390) {
+      // Width checks at every width; the selection logic below runs once per locale, at 390.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
-    await mkdir(reviewDirectory, { recursive: true });
-    await page.screenshot({ path: `${reviewDirectory}/services-overview-${prefix ? "en" : "ka"}-${width}.png`, fullPage: true });
     const axis = () => page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]').allTextContents();
     const scale = await axis();
-    expect(Math.min(...await page.getByTestId("chart-panel").locator('svg text[text-anchor="end"]').evaluateAll(nodes => nodes.map(node => (node as SVGGraphicsElement).getBBox().x)))).toBeGreaterThanOrEqual(0);
-    await page.getByTestId("series-search").fill("no-matching-service-xyz");
+    // Four rows are read at a glance: no search field (DESIGN §7.7, U21-09).
+    await expect(page.getByTestId("series-search")).toHaveCount(0);
     await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("trade-excel-download")).toBeDisabled();
     await expect(page.getByTestId("trade-summary")).toBeVisible();
@@ -69,7 +74,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     const amount = (id: string) => Number(facts.find(row => row.entity_id === id && row.year === "2024" && row.indicator_id === "trade.turnover")!.value_usd);
     const travelRow = page.locator('[data-testid="trade-partners-ranking-row"][data-entity-id="services.travel"]');
     await expect(travelRow.locator("td").last()).toHaveText(`${(amount("services.travel") / amount("services.total") * 100).toFixed(1)}%`);
-    await page.screenshot({ path: `${reviewDirectory}/services-types-${prefix ? "en" : "ka"}-${width}.png`, fullPage: true });
     const typeScale = await axis();
     await page.getByTestId("series-search").fill(prefix ? "Travel" : "მოგზაურობა");
     await expect(toggle(page, "services.travel")).toBeVisible();
@@ -94,7 +98,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });
+}
 
+// 390 takes the sidebar-toggle path, 1440 the desktop sidebar.
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`Services missingness, keyboard, view memory and navigation ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade/services#section=types&measure=trade.exports&sel=services.maintenance_repair&view=table&start=2020&end=2024`);

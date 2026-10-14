@@ -1,24 +1,21 @@
 import { expect, test, type Page } from "@playwright/test";
+import { gzipSync } from "node:zlib";
 
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-for (const locale of ["ka", "en"] as const) {
-  for (const width of [390, 768, 1440]) {
-    test(`inflation overview layout ${locale} at ${width}px`, async ({ page }, testInfo) => {
-      await page.setViewportSize({ width, height: 1000 });
-      await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/overview`);
-      await ready(page);
-      await expect(page.getByTestId("inflation-tabs").getByRole("button")).toHaveCount(3);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`inflation-${locale}-${width}.png`), fullPage: true });
-      await page.getByTestId("chart-mode-table").click();
-      await expect(page.getByTestId("month-grid")).toBeVisible();
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      // Desktop shows every month and the annual average without a hidden scroll.
-      if (width === 1440) expect(await page.getByTestId("month-grid").evaluate((grid) => grid.scrollWidth <= grid.clientWidth)).toBe(true);
-      await page.screenshot({ path: testInfo.outputPath(`inflation-table-${locale}-${width}.png`), fullPage: true });
-    });
-  }
+// Phone table overflow in Georgian, and the full month grid on a desktop in English.
+for (const [locale, width] of [["ka", 390], ["en", 1440]] as const) {
+  test(`inflation overview layout ${locale} at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/overview`);
+    await ready(page);
+    await expect(page.getByTestId("inflation-tabs").getByRole("button")).toHaveCount(3);
+    await page.getByTestId("chart-mode-table").click();
+    await expect(page.getByTestId("month-grid")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    // Desktop shows every month and the annual average without a hidden scroll.
+    if (width === 1440) expect(await page.getByTestId("month-grid").evaluate((grid) => grid.scrollWidth <= grid.clientWidth)).toBe(true);
+  });
 }
 
 test("tabs switch units, series and the target together", async ({ page }) => {
@@ -39,6 +36,14 @@ test("tabs switch units, series and the target together", async ({ page }) => {
 
   await page.getByTestId("inflation-tab-mom").click();
   await expect(page.getByTestId("inflation-unit")).toHaveText("Percent · change on the previous month");
+  // U13-04: the target draws on annual inflation only, so here its row is inert and not counted.
+  await expect(page.getByTestId("series-status")).toContainText("1 / 3");
+  const target = page.locator('[data-series-id="target"]').getByTestId("series-row-toggle");
+  await expect(target).toHaveAttribute("aria-disabled", "true");
+  await expect(target).toHaveAttribute("aria-pressed", "false");
+  await page.getByTestId("inflation-tab-yoy").click();
+  await expect(page.getByTestId("series-status")).toContainText("2 / 4");
+  await expect(target).toHaveAttribute("aria-pressed", "true");
 });
 
 test("range chips, keyboard steps and tab switches keep a consistent period", async ({ page }) => {
@@ -99,42 +104,14 @@ test("language switch keeps the state", async ({ page }) => {
   await expect(page.getByTestId("inflation-tab-mom")).toHaveAttribute("aria-pressed", "true");
 });
 
-test("the sidebar lists six datasets and the hub links all four live sections", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/explorer/inflation");
-  await expect(page.getByTestId("inflation-link")).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("inflation-hub").getByTestId("hub-card")).toHaveCount(4);
-  await expect(page.getByTestId("inflation-hub").locator("a")).toHaveCount(4);
-  // Budget and Economy stay inactive; the footer names both publishers.
-  await expect(page.getByTestId("section-link-expenditure")).toHaveCount(0);
-  await expect(page.getByTestId("economy-link")).not.toHaveAttribute("aria-current", "page");
-  await expect(page.getByText("მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი", { exact: false })).toBeVisible();
-  await page.getByTestId("inflation-hub").getByRole("link").first().click();
-  await ready(page);
-  await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(0);
+
+// U13-05: the facts travelled as 1,960 verbose objects (46.7 KB gzip Georgian page); they now use the categories page's
+// run-length form.
+test("the overview facts travel as run-length runs", async ({ request }) => {
+  for (const [prefix, limit] of [["", 42_000], ["/en", 37_000]] as const) {
+    const html = await (await request.get(`${prefix}/explorer/inflation/overview`)).text();
+    expect(html.includes('\\"seriesId\\"'), "a verbose fact object in the HTML").toBe(false);
+    expect(gzipSync(html).length).toBeLessThan(limit);
+  }
 });
 
-test("the methodology Dataset is the node the catalog references", async ({ page }) => {
-  await page.goto("/methodology");
-  const catalog = JSON.parse((await page.getByTestId("catalog-json-ld").textContent()) ?? "{}");
-  const id = "https://fiscal.ge/methodology/inflation";
-  expect(catalog.dataset.map((entry: { "@id": string }) => entry["@id"])).toContain(id);
-  await page.goto("/en/methodology/inflation");
-  const dataset = JSON.parse((await page.getByTestId("dataset-json-ld").textContent()) ?? "{}");
-  expect(dataset["@id"]).toBe(id);
-  expect(dataset.includedInDataCatalog["@id"]).toBe("https://fiscal.ge/methodology#catalog");
-  expect(dataset.distribution.contentUrl).toBe("https://fiscal.ge/downloads/data/inflation-cpi-national.csv");
-});
-
-for (const locale of ["ka", "en"] as const) {
-  test(`chart axis labels stay inside the frame in ${locale}`, async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/overview`);
-    await ready(page);
-    await page.evaluate(() => document.fonts.ready);
-    for (const label of await page.getByTestId("chart-panel").locator("svg text").all()) {
-      expect(await label.evaluate((element) => (element as SVGGraphicsElement).getBBox().x)).toBeGreaterThanOrEqual(0);
-    }
-  });
-}

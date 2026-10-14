@@ -16,10 +16,13 @@ type SourceArchiveProps = {
   summary: MethodologyArchiveSummary;
 };
 
+/** The file's type, from its extension (every reviewed filename has one; the media type stays on the server). */
 function formatLabel(row: PublicSourceManifestRow) {
-  const extension = row.official_filename.split(".").at(-1);
-  return extension ? extension.toUpperCase() : row.media_type;
+  return row.official_filename.split(".").at(-1)!.toUpperCase();
 }
+
+/** Up to this many files the year filter is hidden: it would offer more years than there are rows to filter. */
+const YEAR_FILTER_MIN_ROWS = 13;
 
 function formatBytes(bytes: number) {
   if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
@@ -77,7 +80,7 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
           />
         </label>
         {/* Below 760px the years wrap onto more rows instead of scrolling sideways. */}
-        <div data-testid="archive-year-filter" className="pb-1 min-[760px]:overflow-x-auto" aria-label={message(messages, "methodology.yearFilter")}>
+        {rows.length >= YEAR_FILTER_MIN_ROWS ? <div data-testid="archive-year-filter" role="group" className="pb-1 min-[760px]:overflow-x-auto" aria-label={message(messages, "methodology.yearFilter")}>
           <div className="flex flex-wrap gap-2 min-[760px]:min-w-max min-[760px]:flex-nowrap">
             <button
               type="button"
@@ -99,8 +102,13 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
               </button>
             ))}
           </div>
-        </div>
+        </div> : null}
       </div>
+
+      {/* The table changes silently as the search and year narrow it: this polite live region says how far. */}
+      <p data-testid="source-archive-status" role="status" className="sr-only">
+        {message(messages, "methodology.resultCount", { count: filteredRows.length, total: rows.length })}
+      </p>
 
       {/* Below 760px the same rows render as stacked blocks — year, title, file
           name, publisher, then a full-width download link showing format and
@@ -125,13 +133,14 @@ export function SourceArchive({ datasetId, datasetLabel, rows, summary }: Source
               const format = formatLabel(row);
               return (
                 <tr key={row.source_id} role="row" data-testid="source-archive-row" className="border-b border-[var(--hairline-soft)] align-top max-[759px]:block max-[759px]:py-4">
-                  <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[0.6875rem] max-[759px]:text-[var(--muted)]">{row.year}</td>
+                  <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:block max-[759px]:p-0 max-[759px]:text-[0.6875rem] max-[759px]:text-[var(--muted)]">{row.year.replace(/(\d{4})-(\d{4})/g, "$1–$2")}</td>
                   <td role="cell" className="max-w-[320px] px-2 py-4 max-[759px]:block max-[759px]:max-w-none max-[759px]:p-0 max-[759px]:pt-1">
-                    <span className="block font-semibold text-[var(--ink)] max-[759px]:text-[0.8125rem] max-[759px]:leading-snug">{row.title}</span>
+                    {/* The title and publisher are what the reader is looking for: body size, not metadata size (U29-16, DESIGN.md §13). */}
+                    <span className="block text-[0.8125rem] font-semibold text-[var(--ink)] max-[759px]:leading-snug">{row.title}</span>
                     <span lang={/\p{Script=Georgian}/u.test(row.official_filename) ? "ka" : undefined} data-original-language="filename" data-source-id={row.source_id} className="mt-1 block break-all font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[9.5px] text-[var(--muted)]">
                       {row.official_filename}
                     </span>
-                    <span className="mt-1 block text-[0.6875rem] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[0.6875rem]">{row.publisher}</span>
+                    <span className="mt-1 block text-[0.75rem] text-[var(--faint)]">{row.publisher}</span>
                     {row.documentLanguage ? <span className="mt-1 block text-[0.6875rem] min-[768px]:text-[10px] text-[var(--faint)] max-[759px]:text-[0.6875rem]">{message(messages, "methodology.documentLanguage", { language: message(messages, `methodology.language${row.documentLanguage === "ka" ? "Ka" : row.documentLanguage === "en" ? "En" : "Mul"}`) })}</span> : null}
                   </td>
                   <td role="cell" className="px-2 py-4 font-[family-name:var(--font-numeric)] max-[759px]:sr-only">{format}</td>

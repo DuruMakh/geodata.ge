@@ -5,12 +5,14 @@ import { CURRENT_ACCOUNT_PARTS, CURRENT_ACCOUNT_SERIES, type CurrentAccountSerie
 import { buildCurrentAccountModel, type CurrentAccountGdp } from "../../lib/explorer/currentAccount";
 import { CURRENT_ACCOUNT_TABS, currentAccountCoverage, parseCurrentAccountHash, serializeCurrentAccountHash } from "../../lib/explorer/currentAccountState";
 import { buildCurrentAccountWorkbookModel } from "../../lib/explorer/currentAccountWorkbook";
-import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import { formatDisplayDate, formatInUnit } from "../../lib/explorer/format";
+import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
+import { formatInUnit } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { useI18n } from "../../lib/i18n/provider";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
@@ -21,7 +23,7 @@ import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { Callout, SegmentedTabs, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
+import { Callout, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 
@@ -41,7 +43,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildCurrentAccountWorkbookModel({ facts, gdp, state, sources, gdpSources, siteOrigin }, presentation));
   }} />;
-  const lineSeries = shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]), planned: model.years.map(() => false) }));
+  const lineSeries = shown.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesById[id][year]) }));
   return <div data-testid="current-account" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
     <div role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{CURRENT_ACCOUNT_TABS.map(tab => <TextTab key={tab} label={t(`tab.${tab}`)} active={state.tab === tab} onClick={() => update(s => ({ ...s, tab }), true)} testId={`current-account-tab-${tab}`} />)}</div>
@@ -49,7 +51,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} data-unit={state.unit} className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} options={[{ value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" }, { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" }]} />
+            <ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} />
             <div className="flex items-center gap-3">
               {percent ? null : <span className="text-[11px] text-[var(--muted)]">{tabLabel} · {model.unit.label}</span>}
               <MeasurePill label={message(messages, "main.percentGdp")} pressed={percent} onChange={pressed => update(s => ({ ...s, unit: pressed ? "gdp" : "usd" }), true)} />
@@ -61,12 +63,12 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
               : <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>}
           {/* The Balance stack is a chart (the return pill says so) but has its own key, so it gets no legend. */}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={balance ? 0 : undefined} />
-          <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildCurrentAccountModel(facts, gdp, s, presentation).range, patch) }))} />
+          <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, currentAccountCoverage(facts)), patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt}
+        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, percent ? "external.account.sourceNotePercent" : "external.sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           {percent ? ` · ${message(messages, "main.gdpSource")}` : null}
           {model.preliminaryGdpYears.length ? ` · ${message(messages, "main.preliminaryGdp", { years: model.preliminaryGdpYears.join(", ") })}` : null}
-          <Link href={pageHref("/methodology/external-flows", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
+          <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}>
@@ -80,7 +82,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
             </li>)}
           </ul>
           {downloadAction}
-        </> : <MoneyFromAbroadSeriesPanel model={{ ...model, valuesByEntity: model.valuesById, selectedCount: model.selectedIds.length, totalCount: CURRENT_ACCOUNT_SERIES.length }} totalId="ca.balance" searchPlaceholder={t("search")} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: CURRENT_ACCOUNT_SERIES.filter(id => selectedIds.includes(id)) }), true)} downloadAction={downloadAction} />}
+        </> : <MoneyFromAbroadSeriesPanel model={{ ...model, valuesByEntity: model.valuesById, selectedCount: model.selectedIds.length, totalCount: CURRENT_ACCOUNT_SERIES.length }} totalId="ca.balance" onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: CURRENT_ACCOUNT_SERIES.filter(id => selectedIds.includes(id)) }), true)} downloadAction={downloadAction} />}
       </SeriesAside>
     </ExplorerWorkspace>
   </div>;

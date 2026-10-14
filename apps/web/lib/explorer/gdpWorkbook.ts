@@ -10,6 +10,19 @@ import {
   workbookFilename,
 } from "./workbookModel";
 
+// The World Bank indicator-metadata file is its own manifest row and keeps its
+// own id; it documents both World Bank series, so a selection resting on either
+// one cites it too.
+const DOCUMENTED_BY: Readonly<Record<string, readonly string[]>> = {
+  "source.wb_gdp_metadata": ["source.wb_gdp_real_usd_2015", "source.wb_gdp_real_growth_percent"],
+};
+
+/** The page's sources a selection rests on: those its facts cite, plus the files that document them. */
+export function gdpSelectionSources<T extends { sourceId: string }>(sources: readonly T[], sourceIds: readonly string[]): T[] {
+  return sources.filter((source) =>
+    sourceIds.includes(source.sourceId) || (DOCUMENTED_BY[source.sourceId] ?? []).some((id) => sourceIds.includes(id)));
+}
+
 export function gdpDisplay(state: GdpState, presentation: Presentation) {
   const t = (key: string) => message(presentation.messages, `gdp.${key}`);
   const growth = state.indicator === "growth",
@@ -18,7 +31,8 @@ export function gdpDisplay(state: GdpState, presentation: Presentation) {
   const unit = {
     divisor: capita ? 1 : 1e9,
     label: capita ? t(currency) : t("bn"),
-    decimals: 1,
+    // Per person in whole units, as the latest-value line prints it (U10-14).
+    decimals: capita ? 0 : 1,
   };
   const fullUnitLabel = growth
     ? t("percent")

@@ -27,11 +27,11 @@ export function TradePartnersRanking({ model, tab, measure, pageSize }: { model:
   const itemLabel = composition ? message(messages, "trade.composition.category") : services ? message(messages, "trade.services.type") : tab === "products" ? p("series") : t(tab === "countries" ? "country" : "group");
   return <ExternalRanking
     testId="trade-partners" data={{ "end-year": model.range.end, "has-share": String(!balance) }}
-    title={title} itemLabel={itemLabel} shareLabel={composition ? message(messages, "trade.composition.share") : services ? message(messages, "trade.services.share") : t("share")} note={note} empty={t("noRanking")}
+    title={title} itemLabel={itemLabel} shareLabel={composition ? message(messages, "trade.composition.share") : services ? message(messages, "trade.services.share") : t("share")} shareShortLabel={t("shareShort")} note={note} empty={t("noRanking")}
     rows={listed.map(shareRow)} other={null} unit={model.unit} signed={signed} barMax={Math.max(...model.ranking.map(row => Math.abs(row.valueUsd!)), 1)}
     showShare={!balance} rankLabel={t("rank")} unavailableLabel={t("unavailable")}
     footer={<>
-      {!showAll && (model.ranking.length > 10 || model.missingRanking.length > 0) ? <button type="button" data-testid="trade-partners-show-all" onClick={() => setExpanded(true)} className={`mt-4 ${tab === "products" ? "min-h-11 " : ""}cursor-pointer text-[12px] font-semibold text-[var(--accent)] underline underline-offset-4`}>{tab === "products" ? p("showAll") : t("showAll")}</button> : null}
+      {!showAll && (model.ranking.length > 10 || model.missingRanking.length > 0) ? <button type="button" data-testid="trade-partners-show-all" onClick={() => setExpanded(true)} className={`mt-4 ${tab === "products" ? "min-h-11 " : "max-[768px]:min-h-11 "}cursor-pointer text-[12px] font-semibold text-[var(--accent)] underline underline-offset-4`}>{tab === "products" ? p("showAll") : t("showAll")}</button> : null}
       {showAll && pageSize && pageCount > 1 ? <nav aria-label={p("rankingPages")} className="mt-4 flex items-center justify-between gap-4 text-xs"><button type="button" data-testid="trade-products-ranking-previous" disabled={page === 0} onClick={() => setPage(page - 1)} className="min-h-11 cursor-pointer disabled:opacity-35">{p("previous")}</button><span>{page + 1} / {pageCount}</span><button type="button" data-testid="trade-products-ranking-next" disabled={page + 1 === pageCount} onClick={() => setPage(page + 1)} className="min-h-11 cursor-pointer disabled:opacity-35">{p("next")}</button></nav> : null}
     </>} />;
 }

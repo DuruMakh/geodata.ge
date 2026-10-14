@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare, type Comparison } from "../../lib/factQuery/compare";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let real: FactQuerySnapshot;
-beforeAll(async () => { real = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
+beforeAll(async () => { real = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
 const id = "cpi.product.p0001";
 const request = { target: { dataset: "inflation-products", seriesIds: [id] }, measure: "yoy_pct", fromPeriod: "2025-01", toPeriod: "2026-02" };
 function fixture(missing = false): FactQuerySnapshot {

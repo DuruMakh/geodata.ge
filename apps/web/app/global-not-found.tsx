@@ -8,25 +8,27 @@ import { DATASET_HUBS } from "../lib/navigation/datasetHubs";
 
 export const metadata: Metadata = { ...rootMetadata("ka"), robots: { index: false, follow: true } };
 
-// People-facing recovery: the homepage, the four dataset hubs and methodology.
+// People-facing recovery: the homepage, every dataset hub and methodology.
 // The XML sitemap and the agent guide stay published for machines; on a phone
 // they opened raw files.
 // It renders outside the i18n provider, so the hub labels come straight from the message files.
+const ka: Readonly<Record<string, string>> = kaCommon;
+const en: Readonly<Record<string, string>> = enCommon;
 const destinations = [
   { href: "/", label: "მთავარი გვერდი" },
-  ...DATASET_HUBS.map(({ href, labelKey }) => ({ href, label: kaCommon[labelKey] })),
+  ...DATASET_HUBS.map(({ href, labelKey }) => ({ href, label: ka[labelKey] })),
   { href: "/methodology", label: kaCommon["common.methodology"] },
 ];
 
 const englishDestinations = [
   ["/en", enCommon["common.home"]],
-  ...DATASET_HUBS.map(({ href, labelKey }) => [`/en${href}`, enCommon[labelKey]] as const),
+  ...DATASET_HUBS.map(({ href, labelKey }) => [`/en${href}`, en[labelKey]] as const),
   ["/en/methodology", enCommon["common.methodology"]],
 ] as const;
 
 export default function NotFound() {
   return (
-    <RootDocument locale="ka"><main className="min-h-screen bg-[var(--paper)] px-5 py-6 text-[var(--ink)] min-[768px]:px-7 min-[768px]:py-8">
+    <RootDocument locale="ka"><main id="content" tabIndex={-1} className="min-h-screen outline-none bg-[var(--paper)] px-5 py-6 text-[var(--ink)] min-[768px]:px-7 min-[768px]:py-8">
       <div className="mx-auto max-w-[760px] min-[768px]:pt-[min(18vh,11rem)]">
         <section data-testid="not-found-recovery" className="border-t-2 border-[var(--ink)] pt-5">
           <p className="font-[family-name:var(--font-numeric)] text-[11px] font-medium tracking-[0.08em] text-[var(--muted)]">

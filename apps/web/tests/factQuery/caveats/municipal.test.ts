@@ -1,4 +1,4 @@
-import { buildFactQuerySnapshot } from "../../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../../helpers/factQuerySnapshot";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 // apps/web/tests/factQuery/caveats/municipal.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
@@ -7,7 +7,7 @@ import { MUNICIPAL_CAVEAT_RULES } from "../../../lib/factQuery/caveats/rules.mun
 import type { MunicipalTotalFact } from "../../../lib/data/municipal/types";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 function total(overrides: Partial<MunicipalTotalFact>): MunicipalTotalFact {
   return {

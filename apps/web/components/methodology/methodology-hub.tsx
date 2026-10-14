@@ -20,8 +20,8 @@ export function MethodologyHub({
   breadcrumbItems: readonly BreadcrumbItem[];
 }) {
   return (
-    <main data-testid="methodology-hub" className="mx-auto w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-14">
-      <BreadcrumbTrail items={breadcrumbItems} />
+    <main id="content" tabIndex={-1} data-testid="methodology-hub" className="mx-auto outline-none w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-14">
+      <BreadcrumbTrail items={breadcrumbItems} label={message(messages, "common.breadcrumb")} />
       <section className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 border-b-2 border-[var(--ink)] pb-14 min-[860px]:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] min-[860px]:gap-16 min-[860px]:pb-20">
         <div className="max-w-[620px]">
           <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.hubOverline")}</p>
@@ -33,6 +33,7 @@ export function MethodologyHub({
           </p>
           <Link
             href="#datasets"
+            prefetch={false}
             className="mt-5 inline-flex min-h-11 items-center text-[0.78125rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4 hover:text-[var(--ink)]"
           >
             {message(messages, "methodology.hubJump")}
@@ -54,6 +55,7 @@ export function MethodologyHub({
               key={entry.id}
               data-testid="methodology-live-row"
               href={entry.href}
+              prefetch={false}
               className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-3 border-b border-[var(--hairline)] py-7 transition-[background-color,transform] duration-150 hover:translate-x-1 hover:bg-[var(--tint)] focus-visible:translate-x-1 focus-visible:bg-[var(--tint)] motion-reduce:transform-none motion-reduce:transition-none min-[768px]:grid-cols-[minmax(180px,0.75fr)_minmax(300px,1.25fr)_auto] min-[768px]:items-center min-[768px]:gap-8 min-[768px]:px-3"
             >
               <h3 className="font-[family-name:var(--font-display)] text-[24px] font-semibold tracking-[-0.01em]">{entry.title}</h3>
@@ -92,7 +94,7 @@ export function MethodologyHub({
               className="flex items-center justify-between gap-4 border-b border-[var(--hairline-soft)] py-4 text-[0.84375rem] text-[var(--muted)]"
             >
               <span>{message(messages, `methodology.${key}`)}</span>
-              <ComingSoonBadge surface="paper" />
+              <ComingSoonBadge label={message(messages, "common.comingSoon")} surface="paper" />
             </div>
           ))}
         </div>

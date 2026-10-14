@@ -44,7 +44,7 @@ export function LandingFiscalSections({
           <p className="mt-4 max-w-[470px] text-[0.8125rem] leading-[1.75] text-[var(--body)]">
             {message(messages, "landing.debtDescription")}
           </p>
-          <Link href={pageHref("/explorer/debt", locale)} className={linkClassName}>
+          <Link href={pageHref("/explorer/debt", locale)} prefetch={false} className={linkClassName}>
             {message(messages, "landing.debtLink")}
           </Link>
         </div>
@@ -88,7 +88,7 @@ export function LandingFiscalSections({
           <p className="mt-4 max-w-[470px] text-[0.8125rem] leading-[1.75] text-[var(--body)]">
             {message(messages, "landing.deficitDescription")}
           </p>
-          <Link href={pageHref("/explorer/deficit", locale)} className={linkClassName}>
+          <Link href={pageHref("/explorer/deficit", locale)} prefetch={false} className={linkClassName}>
             {message(messages, "landing.deficitLink")}
           </Link>
         </div>

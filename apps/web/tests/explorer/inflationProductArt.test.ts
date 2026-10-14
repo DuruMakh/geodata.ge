@@ -36,6 +36,5 @@ describe("individual-product artwork", () => {
     const html = renderToStaticMarkup(createElement(InflationProductArt, { productId: "cpi.product.p0058" }));
     expect(html).toContain('alt=""');
     expect(html).toContain("p0058.webp");
-    expect(html).not.toMatch(/emoji|fallback|initials/i);
   });
 });

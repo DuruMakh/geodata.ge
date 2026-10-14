@@ -38,7 +38,8 @@ describe("shared chart frame", () => {
     const fitted = renderGeorgianMarkup(<ChartScrollFrame fit><svg /></ChartScrollFrame>);
     expect(fitted).not.toContain("min-w-[720px]");
     expect(fitted).toContain('role="region"');
-    expect(fitted).toContain('tabindex="0"');
+    // Nothing to scroll: the chart inside is the keyboard stop, not the frame.
+    expect(fitted).not.toContain("tabindex");
   });
 
   it("renders the phone readout in flow, at 12px, with the tooltip's rows in order", () => {

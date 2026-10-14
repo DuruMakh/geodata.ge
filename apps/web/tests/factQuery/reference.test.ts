@@ -9,7 +9,7 @@
 // the FIXTURE is wrong; if the engine is wrong, stop and report it. Never
 // reconcile by editing an expectation to match the code.
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare } from "../../lib/factQuery/compare";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { getSources } from "../../lib/factQuery/getSources";
@@ -33,7 +33,7 @@ import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/t
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-02T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-02T00:00:00.000Z" });
 });
 
 function run(tool: string, args: unknown, productSnapshot = snapshot): FactQueryResponse {

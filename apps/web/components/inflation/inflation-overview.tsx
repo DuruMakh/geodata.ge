@@ -2,19 +2,19 @@
 
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
+import { useMemo, useState } from "react";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
-import type { ClientCpiFact } from "../../lib/servedRows";
-import { formatDisplayDate } from "../../lib/explorer/format";
-import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
+import { formatInflationValue, periodLabel, seriesLabel, monthlyChartPeriod } from "../../lib/explorer/inflationLabels";
 import { latestEntry } from "../../lib/explorer/latestValue";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
-  DEFAULT_INFLATION_STATE, INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
-  parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection,
-  type InflationState, type InflationTab,
+  INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
+  parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection, unpackCpiFacts,
+  type InflationIndex, type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
+import type { PackedCategorySeries } from "../../lib/explorer/inflationCategories";
 import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
@@ -24,24 +24,30 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { PageHeader } from "../shell/page-header";
-import { Callout, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { Callout, SourceNote, TextTab } from "../ui/editorial";
 import { InflationIndicators } from "./inflation-indicators";
 import { InflationSeriesPanel } from "./inflation-series-panel";
 import { InflationTable } from "./inflation-table";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { useHashState } from "../explorer-shell/use-hash-state";
 
 // Inflation overview (spec §6): the GDP overview's centred tabs over the Budget
 // explorers' workspace — chart or monthly table, range strip and series panel.
 
 const INDEX_UNIT = { divisor: 1, label: "", decimals: 1 };
 
+// A restored hash keeps its range only where the tab has data.
+function parseOverviewHash(hash: string, index: InflationIndex): InflationState {
+  const parsed = parseInflationHash(hash);
+  return changeInflationTab(parsed, parsed.tab, index);
+}
+
 export type InflationOverviewProps = {
-  facts: ClientCpiFact[];
+  /** Packed on the server (packCpiFacts): one dense run per series and measure. */
+  facts: PackedCategorySeries[];
   // One entry per series and measure: every CPI row of a group comes from the
   // same Geostat publication, and the workbook cites it.
   sourceIdBySeriesMeasure: Record<string, string>;
@@ -56,67 +62,53 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
   const index = useMemo(
-    () => indexInflationFacts(facts, sourceIdBySeriesMeasure),
+    () => indexInflationFacts(unpackCpiFacts(facts), sourceIdBySeriesMeasure),
     [facts, sourceIdBySeriesMeasure],
   );
-  const [state, setState] = useState<InflationState>(DEFAULT_INFLATION_STATE);
-  const [ready, setReady] = useState(false);
+  const { state, update } = useHashState(index, parseOverviewHash, serializeInflationHash);
   const [announcement, setAnnouncement] = useState("");
-
-  useEffect(() => {
-    const parsed = parseInflationHash(window.location.hash);
-    // The hash is read after hydration so the server render stays the stable default view.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState(changeInflationTab(parsed, parsed.tab, index));
-    setReady(true);
-  }, [index]);
-  useAppReady();
-
-  const serializedHash = serializeInflationHash(state);
-  useReplaceHash(serializedHash, ready);
 
   const range = resolveInflationRange(state, index);
   const { periods, lines } = buildInflationLines(index, targets, state, range);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   // The eyebrow states the active tab's span — the same months the chart and range strip offer
   // (the index series starts years before the annual and monthly change series).
-  const coverage = { min: range.min, max: range.max };
   // The headline CPI's latest published month on the active tab.
   const latest = latestEntry(index.values.get(seriesGroup("cpi", state.tab)));
-  const displayDate = locale === "en" ? formatDisplayDate(lastReviewedAt, locale) : lastReviewedAt;
+  const displayDate = updatedDate(lastReviewedAt, locale);
   const hasSeries = lines.some((line) => line.key !== "target");
   const chartSeries: ChartSeries[] = lines.map((line) => ({
     id: line.key,
     label: seriesLabel(messages, line.key, state.tab),
     color: INFLATION_COLORS[line.key],
     vals: line.values,
-    planned: line.values.map(() => false),
     dashed: line.key === "target",
   }));
 
   function selectTab(tab: InflationTab) {
     const next = changeInflationTab(state, tab, index);
     const nextRange = resolveInflationRange(next, index);
-    setState(next);
+    update(() => next);
     setAnnouncement(t("rangeChanged", { start: periodLabel(messages, nextRange.start, "short"), end: periodLabel(messages, nextRange.end, "short") }));
   }
 
   return (
     <ExplorerPage testId="inflation-overview">
       <PageHeader
+        locale={locale}
+        messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
           { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
           { label: t("heading") },
         ]}
-        coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}
+        coverage={coverageLabel(messages, locale, periodLabel(messages, range.min, "short"), periodLabel(messages, range.max, "short"), lastReviewedAt)}
       />
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
       {latest ? (
         <LatestValueLine testId="inflation-latest" measure={t(`tab.${state.tab}`)} period={periodLabel(messages, latest.period, "long")} value={formatInflationValue(latest.value, state.tab)} />
       ) : null}
-      <p data-testid="inflation-unit" className="mb-4 text-[13px] text-[var(--muted)]">{t(`unit.${state.tab}`)}</p>
 
       <div
         data-testid="inflation-tabs"
@@ -135,21 +127,13 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={state.mode} data-tab={state.tab} className="border-t border-[var(--ink)] pt-3">
-            <SegmentedTabs<InflationState["mode"]>
-              ariaLabel={message(messages, "controls.viewMode")}
-              value={state.mode}
-              onChange={(mode) => setState((current) => ({ ...current, mode }))}
-              options={[
-                { value: "line", label: message(messages, "controls.chart"), testId: "chart-mode-line" },
-                { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-              ]}
-            />
+            <ModeTabs value={state.mode} onChange={(mode) => update((current) => ({ ...current, mode }))} />
             {!hasSeries ? (
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
               </div>
             ) : state.mode === "table" ? (
-              <InflationTable index={index} state={state} range={range} onTableSeriesChange={(key) => setState((current) => ({ ...current, tableSeries: key }))} />
+              <InflationTable index={index} state={state} range={range} onTableSeriesChange={(key) => update((current) => ({ ...current, tableSeries: key }))} />
             ) : (
               <div className="mt-5">
                 <EditorialLineChart
@@ -159,9 +143,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
                   unit={INDEX_UNIT}
                   shareLabel={t(`tab.${state.tab}`)}
                   periodsPerYear={12}
-                  formatPeriod={(period, kind) =>
-                    kind === "axis" && periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, kind === "axis" ? "short" : "long")
-                  }
+                  formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
                 />
               </div>
             )}
@@ -172,14 +154,17 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
               periodsPerYear={12}
               formatPeriod={(period) => periodLabel(messages, period, "short")}
               formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
-              onChange={(patch) => setState((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+              onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
             />
           </section>
           <div className="mt-[18px] space-y-2">
             <SourceNote testId="source-label">
+              {/* The unit sits with the source, not as a second line under the heading (DESIGN §17). */}
+              <span data-testid="inflation-unit">{t(`unit.${state.tab}`)}</span>
+              {" · "}
               {t("source")} {message(messages, "main.lastUpdated", { date: displayDate })}
             </SourceNote>
-            <Link href={pageHref("/methodology/inflation", locale)} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
+            <Link href={pageHref("/methodology/inflation", locale)} prefetch={false} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
               {t("methodology")}
             </Link>
           </div>
@@ -190,8 +175,8 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
           targets={targets}
           state={state}
           range={range}
-          onToggle={(key) => setState((current) => toggleSelection(current, key))}
-          onClear={() => setState((current) => ({ ...current, selected: [] }))}
+          onToggle={(key) => update((current) => toggleSelection(current, key))}
+          onClear={() => update((current) => ({ ...current, selected: [] }))}
           downloadAction={
             <ExcelDownloadButton
               testId="inflation-download"

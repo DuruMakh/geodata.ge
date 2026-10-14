@@ -185,8 +185,10 @@ export async function preparePublicDatasets(options: {
     await rm(outputRoot, { recursive: true, force: true });
     await mkdir(outputRoot, { recursive: true });
     await Promise.all(outputs.map((output) => writeFile(path.join(outputRoot, output.fileName), output.bytes)));
-  } else if (options.mode === "check-output") {
-    // "check" validates the inputs; only this mode reads what was written.
+  }
+  // "check" validates the inputs only. "write" reads back what it just wrote, so the build needs no
+  // separate re-check after it; "check-output" is that same read on its own.
+  if (options.mode !== "check") {
     const stale: string[] = [];
     for (const output of outputs) {
       const onDisk = await readFile(path.join(outputRoot, output.fileName)).catch(() => null);

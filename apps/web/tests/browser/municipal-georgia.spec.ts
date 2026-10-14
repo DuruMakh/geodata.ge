@@ -1,24 +1,10 @@
-import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
-import ExcelJS from "exceljs";
 import { TEST_BASE_URL } from "./test-base-url";
 
 const COUNTRY_URL = `${TEST_BASE_URL}/explorer/municipalities/georgia`;
-const SOURCE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000").replace(/\/+$/, "");
 
 async function expectMunicipalAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-}
-
-async function downloadMunicipalWorkbook(page: Page) {
-  const downloadPromise = page.waitForEvent("download");
-  await page.getByTestId("municipal-excel").click();
-  const download = await downloadPromise;
-  const path = await download.path();
-  if (!path) throw new Error("Expected a local XLSX download path");
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
-  return { download, workbook };
 }
 
 test("Georgia municipal aggregate is a country-only explorer", async ({ page }) => {
@@ -56,36 +42,5 @@ test("Georgia municipal aggregate is a country-only explorer", async ({ page }) 
   await expect(page.getByTestId("entity-kpi")).toHaveCount(4);
   await expect(page.getByTestId("region-member-row")).toHaveCount(0);
   await expect(page.getByTestId("municipal-entity-navigation")).toHaveCount(0);
-
-  const { download, workbook } = await downloadMunicipalWorkbook(page);
-  expect(download.suggestedFilename()).toBe("fiscal-municipalities-georgia-2020-2021.xlsx");
-  expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
-  const readable = workbook.getWorksheet("მარტივი ცხრილი")!;
-  expect(readable.getCell("A1").value).toBe("საქართველო");
-  expect(readable.getRow(3).values).toEqual([
-    undefined,
-    "კატეგორია",
-    2020,
-    2021,
-    "ცვლილება 2020–2021",
-  ]);
-  const analysis = workbook.getWorksheet("მონაცემები")!;
-  const analysisRows = (analysis.getRows(2, 10) ?? []).filter((row) => row.getCell(1).value !== null);
-  expect(analysisRows.map((row) => row.getCell(1).value)).toEqual([2020, 2021]);
-
-  const workbookValues = workbook.worksheets.map((sheet) => sheet.getSheetValues());
-  const workbookJson = JSON.stringify(workbookValues);
-  expect(workbookJson).not.toContain("country.georgia");
-  const hyperlinks = workbook.getWorksheet("წყაროები")!.getSheetValues().flatMap((row) =>
-    Array.isArray(row)
-      ? row.flatMap((cell) => typeof cell === "object" && cell && "hyperlink" in cell ? [cell.hyperlink] : [])
-      : [],
-  );
-  expect(hyperlinks.some((value) => value.includes("/downloads/methodology/municipalities/"))).toBe(true);
-  expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-04.xlsx`);
-  expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/adjara-republic-actual-payments.xlsx`);
-  for (const code of ["05", "42", "43", "46", "64"]) {
-    expect(hyperlinks).toContain(`${SOURCE_ORIGIN}/downloads/methodology/municipalities/files/2016-2025/mof-municipality-budget-history-${code}.xlsx`);
-  }
-  expect(workbookJson).not.toContain("country.georgia");
+  // The workbook contract lives in bilingual-municipal.spec.ts (country case).
 });

@@ -9,6 +9,8 @@ import { buildSectorHighlights } from "../../lib/explorer/sectorHighlights";
 import { ECONOMIC_SECTORS } from "../../lib/data/economicSectors/importEconomicSectors";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { getPresentation } from "../../lib/i18n/presentation.server";
+import { loadServedEconomicSectorsData } from "../../lib/data/economicSectors/importEconomicSectors";
+import { loadServedGdpOverviewData } from "../../lib/data/gdpOverview/importGdpOverview";
 it("links all three delivered Economy datasets and derives their coverage", async () => {
   const facts = (await prepareGdpOverview()).facts.map((f) => ({
     ...f,
@@ -50,4 +52,13 @@ it("keeps Regional economies unavailable when regional facts are absent", async 
     englishLabels: {},
   });
   expect(cards[2]).toMatchObject({ href: null, comingSoon: true, footer: null });
+});
+
+// Moved from economicSectorsRoute.test.ts: the served loaders with sectors present and regional facts absent.
+it("activates sectors with loaded coverage and no regional facts", async () => {
+  const [{ facts: gdp }, { facts: sectors }, presentation] = await Promise.all([loadServedGdpOverviewData(), loadServedEconomicSectorsData(), getPresentation("en", ["gdp", "sectors"], [])]);
+  const cards = buildEconomyHubCards(gdp, presentation, sectors);
+  expect(cards[1].href).toBe("/explorer/economy/sectors");
+  expect(cards[1].footer).toContain("2010–2025");
+  expect(cards[2].href).toBeNull();
 });

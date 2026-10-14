@@ -10,7 +10,7 @@ import { TradePartners } from "./trade-partners";
 import { useTradeSectionsState } from "./use-trade-sections-state";
 
 const sections = ["sitc", "bec"] as const;
-export function TradeComposition({ data, sources, lastReviewedAt, siteOrigin }: { data: ReturnType<typeof toClientTradeCompositionData>; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+export function TradeComposition({ data, sources, lastReviewedAt, siteOrigin }: { data: Omit<ReturnType<typeof toClientTradeCompositionData>, "englishLabels">; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const { messages } = useI18n(), t = (key: string) => message(messages, `trade.composition.${key}`);
   const { section, changeSection } = useTradeSectionsState(sections, "sitc", "trade-composition-state");
   const pendingFocus = useRef<string | null>(null);

@@ -27,28 +27,28 @@ import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { YearPicker } from "../ui/year-picker";
-import { Download } from "./national-vital-charts";
+import { Download, SECTION_CLASS } from "./demography-helpers";
 import { PopulationPyramid } from "./population-pyramid";
 
-/** The rule and spacing every part of the page opens with, shared with the regional glance below it. */
-export const SECTION_CLASS = "mt-16 border-t-2 border-[var(--ink)] pt-[22px]";
 const percent = (value: number | null) => formatShare(value === null ? null : value / 100);
 
 /** Georgia's age structure on 1 January of every year: the pyramid and the age-by-year heat map. */
 export function AgeSexExplorer({
-  facts,
+  facts: shippedFacts,
   sources,
   siteOrigin,
 }: {
-  facts: ClientAgeFact[];
+  facts: FactsInput<ClientAgeFact>;
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
 }) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
@@ -71,7 +71,7 @@ export function AgeSexExplorer({
   const source = (
     <>
       {t("annualSource", { first, last })}{" "}
-      <Link href={pageHref("/methodology/demography", locale)} className="underline underline-offset-2">
+      <Link href={pageHref("/methodology/demography", locale)} prefetch={false} className="underline underline-offset-2">
         {message(messages, "common.methodology")}
       </Link>
       .

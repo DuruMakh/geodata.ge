@@ -1,4 +1,4 @@
-import { inflationCityPageMetadata, inflationCityStaticParams, renderInflationCityPage } from "../../../../../../lib/pages/inflation";
+import { inflationCityPageMetadata, inflationCityStaticParams, renderInflationCityPage } from "../../../../../../lib/pages/inflation-cities";
 
 export const dynamicParams = false;
 export const generateStaticParams = inflationCityStaticParams;

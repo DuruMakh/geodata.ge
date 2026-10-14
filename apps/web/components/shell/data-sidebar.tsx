@@ -4,25 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronsLeft, ChevronsRight, House, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ComingSoonBadge } from "../ui/coming-soon-badge";
-import { SectionNav } from "./section-nav";
+import { SectionNav, SidebarSectionLink } from "./section-nav";
 import { LanguageSwitch } from "../site/language-switch";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import { pageHref } from "../../lib/i18n/routes";
-import { UNEMPLOYMENT_SECTIONS } from "../../lib/explorer/unemploymentSections";
-import { WAGES_SECTIONS } from "../../lib/explorer/wages";
-import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../../lib/explorer/livingStandards";
-import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../../lib/explorer/energyFood";
-import { MONEY_BANKS_SECTIONS } from "../../lib/explorer/moneyBanks";
-import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
+import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
+import { BUDGET_HUB_PATH, NAV_TREE, currentEntry, openHub } from "../../lib/navigation/navTree";
 
 // Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
 // 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
-// platform whose first dataset is the budget; teaser rows are markers only.
+// platform whose first dataset is the budget.
 
-// Keys of `common.{key}` labels for datasets not live yet; none today, so no teaser list renders.
-const TEASERS: readonly string[] = [];
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
 const MOBILE_NAV_ID = "data-sidebar-navigation";
@@ -31,38 +23,17 @@ export function DataSidebar() {
   const { locale, messages } = useI18n();
   const [collapsed, setCollapsed] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(true);
+  // Unknown until mounted: the server cannot see the width, and the toggle's state and
+  // label differ by it (the rail on desktop, the closed sheet on a phone).
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
   const [animateWidth, setAnimateWidth] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const asideRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
-  const economyActive = pathname.includes("/explorer/economy");
-  const inflationActive = pathname.includes("/explorer/inflation");
-  const moneyBanksActive = pathname.includes("/explorer/money");
-  const unemploymentActive = pathname.includes("/explorer/unemployment");
-  const wagesActive = pathname.includes("/explorer/wages");
-  const livingStandardsActive = pathname.includes(LIVING_STANDARDS_HUB_PATH);
-  const tradeActive = pathname.includes("/explorer/trade");
-  const tradeOverviewActive = pathname.endsWith("/explorer/trade/overview");
-  const tradePartnersActive = pathname.endsWith("/explorer/trade/partners");
-  const externalActive = pathname.includes("/explorer/external");
-  const moneyFromAbroadActive = pathname.endsWith("/explorer/external/money-from-abroad");
-  const foreignInvestmentActive = pathname.endsWith("/explorer/external/foreign-investment");
-  const currentAccountActive = pathname.endsWith("/explorer/external/current-account");
-  const tradeProductsActive = pathname.endsWith("/explorer/trade/products");
-  const tradeCompositionActive = pathname.endsWith("/explorer/trade/composition");
-  const tradeServicesActive = pathname.endsWith("/explorer/trade/services");
-  const tradeDomesticActive = pathname.endsWith("/explorer/trade/domestic-exports");
-  const demographyActive = pathname.includes("/explorer/demography");
-  const energyFoodActive = pathname.includes(ENERGY_FOOD_HUB_PATH);
-  const budgetActive = !economyActive && !inflationActive && !moneyBanksActive && !unemploymentActive && !wagesActive && !livingStandardsActive && !tradeActive && !externalActive && !demographyActive && !energyFoodActive;
-  const gdpActive = pathname.endsWith("/explorer/economy/gdp");
-  const sectorsActive = pathname.endsWith("/explorer/economy/sectors");
-  const regionsActive = pathname.includes("/explorer/economy/regions");
-  const inflationOverviewActive = pathname.endsWith("/explorer/inflation/overview");
-  const inflationCategoriesActive = pathname.endsWith("/explorer/inflation/categories");
-  const inflationProductsActive = pathname.endsWith("/explorer/inflation/products");
-  const inflationCitiesActive = pathname.includes("/explorer/inflation/cities");
+  // The navigation tree's addresses carry no language prefix.
+  const page = splitLanguagePath(pathname).pathname;
+  const activeHub = openHub(page);
+  const current = currentEntry(page);
 
   // Read after mount: the server render cannot see localStorage, and guessing
   // would flash the wrong width on every load.
@@ -120,11 +91,12 @@ export function DataSidebar() {
 
   // Collapse is a desktop posture. A preference set on a laptop must not follow
   // the user to a phone, where it would render as a mystery-narrow rail.
-  const railed = collapsed && isDesktop;
+  const railed = collapsed && isDesktop === true;
   // One control, two jobs, so "expanded" means different things by width: the
   // rail on desktop, the sheet on mobile. The label, the glyph and aria-expanded
-  // must all describe whichever one the next click will change.
-  const navVisible = isDesktop ? !railed : sheetOpen;
+  // must all describe whichever one the next click will change. Before the width
+  // is known the toggle states nothing: a neutral "Menu" and no aria-expanded.
+  const navVisible = isDesktop === null ? undefined : isDesktop ? !railed : sheetOpen;
 
   function handleToggle() {
     if (!isDesktop) {
@@ -161,7 +133,7 @@ export function DataSidebar() {
           <a
             href={pageHref("/", locale)}
             aria-label={message(messages, "common.brandHome")}
-            className="flex min-w-0 items-center gap-2.5 no-underline"
+            className="flex min-w-0 items-center gap-2.5 no-underline max-[900px]:min-h-11"
           >
             {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -188,7 +160,7 @@ export function DataSidebar() {
           type="button"
           data-testid="sidebar-toggle"
           aria-expanded={navVisible}
-          aria-controls={!isDesktop ? MOBILE_NAV_ID : undefined}
+          aria-controls={isDesktop === false ? MOBILE_NAV_ID : undefined}
           aria-label={message(messages, isDesktop ? (navVisible ? "common.collapsePanel" : "common.expandPanel") : "common.menu")}
           onClick={handleToggle}
           className="-mr-2 flex size-11 flex-none cursor-pointer items-center justify-center rounded-[3px] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)] min-[900px]:mr-0 min-[900px]:size-[26px] min-[900px]:border min-[900px]:border-[rgba(247,242,233,0.18)]"
@@ -207,11 +179,12 @@ export function DataSidebar() {
             className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
             style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
           >
-            {message(messages, tradeActive ? "common.dataTrade" : externalActive ? "common.dataExternal" : energyFoodActive ? "common.dataEnergyFood" : wagesActive ? "common.dataWages" : livingStandardsActive ? "common.dataLivingStandards" : moneyBanksActive ? "common.dataMoneyBanks" : demographyActive ? "common.dataDemography" : unemploymentActive ? "common.dataUnemployment" : inflationActive ? "common.dataInflation" : economyActive ? "common.dataEconomy" : "common.dataBudget")}
+            {message(messages, activeHub.railLabelKey)}
           </p>
           <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
           <Link
             href={pageHref("/", locale)}
+            prefetch={false}
             aria-label={message(messages, "common.home")}
             title={message(messages, "common.home")}
             className="mt-auto flex size-[26px] items-center justify-center self-center text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)]"
@@ -233,301 +206,48 @@ export function DataSidebar() {
           <p className="mb-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
             {message(messages, "common.dataSection")}
           </p>
-          <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5">
-            <Link href={pageHref("/explorer",locale)} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${budgetActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.budget")}
-            </Link>
-            {budgetActive ? <SectionNav /> : null}
-            <Link href={pageHref("/explorer/economy",locale)} data-testid="economy-link" aria-current={pathname.endsWith('/economy')?'page':undefined} className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${economyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages,"common.economy")}
-            </Link>
-            {economyActive ? (
-              <Link
-                href={pageHref("/explorer/economy/gdp", locale)}
-                aria-current={gdpActive ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${gdpActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
-              >
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${gdpActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, "common.gdpOverview")}
-              </Link>
-            ) : null}
-            {economyActive ? (
-              <Link
-                href={pageHref("/explorer/economy/sectors", locale)}
-                aria-current={sectorsActive ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${sectorsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
-              >
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${sectorsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, "common.economicSectors")}
-              </Link>
-            ) : null}
-            {economyActive ? (
-              <Link
-                href={pageHref("/explorer/economy/regions", locale)}
-                aria-current={regionsActive ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${regionsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
-              >
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${regionsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, "common.regionalEconomies")}
-              </Link>
-            ) : null}
-            <Link
-              href={pageHref("/explorer/inflation", locale)}
-              data-testid="inflation-link"
-              aria-current={pathname.endsWith("/explorer/inflation") ? "page" : undefined}
-              className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${inflationActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
-            >
-              {message(messages, "common.inflation")}
-            </Link>
-            {inflationActive ? (
-              <Link
-                href={pageHref("/explorer/inflation/overview", locale)}
-                data-testid="inflation-overview-link"
-                aria-current={inflationOverviewActive ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
-              >
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, "common.inflationOverview")}
-              </Link>
-            ) : null}
-            {inflationActive ? (
-              <Link
-                href={pageHref("/explorer/inflation/categories", locale)}
-                data-testid="inflation-categories-link"
-                aria-current={inflationCategoriesActive ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationCategoriesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
-              >
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationCategoriesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, "common.inflationCategories")}
-              </Link>
-            ) : null}
-            {inflationActive ? (
-              <Link
-                href={pageHref("/explorer/inflation/products", locale)}
-                data-testid="inflation-products-link"
-                aria-current={inflationProductsActive ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationProductsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
-              >
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, "common.inflationProducts")}
-              </Link>
-            ) : null}
-            {inflationActive ? (
-              <Link
-                href={pageHref("/explorer/inflation/cities", locale)}
-                data-testid="inflation-cities-link"
-                aria-current={inflationCitiesActive ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${inflationCitiesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
-              >
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${inflationCitiesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, "common.inflationCities")}
-              </Link>
-            ) : null}
-            <Link href={pageHref("/explorer/money", locale)} data-testid="money-link" aria-current={pathname.endsWith("/explorer/money") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${moneyBanksActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.moneyBanks")}
-            </Link>
-            {moneyBanksActive ? MONEY_BANKS_SECTIONS.map(section => {
-              const active = pathname.endsWith(section.href);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`money-${section.id}-link`} aria-current={active ? "page" : undefined}
-                onNavigate={(event) => {
-                  if (active) event.preventDefault();
-                  setSheetOpen(false);
-                }}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, section.labelKey)}
-              </Link>;
-            }) : null}
-
-            <Link href={pageHref("/explorer/unemployment", locale)} data-testid="unemployment-link" aria-current={pathname.endsWith("/explorer/unemployment") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${unemploymentActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.unemployment")}
-            </Link>
-            {unemploymentActive ? UNEMPLOYMENT_SECTIONS.map(section => {
-              const active = pathname.endsWith(section.href) || section.id === "regions" && pathname.includes(`${section.href}/`);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`unemployment-${section.id}-link`} aria-current={active ? "page" : undefined}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, section.labelKey)}
-              </Link>;
-            }) : null}
-            <Link href={pageHref("/explorer/wages", locale)} data-testid="wages-link" aria-current={pathname.endsWith("/explorer/wages") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${wagesActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.wages")}
-            </Link>
-            {wagesActive ? WAGES_SECTIONS.map(section => {
-              const active = pathname.endsWith(section.href);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`wages-${section.id}-link`} aria-current={active ? "page" : undefined}
-                onNavigate={(event) => {
-                  if (active) event.preventDefault();
-                  setSheetOpen(false);
-                }}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, section.labelKey)}
-              </Link>;
-            }) : null}
-            <Link href={pageHref(LIVING_STANDARDS_HUB_PATH, locale)} data-testid="living-standards-link" aria-current={pathname.endsWith(LIVING_STANDARDS_HUB_PATH) ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${livingStandardsActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.livingStandards")}
-            </Link>
-            {livingStandardsActive ? LIVING_STANDARDS_SECTIONS.map(section => {
-              // Income and Spending stay active on their region pages, from which the link still opens the section page.
-              const current = pathname.endsWith(section.href), active = current || pathname.includes(`${section.href}/`);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`living-standards-${section.id}-link`} aria-current={active ? "page" : undefined}
-                onNavigate={(event) => {
-                  if (current) event.preventDefault();
-                  setSheetOpen(false);
-                }}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, section.labelKey)}
-              </Link>;
-            }) : null}
-            <Link href={pageHref("/explorer/trade", locale)} data-testid="trade-link" aria-current={pathname.endsWith("/explorer/trade") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${tradeActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.trade")}
-            </Link>
-            {tradeActive ? <Link href={pageHref("/explorer/trade/overview", locale)} data-testid="trade-overview-link" aria-current={tradeOverviewActive ? "page" : undefined}
-              onNavigate={(event) => {
-                if (tradeOverviewActive) event.preventDefault();
-                setSheetOpen(false);
-              }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeOverviewActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeOverviewActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.tradeOverview")}
-            </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/partners", locale)} data-testid="trade-partners-link" aria-current={tradePartnersActive ? "page" : undefined}
-              onNavigate={(event) => {
-                if (tradePartnersActive) event.preventDefault();
-                setSheetOpen(false);
-              }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradePartnersActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradePartnersActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.tradePartners")}
-            </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/products", locale)} data-testid="trade-products-link" aria-current={tradeProductsActive ? "page" : undefined}
-              onNavigate={(event) => {
-                if (tradeProductsActive) event.preventDefault();
-                setSheetOpen(false);
-              }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeProductsActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeProductsActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.tradeProducts")}
-            </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/domestic-exports", locale)} data-testid="trade-domestic-link" aria-current={tradeDomesticActive ? "page" : undefined}
-              onNavigate={(event) => { if (tradeDomesticActive) event.preventDefault(); setSheetOpen(false); }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeDomesticActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeDomesticActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.tradeDomestic")}
-            </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/services", locale)} data-testid="trade-services-link" aria-current={tradeServicesActive ? "page" : undefined}
-              onNavigate={(event) => { if (tradeServicesActive) event.preventDefault(); setSheetOpen(false); }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeServicesActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeServicesActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.tradeServices")}
-            </Link> : null}
-            {tradeActive ? <Link href={pageHref("/explorer/trade/composition", locale)} data-testid="trade-composition-link" aria-current={tradeCompositionActive ? "page" : undefined}
-              onNavigate={(event) => { if (tradeCompositionActive) event.preventDefault(); setSheetOpen(false); }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${tradeCompositionActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${tradeCompositionActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.tradeComposition")}
-            </Link> : null}
-            <Link href={pageHref("/explorer/external", locale)} data-testid="external-link" aria-current={pathname.endsWith("/explorer/external") ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${externalActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.external")}
-            </Link>
-            {externalActive ? <Link href={pageHref("/explorer/external/money-from-abroad", locale)} data-testid="money-from-abroad-link" aria-current={moneyFromAbroadActive ? "page" : undefined}
-              onNavigate={(event) => {
-                if (moneyFromAbroadActive) event.preventDefault();
-                setSheetOpen(false);
-              }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${moneyFromAbroadActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${moneyFromAbroadActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.moneyFromAbroad")}
-            </Link> : null}
-            {externalActive ? <Link href={pageHref("/explorer/external/foreign-investment", locale)} data-testid="foreign-investment-link" aria-current={foreignInvestmentActive ? "page" : undefined}
-              onNavigate={(event) => {
-                if (foreignInvestmentActive) event.preventDefault();
-                setSheetOpen(false);
-              }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${foreignInvestmentActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${foreignInvestmentActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.foreignInvestment")}
-            </Link> : null}
-            {externalActive ? <Link href={pageHref("/explorer/external/current-account", locale)} data-testid="current-account-link" aria-current={currentAccountActive ? "page" : undefined}
-              onNavigate={(event) => {
-                if (currentAccountActive) event.preventDefault();
-                setSheetOpen(false);
-              }}
-              className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${currentAccountActive ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-              <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${currentAccountActive ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-              {message(messages, "common.currentAccount")}
-            </Link> : null}
-            <Link href={pageHref(ENERGY_FOOD_HUB_PATH, locale)} data-testid="energy-food-link" aria-current={pathname.endsWith(ENERGY_FOOD_HUB_PATH) ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${energyFoodActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}>
-              {message(messages, "common.energyFood")}
-            </Link>
-            {energyFoodActive ? ENERGY_FOOD_SECTIONS.map(section => {
-              const active = pathname.endsWith(section.href);
-              return <Link key={section.id} href={pageHref(section.href, locale)} data-testid={`energy-food-${section.id}-link`} aria-current={active ? "page" : undefined}
-                onNavigate={(event) => {
-                  if (active) event.preventDefault();
-                  setSheetOpen(false);
-                }}
-                className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}>
-                <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                {message(messages, section.labelKey)}
-              </Link>;
-            }) : null}
-            <Link
-              href={pageHref(DEMOGRAPHY_HUB_PATH, locale)}
-              data-testid="demography-link"
-              aria-current={pathname.endsWith(DEMOGRAPHY_HUB_PATH) ? "page" : undefined}
-              className={`mt-2 flex items-baseline gap-2 max-[900px]:mt-0 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${demographyActive ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
-            >
-              {message(messages, "common.demography")}
-            </Link>
-            {demographyActive
-              ? LIVE_DEMOGRAPHY_PAGES.map((page) => {
-                  // `includes`, as for Regions and Cities: a page's own place pages sit under its path.
-                  const active = pathname.includes(page.path);
-                  return (
+          {/* Every link closes the sheet here, the current page's included: the pathname effect above never fires for it. */}
+          <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5" onClick={(event) => { if ((event.target as Element).closest("a")) setSheetOpen(false); }}>
+            {/* Each hub is a list item and its pages a nested list (U02-09); the list boxes carry the gaps the rows had as siblings. */}
+            <ul className="flex list-none flex-col gap-0.5">
+              {NAV_TREE.map((hub) => {
+                const open = hub === activeHub;
+                return (
+                  <li key={hub.href} className={`${hub.spaced ? "mt-2 max-[900px]:mt-0 " : ""}flex flex-col gap-0.5`}>
                     <Link
-                      key={page.id}
-                      href={pageHref(page.path, locale)}
-                      data-testid={`demography-${page.id}-link`}
-                      aria-current={active ? "page" : undefined}
-                      className={`ml-[18px] flex items-baseline gap-2 py-[5px] pr-2 pl-2 max-[900px]:min-h-11 max-[900px]:items-center text-[12px] no-underline transition-colors duration-150 ${active ? "bg-[rgba(247,242,233,0.07)] font-semibold text-[var(--paper)]" : "font-medium text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"}`}
+                      href={pageHref(hub.href, locale)}
+                      prefetch={false}
+                      data-testid={hub.testId}
+                      aria-current={current === hub.href ? "page" : undefined}
+                      className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${open ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
                     >
-                      <span aria-hidden className={`font-[family-name:var(--font-numeric)] text-[9px] ${active ? "text-[var(--accent)]" : "text-transparent"}`}>▸</span>
-                      {message(messages, page.labelKey)}
+                      {message(messages, hub.labelKey)}
                     </Link>
-                  );
-                })
-              : null}
-            {/* No aria-disabled on the rows: the listitem role ignores it (jsx-a11y
-                flags it), and the ComingSoonBadge text already reads out. */}
-            {TEASERS.length > 0 ? (
-            <ul className="mt-2 flex list-none flex-col gap-0.5 max-[900px]:mt-0">
-              {TEASERS.map((label) => (
-                // Reduced emphasis: a marker must not read as a live dataset row.
-                <li
-                  key={label}
-                  data-testid={`teaser-${label}`}
-                  className="flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center border-transparent px-2.5 py-2 text-[12.5px] font-medium text-[var(--ink-fg-muted)] opacity-60"
-                >
-                  <span className="min-w-0 flex-1 truncate">{message(messages, `common.${label}`)}</span>
-                  <ComingSoonBadge />
-                </li>
-              ))}
+                    {/* Budget's sections render as SectionNav's list, with its coming-soon rows. */}
+                    {open && hub.href === BUDGET_HUB_PATH ? <SectionNav /> : null}
+                    {open && hub.href !== BUDGET_HUB_PATH ? (
+                      <ul className="flex list-none flex-col gap-0.5 pl-[18px]">
+                        {hub.sections.map((section) => (
+                          <li key={section.href}>
+                            <SidebarSectionLink
+                              href={pageHref(section.href, locale)}
+                              testId={section.testId}
+                              label={message(messages, section.labelKey)}
+                              active={current === section.href}
+                              current={page === section.href}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                );
+              })}
             </ul>
-            ) : null}
           </nav>
           <div className="mt-auto border-t border-[rgba(247,242,233,0.12)] pt-3">
             <div className="mb-2 text-[var(--ink-fg-muted)] max-[900px]:mb-0 max-[900px]:[&_a]:min-h-11"><LanguageSwitch /></div>
-            <Link href={pageHref("/", locale)} data-testid="sidebar-back-home" className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)] max-[900px]:flex max-[900px]:min-h-11 max-[900px]:w-full max-[900px]:items-center max-[900px]:px-2.5 max-[900px]:text-[12.5px]">
+            <Link href={pageHref("/", locale)} prefetch={false} data-testid="sidebar-back-home" className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)] max-[900px]:flex max-[900px]:min-h-11 max-[900px]:w-full max-[900px]:items-center max-[900px]:px-2.5 max-[900px]:text-[12.5px]">
               {message(messages, "common.backHome")}
             </Link>
           </div>

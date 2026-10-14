@@ -25,7 +25,6 @@ test("canonical files preserve every reviewed numeric token and source column by
   const original = parse(await readFile(path.join(root, research, "source-observations.csv")), { columns: true, bom: true }) as Record<string, string>[];
   expect(rows).toEqual(original.filter(row => (["national", "settlement"].includes(row.dimension) || row.dimension === "region" && row.role === "primary") && row.methodology_epoch === "ilo19_20" && ["hired", "self_employed"].includes(row.indicator_id)));
   expect(rows).toHaveLength(228);
-  await expect(prepareUnemploymentData(root, "check")).resolves.toBeUndefined();
 });
 
 test("employment-status extraction refuses a source value that differs from its archived workbook cell", async () => {

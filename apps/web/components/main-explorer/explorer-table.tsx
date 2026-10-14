@@ -64,6 +64,13 @@ export const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-m
 const MOBILE_LABEL_CLASS =
   "@max-[768px]:pr-1.5 @max-[768px]:w-[40cqw] @max-[768px]:min-w-[40cqw] @max-[768px]:max-w-[40cqw] @max-[768px]:whitespace-normal @max-[768px]:break-words";
 const PIN_RIGHT_CLASS = "sticky @max-[768px]:static";
+// A solid 10px paper margin right of the sticky label column, on its header and body cells alike, so a year scrolled
+// under it passes behind the column instead of showing half a figure (U25-07). Solid, not a fade: DESIGN.md §17 has
+// no gradients. Its left border redraws the column rule where the cells' own 1px hairline-soft shadow sat (the margin
+// paints over that shadow), so the rule keeps its place and colour. 10px is within the empty left of a right-aligned
+// year cell: the 78px desktop column, and the 10px phone cell padding.
+const STICKY_EDGE_CLASS =
+  "after:pointer-events-none after:absolute after:inset-y-0 after:left-full after:w-2.5 after:border-l after:border-[var(--hairline-soft)] after:bg-[var(--paper)] after:content-['']";
 // A value cell of the year-rows layout: flush right under its series header.
 const ROWS_VALUE_CELL_CLASS = "pl-2 text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
 
@@ -254,9 +261,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
 
   const total = showTotal && totalRow ? (
     <tr className="border-t-2 border-[var(--ink)]">
-      <td className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35] ${labelClass}`} style={cellPad}>
+      <th scope="row" className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left text-[13px] font-semibold shadow-[1px_0_0_var(--hairline-soft)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35] ${STICKY_EDGE_CLASS} ${labelClass}`} style={cellPad}>
         {rowLabel(totalRow)}
-      </td>
+      </th>
       {years.map((year) => (
         <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={{ ...cellPad, ...breakStyle(year) }}>
           {cellValue(totalRow, year)}
@@ -302,22 +309,22 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
-            <th className={`sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`}>
+            <th scope="col" className={`sticky left-0 z-[2] border-b-2 border-[var(--ink)] bg-[var(--paper)] pr-3 pt-1.5 pb-[9px] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)] shadow-[1px_0_0_var(--hairline-soft)] ${STICKY_EDGE_CLASS} ${labelClass}`}>
               {firstColumnLabel}
             </th>
             {years.map((year, index) => (
-              <th key={year} data-latest-year={index === lastIndex ? "" : undefined} style={breakStyle(year)} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
+              <th key={year} scope="col" data-latest-year={index === lastIndex ? "" : undefined} style={breakStyle(year)} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
                 {year}
                 {breakMark(year)}
               </th>
             ))}
             {showChangeColumn ? (
-              <th className={`${headCellClass} ${PIN_RIGHT_CLASS} ${shareColumnLabel ? "right-24" : "right-0"} z-[2] w-28 min-w-28 bg-[var(--paper)] uppercase tracking-[0.06em] shadow-[-1px_0_0_var(--hairline-soft)]`}>
+              <th scope="col" className={`${headCellClass} ${PIN_RIGHT_CLASS} ${shareColumnLabel ? "right-24" : "right-0"} z-[2] w-28 min-w-28 bg-[var(--paper)] uppercase tracking-[0.06em] shadow-[-1px_0_0_var(--hairline-soft)]`}>
                 {message(messages, "controls.change")}
               </th>
             ) : null}
             {shareColumnLabel ? (
-              <th className={`${headCellClass} ${PIN_RIGHT_CLASS} right-0 z-[2] w-24 min-w-24 bg-[var(--paper)] pr-0 uppercase tracking-[0.06em]`}>
+              <th scope="col" className={`${headCellClass} ${PIN_RIGHT_CLASS} right-0 z-[2] w-24 min-w-24 bg-[var(--paper)] pr-0 uppercase tracking-[0.06em]`}>
                 {shareColumnLabel} {endYear}
               </th>
             ) : null}
@@ -327,8 +334,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
           {totalFirst ? total : null}
           {rows.map((row) => (
             <tr key={row.itemId} className="border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]">
-              <td
-                className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 shadow-[1px_0_0_var(--hairline-soft)] ${labelClass}`}
+              <th
+                scope="row"
+                className={`sticky left-0 z-[1] bg-[var(--paper)] pr-3 text-left font-normal shadow-[1px_0_0_var(--hairline-soft)] ${STICKY_EDGE_CLASS} ${labelClass}`}
                 style={cellPad}
                 title={rowLabel(row)}
               >
@@ -336,7 +344,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   <SwatchBar color={row.color} />
                   <span className="text-[13px] font-medium text-[var(--ink)] @max-[768px]:text-[12px] @max-[768px]:leading-[1.35]">{rowLabel(row)}</span>
                 </span>
-              </td>
+              </th>
               {years.map((year, index) => (
                 <td
                   key={year}

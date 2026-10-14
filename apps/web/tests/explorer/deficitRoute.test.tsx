@@ -9,11 +9,12 @@ import type { ServedGeneralGovernmentBalanceFact } from "../../lib/servedRows";
 
 import * as sources from "../../lib/methodology/workbookSources";
 import * as servedData from "../../lib/data/servedData";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 afterEach(() => vi.restoreAllMocks());
 
 let presentation: Presentation;
-beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "deficit"], ["deficit.general_government.balance"]); });
+beforeAll(async () => { presentation = await getPresentation("ka", ["common", "controls", "format", "main", "deficit"], ["deficit.general_government.balance"], ["deficit.general_government.balance"]); });
 function renderGeorgianMarkup(children: ReactNode) { return renderToStaticMarkup(<I18nProvider {...presentation}>{children}</I18nProvider>); }
 
 const facts: ServedGeneralGovernmentBalanceFact[] = [
@@ -22,41 +23,7 @@ const facts: ServedGeneralGovernmentBalanceFact[] = [
   { year: 2026, generalGovernmentBalancePctGdp: -2.327, generalGovernmentBalanceGel: -2_672_000_000, status: "projection", sourceId: "source.imf", lastReviewedAt: "2026-09-04" },
 ];
 
-async function loadDeficitComponent() {
-  try {
-    return await import("../../components/deficit/deficit-explorer");
-  } catch {
-    return null;
-  }
-}
-
 describe("general-government deficit route composition", () => {
-  it("reuses the one-chart explorer with percentage default and visible projections", async () => {
-    const components = await loadDeficitComponent();
-    expect(components).not.toBeNull();
-    if (!components) return;
-
-    const markup = renderGeorgianMarkup(createElement(components.DeficitExplorer, {
-      facts,
-      workbookSources: [],
-      edition: "2026 წლის აპრილი",
-      lastUpdatedAt: "2026-09-04",
-    }));
-    const text = markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-
-    expect(markup).toContain('data-testid="deficit-explorer"');
-    expect(markup).toContain("რამდენია საქართველოს ბიუჯეტის დეფიციტი");
-    expect(text).toContain("2025: ზოგადი მთავრობის ბალანსი · −1.5%");
-    expect(markup).toContain('data-measure="percent"');
-    expect(markup).toContain('data-testid="chart-frame"');
-    expect((markup.match(/data-testid="series-row"/g) ?? [])).toHaveLength(1);
-    expect(markup).toContain('data-series-id="deficit.general_government.balance"');
-    expect(markup).toContain('data-testid="range-marker"');
-    expect(text).toContain("2026–2026 წლები IMF-ის პროგნოზია");
-    expect(text).toContain("2024–2025 წლები ამ WEO გამოცემაში ფაქტობრივ პერიოდადაა მონიშნული");
-    expect(text).toContain("უარყოფითი მნიშვნელობა დეფიციტია");
-    expect(markup).not.toContain('data-testid="site-footer"');
-  });
   it("marks the first projection year declared by the full facts", async () => {
     const { DeficitExplorer } = await import("../../components/deficit/deficit-explorer");
     const shifted = [
@@ -74,9 +41,20 @@ describe("general-government deficit route composition", () => {
     expect(marker).toContain('style="left:100.00%"');
   });
 
+  // U07-11 / U07-12: one series needs no bulk toggle or "1 / 1" count, and the sign note is the source note's first
+  // sentence, so the deck under the heading states only the value.
+  it("keeps the one-series panel and the deck to what they add", async () => {
+    const { renderDeficitPage } = await import("../../lib/pages/deficit");
+    const html = renderPageMarkup("en", await renderDeficitPage("en"));
+    const deck = html.match(/<p data-testid="deficit-deck"[^>]*>([\s\S]*?)<\/p>/)![1]!;
+    expect(deck).not.toContain("A negative value indicates a deficit");
+    expect(html).toContain("A negative value indicates a deficit and a positive value a surplus.");
+    expect(html).not.toContain('data-testid="series-actions"');
+  });
+
   it("names the reviewed IMF edition and actual/projection coverage", async () => {
     const { renderDeficitPage } = await import("../../lib/pages/deficit");
-    const html = renderToStaticMarkup(await renderDeficitPage("en"));
+    const html = renderPageMarkup("en", await renderDeficitPage("en"));
     expect(html).toContain("World Economic Outlook, April 2026");
     expect(html).toContain("The IMF projects the figures for 2026–2031");
     expect(html).toContain("This WEO edition identifies 1995–2025 as the actual-data period");
@@ -96,7 +74,7 @@ describe("general-government deficit route composition", () => {
     ] });
     const { renderDeficitPage } = await import("../../lib/pages/deficit");
     const page = await renderDeficitPage(locale);
-    const html = renderToStaticMarkup(page);
+    const html = renderPageMarkup(locale, page);
     expect(html).toContain(edition);
     expect(html).toContain(description);
     expect(html).toContain("2024–2026");

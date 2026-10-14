@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/getSources.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { getSources } from "../../lib/factQuery/getSources";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
 import type { GetSourcesData } from "../../lib/factQuery/getSources";
@@ -9,7 +9,7 @@ import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
 });
 
 const data = (result: ReturnType<typeof getSources>) => (result as { data: GetSourcesData }).data;

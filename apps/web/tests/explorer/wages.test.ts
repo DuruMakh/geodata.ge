@@ -116,6 +116,19 @@ test("the Data sheet formats the amount column", async () => {
   expect(amount.numFmt).toBe("#,##0.0");
 });
 
+test("median stays whole when shown beside the average", async () => {
+  const model = await overviewWorkbook("en", { state: { mode: "table", view: "main", range: { kind: "manual", start: 2025, end: 2025 }, selectedIds: ["average", "median"] } });
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  const [summary, data] = excel.worksheets;
+  const summaryRow = (label: string) => [4, 5].find(row => summary.getCell(`A${row}`).value === label)!;
+  expect(summary.getCell(`B${summaryRow("Average")}`).numFmt).toBe("#,##0.0");
+  expect(summary.getCell(`B${summaryRow("Median")}`).numFmt).toBe("#,##0");
+  const dataRow = (label: string) => [2, 3].find(row => data.getCell(`B${row}`).value === label)!;
+  expect(data.getCell(`C${dataRow("Average")}`).numFmt).toBe("#,##0.0");
+  expect(data.getCell(`C${dataRow("Median")}`).value).toBe(1531);
+  expect(data.getCell(`C${dataRow("Median")}`).numFmt).toBe("#,##0");
+});
+
 test("a region workbook is named after its region", async () => {
   const state = { ...defaultWagesState("regions", facts), range: { kind: "manual" as const, start: 2024, end: 2025 } };
   const adjara = await overviewWorkbook("en", { section: "regions", state, regionId: "region.adjara" });
@@ -128,14 +141,42 @@ test("a region workbook is named after its region", async () => {
 test("wages summaries take their years and activity count from the facts", async () => {
   const messages = await getMessages("en", ["wages"]);
   const text = (key: string, from: readonly ClientWagesFact[], extra: Record<string, string> = {}) => message(messages, key, { ...wagesSummaryValues(from), ...extra });
-  expect(text("wages.page.overview.summary", facts)).toBe("Georgia’s average monthly wage since 1995 and median monthly wage since 2018, with comparisons between public and non-public employers and between women and men.");
-  expect(text("wages.page.industries.summary", facts)).toBe("Compare average monthly wages across 19 economic activities since 2014, for all employees, women, men or each employer type, or the median wage by activity since 2018.");
-  expect(text("wages.regionSummary", facts, { region: "Adjara" })).toBe("Average monthly wage in Adjara since 2010, with Georgia’s average for comparison.");
+  const overview = text("wages.page.overview.summary", facts);
+  expect(overview).toContain("since 1995");
+  expect(overview).toContain("since 2018");
+  const industries = text("wages.page.industries.summary", facts);
+  expect(industries).toContain("19 economic activities since 2014");
+  expect(industries).toContain("since 2018");
+  expect(text("wages.regionSummary", facts, { region: "Adjara" })).toContain("Adjara since 2010");
   expect(text("wages.page.overview.summary", facts.filter(f => f.year >= 1996))).toContain("since 1996");
 });
 
-test("the wages region map model is unchanged by the shared builder (fingerprint recorded before the refactor)", async () => {
-  const { createHash } = await import("node:crypto");
+test("the wages region map ranks the eleven regions by their latest average wage, with buckets and the occupied overlays", async () => {
   const { buildWagesRegionMapModel } = await import("../../lib/explorer/wagesRegionMap");
-  expect(createHash("sha256").update(JSON.stringify(buildWagesRegionMapModel(facts))).digest("hex")).toBe("eb60e44956f58444c260457470cc34a5b05009136e69fae2114843e9d7cf3acc");
+  const model = buildWagesRegionMapModel(facts);
+  const regional = facts.filter(fact => fact.dimension === "region" && fact.indicatorId === "average_monthly_nominal_earnings" && fact.value !== null);
+  const year = Math.max(...regional.map(fact => fact.year));
+  expect(model.year).toBe(year);
+  expect(model.firstYear).toBe(Math.min(...regional.map(fact => fact.year)));
+  expect(model.regions).toHaveLength(11);
+  expect(model.regions.map(region => region.rank)).toEqual(Array.from({ length: 11 }, (_, index) => index + 1));
+  const latest = regional.filter(fact => fact.year === year);
+  expect(model.regions.map(region => region.value)).toEqual(latest.map(fact => fact.value!).sort((left, right) => right - left));
+  expect(model.regions[0]!.regionId).toBe(latest.find(fact => fact.value === Math.max(...latest.map(item => item.value!)))!.groupId);
+  expect(new Set(model.regions.map(region => region.pathD))).toHaveLength(11);
+  expect(model.regions.every(region => region.bucket >= 0 && region.bucket <= 5)).toBe(true);
+  expect(model.regions[0]!.bucket).toBe(5);
+  expect(model.regions.at(-1)!.bucket).toBe(0);
+  expect(model.occupiedAreas.map(area => area.key).sort()).toEqual(["abkhazia", "tskhinvali"]);
+  expect([model.legendMin, model.legendMax]).toEqual([model.regions.at(-1)!.value, model.regions[0]!.value]);
+});
+
+// U18-10: the source note ends its sentence before the map-boundaries credit. U18-11: the Regions index is the map and
+// the ranked list (DESIGN.md §31): no overview tiles repeating the Georgia average under the heading.
+test("the wages Regions index is the map and list, its source note a full sentence", async () => {
+  const { renderWagesRegionsIndexPage } = await import("../../lib/pages/wages-regions-index");
+  const { renderPageMarkup } = await import("../helpers/render-localized");
+  const html = renderPageMarkup("en", await renderWagesRegionsIndexPage("en"));
+  expect(html).toContain("Source: Geostat · enterprise surveys · annual. Map boundaries");
+  expect(html).not.toContain("Regional overview");
 });

@@ -39,6 +39,8 @@ test.each(["ka", "en"] as const)("writes native %s count/rate workbooks with cor
       expect(cell.value).toBeCloseTo(224, 1); expect(cell.numFmt).toContain("0.0");
       expect(model.analysis.headers[2]).toBe(locale === "en" ? "Number (thousand persons)" : "რაოდენობა (ათასი ადამიანი)");
     }
+    // U16-16: the Data sheet names the row column as the Summary sheet does.
+    expect(model.analysis.headers[1]).toBe(locale === "en" ? "Category" : "კატეგორია");
     const sourceCell = excel.worksheets[2].getCell("D4").value;
     expect(sourceCell).toMatchObject({ hyperlink: "https://fiscal.ge/downloads/methodology/unemployment/files/01-labour-force-indicators.xlsx" });
   }
@@ -57,9 +59,35 @@ test.each(["ka", "en"] as const)("export filenames describe the active populatio
   const national = changeUnemploymentBreakdown(education, "national", facts);
   const suffix = locale === "en" ? "-en" : "";
   expect(national.educationSex).toBe("women");
-  expect((await workbook(locale, national)).filename).toBe(`fiscal-unemployment-national-unemployment_rate-2010-2025${suffix}.xlsx`);
+  expect((await workbook(locale, national)).filename).toBe(`fiscal-unemployment-national-unemployment-rate-2010-2025${suffix}.xlsx`);
   const returned = changeUnemploymentBreakdown(national, "education", facts);
-  expect((await workbook(locale, returned)).filename).toBe(`fiscal-unemployment-education-unemployment_rate-women-2020-2025${suffix}.xlsx`);
+  expect((await workbook(locale, returned)).filename).toBe(`fiscal-unemployment-education-unemployment-rate-women-2020-2025${suffix}.xlsx`);
+});
+
+// U16-17 and U17-10: one English-word stem for both languages (the English edition adds "-en"), never ids such as `labour_force`.
+test("export filenames share one readable English stem, not ids", async () => {
+  const names = async (hash: string, section: Parameters<typeof parseUnemploymentHash>[3], regionId?: string) => {
+    const state = parseUnemploymentHash(hash, facts, UNEMPLOYMENT_GROUPS, section, regionId);
+    const [ka, en] = [(await workbook("ka", state)).filename, (await workbook("en", state)).filename];
+    expect(en).toBe(ka.replace(/\.xlsx$/, "-en.xlsx"));
+    expect(ka).toMatch(/^[a-z0-9.-]+$/);
+    return ka;
+  };
+  expect([
+    await names("sel=georgia:unemployment_rate,women:unemployment_rate&start=2010&end=2025", "gender"),
+    await names("breakdown=age&start=2020&end=2025", "age"),
+    await names("sel=region.imereti:labour_force&start=2019&end=2025", "regions", "region.imereti"),
+    await names("sel=region.imereti:population_15_plus&start=2019&end=2025", "regions", "region.imereti"),
+    await names("sel=region.imereti:labour_force,region.imereti:employed&start=2019&end=2025", "regions", "region.imereti"),
+    await names("sel=region.samegrelo_zemo_svaneti:unemployment_rate&start=2019&end=2025", "regions", "region.samegrelo_zemo_svaneti"),
+  ]).toEqual([
+    "fiscal-unemployment-sex-unemployment-rate-2010-2025.xlsx",
+    "fiscal-unemployment-age-unemployment-rate-2020-2025.xlsx",
+    "fiscal-unemployment-imereti-labour-force-2019-2025.xlsx",
+    "fiscal-unemployment-imereti-population-15-plus-2019-2025.xlsx",
+    "fiscal-unemployment-imereti-people-2019-2025.xlsx",
+    "fiscal-unemployment-samegrelo-zemo-svaneti-unemployment-rate-2019-2025.xlsx",
+  ]);
 });
 test("age exports omit removed historical bands and Georgia and use modern years and age-source links", async () => {
   const model = await workbook("en", { breakdown: "age", selectedIds: ["georgia", "age.15_24", "age.15_19"], range: { kind: "manual", start: 2010, end: 2025 } });

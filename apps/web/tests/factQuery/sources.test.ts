@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/sources.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { findSourceProvenanceFailures, resolvePublicSources, selectSources } from "../../lib/factQuery/sources";
 import { packageManifestRowSchema } from "../../lib/factQuery/buildSnapshot";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -11,7 +11,7 @@ const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:0
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot(OPTIONS);
+  snapshot = testSnapshot(OPTIONS);
 });
 
 describe("public source resolution", () => {

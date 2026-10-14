@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage, type CoverageData } from "../../lib/factQuery/describeCoverage";
 import { getSources, type GetSourcesData } from "../../lib/factQuery/getSources";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let real: FactQuerySnapshot;
-beforeAll(async () => { real = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
+beforeAll(async () => { real = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
 const catalogue = (snapshot: FactQuerySnapshot, input: unknown): CoverageData => {
   const result = describeCoverage(snapshot, input);
   if (result.kind !== "catalogue") throw new Error(JSON.stringify(result));

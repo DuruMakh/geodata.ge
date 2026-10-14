@@ -1,7 +1,15 @@
 import type { SectorMeasure } from "../data/economicSectors/types";
+import type { FactQuerySnapshot } from "./types";
 export const SECTOR_QUERY_MEASURES = {
   amount_gel: "nominal", share_of_gdp_pct: "share_of_gdp", real_growth_pct: "real_growth",
 } as const satisfies Record<string, SectorMeasure>;
+/** First and last year of each sector measure; real growth starts later because it needs a prior year to grow from. Shared by /mcp and /connect. */
+export function sectorMeasureYearSpans(snapshot: FactQuerySnapshot): Record<SectorMeasure, [number, number]> {
+  return Object.fromEntries(Object.values(SECTOR_QUERY_MEASURES).map((measure) => {
+    const years = snapshot.economicSectors.facts.filter((fact) => fact.measure === measure).map((fact) => fact.year);
+    return [measure, [Math.min(...years), Math.max(...years)]];
+  })) as Record<SectorMeasure, [number, number]>;
+}
 export const SECTOR_DEFINITIONS = {
   reference: {
     nominal: {ka:"მთლიანი მშპ საბაზრო ფასებში, მიმდინარე ლარში; მოიცავს პროდუქციაზე გადასახადებს სუბსიდიების გამოკლებით.",en:"Total GDP at market prices in current GEL, including taxes on products less subsidies."},

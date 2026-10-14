@@ -2,14 +2,14 @@
 import { createHash } from "node:crypto";
 import { parse } from "csv-parse/sync";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { buildAllPublications, INFLATION_CATEGORIES_CSV_COLUMNS, type PublicationArtifact } from "../../lib/factQuery/publications";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
 let files: PublicationArtifact[];
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
   files = buildAllPublications(snapshot);
 }, 120_000);
 

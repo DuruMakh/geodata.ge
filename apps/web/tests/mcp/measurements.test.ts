@@ -34,10 +34,12 @@ describe("packaged MCP measurement CLI", () => {
     expect(report.cold).toBeDefined();
     expect(report.cold.samples).toHaveLength(5);
     expect(new Set(report.cold.samples.map(sample => sample.pid)).size).toBe(5);
+    const catalogue = report.measurements.find(sample => sample.name === "catalogue-inflation-products")!;
     for (const sample of report.cold.samples) {
       expect(sample.snapshotBytes).toBe(report.snapshotBytes);
       expect(sample.dataVersion).toBe(report.dataVersion);
-      expect(sample.productCount).toBe(305);
+      // Relations, not pinned counts, so a data refresh does not break the evidence check.
+      expect(sample.productCount).toBe(catalogue.rowCount);
       for (const field of ["readMs", "parseMs", "indexMs", "totalMs", "processElapsedMs"] as const) expect(sample[field]).toBeGreaterThan(0);
       expect(sample.totalMs).toBeGreaterThanOrEqual(sample.readMs + sample.parseMs + sample.indexMs);
     }
@@ -52,13 +54,19 @@ describe("packaged MCP measurement CLI", () => {
 
   it("retains full catalogue and ranking evidence and reports whole-result refusals", () => {
     const scenario = (name: string) => report.measurements.find(sample => sample.name === name)!;
-    expect(scenario("catalogue-inflation-products").rowCount).toBe(305);
+    // Relations, not pinned counts, so a data refresh does not break the evidence check.
+    const products = scenario("catalogue-inflation-products").rowCount;
+    expect(products).toBeGreaterThan(100);
     expect(scenario("catalogue-inflation-products").limitOutcome).toBe("accepted");
-    expect(scenario("products-single-history").rowCount).toBe(140);
-    expect(scenario("products-annual-rank-100").universe).toMatchObject({ candidateCount: 305, eligibleCount: 305, returnedCount: 100 });
-    expect(scenario("products-cumulative-rank-100").universe).toMatchObject({ candidateCount: 305, eligibleCount: 287, returnedCount: 100 });
-    expect(scenario("products-missing-history-rank-100").excludedCount).toBe(18);
-    expect(scenario("products-missing-history-rank-100").universe).toMatchObject({ candidateCount: 305, eligibleCount: 287, returnedCount: 100 });
+    expect(scenario("products-single-history").rowCount).toBeGreaterThan(0);
+    expect(scenario("products-single-history").rowCount).toBe(scenario("products-single-history").returnedCount);
+    expect(scenario("products-annual-rank-100").universe).toMatchObject({ candidateCount: products, eligibleCount: products, returnedCount: 100 });
+    for (const name of ["products-cumulative-rank-100", "products-missing-history-rank-100"]) {
+      const { universe, excludedCount } = scenario(name);
+      expect(universe, name).toMatchObject({ candidateCount: products, returnedCount: 100 });
+      expect(excludedCount, name).toBeGreaterThan(0);
+      expect(universe.eligibleCount, name).toBe(universe.candidateCount - excludedCount);
+    }
     const oversized = scenario("products-500-output-cells");
     expect(oversized.requestedCells).toBe(500);
     expect(oversized.limitOutcome).toBe("byte_limit");

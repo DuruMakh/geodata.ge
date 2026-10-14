@@ -17,7 +17,7 @@ export const DIVISION_IDS = Array.from({ length: 12 }, (_, index) => `cpi.cat.${
 /** The residual segment's id. Not a category: it is what the selection leaves over. */
 export const RESIDUAL_ID = "cpi.cat.residual";
 
-export type CategoryRange = PeriodRange;
+type CategoryRange = PeriodRange;
 export type CategoryState = {
   tab: CategoryTab;
   mode: "chart" | "table";
@@ -39,7 +39,7 @@ export const DEFAULT_CATEGORY_STATE: CategoryState = {
   tableSeries: null,
 };
 
-export type CategoryNode = { categoryId: string; level: 2 | 3; children: string[] };
+type CategoryNode = { categoryId: string; level: 2 | 3; children: string[] };
 export type CategoryIndex = {
   /** `${categoryId}:${measure}` → period → published change. */
   values: Map<string, Map<number, number>>;
@@ -68,14 +68,19 @@ function byCoicop(a: string, b: string): number {
  * The wire form of the category facts. 27,668 rows repeat 110 category/measure
  * pairs and a month string each, which prerendered to a 9 MB page; packed as one
  * dense run per series it is a fraction of that. Short keys because every byte
- * here is multiplied by 27,668 and then by two locales.
+ * here is multiplied by 27,668 and then by two locales. The overview's CPI facts
+ * travel in the same form (packMonthlyRuns).
  */
 export type PackedCategorySeries = { k: string; s: string; v: Array<number | null> };
 
-export function packCategoryFacts(facts: CategoryFactInput[]): PackedCategorySeries[] {
+/** A monthly published value of one series and measure, the shape every inflation page's facts share. */
+type MonthlyFact = { measure: string; period: string; value: number };
+
+/** One dense run per series and measure; `seriesOf` names the series a fact belongs to. */
+export function packMonthlyRuns<F extends MonthlyFact>(facts: readonly F[], seriesOf: (fact: F) => string): PackedCategorySeries[] {
   const byKey = new Map<string, Map<number, number>>();
   for (const fact of facts) {
-    const key = `${fact.categoryId}:${fact.measure}`;
+    const key = `${seriesOf(fact)}:${fact.measure}`;
     if (!byKey.has(key)) byKey.set(key, new Map());
     byKey.get(key)!.set(periodFromKey(fact.period), fact.value);
   }
@@ -88,14 +93,24 @@ export function packCategoryFacts(facts: CategoryFactInput[]): PackedCategorySer
   });
 }
 
-export function unpackCategoryFacts(series: PackedCategorySeries[]): CategoryFactInput[] {
-  return series.flatMap(({ k, s, v }) => {
-    const [categoryId, measure] = k.split(":") as [string, CategoryFactInput["measure"]];
+/** The facts packMonthlyRuns packed, with the series in `series`. */
+export function unpackMonthlyRuns(packed: readonly PackedCategorySeries[]): Array<MonthlyFact & { series: string }> {
+  return packed.flatMap(({ k, s, v }) => {
+    const separator = k.lastIndexOf(":");
+    const series = k.slice(0, separator);
+    const measure = k.slice(separator + 1);
     const start = periodFromKey(s);
-    return v.flatMap((value, offset) =>
-      value === null ? [] : [{ categoryId, measure, period: periodKey(start + offset), value }],
-    );
+    return v.flatMap((value, offset) => (value === null ? [] : [{ series, measure, period: periodKey(start + offset), value }]));
   });
+}
+
+export function packCategoryFacts(facts: CategoryFactInput[]): PackedCategorySeries[] {
+  return packMonthlyRuns(facts, (fact) => fact.categoryId);
+}
+
+export function unpackCategoryFacts(series: PackedCategorySeries[]): CategoryFactInput[] {
+  return unpackMonthlyRuns(series).map(({ series: categoryId, measure, period, value }) =>
+    ({ categoryId, measure: measure as CategoryFactInput["measure"], period, value }));
 }
 
 export function buildCategoryIndex(facts: CategoryFactInput[], weights: ClientBasketWeightRow[]): CategoryIndex {
@@ -143,6 +158,13 @@ export function categoryCoverage(index: CategoryIndex, tab: CategoryTab): { min:
   if (tab === "contrib") return periodBounds([...index.contributions.values()], "Category data has no periods");
   const measure = TAB_MEASURE[tab];
   return periodBounds([...index.values].filter(([group]) => group.endsWith(`:${measure}`)).map(([, map]) => map), "Category data has no periods");
+}
+
+/** Whether the index holds the tab's data: the monthly runs arrive after load (U13-03). */
+export function categoryTabLoaded(index: CategoryIndex, tab: CategoryTab): boolean {
+  if (tab === "contrib") return index.contributions.size > 0;
+  const suffix = `:${TAB_MEASURE[tab]}`;
+  return [...index.values.keys()].some((group) => group.endsWith(suffix));
 }
 
 export function resolveCategoryRange(state: CategoryState, index: CategoryIndex): ResolvedPeriodRange {
@@ -320,7 +342,7 @@ export type CategoryIndicatorEntry = {
   spark: Array<number | null>;
 };
 
-export type CategoryIndicators = {
+type CategoryIndicators = {
   period: number;
   /**
    * Null when the newest published month has no contribution yet. Weights refresh

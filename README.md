@@ -1,6 +1,6 @@
 # Fiscal.ge
 
-Fiscal.ge is a Georgian-first explorer of reviewed Georgian public-finance and economy data, with an English mirror under `/en`: national expenditure and revenue, municipal budgets, government debt, the general-government balance, GDP, national economic sectors, regional economies, and monthly national inflation. Each explorer downloads as an Excel workbook; the same figures are published as static data files under `/downloads/data/` and through a read-only MCP connection for AI clients at `/mcp`.
+Fiscal.ge is a Georgian-first explorer of reviewed Georgian public-finance and economy data, with an English mirror under `/en`, in eleven dataset hubs: budget (national expenditure and revenue, municipal budgets, government debt and the general-government balance), economy, inflation, money and banks, unemployment, wages, living standards, trade, external flows, energy and food, and demography. `Project_Definition.md` section 2 owns the authoritative list. Each explorer downloads as an Excel workbook; several datasets are also published as static data files under `/downloads/data/` (listed in its `catalogue.json`) and through a read-only MCP connection for AI clients at `/mcp`.
 
 Read first:
 
@@ -23,7 +23,7 @@ By default (`GEODATA_DATA_SOURCE` unset or `csv`) the app reads CSV data from `d
 
 The reviewed CSVs are the canonical source of truth. Supabase Postgres is the canonical serving store, populated from them by the idempotent, parity-checked import (`npm run data:import`). Production builds set `GEODATA_DATA_SOURCE=db` to render pages from the database at build time — the deployed site stays fully static. See `docs/data-methodology/database-import.md` for the full workflow, including the one-time Supabase setup. (Activation status: live in production since 2026-07-28 — production builds render from the Supabase mirror via the Actions deploy pipeline; CSV remains the break-glass fallback.)
 
-Database commands (`npm run prisma:migrate`, `npm run data:import`, builds with `GEODATA_DATA_SOURCE=db`) need `apps/web/.env` with the Supabase connection strings — copy `apps/web/.env.example` and fill in the pooled (`DATABASE_URL`, port 6543) and session-pooler (`DIRECT_URL`, port 5432) URLs.
+Database commands (`npm run prisma:deploy`, `npm run data:import`, builds with `GEODATA_DATA_SOURCE=db`) need `apps/web/.env` with the Supabase connection strings — copy `apps/web/.env.example` and fill in the pooled (`DATABASE_URL`, port 6543) and session-pooler (`DIRECT_URL`, port 5432) URLs. New migrations are written by hand, not with `prisma migrate dev`: see [Creating a migration](docs/data-methodology/database-import.md#creating-a-migration-prisma-migrate-dev-does-not-work-here).
 
 ## Deployment
 
@@ -35,7 +35,7 @@ Root data files live under `data/`.
 
 - `data/taxonomy`: stable public category IDs.
 - `data/glossary`: Georgian-first labels.
-- `data/mappings`: reviewed mappings from official rows to public spending fields.
+- `data/mappings`: reviewed mapping and review files the data generators read: `review/` (official expenditure rows to public spending fields, institutions and major programs), `demography/` and `inflation-products/`.
 - `data/imports`: reviewed import files and sample imports.
 - `data/sources`: source document metadata.
 - `data/methodology`: the public methodology decision register and archived original source files.

@@ -213,7 +213,7 @@ exports[`builds a stable model for a fixed input > share_of_region_gdp 1`] = `
       ],
     ],
   },
-  "filename": "fiscal-regional-economy-imereti-share_of_region_gdp-2023-2024-en.xlsx",
+  "filename": "fiscal-regional-economy-imereti-share-of-region-gdp-2023-2024-en.xlsx",
   "locale": "en",
   "readable": {
     "amountDecimals": 2,

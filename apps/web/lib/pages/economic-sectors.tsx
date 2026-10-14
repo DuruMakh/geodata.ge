@@ -5,8 +5,9 @@ import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedEconomicSectorsData, ECONOMIC_SECTORS } from "../data/economicSectors/importEconomicSectors";
+import { packFacts } from "../data/packedFacts";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
@@ -27,7 +28,7 @@ export async function economicSectorsPageMetadata(locale: Locale) {
 export async function renderEconomicSectorsPage(locale: Locale) {
   const root=path.resolve(/* turbopackIgnore: true */ process.cwd(),"../..");
   const [{facts},presentation,manifest,catalogue]=await Promise.all([
-    loadServedEconomicSectorsData(),getPresentation(locale,["sectors","common","controls","format","main","workbook"],ECONOMIC_SECTORS.map(r=>r.id)),
+    loadServedEconomicSectorsData(),getPresentation(locale,["sectors","format","main","workbook"],ECONOMIC_SECTORS.map(r=>r.id)),
     loadReviewedSourceManifest(root,"economic-sectors"),loadEnglishCatalogue(root),
   ]);
   const publicSources=projectPublicSources(manifest,locale,catalogue.documents);
@@ -37,12 +38,12 @@ export async function renderEconomicSectorsPage(locale: Locale) {
   });
   const title=message(presentation.messages,"sectors.heading"),firstYear=Math.min(...facts.map(f=>f.year)),lastYear=Math.max(...facts.map(f=>f.year)),dateModified=facts.map(f=>f.lastReviewedAt).sort().at(-1)!;
   const crumbs=[{label:message(presentation.messages,"common.home"),href:pageHref("/",locale)},{label:message(presentation.messages,"common.data")},{label:message(presentation.messages,"common.economy"),href:pageHref("/explorer/economy",locale)},{label:title}];
-  return <I18nProvider {...presentation}>
-    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"economic-sectors",origin:resolveSiteUrl(),path:"/explorer/economy/sectors",name:title,description:message(presentation.messages,"sectors.nominalContext"),firstYear,lastYear,dateModified,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/economic-sectors.csv"})}/>
+  return <I18nProvider {...clientPresentation(presentation)}>
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"economic-sectors",origin:resolveSiteUrl(),path:"/explorer/economy/sectors",name:message(presentation.messages,"sectors.metaTitle"),description:message(presentation.messages,"sectors.metaDescription"),firstYear,lastYear,dateModified,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/economic-sectors.csv"})}/>
     <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:crumbs[2].label,path:pageHref("/explorer/economy",locale)},{name:title,path:pageHref("/explorer/economy/sectors",locale)}]}/>
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, dateModified)}/>
-      <EconomicSectorsExplorer facts={facts.map(projectSectorObservation)} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, dateModified)}/>
+      <EconomicSectorsExplorer facts={packFacts(facts.map(projectSectorObservation))} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>
     </ExplorerPage>
   </I18nProvider>;
 }

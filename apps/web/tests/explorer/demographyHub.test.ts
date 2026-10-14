@@ -53,7 +53,8 @@ describe("demography hub cards", () => {
     expect(card.series![0]).toBe(georgia[0]!.value);
     expect(card.series!.at(-1)).toBe(georgia.at(-1)!.value);
     expect(card.seriesColor).toBe(INK);
-    expect(card.footer).toBe("2026: 3,941,103 people · 2004–2026");
+    // U28-10: the year is followed by " · " as on every other hub card, not a colon.
+    expect(card.footer).toBe("2026 · 3,941,103 people · 2004–2026");
   });
 
   it("draws the age and sex card from Georgia's share aged 65+ on 1 January", async () => {
@@ -66,7 +67,7 @@ describe("demography hub cards", () => {
     expect(card.series![0]).toBeCloseTo(14.07, 2);
     expect(card.series!.at(-1)).toBeCloseTo(18.08, 2);
     expect(card.seriesColor).toBe(INK);
-    expect(card.footer).toBe("2026: 18.1% aged 65+ · 2004–2026");
+    expect(card.footer).toBe("2026 · 18.1% aged 65+ · 2004–2026");
   });
 
   it("draws the migration card from Geostat's published net", async () => {
@@ -74,7 +75,7 @@ describe("demography hub cards", () => {
     const presentation = await getPresentation("en", ["demography"], []);
     const card = buildDemographyHubCards(facts, presentation)[2]!;
     expect(card.series).toHaveLength(14);
-    expect(card.footer).toBe("2025: net migration +17,127 · 2012–2025");
+    expect(card.footer).toBe("2025 · net migration +17,127 · 2012–2025");
   });
 
   it("draws the births card from Georgia's registered births", async () => {
@@ -83,6 +84,6 @@ describe("demography hub cards", () => {
     const card = buildDemographyHubCards(facts, presentation)[3]!;
     expect(card.series).toHaveLength(12);
     expect(card.series![0]).toBe(60_635);
-    expect(card.footer).toBe("2025: 37,867 births · 2014–2025");
+    expect(card.footer).toBe("2025 · 37,867 births · 2014–2025");
   });
 });

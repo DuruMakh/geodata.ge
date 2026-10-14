@@ -1,4 +1,4 @@
-﻿import type { GlossaryEntry } from "../data/glossary";
+﻿import type { PublicGlossaryEntry } from "../data/glossary";
 import type {
   ClientAdminFact,
   ClientBudgetFact,
@@ -41,7 +41,7 @@ export type ExplorerModelInput = {
   adminFacts?: ClientAdminFact[];
   adminCategories?: Map<string, AdminSpendingCategory>;
   expenditureGrouping?: ExpenditureGrouping;
-  glossary: Map<string, GlossaryEntry>;
+  glossary: Map<string, PublicGlossaryEntry>;
   gdpFacts?: ClientNationalGdpFact[];
   side: ExplorerSide;
   selectedItemIds: string[];
@@ -76,7 +76,7 @@ function sideForItemId(itemId: string): ExplorerSide {
   return itemId.startsWith("revenue.") ? "revenue" : "expenditure";
 }
 
-function labelsFor(id: string, side: ExplorerSide, glossary: Map<string, GlossaryEntry>) {
+function labelsFor(id: string, side: ExplorerSide, glossary: Map<string, PublicGlossaryEntry>) {
   if (id === totalIdFor(side)) {
     return side === "revenue"
       ? { kaLabel: "მთლიანი შემოსავლები", enLabel: "Total revenue" }

@@ -1,20 +1,22 @@
-import { HOUSEHOLD_SOURCES, householdFactKey, householdSourceId, type ClientHouseholdFact, type HouseholdArea } from "../data/household/types";
-import type { PublicSourceManifestRow } from "../methodology/publicSources";
+import { HOUSEHOLD_SOURCES, householdFactKey, householdSourceId, type ClientHouseholdFact, type HouseholdArea, type HouseholdMeasure } from "../data/household/types";
+import { sourcedWorkbookSources, type PublicSourceManifestRow } from "../methodology/publicSources";
 import type { ValidatedSourceManifestRow } from "../methodology/sourceManifest";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { buildHouseholdModel, type HouseholdSectionId, type HouseholdState } from "./household";
-import { SHEET_NAMES, mergeSourcesByHref, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource, type WorkbookReadableRow } from "./workbookModel";
+import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource, type WorkbookReadableRow } from "./workbookModel";
 
 const NUMBER_FORMAT = "0.0";
+// File names share one English stem in both languages, in words rather than ids.
+const MEASURE_FILE_WORDS: Record<HouseholdMeasure, string> = { per_household: "per-household", per_capita: "per-capita" };
 
-/** The twelve served workbooks of the validated archive, as the Sources sheet lists them; the population totals, page captures and metadata are not data sources of any value shown. */
+/** The twelve served workbooks of the validated archive; the population totals, page captures and metadata are not data sources of any value shown. */
+export const isHouseholdWorkbookSource = (source: ValidatedSourceManifestRow) => HOUSEHOLD_SOURCES.includes(source.source_id);
+
+/** The served workbooks as the Sources sheet lists them. */
 export function householdWorkbookSources(manifest: readonly ValidatedSourceManifestRow[], publicSources: readonly PublicSourceManifestRow[]): (WorkbookPublicSource & { sourceId: string })[] {
-  return manifest.filter(source => HOUSEHOLD_SOURCES.includes(source.source_id)).map(source => {
-    const translated = publicSources.find(row => row.source_id === source.source_id)!;
-    return { sourceId: source.source_id, years: source.years, title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at };
-  });
+  return sourcedWorkbookSources(manifest, publicSources, isHouseholdWorkbookSource);
 }
 
 export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSectionId; area: HouseholdArea; facts: readonly ClientHouseholdFact[]; state: HouseholdState; labels: Readonly<Record<string, string>>; areaLabel: string; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string }, presentation: Presentation): WorkbookExportModel {
@@ -22,18 +24,13 @@ export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSec
   const t = (key: string) => message(messages, `household.${key}`);
   const model = buildHouseholdModel(section, area, facts, state);
   const byCell = new Set(facts.map(householdFactKey));
-  const neededYears = new Map<string, Set<number>>();
-  for (const series of model.selected) for (const year of model.years) {
-    if (!byCell.has(householdFactKey({ indicatorId: series.indicatorId, areaId: series.areaId, measure: state.measure, year }))) continue;
-    const sourceId = householdSourceId(series.indicatorId, series.areaId, state.measure);
-    neededYears.set(sourceId, (neededYears.get(sourceId) ?? new Set<number>()).add(year));
-  }
-  const originals = mergeSourcesByHref(input.sources, source => source.years.filter(year => neededYears.get(source.sourceId)?.has(year)));
+  const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) =>
+    byCell.has(householdFactKey({ indicatorId: series.indicatorId, areaId: series.areaId, measure: state.measure, year })) ? householdSourceId(series.indicatorId, series.areaId, state.measure) : undefined));
   const status = (value: number | null) => value === null ? workbookMessage(locale, "workbook.unavailable") : t("status.survey_estimate");
   const title = [input.title ?? t(`page.${section}.title`), t(`tab.parts.${section}`), input.areaLabel, t(`measure.${state.measure}`)].join(" · ");
   const kind = (series: typeof model.selected[number]): WorkbookReadableRow["kind"] => series.reference ? "total" : series.parentId ? "item" : "group";
   return {
-    locale, filename: workbookFilename(`household-${section}-${area.replace(/\./g, "-")}-${state.measure}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
+    locale, filename: workbookFilename(`household-${section}-${area.replace(/\./g, "-")}-${MEASURE_FILE_WORDS[state.measure]}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title, subtitle: `${model.range.start}–${model.range.end} · ${t(`unitLong.${state.measure}`)}`,
       unitLabel: t("unitGel"), amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat: NUMBER_FORMAT,

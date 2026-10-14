@@ -90,5 +90,9 @@ describe("population index model", () => {
 
 test("the index rows are unchanged by the shared row builder (fingerprint recorded before the refactor)", async () => {
   const { createHash } = await import("node:crypto");
-  expect(createHash("sha256").update(JSON.stringify(index)).digest("hex")).toBe("96a3713cb7d58727ee659b136a7e5025acaf757a431e9d71b7bb1a1904514070");
+  // The map's touch targets are left out: since Task 23 they are target bounds the
+  // map sizes into disks at its drawn width, not index row data. Everything else
+  // is pinned; the hash below equals the pre-refactor model minus that one field.
+  const { touchTargets: _touchTargets, ...map } = index.map;
+  expect(createHash("sha256").update(JSON.stringify({ ...index, map })).digest("hex")).toBe("d8b1534874b2343802d3c4f141df13f34419a323b6f706e08fd9aafe3811078a");
 });

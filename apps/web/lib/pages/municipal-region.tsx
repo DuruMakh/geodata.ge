@@ -13,7 +13,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
-import { ADJARA_REGION_ID, MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { ADJARA_REGION_ID } from "../data/municipal/types";
 import {
   applyAdjaraBudgetAdjustment,
   aggregateFactsForEntity,
@@ -21,9 +21,10 @@ import {
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
-  MUNICIPAL_COUNTRY_BUDGET_COUNT,
   regionFactsFor,
+  buildPickerCountry,
 } from "../explorer/municipalData";
+import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
 import { municipalRankLabel, REGION_GENITIVE_KA } from "../explorer/municipalLabels";
 import { municipalityHrefForCode } from "../explorer/municipalityRoutes";
 import { formatAmount, formatShare } from "../explorer/format";
@@ -37,8 +38,17 @@ import {
 } from "../seo/municipalMetadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { clientPresentation } from "../i18n/presentation.server";
 
 // The 11 region ids are the complete, closed set.
+
+// The occupied-territory exclusion is said only on the two regions it applies to (U09-11).
+const OCCUPIED_EXCLUSION_REGIONS: ReadonlySet<string> = new Set(["region.shida_kartli", "region.mtskheta_mtianeti"]);
+
+function regionSourceKey(regionId: string): string {
+  if (regionId === ADJARA_REGION_ID) return "municipal.adjaraSource";
+  return OCCUPIED_EXCLUSION_REGIONS.has(regionId) ? "municipal.regionSource" : "municipal.regionSourceGeneral";
+}
 
 export async function municipalRegionStaticParams() {
   const { regions } = await loadServedMunicipalData();
@@ -132,7 +142,10 @@ export async function municipalRegionMetadata(id: string, locale: Locale): Promi
         }, presentation);
 
   return fiscalMetadata({ locale,
-    title: regionBudgetTitle(name, facts.firstYear, facts.latestYear, presentation),
+    // Adjara's figure folds in the republican budget, so it is a consolidated budget, not a sum of municipal ones.
+    title: regionId === ADJARA_REGION_ID
+      ? message(presentation.messages, "municipal.metaAdjaraTitle", { name, first: facts.firstYear, last: facts.latestYear })
+      : regionBudgetTitle(name, facts.firstYear, facts.latestYear, presentation),
     description,
     path: `/explorer/municipalities/region/${id}`,
   });
@@ -225,7 +238,9 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
             description: message(messages, "municipal.metaIndexDescription", { first: firstYear, last: latestYear }),
           },
           withinGeorgia: true,
-          name: message(messages, "municipal.regionDatasetName", { name: grammaticalName }),
+          // The per-resident figure is shown on the municipal index only; this page does not carry it.
+          omitMeasures: ["gel_per_resident"],
+          name: message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraDatasetName" : "municipal.regionDatasetName", { name: grammaticalName }),
           description,
           firstYear,
           lastYear: latestYear,
@@ -236,6 +251,8 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name, path: pageHref(`/explorer/municipalities/region/${id}`, locale) }]} />
       <PageHeader
+        locale={locale}
+        messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -247,14 +264,14 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
       />
 
       <MunicipalExplorer
-        presentation={presentation}
+        presentation={clientPresentation(presentation)}
         title={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraHeading" : "municipal.howSpent")}
         triggerLabel={name}
         entityId={regionId}
         metaLine={message(messages, members.memberCodes.length === 1 ? "municipal.regionMetaOne" : "municipal.regionMeta", { members: members.memberCodes.length, rank: municipalRankLabel(rank, locale), count: regions.length }) + (regionId === ADJARA_REGION_ID ? message(messages, "municipal.adjaraMetaSuffix") : "")}
         functions={functions}
-        functionFacts={own.functionFacts}
-        totalFacts={own.totalFacts}
+        functionFacts={own.functionFacts.map(projectMunicipalFunctionFact)}
+        totalFacts={own.totalFacts.map(projectMunicipalTotalFact)}
         metrics={{
           kind: "ranked",
           nationalTotalByYear,
@@ -266,19 +283,14 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
         functionalWorkbookSources={functionalWorkbookSources}
         supplementalWorkbookSources={regionId === ADJARA_REGION_ID ? adjustmentWorkbookSources : []}
         siteOrigin={resolveSiteUrl()}
-        pickerCountry={{
-          id: MUNICIPAL_COUNTRY_ID,
-          nameKa: "საქართველო",
-          valueGel: nationalTotalByYear[latestYear] ?? 0,
-          budgetCount: MUNICIPAL_COUNTRY_BUDGET_COUNT,
-        }}
+        pickerCountry={buildPickerCountry(nationalTotalByYear[latestYear] ?? 0)}
         pickerGroups={buildPickerGroups(listInput)}
         navigation={{
           prev: { label: publicLabel(locale, prev.id, prev.kaLabel, englishLabels), href: hrefFor(prev) },
           next: { label: publicLabel(locale, next.id, next.kaLabel, englishLabels), href: hrefFor(next) },
         }}
         summary={summary}
-        sourceNote={message(messages, regionId === ADJARA_REGION_ID ? "municipal.adjaraSource" : "municipal.regionSource") + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
+        sourceNote={message(messages, regionSourceKey(regionId)) + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
       >
         <EntityMemberList
           heading={message(messages, "municipal.regionMembers")}

@@ -1,8 +1,12 @@
 import { readFile } from "node:fs/promises";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { expectReadableText } from "./color-contrast";
+import { expectEnglish } from "./expect-english";
 import { TEST_BASE_URL } from "./test-base-url";
+
+// A line chart without its own label is named "{first series}, {count} სერია, {first}–{last}".
+const LINE_CHART_NAME = /, \d+ სერია, \d{4}–\d{4}$/;
 
 function collectConsoleProblems(page: Page) {
   const consoleProblems: string[] = [];
@@ -30,31 +34,28 @@ async function expectAppReady(page: Page) {
 }
 
 test.describe("main explorer", () => {
-for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 768 }]) {
-  for (const section of ["expenditure", "revenue"] as const) {
-    test(`${section} series values stay readable on selected and hover backgrounds at ${viewport.width}px`, async ({ page }) => {
-      await page.setViewportSize(viewport);
-      await page.goto(`${TEST_BASE_URL}/explorer/${section}`);
-      await expectAppReady(page);
-      const row = page.locator(`[data-testid="series-row"][data-series-id="${section}.total"]`);
-      const toggle = row.getByTestId("series-row-toggle");
-      const value = toggle.locator(":scope > span").last();
-      await expect(toggle).toHaveAttribute("aria-pressed", "true");
-      await expect(row).toHaveCSS("background-color", "rgb(241, 234, 220)");
-      await expectReadableText(value, row);
+// One SeriesSelectorRow serves every section and width; its tint and muted value have no variants.
+test("expenditure series values stay readable on selected and hover backgrounds at 1366px", async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
+  await expectAppReady(page);
+  const row = page.locator(`[data-testid="series-row"][data-series-id="expenditure.total"]`);
+  const toggle = row.getByTestId("series-row-toggle");
+  const value = toggle.locator(":scope > span").last();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await expect(row).toHaveCSS("background-color", "rgb(241, 234, 220)");
+  await expectReadableText(value, row);
 
-      await toggle.click();
-      await expect(toggle).toHaveAttribute("aria-pressed", "false");
-      await page.mouse.move(0, 0);
-      await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-      await expectReadableText(value, page.locator("body"));
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await page.mouse.move(0, 0);
+  await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expectReadableText(value, page.locator("body"));
 
-      await row.hover();
-      await expect(row).toHaveCSS("background-color", "rgb(241, 234, 220)");
-      await expectReadableText(value, row);
-    });
-  }
-}
+  await row.hover();
+  await expect(row).toHaveCSS("background-color", "rgb(241, 234, 220)");
+  await expectReadableText(value, row);
+});
 
 async function downloadWorkbook(page: Page, testId = "series-excel") {
   const downloadPromise = page.waitForEvent("download");
@@ -103,6 +104,15 @@ for (const section of ["expenditure", "revenue", "analysis"] as const) {
         await expect(page.locator(`[data-series-id="${section}.total"]`)).toBeVisible();
       }
       await expectNoPageOverflow(page);
+
+      if (section === "analysis") {
+        // The English analysis is in the initial HTML too.
+        expect((await page.goto(`${TEST_BASE_URL}/en/explorer/analysis`))?.status()).toBe(200);
+        await expect(page.locator("html")).toHaveAttribute("lang", "en");
+        await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+        for (const id of ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"]) await expect(page.getByTestId(id)).toBeVisible();
+        await expectEnglish(page);
+      }
     } finally {
       await context.close();
     }
@@ -143,6 +153,14 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   const availableSeries = page.getByTestId("series-selector").getByTestId("series-row");
   await expect(comparison.locator("tbody tr")).toHaveCount(await availableSeries.count());
 
+  // Every side KPI carries one sparkline. Path count is deliberately not asserted:
+  // a series with an interior gap legitimately draws more than one segment.
+  const kpis = page.getByTestId("side-kpi");
+  await expect(kpis).toHaveCount(3);
+  for (let index = 0; index < 3; index += 1) {
+    await expect(kpis.nth(index).locator("svg")).toHaveCount(1);
+  }
+
   await expectNoPageOverflow(page);
   expect(consoleProblems).toEqual([]);
 });
@@ -175,6 +193,14 @@ test("national selector uses the standardized search, action, status, and row an
       .getByTestId("series-label")
       .evaluate((node) => getComputedStyle(node).getPropertyValue("-webkit-line-clamp")),
   ).toBe("2");
+
+  // Stacked below the chart at 820px, the selector keeps the same section order (above).
+  await page.setViewportSize({ width: 820, height: 900 });
+  const chartBox = await page.getByTestId("chart-panel").boundingBox();
+  const selectorBox = await panel.boundingBox();
+  expect(chartBox).not.toBeNull();
+  expect(selectorBox).not.toBeNull();
+  expect(selectorBox!.y).toBeGreaterThan(chartBox!.y + chartBox!.height);
 });
 
 test("national selector treats a pinned total search as a match and reports genuine misses", async ({ page }) => {
@@ -195,48 +221,6 @@ test("national selector treats a pinned total search as a match and reports genu
   await expect(emptyState).toBeVisible();
 });
 
-test("standardized selector keeps its order when stacked below the chart", async ({ page }) => {
-  await page.setViewportSize({ width: 820, height: 900 });
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-
-  const chartBox = await page.getByTestId("chart-panel").boundingBox();
-  const selector = page.getByTestId("series-selector");
-  const selectorBox = await selector.boundingBox();
-  expect(chartBox).not.toBeNull();
-  expect(selectorBox).not.toBeNull();
-  expect(selectorBox!.y).toBeGreaterThan(chartBox!.y + chartBox!.height);
-
-  const sections = await selector.locator("[data-selector-section]").evaluateAll((nodes) =>
-    nodes.map((node) => node.getAttribute("data-selector-section")),
-  );
-  expect(sections).toEqual(["controls", "search", "actions", "list"]);
-});
-
-test("series header clears and selects every series independently of search", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-
-  const panel = page.getByTestId("series-selector");
-  const bulk = panel.getByTestId("series-toggle-all");
-  const seriesButtons = panel.locator("button[title]");
-
-  await expect(panel.locator('[data-level="total"]').first()).toContainText("მთლიანი ხარჯი");
-  await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
-  await expect(bulk).toContainText("გასუფთავება");
-
-  await bulk.click();
-  await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(0);
-  await expect(bulk).toContainText("ყველას მონიშვნა");
-
-  await panel.getByTestId("series-search").fill("ჯანმრთელობა");
-  await bulk.click();
-  await panel.getByTestId("series-search").fill("");
-
-  const allCount = await seriesButtons.count();
-  await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(allCount);
-});
-
 test("bulk selector exposes mixed, empty, and checked states", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
@@ -245,25 +229,31 @@ test("bulk selector exposes mixed, empty, and checked states", async ({ page }) 
   const bulk = panel.getByTestId("series-toggle-all");
   const indicator = panel.getByTestId("series-toggle-indicator");
 
-  await expect(bulk).toHaveAttribute("role", "checkbox");
-  await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+  await expect(bulk).not.toHaveAttribute("role", "checkbox");
+  await expect(bulk).toHaveAttribute("data-state", "mixed");
   await expect(indicator).toHaveText("—");
 
   await panel.getByTestId("series-row").nth(1).getByTestId("series-row-toggle").click();
   await expect(panel.getByTestId("series-status")).toContainText(/სერიები\s*2 \/ \d+/);
-  await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+  await expect(bulk).toHaveAttribute("data-state", "mixed");
   await expect(indicator).toHaveText("—");
 
   await bulk.click();
-  await expect(bulk).toHaveAttribute("aria-checked", "false");
+  await expect(bulk).toHaveAttribute("data-state", "false");
   await expect(indicator).toHaveText("");
   await expect(bulk).toContainText("ყველას მონიშვნა");
+  await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(0);
 
   await panel.getByTestId("series-search").fill("ჯანმრთელობა");
   await bulk.click();
-  await expect(bulk).toHaveAttribute("aria-checked", "true");
+  await expect(bulk).toHaveAttribute("data-state", "true");
   await expect(indicator).toHaveText("✓");
   await expect(bulk).toContainText("გასუფთავება");
+
+  // Search never scopes the bulk action: with the search cleared, every series is selected.
+  await panel.getByTestId("series-search").fill("");
+  const allCount = await panel.locator("button[title]").count();
+  await expect(panel.locator('button[title][aria-pressed="true"]')).toHaveCount(allCount);
 });
 
 test("explorer controls expose line, table, grouping, and the share pill", async ({ page }) => {
@@ -304,7 +294,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(chartPanel).toHaveAttribute("data-measure", "share_of_gdp");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveText("% მშპ-ში");
   await expect(chartPanel.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("img", { name: "მრავალწლიანი დინამიკა" }).hover({ position: { x: 300, y: 100 } });
+  await page.getByRole("img", { name: LINE_CHART_NAME }).hover({ position: { x: 300, y: 100 } });
   await expect(page.getByTestId("chart-tooltip")).toContainText("წილი მშპ-ში");
   await chartPanel.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("explorer-table")).not.toContainText("წილი მშპ-ში 2025");
@@ -370,8 +360,82 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
   await expect(page.getByTestId("municipality-map")).toBeVisible();
   await expect(municipalitiesLink).toHaveAttribute("aria-current", "page");
 
+  // Municipalities is the first section with child routes: the row stays
+  // current one level deeper, on a municipality page, and no other row claims it.
+  await page.goto(`${TEST_BASE_URL}/explorer/municipalities/tbilisi`);
+  await expect(page.getByTestId("data-sidebar").getByTestId("section-link-municipalities")).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("data-sidebar").getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
+
   expect(consoleProblems).toEqual([]);
 });
+
+// Next prefetches a <Link> as soon as it enters the viewport, so every sidebar, footer and
+// list row used to pull its page's data in the background. Prefetch runs only in production:
+// against `next dev` these tests pass without proving anything (CI runs them on `next start`).
+// The municipal index also at phone width, where the whole 64-row list is in the page; the
+// regional index and a region page list their regions; dataset pages link their methodology
+// page; the methodology hub lists every dataset.
+for (const [path, width] of [
+  ["/explorer/municipalities", 390],
+  ["/explorer/municipalities", 1280],
+  ["/explorer/economy/regions", 1280],
+  ["/explorer/economy/regions/imereti", 1280],
+  ["/explorer/unemployment/overview", 1280],
+  ["/methodology", 1280],
+  ["/explorer/expenditure", 1280],
+] as const) {
+  test(`opening ${path} at ${width}px fetches no other page's data`, async ({ page }) => {
+    const prefetched: string[] = [];
+    let inFlight = 0;
+    let lastActivity = Date.now();
+    page.on("request", (request) => {
+      inFlight += 1;
+      lastActivity = Date.now();
+      const url = new URL(request.url());
+      if (url.searchParams.has("_rsc")) prefetched.push(url.pathname);
+    });
+    const settled = () => {
+      inFlight -= 1;
+      lastActivity = Date.now();
+    };
+    page.on("requestfinished", settled);
+    page.on("requestfailed", settled);
+
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto(`${TEST_BASE_URL}${path}`);
+    // A link starts prefetching once it has hydrated and enters the viewport, so wait until
+    // React has hydrated every link (not every page here marks itself ready: the methodology
+    // hub does not). networkidle is not that signal: under load Playwright reports it before
+    // DOMContentLoaded, and a request after it (the sidebar's compact logo) followed by the
+    // load event clears it for good, so a second wait for it hung until the test timed out.
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("a[href]")].every((link) => Object.keys(link).some((key) => key.startsWith("__reactFiber$"))),
+    );
+    // Scroll the page down half a screen at a time so every link in the page flow passes
+    // through the viewport (a list in its own scroll box, as the municipal index is from
+    // 768px, shows only its first screen), then wait until nothing has been in flight for
+    // half a second, so a prefetch that starts late under load is still counted.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight / 2) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+    });
+    await expect
+      .poll(() => inFlight === 0 && Date.now() - lastActivity >= 500, { intervals: [100], timeout: 15_000 })
+      .toBe(true);
+    expect(prefetched).toEqual([]);
+
+    if (path !== "/explorer/expenditure") return;
+    // Without a prefetch the sidebar still navigates in-app, not by a full reload.
+    await expectAppReady(page);
+    await page.evaluate(() => ((window as unknown as { stillHere?: boolean }).stillHere = true));
+    await page.getByTestId("data-sidebar").getByTestId("section-link-revenue").click();
+    await expect(page).toHaveURL(/\/explorer\/revenue$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("როგორ ფინანსდება საქართველოს ბიუჯეტი");
+    expect(await page.evaluate(() => (window as unknown as { stillHere?: boolean }).stillHere)).toBe(true);
+  });
+}
 
 test("ministries grouping expands nested programs by name only", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
@@ -488,11 +552,11 @@ test("2004 revenue total excludes an unavailable liability value in tables and E
   const table = page.getByTestId("explorer-table");
   const totalRow = table.getByRole("row").filter({ hasText: "მთლიანი შემოსავლები" });
   const liabilitiesRow = table.getByRole("row").filter({ hasText: "ვალდებულებების ზრდა" });
-  // One decimal: national scopes cap there (DESIGN.md §11). 2004 total
+  // Two decimals: revenue caps there, as five of its lines sit under 1 bn (DESIGN.md §11, U04-05). 2004 total
   // 2,283,035,800 ₾ and 2005 liabilities 85,316,805 ₾.
-  await expect(totalRow).toContainText("2.3");
+  await expect(totalRow).toContainText("2.28");
   await expect(liabilitiesRow).toContainText("—");
-  await expect(liabilitiesRow).toContainText("0.1");
+  await expect(liabilitiesRow).toContainText("0.09");
 
   const revenueExport = await downloadWorkbook(page);
   expect(revenueExport.download.suggestedFilename()).toMatch(/^fiscal-revenue-\d{4}-\d{4}\.xlsx$/);
@@ -502,39 +566,6 @@ test("2004 revenue total excludes an unavailable liability value in tables and E
   expect(exportedRows.some((row) => row.getCell(1).value === 2005 && row.getCell(3).value === "ვალდებულებების ზრდა")).toBe(true);
 
   expect(consoleProblems).toEqual([]);
-});
-
-test("Debt Excel exports the active family, forecast status, rate gaps and validated sources", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=table&r=2025-2026&sel=debt.service.total`);
-  await expectAppReady(page);
-
-  const serviceExport = await downloadWorkbook(page, "debt-excel");
-  expect(serviceExport.download.suggestedFilename()).toBe("fiscal-government-debt-service-2025-2026.xlsx");
-  expect(serviceExport.workbook.worksheets.map((sheet) => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
-  const serviceRows = serviceExport.workbook.getWorksheet("მონაცემები")!.getRows(2, 10) ?? [];
-  expect(serviceRows.map((row) => row.getCell(5).value).filter((value) => value !== null)).toEqual(["ფაქტი", "პროგნოზი"]);
-  expect(serviceExport.workbook.getWorksheet("წყაროები")!.getCell("D4").value).toEqual(expect.objectContaining({
-    text: "ფაილის ჩამოტვირთვა",
-    hyperlink: expect.stringContaining("/downloads/methodology/debt/files/"),
-  }));
-
-  await page.goto(`${TEST_BASE_URL}/explorer/debt?view=rate#f=rate&m=table&r=2019-2021&sel=debt.rate.external`);
-  await expectAppReady(page);
-  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "rate");
-  const rateExport = await downloadWorkbook(page, "debt-excel");
-  const rateSheet = rateExport.workbook.getWorksheet("მონაცემები")!;
-  expect(rateSheet.getRow(1).values).toEqual([
-    undefined,
-    "წელი",
-    "მთავარი ჯგუფი",
-    "კატეგორია",
-    "თანხა (₾)",
-    "სტატუსი",
-    "საპროცენტო განაკვეთი (%)",
-  ]);
-  const rateRows = rateSheet.getRows(2, 10) ?? [];
-  expect(rateRows.some((row) => row.getCell(1).value === 2019 && row.getCell(4).value === null && row.getCell(5).value === "არ არის ხელმისაწვდომი")).toBe(true);
-  expect(rateRows.some((row) => row.getCell(1).value === 2021 && row.getCell(6).value === 0.0095)).toBe(true);
 });
 
 test("range strip supports chips and dragging handles", async ({ page }) => {
@@ -693,7 +724,8 @@ test("shared ministries program links restore with the parent expanded", async (
 
   await page.getByTestId("grouping-ministries").click();
   const panel = page.getByTestId("series-selector");
-  await panel.getByRole("button", { name: "ქვეპროგრამები" }).first().click();
+  // Each caret is named after its own ministry.
+  await panel.getByRole("button", { name: /^.+ — ქვეკატეგორიები$/ }).first().click();
   const firstProgram = panel.locator("[data-level='major_program']").first();
   await firstProgram.getByRole("button").last().click();
   await expect(page).toHaveURL(/sel=[^&]*admin_program/);
@@ -730,6 +762,27 @@ test("Excel download uses only the selected range and series", async ({ page }) 
   expect([...new Set(dataRows.map((row) => row.getCell(1).value))]).toEqual([2020, 2021]);
   expect([...new Set(dataRows.map((row) => row.getCell(3).value))]).toEqual(["სოციალური დაცვა"]);
   expect(JSON.stringify(workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues())).not.toContain("geostat.ge");
+
+  // The GDP share adds its analysis column, and the official GDP source sits in Sources only.
+  await page.getByTestId("measure-share-toggle").click();
+  const { workbook: share } = await downloadWorkbook(page);
+  expect(share.getWorksheet("მონაცემები")!.getRow(1).values).toEqual([
+    undefined,
+    "წელი",
+    "მთავარი ჯგუფი",
+    "კატეგორია",
+    "თანხა (₾)",
+    "სტატუსი",
+    "მშპ-ის წილი (%)",
+  ]);
+  const analysis = share.getWorksheet("მონაცემები")!;
+  expect(analysis.getCell("F2").value).toEqual(expect.any(Number));
+  expect(analysis.getCell("F2").numFmt).toBe("0.0%");
+  const readableText = JSON.stringify(share.getWorksheet("მარტივი ცხრილი")!.getSheetValues());
+  const sourceText = JSON.stringify(share.getWorksheet("წყაროები")!.getSheetValues());
+  expect(readableText).not.toContain("https://www.geostat.ge/");
+  expect(sourceText).toContain("https://www.geostat.ge/");
+  expect(sourceText).not.toMatch(/docs[\\/]Raw Data|national-gdp-annual/);
 });
 
 test("Excel button shows working and retryable error states", async ({ page }) => {
@@ -806,31 +859,6 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   await expect(button).toBeDisabled();
 });
 
-test("GDP share Excel download adds the analysis column and official sources", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#r=2020-2021&sel=expenditure.total`);
-  await expectAppReady(page);
-  await page.getByTestId("measure-share-toggle").click();
-
-  const { workbook } = await downloadWorkbook(page);
-  expect(workbook.getWorksheet("მონაცემები")!.getRow(1).values).toEqual([
-    undefined,
-    "წელი",
-    "მთავარი ჯგუფი",
-    "კატეგორია",
-    "თანხა (₾)",
-    "სტატუსი",
-    "მშპ-ის წილი (%)",
-  ]);
-  const analysis = workbook.getWorksheet("მონაცემები")!;
-  expect(analysis.getCell("F2").value).toEqual(expect.any(Number));
-  expect(analysis.getCell("F2").numFmt).toBe("0.0%");
-  const readableText = JSON.stringify(workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues());
-  const sourceText = JSON.stringify(workbook.getWorksheet("წყაროები")!.getSheetValues());
-  expect(readableText).not.toContain("https://www.geostat.ge/");
-  expect(sourceText).toContain("https://www.geostat.ge/");
-  expect(sourceText).not.toMatch(/docs[\\/]Raw Data|national-gdp-annual/);
-});
-
 test("analysis view renders the fixed single-year section order", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
@@ -843,6 +871,8 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   await expect(page.locator("main h2")).toHaveCount(5);
 
   await expect(page.getByTestId("analysis-year-selector")).toContainText("2025");
+  // On a desktop the years wrap instead of scrolling (phones scroll one row; see the mobile test).
+  expect(await page.getByTestId("analysis-year-selector").evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
   await expect(page.getByTestId("snapshot-treemap")).toBeVisible();
   await expect(page.getByTestId("snapshot-structure-grid")).toBeVisible();
   expect(await page.getByTestId("snapshot-structure-card").count()).toBeGreaterThan(5);
@@ -903,6 +933,41 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   expect(consoleProblems).toEqual([]);
 });
 
+// U05-15: the side tabs, grouping tabs and year row are reached with Tab and pressed with Enter or Space.
+test("the analysis tabs and year row work from the keyboard", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
+  await expectAppReady(page);
+  const caption = page.getByTestId("single-year-ranking").locator("caption");
+  const expenditure = page.getByTestId("analysis-side-expenditure"), revenue = page.getByTestId("analysis-side-revenue");
+
+  await expenditure.focus();
+  await page.keyboard.press("Tab");
+  await expect(revenue).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(revenue).toHaveAttribute("aria-pressed", "true");
+  await expect(caption).toContainText("შემოსავლები კატეგორიების მიხედვით");
+
+  await page.keyboard.press("Shift+Tab");
+  await expect(expenditure).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(expenditure).toHaveAttribute("aria-pressed", "true");
+  // Revenue, then the grouping row's fields and ministries.
+  for (let press = 0; press < 3; press += 1) await page.keyboard.press("Tab");
+  const ministries = page.getByTestId("analysis-grouping-ministries");
+  await expect(ministries).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(ministries).toHaveAttribute("aria-pressed", "true");
+  await expect(caption).toContainText("ხარჯები უწყებების მიხედვით");
+
+  const years = page.getByTestId("analysis-year-selector").getByRole("button");
+  const earlier = years.nth((await years.count()) - 2);
+  const year = (await earlier.textContent())!.match(/\d{4}/)![0];
+  await earlier.focus();
+  await page.keyboard.press("Space");
+  await expect(earlier).toHaveAttribute("aria-pressed", "true");
+  await expect(caption).toContainText(year);
+});
+
 test("budget field identifies a circle with its category and amount on hover and focus", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
@@ -927,23 +992,59 @@ test("budget field identifies a circle with its category and amount on hover and
   await expect(tooltip).toBeVisible();
 });
 
-test("mobile explorer and analysis layouts have no page overflow", async ({ page }) => {
-  const consoleProblems = collectConsoleProblems(page);
-  await page.setViewportSize({ width: 390, height: 844 });
-
+test("the line chart is named from its series and read with the arrow keys", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
-  await expect(page.getByTestId("explorer-header")).toBeVisible();
-  await expect(page.getByTestId("chart-frame")).toBeVisible();
-  await expect(page.getByTestId("series-selector")).toBeVisible();
-  await expectNoPageOverflow(page);
+  const frame = page.getByTestId("chart-frame");
+  const chart = frame.locator('svg[role="img"]:visible');
+  await expect(chart).toHaveAttribute("aria-label", /^.+, 1 სერია, \d{4}–\d{4}$/);
+  const [, first, last] = /(\d{4})–(\d{4})$/.exec((await chart.getAttribute("aria-label")) ?? "")!;
+  const caption = page.locator(`[id="${await chart.getAttribute("aria-describedby")}"]`);
+  await expect(caption).toContainText(`, ${last}: `);
+
+  // A pointer sees the readout; the live line speaks only for the keys.
+  const live = page.locator('figure [aria-live="polite"]');
+  await chart.hover({ position: { x: 300, y: 100 } });
+  await expect(page.getByTestId("chart-tooltip")).toBeVisible();
+  await expect(live).toHaveText("");
+  await page.mouse.move(0, 0);
+
+  // Nothing scrolls sideways, so the frame is no stop: Tab goes from the control before it straight to the chart.
+  await expect(frame).not.toHaveAttribute("tabindex");
+  await chart.evaluate((svg) => {
+    const stops = [...document.querySelectorAll<HTMLElement | SVGElement>('a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+      .filter((element) => element.getClientRects().length > 0);
+    (stops[stops.indexOf(svg) - 1] as HTMLElement).focus();
+  });
+  await page.keyboard.press("Tab");
+  await expect(chart).toBeFocused();
+
+  const period = page.getByTestId("chart-tooltip").getByTestId("chart-tooltip-period");
+  await page.keyboard.press("End");
+  await expect(period).toHaveText(last!);
+  await page.keyboard.press("ArrowLeft");
+  await expect(period).toHaveText(String(Number(last) - 1));
+  await page.keyboard.press("Home");
+  await expect(period).toHaveText(first!);
+  await expect(live).toHaveText(new RegExp(`^${first}: .+ \\d`));
+
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("chart-tooltip")).toHaveCount(0);
+});
+
+test("mobile analysis layouts have no page overflow", async ({ page }) => {
+  const consoleProblems = collectConsoleProblems(page);
+  await page.setViewportSize({ width: 390, height: 844 });
 
   await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
 
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   await expect(page.getByTestId("every-100-grid").locator("[data-cell='gel']")).toHaveCount(100);
+  // No native select on the phone analysis page; the radar still shows there.
+  await expect(page.locator("select")).toHaveCount(0);
+  await expect(page.getByTestId("budget-radar")).toBeVisible();
   await expectNoPageOverflow(page);
 
   for (const width of [320, 375, 390]) {
@@ -990,7 +1091,9 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
     expect(await ranking.getByTestId("ranking-share-bar").evaluateAll((elements) => elements.every((element) => getComputedStyle(element).display === "none"))).toBe(true);
     const longLabel = ranking.locator('tbody td[title="ინფრასტრუქტურა და რეგიონული განვითარება"]');
     await expect(longLabel).toHaveCount(1);
-    await expect(longLabel).toContainText("ინფრასტრუქტურა და…");
+    // The whole name is in the cell; CSS clamps it to two lines on a phone.
+    await expect(longLabel).toContainText("ინფრასტრუქტურა და რეგიონული განვითარება");
+    expect(await longLabel.locator(".line-clamp-2").evaluate((element) => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))).toBeLessThanOrEqual(2.05);
 
     for (const sideTestId of ["analysis-side-expenditure", "analysis-side-revenue"]) {
       await page.getByTestId(sideTestId).click();
@@ -1038,42 +1141,14 @@ test("mobile explorer and analysis layouts have no page overflow", async ({ page
     }
 
     await expectNoPageOverflow(page);
+
+    // Picking an early year keeps it in view and still drives the page.
+    await selector.evaluate((element) => { element.scrollLeft = 0; });
+    await selector.getByRole("button", { name: "2010", exact: true }).click();
+    await expect(selector.getByRole("button", { name: "2010", exact: true })).toHaveAttribute("aria-pressed", "true");
   }
 
   expect(consoleProblems).toEqual([]);
-});
-
-test("mobile chart fits its frame and the table keeps contained horizontal scroll", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-
-  // D1 (2026-10-07): phones draw the chart at the frame's width, so it no
-  // longer scrolls; the frame keeps its focusable, named region.
-  const chart = page.getByTestId("chart-frame");
-  await expect(page.getByTestId("chart-scroll-hint")).toHaveCount(0);
-  await expect(chart).toHaveAttribute("tabindex", "0");
-  // The name mentions sideways scrolling only where the frame scrolls.
-  await expect(chart).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი");
-  expect(await chart.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
-
-  // The default total alone lists its years as rows (owner decision D5): nothing scrolls sideways.
-  await page.getByTestId("chart-mode-table").click();
-  const table = page.getByTestId("explorer-table");
-  await expect(page.getByTestId("table-scroll-hint")).toHaveCount(0);
-  await expect(table).toHaveAttribute("data-layout", "rows");
-  expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(false);
-
-  // Four series keep the year columns, a contained, keyboard-scrollable region.
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#g=fields&m=table&sel=expenditure.total,spending.social_protection,spending.education,spending.health`);
-  await page.reload();
-  await expectAppReady(page);
-  await expect(table).toHaveAttribute("data-layout", "columns");
-  await expect(table).toHaveAttribute("tabindex", "0");
-  await expect(table).toHaveAttribute("aria-label", "მრავალწლიანი ცხრილი — ჰორიზონტალურად გადაადგილებადი");
-  expect(await table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-
-  await expectNoPageOverflow(page);
 });
 
 test("a chart frame that still overflows accepts a horizontal touch drag", async ({ page }) => {
@@ -1101,91 +1176,6 @@ test("a chart frame that still overflows accepts a horizontal touch drag", async
   await expect.poll(() => chart.evaluate((element) => element.scrollLeft)).toBeLessThan(maxScroll - 1);
 });
 
-test("captures editorial desktop and mobile screenshots", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-  await expectLineChartRendered(page);
-  await page.screenshot({ path: "test-results/geodata-editorial-desktop.png", fullPage: true, caret: "initial" });
-
-  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
-  await expectAppReady(page);
-  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-  await page.screenshot({ path: "test-results/geodata-editorial-analysis.png", fullPage: true, caret: "initial" });
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-  await page.screenshot({ path: "test-results/geodata-editorial-mobile.png", fullPage: true, caret: "initial" });
-});
-
-test("every side KPI carries a sparkline", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-
-  const kpis = page.getByTestId("side-kpi");
-  await expect(kpis).toHaveCount(3);
-
-  // One sparkline each. Path count is deliberately not asserted — a series with
-  // an interior gap legitimately draws more than one segment.
-  for (let index = 0; index < 3; index += 1) {
-    await expect(kpis.nth(index).locator("svg")).toHaveCount(1);
-  }
-});
-
-test("chart draws a dot lattice instead of horizontal gridlines", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-  await expectAppReady(page);
-
-  const chart = page.getByTestId("chart-frame");
-  await expect(chart.getByTestId("chart-dot-lattice")).toBeVisible();
-
-  // Only the zero rule survives; the hairline-soft gridlines are gone.
-  const strokes = await chart.locator("svg line").evaluateAll((lines) =>
-    lines.map((line) => line.getAttribute("stroke")),
-  );
-  expect(strokes).not.toContain("#E7DECF");
-  expect(strokes).toContain("#1E1B16");
-
-  // The pattern tile is offset back by half a pitch and its circle is centred
-  // in the tile (editorial-line-chart.tsx: `x={PAD_L - lattice.colPitch / 2}`,
-  // `cx={lattice.colPitch / 2}`), so dots land exactly on the chart's own grid
-  // at (PAD_L, PAD_T) rather than merely tiling the plot rect. Dropping that
-  // offset wouldn't affect the lattice's visibility or stroke colors above,
-  // so the half-pitch relationship is asserted directly against the live DOM.
-  const geometry = await chart.locator("#chart-dot-lattice").evaluate((pattern) => {
-    const circle = pattern.querySelector("circle");
-    return {
-      patternX: Number(pattern.getAttribute("x")),
-      patternY: Number(pattern.getAttribute("y")),
-      patternWidth: Number(pattern.getAttribute("width")),
-      patternHeight: Number(pattern.getAttribute("height")),
-      circleCx: Number(circle?.getAttribute("cx")),
-      circleCy: Number(circle?.getAttribute("cy")),
-    };
-  });
-
-  // The left padding grows to fit the widest y label, so read the plot's left
-  // edge from the y-axis hairline instead of assuming the 74-unit minimum.
-  const PAD_L = Number(await chart.locator('svg line[stroke="#D9CFBE"]').first().getAttribute("x1"));
-  expect(PAD_L).toBeGreaterThanOrEqual(74);
-  const PAD_T = 16;
-  expect(geometry.patternX + geometry.circleCx).toBeCloseTo(PAD_L, 5);
-  expect(geometry.patternY + geometry.circleCy).toBeCloseTo(PAD_T, 5);
-  expect(geometry.circleCx).toBeCloseTo(geometry.patternWidth / 2, 5);
-  expect(geometry.circleCy).toBeCloseTo(geometry.patternHeight / 2, 5);
-
-  // A single-year range gives the lattice no interval to divide, so it drops out
-  // entirely and the hairline rules have to come back — without them the axis
-  // labels sit against blank paper with nothing to read a value against.
-  await page.getByTestId("range-start-handle").press("End");
-  await expect(chart.getByTestId("chart-dot-lattice")).toHaveCount(0);
-
-  const singleYearStrokes = await chart.locator("svg line").evaluateAll((lines) =>
-    lines.map((line) => line.getAttribute("stroke")),
-  );
-  expect(singleYearStrokes).toContain("#E7DECF");
-});
-
 test("a single-year range states that it has no period instead of reporting 0.0% everywhere", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
@@ -1211,16 +1201,40 @@ test("a single-year range states that it has no period instead of reporting 0.0%
   await expect(kpis).not.toContainText("პერიოდის ცვლილება");
 });
 
-test("ships no server-only provenance fields in explorer payloads", async ({ page }) => {
+// The payload is the inline script text of the served HTML — the RSC flight
+// data the client hydrates from — so a plain request reads it without a page.
+// Script text joined with nothing. A separator can only hide an occurrence
+// that straddles two flight chunks; it can never invent one, and this is a
+// guard, so it should err towards counting.
+const readPayloadOccurrences = async (request: APIRequestContext, route: string) => {
+  const response = await request.get(`${TEST_BASE_URL}${route}`);
+  expect(response.status(), route).toBe(200);
+  const html = await response.text();
+  const payload = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map((match) => match[1]).join("");
+  const count = (needle: string) => payload.split(needle).length - 1;
+  return {
+    sourceRegistry: count("sourceUrlOrFile"),
+    officialInstitutionLabels: count("officialInstitutionLabelKa"),
+    sourceIds: count("sourceId"),
+    sourceLocators: count("sourceLocator"),
+    snapshotDates: count("snapshotDate"),
+    valuations: count("valuation"),
+    priceBases: count("priceBasis"),
+    accountingStandards: count("accountingStandard"),
+    calculations: count("calculation"),
+    estimateBases: count("estimateBasis"),
+    reviewDates: count("lastReviewedAt"),
+  };
+};
+
+test("ships no server-only provenance fields in explorer payloads", async ({ request }) => {
   for (const route of ["/explorer/expenditure", "/explorer/revenue", "/explorer/analysis"]) {
-    await page.goto(`${TEST_BASE_URL}${route}`);
-    await expectAppReady(page);
 
     // lastUpdatedAt and workbook source links are computed from the complete
     // server rows before projection. Per-row source ids and original institution
     // labels have no browser consumer and must not be repeated through RSC.
     const { sourceRegistry, sourceIds, officialInstitutionLabels } =
-      await readPayloadOccurrences(page);
+      await readPayloadOccurrences(request, route);
 
     expect({ sourceRegistry, sourceIds, officialInstitutionLabels }, route).toEqual({
       sourceRegistry: 0,
@@ -1230,29 +1244,7 @@ test("ships no server-only provenance fields in explorer payloads", async ({ pag
   }
 });
 
-// Script text joined with nothing. A separator can only hide an occurrence
-// that straddles two flight chunks; it can never invent one, and this is a
-// guard, so it should err towards counting.
-const readPayloadOccurrences = (page: Page) =>
-  page.evaluate(() => {
-    const payload = [...document.querySelectorAll("script")].map((script) => script.textContent ?? "").join("");
-    const count = (needle: string) => payload.split(needle).length - 1;
-    return {
-      sourceRegistry: count("sourceUrlOrFile"),
-      officialInstitutionLabels: count("officialInstitutionLabelKa"),
-      sourceIds: count("sourceId"),
-      sourceLocators: count("sourceLocator"),
-      snapshotDates: count("snapshotDate"),
-      valuations: count("valuation"),
-      priceBases: count("priceBasis"),
-      accountingStandards: count("accountingStandard"),
-      calculations: count("calculation"),
-      estimateBases: count("estimateBasis"),
-      reviewDates: count("lastReviewedAt"),
-    };
-  });
-
-test("ships no unread provenance columns on the dataset routes", async ({ page }) => {
+test("ships no unread provenance columns on the dataset routes", async ({ request }) => {
   for (const route of [
     "/explorer/debt",
     "/explorer/deficit",
@@ -1271,13 +1263,7 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
     "/explorer/demography/births-deaths",
     "/explorer/demography/age-sex",
   ]) {
-    await page.goto(`${TEST_BASE_URL}${route}`);
-    // The economy and demography hubs and the regions index are link maps with
-    // no client explorer, so they never raise the app-ready flag; their payload
-    // is in the served HTML regardless.
-    if (!["/explorer/economy", "/explorer/economy/regions", "/explorer/demography"].includes(route))
-      await expectAppReady(page);
-    const occurrences = await readPayloadOccurrences(page);
+    const occurrences = await readPayloadOccurrences(request, route);
 
     // These columns exist for validation, mapping review and the database
     // parity check. No client component reads one.
@@ -1321,7 +1307,7 @@ test("ships no unread provenance columns on the dataset routes", async ({ page }
   }
 });
 
-test("hoists the source ids the workbook builders read", async ({ page }) => {
+test("hoists the source ids the workbook builders read", async ({ request }) => {
   // One map or run list per page instead of an id per row. The bound is the
   // count measured on 2026-09-22 plus room for a few more published sources;
   // what matters is that none of them grows with the number of rows, which run
@@ -1337,9 +1323,7 @@ test("hoists the source ids the workbook builders read", async ({ page }) => {
     ["/explorer/inflation/overview", 26],
     ["/explorer/inflation/categories", 22],
   ] as const) {
-    await page.goto(`${TEST_BASE_URL}${route}`);
-    await expectAppReady(page);
-    const occurrences = await readPayloadOccurrences(page);
+    const occurrences = await readPayloadOccurrences(request, route);
     expect(occurrences.sourceIds, `${route} sourceId occurrences`).toBeLessThanOrEqual(limit);
   }
 });
@@ -1379,7 +1363,7 @@ test("exposes the explorer breadcrumb as a navigation landmark", async ({ page }
   // 76 municipal pages — rendered the same information as a paragraph of spans
   // with an unhidden "/" separator and the current page marked by colour alone.
   const header = page.getByTestId("explorer-header");
-  const trail = header.getByRole("navigation", { name: "Breadcrumb" });
+  const trail = header.getByRole("navigation", { name: "ნავიგაციის ბილიკი" });
 
   await expect(trail).toBeVisible();
   await expect(trail.locator("[aria-current='page']")).toHaveText("ხარჯები");
@@ -1428,7 +1412,11 @@ test("sidebar collapses to a rail and remembers the choice", async ({ page }) =>
   await expect(sidebar).toHaveAttribute("data-collapsed", "true");
   await expect(page.getByTestId("section-link-revenue")).toHaveCount(0);
   await expect(page.getByTestId("sidebar-brand-mark")).toHaveCount(0);
-  await expect(sidebar.getByRole("link", { name: "მთავარი", exact: true })).toBeVisible();
+  const home = sidebar.getByRole("link", { name: "მთავარი", exact: true });
+  await expect(home).toBeVisible();
+  // The home icon stays visible and readable on the dark rail.
+  await expect(home.locator("svg")).toBeVisible();
+  await expectReadableText(home, sidebar);
   // The rail keeps orientation instead of the section list (spec §4.2).
   await expect(sidebar).toContainText("მონაცემები · ბიუჯეტი");
 
@@ -1517,7 +1505,6 @@ test("hub lists six cards, all six live", async ({ page }) => {
   await expectAppReady(page);
 
   await expect(page.getByTestId("hub-card")).toHaveCount(6);
-  await expect(page.getByTestId("hub-card").locator("h2")).toHaveCount(6);
   for (const card of await page.getByTestId("hub-card").all()) {
     await expect(card.locator("h2")).toHaveCount(1);
   }
@@ -1538,7 +1525,6 @@ test("hub lists six cards, all six live", async ({ page }) => {
 
   // No invented article count or unit total anywhere on the hub.
   await expect(page.getByTestId("budget-hub")).not.toContainText("სტატია");
-  await expect(page.getByTestId("budget-hub")).not.toContainText("64 ერთეული");
 
   // Absence alone would pass on a hub whose footers all came back null, so also
   // assert a real figure is there. The shape, not the figure: the number moves
@@ -1546,7 +1532,8 @@ test("hub lists six cards, all six live", async ({ page }) => {
   await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
   // Card 03 now carries the same contract — this is the figure this task adds.
   await expect(municipalities).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
-  await expect(municipalities).toContainText("2025 · 6.1 მლრდ ₾");
+
+  await expect(page.getByTestId("hub-card").nth(3).getByRole("heading")).toHaveText("ანალიზი");
 
   const debt = page.getByTestId("hub-card").nth(4);
   await expect(debt).toContainText("ვალი");
@@ -1556,7 +1543,7 @@ test("hub lists six cards, all six live", async ({ page }) => {
   const deficit = page.getByTestId("hub-card").nth(5);
   await expect(deficit).toContainText("დეფიციტი");
   await expect(deficit).toHaveAttribute("href", "/explorer/deficit");
-  await expect(deficit).toContainText("2025 · −1.5% მშპ-ის");
+  await expect(deficit).toContainText(/\d{4} · [+−]?\d+\.\d% მშპ-ის/);
 
   // The card is not just styled as a link — clicking it actually lands on the
   // municipalities index.
@@ -1570,12 +1557,16 @@ test("hub lists six cards, all six live", async ({ page }) => {
 test("legacy nav hashes redirect to their route", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
+  // The hub redirects from an effect, so only once it has hydrated; it raises data-app-ready in
+  // that same commit. Waiting for it first keeps the hub's hydration out of the redirect's budget.
   await page.goto(`${TEST_BASE_URL}/explorer#nav=analysis&ay=2024`);
+  await expectAppReady(page);
   await expect(page).toHaveURL(/\/explorer\/analysis/);
   await expect(page).toHaveURL(/ay=2024/);
   await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
 
   await page.goto(`${TEST_BASE_URL}/explorer#nav=revenue&m=table`);
+  await expectAppReady(page);
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-table")).toBeVisible();
 

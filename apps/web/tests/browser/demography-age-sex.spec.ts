@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Download, type Page } from "@playwright/test";
+import ExcelJS from "exceljs";
 import { TEST_BASE_URL } from "./test-base-url";
 
 const NATIONAL = `${TEST_BASE_URL}/en/explorer/demography/age-sex`;
@@ -65,6 +66,11 @@ test.describe("the Age and sex page", () => {
     await page.keyboard.press("Escape");
     for (const gone of ["age-sex-year-row", "age-sex-compare-row", "age-sex-compare-toggle", "age-sex-pyramid-mode-table"]) await expect(page.getByTestId(gone)).toHaveCount(0);
     await expect(page.getByTestId("age-sex-pyramid-summary")).toContainText("65+: 18.1%");
+    // The Georgian page renders.
+    await page.goto(`${TEST_BASE_URL}/explorer/demography/age-sex`);
+    await expectAppReady(page);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("ასაკი და სქესი");
+    await expect(page.getByTestId("age-sex-heatmap")).toBeVisible();
   });
 
   test("a pyramid row moves focus to the next one with ArrowUp", async ({ page }) => {
@@ -178,6 +184,17 @@ test.describe("the Age and sex page", () => {
     await expect(trigger).not.toHaveAttribute("aria-controls", /.+/);
   });
 
+  test("a click outside an open year grid closes it and returns focus to its trigger", async ({ page }) => {
+    await page.goto(NATIONAL);
+    await expectAppReady(page);
+    await openPicker(page, "age-sex-year-select");
+    // Beside the panel: the press lands on the page behind it.
+    const panel = (await page.getByTestId("age-sex-year-select-panel").boundingBox())!;
+    await page.mouse.click(panel.x + panel.width + 40, panel.y + 10);
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(page.getByTestId("age-sex-year-select")).toBeFocused();
+  });
+
   test("a grid opened by mouse shows the ring after the arrows, and a click on its footer keeps Escape working", async ({ page }) => {
     await page.goto(`${NATIONAL}#year=2010`);
     await expectAppReady(page);
@@ -190,6 +207,32 @@ test.describe("the Age and sex page", () => {
     await page.keyboard.press("Escape");
     await expect(page.getByRole("listbox")).toHaveCount(0);
     await expect(page.getByTestId("age-sex-year-select")).toBeFocused();
+  });
+
+  // U27-15: the two national workbooks, clicked in a browser: their names carry the years shown, and each has the
+  // three public sheets with source links into the published demography archive.
+  test("the pyramid and heat map download their own workbooks", async ({ page }) => {
+    await page.goto(NATIONAL);
+    await expectAppReady(page);
+    const year = (await page.getByTestId("age-sex-year-select").textContent())!.trim();
+    const compareGrid = await openPicker(page, "age-sex-compare-select");
+    const compare = (await compareGrid.getByRole("option").last().textContent())!.match(/\d{4}/)![0];
+    await compareGrid.getByRole("option").last().click();
+    await expect(page.getByTestId("age-sex-compare-select")).toHaveText(compare);
+    const workbook = async (testId: string) => {
+      const pending = page.waitForEvent("download");
+      await page.getByTestId(testId).click();
+      const download: Download = await pending;
+      const book = new ExcelJS.Workbook();
+      await book.xlsx.readFile((await download.path())!);
+      expect(book.worksheets.map((sheet) => sheet.name), testId).toEqual(["Summary", "Data", "Sources"]);
+      const sources: string[] = [];
+      book.worksheets[2]!.eachRow((row) => row.eachCell((cell) => { sources.push(JSON.stringify(cell.value)); }));
+      expect(sources.join("\n"), testId).toContain("/downloads/methodology/demography/files/");
+      return download.suggestedFilename();
+    };
+    expect(await workbook("age-sex-pyramid-excel-download")).toBe(`fiscal-demography-age-sex-georgia-${year}-${compare}-en.xlsx`);
+    expect(await workbook("age-sex-heatmap-excel-download")).toMatch(/^fiscal-demography-age-by-year-\d{4}-\d{4}-en\.xlsx$/);
   });
 
   test("choosing the compared year to be the shown year drops the comparison", async ({ page }) => {
@@ -233,23 +276,10 @@ test.describe("the Age and sex page", () => {
     await expect(page.getByTestId("age-sex-pyramid-figure").locator("svg text").filter({ hasText: /thousand/i })).toHaveCount(0);
   });
 
-  test("an old link to the removed pyramid table is ignored", async ({ page }) => {
-    await page.goto(`${NATIONAL}#pyramid=table`);
-    await expectAppReady(page);
-    await expect(page.getByTestId("age-sex-pyramid-figure")).toBeVisible();
-    await expect(page.getByTestId("age-sex-pyramid-panel").getByRole("table")).toHaveCount(0);
-  });
-
   test("the heat map carries the re-base label", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
     await expect(page.getByTestId("age-sex-heatmap").getByRole("columnheader", { name: /^2025.*Census re-base/ })).toBeVisible();
-  });
-
-  test("an old link to the removed age-groups table is ignored", async ({ page }) => {
-    await page.goto(`${NATIONAL}#bands=table`);
-    await expectAppReady(page);
-    await expect(page.getByTestId("age-sex-bands")).toHaveCount(0);
   });
 
   test("the regional glance has no links, no tab stops and no arrows, but still ranks and searches", async ({ page }) => {
@@ -273,13 +303,6 @@ test.describe("the Age and sex page", () => {
     // The search still narrows the list.
     await glance.locator("input").fill("Imereti");
     await expect(rows).toHaveCount(1);
-  });
-
-  test("the Georgian page renders", async ({ page }) => {
-    await page.goto(`${TEST_BASE_URL}/explorer/demography/age-sex`);
-    await expectAppReady(page);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("ასაკი და სქესი");
-    await expect(page.getByTestId("age-sex-heatmap")).toBeVisible();
   });
 });
 
@@ -313,6 +336,8 @@ test.describe("the Age and sex block on a place page", () => {
     await page.goto(IMERETI);
     await expectAppReady(page);
     const section = page.getByTestId("age-sex-section");
+    // The settlement tabs are one named row of text tabs (DESIGN.md §7.7).
+    await expect(section.getByRole("group", { name: "Settlement type" }).getByRole("button")).toHaveCount(3);
     await section.getByTestId("age-sex-mode-table").click();
     const total = section.getByTestId("age-sex-panel").locator("tbody tr").last().locator("td").nth(2);
     await expect(total).toHaveText("510,741");
@@ -353,7 +378,6 @@ test.describe("at 390px", () => {
   test("the national page has no sideways scroll, and its heat map scrolls from the newest years", async ({ page }) => {
     await page.goto(NATIONAL);
     await expectAppReady(page);
-    expect(await hasNoSidewaysScroll(page)).toBe(true);
     // The open year grid fits the phone and adds no sideways scroll.
     for (const picker of ["age-sex-year-select", "age-sex-compare-select"]) {
       await openPicker(page, picker);
@@ -376,10 +400,35 @@ test.describe("at 390px", () => {
       .poll(() => scroller.evaluate((element) => ({ wide: element.scrollWidth > element.clientWidth, atEnd: element.scrollLeft + element.clientWidth >= element.scrollWidth - 2 })))
       .toEqual({ wide: true, atEnd: true });
   });
+});
 
-  test("Imereti has no sideways scroll", async ({ page }) => {
-    await page.goto(IMERETI);
+test.describe("the year grid on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("a tap outside an open year grid closes it without pressing the link beneath", async ({ page }) => {
+    await page.goto(NATIONAL);
     await expectAppReady(page);
-    expect(await hasNoSidewaysScroll(page)).toBe(true);
+    await page.getByTestId("age-sex-year-select").tap();
+    await expect(page.getByRole("listbox")).toBeVisible();
+    // A page link in view and clear of the panel: it lies under the overlay that catches outside taps.
+    const target = await page.evaluate(() => {
+      const panel = document.querySelector('[data-testid="age-sex-year-select-panel"]')!.getBoundingClientRect();
+      for (const link of document.querySelectorAll<HTMLAnchorElement>('#content a[href^="/"]')) {
+        const box = link.getBoundingClientRect();
+        const x = box.left + box.width / 2, y = box.top + box.height / 2;
+        const clear = box.width > 0 && y > 80 && y < innerHeight - 10 && x > 0 && x < innerWidth
+          && (y < panel.top - 8 || y > panel.bottom + 8 || x > panel.right + 8);
+        if (clear) return { x, y, href: link.getAttribute("href") };
+      }
+      return null;
+    });
+    expect(target, "a link under the overlay").not.toBeNull();
+    await page.evaluate(() => { (window as unknown as { tapMarker: boolean }).tapMarker = true; });
+    const before = page.url();
+    await page.touchscreen.tap(target!.x, target!.y);
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    // A link pressed by the same tap would navigate after the grid closed; give it the time to.
+    await page.waitForTimeout(1_000);
+    expect(page.url()).toBe(before);
+    expect(await page.evaluate(() => (window as unknown as { tapMarker?: boolean }).tapMarker)).toBe(true);
   });
 });

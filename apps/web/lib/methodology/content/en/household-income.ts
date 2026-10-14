@@ -128,6 +128,7 @@ export const HOUSEHOLD_INCOME_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "household-income",
   "title": "Household income and spending",
   "summary": "The average monthly income and spending of households in Georgia, per household and per person, for towns, villages and regions, from Geostat’s Households Incomes and Expenditures Survey.",
+  "metaDescription": "Average monthly household income and spending in Georgia, per household and per person, for towns, villages and regions, from Geostat’s household survey.",
   "reviewedAt": "2026-10-11",
   "archiveManifestId": "household-income",
   "coverageSource": {

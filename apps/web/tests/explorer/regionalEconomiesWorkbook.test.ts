@@ -58,7 +58,8 @@ test("nominal and share workbooks retain GEL numerators, percentage fractions, z
       sources,
       "https://fiscal.ge",
     );
-    expect(model.filename).toBe(`fiscal-regional-economy-imereti-${measure}-2023-2024-en.xlsx`);
+    // One English-word stem for both languages, never the measure id.
+    expect(model.filename).toBe(`fiscal-regional-economy-imereti-${measure === "nominal" ? "nominal" : "share-of-region-gdp"}-2023-2024-en.xlsx`);
     expect(model.analysis.headers[0]).toBe("Region");
     expect(model.analysis.rows[0]?.slice(0, 2)).toEqual(["Imereti", 2023]);
     expect(model.readable.rows[0].valuesByYear[2024]).toBe(measure === "nominal" ? 1 : 1);

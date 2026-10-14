@@ -19,7 +19,7 @@ const originals = [
   { sourceId: "geostat_trade_import-bec-2000-2026", filename: "Import-BEC-2000-2026.xlsx", bytes: 69500, hash: "de22fc331f67306855d32cbc31481d90b117d17ac8ae4b4b360a853643571ec4" },
 ];
 
-test("publishes four unchanged native originals and binds both flows to their workbook sources", async () => {
+test("registers four unchanged native originals and binds both flows to their workbook sources", async () => {
   const root = path.resolve(process.cwd(), "../..");
   const manifestBytes = await readFile(path.join(root, "data/methodology/source-archives/trade.csv"));
   expect(manifestBytes.subarray(0, 3)).toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
@@ -32,11 +32,9 @@ test("publishes four unchanged native originals and binds both flows to their wo
   for (const expected of originals) {
     const row = manifest.find(source => source.source_id === expected.sourceId)!;
     expect(row).toMatchObject({ official_filename: expected.filename, byte_size: expected.bytes, sha256: expected.hash, year: "2000-2025", downloadHref: `/downloads/methodology/trade/files/${expected.filename.toLowerCase()}` });
-    for (const relative of [row.repository_source_path, `apps/web/public${row.downloadHref}`]) {
-      const bytes = await readFile(path.join(root, relative));
-      expect(bytes.byteLength).toBe(expected.bytes);
-      expect(createHash("sha256").update(bytes).digest("hex")).toBe(expected.hash);
-    }
+    const bytes = await readFile(path.join(root, row.repository_source_path));
+    expect(bytes.byteLength).toBe(expected.bytes);
+    expect(createHash("sha256").update(bytes).digest("hex")).toBe(expected.hash);
     expect(documents.find(document => document.source_id === `source.${expected.sourceId.replaceAll("-", "_")}`)).toMatchObject({ source_url_or_file: row.repository_source_path });
     expect(catalogue.documents[expected.sourceId].attribution?.text).toBe("Geostat");
   }

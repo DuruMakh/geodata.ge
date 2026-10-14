@@ -1,6 +1,6 @@
 # Fiscal.ge
 
-> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, GDP, national economic sectors, regional economies, unemployment, wages, poverty and inequality, trade, external flows and population, and to Geostat's monthly consumer-price inflation.
+> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, GDP, national economic sectors, regional economies, money and banks, unemployment, wages, poverty and inequality, trade in goods and services, external flows, energy and food, and population, and to Geostat's monthly consumer-price inflation.
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
@@ -17,6 +17,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Government debt explorer](https://fiscal.ge/explorer/debt) — annual government debt stock, debt service and weighted-average interest rates.
 - [Deficit explorer](https://fiscal.ge/explorer/deficit) — the IMF general-government balance as a share of GDP and in GEL, with IMF projection years marked.
 
+- [Economy](https://fiscal.ge/explorer/economy) — the economy section: GDP, national economic sectors and regional economies.
 - [Economy overview](https://fiscal.ge/explorer/economy/gdp) — real GDP, annual real growth, nominal GDP and nominal GDP per person.
 - [Economic sectors](https://fiscal.ge/explorer/economy/sectors) — 20 national economic activities plus a Total GDP reference.
 - [Regional economies](https://fiscal.ge/explorer/economy/regions) — choose one of 11 regions and explore total regional GDP plus 20 activities, 2010–2024.
@@ -25,6 +26,11 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Inflation categories](https://fiscal.ge/explorer/inflation/categories) — the national CPI by its 12 COICOP divisions and 43 subgroups, the annual consumer-basket weights, and each group's contribution to annual inflation as derived by Fiscal.ge.
 - [Inflation by city](https://fiscal.ge/explorer/inflation/cities) — annual inflation in Tbilisi, Kutaisi, Batumi, Gori, Telavi and Zugdidi from 2016 compared with Georgia's national rate, plus one page per city with its 12 COICOP divisions. Some prices (fuel, medicines, cars, mobile tariffs, flights) are recorded once and applied to every city.
 - [Inflation by product](https://fiscal.ge/explorer/inflation/products) — reviewed current-basket products, published annual changes and Fiscal.ge-derived cumulative changes from monthly product indices. Discover current IDs, labels, coverage and identity limits in the catalogue; do not assume an old product name identifies today's product.
+- [Money and banks](https://fiscal.ge/explorer/money) — the money-and-banks section: the National Bank of Georgia's annual money supply, bank loans and deposits, interest rates and bank-health measures, 1995–2025. Browse-only: there is no MCP tool and no bulk file for money and banks.
+- [Money supply](https://fiscal.ge/explorer/money/supply) — broad money (M3), broad money in lari (M2), narrow money (M1) and cash outside banks (M0) in million GEL from 1995, and all four as a share of GDP from 1996.
+- [Loans and deposits](https://fiscal.ge/explorer/money/loans-deposits) — bank loans from 2002 and deposits from 1996, in total, in lari and in foreign currency; deposits of people from 2002 and of companies and organisations from 2015; and the share of loans and of deposits held in foreign currency.
+- [Interest rates](https://fiscal.ge/explorer/money/interest-rates) — the National Bank of Georgia's policy rate from 2008 and the average rates on loans and on deposits from 1996, in total, in lari and in foreign currency.
+- [Bank health](https://fiscal.ge/explorer/money/bank-health) — bad loans as a share of all loans from 2003, return on assets and on equity from 2001, and the two capital ratios from 2014.
 - [Unemployment](https://fiscal.ge/explorer/unemployment) — the unemployment section: Geostat's annual Labour Force Survey estimates for Georgia, 2010–2025. Browse-only: there is no MCP tool and no bulk file for unemployment.
 - [Unemployment overview](https://fiscal.ge/explorer/unemployment/overview) — unemployment, employment and participation rates and people counts for Georgia, with urban/rural, education and long-term tabs.
 - [Unemployment by region](https://fiscal.ge/explorer/unemployment/regions) — the latest unemployment rate of the 11 regions on a map and in a ranked list, with one page per region.
@@ -39,15 +45,22 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Household spending](https://fiscal.ge/explorer/living-standards/spending) — average monthly household spending in Georgia by category, with towns, villages and regions compared, and one page per region.
 - [Poverty](https://fiscal.ge/explorer/living-standards/poverty) — the share of people below the absolute poverty line (Georgia, towns, villages, age groups, women and men) and below 60% and 40% of median consumption, 2004–2025, and below the World Bank's international lines as republished by Geostat, 2004–2024.
 - [Inequality](https://fiscal.ge/explorer/living-standards/inequality) — six Gini coefficients of income and expenditure, 2006–2025.
-- [Trade](https://fiscal.ge/explorer/trade) — the trade section: Geostat's annual goods trade in nominal USD. Browse-only: there is no MCP tool and no bulk file for trade.
+- [Trade](https://fiscal.ge/explorer/trade) — the trade section: Geostat's annual trade in goods and in services, in nominal USD. Browse-only: there is no MCP tool and no bulk file for trade.
 - [Trade overview](https://fiscal.ge/explorer/trade/overview) — total trade, exports, imports and the trade balance, 1995–2025.
 - [Trading partners](https://fiscal.ge/explorer/trade/partners) — 212 countries and five published country groups (EU, CIS, BSEC, OECD, GUAM), 1995–2025, with end-year rankings; groups overlap and are never added up.
 - [Products](https://fiscal.ge/explorer/trade/products) — exports and imports of 1,192 HS4 products, 2020–2025.
 - [Domestic exports](https://fiscal.ge/explorer/trade/domestic-exports) — total exports, domestic exports and re-exports, 2014–2025, by country and for 99 products plus Other commodities.
+- [Services trade](https://fiscal.ge/explorer/trade/services) — services exports, imports, turnover and balance, in total and for 12 service types, 2020–2024.
+- [Trade composition](https://fiscal.ge/explorer/trade/composition) — goods exports and imports by ten SITC goods groups or seven published BEC economic categories, 2000–2025; the two views are alternative classifications of the same trade.
 - [External flows](https://fiscal.ge/explorer/external) — the external-flows section: money transfers, foreign direct investment and the current account, in nominal USD. Browse-only: there is no MCP tool and no bulk file for external flows.
 - [Money from abroad](https://fiscal.ge/explorer/external/money-from-abroad) — the National Bank of Georgia's money transfers received and sent, in total and by country, 2000–2025; partial years are marked.
 - [Foreign investment](https://fiscal.ge/explorer/external/foreign-investment) — Geostat's foreign direct investment inflow by country (1996–2025), sector (2016–2025) and region (2009–2025).
 - [Current account](https://fiscal.ge/explorer/external/current-account) — the National Bank of Georgia's BPM6 current account and its four parts, 2000–2025, in USD or as a share of GDP.
+- [Energy and food](https://fiscal.ge/explorer/energy-food) — the energy-and-food section: Geostat's annual energy balance, 2013–2024, and food self-sufficiency ratios, 2014–2025. Browse-only: there is no MCP tool and no bulk file for energy and food.
+- [Energy supply](https://fiscal.ge/explorer/energy-food/energy-supply) — domestic energy supply by fuel, production, imports and exports, in thousand tonnes of oil equivalent.
+- [Electricity](https://fiscal.ge/explorer/energy-food/electricity) — electricity production by plant type, imports, exports, final consumption by user and network losses, in GWh.
+- [Energy use](https://fiscal.ge/explorer/energy-food/energy-use) — final energy consumption by user and by fuel, in thousand tonnes of oil equivalent.
+- [Food self-sufficiency](https://fiscal.ge/explorer/energy-food/food-self-sufficiency) — the self-sufficiency ratio, in percent, of twelve foods: wheat, maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat, and poultry), milk and eggs.
 - [Demography](https://fiscal.ge/explorer/demography) — the demography section: Population, Age and sex, Migration, and Births, deaths and fertility.
 - [Population](https://fiscal.ge/explorer/demography/population) — population on 1 January for Georgia (2004–2026), its 11 regions and 64 municipalities (2015–2026) with a clickable map, and density for Georgia and the regions. Figures from 2025 are based on the 2024 census and are not comparable with earlier years, so no growth or change is computed. Browse-only for now: there is no MCP tool and no bulk file for demography.
 - [Migration](https://fiscal.ge/explorer/demography/migration) — immigrants and emigrants for Georgia, 2012–2025, by sex and six citizenship groups (Georgia, Russia, Turkey, Azerbaijan, Ukraine, and other countries, added up by Fiscal.ge), with net migration. Border-crossing records: citizenship is not country of birth or residence. Browse-only: there is no MCP tool and no bulk file for demography.
@@ -60,16 +73,20 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Expenditure methodology](https://fiscal.ge/methodology/expenditure) — national-expenditure sources and processing.
 - [Revenue methodology](https://fiscal.ge/methodology/revenue) — national-revenue sources and processing.
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
+- [Government debt methodology](https://fiscal.ge/methodology/debt) — debt stock, principal and interest payments, the portfolio's average interest rates and original sources.
 
 - [GDP methodology](https://fiscal.ge/methodology/gdp) — price bases, series coverage, preliminary status and original sources.
 - [Economic sectors methodology](https://fiscal.ge/methodology/economic-sectors) — sector GVA versus GDP, GDP shares, annual real growth and preliminary status.
 - [Regional economies methodology](https://fiscal.ge/methodology/regional-economies) — regional GVA at basic prices, regional GDP at market prices, calculations and original sources.
 - [Inflation methodology](https://fiscal.ge/methodology/inflation) — Geostat CPI definitions, validation, the NBG target and original files.
+- [Money and banks methodology](https://fiscal.ge/methodology/money) — National Bank of Georgia money, loan, deposit, interest-rate and bank-health definitions and original files.
 - [Unemployment methodology](https://fiscal.ge/methodology/unemployment) — Labour Force Survey definitions, age-band and regional changes, and original files.
 - [Wages methodology](https://fiscal.ge/methodology/wages) — average and median earnings, gross nominal lari, NACE Rev.2 sections and original files.
+- [Household income and spending methodology](https://fiscal.ge/methodology/household-income) — Geostat's household survey, per-household and per-person averages, income sources, spending categories and original files.
 - [Poverty methodology](https://fiscal.ge/methodology/poverty) — absolute, relative and international poverty lines, the Gini coefficients and original files.
 - [Trade methodology](https://fiscal.ge/methodology/trade) — FOB exports, CIF imports, partner and product identities, re-exports and original files.
 - [External flows methodology](https://fiscal.ge/methodology/external-flows) — money transfers, BPM6 balance of payments, Geostat FDI and original files.
+- [Energy and food methodology](https://fiscal.ge/methodology/energy-food) — Geostat's energy balance and food balance sheets, units and original files.
 - [Demography methodology](https://fiscal.ge/methodology/demography) — Geostat population and density, the 1 January 2025 census re-base, definitions and original files.
 
 ## Bulk data files
@@ -113,7 +130,7 @@ The endpoint is `https://fiscal.ge/mcp`, stateless unauthenticated MCP over Stre
 ## Site navigation
 
 - [English home](https://fiscal.ge/en) — scope and latest reviewed coverage.
-- [English budget explorer](https://fiscal.ge/en/explorer) — all current data families.
+- [English budget explorer](https://fiscal.ge/en/explorer) — the English budget hub: expenditure, revenue, municipalities, analysis, debt and deficit.
 - [English methodology](https://fiscal.ge/en/methodology/expenditure) — reviewed definitions and original source documents.
 
 - [Mission — Fiscal.ge](https://fiscal.ge/about) — the site's purpose and public-data boundaries.

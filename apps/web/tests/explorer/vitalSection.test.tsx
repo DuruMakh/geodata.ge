@@ -26,10 +26,11 @@ beforeAll(async () => {
 });
 
 describe("births and deaths section", () => {
-  it("Georgia: anchor, heading, lead, chart, key figures and the national link", async () => {
+  it("Georgia: anchor, heading, chart, key figures and the national link", async () => {
     const html = await render("country.georgia");
     expect(html).toContain('id="births-deaths"');
-    expect(html).toContain("Births and deaths registered in Georgia, 2014–2025.");
+    // U26-13: no lead line repeating the heading and the source note (DESIGN.md §29.2).
+    expect(html).not.toContain("Births and deaths registered in Georgia, 2014–2025.");
     expect(html).toContain('data-testid="vital-chart-panel"');
     expect(html).toContain("−6,452");
     expect(html).toContain("37,867");

@@ -27,7 +27,7 @@ export async function renderAboutPage(locale: Locale) {
     <div className="min-h-screen bg-[var(--paper)] px-5 pt-[22px] text-[var(--ink)] min-[768px]:px-7 min-[768px]:pt-[30px]">
       <div className="mx-auto max-w-[1240px]">
         <SiteHeader locale={locale} active="mission" testId="about-header" />
-        <main className="pt-10 min-[768px]:pt-16">
+        <main id="content" tabIndex={-1} className="pt-10 outline-none min-[768px]:pt-16">
           <section
             data-testid="mission-cover"
             aria-labelledby="mission-title"
@@ -47,7 +47,8 @@ export async function renderAboutPage(locale: Locale) {
             >
               {message(messages, "about.heading")}
             </h1>
-            <span className="self-end font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
+            {/* Decorative, like the overline opposite: English on both pages, so hidden from screen readers. */}
+            <span aria-hidden="true" className="self-end font-[family-name:var(--font-numeric)] text-[0.6875rem] min-[768px]:text-[10px] leading-[1.45] tracking-[0.08em] text-[var(--paper)] max-[767.99px]:mt-5">
               {model.updatedAt.slice(0, 4)}
               <br />
               MISSION NOTE

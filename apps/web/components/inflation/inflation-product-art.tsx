@@ -6,7 +6,7 @@ export function productArtPath(productId: string): string {
   return `/inflation-products/${match[1]}.webp`;
 }
 
-export function InflationProductArt({ productId, eager = false }: { productId: string; eager?: boolean }) {
+export function InflationProductArt({ productId }: { productId: string }) {
   return <Image
     src={productArtPath(productId)}
     alt=""
@@ -14,7 +14,7 @@ export function InflationProductArt({ productId, eager = false }: { productId: s
     width={32}
     height={32}
     className="h-8 w-8 shrink-0 object-contain"
-    loading={eager ? "eager" : "lazy"}
+    loading="lazy"
     unoptimized
   />;
 }

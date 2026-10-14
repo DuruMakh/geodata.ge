@@ -1,7 +1,9 @@
 import { writeGdpOverviewArtifacts } from "../lib/data/gdpOverview/prepareGdpOverview";
-writeGdpOverviewArtifacts(process.argv.includes("--write"))
-  .then((result) => console.log(JSON.stringify(result, null, 2)))
-  .catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
+import { runAsCli } from "../lib/runAsCli";
+
+export async function main(args: readonly string[]) {
+  const result = await writeGdpOverviewArtifacts(args.includes("--write"));
+  console.log(JSON.stringify(result, null, 2));
+}
+
+runAsCli(import.meta.url, main);

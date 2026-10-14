@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
-import { sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
+import { projectCpiFact, sourceIdBySeriesMeasure } from "../../lib/explorer/clientData";
 import { makePeriod, periodFromKey } from "../../lib/data/inflation/periods";
 import type { ServedCpiFact, ServedInflationTargetRow } from "../../lib/data/inflation/types";
 import {
-  DEFAULT_INFLATION_STATE, buildInflationLines, changeInflationTab, effectiveTableSeries, indexInflationFacts,
-  latestIndicators, panelValue, parseInflationHash, resolveInflationRange, serializeInflationHash, targetForPeriod, toggleSelection,
+  DEFAULT_INFLATION_STATE, buildInflationLines, changeInflationTab, drawableKeys, drawableSelection, effectiveTableSeries, indexInflationFacts,
+  latestIndicators, packCpiFacts, panelValue, parseInflationHash, unpackCpiFacts, resolveInflationRange, serializeInflationHash, targetForPeriod, toggleSelection,
   type InflationIndex, type InflationState,
 } from "../../lib/explorer/inflationOverview";
 import { formatInflationValue, periodLabel, seriesLabel } from "../../lib/explorer/inflationLabels";
@@ -52,6 +52,19 @@ describe("inflation overview state", () => {
     expect(panelValue(index, targets, "core", indexState, resolveInflationRange(indexState, index))).toBeNull();
   });
 
+  // U13-04: the panel read "Series 2 / 4" on monthly inflation with only the headline drawn.
+  it("the target row is not counted on the monthly tab", () => {
+    const monthly = { ...DEFAULT_INFLATION_STATE, tab: "mom" as const };
+    expect(drawableKeys(index, "mom")).toEqual(["cpi", "core", "core_ex_tobacco"]);
+    expect(drawableSelection(index, monthly)).toEqual(["cpi"]);
+    expect(drawableSelection(index, { ...monthly, selected: ["target"] })).toEqual([]);
+    expect(monthly.selected).toEqual(["cpi", "target"]);
+    expect(drawableSelection(index, DEFAULT_INFLATION_STATE)).toEqual(["cpi", "target"]);
+    expect(drawableKeys(index, "yoy")).toEqual(["cpi", "core", "core_ex_tobacco", "target"]);
+    // Core has no published index either, so the index tab counts the headline alone.
+    expect(drawableKeys(index, "index")).toEqual(["cpi"]);
+  });
+
   it("toggles selection, keeps the table series among selected series, and round-trips the hash", () => {
     const withCore = toggleSelection(DEFAULT_INFLATION_STATE, "core");
     expect(withCore.selected).toEqual(["cpi", "core", "target"]);
@@ -92,5 +105,17 @@ describe("inflation labels", () => {
     expect(formatInflationValue(0.4049, "mom")).toBe("+0.4%");
     expect(formatInflationValue(-0.31, "mom")).toBe("−0.3%");
     expect(formatInflationValue(196.1968, "index")).toBe("196.2");
+  });
+});
+
+// U13-05: the overview sent 1,960 verbose fact objects; it now uses the categories page's run-length form.
+describe("overview facts on the wire", () => {
+  it("round-trip the run-length packing unchanged and build the same index", () => {
+    const plain = facts.map(projectCpiFact);
+    const packed = packCpiFacts(plain);
+    const key = (fact: (typeof plain)[number]) => `${fact.seriesId}:${fact.measure}:${fact.period}`;
+    expect(unpackCpiFacts(packed).sort((a, b) => key(a).localeCompare(key(b)))).toEqual([...plain].sort((a, b) => key(a).localeCompare(key(b))));
+    expect(indexInflationFacts(unpackCpiFacts(packed), sourceIdBySeriesMeasure(facts))).toEqual(index);
+    expect(JSON.stringify(packed).length).toBeLessThan(JSON.stringify(plain).length / 5);
   });
 });

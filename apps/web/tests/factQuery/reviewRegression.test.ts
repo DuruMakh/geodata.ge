@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare } from "../../lib/factQuery/compare";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { getSources } from "../../lib/factQuery/getSources";
@@ -11,7 +11,7 @@ import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" });
 });
 
 describe("MCP review regressions", () => {

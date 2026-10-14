@@ -103,7 +103,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "title": "Domestic exports and re-exports",
       "paragraphs": [
         "The Domestic exports page compares total exports, domestic exports and calculated re-exports nationally for 2014–2025. Country comparisons show domestic exports and supported re-exports for the same years. All are goods exports in nominal USD on an FOB basis. Domestic exports include goods originating in Georgia and imported goods substantially processed here; they do not measure domestic value added.",
-        "Re-exports equal total exports minus domestic exports only where identities and years have a reviewed match. The historical Macedonia (FYR) entry has no reviewed total-export counterpart, so its re-export figures remain unavailable. Missing figures stay gaps, dashes and blank workbook cells; source decimal differences are preserved.",
+        "Re-exports equal total exports minus domestic exports only where identities and years have a reviewed match. The historical Macedonia (FYR) entry has no reviewed total-export counterpart, so its re-export figures remain unavailable. Missing figures stay gaps, dashes and blank workbook cells. The page and Excel show whole US dollars, so an amount under half a dollar shows as 0.",
         "The product view covers 2020–2025 and retains 99 source-published products plus Other commodities. Omitted products are not zero, the remainder is not allocated, and no product re-exports are inferred. Shares use the matching national domestic-export total. Excel includes the entire selected comparison and its applicable originals."
       ]
     },

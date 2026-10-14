@@ -20,8 +20,8 @@ test("services adapter preserves the national identity, twenty numeric points an
   expect(data.types.dataset).toBe("services");
   expect(data.types.entities).toHaveLength(12);
   expect(data.types.entities.every(e => e.kind === "service_type")).toBe(true);
-  expect(data.national.filter(f => f.role === "derived").every(f => f.sourceId === null)).toBe(true);
-  expect(data.national.filter(f => f.role === "total").every(f => f.sourceId?.startsWith("geostat_services_"))).toBe(true);
+  // Source and review metadata stay on the server (platform review U21-15); the raw facts below keep it.
+  expect(data.national.every(f => Object.keys(f).sort().join() === "indicatorId,valueUsd,year")).toBe(true);
   expect(raw.facts.filter(f => f.indicatorId === "trade.turnover" || f.indicatorId === "trade.balance").every(f => f.sourceId === null)).toBe(true);
   expect(raw.facts.filter(f => f.indicatorId === "trade.exports" || f.indicatorId === "trade.imports").every(f => f.sourceId?.startsWith("geostat_services_"))).toBe(true);
   expect(tradePartnersTotalId(data.types)).toBe("services.total");

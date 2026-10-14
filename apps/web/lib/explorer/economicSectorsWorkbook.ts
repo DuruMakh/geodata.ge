@@ -1,5 +1,6 @@
 import type {
   SectorDefinition,
+  SectorMeasure,
 } from "../data/economicSectors/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
@@ -20,6 +21,9 @@ import {
   workbookFilename,
 } from "./workbookModel";
 import type { ClientSectorObservation } from "../servedRows";
+
+// File names share one English stem in both languages, in words rather than ids.
+const MEASURE_FILE_WORDS: Record<SectorMeasure, string> = { nominal: "nominal", share_of_gdp: "share-of-gdp", real_growth: "real-growth" };
 
 export function buildEconomicSectorsWorkbookExportModel(
   facts: ClientSectorObservation[],
@@ -77,7 +81,7 @@ export function buildEconomicSectorsWorkbookExportModel(
   ].sort((a, b) => a - b);
   return {
     locale,
-    filename: workbookFilename(`economic-sectors-${state.measure}-${model.range.start}-${model.range.end}`, locale),
+    filename: workbookFilename(`economic-sectors-${MEASURE_FILE_WORDS[state.measure]}-${model.range.start}-${model.range.end}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
       title: message(messages, "sectors.workbookTitle", { measure: label }),

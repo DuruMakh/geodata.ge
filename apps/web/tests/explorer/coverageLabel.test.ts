@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coverageLabel } from "../../lib/explorer/coverageLabel";
+import { coverageLabel, updatedDate } from "../../lib/explorer/coverageLabel";
 import { getMessages } from "../../lib/i18n/messages.server";
 
 describe("coverageLabel", () => {
@@ -17,5 +17,14 @@ describe("coverageLabel", () => {
     expect(coverageLabel(ka, "ka", 2010, 2025)).toBe("2010–2025");
     expect(coverageLabel(ka, "ka", undefined, undefined, "2026-10-04")).toBe("განახლდა 2026-10-04");
     expect(coverageLabel(ka, "ka", 2025, 2025, "2026-10-04")).toBe("2025 · განახლდა 2026-10-04");
+  });
+});
+
+// X1-11: every "updated" date on a page goes through this one rule (DESIGN.md §6.2).
+describe("updatedDate", () => {
+  it("keeps the ISO date in Georgian and writes it out in English", () => {
+    expect(updatedDate("2026-10-04", "ka")).toBe("2026-10-04");
+    expect(updatedDate("2026-10-04", "en")).toBe("4 October 2026");
+    expect(updatedDate("2025-01-31", "en")).toBe("31 January 2025");
   });
 });

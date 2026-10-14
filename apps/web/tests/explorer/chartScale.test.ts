@@ -34,6 +34,12 @@ describe("chart scale helpers", () => {
     expect(top).toBe(50 * quantum);
   });
 
+  // U04-04 / U04-15: revenue "Other taxes" is −0.25 bn in 2019–2020 under a 32.4 bn total. One small dip
+  // below zero must not double the step and leave a −10 bn floor (a fifth of the plot) under the zero line.
+  it("keeps a small negative dip to one step below zero", () => {
+    expect(niceScale(-0.25, 32.4, 0.1)).toEqual({ bottom: -5, top: 35, step: 5 });
+  });
+
   it("falls back to the finest printable step when the quantum allows no four intervals", () => {
     expect(niceScale(0, 900_000, 1_000_000)).toEqual({ bottom: 0, top: 1_000_000, step: 1_000_000 });
   });

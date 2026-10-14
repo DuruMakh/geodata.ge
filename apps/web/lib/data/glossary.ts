@@ -18,6 +18,13 @@ export type GlossaryEntry = {
   notes: string;
 };
 
+// What a page may hand the browser: description and notes are internal review text.
+export type PublicGlossaryEntry = Pick<GlossaryEntry, "id" | "kaLabel" | "enLabel">;
+
+export function publicGlossaryEntry(entry: GlossaryEntry): PublicGlossaryEntry {
+  return { id: entry.id, kaLabel: entry.kaLabel, enLabel: entry.enLabel };
+}
+
 export async function loadGlossary(relativePath: string): Promise<Map<string, GlossaryEntry>> {
   const records = await readCsvRecords(relativePath);
   const glossary = new Map<string, GlossaryEntry>();

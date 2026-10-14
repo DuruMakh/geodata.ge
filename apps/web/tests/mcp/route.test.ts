@@ -120,6 +120,8 @@ describe("/mcp route", () => {
     const response = await POST(post("{not json", { "mcp-protocol-version": PROTOCOL }));
 
     expect(response.status).toBeGreaterThanOrEqual(400);
+    // The protocol parse-error code (moved from reviewRegression.test.ts).
+    expect((await response.json()).error.code).toBe(-32700);
   });
 
   // Spec 11.1: no long-lived background subscriptions. Passed straight to the
@@ -135,7 +137,11 @@ describe("/mcp route", () => {
     expect(response.headers.get("allow")).toBe("POST");
     expect(response.headers.get("content-type")).toContain("application/json");
     // Not a stream: the body is finite and readable in one go.
-    expect(await response.text()).toContain("POST only");
+    const text = await response.text();
+    expect(text).toContain("POST only");
+    // Someone who opens the address in a browser to test it is shown where to start (U30-13).
+    expect(text).toContain("https://fiscal.ge/connect");
+    expect(response.headers.get("link")).toBe('<https://fiscal.ge/connect>; rel="help"');
   });
 
   it("refuses a session DELETE, having no sessions", () => {
@@ -175,8 +181,9 @@ describe("/mcp guards", () => {
 
   it("answers 503 while paused, and says where the data still is", async () => {
     process.env.MCP_ENABLED = "false";
+    process.env.MCP_ALLOWED_ORIGINS = "https://studio.example";
     try {
-      const response = await POST(post(initialize));
+      const response = await POST(post(initialize, { origin: "https://studio.example" }));
       const body = await response.text();
 
       expect(response.status).toBe(503);
@@ -185,8 +192,12 @@ describe("/mcp guards", () => {
       // published files are untouched, and the message says so in both languages.
       expect(body).toContain("/downloads/data/");
       expect(body).toMatch(/[Ⴀ-ჿ]/);
+      // It points at a real published file, readable to an approved browser (moved from reviewRegression.test.ts).
+      expect(body).toContain("/downloads/data/manifest.json");
+      expect(response.headers.get("access-control-allow-origin")).toBe("https://studio.example");
     } finally {
       process.env.MCP_ENABLED = "true";
+      delete process.env.MCP_ALLOWED_ORIGINS;
     }
   });
 
@@ -208,21 +219,35 @@ describe("/mcp guards", () => {
     }
   });
 
-  it("denies once a client's rolling-minute allowance is spent", async () => {
+  it("one key is refused after its daily cap while another key still passes", async () => {
     process.env.MCP_RATE_LIMITER = "memory";
     vi.resetModules();
+    // Only the clock is faked: each request lands just over a second after the
+    // last, so the 60-a-minute limit never fires and only the daily cap can.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-12T06:00:00Z"));
     try {
       const { POST: freshPost } = await import("../../app/mcp/route");
-      // A trusted platform header, so the request is keyed and the per-key
-      // limit applies. A client-supplied X-Forwarded-For would not count.
-      const keyed = () => post(initialize, { "x-vercel-forwarded-for": "203.0.113.7" });
+      const from = (address: string, body: unknown = initialize) => post(body, { "x-vercel-forwarded-for": address });
 
-      let last = await freshPost(keyed());
-      for (let i = 0; i < 61 && last.status !== 429; i += 1) last = await freshPost(keyed());
+      // Every request counts, including one the protocol layer then rejects.
+      // An empty message is that, and costs about a millisecond against the
+      // sixty a full initialize exchange takes, so the thousand stay quick.
+      for (let i = 0; i < 1_000; i += 1) {
+        const counted = await freshPost(from("203.0.113.7", {}));
+        expect(counted.status, `request ${i + 1}`).toBe(400);
+        vi.advanceTimersByTime(1_001);
+      }
 
-      expect(last.status).toBe(429);
-      expect(last.headers.get("retry-after")).toBe("60");
+      const refused = await freshPost(from("203.0.113.7"));
+      expect(refused.status).toBe(429);
+      // Retry at the next UTC midnight, not in a minute.
+      expect(Number(refused.headers.get("retry-after"))).toBeGreaterThan(60);
+      expect(Number(refused.headers.get("retry-after"))).toBeLessThanOrEqual(18 * 60 * 60);
+
+      expect((await freshPost(from("198.51.100.4"))).status).toBe(200);
     } finally {
+      vi.useRealTimers();
       vi.resetModules();
     }
   });
@@ -262,6 +287,20 @@ describe("what the log is allowed to say", () => {
 
     expect(JSON.parse(logs.at(-1)!).tool).toBe("unknown_method");
     expect(logs.join("")).not.toContain("nonsense/method");
+  });
+
+  // The SDK rejects a schema-shape mistake in English with no error code line,
+  // so the log called the commonest client mistake a protocol fault (U30-06).
+  it("logs a malformed argument as invalid parameters, not a protocol error", async () => {
+    const logs = captureLogs();
+    await POST(
+      post(
+        { jsonrpc: "2.0", id: 23, method: "tools/call", params: { name: "get_sources", arguments: { bogus: 1 } } },
+        { "mcp-protocol-version": PROTOCOL },
+      ),
+    );
+
+    expect(JSON.parse(logs.at(-1)!)).toMatchObject({ tool: "get_sources", outcome: "error", errorCode: "invalid_parameters" });
   });
 
   it("records a genuine tool call under its own name", async () => {

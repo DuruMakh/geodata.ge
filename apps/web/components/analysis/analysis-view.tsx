@@ -3,11 +3,11 @@
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { Message } from "../../lib/i18n/message";
-import { formatDisplayDate } from "../../lib/explorer/format";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
 import type { ExpenditureGrouping } from "../../lib/explorer/types";
 import { NEGATIVE } from "../../lib/explorer/colors";
-import { Callout, Overline, SourceNote, TabDivider, TextTab } from "../ui/editorial";
+import { Callout, Overline, SourceNote, TabDivider, TextTab, TextTabGroup } from "../ui/editorial";
 import { YearButtonRow } from "../ui/year-button-row";
 import { BudgetField } from "./budget-field";
 import { Every100Gel } from "./every-100";
@@ -53,16 +53,16 @@ export function AnalysisView({
       <section className="border-t border-[var(--ink)] pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div data-testid="analysis-tab-groups" className="flex min-w-0 flex-wrap items-center gap-x-[18px] gap-y-3">
-            <span className="flex items-center gap-[18px]">
+            <TextTabGroup ariaLabel={message(messages, "analysis.sideLabel")} className="flex items-center gap-[18px]">
               <TextTab label={message(messages, "analysis.expenditure")} active={side === "expenditure"} onClick={() => onSideChange("expenditure")} testId="analysis-side-expenditure" />
               <TextTab label={message(messages, "analysis.revenue")} active={side === "revenue"} onClick={() => onSideChange("revenue")} testId="analysis-side-revenue" />
-            </span>
+            </TextTabGroup>
             {side === "expenditure" ? (
-              <span className="flex items-center gap-[18px]">
+              <TextTabGroup ariaLabel={message(messages, "controls.grouping")} className="flex items-center gap-[18px]">
                 <span className="hidden min-[480px]:inline"><TabDivider /></span>
                 <TextTab label={message(messages, "analysis.fields")} active={grouping === "fields"} onClick={() => onGroupingChange("fields")} testId="analysis-grouping-fields" />
                 <TextTab label={message(messages, "analysis.ministries")} active={grouping === "ministries"} onClick={() => onGroupingChange("ministries")} testId="analysis-grouping-ministries" />
-              </span>
+              </TextTabGroup>
             ) : null}
           </div>
           <span className="font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
@@ -124,7 +124,7 @@ export function AnalysisView({
                 : null}
               {lastUpdatedAt ? (
                 <>
-                  <Message messages={messages} id="analysis.updated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{locale === "en" ? formatDisplayDate(lastUpdatedAt, locale) : lastUpdatedAt}</span> }} />
+                  <Message messages={messages} id="analysis.updated" values={{ date: <span className="font-[family-name:var(--font-numeric)]">{updatedDate(lastUpdatedAt, locale)}</span> }} />
                 </>
               ) : null}
             </SourceNote>

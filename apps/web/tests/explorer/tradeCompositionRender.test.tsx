@@ -35,7 +35,7 @@ test.each(["en", "ka"] as const)("%s shared composition workspace retains defaul
 test.each(["en", "ka"] as const)("%s wrapper places flow above the workspace and classification below search", async locale => {
   const { TradeComposition } = await import("../../components/trade/trade-composition");
   const sitc = compositionFixture("sitc"), bec = compositionFixture("bec"), p = await compositionPresentation(locale, sitc);
-  const html = renderToStaticMarkup(<I18nProvider {...p}><TradeComposition data={{ sitc, bec, englishLabels: p.englishLabels }} sources={[]} lastReviewedAt="2026-10-14" siteOrigin="https://fiscal.ge" /></I18nProvider>);
+  const html = renderToStaticMarkup(<I18nProvider {...p}><TradeComposition data={{ sitc, bec }} sources={[]} lastReviewedAt="2026-10-14" siteOrigin="https://fiscal.ge" /></I18nProvider>);
   expect(html.match(/data-testid="trade-composition-tabs"/g)).toHaveLength(1);
   for (const flow of ["trade.exports", "trade.imports"]) {
     expect(html.match(new RegExp(`data-testid="trade-partners-measure-${flow}"`, "g"))).toHaveLength(1);

@@ -13,7 +13,7 @@ let ka: Presentation, en: Presentation;
 beforeAll(async () => {
   [debt, deficit, gdp] = await Promise.all([loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(), loadServedExplorerData()]);
   const ids = [...new Set(debt.facts.map(fact => fact.seriesId)), DEFICIT_SERIES_ID];
-  [ka, en] = await Promise.all([getPresentation("ka", ["debt", "deficit"], ids), getPresentation("en", ["debt", "deficit"], ids)]);
+  [ka, en] = await Promise.all([getPresentation("ka", ["debt", "deficit"], ids, ids), getPresentation("en", ["debt", "deficit"], ids)]);
 });
 
 function withoutEnglishLabels(value: unknown): unknown {

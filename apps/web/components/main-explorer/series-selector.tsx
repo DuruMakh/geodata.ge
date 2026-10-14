@@ -2,7 +2,7 @@
 
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
-import type { FocusEvent, ReactNode } from "react";
+import { useId, useRef, type FocusEvent, type ReactNode } from "react";
 import { SwatchBar } from "../ui/editorial";
 import { withLari } from "../ui/lari";
 
@@ -11,7 +11,7 @@ import { withLari } from "../ui/lari";
  * viewport, so its results land above the on-screen keyboard instead of under it.
  * Wide layouts keep their position: the series aside is sticky there.
  */
-export function revealSearchField(event: FocusEvent<HTMLInputElement>) {
+function revealSearchField(event: FocusEvent<HTMLInputElement>) {
   if (!window.matchMedia("(max-width: 1099.98px)").matches) return;
   event.currentTarget.scrollIntoView({ block: "start" });
 }
@@ -19,19 +19,24 @@ export function revealSearchField(event: FocusEvent<HTMLInputElement>) {
 /** A series list with this many rows or fewer drops its search field: it is read at a glance. */
 export const SEARCHABLE_MIN_ROWS = 10;
 
+/** A series list with more rows than this scrolls inside its panel at every width (`listLayout="scroll"`). */
+export const LONG_LIST_ROWS = 30;
+
 /** Mobile keyboard hints shared by the site's search fields. */
 export const SEARCH_FIELD_PROPS = { type: "search", enterKeyHint: "search", onFocus: revealSearchField } as const;
 
 type SeriesSelectorProps = {
   controls?: ReactNode;
   controlsAfterSearch?: boolean;
-  query: string;
-  onQueryChange: (query: string) => void;
-  searchPlaceholder: string;
+  /** The search props; a list that is never searchable (`searchable={false}`) can leave them out. */
+  query?: string;
+  onQueryChange?: (query: string) => void;
+  searchPlaceholder?: string;
   /** False hides the search field: a list of ten rows or fewer is read at a glance. */
   searchable?: boolean;
   searchFocus?: "page" | "local";
-  listLayout?: "aside" | "flow";
+  /** "scroll" caps a long list in its own scroller at every width and adds a "skip the list" button before it. */
+  listLayout?: "aside" | "flow" | "scroll";
   countLabel?: string;
   selectedCount: number;
   totalCount: number;
@@ -40,16 +45,19 @@ type SeriesSelectorProps = {
   allSelected: boolean;
   onToggleAll: () => void;
   allowSelectAll?: boolean;
-  hasVisibleMatches: boolean;
+  /** False shows the no-matches line; it defaults to true, as a list without search always has its rows. */
+  hasVisibleMatches?: boolean;
   /** Optional visible names for the row values, shown above the list. */
   listHeader?: ReactNode;
+  /** False leaves out the bulk toggle and the count: a one-row list, where both would only repeat the row's own tick. */
+  bulkActions?: boolean;
   children: ReactNode;
 };
 
 export function SeriesSelector({
   controls,
   controlsAfterSearch = false,
-  query,
+  query = "",
   onQueryChange,
   searchPlaceholder,
   searchable = true,
@@ -63,11 +71,13 @@ export function SeriesSelector({
   allSelected,
   onToggleAll,
   allowSelectAll = true,
-  hasVisibleMatches,
+  hasVisibleMatches = true,
   listHeader,
+  bulkActions = true,
   children,
 }: SeriesSelectorProps) {
   const { messages } = useI18n();
+  const listEnd = useRef<HTMLSpanElement>(null);
   const bulkState: "false" | "mixed" | "true" =
     hasSelection && allSelected ? "true" : hasSelection ? "mixed" : "false";
   const bulkMark = bulkState === "true" ? "✓" : bulkState === "mixed" ? "—" : "";
@@ -84,7 +94,7 @@ export function SeriesSelector({
           {...SEARCH_FIELD_PROPS}
           onFocus={searchFocus === "page" ? revealSearchField : undefined}
           value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
+          onChange={(event) => onQueryChange?.(event.target.value)}
           placeholder={searchPlaceholder}
           aria-label={message(messages, "controls.searchSeries")}
           className={`${controls && !controlsAfterSearch ? "mt-3.5" : ""} h-[34px] w-full scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[0.8125rem] text-[var(--ink)] outline-none placeholder:text-[var(--muted)]`}
@@ -93,7 +103,7 @@ export function SeriesSelector({
 
       {controlsAfterSearch ? selectorControls : null}
 
-      <div
+      {bulkActions ? <div
         data-testid="series-actions"
         data-selector-section="actions"
         // The bulk toggle is the full 44px height of this row (D8 touch target); the
@@ -103,9 +113,10 @@ export function SeriesSelector({
         {hasSelection || allowSelectAll ? (
           <button
             type="button"
-            role="checkbox"
             data-testid="series-toggle-all"
-            aria-checked={bulkState}
+            // A plain action button named by its visible word (WCAG 2.5.3): a checkbox called
+            // "Clear" that reports a mixed state confuses a screen reader. The square is decoration.
+            data-state={bulkState}
             onClick={onToggleAll}
             className="grid min-h-11 shrink-0 cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2 pr-1 pl-0.5 text-left"
           >
@@ -148,7 +159,7 @@ export function SeriesSelector({
             </>
           ) : null}
         </span>
-      </div>
+      </div> : null}
 
       {!hasVisibleMatches ? (
         <p className="border-b border-[var(--row-border)] px-1 py-3 text-xs text-[var(--muted)]">
@@ -158,17 +169,33 @@ export function SeriesSelector({
 
       {listHeader}
 
+      {listLayout === "scroll" ? (
+        // A button, not an in-page link: these pages keep their state in the URL hash.
+        <button
+          type="button"
+          data-testid="series-skip-list"
+          onClick={() => listEnd.current?.focus()}
+          className="sr-only cursor-pointer text-[12px] font-semibold text-[var(--accent)] underline underline-offset-4 focus:not-sr-only focus:mb-1 focus:inline-flex focus:min-h-11 focus:items-center"
+        >
+          {message(messages, "controls.skipList")}
+        </button>
+      ) : null}
+
       <div
         data-testid="series-list"
         data-selector-section="list"
         // The 430px inner scroll belongs to the sticky two-column aside; stacked under the
         // chart (owner decision D4, 2026-10-07) the list flows with the page, so a finger
-        // swipe never gets caught inside it.
+        // swipe never gets caught inside it. A list over LONG_LIST_ROWS rows ("scroll")
+        // keeps its own scroller at every width, or it would push the rest of the page
+        // thousands of pixels down (DESIGN §7.7).
         // overflow-y clip keeps the last caret's downward hit extension inside the list.
-        className={listLayout === "aside" ? "flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto" : "flex flex-col overflow-y-clip"}
+        className={listLayout === "scroll" ? "flex max-h-[min(430px,60svh)] flex-col overflow-y-auto" : listLayout === "aside" ? "flex flex-col overflow-y-clip @min-[1100px]:max-h-[430px] @min-[1100px]:overflow-y-auto" : "flex flex-col overflow-y-clip"}
       >
         {children}
       </div>
+      {/* Where "skip the list" lands: named, so a screen reader says where focus went. */}
+      {listLayout === "scroll" ? <span ref={listEnd} tabIndex={-1} className="sr-only">{message(messages, "controls.listEnd")}</span> : null}
     </div>
   );
 }
@@ -198,8 +225,12 @@ type SeriesSelectorRowProps = {
   childLabelSize?: "compact" | "standard";
   wrapLabel?: boolean;
   swatch?: "solid" | "dashed";
+  /** Keeps the row listed but inert and unticked (`aria-disabled`, no toggle); the reason is its tooltip. */
+  disabledReason?: string;
   onToggle: () => void;
   onToggleExpanded?: () => void;
+  /** A parent's shown child rows: they follow it inside a group named after it, which its caret controls. */
+  children?: ReactNode;
 };
 
 export function SeriesSelectorRow({
@@ -224,17 +255,22 @@ export function SeriesSelectorRow({
   childLabelSize = "compact",
   wrapLabel = false,
   swatch = "solid",
+  disabledReason,
   onToggle,
   onToggleExpanded,
+  children,
 }: SeriesSelectorRowProps) {
   const { messages } = useI18n();
-  return (
+  const groupId = useId();
+  const disabled = disabledReason !== undefined;
+  const ticked = selected && !disabled;
+  const row = (
     <div
       data-testid="series-row"
       data-series-id={id}
       data-level={level}
       data-parent-id={parentId ?? undefined}
-      className={`relative flex items-stretch border-b border-[var(--row-border)] transition-colors duration-100 hover:bg-[var(--tint)] ${selected ? "bg-[var(--tint)]" : "bg-transparent"}`}
+      className={`relative flex items-stretch border-b border-[var(--row-border)] transition-colors duration-100 ${disabled ? "" : "hover:bg-[var(--tint)]"} ${ticked ? "bg-[var(--tint)]" : "bg-transparent"}`}
     >
       <span
         aria-hidden
@@ -249,14 +285,14 @@ export function SeriesSelectorRow({
             if (!expansionLocked) onToggleExpanded?.();
           }}
           aria-expanded={hasChildren ? expanded : undefined}
-          aria-label={expansionLabel ?? message(messages, "controls.subprogrammes")}
+          aria-controls={children ? groupId : undefined}
+          aria-label={expansionLabel ?? message(messages, "controls.subitemsFor", { label })}
           aria-disabled={expansionLocked || undefined}
-          // The caret keeps its 22px column; a transparent extension over the row button's
-          // empty left padding makes the hit area 26px wide (WCAG 2.5.8 asks for 24px), and
-          // 12px below the row it reaches 44px tall (D8). The extension only runs downward:
+          // The caret's own box is 24px wide (WCAG 2.5.8, which axe measures on the element), and
+          // a transparent extension 12px below the row makes it 44px tall (D8). The extension only runs downward:
           // a following row's own caret paints over it, so it never steals that row's taps,
           // and it only lands in the empty caret gutter of a row without children.
-          className={`relative z-[1] flex w-[22px] flex-none items-center justify-center text-base leading-none before:absolute before:top-0 before:-bottom-3 before:left-0 before:-right-1 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
+          className={`relative z-[1] flex w-6 flex-none items-center justify-center text-base leading-none before:absolute before:top-0 before:-bottom-3 before:inset-x-0 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
           style={{ visibility: hasChildren ? "visible" : "hidden" }}
           tabIndex={hasChildren && !expansionLocked ? 0 : -1}
         >
@@ -267,19 +303,20 @@ export function SeriesSelectorRow({
       <button
         type="button"
         data-testid="series-row-toggle"
-        onClick={onToggle}
+        onClick={disabled ? undefined : onToggle}
         role={selectionRole === "checkbox" ? "checkbox" : undefined}
-        aria-checked={selectionRole === "checkbox" ? selected : undefined}
-        aria-pressed={selectionRole === "button" ? selected : undefined}
-        title={label}
-        className={`flex min-w-0 flex-1 cursor-pointer items-start gap-2.5 py-[7px] pr-1.5 text-left ${isChild ? "pl-0.5" : "pl-1"}`}
+        aria-checked={selectionRole === "checkbox" ? ticked : undefined}
+        aria-pressed={selectionRole === "button" ? ticked : undefined}
+        aria-disabled={disabled || undefined}
+        title={disabledReason ?? label}
+        className={`flex min-w-0 flex-1 ${disabled ? "cursor-default opacity-55" : "cursor-pointer"} items-start gap-2.5 py-[7px] pr-1.5 text-left ${isChild ? "pl-0.5" : "pl-1"}`}
       >
         <span
           aria-hidden
           className="mt-0.5 inline-flex size-3.5 flex-none items-center justify-center border-[1.5px] text-[9.5px] leading-none text-[var(--paper)]"
-          style={{ borderColor: selected ? color : "var(--control)", background: selected ? color : "transparent" }}
+          style={{ borderColor: ticked ? color : "var(--control)", background: ticked ? color : "transparent" }}
         >
-          {selected ? "✓" : ""}
+          {ticked ? "✓" : ""}
         </span>
         <span className="flex min-w-0 flex-1 items-start gap-2">
           <span data-testid="series-swatch" className="mt-[7px] flex-none">
@@ -305,6 +342,13 @@ export function SeriesSelectorRow({
       </button>
     </div>
   );
+  // The hierarchy is not only visual: a screen reader hears the children as a group named after their parent.
+  return children ? (
+    <>
+      {row}
+      <div id={groupId} role="group" aria-label={label} data-testid="series-row-group">{children}</div>
+    </>
+  ) : row;
 }
 
 // Reference rows (a target, not a series) match their dashed chart line.

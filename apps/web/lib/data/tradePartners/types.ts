@@ -13,6 +13,17 @@ export const TRADE_PARTNER_DOCUMENT_IDS: Record<string, string> = {
   "geostat_trade_import-country-group-1995-2026": "source.geostat_trade_import_country_group_1995_2026",
 };
 export const TRADE_PARTNER_GROUP_IDS = ["group.eu", "group.cis", "group.bsec", "group.oecd", "group.guam"] as const;
+/**
+ * Common names a reviewed label does not contain, by Geostat partner code (the code is shared by Partners and
+ * Domestic-export countries). Search only: never displayed, exported or served to /mcp. "Turkiye" needs no entry:
+ * search ignores accents.
+ */
+export const TRADE_PARTNER_SEARCH_ALIASES: Readonly<Record<string, readonly string[]>> = {
+  "792": ["Turkey"],
+  "840": ["USA", "United States of America", "აშშ"],
+  "826": ["UK", "Great Britain", "დიდი ბრიტანეთი"],
+  "643": ["Russian Federation"],
+};
 export type TradePartnerFact = {
   entityId: string; year: number; indicatorId: TradeOverviewIndicator; valueUsd: string | null;
   unit: "usd"; basis: "actual"; valueStatus: "numeric" | "blank" | "not_applicable"; publicationStatus: "unspecified";

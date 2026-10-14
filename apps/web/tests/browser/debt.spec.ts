@@ -3,6 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { TEST_BASE_URL } from "./test-base-url";
 
+// A line chart without its own label is named "{first series}, {count} სერია, {first}–{last}".
+const LINE_CHART_NAME = /, \d+ სერია, \d{4}–\d{4}$/;
+
 async function expectAppReady(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
@@ -33,7 +36,7 @@ test.describe("Government Debt explorer", () => {
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("რამდენია მთავრობის ვალი და როგორ ვიხდით მას");
       await expect(page.getByTestId("debt-explorer")).toHaveCount(1);
       await expect(page.getByTestId("chart-panel")).toHaveCount(1);
-      await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(1);
+      await expect(page.getByRole("img", { name: LINE_CHART_NAME })).toHaveCount(1);
       await expect(page.getByTestId("explorer-table")).toHaveCount(0);
 
       const selector = page.getByTestId("series-selector");
@@ -56,7 +59,7 @@ test.describe("Government Debt explorer", () => {
 
       await expect(selector.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
       await expect(seriesRow(page, "debt.stock.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-      await expect(selector.getByTestId("series-status")).toContainText("1 / 9");
+      await expect(selector.getByTestId("series-status")).toContainText("1 / 3");
       await expect(page.getByTestId("year-range-strip")).toContainText("2013–2025");
       await expect(page.getByTestId("chart-mode-line")).toHaveAttribute("aria-pressed", "true");
       await expect(page.getByTestId("measure-share-toggle")).toHaveAttribute("aria-pressed", "false");
@@ -93,7 +96,7 @@ test.describe("Government Debt explorer", () => {
     await seriesRow(page, "debt.stock.domestic").getByTestId("series-row-toggle").click();
     await seriesRow(page, "debt.stock.external").getByTestId("series-row-toggle").click();
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(3);
-    await expect(page.getByTestId("series-status")).toContainText("3 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 3");
 
     await seriesRow(page, "debt.service.interest").getByTestId("series-row-toggle").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "service");
@@ -135,11 +138,12 @@ test.describe("Government Debt explorer", () => {
     ] as const;
     await expect(table.getByRole("columnheader")).toHaveText(["სერია", ...expectedByYear.map(([year]) => String(year))]);
     const rateRow = table.getByRole("row").filter({ hasText: "საგარეო განაკვეთი" });
-    await expect(rateRow.getByRole("cell")).toHaveText(["საგარეო განაკვეთი", ...expectedByYear.map(([, value]) => value)]);
+    await expect(rateRow.getByRole("rowheader")).toHaveText("საგარეო განაკვეთი");
+    await expect(rateRow.getByRole("cell")).toHaveText(expectedByYear.map(([, value]) => value));
 
     await page.getByTestId("chart-mode-line").click();
     await expect(page.getByTestId("explorer-table")).toHaveCount(0);
-    await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(1);
+    await expect(page.getByRole("img", { name: LINE_CHART_NAME })).toHaveCount(1);
   });
 
   test("restores the family total for unknown-only selections but preserves explicit empty selection", async ({ page }) => {
@@ -147,16 +151,15 @@ test.describe("Government Debt explorer", () => {
     await expectAppReady(page);
 
     await expect(seriesRow(page, "debt.rate.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByTestId("series-status")).toContainText("1 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
     await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
 
-    // Change the document URL as well as the hash: the explorer intentionally
-    // parses shared-link state once per mount, so a hash-only navigation would
-    // keep the first case's live state instead of exercising a fresh restore.
+    // Change the document URL as well as the hash so this case exercises a fresh
+    // page load's restore rather than a same-document hash change.
     await page.goto(`${TEST_BASE_URL}/explorer/debt?case=empty#f=rate&m=line&r=2015-2025&sel=`);
     await expectAppReady(page);
     await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
-    await expect(page.getByTestId("series-status")).toContainText("0 / 9");
+    await expect(page.getByTestId("series-status")).toContainText("0 / 3");
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
   });
 
@@ -166,7 +169,7 @@ test.describe("Government Debt explorer", () => {
 
     const callout = page.getByTestId("no-range-data-callout");
     await expect(callout).toContainText("არჩეული სერიებისთვის ამ დიაპაზონში მონაცემები არ არის");
-    await expect(page.getByRole("img", { name: "მრავალწლიანი დინამიკა" })).toHaveCount(0);
+    await expect(page.getByRole("img", { name: LINE_CHART_NAME })).toHaveCount(0);
 
     await page.getByTestId("chart-mode-table").click();
     await expect(callout).toBeVisible();
@@ -233,6 +236,53 @@ test.describe("Government Debt explorer", () => {
     const summary = workbook.getWorksheet("მარტივი ცხრილი")!;
     expect(summary.getCell("C4").numFmt).not.toContain("პროგნოზი");
     expect(summary.getCell("D4").numFmt).toContain("პროგნოზი");
+    expect(workbook.getWorksheet("წყაროები")!.getCell("D4").value).toEqual(expect.objectContaining({
+      text: "ფაილის ჩამოტვირთვა",
+      hyperlink: expect.stringContaining("/downloads/methodology/debt/files/"),
+    }));
+  });
+
+  test("exports the rate family with its rate column and published gaps", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt?view=rate#f=rate&m=table&r=2019-2021&sel=debt.rate.external`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "rate");
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByTestId("debt-excel").click();
+    const download = await downloadPromise;
+    const path = await download.path();
+    if (!path) throw new Error("Expected a local XLSX download path");
+    const rateExport = new ExcelJS.Workbook();
+    await rateExport.xlsx.load(Uint8Array.from(await readFile(path)).buffer);
+    const rateSheet = rateExport.getWorksheet("მონაცემები")!;
+    expect(rateSheet.getRow(1).values).toEqual([
+      undefined,
+      "წელი",
+      "მთავარი ჯგუფი",
+      "კატეგორია",
+      "თანხა (₾)",
+      "სტატუსი",
+      "საპროცენტო განაკვეთი (%)",
+    ]);
+    const rateRows = rateSheet.getRows(2, 10) ?? [];
+    expect(rateRows.some((row) => row.getCell(1).value === 2019 && row.getCell(4).value === null && row.getCell(5).value === "არ არის ხელმისაწვდომი")).toBe(true);
+    expect(rateRows.some((row) => row.getCell(1).value === 2021 && row.getCell(6).value === 0.0095)).toBe(true);
+  });
+
+  // U06-03: a projection year read like an actual one in the hover readout.
+  test("hovering a projection year shows the forecast label", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=line&r=2027-2030&sel=debt.service.total`);
+    await expectAppReady(page);
+    const chart = page.getByRole("img", { name: LINE_CHART_NAME });
+    await chart.hover({ position: { x: 300, y: 100 } });
+    await expect(page.getByTestId("chart-tooltip")).toContainText("პროგნოზი");
+
+    // An actual year reads without it.
+    await page.goto(`${TEST_BASE_URL}/explorer/debt#f=service&m=line&r=2024-2025&sel=debt.service.total`);
+    await page.reload();
+    await expectAppReady(page);
+    await chart.hover({ position: { x: 300, y: 100 } });
+    await expect(page.getByTestId("chart-tooltip")).toBeVisible();
+    await expect(page.getByTestId("chart-tooltip")).not.toContainText("პროგნოზი");
   });
 
   test("the bulk control clears, then selects every row of the active family", async ({ page }) => {
@@ -241,18 +291,54 @@ test.describe("Government Debt explorer", () => {
     const bulk = page.getByTestId("series-toggle-all");
     const toggle = (id: string) => seriesRow(page, id).getByTestId("series-row-toggle");
     // The default total alone is a partial selection.
-    await expect(bulk).toHaveAttribute("aria-checked", "mixed");
+    await expect(bulk).toHaveAttribute("data-state", "mixed");
 
     await bulk.click();
     await expect(toggle("debt.stock.total")).toHaveAttribute("aria-pressed", "false");
     await expect(bulk).toBeVisible();
-    await expect(bulk).toHaveAttribute("aria-checked", "false");
+    await expect(bulk).toHaveAttribute("data-state", "false");
 
     await bulk.click();
     for (const id of ["debt.stock.total", "debt.stock.domestic", "debt.stock.external"]) {
       await expect(toggle(id)).toHaveAttribute("aria-pressed", "true");
     }
-    await expect(bulk).toHaveAttribute("aria-checked", "true");
-    await expect(page.getByTestId("series-status")).toContainText("3 / 9");
+    await expect(bulk).toHaveAttribute("data-state", "true");
+    await expect(page.getByTestId("series-status")).toContainText("3 / 3");
+  });
+
+  // U06-04: the hash was read once on mount, so an address-bar edit left the URL and the view disagreeing.
+  test("editing the hash in the address bar updates the view", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt`);
+    await expectAppReady(page);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "stock");
+
+    await page.evaluate(() => { window.location.hash = "f=rate&m=table&sel=debt.rate.total"; });
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-family", "rate");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+    await expect(seriesRow(page, "debt.rate.total").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
+
+    // The next change builds on the edited state instead of overwriting it with the old one.
+    await page.getByTestId("chart-mode-line").click();
+    await expect(page).toHaveURL(/#f=rate&m=line&r=\d{4}-\d{4}&sel=debt\.rate\.total$/);
+  });
+
+  // Review Focus 3: a deliberate clear must not come back as the default selection.
+  test("an explicitly empty sel= survives Back and Forward", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/debt`);
+    await expectAppReady(page);
+    await page.getByTestId("series-toggle-all").click();
+    await expect(page).toHaveURL(/#f=stock&m=line&r=\d{4}-\d{4}&sel=$/);
+
+    await page.evaluate(() => { window.location.hash = "f=stock&sel=debt.stock.domestic"; });
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
+
+    await page.goBack();
+    await expect(page).toHaveURL(/sel=$/);
+    await expect(page.getByTestId("series-status")).toContainText("0 / 3");
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+
+    await page.goForward();
+    await expect(seriesRow(page, "debt.stock.domestic").getByTestId("series-row-toggle")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 3");
   });
 });

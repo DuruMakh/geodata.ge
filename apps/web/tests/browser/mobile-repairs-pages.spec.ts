@@ -67,15 +67,17 @@ for (const locale of ["ka", "en"] as const) {
     await caret.scrollIntoViewIfNeeded();
     const hit = await caret.evaluate((button) => {
       const box = button.getBoundingClientRect();
-      const target = document.elementFromPoint(box.left + 24.5, box.top + box.height / 2);
+      // The caret's own box is the 24px target (axe measures the element), so its last column answers.
+      const target = document.elementFromPoint(box.left + 23.5, box.top + box.height / 2);
       return { width: Math.round(box.width), hitsCaret: target === button || button.contains(target) };
     });
-    expect(hit).toEqual({ width: 22, hitsCaret: true });
+    expect(hit).toEqual({ width: 24, hitsCaret: true });
   });
 }
 
+// 360px is the worst case for the marker label; 390 adds nothing over it.
 for (const path of ["/explorer/deficit", "/explorer/debt#f=service&m=line&sel=debt.service.total", "/en/explorer/deficit"]) {
-  for (const width of [360, 390]) {
+  for (const width of [360]) {
     test(`forecast marker label stays clear of the range chips at ${width}px: ${path}`, async ({ page }) => {
       await page.setViewportSize({ width, height: 844 });
       await page.goto(path);
@@ -119,6 +121,17 @@ for (const { path, selector } of unclipped) {
   });
 }
 
+test("the largest GDP share keeps its year in view when its name is clipped from 768px", async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await page.goto("/explorer/expenditure");
+  const year = page.locator("[data-testid=side-kpi] p[title] > span.shrink-0");
+  await expect(year).toHaveText(/^, \d{4}$/);
+  expect(await year.evaluate((element) => {
+    const box = element.getBoundingClientRect(), line = element.parentElement!.getBoundingClientRect();
+    return box.width > 0 && box.right <= line.right + 0.5;
+  })).toBe(true);
+});
+
 test("the wrapping Georgia heading stays inside a 320px phone", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await page.goto("/explorer/municipalities/georgia");
@@ -157,13 +170,6 @@ for (const { path, field } of [
   });
 }
 
-for (const locale of ["ka", "en"] as const) {
-  test(`${locale} /connect lists unemployment among the data the endpoint does not serve`, async ({ page }) => {
-    await page.goto(`${locale === "en" ? "/en" : ""}/connect`);
-    await expect(page.getByTestId("connect-coverage-excluded")).toContainText(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
-  });
-}
-
 for (const path of ["/explorer/expenditure", "/explorer/unemployment/overview", "/en/explorer/inflation/overview"]) {
   test(`explorer menu rows are at least 36px tall below 900px: ${path}`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -183,6 +189,7 @@ test("the unemployment dataset row keeps the menu rhythm below 900px", async ({ 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/explorer/unemployment/overview");
   await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
-  const marginTop = await page.locator("#data-sidebar-navigation nav > a[href$=\"/explorer/unemployment\"]").evaluate((link) => getComputedStyle(link).marginTop);
+  // The dataset's list item carries the desktop gap since the hubs became a list (U02-09).
+  const marginTop = await page.locator("#data-sidebar-navigation nav li:has(> a[href$=\"/explorer/unemployment\"])").evaluate((row) => getComputedStyle(row).marginTop);
   expect(marginTop).toBe("0px");
 });

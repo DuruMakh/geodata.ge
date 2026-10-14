@@ -98,3 +98,16 @@ test("Connect examples move with the loaded facts rather than retaining the rele
   expect(examples).not.toContain("2026-08");
   expect(examples).toContain("2014-12");
 });
+
+test.each(["ka", "en"] as const)("Connect gives numbered steps for at least two clients and lists unemployment as not served in %s", async locale => {
+  const html = await connectHtml(locale);
+  const clients = html.split('data-testid="connect-client"').slice(1).map(chunk => chunk.slice(0, chunk.indexOf("</ol>") + "</ol>".length));
+  expect(clients.length).toBeGreaterThanOrEqual(2);
+  for (const client of clients) {
+    // Each application gets numbered steps (DESIGN: real menu paths), not a paragraph.
+    expect(client).toMatch(/<ol\b[^>]*><li\b/);
+    expect(client.replace(/<[^>]+>/g, "").trim().length).toBeGreaterThan(30);
+  }
+  const excluded = html.slice(html.indexOf('data-testid="connect-coverage-excluded"'));
+  expect(excluded.slice(0, excluded.indexOf("</ul>"))).toContain(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
+});

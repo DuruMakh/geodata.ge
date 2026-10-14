@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ChartPie, ChartNoAxesCombined } from "lucide-react";
 import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import type { ClientSectorObservation } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import {
   buildEconomicSectorsModel,
   changeSectorMeasure,
@@ -26,6 +27,7 @@ import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 import { SectorSeriesPanel } from "./sector-series-panel";
 import { SectorHighlights } from "./sector-highlights";
 import { useEconomicSectorsState } from "./use-economic-sectors-state";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -33,7 +35,7 @@ import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
-  facts: ClientSectorObservation[];
+  facts: FactsInput<ClientSectorObservation>;
   // One entry per measure: every row of a measure comes from one publication.
   sourceIdByMeasure: Record<string, string>;
   registry: SectorDefinition[];
@@ -42,12 +44,13 @@ export type EconomicSectorsExplorerProps = {
 };
 
 export function EconomicSectorsExplorer({
-  facts,
+  facts: shippedFacts,
   sourceIdByMeasure,
   registry,
   sources,
   siteOrigin,
 }: EconomicSectorsExplorerProps) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string) => message(messages, `sectors.${key}`);
@@ -94,12 +97,18 @@ export function EconomicSectorsExplorer({
         .map((f) => f.year),
     ),
   ].sort((a, b) => a - b);
+  // The longest of the three measures' lines, the national nominal one with its note, kept as the line's height so
+  // switching measure never moves the chart (DESIGN.md, sectors): the one-line share headline would otherwise lift it.
+  const latestNominal = facts.filter((f) => f.measure === "nominal" && f.seriesId === SECTOR_GDP).toSorted((a, b) => a.year - b.year).at(-1);
+  const nationalLine = latestNominal
+    ? { measure: t("reference"), period: latestNominal.year, value: formatAmount(latestNominal.value, locale), note: t("preliminary") }
+    : undefined;
   return (
     <div data-testid="economic-sectors-explorer" className="@container">
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
       <LatestValueLine
         testId="sectors-headline"
-        measure={t("reference")}
+        measure={state.measure === "share_of_gdp" ? t("largest") : t("reference")}
         period={model.headline?.year ?? "—"}
         value={
           percent
@@ -107,15 +116,8 @@ export function EconomicSectorsExplorer({
             : formatAmount(model.headline?.value, locale)
         }
         note={model.headline?.status === "preliminary" ? t("preliminary") : undefined}
+        reserve={nationalLine}
       />
-      <div className="mb-[30px] grid text-[13px] text-[var(--muted)]">
-        {(["nominal", "share_of_gdp", "real_growth"] as const).map(measure => (
-          <p key={measure} aria-hidden={measure !== state.measure}
-            className={`[grid-area:1/1] ${measure !== state.measure ? "invisible" : ""}`}>
-            {t(measure === "nominal" ? "nominalContext" : measure === "share_of_gdp" ? "shareContext" : "growthContext")}
-          </p>
-        ))}
-      </div>
       <p role="status" className="sr-only">
         {announcement}
       </p>
@@ -128,23 +130,7 @@ export function EconomicSectorsExplorer({
             className="border-t border-[var(--ink)] pt-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={state.mode}
-                onChange={(mode) => update((s) => ({ ...s, mode }), "push")}
-                options={[
-                  {
-                    value: "line",
-                    label: message(messages, "controls.chart"),
-                    testId: "chart-mode-line",
-                  },
-                  {
-                    value: "table",
-                    label: message(messages, "controls.table"),
-                    testId: "chart-mode-table",
-                  },
-                ]}
-              />
+              <ModeTabs value={state.mode} onChange={(mode) => update((s) => ({ ...s, mode }), "push")} />
               <SegmentedTabs
                 ariaLabel={t("measure")}
                 value={state.measure}
@@ -220,6 +206,9 @@ export function EconomicSectorsExplorer({
           </section>
           <div className="mt-[18px]">
             <SourceNote testId="source-label">
+              {/* The measure's price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
+              <span data-testid="sectors-context">{t(state.measure === "nominal" ? "nominalContext" : state.measure === "share_of_gdp" ? "shareContext" : "growthContext")}</span>
+              {" "}
               {t("source")} {model.range.start}–{model.range.end}
               {activeSources.length
                 ? ` · ${[...new Set(activeSources.map((s) => s.title))].join("; ")}`

@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ClientAdminFact, ClientBudgetFact } from "../../lib/explorer/clientData";
-import { getDefaultSelection, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
-import { type ChartMode, type ExpenditureGrouping, type ExplorerNav, type ExplorerScope } from "../../lib/explorer/types";
-import { parseExplorerHash, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
+import { getDefaultSelection } from "../../lib/explorer/explorerData";
+import { type ChartMode, type ExpenditureGrouping, type ExplorerScope, type ExplorerSide } from "../../lib/explorer/types";
+import { parseExplorerHash, restoreExplorerSelection, scopeFor, serializeExplorerHash } from "../../lib/explorer/urlState";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { toggleId } from "../../lib/explorer/selection";
+import { budgetYearsByScope } from "./budget-explorer-frame";
 
 type UseExplorerStateInput = {
   facts: ClientBudgetFact[];
   adminFacts: ClientAdminFact[];
-  nav: ExplorerNav;
+  nav: ExplorerSide;
 };
 
 type RangePatch = { start?: number; end?: number };
@@ -23,21 +24,7 @@ function clampYear(year: number, min: number, max: number): number {
 }
 
 export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInput) {
-  const yearsByScope = useMemo<Record<ExplorerScope, number[]>>(() => {
-    const collect = (values: Iterable<number>) => Array.from(new Set(values)).sort((a, b) => a - b);
-
-    return {
-      // Chartable field/revenue years follow category-detail coverage. Derived
-      // totals remain selectable, but total-only years are not offered.
-      fields: collect(
-        facts.filter((fact) => fact.side === "expenditure" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
-      ),
-      revenue: collect(
-        facts.filter((fact) => fact.side === "revenue" && !isDerivedTotalItemId(fact.itemId)).map((fact) => fact.year),
-      ),
-      ministries: collect(adminFacts.map((fact) => fact.year)),
-    };
-  }, [facts, adminFacts]);
+  const yearsByScope = useMemo(() => budgetYearsByScope(facts, adminFacts), [facts, adminFacts]);
 
   const idsByScope = useMemo<Record<ExplorerScope, Set<string>>>(
     () => ({
@@ -63,19 +50,10 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
   const [ranges, setRanges] = useState<Partial<Record<ExplorerScope, RangePatch>>>({});
   const [selections, setSelections] = useState<Partial<Record<ExplorerScope, string[]>>>({});
   const [expandedMinistries, setExpandedMinistries] = useState<string[]>([]);
-  const [analysisSide, setAnalysisSide] = useState<"expenditure" | "revenue">("expenditure");
-  const [analysisGrouping, setAnalysisGrouping] = useState<ExpenditureGrouping>("fields");
-  const [analysisYear, setAnalysisYear] = useState<number | null>(null);
   const hashAppliedRef = useRef(false);
 
-  const explorerSide: "expenditure" | "revenue" = nav === "revenue" ? "revenue" : "expenditure";
-  const scope = scopeFor(explorerSide, grouping);
+  const scope = scopeFor(nav, grouping);
   const scopeYears = yearsByScope[scope];
-
-  const analysisScope = scopeFor(analysisSide, analysisGrouping);
-  const analysisYears = yearsByScope[analysisScope];
-  const resolvedAnalysisYear =
-    analysisYear !== null && analysisYears.includes(analysisYear) ? analysisYear : analysisYears.at(-1) ?? null;
 
   function rangeOf(targetScope: ExplorerScope): ResolvedRange {
     const years = yearsByScope[targetScope];
@@ -115,14 +93,6 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     );
   }
 
-  function handleGroupingChange(nextGrouping: ExpenditureGrouping) {
-    setGrouping(nextGrouping);
-  }
-
-  function handleChartModeChange(mode: ChartMode) {
-    setChartMode(mode);
-  }
-
   // Restore shareable state from the URL hash once, after mount (the server render
   // always shows defaults; unknown values are dropped by the parser or the checks below).
   // The hash is a one-time external input on load, so the one extra render is intended.
@@ -135,31 +105,13 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     if (parsed.grouping) setGrouping(parsed.grouping);
     if (parsed.chartMode) setChartMode(parsed.chartMode);
     if (parsed.share) setShare(true);
-    if (parsed.analysisSide) setAnalysisSide(parsed.analysisSide);
-    if (parsed.analysisGrouping) setAnalysisGrouping(parsed.analysisGrouping);
-    if (parsed.analysisYear !== undefined) setAnalysisYear(parsed.analysisYear);
     if (parsed.range) setRanges((current) => ({ ...current, [parsed.range!.scope]: { start: parsed.range!.start, end: parsed.range!.end } }));
     if (parsed.selection) {
-      const knownIds = parsed.selection.ids.filter((id) => idsByScope[parsed.selection!.scope].has(id));
-      // A deliberately-empty shared selection restores as empty; a selection whose
-      // ids are ALL unknown (renamed taxonomy, typos) falls back to the default.
-      if (knownIds.length > 0 || parsed.selection.ids.length === 0) {
-        setSelections((current) => ({ ...current, [parsed.selection!.scope]: knownIds }));
-      }
-      // A restored program selection must be visible in the panel: expand the
-      // parents of every selected major program, or the recipient sees a charted
-      // series with no checked row anywhere.
-      if (parsed.selection.scope === "ministries") {
-        const known = new Set(knownIds);
-        const parents = Array.from(
-          new Set(
-            adminFacts
-              .filter((fact) => fact.level === "major_program" && fact.parentItemId !== null && known.has(fact.itemId))
-              .map((fact) => fact.parentItemId as string),
-          ),
-        );
-        if (parents.length > 0) setExpandedMinistries(parents);
-      }
+      const { scope: selectionScope } = parsed.selection;
+      const { ids, expandedMinistries: parents } = restoreExplorerSelection(parsed.selection, idsByScope[selectionScope], adminFacts);
+      if (ids) setSelections((current) => ({ ...current, [selectionScope]: ids }));
+      // Without the open parents, a recipient would see a charted program with no checked row anywhere.
+      if (parents.length > 0) setExpandedMinistries(parents);
     }
     // The hook state is the source of truth after mount; the hash is write-only from here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -174,15 +126,12 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     rangeStart: activeRange.start,
     rangeEnd: activeRange.end,
     selectedIds,
-    analysisSide,
-    analysisGrouping,
-    analysisYear: resolvedAnalysisYear,
   });
 
   useReplaceHash(serializedHash);
 
   return {
-    explorerSide,
+    explorerSide: nav,
     scope,
     grouping,
     chartMode,
@@ -196,14 +145,7 @@ export function useExplorerState({ facts, adminFacts, nav }: UseExplorerStateInp
     toggleMinistryExpanded,
     toggleSeries,
     setSelectedSeries,
-    handleGroupingChange,
-    handleChartModeChange,
-    analysisSide,
-    setAnalysisSide,
-    analysisGrouping,
-    setAnalysisGrouping,
-    analysisYears,
-    analysisYear: resolvedAnalysisYear,
-    setAnalysisYear,
+    setGrouping,
+    setChartMode,
   };
 }

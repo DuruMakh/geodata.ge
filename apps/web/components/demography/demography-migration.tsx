@@ -20,7 +20,7 @@ import {
 } from "../../lib/explorer/demographyMigration";
 import { buildMigrationWorkbookExportModel } from "../../lib/explorer/demographyMigrationWorkbook";
 import { INK, NEGATIVE } from "../../lib/explorer/colors";
-import { formatInUnit, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
+import { formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { Message } from "../../lib/i18n/message";
@@ -31,6 +31,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientMigrationFact } from "../../lib/servedRows";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
@@ -41,6 +42,7 @@ import { SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selec
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { Callout, SectionTitle, SegmentedTabs, ShareBar, SourceNote } from "../ui/editorial";
 import { toggleId } from "../../lib/explorer/selection";
+import { persons, saveWorkbook, signedPersons } from "./demography-helpers";
 
 const SEX_KEYS = { total: "sexTotal", male: "sexMale", female: "sexFemale" } as const;
 const SEX_ICONS = {
@@ -52,9 +54,6 @@ const DIRECTION_KEYS = { arrivals: "dirArrivals", departures: "dirDepartures", n
 /** The chart draws thousands, so its axis stays short; every printed value is converted back to whole persons. */
 const CHART_SCALE = 1_000;
 
-const persons = (value: number | null | undefined) => formatInUnit(value, UNIT_PERSONS);
-const signedPersons = (value: number | null | undefined) =>
-  value === null || value === undefined ? persons(value) : `${value > 0 ? "+" : ""}${persons(value)}`;
 const KPI_META_CLASS = "font-[family-name:var(--font-numeric)] text-[0.6875rem] text-[var(--muted)]";
 
 export function MigrationExplorer({
@@ -135,15 +134,7 @@ export function MigrationExplorer({
         <div className="flex min-w-0 flex-col">
           <section data-testid="chart-panel" data-mode={state.mode} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <SegmentedTabs
-                ariaLabel={message(messages, "controls.viewMode")}
-                value={state.mode}
-                onChange={(mode) => update((s) => ({ ...s, mode }))}
-                options={[
-                  { value: "line", label: t("columns"), testId: "chart-mode-line" },
-                  { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
-                ]}
-              />
+              <ModeTabs value={state.mode} onChange={(mode) => update((s) => ({ ...s, mode }))} lineLabel={t("columns")} />
               <SegmentedTabs
                 ariaLabel={t("sexAria")}
                 value={state.sex}
@@ -161,6 +152,10 @@ export function MigrationExplorer({
                   periodsPerYear={1}
                   segments={segments}
                   overlay={{ label: netLabel, values: scaled(model.totals.net, 1) }}
+                  legend={[
+                    ...model.selectedIds.map((group) => ({ id: group, label: groupLabel(group), color: MIGRATION_COLORS[group] })),
+                    { id: "net", label: netLabel, color: INK },
+                  ]}
                   formatPeriod={String}
                   formatValue={(value) => persons(Math.abs(Math.round(value * CHART_SCALE)))}
                   formatOverlayValue={(value) => signedPersons(Math.round(value * CHART_SCALE))}
@@ -241,10 +236,7 @@ export function MigrationExplorer({
           <ExcelDownloadButton
             testId="migration-excel-download"
             disabled={!model.selectedIds.length}
-            onDownload={async () => {
-              const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-              await downloadWorkbook(buildMigrationWorkbookExportModel({ facts, state, sources, siteOrigin }, presentation));
-            }}
+            onDownload={() => saveWorkbook(() => buildMigrationWorkbookExportModel({ facts, state, sources, siteOrigin }, presentation))}
           />
         </SeriesAside>
       </ExplorerWorkspace>

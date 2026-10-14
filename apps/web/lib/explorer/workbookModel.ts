@@ -34,7 +34,6 @@ export type WorkbookExportInput = {
   locale: Locale;
   filenameBase: string;
   title: string;
-  groupLabel: string;
   years: number[];
   measure: WorkbookMeasure;
   totalId: string | null;
@@ -44,7 +43,11 @@ export type WorkbookExportInput = {
   showChangeColumn?: boolean;
   sources: WorkbookPublicSource[];
   siteOrigin: string;
-};
+} & (
+  | { groupLabel: string; omitGroupColumn?: false }
+  /** Drops the Data sheet's group column, for a one-series dataset whose group would repeat the category on every row. */
+  | { groupLabel?: never; omitGroupColumn: true }
+);
 
 export type WorkbookReadableRow = {
   kind: WorkbookSeries["kind"];
@@ -118,6 +121,11 @@ export function workbookFilename(stem: string, locale: Locale): string {
   return `fiscal-${stem}${locale === "en" ? "-en" : ""}.xlsx`;
 }
 
+/** An English label as file-name words: lower case, each run of spaces and punctuation one hyphen. */
+export function filenameWords(label: string): string {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 /** Adds the absolute link the Sources sheet prints for each source. */
 export function withAbsoluteUrls<T extends WorkbookPublicSource>(
   sources: readonly T[],
@@ -146,6 +154,21 @@ export function mergeSourcesByHref<T extends WorkbookPublicSource>(
     });
   }
   return [...byHref.values()];
+}
+
+/** The years each source supplies to the selected series: `sourceOf` names the source of a series' value in a year, or nothing where it has none. */
+export function neededSourceYears<S>(selected: readonly S[], years: readonly number[], sourceOf: (series: S, year: number) => string | undefined): Map<string, Set<number>> {
+  const needed = new Map<string, Set<number>>();
+  for (const series of selected) for (const year of years) {
+    const sourceId = sourceOf(series, year);
+    if (sourceId !== undefined) needed.set(sourceId, (needed.get(sourceId) ?? new Set<number>()).add(year));
+  }
+  return needed;
+}
+
+/** The Sources sheet of a selection: each source with only the `needed` years it supplies, merged by link. */
+export function sourcesForNeededYears<T extends WorkbookPublicSource & { sourceId: string }>(sources: readonly T[], needed: ReadonlyMap<string, ReadonlySet<number>>): T[] {
+  return mergeSourcesByHref(sources, source => source.years.filter(year => needed.get(source.sourceId)?.has(year)));
 }
 
 function safeChange(start: number | null, end: number | null): number | null {
@@ -185,6 +208,9 @@ function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: strin
   return `${period} · ${basis} · ${unitLabel}`;
 }
 
+/** The Data-sheet amount format of the year/group/category/amount/status layout. */
+const AMOUNT_FORMAT = "#,##0.00;[Red](#,##0.00);–";
+
 /** A Data-sheet format that keeps every stored digit, with a true minus sign rather than red. */
 export const EXACT_SIGNED_FORMAT = '#,##0.###############;"−"#,##0.###############';
 
@@ -222,14 +248,17 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
   const analysisSeries = input.includeTotalsInAnalysis
     ? input.series
     : input.series.filter((series) => !nonTotalsExist || series.kind !== "total");
-  const headers = (["workbook.year", "workbook.group", "workbook.category", "workbook.amountGel", "workbook.status"] as const).map(key => workbookMessage(input.locale, key));
+  const headerKeys = input.omitGroupColumn
+    ? (["workbook.year", "workbook.category", "workbook.amountGel", "workbook.status"] as const)
+    : (["workbook.year", "workbook.group", "workbook.category", "workbook.amountGel", "workbook.status"] as const);
+  const headers: string[] = headerKeys.map(key => workbookMessage(input.locale, key));
   if (input.measure.kind === "percentage") headers.push(input.measure.analysisHeader);
   const analysisRows: Array<Array<string | number | null>> = [];
   for (const year of years) {
     for (const series of analysisSeries) {
       const point = series.pointsByYear[year];
       if (!point) continue;
-      const row: Array<string | number | null> = [year, series.parentLabel ?? input.groupLabel, series.label, point.amountGel];
+      const row: Array<string | number | null> = [year, ...(input.omitGroupColumn ? [] : [series.parentLabel ?? input.groupLabel]), series.label, point.amountGel];
       row.push(statusLabel(point.basis, input.locale));
       if (input.measure.kind === "percentage") row.push(point.measureValue ?? null);
       analysisRows.push(row);
@@ -255,7 +284,13 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
       years,
       rows,
     },
-    analysis: { headers, rows: analysisRows },
+    analysis: {
+      headers,
+      rows: analysisRows,
+      // The amount column is the only one formatted here; the writer formats a "(%)" share column by its header.
+      numericFormats: { [headerKeys.indexOf("workbook.amountGel") + 1]: AMOUNT_FORMAT },
+      ...(input.omitGroupColumn ? { columnWidths: [10, 42, 18, 12, 16] } : {}),
+    },
     sources,
   };
 }

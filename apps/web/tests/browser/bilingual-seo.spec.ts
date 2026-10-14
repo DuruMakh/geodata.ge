@@ -21,14 +21,23 @@ test.beforeAll(async () => {
 
 // The only Georgian fragments allowed on English pages are the language switch
 // and an explicitly marked original filename that matches its reviewed manifest.
-for (const route of paths) test(`paired discovery and English content: ${route}`, async ({ page }) => {
+// The Georgian page is checked for metadata only, so its served HTML is fetched and
+// parsed without loading it in the browser; the English page is also checked as rendered.
+for (const route of paths) test(`paired discovery and English content: ${route}`, async ({ page, request }) => {
   for (const locale of ["ka", "en"] as const) {
     const target = locale === "en" ? englishPath(route) : route;
-    const response = await page.goto(target);
+    const response = locale === "en" ? await page.goto(target) : await request.get(target);
     expect(response?.status()).toBe(200);
     const initialHtml = await response!.text();
     const expected = { canonical: origin + target, ka: origin + route, en: origin + englishPath(route), locale };
-    for (const initial of [true, false]) {
+    if (locale === "en") {
+      // The rendered check must see a page whose series load after hydration (use-page-data.ts) once they have
+      // loaded, or it checks only the loading line. The product names prove it ran: each carries its Georgian original.
+      await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
+      await expect(page.getByTestId("page-data-error")).toHaveCount(0);
+      if (route === "/explorer/inflation/products") expect(await page.locator('[data-original-language="product"][lang="ka"]').count()).toBeGreaterThan(0);
+    }
+    for (const initial of locale === "en" ? [true, false] : [true]) {
       const result = await page.evaluate(({ html, initial, originals, products, locale }) => {
         const root = initial ? new DOMParser().parseFromString(html, "text/html") : document;
         const failures: string[] = [];
@@ -54,6 +63,9 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
         return {
           lang: root.documentElement.lang,
           canonicals: [...root.querySelectorAll('link[rel="canonical"]')].map(element => element.getAttribute("href")),
+          ogUrls: [...root.querySelectorAll('meta[property="og:url"]')].map(element => element.getAttribute("content")),
+          twitterCard: root.querySelector('meta[name="twitter:card"]')?.getAttribute("content"),
+          headings: root.querySelectorAll("h1").length, mainHeadings: root.querySelectorAll("main h1").length,
           alternates: Object.fromEntries([...root.querySelectorAll('link[rel="alternate"][hreflang]')].map(element => [element.getAttribute("hreflang"), element.getAttribute("href")])),
           title: root.title, description: root.querySelector('meta[name="description"]')?.getAttribute("content"),
           ogLocale: root.querySelector('meta[property="og:locale"]')?.getAttribute("content"),
@@ -66,6 +78,10 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
       }, { html: initialHtml, initial, originals: originalFilenames, products: originalProductLabels, locale });
       expect(result.lang).toBe(locale);
       expect(result.canonicals).toEqual([expected.canonical]);
+      expect(result.ogUrls).toEqual([expected.canonical]);
+      expect(result.twitterCard).toBe("summary_large_image");
+      expect([result.headings, result.mainHeadings]).toEqual([1, 1]);
+      expect(result.jsonLd.length).toBeGreaterThan(0);
       expect(result.alternates).toEqual({ ka: expected.ka, en: expected.en, "x-default": expected.ka });
       if (route === "/explorer/economy/sectors") {
         expect(result.title).toBe(locale === "en" ? "Georgia GDP by economic sector | Fiscal.ge" : "საქართველოს მშპ სექტორების მიხედვით | Fiscal.ge");
@@ -76,6 +92,7 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
       }
       expect(result.description?.length).toBeGreaterThan(30);
       expect(result.ogLocale).toBe(locale === "en" ? "en_GB" : "ka_GE");
+      expect(new URL(result.ogImage!).origin).toBe(origin);
       expect(new URL(result.ogImage!).pathname).toBe(`${locale === "en" ? "/en" : ""}/opengraph-image`);
       expect(new URL(result.twitterImage!).pathname).toBe(`${locale === "en" ? "/en" : ""}/opengraph-image`);
       expect(result.failures, `${target} ${initial ? "initial HTML" : "browser"}`).toEqual([]);
@@ -84,8 +101,8 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
         for (const url of result.breadcrumbs) expect(new URL(url).pathname).toMatch(/^\/en(?:\/|$)/);
       }
     }
-    await expect(page.locator("h1")).toHaveCount(1);
     if (locale === "en") {
+      await expect(page.locator("h1")).toHaveCount(1);
       const links = await page.locator('a[href^="/"]').evaluateAll(elements => elements.filter(element => !element.closest('[data-testid="language-switch"]')).map(element => element.getAttribute("href")!));
       expect(links.filter(href => /^\/(?:explorer|methodology|about|connect)(?:[/?#]|$)/.test(href))).toEqual([]);
       expect(links.filter(href => /^\/en\/(?:mcp|downloads|robots\.txt|sitemap\.xml|llms\.txt)(?:[/?#]|$)/.test(href))).toEqual([]);

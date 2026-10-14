@@ -1,11 +1,12 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { preparePublicDatasets } from "../lib/data/publicDatasetExports";
+import { runAsCli } from "../lib/runAsCli";
 
-async function main() {
-  const write = process.argv.includes("--write");
-  const check = process.argv.includes("--check");
-  const checkOutput = process.argv.includes("--check-output");
+export async function main(args: readonly string[]) {
+  const write = args.includes("--write");
+  const check = args.includes("--check");
+  const checkOutput = args.includes("--check-output");
   if ([write, check, checkOutput].filter(Boolean).length !== 1) {
     throw new Error("Pass exactly one of --write, --check or --check-output");
   }
@@ -26,7 +27,4 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+runAsCli(import.meta.url, main);

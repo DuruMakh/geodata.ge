@@ -5,6 +5,7 @@ export const DEMOGRAPHY_METHODOLOGY: MethodologyContent = {
   slug: "demography",
   title: "Demography",
   summary: "Population on 1 January for Georgia, its 11 regions and 64 municipalities, 2004–2026, density by region, international migration by citizenship, 2012–2025, and registered births and deaths, 2014–2025, with Georgia’s fertility and life expectancy, and the population by age and sex: Georgia 2004–2026 and the 2024 census for Georgia and the 11 regions.",
+  metaDescription: "Population of Georgia, its regions and municipalities, density, international migration, births and deaths, and the population by age and sex.",
   reviewedAt: "2026-10-10",
   archiveManifestId: "demography",
   coverageSource: { kind: "archive" },

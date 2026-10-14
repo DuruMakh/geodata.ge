@@ -1,12 +1,12 @@
 // apps/web/tests/factQuery/compareInflation.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare, type Comparison } from "../../lib/factQuery/compare";
 import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
 });
 
 function comparisons(response: FactQueryResponse): Comparison[] {

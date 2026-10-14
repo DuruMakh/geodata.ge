@@ -38,7 +38,8 @@ test("shares are selection-independent and percent boundaries are correct", () =
   const model = buildEconomicSectorsModel(facts,registry,state,sourceIdByMeasure(facts));
   expect(model.series[0].vals).toEqual([12.5]);
   expect(model.rows[0].valuesByYear[2010]).toBe(0.125);
-  expect(model.headline?.value).toBe(100);
+  // U11-01: Total GDP is 100% of itself; the share headline is the largest sector's share in the latest year.
+  expect(model.headline).toMatchObject({ seriesId: "sector.b", measure: "share_of_gdp", value: 37.5 });
   const growth=buildEconomicSectorsModel(facts,registry,{...state,measure:"real_growth"},sourceIdByMeasure(facts));
   expect(growth.series[0].vals).toEqual([7.5]);
   expect(growth.rows[0].valuesByYear[2011]).toBe(0.075);
@@ -156,4 +157,14 @@ test("sector search matches either label or the NACE code with the shared matche
   expect(sectorMatchesQuery(ict, " J ")).toBe(true);
   expect(sectorMatchesQuery(ict, "")).toBe(true);
   expect(sectorMatchesQuery(ict, "no-such-sector")).toBe(false);
+});
+
+// U11-01 (owner decision Q6): switching to the share of GDP with only Total GDP selected opens on the five largest
+// sectors at the range's end; any other selection is kept.
+test("the share view opens on the five largest sectors instead of a flat 100% line", () => {
+  const shares = [3, 9, 1, 7, 5, 8, 2].map((value, index) => make(`sector.${"abcdefg"[index]}`, 2010, "share_of_gdp", value));
+  const many = [...facts.filter(f => f.measure !== "share_of_gdp"), make("economy.gdp_total", 2010, "share_of_gdp", 100), ...shares];
+  expect(changeSectorMeasure(DEFAULT_SECTOR_STATE, "share_of_gdp", many).selectedIds).toEqual(["sector.b", "sector.f", "sector.d", "sector.e", "sector.a"]);
+  expect(changeSectorMeasure({ ...DEFAULT_SECTOR_STATE, selectedIds: ["economy.gdp_total", "sector.c"] }, "share_of_gdp", many).selectedIds).toEqual(["economy.gdp_total", "sector.c"]);
+  expect(changeSectorMeasure(DEFAULT_SECTOR_STATE, "real_growth", many).selectedIds).toEqual(["economy.gdp_total"]);
 });

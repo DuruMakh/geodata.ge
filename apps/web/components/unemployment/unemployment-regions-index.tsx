@@ -26,12 +26,12 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
   }, []);
   useAppReady();
   const t = (key: string) => message(messages, `unemployment.${key}`);
-  if (comparison) return <><a href={pageHref("/explorer/unemployment/regions", locale)} className="mb-4 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{message(messages, "regionalEconomies.allRegions")}</a><UnemploymentExplorer {...explorer} /></>;
+  // An in-app move to the same path drops the hash without a hashchange event, so the click leaves comparison itself.
+  if (comparison) return <><Link href={pageHref("/explorer/unemployment/regions", locale)} prefetch={false} onClick={() => setComparison(false)} className="mb-4 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{message(messages, "regionalEconomies.allRegions")}</Link><UnemploymentExplorer {...explorer} /></>;
   const national = explorer.facts.find(fact => fact.dimension === "national" && fact.indicatorId === "unemployment_rate" && fact.year === model.year);
   const percent = (value: number) => formatShare(value / 100);
   return <div data-testid="unemployment-regions-index" className="@container">
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
-    <p className="mb-8 max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("page.regions.summary")}</p>
     <RegionIndex model={model} sourceNote={t("sourceNote")} metric={{
       hrefForRegion: unemploymentRegionHref, formatValue: percent, mapAria: message(messages, "unemployment.regionMapAria", { year: model.year }),
       entityAria: (name, value, year) => message(messages, "unemployment.regionMapEntityAria", { name, rate: percent(value), year }),
@@ -41,7 +41,7 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
       { label: t("nationalRate"), value: national ? percent(national.value) : "—", detail: String(model.year) },
       { label: message(messages, "regionalEconomies.period"), value: `${model.firstYear}–${model.year}`, detail: t("annual") },
     ]} />
-    <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")} <Link href={pageHref("/methodology/unemployment", locale)} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link></p>
+    <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")} <Link href={pageHref("/methodology/unemployment", locale)} prefetch={false} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link></p>
     <a href="#breakdown=region" className="mt-3 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{t("regionalComparison")}</a>
   </div>;
 }

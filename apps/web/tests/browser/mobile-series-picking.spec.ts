@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 // Owner decision D4 (2026-10-07): picking series on a phone. The lists flow with the
-// page, a pill leads back to the chart, a legend names the lines, and the controls
-// that change the chart sit next to it.
+// page (lists over 30 rows scroll inside their panel instead, DESIGN §7.7), a pill
+// leads back to the chart, a legend names the lines, and the controls that change
+// the chart sit next to it.
 test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
 const listPages = [
@@ -11,7 +12,6 @@ const listPages = [
   "/explorer/economy/sectors",
   "/explorer/economy/regions/adjara",
   "/explorer/inflation/categories",
-  "/explorer/inflation/products",
   "/explorer/unemployment/overview",
 ];
 
@@ -33,6 +33,20 @@ for (const path of listPages) {
   });
 }
 
+// Lists over 30 rows (U21-01, U14-05) scroll inside a box of at most 430px or 60% of the screen.
+for (const path of ["/explorer/inflation/products", "/explorer/trade/partners"]) {
+  test(`the long series list scrolls inside its panel on a phone: ${path}`, async ({ page }) => {
+    await page.goto(path);
+    if (path.endsWith("products")) await page.getByTestId("product-panel-more").click();
+    const box = await page.getByTestId("series-list").evaluate((element) => ({
+      overflowY: getComputedStyle(element).overflowY,
+      maxHeight: parseFloat(getComputedStyle(element).maxHeight),
+      scrolls: element.scrollHeight > element.clientHeight,
+    }));
+    expect(box).toEqual({ overflowY: "auto", maxHeight: Math.min(430, 844 * 0.6), scrolls: true });
+  });
+}
+
 test.describe("desktop", () => {
   test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 
@@ -43,11 +57,28 @@ test.describe("desktop", () => {
     expect(box).toEqual({ overflowY: "auto", maxHeight: "430px" });
     await expect(page.getByTestId("product-panel-more")).toBeHidden();
   });
+
+  test("a skip button leads a keyboard past the 305 products to the download (U14-05)", async ({ page }) => {
+    await page.goto("/en/explorer/inflation/products");
+    await page.getByTestId("series-search").focus();
+    const skip = page.getByTestId("series-skip-list");
+    for (let presses = 0; presses < 3 && !(await skip.evaluate((element) => element === document.activeElement)); presses++) await page.keyboard.press("Tab");
+    await expect(skip).toBeFocused();
+    await expect(skip).toHaveText("Skip the list");
+    expect((await skip.boundingBox())!.height).toBeGreaterThan(0);
+    await page.keyboard.press("Enter");
+    // Focus lands on a named point, so a screen reader says where it went.
+    await expect(page.locator(":focus")).toHaveText("End of the list");
+    await page.keyboard.press("Tab");
+    await expect(page.getByTestId("inflation-product-download")).toBeFocused();
+  });
 });
 
 for (const locale of ["ka", "en"] as const) {
   test(`${locale} products list shows the top ten and a "more products" button`, async ({ page }) => {
     await page.goto(`${locale === "en" ? "/en" : ""}/explorer/inflation/products`);
+    // The rows render once the product runs are fetched (U14-01).
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     const rows = page.getByTestId("series-list").getByTestId("series-row");
     const total = await rows.count();
     expect(total).toBeGreaterThan(100);
@@ -175,6 +206,7 @@ test.describe("the phone legend", () => {
     ["Foreign investment", "/en/explorer/external/foreign-investment#tab=sector&view=line&sel=fdi.total,fdi.sector.k"],
     ["Current account", "/en/explorer/external/current-account#tab=in&unit=usd&sel=ca.balance,ca.services"],
     ["Wages", "/en/explorer/wages/overview#view=line&sel=average,median"],
+    ["Poverty rates", "/en/explorer/living-standards/poverty#tab=relative&view=line&sel=poverty.relative_60%7Cgeorgia%2Cpoverty.relative_40%7Cgeorgia"],
   ] as const) {
     test(`lists two lines on ${name}`, async ({ page }) => {
       await page.goto(url);
@@ -182,9 +214,28 @@ test.describe("the phone legend", () => {
     });
   }
 
-  test("lists two lines on Poverty rates", async ({ page }) => {
-    await page.goto("/en/explorer/poverty/rates#tab=relative&view=line&sel=poverty.relative_60%7Cgeorgia%2Cpoverty.relative_40%7Cgeorgia");
-    await expect(page.getByTestId("chart-phone-legend").locator("li")).toHaveCount(2);
+  // Pages that drew several lines without the legend until 2026-10 (X1-01): each lists every line.
+  for (const [name, url, scope, ids] of [
+    ["Household income", "/en/explorer/living-standards/income/regions/georgia#view=line&sel=income.total,settlement.urban", "chart-panel", ["income.total", "settlement.urban"]],
+    ["Loans and deposits", "/en/explorer/money/loans-deposits", "chart-panel", ["loans.total", "deposits.total"]],
+    ["Energy supply", "/en/explorer/energy-food/energy-supply#view=line&sel=energy.supply.total,energy.production.total", "chart-panel", ["energy.supply.total", "energy.production.total"]],
+    ["Life expectancy", "/en/explorer/demography/births-deaths", "life-section", ["demography.life_expectancy_total", "demography.life_expectancy_male", "demography.life_expectancy_female"]],
+  ] as const) {
+    test(`lists every line on ${name}`, async ({ page }) => {
+      await page.goto(url);
+      const legend = page.getByTestId(scope).getByTestId("chart-phone-legend");
+      await expect(legend).toBeVisible();
+      await expect(legend.locator("li")).toHaveCount(ids.length);
+      expect(await legend.locator("li").evaluateAll((items) => items.map((item) => item.getAttribute("data-legend-series-id")))).toEqual(ids);
+    });
+  }
+
+  test("leaves out the legend above ten lines (Trading partners, 11 countries)", async ({ page }) => {
+    const countries = [643, 792, 840, 826, 860, 804, 784, 764, 756, 807, 818].map((code) => `partner.1995-2025.${code}`);
+    await page.goto(`/en/explorer/trade/partners#sel=${countries.join(",")}&view=line&tab=countries&measure=trade.exports`);
+    await expect(page.getByTestId("series-status")).toContainText("11 / 218");
+    await expect(page.getByTestId("chart-frame")).toBeVisible();
+    await expect(page.getByTestId("chart-phone-legend")).toHaveCount(0);
   });
 
   test("stays hidden for one line on Trade overview and on the Current account Balance tab", async ({ page }) => {
@@ -229,6 +280,21 @@ test.describe("the phone legend", () => {
       await expect(page.getByTestId("chart-phone-legend")).toBeHidden();
     });
   });
+
+  // Q4 (2026-10-12): the legend stays while the series list sits below the chart, up to 1100px of column width
+  // (a 1024px tablet has a 724px column beside the 232px sidebar, a 1280px laptop 980px).
+  for (const width of [1024, 1280]) {
+    test.describe(`stacked layout at ${width}px`, () => {
+      test.use({ viewport: { width, height: 800 }, isMobile: false, hasTouch: false });
+      test("lists the lines under the chart", async ({ page }) => {
+        await page.goto("/explorer/expenditure#g=fields&sel=expenditure.total%2Cspending.social_protection");
+        await expect(page.getByTestId("chart-frame")).toBeVisible();
+        const legend = page.getByTestId("chart-phone-legend");
+        await expect(legend).toBeVisible();
+        await expect(legend.locator("li")).toHaveCount(2);
+      });
+    });
+  }
 });
 
 for (const locale of ["ka", "en"] as const) {

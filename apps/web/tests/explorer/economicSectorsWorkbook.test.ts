@@ -72,6 +72,8 @@ test("exports full GEL, single-conversion percentages, mixed status, missing row
         sourceIdByMeasure(facts),
       );
       expect(model.readable.rows).toHaveLength(2);
+      // One English-word stem for both languages, never the measure id.
+      expect(model.filename).toBe(`fiscal-economic-sectors-${{ nominal: "nominal", share_of_gdp: "share-of-gdp", real_growth: "real-growth" }[measure]}-2024-2025${locale === "en" ? "-en" : ""}.xlsx`);
       expect(model.readable.rows[1].valuesByYear[2025]).toBeNull();
       expect(model.readable.rows[0].basisByYear).toEqual({
         2024: "published",

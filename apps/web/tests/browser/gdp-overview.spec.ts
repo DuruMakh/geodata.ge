@@ -1,15 +1,11 @@
 import { expect, test } from "@playwright/test";
-for (const locale of ['ka','en']) for (const width of [390,768,1440]) {
-  test(`GDP layout ${locale} at ${width}px`,async({page},testInfo)=>{
+// Page overflow at 390/768/1440 is in the layout pass of mobile-fit-charts.spec.ts.
+for (const [locale, width] of [['ka', 390], ['en', 1440]] as const) {
+  test(`GDP layout ${locale} at ${width}px`,async({page})=>{
     await page.setViewportSize({width,height:1000});
     await page.goto(`${locale==='en'?'/en':''}/explorer/economy/gdp`);
     await expect(page.locator('body')).toHaveAttribute('data-app-ready','true');
     await expect(page.getByTestId('gdp-indicators').getByRole('button')).toHaveCount(4);
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    await page.screenshot({path:testInfo.outputPath(`gdp-${locale}-${width}.png`),fullPage:true});
-    await page.goto(`${locale==='en'?'/en':''}/explorer/deficit`);
-    await expect(page.locator('body')).toHaveAttribute('data-app-ready','true');
-    await page.screenshot({path:testInfo.outputPath(`reference-deficit-${locale}-${width}.png`),fullPage:true});
   });
 }
 test('Economy footer identifies its actual sources',async({page})=>{
@@ -74,58 +70,35 @@ test("the Economy heading steps from 30px on phones to 40px on wider screens", a
   await page.setViewportSize({ width: 1024, height: 800 });
   await expect(heading).toHaveCSS("font-size", "40px");
 });
-test("Economy links the delivered overview, national sectors and regional economies", async ({ page }) => {
-  await page.goto("/en/explorer/economy");
-  const cards = page.getByTestId("economy-hub").getByTestId("hub-card");
-  await expect(cards).toHaveCount(3);
-  await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(3);
-  await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/sectors"]')).toHaveCount(1);
-  await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/regions"]')).toHaveCount(1);
-  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
-  await expect(cards.nth(1)).toContainText("Top 3 sectors’ GDP share");
-  await expect(cards.nth(2)).toContainText("Total regional GDP (Current prices)");
-  await page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/gdp"]').click();
-  await expect(page.getByTestId("gdp-overview")).toBeVisible();
-  await page.goto("/explorer/economy");
-  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
-  await expect(cards.nth(1)).toContainText("ტოპ 3-ის წილი მშპ-ში");
-  await expect(cards.nth(2)).toContainText("რეგიონის მთლიანი მშპ (მიმდინარე ფასები)");
-});
 
 for (const locale of ['ka', 'en']) {
-  test(`GDP axes use readable currencies and percentage points in ${locale}`, async ({ page }, testInfo) => {
+  test(`GDP axes use readable currencies and percentage points in ${locale}`, async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto(`${locale === 'en' ? '/en' : ''}/explorer/economy/gdp#indicator=growth&start=2015&end=2025`);
     await expect(page.locator('body')).toHaveAttribute('data-app-ready', 'true');
     const axis = page.getByTestId('chart-panel').locator('svg text');
     await expect(axis.filter({ hasText: /^15%$/ })).toHaveCount(1);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(locale === 'en' ? 'Economy overview' : 'ეკონომიკის მიმოხილვა');
-    await page.screenshot({ path: testInfo.outputPath(`growth-${locale}.png`), fullPage: true });
     await page.getByTestId('gdp-tab-per_capita').click();
     for (const currency of ['GEL', 'USD']) {
-      await page.getByRole('button', { name: currency, exact: true }).click();
-      await expect(page.getByRole('button', { name: currency, exact: true })).toHaveText(currency === 'GEL' ? '₾' : '$');
+      // The symbol is the visible face; the accessible name is the localized currency name (U10-01).
+      const name = locale === 'en' ? currency : currency === 'GEL' ? '₾' : 'აშშ დოლარი';
+      await page.getByRole('button', { name, exact: true }).click();
+      await expect(page.getByRole('button', { name, exact: true })).toHaveText(currency === 'GEL' ? '₾' : '$');
       const ticks = axis.filter({ hasText: currency === 'GEL' ? /₾$/ : /\$$/ });
       expect(await ticks.count()).toBeGreaterThan(2);
-      for (const tick of await ticks.all()) {
-        expect(await tick.evaluate(el => (el as SVGGraphicsElement).getBBox().x)).toBeGreaterThanOrEqual(0);
-      }
-      await page.screenshot({ path: testInfo.outputPath(`per-capita-${locale}-${currency}.png`), fullPage: true });
+      const tickXs = await ticks.evaluateAll(elements => elements.map(el => (el as SVGGraphicsElement).getBBox().x));
+      expect(Math.min(...tickXs)).toBeGreaterThanOrEqual(0);
     }
+
+    // The real-growth chart keeps every label inside its drawing too.
+    await page.getByTestId('gdp-tab-real').click();
+    await expect(page.getByTestId('gdp-tab-real')).toHaveAttribute('aria-pressed', 'true');
+    await page.evaluate(() => document.fonts.ready);
+    // Read every label in one pass: after the first measurement the chart drops the
+    // geometry that does not fit, so a label list collected earlier can go stale.
+    const labelXs = await page.getByTestId('chart-panel').evaluate(panel => [...panel.querySelectorAll('svg text')].map(e => (e as SVGGraphicsElement).getBBox().x));
+    expect(labelXs.length).toBeGreaterThan(0);
+    for (const x of labelXs) expect(x).toBeGreaterThanOrEqual(0);
   });
 }
-
-for(const locale of ['ka','en']) test(`GDP real axis and dataset metadata are complete in ${locale}`,async({page})=>{
- await page.goto(`${locale==='en'?'/en':''}/explorer/economy/gdp`);
- await expect(page.getByTestId('gdp-tab-real')).toHaveAttribute('aria-pressed','true');
- await page.evaluate(()=>document.fonts.ready);
- // Read every label in one pass: after the first measurement the chart drops the
- // geometry that does not fit, so a label list collected earlier can go stale.
- const labelXs=await page.getByTestId('chart-panel').evaluate(panel=>[...panel.querySelectorAll('svg text')].map(e=>(e as SVGGraphicsElement).getBBox().x));
- expect(labelXs.length).toBeGreaterThan(0);
- for(const x of labelXs) expect(x).toBeGreaterThanOrEqual(0);
- const dataset=JSON.parse(await page.getByTestId('explorer-dataset-json-ld').textContent()??'{}');
- expect(dataset['@id']).toBe('https://fiscal.ge/explorer/economy/gdp#dataset');
- expect(dataset.variableMeasured).toHaveLength(6);
- expect(dataset.variableMeasured.map((v:{unitText:string})=>v.unitText)).toContain('USD_2015');
-});

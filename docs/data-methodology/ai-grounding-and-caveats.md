@@ -749,8 +749,16 @@ because it really is built from all of them.
 the `prebuild` chain, after `data:prepare-public-datasets`, which clears the
 output directory before writing its CSVs.
 
-`npm run data:check-fact-query-publications` verifies them, and runs as
-`postbuild` — after the files exist. It fails the build if a published file
+Both the write and the check read the snapshot that `data:prepare-fact-query-snapshot`
+wrote earlier in the chain (`lib/factQuery/generated/snapshot.json`, the file `/mcp`
+serves) rather than building their own, and stop if it is missing, unreadable or from an
+older schema. Run on their own after a data edit, they compare against whatever snapshot
+is on disk, so regenerate it first.
+
+`npm run data:prepare-fact-query-publications` verifies them as soon as it has
+written them, in the same `prebuild` step, and `npm run
+data:check-fact-query-publications` runs the same verification on its own. It
+fails the build if a published file
 drifts from what the current snapshot produces, and separately verifies the
 on-disk manifest's hashes and byte sizes against the on-disk files. It is
 deliberately **not** part of `npm run data:validate`: that runs before `npm run

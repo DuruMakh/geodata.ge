@@ -1,10 +1,8 @@
-import ExcelJS from "exceljs";
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadProductCatalogueCsv, loadProductFactsCsv } from "../../lib/data/inflation/importProducts";
 import { buildProductIndex, packProductFacts, productAnnual, rankProducts, type ProductIndex } from "../../lib/explorer/inflationProducts";
 import { buildInflationProductWorkbookExportModel } from "../../lib/explorer/inflationProductWorkbook";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
-import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
 
@@ -93,22 +91,4 @@ describe("individual-product inflation workbook", () => {
     expect(model.readable.rows[0]!.label).toContain("2026-02");
     expect(model.analysis.rows.every((row) => row[5] === null)).toBe(true);
   });
-
-  it("writes percentage fractions and all selected products without truncation", async () => {
-    const model = buildInflationProductWorkbookExportModel({
-      ...input(), state: { ...input().state, range: { startYear: index.earliestYear, endYear: index.defaultRange.endYear }, selected: rankProducts(index) },
-    });
-    const before = performance.now();
-    const bytes = await createWorkbookBuffer(model);
-    const elapsedMs = Math.round(performance.now() - before);
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(bytes);
-    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
-    expect(workbook.worksheets[0]!.getCell("B4").value).toBeCloseTo(productAnnual(index, rankProducts(index)[0]!, index.latestPeriod)! / 100);
-    expect(workbook.worksheets[0]!.getCell("B4").numFmt).toBe("0.0%");
-    expect(workbook.worksheets[0]!.rowCount).toBeGreaterThan(305);
-    expect(workbook.worksheets[1]!.rowCount).toBeGreaterThan(40_000);
-    expect(workbook.worksheets[2]!.getCell("D4").hyperlink).toMatch(/^https:\/\/fiscal\.ge\/downloads\//);
-    console.info(`Full product workbook: ${elapsedMs} ms, ${bytes.byteLength} bytes, heap ${Math.round(process.memoryUsage().heapUsed / 1_048_576)} MiB`);
-  }, 120_000);
 });

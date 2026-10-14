@@ -10,16 +10,19 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 // /mcp down for everybody until the next UTC day, with the per-key limit
 // offering no protection at all, because the very requests it denied were the
 // ones doing the spending.
-const state = vi.hoisted(() => ({ hits: [] as string[], perKeyVerdict: "allow" as "allow" | "deny" | "unavailable", dailyVerdict: "allow" as "allow" | "deny" | "unavailable" }));
+type Verdict = "allow" | "deny" | "unavailable";
+const state = vi.hoisted(() => ({ hits: [] as string[], calls: [] as { key: string; windowSeconds: number; max: number }[], perKeyVerdict: "allow" as Verdict, perKeyDailyVerdict: "allow" as Verdict, dailyVerdict: "allow" as Verdict }));
 
 vi.mock("../../lib/mcp/limits", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../lib/mcp/limits")>();
   return {
     ...actual,
     createCounter: () => ({
-      hit: (key: string) => {
+      hit: (key: string, windowSeconds: number, max: number) => {
         state.hits.push(key);
-        return Promise.resolve(key.startsWith("mcp:rate:") ? state.perKeyVerdict : state.dailyVerdict);
+        state.calls.push({ key, windowSeconds, max });
+        if (key.startsWith("mcp:rate:")) return Promise.resolve(state.perKeyVerdict);
+        return Promise.resolve(key.startsWith("mcp:keyday:") ? state.perKeyDailyVerdict : state.dailyVerdict);
       },
     }),
   };
@@ -43,7 +46,9 @@ afterAll(() => {
 
 beforeEach(() => {
   state.hits.length = 0;
+  state.calls.length = 0;
   state.perKeyVerdict = "allow";
+  state.perKeyDailyVerdict = "allow";
   state.dailyVerdict = "allow";
 });
 
@@ -75,14 +80,35 @@ describe.each(["legacy", "modern"])("%s rate-limit failures", era => {
     expect(Number(response.headers.get("retry-after"))).toBeGreaterThan(0);
     expect(Number(response.headers.get("retry-after"))).toBeLessThanOrEqual(86400);
     expect(await response.text()).toContain("/downloads/data/manifest.json");
-    expect(state.hits).toHaveLength(2);
+    expect(state.hits).toHaveLength(3);
   });
-  it.each(["minute", "daily"])("fails closed if the %s limiter is unavailable", async limit => {
-    if (limit === "minute") state.perKeyVerdict = "unavailable"; else state.dailyVerdict = "unavailable";
+  it("refuses a key's exhausted daily allowance without charging the shared one", async () => {
+    state.perKeyDailyVerdict = "deny";
+    const response = await POST(request());
+    expect(response.status).toBe(429);
+    expect(Number(response.headers.get("retry-after"))).toBeGreaterThan(0);
+    expect(Number(response.headers.get("retry-after"))).toBeLessThanOrEqual(86400);
+    expect(await response.text()).toContain("/downloads/data/manifest.json");
+    expect(dailyHits()).toEqual([]);
+  });
+  // A JSON-RPC client matches a reply to its request by id; with null it cannot
+  // tell which call was refused, and a retry layer reads a transport fault (U30-05).
+  it.each([["minute", "deny"], ["per-key daily", "deny"], ["daily", "deny"], ["minute", "unavailable"], ["daily", "unavailable"]] as const)("answers a %s %s with the request's own id", async (limit, verdict) => {
+    if (limit === "minute") state.perKeyVerdict = verdict;
+    else if (limit === "per-key daily") state.perKeyDailyVerdict = verdict;
+    else state.dailyVerdict = verdict;
+    const response = await POST(request());
+    expect(response.status).toBe(verdict === "deny" ? 429 : 503);
+    expect((await response.json()).id).toBe(era === "legacy" ? 1 : 61);
+  });
+  it.each([["minute", 1], ["per-key daily", 2], ["daily", 3]] as const)("fails closed if the %s limiter is unavailable", async (limit, hits) => {
+    if (limit === "minute") state.perKeyVerdict = "unavailable";
+    else if (limit === "per-key daily") state.perKeyDailyVerdict = "unavailable";
+    else state.dailyVerdict = "unavailable";
     const response = await POST(request());
     expect(response.status).toBe(503);
     expect(await response.text()).toContain("service_unavailable");
-    expect(state.hits).toHaveLength(limit === "minute" ? 1 : 2);
+    expect(state.hits).toHaveLength(hits);
   });
 });
 
@@ -107,6 +133,14 @@ function post(headers: Record<string, string> = {}): Request {
 const dailyHits = (): string[] => state.hits.filter((key) => key.startsWith("mcp:daily:"));
 
 describe("the order the request limits are charged in", () => {
+  // The real per-key limit wired into the route (moved from route.test.ts, which spent 61 requests on it):
+  // a keyed request charges a 60-second rolling window with an allowance of 60, and a denial says retry in 60.
+  it("charges a keyed request's minute counter with a 60-second window and 60 requests", async () => {
+    const allowed = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+    expect(allowed.status).toBe(200);
+    expect(state.calls.find((call) => call.key.startsWith("mcp:rate:"))).toEqual({ key: expect.stringMatching(/^mcp:rate:[0-9a-f]{32}$/), windowSeconds: 60, max: 60 });
+  });
+
   it("does not charge the shared daily budget for a request it has already refused", async () => {
     state.perKeyVerdict = "deny";
 
@@ -124,6 +158,23 @@ describe("the order the request limits are charged in", () => {
     // Per-key first: the cheaper, narrower limit decides before the shared one
     // is touched at all.
     expect(state.hits[0]!.startsWith("mcp:rate:")).toBe(true);
+  });
+
+  it("the per-key daily check runs before the global one", async () => {
+    const response = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    expect(response.status).toBe(200);
+    expect(state.hits.map((key) => key.split(":")[1])).toEqual(["rate", "keyday", "daily"]);
+    // The same client key as the minute bucket, scoped to today's UTC date.
+    const clientKey = state.hits[0]!.slice("mcp:rate:".length);
+    expect(state.hits[1]).toBe(`mcp:keyday:${clientKey}:${new Date().toISOString().slice(0, 10)}`);
+
+    state.hits.length = 0;
+    state.perKeyDailyVerdict = "deny";
+    const refused = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    expect(refused.status).toBe(429);
+    expect(dailyHits()).toEqual([]);
   });
 
   it("puts a caller it cannot identify in one shared bucket rather than exempting it", async () => {

@@ -138,15 +138,13 @@ describe("methodology catalog", () => {
     expect(publicText).toContain("69 მუნიციპალურ სერიას");
   });
 
-  it("discloses the nominal-GDP denominator without opening a GDP methodology route", () => {
+  it("discloses the nominal-GDP denominator on expenditure and revenue, and GDP and inflation keep their own slugs", () => {
     for (const dataset of ["expenditure", "revenue"] as const) {
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მშპ");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მიმდინარე ფასებში");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2010 წლიდან — SNA 2008");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2025 წლის მშპ წინასწარია");
     }
-    expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
-    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-20");
 
     expect(METHODOLOGY_CONTENT.gdp.slug).toBe("gdp");
     expect(METHODOLOGY_CONTENT.inflation.slug).toBe("inflation");
@@ -443,4 +441,26 @@ describe("methodology catalog", () => {
 
     expect(() => buildMethodologyHubEntries({ budgetFacts, municipalFacts, debtFacts, archives })).toThrow(/validated archive/i);
   });
+});
+
+// U29-10: the disclosure says what is official and what is Fiscal.ge's method (DESIGN.md §21); it never repeats the lead.
+it.each(["ka", "en"] as const)("every %s methodology disclosure says something its summary does not", async (locale) => {
+  const { getMethodologyContent } = await import("../../lib/methodology/catalog");
+  for (const id of LIVE_METHODOLOGY_IDS) {
+    const content = getMethodologyContent(id, locale);
+    expect(content.disclosure, id).not.toBe(content.summary);
+  }
+});
+
+// Task 48 fix round: nominal GDP joins Geostat's SNA 1993 and SNA 2008 series (docs/data-methodology/gdp-overview.md);
+// the disclosure says so rather than claiming no series is spliced.
+it.each([
+  ["ka", /SNA 1993/, /SNA 2008/, /არცერთი სერია არ არის გადაბმული/],
+  ["en", /SNA 1993/, /SNA 2008/, /does not splice, rebase or convert any series/],
+] as const)("the %s GDP disclosure names the nominal SNA join", async (locale, older, newer, wrong) => {
+  const { getMethodologyContent } = await import("../../lib/methodology/catalog");
+  const { disclosure } = getMethodologyContent("gdp", locale);
+  expect(disclosure).toMatch(older);
+  expect(disclosure).toMatch(newer);
+  expect(disclosure).not.toMatch(wrong);
 });

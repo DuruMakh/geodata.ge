@@ -2911,8 +2911,8 @@
   },
   "source.wb_gdp_real_usd_2015": {
     "title": {
-      "text": "NY.GDP.MKTP.KD.json",
-      "reviewedAt": "2026-09-11"
+      "text": "World Bank · Real GDP",
+      "reviewedAt": "2026-10-13"
     },
     "publisher": {
       "text": "World Bank",
@@ -2926,8 +2926,8 @@
   },
   "source.wb_gdp_real_growth_percent": {
     "title": {
-      "text": "NY.GDP.MKTP.KD.ZG.json",
-      "reviewedAt": "2026-09-11"
+      "text": "World Bank · Annual GDP growth",
+      "reviewedAt": "2026-10-13"
     },
     "publisher": {
       "text": "World Bank",
@@ -2941,8 +2941,8 @@
   },
   "source.wb_gdp_metadata": {
     "title": {
-      "text": "wb_indicator_metadata.json",
-      "reviewedAt": "2026-09-11"
+      "text": "World Bank · GDP indicator metadata",
+      "reviewedAt": "2026-10-13"
     },
     "publisher": {
       "text": "World Bank",

@@ -3,7 +3,7 @@
 // The read-only tools, wired to the pure query core. This file owns names,
 // descriptions, schemas and annotations; it owns no arithmetic. Every figure
 // still comes from lib/factQuery/, and every error envelope is the core's own.
-import { McpServer } from "@modelcontextprotocol/server";
+import { McpServer, type StandardSchemaWithJSON } from "@modelcontextprotocol/server";
 import type { ZodTypeAny } from "zod";
 import { compare } from "../factQuery/compare";
 import { describeCoverage } from "../factQuery/describeCoverage";
@@ -16,7 +16,7 @@ import { queryEconomicSectors } from "../factQuery/queryEconomicSectors";
 import { queryEconomicSectorsInput } from "../factQuery/schemas";
 import { queryRegionalEconomies } from "../factQuery/queryRegionalEconomies";
 import { queryRegionalEconomiesInput } from "./schemas.regional-economies";
-import { inflationDatasetPeriods } from "../factQuery/inflationData";
+import { inflationDatasetPeriods, inflationEntityPeriods } from "../factQuery/inflationData";
 import { inflationCellCount, queryInflation } from "../factQuery/queryInflation";
 import { queryInflationInput } from "../factQuery/schemas";
 import { productQueryCellCount, queryInflationProducts } from "../factQuery/queryInflationProducts";
@@ -36,7 +36,8 @@ import {
   queryNationalInput,
   rankInput,
 } from "../factQuery/schemas";
-import { SECTOR_QUERY_MEASURES } from "../factQuery/economicSectorsSeries";
+import { SECTOR_QUERY_MEASURES, sectorMeasureYearSpans } from "../factQuery/economicSectorsSeries";
+import { MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
 import { serverInstructions, type SectorMeasureYears } from "./instructions";
 import { outputSchemaFor } from "./outputSchema";
 import { boundedToolResult, LIMITS, tooLargeResponse, toolResult } from "./result";
@@ -60,6 +61,15 @@ type ServiceFacts = {
   sectorMeasureYears: SectorMeasureYears;
   inflationPeriods: string;
   inflationGroupCount: number;
+  regionalRegions: number;
+  regionalActivities: number;
+  regionalLastYear: number;
+  cityLabelsEn: string[];
+  cityFirstPeriod: string;
+  cityDivisions: number;
+  municipalities: number;
+  municipalRegions: number;
+  sectorActivities: number;
 };
 
 /**
@@ -79,8 +89,8 @@ export const TOOLS: readonly ToolDefinition[] = [
   {
     name: "query_regional_economies",
     title: "რეგიონული ეკონომიკები / Regional economies",
-    describe: coverage =>
-      `Annual GDP and 20 NACE Rev.2 economic activities for Georgia's 11 published regions, ${coverage["regional-economies"]}. Measures: amount_gel and share_of_region_gdp_pct. Values are current-price GEL; activities are GVA at basic prices, while each share divides by the same region's complete market-price GDP. Percent 7.5 means 7.5%. No 2025, real growth, per-capita values, national GDP share, rankings, forecasts or multi-region chart implication.`,
+    describe: (coverage, facts) =>
+      `Annual GDP and ${facts.regionalActivities} NACE Rev.2 economic activities for Georgia's ${facts.regionalRegions} published regions, ${coverage["regional-economies"]}. Measures: amount_gel and share_of_region_gdp_pct. Values are current-price GEL; activities are GVA at basic prices, while each share divides by the same region's complete market-price GDP. Percent 7.5 means 7.5%. No year after ${facts.regionalLastYear}, real growth, per-capita values, national GDP share, rankings, forecasts or multi-region chart implication.`,
     schema: queryRegionalEconomiesInput,
     run: queryRegionalEconomies,
   },
@@ -113,7 +123,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "Take the latest month from describe_coverage. Monthly changes do not add up to annual inflation, and the 12-month average is not annual inflation. " +
       "One answer fits about 250 cells (entities × series × months): a single series' full history, or a year of every division's contributions. " +
       "Beyond that ask for fewer months or groups; a result over the response-size limit is refused and points to the bulk files. " +
-      "Optional entityIds: country.georgia (default) or the six city.* ids from describe_coverage — Tbilisi, Kutaisi, Batumi, Gori, Telavi, Zugdidi — from 2016-01, for cpi.headline and cpi.cat.01–12 (yoy_pct, mom_pct; avg12_pct for cpi.headline). Cells count entities × series × months.",
+      `Optional entityIds: country.georgia (default) or the ${facts.cityLabelsEn.length} city.* ids from describe_coverage — ${facts.cityLabelsEn.join(", ")} — from ${facts.cityFirstPeriod}, for cpi.headline and cpi.cat.01–12 (yoy_pct, mom_pct; avg12_pct for cpi.headline). Cells count entities × series × months.`,
     schema: queryInflationInput,
     run: (snapshot, input) => queryInflation(snapshot, input),
   },
@@ -132,20 +142,21 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "describe_coverage",
-    title: "დაფარვა და შესაძლებლობები",
+    title: "დაფარვა და შესაძლებლობები / Coverage and capabilities",
     describe: (_coverage, facts) =>
       "Ask this FIRST when you do not already know an id. Returns the datasets, entities, series, " +
       "hierarchy, calculated totals, legal measures, year coverage and documented exclusions that " +
       "actually exist. Optional `search` matches reviewed Georgian and English labels and Latin slugs, and works WITHOUT " +
       `a datasetId — search alone looks across all ${facts.datasetCount} datasets and each match names the dataset ` +
-      "it belongs to, so you can find an id before you know where it lives. Georgian case endings " +
+      "it belongs to, so you can find an id before you know where it lives. A search answers with the matches and " +
+      "the datasets they belong to, not the whole catalogue. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
     schema: describeCoverageInput,
     run: (snapshot, input) => describeCoverage(snapshot, input),
   },
   {
     name: "query_national",
-    title: "სახელმწიფო ბიუჯეტი",
+    title: "სახელმწიფო ბიუჯეტი / State budget",
     describe: (coverage) =>
       `Annual Georgian consolidated-budget receipts or state-budget expenditure by category, ${coverage["national-revenue"]} for ` +
       `revenue and ${coverage["national-expenditure"]} for expenditure, in nominal GEL. Measures: ` +
@@ -156,7 +167,7 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "query_ministries",
-    title: "უწყებები და პროგრამები",
+    title: "უწყებები და პროგრამები / Ministries and programs",
     describe: (coverage) =>
       `Spending by administrative category (ministry) or by major program, ${coverage.ministries}, in ` +
       "nominal GEL. Set `level` to admin_category or major_program; the two levels are separate " +
@@ -167,12 +178,12 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "query_municipal",
-    title: "მუნიციპალური ხარჯები",
-    describe: (coverage) =>
-      `Municipal expenditure by function, ${coverage["municipal-expenditure"]}, for 64 municipalities, 11 ` +
+    title: "მუნიციპალური ხარჯები / Municipal expenditure",
+    describe: (coverage, facts) =>
+      `Municipal expenditure by function, ${coverage["municipal-expenditure"]}, for ${facts.municipalities} municipalities, ${facts.municipalRegions} ` +
       "regions and the Georgia aggregate. `entityIds` takes a municipality code, a region id " +
       "(region.adjara) or the country id. Measures: amount_gel, share_of_total_pct, " +
-      "gel_per_resident (2025 municipality/region totals only). Five municipal codes are excluded as not territorially attributable and " +
+      `gel_per_resident (${MUNICIPAL_PER_RESIDENT_YEAR} municipality/region totals only). Five municipal codes are excluded as not territorially attributable and ` +
       "return an explained exclusion rather than a number. These are municipal budgets, not a " +
       "territorial split of national spending.",
     schema: queryMunicipalInput,
@@ -180,7 +191,7 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "query_debt",
-    title: "სახელმწიფო ვალი",
+    title: "სახელმწიფო ვალი / Government debt",
     describe: (coverage) =>
       `Annual Georgian government debt, ${coverage["government-debt"]}. Three families: stock (how ` +
       "much debt exists), service (principal and interest paid) and rate (year-end weighted-average " +
@@ -195,7 +206,7 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "query_deficit",
-    title: "ზოგადი მთავრობის ბალანსი",
+    title: "ზოგადი მთავრობის ბალანსი / General government balance",
     describe: (coverage) =>
       `The general government balance as measured by the IMF, ${coverage["general-government-balance"]}. ` +
       "Measures: share_of_gdp_pct and amount_gel, both published by the source rather than derived " +
@@ -207,7 +218,7 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "compare",
-    title: "შედარება ორ წელს შორის",
+    title: "შედარება ორ წელს შორის / Comparison between two years",
     describe: () =>
       "Change between two years, or for inflation two months, for one target, with the comparability judgement attached. " +
       "Budget, debt and balance targets require fromYear < toYear. Inflation targets { dataset: \"inflation\", seriesIds } " +
@@ -222,7 +233,7 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "rank",
-    title: "დალაგება",
+    title: "დალაგება / Ranking",
     describe: () =>
       "Order series or entities by value or by change. `metric: value` requires `year`; the change " +
       "metrics require `fromYear` and `toYear` (cross-field rules the JSON Schema cannot express). " +
@@ -237,7 +248,7 @@ export const TOOLS: readonly ToolDefinition[] = [
   },
   {
     name: "get_sources",
-    title: "წყაროები",
+    title: "წყაროები / Sources",
     describe: () =>
       "The public originals behind a set of sourceIds: title, publisher, official and archived URLs, " +
       "checksum and coverage years. Optionally narrowed by dataset, years or entities. A source " +
@@ -261,40 +272,118 @@ function datasetCoverage(snapshot: FactQuerySnapshot): DatasetCoverage {
   return coverage;
 }
 
-/** Sector measures start in different years: real growth needs a prior year to grow from. */
-function sectorMeasureYears(snapshot: FactQuerySnapshot): SectorMeasureYears {
-  return Object.fromEntries(
-    Object.entries(SECTOR_QUERY_MEASURES).map(([queryMeasure, measure]) => {
-      const years = snapshot.economicSectors.facts.filter((fact) => fact.measure === measure).map((fact) => fact.year);
-      return [queryMeasure, `${Math.min(...years)}-${Math.max(...years)}`];
-    }),
-  );
+function serviceFacts(snapshot: FactQuerySnapshot, coverage: DatasetCoverage): ServiceFacts {
+  const spans = sectorMeasureYearSpans(snapshot);
+  const activities = (registry: { classificationCode: string | null }[]) => registry.filter((series) => series.classificationCode !== null).length;
+  return {
+    datasetCount: Object.keys(coverage).length,
+    sectorMeasureYears: Object.fromEntries(
+      Object.entries(SECTOR_QUERY_MEASURES).map(([queryMeasure, measure]) => [queryMeasure, `${spans[measure][0]}-${spans[measure][1]}`]),
+    ),
+    inflationPeriods: inflationDatasetPeriods(snapshot).join(" to "),
+    inflationGroupCount: snapshot.inflation.groups.length,
+    regionalRegions: snapshot.regionalEconomies.regions.length,
+    regionalActivities: activities(snapshot.regionalEconomies.registry),
+    regionalLastYear: Math.max(...snapshot.regionalEconomies.facts.map((fact) => fact.year)),
+    cityLabelsEn: snapshot.inflation.cityEntities.map((city) => city.labelEn),
+    cityFirstPeriod: [...inflationEntityPeriods(snapshot).values()].map(([first]) => first).sort()[0] ?? "see describe_coverage",
+    cityDivisions: new Set(snapshot.inflation.cities.map((fact) => fact.seriesId).filter((id) => id.startsWith("cpi.cat."))).size,
+    municipalities: snapshot.municipal.municipalities.length,
+    municipalRegions: snapshot.municipal.regions.length,
+    sectorActivities: activities(snapshot.economicSectors.registry),
+  };
 }
+
+type ServiceText = { instructions: string; descriptions: ReadonlyMap<string, string> };
+
+/**
+ * What the server says about itself depends on the snapshot alone, and every
+ * exchange builds a new server, so building it per request rebuilt the whole
+ * catalogue for a ping (U30-01). Keyed by the snapshot object, which the loader
+ * keeps for the life of the instance.
+ */
+const serviceTextBySnapshot = new WeakMap<FactQuerySnapshot, ServiceText>();
+
+function serviceText(snapshot: FactQuerySnapshot): ServiceText {
+  const cached = serviceTextBySnapshot.get(snapshot);
+  if (cached !== undefined) return cached;
+
+  const coverage = datasetCoverage(snapshot);
+  const facts = serviceFacts(snapshot, coverage);
+  const text: ServiceText = {
+    instructions: serverInstructions(
+      coverage,
+      {
+        // Counted, not written down, for the same reason the year ranges are.
+        municipalities: facts.municipalities,
+        regions: facts.municipalRegions,
+        regionalEconomyRegions: facts.regionalRegions,
+        regionalActivities: facts.regionalActivities,
+        regionalLastYear: facts.regionalLastYear,
+        sectorActivities: facts.sectorActivities,
+        cities: facts.cityLabelsEn.length,
+        cityDivisions: facts.cityDivisions,
+        cityFirstPeriod: facts.cityFirstPeriod,
+      },
+      facts.sectorMeasureYears,
+    ),
+    descriptions: new Map(TOOLS.map((tool) => [tool.name, tool.describe(coverage, facts)])),
+  };
+  serviceTextBySnapshot.set(snapshot, text);
+  return text;
+}
+
+/**
+ * Drops what Zod emits that tells a client nothing: the ±(2^53 - 1) bounds on
+ * every integer and `additionalProperties: {}`. Keys inside a `properties` map
+ * are field names, not keywords, so they are never dropped.
+ */
+function compactJsonSchema(value: unknown, isPropertyMap = false): unknown {
+  if (Array.isArray(value)) return Object.freeze(value.map((item) => compactJsonSchema(item)));
+  if (value === null || typeof value !== "object") return value;
+  const compact: Record<string, unknown> = {};
+  for (const [key, item] of Object.entries(value)) {
+    if (!isPropertyMap) {
+      if ((key === "minimum" && item === Number.MIN_SAFE_INTEGER) || (key === "maximum" && item === Number.MAX_SAFE_INTEGER)) continue;
+      if (key === "additionalProperties" && item !== null && typeof item === "object" && Object.keys(item).length === 0) continue;
+    }
+    compact[key] = compactJsonSchema(item, !isPropertyMap && key === "properties");
+  }
+  return Object.freeze(compact);
+}
+
+/**
+ * The SDK converts each registered schema to JSON Schema when a tool is
+ * registered and again on every tools/list. The schemas never change, so this
+ * converts each one once per instance (U30-01, U30-03). Validation is still
+ * Zod's own, so arguments and results are checked exactly as before; the
+ * cached JSON is frozen so nothing can alter what the next client is shown.
+ */
+function convertedOnce(schema: ZodTypeAny): StandardSchemaWithJSON {
+  const standard = schema["~standard"] as StandardSchemaWithJSON["~standard"];
+  const converted = new Map<string, Record<string, unknown>>();
+  const convert = (io: "input" | "output") => (options: Parameters<StandardSchemaWithJSON["~standard"]["jsonSchema"]["input"]>[0]) => {
+    const key = `${io}:${options.target}`;
+    let json = converted.get(key);
+    if (json === undefined) {
+      json = compactJsonSchema(standard.jsonSchema[io](options)) as Record<string, unknown>;
+      converted.set(key, json);
+    }
+    return json;
+  };
+  return { "~standard": { version: 1, vendor: standard.vendor, validate: standard.validate, jsonSchema: { input: convert("input"), output: convert("output") } } };
+}
+
+let registeredSchemas: Map<string, { input: StandardSchemaWithJSON; output: StandardSchemaWithJSON }> | undefined;
 
 export function createMcpServer(): McpServer {
   const snapshot = loadPackagedSnapshot();
-  const coverage = datasetCoverage(snapshot);
-  const facts: ServiceFacts = {
-    datasetCount: Object.keys(coverage).length,
-    sectorMeasureYears: sectorMeasureYears(snapshot),
-    inflationPeriods: inflationDatasetPeriods(snapshot).join(" to "),
-    inflationGroupCount: snapshot.inflation.groups.length,
-  };
+  const { instructions, descriptions } = serviceText(snapshot);
+  registeredSchemas ??= new Map(TOOLS.map((tool) => [tool.name, { input: convertedOnce(tool.schema), output: convertedOnce(outputSchemaFor(tool.name)) }]));
 
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
-    {
-      capabilities: { tools: { listChanged: false } },
-      instructions: serverInstructions(
-        coverage,
-        {
-          // Counted, not written down, for the same reason the year ranges are.
-          municipalities: snapshot.municipal.municipalities.length,
-          regions: snapshot.municipal.regions.length,
-        },
-        facts.sectorMeasureYears,
-      ),
-    },
+    { capabilities: { tools: { listChanged: false } }, instructions },
   );
 
   for (const tool of TOOLS) {
@@ -302,7 +391,7 @@ export function createMcpServer(): McpServer {
       tool.name,
       {
         title: tool.title,
-        description: tool.describe(coverage, facts),
+        description: descriptions.get(tool.name),
         // The schema is registered so clients can SEE it and build valid calls;
         // that is what prevents most errors in the first place. The SDK also
         // validates against it and rejects a shape failure with its own English
@@ -311,11 +400,11 @@ export function createMcpServer(): McpServer {
         // SEMANTIC error - unknown series, year out of range, unsupported
         // measure, result too large - still comes back as the core's own
         // bilingual envelope below.
-        inputSchema: tool.schema,
+        inputSchema: registeredSchemas.get(tool.name)!.input,
         // Declared so a client KNOWS the structured twin exists. Every response
         // has always carried one, but without this a client has no way to learn
         // that and parses the text table instead.
-        outputSchema: outputSchemaFor(tool.name),
+        outputSchema: registeredSchemas.get(tool.name)!.output,
         annotations: ANNOTATIONS,
       },
       (args: unknown) => {
