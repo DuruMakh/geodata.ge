@@ -46,6 +46,11 @@ describe("served data source resolution", () => {
 });
 
 describe("csv served data", () => {
+  it("registers accepted trade composition facts and catalogue", () => {
+    expect(SERVED_DATA_FILES.tradeCompositionEntities).toBe("../../data/taxonomy/trade-composition.json");
+    expect(SERVED_DATA_FILES.tradeCompositionFacts).toBe("../../data/imports/trade-composition-annual.csv");
+  });
+
   it("uses truthful 2004-2025 filenames for expenditure and admin facts", () => {
     expect(SERVED_DATA_FILES.budgetFacts).toBe("../../data/imports/budget-facts-2004-2025.csv");
     expect(SERVED_DATA_FILES.adminSpendingFacts).toBe("../../data/imports/admin-spending-facts-2004-2025.csv");

@@ -36,6 +36,7 @@ import {
   loadTradeProductsDataFromMirror,
   loadTradeDomesticDataFromMirror,
   loadTradeServicesDataFromMirror,
+  loadTradeCompositionDataFromMirror,
   loadRegionalEconomyFactsFromMirror,
   loadDemographyFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
@@ -48,6 +49,7 @@ import {
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
+import type { TradeCompositionData } from "../data/tradeComposition/types";
 
 // Database-backed loaders for GEODATA_DATA_SOURCE=db, reading the mirror over
 // the pooled connection. The row shapes and mapping live in ./mirrorRows so
@@ -176,6 +178,10 @@ export async function loadTradeDomesticDataFromDb() {
 }
 export async function loadTradeServicesDataFromDb() {
   return loadTradeServicesDataFromMirror(prisma);
+}
+
+export async function loadTradeCompositionDataFromDb(): Promise<TradeCompositionData> {
+  return loadTradeCompositionDataFromMirror(prisma);
 }
 export async function loadRegionalEconomyFactsFromDb() {
   return loadRegionalEconomyFactsFromMirror(prisma);

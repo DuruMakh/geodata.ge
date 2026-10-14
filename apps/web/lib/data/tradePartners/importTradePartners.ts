@@ -9,6 +9,7 @@ import { toClientTradeOverviewFact } from "../tradeOverview/importTradeOverview"
 import { TRADE_CHART_INDICATORS, type ClientTradeOverviewFact, type TradeOverviewFact, type TradeChartIndicator } from "../tradeOverview/types";
 import { tradePartnerFactKey, type TradePartnerEntity, type TradePartnerFact, type TradePartnersData, type TradePartnersAcceptance } from "./types";
 import { tradePartnersEnglishLabels, validateTradePartnersData } from "./validation";
+import type { TradeCompositionClassification } from "../tradeComposition/types";
 
 /**
  * One partner observation as the page receives it: the entity's index in `entities`, the year, the measure's index in
@@ -16,8 +17,8 @@ import { tradePartnersEnglishLabels, validateTradePartnersData } from "./validat
  * so field names and unread metadata stay server-side; Products uses the same shape.
  */
 export type ClientTradePartnerFact = [entityIndex: number, year: number, measureIndex: number, valueUsd: number | null];
-export type ClientTradePartnerEntity = Omit<TradePartnerEntity, "kind"> & { kind: TradePartnerEntity["kind"] | "service_type" };
-export type ClientTradePartnersData = { dataset?: "services"; entities: ClientTradePartnerEntity[]; facts: ClientTradePartnerFact[]; nationalFacts: ClientTradeOverviewFact[]; measures?: readonly TradeChartIndicator[] };
+export type ClientTradePartnerEntity = Omit<TradePartnerEntity, "kind"> & { kind: TradePartnerEntity["kind"] | "service_type" | "commodity_group" };
+export type ClientTradePartnersData = ({ dataset?: "services" } | { dataset: "composition"; classification: TradeCompositionClassification }) & { entities: ClientTradePartnerEntity[]; facts: ClientTradePartnerFact[]; nationalFacts: ClientTradeOverviewFact[]; measures?: readonly TradeChartIndicator[] };
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 export async function loadTradePartnersData(): Promise<TradePartnersData> {
