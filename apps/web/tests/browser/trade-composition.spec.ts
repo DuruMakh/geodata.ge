@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { createHash } from "node:crypto";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
@@ -113,6 +113,33 @@ for (const prefix of ["", "/en"]) for (const width of [1440, 390]) {
 }
 
 for (const prefix of ["", "/en"]) {
+  test(`keeps mobile classification focus visible after restoring line and table ${prefix || "ka"}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${prefix}/explorer/trade/composition#section=sitc&view=table`);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+    const measurements = [];
+    const focusArtifacts = path.join(artifacts, "focus-fix");
+    await mkdir(focusArtifacts, { recursive: true });
+    for (const [classification, mode] of [["bec", "line"], ["sitc", "table"]] as const) {
+      await section(page, classification).focus();
+      await page.keyboard.press("Enter");
+      await expect(page.getByTestId("trade-composition")).toHaveAttribute("data-section", classification);
+      await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", mode);
+      // Hash restoration is passive: measure only after the remembered mode and settled frames.
+      await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+      measurements.push(await section(page, classification).evaluate(node => {
+        const rect = node.getBoundingClientRect();
+        return { id: node.id, focused: document.activeElement === node, top: rect.top, bottom: rect.bottom, headerBottom: document.querySelector('[data-testid="data-sidebar"]')!.getBoundingClientRect().bottom, viewportHeight: innerHeight, scrollY };
+      }));
+      await page.screenshot({ path: path.join(focusArtifacts, `${prefix ? "en" : "ka"}-${classification}-${mode}-focus.png`) });
+    }
+    await writeFile(path.join(focusArtifacts, `${prefix ? "en" : "ka"}-focus-visibility.json`), JSON.stringify(measurements, null, 2));
+    for (const measurement of measurements) {
+      expect(measurement.focused).toBe(true);
+      expect(measurement.top, `${measurement.id} must clear the sticky header`).toBeGreaterThanOrEqual(measurement.headerBottom);
+      expect(measurement.bottom, `${measurement.id} must stay in the viewport`).toBeLessThanOrEqual(measurement.viewportHeight);
+    }
+  });
   test(`remembers each classification and restores shared links ${prefix || "ka"}`, async ({ page }) => {
     await page.goto(`${prefix}/explorer/trade/composition#section=sitc&view=table&measure=trade.imports&sel=goods.total,trade.sitc1.0&start=2010&end=2023`);
     await selected(page, 2, 11);

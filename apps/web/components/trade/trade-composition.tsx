@@ -16,7 +16,7 @@ export function TradeComposition({ data, sources, lastReviewedAt, siteOrigin }: 
   const pendingFocus = useRef<string | null>(null);
   useEffect(() => {
     if (!pendingFocus.current) return;
-    document.getElementById(pendingFocus.current)?.focus({ preventScroll: true });
+    document.getElementById(pendingFocus.current)?.focus();
     pendingFocus.current = null;
   }, [section]);
   const changeView = (next: typeof section) => {

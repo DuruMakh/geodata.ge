@@ -92,7 +92,7 @@ Use concise, faithful localized display labels where the source wording is long;
 
 Reuse `useTradeSectionsState` for the two views and the existing Trade hash-state helpers for comparisons. Save the active classification, flow, years, line/table mode and unlimited or explicitly empty selections. Switching views remembers each view's latest comparison during the visit. Reload, browser history, language changes and active sidebar links preserve the comparison.
 
-Use `section=sitc` or `section=bec`. Normalize unsupported flow values, category IDs from the other classification and out-of-range years through the established state rules. The default flow is Exports. Search remains local and is not saved in the URL. Restore keyboard focus to the selected classification tab in the series panel when changing view; moving the controls preserves each classification's remembered flow.
+Use `section=sitc` or `section=bec`. Normalize unsupported flow values, category IDs from the other classification and out-of-range years through the established state rules. The default flow is Exports. Search remains local and is not saved in the URL. Restore keyboard focus to the selected classification tab in the series panel when changing view, keeping it visible below the phone header after the remembered chart/table layout settles; moving the controls preserves each classification's remembered flow.
 
 ## 8. Accepted data subset
 
