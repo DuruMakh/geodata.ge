@@ -30,3 +30,15 @@ test.each(["en", "ka"] as const)("%s composition embeds flow controls below sear
     }
   }
 });
+
+
+test.each(["en", "ka"] as const)("%s wrapper mounts exactly one classification row and its approved heading/lead", async locale => {
+  const { TradeComposition } = await import("../../components/trade/trade-composition");
+  const sitc = compositionFixture("sitc"), bec = compositionFixture("bec"), p = await compositionPresentation(locale, sitc);
+  const html = renderToStaticMarkup(<I18nProvider {...p}><TradeComposition data={{ sitc, bec, englishLabels: p.englishLabels }} sources={[]} lastReviewedAt="2026-10-14" siteOrigin="https://fiscal.ge" /></I18nProvider>);
+  expect(html.match(/data-testid="trade-composition-tabs"/g)).toHaveLength(1);
+  expect(html).toContain('data-testid="trade-composition" data-section="sitc"');
+  expect(html.match(/<h1/g)).toHaveLength(1);
+  for (const key of ["title", "summary", "sitc", "bec"]) expect(html).toContain(p.messages[`trade.composition.${key}`].replaceAll("'", "&#x27;"));
+  expect(html).not.toMatch(/trade-partners-tab-|trade-partners-group-note|Domestic exports|Country groups/);
+});

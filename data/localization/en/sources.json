@@ -1605,5 +1605,33 @@
       "reviewedAt": "2026-10-11"
     },
     "derivation": null
+  },
+  "source.geostat_trade_export_sitc_2000_2026": {
+    "name": {
+      "text": "Goods exports by SITC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_export_bec_2000_2026": {
+    "name": {
+      "text": "Goods exports by BEC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_import_sitc_2000_2026": {
+    "name": {
+      "text": "Goods imports by SITC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "derivation": null
+  },
+  "source.geostat_trade_import_bec_2000_2026": {
+    "name": {
+      "text": "Goods imports by BEC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "derivation": null
   }
 }

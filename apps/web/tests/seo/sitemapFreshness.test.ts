@@ -145,4 +145,9 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
     expect(dates.get(`${SITE}/explorer/trade/products`)).toBe("2026-10-09");
     expect(dates.get(`${SITE}/en/explorer/trade/products`)).toBe("2026-10-10");
   });
+  it("dates both composition routes from the accepted data", async () => {
+    const dates = await sitemapDates();
+    expect(dates.get(`${SITE}/explorer/trade/composition`)).toBe("2026-10-14");
+    expect(dates.get(`${SITE}/en/explorer/trade/composition`)).toBe("2026-10-14");
+  });
 });

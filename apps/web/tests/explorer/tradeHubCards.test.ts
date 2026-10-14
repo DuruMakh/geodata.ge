@@ -1,6 +1,19 @@
 import { expect, test } from "vitest";
 import { tradeFixtureFacts } from "../data/tradeOverview/fixtures";
 import { buildTradeHubCards } from "../../lib/explorer/tradeHubCards";
+import { getMessages } from "../../lib/i18n/messages.server";
+test("appends composition without changing the five existing cards", async () => {
+  const facts = tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) }));
+  const presentation = { locale: "en" as const, englishLabels: {}, messages: await getMessages("en", ["trade"]) };
+  const coverage = { min: 2000, max: 2025, years: [2000, 2025] };
+  const existing = buildTradeHubCards(facts, presentation, coverage, coverage, facts, facts);
+  const composition = [2000, 2025].map((year, index) => ({ ...facts[0], year, indicatorId: "trade.exports" as const, valueUsd: [10, 50][index] }));
+  const cards = buildTradeHubCards(facts, presentation, coverage, coverage, facts, facts, composition);
+  expect(cards.slice(0, 5)).toEqual(existing);
+  expect(cards).toHaveLength(6);
+  expect(cards.at(-1)).toMatchObject({ index: "06", href: "/explorer/trade/composition", title: "Trade composition", series: [10, 50] });
+  expect(cards.at(-1)?.footer).toContain("2000–2025");
+});
 test("the hub has working Overview and Partners entries with their loaded coverage", () => {
   const cards = buildTradeHubCards(tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) })), { locale: "en", englishLabels: {}, messages: { "trade.title": "Trade Overview", "trade.summary": "Annual goods trade", "trade.annual": "Annual", "trade.partners.title": "Trading partners", "trade.partners.summary": "Countries and groups" } }, { min: 1995, max: 2025, years: [1995, 2025] });
   expect(cards).toHaveLength(2);

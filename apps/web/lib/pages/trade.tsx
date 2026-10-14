@@ -1,3 +1,6 @@
+import { TradeComposition } from "../../components/trade/trade-composition";
+import { loadServedTradeCompositionData, toClientTradeCompositionData } from "../data/tradeComposition/importTradeComposition";
+import { TRADE_COMPOSITION_SOURCES } from "../data/tradeComposition/types";
 import path from "node:path";
 import { TradeOverview } from "../../components/trade/trade-overview";
 import { TradePartners } from "../../components/trade/trade-partners";
@@ -49,9 +52,9 @@ export async function tradeOverviewMetadata(locale: Locale) {
   return fiscalMetadata({ locale, path: "/explorer/trade/overview", title: message(messages, "trade.title"), description: `${message(messages, "trade.metaDescription")} ${min}–${max}.` });
 }
 export async function renderTradeHub(locale: Locale) {
-  const [{ facts }, partners, products, domestic, services, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), getPresentation(locale, ["trade", "common"], [])]);
+  const [{ facts }, partners, products, domestic, services, composition, presentation] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), loadServedTradeCompositionData(), getPresentation(locale, ["trade", "common"], [])]);
   const title = message(presentation.messages, "trade.hubTitle");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage="" cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national)} testId="trade-hub" />;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "trade.hubSummary")} path={"/explorer/trade"} coverage="" cards={buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(toClientTradePartnersData(partners, [])), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national, toClientTradeCompositionData(composition, facts).sitc.nationalFacts.filter(fact => fact.indicatorId === "trade.exports"))} testId="trade-hub" />;
 }
 export async function tradeProductsMetadata(locale: Locale) {
   const [products, messages] = await Promise.all([loadServedTradeProductsData(), getMessages(locale, ["trade"])]);
@@ -197,6 +200,35 @@ export async function renderTradeServicesPage(locale: Locale) {
     <ExplorerPage containerQueries={false}>
       <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
       <TradeServices data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+    </ExplorerPage>
+  </I18nProvider>;
+}
+
+
+export async function tradeCompositionMetadata(locale: Locale) {
+  const [composition, national, messages] = await Promise.all([loadServedTradeCompositionData(), loadServedTradeOverviewData(), getMessages(locale, ["trade"])]);
+  const { min, max } = tradePartnersCoverage(toClientTradeCompositionData(composition, national.facts).sitc);
+  return fiscalMetadata({ locale, path: "/explorer/trade/composition", title: message(messages, "trade.composition.title"), description: `${message(messages, "trade.composition.summary")} ${min}–${max}.` });
+}
+
+export async function renderTradeCompositionPage(locale: Locale) {
+  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const [composition, national, presentation, manifest, catalogue] = await Promise.all([
+    loadServedTradeCompositionData(), loadServedTradeOverviewData(), getPresentation(locale, ["trade", "common", "controls", "main", "format", "workbook"], []), loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
+  ]);
+  const data = toClientTradeCompositionData(composition, national.facts), { min, max } = tradePartnersCoverage(data.sitc);
+  const sourceIds = new Set<string>(Object.values(TRADE_COMPOSITION_SOURCES).flatMap(sources => Object.values(sources)));
+  sourceIds.add(TRADE_OVERVIEW_SOURCE);
+  const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
+  const lastReviewedAt = [...composition.facts, ...national.facts.filter(fact => fact.year >= min && fact.year <= max && (fact.indicatorId === "trade.exports" || fact.indicatorId === "trade.imports"))].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
+  const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("composition.title");
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
+  return <I18nProvider {...presentation} englishLabels={{ ...presentation.englishLabels, ...data.englishLabels }}>
+    <JsonLd testId="explorer-dataset-json-ld" data={{ "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}/explorer/trade/composition#dataset`, name: title, description: t("composition.summary"), url: `${origin}${pageHref("/explorer/trade/composition", locale)}`, temporalCoverage: `${min}/${max}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"], spatialCoverage: { "@type": "Place", name: locale === "en" ? "Georgia" : "საქართველო" }, creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" }, publisher: { "@id": `${origin}/#organization` }, variableMeasured: [t("composition.indicator.trade.exports"), t("composition.indicator.trade.imports")] }} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/composition", locale) }]} />
+    <ExplorerPage containerQueries={false}>
+      <PageHeader crumbs={crumbs} coverage={`${min}–${max} · ${message(presentation.messages, "main.updated", { date: formatDisplayDate(lastReviewedAt, locale) })}`} />
+      <TradeComposition data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }
