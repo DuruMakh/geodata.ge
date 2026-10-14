@@ -401,3 +401,34 @@ test.describe("at 390px", () => {
       .toEqual({ wide: true, atEnd: true });
   });
 });
+
+test.describe("the year grid on a phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  test("a tap outside an open year grid closes it without pressing the link beneath", async ({ page }) => {
+    await page.goto(NATIONAL);
+    await expectAppReady(page);
+    await page.getByTestId("age-sex-year-select").tap();
+    await expect(page.getByRole("listbox")).toBeVisible();
+    // A page link in view and clear of the panel: it lies under the overlay that catches outside taps.
+    const target = await page.evaluate(() => {
+      const panel = document.querySelector('[data-testid="age-sex-year-select-panel"]')!.getBoundingClientRect();
+      for (const link of document.querySelectorAll<HTMLAnchorElement>('#content a[href^="/"]')) {
+        const box = link.getBoundingClientRect();
+        const x = box.left + box.width / 2, y = box.top + box.height / 2;
+        const clear = box.width > 0 && y > 80 && y < innerHeight - 10 && x > 0 && x < innerWidth
+          && (y < panel.top - 8 || y > panel.bottom + 8 || x > panel.right + 8);
+        if (clear) return { x, y, href: link.getAttribute("href") };
+      }
+      return null;
+    });
+    expect(target, "a link under the overlay").not.toBeNull();
+    await page.evaluate(() => { (window as unknown as { tapMarker: boolean }).tapMarker = true; });
+    const before = page.url();
+    await page.touchscreen.tap(target!.x, target!.y);
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    // A link pressed by the same tap would navigate after the grid closed; give it the time to.
+    await page.waitForTimeout(1_000);
+    expect(page.url()).toBe(before);
+    expect(await page.evaluate(() => (window as unknown as { tapMarker?: boolean }).tapMarker)).toBe(true);
+  });
+});

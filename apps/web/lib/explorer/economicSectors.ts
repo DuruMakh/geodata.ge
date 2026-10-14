@@ -62,7 +62,7 @@ function resolveRange(state: SectorState, facts: readonly ClientSectorObservatio
   return { availableYears, ...resolvePeriodRange(state.range, { min, max }) };
 }
 
-/** How many sectors the share view opens with when only Total GDP was selected (owner decision Q6). */
+/** How many sectors the share view opens with when only Total GDP was selected (plan default Q6, not yet confirmed by the owner). */
 export const SHARE_DEFAULT_SECTORS = 5;
 
 export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, facts: readonly ClientSectorObservation[]): SectorState {
