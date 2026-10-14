@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, symlinkSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, symlinkSync, unlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -12,7 +12,13 @@ const linkRoot = mkdtempSync(path.join(tmpdir(), "run-as-cli-"));
 const linkedScripts = path.join(linkRoot, "scripts");
 // A junction needs no privileges on Windows; elsewhere the type is ignored.
 symlinkSync(path.join(process.cwd(), "scripts"), linkedScripts, "junction");
-afterAll(() => rmSync(linkRoot, { recursive: true, force: true }));
+// Unlink the link itself first: a recursive remove that descended into a Windows junction would delete the real
+// scripts folder.
+afterAll(() => {
+  unlinkSync(linkedScripts);
+  rmSync(linkRoot, { recursive: true, force: true });
+  expect(existsSync(path.join(process.cwd(), "scripts", "check-nominal-gdp-consistency.ts"))).toBe(true);
+});
 
 function runTsx(script: string) {
   return spawnSync(process.execPath, [tsxCli, script], { cwd: process.cwd(), encoding: "utf8" });
