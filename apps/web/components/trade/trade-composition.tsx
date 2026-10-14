@@ -26,9 +26,10 @@ export function TradeComposition({ data, sources, lastReviewedAt, siteOrigin }: 
   return <div data-testid="trade-composition" data-section={section} className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
     <p className="mb-4 max-w-[850px] text-[13px] leading-relaxed text-[var(--body)]">{t("summary")}</p>
-    <div role="group" aria-label={t("views")} data-testid="trade-composition-tabs" className="mb-5 flex flex-wrap items-center gap-5">
+    <TradePartners key={section} data={data[section]} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={siteOrigin} navigation={(measure, changeMeasure) => <div role="group" aria-label={t("measure")} className="mb-5 flex flex-wrap items-center gap-5">
+      {data[section].measures!.map(id => <TextTab key={id} label={t(`indicator.${id}`)} active={measure === id} onClick={() => changeMeasure(id)} testId={`trade-partners-measure-${id}`} />)}
+    </div>} seriesControls={<div role="group" aria-label={t("views")} data-testid="trade-composition-tabs" className="flex flex-wrap items-center gap-x-5 gap-y-3 text-[12px]">
       {sections.map(id => <TextTab key={id} label={t(id)} active={section === id} onClick={() => changeView(id)} id={`trade-composition-section-${id}`} testId={`trade-composition-section-${id}`} />)}
-    </div>
-    <TradePartners key={section} data={data[section]} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={siteOrigin} />
+    </div>} />
   </div>;
 }

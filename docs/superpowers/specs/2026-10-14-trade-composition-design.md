@@ -27,7 +27,7 @@ Serve only Exports and Imports. Add no category turnover, balance or re-export d
 - Georgian route: `/explorer/trade/composition`; title: `საქონლით ვაჭრობის სტრუქტურა`.
 - English route: `/en/explorer/trade/composition`; title: `Trade composition`.
 - One short lead line: `Compare Georgia's goods exports and imports by broad product groups and economic categories.` Provide its Georgian translation.
-- One page-level text-tab row: **Goods groups | Economic categories**, with localized labels. Start with Goods groups.
+- Owner-requested placement amendment (2026-10-14): one page-level **Exports | Imports** text-tab row above the workspace; **Goods groups | Economic categories** below search in the series panel, with localized labels and readable phone wrapping. Start with Goods groups.
 - Append the page as the sixth Trade hub card and the last Trade sidebar child, preserving the existing five entries' order. Use loaded coverage and a national goods-exports sparkline restricted to those years.
 - Reuse breadcrumbs, language links, metadata, Dataset JSON-LD, sitemap and the existing page shell.
 - Extend the existing bilingual `/methodology/trade` page and the Trade source archive.
@@ -40,7 +40,7 @@ Reuse the Trading partners comparison workspace through a small explicit composi
 
 - Default to Exports, Line mode and the full accepted range in each view.
 - Only removable Georgia total is selected initially, first in the selector.
-- Exports/Imports controls sit below search in the series panel, matching the established embedded Trade layout. Do not add a second page-level tab row.
+- Exports/Imports controls sit above the workspace through the existing Trade navigation slot. Goods groups/Economic categories use a small optional series-controls slot below search. Render each control group once.
 - Keep unlimited selection, local bilingual label/code search, global Clear/Select all, the standard selected/all count and the native Excel action.
 - The full catalogue consists of Georgia total plus ten or seven categories, according to the active view. Search does not narrow bulk actions, counts, ranking or export.
 - Reuse the line chart, table, year range controls, selection aids and source note. Missing values remain gaps/dashes/blank cells; published zero and negative values retain their meaning.
@@ -92,7 +92,7 @@ Use concise, faithful localized display labels where the source wording is long;
 
 Reuse `useTradeSectionsState` for the two views and the existing Trade hash-state helpers for comparisons. Save the active classification, flow, years, line/table mode and unlimited or explicitly empty selections. Switching views remembers each view's latest comparison during the visit. Reload, browser history, language changes and active sidebar links preserve the comparison.
 
-Use `section=sitc` or `section=bec`. Normalize unsupported flow values, category IDs from the other classification and out-of-range years through the established state rules. The default flow is Exports. Search remains local and is not saved in the URL. Restore keyboard focus appropriately when changing view.
+Use `section=sitc` or `section=bec`. Normalize unsupported flow values, category IDs from the other classification and out-of-range years through the established state rules. The default flow is Exports. Search remains local and is not saved in the URL. Restore keyboard focus to the selected classification tab in the series panel when changing view; moving the controls preserves each classification's remembered flow.
 
 ## 8. Accepted data subset
 

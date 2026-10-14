@@ -10,7 +10,7 @@ type Classification = "sitc" | "bec";
 type Fact = { entity_id?: string; year: string; indicator_id: string; value_usd: string };
 type Entity = { id: string; classification: Classification; sourceCode: string; labelKa: string; labelEn: string };
 const root = path.resolve(process.cwd(), "../..");
-const artifacts = path.join(root, ".tmp/trade-composition");
+const artifacts = path.join(root, ".tmp/trade-composition-controls");
 let facts: Fact[], national: Fact[], entities: Entity[];
 test.beforeAll(async () => {
   facts = parse(await readFile(path.join(root, "data/imports/trade-composition-annual.csv")), { columns: true, bom: true });
@@ -60,6 +60,13 @@ for (const prefix of ["", "/en"]) for (const width of [1440, 390]) {
     await expect(page.getByTestId("range-end-handle")).toHaveAttribute("aria-valuenow", "2025");
     await expect(page.getByTestId("trade-composition-tabs")).toHaveCount(1);
     await expect(page.getByTestId("trade-composition-tabs").getByRole("button")).toHaveCount(2);
+    await expect(page.getByTestId("series-selector").getByTestId("trade-composition-tabs")).toHaveCount(1);
+    for (const flow of ["trade.exports", "trade.imports"]) {
+      const control = page.getByTestId(`trade-partners-measure-${flow}`);
+      await expect(control).toHaveCount(1);
+      expect(await control.evaluate(node => Boolean(node.closest('[data-testid="explorer-workspace"]')))).toBe(false);
+      expect((await control.boundingBox())!.y).toBeLessThan((await page.getByTestId("explorer-workspace").boundingBox())!.y);
+    }
     await expect(page.getByTestId("trade-partners-tab-countries")).toHaveCount(0);
     await expect(page.getByTestId("trade-partners-tab-groups")).toHaveCount(0);
     expect(await page.getByTestId("series-selector").locator('[data-selector-section]').evaluateAll(nodes => nodes.map(node => node.getAttribute("data-selector-section")))).toEqual(["search", "controls", "actions", "list"]);

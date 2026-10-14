@@ -7,7 +7,7 @@ import { buildTradePartnersModel } from "../../lib/explorer/tradePartners";
 import { parseTradePartnersHash } from "../../lib/explorer/tradePartnersState";
 import { compositionFixture, compositionPresentation } from "./tradeCompositionFixtures";
 
-test.each(["en", "ka"] as const)("%s composition embeds flow controls below search with one removable total and complete ranking", async locale => {
+test.each(["en", "ka"] as const)("%s shared composition workspace retains default flow controls and complete ranking", async locale => {
   for (const classification of ["sitc", "bec"] as const) {
     const data = compositionFixture(classification), p = await compositionPresentation(locale, data);
     const html = renderToStaticMarkup(<I18nProvider {...p}><TradePartners data={data} sources={[]} lastReviewedAt="2026-10-14" siteOrigin="https://fiscal.ge" /></I18nProvider>);
@@ -32,11 +32,17 @@ test.each(["en", "ka"] as const)("%s composition embeds flow controls below sear
 });
 
 
-test.each(["en", "ka"] as const)("%s wrapper mounts exactly one classification row and its approved heading/lead", async locale => {
+test.each(["en", "ka"] as const)("%s wrapper places flow above the workspace and classification below search", async locale => {
   const { TradeComposition } = await import("../../components/trade/trade-composition");
   const sitc = compositionFixture("sitc"), bec = compositionFixture("bec"), p = await compositionPresentation(locale, sitc);
   const html = renderToStaticMarkup(<I18nProvider {...p}><TradeComposition data={{ sitc, bec, englishLabels: p.englishLabels }} sources={[]} lastReviewedAt="2026-10-14" siteOrigin="https://fiscal.ge" /></I18nProvider>);
   expect(html.match(/data-testid="trade-composition-tabs"/g)).toHaveLength(1);
+  for (const flow of ["trade.exports", "trade.imports"]) {
+    expect(html.match(new RegExp(`data-testid="trade-partners-measure-${flow}"`, "g"))).toHaveLength(1);
+    expect(html.indexOf(`data-testid="trade-partners-measure-${flow}"`)).toBeLessThan(html.indexOf('data-testid="explorer-workspace"'));
+  }
+  expect(html.indexOf('data-testid="series-search"')).toBeLessThan(html.indexOf('data-testid="trade-composition-tabs"'));
+  expect(html.indexOf('data-testid="trade-composition-tabs"')).toBeLessThan(html.indexOf('data-testid="series-status"'));
   expect(html).toContain('data-testid="trade-composition" data-section="sitc"');
   expect(html.match(/<h1/g)).toHaveLength(1);
   for (const key of ["title", "summary", "sitc", "bec"]) expect(html).toContain(p.messages[`trade.composition.${key}`].replaceAll("'", "&#x27;"));

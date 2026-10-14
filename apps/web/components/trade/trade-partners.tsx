@@ -26,7 +26,7 @@ import { useTradePartnersState } from "./use-trade-partners-state";
 import { TradePartnersSeriesPanel } from "./trade-partners-series-panel";
 import { TradePartnersRanking } from "./trade-partners-ranking";
 
-export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navigation }: { data: ClientTradePartnersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string; navigation?: (measure: TradeChartIndicator, changeMeasure: (next: TradeChartIndicator) => void) => ReactNode }) {
+export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navigation, seriesControls }: { data: ClientTradePartnersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string; navigation?: (measure: TradeChartIndicator, changeMeasure: (next: TradeChartIndicator) => void) => ReactNode; seriesControls?: ReactNode }) {
   const services = data.dataset === "services", composition = data.dataset === "composition", domestic = !services && !composition && Boolean(data.measures), embedded = services || domestic || composition;
   const totalId = tradePartnersTotalId(data);
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
@@ -60,7 +60,7 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
         </section>
         <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, composition ? "trade.composition.sourceNote" : services ? "trade.services.sourceNote" : "trade.sourceNote")} · {model.range.start}–{model.range.end} · {lastReviewedAt}<Link href={pageHref("/methodology/trade", locale)} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{composition ? t("definitions") : services ? message(messages, "trade.services.definitions") : domestic ? message(messages, "trade.domestic.countryDefinitions") : t("definitions")}</p></div>
       </div>
-      <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} measureControls={navigation ? undefined : measureControls} downloadAction={downloadAction} /></SeriesAside>
+      <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} measureControls={seriesControls ?? (navigation ? undefined : measureControls)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <TradePartnersRanking key={`${state.tab}:${state.measure}:${model.range.end}`} model={model} tab={state.tab} measure={state.measure} />
   </div>;
