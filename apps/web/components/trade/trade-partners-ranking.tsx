@@ -15,18 +15,19 @@ export function TradePartnersRanking({ model, tab, measure, pageSize }: { model:
   const t = (key: string) => message(messages, `trade.partners.${key}`);
   const p = (key: string) => message(messages, `trade.products.${key}`);
   const services = tab === "types";
-  const balance = measure === "trade.balance", showAll = tab === "groups" || services || expanded;
-  const signed = balance || (tab === "products" && model.ranking.some(row => row.valueUsd! < 0));
+  const composition = tab === "categories";
+  const balance = measure === "trade.balance", showAll = tab === "groups" || services || composition || expanded;
+  const signed = balance || ((tab === "products" || composition) && model.ranking.some(row => row.valueUsd! < 0));
   const complete = [...model.ranking, ...model.missingRanking], pageCount = pageSize ? Math.ceil(complete.length / pageSize) : 1;
   const rows = showAll ? pageSize ? complete.slice(page * pageSize, (page + 1) * pageSize) : model.ranking : model.ranking.slice(0, 10);
-  const title = message(messages, services ? "trade.services.rankingTitle" : tab === "products" ? "trade.products.rankingTitle" : "trade.partners.rankingTitle", { measure: message(messages, `trade.${services ? "services." : ""}indicator.${measure}`), kind: t(tab === "countries" ? "countries" : "groups"), year: model.range.end });
+  const title = message(messages, composition ? "trade.composition.rankingTitle" : services ? "trade.services.rankingTitle" : tab === "products" ? "trade.products.rankingTitle" : "trade.partners.rankingTitle", { measure: message(messages, `trade.${composition ? "composition." : services ? "services." : ""}indicator.${measure}`), kind: t(tab === "countries" ? "countries" : "groups"), year: model.range.end });
   const shareRow = (item: TradeProductRankingRow) => ({ entityId: item.entityId, label: item.label, valueUsd: item.valueUsd, share: item.shareOfNational, rank: item.rank, color: item.color });
   const listed = showAll && !pageSize ? [...model.ranking, ...model.missingRanking] : rows;
-  const note = services ? message(messages, balance ? "trade.services.balanceRankingNote" : "trade.services.shareNote") : tab === "products" || measure === "trade.domestic_exports" || measure === "trade.reexports" ? p("shareNote") : t(balance ? "balanceRankingNote" : "shareNote");
-  const itemLabel = services ? message(messages, "trade.services.type") : tab === "products" ? p("series") : t(tab === "countries" ? "country" : "group");
+  const note = composition ? message(messages, "trade.composition.shareNote") : services ? message(messages, balance ? "trade.services.balanceRankingNote" : "trade.services.shareNote") : tab === "products" || measure === "trade.domestic_exports" || measure === "trade.reexports" ? p("shareNote") : t(balance ? "balanceRankingNote" : "shareNote");
+  const itemLabel = composition ? message(messages, "trade.composition.category") : services ? message(messages, "trade.services.type") : tab === "products" ? p("series") : t(tab === "countries" ? "country" : "group");
   return <ExternalRanking
     testId="trade-partners" data={{ "end-year": model.range.end, "has-share": String(!balance) }}
-    title={title} itemLabel={itemLabel} shareLabel={services ? message(messages, "trade.services.share") : t("share")} note={note} empty={t("noRanking")}
+    title={title} itemLabel={itemLabel} shareLabel={composition ? message(messages, "trade.composition.share") : services ? message(messages, "trade.services.share") : t("share")} note={note} empty={t("noRanking")}
     rows={listed.map(shareRow)} other={null} unit={model.unit} signed={signed} barMax={Math.max(...model.ranking.map(row => Math.abs(row.valueUsd!)), 1)}
     showShare={!balance} rankLabel={t("rank")} unavailableLabel={t("unavailable")}
     footer={<>
