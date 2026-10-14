@@ -184,6 +184,17 @@ test.describe("the Age and sex page", () => {
     await expect(trigger).not.toHaveAttribute("aria-controls", /.+/);
   });
 
+  test("a click outside an open year grid closes it and returns focus to its trigger", async ({ page }) => {
+    await page.goto(NATIONAL);
+    await expectAppReady(page);
+    await openPicker(page, "age-sex-year-select");
+    // Beside the panel: the press lands on the page behind it.
+    const panel = (await page.getByTestId("age-sex-year-select-panel").boundingBox())!;
+    await page.mouse.click(panel.x + panel.width + 40, panel.y + 10);
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    await expect(page.getByTestId("age-sex-year-select")).toBeFocused();
+  });
+
   test("a grid opened by mouse shows the ring after the arrows, and a click on its footer keeps Escape working", async ({ page }) => {
     await page.goto(`${NATIONAL}#year=2010`);
     await expectAppReady(page);
@@ -325,6 +336,8 @@ test.describe("the Age and sex block on a place page", () => {
     await page.goto(IMERETI);
     await expectAppReady(page);
     const section = page.getByTestId("age-sex-section");
+    // The settlement tabs are one named row of text tabs (DESIGN.md §7.7).
+    await expect(section.getByRole("group", { name: "Settlement type" }).getByRole("button")).toHaveCount(3);
     await section.getByTestId("age-sex-mode-table").click();
     const total = section.getByTestId("age-sex-panel").locator("tbody tr").last().locator("td").nth(2);
     await expect(total).toHaveText("510,741");

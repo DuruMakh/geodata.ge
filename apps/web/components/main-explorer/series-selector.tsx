@@ -194,7 +194,8 @@ export function SeriesSelector({
       >
         {children}
       </div>
-      {listLayout === "scroll" ? <span ref={listEnd} tabIndex={-1} className="outline-none" /> : null}
+      {/* Where "skip the list" lands: named, so a screen reader says where focus went. */}
+      {listLayout === "scroll" ? <span ref={listEnd} tabIndex={-1} className="sr-only">{message(messages, "controls.listEnd")}</span> : null}
     </div>
   );
 }

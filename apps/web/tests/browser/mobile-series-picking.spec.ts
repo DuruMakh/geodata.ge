@@ -67,6 +67,8 @@ test.describe("desktop", () => {
     await expect(skip).toHaveText("Skip the list");
     expect((await skip.boundingBox())!.height).toBeGreaterThan(0);
     await page.keyboard.press("Enter");
+    // Focus lands on a named point, so a screen reader says where it went.
+    await expect(page.locator(":focus")).toHaveText("End of the list");
     await page.keyboard.press("Tab");
     await expect(page.getByTestId("inflation-product-download")).toBeFocused();
   });

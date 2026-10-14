@@ -89,7 +89,7 @@ describe("series names", () => {
     // Side KPIs, movers and the period comparison.
     const indicators = textOf(section(html, "period-indicators"));
     expect(indicators).toContain(`\n${HEALTH}\n`); // biggest increase, fastest mover, comparison row
-    expect(indicators).toContain(`\n${HEALTH}, 2025\n`); // largest share of GDP
+    expect(indicators).toMatch(new RegExp(`\n${HEALTH}\n+, 2025\n`)); // largest share of GDP; its year is its own span
     expect(indicators.match(new RegExp(`\n${ROADS}\n`, "g"))?.length).toBeGreaterThanOrEqual(3);
     expect(legend + indicators).not.toContain("…");
   });

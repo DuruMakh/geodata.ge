@@ -26,8 +26,11 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.evaluate(() => document.fonts.ready);
     await page.getByTestId("trade-partners-show-all").click();
     expect(await page.getByTestId("trade-partners-ranking-row").count() + await page.getByTestId("trade-partners-unavailable-row").count()).toBe(212);
+    await expect(page.getByTestId("series-skip-list")).toHaveCount(1);
     await page.getByTestId("trade-partners-tab-groups").click();
     await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(5);
+    // The five groups are a short list: no scroller and no skip button (U21-01 applies to the countries).
+    await expect(page.getByTestId("series-skip-list")).toHaveCount(0);
     await toggle(page, "group.eu").click();
     await page.getByTestId("trade-partners-tab-countries").click();
     await expect(page.getByTestId("trade-partners-off-tab")).toContainText(prefix ? "European Union" : "ევროკავშირი");

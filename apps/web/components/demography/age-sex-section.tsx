@@ -16,7 +16,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
-import { SectionTitle, SegmentedTabs, SourceNote, TextTab } from "../ui/editorial";
+import { SectionTitle, SegmentedTabs, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
 import { Download, SECTION_CLASS } from "./demography-helpers";
 import { PopulationPyramid, PyramidTable } from "./population-pyramid";
 
@@ -64,11 +64,11 @@ export function AgeSexSection({
     <section id="age-sex" aria-labelledby="age-sex-title" data-testid="age-sex-section" className={`@container ${SECTION_CLASS}`}>
       <SectionTitle id="age-sex-title">{t("ageSexCensusHeading")}</SectionTitle>
       <div className="mt-4 mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-        <div className="flex flex-wrap items-center gap-x-7 gap-y-3">
+        <TextTabGroup ariaLabel={t("settlementLabel")} className="flex flex-wrap items-center gap-x-7 gap-y-3">
           {SETTLEMENTS.map(({ id, key }) => (
             <TextTab key={id} label={t(key)} active={settlement === id} onClick={() => setSettlement(id)} testId={`age-sex-settlement-${id}`} />
           ))}
-        </div>
+        </TextTabGroup>
         <SegmentedTabs<AgeMeasure>
           ariaLabel={t("measureLabel")}
           value={measure}

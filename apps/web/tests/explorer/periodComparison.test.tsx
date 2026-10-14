@@ -40,4 +40,10 @@ describe("PeriodComparisonTable", () => {
     expect(render().match(/<tr/g) ?? []).toHaveLength(3);
     expect(render("municipal").match(/<tr/g) ?? []).toHaveLength(3);
   });
+
+  it.each(["national", "municipal"] as const)("names each value by its column and row header: %s", (variant) => {
+    const html = render(variant);
+    expect(html.match(/<th scope="col"/g) ?? []).toHaveLength(4);
+    expect([...html.matchAll(/<th scope="row"[^>]*>([\s\S]*?)<\/th>/g)].map((match) => match[1].replace(/<[^>]+>/g, ""))).toEqual(["Total", "Alpha"]);
+  });
 });

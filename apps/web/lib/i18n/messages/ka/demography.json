@@ -196,6 +196,7 @@
   "demography.settlementAll": "ყველა",
   "demography.settlementUrban": "ქალაქი",
   "demography.settlementRural": "სოფელი",
+  "demography.settlementLabel": "დასახლების ტიპი",
   "demography.unitShare": "% მოსახლეობისგან",
   "demography.ageSexCensusHeading": "ასაკი და სქესი · აღწერა, 2024 წლის 14 ნოემბერი",
   "demography.measureLabel": "საზომი",

@@ -101,7 +101,9 @@ export function Indicators({ model, scope, unit }: IndicatorsProps) {
       value: largestShare ? formatShare(largestShare.shareByYear?.[endYear] ?? null) : MISSING,
       unit: "",
       color: "var(--ink)",
-      detail: largestShare ? `${rowLabel(largestShare)}, ${endYear}` : MISSING,
+      detail: largestShare ? rowLabel(largestShare) : MISSING,
+      // The year is meaning-bearing: a long name must not ellipsize it away from 768px.
+      detailSuffix: largestShare ? `, ${endYear}` : undefined,
       spark: largestShare ? { values: buildKpiShareSeries(largestShare, years), color: ACCENT } : null,
     },
   ].filter((kpi) => !singleYear || !kpi.isDelta);

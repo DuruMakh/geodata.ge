@@ -998,7 +998,8 @@ test.describe("municipality page", () => {
     expect(sizes.containerScrollWidth).toBe(sizes.containerClientWidth);
     expect(sizes.pageScrollWidth).toBe(sizes.pageClientWidth);
 
-    const boxes = await table.locator("tbody tr").first().locator("td").evaluateAll((cells) => cells.slice(1).map((cell) => {
+    // The row's name is its header cell (th scope="row"); the three values follow it.
+    const boxes = await table.locator("tbody tr").first().locator("th, td").evaluateAll((cells) => cells.slice(1).map((cell) => {
       const box = cell.getBoundingClientRect();
       return { left: box.left, right: box.right };
     }));

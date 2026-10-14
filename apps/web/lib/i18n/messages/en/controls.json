@@ -9,6 +9,7 @@
   "controls.selectAll": "Select all",
   "controls.noMatches": "No matching category found — try a different search.",
   "controls.skipList": "Skip the list",
+  "controls.listEnd": "End of the list",
   "controls.subitemsFor": "Subcategories of {label}",
   "controls.fiveYears": "5y",
   "controls.tenYears": "10y",

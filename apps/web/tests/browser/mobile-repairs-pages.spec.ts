@@ -121,6 +121,17 @@ for (const { path, selector } of unclipped) {
   });
 }
 
+test("the largest GDP share keeps its year in view when its name is clipped from 768px", async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await page.goto("/explorer/expenditure");
+  const year = page.locator("[data-testid=side-kpi] p[title] > span.shrink-0");
+  await expect(year).toHaveText(/^, \d{4}$/);
+  expect(await year.evaluate((element) => {
+    const box = element.getBoundingClientRect(), line = element.parentElement!.getBoundingClientRect();
+    return box.width > 0 && box.right <= line.right + 0.5;
+  })).toBe(true);
+});
+
 test("the wrapping Georgia heading stays inside a 320px phone", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await page.goto("/explorer/municipalities/georgia");
