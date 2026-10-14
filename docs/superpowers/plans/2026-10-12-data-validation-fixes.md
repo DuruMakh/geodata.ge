@@ -8,7 +8,7 @@ numbers read wrongly, and make the provenance and methodology pages tell the tru
 **Spec:** [Fiscal.ge data validation — October 2026](../specs/2026-10-12-data-validation.md). Finding ids (e.g. `EXPM-B1`) refer to
 that spec and to the per-task reports in `.superpowers/data-validation-2026-10/`.
 
-**Status:** Plan only. Not approved, not started. No data or code was changed by the validation.
+**Status:** Tasks 1–3 are implemented on branch `claude/youthful-mirzakhani-f0da3e` (commits a8779bdf, ccd40d49 and c079a4b0, plus one review follow-up commit); not pushed, no PR yet. Tasks 4–23 are not started.
 
 **Delivery (owner preference):** one branch (`codex/data-validation-fixes`) with **one commit per task** and one PR. Split only
 where a part must ship independently: tasks 1–5 (wrong numbers) may go out first as their own PR if the owner wants them live
@@ -25,6 +25,9 @@ display, rounding, labels → source swaps or additions → documentation.
 - Each data change updates its methodology doc under `docs/data-methodology/` **in the same commit** (CLAUDE.md definition of done 3).
 - Query-service changes (`lib/factQuery/`, `lib/mcp/`) must keep `npx vitest run tests/factQuery/reference.test.ts` green; a
   disagreement is a stop condition, not a reason to edit the expectation.
+- A data correction this spec predicts may change the expected values in `tests/factQuery/fixtures/referenceIntents.ts` in the
+  same commit, recomputed from the corrected CSVs and listed old → new in the commit and the PR body (Task 2 did this for the
+  per-resident ranking: its commit gives the corrected figures, and the PR body lists the fixture's five values old → new). A disagreement caused by a change under `lib/factQuery/`, `lib/mcp/` or `app/mcp/` stays a stop condition.
 - Feedback while editing: run only the narrow test (`npx vitest run tests/<path>.test.ts`, `npm run typecheck`, the dataset's
   `data:check-*`). Done-check once at the end: `npm run check`, `npm run build`, `npm run test:browser` (UI tasks).
 
@@ -60,10 +63,10 @@ No new component, page or library.
   Prosecutor's Office, the Academy of Sciences and the Intellectual Property Center. Also correct rows 11 and 39 of
   `data/mappings/review/admin-spending-institution-review-2004.csv`.
 - **Steps:**
-  - [ ] Write failing tests: rows with institution "საქართველოს იუსტიციის უმაღლესი საბჭო", "სსიპ -განათლების საერთაშორისო ცენტრი", "საქართველოს სოფლის მეურნეობის მეცნიერებათა აკადემია" and "ა(ა)იპ – რიჩარდ გ. ლუგარის საზოგადოებრივი ჯანმრთელობის კვლევის ცენტრი" classify to `admin_spending.other_costs`; the Ministry of Justice, Education, Agriculture and Health rows keep their categories.
-  - [ ] Add one explicit exclusion list of independent bodies ahead of the keyword rules (not four ad-hoc checks); run the tests.
-  - [ ] Regenerate the admin facts; for each affected year the category drops by exactly the body's actual (table in spec §1a), Other costs rises by the same, totals unchanged (303 category-year facts, 0 other changes).
-  - [ ] Re-run the institution-by-category listing (`admin-audit.mts` approach) and confirm no other non-ministry body sits in a ministry category.
+  - [x] Write failing tests: rows with institution "საქართველოს იუსტიციის უმაღლესი საბჭო", "სსიპ -განათლების საერთაშორისო ცენტრი", "საქართველოს სოფლის მეურნეობის მეცნიერებათა აკადემია" and "ა(ა)იპ – რიჩარდ გ. ლუგარის საზოგადოებრივი ჯანმრთელობის კვლევის ცენტრი" classify to `admin_spending.other_costs`; the Ministry of Justice, Education, Agriculture and Health rows keep their categories.
+  - [x] Add one explicit exclusion list of independent bodies ahead of the keyword rules (not four ad-hoc checks); run the tests.
+  - [x] Regenerate the admin facts; for each affected year the category drops by exactly the body's actual (table in spec §1a), Other costs rises by the same, totals unchanged (303 category-year facts, 0 other changes).
+  - [x] Re-run the institution-by-category listing (`admin-audit.mts` approach) and confirm no other non-ministry body sits in a ministry category.
 - **Verify:** `npx vitest run tests/data/adminSpending`; `npm run data:validate`; `/explorer/expenditure` ministries scope shows Justice 2024 = 425.0 mln and 2025 = 407.0 mln, Education 2015 = 824.7 mln; `query_ministries` and `ministries.json` agree.
 - **Methodology:** `docs/data-methodology/ministries-expenditure-methodology.md` §6.10 (name the Council explicitly).
 
@@ -77,9 +80,9 @@ No new component, page or library.
   `scripts/prepare-municipal-population-2025.ts`; `data/imports/municipal-population-2025.csv`; the regional-GDP inputs read by the
   same helper; tests under `apps/web/tests/data/municipalIndicators/`.
 - **Steps:**
-  - [ ] Failing test: Lentekhi 2025 = 5,145 persons; Tbilisi 1,335,671.
-  - [ ] Switch to stored values; regenerate with `npm run data:prepare-municipal-indicators` then `npm run data:prepare-municipal-population` (that order — see memory note in `data-validate-real-gates`).
-  - [ ] Confirm the 64 values equal the demography CSV's 2025 municipal populations and that the reconciliation residual becomes 0 (MUNI-C2).
+  - [x] Failing test: Lentekhi 2025 = 5,145 persons; Tbilisi 1,335,671.
+  - [x] Switch to stored values; regenerate with `npm run data:prepare-municipal-indicators` then `npm run data:prepare-municipal-population` (that order — see memory note in `data-validate-real-gates`).
+  - [x] Confirm the 64 values equal the demography CSV's 2025 municipal populations and that the reconciliation residual becomes 0 (MUNI-C2).
 - **Verify:** `npm run data:check-municipal-indicators && npm run data:check-municipal-population`; per-resident values change for exactly 39 municipalities (spec §1a: Lentekhi 3,307 → 3,278, Kazbegi 3,476 → 3,457, Oni 4,373 → 4,396 …), Racha-Lechkhumi region 3,209 → 3,214, Abasha/Terjola swap ranks 40/41; `query_municipal` agrees; Tbilisi population equals the demography page (1,335,671).
 - **Methodology:** `docs/data-methodology/municipal-population-regional-gdp.md` (drop "published rounding" residual explanation).
 
@@ -91,14 +94,17 @@ No new component, page or library.
 - **Files:** `apps/web/lib/explorer/format.ts` (`formatSignedFixed` behind `formatShare`/`formatPoints`), `apps/web/lib/explorer/inflationGrid.ts:26` (`displayedValue`), `lib/explorer/inflationCategoryLabels.ts:28,38`, `lib/explorer/inflationLabels.ts:21`, `components/inflation/inflation-category-indicators.tsx:82`, `components/demography/population-pyramid.tsx:93`, `components/main-explorer/editorial-line-chart.tsx:184`, `components/analysis/every-100.tsx:53`; tests in `tests/explorer/format.test.ts`.
 - **Scope after the deep dive (spec §1a):** about 51 displayed values — inflation national/categories/cities 22, inflation products 28 (rate = index − 100), debt rate 1. The correct Intl path (`fixed()`) is the model: it already rounds 0.95 → 1.0.
 - **Steps:**
-  - [ ] Failing tests: 0.95 → "1.0"; 1.45 → "1.5"; 7.35 → "7.4"; 1.65 → "1.7" (in both `formatShare` and `displayedValue`); 12.85 → "12.9"; −0.95 → "−1.0"; 10.25 → "10.3"; product index 99.05 → "−1.0%".
-  - [ ] Replace the `toFixed` rounding in every file above with the same rounding Intl uses (simplest: let `fixed()` do the rounding and derive the sign from its output); keep "−0.0 reads as 0.0".
-  - [ ] Re-run the tie scan (`tie-scan.mjs` approach) and the inflation, debt and product unit tests; `published_value`-fed pages must not change.
+  - [x] Failing tests: 0.95 → "1.0"; 1.45 → "1.5"; 7.35 → "7.4"; 1.65 → "1.7" (in both `formatShare` and `displayedValue`); 12.85 → "12.9"; −0.95 → "−1.0"; 10.25 → "10.3"; product index 99.05 → "−1.0%".
+  - [x] Replace the `toFixed` rounding in every file above with the same rounding Intl uses (simplest: let `fixed()` do the rounding and derive the sign from its output); keep "−0.0 reads as 0.0".
+  - [x] Re-run the tie scan (`tie-scan.mjs` approach) and the inflation, debt and product unit tests; `published_value`-fed pages must not change.
 - **Owner decision (2026-10-13):** fix the rounding everywhere **and show interest rates with 2 decimals**, as the Ministry of Finance and NBG publish them. Inflation and all other percentages stay at 1 decimal (Geostat's releases use 1). Showing 2 decimals without the rounding fix would make things worse: measured on our data, inflation would go from 50 to ~600 mis-rounded cells, because most CPI values are stored with 3–4 decimals.
-  - [ ] **Debt rates — re-read before showing 2 decimals.** `debt.rate.total` 2015–2025 comes from chart labels in the July 2026 monthly debt report at 1 decimal (2022 = 3.9; MoF prints 3.97 elsewhere — `DEBT-A3`). Re-read every year from the MoF document that prints 2 decimals (debt-management strategy tables, Bulletin N26, Strategy 2027–2030; the latter also gives 2025 domestic 8.88 / external 2.71 — `DEBT-A1`). Domestic/external values printed as 8.3, 9.2, 3.4 must be checked against their source table for a second decimal. Where a publisher prints only one decimal, show that value as printed (never pad "3.1" to "3.10") and say so in the methodology. Regenerate with `npm run data:prepare-government-debt`; update `docs/data-methodology/government-debt-annual.md`.
-  - [ ] **Debt display:** rates table, chart tooltips, latest-value line and the rates workbook (`components/debt/debt-explorer.tsx`, `lib/explorer/debtWorkbook.ts`) show the stored precision (2 decimals) instead of 1.
-  - [ ] **Bank rates:** `moneyBanksDisplayDecimals` (`apps/web/lib/data/moneyBanks/validation.ts:53`) returns 2 only for `rates.policy`; return 2 for every `rates.*` indicator (loan and deposit rates, GEL/FX/total), whose NBG sources print 2 decimals (`MONEY-C3`). FSI ratios and money aggregates stay at 1. Regenerate with `npm run data:prepare-money`; the money pages and workbook read `published_value`, so they pick up the new precision. Update `docs/data-methodology/money-banks-annual.md`.
-  - [ ] **DESIGN.md §(numbers):** amend "Percentages carry 1 decimal" with the exception "interest rates show 2 decimals, as the Ministry of Finance and NBG publish them".
+  - [x] **Debt rates — re-read before showing 2 decimals.** `debt.rate.total` 2015–2025 comes from chart labels in the July 2026 monthly debt report at 1 decimal (2022 = 3.9; MoF prints 3.97 elsewhere — `DEBT-A3`). Re-read every year from the MoF document that prints 2 decimals (debt-management strategy tables, Bulletin N26, Strategy 2027–2030; the latter also gives 2025 domestic 8.88 / external 2.71 — `DEBT-A1`). Domestic/external values printed as 8.3, 9.2, 3.4 must be checked against their source table for a second decimal. Where a publisher prints only one decimal, show that value as printed (never pad "3.1" to "3.10") and say so in the methodology. Regenerate with `npm run data:prepare-government-debt`; update `docs/data-methodology/government-debt-annual.md`.
+    *Done 2026-10-13:* no reviewed document prints the General Government total to two decimals year by year (Bulletin N25's
+    two-decimal series is Public Debt; 3.97 for 2022 is a preliminary estimate), so the totals stay at the one decimal printed
+    and no debt data changed; component rates show their source's decimals. A two-decimal total waits for Task 13.
+  - [x] **Debt display:** rates table, chart tooltips, latest-value line and the rates workbook (`components/debt/debt-explorer.tsx`, `lib/explorer/debtWorkbook.ts`) show the stored precision (2 decimals) instead of 1 — as shipped, each rate at its source's decimals (see the note above).
+  - [x] **Bank rates:** `moneyBanksDisplayDecimals` (`apps/web/lib/data/moneyBanks/validation.ts:53`) returns 2 only for `rates.policy`; return 2 for every `rates.*` indicator (loan and deposit rates, GEL/FX/total), whose NBG sources print 2 decimals (`MONEY-C3`). FSI ratios and money aggregates stay at 1. Regenerate with `npm run data:prepare-money`; the money pages and workbook read `published_value`, so they pick up the new precision. Update `docs/data-methodology/money-banks-annual.md`.
+  - [x] **DESIGN.md §(numbers):** amend "Percentages carry 1 decimal" with the exception "interest rates show 2 decimals, as the Ministry of Finance and NBG publish them".
 - **Verify:** `npx vitest run tests/explorer`; inflation core ex-tobacco Nov 2014 shows 1.7 in the grid, label and Excel; product p0028 May 2024 shows −1.0%; debt external rate 2021 shows 0.95%; debt total 2022 shows the re-read MoF value (3.97 if confirmed); loan rate 2010 shows 18.56%; policy rate unchanged; browser specs for debt and money updated only where the precision is the change.
 - **Methodology:** `docs/data-methodology/bilingual-presentation.md` (half-up rounding of displayed decimals; interest rates at 2 decimals), `government-debt-annual.md`, `money-banks-annual.md`.
 

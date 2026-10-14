@@ -111,8 +111,8 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   const deck = buildDebtDeck(props.facts, props.family);
   const deckValue = deck === null
     ? "—"
-    : props.family === "rate"
-      ? formatShare(deck.value / 100)
+    : formatRate && totalItemId
+      ? formatRate(deck.value, totalItemId, deck.year)
       : formatAmount(deck.value, locale);
   const deckChange = deck?.change ?? null;
   const preliminaryGdpYears = props.family === "stock"

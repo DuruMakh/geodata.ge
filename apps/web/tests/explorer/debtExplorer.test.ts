@@ -4,6 +4,7 @@ import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "../../lib/data/governm
 import {
   buildDebtDeck,
   buildDebtExplorerModel,
+  DEBT_RATE_SOURCE_DECIMALS,
   debtRateDecimals,
   formatDebtRate,
   getDefaultDebtSelection,
@@ -140,7 +141,8 @@ describe("interest-rate precision", () => {
     expect(debtRateDecimals("source.mof_debt_strategy_2022_2025")).toBe(2);
     expect(debtRateDecimals("source.mof_debt_strategy_2023_2026")).toBe(2);
     expect(debtRateDecimals("mof_debt_strategy_2025_2029")).toBe(2);
-    for (const id of GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS) expect([1, 2]).toContain(debtRateDecimals(id));
+    // Every reviewed rate source states its precision; none falls back to the one-decimal default.
+    expect(Object.keys(DEBT_RATE_SOURCE_DECIMALS).sort()).toEqual([...GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS].sort());
   });
 
   it("formats a rate as printed: 3.1% stays 3.1%, 9.20% keeps its zero, 0.95% is not rounded away", () => {

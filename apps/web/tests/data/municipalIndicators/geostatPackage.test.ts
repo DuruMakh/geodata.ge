@@ -675,6 +675,13 @@ describe("Geostat population and regional GDP research package", () => {
     );
   });
 
+  it("accepts float noise but stops on a population that is not a whole number of persons", async () => {
+    const { wholeThousandPersons } = await import("../../../lib/data/municipalIndicators/prepareGeostatPackage");
+    // 4929.9000000000015 thousand is 4,929,900.000000002 persons: noise of 2e-9 persons, rounded away.
+    expect(wholeThousandPersons(4929.9000000000015, "Georgia 1994")).toBe(4929.9);
+    expect(() => wholeThousandPersons(1.2340001, "test cell")).toThrow(/not a whole number of persons at test cell/);
+  });
+
   it("reads Geostat's stored population, not the one-decimal display", async () => {
     // The workbook displays Lentekhi 2025 as 5.1 thousand; the stored cell is 5.145.
     const result = await buildPackage(false);
@@ -823,6 +830,20 @@ describe("Geostat population and regional GDP research package", () => {
     expect(report.excluded_codes_present).toEqual([]);
     expect(report.source_hashes_match).toBe(true);
     expect(report.normalized_values_reconcile).toBe(true);
+  });
+
+  it("formats the review workbook's population and GDP values to show more than the one-decimal display", () => {
+    const workbook = XLSX.read(
+      fs.readFileSync(path.join(packageDir, "municipal-population-and-regional-gdp.xlsx")),
+      { type: "buffer", cellNF: true },
+    );
+    for (const sheetName of ["Population", "Regional GDP"]) {
+      const sheet = workbook.Sheets[sheetName]!;
+      const rows = XLSX.utils.decode_range(sheet["!ref"]!).e.r + 1;
+      const formats = new Set<string | undefined>();
+      for (let row = 2; row <= rows; row += 1) if (sheet[`E${row}`]?.t === "n") formats.add(sheet[`E${row}`]!.z as string | undefined);
+      expect([...formats], sheetName).toEqual(["#,##0.000"]);
+    }
   });
 
   it("matches every XLSX review-sheet field and type to the CSV artifacts", async () => {

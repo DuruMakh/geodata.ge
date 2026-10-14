@@ -121,7 +121,7 @@ export function debtRangeForFamily(
 // chart labels and the 2019-2021 strategy show one ("3.1%", "8.3%"), the 2022-2025, 2023-2026
 // and 2025-2029 strategy tables two ("8.21%", "9.20%"). A rate is never padded to a decimal its
 // source does not print; a source missing here falls back to one.
-const RATE_SOURCE_DECIMALS: Record<string, 1 | 2> = {
+export const DEBT_RATE_SOURCE_DECIMALS: Readonly<Record<string, 1 | 2>> = {
   mof_monthly_debt_report_2026_07: 1,
   mof_debt_strategy_2019_2021: 1,
   mof_debt_strategy_2022_2025: 2,
@@ -131,7 +131,7 @@ const RATE_SOURCE_DECIMALS: Record<string, 1 | 2> = {
 
 /** Decimals a rate from this source is shown with; takes the bare or the registry (`source.`) id. */
 export function debtRateDecimals(sourceId: string | null): 1 | 2 {
-  return RATE_SOURCE_DECIMALS[(sourceId ?? "").replace(/^source\./, "")] ?? 1;
+  return DEBT_RATE_SOURCE_DECIMALS[(sourceId ?? "").replace(/^source\./, "")] ?? 1;
 }
 
 type RateCellFact = Pick<ClientGovernmentDebtFact, "seriesId" | "year" | "sourceId">;

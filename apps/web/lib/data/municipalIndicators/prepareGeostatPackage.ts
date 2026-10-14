@@ -469,7 +469,7 @@ function sourceNumber(value: unknown, context: string): number {
 
 // Population in thousands is a whole number of persons; stored cells can carry float noise
 // (4929.9000000000015), so persons are rounded and the thousands re-derived from them.
-function wholeThousandPersons(thousand: number, context: string): number {
+export function wholeThousandPersons(thousand: number, context: string): number {
   const scaled = thousand * 1000;
   const persons = Math.round(scaled);
   if (Math.abs(scaled - persons) > WHOLE_PERSON_TOLERANCE) {

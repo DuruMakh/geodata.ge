@@ -85,15 +85,22 @@ export function formatShare(fraction: number | null | undefined, signed = false,
   return formatSignedFixed(fraction * 100, signed, decimals) + "%";
 }
 
-// Rounds a displayed decimal as Excel and Geostat do: a last-digit 5 goes up (0.95 → 1.0).
-// toFixed rounds the binary value instead, so (0.95).toFixed(1) is "0.9" but (10.25).toFixed(1)
-// is "10.3". Twelve significant digits first drop the noise arithmetic adds (a fraction × 100
-// turns 1.65 into 1.6499999999999999); Intl then rounds the decimal half away from zero.
+// Rounds a displayed decimal as Excel and Geostat do: a last-digit 5 goes away from zero
+// (0.95 → 1.0, −0.95 → −1.0). toFixed rounds the binary value instead, so (0.95).toFixed(1) is
+// "0.9" but (10.25).toFixed(1) is "10.3". While the value counted in units of its last shown
+// decimal stays below 1e9 (every percentage and point the site shows), twelve significant digits
+// first drop the noise arithmetic adds (a fraction × 100 turns 1.65 into 1.6499999999999999); that
+// leaves at least three digits below the last shown one, and a value within half a unit of the
+// twelfth significant digit of a tie is treated as the tie. Beyond that the value keeps every
+// digit, since twelve would cut digits it shows. Intl then rounds the decimal.
 function decimalFixed(value: number, decimals: number): string {
-  return fixed(Number(value.toPrecision(12)), decimals);
+  return fixed(Math.abs(value) * 10 ** decimals < 1e9 ? Number(value.toPrecision(12)) : value, decimals);
 }
 
-/** `value` rounded to `decimals` the way it is displayed (1.65 → 1.7); −0 comes back as 0. */
+/**
+ * `value` rounded to `decimals` the way it is displayed (1.65 → 1.7); −0 comes back as 0. Meant for
+ * percentages and points; see decimalFixed for the noise trim and its limit.
+ */
 export function roundForDisplay(value: number, decimals: number): number {
   return Number(decimalFixed(value, decimals).replaceAll(",", "")) + 0;
 }
