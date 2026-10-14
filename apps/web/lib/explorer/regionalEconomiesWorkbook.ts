@@ -8,9 +8,10 @@ import {
   regionalEconomyDefinitions,
   type RegionalEconomyState,
 } from "./regionalEconomies";
-import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
+import { REGIONAL_GDP_TOTAL, type RegionalEconomyMeasure } from "../data/regionalEconomies/types";
 import {
   SHEET_NAMES,
+  filenameWords,
   type WorkbookExportModel,
   type WorkbookPublicSource,
   withAbsoluteUrls,
@@ -18,9 +19,11 @@ import {
 } from "./workbookModel";
 import type { ClientRegionalEconomyObservation } from "../servedRows";
 
+// File names share one English stem in both languages, in words rather than ids.
+const MEASURE_FILE_WORDS: Record<RegionalEconomyMeasure, string> = { nominal: "nominal", share_of_region_gdp: "share-of-region-gdp" };
+
 type RegionExportIdentity = {
   id: string;
-  slug: string;
   labelKa: string;
   labelEn: string;
 };
@@ -62,7 +65,7 @@ export function buildRegionalEconomyWorkbookExportModel(
   const regionLabel = locale === "en" ? region.labelEn : region.labelKa;
   return {
     locale,
-    filename: workbookFilename(`regional-economy-${region.slug}-${state.measure}-${model.range.start}-${model.range.end}`, locale),
+    filename: workbookFilename(`regional-economy-${filenameWords(region.labelEn)}-${MEASURE_FILE_WORDS[state.measure]}-${model.range.start}-${model.range.end}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
       title: message(messages, "regionalEconomies.workbookTitle", { measure: measureLabel, region: regionLabel }),

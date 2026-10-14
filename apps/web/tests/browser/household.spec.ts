@@ -169,7 +169,7 @@ test("Georgia's spending page reads consumption spending and exports Excel with 
   await expect(page.locator(pressed("settlement.urban"))).toHaveAttribute("aria-pressed", "true");
   const promise = page.waitForEvent("download"); await page.getByTestId("household-excel-download").click();
   const download = await promise;
-  expect(download.suggestedFilename()).toBe("fiscal-household-spending-georgia-per_household-2002-2025-en.xlsx");
+  expect(download.suggestedFilename()).toBe("fiscal-household-spending-georgia-per-household-2002-2025-en.xlsx");
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets).toHaveLength(3);
   const data = workbook.getWorksheet("Data")!;

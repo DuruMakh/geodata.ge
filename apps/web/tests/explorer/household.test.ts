@@ -214,7 +214,7 @@ test.each(["ka", "en"] as const)("the %s income workbook for Georgia with towns 
     section: "income", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), areaLabel: "Georgia",
     state: { mode: "table", measure: "per_household", range: { kind: "manual", start: 2019, end: 2025 }, selectedIds: ids },
   }, presentation);
-  expect(model.filename).toBe(`fiscal-household-income-georgia-per_household-2019-2025${locale === "en" ? "-en" : ""}.xlsx`);
+  expect(model.filename).toBe(`fiscal-household-income-georgia-per-household-2019-2025${locale === "en" ? "-en" : ""}.xlsx`);
   expect(model.readable.years).toEqual([2019, 2020, 2021, 2022, 2023, 2024, 2025]);
   expect(model.readable.rows).toHaveLength(3);
   expect(model.readable.numberFormat).toBe("0.0");
@@ -237,7 +237,7 @@ test("the workbook title names the page, its list, the area and the measure", as
     state: { ...defaultHouseholdState("income"), measure: "per_capita", range: { kind: "manual", start: 2020, end: 2021 } },
   }, presentation);
   expect(model.readable.title).toBe("Income · Where it comes from · Guria · Per person");
-  expect(model.filename).toBe("fiscal-household-income-region-guria-per_capita-2020-2021-en.xlsx");
+  expect(model.filename).toBe("fiscal-household-income-region-guria-per-capita-2020-2021-en.xlsx");
   const custom = buildHouseholdWorkbookExportModel({
     section: "spending", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(["spending.consumption"]), areaLabel: "Georgia", title: "Custom",
     state: { ...defaultHouseholdState("spending"), range: { kind: "manual", start: 2020, end: 2021 } },

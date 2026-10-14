@@ -224,9 +224,11 @@ describe("createWorkbookBuffer", () => {
     expect(analysis.getCell("B2").numFmt).toBeUndefined();
     expect(analysis.getCell("D2").value).toBe("გამოკვლევის შეფასება");
     expect(analysis.getCell("D2").numFmt).toBeUndefined();
-    // The amount layout still formats its amount column, and its status column stays plain.
-    const amounts = (await loadWorkbook(approvedModelFixture)).getWorksheet("მონაცემები")!;
-    expect(amounts.getCell("E2").numFmt).toBeUndefined();
+    // The writer formats only the columns the model names; it no longer guesses that column 4 is an amount.
+    const { numericFormats: _amountFormat, ...unformatted } = approvedModelFixture.analysis;
+    const plain = (await loadWorkbook({ ...approvedModelFixture, analysis: unformatted })).getWorksheet("მონაცემები")!;
+    expect(plain.getCell("D2").value).toBe(1_212_500_000);
+    expect(plain.getCell("D2").numFmt).toBeUndefined();
   });
 
   it("adds the GDP-share header only to percentage analysis data", async () => {

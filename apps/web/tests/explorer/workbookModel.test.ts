@@ -1,4 +1,6 @@
+import ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import {
   absoluteWorkbookSourceUrl,
   buildWorkbookExportModel,
@@ -48,6 +50,23 @@ const input: WorkbookExportInput = {
 };
 
 describe("buildWorkbookExportModel", () => {
+  // U20-05: the amount format sits on the amount column the model writes (budget, municipal, debt), not on Status.
+  it("formats the amount column of the five-column layout, and of the layout without a group", async () => {
+    const model = buildWorkbookExportModel(input);
+    expect(model.analysis.headers).toEqual(["წელი", "მთავარი ჯგუფი", "კატეგორია", "თანხა (₾)", "სტატუსი"]);
+    expect(model.analysis.numericFormats).toEqual({ 4: "#,##0.00;[Red](#,##0.00);–" });
+    const data = new ExcelJS.Workbook();
+    await data.xlsx.load(await createWorkbookBuffer(model));
+    const sheet = data.worksheets[1]!;
+    expect(sheet.getCell("D2").value).toBe(-10);
+    expect(sheet.getCell("D2").numFmt).toBe("#,##0.00;[Red](#,##0.00);–");
+    expect(sheet.getCell("E2").numFmt).toBeUndefined();
+    const { groupLabel: _groupLabel, ...withoutGroup } = input;
+    const ungrouped = buildWorkbookExportModel({ ...withoutGroup, omitGroupColumn: true });
+    expect(ungrouped.analysis.headers).toEqual(["წელი", "კატეგორია", "თანხა (₾)", "სტატუსი"]);
+    expect(ungrouped.analysis.numericFormats).toEqual({ 3: "#,##0.00;[Red](#,##0.00);–" });
+  });
+
   it("exports English headings and status without changing amounts, missingness or source selection", () => {
     const ka = buildWorkbookExportModel(input);
     const englishInput = {

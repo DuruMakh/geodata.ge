@@ -142,7 +142,7 @@ exports[`builds a stable model for a fixed input > en real_growth 1`] = `
       ],
     ],
   },
-  "filename": "fiscal-economic-sectors-real_growth-2024-2025-en.xlsx",
+  "filename": "fiscal-economic-sectors-real-growth-2024-2025-en.xlsx",
   "locale": "en",
   "readable": {
     "amountDecimals": 0,
@@ -251,7 +251,7 @@ exports[`builds a stable model for a fixed input > en share_of_gdp 1`] = `
       ],
     ],
   },
-  "filename": "fiscal-economic-sectors-share_of_gdp-2024-2025-en.xlsx",
+  "filename": "fiscal-economic-sectors-share-of-gdp-2024-2025-en.xlsx",
   "locale": "en",
   "readable": {
     "amountDecimals": 0,
@@ -457,7 +457,7 @@ exports[`builds a stable model for a fixed input > ka real_growth 1`] = `
       ],
     ],
   },
-  "filename": "fiscal-economic-sectors-real_growth-2024-2025.xlsx",
+  "filename": "fiscal-economic-sectors-real-growth-2024-2025.xlsx",
   "locale": "ka",
   "readable": {
     "amountDecimals": 0,
@@ -566,7 +566,7 @@ exports[`builds a stable model for a fixed input > ka share_of_gdp 1`] = `
       ],
     ],
   },
-  "filename": "fiscal-economic-sectors-share_of_gdp-2024-2025.xlsx",
+  "filename": "fiscal-economic-sectors-share-of-gdp-2024-2025.xlsx",
   "locale": "ka",
   "readable": {
     "amountDecimals": 0,

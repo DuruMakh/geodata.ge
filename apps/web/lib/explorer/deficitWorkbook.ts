@@ -26,7 +26,6 @@ export function buildDeficitWorkbookExportModel(input: {
     locale,
     filenameBase: "general-government-deficit",
     title: workbookMessage(locale, "workbook.balance"),
-    groupLabel: workbookMessage(locale, "workbook.balance"),
     years,
     measure: input.percentage
       ? {

@@ -33,8 +33,6 @@ const SETTLEMENT_KEYS = { total: "settlementAll", urban: "settlementUrban", rura
 // Group order on every table: the oldest group first, as the pyramid is read from the top.
 const OLDEST_FIRST = [...AGE_SEX_GROUPS].reverse();
 const SEXES = ["male", "female"] as const;
-// The Data sheet stores a share to the one decimal it shows; the persons beside it keep the exact count.
-const shareToShow = (share: number) => Math.round(share * 10) / 10;
 
 function helpers(presentation: Presentation) {
   const { locale, messages } = presentation;
@@ -107,7 +105,7 @@ function pyramidWorkbook(
         SEXES.flatMap((sex) =>
           OLDEST_FIRST.map((group) => {
             const persons = part.pyramid.rows[AGE_SEX_GROUPS.indexOf(group)]![sex];
-            return [part.year, t(sex === "male" ? "sexMale" : "sexFemale"), ageGroupLabel(group), persons, shareToShow(shareOf(persons, part.pyramid.total)), part.basis];
+            return [part.year, t(sex === "male" ? "sexMale" : "sexFemale"), ageGroupLabel(group), persons, shareOf(persons, part.pyramid.total), part.basis];
           }),
         ),
       ),
@@ -203,7 +201,7 @@ export function buildAgeYearWorkbookExportModel(input: Input, presentation: Pres
     dataRows: years.flatMap((year, yearIndex) =>
       heat.rows.map((row) => {
         const pyramidRow = pyramids[yearIndex]!.rows[AGE_SEX_GROUPS.indexOf(row.id)]!;
-        return [year, row.label, pyramidRow.male + pyramidRow.female, shareToShow(row.values[yearIndex]!), annualBasis(year)];
+        return [year, row.label, pyramidRow.male + pyramidRow.female, row.values[yearIndex]!, annualBasis(year)];
       }),
     ),
     numericFormats: { 3: "#,##0", 4: "0.0" },

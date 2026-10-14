@@ -34,7 +34,6 @@ export type WorkbookExportInput = {
   locale: Locale;
   filenameBase: string;
   title: string;
-  groupLabel: string;
   years: number[];
   measure: WorkbookMeasure;
   totalId: string | null;
@@ -42,11 +41,13 @@ export type WorkbookExportInput = {
   includeTotalsInAnalysis?: boolean;
   /** false drops the readable sheet's relative change column (percentage measures). */
   showChangeColumn?: boolean;
-  /** Drops the Data sheet's group column, for a one-series dataset whose group would repeat the category on every row. */
-  omitGroupColumn?: boolean;
   sources: WorkbookPublicSource[];
   siteOrigin: string;
-};
+} & (
+  | { groupLabel: string; omitGroupColumn?: false }
+  /** Drops the Data sheet's group column, for a one-series dataset whose group would repeat the category on every row. */
+  | { groupLabel?: never; omitGroupColumn: true }
+);
 
 export type WorkbookReadableRow = {
   kind: WorkbookSeries["kind"];
@@ -120,16 +121,9 @@ export function workbookFilename(stem: string, locale: Locale): string {
   return `fiscal-${stem}${locale === "en" ? "-en" : ""}.xlsx`;
 }
 
-// Georgia's national romanization (2002) without its apostrophes. Chromium saves a download whose name is not ASCII as
-// "download", so a Georgian label reaches a file name in Latin letters.
-const GEORGIAN_LATIN: Readonly<Record<string, string>> = {
-  ა: "a", ბ: "b", გ: "g", დ: "d", ე: "e", ვ: "v", ზ: "z", თ: "t", ი: "i", კ: "k", ლ: "l", მ: "m", ნ: "n", ო: "o", პ: "p", ჟ: "zh", რ: "r",
-  ს: "s", ტ: "t", უ: "u", ფ: "p", ქ: "k", ღ: "gh", ყ: "q", შ: "sh", ჩ: "ch", ც: "ts", ძ: "dz", წ: "ts", ჭ: "ch", ხ: "kh", ჯ: "j", ჰ: "h",
-};
-
-/** A label as ASCII file-name words: lower case, Georgian romanized, each run of other characters one hyphen. */
+/** An English label as file-name words: lower case, each run of spaces and punctuation one hyphen. */
 export function filenameWords(label: string): string {
-  return [...label.toLowerCase()].map(character => GEORGIAN_LATIN[character] ?? character).join("").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
 /** Adds the absolute link the Sources sheet prints for each source. */

@@ -15,12 +15,19 @@ export function buildPovertyWorkbookExportModel(input: { section: PovertySection
   const numberFormat = model.decimals === 2 ? "0.00" : "0.0";
   const status = (value: number | null) => value === null ? workbookMessage(locale, "workbook.unavailable") : t("status.survey_estimate");
   const view = state.view === "main" ? "" : ` · ${t(`tab.${state.view}`)}`;
+  // A nested row names its parent line, unless its label already starts with the parent's "Below 60%:" prefix.
+  const parentLabel = (series: typeof model.selected[number]) => {
+    const parent = series.parentId ? labels[series.parentId] : undefined;
+    if (!parent) return null;
+    const prefix = parent.includes(": ") ? `${parent.split(": ")[0]}: ` : null;
+    return prefix && labels[series.id]?.startsWith(prefix) ? null : parent;
+  };
   return {
     locale, filename: workbookFilename(`poverty-${section}${state.view === "main" ? "" : `-${state.view}`}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title: `${input.title ?? t(`page.${section}.title`)}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${t(unit === "index" ? "unitIndex" : "unitPercentLong")}`,
       unitLabel: t(unit === "index" ? "unitIndex" : "unitPercent"), amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
-      rows: model.selected.map(series => ({ kind: series.reference ? "total" : "item", parentLabel: series.parentId ? labels[series.parentId] ?? null : null, label: labels[series.id], change: null,
+      rows: model.selected.map(series => ({ kind: series.reference ? "total" : "item", parentLabel: parentLabel(series), label: labels[series.id], change: null,
         valuesByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year]])),
         basisByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year] === null ? null : "actual"])),
       })),
