@@ -75,7 +75,7 @@ export const queryInflationInput = z.strictObject({
   measure: inflationMeasure,
   fromPeriod: periodKeySchema.describe("First month, YYYY-MM, inclusive."),
   toPeriod: periodKeySchema.describe("Last month, YYYY-MM, inclusive. basket_weight_pct returns one cell per calendar year the range touches."),
-  entityIds: entityIdList.optional().describe("country.georgia (the default) or city.* ids from describe_coverage. Cities publish cpi.headline and cpi.cat.01–12: yoy_pct and mom_pct, and avg12_pct for cpi.headline, from 2016-01."),
+  entityIds: entityIdList.optional().describe("country.georgia (the default) or city.* ids from describe_coverage. Cities publish cpi.headline and cpi.cat.01–12: yoy_pct and mom_pct, and avg12_pct for cpi.headline, from the first city period describe_coverage reports."),
   expectedDataVersion,
 });
 

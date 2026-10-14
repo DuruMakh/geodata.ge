@@ -44,11 +44,11 @@ const TOOL_NAMES = [
 
 describe("MCP tool surface", () => {
   it("preflights 501 product output cells before calculation while accepting a long input span", async () => {
+    const product = TOOLS.find(tool => tool.name === "query_inflation_products");
+    expect(product).toBeDefined();
+    const calculate = vi.spyOn(product!, "run");
     const client = await connected();
     try {
-      const product = TOOLS.find(tool => tool.name === "query_inflation_products");
-      expect(product).toBeDefined();
-      const calculate = vi.spyOn(product!, "run");
       const refused = await client.callTool({ name: "query_inflation_products", arguments: {
         seriesIds: loadPackagedSnapshot().inflationProducts.catalogue.slice(0, 167).map(product => product.productId),
         measure: "yoy_pct", fromPeriod: "2026-06", toPeriod: "2026-08",
@@ -63,8 +63,10 @@ describe("MCP tool surface", () => {
       expect(endpoint.isError).toBeFalsy();
       expect(endpoint.structuredContent).toMatchObject({ data: { coverage: { expectedCount: 5 } } });
       expect((endpoint.structuredContent as { data: { observations: { calculationBasePeriod: string }[] } }).data.observations.every(row => row.calculationBasePeriod === "2014-12")).toBe(true);
+    } finally {
       calculate.mockRestore();
-    } finally { await client.close(); }
+      await client.close();
+    }
   });
   it("advertises exactly the read-only query functions", async () => {
     const { tools } = await (await connected()).listTools();
@@ -165,26 +167,29 @@ describe("MCP tool surface", () => {
 
   it("refuses an oversized request rather than truncating it, before running the query", async () => {
     const run = vi.spyOn(TOOLS.find((tool) => tool.name === "query_municipal")!, "run");
-    const result = await (await connected()).callTool({
-      name: "query_municipal",
-      arguments: {
-        // 14 municipalities x 7 series x 11 years = 1,078 cells, over the 500 cap.
-        entityIds: ["04", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18"],
-        seriesIds: [
-          "municipal.total", "municipal.education", "municipal.health", "municipal.social_protection",
-          "municipal.housing_communal", "municipal.recreation_culture", "municipal.economic_affairs",
-        ],
-        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
-        measure: "amount_gel",
-      },
-    });
+    try {
+      const result = await (await connected()).callTool({
+        name: "query_municipal",
+        arguments: {
+          // 14 municipalities x 7 series x 11 years = 1,078 cells, over the 500 cap.
+          entityIds: ["04", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18"],
+          seriesIds: [
+            "municipal.total", "municipal.education", "municipal.health", "municipal.social_protection",
+            "municipal.housing_communal", "municipal.recreation_culture", "municipal.economic_affairs",
+          ],
+          years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+          measure: "amount_gel",
+        },
+      });
 
-    expect(result.isError).toBe(true);
-    expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
-    expect((result.content as { text: string }[])[0]!.text).toContain("/downloads/data/");
-    // Rejected before the query runs (moved from reviewRegression.test.ts).
-    expect(run).not.toHaveBeenCalled();
-    run.mockRestore();
+      expect(result.isError).toBe(true);
+      expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
+      expect((result.content as { text: string }[])[0]!.text).toContain("/downloads/data/");
+      // Rejected before the query runs (moved from reviewRegression.test.ts).
+      expect(run).not.toHaveBeenCalled();
+    } finally {
+      run.mockRestore();
+    }
   });
 
   it("requires an all-regions regional request to be narrowed instead of truncating it", async () => {

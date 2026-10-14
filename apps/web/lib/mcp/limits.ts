@@ -11,7 +11,8 @@ export const RATE_WINDOW_SECONDS = 60;
 export const RATE_MAX_REQUESTS = 60;
 /**
  * Requests per key per UTC day. Without it one key at 60 a minute could spend
- * the whole shared daily allowance on its own (owner decision 2026-10-12).
+ * the whole shared daily allowance on its own (the plan's recommended default
+ * for Q2, pending owner confirmation).
  */
 export const RATE_PER_KEY_DAILY_MAX = 1_000;
 

@@ -642,9 +642,8 @@ no budget data and require no migration when a code release is rolled back.
   loaded (judge this on the production domain: preview deployments also load
   the Vercel toolbar from `vercel.live`, which shows up as reports there and is
   not a site problem); keep the enforced site-wide policy off the archived
-  originals under `/downloads/methodology/:dataset/files/` (for example a
-  `/(.*)` source with a negative lookahead for that path, or the archive rules
-  placed after the site-wide rule). This matters because while the policy is
+  originals under `/downloads/methodology/:dataset/files/` by giving the
+  `/(.*)` source a negative lookahead for that path. This matters because while the policy is
   report-only the archive rule's enforcing `sandbox; default-src 'none'` header
   has a different key and is sent alongside it, but once both rules set
   `Content-Security-Policy` Next.js keeps only the later rule's value, and the
