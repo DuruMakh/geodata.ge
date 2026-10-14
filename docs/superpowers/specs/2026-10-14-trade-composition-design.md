@@ -1,7 +1,7 @@
 # Trade composition: goods groups and economic categories
 
 Date: 2026-10-14
-Status: Draft for owner review. The owner authorized the Trade composition feature after discussing the two official groupings. This written design has not yet been approved for implementation.
+Status: Approved by the owner on 2026-10-14. The approved scope is local implementation and verification; publishing remains a separate operation.
 
 ## 1. Intended result
 
