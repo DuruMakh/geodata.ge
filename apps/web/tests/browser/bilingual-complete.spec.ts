@@ -5,11 +5,12 @@ import { pageHref } from "../../lib/i18n/routes";
 test("every public page has two working document languages", async ({ request }) => {
   test.setTimeout(90_000);
   const paths = await listPublicPagePaths();
-  expect(paths).toHaveLength(290);
+  expect(paths).toHaveLength(291);
   expect(paths).toContain("/explorer/trade/partners");
   expect(paths).toContain("/explorer/trade/products");
   expect(paths).toContain("/explorer/trade/domestic-exports");
   expect(paths).toContain("/explorer/trade/services");
+  expect(paths).toContain("/explorer/trade/composition");
   for (const path of paths) for (const locale of ["ka", "en"] as const) {
     const response = await request.get(pageHref(path, locale));
     expect(response.status(), `${locale}:${path}`).toBe(200);

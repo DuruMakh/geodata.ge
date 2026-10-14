@@ -11,7 +11,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade`);
     const card = page.getByTestId("trade-hub").getByTestId("hub-card");
-    await expect(card).toHaveCount(5); await card.first().click();
+    await expect(card).toHaveCount(6); await card.first().click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/overview$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await page.evaluate(() => document.fonts.ready);
@@ -100,7 +100,7 @@ for (const prefix of ["", "/en"]) {
     await page.getByTestId("source-label").getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/trade$`));
     await expect(page.locator("#services").getByRole("link", { name: prefix ? "Geostat services trade source page" : "საქსტატის მომსახურებით ვაჭრობის გვერდი", exact: true })).toHaveAttribute("href", "https://www.geostat.ge/en/modules/categories/766/international-trade-in-services");
-    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(18);
+    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(22);
     for (const filename of ["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx", "1004_180325_en.pdf"]) {
       await expect(page.locator(`a[href="/downloads/methodology/trade/files/${filename}"]`)).toHaveCount(1);
     }
