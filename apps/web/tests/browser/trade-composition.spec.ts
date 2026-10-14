@@ -31,8 +31,14 @@ async function ranking(page: Page, classification: Classification, flow: string,
   const denominator = Number(national.find(f => Number(f.year) === year && f.indicator_id === flow)!.value_usd);
   const expected = facts.filter(f => f.entity_id!.startsWith(`trade.${classification}1.`) && Number(f.year) === year && f.indicator_id === flow)
     .sort((a, b) => Number(b.value_usd) - Number(a.value_usd));
+  // These accepted comparison ranges use billion USD with two decimal places.
+  const unitLabel = new URL(page.url()).pathname.startsWith("/en/") ? "billion USD" : "მლრდ აშშ დოლარი";
+  await expect(page.getByTestId("trade-partners-ranking").locator("thead th").nth(2)).toHaveText(unitLabel);
   for (const [index, fact] of expected.entries()) {
     await expect(rows.nth(index)).toHaveAttribute("data-entity-id", fact.entity_id!);
+    const billions = Number(fact.value_usd) / 1_000_000_000;
+    const amount = Number(billions.toFixed(2)) === 0 ? "<0.01" : new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(billions);
+    await expect(rows.nth(index).locator("td").nth(1)).toHaveText(amount);
     await expect(rows.nth(index).locator("td").last()).toHaveText(`${(Number(fact.value_usd) / denominator * 100).toFixed(1).replace("-", "−")}%`);
   }
 }
