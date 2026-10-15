@@ -15,6 +15,7 @@ import prepare  # noqa: E402
 SECTORS = ['sector_a', 'sector_b_e', 'sector_f', 'sector_g', 'sector_h', 'sector_i', 'sector_j', 'sector_l', 'sector_m',
            'sector_n', 'sector_p', 'sector_q', 'sector_r', 'sector_s']
 SECTIONS = [f'sector_{letter}' for letter in 'abcdefghijklmnpqrs']
+ACTIVITY = SECTIONS + ['sector_unknown']  # Geostat's "ACTIVITY UNKNOWN" row
 REGIONS = ['region_tbilisi', 'region_adjara', 'region_guria', 'region_imereti', 'region_kakheti', 'region_mtskheta_mtianeti',
            'region_racha_lechkhumi_kvemo_svaneti', 'region_samegrelo_zemo_svaneti', 'region_samtskhe_javakheti',
            'region_kvemo_kartli', 'region_shida_kartli']
@@ -135,16 +136,16 @@ class BusinessPackageTests(unittest.TestCase):
         for measure in FIRMS:
             regions = REGIONS + ['region_abkhazeti', 'region_unknown']
             self.assertEqual(differences(measure, regions, range(2014, 2025)), {}, measure)
-            # Sections add up only with Geostat's "ACTIVITY UNKNOWN" row, which is read for this check and not served.
-            unknown = prepare.activity_unknown(measure)
-            total, sections = series(self.rows, f'business.{measure}.total'), [series(self.rows, f'business.{measure}.{s}') for s in SECTIONS]
-            for year in range(2014, 2025):
-                self.assertEqual(sum(part[year] for part in sections) + unknown[year], total[year], (measure, year))
-                self.assertGreater(unknown[year], 0, (measure, year))
+            # The 18 sections add up to the total only with sector_unknown, Geostat's "ACTIVITY UNKNOWN" row.
+            self.assertEqual(differences(measure, ACTIVITY, range(2014, 2025)), {}, measure)
+            self.assertTrue(all(differences(measure, SECTIONS, [year]) for year in range(2014, 2025)), measure)
+            self.assertEqual(find(self.rows, f'business.{measure}.sector_unknown', 2024)['source_cell'][1:], '108')
         with self.assertRaisesRegex(ValueError, 'add up'):
             prepare.validate(patched(self.rows, 'business.turnover.size_large', 2020, Decimal(10)))
         with self.assertRaisesRegex(ValueError, 'add up'):
             prepare.validate(patched(self.rows, 'business.births.region_unknown', 2024, Decimal(1)))
+        with self.assertRaisesRegex(ValueError, 'add up'):
+            prepare.validate(patched(self.rows, 'business.active.sector_unknown', 2024, Decimal(1)))
         with self.assertRaisesRegex(ValueError, 'add up'):  # A year with a recorded difference must keep exactly that difference.
             prepare.validate(patched(self.rows, 'business.turnover.region_tbilisi', 2025, Decimal('0.1')))
 
@@ -154,7 +155,7 @@ class BusinessPackageTests(unittest.TestCase):
             self.assertTrue(rates)
             for row in rates:
                 group = row['indicator_id'].rsplit('.', 1)[1]
-                self.assertTrue(group == 'total' or group in SECTIONS, row['indicator_id'])
+                self.assertTrue(group == 'total' or group in ACTIVITY, row['indicator_id'])
                 year = row['year']
                 ratio = Decimal(find(self.rows, f'business.{part}.{group}', year)['value']) * 100 / Decimal(
                     find(self.rows, f'business.active.{group}', year)['value'])
@@ -201,6 +202,10 @@ class BusinessPackageTests(unittest.TestCase):
                 by_measure[row['indicator_id']].add(row['year'])
         self.assertEqual(by_measure['business.turnover.region_tbilisi'], set(range(2006, 2026)))
         self.assertEqual(by_measure['business.active.region_unknown'], set(range(2014, 2025)))
+        # Geostat prints the unknown-activity rates as it prints the sections' (none for deaths in 2016 and 2019).
+        self.assertEqual(series(self.rows, 'business.active.sector_unknown')[2024], Decimal(22681))
+        self.assertEqual(sorted(series(self.rows, 'business.death_rate.sector_unknown')), [2014, 2015, 2017, 2018, 2020, 2021, 2022, 2023, 2024])
+        self.assertEqual(find(self.rows, 'business.death_rate.sector_unknown', 2020)['published_value'], '628.2')
 
     def test_series_break(self):
         with open(prepare.ROOT / 'business-series-breaks.csv', encoding='utf-8-sig', newline='') as handle:

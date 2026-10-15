@@ -1,6 +1,6 @@
 // Independent Excel-cell comparison for the Geostat business statistics research package.
 // Reads the preserved workbooks with SheetJS (the web app's own dependency), not the Python XML reader, and
-// recomputes every one of the 4,590 values from its cell: the stored value, the rounding to the cell's number format,
+// recomputes every one of the 4,643 values from its cell: the stored value, the rounding to the cell's number format,
 // the year (column A, the year block above it, or the sheet name), the printed column heading or row label, and the
 // table title. The label tables below are written separately from prepare.py. Writes independent-validation.json.
 import { createRequire } from 'node:module';
@@ -21,7 +21,7 @@ const FILES = {
 };
 const books = Object.fromEntries(Object.entries(FILES).map(([id, file]) =>
   [id, XLSX.read(readFileSync(join(root, file)), { type: 'buffer', cellNF: true })]));
-const EXPECTED_TOTAL = 4590;
+const EXPECTED_TOTAL = 4643;
 
 // Written from the approved spec and the task brief, not from prepare.py.
 const SURVEY = {
@@ -70,7 +70,7 @@ function expectedKeys() {
   for (const [measure, { first }] of Object.entries(SURVEY)) {
     for (const group of Object.keys(SURVEY_HEADINGS)) add(`business.${measure}.${group}`, group.startsWith('region_') ? 2006 : first, 2025);
   }
-  const sections = [...SECTION_LETTERS].map(letter => `sector_${letter.toLowerCase()}`);
+  const sections = [...[...SECTION_LETTERS].map(letter => `sector_${letter.toLowerCase()}`), 'sector_unknown'];
   for (const measure of ['active', 'births', 'deaths']) for (const group of [...Object.keys(DEMOGRAPHY_ROWS), ...sections]) add(`business.${measure}.${group}`, 2014, 2024);
   for (const group of ['total', ...sections]) {
     add(`business.birth_rate.${group}`, 2014, 2024);
@@ -186,8 +186,12 @@ function verify(rows) {
       if (activity) {
         if (Number(activity[1]) !== yearValue) failures.push(`${where}: sheet ${row.source_sheet} is not ${yearValue}`);
         const code = clean(sheet[`B${number}`]?.v);
-        const expected = group === 'total' ? 'TOTAL' : group.replace('sector_', '').toUpperCase();
-        if (code !== expected || (group !== 'total' && !SECTION_LETTERS.includes(code))) failures.push(`${where}: row ${number} is ${code}`);
+        if (group === 'sector_unknown') {
+          if (code || clean(sheet[`C${number}`]?.v) !== 'ACTIVITY UNKNOWN') failures.push(`${where}: row ${number} is not ACTIVITY UNKNOWN`);
+        } else {
+          const expected = group === 'total' ? 'TOTAL' : group.replace('sector_', '').toUpperCase();
+          if (code !== expected || (group !== 'total' && !SECTION_LETTERS.includes(code))) failures.push(`${where}: row ${number} is ${code}`);
+        }
       } else {
         if (clean(sheet[`B${number}`]?.v) !== DEMOGRAPHY_ROWS[group]) failures.push(`${where}: row ${number} is ${clean(sheet[`B${number}`]?.v)}`);
         if (measure.endsWith('_rate') && group !== 'total') failures.push(`${where}: regional rates are not served`);
@@ -221,6 +225,7 @@ const at = (indicator, yearValue) => observations.findIndex(row => row.indicator
 const edit = (index, change) => observations.map((row, i) => (i === index ? { ...row, ...change } : row));
 const turnover = at('business.turnover.total', 2025), large = at('business.turnover.size_large', 2020);
 const tbilisi = at('business.active.region_tbilisi', 2024), section = at('business.births.sector_g', 2018);
+const unknown = at('business.active.sector_unknown', 2024), sectionS = at('business.active.sector_s', 2024);
 const profit = at('business.profit.total', 2025), loss = at('business.loss.total', 2025);
 const negative = {
   altered_value_detected: detects(edit(turnover, { value: '253725.6', published_value: '253725.6' })),
@@ -233,6 +238,8 @@ const negative = {
   wrong_year_sheet_detected: detects(edit(section, { source_sheet: 'By kind of ec.activity - 2017' })),
   loss_table_read_as_profit_detected: detects(edit(profit, {
     source_cell: observations[loss].source_cell, value: observations[loss].value, published_value: observations[loss].published_value })),
+  section_row_read_as_unknown_detected: detects(edit(unknown, {
+    source_cell: observations[sectionS].source_cell, value: observations[sectionS].value, published_value: observations[sectionS].published_value })),
   unrounded_published_value_detected: detects(edit(turnover, { published_value: '253725.50' })),
 };
 

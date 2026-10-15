@@ -180,6 +180,8 @@ DEMOGRAPHY_REGIONS = {
     'The city of Tbilisi': 'region_tbilisi', 'Racha-Lechkhumi and Kvemo Svaneti': 'region_racha_lechkhumi_kvemo_svaneti',
     'Abkhazeti AR': 'region_abkhazeti', 'Unknown': 'region_unknown'}
 SECTIONS = {letter: f'sector_{letter.lower()}' for letter in 'ABCDEFGHIJKLMNPQRS'}  # NACE Rev. 2 sections; O, T and U are out of scope.
+# Firms by activity: the 18 sections and Geostat's "ACTIVITY UNKNOWN" row, which is part of the total but of no section.
+ACTIVITY_GROUPS = [*SECTIONS.values(), 'sector_unknown']
 REGION_COLUMNS = {'active enterprises': 'active', 'enterprise births': 'births', 'enterprise deaths': 'deaths',
                   'enterprise birth rate (%)': 'birth_rate', 'enterprise death rate (%)': 'death_rate'}
 ACTIVITY_COLUMNS = {'active enterprises': 'active', 'enterprise births': 'births', 'enterprise deaths': 'deaths',
@@ -409,7 +411,7 @@ def region_blocks():
 @functools.lru_cache(maxsize=None)
 def activity_sheets():
     """Main-results "By kind of ec.activity - YYYY": {year: (sheet, columns, {group: row})} with the TOTAL row, the 18
-    one-letter sections and the unserved "ACTIVITY UNKNOWN" row; divisions such as A01 are skipped."""
+    one-letter sections and the "ACTIVITY UNKNOWN" row (sector_unknown); divisions such as A01 are skipped."""
     found = {}
     for name in sheet_names(DEMOGRAPHY):
         match = re.fullmatch(r'By kind of ec\.\s*activity\s*-\s*(\d{4})', name)
@@ -426,7 +428,7 @@ def activity_sheets():
             if code == 'TOTAL':
                 group = 'total'
             elif not code and text(cells.get('C')) == 'ACTIVITY UNKNOWN':
-                group = 'activity_unknown'
+                group = 'sector_unknown'
             elif re.fullmatch(r'[A-Z]', code):
                 if code not in SECTIONS:
                     raise ValueError(f'Section {code} is outside the survey scope in {name}')
@@ -436,7 +438,7 @@ def activity_sheets():
             if group in groups:
                 raise ValueError(f'{group} is printed twice in {name}')
             groups[group] = number
-        if set(groups) != {'total', 'activity_unknown', *SECTIONS.values()}:
+        if set(groups) != {'total', *ACTIVITY_GROUPS}:
             raise ValueError(f'Unexpected rows in {name}: {sorted(groups)}')
         found[year] = (name, columns, groups)
     if sorted(found) != list(range(FIRM_YEARS[0], FIRM_YEARS[1] + 1)):
@@ -455,17 +457,11 @@ def demography_observations():
                     rows.append(observation(f'business.{measure}.{group}', year, regions[number].get(column), DEMOGRAPHY, REGIONS_SHEET))
     for year, (name, columns, groups) in activity_sheets().items():
         for group, number in groups.items():
-            if group in ('total', 'activity_unknown'):
+            if group == 'total':
                 continue
             for measure, column in columns.items():
                 rows.append(observation(f'business.{measure}.{group}', year, sheet(DEMOGRAPHY, name)[number].get(column), DEMOGRAPHY, name))
     return rows
-
-
-def activity_unknown(measure):
-    """The "ACTIVITY UNKNOWN" row of each year's activity sheet: firms Geostat counts in the total but in no section."""
-    return {year: cell_number(sheet(DEMOGRAPHY, name)[groups['activity_unknown']].get(columns[measure]))
-            for year, (name, columns, groups) in activity_sheets().items()}
 
 
 def extract():
@@ -485,10 +481,10 @@ def expected_keys():
             keys |= {(f'business.{measure}.{group}', year) for year in range(max(FIRST_YEAR[measure], REGION_FIRST_YEAR), LAST_YEAR + 1)}
     years = range(FIRM_YEARS[0], FIRM_YEARS[1] + 1)
     for measure in FIRM_MEASURES:
-        for group in ['total', *SECTIONS.values(), *DEMOGRAPHY_REGIONS.values()]:
+        for group in ['total', *ACTIVITY_GROUPS, *DEMOGRAPHY_REGIONS.values()]:
             keys |= {(f'business.{measure}.{group}', year) for year in years}
     for measure in RATES:
-        for group in ['total', *SECTIONS.values()]:
+        for group in ['total', *ACTIVITY_GROUPS]:
             keys |= {(f'business.{measure}.{group}', year) for year in years
                      if not (measure == 'death_rate' and group != 'total' and year in NO_SECTION_DEATH_RATE)}
     return keys
@@ -547,12 +543,12 @@ def validate(rows):
     if any(year > LAST_YEAR for _, year in keys):
         raise ValueError('A year after 2025 is served')
 
-    def adds_up(measure, kind, groups, years, extra=None):
+    def adds_up(measure, kind, groups, years):
         tolerance, known = TOLERANCE[UNITS[measure]], KNOWN_DIFFERENCES.get((measure, kind), {})
         for year in years:
             total = (f'business.{measure}.total', year)
-            parts = sum(values[(f'business.{measure}.{group}', year)] for group in groups) + (extra[year] if extra else 0)
-            printed = sum(shown[(f'business.{measure}.{group}', year)] for group in groups) + (extra[year] if extra else 0) - shown[total]
+            parts = sum(values[(f'business.{measure}.{group}', year)] for group in groups)
+            printed = sum(shown[(f'business.{measure}.{group}', year)] for group in groups) - shown[total]
             failed = str(printed) != known[year] if year in known else abs(parts - values[total]) > tolerance
             if failed:
                 raise ValueError(f'The {measure} {kind}s do not add up to the total in {year} as recorded')
@@ -565,8 +561,7 @@ def validate(rows):
     firm_years = range(FIRM_YEARS[0], FIRM_YEARS[1] + 1)
     for measure in FIRM_MEASURES:
         adds_up(measure, 'region', list(DEMOGRAPHY_REGIONS.values()), firm_years)
-        # Sections add up only with the "ACTIVITY UNKNOWN" row, which is read for this check and not served.
-        adds_up(measure, 'section', list(SECTIONS.values()), firm_years, activity_unknown(measure))
+        adds_up(measure, 'section', ACTIVITY_GROUPS, firm_years)
     for (indicator_id, year), value in values.items():
         measure, group = indicator_id.split('.')[1:]
         if measure in RATES:
@@ -621,8 +616,7 @@ def build(check=False):
             'sizes_sectors_regions_add_up_to_total': {unit: str(t) for unit, t in TOLERANCE.items()},
             'recorded_differences_parts_minus_total': {f'{measure}.{kind}': {str(y): d for y, d in years.items()}
                                                        for (measure, kind), years in KNOWN_DIFFERENCES.items()},
-            'firm_sections_add_up_with_activity_unknown_row': {measure: {str(y): str(v) for y, v in activity_unknown(measure).items()}
-                                                               for measure in FIRM_MEASURES},
+            'firm_sections_and_sector_unknown_add_up_exactly': True,
             'rates_equal_births_or_deaths_per_100_active': True,
             'section_death_rate_not_printed': list(NO_SECTION_DEATH_RATE),
             'survey_totals_agree_across_sheets': agreement['survey_totals_compared'],

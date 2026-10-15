@@ -27,9 +27,9 @@ Every file link is `https://geostat.ge/media/<id>/<name>`, which redirects to `h
 
 ## Outputs
 
-- `business-annual.csv`: the 4,590 served observations, one row per indicator and year, with columns `year,indicator_id,value,published_value,unit,basis,value_status,source_id,source_sheet,source_cell`. `value` is the exact decimal token stored in the cell (a text cell would be read with its spaces removed; none of the served cells is text). `published_value` is the value as the cell displays it: the stored double to 15 significant digits, then rounded half-up to the decimals of the cell's number format, which must be one for amounts and rates and none for persons and firms. `basis` is always `actual` and `value_status` always `official`: nothing is calculated or imputed.
+- `business-annual.csv`: the 4,643 served observations, one row per indicator and year, with columns `year,indicator_id,value,published_value,unit,basis,value_status,source_id,source_sheet,source_cell`. `value` is the exact decimal token stored in the cell (a text cell would be read with its spaces removed; none of the served cells is text). `published_value` is the value as the cell displays it: the stored double to 15 significant digits, then rounded half-up to the decimals of the cell's number format, which must be one for amounts and rates and none for persons and firms. `basis` is always `actual` and `value_status` always `official`: nothing is calculated or imputed.
 - `business-series-breaks.csv`: one row, `survey_scope_2006`, applying to every `business.turnover.*` and `business.employed.*` ID from `2006-01-01` (see Notes), in the demography break format.
-- `coverage.csv`: first and last year, count and any unavailable years inside that range for each of the 279 indicators.
+- `coverage.csv`: first and last year, count and any unavailable years inside that range for each of the 284 indicators.
 - `validation-report.json` (from `prepare.py`) and `independent-validation.json` (from `verify_independent.mjs`).
 - `source-manifest.csv` and `source-manifest.json`.
 
@@ -40,9 +40,9 @@ Every file link is `https://geostat.ge/media/<id>/<name>`, which redirects to `h
 | `business.investment.*` | `gel_million` | same | 2006–2025 | 580 |
 | `business.profit.*` | `gel_million` | same | 2006–2025 | 580 |
 | `business.loss.*` | `gel_million` | same | 2006–2025 | 580 |
-| `business.active.*`, `business.births.*`, `business.deaths.*` | `enterprises` | total, 18 sections, 11 regions, `region_abkhazeti`, `region_unknown` | 2014–2024 | 352 each |
-| `business.birth_rate.*` | `percent` | total, 18 sections | 2014–2024 | 209 |
-| `business.death_rate.*` | `percent` | total, 18 sections | 2014–2024; sections not 2016 or 2019 | 173 |
+| `business.active.*`, `business.births.*`, `business.deaths.*` | `enterprises` | total, 18 sections, `sector_unknown`, 11 regions, `region_abkhazeti`, `region_unknown` | 2014–2024 | 363 each |
+| `business.birth_rate.*` | `percent` | total, 18 sections, `sector_unknown` | 2014–2024 | 220 |
+| `business.death_rate.*` | `percent` | total, 18 sections, `sector_unknown` | 2014–2024; sections and `sector_unknown` not 2016 or 2019 | 182 |
 
 ## Cell map
 
@@ -58,7 +58,7 @@ Every file link is `https://geostat.ge/media/<id>/<name>`, which redirects to `h
 **Main-results.xlsx** (business demography):
 
 - `By regions`: one block per year, opened by a row holding only the year in column C (the 2019 heading, C80, is stored as text), then `Total` and 13 named rows. `The city of Tbilisi` and `Racha-Lechkhumi and Kvemo Svaneti` map explicitly to `region_tbilisi` and `region_racha_lechkhumi_kvemo_svaneti`, `Abkhazeti AR` to `region_abkhazeti` and `Unknown` to `region_unknown`; the others match the survey names. Columns by heading: `Active enterprises`, `Enterprise births*`, `Enterprise deaths**`, `Enterprise birth rate (%)`, `Enterprise death rate (%)`. The `total` of all five measures comes from the `Total` row; regions serve active, births and deaths only.
-- `By kind of ec.activity - YYYY` (one sheet per year 2014–2024; the year is read from the sheet name and checked against the title): the `TOTAL` row, the 18 one-letter sections A–N and P–S (letter cells trimmed, as `" I"` is printed with a space) and the `ACTIVITY UNKNOWN` row, which is read for the sum check only. Division rows (`A01` and so on) are skipped. A section O, T or U row would stop the build. Columns: `Active enterprises`, `Enterprise births*`, `Enterprise deaths**`, `Enterprise births %`, `Enterprise deaths %`. The 2016 and 2019 sheets have no death-rate column, so those section death rates are unavailable (listed in `coverage.csv`) and nothing is calculated in their place.
+- `By kind of ec.activity - YYYY` (one sheet per year 2014–2024; the year is read from the sheet name and checked against the title): the `TOTAL` row, the 18 one-letter sections A–N and P–S (letter cells trimmed, as `" I"` is printed with a space) and the `ACTIVITY UNKNOWN` row (no letter in column B, the label in column C), served as `sector_unknown`. Division rows (`A01` and so on) are skipped. A section O, T or U row would stop the build. Columns: `Active enterprises`, `Enterprise births*`, `Enterprise deaths**`, `Enterprise births %`, `Enterprise deaths %`. The 2016 and 2019 sheets have no death-rate column, so those section and `sector_unknown` death rates are unavailable (listed in `coverage.csv`) and nothing is calculated in their place.
 
 The `Persons employed in the population of active enterprises` column and the `By legal forms` sheet are not served.
 
@@ -66,18 +66,18 @@ The `Persons employed in the population of active enterprises` column and the `B
 
 `python3 prepare.py` rebuilds every generated file and fails unless all of these hold; `python3 prepare.py --check` fails if a committed file differs from a rebuild. `python3 -m unittest test_validation -v` runs the regression tests, including negative controls.
 
-- Every served (indicator, year) is present exactly once, and nothing else (4,590 rows); no year is after 2025, no source cell lies below its table's first blank row after 2025, and no survey region row is before 2006.
+- Every served (indicator, year) is present exactly once, and nothing else (4,643 rows); no year is after 2025, no source cell lies below its table's first blank row after 2025, and no survey region row is before 2006.
 - Every value equals its source cell's token, re-read, and every published value is that value rounded to the cell's number format.
 - Sizes, sectors and regions add up to the total within 0.15 million GEL for amounts, 2 persons for persons and exactly for firms, except in the years recorded in `KNOWN_DIFFERENCES` in `prepare.py` (and in `validation-report.json`), each of which must keep exactly its recorded difference of the printed values:
   - sizes and sectors from 2006: ±0.2 in 12 measure-years, the rounding of up to 15 printed values to one decimal (turnover sizes 2011; turnover sectors 2009 and 2025; investment sectors 2009, 2014 and 2017; profit sectors 2017; loss sectors 2012, 2013, 2020, 2021 and 2025);
   - sectors 1999–2005 for sales and jobs: the totals are 1.4–19.1 million GEL and 240–449 persons above the sectors, because until 2005 they include section K (financial and insurance), which has no column (Remark item 1);
   - regions: the 11 regions add up to less than Georgia in every year from 2006 for sales (29.8–170.1 million GEL short), jobs (901–1,413 persons short) and investment (1.1–86.7 million GEL short), and in most years for profit and loss. The workbooks print no other region and no note on the difference.
-- For firms, the 13 region rows (including Abkhazeti AR and Unknown) add up exactly to the total, and the 18 sections add up exactly to the total only together with the unserved `ACTIVITY UNKNOWN` row (22,681 of 249,236 active firms and 21,615 of 56,259 births in 2024).
+- For firms, the 13 region rows (including Abkhazeti AR and Unknown) add up exactly to the total, and the 18 sections add up exactly to the total only together with `sector_unknown`, Geostat's `ACTIVITY UNKNOWN` row (22,681 of 249,236 active firms and 21,615 of 56,259 births in 2024).
 - Every birth (death) rate equals births (deaths) ÷ active × 100 at one decimal.
 - The size and region sheets print the same total as the activity sheet (114 table-years), and each activity sheet's `TOTAL` row prints the same firms and rates as the year's `Total` by region (53 cells).
 - Anchors, as published: turnover 2025 total 253725.5, large firms 173004.5, Tbilisi 200837.9; persons employed 2025 899026; investment 2025 8021.8; profit 2025 27936.1; loss 2025 7152.9; 2024 active firms 249236, births 56259, deaths 29634, birth rate 22.6.
 
-`node verify_independent.mjs` re-reads the five served workbooks with SheetJS (the `xlsx` package of `apps/web`), with label tables written separately from `prepare.py`, and checks every row's stored value, rounding to the cell's number format, year (column A, block heading or sheet name), heading or row label and table title, plus the full set of keys. Its negative controls (altered value, omitted row, shifted year, neighbouring column, quarter row, swapped sheets, wrong region row, wrong year sheet, loss table read as profit, unrounded published value) must all be detected.
+`node verify_independent.mjs` re-reads the five served workbooks with SheetJS (the `xlsx` package of `apps/web`), with label tables written separately from `prepare.py`, and checks every row's stored value, rounding to the cell's number format, year (column A, block heading or sheet name), heading or row label and table title, plus the full set of keys. Its negative controls (altered value, omitted row, shifted year, neighbouring column, quarter row, swapped sheets, wrong region row, wrong year sheet, loss table read as profit, section row read as `sector_unknown`, unrounded published value) must all be detected.
 
 ## Notes
 
@@ -97,4 +97,4 @@ The `Persons employed in the population of active enterprises` column and the `B
 
 The footnotes do not mention the two-year reactivation window the design spec describes; that wording would need another source.
 
-**Firms with unknown activity.** Each activity sheet has an `ACTIVITY UNKNOWN` row that is part of the total but of no section; in 2024 it holds 9% of active firms and 38% of births, far more than in earlier years. Its rates exceed 100% in some years (deaths 628.2% in 2020), so they are not meaningful.
+**Firms with unknown activity.** Each activity sheet has an `ACTIVITY UNKNOWN` row that is part of the total but of no section; in 2024 it holds 9% of active firms and 38% of births, far more than in earlier years. It is served as `sector_unknown`, with the rates Geostat prints for it; those exceed 100% in some years (deaths 628.2% in 2020); the workbook does not explain why.

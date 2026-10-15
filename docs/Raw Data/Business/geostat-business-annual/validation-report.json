@@ -2,13 +2,13 @@
   "status": "passed",
   "retrieved_at": "2026-10-15",
   "scope": "Annual research only: turnover, persons employed, investment, profit and loss by activity, size and region (regions from 2006), and active, new and closed firms with birth and death rates (2014-2024); no quarters, no 2026, no other survey tables, survival, legal forms or ownership",
-  "primary_observation_count": 4590,
+  "primary_observation_count": 4643,
   "observations_by_measure": {
-    "active": 352,
-    "birth_rate": 209,
-    "births": 352,
-    "death_rate": 173,
-    "deaths": 352,
+    "active": 363,
+    "birth_rate": 220,
+    "births": 363,
+    "death_rate": 182,
+    "deaths": 363,
     "employed": 706,
     "investment": 580,
     "loss": 580,
@@ -16,13 +16,13 @@
     "turnover": 706
   },
   "observations_by_source": {
-    "geostat_business_demography": 1438,
+    "geostat_business_demography": 1491,
     "geostat_business_employed": 706,
     "geostat_business_investment": 580,
     "geostat_business_profit_loss": 1160,
     "geostat_business_turnover": 706
   },
-  "indicator_count": 279,
+  "indicator_count": 284,
   "imputed_values": 0,
   "calculated_values": 0,
   "reconciliation_failed_count": 0,
@@ -178,47 +178,7 @@
         "2025": "-1.0"
       }
     },
-    "firm_sections_add_up_with_activity_unknown_row": {
-      "active": {
-        "2024": "22681",
-        "2023": "4600",
-        "2022": "4436",
-        "2021": "2208",
-        "2020": "1431",
-        "2019": "3600",
-        "2018": "8523",
-        "2017": "14420",
-        "2016": "17714",
-        "2015": "16582",
-        "2014": "10235"
-      },
-      "births": {
-        "2024": "21615",
-        "2023": "2941",
-        "2022": "3550",
-        "2021": "1621",
-        "2020": "795",
-        "2019": "2053",
-        "2018": "3830",
-        "2017": "6692",
-        "2016": "8957",
-        "2015": "11087",
-        "2014": "7155"
-      },
-      "deaths": {
-        "2024": "1750",
-        "2023": "1617",
-        "2022": "2871",
-        "2021": "6196",
-        "2020": "8990",
-        "2019": "10249",
-        "2018": "8235",
-        "2017": "5291",
-        "2016": "5331",
-        "2015": "9176",
-        "2014": "11745"
-      }
-    },
+    "firm_sections_and_sector_unknown_add_up_exactly": true,
     "rates_equal_births_or_deaths_per_100_active": true,
     "section_death_rate_not_printed": [
       2016,

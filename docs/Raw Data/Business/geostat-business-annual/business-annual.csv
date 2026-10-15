@@ -340,6 +340,17 @@
 2022,business.active.sector_s,5230,5230,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2022,D104
 2023,business.active.sector_s,5499,5499,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2023,D104
 2024,business.active.sector_s,5476,5476,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2024,D104
+2014,business.active.sector_unknown,10235,10235,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2014,D108
+2015,business.active.sector_unknown,16582,16582,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2015,D108
+2016,business.active.sector_unknown,17714,17714,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2016,D108
+2017,business.active.sector_unknown,14420,14420,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2017,D108
+2018,business.active.sector_unknown,8523,8523,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2018,D108
+2019,business.active.sector_unknown,3600,3600,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2019,D108
+2020,business.active.sector_unknown,1431,1431,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2020,D108
+2021,business.active.sector_unknown,2208,2208,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2021,D108
+2022,business.active.sector_unknown,4436,4436,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2022,D108
+2023,business.active.sector_unknown,4600,4600,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2023,D108
+2024,business.active.sector_unknown,22681,22681,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2024,D108
 2014,business.active.total,128433,128433,enterprises,actual,official,geostat_business_demography,By regions,C156
 2015,business.active.total,157796,157796,enterprises,actual,official,geostat_business_demography,By regions,C141
 2016,business.active.total,160838,160838,enterprises,actual,official,geostat_business_demography,By regions,C126
@@ -549,6 +560,17 @@
 2022,business.birth_rate.sector_s,19.024856596558301,19.0,percent,actual,official,geostat_business_demography,By kind of ec.activity -2022,H104
 2023,business.birth_rate.sector_s,18.494271685760999,18.5,percent,actual,official,geostat_business_demography,By kind of ec.activity -2023,H104
 2024,business.birth_rate.sector_s,13.9700511322133,14.0,percent,actual,official,geostat_business_demography,By kind of ec.activity -2024,H104
+2014,business.birth_rate.sector_unknown,69.907181240840302,69.9,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2014,H108
+2015,business.birth_rate.sector_unknown,66.8616572186708,66.9,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2015,H108
+2016,business.birth_rate.sector_unknown,50.564525234278001,50.6,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2016,H108
+2017,business.birth_rate.sector_unknown,46.4077669902913,46.4,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2017,H108
+2018,business.birth_rate.sector_unknown,44.937228675349097,44.9,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2018,H108
+2019,business.birth_rate.sector_unknown,57.0277777777778,57.0,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2019,H108
+2020,business.birth_rate.sector_unknown,55.5555555555556,55.6,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2020,H108
+2021,business.birth_rate.sector_unknown,73.414855072463794,73.4,percent,actual,official,geostat_business_demography,By kind of ec.activity -2021,H108
+2022,business.birth_rate.sector_unknown,80.027051397655498,80.0,percent,actual,official,geostat_business_demography,By kind of ec.activity -2022,H108
+2023,business.birth_rate.sector_unknown,63.934782608695599,63.9,percent,actual,official,geostat_business_demography,By kind of ec.activity -2023,H108
+2024,business.birth_rate.sector_unknown,95.300030862836707,95.3,percent,actual,official,geostat_business_demography,By kind of ec.activity -2024,H108
 2014,business.birth_rate.total,21.228967632929201,21.2,percent,actual,official,geostat_business_demography,By regions,G156
 2015,business.birth_rate.total,32.863317194352199,32.9,percent,actual,official,geostat_business_demography,By regions,G141
 2016,business.birth_rate.total,19.854138947263699,19.9,percent,actual,official,geostat_business_demography,By regions,G126
@@ -901,6 +923,17 @@
 2022,business.births.sector_s,995,995,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2022,F104
 2023,business.births.sector_s,1017,1017,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2023,F104
 2024,business.births.sector_s,765,765,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2024,F104
+2014,business.births.sector_unknown,7155,7155,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2014,F108
+2015,business.births.sector_unknown,11087,11087,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2015,F108
+2016,business.births.sector_unknown,8957,8957,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2016,F108
+2017,business.births.sector_unknown,6692,6692,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2017,F108
+2018,business.births.sector_unknown,3830,3830,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2018,F108
+2019,business.births.sector_unknown,2053,2053,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2019,F108
+2020,business.births.sector_unknown,795,795,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2020,F108
+2021,business.births.sector_unknown,1621,1621,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2021,F108
+2022,business.births.sector_unknown,3550,3550,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2022,F108
+2023,business.births.sector_unknown,2941,2941,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2023,F108
+2024,business.births.sector_unknown,21615,21615,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2024,F108
 2014,business.births.total,27265,27265,enterprises,actual,official,geostat_business_demography,By regions,E156
 2015,business.births.total,51857,51857,enterprises,actual,official,geostat_business_demography,By regions,E141
 2016,business.births.total,31933,31933,enterprises,actual,official,geostat_business_demography,By regions,E126
@@ -1074,6 +1107,15 @@
 2022,business.death_rate.sector_s,14.7227533460803,14.7,percent,actual,official,geostat_business_demography,By kind of ec.activity -2022,I104
 2023,business.death_rate.sector_s,16.4939079832697,16.5,percent,actual,official,geostat_business_demography,By kind of ec.activity -2023,I104
 2024,business.death_rate.sector_s,12.509130752374,12.5,percent,actual,official,geostat_business_demography,By kind of ec.activity -2024,I104
+2014,business.death_rate.sector_unknown,114.753297508549,114.8,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2014,I108
+2015,business.death_rate.sector_unknown,55.3371125316608,55.3,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2015,I108
+2017,business.death_rate.sector_unknown,36.692094313453502,36.7,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2017,I108
+2018,business.death_rate.sector_unknown,96.620908130939796,96.6,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2018,I108
+2020,business.death_rate.sector_unknown,628.23200559049599,628.2,percent,actual,official,geostat_business_demography,By kind of ec.activity - 2020,I108
+2021,business.death_rate.sector_unknown,280.61594202898601,280.6,percent,actual,official,geostat_business_demography,By kind of ec.activity -2021,I108
+2022,business.death_rate.sector_unknown,64.720468890892704,64.7,percent,actual,official,geostat_business_demography,By kind of ec.activity -2022,I108
+2023,business.death_rate.sector_unknown,35.152173913043498,35.2,percent,actual,official,geostat_business_demography,By kind of ec.activity -2023,I108
+2024,business.death_rate.sector_unknown,7.7157091838984204,7.7,percent,actual,official,geostat_business_demography,By kind of ec.activity -2024,I108
 2014,business.death_rate.total,23.1210047261997,23.1,percent,actual,official,geostat_business_demography,By regions,H156
 2015,business.death_rate.total,15.2665466805242,15.3,percent,actual,official,geostat_business_demography,By regions,H141
 2016,business.death_rate.total,14.9007075442371,14.9,percent,actual,official,geostat_business_demography,By regions,H126
@@ -1426,6 +1468,17 @@
 2022,business.deaths.sector_s,770,770,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2022,G104
 2023,business.deaths.sector_s,907,907,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2023,G104
 2024,business.deaths.sector_s,685,685,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2024,G104
+2014,business.deaths.sector_unknown,11745,11745,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2014,G108
+2015,business.deaths.sector_unknown,9176,9176,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2015,G108
+2016,business.deaths.sector_unknown,5331,5331,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2016,G108
+2017,business.deaths.sector_unknown,5291,5291,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2017,G108
+2018,business.deaths.sector_unknown,8235,8235,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2018,G108
+2019,business.deaths.sector_unknown,10249,10249,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2019,G108
+2020,business.deaths.sector_unknown,8990,8990,enterprises,actual,official,geostat_business_demography,By kind of ec.activity - 2020,G108
+2021,business.deaths.sector_unknown,6196,6196,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2021,G108
+2022,business.deaths.sector_unknown,2871,2871,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2022,G108
+2023,business.deaths.sector_unknown,1617,1617,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2023,G108
+2024,business.deaths.sector_unknown,1750,1750,enterprises,actual,official,geostat_business_demography,By kind of ec.activity -2024,G108
 2014,business.deaths.total,29695,29695,enterprises,actual,official,geostat_business_demography,By regions,F156
 2015,business.deaths.total,24090,24090,enterprises,actual,official,geostat_business_demography,By regions,F141
 2016,business.deaths.total,23966,23966,enterprises,actual,official,geostat_business_demography,By regions,F126
