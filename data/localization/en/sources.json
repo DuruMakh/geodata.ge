@@ -1741,14 +1741,14 @@
   },
   "source.geostat_health_16_number_of_persons_medicines": {
     "name": {
-      "text": "Number of persons, medicines (table 16)",
+      "text": "Persons with disabilities who received medicines under the state health programme (table 16)",
       "reviewedAt": "2026-10-15"
     },
     "derivation": null
   },
   "source.geostat_health_17_the_cost_of_medicines": {
     "name": {
-      "text": "The cost of medicines (table 17)",
+      "text": "Cost of medicines issued to persons with disabilities under the state health programme (table 17)",
       "reviewedAt": "2026-10-15"
     },
     "derivation": null
