@@ -6,16 +6,21 @@ import { parseTopicHash, serializeTopicHash, topicCoverage, type TopicState } fr
 /** The areas with a page: Georgia, then the eleven regions. Abkhazeti AR and the unknown region are part of the firms total but have no page. */
 export const BUSINESS_AREAS = ["georgia", ...BUSINESS_REGIONS] as const;
 export type BusinessArea = typeof BUSINESS_AREAS[number];
-const REGIONS_HREF = BUSINESS_SECTIONS.find(section => section.id === "regions")!.href;
+/** The Regions index, whose map and list open the area pages. */
+export const BUSINESS_REGIONS_HREF = BUSINESS_SECTIONS.find(section => section.id === "regions")!.href;
 /** An area's URL slug: a region's drops the `region_` prefix. */
 export const businessAreaSlug = (area: BusinessArea) => area.replace(/^region_/, "");
-export const businessAreaHref = (area: BusinessArea): `/${string}` => `${REGIONS_HREF}/${businessAreaSlug(area)}`;
-/** The area page of a map or list row: `georgia`, or a region in the map's `region.<id>` form (as `householdRegionHref` reads it). */
-export const businessRegionHref = (id: string): `/${string}` => businessAreaHref((id === "georgia" ? id : id.replace(/^region\./, "region_")) as BusinessArea);
+export const businessAreaHref = (area: BusinessArea): `/${string}` => `${BUSINESS_REGIONS_HREF}/${businessAreaSlug(area)}`;
+/** An area's id on the shared region map and picker: `georgia`, or a region's `region.<id>`, whose names the shared region labels carry. */
+export const businessMapId = (area: BusinessArea) => area === "georgia" ? area : area.replace(/^region_/, "region.");
+/** The area of a map, picker or list row id (`businessMapId`'s inverse). */
+export const businessAreaOfMapId = (id: string) => (id === "georgia" ? id : id.replace(/^region\./, "region_")) as BusinessArea;
+/** The area page of a map or list row (as `householdRegionHref` reads it). */
+export const businessRegionHref = (id: string): `/${string}` => businessAreaHref(businessAreaOfMapId(id));
 
 /** The area page's icon measure switch. */
 export type BusinessAreaMeasure = "money" | "jobs" | "firms";
-const AREA_MEASURES: readonly BusinessAreaMeasure[] = ["money", "jobs", "firms"];
+export const BUSINESS_AREA_MEASURES: readonly BusinessAreaMeasure[] = ["money", "jobs", "firms"];
 /** Each switch option's series, in list order, and the bold ones it selects when chosen. */
 const AREA_SERIES: Record<BusinessAreaMeasure, { measures: readonly BusinessMeasure[]; selected: readonly BusinessMeasure[] }> = {
   money: { measures: ["turnover", "investment", "profit", "loss"], selected: ["turnover"] },
@@ -47,7 +52,7 @@ export function businessAreaCoverage(area: BusinessArea, measure: BusinessAreaMe
 /** Reads the view of the page for `area`; the measure is `m` (money when missing or unknown), and a selection keeps only that measure's series. */
 export function parseBusinessAreaHash(hash: string, area: BusinessArea, facts: readonly ClientBusinessFact[]): BusinessAreaState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
-  const measure = AREA_MEASURES.find(item => item === p.get("m")) ?? "money";
+  const measure = BUSINESS_AREA_MEASURES.find(item => item === p.get("m")) ?? "money";
   return { ...parseTopicHash(p, businessAreaSeries(area, measure), businessAreaDefaultSelection(area, measure), businessAreaCoverage(area, measure, facts)), measure };
 }
 

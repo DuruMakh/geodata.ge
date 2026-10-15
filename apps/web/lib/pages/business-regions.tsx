@@ -10,8 +10,8 @@ import { loadServedBusinessData, toClientBusinessFact } from "../data/business/i
 import type { BusinessFact } from "../data/business/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
-import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
-import { BUSINESS_AREAS, businessAreaCoverage, businessAreaHref, businessAreaSeries, businessAreaSlug, type BusinessArea, type BusinessAreaMeasure, type BusinessMapMeasure } from "../explorer/businessAreas";
+import { BUSINESS_HUB_PATH } from "../explorer/business";
+import { BUSINESS_AREA_MEASURES, BUSINESS_AREAS, BUSINESS_REGIONS_HREF, businessAreaCoverage, businessAreaHref, businessAreaSeries, businessAreaSlug, businessMapId, type BusinessArea, type BusinessMapMeasure } from "../explorer/businessAreas";
 import { buildBusinessRegionMapModel } from "../explorer/businessRegionMap";
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { RegionMapModel } from "../explorer/regionalEconomyMap";
@@ -26,12 +26,8 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
-const REGIONS_HREF = BUSINESS_SECTIONS.find(section => section.id === "regions")!.href;
-const AREA_MEASURES: readonly BusinessAreaMeasure[] = ["money", "jobs", "firms"];
-/** The map's id of an area: Georgia, or a region's shared `region.<id>`, whose names the shared region labels carry. */
-const mapId = (area: BusinessArea) => area === "georgia" ? area : area.replace(/^region_/, "region.");
 /** Georgia and the eleven regions, in the picker's and previous/next order; Georgia's English name is the catalogue's `georgia` label. */
-const AREA_PAGES: readonly MunicipalRegion[] = BUSINESS_AREAS.map(area => area === "georgia" ? { id: area, kaLabel: "საქართველო", sortOrder: 0 } : REGIONAL_ECONOMY_REGIONS.find(region => region.id === mapId(area))!);
+const AREA_PAGES: readonly MunicipalRegion[] = BUSINESS_AREAS.map(area => area === "georgia" ? { id: area, kaLabel: "საქართველო", sortOrder: 0 } : REGIONAL_ECONOMY_REGIONS.find(region => region.id === businessMapId(area))!);
 const AREA_LABEL_IDS = AREA_PAGES.map(area => area.id);
 
 export const businessAreaStaticParams = () => BUSINESS_AREAS.map(area => ({ id: businessAreaSlug(area) }));
@@ -49,7 +45,7 @@ function businessAreaLabels(presentation: Presentation): Record<BusinessArea, st
 
 export async function businessRegionsPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["business"]);
-  return fiscalMetadata({ locale, path: REGIONS_HREF, title: message(messages, "business.page.regions.metaTitle"), description: message(messages, "business.page.regions.summary") });
+  return fiscalMetadata({ locale, path: BUSINESS_REGIONS_HREF, title: message(messages, "business.page.regions.metaTitle"), description: message(messages, "business.page.regions.summary") });
 }
 
 export async function businessAreaPageMetadata(slug: string, locale: Locale) {
@@ -68,21 +64,21 @@ async function renderBusinessRegionsFrame(locale: Locale, area: BusinessArea | u
   const regionsTitle = t("page.regions.title"), regionName = area ? areaLabels[area] : "";
   const title = area ? t("page.area.regionTitle", { region: regionName }) : regionsTitle;
   const description = area ? t("page.area.regionSummary", { region: regionName }) : t("page.regions.summary");
-  const href = area ? businessAreaHref(area) : REGIONS_HREF;
+  const href = area ? businessAreaHref(area) : BUSINESS_REGIONS_HREF;
   const covered = years(data.facts), firstYear = Math.min(...covered), lastYear = Math.max(...covered);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const hubTitle = t("title");
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(BUSINESS_HUB_PATH, locale) }, ...(area ? [{ label: regionsTitle, href: pageHref(REGIONS_HREF, locale) }] : []), { label: area ? regionName : title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(BUSINESS_HUB_PATH, locale) }, ...(area ? [{ label: regionsTitle, href: pageHref(BUSINESS_REGIONS_HREF, locale) }] : []), { label: area ? regionName : title }];
   // The measures the page shows, by name: an area's three switch options, or the index map's sales and jobs.
-  const measures = area ? AREA_MEASURES.flatMap(measure => businessAreaSeries(area, measure).map(series => series.id.split(".")[1])) : ["turnover", "employed"];
+  const measures = area ? BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaSeries(area, measure).map(series => series.id.split(".")[1])) : ["turnover", "employed"];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "business", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
       // An area page is a slice of the regions' dataset.
-      ...(area ? { spatialCoverageName: regionName, withinGeorgia: area !== "georgia", partOf: { path: REGIONS_HREF, name: regionsTitle, description: t("page.regions.summary") } } : {}),
+      ...(area ? { spatialCoverageName: regionName, withinGeorgia: area !== "georgia", partOf: { path: BUSINESS_REGIONS_HREF, name: regionsTitle, description: t("page.regions.summary") } } : {}),
       variableMeasured: [...new Set(measures.map(measure => t(`series.${measure}`)))],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(BUSINESS_HUB_PATH, locale) }, ...(area ? [{ name: regionsTitle, path: pageHref(REGIONS_HREF, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(BUSINESS_HUB_PATH, locale) }, ...(area ? [{ name: regionsTitle, path: pageHref(BUSINESS_REGIONS_HREF, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {body({ facts: data.facts, presentation, areaLabels, origin, lastReviewedAt })}
@@ -100,9 +96,9 @@ export function renderBusinessRegionsPage(locale: Locale) {
 
 export function renderBusinessAreaPage(locale: Locale, slug: string) {
   const area = areaForSlug(slug);
-  const ids = new Set<string>(AREA_MEASURES.flatMap(measure => businessAreaSeries(area, measure).map(series => series.id)));
+  const ids = new Set<string>(BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaSeries(area, measure).map(series => series.id)));
   const areaFacts = (facts: BusinessFact[]) => facts.map(toClientBusinessFact).filter(f => ids.has(f.indicatorId));
-  return renderBusinessRegionsFrame(locale, area, facts => AREA_MEASURES.flatMap(measure => businessAreaCoverage(area, measure, areaFacts(facts)).years), ({ facts, presentation, areaLabels, origin, lastReviewedAt }) => {
+  return renderBusinessRegionsFrame(locale, area, facts => BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaCoverage(area, measure, areaFacts(facts)).years), ({ facts, presentation, areaLabels, origin, lastReviewedAt }) => {
     // Every row is its measure's name: the area is the page's own.
     const labels = Object.fromEntries([...ids].map(id => [id, message(presentation.messages, `business.series.${id.split(".")[1]}`)]));
     // The archived Geostat workbooks join with the business methodology (Task 8); until then the Sources sheet lists none.

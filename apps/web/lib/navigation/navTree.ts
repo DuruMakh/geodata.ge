@@ -62,7 +62,6 @@ export const NAV_TREE: readonly NavHub[] = [
     labelKey: "common.business",
     railLabelKey: "common.dataBusiness",
     testId: "business-link",
-    spaced: true,
     sections: sectionRows(BUSINESS_SECTIONS, "business"),
   },
   {

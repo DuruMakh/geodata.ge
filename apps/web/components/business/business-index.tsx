@@ -2,7 +2,7 @@
 import { Users } from "lucide-react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import { businessMapHash, businessRegionHref, parseBusinessMapMeasure, serializeBusinessMapMeasure, type BusinessMapMeasure } from "../../lib/explorer/businessAreas";
-import { formatInUnit, unitFor, unitsFor } from "../../lib/explorer/format";
+import { formatInUnit, unitsFor } from "../../lib/explorer/format";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { publicLabel } from "../../lib/i18n/labels";
 import { useI18n } from "../../lib/i18n/provider";
@@ -28,8 +28,8 @@ export function BusinessIndex({ facts, regionMaps }: {
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `business.${key}`, values);
   const { state: measure, update } = useHashState(null, parseBusinessMapMeasure, serializeBusinessMapMeasure);
   const regionMap = regionMaps[measure];
-  // One unit for the whole map and list: billion GEL (decimals that keep the smallest region apart from zero) or thousand people.
-  const bn = unitFor(regionMaps.turnover.regions.map(region => region.value), unitsFor(locale).bn);
+  // One unit for the whole map and list: billion GEL to one decimal, or thousand people.
+  const bn = { ...unitsFor(locale).bn, decimals: 1 };
   const unitLabel = measure === "turnover" ? message(messages, "format.bnGel") : t("unitThousandPeople");
   const valueLabel = (value: number) => measure === "turnover" ? `${formatInUnit(value, bn)} ${unitLabel}` : `${formatInUnit(value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandPersons")}`;
   // The latest-value line is the page's headline: the region with the largest sales, whichever measure the map shows.

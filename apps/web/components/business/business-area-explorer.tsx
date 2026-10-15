@@ -4,11 +4,10 @@ import { Building2, ChevronDown, Users } from "lucide-react";
 import { useCallback, useId, useRef, useState, type ReactNode } from "react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { BUSINESS_SECTIONS } from "../../lib/explorer/business";
-import { buildBusinessAreaModel, businessAreaCoverage, businessRegionHref, changeBusinessAreaMeasure, parseBusinessAreaHash, serializeBusinessAreaHash, type BusinessArea, type BusinessAreaMeasure } from "../../lib/explorer/businessAreas";
+import { BUSINESS_AREA_MEASURES, BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaOfMapId, businessAreaSeries, businessMapId, businessRegionHref, changeBusinessAreaMeasure, parseBusinessAreaHash, serializeBusinessAreaHash, type BusinessArea, type BusinessAreaMeasure } from "../../lib/explorer/businessAreas";
 import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
-import { formatAmount, formatInUnit, thousandsUnit, unitFor, unitsFor, type ValueUnit } from "../../lib/explorer/format";
+import { formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
@@ -29,15 +28,11 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionPicker, useRefocusAfterPick } from "../regional-economies/region-picker";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
-const REGIONS_HREF = BUSINESS_SECTIONS.find(section => section.id === "regions")!.href;
-const MEASURES: readonly BusinessAreaMeasure[] = ["money", "jobs", "firms"];
 const MEASURE_ICON: Record<BusinessAreaMeasure, ReactNode> = {
   money: <span aria-hidden="true" className="text-base">₾</span>,
   jobs: <Users aria-hidden="true" size={18} strokeWidth={1.5} />,
   firms: <Building2 aria-hidden="true" size={18} strokeWidth={1.5} />,
 };
-/** The map's id of an area (the picker and the previous/next links use the map's `region.<id>` ids). */
-const mapId = (area: BusinessArea) => area === "georgia" ? area : area.replace(/^region_/, "region.");
 
 export type BusinessAreaExplorerProps = {
   area: BusinessArea; facts: ClientBusinessFact[];
@@ -60,10 +55,14 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   const pickerTrigger = useRef<HTMLButtonElement>(null);
   useRefocusAfterPick(pickerTrigger, "region-picker-trigger");
   const model = buildBusinessAreaModel(area, facts, state);
-  const viewIds = new Set<string>(model.series.map(series => series.id));
-  const unit: ValueUnit = model.unit === "gel" ? unitFor(facts.filter(f => viewIds.has(f.indicatorId)).map(f => f.value), unitsFor(locale).bn)
-    : model.unit === "persons" ? thousandsUnit(locale) : { divisor: 1, label: "", decimals: 0 };
-  const unitLabel = { gel: message(messages, "format.bnGel"), persons: t("unitThousandPeople"), enterprises: t("unitFirms"), percent: t("unitPercent") }[model.unit];
+  // Amounts are in billion GEL to one decimal when the area's largest amount reaches a billion, otherwise in million GEL
+  // to one decimal; the latest line uses the same unit. People are in thousands, firms whole numbers.
+  const moneyIds = new Set<string>(businessAreaSeries(area, "money").map(series => series.id));
+  const inBillions = facts.some(f => moneyIds.has(f.indicatorId) && Math.abs(f.value) >= 1e9);
+  const moneyUnit: ValueUnit = { ...unitsFor(locale)[inBillions ? "bn" : "mln"], decimals: 1 };
+  const moneyLabel = message(messages, inBillions ? "format.bnGel" : "format.mlnGel");
+  const unit: ValueUnit = model.unit === "gel" ? moneyUnit : model.unit === "persons" ? thousandsUnit(locale) : { divisor: 1, label: "", decimals: 0 };
+  const unitLabel = { gel: moneyLabel, persons: t("unitThousandPeople"), enterprises: t("unitFirms"), percent: t("unitPercent") }[model.unit];
   const format = (value: number | null | undefined) => formatInUnit(value, unit);
   const valueLabel = (value: number | null | undefined) => value == null ? "—" : `${format(value)} ${unitLabel}`;
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
@@ -78,9 +77,9 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   // Links to another area's page carry the measure, and nothing else; the index reads only the jobs choice.
   const measureHash = state.measure === "money" ? "" : `#m=${state.measure}`;
   const areaHref = (id: string) => `${businessRegionHref(id)}${measureHash}`;
-  const index = areas.findIndex(item => item.id === mapId(area));
+  const index = areas.findIndex(item => item.id === businessMapId(area));
   const neighbours = { previous: areas[(index - 1 + areas.length) % areas.length]!, next: areas[(index + 1) % areas.length]! };
-  const nameOf = (id: string) => areaLabels[(id === "georgia" ? id : id.replace(/^region\./, "region_")) as BusinessArea];
+  const nameOf = (id: string) => areaLabels[businessAreaOfMapId(id)];
   return <div data-testid={`business-area-${area}`} className="@container">
     <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
       <div className="relative min-w-0 min-[768px]:flex-1">
@@ -89,13 +88,13 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
             {areaName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
           </button>
         </ExplorerHeading>
-        <RegionPicker id={pickerId} open={pickerOpen} onClose={() => setPickerOpen(false)} regions={areas} activeRegionId={mapId(area)} hrefForRegion={areaHref} indexHref={`${REGIONS_HREF}${state.measure === "jobs" ? "#m=jobs" : ""}`} />
+        <RegionPicker id={pickerId} open={pickerOpen} onClose={() => setPickerOpen(false)} regions={areas} activeRegionId={businessMapId(area)} hrefForRegion={areaHref} indexHref={`${BUSINESS_REGIONS_HREF}${state.measure === "jobs" ? "#m=jobs" : ""}`} />
       </div>
       <EntityNeighbourLinks testId="business-region-navigation" className="mb-3"
         previous={{ href: pageHref(areaHref(neighbours.previous.id), locale), label: nameOf(neighbours.previous.id) }}
         next={{ href: pageHref(areaHref(neighbours.next.id), locale), label: nameOf(neighbours.next.id) }} />
     </div>
-    <LatestValueLine testId="business-latest" measure={t("latest.area")} period={latest.year} value={formatAmount(latest.value, locale)} note={areaName} />
+    <LatestValueLine testId="business-latest" measure={t("latest.area")} period={latest.year} value={`${formatInUnit(latest.value, moneyUnit)} ${moneyLabel}`} note={areaName} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={area} data-unit={model.unit} data-measure={state.measure} className="border-t border-[var(--ink)] pt-4">
@@ -104,7 +103,7 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
             <div className="flex items-center gap-3.5">
               <span data-testid="business-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
               <SegmentedTabs<BusinessAreaMeasure> ariaLabel={t("measure")} value={state.measure} onChange={measure => { if (measure !== state.measure) update(s => changeBusinessAreaMeasure(s, area, measure, facts), true); }}
-                options={MEASURES.map(measure => ({ value: measure, label: t(`measure.${measure}`), testId: `business-area-measure-${measure}`, icon: MEASURE_ICON[measure] }))} />
+                options={BUSINESS_AREA_MEASURES.map(measure => ({ value: measure, label: t(`measure.${measure}`), testId: `business-area-measure-${measure}`, icon: MEASURE_ICON[measure] }))} />
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>

@@ -6,7 +6,7 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import { buildBusinessModel, businessCoverage, businessViews, businessViewSeries, changeBusinessView, parseBusinessHash, serializeBusinessHash, type BusinessState, type BusinessTopicId, type BusinessView } from "../../lib/explorer/business";
 import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
-import { formatAmount, formatInUnit, thousandsUnit, unitFor, unitsFor, type ValueUnit } from "../../lib/explorer/format";
+import { formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
@@ -47,24 +47,26 @@ export function BusinessExplorer({ section, facts, labels, sources, lastReviewed
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState("");
   const model = buildBusinessModel(section, facts, state);
-  // Each view has one unit: amounts in billion GEL (decimals read from every value the view can show), people in
-  // thousands, firms as whole numbers and rates in percent to one decimal.
+  // Each view has one unit: amounts in billion GEL to one decimal, people in thousands, firms as whole numbers and
+  // rates in percent to one decimal.
   const percent = model.unit === "percent";
-  const viewIds = new Set<string>(model.series.map(series => series.id));
-  const unit: ValueUnit = model.unit === "gel" ? unitFor(facts.filter(f => viewIds.has(f.indicatorId)).map(f => f.value), unitsFor(locale).bn)
+  const bn: ValueUnit = { ...unitsFor(locale).bn, decimals: 1 };
+  const unit: ValueUnit = model.unit === "gel" ? bn
     : model.unit === "persons" ? thousandsUnit(locale) : { divisor: 1, label: percent ? t("unitPercent") : "", decimals: percent ? 1 : 0 };
   const unitLabel = { gel: message(messages, "format.bnGel"), persons: t("unitThousandPeople"), enterprises: t("unitFirms"), percent: t("unitPercent") }[model.unit];
   const format = (value: number | null | undefined) => formatInUnit(value, percent ? { ...unit, label: "" } : unit);
   const valueLabel = (value: number | null | undefined) => value == null ? "—" : percent ? `${format(value)}${unitLabel}` : `${format(value)} ${unitLabel}`;
-  const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
-  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
+  // Outside the list, a nested series carries its parent's name (as in the workbook): Construction under profit and under loss stay apart.
+  const fullLabel = (series: { id: string; parentId?: string }) => series.parentId ? `${labels[series.parentId]} — ${labels[series.id]}` : labels[series.id];
+  const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: fullLabel(series), color: series.color, valuesByYear: series.valuesByYear }));
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: fullLabel(series), color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   const reference = model.series.find(series => series.reference);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   // The latest-value line is the page's headline, whatever the list shows: firms' sales, people employed, investment, or new firms with the closed beside them.
   const latestOf = (id: string) => facts.filter(f => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
   const latest = latestOf(LATEST_ID[section]);
   const count = (value: number) => formatInUnit(value, { divisor: 1, label: "", decimals: 0 });
-  const latestValue = section === "jobs" ? `${formatInUnit(latest.value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandPersons")}` : section === "firms" ? count(latest.value) : formatAmount(latest.value, locale);
+  const latestValue = section === "jobs" ? `${formatInUnit(latest.value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandPersons")}` : section === "firms" ? count(latest.value) : `${formatInUnit(latest.value, bn)} ${message(messages, "format.bnGel")}`;
   const closed = section === "firms" ? facts.find(f => f.indicatorId === "business.deaths.total" && f.year === latest.year) : undefined;
   const title = t(`page.${section}.title`);
   const chartLabel = state.view === "rate" ? t("measure.rate") : title;

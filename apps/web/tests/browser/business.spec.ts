@@ -26,8 +26,7 @@ test("the hub shows five cards, each opening its page", async ({ page }) => {
 test("sales selects all firms alone and lists sizes and industries under two headings", async ({ page }) => {
   await page.goto("/explorer/business/sales");
   await ready(page);
-  await expect(page.getByTestId("business-latest")).toContainText("253.7");
-  await expect(page.getByTestId("business-latest")).toContainText("2025");
+  await expect(page.getByTestId("business-latest")).toHaveText("საწარმოების ბრუნვა · 2025: 253.7 მლრდ ₾");
   await expect(page.getByTestId("series-status")).toContainText("1 / 18");
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
   await expect(page.locator(pressed("business.turnover.total"))).toHaveAttribute("aria-pressed", "true");
@@ -71,6 +70,18 @@ test("investment and profit has no measure switch and its search opens the neste
   await expect(page.getByTestId("series-status")).toContainText("1 / 3");
 });
 
+test("outside the list a nested series carries its parent's name, and amounts read in billion GEL to one decimal", async ({ page }) => {
+  await page.goto("/explorer/business/investment-profit#view=table&sel=business.investment.sector_f,business.profit.sector_f");
+  await ready(page);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  const labels = (await page.getByTestId("explorer-table").locator("tbody th").allInnerTexts()).map(text => text.trim());
+  expect(labels).toEqual(expect.arrayContaining(["ინვესტიციები ძირითად საშუალებებში — მშენებლობა", "მოგება — მშენებლობა"]));
+  // The list keeps the short name under its parent.
+  await expect(page.locator('[data-series-id="business.profit.sector_f"]')).toContainText("მშენებლობა");
+  await expect(page.locator('[data-series-id="business.profit.sector_f"]')).not.toContainText("მოგება —");
+  for (const name of ["ინვესტიციები ძირითად საშუალებებში — მშენებლობა", "მოგება — მშენებლობა"]) await expect(await cell(page, name, 2025)).toHaveText(/^(\d+\.\d|<0\.1)$/);
+});
+
 test("firms opened and closed selects both, and the rate switch keeps them and the headline", async ({ page }) => {
   await page.goto("/explorer/business/firms");
   await ready(page);
@@ -100,13 +111,15 @@ test("regions is the map and list with Georgia first, and a region opens with th
   await page.goto("/explorer/business/regions");
   await ready(page);
   await expect(page.getByTestId("business-latest")).toContainText("თბილისი");
-  await expect(page.getByTestId("business-latest")).toContainText("200.8");
+  await expect(page.getByTestId("business-latest")).toHaveText("ბრუნვა · თბილისი · 2025: 200.8 მლრდ ₾");
   await expect(page.getByTestId("business-region-map").getByTestId("regional-map-path")).toHaveCount(11);
   const rows = page.getByTestId("regional-list-row");
   await expect(rows).toHaveCount(12);
   await expect(rows.first()).toHaveAttribute("data-region-id", "georgia");
   await expect(rows.first()).toContainText("საქართველო");
   await expect(rows.first()).toHaveAttribute("href", "/explorer/business/regions/georgia");
+  // Every sales value reads in billion GEL to one decimal.
+  for (const text of await rows.allInnerTexts()) expect(text).toMatch(/(\d+\.\d|<0\.1) მლრდ ₾/);
   await expect(rows.nth(1)).toHaveAttribute("data-region-id", "region.tbilisi");
   await expect(row(page, "region.guria")).toHaveAttribute("href", "/explorer/business/regions/guria");
   for (const id of ["chart-panel", "series-status", "business-excel-download", "source-label"]) await expect(page.getByTestId(id)).toHaveCount(0);
@@ -128,8 +141,9 @@ test("the Guria page: picker, neighbours, measures, the language switch and Exce
   const heading = page.getByRole("heading", { level: 1 });
   await expect(heading).toContainText("ბიზნესი —");
   await expect(heading.getByTestId("region-picker-trigger")).toHaveText("გურია");
-  await expect(page.getByTestId("business-latest")).toContainText("1.1");
-  await expect(page.getByTestId("business-latest")).toContainText("· გურია");
+  // Guria's amounts reach a billion: the line, the chart and the list read in billion GEL to one decimal.
+  await expect(page.getByTestId("business-latest")).toHaveText(/^ბრუნვა · 2025: 1\.\d მლრდ ₾ · გურია$/);
+  await expect(page.getByTestId("business-unit-label")).toHaveText("მლრდ ₾");
   await expect(page.getByTestId("business-area-measure-money")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2006–2025");
   await expect(page.getByTestId("source-label")).toContainText("სათაო ოფისი");
@@ -163,6 +177,13 @@ test("the Guria page: picker, neighbours, measures, the language switch and Exce
   await expect(page.getByTestId("year-range-strip")).toContainText("2014–2024");
   await page.getByTestId("business-region-navigation").getByRole("link", { name: "Imereti →" }).click();
   await expect(page).toHaveURL(/\/en\/explorer\/business\/regions\/imereti#m=firms$/);
+});
+
+test("an area whose amounts stay under a billion reads in million GEL, in the line and the chart alike", async ({ page }) => {
+  await page.goto("/explorer/business/regions/racha_lechkhumi_kvemo_svaneti");
+  await ready(page);
+  await expect(page.getByTestId("business-latest")).toHaveText(/^ბრუნვა · 2025: \d+\.\d მლნ ₾ · /);
+  await expect(page.getByTestId("business-unit-label")).toHaveText("მლნ ₾");
 });
 
 test("the topic Excel download is a workbook", async ({ page }) => {

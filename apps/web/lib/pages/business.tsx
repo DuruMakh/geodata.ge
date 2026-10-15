@@ -22,10 +22,10 @@ import { resolveSiteUrl } from "../siteUrl";
 import { TopicHub } from "./hub";
 
 /** The shared economic-sector labels the industry rows wear (`sector_x` is `sector.x`); the survey's B–E group and the unknown activity have their own. */
-export const BUSINESS_SECTOR_LABEL_IDS = BUSINESS_DEMOGRAPHY_SECTORS.map(group => `sector.${group.slice("sector_".length)}`);
+const BUSINESS_SECTOR_LABEL_IDS = BUSINESS_DEMOGRAPHY_SECTORS.map(group => `sector.${group.slice("sector_".length)}`);
 
 /** A size's or industry's name, in the page's language: industries take the Economy pages' sector names, as Wages does. */
-export function businessGroupLabel(presentation: Presentation, group: BusinessGroup): string {
+function businessGroupLabel(presentation: Presentation, group: BusinessGroup): string {
   const sector = ECONOMIC_SECTORS.find(item => item.id === `sector.${group.slice("sector_".length)}`);
   return group.startsWith("sector_") && sector ? publicLabel(presentation.locale, sector.id, sector.labelKa, presentation.englishLabels) : message(presentation.messages, `business.group.${group}`);
 }
@@ -53,7 +53,8 @@ function sectionSeries(section: BusinessTopicId) {
 
 /**
  * Display names for every series a topic page can show. Sales and Jobs call their total "All firms"; elsewhere a total
- * is its measure's name (Investment, New firms…). Parts carry no prefix: the heading or parent they sit under names them.
+ * is its measure's name (Investment, New firms…). Parts carry no prefix: the heading or parent they sit under names them
+ * (the chart, table and workbook add a nested part's parent name).
  */
 function businessLabels(presentation: Presentation, section: BusinessTopicId): Record<string, string> {
   const t = (key: string) => message(presentation.messages, `business.${key}`);
