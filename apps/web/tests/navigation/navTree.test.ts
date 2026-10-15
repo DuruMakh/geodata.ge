@@ -18,6 +18,8 @@ describe("the navigation tree", () => {
     expect(openHub("/explorer/deficit").href).toBe("/explorer");
     expect(openHub("/explorer/economy/regions/adjara").href).toBe("/explorer/economy");
     expect(openHub("/explorer/external/money-from-abroad").href).toBe("/explorer/external");
+    expect(openHub("/explorer/business/regions/guria").href).toBe("/explorer/business");
+    expect(currentEntry("/explorer/business/regions/guria")).toBe("/explorer/business/regions");
     expect(openHub("/explorer/demography/population/region/imereti").href).toBe("/explorer/demography");
   });
 
@@ -69,6 +71,8 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/inflation/cities/batumi")).toBe("common.inflationSourceNote");
     expect(sourceNoteKey("/explorer/inflation/products")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/money/supply")).toBe("common.nbgSourceNote");
+    expect(sourceNoteKey("/explorer/business")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/business/regions/guria")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/external")).toBe("common.externalHubSourceNote");
     expect(sourceNoteKey("/explorer/external/current-account")).toBe("common.nbgSourceNote");
     expect(sourceNoteKey("/explorer/external/foreign-investment")).toBe("common.geostatSourceNote");

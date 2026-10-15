@@ -10,6 +10,8 @@ const REGIONS_HREF = BUSINESS_SECTIONS.find(section => section.id === "regions")
 /** An area's URL slug: a region's drops the `region_` prefix. */
 export const businessAreaSlug = (area: BusinessArea) => area.replace(/^region_/, "");
 export const businessAreaHref = (area: BusinessArea): `/${string}` => `${REGIONS_HREF}/${businessAreaSlug(area)}`;
+/** The area page of a map or list row: `georgia`, or a region in the map's `region.<id>` form (as `householdRegionHref` reads it). */
+export const businessRegionHref = (id: string): `/${string}` => businessAreaHref((id === "georgia" ? id : id.replace(/^region\./, "region_")) as BusinessArea);
 
 /** The area page's icon measure switch. */
 export type BusinessAreaMeasure = "money" | "jobs" | "firms";
@@ -68,3 +70,6 @@ export function buildBusinessAreaModel(area: BusinessArea, facts: readonly Clien
 export type BusinessMapMeasure = "turnover" | "employed";
 /** The hash a map or list link to an area page carries: jobs opens on the jobs measure; sales is every page's default. */
 export const businessMapHash = (measure: BusinessMapMeasure) => measure === "turnover" ? "" : "#m=jobs";
+/** The Regions index's view is only the map's measure, kept in the hash under the area pages' key `m`. */
+export const parseBusinessMapMeasure = (hash: string): BusinessMapMeasure => new URLSearchParams(hash.replace(/^#/, "")).get("m") === "jobs" ? "employed" : "turnover";
+export const serializeBusinessMapMeasure = (measure: BusinessMapMeasure) => `m=${measure === "turnover" ? "money" : "jobs"}`;

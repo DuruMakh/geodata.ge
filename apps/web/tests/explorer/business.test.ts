@@ -9,7 +9,7 @@ import {
 } from "../../lib/explorer/business";
 import {
   BUSINESS_AREAS, buildBusinessAreaModel, businessAreaCoverage, businessAreaDefaultSelection, businessAreaHref, businessAreaSeries,
-  businessMapHash, changeBusinessAreaMeasure, parseBusinessAreaHash, serializeBusinessAreaHash,
+  businessMapHash, businessRegionHref, changeBusinessAreaMeasure, parseBusinessAreaHash, parseBusinessMapMeasure, serializeBusinessAreaHash, serializeBusinessMapMeasure,
 } from "../../lib/explorer/businessAreas";
 import { buildBusinessRegionMapModel } from "../../lib/explorer/businessRegionMap";
 import { buildBusinessHubCards } from "../../lib/explorer/businessHubCards";
@@ -184,6 +184,16 @@ test("the area pages are Georgia and the eleven regions, linked by slug", () => 
   expect(businessAreaHref("region_samegrelo_zemo_svaneti")).toBe("/explorer/business/regions/samegrelo_zemo_svaneti");
   expect(businessMapHash("turnover")).toBe("");
   expect(businessMapHash("employed")).toBe("#m=jobs");
+  // Map and list rows carry the map's region ids.
+  expect(businessRegionHref("georgia")).toBe("/explorer/business/regions/georgia");
+  expect(businessRegionHref("region.mtskheta_mtianeti")).toBe("/explorer/business/regions/mtskheta_mtianeti");
+});
+
+test("the Regions index keeps its map measure in the hash under the area pages' key", () => {
+  expect(parseBusinessMapMeasure("")).toBe("turnover");
+  expect(parseBusinessMapMeasure("#m=jobs")).toBe("employed");
+  expect(parseBusinessMapMeasure("#m=firms")).toBe("turnover");
+  for (const measure of ["turnover", "employed"] as const) expect(parseBusinessMapMeasure(serializeBusinessMapMeasure(measure))).toBe(measure);
 });
 
 test("an area lists the measure's series for its own group, the bold default first", () => {

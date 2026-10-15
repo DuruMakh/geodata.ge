@@ -38,7 +38,9 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  */
 export type TopicDatasetId =
   | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
-  | "inflation-products";
+  | "inflation-products"
+  // Business pages carry their Dataset ahead of the business methodology article, which adds the id to MethodologyDatasetId.
+  | "business";
 
 /** An official statistics producer whose published figures a dataset is read from. */
 export type SourceAgencyId = "geostat" | "nbg";
@@ -296,6 +298,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       en: "Reviewed extraction from the National Bank of Georgia's official published monetary and financial statistics.",
     },
     sources: ["nbg"],
+  },
+  business: {
+    keywords: {
+      ka: ["ბიზნესი", "საწარმოები", "ბრუნვა", "დასაქმებულები", "ინვესტიციები", "საქართველო"],
+      en: ["Georgia", "business", "firms", "turnover", "employment", "investment"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის ბიზნეს სტატისტიკის ოფიციალური გამოქვეყნებული ფაილებიდან.",
+      en: "Reviewed extraction from Geostat's official published business statistics files.",
+    },
+    sources: ["geostat"],
   },
   unemployment: {
     keywords: {

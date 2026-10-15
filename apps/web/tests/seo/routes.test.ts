@@ -102,7 +102,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Services trade adds one further bilingual pair.
     // Trade composition adds one further bilingual pair.
-    expect(urls).toHaveLength(582);
+    // Business adds its hub, five pages and a page for Georgia and each of the 11 regions: 18 bilingual pairs.
+    expect(urls).toHaveLength(618);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -138,6 +139,11 @@ describe("indexable Fiscal.ge routes", () => {
     for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);
+    }
+    const businessAreas = ["georgia", "tbilisi", "adjara", "guria", "imereti", "kakheti", "mtskheta_mtianeti", "racha_lechkhumi_kvemo_svaneti", "samegrelo_zemo_svaneti", "samtskhe_javakheti", "kvemo_kartli", "shida_kartli"];
+    for (const page of ["", "/sales", "/jobs", "/investment-profit", "/firms", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/business${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/business${page}`);
     }
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
