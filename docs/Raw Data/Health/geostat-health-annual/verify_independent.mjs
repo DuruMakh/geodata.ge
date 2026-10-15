@@ -15,7 +15,7 @@ const require = createRequire(join(root, '../../../../apps/web/package.json'));
 const XLSX = require('xlsx');
 
 // Labels are compared with all whitespace (and zero-width spaces) removed and case ignored.
-const compact = value => String(value ?? '').replace(/[\s​]+/g, '').toLowerCase();
+const compact = value => String(value ?? '').replace(/[\s\u200b]+/g, '').toLowerCase();
 const book = path => XLSX.read(readFileSync(join(root, path)), { type: 'buffer', cellNF: true });
 const column = address => address.replace(/\d+$/, '');
 const rowOf = address => Number(address.replace(/^[A-Z]+/, ''));

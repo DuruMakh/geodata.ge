@@ -274,8 +274,10 @@ class HealthPackageTests(unittest.TestCase):
         self.assertIn('health.illness.diabetes', breaks['new_cases_electronic_2020']['applies_to'])
         self.assertIn('ISCO-08', breaks['staff_definitions_2012']['reason'])
         # Every quoted piece is a footnote that Geostat prints in the named workbook
+        readme = ' '.join((prepare.ROOT / 'README.md').read_text(encoding='utf-8').split())
         for source_id, quote in prepare.FOOTNOTE_QUOTES.values():
             self.assertIn(quote, prepare.workbook_text(source_id))
+            self.assertIn(quote, readme)  # and the README quotes it as printed
 
     def test_footnote_quote_missing_fails(self):
         with self.assertRaisesRegex(ValueError, 'footnote'):

@@ -95,7 +95,7 @@ python3 -B prepare.py --check && python3 -B -m unittest test_validation -v && no
 - **COVID-19 (XXII)** has values from 2020. Its 2014-2019 cells are empty styled cells with no value, so the first value is in column `I` (2020), and `coverage.csv` lists 2014-2019 as unavailable. Years are always taken from the heading row, never from an offset after the label.
 - **Chapters.** XVIII is "Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified" (served as `ill_defined`) and XIX is injury, poisoning and other external causes (`external`). Chapters XX and XXI do not appear in the table.
 - **Disease groups** are in thousands, as the table's title says; the 2002-2005 combined nervous system and sense organs group is replaced by three separate groups from 2006.
-- **Other caveats.** Geostat's wider caveats (the 2018 pregnancy and newborn registry, the 2008-2009 HIV reporting change, and the rest) are quoted below; only the four breaks of section 8 are recorded in `health-series-breaks.csv`.
+- **Other caveats.** Geostat's wider caveats (the 2018 pregnancy and newborn registry, the 2008-2009 HIV reporting change, and the rest) are quoted in the footnotes section below (pregnancy registry from 2018 under the disease groups, the 2008-2009 HIV change under HIV/AIDS, the 2015-2017 revision of causes of death under deaths by chapters and regions); only the four breaks of section 8 are recorded in `health-series-breaks.csv`.
 
 ## Footnotes Geostat prints under the served tables
 
@@ -125,6 +125,7 @@ Quoted as printed (spelling and all, with spaces collapsed). Every table also ca
   - "Note: based on the registered data"
   - "* based on International Classification of Diseases, Tenth Revision (ICD-10)"
   - "** In case of death caused by injury or other external factors (chapter XIX), the external cause of the injury must be indicated as the primary cause of death (chapter XX)"
+  - "The revision of causes of death for 2015-2017 is based on the information (Verbal Autopsy, Cancer Registry and Stationary Electronic System) from the National Center for Disease Control and Public Health" (printed in cell `B260`, with a trailing space, between the note and the asterisk footnotes)
   - "*** In 2021, 24 cases of maternal deaths are related to COVID-19" (attached to the Georgia pregnancy value `34***` in 2021)
 - **Crude death rate** (title "Crude death rate (death per 1 000 population) by regions"):
   - "Note: 1995-2013 based on the retro-projection; starting from 2014 based on the registered data"

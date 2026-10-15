@@ -190,7 +190,7 @@ def _specs():
 SPECS = _specs()
 CELL_LABELS = {indicator: spec.label for indicator, spec in SPECS.items() if spec.label and not spec.source_id.startswith('geostat_deaths')}
 
-# Footnotes quoted by health-series-breaks.csv. Each must be printed in the named workbook.
+# Footnotes quoted by health-series-breaks.csv and the README. Each must be printed in the named workbook.
 FOOTNOTE_QUOTES = {
     'isco_physicians': ('geostat_health_physicians', 'In 2012 the health care human resources definitions were revised and classified in accordance '
                         'with International Standard Classification of Occupations (ISCO-08).'),
@@ -204,6 +204,8 @@ FOOTNOTE_QUOTES = {
     'electronic_groups': ('geostat_health_morbidity_groups', 'Since 2020, an electronic system for recording new cases of diseases in outpatient '
                           'facilities has been operating.'),
     'personalized_diabetes': ('geostat_health_diabetes', 'From 2020 - According to personalized data.'),
+    'causes_revision': ('geostat_deaths_by_cause_region', 'The revision of causes of death for 2015-2017 is based on the information (Verbal Autopsy, '
+                        'Cancer Registry and Stationary Electronic System) from the National Center for Disease Control and Public Health'),  # cell B260
 }
 BREAK_FIELDS = ['break_id', 'applies_to', 'reference_date', 'reason', 'source_note']
 
@@ -212,7 +214,7 @@ BREAK_FIELDS = ['break_id', 'applies_to', 'reference_date', 'reason', 'source_no
 
 def clean(value):
     """Whitespace (including non-breaking spaces) collapsed, zero-width characters dropped."""
-    return ' '.join(value.replace('​', '').split()) if isinstance(value, str) else value
+    return ' '.join(value.replace('\u200b', '').split()) if isinstance(value, str) else value
 
 
 def _column_number(column):
