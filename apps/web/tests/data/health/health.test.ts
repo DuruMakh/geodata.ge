@@ -202,15 +202,20 @@ describe("loading and parity", () => {
   });
 });
 
-test("every public source has one source-document row with the package's title and local file", () => {
+test("every public source has one source-document row with a Georgian title, an English title and the local file", () => {
   const documents = new Map(records(path.join(root, "data/sources/source-documents.csv")).map(row => [row.source_id, row]));
+  const english: Record<string, { name: { text: string } }> = JSON.parse(fs.readFileSync(path.join(root, "data/localization/en/sources.json"), "utf8"));
   const manifest = records(path.join(research, "source-manifest.csv"));
   expect(new Set(manifest.map(row => row.source_id))).toEqual(new Set(HEALTH_PUBLIC_SOURCES));
   expect(manifest).toHaveLength(HEALTH_PUBLIC_SOURCES.length);
+  // Geostat's own Georgian table titles, as on the other Georgian-first source rows.
+  expect(documents.get("source.geostat_deaths_by_cause_region")!.source_name).toBe("გარდაცვლილთა რიცხოვნობა რეგიონების და გარდაცვალების მიზეზების ძირითადი კლასების მიხედვით");
+  expect(documents.get("source.geostat_health_main")!.source_name).toBe("ჯანმრთელობის დაცვის ძირითადი მაჩვენებლები");
   for (const row of manifest) {
     const document = documents.get(`source.${row.source_id}`);
     expect(document, row.source_id).toBeDefined();
-    expect(document!.source_name).toBe(row.dataset_title);
+    expect(document!.source_name, row.source_id).toMatch(/^[^A-Za-z]*[ა-ჿ]/);
+    expect(english[`source.${row.source_id}`]?.name.text, row.source_id).toMatch(/^[^ა-ჿ]+$/);
     expect(document!.source_url_or_file).toBe(`docs/Raw Data/Health/geostat-health-annual/${row.local_file}`);
     expect(document!.last_reviewed_at).toBe("2026-10-15");
   }
