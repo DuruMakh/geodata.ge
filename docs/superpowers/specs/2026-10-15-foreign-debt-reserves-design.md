@@ -25,7 +25,7 @@ What is new: the site's existing Debt page (Budget hub) covers only the **govern
 ## 2. Pages and navigation
 
 - **Foreign debt**: `/explorer/external/foreign-debt`, in English `/en/explorer/external/foreign-debt`. Georgian name `საგარეო ვალი`; heading `რამდენი ვალი აქვს საქართველოს საზღვარგარეთ`.
-- **Reserves**: `/explorer/external/reserves`, in English `/en/explorer/external/reserves`. Georgian name `საერთაშორისო რეზერვები`; heading `რამდენი სარეზერვო ვალუტა აქვს ეროვნულ ბანკს`.
+- **Reserves**: `/explorer/external/reserves`, in English `/en/explorer/external/reserves`. Georgian name `საერთაშორისო რეზერვები`; heading `რამდენი რეზერვი აქვს ეროვნულ ბანკს`.
 - The External flows hub gets card 04 Foreign debt and card 05 Reserves after Current account. Each card shows a small chart of its total and its coverage from the served facts, for example `2006–2026 (ივნისი)`.
 - The sidebar lists both pages under External flows, after Current account.
 - Both pages reuse the existing breadcrumbs, heading, language links, metadata, Dataset JSON-LD and sitemap patterns.
