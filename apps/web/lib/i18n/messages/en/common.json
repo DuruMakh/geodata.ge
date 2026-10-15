@@ -66,6 +66,8 @@
   "common.dataExternal": "DATA · EXTERNAL FLOWS",
   "common.foreignInvestment": "Foreign investment",
   "common.currentAccount": "Current account",
+  "common.foreignDebt": "Foreign debt",
+  "common.reserves": "Reserves",
   "common.moneyFromAbroad": "Money from abroad",
   "common.tradeProducts": "Products",
   "common.tradeDomestic": "Domestic exports",
