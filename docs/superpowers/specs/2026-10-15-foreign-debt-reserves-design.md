@@ -63,7 +63,7 @@ Source: National Bank of Georgia, "Gross External Debt (BPM-6)" (`edbpm6eng.xlsx
 | Loans between related companies | `სესხები დაკავშირებულ კომპანიებს შორის` | 2.5 bn |
 | National Bank | `ეროვნული ბანკი` | 0.8 bn |
 
-- The five groups are listed under the total (nested, as on Loans and deposits) and add up to it every year.
+- The five groups follow the total in one flat list, nothing collapsed (Duru, 2026-10-15), and add up to it every year.
 - "Companies" is NBG's "Other sectors": non-financial companies plus non-bank financial companies. "Loans between related companies" is NBG's "Direct investment: intercompany lending", for example a foreign parent lending to its Georgian branch.
 - Years: 31 December 2006 to 31 December 2025, plus 30 June 2026. NBG's older-method file (1999–2005) is not used, because it would put a method break into the line.
 

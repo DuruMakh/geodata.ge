@@ -25,7 +25,7 @@ test("the external hub shows five cards, each linking to its page", async ({ pag
 test("reserves opens on the total alone and its latest line names the September amount", async ({ page }) => {
   await page.goto("/en/explorer/external/reserves");
   await ready(page);
-  await expect(page.getByTestId("series-status")).toContainText("1 / 1");
+  await expect(page.getByTestId("series-status")).toContainText("1 / 4");
   await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(1);
   await expect(page.locator(pressed("reserves.total"))).toHaveAttribute("aria-pressed", "true");
   const latest = page.getByTestId("position-latest");
@@ -72,8 +72,8 @@ test("foreign debt's % of GDP view ends at 2025", async ({ page }) => {
 test("ticking a group then clearing the selection shows the empty callout", async ({ page }) => {
   await page.goto("/en/explorer/external/foreign-debt");
   await ready(page);
-  await expect(page.getByTestId("series-status")).toContainText("1 / 1");
-  await page.locator('[data-series-id="ext_debt.total"] [aria-expanded]').click();
+  await expect(page.getByTestId("series-status")).toContainText("1 / 6");
+  await expect(page.locator('[data-series-id] [aria-expanded]')).toHaveCount(0);
   await page.locator(pressed("ext_debt.banks")).click();
   await expect(page.locator(pressed("ext_debt.banks"))).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/sel=ext_debt\.total(%2C|,)ext_debt\.banks(&|$)/);

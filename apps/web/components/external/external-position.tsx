@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ChartPie } from "lucide-react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientExternalPositionFact } from "../../lib/data/externalPosition/types";
@@ -48,7 +48,6 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
   const t = (suffix: string, values?: Record<string, string | number>) => message(messages, `external.position.${suffix}`, values);
   const data = useMemo(() => ({ section, facts, gdp }), [section, facts, gdp]);
   const { state, update } = useHashState(data, parseState, serializeState);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildExternalPositionModel(section, facts, state, gdp);
   const percent = model.unit === "percent";
   // Amounts share one billion-USD scale whose decimals are read from every value the page can show, so they do not move with
@@ -76,7 +75,7 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
   const tabLabel = t(`tab.${state.view}`);
   // % of GDP divides by the nominal GDP Current account uses: the source line names it and its preliminary years.
   const preliminaryGdpYears = percent ? model.years.filter(year => gdp.some(row => row.year === year && row.preliminary)) : [];
-  const changeView = (view: ExternalPositionView) => { if (view === state.view) return; setExpanded({}); update(s => changeExternalPositionView(s, section, view, facts, gdp), true); };
+  const changeView = (view: ExternalPositionView) => { if (view === state.view) return; update(s => changeExternalPositionView(s, section, view, facts, gdp), true); };
   const downloadAction = <ExcelDownloadButton testId="position-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildExternalPositionWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title, gdp, gdpSources, latestLabel }, presentation));
@@ -110,11 +109,10 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
           <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      {/* The parts nest under their total. Both lists have six rows or fewer, so neither has a search field (DESIGN §7.7). */}
+      {/* One flat list: the total first, then its parts. Both lists have six rows or fewer, so neither has a search field (DESIGN §7.7). */}
       <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{yearLabel(model.range.end)} · {unitLabel}</>} downloadAction={downloadAction}
-        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue), parentId: series.parentId }))}
-        totalId={total.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} searchable={false}
-        nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }), expanded, onExpandedChange: setExpanded }} />
+        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue) }))}
+        totalId={total.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} searchable={false} />
     </ExplorerWorkspace>
   </div>;
 }

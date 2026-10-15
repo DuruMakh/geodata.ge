@@ -105,7 +105,5 @@
   "external.position.sourceNote": "წყარო: საქართველოს ეროვნული ბანკი · თანხები პერიოდის ბოლოს ·",
   "external.position.methodology": "მეთოდოლოგია და წყაროები",
   "external.position.series": "სერია",
-  "external.position.emptySelection": "შესადარებლად აირჩიეთ ერთი ან მეტი სერია.",
-  "external.position.nestedSelected": "ქვეკატეგორიები",
-  "external.position.subcategoriesFor": "{label} — ქვეკატეგორიები"
+  "external.position.emptySelection": "შესადარებლად აირჩიეთ ერთი ან მეტი სერია."
 }

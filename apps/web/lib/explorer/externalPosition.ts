@@ -14,10 +14,10 @@ export type ExternalPositionSectionId = typeof EXTERNAL_POSITION_SECTIONS[number
 export type ExternalPositionView = "amount" | "gdp";
 const VIEWS: readonly ExternalPositionView[] = ["amount", "gdp"];
 
-export type ExternalPositionSeriesDefinition = { id: ExternalPositionIndicator; reference: boolean; parentId?: ExternalPositionIndicator };
-/** The total first, drawn in ink, then the parts that nest under it. */
+export type ExternalPositionSeriesDefinition = { id: ExternalPositionIndicator; reference: boolean };
+/** The total first, drawn in ink, then its parts as rows of the same flat list. */
 const withParts = (id: ExternalPositionIndicator, parts: readonly ExternalPositionIndicator[]): ExternalPositionSeriesDefinition[] =>
-  [{ id, reference: true }, ...parts.map(part => ({ id: part, reference: false, parentId: id }))];
+  [{ id, reference: true }, ...parts.map(part => ({ id: part, reference: false }))];
 
 export function externalPositionSeries(section: ExternalPositionSectionId): ExternalPositionSeriesDefinition[] {
   return section === "foreign-debt"

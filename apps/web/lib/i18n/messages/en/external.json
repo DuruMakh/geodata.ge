@@ -105,7 +105,5 @@
   "external.position.sourceNote": "Source: National Bank of Georgia · amounts at the end of each period ·",
   "external.position.methodology": "Methodology and sources",
   "external.position.series": "Series",
-  "external.position.emptySelection": "Select one or more series to compare.",
-  "external.position.nestedSelected": "Subcategories",
-  "external.position.subcategoriesFor": "Subcategories of {label}"
+  "external.position.emptySelection": "Select one or more series to compare."
 }

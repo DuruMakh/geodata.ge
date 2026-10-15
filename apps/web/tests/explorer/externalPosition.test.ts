@@ -34,19 +34,13 @@ test("each page starts on amounts with its total selected and covers its own yea
   expect(span(externalPositionCoverage("reserves", "amount", facts, gdp))).toEqual([1995, 2026]);
 });
 
-test("the parts nest under the total", () => {
-  const shape = (section: Parameters<typeof externalPositionSeries>[0]) => externalPositionSeries(section).map(s => [s.id, s.reference, s.parentId]);
+test("the total comes first and its parts follow in one flat list", () => {
+  const shape = (section: Parameters<typeof externalPositionSeries>[0]) => externalPositionSeries(section).map(s => [s.id, s.reference]);
   expect(shape("foreign-debt")).toEqual([
-    ["ext_debt.total", true, undefined],
-    ["ext_debt.government", false, "ext_debt.total"], ["ext_debt.banks", false, "ext_debt.total"], ["ext_debt.companies", false, "ext_debt.total"],
-    ["ext_debt.intercompany", false, "ext_debt.total"], ["ext_debt.central_bank", false, "ext_debt.total"],
+    ["ext_debt.total", true], ["ext_debt.government", false], ["ext_debt.banks", false], ["ext_debt.companies", false],
+    ["ext_debt.intercompany", false], ["ext_debt.central_bank", false],
   ]);
-  expect(shape("reserves")).toEqual([
-    ["reserves.total", true, undefined],
-    ["reserves.fx", false, "reserves.total"], ["reserves.gold", false, "reserves.total"], ["reserves.sdr", false, "reserves.total"],
-  ]);
-  expect(externalPositionSeries("foreign-debt").filter(s => s.parentId)).toHaveLength(5);
-  expect(externalPositionSeries("reserves").filter(s => s.parentId)).toHaveLength(3);
+  expect(shape("reserves")).toEqual([["reserves.total", true], ["reserves.fx", false], ["reserves.gold", false], ["reserves.sdr", false]]);
 });
 
 test("% of GDP divides each amount by the same year's GDP and drops the years without one", () => {
