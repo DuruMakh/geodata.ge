@@ -61,6 +61,17 @@ test("% of GDP divides each amount by the same year's GDP and drops the years wi
   expect(span(externalPositionCoverage("foreign-debt", "gdp", facts, gdp))).toEqual([2006, 2025]);
 });
 
+test("2026 never gets a % of GDP value, even once a GDP row for it exists", () => {
+  const withGdp2026 = [...gdp, { year: 2026, valueUsd: 55e9, preliminary: true }];
+  const shown = externalPositionViewFacts("gdp", facts, withGdp2026);
+  expect(shown.some(f => f.year === 2026)).toBe(false);
+  expect(span(externalPositionCoverage("foreign-debt", "gdp", facts, withGdp2026))).toEqual([2006, 2025]);
+  const model = buildExternalPositionModel("foreign-debt", facts, { ...defaultExternalPositionState("foreign-debt"), view: "gdp" }, withGdp2026);
+  expect(model.years).not.toContain(2026);
+  expect(model.years.at(-1)).toBe(2025);
+  expect(model.latestYears).toEqual([]);
+});
+
 test("the model's 1995 reserves value is absent on % of GDP, not 0", () => {
   const model = buildExternalPositionModel("reserves", facts, { ...defaultExternalPositionState("reserves"), view: "gdp", range: { kind: "manual", start: 1995, end: 2000 } }, gdp);
   expect(model.years).toEqual([1996, 1997, 1998, 1999, 2000]);

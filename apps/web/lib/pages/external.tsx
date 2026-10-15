@@ -33,6 +33,10 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { publicLabel } from "../i18n/labels";
 import { resolveSiteUrl } from "../siteUrl";
 
+/** The nominal GDP in US dollars, as the % of GDP views divide by it. */
+const nominalGdpUsd = (gdpFacts: readonly { seriesId: string; year: number; value: number; status: string }[]) =>
+  gdpFacts.filter(fact => fact.seriesId === "nominal_usd").map(fact => ({ year: fact.year, valueUsd: fact.value, preliminary: fact.status === "preliminary" }));
+
 async function loadClientMoneyTransfers() {
   const data = await loadServedMoneyTransfersData();
   return { data, client: toClientMoneyTransfersData(data) };
@@ -128,7 +132,7 @@ export async function renderCurrentAccountPage(locale: Locale) {
   const { min, max } = currentAccountCoverage(client);
   const sourceId = CURRENT_ACCOUNT_SOURCE.replace(/^source\./, "");
   const sources = projectWorkbookSources(manifest.filter(row => row.source_id === sourceId), locale, catalogue.documents);
-  const gdp = gdpFacts.filter(fact => fact.seriesId === "nominal_usd").map(fact => ({ year: fact.year, valueUsd: fact.value, preliminary: fact.status === "preliminary" }));
+  const gdp = nominalGdpUsd(gdpFacts);
   const lastReviewedAt = facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("account.title") }];
@@ -173,7 +177,7 @@ export async function renderExternalPositionPage(locale: Locale, section: Extern
     loadClientExternalPosition(section), loadServedGdpOverviewData(), loadGdpWorkbookSources(locale), loadSourcedWorkbookSources("external-flows", locale),
     getPresentation(locale, ["external", "main", "format", "workbook"], []),
   ]);
-  const gdp = gdpFacts.filter(fact => fact.seriesId === "nominal_usd").map(fact => ({ year: fact.year, valueUsd: fact.value, preliminary: fact.status === "preliminary" }));
+  const gdp = nominalGdpUsd(gdpFacts);
   // The workbook cites only the files these observations come from.
   const sourceIds = new Set(client.map(fact => fact.sourceId));
   const labels = Object.fromEntries(externalPositionSeries(section).map(series => [series.id, message(presentation.messages, `external.${key}.series.${series.id}`)]));

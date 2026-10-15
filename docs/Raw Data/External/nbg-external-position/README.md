@@ -67,6 +67,20 @@ python3 -B prepare.py --check && python3 -B -m unittest test_validation -v && no
 
 `python3 prepare.py` rebuilds the generated files. `node verify_independent.mjs` rewrites `independent-validation.json`. Treat the files in `official/` as data: nothing in them is executed.
 
+## Refreshing
+
+When NBG publishes a newer file, archive it under `official/`, then change every place below in the same commit. Find stragglers with `rg -n "8166.9|28166.2|2026-09-30|2026-06-30|8\.17|28\.17|254" --glob '!**/*.csv' --glob '!**/official/**'`.
+
+- `prepare.py`: `LATEST_PERIOD` and the anchor values. The same dates, years and values are pinned in `test_validation.py` (also the 254) and `verify_independent.mjs` (`LATEST`, `LATEST_YEAR`, the ranges); rerun the three commands under Checks.
+- `apps/web/lib/data/externalPosition/validation.ts`: `LATEST_YEAR`, `LATEST_PERIOD`, the anchors and the year ranges (coverage); the comment in `types.ts`.
+- `apps/web/lib/data/externalPosition/prepareExternalPosition.ts`: the 254 row count; then `npm run data:prepare-external-position`, and the 254 in `docs/deployment.md`.
+- Methodology content, `lib/methodology/content/external-flows.ts` (ka) and `content/en/external-flows.ts`: the latest amounts and dates, the retrieval and listing dates, and the 254 / 21 dates / 32 dates counts.
+- `apps/web/public/llms.txt`: "end of June" / "end of September" and the year ranges.
+- `DESIGN.md` §30.3 and §30.4 and the `Project_Definition.md` §2 paragraph: dates, months, coverage.
+- `docs/data-methodology/external-flows-annual.md`: the row count and the Dates bullet.
+- A new latest month needs no new message: `external.position.latestMonth.01` to `.12` all exist in `ka` and `en` `external.json`.
+- Tests: `tests/data/externalPosition/externalPosition.test.ts` (254, 8166.9, 28166.2, period ends), `tests/explorer/externalPosition.test.ts` and `externalHubCards.test.ts` ("(Sep)", "(Jun)", period ends), `tests/browser/external-position.spec.ts` (`2026 (Sep)`, `8.17`, `2026 (Jun)`).
+
 ## Notes
 
 - **BPM6 only.** The ED-6 file (BPM6, from 2006) is the only debt series used. NBG's older BPM5 file (`edbpm5-eng.xlsx`, back to 1999) uses a different method, so combining them would put a break in the series; it is not archived or served.

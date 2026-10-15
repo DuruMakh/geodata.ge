@@ -31,14 +31,15 @@ const cellKey = (f: { indicatorId: string; year: number }) => `${f.indicatorId}:
 
 /**
  * The values a view shows. % of GDP divides each amount by the nominal GDP in US dollars of the same year and drops a year
- * without one (1995 and the 2026 mid-year point), so a missing share is a gap, never 0. Amounts are shown as they are.
+ * without one (1995), so a missing share is a gap, never 0. A latest-period point (the 2026 mid-year amount) is never divided
+ * by a full year's GDP, so it is dropped even if a GDP row for its year exists. Amounts are shown as they are.
  */
 export function externalPositionViewFacts(view: ExternalPositionView, facts: readonly ClientExternalPositionFact[], gdp: readonly CurrentAccountGdp[]): readonly ClientExternalPositionFact[] {
   if (view !== "gdp") return facts;
   const gdpByYear = new Map(gdp.map(row => [row.year, row.valueUsd]));
   return facts.flatMap(f => {
     const valueUsd = gdpByYear.get(f.year);
-    return valueUsd === undefined ? [] : [{ ...f, value: f.value / valueUsd * 100 }];
+    return f.latestPeriod || valueUsd === undefined ? [] : [{ ...f, value: f.value / valueUsd * 100 }];
   });
 }
 
