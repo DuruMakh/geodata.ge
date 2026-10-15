@@ -1,7 +1,7 @@
 # Health and social protection hub: Health pages
 
 Date: 2026-10-15
-Status: Awaiting Duru's approval. On 2026-10-15 Duru approved adding health data. On the "Where should the Health pages live on fiscal.ge?" card, Duru picked "New health hub". Duru then called the regional causes-of-death data "great" and replied "Great continue" to the three-page proposal (Doctors and hospitals, Illnesses, Causes of death). This document covers both the data foundation and the pages.
+Status: Approved by Duru on 2026-10-15 ("Continue"). On 2026-10-15 Duru approved adding health data. On the "Where should the Health pages live on fiscal.ge?" card, Duru picked "New health hub". Duru then called the regional causes-of-death data "great" and replied "Great continue" to the three-page proposal (Doctors and hospitals, Illnesses, Causes of death). This document covers both the data foundation and the pages.
 
 ## 1. Intended result
 
