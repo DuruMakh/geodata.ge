@@ -61,7 +61,7 @@ export function healthDisplay(view: HealthView, indicatorId: HealthIndicator): {
 }
 
 /** A power of ten applied to a published figure; rounding to 15 digits removes the binary noise (933 x 0.001 is 0.933). */
-const scaled = (value: number, multiplier: number) => multiplier === 1 ? value : Number((value * multiplier).toPrecision(15));
+export const scaled = (value: number, multiplier: number) => multiplier === 1 ? value : Number((value * multiplier).toPrecision(15));
 /** The facts of one area. National pages read `georgia`. */
 const areaFacts = (facts: readonly ClientHealthFact[], area: HealthArea) => facts.filter(f => f.areaId === area);
 

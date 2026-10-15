@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
-import { useCallback, useId, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientHealthFact, HealthArea } from "../../lib/data/health/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
@@ -16,18 +15,17 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
-import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
+import { PlaceHeading } from "../explorer-shell/place-heading";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
-import { RegionPicker, useRefocusAfterPick } from "../regional-economies/region-picker";
+import { RegionPicker } from "../regional-economies/region-picker";
 import { Callout, SourceNote } from "../ui/editorial";
 
 type HealthDeathsExplorerProps = {
@@ -53,10 +51,6 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
   const parse = useCallback((hash: string, f: ClientHealthFact[]) => parseHealthDeathsHash(hash, area, f), [area]);
   const { state, update } = useHashState(facts, parse, serializeHealthDeathsHash);
   const [query, setQuery] = useState("");
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const pickerId = useId();
-  const pickerTrigger = useRef<HTMLButtonElement>(null);
-  useRefocusAfterPick(pickerTrigger, "region-picker-trigger");
   const model = buildHealthDeathsModel(area, facts, state);
   const unitLabel = t("unitPersons");
   const format = (value: number | null | undefined) => formatInUnit(value, UNIT);
@@ -72,19 +66,13 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
   const neighbours = { previous: areas[(index - 1 + areas.length) % areas.length]!, next: areas[(index + 1) % areas.length]! };
   const coverage = healthSeriesCoverage(facts, area, healthDeathsSeries(), `No causes-of-death years for ${area}`);
   return <div data-testid="health-causes-of-death-area" className="@container">
-    <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
-      <div className="relative min-w-0 min-[768px]:flex-1">
-        <ExplorerHeading>{t("page.area.regionHeadingLead")}{" "}
-          <button ref={pickerTrigger} type="button" data-testid="region-picker-trigger" aria-expanded={pickerOpen} aria-haspopup="dialog" aria-controls={pickerOpen ? pickerId : undefined} onClick={() => setPickerOpen(open => !open)} className="group inline-flex max-w-full cursor-pointer items-center gap-2 border-b border-dashed border-[color:color-mix(in_srgb,var(--accent)_60%,transparent)] align-bottom text-left text-[var(--accent)] transition-colors duration-100 hover:border-[var(--accent)]">
-            {areaName}<ChevronDown aria-hidden size={20} strokeWidth={1.5} />
-          </button>
-        </ExplorerHeading>
-        <RegionPicker id={pickerId} open={pickerOpen} onClose={() => setPickerOpen(false)} regions={areas} activeRegionId={area} hrefForRegion={id => healthDeathsAreaHref(id as HealthArea)} indexHref={INDEX_HREF} />
-      </div>
-      <EntityNeighbourLinks testId="health-region-navigation" className="mb-3"
-        previous={{ href: pageHref(healthDeathsAreaHref(neighbours.previous.id as HealthArea), locale), label: areaLabels[neighbours.previous.id as HealthArea] }}
-        next={{ href: pageHref(healthDeathsAreaHref(neighbours.next.id as HealthArea), locale), label: areaLabels[neighbours.next.id as HealthArea] }} />
-    </div>
+    <PlaceHeading lead={t("page.area.regionHeadingLead")} placeLabel={areaName} triggerTestId="region-picker-trigger"
+      picker={(open, close, id) => <RegionPicker id={id} open={open} onClose={close} regions={areas} activeRegionId={area} hrefForRegion={id => healthDeathsAreaHref(id as HealthArea)} indexHref={INDEX_HREF} />}
+      neighbours={{
+        testId: "health-region-navigation",
+        previous: { href: pageHref(healthDeathsAreaHref(neighbours.previous.id as HealthArea), locale), label: areaLabels[neighbours.previous.id as HealthArea] },
+        next: { href: pageHref(healthDeathsAreaHref(neighbours.next.id as HealthArea), locale), label: areaLabels[neighbours.next.id as HealthArea] },
+      }} />
     <LatestValueLine testId="health-latest" measure={`${t("latest.area")} · ${areaName}`} period={latest.year} value={valueLabel(latest.value)} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { BedDouble, Hospital, Stethoscope, Users, type LucideIcon } from "lucide-react";
 import type { ClientHealthFact, HealthSeriesBreak } from "../../lib/data/health/types";
-import { buildHealthModel, changeHealthView, healthCoverage, healthDisplay, healthViews, healthViewSeries, parseHealthHash, serializeHealthHash, type HealthNationalSectionId, type HealthState, type HealthView } from "../../lib/explorer/health";
+import { buildHealthModel, changeHealthView, healthCoverage, healthDisplay, healthViews, healthViewSeries, parseHealthHash, scaled, serializeHealthHash, type HealthNationalSectionId, type HealthState, type HealthView } from "../../lib/explorer/health";
 import { buildHealthWorkbookExportModel } from "../../lib/explorer/healthWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -42,7 +42,6 @@ const serializeHealthState = (state: HealthState, data: HealthHashData) => seria
 const VIEW_ICONS: Partial<Record<HealthView, LucideIcon>> = { staff: Users, hospitals: Hospital, beds: BedDouble, visits: Stethoscope };
 /** The latest-value line on Illnesses names respiratory disease, the largest group, whatever is selected. */
 const ILLNESSES_HEADLINE = "health.illness.respiratory";
-const scaled = (value: number, multiplier: number) => multiplier === 1 ? value : Number((value * multiplier).toPrecision(15));
 
 /** Doctors and hospitals (four measures) or Illnesses (disease groups and single diseases under their headings), for Georgia. */
 export function HealthExplorer({ section, facts, breaks, labels, sources, lastReviewedAt, siteOrigin }: HealthExplorerProps) {

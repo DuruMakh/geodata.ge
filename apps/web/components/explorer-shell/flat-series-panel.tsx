@@ -88,7 +88,7 @@ export function FlatSeriesPanel({
   const hasCarets = rows.some((row) => row.parentId);
   // A group's label goes above the first of its rows still shown, so a search that hides all of them hides it too.
   const withHeadings = (shown: FlatSeriesRow[], render: (row: FlatSeriesRow) => ReactNode): ReactNode[] => shown.flatMap((row, index) => [
-    row.heading && row.heading !== shown[index - 1]?.heading ? <p key={`heading:${row.heading}`} role="presentation" data-testid="series-heading" className="pt-3 pb-1 text-[11px] text-[var(--muted)]">{row.heading}</p> : null,
+    row.heading && row.heading !== shown[index - 1]?.heading ? <p key={`heading:${row.id}`} role="presentation" data-testid="series-heading" className="pt-3 pb-1 text-[11px] text-[var(--muted)]">{row.heading}</p> : null,
     render(row),
   ]);
   function nestedRow(row: FlatSeriesRow, labels: SeriesNesting): ReactNode {

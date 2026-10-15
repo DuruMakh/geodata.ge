@@ -1,6 +1,6 @@
 {
   "health.title": "ჯანდაცვა და სოციალური დაცვა",
-  "health.hubSummary": "ექიმები, საავადმყოფოები, დაავადებები და სიკვდილის მიზეზები",
+  "health.hubSummary": "ექიმები, საავადმყოფოები, ავადობა, მოკვდაობა",
   "health.metaTitle": "ჯანდაცვა და სოციალური დაცვა საქართველოში",
   "health.metaDescription": "ექიმები, საექთნო პერსონალი, საავადმყოფოები და საწოლები, დაავადებების ახალი შემთხვევები და სიკვდილის მიზეზები რეგიონების მიხედვით საქართველოში (საქსტატი).",
   "health.page.doctors-hospitals.title": "ექიმები და საავადმყოფოები",
@@ -106,8 +106,8 @@
   "health.unitPerThousand": "1,000 მოსახლეზე",
   "health.thousand": "ათასი",
   "health.latest.doctors-hospitals": "ექიმები",
-  "health.latest.illnesses": "სასუნთქი სისტემის დაავადებების ახალი შემთხვევები",
-  "health.latest.causes-of-death": "გარდაცვალებები 1,000 მოსახლეზე, საქართველო",
+  "health.latest.illnesses": "სასუნთქი სისტემის ავადობა",
+  "health.latest.causes-of-death": "მოკვდაობა 1,000 კაცზე, საქართველო",
   "health.latest.area": "გარდაცვალებები",
   "health.break.newCounting": "ახალი აღრიცხვა",
   "health.area.georgia": "საქართველო",
