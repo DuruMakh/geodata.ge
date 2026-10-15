@@ -5,7 +5,7 @@ import { ChartPie } from "lucide-react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientExternalPositionFact } from "../../lib/data/externalPosition/types";
 import type { CurrentAccountGdp } from "../../lib/explorer/currentAccount";
-import { buildExternalPositionModel, changeExternalPositionView, externalPositionCoverage, externalPositionLatestLabel, parseExternalPositionHash, serializeExternalPositionHash, type ExternalPositionSectionId, type ExternalPositionState, type ExternalPositionView } from "../../lib/explorer/externalPosition";
+import { buildExternalPositionModel, changeExternalPositionView, externalPositionCoverage, externalPositionLatestLabel, externalPositionLatestMonth, parseExternalPositionHash, serializeExternalPositionHash, type ExternalPositionSectionId, type ExternalPositionState, type ExternalPositionView } from "../../lib/explorer/externalPosition";
 import { buildExternalPositionWorkbookExportModel } from "../../lib/explorer/externalPositionWorkbook";
 import { formatInUnit, unitFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -60,6 +60,8 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
   const valueLabel = (value: number | null | undefined) => value == null ? "—" : percent ? `${format(value)}${unitLabel}` : `${format(value)} ${unitLabel}`;
   // The latest-period point (2026 (Sep)) is named wherever it appears; % of GDP has none.
   const latestLabel = model.latest.latestPeriod ? externalPositionLatestLabel(model.latest, messages) : undefined;
+  // The chart's hover names the year itself, so its mark is only the month: `(Sep)`.
+  const latestMonth = model.latest.latestPeriod ? `(${externalPositionLatestMonth(model.latest.periodEnd, messages)})` : undefined;
   const yearLabel = (year: number) => latestLabel && model.latestYears.includes(year) ? latestLabel : String(year);
   const total = model.series[0];
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
@@ -96,7 +98,7 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={percent} unit={unit} shareLabel={tabLabel} preliminaryLabel={latestLabel} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={percent} unit={unit} shareLabel={tabLabel} preliminaryLabel={latestMonth} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${title} · ${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== totalRow)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={yearLabel} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
               shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={valueLabel} />

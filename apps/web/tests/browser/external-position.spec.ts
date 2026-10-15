@@ -65,6 +65,7 @@ test("foreign debt's % of GDP view ends at 2025", async ({ page }) => {
   expect((await page.getByTestId("explorer-table").locator("thead th").allInnerTexts()).some(text => text.trim().startsWith("2026"))).toBe(false);
   await expect(page.getByTestId("position-latest")).toHaveText(/Total foreign debt, % of GDP · 2025: \d+\.\d%$/);
   await expect(page.getByTestId("source-label")).toContainText("GDP: Geostat, at current prices.");
+  await expect(page.getByTestId("source-label")).toContainText("GDP for 2025 is preliminary.");
   await expect(page).toHaveURL(/tab=gdp/);
 });
 
