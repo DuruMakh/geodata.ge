@@ -1,7 +1,7 @@
 # Business hub
 
 Date: 2026-10-14
-Status: Awaiting Duru's approval. Duru picked business statistics as the next data on 2026-10-14 ("Pick the next data to add to fiscal.ge" card, option Business), chose four pages ("Four pages" card) and approved the page layout with one separate Regions page ("Approve this layout for the Business hub?" card). This document covers both the data foundation and the pages.
+Status: Approved by Duru on 2026-10-15. Duru picked business statistics as the next data on 2026-10-14 ("Pick the next data to add to fiscal.ge" card, option Business), chose four pages ("Four pages" card) and approved the page layout with one separate Regions page ("Approve this layout for the Business hub?" card). This document covers both the data foundation and the pages.
 
 ## 1. Intended result
 
