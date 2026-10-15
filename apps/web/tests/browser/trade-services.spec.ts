@@ -10,6 +10,95 @@ const toggle = (page: Page, id: string) => page.locator(`[data-series-id="${id}"
 const section = (page: Page, id: string) => page.getByTestId(`trade-services-section-${id}`);
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+  test(`Services countries use both flows and remember comparisons ${prefix || "ka"} ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto(`${prefix}/explorer/trade/services#section=types&measure=trade.imports&view=table&start=2022&end=2024&sel=services.travel`);
+    await page.evaluate(() => document.fonts.ready);
+    expect(await page.getByTestId("trade-services-tabs").getByRole("button").evaluateAll(buttons => buttons.every(button => button.scrollWidth <= button.clientWidth))).toBe(true);
+    await page.getByTestId("trade-services-dimension-countries").click();
+    await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "countries");
+    await expect(page.getByTestId("trade-services-dimension-countries")).toBeFocused();
+    await expect(section(page, "trade.imports")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+    await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2022");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 154");
+    const dimensions = await page.getByTestId("trade-services-dimensions").boundingBox(), search = page.getByTestId("series-search");
+    expect(dimensions!.y).toBeLessThan((await search.boundingBox())!.y);
+    await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(10);
+    await search.fill("826");
+    await expect(toggle(page, "partner.2020-2024.826")).toBeVisible();
+    await toggle(page, "services.total").click();
+    await toggle(page, "partner.2020-2024.826").click();
+    await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(10);
+    const countryHash = new URL(page.url()).hash;
+    expect(new URLSearchParams(countryHash.slice(1)).get("section")).toBe("countries");
+    const catalogue = JSON.parse(await readFile("../../data/taxonomy/trade-services.json", "utf8")) as { id: string; labelEn: string; labelKa: string }[];
+    const uk = catalogue.find(e => e.id === "partner.2020-2024.826")![prefix ? "labelEn" : "labelKa"];
+    const imports = await tableSeriesValues(page.getByTestId("explorer-table"), uk);
+    expect(imports).toHaveLength(3);
+    expect(imports.every(value => value !== "—")).toBe(true);
+    await section(page, "trade.exports").click();
+    expect(await tableSeriesValues(page.getByTestId("explorer-table"), uk)).not.toEqual(imports);
+    await section(page, "trade.imports").click();
+    await page.getByTestId("trade-services-dimension-types").click();
+    await expect(toggle(page, "services.travel")).toHaveAttribute("aria-pressed", "true");
+    await page.getByTestId("trade-services-dimension-countries").click();
+    await expect(toggle(page, "partner.2020-2024.826")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("series-status")).toContainText("1 / 154");
+    await page.reload();
+    await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "countries");
+    await expect(toggle(page, "partner.2020-2024.826")).toHaveAttribute("aria-pressed", "true");
+    await page.goBack();
+    await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "types");
+    await page.goForward();
+    await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "countries");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    if (width !== 390) return;
+    await page.getByTestId("sidebar-toggle").click();
+    await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
+    await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "countries");
+    await expect(section(page, "trade.imports")).toHaveAttribute("aria-pressed", "true");
+    await expect(toggle(page, "partner.2020-2024.826")).toHaveAttribute("aria-pressed", "true");
+    await search.fill("UK");
+    await expect(toggle(page, "partner.2020-2024.826")).toBeVisible();
+    await page.getByTestId("series-toggle-all").click();
+    await expect(page.getByTestId("trade-partners-excel-download")).toBeDisabled();
+    await page.getByTestId("series-toggle-all").click();
+    await expect(page.getByTestId("series-status")).toContainText("154 / 154");
+    await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(10);
+    await page.getByTestId("series-toggle-all").click();
+    await page.reload();
+    await expect(page.getByTestId("series-status")).toContainText("0 / 154");
+    await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+    await page.getByTestId("trade-partners-show-all").click();
+    await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(107);
+    await expect(page.getByTestId("trade-partners-unavailable-row")).toHaveCount(42);
+  });
+}
+
+test("country Excel uses published imports, gaps and the correct archived originals", async ({ page, request }) => {
+  await page.goto("/en/explorer/trade/services#section=countries&measure=trade.imports&sel=partner.2020-2024.826,partner.2020-2024.496&start=2020&end=2024&view=table");
+  await expect(page.getByTestId("series-status")).toContainText("2 / 154");
+  const download = page.waitForEvent("download");
+  await page.getByTestId("trade-partners-excel-download").click();
+  const file = await download;
+  expect(file.suggestedFilename()).toContain("trade-services-countries");
+  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await file.path())!);
+  expect(workbook.worksheets).toHaveLength(3);
+  const rows = workbook.worksheets[1].getSheetValues() as unknown[][];
+  expect(rows.filter(row => row?.includes("United Kingdom") && row.includes(2024))[0][4]).toBeCloseTo(96175488.549999951, 6);
+  expect(rows.filter(row => row?.includes("Mongolia") && row.includes(2020))[0][4] ?? null).toBeNull();
+  const sourceCells = JSON.stringify(workbook.worksheets[2].getSheetValues());
+  expect(sourceCells).toContain("georgian-imports-of-services-by-countries.xlsx");
+  expect(sourceCells).not.toContain("services-by-types");
+  for (const [filename, hash] of [["georgian-imports-of-services-by-countries.xlsx", "06a2ce5527af858c2e9670354ef26fd549a255a9d02b37a3656aeb8cf621af50"], ["georgian-exports-of-services-by-countries.xlsx", "f34b544286ef73baf0a045b5273aa916eae5515e680c9361cfbae6294c1e1e9f"]]) {
+    const response = await request.get(`/downloads/methodology/trade/files/${filename}`);
+    expect(response.status()).toBe(200);
+    expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(hash);
+  }
+});
+
+for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Services defaults, independent ranking and complete selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
@@ -21,6 +110,8 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Services trade" : "მომსახურებით ვაჭრობა");
     const tabs = page.getByTestId("trade-services-tabs");
     await expect(tabs.getByRole("button")).toHaveCount(5);
+    await page.evaluate(() => document.fonts.ready);
+    expect(await tabs.getByRole("button").evaluateAll(buttons => buttons.every(button => button.scrollWidth <= button.clientWidth))).toBe(true);
     // U22-14: the five tabs are one row at every width; on a phone the row scrolls sideways.
     expect((await tabs.boundingBox())!.height).toBeLessThan(60);
     await expect(section(page, "overview")).toHaveAttribute("aria-pressed", "true");

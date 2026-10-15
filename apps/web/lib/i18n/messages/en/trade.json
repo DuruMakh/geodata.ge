@@ -162,5 +162,12 @@
   "trade.composition.shareNote": "Shares use Georgia’s national total for the same year and trade flow.",
   "trade.composition.sourceNote": "Source: Geostat · annual goods trade by SITC and BEC · nominal USD",
   "trade.composition.definitions": "Goods groups follow SITC sections; economic categories follow BEC. Capital goods includes the stated parts and accessories; transport equipment is separate. Exports include re-exports and use FOB values; imports use CIF values. Missing observations remain gaps or dashes.",
-  "trade.composition.workbookNote": "Nominal USD. Exports include re-exports (FOB); imports use CIF values. Missing amounts remain blank."
+  "trade.composition.workbookNote": "Nominal USD. Exports include re-exports (FOB); imports use CIF values. Missing amounts remain blank.",
+  "trade.services.breakdown": "Services breakdown",
+  "trade.services.countries": "Countries",
+  "trade.services.countriesTitle": "Services trade by country",
+  "trade.services.countryBulkScope": "Clear and Select all apply to Georgia total, all countries and the published other/unknown entries, regardless of search.",
+  "trade.services.countryEmptySelection": "Select countries to compare their trends. The ranking stays visible below.",
+  "trade.services.countryRankingTitle": "{measure} · Countries · {year}",
+  "trade.services.countryDefinitions": "Country values use Geostat’s published country totals. Other countries, international organizations and undefined/unknown entries remain separate; the ranking lists named countries only. Total trade and balance require both exports and imports for the same country and year. Missing values stay blank."
 }

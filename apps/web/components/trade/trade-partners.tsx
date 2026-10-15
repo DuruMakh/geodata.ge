@@ -30,10 +30,15 @@ import { TradePartnersSeriesPanel } from "./trade-partners-series-panel";
 import { TradePartnersRanking } from "./trade-partners-ranking";
 
 export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navigation, seriesControls }: { data: ClientTradePartnersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string; navigation?: (measure: TradeChartIndicator, changeMeasure: (next: TradeChartIndicator) => void) => ReactNode; seriesControls?: ReactNode }) {
-  const services = data.dataset === "services", composition = data.dataset === "composition", domestic = !services && !composition && Boolean(data.measures), embedded = services || domestic || composition;
+  const services = data.dataset === "services", countries = services && data.dimension === "countries", composition = data.dataset === "composition", domestic = !services && !composition && Boolean(data.measures), embedded = services || domestic || composition;
   const totalId = tradePartnersTotalId(data);
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
-  const t = (key: string) => message(messages, `trade.${composition ? "composition" : services && ["title", "total", "series", "emptySelection"].includes(key) ? "services" : "partners"}.${key}`);
+  const t = (key: string) => {
+    if (countries && key === "series") return message(messages, "trade.partners.country");
+    if (countries && key === "emptySelection") return message(messages, "trade.services.countryEmptySelection");
+    const serviceKey = services && ["title", "total", "series", "emptySelection"].includes(key) && !(countries && key === "total");
+    return message(messages, `trade.${composition ? "composition" : serviceKey ? "services" : "partners"}.${key}`);
+  };
   const { state, update } = useTradePartnersState(data), model = buildTradePartnersModel(data, state, presentation);
   const entities = new Map(data.entities.map(entity => [entity.id, entity]));
   const label = (id: string) => id === totalId ? t("total") : publicLabel(locale, id, entities.get(id)!.labelKa, englishLabels);
@@ -64,10 +69,10 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradePartnersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradePartnersModel(data, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, composition ? "trade.composition.sourceNote" : services ? "trade.services.sourceNote" : "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{composition ? t("definitions") : services ? message(messages, "trade.services.definitions") : domestic ? message(messages, "trade.domestic.countryDefinitions") : t("definitions")}</p></div>
+        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, composition ? "trade.composition.sourceNote" : services ? "trade.services.sourceNote" : "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{composition ? t("definitions") : services ? message(messages, countries ? "trade.services.countryDefinitions" : "trade.services.definitions") : domestic ? message(messages, "trade.domestic.countryDefinitions") : t("definitions")}</p></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} measureControls={seriesControls ?? (navigation ? undefined : measureControls)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
-    <TradePartnersRanking key={`${state.tab}:${state.measure}:${model.range.end}`} model={model} tab={state.tab} measure={state.measure} />
+    <TradePartnersRanking key={`${state.tab}:${state.measure}:${model.range.end}`} model={model} tab={state.tab} measure={state.measure} services={services} />
   </div>;
 }

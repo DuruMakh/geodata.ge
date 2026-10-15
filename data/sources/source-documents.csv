@@ -1,4 +1,4 @@
-﻿source_id,source_name,source_url_or_file,last_reviewed_at
+source_id,source_name,source_url_or_file,last_reviewed_at
 source.mof_2017_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2017 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2017-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2017-fact.xlsx,2026-06-08
 source.mof_2018_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2018 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2018-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2018-fact.xlsx,2026-06-08
 source.mof_2019_expenditure_pdf_e11_plus_tavi6_supplement_actual,Reviewed official 2019 expenditure E11 PDF plus tavi 6 workbook supplement,docs/Raw Data/Expenditure/treasury.ge/2019-12-month-state-budget-functional-expenditure.pdf + docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2019-fact.xlsx,2026-06-08
@@ -275,3 +275,5 @@ source.geostat_trade_export_sitc_2000_2026,Georgian Exports by Standard Internat
 source.geostat_trade_import_sitc_2000_2026,Georgian Imports by Standard International Trade Classification (SITC) section,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import-SITC_2000-2026.xlsx,2026-10-14
 source.geostat_trade_export_bec_2000_2026,Georgian Exports by Broad Economic Categories (BEC),docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Export-BEC_2000-2026.xlsx,2026-10-14
 source.geostat_trade_import_bec_2000_2026,Georgian Imports by Broad Economic Categories (BEC),docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import-BEC-2000-2026.xlsx,2026-10-14
+source.geostat_services_georgian_exports_of_services_by_countries,"მომსახურების ექსპორტი ქვეყნების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Exports-of-services-by-countries.xlsx,2026-10-14
+source.geostat_services_georgian_imports_of_services_by_countries,"მომსახურების იმპორტი ქვეყნების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Imports-of-services-by-countries.xlsx,2026-10-14
