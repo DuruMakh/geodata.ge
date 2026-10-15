@@ -105,3 +105,8 @@ export function buildExternalPositionModel(section: ExternalPositionSectionId, a
 export function externalPositionLatestMonth(periodEnd: string, messages: Messages): string {
   return message(messages, `external.position.latestMonth.${periodEnd.slice(5, 7)}`);
 }
+
+/** The header of the latest-period column, for example `2026 (Sep)`. */
+export function externalPositionLatestLabel(latest: Pick<ExternalPositionLatest, "year" | "periodEnd">, messages: Messages): string {
+  return `${latest.year} (${externalPositionLatestMonth(latest.periodEnd, messages)})`;
+}

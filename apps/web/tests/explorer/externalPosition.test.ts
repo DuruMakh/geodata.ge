@@ -7,7 +7,7 @@ import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
 import { buildExternalPositionWorkbookExportModel } from "../../lib/explorer/externalPositionWorkbook";
 import {
-  EXTERNAL_POSITION_SECTIONS, buildExternalPositionModel, externalPositionLatestMonth, changeExternalPositionView, defaultExternalPositionState, externalPositionCoverage, externalPositionSeries,
+  EXTERNAL_POSITION_SECTIONS, buildExternalPositionModel, externalPositionLatestLabel, externalPositionLatestMonth, changeExternalPositionView, defaultExternalPositionState, externalPositionCoverage, externalPositionSeries,
   externalPositionViewFacts, parseExternalPositionHash, serializeExternalPositionHash, type ExternalPositionState,
 } from "../../lib/explorer/externalPosition";
 
@@ -150,7 +150,7 @@ const workbookFor = async (section: Parameters<typeof externalPositionSeries>[0]
   return buildExternalPositionWorkbookExportModel({
     section, facts, gdp, gdpSources: GDP_SOURCES, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: Object.fromEntries(selectedIds.map(id => [id, id])),
     state: { mode: "table", view, range: { kind: "manual", start, end }, selectedIds },
-    latestLabel: model.latestYears.length ? `${model.latest.year} (${externalPositionLatestMonth(model.latest.periodEnd, p.messages)})` : undefined,
+    latestLabel: model.latestYears.length ? externalPositionLatestLabel(model.latest, p.messages) : undefined,
   }, p);
 };
 
@@ -159,6 +159,11 @@ test("the latest point's month is localized from its period end", async () => {
   expect(externalPositionLatestMonth("2026-06-30", (await presentation("en")).messages)).toBe("Jun");
   expect(externalPositionLatestMonth("2026-09-30", (await presentation("ka")).messages)).toBe("სექტ.");
   expect(externalPositionLatestMonth("2026-06-30", (await presentation("ka")).messages)).toBe("ივნ.");
+});
+
+test("the latest column label joins the year and the localized month", async () => {
+  expect(externalPositionLatestLabel({ year: 2026, periodEnd: "2026-09-30" }, (await presentation("en")).messages)).toBe("2026 (Sep)");
+  expect(externalPositionLatestLabel({ year: 2026, periodEnd: "2026-06-30" }, (await presentation("ka")).messages)).toBe("2026 (ივნ.)");
 });
 
 test("the Reserves workbook exports million USD for the four series, with the 2026 column named by its month", async () => {
