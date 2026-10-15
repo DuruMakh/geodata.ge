@@ -1,6 +1,6 @@
 # Annual external flows research foundation: money transfers, FDI and the current account
 
-Approved scope: 2026-10-10. This began as a research package. Three public pages now serve parts of it, each approved on 2026-10-10: Money from abroad, Foreign investment and Current account (see their sections below); everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
+Approved scope: 2026-10-10. This began as a research package. Five public pages now serve parts of it: Money from abroad, Foreign investment and Current account (approved 2026-10-10) and Foreign debt and Reserves (approved 2026-10-15, from a separate package); see their sections below. Everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
 
 ## Source capture and coverage
 
@@ -105,3 +105,20 @@ The approved 2026-10-10 Current account design (`docs/superpowers/specs/2026-10-
 - **Secondary income** contains the balance-of-payments personal transfers; it is not added to Money from abroad.
 
 The private mirror stores `CurrentAccountFact` (key series, flow, year; `Decimal(40,20)`), with RLS on and public grants revoked, and is compared field by field inside the existing import transaction. The methodology archive's BPM6 workbook and external-sector methodology note, already published for Money from abroad, are the page's sources. Publishing, live migration and live import remain separate authorized operations.
+
+## Foreign debt and reserves serving package
+
+The approved 2026-10-15 design (`docs/superpowers/specs/2026-10-15-foreign-debt-reserves-design.md`) serves NBG's gross external debt and official reserve assets from their own package, `docs/Raw Data/External/nbg-external-position/` (README, source manifest with URLs, retrieval time and SHA-256, the two unedited workbooks and NBG's category-24 file listing). It does not use the 2026-10-10 package. Both workbooks were retrieved on 2026-10-15: `edbpm6eng.xlsx` (gross external debt, BPM6, sheet `ED-GEO-Tb1`, million USD) and `templatesection-ieng.xlsx` (official reserve assets, sheet `GIR (eng) `, thousand USD). NBG's older BPM5 debt file (`edbpm5-eng.xlsx`, 1999–2005) uses a different method and is not used.
+
+`npm run data:prepare-external-position` writes `data/imports/external-position-annual.csv` (UTF-8 with BOM, 254 rows, one per indicator and year) and `data/reports/external-position-validation.json`; `data:check-external-position` reproduces both byte for byte and runs in `data:validate`. Each row keeps the exact workbook value in million USD (reserves are divided by 1,000 exactly, never as a float), the value rounded to one decimal, the period end date, the source ID, sheet and cell, and the review date.
+
+- **IDs.** `ext_debt.total`, `ext_debt.government`, `ext_debt.banks`, `ext_debt.companies`, `ext_debt.intercompany` and `ext_debt.central_bank`, 2006–2026 (126 rows); `reserves.total`, `reserves.fx`, `reserves.gold` and `reserves.sdr`, 1995–2026 (128 rows).
+- **Dates.** Every value is the amount on 31 December, plus exactly one latest 2026 point per indicator: 2026-06-30 for debt and 2026-09-30 for reserves, the last period in each file. That point is the latest published amount on a date, not a full year; it is never a sum or average of months, and nothing is interpolated. Validation rejects any other date.
+- **Units.** Values are million USD as NBG publishes them. No exchange rate is stored, served or archived, and nothing is converted to GEL.
+- **Checks.** The five debt groups add up to the total within 0.05 million USD in every year. Total reserves minus foreign currency, gold and SDRs stays between −2.5 and +13.1 million USD (validation rejects more than 30), because NBG's IMF reserve position and other reserve assets are not served. Anchors: gross external debt 27,046.9 million USD and general government 9,202.9 at the end of 2025; reserves 6,159.3 at the end of 2025. The package also keeps an independent re-read of both workbooks with SheetJS.
+- **Gold** is a published zero from 1995 to 2023, so it is served as 0, not a gap.
+- **% of GDP** is calculated at build time from the served `nominal_usd` GDP series, to one decimal, and is not stored. A year without GDP (1995 and 2026) has no value; preliminary GDP years are named in the source line, and the Excel Sources sheet lists the Geostat GDP workbooks, as for Current account.
+- **Export.** The workbooks follow the three-sheet model in the reader's language, in million USD or % of GDP, with the 2026 column labelled with its month and blank cells for missing values. They link only validated archive files and have no internal ID or cell columns.
+- **Not served.** Debt by currency or maturity, quarterly or monthly values, sub-sector detail, the IMF reserves template and exchange rates. No `/mcp` tool or central JSON/CSV publication is added, and the fact-query snapshot excludes these sources.
+
+The private mirror stores `ExternalPositionFact` (key indicator, year; `Decimal(40,30)`), with RLS on and public grants revoked, and is compared field by field inside the existing import transaction. The methodology archive publishes both NBG workbooks and the category-24 listing. Publishing, live migration and live import remain separate authorized operations.
