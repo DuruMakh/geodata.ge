@@ -1,0 +1,379 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-15",
+  "scope": "Annual research only: turnover, persons employed, investment, profit and loss by activity, size and region (regions from 2006), and active, new and closed firms with birth and death rates (2014-2024); no quarters, no 2026, no other survey tables, survival, legal forms or ownership",
+  "primary_observation_count": 4590,
+  "observations_by_measure": {
+    "active": 352,
+    "birth_rate": 209,
+    "births": 352,
+    "death_rate": 173,
+    "deaths": 352,
+    "employed": 706,
+    "investment": 580,
+    "loss": 580,
+    "profit": 580,
+    "turnover": 706
+  },
+  "observations_by_source": {
+    "geostat_business_demography": 1438,
+    "geostat_business_employed": 706,
+    "geostat_business_investment": 580,
+    "geostat_business_profit_loss": 1160,
+    "geostat_business_turnover": 706
+  },
+  "indicator_count": 279,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": {
+    "coverage_matches_year_ranges": true,
+    "values_match_source_cells": true,
+    "published_values_are_rounded_stored_values_at_cell_precision": true,
+    "sizes_sectors_regions_add_up_to_total": {
+      "gel_million": "0.15",
+      "persons": "2",
+      "enterprises": "0"
+    },
+    "recorded_differences_parts_minus_total": {
+      "turnover.size": {
+        "2011": "-0.2"
+      },
+      "turnover.sector": {
+        "1999": "-1.4",
+        "2000": "-2.9",
+        "2001": "-2.4",
+        "2002": "-1.7",
+        "2003": "-2.2",
+        "2004": "-5.4",
+        "2005": "-19.1",
+        "2009": "-0.2",
+        "2025": "-0.2"
+      },
+      "employed.sector": {
+        "1999": "-240",
+        "2000": "-252",
+        "2001": "-322",
+        "2002": "-255",
+        "2003": "-244",
+        "2004": "-271",
+        "2005": "-449"
+      },
+      "investment.sector": {
+        "2009": "0.2",
+        "2014": "-0.2",
+        "2017": "0.2"
+      },
+      "profit.sector": {
+        "2017": "-0.2"
+      },
+      "loss.sector": {
+        "2012": "0.2",
+        "2013": "0.2",
+        "2020": "-0.2",
+        "2021": "-0.2",
+        "2025": "-0.2"
+      },
+      "turnover.region": {
+        "2006": "-29.8",
+        "2007": "-41.5",
+        "2008": "-45.2",
+        "2009": "-42.0",
+        "2010": "-59.5",
+        "2011": "-45.3",
+        "2012": "-44.1",
+        "2013": "-50.0",
+        "2014": "-61.8",
+        "2015": "-53.5",
+        "2016": "-61.5",
+        "2017": "-79.0",
+        "2018": "-105.1",
+        "2019": "-90.1",
+        "2020": "-50.9",
+        "2021": "-116.3",
+        "2022": "-129.5",
+        "2023": "-116.1",
+        "2024": "-126.3",
+        "2025": "-170.1"
+      },
+      "employed.region": {
+        "2006": "-901",
+        "2007": "-950",
+        "2008": "-973",
+        "2009": "-1052",
+        "2010": "-1100",
+        "2011": "-1073",
+        "2012": "-1110",
+        "2013": "-1152",
+        "2014": "-1130",
+        "2015": "-1175",
+        "2016": "-1182",
+        "2017": "-1208",
+        "2018": "-1178",
+        "2019": "-1285",
+        "2020": "-1206",
+        "2021": "-1305",
+        "2022": "-1413",
+        "2023": "-1407",
+        "2024": "-1391",
+        "2025": "-1361"
+      },
+      "investment.region": {
+        "2006": "-60.2",
+        "2007": "-36.9",
+        "2008": "-4.0",
+        "2009": "-10.3",
+        "2010": "-28.8",
+        "2011": "-10.2",
+        "2012": "-1.1",
+        "2013": "-26.9",
+        "2014": "-29.6",
+        "2015": "-1.5",
+        "2016": "-55.7",
+        "2017": "-24.4",
+        "2018": "-17.2",
+        "2019": "-14.5",
+        "2020": "-8.4",
+        "2021": "-86.7",
+        "2022": "-72.9",
+        "2023": "-28.5",
+        "2024": "-3.8",
+        "2025": "-6.6"
+      },
+      "profit.region": {
+        "2006": "-0.9",
+        "2009": "-0.8",
+        "2010": "-14.1",
+        "2011": "-2.2",
+        "2012": "-1.5",
+        "2013": "-0.3",
+        "2014": "-10.9",
+        "2016": "-0.2",
+        "2017": "-5.9",
+        "2018": "-26.3",
+        "2019": "-15.1",
+        "2020": "-0.7",
+        "2021": "-43.6",
+        "2022": "-62.1",
+        "2023": "-0.9",
+        "2024": "-3.8",
+        "2025": "-7.4"
+      },
+      "loss.region": {
+        "2007": "-2.3",
+        "2008": "-9.5",
+        "2009": "-1.5",
+        "2011": "-1.5",
+        "2012": "-1.6",
+        "2013": "-2.8",
+        "2015": "-13.4",
+        "2016": "-7.1",
+        "2017": "-9.5",
+        "2018": "-0.2",
+        "2019": "-8.3",
+        "2020": "-59.3",
+        "2021": "-1.3",
+        "2022": "-4.2",
+        "2023": "-9.0",
+        "2025": "-1.0"
+      }
+    },
+    "firm_sections_add_up_with_activity_unknown_row": {
+      "active": {
+        "2024": "22681",
+        "2023": "4600",
+        "2022": "4436",
+        "2021": "2208",
+        "2020": "1431",
+        "2019": "3600",
+        "2018": "8523",
+        "2017": "14420",
+        "2016": "17714",
+        "2015": "16582",
+        "2014": "10235"
+      },
+      "births": {
+        "2024": "21615",
+        "2023": "2941",
+        "2022": "3550",
+        "2021": "1621",
+        "2020": "795",
+        "2019": "2053",
+        "2018": "3830",
+        "2017": "6692",
+        "2016": "8957",
+        "2015": "11087",
+        "2014": "7155"
+      },
+      "deaths": {
+        "2024": "1750",
+        "2023": "1617",
+        "2022": "2871",
+        "2021": "6196",
+        "2020": "8990",
+        "2019": "10249",
+        "2018": "8235",
+        "2017": "5291",
+        "2016": "5331",
+        "2015": "9176",
+        "2014": "11745"
+      }
+    },
+    "rates_equal_births_or_deaths_per_100_active": true,
+    "section_death_rate_not_printed": [
+      2016,
+      2019
+    ],
+    "survey_totals_agree_across_sheets": 114,
+    "firm_totals_agree_by_section_and_region": 53,
+    "no_quarter_or_2026_rows": true,
+    "regions_start_2006_for_survey_measures": true,
+    "anchor_values": {
+      "business.turnover.total:2025": "253725.5",
+      "business.turnover.size_large:2025": "173004.5",
+      "business.turnover.region_tbilisi:2025": "200837.9",
+      "business.employed.total:2025": "899026",
+      "business.investment.total:2025": "8021.8",
+      "business.profit.total:2025": "27936.1",
+      "business.loss.total:2025": "7152.9",
+      "business.active.total:2024": "249236",
+      "business.births.total:2024": "56259",
+      "business.deaths.total:2024": "29634",
+      "business.birth_rate.total:2024": "22.6"
+    }
+  },
+  "source_checks": [
+    {
+      "source_id": "geostat_business_turnover",
+      "sha256": "7D5F535EC523D01EB73666C1D529602F6F9D3715A53DFD11382EF49B1D7864C4",
+      "bytes": 38844,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_production_value",
+      "sha256": "3773684E912E88E5958C59FF6D97F377EFF1819626D70ED531B068AD7D16C5E0",
+      "bytes": 39469,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_employed",
+      "sha256": "4FDCAE314EB9080650EB46EEAC6D557AFDC33EE9AF8E661B0310B6BC105F78E6",
+      "bytes": 57154,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_employees",
+      "sha256": "E2237BDC8F20A2F29FFFAEE397728B2A84C8DD7A946D34CAD4B8FE9E44EF1C27",
+      "bytes": 34274,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_earnings",
+      "sha256": "24EF3201A9CA18978B307C1012B81F928A00D4E88AF26BD946295B13A71FF2E3",
+      "bytes": 35692,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_value_added",
+      "sha256": "6854FFB610BBDE999431B6495B9869251505C167DB31D54AA8949FEAC2F240D9",
+      "bytes": 32152,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_intermediate_consumption",
+      "sha256": "9E19CB8CBFEDADF913062C057F72A7FFA2DA66D45AF2D54B9455DF11D6517EC0",
+      "bytes": 32078,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_personnel_costs",
+      "sha256": "2DEBA63D9C47F8D196A4A9C27AEFB367CBF5D1C0044CBA4C186C202C231F7B2B",
+      "bytes": 42195,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_purchases",
+      "sha256": "226FC7825638C32C815A21DD7E633F9E495FB157F95F3D5812513C9DAD3FB10B",
+      "bytes": 34471,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_purchases_for_resale",
+      "sha256": "FBE0CE925F76CFA4C3FBC63143E80F57E52C3CDEB7049ABBA8DE3A6615768886",
+      "bytes": 33518,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_investment",
+      "sha256": "766D30FF86A27BEC888511CCD36AF93C02BC208AC272F84B4AF47032758ECC89",
+      "bytes": 49254,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_gender",
+      "sha256": "DED9D8B694F34F606215FE95F079FADEFE01D2F68629C446BAB58A80D2FB2172",
+      "bytes": 181890,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_fixed_assets",
+      "sha256": "25B5DBACCF1AA9BD95E7D30B12829DC3B382A156CBC23FE1FB057760213FCAF0",
+      "bytes": 52170,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_profit_loss",
+      "sha256": "7861052BAEAB9EF73BC75D1D6A9E562DBA3D5D033529F465A30E25333AB49240",
+      "bytes": 68601,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_labour_productivity",
+      "sha256": "CF028A184EB0152F8A165ECAA8D88115ED586EC4277E2E16751B0D0D2397B744",
+      "bytes": 72372,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_remarks",
+      "sha256": "6C0A692507DE77A2678F571CD5C995A3114204F97015665BDB16C6B83D892111",
+      "bytes": 124115,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_demography",
+      "sha256": "A1F3CAF275FF51C79687C8E777F0D47CA2DAD853B929D1472615B081FA8E8021",
+      "bytes": 137238,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_demography_other",
+      "sha256": "ADB74492AC7B5BDEBDD610756F49D6AD4A007E1585BFFD595CC407446C72D485",
+      "bytes": 10845,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_demography_births",
+      "sha256": "586D2C24D4035C9D831AF2290C1D6AFAB5D47461ECB71FCF4FA04D3184CFD6A0",
+      "bytes": 69132,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_demography_deaths",
+      "sha256": "5A38B15A29170413B7017AD149783B183CC4E714B4B7AEE58C0033CA1DA31FAD",
+      "bytes": 65515,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_survey_page",
+      "sha256": "23D0161535B9FAD873BEC5A2BB3D515A3E5F73367433276197B225E43CD96215",
+      "bytes": 108359,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_demography_page",
+      "sha256": "CF820589E8E174AE1DF849045B6A62C7660BE2FA59498600857E522AF664DB0B",
+      "bytes": 72100,
+      "passed": true
+    }
+  ]
+}
