@@ -4,7 +4,7 @@ import { BUSINESS_DEMOGRAPHY_SECTORS, BUSINESS_REGIONS, BUSINESS_SIZES, BUSINESS
 import { INK, OTHER_COLOR } from "../../lib/explorer/colors";
 import {
   BUSINESS_HUB_PATH, BUSINESS_SECTIONS, buildBusinessModel, businessCoverage, businessDefaultSelection, businessSeriesColor, businessViews, businessViewSeries,
-  changeBusinessView, defaultBusinessState, parseBusinessHash, serializeBusinessHash, type BusinessTopicId,
+  changeBusinessView, defaultBusinessState, parseBusinessHash, serializeBusinessHash, type BusinessSeriesDefinition, type BusinessTopicId,
 } from "../../lib/explorer/business";
 import {
   BUSINESS_AREAS, buildBusinessAreaModel, businessAreaCoverage, businessAreaDefaultSelection, businessAreaHref, businessAreaSeries,
@@ -146,6 +146,32 @@ test("an industry wears its economic-sector colour under every parent; the unkno
   expect(color("sales", "main", "business.turnover.total")).toBe(INK);
 });
 
+test("in every list, only the same industry or size under two parents shares a colour", () => {
+  /** What a series is: an industry or size is the same line of thought under every parent; anything else is itself. */
+  const identity = (id: string) => { const group = id.split(".")[2]; return /^(sector|size)_/.test(group) ? group : id; };
+  const lists: [string, BusinessSeriesDefinition[]][] = [
+    ...TOPICS.flatMap(section => businessViews(section).map(view => [`${section}:${view}`, businessViewSeries(section, view)] as [string, BusinessSeriesDefinition[]])),
+    ...(["georgia", "region_guria"] as const).flatMap(area => (["money", "jobs", "firms"] as const).map(measure => [`${area}:${measure}`, businessAreaSeries(area, measure)] as [string, BusinessSeriesDefinition[]])),
+  ];
+  for (const [name, series] of lists) {
+    const owner = new Map<string, string>();
+    series.forEach((s, index) => {
+      const color = businessSeriesColor(s, index), who = identity(s.id);
+      expect(owner.get(color) ?? who, `${name}: ${s.id} wears ${color}`).toBe(who);
+      owner.set(color, who);
+    });
+  }
+  // A size or a measure's total keeps its colour across pages and parents; a rate wears its count's.
+  const colorOf = (series: BusinessSeriesDefinition[], id: string) => { const index = series.findIndex(s => s.id === id); return businessSeriesColor(series[index], index); };
+  const sales = businessViewSeries("sales", "main"), money = businessViewSeries("investment-profit", "main"), firms = businessViewSeries("firms", "count");
+  expect(colorOf(sales, "business.turnover.size_large")).toBe(colorOf(money, "business.profit.size_large"));
+  expect(colorOf(money, "business.investment.size_small")).toBe(colorOf(money, "business.loss.size_small"));
+  expect(colorOf(money, "business.loss.total")).toBe(colorOf(businessAreaSeries("region_guria", "money"), "business.loss.region_guria"));
+  expect(colorOf(firms, "business.births.total")).toBe(colorOf(businessAreaSeries("georgia", "firms"), "business.births.total"));
+  expect(colorOf(firms, "business.births.total")).toBe(colorOf(businessAreaSeries("region_guria", "firms"), "business.births.region_guria"));
+  expect(colorOf(businessViewSeries("firms", "rate"), "business.birth_rate.total")).toBe(colorOf(firms, "business.births.total"));
+});
+
 test("the area pages are Georgia and the eleven regions, linked by slug", () => {
   expect(BUSINESS_AREAS).toEqual(["georgia", ...BUSINESS_REGIONS]);
   expect(businessAreaHref("georgia")).toBe("/explorer/business/regions/georgia");
@@ -183,6 +209,8 @@ test("area pages start on money with sales selected, over the area's coverage", 
 test("the area hash keeps only the measure's series, falls back to money, and switching measure selects its default and refits the years", () => {
   expect(parseBusinessAreaHash("#m=firms&sel=business.turnover.region_guria", "region_guria", facts)).toMatchObject({ measure: "firms", selectedIds: [] });
   expect(parseBusinessAreaHash("#m=xyz", "region_guria", facts).measure).toBe("money");
+  // The hash's years are refitted to the measure it names.
+  expect(parseBusinessAreaHash("#m=firms&start=2006&end=2020", "region_guria", facts).range).toEqual({ kind: "manual", start: 2014, end: 2020 });
   const state = { ...parseBusinessAreaHash("", "region_guria", facts), range: { kind: "manual" as const, start: 2006, end: 2025 } };
   expect(changeBusinessAreaMeasure(state, "region_guria", "firms", facts)).toEqual({
     mode: "line", measure: "firms", range: { kind: "manual", start: 2014, end: 2024 }, selectedIds: ["business.births.region_guria", "business.deaths.region_guria"],

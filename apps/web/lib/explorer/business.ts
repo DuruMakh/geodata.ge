@@ -2,7 +2,7 @@ import {
   BUSINESS_DEMOGRAPHY_SECTORS, BUSINESS_SECTOR_UNKNOWN, BUSINESS_SIZES, BUSINESS_SURVEY_SECTORS, businessFactKey, businessIndicator,
   type BusinessGroup, type BusinessIndicator, type BusinessMeasure, type ClientBusinessFact,
 } from "../data/business/types";
-import { OTHER_COLOR } from "./colors";
+import { INK, OTHER_COLOR } from "./colors";
 import { refitRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
 
@@ -65,14 +65,28 @@ export function businessDefaultSelection(section: BusinessTopicId, view: Busines
 }
 
 /**
+ * Fixed colours for the firm sizes and for each measure's total (on the topic and area pages alike), so none takes a
+ * palette colour by position that an industry already wears. Each is an existing palette hex that is no economic-sector
+ * colour and sits at CIEDE2000 >= 11 from every sector of the lists it appears in. A rate wears its count's colour:
+ * the two are never in one view. Sales and jobs totals are always the ink reference.
+ */
+const SIZE_COLORS: Readonly<Record<string, string>> = { size_large: "#4A707A", size_medium: "#A5822B", size_small: "#5B5347" };
+const MEASURE_COLORS: Partial<Record<BusinessMeasure, string>> = {
+  investment: "#4E5D74", profit: "#667722", loss: "#B3402A",
+  active: "#5B5347", births: "#667722", deaths: "#B3402A", birth_rate: "#667722", death_rate: "#B3402A",
+};
+
+/**
  * The reference is ink. An industry wears its economic-sector colour under every parent (the survey's combined B–E group
  * wears manufacturing's, `sector.c`); Geostat's unknown activity is no sector and wears the shared "other" colour.
+ * A size and a measure's total or region row wear their fixed colour.
  */
 export function businessSeriesColor(series: BusinessSeriesDefinition, index: number): string {
-  const group = series.id.split(".")[2];
+  const [, measure, group] = series.id.split(".");
+  if (series.reference) return INK;
   if (group === BUSINESS_SECTOR_UNKNOWN) return OTHER_COLOR;
   if (group.startsWith("sector_")) return topicSeriesColor(series, index, `sector.${group === "sector_b_e" ? "c" : group.slice("sector_".length)}`);
-  return topicSeriesColor(series, index);
+  return SIZE_COLORS[group] ?? MEASURE_COLORS[measure as BusinessMeasure] ?? topicSeriesColor(series, index);
 }
 
 export type BusinessState = TopicState & { view: BusinessView };
