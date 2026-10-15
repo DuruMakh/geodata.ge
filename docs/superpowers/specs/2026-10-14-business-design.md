@@ -48,10 +48,10 @@ The pages keep the production editorial look and reuse the Wages, Living standar
 These rules apply to every Business page, as on Money and banks:
 
 - Under the heading there is one short line from `LatestValueLine`. The wording for each page is in its own section below. Nothing else sits under the heading, and the only text under the chart is one short source line.
-- **No page has a tab row.** Different units switch with the icon-only measure switch of DESIGN.md §7.2a (`SegmentedTabs` with icon options and `ControlTooltip`), at the right of the chart controls row after the unit caption.
+- **No page has a tab row or a measure switch.** Where a list mixes units (Firms and the area pages), each unit's rows sit under a heading that names the unit, and the chart shows one unit at a time: ticking a row of another unit replaces the selection with that row, and the chart, table, years and Excel follow the selection's unit.
 - Only the default series named for each page is selected on arrival. It stays first, selectable and removable, and selection is unlimited.
 - Breakdowns sit under headings ("Firm size", "Industry") or nest under the total they break down, as caret-expanded subcategories. Series names carry no prefixes.
-- Chart | Table, the year range and Excel work as on Money and banks. Measure, range, selection (including an empty one) and chart/table mode live in the URL hash through `use-hash-explorer-state` and survive a language change.
+- Chart | Table, the year range and Excel work as on Money and banks. Range, selection (including an empty one) and chart/table mode live in the URL hash through `use-hash-explorer-state` and survive a language change.
 - Every series has a fixed, distinguishable colour. The reference series is drawn in ink, and industries reuse the economic-sector colours of the same NACE section.
 - A year without a value is a gap in the chart, a dash in the table and a blank Excel cell, never zero. Geostat's `…` cells are unavailable values.
 - **Yearly values only.** The last year shown is 2025 (2024 for firms opened and closed). Geostat's 2026 quarterly rows at the bottom of each sheet are not served.
@@ -92,12 +92,12 @@ Profit is the total profit of the firms that made a profit, and Loss is the tota
 
 Line under the heading: "2024: 56,259 firms opened, 29,634 closed".
 
-One list, 2014–2024, with an icon measure switch on the chart toolbar:
+One list, 2014–2024, under two headings:
 
-- **Number** (Lucide `Building2`): Active firms; **New firms** (selected); **Closed firms** (selected). Each has its NACE sections A–S nested under it, as Geostat publishes them in its business demography (here mining, manufacturing, energy and water are separate sections, and financial activities are included).
-- **Rate** (Lucide `Percent`): New firms and Closed firms as a percent of active firms, with the same nested sections. These are Geostat's published birth and death rates, not calculated by fiscal.ge. Active firms has no rate, so it is unavailable in this measure.
+- **Number**: Active firms; **New firms** (selected); **Closed firms** (selected). Each has its NACE sections A–S nested under it, as Geostat publishes them in its business demography (here mining, manufacturing, energy and water are separate sections, and financial activities are included).
+- **Compared with active firms · %**: New firms and Closed firms as a percent of active firms, with the same nested sections. These are Geostat's published birth and death rates, not calculated by fiscal.ge. Active firms has no rate.
 
-Switching measure keeps any selected New or Closed row and drops Active firms. Switching back keeps the rows. New firms and Closed firms are both selected by default (named here as the approved default, AGENTS.md "only the applicable total" exception), because opening and closing is the point of the page.
+Counts and rates are never charted together: ticking a rate while counts are selected replaces them with the rate, and back. New firms and Closed firms are both selected by default (named here as the approved default, AGENTS.md "only the applicable total" exception), because opening and closing is the point of the page.
 
 Source: Geostat business demography, "Main results" workbook (one sheet per year, 2014–2024, by section and by region). A "new firm" is Geostat's enterprise birth, a new combination of production factors. A "closed firm" is an enterprise death, meaning it stopped and did not restart within two years, which is why the last year is 2024. The methodology page explains both in plain words.
 
@@ -107,18 +107,18 @@ Source: Geostat business demography, "Main results" workbook (one sheet per year
 
 - Under the heading is the one latest-value line ("2025: firms' sales in Tbilisi 200.8 billion GEL"). Under it is the shared `RegionIndex` map and ranked list of the 11 regions, coloured by the latest year's value, with the occupied-territory overlays.
 - An icon switch above the map, aligned right within the map column as on Living standards, chooses the map value: `₾` sales (initial) or Lucide `Users` jobs.
-- Georgia is the list's first, unranked row. Georgia and every region, on the map or in the list, are links to their own area page, carrying the chosen measure in the hash.
+- Georgia is the list's first, unranked row. Georgia and every region, on the map or in the list, are links to their own area page, opening it with jobs selected when the map shows jobs.
 - There is no chart workspace on the index. The one source line is the `RegionIndex` footer, naming the source, unit and map year with the geoBoundaries credit.
 
 **Area pages** (`/explorer/business/regions/[id]`, 12 pages: `georgia` and the 11 regions), following the Living standards area pages:
 
 - The heading is `ბიზნესი — [გურია ▾]` / `Business — [Guria ▾]`, with the `RegionPicker` (Georgia first, and an all-regions entry that returns to the index) and previous/next links on the right, in the order Georgia then the regions.
 - One latest-value line: the area's sales, for example "2025: firms' sales 1.1 billion GEL · Guria". No map follows.
-- The chart workspace has an icon measure switch with three options:
-  - `₾` money (initial): **Sales** (selected), Investment, Profit, Loss, in billion GEL.
-  - `Users` jobs: **Jobs**, in thousand people.
-  - `Building2` firms: Active firms, **New firms**, **Closed firms**, as counts.
-- Each measure selects its bold series when first chosen. Switching keeps the years, clamped to the measure's coverage.
+- The chart workspace has one series list under three headings that name their units:
+  - Money: **Sales** (selected initially), Investment, Profit, Loss, in million GEL.
+  - Jobs: Jobs, in thousand people.
+  - Firms: Active firms, New firms, Closed firms, as counts.
+- Ticking a row of another heading's unit replaces the selection with it. The years stay, clamped to that unit's coverage.
 - Years: money and jobs run 2006–2025 for regions and 1999–2025 for Georgia. Firms run 2014–2024.
 - Georgia's page uses the same national totals as the four topic pages.
 - The source line adds the head-office caveat in a few words ("firms counted where their main office is"), as Wages does.

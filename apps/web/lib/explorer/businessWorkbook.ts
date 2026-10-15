@@ -21,9 +21,7 @@ export function buildBusinessWorkbookExportModel(input: BusinessWorkbookInput, p
   const { labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `business.${key}`);
   const model: BusinessModel = "area" in input ? buildBusinessAreaModel(input.area, input.facts, input.state) : buildBusinessModel(input.section, input.facts, input.state);
-  const stem = "area" in input
-    ? `business-${businessAreaSlug(input.area)}-${input.state.measure}`
-    : `business-${input.section}${input.state.view === "rate" ? "-rate" : ""}`;
+  const stem = "area" in input ? `business-${businessAreaSlug(input.area)}` : `business-${input.section}${model.unit === "percent" ? "-rate" : ""}`;
   const byCell = new Map(input.facts.map(f => [businessFactKey(f), f]));
   const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) => byCell.get(`${series.id}:${year}`)?.sourceId));
   const isAmount = model.unit === "gel";

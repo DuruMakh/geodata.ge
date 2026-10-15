@@ -1,7 +1,6 @@
 import { BUSINESS_REGIONS, businessIndicator, type BusinessMeasure, type ClientBusinessFact } from "../data/business/types";
-import { BUSINESS_SECTIONS, buildBusinessSeriesModel, type BusinessModel, type BusinessSeriesDefinition } from "./business";
-import { refitRange } from "./periodRange";
-import { parseTopicHash, serializeTopicHash, topicCoverage, type TopicState } from "./topicSeries";
+import { BUSINESS_SECTIONS, buildBusinessSeriesModel, businessListCoverage, parseBusinessListHash, type BusinessModel, type BusinessSeriesDefinition } from "./business";
+import type { TopicState } from "./topicSeries";
 
 /** The areas with a page: Georgia, then the eleven regions. Abkhazeti AR and the unknown region are part of the firms total but have no page. */
 export const BUSINESS_AREAS = ["georgia", ...BUSINESS_REGIONS] as const;
@@ -18,63 +17,54 @@ export const businessAreaOfMapId = (id: string) => (id === "georgia" ? id : id.r
 /** The area page of a map or list row (as `householdRegionHref` reads it). */
 export const businessRegionHref = (id: string): `/${string}` => businessAreaHref(businessAreaOfMapId(id));
 
-/** The area page's icon measure switch. */
-export type BusinessAreaMeasure = "money" | "jobs" | "firms";
-export const BUSINESS_AREA_MEASURES: readonly BusinessAreaMeasure[] = ["money", "jobs", "firms"];
-/** Each switch option's series, in list order, and the bold ones it selects when chosen. */
-const AREA_SERIES: Record<BusinessAreaMeasure, { measures: readonly BusinessMeasure[]; selected: readonly BusinessMeasure[] }> = {
-  money: { measures: ["turnover", "investment", "profit", "loss"], selected: ["turnover"] },
-  jobs: { measures: ["employed"], selected: ["employed"] },
-  firms: { measures: ["active", "births", "deaths"], selected: ["births", "deaths"] },
-};
+/** An area's list: the money measures (million GEL), jobs (thousand people) and the firm counts, each group under its heading. */
+const AREA_SERIES: readonly { heading: "money" | "jobs" | "firms"; measures: readonly BusinessMeasure[] }[] = [
+  { heading: "money", measures: ["turnover", "investment", "profit", "loss"] },
+  { heading: "jobs", measures: ["employed"] },
+  { heading: "firms", measures: ["active", "births", "deaths"] },
+];
 /** Georgia's page shows the national totals, a region's page its own row. */
 const areaGroup = (area: BusinessArea) => area === "georgia" ? "total" : area;
 
-/** An area's series for a measure. Sales and jobs, each a measure's lone bold default, are the ink reference; firms has none, as on the Firms page. */
-export function businessAreaSeries(area: BusinessArea, measure: BusinessAreaMeasure): BusinessSeriesDefinition[] {
-  const { measures, selected } = AREA_SERIES[measure];
-  return measures.map(item => ({ id: businessIndicator(item, areaGroup(area)), reference: selected.length === 1 && selected[0] === item }));
+/** An area's series. Sales, the default, is the ink reference; jobs and the firm counts have none, as on the Firms page. */
+export function businessAreaSeries(area: BusinessArea): BusinessSeriesDefinition[] {
+  return AREA_SERIES.flatMap(({ heading, measures }) => measures.map(item => ({ id: businessIndicator(item, areaGroup(area)), reference: item === "turnover", heading })));
 }
 
-export function businessAreaDefaultSelection(area: BusinessArea, measure: BusinessAreaMeasure): string[] {
-  return AREA_SERIES[measure].selected.map(item => businessIndicator(item, areaGroup(area)));
+export function businessAreaDefaultSelection(area: BusinessArea): string[] {
+  return [businessIndicator("turnover", areaGroup(area))];
 }
 
 /** An area page's view; the area is the page's own and is not part of it. */
-export type BusinessAreaState = TopicState & { measure: BusinessAreaMeasure };
+export type BusinessAreaState = TopicState;
 
-/** An area's years for a measure: every year any of its series has a value. */
-export function businessAreaCoverage(area: BusinessArea, measure: BusinessAreaMeasure, facts: readonly ClientBusinessFact[]) {
-  const ids = new Set<string>(businessAreaSeries(area, measure).map(s => s.id));
-  return topicCoverage(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year), `No business years for ${area}:${measure}`);
+/** An area's years for a selection: every year any series of its unit has a value (any of the area's series when nothing is selected). */
+export function businessAreaCoverage(area: BusinessArea, facts: readonly ClientBusinessFact[], selectedIds: readonly string[] = []) {
+  return businessListCoverage(businessAreaSeries(area), selectedIds, facts);
 }
 
-/** Reads the view of the page for `area`; the measure is `m` (money when missing or unknown), and a selection keeps only that measure's series. */
+/** Reads the view of the page for `area`: its selection, kept to one unit, and the years. */
 export function parseBusinessAreaHash(hash: string, area: BusinessArea, facts: readonly ClientBusinessFact[]): BusinessAreaState {
-  const p = new URLSearchParams(hash.replace(/^#/, ""));
-  const measure = BUSINESS_AREA_MEASURES.find(item => item === p.get("m")) ?? "money";
-  return { ...parseTopicHash(p, businessAreaSeries(area, measure), businessAreaDefaultSelection(area, measure), businessAreaCoverage(area, measure, facts)), measure };
+  return parseBusinessListHash(hash, businessAreaSeries(area), businessAreaDefaultSelection(area), facts);
 }
 
-export function serializeBusinessAreaHash(state: BusinessAreaState): string {
-  const p = new URLSearchParams();
-  p.set("m", state.measure);
-  return serializeTopicHash(state, p);
-}
-
-/** Choosing a measure selects its bold series and keeps the years, clamped to the measure's coverage (never collapsed to "all"). */
-export function changeBusinessAreaMeasure(state: BusinessAreaState, area: BusinessArea, measure: BusinessAreaMeasure, facts: readonly ClientBusinessFact[]): BusinessAreaState {
-  return { ...state, measure, selectedIds: businessAreaDefaultSelection(area, measure), range: refitRange(state.range, businessAreaCoverage(area, measure, facts), { collapseToAll: false }) };
+/**
+ * The hash a link to another area's page carries: this page's selection, moved to that area, as `serializeTopicHash`
+ * writes it. The default selection (sales) carries none.
+ */
+export function businessAreaSelectionHash(selectedIds: readonly string[], area: BusinessArea): string {
+  const moved = selectedIds.map(id => `${id.split(".").slice(0, 2).join(".")}.${areaGroup(area)}`);
+  return moved.join(",") === businessAreaDefaultSelection(area).join(",") ? "" : `#${new URLSearchParams({ sel: moved.join(",") })}`;
 }
 
 export function buildBusinessAreaModel(area: BusinessArea, facts: readonly ClientBusinessFact[], state: BusinessAreaState): BusinessModel {
-  return buildBusinessSeriesModel(businessAreaSeries(area, state.measure), businessAreaCoverage(area, state.measure, facts), facts, state);
+  return buildBusinessSeriesModel(businessAreaSeries(area), facts, state);
 }
 
 /** The Regions index map's value: sales (initial) or jobs. The map itself is built server-side (businessRegionMap.ts). */
 export type BusinessMapMeasure = "turnover" | "employed";
-/** The hash a map or list link to an area page carries: jobs opens on the jobs measure; sales is every page's default. */
-export const businessMapHash = (measure: BusinessMapMeasure) => measure === "turnover" ? "" : "#m=jobs";
-/** The Regions index's view is only the map's measure, kept in the hash under the area pages' key `m`. */
+/** The hash a map or list link to an area page carries: jobs opens with jobs selected; sales is every page's default. */
+export const businessMapHash = (measure: BusinessMapMeasure, area: BusinessArea) => businessAreaSelectionHash([businessIndicator(measure, areaGroup(area))], area);
+/** The Regions index's view is only the map's measure, kept in the hash under `m`. */
 export const parseBusinessMapMeasure = (hash: string): BusinessMapMeasure => new URLSearchParams(hash.replace(/^#/, "")).get("m") === "jobs" ? "employed" : "turnover";
 export const serializeBusinessMapMeasure = (measure: BusinessMapMeasure) => `m=${measure === "turnover" ? "money" : "jobs"}`;

@@ -1,7 +1,7 @@
 "use client";
 import { Users } from "lucide-react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
-import { businessMapHash, businessRegionHref, parseBusinessMapMeasure, serializeBusinessMapMeasure, type BusinessMapMeasure } from "../../lib/explorer/businessAreas";
+import { businessAreaOfMapId, businessMapHash, businessRegionHref, parseBusinessMapMeasure, serializeBusinessMapMeasure, type BusinessMapMeasure } from "../../lib/explorer/businessAreas";
 import { formatInUnit, unitsFor } from "../../lib/explorer/format";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -17,7 +17,7 @@ const TOTAL_ID: Record<BusinessMapMeasure, string> = { turnover: "business.turno
 
 /**
  * The Regions index: the largest region's sales, the map measure switch and the map and ranked list of the eleven regions.
- * Georgia (the list's first row) and each region open their own page, carrying the jobs choice.
+ * Georgia (the list's first row) and each region open their own page, with jobs selected when the map shows jobs.
  */
 export function BusinessIndex({ facts, regionMaps }: {
   /** Georgia's sales and jobs totals. */
@@ -47,7 +47,7 @@ export function BusinessIndex({ facts, regionMaps }: {
           { value: "employed", label: t("map.employed"), testId: "business-map-employed", icon: <Users aria-hidden="true" size={18} strokeWidth={1.5} /> },
         ]} />}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
-          hrefForRegion: id => `${businessRegionHref(id)}${businessMapHash(measure)}`, formatValue: valueLabel, legend: `${mapLabel} · ${unitLabel}`, testId: "business-region-map",
+          hrefForRegion: id => `${businessRegionHref(id)}${businessMapHash(measure, businessAreaOfMapId(id))}`, formatValue: valueLabel, legend: `${mapLabel} · ${unitLabel}`, testId: "business-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
         }} />
     </section>

@@ -11,7 +11,7 @@ import type { BusinessFact } from "../data/business/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { BUSINESS_HUB_PATH } from "../explorer/business";
-import { BUSINESS_AREA_MEASURES, BUSINESS_AREAS, BUSINESS_REGIONS_HREF, businessAreaCoverage, businessAreaHref, businessAreaSeries, businessAreaSlug, businessMapId, type BusinessArea, type BusinessMapMeasure } from "../explorer/businessAreas";
+import { BUSINESS_AREAS, BUSINESS_REGIONS_HREF, businessAreaCoverage, businessAreaHref, businessAreaSeries, businessAreaSlug, businessMapId, type BusinessArea, type BusinessMapMeasure } from "../explorer/businessAreas";
 import { buildBusinessRegionMapModel } from "../explorer/businessRegionMap";
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { RegionMapModel } from "../explorer/regionalEconomyMap";
@@ -70,8 +70,8 @@ async function renderBusinessRegionsFrame(locale: Locale, area: BusinessArea | u
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const hubTitle = t("title");
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(BUSINESS_HUB_PATH, locale) }, ...(area ? [{ label: regionsTitle, href: pageHref(BUSINESS_REGIONS_HREF, locale) }] : []), { label: area ? regionName : title }];
-  // The measures the page shows, by name: an area's three switch options, or the index map's sales and jobs.
-  const measures = area ? BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaSeries(area, measure).map(series => series.id.split(".")[1])) : ["turnover", "employed"];
+  // The measures the page shows, by name: an area's list, or the index map's sales and jobs.
+  const measures = area ? businessAreaSeries(area).map(series => series.id.split(".")[1]) : ["turnover", "employed"];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "business", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
@@ -99,9 +99,9 @@ export async function renderBusinessAreaPage(locale: Locale, slug: string) {
   const area = areaForSlug(slug);
   // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/business.csv) behind the exported values.
   const sources = await loadSourcedWorkbookSources("business", locale);
-  const ids = new Set<string>(BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaSeries(area, measure).map(series => series.id)));
+  const ids = new Set<string>(businessAreaSeries(area).map(series => series.id));
   const areaFacts = (facts: BusinessFact[]) => facts.map(toClientBusinessFact).filter(f => ids.has(f.indicatorId));
-  return renderBusinessRegionsFrame(locale, area, facts => BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaCoverage(area, measure, areaFacts(facts)).years), ({ facts, presentation, areaLabels, origin, lastReviewedAt }) => {
+  return renderBusinessRegionsFrame(locale, area, facts => businessAreaCoverage(area, areaFacts(facts)).years, ({ facts, presentation, areaLabels, origin, lastReviewedAt }) => {
     // Every row is its measure's name: the area is the page's own.
     const labels = Object.fromEntries([...ids].map(id => [id, message(presentation.messages, `business.series.${id.split(".")[1]}`)]));
     return <BusinessAreaExplorer key={area} area={area} facts={areaFacts(facts)} labels={labels} areaLabels={areaLabels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} areas={AREA_PAGES} />;

@@ -62,9 +62,8 @@ test("jobs reads in thousand people", async ({ page }) => {
 });
 
 test("a section death rate Geostat did not publish is a dash in the table, never zero", async ({ page }) => {
-  await page.goto("/explorer/business/firms#tab=rate&view=table&sel=business.death_rate.sector_c");
+  await page.goto("/explorer/business/firms#view=table&sel=business.death_rate.sector_c");
   await ready(page);
-  await expect(page.getByTestId("business-measure-rate")).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
   for (const year of [2016, 2019]) await expect(await cell(page, "დამამუშავებელი მრეწველობა", year)).toHaveText("—");
   await expect(await cell(page, "დამამუშავებელი მრეწველობა", 2017)).toHaveText(/^\d+\.\d%$/);
@@ -109,29 +108,46 @@ test("the same industry under two parents keeps its colour and takes its parent'
   expect(strokes).toHaveLength(1);
 });
 
-test("firms opened and closed selects both, and the rate switch keeps them and the headline", async ({ page }) => {
+test("firms lists counts and rates under two headings, and ticking a rate replaces the counts", async ({ page }) => {
   await page.goto("/explorer/business/firms");
   await ready(page);
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(2);
   await expect(page.getByTestId("business-latest")).toContainText("2024");
   await expect(page.getByTestId("business-latest")).toContainText("56,259");
   await expect(page.getByTestId("business-latest")).toContainText("29,634");
-  const measures = page.getByRole("group", { name: "მაჩვენებელი" });
-  await expect(measures.getByRole("button", { name: "რაოდენობა" })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("business-measure-count").locator("svg.lucide-building2, svg.lucide-building-2")).toHaveCount(1);
-  await expect(page.getByTestId("business-measure-rate").locator("svg.lucide-percent")).toHaveCount(1);
-  await page.getByTestId("business-measure-rate").click();
-  await expect(page.getByTestId("business-measure-rate")).toHaveAttribute("aria-pressed", "true");
+  // No measure switch: one list holds the counts and the rates, each unit under its heading.
+  await expect(page.locator('[data-testid^="business-measure-"]')).toHaveCount(0);
+  await expect(page.getByTestId("chart-panel").locator("svg.lucide-building2, svg.lucide-building-2, svg.lucide-percent")).toHaveCount(0);
+  await expect(page.getByTestId("series-heading")).toHaveText(["რაოდენობა", "აქტიურ საწარმოებთან შეფარდებით · %"]);
+  await expect(page.getByRole("group", { name: "რაოდენობა" }).locator('[data-series-id$=".total"]')).toHaveCount(3);
+  await expect(page.getByTestId("series-status")).toContainText("2 / 5");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "enterprises");
+  // Each row reads in its own unit at the end year: whole firms, rates to one decimal.
+  await expect(page.locator('[data-series-id="business.births.total"]')).toContainText("56,259");
+  await expect(page.locator('[data-series-id="business.birth_rate.total"] [data-testid="series-row-toggle"]')).toHaveText(/\d+\.\d/);
+  await page.locator(pressed("business.birth_rate.total")).click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+  await expect(page.locator(pressed("business.birth_rate.total"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
+  await expect(page.getByTestId("business-unit-label")).toHaveText("%");
+  // Ticking another rate adds it; the headline stays.
+  await page.locator(pressed("business.death_rate.total")).click();
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(2);
-  for (const id of ["business.birth_rate.total", "business.death_rate.total"]) await expect(page.locator(pressed(id))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("business-latest")).toContainText("2024");
-  await expect(page).toHaveURL(/#tab=rate/);
-  // The language switch keeps the view.
+  await expect(page.getByTestId("business-latest")).toContainText("56,259");
+  await expect(page).toHaveURL(/#view=line&sel=business\.birth_rate\.total%2Cbusiness\.death_rate\.total/);
+  // The language switch keeps the selection.
   await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
-  await expect(page).toHaveURL(/\/en\/explorer\/business\/firms#tab=rate/);
+  await expect(page).toHaveURL(/\/en\/explorer\/business\/firms#view=line&sel=business\.birth_rate\.total/);
   await ready(page);
-  await expect(page.getByTestId("business-measure-rate")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "percent");
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(2);
+  await expect(page.getByTestId("series-heading")).toHaveText(["Number", "Compared with active firms · %"]);
+  // Clearing and selecting all takes the counts only.
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(0);
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(3);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "enterprises");
 });
 
 test("regions is the map and list with Georgia first, and a region opens with the jobs choice", async ({ page }) => {
@@ -155,14 +171,17 @@ test("regions is the map and list with Georgia first, and a region opens with th
   await expect(page.getByTestId("business-region-index")).toHaveAttribute("data-measure", "employed");
   await expect(page).toHaveURL(/\/explorer\/business\/regions#m=jobs$/);
   await expect(rows.first()).toContainText("899.0");
-  await expect(page.getByTestId("business-region-map").locator('a[data-region-id="region.guria"]')).toHaveAttribute("href", "/explorer/business/regions/guria#m=jobs");
+  await expect(page.getByTestId("business-region-map").locator('a[data-region-id="region.guria"]')).toHaveAttribute("href", "/explorer/business/regions/guria#sel=business.employed.region_guria");
+  await expect(rows.first()).toHaveAttribute("href", "/explorer/business/regions/georgia#sel=business.employed.total");
   await row(page, "region.guria").click();
-  await expect(page).toHaveURL(/\/explorer\/business\/regions\/guria#m=jobs$/);
+  await expect(page).toHaveURL(/\/explorer\/business\/regions\/guria#sel=business\.employed\.region_guria$/);
   await ready(page);
-  await expect(page.getByTestId("business-area-measure-jobs")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+  await expect(page.locator(pressed("business.employed.region_guria"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "persons");
 });
 
-test("the Guria page: picker, neighbours, measures, the language switch and Excel", async ({ page }) => {
+test("the Guria page: picker, neighbours, the one list, the language switch and Excel", async ({ page }) => {
   await page.goto("/explorer/business/regions/guria");
   await ready(page);
   const heading = page.getByRole("heading", { level: 1 });
@@ -172,7 +191,11 @@ test("the Guria page: picker, neighbours, measures, the language switch and Exce
   await expect(page.getByTestId("business-latest")).toHaveText(/^ბრუნვა · 2025: 1\.\d მლრდ ₾ · გურია$/);
   await expect(page.getByTestId("business-unit-label")).toHaveText("მლნ ₾");
   await expect(page.locator('[data-series-id="business.turnover.region_guria"]')).toContainText("1,078.7");
-  await expect(page.getByTestId("business-area-measure-money")).toHaveAttribute("aria-pressed", "true");
+  // No measure switch: money, jobs and firms are one list under three headings, each naming its unit.
+  await expect(page.locator('[data-testid^="business-area-measure-"]')).toHaveCount(0);
+  await expect(page.getByTestId("series-heading")).toHaveText(["ბრუნვა, ინვესტიციები, მოგება და ზარალი · მლნ ₾", "დასაქმებულები · ათასი ადამიანი", "საწარმოების რაოდენობა"]);
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+  await expect(page.locator(pressed("business.turnover.region_guria"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2006–2025");
   await expect(page.getByTestId("source-label")).toContainText("სათაო ოფისი");
   // The picker lists Georgia first and returns to the index.
@@ -184,29 +207,49 @@ test("the Guria page: picker, neighbours, measures, the language switch and Exce
   // Previous and next follow Georgia, then the regions' order.
   const navigation = page.getByTestId("business-region-navigation");
   await expect(navigation.getByRole("link")).toHaveText(["← აჭარა", "იმერეთი →"]);
-  // Firms run 2014–2024 and select new and closed firms.
-  await page.getByTestId("business-area-measure-firms").click();
-  await expect(page.getByTestId("year-range-strip")).toContainText("2014–2024");
+  await expect(navigation.getByRole("link").last()).toHaveAttribute("href", "/explorer/business/regions/imereti");
+  // Ticking a firm count replaces sales; firms run 2014–2024.
+  await page.locator(pressed("business.births.region_guria")).click();
+  await page.locator(pressed("business.deaths.region_guria")).click();
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(2);
-  await expect(page).toHaveURL(/#m=firms/);
-  await expect(navigation.getByRole("link").last()).toHaveAttribute("href", "/explorer/business/regions/imereti#m=firms");
+  await expect(page.locator(pressed("business.turnover.region_guria"))).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "enterprises");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2014–2024");
+  await expect(page).toHaveURL(/#view=line&sel=business\.births\.region_guria%2Cbusiness\.deaths\.region_guria/);
+  // Links to another area carry the selection, moved to that area.
+  await expect(navigation.getByRole("link").last()).toHaveAttribute("href", "/explorer/business/regions/imereti#sel=business.births.region_imereti%2Cbusiness.deaths.region_imereti");
   const promise = page.waitForEvent("download");
   await page.getByTestId("business-excel-download").click();
   const download = await promise;
-  expect(download.suggestedFilename()).toMatch(/^fiscal-business-guria-firms-2014-2024\.xlsx$/);
+  expect(download.suggestedFilename()).toMatch(/^fiscal-business-guria-2014-2024\.xlsx$/);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   // The Sources sheet links the archived business demography workbook the firm counts come from, and nothing else.
   expect(sheetText(workbook.worksheets[2])).toContain("https://fiscal.ge/downloads/methodology/business/files/main-results.xlsx");
   expect(sheetText(workbook.worksheets[2])).not.toContain("0502en0101_turnover.xlsx");
-  // The language switch keeps the measure.
+  // The language switch keeps the selection.
   await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
-  await expect(page).toHaveURL(/\/en\/explorer\/business\/regions\/guria#m=firms/);
+  await expect(page).toHaveURL(/\/en\/explorer\/business\/regions\/guria#view=line&sel=business\.births\.region_guria/);
   await ready(page);
   await expect(page.getByTestId("region-picker-trigger")).toHaveText("Guria");
-  await expect(page.getByTestId("business-area-measure-firms")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(2);
   await expect(page.getByTestId("year-range-strip")).toContainText("2014–2024");
   await page.getByTestId("business-region-navigation").getByRole("link", { name: "Imereti →" }).click();
-  await expect(page).toHaveURL(/\/en\/explorer\/business\/regions\/imereti#m=firms$/);
+  await expect(page).toHaveURL(/\/en\/explorer\/business\/regions\/imereti#sel=business\.births\.region_imereti%2Cbusiness\.deaths\.region_imereti$/);
+  await ready(page);
+  await expect(page.locator(pressed("business.deaths.region_imereti"))).toHaveAttribute("aria-pressed", "true");
+});
+
+test("on an area page, ticking Employed replaces Sales and the all-regions link opens the jobs map", async ({ page }) => {
+  await page.goto("/explorer/business/regions/guria");
+  await ready(page);
+  await page.locator(pressed("business.employed.region_guria")).click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+  await expect(page.locator(pressed("business.employed.region_guria"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "persons");
+  await expect(page.getByTestId("business-unit-label")).toHaveText("ათასი ადამიანი");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2006–2025");
+  await page.getByTestId("region-picker-trigger").click();
+  await expect(page.getByTestId("region-picker-all-option")).toHaveAttribute("href", "/explorer/business/regions#m=jobs");
 });
 
 test("an area whose sales stay under a billion reads in million GEL, in the line and the chart alike, as Georgia's chart does", async ({ page }) => {
