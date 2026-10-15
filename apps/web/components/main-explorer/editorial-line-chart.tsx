@@ -431,15 +431,23 @@ export function EditorialLineChart({
         {hover !== null && plot === active ? (
           <line x1={x(hover)} x2={x(hover)} y1={padTop - 6} y2={height - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
-        {breakMarks.map((entry) => {
+        {breakMarks.map((entry, markIndex) => {
           const bx = (x(entry.index - 1) + x(entry.index)) / 2;
           const toTheLeft = bx > width / 2;
+          // Labels of nearby breaks would print over each other on a narrow chart: a repeat of the previous
+          // label is left out, and a different one drops one line. The width is an estimate; no font metrics here.
+          const previous = breakMarks[markIndex - 1];
+          const previousX = previous === undefined ? null : (x(previous.index - 1) + x(previous.index)) / 2;
+          const reach = (label: string) => label.length * FONT * 0.62 + 10;
+          const clash = previousX !== null && previous !== undefined && bx - previousX < reach(entry.label) + reach(previous.label);
+          const repeat = clash && entry.label === previous?.label;
+          const labelY = padTop + 10 + (clash && markIndex % 2 === 1 ? FONT + 4 : 0);
           return (
             <g key={`break-${entry.year}`} data-testid="chart-break">
               <line x1={bx} x2={bx} y1={padTop} y2={height - PAD_B} stroke={CHART_AXIS_LABEL} strokeWidth={1} strokeDasharray="4 3" />
-              <text x={toTheLeft ? bx - 5 : bx + 5} y={padTop + 10} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor={toTheLeft ? "end" : "start"} style={{ fontFamily: "var(--font-numeric)" }}>
+              {repeat ? null : <text x={toTheLeft ? bx - 5 : bx + 5} y={labelY} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor={toTheLeft ? "end" : "start"} style={{ fontFamily: "var(--font-numeric)" }}>
                 {entry.label}
-              </text>
+              </text>}
             </g>
           );
         })}
