@@ -13,7 +13,7 @@ const HEADLINE: Record<Exclude<BusinessSectionId, "regions">, string> = {
 };
 
 export function buildBusinessHubCards(facts: readonly ClientBusinessFact[], presentation: Presentation): HubCardModel[] {
-  const t = (key: string) => message(presentation.messages, `business.${key}`);
+  const t = (key: string, values?: Record<string, string | number>) => message(presentation.messages, `business.${key}`, values);
   return BUSINESS_SECTIONS.map((section, index) => {
     const card = {
       index: String(index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
@@ -27,7 +27,7 @@ export function buildBusinessHubCards(facts: readonly ClientBusinessFact[], pres
     const last = headline.at(-1)!;
     const value = last.unit === "gel" ? formatAmount(last.value, presentation.locale)
       : last.unit === "persons" ? `${formatInUnit(last.value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandPersons")}`
-      : formatInUnit(last.value, { divisor: 1, label: "", decimals: 0 });
+      : t("cardFirms", { value: formatInUnit(last.value, { divisor: 1, label: "", decimals: 0 }) });
     return { ...card, series: headline.map(f => f.value), seriesColor: INK, footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}` };
   });
 }

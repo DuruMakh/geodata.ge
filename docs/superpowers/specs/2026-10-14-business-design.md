@@ -3,6 +3,14 @@
 Date: 2026-10-14
 Status: Approved by Duru on 2026-10-15. Duru picked business statistics as the next data on 2026-10-14 ("Pick the next data to add to fiscal.ge" card, option Business), chose four pages ("Four pages" card) and approved the page layout with one separate Regions page ("Approve this layout for the Business hub?" card). This document covers both the data foundation and the pages.
 
+**Amended during implementation (2026-10-15).** Where the body below differs, this note and the built pages win:
+
+- The 11 survey regions do not add up to Georgia: they fall short in every year from 2006, and each difference is recorded exactly and never filled (the check in section 9 is corrected below). The region source line states the head-office rule and that shortfall as two separate facts, with no cause given for the shortfall.
+- Firms opened and closed also list Geostat's "Activity not known" row, last under Active, New and Closed firms, so the sections add up to the total; its published rates are not shown.
+- Charts, tables and series lists show amounts in million GEL to one decimal on every business page (Sales, Investment and profit and all area pages, Georgia included), as Geostat prints them, so no small amount reads as "<0.1". The latest-value lines and hub cards keep billion GEL from 1 billion GEL (million GEL below), and the Regions index map and list billion GEL; the billion-GEL examples below describe those.
+- A nested series is named `Parent — Child` outside the list (chart, tooltip, table). Each industry keeps its sector colour under every parent, and each parent's children take their own stroke: the first parent's solid, the second's dashed, the third's dotted.
+- Georgian terms follow Geostat's Georgian metadata, for example «ინვესტიციები ფიქსირებულ აქტივებში» and «აქტიური საწარმოები».
+
 ## 1. Intended result
 
 Fiscal.ge readers should be able to see, year by year, how large Georgia's business sector is, where it sits and how it is doing. They should be able to see how much firms sell, how many people they employ, how much they invest, how much profit and loss they make, and how many firms open and close. Each of these is split by industry and firm size, and by region.
@@ -149,7 +157,7 @@ Rough size: Sales and Jobs about 490 values each; Investment, Profit and Loss ab
 - Validation rejects a changed value, a missing, extra or duplicate observation, a year outside each table's coverage, and any quarterly row. It also checks the following, within rounding:
   - sizes add up to the total every year;
   - industries add up to the total every year where every industry is published;
-  - regions add up to Georgia every year from 2006;
+  - regions are compared with Georgia every year from 2006, and their shortfall (they do not add up) is recorded exactly;
   - for firms, sections and regions add up to the total;
   - every published rate equals births (or deaths) ÷ active × 100;
   - a few anchor values match Geostat: sales 2025 253,725.5 million GEL, jobs 2025 899,026, investment 2025 8,021.8 million GEL, profit 2025 27,936.1, loss 2025 7,152.9, and for 2024 active firms 249,236, births 56,259 and deaths 29,634.

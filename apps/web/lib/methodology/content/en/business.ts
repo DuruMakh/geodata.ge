@@ -124,7 +124,7 @@ export const BUSINESS_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "classification",
       "title": "Values as Geostat publishes them",
       "paragraphs": [
-        "Fiscal.ge calculates nothing on these pages: no net profit, shares, growth rates, totals or filled gaps. Every value is Geostat’s, rounded as Geostat’s files display it: amounts in million GEL to one decimal, persons and firms as whole numbers and rates to one decimal. The pages show amounts in billion GEL and people in thousands, to one decimal, and the pages of smaller regions show million GEL; Excel keeps million GEL and whole persons and firms. A year without a value is a gap in the chart, a dash in the table and an empty Excel cell, never zero. The pages describe the figures and state no causes."
+        "Fiscal.ge calculates nothing on these pages: no net profit, shares, growth rates, totals or filled gaps. Every value is Geostat’s, rounded as Geostat’s files display it: amounts in million GEL to one decimal, persons and firms as whole numbers and rates to one decimal. Amounts are in current lari and not adjusted for inflation, so comparing amounts from different years does not account for price changes. The charts, tables and series lists show amounts in million GEL and people in thousands, to one decimal; the line under a page’s heading shows an amount of 1 billion GEL or more in billion GEL, and the Regions map shows billion GEL. Excel keeps million GEL and whole persons and firms. A year without a value is a gap in the chart, a dash in the table and an empty Excel cell, never zero. The pages describe the figures and state no causes."
       ]
     },
     {
@@ -194,7 +194,7 @@ export const BUSINESS_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "business",
       "title": "Values as Geostat publishes them",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "Fiscal.ge calculates nothing on these pages: no net profit, shares, growth rates, totals or filled gaps. Every value is Geostat’s, rounded as Geostat’s files display it: amounts in million GEL to one decimal, persons and firms as whole numbers and rates to one decimal. The pages show amounts in billion GEL and people in thousands, to one decimal, and the pages of smaller regions show million GEL; Excel keeps million GEL and whole persons and firms. A year without a value is a gap in the chart, a dash in the table and an empty Excel cell, never zero. The pages describe the figures and state no causes.",
+      "summary": "Fiscal.ge calculates nothing on these pages: no net profit, shares, growth rates, totals or filled gaps. Every value is Geostat’s, rounded as Geostat’s files display it: amounts in million GEL to one decimal, persons and firms as whole numbers and rates to one decimal. Amounts are in current lari and not adjusted for inflation, so comparing amounts from different years does not account for price changes. The charts, tables and series lists show amounts in million GEL and people in thousands, to one decimal; the line under a page’s heading shows an amount of 1 billion GEL or more in billion GEL, and the Regions map shows billion GEL. Excel keeps million GEL and whole persons and firms. A year without a value is a gap in the chart, a dash in the table and an empty Excel cell, never zero. The pages describe the figures and state no causes.",
       "detail": [],
       "canonicalDecisionIds": [
         "business.values"

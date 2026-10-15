@@ -51,6 +51,9 @@ describe("FlatSeriesPanel", () => {
     const html = render({ rows: grouped });
     expect(html.match(/data-testid="series-heading"/g) ?? []).toHaveLength(2);
     expect(html).toMatch(/role="presentation"[^>]*>Size<\/p>/);
+    // Each heading names a group holding its rows, so a screen reader announces it.
+    expect(html.match(/role="group" aria-label="Size"[^>]*>.*?<\/p>(.*?)role="group" aria-label="Industry"/)?.[1]).toMatch(/Alpha.*Beta/);
+    expect(html).toMatch(/role="group" aria-label="Industry"[^>]*>.*Gamma/);
     expect(html.indexOf(">Size<")).toBeLessThan(html.indexOf("Alpha"));
     expect(html.indexOf("Beta")).toBeLessThan(html.indexOf(">Industry<"));
     expect(html.indexOf(">Industry<")).toBeLessThan(html.indexOf("Gamma"));

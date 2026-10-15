@@ -12,20 +12,27 @@ import { SeriesAside } from "./series-aside";
 export type FlatSeriesRow = { id: string; label: string; color: string; value: string; searchTerms?: string[]; parentId?: string; heading?: string };
 
 /**
- * The listed rows with each `heading` label before the first of its rows: a muted caption, not a checkbox. A heading
- * whose rows a search hides lists nothing, so its label is left out too. Rows without a heading render as they always have.
+ * The listed rows with each `heading` label before the first of its rows: a muted caption, not a checkbox. The label and
+ * its listed rows form a group named after the label (as nested rows form one named after their parent), so a screen
+ * reader announces the heading. A heading whose rows a search hides lists nothing, so its label is left out too. Rows
+ * without a heading render as they always have.
  */
 function withHeadings(entries: { row: FlatSeriesRow; node: ReactNode }[]): ReactNode[] {
-  let current: string | undefined;
-  return entries.flatMap(({ row, node }, index) => {
+  const listed: ReactNode[] = [];
+  for (let index = 0; index < entries.length; index += 1) {
+    const { row, node } = entries[index];
     // A hidden row stays an empty slot, so a list without headings keeps its children (and their ids) as they were.
-    if (node === null) return [node];
-    const label = row.heading && row.heading !== current
-      ? <p key={`heading-${index}`} role="presentation" data-testid="series-heading" className="mt-3 mb-1 px-0.5 text-[11px] text-[var(--muted)]">{row.heading}</p>
-      : null;
-    current = row.heading;
-    return label ? [label, node] : [node];
-  });
+    if (!row.heading) { listed.push(node); continue; }
+    let last = index;
+    while (last + 1 < entries.length && entries[last + 1].row.heading === row.heading) last += 1;
+    const shown = entries.slice(index, last + 1).map((entry) => entry.node).filter((item) => item !== null);
+    if (shown.length) listed.push(<div key={`heading-${index}`} role="group" aria-label={row.heading} data-testid="series-heading-group">
+      <p role="presentation" data-testid="series-heading" className="mt-3 mb-1 px-0.5 text-[11px] text-[var(--muted)]">{row.heading}</p>
+      {shown}
+    </div>);
+    index = last;
+  }
+  return listed;
 }
 
 /**

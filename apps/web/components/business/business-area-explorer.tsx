@@ -4,10 +4,10 @@ import { Building2, ChevronDown, Users } from "lucide-react";
 import { useCallback, useId, useRef, useState, type ReactNode } from "react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { BUSINESS_AREA_MEASURES, BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaOfMapId, businessAreaSeries, businessMapId, businessRegionHref, changeBusinessAreaMeasure, parseBusinessAreaHash, serializeBusinessAreaHash, type BusinessArea, type BusinessAreaMeasure } from "../../lib/explorer/businessAreas";
+import { BUSINESS_AREA_MEASURES, BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaOfMapId, businessMapId, businessRegionHref, changeBusinessAreaMeasure, parseBusinessAreaHash, serializeBusinessAreaHash, type BusinessArea, type BusinessAreaMeasure } from "../../lib/explorer/businessAreas";
 import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
-import { formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
+import { formatAmount, formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
@@ -55,14 +55,10 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   const pickerTrigger = useRef<HTMLButtonElement>(null);
   useRefocusAfterPick(pickerTrigger, "region-picker-trigger");
   const model = buildBusinessAreaModel(area, facts, state);
-  // Amounts are in billion GEL to one decimal when the area's largest amount reaches a billion, otherwise in million GEL
-  // to one decimal; the latest line uses the same unit. People are in thousands, firms whole numbers.
-  const moneyIds = new Set<string>(businessAreaSeries(area, "money").map(series => series.id));
-  const inBillions = facts.some(f => moneyIds.has(f.indicatorId) && Math.abs(f.value) >= 1e9);
-  const moneyUnit: ValueUnit = { ...unitsFor(locale)[inBillions ? "bn" : "mln"], decimals: 1 };
-  const moneyLabel = message(messages, inBillions ? "format.bnGel" : "format.mlnGel");
-  const unit: ValueUnit = model.unit === "gel" ? moneyUnit : model.unit === "persons" ? thousandsUnit(locale) : { divisor: 1, label: "", decimals: 0 };
-  const unitLabel = { gel: moneyLabel, persons: t("unitThousandPeople"), enterprises: t("unitFirms"), percent: t("unitPercent") }[model.unit];
+  // Amounts are in million GEL to one decimal (as Geostat prints them) on every area, Georgia included; people are in
+  // thousands, firms whole numbers. The latest line reads as the site's amounts do (billion GEL from a billion).
+  const unit: ValueUnit = model.unit === "gel" ? { ...unitsFor(locale).mln, decimals: 1 } : model.unit === "persons" ? thousandsUnit(locale) : { divisor: 1, label: "", decimals: 0 };
+  const unitLabel = { gel: message(messages, "format.mlnGel"), persons: t("unitThousandPeople"), enterprises: t("unitFirms"), percent: t("unitPercent") }[model.unit];
   const format = (value: number | null | undefined) => formatInUnit(value, unit);
   const valueLabel = (value: number | null | undefined) => value == null ? "—" : `${format(value)} ${unitLabel}`;
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
@@ -94,7 +90,7 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
         previous={{ href: pageHref(areaHref(neighbours.previous.id), locale), label: nameOf(neighbours.previous.id) }}
         next={{ href: pageHref(areaHref(neighbours.next.id), locale), label: nameOf(neighbours.next.id) }} />
     </div>
-    <LatestValueLine testId="business-latest" measure={t("latest.area")} period={latest.year} value={`${formatInUnit(latest.value, moneyUnit)} ${moneyLabel}`} note={areaName} />
+    <LatestValueLine testId="business-latest" measure={t("latest.area")} period={latest.year} value={formatAmount(latest.value, locale)} note={areaName} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={area} data-unit={model.unit} data-measure={state.measure} className="border-t border-[var(--ink)] pt-4">

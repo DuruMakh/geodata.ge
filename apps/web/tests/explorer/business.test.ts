@@ -152,6 +152,24 @@ test("an industry wears its economic-sector colour under every parent; the unkno
   expect(color("sales", "main", "business.turnover.total")).toBe(INK);
 });
 
+test("the same industry under two parents keeps its colour but not its stroke: each parent's children take their own", () => {
+  const stroke = (section: BusinessTopicId, view: "main" | "count" | "rate", id: string) => {
+    const model = buildBusinessModel(section, facts, { ...defaultBusinessState(section), view });
+    const series = model.series.find(s => s.id === id)!;
+    return { color: series.color, stroke: series.stroke };
+  };
+  const construction = ["investment", "profit", "loss"].map(measure => stroke("investment-profit", "main", `business.${measure}.sector_f`));
+  expect(new Set(construction.map(s => s.color)).size).toBe(1);
+  expect(construction.map(s => s.stroke)).toEqual(["solid", "dashed", "dotted"]);
+  const manufacturing = ["active", "births", "deaths"].map(measure => stroke("firms", "count", `business.${measure}.sector_c`));
+  expect(new Set(manufacturing.map(s => s.color)).size).toBe(1);
+  expect(manufacturing.map(s => s.stroke)).toEqual(["solid", "dashed", "dotted"]);
+  expect(["birth_rate", "death_rate"].map(measure => stroke("firms", "rate", `business.${measure}.sector_c`).stroke)).toEqual(["solid", "dashed"]);
+  // Totals and the flat Sales and Jobs lists stay solid.
+  expect(stroke("firms", "count", "business.deaths.total").stroke).toBe("solid");
+  expect(buildBusinessModel("sales", facts, defaultBusinessState("sales")).series.every(s => s.stroke === "solid")).toBe(true);
+});
+
 test("in every list, only the same industry or size under two parents shares a colour", () => {
   /** What a series is: an industry or size is the same line of thought under every parent; anything else is itself. */
   const identity = (id: string) => { const group = id.split(".")[2]; return /^(sector|size)_/.test(group) ? group : id; };
@@ -256,7 +274,7 @@ test("the regions map ranks the eleven regions by the latest complete year", () 
 // The catalogue keys Task 6 adds; the tests hand them over directly.
 const TEST_MESSAGES = {
   "business.unitMlnGel": "million GEL", "business.unitPersons": "persons", "business.unitFirms": "firms", "business.unitPercent": "%", "business.unitThousandPersons": "thousand",
-  "business.status.official": "Official",
+  "business.status.official": "Official", "business.cardFirms": "{value} new firms",
   "business.page.sales.summary": "sales", "business.page.jobs.summary": "jobs", "business.page.investment-profit.summary": "investment", "business.page.firms.summary": "firms", "business.page.regions.summary": "regions",
   "common.businessSales": "Sales", "common.businessJobs": "Jobs", "common.businessInvestmentProfit": "Investment and profit", "common.businessFirms": "New and closed firms", "common.businessRegions": "Regions",
 };
@@ -362,7 +380,7 @@ test("the hub has five cards: four headline series with their latest values and 
   const cards = buildBusinessHubCards(facts, await presentation());
   expect(cards.map(card => card.href)).toEqual(BUSINESS_SECTIONS.map(section => section.href));
   expect(cards.map(card => card.title)).toEqual(["Sales", "Jobs", "Investment and profit", "New and closed firms", "Regions"]);
-  expect(cards.map(card => card.footer)).toEqual(["2025 · 253.7 bn GEL · 1999–2025", "2025 · 899.0 thousand · 1999–2025", "2025 · 8.0 bn GEL · 2006–2025", "2024 · 56,259 · 2014–2024", "2006–2025"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 253.7 bn GEL · 1999–2025", "2025 · 899.0 thousand · 1999–2025", "2025 · 8.0 bn GEL · 2006–2025", "2024 · 56,259 new firms · 2014–2024", "2006–2025"]);
   expect(cards.map(card => card.series?.length ?? null)).toEqual([27, 27, 20, 11, null]);
   expect(cards[0].series!.at(-1)).toBe(253725500000);
   expect(cards[4]).toMatchObject({ series: null, seriesColor: null, comingSoon: false });

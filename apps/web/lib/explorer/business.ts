@@ -134,7 +134,14 @@ export function changeBusinessView(state: BusinessState, section: BusinessTopicI
   return { ...state, view, selectedIds: selectedIds.length ? selectedIds : businessDefaultSelection(section, view), range: refitRange(state.range, businessCoverage(section, view, facts), { collapseToAll: false }) };
 }
 
-export type BusinessSeriesModel = TopicSeriesModel<BusinessSeriesDefinition & { decimals: number }>;
+/**
+ * A nested series' line pattern. An industry wears its sector colour under every parent, so each parent's children take
+ * their own stroke instead: the first parent's solid, the second's dashed, the third's dotted. Top-level rows are solid.
+ */
+export type BusinessStroke = "solid" | "dashed" | "dotted";
+const STROKES: readonly BusinessStroke[] = ["solid", "dashed", "dotted"];
+
+export type BusinessSeriesModel = TopicSeriesModel<BusinessSeriesDefinition & { decimals: number; stroke: BusinessStroke }>;
 export type BusinessModel = { range: ResolvedPeriodRange; years: number[]; series: BusinessSeriesModel[]; selected: BusinessSeriesModel[]; unit: ClientBusinessFact["unit"] };
 
 /**
@@ -144,9 +151,11 @@ export type BusinessModel = { range: ResolvedPeriodRange; years: number[]; serie
 export function buildBusinessSeriesModel(definitions: readonly BusinessSeriesDefinition[], coverage: ReturnType<typeof topicCoverage>, facts: readonly ClientBusinessFact[], state: TopicState): BusinessModel {
   const byCell = new Map(facts.map(f => [businessFactKey(f), f]));
   const first = (id: string) => facts.find(f => f.indicatorId === id);
+  const parents = [...new Set(definitions.flatMap(definition => definition.parentId ?? []))];
   return {
     ...buildTopicModel({ range: state.range, coverage, selectedIds: state.selectedIds, color: businessSeriesColor,
-      definitions: definitions.map(definition => ({ ...definition, decimals: first(definition.id)?.decimals ?? 0 })),
+      definitions: definitions.map(definition => ({ ...definition, decimals: first(definition.id)?.decimals ?? 0,
+        stroke: definition.parentId ? STROKES[parents.indexOf(definition.parentId)] : "solid" })),
       value: (definition, year) => byCell.get(businessFactKey({ indicatorId: definition.id, year }))?.value }),
     unit: first(definitions[0].id)!.unit,
   };
