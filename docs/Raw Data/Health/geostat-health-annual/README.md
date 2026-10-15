@@ -9,7 +9,7 @@ All were retrieved on 2026-10-15 from Geostat, the National Statistics Office of
 - **Healthcare page** (`https://www.geostat.ge/en/modules/categories/54`): 21 workbooks in `official/`, capture `official/health-page.html` (`geostat_health_page`).
 - **Deaths page** (`https://www.geostat.ge/en/modules/categories/320`): 13 workbooks in `official/deaths/`, capture `official/deaths-page.html` (`geostat_deaths_page`).
 
-Every workbook has one sheet, named `1`. Eleven are served; the other 23 are archived for provenance and no value is read from them, each under the ID `geostat_health_<file stem>` or `geostat_deaths_<file stem>` (lower case, every run of other characters becomes `_`).
+Every workbook has one sheet, named `1`, except the archived-only `deaths/23-4-deaths-by-chapters-age-sex.xlsx` and `deaths/23-5-deaths-by-causes-age-sex.xlsx`, which have one sheet per year, named `2014` to `2025`. Eleven are served; the other 23 are archived for provenance and no value is read from them, each under the ID `geostat_health_<file stem>` or `geostat_deaths_<file stem>` (lower case, every run of other characters becomes `_`).
 
 | Source ID | Local file | Served |
 | --- | --- | --- |
@@ -21,7 +21,7 @@ Every workbook has one sheet, named `1`. Eleven are served; the other 23 are arc
 | `geostat_deaths_by_cause_region` | `deaths/23-2-deaths-by-chapters-regions.xlsx` | deaths by ICD-10 chapter, Georgia and 11 regions, 2014-2025 |
 | `geostat_death_rate_region` | `deaths/24-1-Crude-death-rate-by-regions.xlsx` | crude death rate per 1,000, Georgia and 11 regions, 2014-2025 |
 
-Archived only: abortions, emergency care, children's illnesses, infectious diseases by type, circulatory and respiratory systems (2020+), medicines, disability programmes, cancer screening, deaths by sex, urban/rural, age and cause, maternal, infant, under-5 and suicide tables. The 1994-2013 columns of the death-rate table are in the archived workbook but are not served: Geostat says they are retro-projections and registered data start in 2014, which is also where the causes of death start.
+Archived only: abortions, emergency care, children's illnesses, infectious diseases by type, circulatory and respiratory systems (2020+), medicines, disability programmes, cancer screening, deaths by sex, urban/rural, age and cause, maternal, infant, under-5 and suicide tables. The 1994-2013 columns of the death-rate table are in the archived workbook but are not served: Geostat marks 1995-2013 as retro-projections and says registered data start in 2014, which is also where the causes of death start.
 
 ## Outputs
 
@@ -99,7 +99,7 @@ python3 -B prepare.py --check && python3 -B -m unittest test_validation -v && no
 
 ## Footnotes Geostat prints under the served tables
 
-Quoted as printed (spelling and all, with spaces collapsed). Every table also carries the line "Source: Ministry of Internally Displaced Persons From The Occupied Territories, Labour, Health and Social Affairs of Georgia, National Center for Disease Control and Public Health." (the 23-2 table says "from the Occupied Territories ... Levan Sakvarelidze National Center for Disease Control and Public Health").
+Quoted as printed (spelling and all, with spaces collapsed). The nine served healthcare tables also carry the line "Source: Ministry of Internally Displaced Persons From The Occupied Territories, Labour, Health and Social Affairs of Georgia, National Center for Disease Control and Public Health." The 23-2 table prints a different line (cell `A258`): "Source: Ministry of Internally Displaced Persons from the Occupied Territories, Labour, Health and Social Affairs of Georgia, Levan Sakvarelidze National Center for Disease Control and Public Health". The 24-1 death-rate table prints no source line.
 
 - **Physicians** (title "Number of physicians by occupations (Main staff) (persons)"):
   - "Notice: In 2012 the health care human resources definitions were revised and classified in accordance with International Standard Classification of Occupations (ISCO-08)."
@@ -131,4 +131,4 @@ Quoted as printed (spelling and all, with spaces collapsed). Every table also ca
   - "Note: 1995-2013 based on the retro-projection; starting from 2014 based on the registered data"
   - "- Occupied territories"
 
-**1994-2013 death rates are retro-projections and are not served.** Fiscal.ge serves the death rate and the causes of death from 2014, the first year of registered data.
+**1994-2013 death rates are not served** (Geostat marks 1995-2013 as retro-projections). Fiscal.ge serves the death rate and the causes of death from 2014, the first year of registered data.
