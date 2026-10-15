@@ -1,6 +1,7 @@
+import ExcelJS from "exceljs";
 import { beforeAll, describe, expect, test } from "vitest";
 import { loadServedHealthData, toClientHealthFact } from "../../lib/data/health/importHealth";
-import { HEALTH_AREAS, HEALTH_INDICATORS, type ClientHealthFact, type HealthSeriesBreak } from "../../lib/data/health/types";
+import { HEALTH_AREAS, HEALTH_INDICATORS, HEALTH_SOURCES, type ClientHealthFact, type HealthSeriesBreak } from "../../lib/data/health/types";
 import { INK } from "../../lib/explorer/colors";
 import {
   HEALTH_HUB_PATH, HEALTH_SECTIONS, buildHealthModel, changeHealthView, defaultHealthState, healthCoverage, healthDefaultSelection, healthDisplay, healthSeriesColor,
@@ -10,6 +11,11 @@ import {
   HEALTH_DEATH_AREAS, buildHealthDeathRateMapModel, buildHealthDeathsModel, defaultHealthDeathsState, healthDeathsAreaForSlug, healthDeathsAreaHref, healthDeathsSeries,
   parseHealthDeathsHash, serializeHealthDeathsHash,
 } from "../../lib/explorer/healthDeaths";
+import { buildHealthHubCards } from "../../lib/explorer/healthHubCards";
+import { buildHealthWorkbookExportModel } from "../../lib/explorer/healthWorkbook";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Locale, Presentation } from "../../lib/i18n/types";
 
 let facts: ClientHealthFact[];
 let breaks: HealthSeriesBreak[];
@@ -266,5 +272,137 @@ describe("causes of death", () => {
     expect(map.regions.map(r => r.rank)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     expect(map.regions.map(r => r.value)).toEqual([...map.regions.map(r => r.value)].sort((a, b) => b - a));
     expect(map.firstYear).toBe(2014);
+  });
+});
+
+// The health message namespace arrives with the copy (Task 6); these are the keys the workbook and the cards read.
+const COPY: Record<Locale, Record<string, string>> = {
+  en: {
+    "health.series": "Series", "health.value": "Value", "health.unit": "Unit", "health.thousand": "thousand",
+    "health.unitPersons": "persons", "health.unitThousandPersons": "thousand persons", "health.unitUnits": "units", "health.unitThousandBeds": "thousand beds",
+    "health.unitThousandVisits": "thousand visits", "health.unitPerThousand": "per 1,000 population",
+    "common.healthDoctorsHospitals": "Doctors and hospitals", "common.healthIllnesses": "Illnesses", "common.healthCausesOfDeath": "Causes of death",
+    ...Object.fromEntries(HEALTH_SECTIONS.map(({ id }) => [`health.page.${id}.summary`, `${id} summary`])),
+  },
+  ka: {
+    "health.series": "სერია", "health.value": "მნიშვნელობა", "health.unit": "ერთეული", "health.thousand": "ათასი",
+    "health.unitPersons": "პირი", "health.unitThousandPersons": "ათასი პირი", "health.unitUnits": "ერთეული", "health.unitThousandBeds": "ათასი საწოლი",
+    "health.unitThousandVisits": "ათასი ვიზიტი", "health.unitPerThousand": "1000 მოსახლეზე",
+    "common.healthDoctorsHospitals": "ექიმები და საავადმყოფოები", "common.healthIllnesses": "დაავადებები", "common.healthCausesOfDeath": "სიკვდილის მიზეზები",
+    ...Object.fromEntries(HEALTH_SECTIONS.map(({ id }) => [`health.page.${id}.summary`, `${id} აღწერა`])),
+  },
+};
+const presentationFor = async (locale: Locale): Promise<Presentation> => ({ locale, englishLabels: {}, messages: { ...(await getMessages(locale, ["workbook", "format"])), ...COPY[locale] } });
+const sourceFor = (sourceId: string) => ({
+  sourceId, years: Array.from({ length: 24 }, (_, i) => 2002 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-15",
+  downloadHref: `/downloads/methodology/health/files/${sourceId}.xlsx` as const,
+});
+const SOURCES = HEALTH_SOURCES.map(sourceFor);
+const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
+const LABELS: Record<string, string> = { "health.staff.nurses": "Nurses", "health.staff.nurses_doctor_assistants": "Doctor's assistants", "health.facilities.beds": "Hospital beds", "health.deaths.total": "All deaths" };
+
+describe("Excel workbooks", () => {
+  test("a staff workbook keeps the published persons, and a group that stopped in 2011 is blank afterwards", async () => {
+    const model = buildHealthWorkbookExportModel({
+      section: "doctors-hospitals", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Doctors and hospitals",
+      state: withIds("doctors-hospitals", "staff", ["health.staff.nurses", "health.staff.nurses_doctor_assistants"], { kind: "manual", start: 2002, end: 2025 }),
+    }, await presentationFor("en"));
+    expect(model.filename).toBe("fiscal-health-doctors-hospitals-2002-2025-en.xlsx");
+    expect(model.readable.years).toHaveLength(24);
+    expect(model.readable.rows.map(row => row.label)).toEqual(["Nurses", "Doctor's assistants"]);
+    const [nurses, assistants] = model.readable.rows;
+    expect(nurses.valuesByYear[2025]).toBe(21262);
+    expect(Object.values(nurses.valuesByYear).every(value => value !== null)).toBe(true);
+    expect(assistants.valuesByYear[2011]).toEqual(expect.any(Number));
+    for (let year = 2012; year <= 2025; year++) expect(assistants.valuesByYear[year], String(year)).toBeNull();
+    const analysis = model.analysis;
+    expect(analysis.headers).toEqual(["Year", "Series", "Value", "Unit", "Status"]);
+    expect(analysis.rows).toHaveLength(48);
+    expect(analysis.rows.find(r => r[0] === 2025 && r[1] === "Nurses")).toEqual([2025, "Nurses", 21262, "persons", "Published"]);
+    expect(analysis.rows.find(r => r[0] === 2025 && r[1] === "Doctor's assistants")).toEqual([2025, "Doctor's assistants", null, "persons", "Not available"]);
+    expect(model.sources.map(source => source.title)).toEqual(["geostat_health_nurses"]);
+    const sheet = (await loadWorkbook(model)).getWorksheet(model.sheetNames[1])!;
+    const rowOf = (year: number, label: string) => analysis.rows.findIndex(r => r[0] === year && r[1] === label) + 2;
+    expect(sheet.getCell(rowOf(2025, "Nurses"), 3).value).toBe(21262);
+    expect(sheet.getCell(rowOf(2025, "Nurses"), 3).numFmt).toBe("#,##0");
+    expect(sheet.getCell(rowOf(2025, "Doctor's assistants"), 3).value).toBeNull();
+    const summary = (await loadWorkbook(model)).getWorksheet(model.sheetNames[0])!;
+    expect(summary.getCell(5, 2 + 23).value).toBeNull();
+  });
+
+  test("a beds workbook exports the thousands as published, to the decimals each year is published with", async () => {
+    const model = buildHealthWorkbookExportModel({
+      section: "doctors-hospitals", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Doctors and hospitals",
+      state: withIds("doctors-hospitals", "beds", ["health.facilities.beds"], { kind: "manual", start: 2024, end: 2025 }),
+    }, await presentationFor("en"));
+    expect(model.filename).toBe("fiscal-health-doctors-hospitals-beds-2024-2025-en.xlsx");
+    const beds2025 = facts.find(f => f.indicatorId === "health.facilities.beds" && f.year === 2025)!;
+    expect(beds2025.value).toBe(15.232);
+    expect(model.analysis.rows.find(r => r[0] === 2025)).toEqual([2025, "Hospital beds", 15.232, "thousand beds", "Published"]);
+    const sheet = (await loadWorkbook(model)).getWorksheet(model.sheetNames[1])!;
+    for (const year of [2024, 2025]) {
+      const fact = facts.find(f => f.indicatorId === "health.facilities.beds" && f.year === year)!;
+      const row = model.analysis.rows.findIndex(r => r[0] === year) + 2;
+      expect(sheet.getCell(row, 3).numFmt, String(year)).toBe(fact.decimals === 0 ? "#,##0" : `#,##0.${"0".repeat(fact.decimals)}`);
+    }
+    expect(sheet.getCell(model.analysis.rows.findIndex(r => r[0] === 2025) + 2, 3).numFmt).toBe("#,##0.000");
+    expect(model.readable.rows[0].numberFormat).toBe("#,##0.000");
+  });
+
+  test("illnesses keep each disease in its stored unit, and the unit column says which", async () => {
+    const model = buildHealthWorkbookExportModel({
+      section: "illnesses", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", title: "Illnesses",
+      labels: { "health.illness.respiratory": "Respiratory", "health.illness.tuberculosis": "Tuberculosis" },
+      state: withIds("illnesses", "main", ["health.illness.respiratory", "health.illness.tuberculosis"], { kind: "manual", start: 2025, end: 2025 }),
+    }, await presentationFor("en"));
+    expect(model.filename).toBe("fiscal-health-illnesses-2025-2025-en.xlsx");
+    expect(model.analysis.rows.map(r => r.slice(1, 4))).toEqual([
+      ["Respiratory", 500.359, "thousand persons"],
+      ["Tuberculosis", facts.find(f => f.indicatorId === "health.illness.tuberculosis" && f.year === 2025)!.value, "persons"],
+    ]);
+    const sheet = (await loadWorkbook(model)).getWorksheet(model.sheetNames[1])!;
+    expect(sheet.getCell(2, 3).numFmt).toBe("#,##0.000");
+    expect(sheet.getCell(3, 3).numFmt).toBe("#,##0");
+  });
+
+  test("an area workbook names the area in its file and cites only the 23-2 workbook", async () => {
+    const model = buildHealthWorkbookExportModel({
+      section: "causes-of-death", area: "region.guria", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Guria",
+      state: defaultHealthDeathsState(),
+    }, await presentationFor("en"));
+    expect(model.filename).toBe("fiscal-health-causes-of-death-guria-2014-2025-en.xlsx");
+    expect(model.readable.years).toHaveLength(12);
+    expect(model.analysis.rows[0]).toEqual([2014, "All deaths", expect.any(Number), "persons", "Published"]);
+    expect(model.sources).toHaveLength(1);
+    expect(model.sources[0].title).toBe("geostat_deaths_by_cause_region");
+    expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/health/files/geostat_deaths_by_cause_region.xlsx");
+    const ka = buildHealthWorkbookExportModel({
+      section: "causes-of-death", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Georgia", state: defaultHealthDeathsState(),
+    }, await presentationFor("ka"));
+    expect(ka.filename).toBe("fiscal-health-causes-of-death-georgia-2014-2025.xlsx");
+    expect(ka.analysis.rows.at(-1)).toEqual([2025, "All deaths", 44319, "პირი", "გამოქვეყნებული"]);
+  });
+
+  test("a source the facts cite but the list lacks is an error", async () => {
+    const presentation = await presentationFor("en");
+    expect(() => buildHealthWorkbookExportModel({
+      section: "doctors-hospitals", facts, sources: [], siteOrigin: "https://fiscal.ge", labels: LABELS, title: "x", state: defaultHealthState("doctors-hospitals", facts),
+    }, presentation)).toThrow(/geostat_health_physicians/);
+  });
+});
+
+describe("hub cards", () => {
+  test("three cards with sparklines and the latest published values", async () => {
+    const cards = buildHealthHubCards(facts, await presentationFor("en"));
+    expect(cards.map(card => card.href)).toEqual(HEALTH_SECTIONS.map(s => s.href));
+    expect(cards.map(card => card.index)).toEqual(["01", "02", "03"]);
+    expect(cards.map(card => card.title)).toEqual(["Doctors and hospitals", "Illnesses", "Causes of death"]);
+    expect(cards.map(card => card.description)).toEqual(HEALTH_SECTIONS.map(s => `${s.id} summary`));
+    expect(cards.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 thousand · 2002–2025", "2025 · 44,319 · 2014–2025"]);
+    expect(cards.map(card => card.series?.length)).toEqual([24, 24, 12]);
+    expect(cards.map(card => card.series!.at(-1))).toEqual([22491, 500.359, 44319]);
+    expect(cards.every(card => card.comingSoon === false && card.seriesColor === INK)).toBe(true);
+    const ka = buildHealthHubCards(facts, await presentationFor("ka"));
+    expect(ka.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 ათასი · 2002–2025", "2025 · 44,319 · 2014–2025"]);
   });
 });
