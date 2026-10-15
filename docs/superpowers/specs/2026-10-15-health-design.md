@@ -142,8 +142,8 @@ Rough size: staff about 530 values, facilities about 100, illnesses about 590, d
 - **Prepare script.** `npm run data:prepare-health` writes `data/imports/health-annual.csv` (UTF-8 with BOM) and `data/reports/health-validation.json`. With `--check` it reproduces both byte for byte, and it runs inside `data:validate`.
 - **Row contents.** Each row keeps:
   - the exact workbook value at its stored precision (the death-rate cells hold unrounded values such as 11.2605…);
-  - the area (`country.georgia` or an existing `region.*` ID);
-  - the unit (`persons`, `persons_thousand`, `units`, `visits_thousand` or `per_1000_population`);
+  - the area (`georgia` or an existing `region.*` ID, as Living standards uses);
+  - the unit, as Geostat prints it (`persons`, `persons_thousand`, `units`, `units_thousand` for beds, `visits_thousand` or `per_1000_population`);
   - `basis=actual` and value status `official`;
   - the source ID, sheet and cell.
 - **Stable IDs.** They are lowercase and follow `health.{topic}.{item}`, for example `health.staff.doctors`, `health.staff.doctors_surgeons`, `health.facilities.hospitals`, `health.facilities.beds`, `health.visits.outpatient`, `health.illness.respiratory`, `health.illness.tuberculosis`, `health.deaths.total`, `health.deaths.circulatory`, `health.deaths.covid19` and `health.death_rate.total`.
