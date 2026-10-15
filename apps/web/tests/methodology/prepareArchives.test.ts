@@ -95,6 +95,7 @@ async function createFixtureRepository() {
     "external-flows": [
       await writeReviewedSource(repositoryRoot, "external-flows", "2000-2025", "docs/Raw Data/External/2026-10-10/official/nbg/REMC_money-transfers-by-countries-eng.xlsx", "downloads/methodology/external-flows/files/remc_money-transfers-by-countries-eng.xlsx", "external-remc"),
       await writeReviewedSource(repositoryRoot, "external-flows", "1996-2025", "docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-countries.xlsx", "downloads/methodology/external-flows/files/fdi_eng-countries.xlsx", "external-fdi-countries"),
+      await writeReviewedSource(repositoryRoot, "external-flows", "2006-2026", "docs/Raw Data/External/nbg-external-position/official/edbpm6eng.xlsx", "downloads/methodology/external-flows/files/edbpm6eng.xlsx", "external-debt"),
     ],
     unemployment: [await writeReviewedSource(repositoryRoot, "unemployment", "2010-2025", "docs/Raw Data/Unemployment/geostat-labour-force-annual/official/lfs.xlsx", "downloads/methodology/unemployment/files/lfs.xlsx", "lfs")],
     "economic-sectors": [await writeReviewedSource(repositoryRoot,"economic-sectors","2011-2025","docs/Raw Data/Economy/economic-sectors/sources/growth.xlsx","downloads/methodology/economic-sectors/files/growth.xlsx","sector-growth")],

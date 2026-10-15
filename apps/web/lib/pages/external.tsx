@@ -1,5 +1,6 @@
 import path from "node:path";
 import { CurrentAccount } from "../../components/external/current-account";
+import { ExternalPositionExplorer } from "../../components/external/external-position";
 import { ForeignInvestment } from "../../components/external/foreign-investment";
 import { MoneyFromAbroad } from "../../components/external/money-from-abroad";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
@@ -10,11 +11,13 @@ import { loadServedCurrentAccountFacts, toClientCurrentAccountFacts } from "../d
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedForeignInvestmentData, toClientForeignInvestmentData } from "../data/externalFlows/importForeignInvestment";
 import { loadServedMoneyTransfersData, toClientMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
+import { loadServedExternalPositionData, toClientExternalPositionFact } from "../data/externalPosition/importExternalPosition";
 import { packFacts } from "../data/packedFacts";
 import { CURRENT_ACCOUNT_SERIES, CURRENT_ACCOUNT_SOURCE, FOREIGN_INVESTMENT_SOURCES, MONEY_TRANSFER_SOURCES } from "../data/externalFlows/types";
 import { moneyTransfersCoverage } from "../explorer/moneyTransfersState";
 import { foreignInvestmentCoverage } from "../explorer/foreignInvestmentState";
 import { currentAccountCoverage } from "../explorer/currentAccountState";
+import { EXTERNAL_POSITION_SECTIONS, externalPositionCoverage, externalPositionSeries, type ExternalPositionSectionId } from "../explorer/externalPosition";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -24,11 +27,15 @@ import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
-import { loadGdpWorkbookSources, projectWorkbookSources } from "../methodology/workbookSources";
+import { loadGdpWorkbookSources, loadSourcedWorkbookSources, projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { publicLabel } from "../i18n/labels";
 import { resolveSiteUrl } from "../siteUrl";
+
+/** The nominal GDP in US dollars, as the % of GDP views divide by it. */
+const nominalGdpUsd = (gdpFacts: readonly { seriesId: string; year: number; value: number; status: string }[]) =>
+  gdpFacts.filter(fact => fact.seriesId === "nominal_usd").map(fact => ({ year: fact.year, valueUsd: fact.value, preliminary: fact.status === "preliminary" }));
 
 async function loadClientMoneyTransfers() {
   const data = await loadServedMoneyTransfersData();
@@ -125,7 +132,7 @@ export async function renderCurrentAccountPage(locale: Locale) {
   const { min, max } = currentAccountCoverage(client);
   const sourceId = CURRENT_ACCOUNT_SOURCE.replace(/^source\./, "");
   const sources = projectWorkbookSources(manifest.filter(row => row.source_id === sourceId), locale, catalogue.documents);
-  const gdp = gdpFacts.filter(fact => fact.seriesId === "nominal_usd").map(fact => ({ year: fact.year, valueUsd: fact.value, preliminary: fact.status === "preliminary" }));
+  const gdp = nominalGdpUsd(gdpFacts);
   const lastReviewedAt = facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("account.title") }];
@@ -140,6 +147,54 @@ export async function renderCurrentAccountPage(locale: Locale) {
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <CurrentAccount facts={client} gdp={gdp} sources={sources} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+    </ExplorerPage>
+  </I18nProvider>;
+}
+
+const positionKey = (section: ExternalPositionSectionId) => section === "foreign-debt" ? "debt" : "reserves";
+const positionHref = (section: ExternalPositionSectionId) => EXTERNAL_POSITION_SECTIONS.find(item => item.id === section)!.href;
+
+/** One page's observations (the dataset serves both pages' indicators) and its years, which the amounts view spans. */
+async function loadClientExternalPosition(section: ExternalPositionSectionId) {
+  const { facts } = await loadServedExternalPositionData();
+  const ids = new Set<string>(externalPositionSeries(section).map(series => series.id));
+  const pageFacts = facts.filter(fact => ids.has(fact.indicatorId));
+  const client = pageFacts.map(toClientExternalPositionFact);
+  const { min, max } = externalPositionCoverage(section, "amount", client, []);
+  return { facts: pageFacts, client, min, max };
+}
+
+export async function externalPositionMetadata(locale: Locale, section: ExternalPositionSectionId) {
+  const key = positionKey(section);
+  const [{ min, max }, messages] = await Promise.all([loadClientExternalPosition(section), getMessages(locale, ["external"])]);
+  return fiscalMetadata({ locale, path: positionHref(section), title: message(messages, `external.${key}.metaTitle`), description: `${message(messages, `external.${key}.summary`)} ${min}–${max}.` });
+}
+
+export async function renderExternalPositionPage(locale: Locale, section: ExternalPositionSectionId) {
+  const key = positionKey(section), href = positionHref(section);
+  // The % of GDP view divides by the nominal GDP Current account uses, and its Excel cites the same Geostat files.
+  const [{ facts, client, min, max }, { facts: gdpFacts }, gdpSources, sources, presentation] = await Promise.all([
+    loadClientExternalPosition(section), loadServedGdpOverviewData(), loadGdpWorkbookSources(locale), loadSourcedWorkbookSources("external-flows", locale),
+    getPresentation(locale, ["external", "main", "format", "workbook"], []),
+  ]);
+  const gdp = nominalGdpUsd(gdpFacts);
+  // The workbook cites only the files these observations come from.
+  const sourceIds = new Set(client.map(fact => fact.sourceId));
+  const labels = Object.fromEntries(externalPositionSeries(section).map(series => [series.id, message(presentation.messages, `external.${key}.series.${series.id}`)]));
+  const lastReviewedAt = facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
+  const t = (suffix: string) => message(presentation.messages, `external.${suffix}`);
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t(`${key}.title`) }];
+  return <I18nProvider {...clientPresentation(presentation)}>
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: href, datasetId: "external-flows", name: t(`${key}.title`), description: t(`${key}.summary`), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      variableMeasured: Object.values(labels),
+      // The NBG's statistics; the % of GDP view divides by Geostat's GDP.
+      sources: ["nbg", "geostat"],
+    })} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t(`${key}.title`), path: pageHref(href, locale) }]} />
+    <ExplorerPage containerQueries={false}>
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
+      <ExternalPositionExplorer key={section} section={section} facts={client} labels={labels} sources={sources.filter(source => sourceIds.has(source.sourceId))} gdp={gdp} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

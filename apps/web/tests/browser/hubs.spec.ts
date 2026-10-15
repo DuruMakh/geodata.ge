@@ -81,13 +81,13 @@ test("the energy and food hub shows one card per page, each linking to it", asyn
   for (const [index, section] of ENERGY_FOOD_SECTIONS.entries()) await expect(cards.nth(index)).toHaveAttribute("href", `/explorer/energy-food/${section}`);
 });
 
-// One hub test for the three external pages (moved from the 18 page-spec defaults runs): count, hrefs and a click to each.
+// One hub test for the five external pages (moved from the 18 page-spec defaults runs): count, hrefs and a click to each.
 for (const prefix of ["", "/en"]) {
-  test(`the external hub links Money from abroad, Foreign investment and Current account ${prefix || "ka"}`, async ({ page }) => {
-    for (const [index, slug] of ["money-from-abroad", "foreign-investment", "current-account"].entries()) {
+  test(`the external hub links Money from abroad, Foreign investment, Current account, Foreign debt and Reserves ${prefix || "ka"}`, async ({ page }) => {
+    for (const [index, slug] of ["money-from-abroad", "foreign-investment", "current-account", "foreign-debt", "reserves"].entries()) {
       await page.goto(`${prefix}/explorer/external`);
       const cards = page.getByTestId("external-hub").getByTestId("hub-card");
-      await expect(cards).toHaveCount(3);
+      await expect(cards).toHaveCount(5);
       await expect(cards.nth(index)).toHaveAttribute("href", new RegExp(`${prefix}/explorer/external/${slug}$`));
       await cards.nth(index).click();
       await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/external/${slug}$`));

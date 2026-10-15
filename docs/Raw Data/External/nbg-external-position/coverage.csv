@@ -1,0 +1,11 @@
+﻿indicator_id,first_year,last_year,observations,latest_period_end
+ext_debt.banks,2006,2026,21,2026-06-30
+ext_debt.central_bank,2006,2026,21,2026-06-30
+ext_debt.companies,2006,2026,21,2026-06-30
+ext_debt.government,2006,2026,21,2026-06-30
+ext_debt.intercompany,2006,2026,21,2026-06-30
+ext_debt.total,2006,2026,21,2026-06-30
+reserves.fx,1995,2026,32,2026-09-30
+reserves.gold,1995,2026,32,2026-09-30
+reserves.sdr,1995,2026,32,2026-09-30
+reserves.total,1995,2026,32,2026-09-30

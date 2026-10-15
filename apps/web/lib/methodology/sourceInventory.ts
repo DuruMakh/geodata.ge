@@ -63,6 +63,7 @@ const inventoryRules = {
   "external-flows": [
     { root: "docs/Raw Data/External/2026-10-10/official/nbg", include: (candidatePath: string) => ["REMC_money-transfers-by-countries-eng.xlsx", "BOP-6_bopbpm6eng.xlsx", "external-sector-methodology-eng-bpm6updated.pdf"].includes(path.posix.basename(candidatePath)) },
     { root: "docs/Raw Data/External/2026-10-10/official/geostat", include: (candidatePath: string) => ["FDI_Eng_by_Quarters.xlsx", "FDI_Eng-countries.xlsx", "FDI_Eng-sectors-NACE-2.xlsx", "FDI_Eng_regions.xlsx", "FDI_metadata_1002_090626_EN.pdf"].includes(path.posix.basename(candidatePath)) },
+    { root: "docs/Raw Data/External/nbg-external-position/official", include: () => true },
   ],
 } satisfies Record<MethodologyDatasetId, readonly InventoryRule[]>;
 

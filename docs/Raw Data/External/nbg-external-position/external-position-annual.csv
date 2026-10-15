@@ -1,0 +1,255 @@
+﻿year,indicator_id,value,published_value,unit,period_end,basis,value_status,source_id,source_sheet,source_cell
+2006,ext_debt.banks,548.67633728999988,548.7,usd_million,2006-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,B32
+2007,ext_debt.banks,1295.0284098700001,1295.0,usd_million,2007-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,F32
+2008,ext_debt.banks,1874.8129086599997,1874.8,usd_million,2008-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,J32
+2009,ext_debt.banks,1498.7221803100001,1498.7,usd_million,2009-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,N32
+2010,ext_debt.banks,1595.2136413400001,1595.2,usd_million,2010-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,R32
+2011,ext_debt.banks,2119.6180749299997,2119.6,usd_million,2011-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,V32
+2012,ext_debt.banks,2468.5347987900004,2468.5,usd_million,2012-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,Z32
+2013,ext_debt.banks,2646.8862716199997,2646.9,usd_million,2013-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AD32
+2014,ext_debt.banks,2683.3540680600004,2683.4,usd_million,2014-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AH32
+2015,ext_debt.banks,2957.1257278600006,2957.1,usd_million,2015-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AL32
+2016,ext_debt.banks,2984.3587090700003,2984.4,usd_million,2016-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AP32
+2017,ext_debt.banks,3686.0277853600001,3686.0,usd_million,2017-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AT32
+2018,ext_debt.banks,4275.3175120200003,4275.3,usd_million,2018-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AX32
+2019,ext_debt.banks,4631.7860826400001,4631.8,usd_million,2019-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BB32
+2020,ext_debt.banks,4537.2777268700002,4537.3,usd_million,2020-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BF32
+2021,ext_debt.banks,4797.0266726100008,4797.0,usd_million,2021-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BJ32
+2022,ext_debt.banks,6526.1508155899992,6526.2,usd_million,2022-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BN32
+2023,ext_debt.banks,7263.7140400700009,7263.7,usd_million,2023-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BR32
+2024,ext_debt.banks,8299.34589065,8299.3,usd_million,2024-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BV32
+2025,ext_debt.banks,9455.5406835100002,9455.5,usd_million,2025-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BZ32
+2026,ext_debt.banks,10753.909132159999,10753.9,usd_million,2026-06-30,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,CB32
+2006,ext_debt.central_bank,294.69135586999994,294.7,usd_million,2006-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,B18
+2007,ext_debt.central_bank,254.22178805999999,254.2,usd_million,2007-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,F18
+2008,ext_debt.central_bank,461.18901011999998,461.2,usd_million,2008-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,J18
+2009,ext_debt.central_bank,914.00390979999997,914.0,usd_million,2009-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,N18
+2010,ext_debt.central_bank,877.28610477000007,877.3,usd_million,2010-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,R18
+2011,ext_debt.central_bank,816.29800970000008,816.3,usd_million,2011-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,V18
+2012,ext_debt.central_bank,582.51235412999995,582.5,usd_million,2012-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,Z18
+2013,ext_debt.central_bank,338.66355116999995,338.7,usd_million,2013-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AD18
+2014,ext_debt.central_bank,252.05983917999998,252.1,usd_million,2014-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AH18
+2015,ext_debt.central_bank,220.25354442999998,220.3,usd_million,2015-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AL18
+2016,ext_debt.central_bank,200.91457792,200.9,usd_million,2016-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AP18
+2017,ext_debt.central_bank,292.44328940000003,292.4,usd_million,2017-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AT18
+2018,ext_debt.central_bank,369.19332595999998,369.2,usd_million,2018-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AX18
+2019,ext_debt.central_bank,449.65171402999999,449.7,usd_million,2019-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BB18
+2020,ext_debt.central_bank,583.24393367999994,583.2,usd_million,2020-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BF18
+2021,ext_debt.central_bank,954.13950334999993,954.1,usd_million,2021-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BJ18
+2022,ext_debt.central_bank,896.17071209000005,896.2,usd_million,2022-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BN18
+2023,ext_debt.central_bank,874.12242607999997,874.1,usd_million,2023-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BR18
+2024,ext_debt.central_bank,811.58864550999999,811.6,usd_million,2024-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BV18
+2025,ext_debt.central_bank,780.91962458,780.9,usd_million,2025-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BZ18
+2026,ext_debt.central_bank,733.94229072999997,733.9,usd_million,2026-06-30,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,CB18
+2006,ext_debt.companies,528.29405144999998,528.3,usd_million,2006-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,B45
+2007,ext_debt.companies,836.08858285999975,836.1,usd_million,2007-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,F45
+2008,ext_debt.companies,1117.4780552100001,1117.5,usd_million,2008-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,J45
+2009,ext_debt.companies,1440.2331150499999,1440.2,usd_million,2009-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,N45
+2010,ext_debt.companies,1801.0470028699999,1801.0,usd_million,2010-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,R45
+2011,ext_debt.companies,2205.4843425400004,2205.5,usd_million,2011-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,V45
+2012,ext_debt.companies,3266.57956638,3266.6,usd_million,2012-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,Z45
+2013,ext_debt.companies,3294.9038814400001,3294.9,usd_million,2013-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AD45
+2014,ext_debt.companies,3311.1967459400003,3311.2,usd_million,2014-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AH45
+2015,ext_debt.companies,4064.5461422600001,4064.5,usd_million,2015-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AL45
+2016,ext_debt.companies,4904.2541770600001,4904.3,usd_million,2016-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AP45
+2017,ext_debt.companies,4622.9885044099992,4623.0,usd_million,2017-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AT45
+2018,ext_debt.companies,4596.8272232899999,4596.8,usd_million,2018-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AX45
+2019,ext_debt.companies,4647.7325539700005,4647.7,usd_million,2019-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BB45
+2020,ext_debt.companies,4968.6270524099991,4968.6,usd_million,2020-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BF45
+2021,ext_debt.companies,4831.749752570001,4831.7,usd_million,2021-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BJ45
+2022,ext_debt.companies,4784.5485262400007,4784.5,usd_million,2022-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BN45
+2023,ext_debt.companies,4656.7272917199998,4656.7,usd_million,2023-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BR45
+2024,ext_debt.companies,4969.3369292099997,4969.3,usd_million,2024-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BV45
+2025,ext_debt.companies,5154.6660948299996,5154.7,usd_million,2025-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BZ45
+2026,ext_debt.companies,4207.6798785599995,4207.7,usd_million,2026-06-30,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,CB45
+2006,ext_debt.government,1440.0872397600003,1440.1,usd_million,2006-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,B4
+2007,ext_debt.government,1585.3406085500005,1585.3,usd_million,2007-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,F4
+2008,ext_debt.government,2088.9805651900001,2089.0,usd_million,2008-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,J4
+2009,ext_debt.government,2746.0411733800001,2746.0,usd_million,2009-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,N4
+2010,ext_debt.government,3345.8619231399994,3345.9,usd_million,2010-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,R4
+2011,ext_debt.government,3695.1947370500006,3695.2,usd_million,2011-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,V4
+2012,ext_debt.government,4250.5579086099997,4250.6,usd_million,2012-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,Z4
+2013,ext_debt.government,4190.5989259299995,4190.6,usd_million,2013-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AD4
+2014,ext_debt.government,4255.8192487900005,4255.8,usd_million,2014-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AH4
+2015,ext_debt.government,4390.3414439800008,4390.3,usd_million,2015-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AL4
+2016,ext_debt.government,4677.7983771900008,4677.8,usd_million,2016-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AP4
+2017,ext_debt.government,5296.1528718399995,5296.2,usd_million,2017-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AT4
+2018,ext_debt.government,5383.9723699500018,5384.0,usd_million,2018-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AX4
+2019,ext_debt.government,5725.9128224300021,5725.9,usd_million,2019-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BB4
+2020,ext_debt.government,7428.0743020799982,7428.1,usd_million,2020-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BF4
+2021,ext_debt.government,7956.4002993699996,7956.4,usd_million,2021-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BJ4
+2022,ext_debt.government,8056.3477412700013,8056.3,usd_million,2022-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BN4
+2023,ext_debt.government,8661.4669728400004,8661.5,usd_million,2023-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BR4
+2024,ext_debt.government,8376.7537237999968,8376.8,usd_million,2024-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BV4
+2025,ext_debt.government,9202.8965120100002,9202.9,usd_million,2025-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BZ4
+2026,ext_debt.government,9126.8738636999988,9126.9,usd_million,2026-06-30,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,CB4
+2006,ext_debt.intercompany,26.549354130000005,26.5,usd_million,2006-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,B88
+2007,ext_debt.intercompany,1848.9649338700001,1849.0,usd_million,2007-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,F88
+2008,ext_debt.intercompany,2236.7240973200001,2236.7,usd_million,2008-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,J88
+2009,ext_debt.intercompany,2358.9612454199992,2359.0,usd_million,2009-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,N88
+2010,ext_debt.intercompany,2621.0790067100002,2621.1,usd_million,2010-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,R88
+2011,ext_debt.intercompany,2881.5298148499992,2881.5,usd_million,2011-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,V88
+2012,ext_debt.intercompany,2845.0809741300009,2845.1,usd_million,2012-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,Z88
+2013,ext_debt.intercompany,2956.2514883400008,2956.3,usd_million,2013-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AD88
+2014,ext_debt.intercompany,3476.1061649899998,3476.1,usd_million,2014-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AH88
+2015,ext_debt.intercompany,3672.8282787999988,3672.8,usd_million,2015-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AL88
+2016,ext_debt.intercompany,3165.9671506,3166.0,usd_million,2016-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AP88
+2017,ext_debt.intercompany,3438.7380374000008,3438.7,usd_million,2017-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AT88
+2018,ext_debt.intercompany,3260.8558916000002,3260.9,usd_million,2018-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AX88
+2019,ext_debt.intercompany,3544.9612862000008,3545.0,usd_million,2019-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BB88
+2020,ext_debt.intercompany,3488.3454581000001,3488.3,usd_million,2020-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BF88
+2021,ext_debt.intercompany,3628.0922759999999,3628.1,usd_million,2021-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BJ88
+2022,ext_debt.intercompany,3722.7745231000008,3722.8,usd_million,2022-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BN88
+2023,ext_debt.intercompany,3052.9036886000004,3052.9,usd_million,2023-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BR88
+2024,ext_debt.intercompany,2722.0446857000002,2722.0,usd_million,2024-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BV88
+2025,ext_debt.intercompany,2452.9145957000001,2452.9,usd_million,2025-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BZ88
+2026,ext_debt.intercompany,3343.8080451000001,3343.8,usd_million,2026-06-30,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,CB88
+2006,ext_debt.total,2838.2983385000007,2838.3,usd_million,2006-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,B92
+2007,ext_debt.total,5819.6443232100009,5819.6,usd_million,2007-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,F92
+2008,ext_debt.total,7779.1846365000001,7779.2,usd_million,2008-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,J92
+2009,ext_debt.total,8957.96162396,8958.0,usd_million,2009-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,N92
+2010,ext_debt.total,10240.487678830001,10240.5,usd_million,2010-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,R92
+2011,ext_debt.total,11718.12497907,11718.1,usd_million,2011-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,V92
+2012,ext_debt.total,13413.265602039999,13413.3,usd_million,2012-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,Z92
+2013,ext_debt.total,13427.3041185,13427.3,usd_million,2013-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AD92
+2014,ext_debt.total,13978.536066960001,13978.5,usd_million,2014-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AH92
+2015,ext_debt.total,15305.095137330001,15305.1,usd_million,2015-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AL92
+2016,ext_debt.total,15933.29299184,15933.3,usd_million,2016-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AP92
+2017,ext_debt.total,17336.35048841,17336.4,usd_million,2017-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AT92
+2018,ext_debt.total,17886.166322820005,17886.2,usd_million,2018-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,AX92
+2019,ext_debt.total,19000.044459270001,19000.0,usd_million,2019-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BB92
+2020,ext_debt.total,21005.56847314,21005.6,usd_million,2020-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BF92
+2021,ext_debt.total,22167.408503900002,22167.4,usd_million,2021-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BJ92
+2022,ext_debt.total,23985.992318290002,23986.0,usd_million,2022-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BN92
+2023,ext_debt.total,24508.934419310001,24508.9,usd_million,2023-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BR92
+2024,ext_debt.total,25179.069874869998,25179.1,usd_million,2024-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BV92
+2025,ext_debt.total,27046.937510629999,27046.9,usd_million,2025-12-31,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,BZ92
+2026,ext_debt.total,28166.213210249996,28166.2,usd_million,2026-06-30,actual,official,nbg_gross_external_debt_bpm6,ED-GEO-Tb1,CB92
+1995,reserves.fx,194.43769880487805,194.4,usd_million,1995-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C7
+1996,reserves.fx,190.76564228840123,190.8,usd_million,1996-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C19
+1997,reserves.fx,200.2976142638037,200.3,usd_million,1997-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C31
+1998,reserves.fx,122.58180555555556,122.6,usd_million,1998-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C43
+1999,reserves.fx,127.51245492227979,127.5,usd_million,1999-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C55
+2000,reserves.fx,109.09037569620251,109.1,usd_million,2000-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C67
+2001,reserves.fx,157.97348883495148,158.0,usd_million,2001-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C79
+2002,reserves.fx,199.26999808612443,199.3,usd_million,2002-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C91
+2003,reserves.fx,191.27074120481926,191.3,usd_million,2003-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C103
+2004,reserves.fx,375.44103068493155,375.4,usd_million,2004-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C115
+2005,reserves.fx,477.60534197489539,477.6,usd_million,2005-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C127
+2006,reserves.fx,929.9134852640793,929.9,usd_million,2006-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C139
+2007,reserves.fx,1346.3381510241264,1346.3,usd_million,2007-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C151
+2008,reserves.fx,1467.8354216616675,1467.8,usd_million,2008-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C163
+2009,reserves.fx,1891.5756670304898,1891.6,usd_million,2009-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C175
+2010,reserves.fx,2041.36492330088,2041.4,usd_million,2010-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C187
+2011,reserves.fx,2594.9102626265939,2594.9,usd_million,2011-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C199
+2012,reserves.fx,2651.648207240297,2651.6,usd_million,2012-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C211
+2013,reserves.fx,2601.4723447780916,2601.5,usd_million,2013-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C223
+2014,reserves.fx,2490.5497565532844,2490.5,usd_million,2014-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C235
+2015,reserves.fx,2321.0385582278999,2321.0,usd_million,2015-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C247
+2016,reserves.fx,2562.7738915053657,2562.8,usd_million,2016-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C259
+2017,reserves.fx,2832.8799563150993,2832.9,usd_million,2017-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C271
+2018,reserves.fx,3089.072833632221,3089.1,usd_million,2018-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C283
+2019,reserves.fx,3306.5083330264674,3306.5,usd_million,2019-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C295
+2020,reserves.fx,3700.4912447109772,3700.5,usd_million,2020-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C307
+2021,reserves.fx,3784.990171878228,3785.0,usd_million,2021-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C319
+2022,reserves.fx,4426.1019125869721,4426.1,usd_million,2022-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C331
+2023,reserves.fx,4553.72487666394,4553.7,usd_million,2023-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C343
+2024,reserves.fx,3397.1360509370109,3397.1,usd_million,2024-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C355
+2025,reserves.fx,4680.015504155688,4680.0,usd_million,2025-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,C367
+2026,reserves.fx,6642.5341631415263,6642.5,usd_million,2026-09-30,actual,official,nbg_official_reserve_assets,GIR (eng) ,C376
+1995,reserves.gold,0,0.0,usd_million,1995-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F7
+1996,reserves.gold,0,0.0,usd_million,1996-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F19
+1997,reserves.gold,0,0.0,usd_million,1997-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F31
+1998,reserves.gold,0,0.0,usd_million,1998-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F43
+1999,reserves.gold,0,0.0,usd_million,1999-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F55
+2000,reserves.gold,0,0.0,usd_million,2000-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F67
+2001,reserves.gold,0,0.0,usd_million,2001-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F79
+2002,reserves.gold,0,0.0,usd_million,2002-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F91
+2003,reserves.gold,0,0.0,usd_million,2003-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F103
+2004,reserves.gold,0,0.0,usd_million,2004-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F115
+2005,reserves.gold,0,0.0,usd_million,2005-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F127
+2006,reserves.gold,0,0.0,usd_million,2006-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F139
+2007,reserves.gold,0,0.0,usd_million,2007-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F151
+2008,reserves.gold,0,0.0,usd_million,2008-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F163
+2009,reserves.gold,0,0.0,usd_million,2009-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F175
+2010,reserves.gold,0,0.0,usd_million,2010-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F187
+2011,reserves.gold,0,0.0,usd_million,2011-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F199
+2012,reserves.gold,0,0.0,usd_million,2012-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F211
+2013,reserves.gold,0,0.0,usd_million,2013-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F223
+2014,reserves.gold,0,0.0,usd_million,2014-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F235
+2015,reserves.gold,0,0.0,usd_million,2015-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F247
+2016,reserves.gold,0,0.0,usd_million,2016-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F259
+2017,reserves.gold,0,0.0,usd_million,2017-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F271
+2018,reserves.gold,0,0.0,usd_million,2018-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F283
+2019,reserves.gold,0,0.0,usd_million,2019-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F295
+2020,reserves.gold,0,0.0,usd_million,2020-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F307
+2021,reserves.gold,0,0.0,usd_million,2021-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F319
+2022,reserves.gold,0,0.0,usd_million,2022-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F331
+2023,reserves.gold,0,0.0,usd_million,2023-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F343
+2024,reserves.gold,598.73104979999992,598.7,usd_million,2024-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F355
+2025,reserves.gold,1002.3140084,1002.3,usd_million,2025-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,F367
+2026,reserves.gold,1051.8403495755,1051.8,usd_million,2026-09-30,actual,official,nbg_official_reserve_assets,GIR (eng) ,F376
+1995,reserves.sdr,1.7362073170731708,1.7,usd_million,1995-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D7
+1996,reserves.sdr,0.070189763779527553,0.1,usd_million,1996-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D19
+1997,reserves.sdr,0.13481211656441715,0.1,usd_million,1997-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D31
+1998,reserves.sdr,5.1965811111111107,5.2,usd_million,1998-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D43
+1999,reserves.sdr,8.4059134715025921,8.4,usd_million,1999-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D55
+2000,reserves.sdr,3.2666648101265823,3.3,usd_million,2000-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D67
+2001,reserves.sdr,3.9532441747572811,4.0,usd_million,2001-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D79
+2002,reserves.sdr,2.8837990430622012,2.9,usd_million,2002-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D91
+2003,reserves.sdr,4.9021667469879512,4.9,usd_million,2003-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D103
+2004,reserves.sdr,11.182524931506849,11.2,usd_million,2004-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D115
+2005,reserves.sdr,1.0261888368200837,1.0,usd_million,2005-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D127
+2006,reserves.sdr,0.90486372920922088,0.9,usd_million,2006-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D139
+2007,reserves.sdr,14.785986786881127,14.8,usd_million,2007-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D151
+2008,reserves.sdr,12.306738818236352,12.3,usd_million,2008-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D163
+2009,reserves.sdr,218.82213488551433,218.8,usd_million,2009-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D175
+2010,reserves.sdr,222.55067933839123,222.6,usd_million,2010-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D187
+2011,reserves.sdr,223.33365270412504,223.3,usd_million,2011-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D199
+2012,reserves.sdr,221.31043081318279,221.3,usd_million,2012-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D211
+2013,reserves.sdr,221.93456543316247,221.9,usd_million,2013-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D223
+2014,reserves.sdr,208.62331614387958,208.6,usd_million,2014-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D235
+2015,reserves.sdr,199.52404295129279,199.5,usd_million,2015-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D247
+2016,reserves.sdr,193.66479625517607,193.7,usd_million,2016-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D259
+2017,reserves.sdr,206.10036320499959,206.1,usd_million,2017-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D271
+2018,reserves.sdr,200.72081873645663,200.7,usd_million,2018-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D283
+2019,reserves.sdr,199.54428634445721,199.5,usd_million,2019-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D295
+2020,reserves.sdr,212.78990902459866,212.8,usd_million,2020-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D307
+2021,reserves.sdr,486.48224319473142,486.5,usd_million,2021-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D319
+2022,reserves.sdr,462.30714833826793,462.3,usd_million,2022-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D331
+2023,reserves.sdr,451.69740251826413,451.7,usd_million,2023-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D343
+2024,reserves.sdr,453.83194784160017,453.8,usd_million,2024-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D355
+2025,reserves.sdr,477.02314029250183,477.0,usd_million,2025-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,D367
+2026,reserves.sdr,472.53916693215357,472.5,usd_million,2026-09-30,actual,official,nbg_official_reserve_assets,GIR (eng) ,D376
+1995,reserves.total,196.18877250844121,196.2,usd_million,1995-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B7
+1996,reserves.total,190.85021309014075,190.9,usd_million,1996-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B19
+1997,reserves.total,200.44592022961812,200.4,usd_million,1997-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B31
+1998,reserves.total,127.79246696666667,127.8,usd_million,1998-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B43
+1999,reserves.total,135.93209349378239,135.9,usd_million,1999-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B55
+2000,reserves.total,112.3700696063291,112.4,usd_million,2000-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B67
+2001,reserves.total,161.93930030970875,161.9,usd_million,2001-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B79
+2002,reserves.total,202.16739232918664,202.2,usd_million,2002-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B91
+2003,reserves.total,196.18776795180721,196.2,usd_million,2003-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B103
+2004,reserves.total,386.63908571643836,386.6,usd_million,2004-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B115
+2005,reserves.total,478.64582351171545,478.6,usd_million,2005-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B127
+2006,reserves.total,930.83339299328846,930.8,usd_million,2006-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B139
+2007,reserves.total,1361.1399403110077,1361.1,usd_million,2007-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B151
+2008,reserves.total,1480.1575631799039,1480.2,usd_million,2008-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B163
+2009,reserves.total,2110.413478816004,2110.4,usd_million,2009-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B175
+2010,reserves.total,2263.9310029392713,2263.9,usd_million,2010-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B187
+2011,reserves.total,2818.2592680307194,2818.3,usd_million,2011-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B199
+2012,reserves.total,2872.9740072534797,2873.0,usd_million,2012-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B211
+2013,reserves.total,2823.4223102112538,2823.4,usd_million,2013-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B223
+2014,reserves.total,2699.1875607971642,2699.2,usd_million,2014-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B235
+2015,reserves.total,2520.5764584791926,2520.6,usd_million,2015-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B247
+2016,reserves.total,2756.4521310605416,2756.5,usd_million,2016-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B259
+2017,reserves.total,3039.2647758103902,3039.3,usd_million,2017-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B271
+2018,reserves.total,3288.8288168977606,3288.8,usd_million,2018-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B283
+2019,reserves.total,3505.8481822805549,3505.8,usd_million,2019-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B295
+2020,reserves.total,3910.7528239709013,3910.8,usd_million,2020-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B307
+2021,reserves.total,4272.549191148377,4272.5,usd_million,2021-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B319
+2022,reserves.total,4901.5286754277823,4901.5,usd_million,2022-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B331
+2023,reserves.total,5009.6023883268638,5009.6,usd_million,2023-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B343
+2024,reserves.total,4448.5525863526762,4448.6,usd_million,2024-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B355
+2025,reserves.total,6159.2766272642547,6159.3,usd_million,2025-12-31,actual,official,nbg_official_reserve_assets,GIR (eng) ,B367
+2026,reserves.total,8166.9203030108893,8166.9,usd_million,2026-09-30,actual,official,nbg_official_reserve_assets,GIR (eng) ,B376

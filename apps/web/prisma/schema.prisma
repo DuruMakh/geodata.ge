@@ -88,6 +88,7 @@ model SourceDocument {
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
   moneyBanksFacts MoneyBanksFact[]
+  externalPositionFacts ExternalPositionFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
@@ -136,6 +137,7 @@ model ImportRun {
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
   moneyBanksFacts MoneyBanksFact[]
+  externalPositionFacts ExternalPositionFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
@@ -963,6 +965,29 @@ model HouseholdIncomeSpendingFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, areaId, measure, year])
+}
+
+// Mirror of data/imports/external-position-annual.csv: NBG's gross external debt and official
+// reserve assets in million USD, exact stored decimals with their published rounding and period end.
+model ExternalPositionFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  periodEnd        String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
 }
 
 // Mirror of the served data/imports/demography-*.csv files: one flat observation table in the
