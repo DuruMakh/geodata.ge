@@ -59,6 +59,7 @@ Unemployment uses the existing single import transaction. Source IDs retain thei
 | `ForeignInvestmentEntity` | `data/taxonomy/foreign-investment.json`, English names from `data/localization/en/labels.json` (see `external-flows-annual.md`) |
 | `ForeignInvestmentFact` | `data/imports/foreign-investment-annual.csv` (see `external-flows-annual.md`) |
 | `CurrentAccountFact` | `data/imports/current-account-annual.csv` (see `external-flows-annual.md`) |
+| `ExternalPositionFact` | `data/imports/external-position-annual.csv` (see `external-flows-annual.md`) |
 | `EnergyFoodFact` | `data/imports/energy-food-annual.csv` (see `energy-food-annual.md`) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
 | `GovernmentDebtFact` | `data/imports/government-debt-facts-2013-2030.csv` (nine public Government Debt series; generated from the approved normalized debt package) |

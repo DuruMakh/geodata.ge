@@ -24,7 +24,7 @@ test("registers four unchanged native originals and binds both flows to their wo
   const manifestBytes = await readFile(path.join(root, "data/methodology/source-archives/trade.csv"));
   expect(manifestBytes.subarray(0, 3)).toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
   const manifest = await loadReviewedSourceManifest(root, "trade");
-  expect(manifest).toHaveLength(22);
+  expect(manifest).toHaveLength(24);
   const inventory = await expectedOriginalSourcePaths(root, "trade");
   expect(inventory.map(row => row.path).sort()).toEqual(manifest.map(row => row.repository_source_path).sort());
   const documents = parse(await readFile(path.join(root, "data/sources/source-documents.csv")), { bom: true, columns: true, skip_empty_lines: true }) as Record<string, string>[];

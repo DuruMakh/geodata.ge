@@ -47,7 +47,7 @@ Indicator IDs are stable lowercase ASCII names `business.{measure}.{group}`; the
 
 ## Serving on the Business pages
 
-`npm run data:prepare-business` writes `data/imports/business-annual.csv` (UTF-8 with BOM) and `data/reports/business-validation.json`; `npm run data:check-business` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `BusinessFact` (migration `20261015090000_business`) is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
+`npm run data:prepare-business` writes `data/imports/business-annual.csv` (UTF-8 with BOM) and `data/reports/business-validation.json`; `npm run data:check-business` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `BusinessFact` (migration `20261015220000_business`) is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
 
 Routes are `/explorer/business` with `/sales`, `/jobs`, `/investment-profit`, `/firms`, `/regions` and `/regions/[area]` (Georgia and the 11 regions, 12 pages), plus `/methodology/business`, each mirrored under `/en`. The sidebar entry sits after Economy. Sales and Jobs list all firms, then the three sizes and 14 industries; Investment and profit nests the sizes and industries under Investment, Profit and Loss; Firms nests the 18 sections (then unknown activity, for counts only) under Active, New and Closed firms. A nested series is named `Parent — Child` in the chart, tooltip and table. The Regions index and area pages show the 11 regions only, not Abkhazeti AR or unknown.
 

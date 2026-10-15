@@ -1,0 +1,67 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-15",
+  "scope": "Annual research only: gross external debt by sector (BPM6) and official reserve assets; year-end values plus the latest period of each workbook; no exchange rates, monthly or quarterly values, interpolation or sums of months, serving or published figures beyond the reviewed cells",
+  "primary_observation_count": 254,
+  "observations_by_source": {
+    "nbg_gross_external_debt_bpm6": 126,
+    "nbg_official_reserve_assets": 128
+  },
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": {
+    "coverage_matches_year_ranges": true,
+    "published_values_are_rounded_stored_values": true,
+    "period_end_is_31_december_except_latest_point": true,
+    "debt_groups_add_up_to_total_within_0_05_million_usd": true,
+    "reserves_residual_within_30_million_usd": true,
+    "reserves_converted_from_thousand_to_million_usd_exactly": true,
+    "largest_debt_group_gap_million_usd": "2.82e-12",
+    "largest_reserves_residual_million_usd": "13.1",
+    "latest_period_end": {
+      "ext_debt": "2026-06-30",
+      "reserves": "2026-09-30"
+    },
+    "api_listing": {
+      "ED-6": {
+        "title": "Gross External Debt (BPM-6)",
+        "update_date": "30/09/2026",
+        "next_update_date": "30/12/2026"
+      },
+      "OIR": {
+        "title": "Official Reserve Assets",
+        "update_date": "07/10/2026",
+        "next_update_date": "06/11/2026"
+      }
+    },
+    "anchor_values": {
+      "ext_debt.total:2025": "27046.9",
+      "ext_debt.government:2025": "9202.9",
+      "reserves.total:2025": "6159.3",
+      "reserves.total:1995": "196.2",
+      "reserves.total:2026": "8166.9",
+      "ext_debt.total:2026": "28166.2"
+    }
+  },
+  "source_checks": [
+    {
+      "source_id": "nbg_gross_external_debt_bpm6",
+      "sha256": "F3CB372D156929AB9A3F249F0CD7A64BC8779C1FDA8C54111233694FE7AE571A",
+      "bytes": 403800,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_official_reserve_assets",
+      "sha256": "C100823FC4A0092FAE919440514AE51A341FF855FAA69F825DF5021610BD4104",
+      "bytes": 117815,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_api_category_24",
+      "sha256": "8E02203540687FA7BB0419DABDA41D08C16F8E03ED7CFF529CA04FF9D683F43F",
+      "bytes": 4355,
+      "passed": true
+    }
+  ]
+}

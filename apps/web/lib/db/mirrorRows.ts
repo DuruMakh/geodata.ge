@@ -39,6 +39,7 @@ import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types
 import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyFood/types";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
+import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
 import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
@@ -755,6 +756,24 @@ export async function loadHouseholdFactsFromMirror(db: Pick<MirrorClient, "house
       year: row.year, indicatorId: row.indicatorId as HouseholdFact["indicatorId"], areaId: row.areaId as HouseholdFact["areaId"], measure: row.measure as HouseholdFact["measure"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as "gel_month", basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function externalPositionMirrorCreateRows(facts: readonly ExternalPositionFact[], importRunId: string): Prisma.ExternalPositionFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: externalPositionSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadExternalPositionFactsFromMirror(db: Pick<MirrorClient, "externalPositionFact">): Promise<ExternalPositionFact[]> {
+  const rows = await db.externalPositionFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== externalPositionSourceDocumentId(row.sourceId)) throw new Error("External position source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as ExternalPositionFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(1), unit: row.unit as "usd_million", periodEnd: row.periodEnd, basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

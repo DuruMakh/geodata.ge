@@ -1,5 +1,6 @@
 import { loadServedCurrentAccountFacts, toClientCurrentAccountFacts } from "../../data/externalFlows/importCurrentAccount";
 import { loadServedForeignInvestmentData, toClientForeignInvestmentData } from "../../data/externalFlows/importForeignInvestment";
+import { loadServedExternalPositionData, toClientExternalPositionFact } from "../../data/externalPosition/importExternalPosition";
 import { loadServedMoneyTransfersData, toClientMoneyTransfersData } from "../../data/externalFlows/importMoneyTransfers";
 import { buildExternalHubCards } from "../../explorer/externalHubCards";
 import { coverageLabel } from "../../explorer/coverageLabel";
@@ -16,11 +17,11 @@ export async function externalHubMetadata(locale: Locale) {
 }
 
 export async function renderExternalHub(locale: Locale) {
-  const [transfers, investment, account, presentation] = await Promise.all([loadServedMoneyTransfersData(), loadServedForeignInvestmentData(), loadServedCurrentAccountFacts(), getPresentation(locale, ["external"], [])]);
+  const [transfers, investment, account, position, presentation] = await Promise.all([loadServedMoneyTransfersData(), loadServedForeignInvestmentData(), loadServedCurrentAccountFacts(), loadServedExternalPositionData(), getPresentation(locale, ["external"], [])]);
   const title = message(presentation.messages, "external.hubTitle");
-  const all = [...transfers.facts, ...investment.facts, ...account];
+  const all = [...transfers.facts, ...investment.facts, ...account, ...position.facts];
   const years = [...new Set(all.map(f => f.year))];
-  // The header's coverage label spans the three external datasets (U28-06).
+  // The header's coverage label spans the five external datasets (U28-06).
   const coverage = coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), all.reduce((latest, f) => f.lastReviewedAt > latest ? f.lastReviewedAt : latest, ""));
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "external.hubSummary")} path={"/explorer/external"} coverage={coverage} cards={buildExternalHubCards(toClientMoneyTransfersData(transfers), toClientForeignInvestmentData(investment), toClientCurrentAccountFacts(account), presentation)} testId="external-hub" />;
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "external.hubSummary")} path={"/explorer/external"} coverage={coverage} cards={buildExternalHubCards(toClientMoneyTransfersData(transfers), toClientForeignInvestmentData(investment), toClientCurrentAccountFacts(account), position.facts.map(toClientExternalPositionFact), presentation)} testId="external-hub" />;
 }

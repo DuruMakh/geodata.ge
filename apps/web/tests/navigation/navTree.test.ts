@@ -75,6 +75,8 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/business/regions/guria")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/external")).toBe("common.externalHubSourceNote");
     expect(sourceNoteKey("/explorer/external/current-account")).toBe("common.nbgSourceNote");
+    expect(sourceNoteKey("/explorer/external/foreign-debt")).toBe("common.nbgSourceNote");
+    expect(sourceNoteKey("/explorer/external/reserves")).toBe("common.nbgSourceNote");
     expect(sourceNoteKey("/explorer/external/foreign-investment")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
   });

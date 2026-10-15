@@ -35,6 +35,8 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   forecastLabel?: string;
   preliminaryYears?: number[];
   preliminaryLabel?: string;
+  /** The text of a year's column header (and its row header on phones), for example `2026 (Sep)`; omitted, the year. */
+  yearLabel?: (year: number) => string;
   /** Years re-based by the publisher: a 2px rule is drawn left of the column and `breakLabel` is printed on its header. In the year-rows layout the rule runs under the year's row, between it and the year before, and the label sits in the row's header. */
   breakYears?: number[];
   breakLabel?: string;
@@ -107,6 +109,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   forecastLabel,
   preliminaryYears,
   preliminaryLabel,
+  yearLabel,
   breakYears,
   breakLabel,
   rowLabelsLocalized = false,
@@ -237,7 +240,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
                   style={breakSet.has(year) ? { borderBottom: "2px solid var(--ink)" } : undefined}
                 >
                   <th scope="row" className="pr-2 text-left font-[family-name:var(--font-numeric)] text-[12.5px] font-semibold text-[var(--ink)]" style={cellPad}>
-                    {year}
+                    {yearLabel ? yearLabel(year) : year}
                     {breakMark(year)}
                   </th>
                   {seriesRows.map((row) => (
@@ -314,7 +317,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
             </th>
             {years.map((year, index) => (
               <th key={year} scope="col" data-latest-year={index === lastIndex ? "" : undefined} style={breakStyle(year)} className={`${headCellClass} font-[family-name:var(--font-numeric)] tracking-[0.04em]`}>
-                {year}
+                {yearLabel ? yearLabel(year) : year}
                 {breakMark(year)}
               </th>
             ))}

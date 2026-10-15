@@ -147,7 +147,9 @@
     "data:prepare-foreign-investment": "tsx scripts/prepare-foreign-investment.ts --write",
     "data:check-foreign-investment": "tsx scripts/prepare-foreign-investment.ts --check",
     "data:prepare-current-account": "tsx scripts/prepare-current-account.ts --write",
-    "data:check-current-account": "tsx scripts/prepare-current-account.ts --check"
+    "data:check-current-account": "tsx scripts/prepare-current-account.ts --check",
+    "data:prepare-external-position": "tsx scripts/prepare-external-position.ts --write",
+    "data:check-external-position": "tsx scripts/prepare-external-position.ts --check"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.2.0",

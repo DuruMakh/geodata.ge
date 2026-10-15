@@ -399,8 +399,8 @@ for (const prefix of ["", "/en"]) {
   test(`trade methodology has the bounded source archive ${prefix || "ka"}`, async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}${prefix}/methodology/trade`);
     await expect(page.locator("#services").getByRole("link", { name: prefix ? "Geostat services trade source page" : "საქსტატის მომსახურებით ვაჭრობის გვერდი", exact: true })).toHaveAttribute("href", "https://www.geostat.ge/en/modules/categories/766/international-trade-in-services");
-    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(22);
-    for (const filename of ["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx", "1004_180325_en.pdf", "export-sitc_2000-2026.xlsx", "import-sitc_2000-2026.xlsx", "export-bec_2000-2026.xlsx", "import-bec-2000-2026.xlsx"]) {
+    await expect(page.locator('a[href*="/downloads/methodology/trade/files/"]')).toHaveCount(24);
+    for (const filename of ["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx", "georgian-exports-of-services-by-countries.xlsx", "georgian-imports-of-services-by-countries.xlsx", "1004_180325_en.pdf", "export-sitc_2000-2026.xlsx", "import-sitc_2000-2026.xlsx", "export-bec_2000-2026.xlsx", "import-bec-2000-2026.xlsx"]) {
       await expect(page.locator(`a[href="/downloads/methodology/trade/files/${filename}"]`)).toHaveCount(1);
     }
     const json = JSON.parse(await page.getByTestId("dataset-json-ld").textContent() ?? "{}");
