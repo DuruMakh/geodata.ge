@@ -1,9 +1,13 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import { describe, expect, test } from "vitest";
 import type { BreakRow } from "../../../lib/data/demography/breaks";
+import { assertHealthParity, loadHealthBreaks, loadHealthFacts, loadServedHealthData, toClientHealthFact } from "../../../lib/data/health/importHealth";
+import { healthMirrorCreateRows, loadHealthFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { HEALTH_AREAS, HEALTH_INDICATORS, HEALTH_PUBLIC_SOURCES, HEALTH_SOURCES, HEALTH_UNITS, type HealthFact, type HealthSeriesBreak } from "../../../lib/data/health/types";
 import { HEALTH_CSV_HEADERS, prepareHealthData } from "../../../lib/data/health/prepareHealth";
 import { expectedHealthKeys, healthDisplayDecimals, healthPublishedValue, validateHealthFacts } from "../../../lib/data/health/validation";
@@ -128,4 +132,86 @@ test("a real zero is a value", () => {
   const facts = loadFacts();
   expect(facts.filter(f => f.value === "0").length).toBeGreaterThan(0);
   expect(() => validateHealthFacts(facts)).not.toThrow();
+});
+
+describe("loading and parity", () => {
+  test("loadHealthFacts serves the canonical rows and rejects a file that no longer matches its acceptance fingerprint", async () => {
+    await expect(loadHealthFacts()).resolves.toHaveLength(4204);
+    const copy = fs.mkdtempSync(path.join(os.tmpdir(), "health-"));
+    try {
+      for (const relative of ["data/imports/health-annual.csv", "data/reports/health-validation.json"]) {
+        fs.mkdirSync(path.dirname(path.join(copy, relative)), { recursive: true });
+        fs.copyFileSync(path.join(root, relative), path.join(copy, relative));
+      }
+      await expect(loadHealthFacts(copy)).resolves.toHaveLength(4204);
+      fs.appendFileSync(path.join(copy, "data/imports/health-annual.csv"), "\n");
+      await expect(loadHealthFacts(copy)).rejects.toThrow(/fingerprint/);
+    } finally {
+      fs.rmSync(copy, { recursive: true, force: true });
+    }
+  });
+
+  test("the breaks load from the CSV only, as the package's four registers", async () => {
+    const breaks = await loadHealthBreaks();
+    expect(breaks.map(b => b.breakId)).toEqual(["staff_definitions_2012", "staff_register_2020", "icd10_groups_2006", "new_cases_electronic_2020"]);
+    expect(breaks[0].appliesTo.length).toBeGreaterThan(1);
+    expect((await loadServedHealthData())).toMatchObject({ facts: expect.any(Array), breaks });
+  });
+
+  test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+    const facts = await loadHealthFacts();
+    expect(() => assertHealthParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+    // A stored value written as "20225.0" is the same figure as "20225".
+    const padded = facts.map(f => ({ ...f }));
+    const doctors = find(padded, "health.staff.doctors", 2002);
+    expect(doctors.value).toBe("20225");
+    doctors.value = "20225.0";
+    expect(() => assertHealthParity(facts, padded)).not.toThrow();
+    expect(new Decimal("22491").eq("22491.0")).toBe(true);
+    const changed = facts.map(f => ({ ...f }));
+    setValue(find(changed, "health.facilities.beds", 2025), "15.233");
+    expect(() => assertHealthParity(facts, changed)).toThrow();
+    expect(() => assertHealthParity(facts, facts.slice(1))).toThrow();
+  });
+
+  test("client facts carry the published figure and the decimals it is published with", async () => {
+    const facts = await loadHealthFacts();
+    expect(toClientHealthFact(find(facts, "health.facilities.beds", 2025))).toEqual({
+      year: 2025, indicatorId: "health.facilities.beds", areaId: "georgia", sourceId: "geostat_health_main", unit: "units_thousand", value: 15.232, decimals: 3,
+    });
+    expect(toClientHealthFact(find(facts, "health.death_rate.total", 2025))).toMatchObject({ value: 11.3, decimals: 1, unit: "per_1000_population" });
+    expect(toClientHealthFact(find(facts, "health.staff.doctors", 2002))).toMatchObject({ value: 20225, decimals: 0, unit: "persons" });
+    expect(facts.every(f => { const c = toClientHealthFact(f); return c.value === Number(f.publishedValue) && c.decimals === healthDisplayDecimals(f.sourceNumberFormat, f.value, f.unit); })).toBe(true);
+    // Nothing exact or internal leaves the server.
+    expect(Object.keys(toClientHealthFact(facts[0])).sort()).toEqual(["areaId", "decimals", "indicatorId", "sourceId", "unit", "value", "year"]);
+  });
+
+  test("the database mirror round-trips exact decimals, published precision and source relations", async () => {
+    const facts = await loadHealthFacts();
+    const rows = healthMirrorCreateRows(facts, "health-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+    const db = (list: typeof rows) => ({ healthFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "healthFact">;
+    const mirror = await loadHealthFactsFromMirror(db(rows));
+    expect(() => assertHealthParity(facts, mirror)).not.toThrow();
+    // A rate published as "13.0" is stored as 13 and comes back with its decimal.
+    const whole = facts.find(f => f.unit === "per_1000_population" && f.publishedValue.endsWith(".0"))!;
+    expect(mirror.find(f => f.indicatorId === whole.indicatorId && f.areaId === whole.areaId && f.year === whole.year)!.publishedValue).toBe(whole.publishedValue);
+    expect(rows[0].importRunId).toBe("health-run-1");
+    expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+    expect(rows.every(row => "areaId" in row)).toBe(true);
+    await expect(loadHealthFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+  });
+});
+
+test("every public source has one source-document row with the package's title and local file", () => {
+  const documents = new Map(records(path.join(root, "data/sources/source-documents.csv")).map(row => [row.source_id, row]));
+  const manifest = records(path.join(research, "source-manifest.csv"));
+  expect(new Set(manifest.map(row => row.source_id))).toEqual(new Set(HEALTH_PUBLIC_SOURCES));
+  expect(manifest).toHaveLength(HEALTH_PUBLIC_SOURCES.length);
+  for (const row of manifest) {
+    const document = documents.get(`source.${row.source_id}`);
+    expect(document, row.source_id).toBeDefined();
+    expect(document!.source_name).toBe(row.dataset_title);
+    expect(document!.source_url_or_file).toBe(`docs/Raw Data/Health/geostat-health-annual/${row.local_file}`);
+    expect(document!.last_reviewed_at).toBe("2026-10-15");
+  }
 });
