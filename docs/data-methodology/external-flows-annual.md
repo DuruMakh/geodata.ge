@@ -1,4 +1,4 @@
-# Annual external flows research foundation: money transfers, FDI and the current account
+# Annual external flows research foundation: money transfers, FDI, the current account, foreign debt and reserves
 
 Approved scope: 2026-10-10. This began as a research package. Five public pages now serve parts of it: Money from abroad, Foreign investment and Current account (approved 2026-10-10) and Foreign debt and Reserves (approved 2026-10-15, from a separate package); see their sections below. Everything else still needs a separate approved design before any page, download, MCP tool or serving-database import.
 
