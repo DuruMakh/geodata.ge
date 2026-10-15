@@ -7,8 +7,9 @@ import { parseTopicHash, serializeTopicHash, topicCoverage, type TopicState } fr
 export const BUSINESS_AREAS = ["georgia", ...BUSINESS_REGIONS] as const;
 export type BusinessArea = typeof BUSINESS_AREAS[number];
 const REGIONS_HREF = BUSINESS_SECTIONS.find(section => section.id === "regions")!.href;
-/** An area's page; a region's slug drops the `region_` prefix. */
-export const businessAreaHref = (area: BusinessArea): `/${string}` => `${REGIONS_HREF}/${area.replace(/^region_/, "")}`;
+/** An area's URL slug: a region's drops the `region_` prefix. */
+export const businessAreaSlug = (area: BusinessArea) => area.replace(/^region_/, "");
+export const businessAreaHref = (area: BusinessArea): `/${string}` => `${REGIONS_HREF}/${businessAreaSlug(area)}`;
 
 /** The area page's icon measure switch. */
 export type BusinessAreaMeasure = "money" | "jobs" | "firms";

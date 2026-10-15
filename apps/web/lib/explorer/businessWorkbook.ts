@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { buildBusinessModel, type BusinessModel, type BusinessState, type BusinessTopicId } from "./business";
-import { buildBusinessAreaModel, type BusinessArea, type BusinessAreaState } from "./businessAreas";
+import { buildBusinessAreaModel, businessAreaSlug, type BusinessArea, type BusinessAreaState } from "./businessAreas";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const MILLION = 1_000_000;
@@ -22,7 +22,7 @@ export function buildBusinessWorkbookExportModel(input: BusinessWorkbookInput, p
   const t = (key: string) => message(messages, `business.${key}`);
   const model: BusinessModel = "area" in input ? buildBusinessAreaModel(input.area, input.facts, input.state) : buildBusinessModel(input.section, input.facts, input.state);
   const stem = "area" in input
-    ? `business-${input.area}-${input.state.measure}`
+    ? `business-${businessAreaSlug(input.area)}-${input.state.measure}`
     : `business-${input.section}${input.state.view === "rate" ? "-rate" : ""}`;
   const byCell = new Map(input.facts.map(f => [businessFactKey(f), f]));
   const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) => byCell.get(`${series.id}:${year}`)?.sourceId));

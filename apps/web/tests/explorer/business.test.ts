@@ -1,8 +1,7 @@
 import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadBusinessFacts, toClientBusinessFact } from "../../lib/data/business/importBusiness";
-import { BUSINESS_DEMOGRAPHY_SECTORS, BUSINESS_REGIONS, BUSINESS_SIZES, BUSINESS_SURVEY_SECTORS, type ClientBusinessFact } from "../../lib/data/business/types";
-import { BUSINESS_SOURCES } from "../../lib/data/business/types";
+import { BUSINESS_DEMOGRAPHY_SECTORS, BUSINESS_REGIONS, BUSINESS_SOURCES, BUSINESS_SIZES, BUSINESS_SURVEY_SECTORS, type ClientBusinessFact } from "../../lib/data/business/types";
 import { INK, OTHER_COLOR } from "../../lib/explorer/colors";
 import {
   BUSINESS_HUB_PATH, BUSINESS_SECTIONS, buildBusinessModel, businessCoverage, businessDefaultSelection, businessSeriesColor, businessViews, businessViewSeries,
@@ -326,7 +325,7 @@ test("the Firms rate workbook uses one decimal and the -rate file name, with Geo
 test("a Guria firms workbook is whole numbers of firms from the demography file alone", async () => {
   const ids = ["business.births.region_guria", "business.deaths.region_guria"];
   const model = await areaWorkbook("region_guria", "firms", ids, 2014, 2024);
-  expect(model.filename).toBe("fiscal-business-region_guria-firms-2014-2024-en.xlsx");
+  expect(model.filename).toBe("fiscal-business-guria-firms-2014-2024-en.xlsx");
   expect(model.readable.unitLabel).toBe("firms");
   expect(model.readable.numberFormat).toBe("#,##0");
   expect(model.readable.rows[0].valuesByYear[2024]).toBe(facts.find(f => f.indicatorId === ids[0] && f.year === 2024)!.value);
