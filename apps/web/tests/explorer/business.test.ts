@@ -1,6 +1,8 @@
+import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadBusinessFacts, toClientBusinessFact } from "../../lib/data/business/importBusiness";
 import { BUSINESS_DEMOGRAPHY_SECTORS, BUSINESS_REGIONS, BUSINESS_SIZES, BUSINESS_SURVEY_SECTORS, type ClientBusinessFact } from "../../lib/data/business/types";
+import { BUSINESS_SOURCES } from "../../lib/data/business/types";
 import { INK, OTHER_COLOR } from "../../lib/explorer/colors";
 import {
   BUSINESS_HUB_PATH, BUSINESS_SECTIONS, buildBusinessModel, businessCoverage, businessDefaultSelection, businessSeriesColor, businessViews, businessViewSeries,
@@ -11,6 +13,11 @@ import {
   businessMapHash, changeBusinessAreaMeasure, parseBusinessAreaHash, serializeBusinessAreaHash,
 } from "../../lib/explorer/businessAreas";
 import { buildBusinessRegionMapModel } from "../../lib/explorer/businessRegionMap";
+import { buildBusinessHubCards } from "../../lib/explorer/businessHubCards";
+import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Presentation } from "../../lib/i18n/types";
 
 let facts: ClientBusinessFact[];
 beforeAll(async () => { facts = (await loadBusinessFacts()).map(toClientBusinessFact); });
@@ -235,4 +242,120 @@ test("the regions map ranks the eleven regions by the latest complete year", () 
   expect(jobs.regions[0].value).toBe(facts.find(f => f.indicatorId === "business.employed.region_tbilisi" && f.year === 2025)!.value);
   const withoutGuria2025 = facts.filter(f => !(f.indicatorId === "business.turnover.region_guria" && f.year === 2025));
   expect(buildBusinessRegionMapModel("turnover", withoutGuria2025).year).toBe(2024);
+});
+
+// The catalogue keys Task 6 adds; the tests hand them over directly.
+const TEST_MESSAGES = {
+  "business.unitMlnGel": "million GEL", "business.unitPersons": "persons", "business.unitFirms": "firms", "business.unitPercent": "%", "business.unitThousandPersons": "thousand",
+  "business.status.official": "Official",
+  "business.page.sales.summary": "sales", "business.page.jobs.summary": "jobs", "business.page.investment-profit.summary": "investment", "business.page.firms.summary": "firms", "business.page.regions.summary": "regions",
+  "common.businessSales": "Sales", "common.businessJobs": "Jobs", "common.businessInvestmentProfit": "Investment and profit", "common.businessFirms": "New and closed firms", "common.businessRegions": "Regions",
+};
+const presentation = async (): Promise<Presentation> => ({ locale: "en", englishLabels: {}, messages: { ...await getMessages("en", ["workbook", "format", "common"]), ...TEST_MESSAGES } });
+const SOURCES = BUSINESS_SOURCES.map(sourceId => ({
+  sourceId, years: Array.from({ length: 27 }, (_, i) => 1999 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-14",
+  downloadHref: `/downloads/methodology/business/files/${sourceId}.xlsx` as const,
+}));
+// The page hands over a label for every series it lists, parents included.
+const labelsFor = (ids: readonly string[]) => Object.fromEntries([...ids, "business.profit.total", "business.loss.total"].map(id => [id, id]));
+const topicWorkbook = async (section: BusinessTopicId, view: "main" | "count" | "rate", selectedIds: string[], start: number, end: number) =>
+  buildBusinessWorkbookExportModel({
+    section, facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), title: "Title",
+    state: { mode: "table", view, range: { kind: "manual", start, end }, selectedIds },
+  }, await presentation());
+const areaWorkbook = async (area: Parameters<typeof businessAreaSeries>[0], measure: Parameters<typeof businessAreaSeries>[1], selectedIds: string[], start: number, end: number) =>
+  buildBusinessWorkbookExportModel({
+    area, facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), title: "Title",
+    state: { mode: "table", measure, range: { kind: "manual", start, end }, selectedIds },
+  }, await presentation());
+const publishedMillions = (id: string, year: number) => facts.find(f => f.indicatorId === id && f.year === year)!.value / 1_000_000;
+
+test("the Sales workbook exports million GEL for 1999-2025, cites only the turnover file and is readable in Excel", async () => {
+  const ids = ["business.turnover.total", "business.turnover.sector_a"];
+  const model = await topicWorkbook("sales", "main", ids, 1999, 2025);
+  expect(model.filename).toBe("fiscal-business-sales-1999-2025-en.xlsx");
+  expect(model.readable.title).toBe("Title");
+  expect(model.readable.unitLabel).toBe("million GEL");
+  expect(model.readable.numberFormat).toBe("#,##0.0");
+  expect(model.readable.years).toHaveLength(27);
+  expect(model.readable.rows.map(row => [row.label, row.kind])).toEqual([["business.turnover.total", "total"], ["business.turnover.sector_a", "item"]]);
+  expect(model.readable.rows[0].valuesByYear[2025]).toBe(253725.5);
+  expect(model.readable.rows[1].valuesByYear[2025]).toBe(publishedMillions("business.turnover.sector_a", 2025));
+  expect(model.analysis.rows).toHaveLength(54);
+  expect(model.analysis.headers).not.toContain("source_cell");
+  expect(model.analysis.rows.find(r => r[0] === 2025 && r[1] === "business.turnover.total")).toEqual([2025, "business.turnover.total", 253725.5, "Official"]);
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_business_turnover"]);
+  expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/business/files/geostat_business_turnover.xlsx");
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  expect(excel.worksheets).toHaveLength(3);
+  expect(excel.worksheets[1].getCell(2, 3).numFmt).toBe("#,##0.0");
+});
+
+test("nested series are labelled with their parent, and the sources follow the exported measures", async () => {
+  const ids = ["business.investment.total", "business.loss.sector_g", "business.profit.sector_g"];
+  const model = await topicWorkbook("investment-profit", "main", ids, 2020, 2025);
+  expect(model.filename).toBe("fiscal-business-investment-profit-2020-2025-en.xlsx");
+  expect(model.readable.rows.map(row => [row.kind, row.parentLabel, row.label])).toEqual([
+    ["total", null, "business.investment.total"], ["item", "business.profit.total", "business.profit.sector_g"], ["item", "business.loss.total", "business.loss.sector_g"],
+  ]);
+  expect(model.analysis.rows.map(row => row[1])).toContain("business.profit.total — business.profit.sector_g");
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_business_investment", "geostat_business_profit_loss"]);
+});
+
+test("the Firms rate workbook uses one decimal and the -rate file name, with Geostat's blank section death rates left empty", async () => {
+  const ids = ["business.death_rate.sector_c", "business.birth_rate.total"];
+  const model = await topicWorkbook("firms", "rate", ids, 2014, 2024);
+  expect(model.filename).toBe("fiscal-business-firms-rate-2014-2024-en.xlsx");
+  expect(model.readable.unitLabel).toBe("%");
+  expect(model.readable.numberFormat).toBe("0.0");
+  const section = model.readable.rows.find(row => row.label === "business.death_rate.sector_c")!;
+  for (const year of [2016, 2019]) { expect(section.valuesByYear[year]).toBeNull(); expect(section.basisByYear[year]).toBeNull(); }
+  expect(section.valuesByYear[2015]).not.toBeNull();
+  const analysis = (year: number) => model.analysis.rows.find(r => r[0] === year && String(r[1]).endsWith("death_rate.sector_c"))!;
+  expect(analysis(2016).slice(2)).toEqual([null, "Not available"]);
+  expect(analysis(2015)[3]).toBe("Official");
+  expect(model.analysis.numericFormats).toEqual({ 3: "0.0" });
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_business_demography"]);
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  const sheet = excel.worksheets[0];
+  const row = [...Array(sheet.rowCount).keys()].map(i => sheet.getRow(i + 1)).find(r => r.getCell(1).value === "business.death_rate.sector_c")!;
+  expect(row.getCell(2 + (2016 - 2014)).value).toBeNull();
+  expect(row.getCell(2 + (2015 - 2014)).value).not.toBeNull();
+});
+
+test("a Guria firms workbook is whole numbers of firms from the demography file alone", async () => {
+  const ids = ["business.births.region_guria", "business.deaths.region_guria"];
+  const model = await areaWorkbook("region_guria", "firms", ids, 2014, 2024);
+  expect(model.filename).toBe("fiscal-business-region_guria-firms-2014-2024-en.xlsx");
+  expect(model.readable.unitLabel).toBe("firms");
+  expect(model.readable.numberFormat).toBe("#,##0");
+  expect(model.readable.rows[0].valuesByYear[2024]).toBe(facts.find(f => f.indicatorId === ids[0] && f.year === 2024)!.value);
+  expect(model.analysis.numericFormats).toEqual({ 3: "#,##0" });
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_business_demography"]);
+});
+
+test("area workbooks scale money to million GEL, keep persons whole, and cite the matching survey file", async () => {
+  const money = await areaWorkbook("georgia", "money", ["business.turnover.total", "business.profit.total"], 2020, 2025);
+  expect(money.filename).toBe("fiscal-business-georgia-money-2020-2025-en.xlsx");
+  expect(money.readable.unitLabel).toBe("million GEL");
+  expect(money.readable.rows[0].valuesByYear[2025]).toBe(253725.5);
+  expect(money.sources.map(s => s.title)).toEqual(["geostat_business_turnover", "geostat_business_profit_loss"]);
+  const jobs = await areaWorkbook("region_adjara", "jobs", ["business.employed.region_adjara"], 2020, 2025);
+  expect(jobs.readable.unitLabel).toBe("persons");
+  expect(jobs.readable.numberFormat).toBe("#,##0");
+  expect(jobs.readable.rows[0].valuesByYear[2025]).toBe(facts.find(f => f.indicatorId === "business.employed.region_adjara" && f.year === 2025)!.value);
+  expect(jobs.sources.map(s => s.title)).toEqual(["geostat_business_employed"]);
+  const empty = await topicWorkbook("sales", "main", [], 2020, 2025);
+  expect(empty.readable.rows).toEqual([]); expect(empty.analysis.rows).toEqual([]); expect(empty.sources).toEqual([]);
+});
+
+test("the hub has five cards: four headline series with their latest values and years, then Regions with its years only", async () => {
+  const cards = buildBusinessHubCards(facts, await presentation());
+  expect(cards.map(card => card.href)).toEqual(BUSINESS_SECTIONS.map(section => section.href));
+  expect(cards.map(card => card.title)).toEqual(["Sales", "Jobs", "Investment and profit", "New and closed firms", "Regions"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 253.7 bn GEL · 1999–2025", "2025 · 899.0 thousand · 1999–2025", "2025 · 8.0 bn GEL · 2006–2025", "2024 · 56,259 · 2014–2024", "2006–2025"]);
+  expect(cards.map(card => card.series?.length ?? null)).toEqual([27, 27, 20, 11, null]);
+  expect(cards[0].series!.at(-1)).toBe(253725500000);
+  expect(cards[4]).toMatchObject({ series: null, seriesColor: null, comingSoon: false });
+  expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04", "05"]);
 });
