@@ -1,10 +1,14 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+import { loadExternalPositionFactsFromMirror, externalPositionMirrorCreateRows } from "../../../lib/db/mirrorRows";
+import { assertExternalPositionParity, loadExternalPositionFacts, toClientExternalPositionFact } from "../../../lib/data/externalPosition/importExternalPosition";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { EXTERNAL_POSITION_CSV_HEADERS, REVIEWED_AT, prepareExternalPositionData } from "../../../lib/data/externalPosition/prepareExternalPosition";
-import { EXTERNAL_POSITION_INDICATORS, EXTERNAL_POSITION_SOURCES, type ExternalPositionFact } from "../../../lib/data/externalPosition/types";
+import { EXTERNAL_POSITION_INDICATORS, EXTERNAL_POSITION_PUBLIC_SOURCES, EXTERNAL_POSITION_SOURCES, externalPositionSourceDocumentId, type ExternalPositionFact } from "../../../lib/data/externalPosition/types";
 import { expectedExternalPositionKeys, validateExternalPositionFacts } from "../../../lib/data/externalPosition/validation";
 
 const root = path.resolve(process.cwd(), "../..");
@@ -80,4 +84,74 @@ test.each([
   const facts = (await loadFacts()).map(f => ({ ...f }));
   mutate(facts);
   expect(() => validateExternalPositionFacts(facts)).toThrow(error);
+});
+
+test("loading serves the canonical file", async () => {
+  expect(await loadExternalPositionFacts()).toEqual(await loadFacts());
+});
+
+test("loading refuses a canonical file whose fingerprint differs from the report", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "external-position-"));
+  try {
+    await fs.mkdir(path.join(dir, "apps/web"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/imports"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/reports"), { recursive: true });
+    const csv = await fs.readFile(path.join(root, "data/imports/external-position-annual.csv"), "utf8");
+    expect(csv).toContain("27046.9");
+    await fs.writeFile(path.join(dir, "data/imports/external-position-annual.csv"), csv.replace("27046.9", "27046.8"));
+    await fs.copyFile(path.join(root, "data/reports/external-position-validation.json"), path.join(dir, "data/reports/external-position-validation.json"));
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.join(dir, "apps/web"));
+    try {
+      await expect(loadExternalPositionFacts()).rejects.toThrow(/fingerprint/);
+    } finally {
+      cwd.mockRestore();
+    }
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("parity accepts equal decimals written differently and rejects a changed value, a changed period end or a missing row", async () => {
+  const facts = await loadFacts();
+  const total = facts.findIndex(f => f.indicatorId === "ext_debt.total" && f.year === 2025);
+  expect(facts[total].publishedValue).toBe("27046.9");
+  expect(() => assertExternalPositionParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const padded = facts.map(f => ({ ...f }));
+  padded[total].value = `${facts[total].value}0`;
+  expect(() => assertExternalPositionParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[total].value = new Decimal(changed[total].value).plus("0.000001").toFixed();
+  expect(() => assertExternalPositionParity(facts, changed)).toThrow();
+  const moved = facts.map(f => ({ ...f }));
+  const latest = moved.findIndex(f => f.indicatorId === "ext_debt.total" && f.year === 2026);
+  moved[latest].periodEnd = "2026-12-31";
+  expect(() => assertExternalPositionParity(facts, moved)).toThrow();
+  expect(() => assertExternalPositionParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry dollars and mark the single latest point of each indicator", async () => {
+  const facts = await loadFacts();
+  expect(toClientExternalPositionFact(find(facts, "reserves.total", 2026))).toEqual({
+    year: 2026, indicatorId: "reserves.total", value: 8166900000, latestPeriod: true, periodEnd: "2026-09-30", sourceId: "nbg_official_reserve_assets",
+  });
+  expect(toClientExternalPositionFact(find(facts, "reserves.total", 2025))).toMatchObject({ value: 6159300000, latestPeriod: false, periodEnd: "2025-12-31" });
+  expect(toClientExternalPositionFact(find(facts, "ext_debt.total", 2026))).toMatchObject({ value: 28166200000, latestPeriod: true, periodEnd: "2026-06-30" });
+  expect(facts.filter(f => toClientExternalPositionFact(f).latestPeriod)).toHaveLength(EXTERNAL_POSITION_INDICATORS.length);
+});
+
+test("the database mirror round-trips exact decimals, period ends and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = externalPositionMirrorCreateRows(facts, "external-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ externalPositionFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "externalPositionFact">;
+  const mirror = await loadExternalPositionFactsFromMirror(db(rows));
+  expect(() => assertExternalPositionParity(facts, mirror)).not.toThrow();
+  expect(rows[0].importRunId).toBe("external-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadExternalPositionFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(EXTERNAL_POSITION_PUBLIC_SOURCES.filter(id => !ids.has(externalPositionSourceDocumentId(id)))).toEqual([]);
 });
