@@ -134,6 +134,8 @@ export const NAV_TREE: readonly NavHub[] = [
       { href: "/explorer/external/money-from-abroad", labelKey: "common.moneyFromAbroad", testId: "money-from-abroad-link" },
       { href: "/explorer/external/foreign-investment", labelKey: "common.foreignInvestment", testId: "foreign-investment-link" },
       { href: "/explorer/external/current-account", labelKey: "common.currentAccount", testId: "current-account-link" },
+      { href: "/explorer/external/foreign-debt", labelKey: "common.foreignDebt", testId: "foreign-debt-link" },
+      { href: "/explorer/external/reserves", labelKey: "common.reserves", testId: "reserves-link" },
     ],
   },
   {

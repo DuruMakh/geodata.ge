@@ -87,6 +87,8 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/external/money-from-abroad", file: "money-transfers-annual.csv" },
   ...(["country", "sector", "region"] as const).map((dimension) => ({ url: "/explorer/external/foreign-investment", file: "foreign-investment-annual.csv", rows: (row: CsvRow) => row.entity_id.startsWith(`fdi.${dimension}.`) })),
   { url: "/explorer/external/current-account", file: "current-account-annual.csv" },
+  { url: "/explorer/external/foreign-debt", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("ext_debt.") },
+  { url: "/explorer/external/reserves", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("reserves.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => !row.indicator_id.startsWith("food.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("food.") },
   { url: "/explorer/demography/migration", file: "demography-migration-annual.csv" },

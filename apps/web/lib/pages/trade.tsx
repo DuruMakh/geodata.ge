@@ -7,7 +7,7 @@ import { TradePartners } from "../../components/trade/trade-partners";
 import { TradeProducts } from "../../components/trade/trade-products";
 import { TradeServices } from "../../components/trade/trade-services";
 import { loadServedTradeServicesData, toClientTradeServicesData } from "../data/tradeServices/importTradeServices";
-import { TRADE_SERVICES_SOURCES } from "../data/tradeServices/types";
+import { TRADE_SERVICES_DOCUMENT_IDS } from "../data/tradeServices/types";
 import { TradeDomesticExports } from "../../components/trade/trade-domestic-exports";
 import { loadServedTradeDomesticData, toClientTradeDomesticData } from "../data/tradeDomestic/importTradeDomestic";
 import { TRADE_DOMESTIC_DOCUMENT_IDS } from "../data/tradeDomestic/types";
@@ -180,7 +180,7 @@ export async function renderTradeServicesPage(locale: Locale) {
     loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root),
   ]);
   const { englishLabels, ...data } = toClientTradeServicesData(services), { min, max } = tradeOverviewCoverage(data.national);
-  const sourceIds = new Set<string>(Object.values(TRADE_SERVICES_SOURCES));
+  const sourceIds = new Set(Object.keys(TRADE_SERVICES_DOCUMENT_IDS));
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = services.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("services.title");

@@ -53,7 +53,7 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 
 ## V1 and Data Non-Negotiables
 
-- Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, a public API beyond the approved read-only MCP and static publications, uploads, sub-annual data other than the approved monthly inflation dataset, and automated production document extraction.
+- Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, a public API beyond the approved read-only MCP and static publications, uploads, sub-annual data other than the approved monthly inflation dataset and the one dated latest-amount point on Foreign debt and Reserves, and automated production document extraction.
 - Multi-year institutions and major programs are selectable series, not clickable drilldown.
 - Use stable lowercase ASCII category IDs; Georgian and English labels are display data, not identifiers.
 - Public expenditure fields come from reviewed mappings over official rows. Preserve every official row. Assign uncertain rows explicitly to `spending.other_unclassified` and retain mapping confidence and notes.

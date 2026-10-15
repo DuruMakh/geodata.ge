@@ -15,7 +15,7 @@ const originals = {
 };
 test("retains the six exact HS4 originals alongside the existing seven Trade sources", async () => {
   const root = path.resolve(process.cwd(), "../.."), manifest = await loadReviewedSourceManifest(root, "trade");
-  expect(manifest).toHaveLength(22);
+  expect(manifest).toHaveLength(24);
   const bytes = await readFile(path.join(root, "data/methodology/source-archives/trade.csv"));
   expect(bytes.subarray(0, 3)).toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
   for (const [filename, hash] of Object.entries(originals)) {
@@ -28,7 +28,7 @@ test("retains the six exact HS4 originals alongside the existing seven Trade sou
   expect(manifest.some(row => /classificatory|6-digit/.test(row.repository_source_path))).toBe(false);
   for (const locale of ["en", "ka"] as const) {
     const sources = await loadWorkbookSources("trade", undefined, locale);
-    expect(sources).toHaveLength(22);
+    expect(sources).toHaveLength(24);
     expect(sources.every(source => source.downloadHref.startsWith("/downloads/methodology/trade/files/"))).toBe(true);
     if (locale === "en") expect(sources.every(source => !/\p{Script=Georgian}/u.test(source.title))).toBe(true);
   }

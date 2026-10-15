@@ -275,6 +275,11 @@ source.geostat_trade_export_sitc_2000_2026,Georgian Exports by Standard Internat
 source.geostat_trade_import_sitc_2000_2026,Georgian Imports by Standard International Trade Classification (SITC) section,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import-SITC_2000-2026.xlsx,2026-10-14
 source.geostat_trade_export_bec_2000_2026,Georgian Exports by Broad Economic Categories (BEC),docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Export-BEC_2000-2026.xlsx,2026-10-14
 source.geostat_trade_import_bec_2000_2026,Georgian Imports by Broad Economic Categories (BEC),docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import-BEC-2000-2026.xlsx,2026-10-14
+source.nbg_gross_external_debt_bpm6,NBG Gross External Debt by sector (ED-6 BPM-6),docs/Raw Data/External/nbg-external-position/official/edbpm6eng.xlsx,2026-10-15
+source.nbg_official_reserve_assets,NBG Official Reserve Assets (OIR),docs/Raw Data/External/nbg-external-position/official/templatesection-ieng.xlsx,2026-10-15
+source.nbg_api_category_24,NBG file list for category 24 (external sector),docs/Raw Data/External/nbg-external-position/official/api-category-24.json,2026-10-15
+source.geostat_services_georgian_exports_of_services_by_countries,"მომსახურების ექსპორტი ქვეყნების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Exports-of-services-by-countries.xlsx,2026-10-14
+source.geostat_services_georgian_imports_of_services_by_countries,"მომსახურების იმპორტი ქვეყნების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Imports-of-services-by-countries.xlsx,2026-10-14
 source.geostat_health_main,ჯანმრთელობის დაცვის ძირითადი მაჩვენებლები,docs/Raw Data/Health/geostat-health-annual/official/Main-characteristics-of-public-health.xlsx,2026-10-15
 source.geostat_health_physicians,ექიმების რიცხოვნობა დაკავებული თანამდებობების მიხედვით,docs/Raw Data/Health/geostat-health-annual/official/Number-of-physicians-by-occupations.xlsx,2026-10-15
 source.geostat_health_nurses,საექთნო პერსონალის რიცხოვნობა,docs/Raw Data/Health/geostat-health-annual/official/Number-of-paramedical-personnel-by-basic-specialities.xlsx,2026-10-15

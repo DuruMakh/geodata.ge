@@ -1634,6 +1634,32 @@
     },
     "derivation": null
   },
+  "source.nbg_gross_external_debt_bpm6": {
+    "name": { "text": "NBG Gross External Debt by sector (ED-6 BPM-6)", "reviewedAt": "2026-10-15" },
+    "derivation": null
+  },
+  "source.nbg_official_reserve_assets": {
+    "name": { "text": "NBG Official Reserve Assets (OIR)", "reviewedAt": "2026-10-15" },
+    "derivation": null
+  },
+  "source.nbg_api_category_24": {
+    "name": { "text": "NBG file list for category 24 (external sector)", "reviewedAt": "2026-10-15" },
+    "derivation": null
+  },
+  "source.geostat_services_georgian_exports_of_services_by_countries": {
+    "name": {
+      "text": "Services exports by country, 2020–2024",
+      "reviewedAt": "2026-10-14"
+    },
+    "derivation": null
+  },
+  "source.geostat_services_georgian_imports_of_services_by_countries": {
+    "name": {
+      "text": "Services imports by country, 2020–2024",
+      "reviewedAt": "2026-10-14"
+    },
+    "derivation": null
+  },
   "source.geostat_health_main": {
     "name": {
       "text": "Main characteristics of public health",

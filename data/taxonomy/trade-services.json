@@ -76,5 +76,923 @@
     "kind": "service_type",
     "labelKa": "სამთავრობო საქონელი და მომსახურება, სხვა კატეგორიაში ჩაურთველი",
     "labelEn": "Government goods and services n.i.e."
+  },
+  {
+    "id": "partner.2020-2024.004",
+    "kind": "country",
+    "labelKa": "ავღანეთი",
+    "labelEn": "Afghanistan"
+  },
+  {
+    "id": "partner.2020-2024.008",
+    "kind": "country",
+    "labelKa": "ალბანეთი",
+    "labelEn": "Albania"
+  },
+  {
+    "id": "partner.2020-2024.012",
+    "kind": "country",
+    "labelKa": "ალჟირი",
+    "labelEn": "Algeria"
+  },
+  {
+    "id": "partner.2020-2024.020",
+    "kind": "country",
+    "labelKa": "ანდორა",
+    "labelEn": "Andorra"
+  },
+  {
+    "id": "partner.2020-2024.024",
+    "kind": "country",
+    "labelKa": "ანგოლა",
+    "labelEn": "Angola"
+  },
+  {
+    "id": "partner.2020-2024.028",
+    "kind": "country",
+    "labelKa": "ანტიგუა და ბარბუდა",
+    "labelEn": "Antigua and Barbuda"
+  },
+  {
+    "id": "partner.2020-2024.031",
+    "kind": "country",
+    "labelKa": "აზერბაიჯანი",
+    "labelEn": "Azerbaijan"
+  },
+  {
+    "id": "partner.2020-2024.032",
+    "kind": "country",
+    "labelKa": "არგენტინა",
+    "labelEn": "Argentina"
+  },
+  {
+    "id": "partner.2020-2024.036",
+    "kind": "country",
+    "labelKa": "ავსტრალია",
+    "labelEn": "Australia"
+  },
+  {
+    "id": "partner.2020-2024.040",
+    "kind": "country",
+    "labelKa": "ავსტრია",
+    "labelEn": "Austria"
+  },
+  {
+    "id": "partner.2020-2024.044",
+    "kind": "country",
+    "labelKa": "ბაჰამის კუნძულები",
+    "labelEn": "Bahamas"
+  },
+  {
+    "id": "partner.2020-2024.048",
+    "kind": "country",
+    "labelKa": "ბაჰრეინი",
+    "labelEn": "Bahrain"
+  },
+  {
+    "id": "partner.2020-2024.050",
+    "kind": "country",
+    "labelKa": "ბანგლადეში",
+    "labelEn": "Bangladesh"
+  },
+  {
+    "id": "partner.2020-2024.051",
+    "kind": "country",
+    "labelKa": "სომხეთი",
+    "labelEn": "Armenia"
+  },
+  {
+    "id": "partner.2020-2024.052",
+    "kind": "country",
+    "labelKa": "ბარბადოსი",
+    "labelEn": "Barbados"
+  },
+  {
+    "id": "partner.2020-2024.056",
+    "kind": "country",
+    "labelKa": "ბელგია",
+    "labelEn": "Belgium"
+  },
+  {
+    "id": "partner.2020-2024.060",
+    "kind": "country",
+    "labelKa": "ბერმუდა",
+    "labelEn": "Bermuda"
+  },
+  {
+    "id": "partner.2020-2024.064",
+    "kind": "country",
+    "labelKa": "ბუტანი",
+    "labelEn": "Bhutan"
+  },
+  {
+    "id": "partner.2020-2024.068",
+    "kind": "country",
+    "labelKa": "ბოლივია",
+    "labelEn": "Bolivia"
+  },
+  {
+    "id": "partner.2020-2024.070",
+    "kind": "country",
+    "labelKa": "ბოსნია და ჰერცეგოვინა",
+    "labelEn": "Bosnia and Herzegovina"
+  },
+  {
+    "id": "partner.2020-2024.072",
+    "kind": "country",
+    "labelKa": "ბოტსვანა",
+    "labelEn": "Botswana"
+  },
+  {
+    "id": "partner.2020-2024.076",
+    "kind": "country",
+    "labelKa": "ბრაზილია",
+    "labelEn": "Brazil"
+  },
+  {
+    "id": "partner.2020-2024.084",
+    "kind": "country",
+    "labelKa": "ბელიზი",
+    "labelEn": "Belize"
+  },
+  {
+    "id": "partner.2020-2024.092",
+    "kind": "country",
+    "labelKa": "ბრიტანეთის ვირჯინის კუნძულები",
+    "labelEn": "Virgin Islands, British"
+  },
+  {
+    "id": "partner.2020-2024.100",
+    "kind": "country",
+    "labelKa": "ბულგარეთი",
+    "labelEn": "Bulgaria"
+  },
+  {
+    "id": "partner.2020-2024.104",
+    "kind": "country",
+    "labelKa": "მიანმარი (ბირმა)",
+    "labelEn": "Myanmar"
+  },
+  {
+    "id": "partner.2020-2024.112",
+    "kind": "country",
+    "labelKa": "ბელარუსი",
+    "labelEn": "Belarus"
+  },
+  {
+    "id": "partner.2020-2024.116",
+    "kind": "country",
+    "labelKa": "კამბოჯა",
+    "labelEn": "Cambodia"
+  },
+  {
+    "id": "partner.2020-2024.120",
+    "kind": "country",
+    "labelKa": "კამერუნი",
+    "labelEn": "Cameroon"
+  },
+  {
+    "id": "partner.2020-2024.124",
+    "kind": "country",
+    "labelKa": "კანადა",
+    "labelEn": "Canada"
+  },
+  {
+    "id": "partner.2020-2024.136",
+    "kind": "country",
+    "labelKa": "კაიმანის კუნძულები",
+    "labelEn": "Cayman Islands"
+  },
+  {
+    "id": "partner.2020-2024.144",
+    "kind": "country",
+    "labelKa": "შრი-ლანკა",
+    "labelEn": "Sri Lanka"
+  },
+  {
+    "id": "partner.2020-2024.148",
+    "kind": "country",
+    "labelKa": "ჩადი",
+    "labelEn": "Chad"
+  },
+  {
+    "id": "partner.2020-2024.152",
+    "kind": "country",
+    "labelKa": "ჩილე",
+    "labelEn": "Chile"
+  },
+  {
+    "id": "partner.2020-2024.156",
+    "kind": "country",
+    "labelKa": "ჩინეთი",
+    "labelEn": "China"
+  },
+  {
+    "id": "partner.2020-2024.158",
+    "kind": "country",
+    "labelKa": "ტაივანი",
+    "labelEn": "Taiwan, Province of China"
+  },
+  {
+    "id": "partner.2020-2024.170",
+    "kind": "country",
+    "labelKa": "კოლუმბია",
+    "labelEn": "Colombia"
+  },
+  {
+    "id": "partner.2020-2024.174",
+    "kind": "country",
+    "labelKa": "კომორის კუნძულები",
+    "labelEn": "Comoros"
+  },
+  {
+    "id": "partner.2020-2024.188",
+    "kind": "country",
+    "labelKa": "კოსტა-რიკა",
+    "labelEn": "Costa Rica"
+  },
+  {
+    "id": "partner.2020-2024.191",
+    "kind": "country",
+    "labelKa": "ხორვატია",
+    "labelEn": "Croatia"
+  },
+  {
+    "id": "partner.2020-2024.192",
+    "kind": "country",
+    "labelKa": "კუბა",
+    "labelEn": "Cuba"
+  },
+  {
+    "id": "partner.2020-2024.196",
+    "kind": "country",
+    "labelKa": "კვიპროსი",
+    "labelEn": "Cyprus"
+  },
+  {
+    "id": "partner.2020-2024.203",
+    "kind": "country",
+    "labelKa": "ჩეხეთი",
+    "labelEn": "Czech Republic"
+  },
+  {
+    "id": "partner.2020-2024.208",
+    "kind": "country",
+    "labelKa": "დანია",
+    "labelEn": "Denmark"
+  },
+  {
+    "id": "partner.2020-2024.212",
+    "kind": "country",
+    "labelKa": "დომინიკა",
+    "labelEn": "Dominica"
+  },
+  {
+    "id": "partner.2020-2024.214",
+    "kind": "country",
+    "labelKa": "დომინიკელთა რესპუბლიკა",
+    "labelEn": "Dominican Republic"
+  },
+  {
+    "id": "partner.2020-2024.218",
+    "kind": "country",
+    "labelKa": "ეკვადორი",
+    "labelEn": "Ecuador"
+  },
+  {
+    "id": "partner.2020-2024.222",
+    "kind": "country",
+    "labelKa": "სალვადორი",
+    "labelEn": "EL Salvador"
+  },
+  {
+    "id": "partner.2020-2024.231",
+    "kind": "country",
+    "labelKa": "ეთიოპია",
+    "labelEn": "Ethiopia"
+  },
+  {
+    "id": "partner.2020-2024.232",
+    "kind": "country",
+    "labelKa": "ერიტრეა",
+    "labelEn": "Eritrea"
+  },
+  {
+    "id": "partner.2020-2024.233",
+    "kind": "country",
+    "labelKa": "ესტონეთი",
+    "labelEn": "Estonia"
+  },
+  {
+    "id": "partner.2020-2024.246",
+    "kind": "country",
+    "labelKa": "ფინეთი",
+    "labelEn": "Finland"
+  },
+  {
+    "id": "partner.2020-2024.250",
+    "kind": "country",
+    "labelKa": "საფრანგეთი",
+    "labelEn": "France"
+  },
+  {
+    "id": "partner.2020-2024.266",
+    "kind": "country",
+    "labelKa": "გაბონი",
+    "labelEn": "Gabon"
+  },
+  {
+    "id": "partner.2020-2024.276",
+    "kind": "country",
+    "labelKa": "გერმანია",
+    "labelEn": "Germany"
+  },
+  {
+    "id": "partner.2020-2024.292",
+    "kind": "country",
+    "labelKa": "გიბრალტარი",
+    "labelEn": "Gibraltar"
+  },
+  {
+    "id": "partner.2020-2024.300",
+    "kind": "country",
+    "labelKa": "საბერძნეთი",
+    "labelEn": "Greece"
+  },
+  {
+    "id": "partner.2020-2024.336",
+    "kind": "country",
+    "labelKa": "ქალაქი ვატიკანი",
+    "labelEn": "Holy See (Vatican City State)"
+  },
+  {
+    "id": "partner.2020-2024.344",
+    "kind": "country",
+    "labelKa": "ჰონკონგის სპეციალური ადმინისტრაციული რეგიონი, ჩინეთი",
+    "labelEn": "Hong Kong"
+  },
+  {
+    "id": "partner.2020-2024.348",
+    "kind": "country",
+    "labelKa": "უნგრეთი",
+    "labelEn": "Hungary"
+  },
+  {
+    "id": "partner.2020-2024.352",
+    "kind": "country",
+    "labelKa": "ისლანდია",
+    "labelEn": "Iceland"
+  },
+  {
+    "id": "partner.2020-2024.356",
+    "kind": "country",
+    "labelKa": "ინდოეთი",
+    "labelEn": "India"
+  },
+  {
+    "id": "partner.2020-2024.360",
+    "kind": "country",
+    "labelKa": "ინდონეზია",
+    "labelEn": "Indonesia"
+  },
+  {
+    "id": "partner.2020-2024.364",
+    "kind": "country",
+    "labelKa": "ირანი",
+    "labelEn": "Iran"
+  },
+  {
+    "id": "partner.2020-2024.368",
+    "kind": "country",
+    "labelKa": "ერაყი",
+    "labelEn": "Iraq"
+  },
+  {
+    "id": "partner.2020-2024.372",
+    "kind": "country",
+    "labelKa": "ირლანდია",
+    "labelEn": "Ireland"
+  },
+  {
+    "id": "partner.2020-2024.376",
+    "kind": "country",
+    "labelKa": "ისრაელი",
+    "labelEn": "Israel"
+  },
+  {
+    "id": "partner.2020-2024.380",
+    "kind": "country",
+    "labelKa": "იტალია",
+    "labelEn": "Italy"
+  },
+  {
+    "id": "partner.2020-2024.384",
+    "kind": "country",
+    "labelKa": "კოტ-დივუარი",
+    "labelEn": "Cote d'ivoire"
+  },
+  {
+    "id": "partner.2020-2024.392",
+    "kind": "country",
+    "labelKa": "იაპონია",
+    "labelEn": "Japan"
+  },
+  {
+    "id": "partner.2020-2024.398",
+    "kind": "country",
+    "labelKa": "ყაზახეთი",
+    "labelEn": "Kazakhstan"
+  },
+  {
+    "id": "partner.2020-2024.400",
+    "kind": "country",
+    "labelKa": "იორდანია",
+    "labelEn": "Jordan"
+  },
+  {
+    "id": "partner.2020-2024.404",
+    "kind": "country",
+    "labelKa": "კენია",
+    "labelEn": "Kenya"
+  },
+  {
+    "id": "partner.2020-2024.410",
+    "kind": "country",
+    "labelKa": "სამხრეთ კორეა",
+    "labelEn": "Korea, Republic of"
+  },
+  {
+    "id": "partner.2020-2024.414",
+    "kind": "country",
+    "labelKa": "ქუვეითი",
+    "labelEn": "Kuwait"
+  },
+  {
+    "id": "partner.2020-2024.417",
+    "kind": "country",
+    "labelKa": "ყირგიზეთი",
+    "labelEn": "Kyrgyzstan"
+  },
+  {
+    "id": "partner.2020-2024.422",
+    "kind": "country",
+    "labelKa": "ლიბანი",
+    "labelEn": "Lebanon"
+  },
+  {
+    "id": "partner.2020-2024.428",
+    "kind": "country",
+    "labelKa": "ლატვია",
+    "labelEn": "Latvia"
+  },
+  {
+    "id": "partner.2020-2024.430",
+    "kind": "country",
+    "labelKa": "ლიბერია",
+    "labelEn": "Liberia"
+  },
+  {
+    "id": "partner.2020-2024.434",
+    "kind": "country",
+    "labelKa": "ლიბია",
+    "labelEn": "Libya"
+  },
+  {
+    "id": "partner.2020-2024.438",
+    "kind": "country",
+    "labelKa": "ლიხტენშტაინი",
+    "labelEn": "Liechtenstein"
+  },
+  {
+    "id": "partner.2020-2024.440",
+    "kind": "country",
+    "labelKa": "ლიეტუვა",
+    "labelEn": "Lithuania (Lietuva)"
+  },
+  {
+    "id": "partner.2020-2024.442",
+    "kind": "country",
+    "labelKa": "ლუქსემბურგი",
+    "labelEn": "Luxembourg"
+  },
+  {
+    "id": "partner.2020-2024.458",
+    "kind": "country",
+    "labelKa": "მალაიზია",
+    "labelEn": "Malaysia"
+  },
+  {
+    "id": "partner.2020-2024.462",
+    "kind": "country",
+    "labelKa": "მალდივები",
+    "labelEn": "Maldives"
+  },
+  {
+    "id": "partner.2020-2024.466",
+    "kind": "country",
+    "labelKa": "მალი",
+    "labelEn": "Mali"
+  },
+  {
+    "id": "partner.2020-2024.470",
+    "kind": "country",
+    "labelKa": "მალტა",
+    "labelEn": "Malta"
+  },
+  {
+    "id": "partner.2020-2024.478",
+    "kind": "country",
+    "labelKa": "მავრიტანია",
+    "labelEn": "Mauritania"
+  },
+  {
+    "id": "partner.2020-2024.480",
+    "kind": "country",
+    "labelKa": "მავრიკი",
+    "labelEn": "Mauritius"
+  },
+  {
+    "id": "partner.2020-2024.484",
+    "kind": "country",
+    "labelKa": "მექსიკა",
+    "labelEn": "Mexico"
+  },
+  {
+    "id": "partner.2020-2024.492",
+    "kind": "country",
+    "labelKa": "მონაკო",
+    "labelEn": "Monaco"
+  },
+  {
+    "id": "partner.2020-2024.496",
+    "kind": "country",
+    "labelKa": "მონღოლეთი",
+    "labelEn": "Mongolia"
+  },
+  {
+    "id": "partner.2020-2024.498",
+    "kind": "country",
+    "labelKa": "მოლდოვა",
+    "labelEn": "Moldova"
+  },
+  {
+    "id": "partner.2020-2024.499",
+    "kind": "country",
+    "labelKa": "მონტენეგრო",
+    "labelEn": "Montenegro"
+  },
+  {
+    "id": "partner.2020-2024.504",
+    "kind": "country",
+    "labelKa": "მაროკო",
+    "labelEn": "Morocco"
+  },
+  {
+    "id": "partner.2020-2024.512",
+    "kind": "country",
+    "labelKa": "ომანი",
+    "labelEn": "Oman"
+  },
+  {
+    "id": "partner.2020-2024.524",
+    "kind": "country",
+    "labelKa": "ნეპალი",
+    "labelEn": "Nepal"
+  },
+  {
+    "id": "partner.2020-2024.528",
+    "kind": "country",
+    "labelKa": "ნიდერლანდები",
+    "labelEn": "Netherlands"
+  },
+  {
+    "id": "partner.2020-2024.533",
+    "kind": "country",
+    "labelKa": "არუბა",
+    "labelEn": "Aruba"
+  },
+  {
+    "id": "partner.2020-2024.554",
+    "kind": "country",
+    "labelKa": "ახალი ზელანდია",
+    "labelEn": "New Zealand"
+  },
+  {
+    "id": "partner.2020-2024.566",
+    "kind": "country",
+    "labelKa": "ნიგერია",
+    "labelEn": "Nigeria"
+  },
+  {
+    "id": "partner.2020-2024.578",
+    "kind": "country",
+    "labelKa": "ნორვეგია",
+    "labelEn": "Norway"
+  },
+  {
+    "id": "partner.2020-2024.584",
+    "kind": "country",
+    "labelKa": "მარშალის კუნძულები",
+    "labelEn": "Marshall Islands"
+  },
+  {
+    "id": "partner.2020-2024.586",
+    "kind": "country",
+    "labelKa": "პაკისტანი",
+    "labelEn": "Pakistan"
+  },
+  {
+    "id": "partner.2020-2024.591",
+    "kind": "country",
+    "labelKa": "პანამა",
+    "labelEn": "Panama"
+  },
+  {
+    "id": "partner.2020-2024.600",
+    "kind": "country",
+    "labelKa": "პარაგვაი",
+    "labelEn": "Paraguay"
+  },
+  {
+    "id": "partner.2020-2024.604",
+    "kind": "country",
+    "labelKa": "პერუ",
+    "labelEn": "Peru"
+  },
+  {
+    "id": "partner.2020-2024.608",
+    "kind": "country",
+    "labelKa": "ფილიპინები",
+    "labelEn": "Philippines"
+  },
+  {
+    "id": "partner.2020-2024.616",
+    "kind": "country",
+    "labelKa": "პოლონეთი",
+    "labelEn": "Poland"
+  },
+  {
+    "id": "partner.2020-2024.620",
+    "kind": "country",
+    "labelKa": "პორტუგალია",
+    "labelEn": "Portugal"
+  },
+  {
+    "id": "partner.2020-2024.634",
+    "kind": "country",
+    "labelKa": "კატარი",
+    "labelEn": "Qatar"
+  },
+  {
+    "id": "partner.2020-2024.642",
+    "kind": "country",
+    "labelKa": "რუმინეთი",
+    "labelEn": "Romania"
+  },
+  {
+    "id": "partner.2020-2024.643",
+    "kind": "country",
+    "labelKa": "რუსეთი",
+    "labelEn": "Russia"
+  },
+  {
+    "id": "partner.2020-2024.659",
+    "kind": "country",
+    "labelKa": "სენტ-კიტსი და ნევისი",
+    "labelEn": "Saint Kitts and Nevis"
+  },
+  {
+    "id": "partner.2020-2024.682",
+    "kind": "country",
+    "labelKa": "საუდის არაბეთი",
+    "labelEn": "Saudi Arabia"
+  },
+  {
+    "id": "partner.2020-2024.686",
+    "kind": "country",
+    "labelKa": "სენეგალი",
+    "labelEn": "Senegal"
+  },
+  {
+    "id": "partner.2020-2024.688",
+    "kind": "country",
+    "labelKa": "სერბეთი",
+    "labelEn": "Serbia"
+  },
+  {
+    "id": "partner.2020-2024.690",
+    "kind": "country",
+    "labelKa": "სეიშელის კუნძულები",
+    "labelEn": "Seychelles"
+  },
+  {
+    "id": "partner.2020-2024.702",
+    "kind": "country",
+    "labelKa": "სინგაპური",
+    "labelEn": "Singapore"
+  },
+  {
+    "id": "partner.2020-2024.703",
+    "kind": "country",
+    "labelKa": "სლოვაკეთი",
+    "labelEn": "Slovakia"
+  },
+  {
+    "id": "partner.2020-2024.704",
+    "kind": "country",
+    "labelKa": "ვიეტნამი",
+    "labelEn": "Viet Nam"
+  },
+  {
+    "id": "partner.2020-2024.705",
+    "kind": "country",
+    "labelKa": "სლოვენია",
+    "labelEn": "Slovenia"
+  },
+  {
+    "id": "partner.2020-2024.706",
+    "kind": "country",
+    "labelKa": "სომალი",
+    "labelEn": "Somalia"
+  },
+  {
+    "id": "partner.2020-2024.710",
+    "kind": "country",
+    "labelKa": "სამხრეთ აფრიკის რესპუბლიკა",
+    "labelEn": "South Africa"
+  },
+  {
+    "id": "partner.2020-2024.716",
+    "kind": "country",
+    "labelKa": "ზიმბაბვე",
+    "labelEn": "Zimbabwe"
+  },
+  {
+    "id": "partner.2020-2024.724",
+    "kind": "country",
+    "labelKa": "ესპანეთი",
+    "labelEn": "Spain"
+  },
+  {
+    "id": "partner.2020-2024.729",
+    "kind": "country",
+    "labelKa": "სუდანი",
+    "labelEn": "Sudan"
+  },
+  {
+    "id": "partner.2020-2024.752",
+    "kind": "country",
+    "labelKa": "შვედეთი",
+    "labelEn": "Sweden"
+  },
+  {
+    "id": "partner.2020-2024.756",
+    "kind": "country",
+    "labelKa": "შვეიცარია",
+    "labelEn": "Switzerland"
+  },
+  {
+    "id": "partner.2020-2024.760",
+    "kind": "country",
+    "labelKa": "სირია",
+    "labelEn": "Syrian"
+  },
+  {
+    "id": "partner.2020-2024.762",
+    "kind": "country",
+    "labelKa": "ტაჯიკეთი",
+    "labelEn": "Tajikistan"
+  },
+  {
+    "id": "partner.2020-2024.764",
+    "kind": "country",
+    "labelKa": "ტაილანდი",
+    "labelEn": "Thailand"
+  },
+  {
+    "id": "partner.2020-2024.784",
+    "kind": "country",
+    "labelKa": "არაბთა გაერთიანებული საამიროები",
+    "labelEn": "United Arab Emirates"
+  },
+  {
+    "id": "partner.2020-2024.788",
+    "kind": "country",
+    "labelKa": "ტუნისი",
+    "labelEn": "Tunisia"
+  },
+  {
+    "id": "partner.2020-2024.792",
+    "kind": "country",
+    "labelKa": "თურქეთი",
+    "labelEn": "Türkiye"
+  },
+  {
+    "id": "partner.2020-2024.795",
+    "kind": "country",
+    "labelKa": "თურქმენეთი",
+    "labelEn": "Turkmenistan"
+  },
+  {
+    "id": "partner.2020-2024.800",
+    "kind": "country",
+    "labelKa": "უგანდა",
+    "labelEn": "Uganda"
+  },
+  {
+    "id": "partner.2020-2024.804",
+    "kind": "country",
+    "labelKa": "უკრაინა",
+    "labelEn": "Ukraine"
+  },
+  {
+    "id": "partner.2020-2024.807",
+    "kind": "country",
+    "labelKa": "ჩრდილოეთ მაკედონია",
+    "labelEn": "North Macedonia"
+  },
+  {
+    "id": "partner.2020-2024.818",
+    "kind": "country",
+    "labelKa": "ეგვიპტე",
+    "labelEn": "Egypt"
+  },
+  {
+    "id": "partner.2020-2024.826",
+    "kind": "country",
+    "labelKa": "გაერთიანებული სამეფო",
+    "labelEn": "United Kingdom"
+  },
+  {
+    "id": "partner.2020-2024.833",
+    "kind": "country",
+    "labelKa": "მენის კუნძული",
+    "labelEn": "Isle of Man"
+  },
+  {
+    "id": "partner.2020-2024.834",
+    "kind": "country",
+    "labelKa": "ტანზანია",
+    "labelEn": "Tanzania"
+  },
+  {
+    "id": "partner.2020-2024.840",
+    "kind": "country",
+    "labelKa": "ამერიკის შეერთებული შტატები",
+    "labelEn": "United States"
+  },
+  {
+    "id": "partner.2020-2024.850",
+    "kind": "country",
+    "labelKa": "აშშ-ის ვირჯინის კუნძულები",
+    "labelEn": "Virgin Islands, U.S"
+  },
+  {
+    "id": "partner.2020-2024.858",
+    "kind": "country",
+    "labelKa": "ურუგვაი",
+    "labelEn": "Uruguay"
+  },
+  {
+    "id": "partner.2020-2024.860",
+    "kind": "country",
+    "labelKa": "უზბეკეთი",
+    "labelEn": "Uzbekistan"
+  },
+  {
+    "id": "partner.2020-2024.862",
+    "kind": "country",
+    "labelKa": "ვენესუელა",
+    "labelEn": "Venezuela"
+  },
+  {
+    "id": "partner.2020-2024.887",
+    "kind": "country",
+    "labelKa": "იემენი",
+    "labelEn": "Yemen"
+  },
+  {
+    "id": "services.other_countries",
+    "kind": "residual",
+    "labelKa": "სხვა ქვეყნები",
+    "labelEn": "Other countries"
+  },
+  {
+    "id": "services.international_organizations",
+    "kind": "residual",
+    "labelKa": "საერთაშორისო ორგანიზაციები",
+    "labelEn": "International organizations"
+  },
+  {
+    "id": "services.undefined_export_country",
+    "kind": "residual",
+    "labelKa": "ქვეყანა არ არის განსაზღვრული (ექსპორტი)",
+    "labelEn": "Country not defined (exports)"
+  },
+  {
+    "id": "services.unknown_import_country",
+    "kind": "residual",
+    "labelKa": "უცნობი ქვეყანა (იმპორტი)",
+    "labelEn": "Unknown country (imports)"
   }
 ]

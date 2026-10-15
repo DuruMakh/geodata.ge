@@ -4,8 +4,8 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
   "id": "external-flows",
   "slug": "external-flows",
   "title": "External flows",
-  "summary": "Money transfers, foreign direct investment and the current account, Georgia, annually in nominal USD.",
-  "reviewedAt": "2026-10-10",
+  "summary": "Money transfers, foreign direct investment, the current account, foreign debt and reserves, Georgia, annually in USD.",
+  "reviewedAt": "2026-10-15",
   "archiveManifestId": "external-flows",
   "coverageSource": {
     "kind": "archive"
@@ -13,7 +13,7 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
   "canonicalDocuments": [
     "docs/data-methodology/external-flows-annual.md"
   ],
-  "disclosure": "The External flows pages use reviewed annual subsets of the external-flows research package: money transfers by country with the balance-of-payments personal transfers (Money from abroad), and Geostat's foreign direct investment by country, sector and region (Foreign investment), and NBG's current account and its four parts (Current account). Monthly and quarterly data and 2026 are outside these pages.",
+  "disclosure": "The External flows pages use reviewed annual subsets of the external-flows research package: money transfers by country with the balance-of-payments personal transfers (Money from abroad), Geostat's foreign direct investment by country, sector and region (Foreign investment), and NBG's current account and its four parts (Current account). Foreign debt and Reserves use NBG's gross external debt and official reserve assets from a separate package. Monthly and quarterly data are outside these pages; 2026 appears only as the one latest amount on Foreign debt and Reserves.",
   "keyFacts": [
     {
       "label": "Coverage",
@@ -43,7 +43,8 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "paragraphs": [
         "NBG's money transfers through fast transfer systems, 2000–2025: total inflow and outflow and every published country. Each annual value is the sum of the published months. Personal transfers from the balance of payments (credit and debit) are added alongside. Monthly data, 2026 months, transfers by system, foreign direct investment and the current account are excluded.",
         "Foreign investment shows Geostat's annual foreign direct investment into Georgia: the total for 1996–2025, by country for 1996–2025, by economic sector (NACE Rev.2 sections) for 2016–2025 and by region for 2009–2025. The investment stock, the split into equity, reinvested earnings and debt, and NBG's balance-of-payments direct-investment lines are not on the page.",
-        "Current account shows NBG's balance-of-payments (BPM6) current account for 2000–2025 and its four parts: goods, services, primary income and secondary income, each as credit (money in), debit (money out) and net. % of GDP divides by Geostat's nominal GDP in US dollars. The split of services by type, the capital and financial accounts and quarterly data are not on the page."
+        "Current account shows NBG's balance-of-payments (BPM6) current account for 2000–2025 and its four parts: goods, services, primary income and secondary income, each as credit (money in), debit (money out) and net. % of GDP divides by Geostat's nominal GDP in US dollars. The split of services by type, the capital and financial accounts and quarterly data are not on the page.",
+        "Foreign debt shows NBG's gross external debt (BPM6) for 2006–2026: the total and the debt of the government, banks, companies, loans between related companies and the National Bank. Reserves shows NBG's official reserve assets for 1995–2026: the total, foreign currency, gold and SDRs. Both pages show US dollar amounts as published, or % of GDP, and use no exchange rates. Debt by currency or maturity and quarterly or monthly values are not on the pages."
       ]
     },
     {
@@ -80,7 +81,8 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "paragraphs": [
         "The money-transfer table is the 15 September 2026 release and the balance of payments the 30 September 2026 release. NBG revises past years regularly, so figures quoted from earlier releases can differ.",
         "Geostat's annual FDI tables are the 17 August 2026 release and the quarterly totals the 8 September 2026 release. Geostat's annual release may adjust the previous five years.",
-        "NBG revises the balance of payments every year on 30 September, when preliminary quarterly figures are replaced with annual ones. Current account uses the 30 September 2026 release."
+        "NBG revises the balance of payments every year on 30 September, when preliminary quarterly figures are replaced with annual ones. Current account uses the 30 September 2026 release.",
+        "The foreign debt and reserves files were retrieved on 15 October 2026. NBG's file list shows the gross external debt file as updated on 30 September 2026 and the official reserve assets file as updated on 7 October 2026, with the next updates listed for 30 December 2026 and 6 November 2026."
       ]
     },
     {
@@ -90,7 +92,8 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       "paragraphs": [
         "The accepted subset holds 9,312 money-transfer observations (14 blank and 140 partial-month values) and 52 personal-transfer observations. Preparation checks the research package's file fingerprints and its independent verification, compares each year's countries with the total, and rejects an omitted year, a duplicate, a blank turned into zero and a partial-month value without its month count.",
         "Foreign investment holds 2,707 observations. Preparation checks the same fingerprints and independent verification, requires every year of every country, sector and region, and checks that each breakdown adds up to Geostat's annual total within the package's recorded rounding tolerance (regions from 2016). Geostat's '-' stays missing and is never turned into zero.",
-        "Current account holds 390 observations: five lines, three flows, 26 years. Preparation checks the same fingerprints and independent verification, and checks in every year that net equals credit minus debit and that the four parts add up to the current account for credit, debit and net, within one dollar."
+        "Current account holds 390 observations: five lines, three flows, 26 years. Preparation checks the same fingerprints and independent verification, and checks in every year that net equals credit minus debit and that the four parts add up to the current account for credit, debit and net, within one dollar.",
+        "Foreign debt and Reserves hold 254 observations: six debt lines on 21 dates and four reserve lines on 32 dates. Preparation checks the workbooks' fingerprints and reads every value again with a second, independent reader. It checks in every year that the five debt groups add up to the total (within USD 0.05 million), that every value except the single latest point is dated 31 December, and that reserves converted from thousand to million USD are exact. Total reserves differ from foreign currency plus gold plus SDRs by between −USD 2.5 million and +USD 13.1 million, the amount of the two reserve parts left out of the page."
       ]
     },
     {
@@ -131,11 +134,49 @@ export const EXTERNAL_FLOWS_METHODOLOGY_CONTENT: MethodologyContent = {
       ]
     },
     {
+      "id": "foreign-debt",
+      "kind": "classification",
+      "title": "What is gross external debt?",
+      "paragraphs": [
+        "Gross external debt is the debt that people and organisations in Georgia owe to creditors abroad on a given date. The page shows who owes it. Government is the general government. Banks are the deposit-taking corporations other than the National Bank. Companies are NBG's Other sectors: non-financial companies and financial companies that are not banks. Loans between related companies are NBG's Direct investment: intercompany lending, for example a foreign parent lending to its Georgian subsidiary; they are a separate group, not part of Companies. National Bank is the central bank.",
+        "The five groups add up to the total. At the end of 2025 the total was USD 27,046.9 million: government 9,202.9, banks 9,455.5, companies 5,154.7, loans between related companies 2,452.9 and the National Bank 780.9."
+      ]
+    },
+    {
+      "id": "foreign-debt-government",
+      "kind": "limitations",
+      "title": "Why the government line differs from the Debt page",
+      "paragraphs": [
+        "The Debt page in the Budget section shows the government's debt from the Ministry of Finance, in lari. At the end of 2025 its external part was GEL 24.2 billion. The government line here is NBG's gross external debt of the general government, in US dollars: USD 9.2 billion at the end of 2025.",
+        "The two come from different publishers, in different currencies and with slightly different rules, so they are not meant to match. Neither is converted into the other's currency."
+      ]
+    },
+    {
+      "id": "reserves",
+      "kind": "classification",
+      "title": "What are official reserves?",
+      "paragraphs": [
+        "Official reserve assets are foreign assets that the National Bank controls and can use when needed. The page shows the total and three parts: foreign currency, gold and SDRs. SDRs (special drawing rights) are a reserve asset created by the International Monetary Fund and held by its member countries. At the end of 2025 total reserves were USD 6,159.3 million: foreign currency 4,680.0, gold 1,002.3 and SDRs 477.0.",
+        "The National Bank has held gold since 2024. NBG publishes gold as 0 from 1995 to 2023 and as USD 598.7 million at the end of 2024; these zeros are published values, not gaps.",
+        "NBG's table has two more reserve lines, the IMF reserve position and other reserve assets, which are not on the page. The three parts therefore do not add up to the total exactly: the gap is between −USD 2.5 million and +USD 13.1 million in every year, well under USD 0.03 billion."
+      ]
+    },
+    {
+      "id": "position-latest",
+      "kind": "limitations",
+      "title": "What does 2026 mean on these pages?",
+      "paragraphs": [
+        "Foreign debt and Reserves each end with one 2026 value: the latest amount NBG has published. For foreign debt it is the amount on 30 June 2026 (USD 28,166.2 million) and for reserves the amount on 30 September 2026 (USD 8,166.9 million). It is an amount on a date, not a full year, and not a sum or average of months. It is drawn as a hollow point with its month. Every other year is the amount on 31 December.",
+        "% of GDP divides each amount by Geostat's nominal GDP in US dollars, the series Current account uses, so it has no value for 2026, which has no GDP yet, and none for 1995 on Reserves. Preliminary GDP years are named in the source line."
+      ]
+    },
+    {
       "id": "archive",
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "Three unedited NBG files retrieved on 10 October 2026 are available: money transfers by country, the balance of payments (BPM6), which is the source of Current account, and the external-sector statistics methodology. Five Geostat files retrieved the same day cover foreign direct investment: the quarterly totals, the country, sector and region tables and Geostat's metadata. Excel follows the chosen direction or breakdown, years and all selected series."
+        "Three unedited NBG files retrieved on 10 October 2026 are available: money transfers by country, the balance of payments (BPM6), which is the source of Current account, and the external-sector statistics methodology. Five Geostat files retrieved the same day cover foreign direct investment: the quarterly totals, the country, sector and region tables and Geostat's metadata. Excel follows the chosen direction or breakdown, years and all selected series.",
+        "Two further unedited NBG files retrieved on 15 October 2026 are available: gross external debt by sector (ED-6, BPM6) and official reserve assets (OIR), together with NBG's file list for the external sector. Their Excel files follow the chosen measure, years and series, in million USD or % of GDP."
       ]
     }
   ],
