@@ -4564,5 +4564,23 @@
       "reviewedAt": "2026-10-14"
     },
     "documentLanguage": "en"
+  },
+  "nbg_gross_external_debt_bpm6": {
+    "title": { "text": "Gross external debt by sector (ED-6, BPM6)", "reviewedAt": "2026-10-15" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-15" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-15" },
+    "documentLanguage": "en"
+  },
+  "nbg_official_reserve_assets": {
+    "title": { "text": "Official reserve assets (OIR)", "reviewedAt": "2026-10-15" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-15" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-15" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_24": {
+    "title": { "text": "National Bank file list - category 24 (external sector)", "reviewedAt": "2026-10-15" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-15" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-15" },
+    "documentLanguage": "en"
   }
 }
