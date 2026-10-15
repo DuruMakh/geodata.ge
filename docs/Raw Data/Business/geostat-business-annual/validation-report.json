@@ -346,6 +346,18 @@
       "sha256": "458CC878F72E412206401C43933DC97EFCC8D896F19D240E3973B646664E74AB",
       "bytes": 91909,
       "passed": true
+    },
+    {
+      "source_id": "geostat_business_survey_metadata_ka",
+      "sha256": "2B0F0DA44E0F9A9E0E18DB24FA8F3F6CE1299882D1F6D9880F6E755D7272E27C",
+      "bytes": 160020,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_demography_metadata_ka",
+      "sha256": "0752FABACFBC08C33E2AB9CAF0EE81B181E4E2A95491C89D720F2DA6B7ED905A",
+      "bytes": 129455,
+      "passed": true
     }
   ]
 }

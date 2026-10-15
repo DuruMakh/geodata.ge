@@ -285,7 +285,7 @@ source.geostat_business_intermediate_consumption,შუალედური მ
 source.geostat_business_personnel_costs,პერსონალის ხარჯები (0502EN0108),docs/Raw Data/Business/geostat-business-annual/official/0502EN0108_Personnel-costs.xlsx,2026-10-15
 source.geostat_business_purchases,საქონლისა და მომსახურების შესყიდვები (0502EN0109),docs/Raw Data/Business/geostat-business-annual/official/0502EN0109_Purchase-of-goods-and-services.xlsx,2026-10-15
 source.geostat_business_purchases_for_resale,გადაყიდვისთვის შესყიდული საქონელი და მომსახურება (0502EN0110),docs/Raw Data/Business/geostat-business-annual/official/0502EN0110_Purchase-of-goods-and-services-for-resale.xlsx,2026-10-15
-source.geostat_business_investment,ინვესტიციები ძირითად კაპიტალში (0502EN0111),docs/Raw Data/Business/geostat-business-annual/official/0502EN0111_Investments-in-fixed-assets.xlsx,2026-10-15
+source.geostat_business_investment,ინვესტიციები ფიქსირებულ აქტივებში (0502EN0111),docs/Raw Data/Business/geostat-business-annual/official/0502EN0111_Investments-in-fixed-assets.xlsx,2026-10-15
 source.geostat_business_gender,ბიზნეს სტატისტიკა გენდერის მიხედვით (0502EN0112),docs/Raw Data/Business/geostat-business-annual/official/0502EN0112_BS_Gender_ENG.xlsx,2026-10-15
 source.geostat_business_fixed_assets,ძირითადი კაპიტალი (0502EN0113),docs/Raw Data/Business/geostat-business-annual/official/0502EN0113_fixed-assets.xlsx,2026-10-15
 source.geostat_business_profit_loss,მოგება და ზარალი (0502EN0114),docs/Raw Data/Business/geostat-business-annual/official/0502EN0114_Profit-and-loss.xlsx,2026-10-15
@@ -299,3 +299,5 @@ source.geostat_business_survey_page,საწარმოთა სტატი�
 source.geostat_business_demography_page,ბიზნეს დემოგრაფიის მაჩვენებლები (წყაროს გვერდი),docs/Raw Data/Business/geostat-business-annual/official/geostat-category-69-2026-10-15.html,2026-10-15
 source.geostat_business_survey_metadata,მეტამონაცემები: საწარმოთა სტატისტიკური კვლევა (წლიური),docs/Raw Data/Business/geostat-business-annual/official/0502_011026_EN.PDF,2026-10-15
 source.geostat_business_demography_metadata,მეტამონაცემები: ბიზნეს დემოგრაფია,docs/Raw Data/Business/geostat-business-annual/official/0519_200225_EN.PDF,2026-10-15
+source.geostat_business_survey_metadata_ka,"მეტამონაცემები: საწარმოთა სტატისტიკური კვლევა (წლიური), ქართული ვერსია",docs/Raw Data/Business/geostat-business-annual/official/0502_011026_GE.PDF,2026-10-15
+source.geostat_business_demography_metadata_ka,"მეტამონაცემები: ბიზნეს დემოგრაფია, ქართული ვერსია",docs/Raw Data/Business/geostat-business-annual/official/0519_200225_GE.PDF,2026-10-15

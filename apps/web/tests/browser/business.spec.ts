@@ -81,11 +81,11 @@ test("outside the list a nested series carries its parent's name, and amounts re
   await ready(page);
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
   const labels = (await page.getByTestId("explorer-table").locator("tbody th").allInnerTexts()).map(text => text.trim());
-  expect(labels).toEqual(expect.arrayContaining(["ინვესტიციები ძირითად საშუალებებში — მშენებლობა", "მოგება — მშენებლობა"]));
+  expect(labels).toEqual(expect.arrayContaining(["ინვესტიციები ფიქსირებულ აქტივებში — მშენებლობა", "მოგება — მშენებლობა"]));
   // The list keeps the short name under its parent.
   await expect(page.locator('[data-series-id="business.profit.sector_f"]')).toContainText("მშენებლობა");
   await expect(page.locator('[data-series-id="business.profit.sector_f"]')).not.toContainText("მოგება —");
-  for (const name of ["ინვესტიციები ძირითად საშუალებებში — მშენებლობა", "მოგება — მშენებლობა"]) await expect(await cell(page, name, 2025)).toHaveText(/^(\d+\.\d|<0\.1)$/);
+  for (const name of ["ინვესტიციები ფიქსირებულ აქტივებში — მშენებლობა", "მოგება — მშენებლობა"]) await expect(await cell(page, name, 2025)).toHaveText(/^(\d+\.\d|<0\.1)$/);
 });
 
 test("firms opened and closed selects both, and the rate switch keeps them and the headline", async ({ page }) => {

@@ -41,9 +41,9 @@ describe("original-source inventory", () => {
     expect(rows.some((row) => row.path.includes("/official/ka/"))).toBe(false);
   });
 
-  it("inventories the 24 business originals", async () => {
+  it("inventories the 26 business originals", async () => {
     const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "business");
-    expect(rows).toHaveLength(24);
+    expect(rows).toHaveLength(26);
     expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Business/geostat-business-annual/official/"))).toBe(true);
   });
 

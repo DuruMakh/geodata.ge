@@ -37,6 +37,7 @@ XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 SURVEY_PAGE = 'https://www.geostat.ge/en/modules/categories/326/statistical-survey-of-enterprises'
 DEMOGRAPHY_PAGE = 'https://www.geostat.ge/en/modules/categories/69/business-demography'
 METADATA_PAGE = 'https://www.geostat.ge/en/modules/categories/530/metadata-business-statistics'
+METADATA_PAGE_KA = 'https://www.geostat.ge/ka/modules/categories/530/metadata-biznes-sektori'
 
 
 def _media(number, name):
@@ -102,6 +103,11 @@ SOURCES = [
      *_media(83205, '0502_011026_EN.PDF'), 'official/0502_011026_EN.PDF', 'application/pdf', '2026-10-15T11:16:24Z'),
     ('geostat_business_demography_metadata', 'Metadata: business demography', METADATA_PAGE,
      *_media(68651, '0519_200225_EN.PDF'), 'official/0519_200225_EN.PDF', 'application/pdf', '2026-10-15T11:16:27Z'),
+    # The Georgian editions, archived for the Georgian definitions the methodology page quotes.
+    ('geostat_business_survey_metadata_ka', 'Metadata: statistical survey of enterprises (annual), Georgian edition', METADATA_PAGE_KA,
+     *_media(83204, '0502_011026_GE.PDF'), 'official/0502_011026_GE.PDF', 'application/pdf', '2026-10-15T11:43:24Z'),
+    ('geostat_business_demography_metadata_ka', 'Metadata: business demography, Georgian edition', METADATA_PAGE_KA,
+     *_media(68650, '0519_200225_GE.PDF'), 'official/0519_200225_GE.PDF', 'application/pdf', '2026-10-15T11:43:26Z'),
 ]
 FILE = {source[0]: source[5] for source in SOURCES}
 FIELDS = ['year', 'indicator_id', 'value', 'published_value', 'unit', 'basis', 'value_status', 'source_id', 'source_sheet', 'source_cell']

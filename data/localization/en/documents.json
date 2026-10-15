@@ -4924,5 +4924,35 @@
       "reviewedAt": "2026-10-15"
     },
     "documentLanguage": "en"
+  },
+  "geostat_business_survey_metadata_ka": {
+    "title": {
+      "text": "Metadata: statistical survey of enterprises (annual), Georgian edition",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_business_demography_metadata_ka": {
+    "title": {
+      "text": "Metadata: business demography, Georgian edition",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "ka"
   }
 }

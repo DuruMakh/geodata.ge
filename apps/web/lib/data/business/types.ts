@@ -47,7 +47,7 @@ export const BUSINESS_INDICATORS: readonly BusinessIndicator[] = [
 export const BUSINESS_SOURCES = [
   "geostat_business_turnover", "geostat_business_employed", "geostat_business_investment", "geostat_business_profit_loss", "geostat_business_demography",
 ];
-/** Every archived source: the served workbooks, the other survey and demography tables, the remarks, the two page captures and Geostat's two metadata documents. */
+/** Every archived source: the served workbooks, the other survey and demography tables, the remarks, the two page captures and Geostat's two metadata documents in English and Georgian. */
 export const BUSINESS_PUBLIC_SOURCES = [
   ...BUSINESS_SOURCES,
   "geostat_business_production_value", "geostat_business_employees", "geostat_business_earnings", "geostat_business_value_added",
@@ -55,6 +55,7 @@ export const BUSINESS_PUBLIC_SOURCES = [
   "geostat_business_gender", "geostat_business_fixed_assets", "geostat_business_labour_productivity", "geostat_business_remarks",
   "geostat_business_demography_other", "geostat_business_demography_births", "geostat_business_demography_deaths",
   "geostat_business_survey_page", "geostat_business_demography_page", "geostat_business_survey_metadata", "geostat_business_demography_metadata",
+  "geostat_business_survey_metadata_ka", "geostat_business_demography_metadata_ka",
 ];
 export type BusinessFact = {
   year: number;

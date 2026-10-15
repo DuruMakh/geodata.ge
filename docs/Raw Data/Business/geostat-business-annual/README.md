@@ -4,7 +4,7 @@ Research package for the Fiscal.ge "Business" hub. Approved design: `docs/superp
 
 ## Sources
 
-All data files were downloaded fresh on 2026-10-15 (UTC, 08:51–08:52) with `curl -L --retry 3` from Geostat's two category pages, which are kept as HTML captures (the two metadata documents listed below followed at 11:16):
+All data files were downloaded fresh on 2026-10-15 (UTC, 08:51–08:52) with `curl -L --retry 3` from Geostat's two category pages, which are kept as HTML captures (the two English metadata documents listed below followed at 11:16 and their Georgian editions at 11:43):
 
 - Statistical survey of enterprises, `https://www.geostat.ge/en/modules/categories/326` (resolves to `.../326/statistical-survey-of-enterprises`): the 15 `0502EN01xx` survey workbooks and `Remark_eng.pdf`.
 - Business demography indicators, `https://www.geostat.ge/en/modules/categories/69` (resolves to `.../69/business-demography`): `Main-results.xlsx`, `Other-indicators.xlsx`, `Enterprise-births.xlsx` and `Enterprise-deaths.xlsx`.
@@ -23,6 +23,7 @@ Every file link is `https://geostat.ge/media/<id>/<name>`, which redirects to `h
 | `geostat_business_remarks` | `official/Remark_eng.pdf` | Survey scope notes (below) |
 | `geostat_business_survey_page`, `geostat_business_demography_page` | `official/geostat-category-326-2026-10-15.html`, `geostat-category-69-2026-10-15.html` | The page captures the file links come from |
 | `geostat_business_survey_metadata`, `geostat_business_demography_metadata` | `official/0502_011026_EN.PDF`, `0519_200225_EN.PDF` | Geostat's metadata for the annual survey (certified 1 October 2026) and for business demography (20 February 2025), linked from `https://www.geostat.ge/en/modules/categories/530/metadata-business-statistics` and downloaded on 2026-10-15 at 11:16 UTC for the definitions the methodology page quotes; no value is read from them |
+| `geostat_business_survey_metadata_ka`, `geostat_business_demography_metadata_ka` | `official/0502_011026_GE.PDF`, `0519_200225_GE.PDF` | The Georgian editions of the same two metadata documents, linked from `https://www.geostat.ge/ka/modules/categories/530/metadata-biznes-sektori` and downloaded on 2026-10-15 at 11:43 UTC for the Georgian definitions the methodology page quotes; no value is read from them |
 
 `By_Regions.xlsx`, `By_kind_of_activity.xlsx` (the business register snapshot) and `Survival-of-enterprises.zip` are out of scope and not archived.
 
