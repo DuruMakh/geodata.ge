@@ -33,11 +33,12 @@ export function buildTradePartnersModel(data: ClientTradePartnersData, state: Tr
   const billion = values.some(value => Math.abs(value) >= 1_000_000_000);
   const unit = unitFor(values, { divisor: billion ? 1_000_000_000 : 1_000_000, label: message(presentation.messages, billion ? "trade.unit.billion" : "trade.unit.million"), decimals: 1 });
   unit.decimals = Math.max(1, unit.decimals);
-  const kind = data.dataset === "composition" ? "commodity_group" : data.dataset === "services" ? "service_type" : state.tab === "countries" ? "country" : "group";
-  const activeEntities = data.entities.filter(entity => entity.kind === kind);
-  const offTabSelected = data.entities.filter(entity => entity.kind !== kind && selectedIds.includes(entity.id));
+  const kind = data.dataset === "composition" ? "commodity_group" : data.dataset === "services" && data.dimension !== "countries" ? "service_type" : state.tab === "countries" ? "country" : "group";
+  const inView = (entity: ClientTradePartnerEntity) => entity.kind === kind || (data.dataset === "services" && data.dimension === "countries" && entity.kind === "residual");
+  const activeEntities = data.entities.filter(inView);
+  const offTabSelected = data.entities.filter(entity => !inView(entity) && selectedIds.includes(entity.id));
   const national = valuesByEntity[totalId][range.end];
-  const rows = activeEntities.map(entity => {
+  const rows = activeEntities.filter(entity => entity.kind !== "residual").map(entity => {
     const valueUsd = valuesByEntity[entity.id][range.end];
     return { entityId: entity.id, kind: entity.kind, label: publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels), valueUsd, shareOfNational: state.measure !== "trade.balance" && valueUsd !== null && national !== null && national > 0 ? valueUsd / national : null, rank: null, color: tradePartnerColor(entity.id) };
   });
@@ -45,6 +46,6 @@ export function buildTradePartnersModel(data: ClientTradePartnersData, state: Tr
   const ranking = rows.filter(row => row.valueUsd !== null).sort((a, b) => (state.measure === "trade.balance" ? Math.abs(b.valueUsd!) - Math.abs(a.valueUsd!) : b.valueUsd! - a.valueUsd!) || labelOrder(a, b)).map((row, index) => ({ ...row, rank: index + 1 }));
   const missingRanking = rows.filter(row => row.valueUsd === null).sort(labelOrder);
   const order = new Map([...ranking, ...missingRanking].map((row, index) => [row.entityId, index]));
-  activeEntities.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
+  activeEntities.sort((a, b) => (order.get(a.id) ?? Infinity) - (order.get(b.id) ?? Infinity));
   return { years, range, unit, selectedIds, valuesByEntity, activeEntities, offTabSelected, ranking, missingRanking, selectedCount: selectedIds.length, totalCount: ids.length };
 }

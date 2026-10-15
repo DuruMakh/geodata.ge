@@ -22806,5 +22806,617 @@
   "trade.bec1.7": {
     "text": "Goods not elsewhere specified",
     "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.004": {
+    "text": "Afghanistan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.008": {
+    "text": "Albania",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.012": {
+    "text": "Algeria",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.020": {
+    "text": "Andorra",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.024": {
+    "text": "Angola",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.028": {
+    "text": "Antigua and Barbuda",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.031": {
+    "text": "Azerbaijan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.032": {
+    "text": "Argentina",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.036": {
+    "text": "Australia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.040": {
+    "text": "Austria",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.044": {
+    "text": "Bahamas",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.048": {
+    "text": "Bahrain",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.050": {
+    "text": "Bangladesh",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.051": {
+    "text": "Armenia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.052": {
+    "text": "Barbados",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.056": {
+    "text": "Belgium",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.060": {
+    "text": "Bermuda",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.064": {
+    "text": "Bhutan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.068": {
+    "text": "Bolivia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.070": {
+    "text": "Bosnia and Herzegovina",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.072": {
+    "text": "Botswana",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.076": {
+    "text": "Brazil",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.084": {
+    "text": "Belize",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.092": {
+    "text": "Virgin Islands, British",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.100": {
+    "text": "Bulgaria",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.104": {
+    "text": "Myanmar",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.112": {
+    "text": "Belarus",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.116": {
+    "text": "Cambodia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.120": {
+    "text": "Cameroon",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.124": {
+    "text": "Canada",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.136": {
+    "text": "Cayman Islands",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.144": {
+    "text": "Sri Lanka",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.148": {
+    "text": "Chad",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.152": {
+    "text": "Chile",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.156": {
+    "text": "China",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.158": {
+    "text": "Taiwan, Province of China",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.170": {
+    "text": "Colombia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.174": {
+    "text": "Comoros",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.188": {
+    "text": "Costa Rica",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.191": {
+    "text": "Croatia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.192": {
+    "text": "Cuba",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.196": {
+    "text": "Cyprus",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.203": {
+    "text": "Czech Republic",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.208": {
+    "text": "Denmark",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.212": {
+    "text": "Dominica",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.214": {
+    "text": "Dominican Republic",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.218": {
+    "text": "Ecuador",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.222": {
+    "text": "EL Salvador",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.231": {
+    "text": "Ethiopia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.232": {
+    "text": "Eritrea",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.233": {
+    "text": "Estonia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.246": {
+    "text": "Finland",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.250": {
+    "text": "France",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.266": {
+    "text": "Gabon",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.276": {
+    "text": "Germany",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.292": {
+    "text": "Gibraltar",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.300": {
+    "text": "Greece",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.336": {
+    "text": "Holy See (Vatican City State)",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.344": {
+    "text": "Hong Kong",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.348": {
+    "text": "Hungary",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.352": {
+    "text": "Iceland",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.356": {
+    "text": "India",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.360": {
+    "text": "Indonesia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.364": {
+    "text": "Iran",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.368": {
+    "text": "Iraq",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.372": {
+    "text": "Ireland",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.376": {
+    "text": "Israel",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.380": {
+    "text": "Italy",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.384": {
+    "text": "Cote d'ivoire",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.392": {
+    "text": "Japan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.398": {
+    "text": "Kazakhstan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.400": {
+    "text": "Jordan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.404": {
+    "text": "Kenya",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.410": {
+    "text": "Korea, Republic of",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.414": {
+    "text": "Kuwait",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.417": {
+    "text": "Kyrgyzstan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.422": {
+    "text": "Lebanon",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.428": {
+    "text": "Latvia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.430": {
+    "text": "Liberia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.434": {
+    "text": "Libya",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.438": {
+    "text": "Liechtenstein",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.440": {
+    "text": "Lithuania (Lietuva)",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.442": {
+    "text": "Luxembourg",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.458": {
+    "text": "Malaysia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.462": {
+    "text": "Maldives",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.466": {
+    "text": "Mali",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.470": {
+    "text": "Malta",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.478": {
+    "text": "Mauritania",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.480": {
+    "text": "Mauritius",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.484": {
+    "text": "Mexico",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.492": {
+    "text": "Monaco",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.496": {
+    "text": "Mongolia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.498": {
+    "text": "Moldova",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.499": {
+    "text": "Montenegro",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.504": {
+    "text": "Morocco",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.512": {
+    "text": "Oman",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.524": {
+    "text": "Nepal",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.528": {
+    "text": "Netherlands",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.533": {
+    "text": "Aruba",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.554": {
+    "text": "New Zealand",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.566": {
+    "text": "Nigeria",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.578": {
+    "text": "Norway",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.584": {
+    "text": "Marshall Islands",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.586": {
+    "text": "Pakistan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.591": {
+    "text": "Panama",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.600": {
+    "text": "Paraguay",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.604": {
+    "text": "Peru",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.608": {
+    "text": "Philippines",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.616": {
+    "text": "Poland",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.620": {
+    "text": "Portugal",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.634": {
+    "text": "Qatar",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.642": {
+    "text": "Romania",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.643": {
+    "text": "Russia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.659": {
+    "text": "Saint Kitts and Nevis",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.682": {
+    "text": "Saudi Arabia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.686": {
+    "text": "Senegal",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.688": {
+    "text": "Serbia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.690": {
+    "text": "Seychelles",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.702": {
+    "text": "Singapore",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.703": {
+    "text": "Slovakia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.704": {
+    "text": "Viet Nam",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.705": {
+    "text": "Slovenia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.706": {
+    "text": "Somalia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.710": {
+    "text": "South Africa",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.716": {
+    "text": "Zimbabwe",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.724": {
+    "text": "Spain",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.729": {
+    "text": "Sudan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.752": {
+    "text": "Sweden",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.756": {
+    "text": "Switzerland",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.760": {
+    "text": "Syrian",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.762": {
+    "text": "Tajikistan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.764": {
+    "text": "Thailand",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.784": {
+    "text": "United Arab Emirates",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.788": {
+    "text": "Tunisia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.792": {
+    "text": "Türkiye",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.795": {
+    "text": "Turkmenistan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.800": {
+    "text": "Uganda",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.804": {
+    "text": "Ukraine",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.807": {
+    "text": "North Macedonia",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.818": {
+    "text": "Egypt",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.826": {
+    "text": "United Kingdom",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.833": {
+    "text": "Isle of Man",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.834": {
+    "text": "Tanzania",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.840": {
+    "text": "United States",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.850": {
+    "text": "Virgin Islands, U.S",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.858": {
+    "text": "Uruguay",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.860": {
+    "text": "Uzbekistan",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.862": {
+    "text": "Venezuela",
+    "reviewedAt": "2026-10-14"
+  },
+  "partner.2020-2024.887": {
+    "text": "Yemen",
+    "reviewedAt": "2026-10-14"
+  },
+  "services.other_countries": {
+    "text": "Other countries",
+    "reviewedAt": "2026-10-14"
+  },
+  "services.international_organizations": {
+    "text": "International organizations",
+    "reviewedAt": "2026-10-14"
+  },
+  "services.undefined_export_country": {
+    "text": "Country not defined (exports)",
+    "reviewedAt": "2026-10-14"
+  },
+  "services.unknown_import_country": {
+    "text": "Unknown country (imports)",
+    "reviewedAt": "2026-10-14"
   }
 }

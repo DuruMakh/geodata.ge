@@ -36,9 +36,12 @@ export function loadServedTradeServicesData(): Promise<TradeServicesData> {
     const mirror = await loadTradeServicesDataFromDb(); assertTradeServicesParity(csv, mirror); return mirror;
   })(); return served;
 }
-export function toClientTradeServicesData(data: TradeServicesData): { national: ClientTradeOverviewFact[]; types: ClientTradePartnersData; englishLabels: Record<string, string> } {
+export function toClientTradeServicesData(data: TradeServicesData): { national: ClientTradeOverviewFact[]; types: ClientTradePartnersData; countries: ClientTradePartnersData; englishLabels: Record<string, string> } {
   const national = data.facts.filter(f => f.entityId === "services.total" && f.valueUsd !== null).map(f => ({ year: f.year, indicatorId: f.indicatorId, valueUsd: Number(f.valueUsd) }));
-  const entities = data.entities.filter(e => e.kind === "service_type").map(e => ({ id: e.id, kind: "service_type" as const, sourceCode: null, labelKa: e.labelKa }));
-  const ids = new Set(entities.map(e => e.id));
-  return { national, types: { dataset: "services", entities, nationalFacts: national, facts: packTradePartnerFacts(entities, data.facts.filter(f => ids.has(f.entityId))) }, englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])) };
+  const view = (dimension: "types" | "countries"): ClientTradePartnersData => {
+    const entities = data.entities.filter(e => dimension === "types" ? e.kind === "service_type" : e.kind === "country" || e.kind === "residual").map(e => ({ id: e.id, kind: e.kind as "service_type" | "country" | "residual", sourceCode: e.kind === "country" ? e.id.split(".").at(-1)! : null, labelKa: e.labelKa }));
+    const ids = new Set(entities.map(e => e.id));
+    return { dataset: "services", dimension, entities, nationalFacts: national, facts: packTradePartnerFacts(entities, data.facts.filter(f => ids.has(f.entityId))) };
+  };
+  return { national, types: view("types"), countries: view("countries"), englishLabels: Object.fromEntries(data.entities.map(e => [e.id, e.labelEn])) };
 }

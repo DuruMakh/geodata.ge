@@ -19,10 +19,12 @@ describe("buildFactQuerySnapshot", () => {
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 42 Energy and food sources, the twenty Money and banks documents, the two Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
-    expect(sources).toHaveLength(279);
+    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 42 Energy and food sources, the twenty Money and banks documents, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
+    expect(sources).toHaveLength(281);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId).sort()).toEqual([
+      "source.geostat_services_georgian_exports_of_services_by_countries",
       "source.geostat_services_georgian_exports_of_services_by_types",
+      "source.geostat_services_georgian_imports_of_services_by_countries",
       "source.geostat_services_georgian_imports_of_services_by_types",
     ]);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);

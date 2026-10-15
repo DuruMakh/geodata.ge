@@ -4582,5 +4582,35 @@
     "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-15" },
     "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-15" },
     "documentLanguage": "en"
+  },
+  "geostat_services_georgian-exports-of-services-by-countries": {
+    "title": {
+      "text": "Services exports by country, 2020–2024",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_services_georgian-imports-of-services-by-countries": {
+    "title": {
+      "text": "Services imports by country, 2020–2024",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
   }
 }
