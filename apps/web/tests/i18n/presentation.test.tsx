@@ -23,10 +23,14 @@ import { renderEnergyFoodPage } from "../../lib/pages/energy-food";
 import { renderExpenditurePage } from "../../lib/pages/expenditure";
 import { renderCurrentAccountPage, renderForeignInvestmentPage, renderMoneyFromAbroadPage } from "../../lib/pages/external";
 import { renderGdpPage } from "../../lib/pages/gdp";
+import { renderHealthPage } from "../../lib/pages/health";
+import { renderHealthDeathsAreaPage } from "../../lib/pages/health-deaths";
+import { renderHealthDeathsIndex } from "../../lib/pages/health-deaths-index";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
 import { renderHubPage, TopicHub } from "../../lib/pages/hub";
 import { renderEnergyFoodHub } from "../../lib/pages/hubs/energy-food";
 import { renderExternalHub } from "../../lib/pages/hubs/external";
+import { renderHealthHub } from "../../lib/pages/hubs/health";
 import { renderInflationHub } from "../../lib/pages/hubs/inflation";
 import { renderMoneyBanksHub } from "../../lib/pages/hubs/moneyBanks";
 import { renderTradeHub } from "../../lib/pages/hubs/trade";
@@ -101,6 +105,10 @@ const pages: PageRender[] = [
   ["living standards hub", renderLivingStandardsHub, 0],
   ["poverty", (locale) => renderPovertyPage(locale, "inequality"), 1],
   ["household", (locale) => renderHouseholdRegionPage("income", "georgia", locale), 1],
+  ["health hub", renderHealthHub, 0],
+  ["health", (locale) => renderHealthPage(locale, "doctors-hospitals"), 1],
+  ["causes of death", renderHealthDeathsIndex, 1],
+  ["causes of death area", (locale) => renderHealthDeathsAreaPage(locale, "guria"), 1],
   ["trade hub", renderTradeHub, 0],
   ["trade overview", renderTradeOverviewPage, 1],
   ["trade partners", renderTradePartnersPage, 1],

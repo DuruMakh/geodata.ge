@@ -8,9 +8,10 @@ import {
   healthViewSeries, healthViews, parseHealthHash, serializeHealthHash, type HealthState,
 } from "../../lib/explorer/health";
 import {
-  HEALTH_DEATH_AREAS, buildHealthDeathRateMapModel, buildHealthDeathsModel, defaultHealthDeathsState, healthDeathsAreaForSlug, healthDeathsAreaHref, healthDeathsSeries,
+  HEALTH_DEATH_AREAS, buildHealthDeathsModel, defaultHealthDeathsState, healthDeathsAreaForSlug, healthDeathsAreaHref, healthDeathsSeries,
   parseHealthDeathsHash, serializeHealthDeathsHash,
 } from "../../lib/explorer/healthDeaths";
+import { buildHealthDeathRateMapModel } from "../../lib/explorer/healthDeathRateMap";
 import { buildHealthHubCards } from "../../lib/explorer/healthHubCards";
 import { buildHealthWorkbookExportModel } from "../../lib/explorer/healthWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
@@ -275,24 +276,8 @@ describe("causes of death", () => {
   });
 });
 
-// The health message namespace arrives with the copy (Task 6); these are the keys the workbook and the cards read.
-const COPY: Record<Locale, Record<string, string>> = {
-  en: {
-    "health.series": "Series", "health.value": "Value", "health.unit": "Unit", "health.thousand": "thousand",
-    "health.unitPersons": "persons", "health.unitThousandPersons": "thousand persons", "health.unitUnits": "units", "health.unitThousandBeds": "thousand beds",
-    "health.unitThousandVisits": "thousand visits", "health.unitPerThousand": "per 1,000 population",
-    "common.healthDoctorsHospitals": "Doctors and hospitals", "common.healthIllnesses": "Illnesses", "common.healthCausesOfDeath": "Causes of death",
-    ...Object.fromEntries(HEALTH_SECTIONS.map(({ id }) => [`health.page.${id}.summary`, `${id} summary`])),
-  },
-  ka: {
-    "health.series": "სერია", "health.value": "მნიშვნელობა", "health.unit": "ერთეული", "health.thousand": "ათასი",
-    "health.unitPersons": "პირი", "health.unitThousandPersons": "ათასი პირი", "health.unitUnits": "ერთეული", "health.unitThousandBeds": "ათასი საწოლი",
-    "health.unitThousandVisits": "ათასი ვიზიტი", "health.unitPerThousand": "1000 მოსახლეზე",
-    "common.healthDoctorsHospitals": "ექიმები და საავადმყოფოები", "common.healthIllnesses": "დაავადებები", "common.healthCausesOfDeath": "სიკვდილის მიზეზები",
-    ...Object.fromEntries(HEALTH_SECTIONS.map(({ id }) => [`health.page.${id}.summary`, `${id} აღწერა`])),
-  },
-};
-const presentationFor = async (locale: Locale): Promise<Presentation> => ({ locale, englishLabels: {}, messages: { ...(await getMessages(locale, ["workbook", "format"])), ...COPY[locale] } });
+// The workbook and the cards read the shipped copy.
+const presentationFor = async (locale: Locale): Promise<Presentation> => ({ locale, englishLabels: {}, messages: await getMessages(locale, ["workbook", "format", "health", "common"]) });
 const sourceFor = (sourceId: string) => ({
   sourceId, years: Array.from({ length: 24 }, (_, i) => 2002 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-15",
   downloadHref: `/downloads/methodology/health/files/${sourceId}.xlsx` as const,
@@ -380,7 +365,7 @@ describe("Excel workbooks", () => {
       section: "causes-of-death", area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Georgia", state: defaultHealthDeathsState(),
     }, await presentationFor("ka"));
     expect(ka.filename).toBe("fiscal-health-causes-of-death-georgia-2014-2025.xlsx");
-    expect(ka.analysis.rows.at(-1)).toEqual([2025, "All deaths", 44319, "პირი", "გამოქვეყნებული"]);
+    expect(ka.analysis.rows.at(-1)).toEqual([2025, "All deaths", 44319, "ადამიანი", "გამოქვეყნებული"]);
   });
 
   test("a source the facts cite but the list lacks is an error", async () => {
@@ -397,7 +382,11 @@ describe("hub cards", () => {
     expect(cards.map(card => card.href)).toEqual(HEALTH_SECTIONS.map(s => s.href));
     expect(cards.map(card => card.index)).toEqual(["01", "02", "03"]);
     expect(cards.map(card => card.title)).toEqual(["Doctors and hospitals", "Illnesses", "Causes of death"]);
-    expect(cards.map(card => card.description)).toEqual(HEALTH_SECTIONS.map(s => `${s.id} summary`));
+    expect(cards.map(card => card.description)).toEqual([
+      "Doctors and nurses by speciality, hospitals, hospital beds and out-patient visits in Georgia.",
+      "New cases of illness diagnosed each year in Georgia, by disease group and for six single diseases.",
+      "What people die of in Georgia and in each region, by main group of causes, with the death rate by region.",
+    ]);
     expect(cards.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 thousand · 2002–2025", "2025 · 44,319 · 2014–2025"]);
     expect(cards.map(card => card.series?.length)).toEqual([24, 24, 12]);
     expect(cards.map(card => card.series!.at(-1))).toEqual([22491, 500.359, 44319]);

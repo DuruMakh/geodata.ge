@@ -21,6 +21,7 @@
   "health.view.hospitals": "საავადმყოფოები და ამბულატორიები",
   "health.view.beds": "საწოლები",
   "health.view.visits": "ვიზიტები",
+  "health.measure": "მაჩვენებელი",
   "health.series.health.staff.doctors": "ექიმები",
   "health.series.health.staff.doctors_internal": "შინაგანი მედიცინის ექიმები (თერაპევტები)",
   "health.series.health.staff.doctors_surgery": "ქირურგები",

@@ -45,4 +45,25 @@ describe("FlatSeriesPanel", () => {
     expect(render({ asideLabel: "Series" })).toMatch(/<aside aria-label="Series"/);
     expect(render({})).not.toContain("<aside");
   });
+
+  it("prints each heading once, above the first shown row of its group, and hides a group the search empties", () => {
+    const grouped: FlatSeriesRow[] = [
+      { id: "a", label: "Alpha", color: "#111", value: "6", heading: "Groups" },
+      { id: "b", label: "Beta", color: "#222", value: "4", heading: "Groups" },
+      { id: "c", label: "Gamma", color: "#333", value: "2", heading: "Single" },
+    ];
+    const headings = (html: string) => [...html.matchAll(/<p role="presentation" data-testid="series-heading"[^>]*>([^<]*)<\/p>/g)].map(match => match[1]);
+    const all = render({ rows: grouped, totalId: undefined, selectedIds: [] });
+    expect(headings(all)).toEqual(["Groups", "Single"]);
+    expect(all.indexOf("Groups")).toBeLessThan(all.indexOf("Alpha"));
+    expect(all.indexOf("Single")).toBeGreaterThan(all.indexOf("Beta"));
+    expect(all.indexOf("Single")).toBeLessThan(all.indexOf("Gamma"));
+    // Searching "Beta" keeps its group's label above it; the group with no match loses its label.
+    expect(headings(render({ rows: grouped, totalId: undefined, selectedIds: [], query: "Beta", onQueryChange: () => {} }))).toEqual(["Groups"]);
+    expect(headings(render({ rows: grouped, totalId: undefined, selectedIds: [], query: "Gamma", onQueryChange: () => {} }))).toEqual(["Single"]);
+  });
+
+  it("renders exactly as before when no row has a heading", () => {
+    expect(render({})).not.toContain("series-heading");
+  });
 });

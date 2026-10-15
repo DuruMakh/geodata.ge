@@ -1,8 +1,6 @@
-import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HEALTH_AREAS, HEALTH_INDICATORS, type ClientHealthFact, type HealthArea } from "../data/health/types";
 import { HEALTH_SECTIONS, buildHealthSeriesModel, healthSeriesCoverage, type HealthSeriesModel } from "./health";
 import type { ResolvedPeriodRange } from "./periodRange";
-import { buildLatestValueRegionMapModel, type RegionMapModel } from "./regionalEconomyMap";
 import { parseTopicHash, serializeTopicHash, type TopicState } from "./topicSeries";
 
 /** Georgia and the eleven regions each have a causes-of-death page; Abkhazia is never served. */
@@ -43,17 +41,4 @@ export type HealthDeathsModel = { range: ResolvedPeriodRange; years: number[]; s
 /** The causes of one area over its years, as published: a count of deaths, so no unit conversion. A cause without a value for a year (COVID-19 before 2020) is a gap. */
 export function buildHealthDeathsModel(area: HealthArea, facts: readonly ClientHealthFact[], state: HealthDeathsState): HealthDeathsModel {
   return buildHealthSeriesModel({ facts, area, range: state.range, coverage: coverage(area, facts), definitions: healthDeathsSeries(), selectedIds: state.selectedIds, scale: () => ({ multiplier: 1 }) });
-}
-
-const RATE = "health.death_rate.total";
-
-/** The map that picks the page's area: the crude death rate for each region in the latest year all eleven regions have, as published. */
-export function buildHealthDeathRateMapModel(facts: readonly ClientHealthFact[]): RegionMapModel {
-  const regionIds = new Set<string>(REGIONAL_ECONOMY_REGIONS.map(region => region.id));
-  const regional = facts.filter(f => f.indicatorId === RATE && regionIds.has(f.areaId));
-  const complete = [...new Set(regional.map(f => f.year))].filter(year => regional.filter(f => f.year === year).length === regionIds.size);
-  if (!complete.length) throw new Error("No year has a death rate for every region");
-  const year = Math.max(...complete);
-  const latest = new Map(regional.filter(f => f.year === year).map(f => [f.areaId, f.value]));
-  return buildLatestValueRegionMapModel({ regions: REGIONAL_ECONOMY_REGIONS, latest, year, firstYear: Math.min(...regional.map(f => f.year)), measure: "death rate" });
 }

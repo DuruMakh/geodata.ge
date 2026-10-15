@@ -102,7 +102,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Services trade adds one further bilingual pair.
     // Trade composition adds one further bilingual pair.
-    expect(urls).toHaveLength(582);
+    // Health adds its hub, three pages and a causes-of-death page for Georgia and each of the 11 regions: 16 bilingual pairs.
+    expect(urls).toHaveLength(614);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -135,6 +136,11 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
     }
+    for (const page of ["", "/doctors-hospitals", "/illnesses", "/causes-of-death", "/causes-of-death/regions/georgia", "/causes-of-death/regions/guria", "/causes-of-death/regions/racha_lechkhumi_kvemo_svaneti"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/health${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
+    }
+    expect(urls.filter((url) => url.includes("/explorer/health/causes-of-death/regions/"))).toHaveLength(24);
     for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);
