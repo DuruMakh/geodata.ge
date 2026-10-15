@@ -1,4 +1,4 @@
-import { BusinessExplorer, type BusinessExplorerProps } from "../../components/business/business-explorer";
+import { BusinessExplorer } from "../../components/business/business-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -10,6 +10,7 @@ import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS, businessCoverage, businessViews, 
 import { buildBusinessHubCards } from "../explorer/businessHubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
+import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
@@ -65,14 +66,13 @@ function businessLabels(presentation: Presentation, section: BusinessTopicId): R
 }
 
 export async function renderBusinessPage(locale: Locale, section: BusinessTopicId) {
-  const [data, presentation] = await Promise.all([
-    loadServedBusinessData(), getPresentation(locale, ["business", "format", "main", "workbook"], BUSINESS_SECTOR_LABEL_IDS),
+  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/business.csv) behind the exported values.
+  const [data, presentation, sources] = await Promise.all([
+    loadServedBusinessData(), getPresentation(locale, ["business", "format", "main", "workbook"], BUSINESS_SECTOR_LABEL_IDS), loadSourcedWorkbookSources("business", locale),
   ]);
   // Each page receives only the observations its views can show.
   const ids = new Set<string>(sectionSeries(section).map(series => series.id));
   const facts = data.facts.map(toClientBusinessFact).filter(f => ids.has(f.indicatorId));
-  // The archived Geostat workbooks join with the business methodology (Task 8); until then the Sources sheet lists none.
-  const sources: BusinessExplorerProps["sources"] = [];
   const years = [...new Set(businessViews(section).flatMap(view => businessCoverage(section, view, facts).years))];
   const firstYear = Math.min(...years), lastYear = Math.max(...years);
   const href = BUSINESS_SECTIONS.find(item => item.id === section)!.href;

@@ -112,3 +112,8 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "household-income.borrowing","household-income","docs/data-methodology/household-income-spending-annual.md","Borrowing and property sales","household-income.borrowing","geodata_decision","2026-10-11"
 "household-income.regions","household-income","docs/data-methodology/household-income-spending-annual.md","Regional boundaries","household-income.regions","official_fact","2026-10-11"
 "household-income.limitations","household-income","docs/data-methodology/household-income-spending-annual.md","Statistical limitations and future use","household-income.limitations","limitation","2026-10-11"
+"business.scope","business","docs/data-methodology/business-annual.md","Serving on the Business pages","business.scope","geodata_decision","2026-10-15"
+"business.survey_scope_2006","business","docs/data-methodology/business-annual.md","Series boundaries","business.survey_scope_2006","limitation","2026-10-15"
+"business.regions","business","docs/data-methodology/business-annual.md","Series boundaries","business.regions","limitation","2026-10-15"
+"business.activity_unknown","business","docs/data-methodology/business-annual.md","Series boundaries","business.activity_unknown","geodata_decision","2026-10-15"
+"business.values","business","docs/data-methodology/business-annual.md","Serving on the Business pages","business.values","geodata_decision","2026-10-15"

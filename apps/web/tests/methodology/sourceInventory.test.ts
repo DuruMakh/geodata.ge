@@ -41,6 +41,12 @@ describe("original-source inventory", () => {
     expect(rows.some((row) => row.path.includes("/official/ka/"))).toBe(false);
   });
 
+  it("inventories the 24 business originals", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "business");
+    expect(rows).toHaveLength(24);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Business/geostat-business-annual/official/"))).toBe(true);
+  });
+
   it("returns forward-slash paths in lexical order", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     for (const rows of Object.values(inventory)) {

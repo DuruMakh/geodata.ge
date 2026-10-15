@@ -284,5 +284,31 @@
     "sha256": "CF820589E8E174AE1DF849045B6A62C7660BE2FA59498600857E522AF664DB0B",
     "bytes": 72100,
     "content_type": "text/html; charset=UTF-8"
+  },
+  {
+    "source_id": "geostat_business_survey_metadata",
+    "dataset_title": "Metadata: statistical survey of enterprises (annual)",
+    "publisher": "National Statistics Office of Georgia (Geostat)",
+    "source_page_url": "https://www.geostat.ge/en/modules/categories/530/metadata-business-statistics",
+    "retrieved_file_url": "https://geostat.ge/media/83205/0502_011026_EN.PDF",
+    "resolved_file_url": "https://www.geostat.ge/media/83205/0502_011026_EN.PDF",
+    "retrieved_at": "2026-10-15T11:16:24Z",
+    "local_file": "official/0502_011026_EN.PDF",
+    "sha256": "BBEE30AC0D6208F3FBFDCF5C4C52AC5DB775B083225E1CA2126F6EDEF3DBD0AF",
+    "bytes": 110879,
+    "content_type": "application/pdf"
+  },
+  {
+    "source_id": "geostat_business_demography_metadata",
+    "dataset_title": "Metadata: business demography",
+    "publisher": "National Statistics Office of Georgia (Geostat)",
+    "source_page_url": "https://www.geostat.ge/en/modules/categories/530/metadata-business-statistics",
+    "retrieved_file_url": "https://geostat.ge/media/68651/0519_200225_EN.PDF",
+    "resolved_file_url": "https://www.geostat.ge/media/68651/0519_200225_EN.PDF",
+    "retrieved_at": "2026-10-15T11:16:27Z",
+    "local_file": "official/0519_200225_EN.PDF",
+    "sha256": "458CC878F72E412206401C43933DC97EFCC8D896F19D240E3973B646664E74AB",
+    "bytes": 91909,
+    "content_type": "application/pdf"
   }
 ]

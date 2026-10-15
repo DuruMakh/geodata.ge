@@ -297,3 +297,5 @@ source.geostat_business_demography_births,ბიზნეს დემოგრ�
 source.geostat_business_demography_deaths,ბიზნეს დემოგრაფია: საწარმოთა გარდაცვალება,docs/Raw Data/Business/geostat-business-annual/official/Enterprise-deaths.xlsx,2026-10-15
 source.geostat_business_survey_page,საწარმოთა სტატისტიკური კვლევა (წყაროს გვერდი),docs/Raw Data/Business/geostat-business-annual/official/geostat-category-326-2026-10-15.html,2026-10-15
 source.geostat_business_demography_page,ბიზნეს დემოგრაფიის მაჩვენებლები (წყაროს გვერდი),docs/Raw Data/Business/geostat-business-annual/official/geostat-category-69-2026-10-15.html,2026-10-15
+source.geostat_business_survey_metadata,მეტამონაცემები: საწარმოთა სტატისტიკური კვლევა (წლიური),docs/Raw Data/Business/geostat-business-annual/official/0502_011026_EN.PDF,2026-10-15
+source.geostat_business_demography_metadata,მეტამონაცემები: ბიზნეს დემოგრაფია,docs/Raw Data/Business/geostat-business-annual/official/0519_200225_EN.PDF,2026-10-15

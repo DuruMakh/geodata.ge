@@ -1721,5 +1721,13 @@
   "source.geostat_business_demography_page": {
     "name": { "text": "Business demography indicators (source page capture)", "reviewedAt": "2026-10-15" },
     "derivation": null
+  },
+  "source.geostat_business_survey_metadata": {
+    "name": { "text": "Metadata: statistical survey of enterprises (annual)", "reviewedAt": "2026-10-15" },
+    "derivation": null
+  },
+  "source.geostat_business_demography_metadata": {
+    "name": { "text": "Metadata: business demography", "reviewedAt": "2026-10-15" },
+    "derivation": null
   }
 }

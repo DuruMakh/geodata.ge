@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { BusinessAreaExplorer, type BusinessAreaExplorerProps } from "../../components/business/business-area-explorer";
+import { BusinessAreaExplorer } from "../../components/business/business-area-explorer";
 import { BusinessIndex } from "../../components/business/business-index";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
@@ -16,6 +16,7 @@ import { buildBusinessRegionMapModel } from "../explorer/businessRegionMap";
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { RegionMapModel } from "../explorer/regionalEconomyMap";
 import { I18nProvider } from "../i18n/provider";
+import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
@@ -94,15 +95,15 @@ export function renderBusinessRegionsPage(locale: Locale) {
     <BusinessIndex facts={facts.map(toClientBusinessFact).filter(f => f.indicatorId === "business.turnover.total" || f.indicatorId === "business.employed.total")} regionMaps={regionMaps(facts)} />);
 }
 
-export function renderBusinessAreaPage(locale: Locale, slug: string) {
+export async function renderBusinessAreaPage(locale: Locale, slug: string) {
   const area = areaForSlug(slug);
+  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/business.csv) behind the exported values.
+  const sources = await loadSourcedWorkbookSources("business", locale);
   const ids = new Set<string>(BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaSeries(area, measure).map(series => series.id)));
   const areaFacts = (facts: BusinessFact[]) => facts.map(toClientBusinessFact).filter(f => ids.has(f.indicatorId));
   return renderBusinessRegionsFrame(locale, area, facts => BUSINESS_AREA_MEASURES.flatMap(measure => businessAreaCoverage(area, measure, areaFacts(facts)).years), ({ facts, presentation, areaLabels, origin, lastReviewedAt }) => {
     // Every row is its measure's name: the area is the page's own.
     const labels = Object.fromEntries([...ids].map(id => [id, message(presentation.messages, `business.series.${id.split(".")[1]}`)]));
-    // The archived Geostat workbooks join with the business methodology (Task 8); until then the Sources sheet lists none.
-    const sources: BusinessAreaExplorerProps["sources"] = [];
     return <BusinessAreaExplorer key={area} area={area} facts={areaFacts(facts)} labels={labels} areaLabels={areaLabels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} areas={AREA_PAGES} />;
   });
 }

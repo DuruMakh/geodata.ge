@@ -5,6 +5,12 @@ const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-r
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const row = (page: Page, id: string) => page.locator(`[data-testid="regional-list-row"][data-region-id="${id}"]`);
 const TOPICS = ["sales", "jobs", "investment-profit", "firms"];
+/** Every cell of a sheet as text, a hyperlink cell as its link. */
+const sheetText = (sheet: ExcelJS.Worksheet) => {
+  const values: string[] = [];
+  sheet.eachRow(row => row.eachCell(cell => { values.push(cell.type === ExcelJS.ValueType.Hyperlink ? (cell.value as ExcelJS.CellHyperlinkValue).hyperlink : String(cell.value)); }));
+  return values.join("\n");
+};
 
 /** The table cell of the row labelled `label` in the `year` column (the wide, year-columns layout). */
 async function cell(page: Page, label: string, year: number) {
@@ -167,7 +173,9 @@ test("the Guria page: picker, neighbours, measures, the language switch and Exce
   const download = await promise;
   expect(download.suggestedFilename()).toMatch(/^fiscal-business-guria-firms-2014-2024\.xlsx$/);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
-  expect(workbook.worksheets.length).toBeGreaterThan(0);
+  // The Sources sheet links the archived business demography workbook the firm counts come from, and nothing else.
+  expect(sheetText(workbook.worksheets[2])).toContain("https://fiscal.ge/downloads/methodology/business/files/main-results.xlsx");
+  expect(sheetText(workbook.worksheets[2])).not.toContain("0502en0101_turnover.xlsx");
   // The language switch keeps the measure.
   await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/explorer\/business\/regions\/guria#m=firms/);
@@ -193,6 +201,11 @@ test("the topic Excel download is a workbook", async ({ page }) => {
   await page.getByTestId("business-excel-download").click();
   const download = await promise;
   expect(download.suggestedFilename()).toMatch(/^fiscal-business-sales-1999-2025\.xlsx$/);
+  const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
+  expect(workbook.worksheets).toHaveLength(3);
+  // The Sources sheet links the archived Geostat turnover workbook behind all firms' sales.
+  expect(sheetText(workbook.worksheets[2])).toContain("https://fiscal.ge/downloads/methodology/business/files/0502en0101_turnover.xlsx");
+  expect(sheetText(workbook.worksheets[2])).not.toContain("main-results.xlsx");
 });
 
 for (const prefix of ["", "/en"]) test(`business pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {

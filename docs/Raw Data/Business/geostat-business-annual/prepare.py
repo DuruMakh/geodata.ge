@@ -36,6 +36,7 @@ PUBLISHER = 'National Statistics Office of Georgia (Geostat)'
 XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 SURVEY_PAGE = 'https://www.geostat.ge/en/modules/categories/326/statistical-survey-of-enterprises'
 DEMOGRAPHY_PAGE = 'https://www.geostat.ge/en/modules/categories/69/business-demography'
+METADATA_PAGE = 'https://www.geostat.ge/en/modules/categories/530/metadata-business-statistics'
 
 
 def _media(number, name):
@@ -96,6 +97,11 @@ SOURCES = [
     ('geostat_business_demography_page', 'Geostat page: business demography indicators (category 69)', DEMOGRAPHY_PAGE,
      'https://www.geostat.ge/en/modules/categories/69', DEMOGRAPHY_PAGE, 'official/geostat-category-69-2026-10-15.html',
      'text/html; charset=UTF-8', '2026-10-15T08:52:00Z'),
+    # Geostat's metadata documents, archived for the definitions the methodology page quotes.
+    ('geostat_business_survey_metadata', 'Metadata: statistical survey of enterprises (annual)', METADATA_PAGE,
+     *_media(83205, '0502_011026_EN.PDF'), 'official/0502_011026_EN.PDF', 'application/pdf', '2026-10-15T11:16:24Z'),
+    ('geostat_business_demography_metadata', 'Metadata: business demography', METADATA_PAGE,
+     *_media(68651, '0519_200225_EN.PDF'), 'official/0519_200225_EN.PDF', 'application/pdf', '2026-10-15T11:16:27Z'),
 ]
 FILE = {source[0]: source[5] for source in SOURCES}
 FIELDS = ['year', 'indicator_id', 'value', 'published_value', 'unit', 'basis', 'value_status', 'source_id', 'source_sheet', 'source_cell']

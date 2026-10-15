@@ -4,7 +4,7 @@ Research package for the Fiscal.ge "Business" hub. Approved design: `docs/superp
 
 ## Sources
 
-All files were downloaded fresh on 2026-10-15 (UTC, 08:51–08:52) with `curl -L --retry 3` from Geostat's two category pages, which are kept as HTML captures:
+All data files were downloaded fresh on 2026-10-15 (UTC, 08:51–08:52) with `curl -L --retry 3` from Geostat's two category pages, which are kept as HTML captures (the two metadata documents listed below followed at 11:16):
 
 - Statistical survey of enterprises, `https://www.geostat.ge/en/modules/categories/326` (resolves to `.../326/statistical-survey-of-enterprises`): the 15 `0502EN01xx` survey workbooks and `Remark_eng.pdf`.
 - Business demography indicators, `https://www.geostat.ge/en/modules/categories/69` (resolves to `.../69/business-demography`): `Main-results.xlsx`, `Other-indicators.xlsx`, `Enterprise-births.xlsx` and `Enterprise-deaths.xlsx`.
@@ -22,6 +22,7 @@ Every file link is `https://geostat.ge/media/<id>/<name>`, which redirects to `h
 | `geostat_business_demography_other`, `_births`, `_deaths` | `official/Other-indicators.xlsx`, `Enterprise-births.xlsx`, `Enterprise-deaths.xlsx` | Archived only |
 | `geostat_business_remarks` | `official/Remark_eng.pdf` | Survey scope notes (below) |
 | `geostat_business_survey_page`, `geostat_business_demography_page` | `official/geostat-category-326-2026-10-15.html`, `geostat-category-69-2026-10-15.html` | The page captures the file links come from |
+| `geostat_business_survey_metadata`, `geostat_business_demography_metadata` | `official/0502_011026_EN.PDF`, `0519_200225_EN.PDF` | Geostat's metadata for the annual survey (certified 1 October 2026) and for business demography (20 February 2025), linked from `https://www.geostat.ge/en/modules/categories/530/metadata-business-statistics` and downloaded on 2026-10-15 at 11:16 UTC for the definitions the methodology page quotes; no value is read from them |
 
 `By_Regions.xlsx`, `By_kind_of_activity.xlsx` (the business register snapshot) and `Survival-of-enterprises.zip` are out of scope and not archived.
 
@@ -95,6 +96,6 @@ The `Persons employed in the population of active enterprises` column and the `B
 - "A birth amounts to the creation of a combination of production factors with the restriction that no other enterprises are involved in the event. Births do not include entries into the population due to mergers, break-ups, split off or restructuring of a set of enterprises. It does not include entries into a subpopulation resulting only from a change of activity."
 - "A death amounts to the dissolution of a combination of production factors with the restriction that no other enterprises are involved in the event. Deaths do not include exits from the population due to mergers, take-overs, break-ups or restructuring of a set of enterprises. It does not include exits from a sub-population resulting only from a change of activity."
 
-The footnotes do not mention the two-year reactivation window the design spec describes; that wording would need another source.
+The footnotes do not mention a two-year window, but the business demography metadata (`0519_200225_EN.PDF`, section 18.3) does: "A death is confirmed only after two years of inactivity, while a reactivation of an enterprise after more than two years is considered a birth." It also says the data come from the business register, not the survey (section 18.1), and are published on November 15 of the year after the reference year (section 14.1).
 
 **Firms with unknown activity.** Each activity sheet has an `ACTIVITY UNKNOWN` row that is part of the total but of no section; in 2024 it holds 9% of active firms and 38% of births, far more than in earlier years. It is served as `sector_unknown`, with the rates Geostat prints for it; those exceed 100% in some years (deaths 628.2% in 2020); the workbook does not explain why.

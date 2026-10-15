@@ -334,6 +334,18 @@
       "sha256": "CF820589E8E174AE1DF849045B6A62C7660BE2FA59498600857E522AF664DB0B",
       "bytes": 72100,
       "passed": true
+    },
+    {
+      "source_id": "geostat_business_survey_metadata",
+      "sha256": "BBEE30AC0D6208F3FBFDCF5C4C52AC5DB775B083225E1CA2126F6EDEF3DBD0AF",
+      "bytes": 110879,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_business_demography_metadata",
+      "sha256": "458CC878F72E412206401C43933DC97EFCC8D896F19D240E3973B646664E74AB",
+      "bytes": 91909,
+      "passed": true
     }
   ]
 }
