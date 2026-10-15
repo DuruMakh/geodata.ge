@@ -70,7 +70,8 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
   }));
   const totalRow = rows.find(row => row.itemId === total.id) ?? null;
   const measureLabel = state.view === "gdp" ? t("latestGdp", { measure: message(messages, `external.${key}.latest`) }) : message(messages, `external.${key}.latest`);
-  const latestValue = valueLabel(model.latest.value);
+  // The line under the heading must stay one line at 375px (DESIGN §17), so it uses the short unit (`მლრდ $` in Georgian).
+  const latestValue = percent ? valueLabel(model.latest.value) : `${format(model.latest.value)} ${t("unitBnUsdShort")}`;
   const title = message(messages, `external.${key}.title`);
   const tabLabel = t(`tab.${state.view}`);
   // % of GDP divides by the nominal GDP Current account uses: the source line names it and its preliminary years.
