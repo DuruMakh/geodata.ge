@@ -35,6 +35,7 @@ export const DATA_VALIDATE_CHECKS = [
   "data:check-foreign-investment",
   "data:check-wages",
   "data:check-current-account",
+  "data:check-external-position",
   "data:check-poverty",
   "data:check-household-income",
   "data:check-energy-food",
