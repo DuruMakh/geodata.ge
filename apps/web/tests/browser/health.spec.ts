@@ -181,7 +181,24 @@ test("Excel downloads an .xlsx of the selection", async ({ page }) => {
     expect(download.suggestedFilename()).toMatch(/^fiscal-health-.+\.xlsx$/);
     const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
     expect(workbook.worksheets).toHaveLength(3);
+    // The Sources sheet links to the fiscal.ge archive copies of the Geostat workbooks.
+    const links: string[] = [];
+    workbook.worksheets[2].eachRow(row => row.eachCell(cell => { const value = cell.value as { hyperlink?: string } | null; if (value && typeof value === "object" && value.hyperlink) links.push(value.hyperlink); }));
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) expect(link).toContain("/downloads/methodology/health/files/");
   }
+});
+
+for (const prefix of ["", "/en"]) test(`the methodology link opens the health methodology with its original files ${prefix || "ka"}`, async ({ page }) => {
+  await page.goto(`${prefix}/explorer/health/illnesses`);
+  await ready(page);
+  await page.getByTestId("source-label").getByRole("link").click();
+  await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/health$`));
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Healthcare and causes of death" : "ჯანდაცვა და სიკვდილის მიზეზები");
+  const archived = page.locator('a[href^="/downloads/methodology/health/files/"]');
+  expect(await archived.count()).toBeGreaterThan(0);
+  const response = await page.request.get(await archived.first().getAttribute("href") as string);
+  expect(response.status()).toBe(200);
 });
 
 for (const prefix of ["", "/en"]) test(`health pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {

@@ -58,6 +58,7 @@ const DATASET_SCHEMA_IDS = {
   wages: "wages",
   poverty: "poverty",
   "household-income": "household-income",
+  health: "health",
   "energy-food": "energy-food",
   money: "money",
 } as const;
@@ -78,6 +79,7 @@ const DATASET_SOURCE_NOTES = {
   wages: "common.geostatSourceNote",
   poverty: "common.geostatSourceNote",
   "household-income": "common.geostatSourceNote",
+  health: "common.geostatSourceNote",
   "energy-food": "common.geostatSourceNote",
   money: "common.nbgSourceNote",
 } as const;
@@ -99,6 +101,7 @@ const DATASET_DOWNLOADS = {
   wages: null,
   poverty: null,
   "household-income": null,
+  health: null,
   "energy-food": null,
   money: null,
 } as const;
@@ -124,6 +127,7 @@ const DATASET_JSON_DOWNLOADS = {
   wages: [],
   poverty: [],
   "household-income": [],
+  health: [],
   "energy-food": [],
   money: [],
   debt: [
@@ -154,6 +158,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   wages: [],
   poverty: [],
   "household-income": [],
+  health: [],
   "energy-food": [],
   money: [],
 } as const;

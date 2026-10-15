@@ -41,6 +41,17 @@ describe("original-source inventory", () => {
     expect(rows.some((row) => row.path.includes("/official/ka/"))).toBe(false);
   });
 
+  it("inventories the 36 health and causes-of-death originals, the served and the archived-only alike", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "health");
+    expect(rows).toHaveLength(36);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Health/geostat-health-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.includes("/official/deaths/"))).toHaveLength(13);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Health/geostat-health-annual/official/health-page.html",
+      "docs/Raw Data/Health/geostat-health-annual/official/deaths-page.html",
+    ]));
+  });
+
   it("returns forward-slash paths in lexical order", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     for (const rows of Object.values(inventory)) {

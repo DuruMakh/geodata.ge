@@ -395,3 +395,23 @@ describe("hub cards", () => {
     expect(ka.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 ათასი · 2002–2025", "2025 · 44,319 · 2014–2025"]);
   });
 });
+
+describe("workbook sources", () => {
+  test("cite the fiscal.ge archive copies of the Geostat workbooks a page's values come from, in the page's language", async () => {
+    const { healthSources } = await import("../../lib/pages/health-shared");
+    const used = [{ sourceId: "geostat_health_physicians", year: 2003 }, { sourceId: "geostat_deaths_by_cause_region", year: 2014 }, { sourceId: "geostat_health_physicians", year: 2002 }];
+    expect(await healthSources("en", used)).toEqual([
+      { sourceId: "geostat_health_physicians", years: [2002, 2003], title: "Number of physicians by occupation", organization: "National Statistics Office of Georgia (Geostat)", downloadHref: "/downloads/methodology/health/files/number-of-physicians-by-occupations.xlsx", retrievedAt: "2026-10-15" },
+      { sourceId: "geostat_deaths_by_cause_region", years: [2014], title: "Deaths by cause chapter and region (table 23-2)", organization: "National Statistics Office of Georgia (Geostat)", downloadHref: "/downloads/methodology/health/files/23-2-deaths-by-chapters-regions.xlsx", retrievedAt: "2026-10-15" },
+    ]);
+    const ka = await healthSources("ka", used);
+    expect(ka.map(source => [source.title, source.organization])).toEqual([
+      ["ექიმების რიცხოვნობა დაკავებული თანამდებობების მიხედვით", "საქსტატი"],
+      ["გარდაცვლილთა რიცხოვნობა რეგიონების და გარდაცვალების მიზეზების ძირითადი კლასების მიხედვით", "საქსტატი"],
+    ]);
+    // Every served health source has an archived copy.
+    const all = await healthSources("en", facts);
+    expect(all.every(source => source.downloadHref.startsWith("/downloads/methodology/health/files/"))).toBe(true);
+    expect(all).toHaveLength(new Set(facts.map(f => f.sourceId)).size);
+  });
+});

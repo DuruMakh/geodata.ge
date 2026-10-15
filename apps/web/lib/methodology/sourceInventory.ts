@@ -58,6 +58,8 @@ const inventoryRules = {
   // official/ka/ holds Georgian copies of the served workbooks, kept only for their labels.
   "household-income": [{ root: "docs/Raw Data/Households/geostat-household-income-spending-annual/official", include: (candidatePath: string) => !candidatePath.includes("/official/ka/") }],
   "energy-food": [{ root: "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official", include: () => true }],
+  // The healthcare and deaths workbooks (official/deaths/) and both page captures; served and archived-only alike.
+  health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
   money: [{ root: "docs/Raw Data/Money/nbg-money-banks-annual/official", include: () => true }],
   trade: [{ root: "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official", include: (candidatePath: string) => ["FTrade_1995-2026.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-1995-1999.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-products--1995-1999_eng.xlsx", "Export-Country_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "Domestic-Export-Country_2014-2026.xlsx", "Domestic-Exports_by-4-digit-2014-2026.xlsx", "external_trade_methodology.html", "metadata-en.html", "Georgian-Exports-of-services-by-types.xlsx", "Georgian-Imports-of-services-by-types.xlsx", "1004_180325_EN.PDF", "Export-SITC_2000-2026.xlsx", "Import-SITC_2000-2026.xlsx", "Export-BEC_2000-2026.xlsx", "Import-BEC-2000-2026.xlsx"].includes(path.posix.basename(candidatePath)) }],
   "external-flows": [

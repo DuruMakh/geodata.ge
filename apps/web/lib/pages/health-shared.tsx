@@ -1,19 +1,14 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import type { ReactNode } from "react";
-import { parse } from "csv-parse/sync";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import { HEALTH_RESEARCH_DIRECTORY, type HealthArea, type HealthFact } from "../data/health/types";
+import type { HealthArea, HealthFact } from "../data/health/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS, type HealthSectionId } from "../explorer/health";
 import { HEALTH_DEATH_AREAS } from "../explorer/healthDeaths";
 import { coverageLabel } from "../explorer/coverageLabel";
-import type { WorkbookPublicSource } from "../explorer/workbookModel";
-import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { getMessages } from "../i18n/messages.server";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation } from "../i18n/presentation.server";
@@ -21,6 +16,7 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
+import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -34,35 +30,15 @@ export async function healthPageMetadata(locale: Locale, section: HealthSectionI
   return fiscalMetadata({ locale, path: HEALTH_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `health.page.${section}.metaTitle`), description: message(messages, `health.page.${section}.summary`) });
 }
 
-export type HealthWorkbookSource = WorkbookPublicSource & { sourceId: string };
-
-type CsvRow = Record<string, string>;
-const repositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-const readCsv = async (file: string) => parse(await readFile(path.join(/* turbopackIgnore: true */ repositoryRoot(), file)), { bom: true, columns: true, skip_empty_lines: true }) as CsvRow[];
-
 /**
- * Every served Geostat workbook, named in the page's language, with the link Geostat published it at.
- * Until the health source archive is published with the methodology page, the workbook cites Geostat's own file;
- * that step replaces this with `loadSourcedWorkbookSources("health", ...)`, as Energy and food does.
+ * The workbook cites each archived Geostat file the page's values were read from, for the years that file supplies.
+ * Links point to the copies in the fiscal.ge source archive.
  */
-async function healthSourceRows(locale: Locale): Promise<Omit<HealthWorkbookSource, "years">[]> {
-  const [manifest, documents, catalogue] = await Promise.all([
-    readCsv(`${HEALTH_RESEARCH_DIRECTORY}/source-manifest.csv`), readCsv("data/sources/source-documents.csv"), locale === "en" ? loadEnglishCatalogue(repositoryRoot()) : undefined,
-  ]);
-  return manifest.map(row => {
-    const id = `source.${row.source_id}`;
-    const title = catalogue ? catalogue.sources[id]?.name.text : documents.find(document => document.source_id === id)?.source_name;
-    if (!title) throw new Error(`Missing ${locale} name for health source ${row.source_id}`);
-    return { sourceId: row.source_id, title, organization: locale === "en" ? row.publisher : "საქსტატი", downloadHref: row.retrieved_file_url as `https://${string}`, retrievedAt: row.retrieved_at };
-  });
-}
-
-/** The workbooks a page's values were read from, each with the years it supplies. */
-export async function healthSources(locale: Locale, facts: readonly { sourceId: string; year: number }[]): Promise<HealthWorkbookSource[]> {
+export async function healthSources(locale: Locale, facts: readonly { sourceId: string; year: number }[]): Promise<SourcedWorkbookPublicSource[]> {
   const used = [...new Set(facts.map(f => f.sourceId))];
-  const rows = await healthSourceRows(locale);
+  const archived = await loadSourcedWorkbookSources("health", locale, row => used.includes(row.source_id));
   return used.map(sourceId => {
-    const source = rows.find(row => row.sourceId === sourceId);
+    const source = archived.find(row => row.sourceId === sourceId);
     if (!source) throw new Error(`Missing reviewed health source ${sourceId}`);
     return { ...source, years: [...new Set(facts.filter(f => f.sourceId === sourceId).map(f => f.year))].sort((a, b) => a - b) };
   });

@@ -103,7 +103,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Services trade adds one further bilingual pair.
     // Trade composition adds one further bilingual pair.
     // Health adds its hub, three pages and a causes-of-death page for Georgia and each of the 11 regions: 16 bilingual pairs.
-    expect(urls).toHaveLength(614);
+    // The Health methodology adds one more bilingual pair.
+    expect(urls).toHaveLength(616);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -179,6 +180,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/wages",
       "/methodology/poverty",
       "/methodology/household-income",
+      "/methodology/health",
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",
