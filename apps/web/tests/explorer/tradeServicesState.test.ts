@@ -74,6 +74,32 @@ test("all twelve types rank independently, shares use the same-year services tot
   const zero = { ...data.types, nationalFacts: data.national.map(f => ({ ...f, valueUsd: 0 })) };
   expect(buildTradePartnersModel(zero, state, presentation).ranking.every(row => row.shareOfNational === null)).toBe(true);
 });
+
+test("country comparisons keep saved selections, national shares and real missing values", async () => {
+  const { data, presentation } = await fixture(), initial = parseTradePartnersHash("", data.countries);
+  expect(initial.tab).toBe("countries");
+  expect(initial.selectedIds).toEqual(["services.total"]);
+  expect(tradePartnersBulkSelection(data.countries)).toHaveLength(154);
+  for (const selectedIds of [[], ["partner.2020-2024.826"], tradePartnersBulkSelection(data.countries)]) {
+    const state = { ...initial, selectedIds, mode: "table" as const, measure: "trade.imports" as const, range: { kind: "manual" as const, start: 2022, end: 2024 } };
+    const hash = serializeTradePartnersHash(state, data.countries);
+    expect(new URLSearchParams(hash).get("section")).toBe("countries");
+    expect(parseTradePartnersHash(hash, data.countries)).toEqual(state);
+  }
+  const imports = buildTradePartnersModel(data.countries, { ...initial, measure: "trade.imports", selectedIds: [] }, presentation);
+  expect(imports.valuesByEntity["partner.2020-2024.826"][2024]).toBeCloseTo(96175488.549999951, 6);
+  expect(imports.activeEntities).toHaveLength(153);
+  expect(imports.ranking.length + imports.missingRanking.length).toBe(149);
+  expect(imports.ranking.every(row => row.kind === "country")).toBe(true);
+  for (const row of imports.ranking) expect(row.shareOfNational).toBe(row.valueUsd! / imports.valuesByEntity["services.total"][2024]!);
+  for (const measure of ["trade.imports", "trade.turnover", "trade.balance"] as const) {
+    const model = buildTradePartnersModel(data.countries, { ...initial, measure, range: { kind: "manual", start: 2020, end: 2020 } }, presentation);
+    expect(model.valuesByEntity["partner.2020-2024.496"][2020]).toBeNull();
+  }
+  const balance = buildTradePartnersModel(data.countries, { ...initial, measure: "trade.balance" }, presentation);
+  expect(balance.valuesByEntity["partner.2020-2024.174"][2024]).toBeNull();
+  expect(balance.ranking.every(row => row.shareOfNational === null)).toBe(true);
+});
 test("negative balances rank by magnitude without shares and missing derivations stay gaps", async () => {
   const { data, presentation } = await fixture();
   const balance = buildTradePartnersModel(data.types, parseTradePartnersHash("#measure=trade.balance", data.types), presentation);

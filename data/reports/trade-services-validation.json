@@ -1,6 +1,8 @@
 {
   "status": "passed",
-  "scope": "annual_services_types",
+  "scope": "annual_services_types_and_countries",
+  "countrySourcePolicy": "published_country_totals",
+  "countryControlObservations": 40,
   "years": [
     2020,
     2021,
@@ -8,13 +10,13 @@
     2023,
     2024
   ],
-  "primaryObservations": 130,
-  "numericObservations": 129,
-  "unavailableObservations": 1,
-  "derivedObservations": 128,
-  "canonicalSha256": "88cfffba50689ee0812a4ca32b94f2006c1c1ca79a5b8bf02f1701ce6b234cc1",
-  "catalogueSha256": "2ccf6e192f6a4a1f55170e76848307c4cb53985ee226f49b66d0bf87cdcc05bb",
-  "englishLabelsSha256": "b83cb17c3414919518cb443233a80e13bb9d3c5560144ec330a7f539c502dd13",
+  "primaryObservations": 1415,
+  "numericObservations": 1400,
+  "unavailableObservations": 15,
+  "derivedObservations": 1142,
+  "canonicalSha256": "a5d65593ac1b93fc1481841e1adc0a76b083084d72c98f3feb59afe47e2793ae",
+  "catalogueSha256": "5e487ba34b273d25dc633a7ceda2f0ef43be4739bbf05e7b99c6ec3862ca4914",
+  "englishLabelsSha256": "50d9b9744c567221c407c67917ea80c4ad966d90abd1253d9ee18bd0d6f50518",
   "inputSha256": {
     "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/independent-verification.json": "536110aeb9761ee924044eed913fc4f0ea029892097c3be6a9354233c011077d",
     "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/prepared-validation.json": "c12653a6a6a11f59b6eb105ff287fe867524b7e447196cc8bc89dce4756f489a",
@@ -26,11 +28,15 @@
     "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/coverage.csv": "5a1ca76f67607b737004bcd01e2a345380b746f41e0795d2683543181e3755a2",
     "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/services-annual.csv": "18a7172015c06ef8ae3fdf0a1ca505e858bc72fa694216f84ade001af4acefe2",
     "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_services_georgian-exports-of-services-by-types-01-2020-2024.csv": "df84e7bfd8fde35b34fc5a6be636baa7ac40604047ec728c7476c468da33f504",
-    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_services_georgian-imports-of-services-by-types-01-2020-2024.csv": "ec5ee592d788fa2745fe444c0aaa88b074c61b4611da5b4d615cc9131e241154"
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_services_georgian-imports-of-services-by-types-01-2020-2024.csv": "ec5ee592d788fa2745fe444c0aaa88b074c61b4611da5b4d615cc9131e241154",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_services_georgian-exports-of-services-by-countries-01-2020-2024.csv": "6005dfde31638d56b15e5a4b4fa46fe3a9db32e8962a949c507f3722ff519f8d",
+    "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/source-observations/geostat_services_georgian-imports-of-services-by-countries-01-2020-2024.csv": "512bcd1d70506805f1b39ed8da5c7a56ef82c6790019a775aa4dcb1b866b6f83"
   },
   "sourceSha256": {
     "geostat_services_georgian-exports-of-services-by-types": "091845ddd121d21e43332cfcdf69008ec3d9444fae279fbe3c6002ba0d75fda3",
-    "geostat_services_georgian-imports-of-services-by-types": "100b9a901dffd1db6604aac7c0b46094e8e46ac425c2090d2d9e18e1141a01d6"
+    "geostat_services_georgian-imports-of-services-by-types": "100b9a901dffd1db6604aac7c0b46094e8e46ac425c2090d2d9e18e1141a01d6",
+    "geostat_services_georgian-exports-of-services-by-countries": "f34b544286ef73baf0a045b5273aa916eae5515e680c9361cfbae6294c1e1e9f",
+    "geostat_services_georgian-imports-of-services-by-countries": "06a2ce5527af858c2e9670354ef26fd549a255a9d02b37a3656aeb8cf621af50"
   },
   "researchPackageStatus": "requires_source_resolution",
   "outsideScopeHoldCount": 2,
@@ -64,5 +70,5 @@
       "evidence": "All twelve numeric country/type counterparts are required; absent or symbolic country detail is not zero."
     }
   ],
-  "reviewedAt": "2026-10-11"
+  "reviewedAt": "2026-10-14"
 }

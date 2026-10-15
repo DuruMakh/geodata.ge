@@ -12,6 +12,7 @@ export function buildTradePartnersWorkbookModel(input: { dataset?: "services" | 
   const entities = new Map(input.data.entities.map(entity => [entity.id, entity]));
   const classification = input.data.dataset === "composition" ? input.data.classification : null;
   const services = input.dataset === "services" || input.data.dataset === "services", composition = classification !== null, domestic = !services && !composition && Boolean(input.data.measures);
+  const countries = input.data.dataset === "services" && input.data.dimension === "countries";
   const totalId = tradePartnersTotalId(input.data);
   const indicatorLabel = t(`${composition ? "composition." : services ? "services." : ""}indicator.${input.state.measure}`);
   const filenames = new Set<string>();
@@ -21,8 +22,9 @@ export function buildTradePartnersWorkbookModel(input: { dataset?: "services" | 
       continue;
     }
     if (services) {
-      if (input.state.measure !== "trade.imports") filenames.add("georgian-exports-of-services-by-types.xlsx");
-      if (input.state.measure !== "trade.exports") filenames.add("georgian-imports-of-services-by-types.xlsx");
+      const dimension = countries && id !== totalId ? "countries" : "types";
+      if (input.state.measure !== "trade.imports") filenames.add(`georgian-exports-of-services-by-${dimension}.xlsx`);
+      if (input.state.measure !== "trade.exports") filenames.add(`georgian-imports-of-services-by-${dimension}.xlsx`);
       continue;
     }
     if (domestic) {
@@ -36,11 +38,11 @@ export function buildTradePartnersWorkbookModel(input: { dataset?: "services" | 
     if (input.state.measure !== "trade.exports") filenames.add(`import-${suffix}-1995-2026.xlsx`);
   }
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: composition ? `trade-composition-${classification}` : services ? "trade-services-types" : domestic ? "trade-domestic-countries" : "trade-partners", title: t(composition ? "composition.title" : services ? "services.typesTitle" : domestic ? "domestic.countriesTitle" : "partners.title"), groupLabel: indicatorLabel, years: model.years,
+    locale: presentation.locale, filenameBase: composition ? `trade-composition-${classification}` : services ? `trade-services-${countries ? "countries" : "types"}` : domestic ? "trade-domestic-countries" : "trade-partners", title: t(composition ? "composition.title" : services ? countries ? "services.countriesTitle" : "services.typesTitle" : domestic ? "domestic.countriesTitle" : "partners.title"), groupLabel: indicatorLabel, years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: totalId, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
-      return { id, kind: id === totalId ? "total" : "item", label: entity ? publicLabel(presentation.locale, id, entity.labelKa, presentation.englishLabels) : t(composition ? "composition.total" : services ? "services.total" : "partners.total"), parentLabel: entity ? t(composition ? "composition.categories" : services ? "services.types" : entity.kind === "country" ? "partners.countries" : "partners.groups") : t(composition ? "composition.total" : services ? "services.total" : "partners.total"), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: model.valuesByEntity[id][year] === null ? "not_available" as const : "actual" as const }])) };
+      return { id, kind: id === totalId ? "total" : "item", label: entity ? publicLabel(presentation.locale, id, entity.labelKa, presentation.englishLabels) : t(composition ? "composition.total" : services && !countries ? "services.total" : "partners.total"), parentLabel: entity ? t(composition ? "composition.categories" : services ? countries ? "services.countries" : "services.types" : entity.kind === "country" ? "partners.countries" : "partners.groups") : t(composition ? "composition.total" : services && !countries ? "services.total" : "partners.total"), pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: model.valuesByEntity[id][year] === null ? "not_available" as const : "actual" as const }])) };
     }), sources: input.sources.filter(source => filenames.has(services ? source.downloadHref.split("/").at(-1)!.toLowerCase() : source.downloadHref.split("/").at(-1)!)), siteOrigin: input.siteOrigin,
   });
   const groupNote = model.selectedIds.some(id => entities.get(id)?.kind === "group") ? ` · ${t("partners.groupOverlap")}` : "";

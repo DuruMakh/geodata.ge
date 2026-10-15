@@ -17,11 +17,11 @@ test("Trade has explicit USD and publication wording", async () => {
   expect(en["trade.publicationUnspecified"]).toBe("Unspecified");
   expect(ka["trade.indicator.trade.turnover"]).toBe("საგარეო სავაჭრო ბრუნვა");
 });
-test("Trade registers its six explorers and twenty-two translated original documents", async () => {
+test("Trade registers its six explorers and twenty-four translated original documents", async () => {
   const root = path.resolve(process.cwd(), "../..");
   const [manifest, catalogue, paths] = await Promise.all([loadReviewedSourceManifest(root, "trade"), loadEnglishCatalogue(root), listPublicPagePaths()]);
-  expect(manifest).toHaveLength(22);
-  expect(manifest.map(row => path.basename(row.repository_source_path)).sort()).toEqual(["Export-Country_1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "FTrade_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html", "Export-Product-by-4-digit-1995-1999.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Import-products--1995-1999_eng.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx", "Domestic-Export-Country_2014-2026.xlsx", "Domestic-Exports_by-4-digit-2014-2026.xlsx", "Georgian-Exports-of-services-by-types.xlsx", "Georgian-Imports-of-services-by-types.xlsx", "1004_180325_EN.PDF", "Export-SITC_2000-2026.xlsx", "Import-SITC_2000-2026.xlsx", "Export-BEC_2000-2026.xlsx", "Import-BEC-2000-2026.xlsx"].sort());
+  expect(manifest).toHaveLength(24);
+  expect(manifest.map(row => path.basename(row.repository_source_path)).sort()).toEqual(["Export-Country_1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "FTrade_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html", "Export-Product-by-4-digit-1995-1999.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Import-products--1995-1999_eng.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx", "Domestic-Export-Country_2014-2026.xlsx", "Domestic-Exports_by-4-digit-2014-2026.xlsx", "Georgian-Exports-of-services-by-types.xlsx", "Georgian-Imports-of-services-by-types.xlsx", "Georgian-Exports-of-services-by-countries.xlsx", "Georgian-Imports-of-services-by-countries.xlsx", "1004_180325_EN.PDF", "Export-SITC_2000-2026.xlsx", "Import-SITC_2000-2026.xlsx", "Export-BEC_2000-2026.xlsx", "Import-BEC-2000-2026.xlsx"].sort());
   for (const source of manifest) expect(catalogue.documents[source.source_id].title.text).toBeTruthy();
   expect(paths).toContain("/explorer/trade"); expect(paths).toContain("/explorer/trade/overview"); expect(paths).toContain("/methodology/trade");
   expect(paths).toContain("/explorer/trade/partners");
@@ -43,7 +43,7 @@ test("Services routes, metadata and sidebar use bilingual services presentation"
   expect(en["trade.services.summary"]).toBe("Georgia’s annual services trade, in nominal US dollars.");
   expect(ka["common.tradeServices"]).toBe(ka["trade.services.title"]);
   expect(en["common.tradeServices"]).toBe(en["trade.services.title"]);
-  expect(JSON.parse(revisions)["/explorer/trade/services"]).toBe("2026-10-11");
+  expect(JSON.parse(revisions)["/explorer/trade/services"]).toBe("2026-10-14");
   // The sidebar lists Services after Domestic exports; every sidebar row keeps its same-page guard (SidebarSectionLink).
   const tradeRows = NAV_TREE.find((hub) => hub.href === "/explorer/trade")!.sections.map((section) => section.testId);
   expect(tradeRows.indexOf("trade-services-link")).toBeGreaterThan(tradeRows.indexOf("trade-domestic-link"));
@@ -75,16 +75,18 @@ test("Services metadata and page inputs use accepted services coverage, labels a
     expect(metadata.alternates?.languages?.ka).toMatch(/\/explorer\/trade\/services$/);
     const page = await renderTradeServicesPage(locale), elements = pageElements(page);
     const dataset = elements.find(element => element.props.testId === "explorer-dataset-json-ld")!.props.data as Record<string, unknown>;
-    expect(dataset).toMatchObject({ "@type": "Dataset", name: title, temporalCoverage: "2020/2024", dateModified: "2026-10-11" });
+    expect(dataset).toMatchObject({ "@type": "Dataset", name: title, temporalCoverage: "2020/2024", dateModified: "2026-10-14" });
     expect(dataset.url).toMatch(new RegExp(`${href}$`));
     const workspace = elements.find(element => element.type === TradeServices)!;
     const props = workspace.props as unknown as Parameters<typeof TradeServices>[0];
-    expect(props.lastReviewedAt).toBe("2026-10-11");
+    expect(props.lastReviewedAt).toBe("2026-10-14");
     expect(props.data.national).toHaveLength(20);
     expect(props.data.types.entities).toHaveLength(12);
+    expect(props.data.countries.entities).toHaveLength(153);
+    expect(props.data.countries).toMatchObject({ dataset: "services", dimension: "countries" });
     expect(props.data.types.dataset).toBe("services");
     expect(page.props.englishLabels["services.total"]).toBeTruthy();
-    expect(props.sources.map(source => path.basename(source.downloadHref)).sort()).toEqual(["georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-types.xlsx"]);
+    expect(props.sources.map(source => path.basename(source.downloadHref)).sort()).toEqual(["georgian-exports-of-services-by-countries.xlsx", "georgian-exports-of-services-by-types.xlsx", "georgian-imports-of-services-by-countries.xlsx", "georgian-imports-of-services-by-types.xlsx"]);
     expect(props.sources.every(source => source.downloadHref === source.downloadHref.toLowerCase())).toBe(true);
     const repairIndex = props.data.types.entities.findIndex(entity => entity.id === "services.maintenance_repair");
     expect(props.data.types.facts.find(([entityIndex, year, measureIndex]) => entityIndex === repairIndex && year === 2020 && TRADE_CHART_INDICATORS[measureIndex] === "trade.exports")?.[3]).toBeNull();
