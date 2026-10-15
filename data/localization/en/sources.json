@@ -1633,5 +1633,257 @@
       "reviewedAt": "2026-10-14"
     },
     "derivation": null
+  },
+  "source.geostat_health_main": {
+    "name": {
+      "text": "Main characteristics of public health",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_physicians": {
+    "name": {
+      "text": "Number of physicians by occupation",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_nurses": {
+    "name": {
+      "text": "Number of paramedical personnel by basic speciality",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_abortions": {
+    "name": {
+      "text": "Abortions",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_morbidity_groups": {
+    "name": {
+      "text": "Morbidity with acute and chronic diseases by main disease group",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_morbidity_of_children_0_14_years_old_with_acute_and_chronic_diseases": {
+    "name": {
+      "text": "Morbidity of children (0–14 years old) with acute and chronic diseases",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_morbidity_caused_by_some_infectious_disease": {
+    "name": {
+      "text": "Morbidity caused by some infectious diseases",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_sti": {
+    "name": {
+      "text": "Morbidity of patients with syphilis and gonorrhoea",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_tuberculosis": {
+    "name": {
+      "text": "Morbidity of patients with tuberculosis",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_hiv": {
+    "name": {
+      "text": "Morbidity of patients with HIV/AIDS",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_emergent_medical_care": {
+    "name": {
+      "text": "Emergency medical care",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_anaemia": {
+    "name": {
+      "text": "New cases of anaemia",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_diabetes": {
+    "name": {
+      "text": "New cases of diabetes mellitus",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_circulatory_system": {
+    "name": {
+      "text": "Diseases of the circulatory system",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_respiratory_system": {
+    "name": {
+      "text": "Diseases of the respiratory system",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_16_number_of_persons_medicines": {
+    "name": {
+      "text": "Number of persons, medicines (table 16)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_17_the_cost_of_medicines": {
+    "name": {
+      "text": "The cost of medicines (table 17)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_18_the_number_of_beneficiaries_with_disabilities": {
+    "name": {
+      "text": "Number of beneficiaries with disabilities (table 18)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_19_number_of_cases_services_of_persons_with_disabilities": {
+    "name": {
+      "text": "Number of cases (services) of persons with disabilities (table 19)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_20_number_of_cases_services_of_persons_with_disabilities_by_regions": {
+    "name": {
+      "text": "Number of cases (services) of persons with disabilities by region (table 20)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_number_of_beneficiaries_screened_for_malignant_neoplasms": {
+    "name": {
+      "text": "Number of beneficiaries screened for malignant neoplasms",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_25_1_infant_mortality_rate_by_regions_and_sex": {
+    "name": {
+      "text": "Infant mortality rate by region and sex (table 25-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_26_1_under_5_mortality_rate_by_regions_andsex": {
+    "name": {
+      "text": "Under-5 mortality rate by region and sex (table 26-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_death_rate_region": {
+    "name": {
+      "text": "Crude death rate by region (table 24-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_1_deaths_by_chapters_sex": {
+    "name": {
+      "text": "Deaths by cause chapter and sex (table 23-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_by_cause_region": {
+    "name": {
+      "text": "Deaths by cause chapter and region (table 23-2)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_3_deaths_by_chapters_urban_rural": {
+    "name": {
+      "text": "Deaths by cause chapter, urban and rural (table 23-3)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_4_deaths_by_chapters_age_sex": {
+    "name": {
+      "text": "Deaths by cause chapter, age and sex (table 23-4)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_6_number_of_maternal_deaths_by_regions": {
+    "name": {
+      "text": "Number of maternal deaths by region (table 23-6)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_7_number_of_maternal_deaths_by_age_groups": {
+    "name": {
+      "text": "Number of maternal deaths by age group (table 23-7)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_10_deaths_from_suicide_by_regions_and_sex": {
+    "name": {
+      "text": "Deaths from suicide by region and sex (table 23-10)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_11_suicide_rate_by_sex": {
+    "name": {
+      "text": "Suicide rate by sex (table 23-11)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_5_deaths_by_causes_age_sex": {
+    "name": {
+      "text": "Deaths by cause, age and sex (table 23-5)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_23_8_maternal_mortality_rate_by_regions": {
+    "name": {
+      "text": "Maternal mortality rate by region (table 23-8)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_health_page": {
+    "name": {
+      "text": "Healthcare (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
+  },
+  "source.geostat_deaths_page": {
+    "name": {
+      "text": "Deaths (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "derivation": null
   }
 }
