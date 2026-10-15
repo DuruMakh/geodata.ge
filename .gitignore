@@ -39,6 +39,7 @@ data/reports/*.json
 !data/reports/wages-validation.json
 !data/reports/poverty-validation.json
 !data/reports/energy-food-validation.json
+!data/reports/health-validation.json
 !data/reports/money-banks-validation.json
 !data/reports/household-income-spending-validation.json
 data/reports/*.txt
