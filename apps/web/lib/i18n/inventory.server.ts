@@ -27,6 +27,8 @@ import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explore
 import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdRegionHref } from "../explorer/household";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
+import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
+import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -43,6 +45,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => householdRegionHref(section.id, id))),
     ENERGY_FOOD_HUB_PATH, ...ENERGY_FOOD_SECTIONS.map(section => section.href),
     "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
+    BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),
