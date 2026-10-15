@@ -39,6 +39,8 @@ import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types
 import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyFood/types";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
+import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
+import { businessDisplayDecimals } from "../data/business/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
@@ -753,6 +755,24 @@ export async function loadHouseholdFactsFromMirror(db: Pick<MirrorClient, "house
       year: row.year, indicatorId: row.indicatorId as HouseholdFact["indicatorId"], areaId: row.areaId as HouseholdFact["areaId"], measure: row.measure as HouseholdFact["measure"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(), unit: row.unit as "gel_month", basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function businessMirrorCreateRows(facts: readonly BusinessFact[], importRunId: string): Prisma.BusinessFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: businessSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadBusinessFactsFromMirror(db: Pick<MirrorClient, "businessFact">): Promise<BusinessFact[]> {
+  const rows = await db.businessFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== businessSourceDocumentId(row.sourceId)) throw new Error("Business source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as BusinessFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(businessDisplayDecimals(row.indicatorId)), unit: row.unit as BusinessFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

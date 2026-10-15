@@ -1,10 +1,14 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+import { assertBusinessParity, loadBusinessFacts, toClientBusinessFact } from "../../../lib/data/business/importBusiness";
+import { businessMirrorCreateRows, loadBusinessFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { BUSINESS_CSV_HEADERS, REVIEWED_AT, prepareBusinessData } from "../../../lib/data/business/prepareBusiness";
-import { BUSINESS_INDICATORS, BUSINESS_SOURCES, type BusinessFact, type BusinessIndicator } from "../../../lib/data/business/types";
+import { BUSINESS_INDICATORS, BUSINESS_PUBLIC_SOURCES, BUSINESS_SOURCES, businessSourceDocumentId, type BusinessFact, type BusinessIndicator } from "../../../lib/data/business/types";
 import { businessDisplayDecimals, expectedBusinessKeys, validateBusinessFacts } from "../../../lib/data/business/validation";
 
 const root = path.resolve(process.cwd(), "../..");
@@ -90,4 +94,73 @@ test.each([
   validateBusinessFacts(facts);
   mutate(facts);
   expect(() => validateBusinessFacts(facts)).toThrow(error);
+});
+
+test("loading serves the same 4,643 values as the canonical file", async () => {
+  const facts = await loadBusinessFacts();
+  expect(facts).toHaveLength(4643);
+  expect(facts).toEqual(await loadFacts());
+});
+
+test("loading refuses a canonical file whose fingerprint differs from the report", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "business-"));
+  try {
+    await fs.mkdir(path.join(dir, "apps/web"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/imports"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/reports"), { recursive: true });
+    const csv = await fs.readFile(path.join(root, "data/imports/business-annual.csv"), "utf8");
+    const altered = csv.replace("253725.5", "253725.6");
+    expect(altered).not.toBe(csv);
+    await fs.writeFile(path.join(dir, "data/imports/business-annual.csv"), altered);
+    await fs.copyFile(path.join(root, "data/reports/business-validation.json"), path.join(dir, "data/reports/business-validation.json"));
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.join(dir, "apps/web"));
+    try {
+      await expect(loadBusinessFacts()).rejects.toThrow(/fingerprint/);
+    } finally {
+      cwd.mockRestore();
+    }
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadFacts();
+  const employed = facts.findIndex(f => f.indicatorId === "business.employed.total" && f.year === 2025);
+  expect(facts[employed].value).toBe("899026");
+  expect(() => assertBusinessParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const padded = facts.map(f => ({ ...f }));
+  padded[employed].value = "899026.0";
+  expect(() => assertBusinessParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[employed].value = "899027";
+  changed[employed].publishedValue = "899027";
+  expect(() => assertBusinessParity(facts, changed)).toThrow();
+  expect(() => assertBusinessParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry numeric values in lari, persons, firms or percent with their display precision", async () => {
+  const facts = await loadFacts();
+  expect(toClientBusinessFact(find(facts, "business.turnover.total", 2025))).toMatchObject({ year: 2025, indicatorId: "business.turnover.total", value: 253725500000, unit: "gel", decimals: 1 });
+  expect(toClientBusinessFact(find(facts, "business.employed.total", 2025))).toMatchObject({ value: 899026, unit: "persons", decimals: 0 });
+  expect(toClientBusinessFact(find(facts, "business.active.total", 2024))).toMatchObject({ value: 249236, unit: "enterprises", decimals: 0 });
+  const rate = find(facts, "business.birth_rate.total", 2020);
+  expect(toClientBusinessFact(rate)).toMatchObject({ value: Number(rate.publishedValue), unit: "percent", decimals: 1 });
+});
+
+test("the database mirror round-trips exact decimals and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = businessMirrorCreateRows(facts, "business-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ businessFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "businessFact">;
+  const mirror = await loadBusinessFactsFromMirror(db(rows));
+  expect(() => assertBusinessParity(facts, mirror)).not.toThrow();
+  expect(rows[0].importRunId).toBe("business-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadBusinessFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(BUSINESS_PUBLIC_SOURCES.filter(id => !ids.has(businessSourceDocumentId(id)))).toEqual([]);
 });
