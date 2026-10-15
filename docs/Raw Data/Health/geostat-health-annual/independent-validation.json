@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 11,
+  "observations": 4204,
+  "cells_found_again_from_labels": 4204,
+  "source_cells_matched": 4204,
+  "stored_values_matched": 4204,
+  "published_values_matched": 4204,
+  "number_formats_matched": 4204,
+  "basis_and_status_matched": 4204,
+  "cross_checks": [
+    "doctors and nurses = main characteristics thousands x 1,000, 2002-2025",
+    "doctor specialities = doctors, 2002-2025",
+    "causes (I-XIX and XXII) = all deaths, 12 areas x 2014-2025",
+    "11 regions = Georgia for all deaths and every cause, 2014-2025"
+  ],
+  "negative_controls": {
+    "altered_value_detected": true,
+    "altered_published_value_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "wrong_cell_detected": true,
+    "wrong_area_detected": true,
+    "cause_sum_break_detected": true,
+    "region_sum_break_detected": true,
+    "staff_total_break_detected": true
+  },
+  "failures": []
+}
