@@ -91,6 +91,7 @@
   "external.position.latestMonth.06": "Jun",
   "external.position.latestMonth.09": "Sep",
   "external.position.latestMark": "Latest published amount, not a 31 December value",
+  "external.position.latestGdp": "{measure}, % of GDP",
   "external.position.sourceNote": "Source: National Bank of Georgia · amounts at the end of each period ·",
   "external.position.methodology": "Methodology and sources",
   "external.position.series": "Series",

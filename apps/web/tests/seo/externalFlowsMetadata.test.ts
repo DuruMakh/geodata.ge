@@ -3,13 +3,15 @@ import { loadServedCurrentAccountFacts, toClientCurrentAccountFacts } from "../.
 import { loadServedForeignInvestmentData, toClientForeignInvestmentData } from "../../lib/data/externalFlows/importForeignInvestment";
 import { loadServedMoneyTransfersData, toClientMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
 import { currentAccountCoverage } from "../../lib/explorer/currentAccountState";
+import { loadServedExternalPositionData, toClientExternalPositionFact } from "../../lib/data/externalPosition/importExternalPosition";
+import { externalPositionCoverage, type ExternalPositionSectionId } from "../../lib/explorer/externalPosition";
 import { foreignInvestmentCoverage } from "../../lib/explorer/foreignInvestmentState";
 import { moneyTransfersCoverage } from "../../lib/explorer/moneyTransfersState";
 import { message } from "../../lib/i18n/messages";
 import { getMessages } from "../../lib/i18n/messages.server";
 import {
-  currentAccountMetadata, foreignInvestmentMetadata, moneyFromAbroadMetadata,
-  renderCurrentAccountPage, renderForeignInvestmentPage, renderMoneyFromAbroadPage,
+  currentAccountMetadata, externalPositionMetadata, foreignInvestmentMetadata, moneyFromAbroadMetadata,
+  renderCurrentAccountPage, renderExternalPositionPage, renderForeignInvestmentPage, renderMoneyFromAbroadPage,
 } from "../../lib/pages/external";
 import { externalHubMetadata } from "../../lib/pages/hubs/external";
 import { renderPageMarkup } from "../helpers/render-localized";
@@ -17,9 +19,15 @@ import { renderPageMarkup } from "../helpers/render-localized";
 beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
 afterAll(() => vi.unstubAllEnvs());
 
-// U23-16: the three External flows pages' own metadata and Dataset record, in both languages, with the years each
+// U23-16: the External flows pages' own metadata and Dataset record, in both languages, with the years each
 // page covers (read through the same loaders and coverage rules as the page). The payload side (no withheld ids)
 // is in tests/explorer/pagePayloadPrivacy.test.tsx; the sitemap-wide Dataset contract in tests/seo/structuredData.test.ts.
+/** Foreign debt and Reserves share one page function; the section picks the page. */
+const positionPage = (section: ExternalPositionSectionId, key: "debt" | "reserves") => ({
+  path: `/explorer/external/${section}`, key, titleKey: "metaTitle",
+  metadata: (locale: "ka" | "en") => externalPositionMetadata(locale, section), render: (locale: "ka" | "en") => renderExternalPositionPage(locale, section),
+  coverage: async () => externalPositionCoverage(section, "amount", (await loadServedExternalPositionData()).facts.map(toClientExternalPositionFact).filter(f => f.indicatorId.startsWith(key === "debt" ? "ext_debt." : "reserves.")), []),
+});
 const PAGES = [
   {
     path: "/explorer/external/money-from-abroad", key: "money", metadata: moneyFromAbroadMetadata, render: renderMoneyFromAbroadPage,
@@ -33,13 +41,16 @@ const PAGES = [
     path: "/explorer/external/current-account", key: "account", metadata: currentAccountMetadata, render: renderCurrentAccountPage,
     coverage: async () => currentAccountCoverage(toClientCurrentAccountFacts(await loadServedCurrentAccountFacts())),
   },
+  positionPage("foreign-debt", "debt"),
+  positionPage("reserves", "reserves"),
 ] as const;
 
 describe.each(["ka", "en"] as const)("External flows pages name themselves and their years: %s", (locale) => {
-  it.each(PAGES)("$path", async ({ path, key, metadata: pageMetadata, render, coverage }) => {
+  it.each(PAGES)("$path", async (page) => {
+    const { path, key, metadata: pageMetadata, render, coverage } = page, titleKey = "titleKey" in page ? page.titleKey : "title";
     const [messages, metadata, { min, max }] = await Promise.all([getMessages(locale, ["external"]), pageMetadata(locale), coverage()]);
     const url = `https://fiscal.ge${locale === "en" ? "/en" : ""}${path}`;
-    expect(metadata.title).toContain(message(messages, `external.${key}.title`));
+    expect(metadata.title).toContain(message(messages, `external.${key}.${titleKey}`));
     expect(metadata.description).toBe(`${message(messages, `external.${key}.summary`)} ${min}–${max}.`);
     expect(metadata.alternates?.canonical).toBe(url);
 

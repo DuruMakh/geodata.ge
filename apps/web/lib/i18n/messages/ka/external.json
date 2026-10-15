@@ -91,6 +91,7 @@
   "external.position.latestMonth.06": "ივნ.",
   "external.position.latestMonth.09": "სექტ.",
   "external.position.latestMark": "ბოლო გამოქვეყნებული თანხა; არა 31 დეკემბრის მონაცემი",
+  "external.position.latestGdp": "{measure}, მშპ-ის %",
   "external.position.sourceNote": "წყარო: საქართველოს ეროვნული ბანკი · თანხები პერიოდის ბოლოს ·",
   "external.position.methodology": "მეთოდოლოგია და წყაროები",
   "external.position.series": "სერია",

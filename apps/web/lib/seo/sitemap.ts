@@ -5,6 +5,8 @@ import { ADJARA_REGION_ID } from "../data/municipal/types";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedProductData } from "../data/inflation/importProducts";
 import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
+import { loadServedExternalPositionData } from "../data/externalPosition/importExternalPosition";
+import { EXTERNAL_POSITION_SECTIONS } from "../explorer/externalPosition";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
 import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
@@ -56,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -82,6 +84,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedMoneyBanksData(),
     loadServedTradeServicesData(),
     loadServedTradeCompositionData(),
+    loadServedExternalPositionData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -102,7 +105,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const moneyTransfersModified = new Date(moneyTransferFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const foreignInvestmentModified = new Date(foreignInvestmentFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const currentAccountModified = new Date(currentAccountFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
-  const externalModified = new Date(Math.max(moneyTransfersModified.getTime(), foreignInvestmentModified.getTime(), currentAccountModified.getTime()));
+  const externalPositionModified = new Date(externalPositionFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  const externalModified = new Date(Math.max(moneyTransfersModified.getTime(), foreignInvestmentModified.getTime(), currentAccountModified.getTime(), externalPositionModified.getTime()));
   const tradeProductsModified = new Date(tradeProductFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeCompositionModified = new Date(tradeCompositionFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeServicesModified = new Date(tradeServicesFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
@@ -171,6 +175,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/external/money-from-abroad`, lastModified: moneyTransfersModified },
     { url: `${siteUrl}/explorer/external/foreign-investment`, lastModified: foreignInvestmentModified },
     { url: `${siteUrl}/explorer/external/current-account`, lastModified: currentAccountModified },
+    ...EXTERNAL_POSITION_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: externalPositionModified })),
     { url: `${siteUrl}/explorer/trade/products`, lastModified: tradeProductsModified },
     { url: `${siteUrl}/explorer/trade/domestic-exports`, lastModified: tradeDomesticModified },
     { url: `${siteUrl}/explorer/trade/services`, lastModified: tradeServicesModified },
