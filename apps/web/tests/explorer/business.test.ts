@@ -195,8 +195,8 @@ test("the same industry under two parents keeps its colour but not its stroke: e
   const manufacturing = ["active", "births", "deaths"].map(measure => stroke("firms", `business.${measure}.sector_c`));
   expect(new Set(manufacturing.map(s => s.color)).size).toBe(1);
   expect(manufacturing.map(s => s.stroke)).toEqual(["solid", "dashed", "dotted"]);
-  expect(["birth_rate", "death_rate"].map(measure => stroke("firms", `business.${measure}.sector_c`).stroke)).toEqual(["solid", "dashed"]);
   // A rate's sections take their stroke among the rates alone, the unit they are charted in.
+  expect(["birth_rate", "death_rate"].map(measure => stroke("firms", `business.${measure}.sector_c`).stroke)).toEqual(["solid", "dashed"]);
   // Totals and the flat Sales and Jobs lists stay solid.
   expect(stroke("firms", "business.deaths.total").stroke).toBe("solid");
   expect(buildBusinessModel("sales", facts, defaultBusinessState("sales")).series.every(s => s.stroke === "solid")).toBe(true);

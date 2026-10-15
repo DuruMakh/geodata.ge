@@ -48,7 +48,7 @@ The pages keep the production editorial look and reuse the Wages, Living standar
 These rules apply to every Business page, as on Money and banks:
 
 - Under the heading there is one short line from `LatestValueLine`. The wording for each page is in its own section below. Nothing else sits under the heading, and the only text under the chart is one short source line.
-- **No page has a tab row or a measure switch.** Where a list mixes units (Firms and the area pages), each unit's rows sit under a heading that names the unit, and the chart shows one unit at a time: ticking a row of another unit replaces the selection with that row, and the chart, table, years and Excel follow the selection's unit.
+- **No topic or area page has a tab row or a measure switch** (only the Regions map keeps its ₾ / jobs switch, §8). Where a list mixes units (Firms and the area pages), each unit's rows sit under a heading that names the unit, and the chart shows one unit at a time: ticking a row of another unit replaces the selection with that row, and the chart, table, years and Excel follow the selection's unit.
 - Only the default series named for each page is selected on arrival. It stays first, selectable and removable, and selection is unlimited.
 - Breakdowns sit under headings ("Firm size", "Industry") or nest under the total they break down, as caret-expanded subcategories. Series names carry no prefixes.
 - Chart | Table, the year range and Excel work as on Money and banks. Range, selection (including an empty one) and chart/table mode live in the URL hash through `use-hash-explorer-state` and survive a language change.
