@@ -3,8 +3,11 @@ import { loadExternalPositionFacts, toClientExternalPositionFact } from "../../l
 import type { ClientExternalPositionFact } from "../../lib/data/externalPosition/types";
 import { INK } from "../../lib/explorer/colors";
 import type { CurrentAccountGdp } from "../../lib/explorer/currentAccount";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Presentation } from "../../lib/i18n/types";
+import { buildExternalPositionWorkbookExportModel } from "../../lib/explorer/externalPositionWorkbook";
 import {
-  EXTERNAL_POSITION_SECTIONS, buildExternalPositionModel, changeExternalPositionView, defaultExternalPositionState, externalPositionCoverage, externalPositionSeries,
+  EXTERNAL_POSITION_SECTIONS, buildExternalPositionModel, externalPositionLatestMonth, changeExternalPositionView, defaultExternalPositionState, externalPositionCoverage, externalPositionSeries,
   externalPositionViewFacts, parseExternalPositionHash, serializeExternalPositionHash, type ExternalPositionState,
 } from "../../lib/explorer/externalPosition";
 
@@ -133,4 +136,75 @@ test("gold is a published zero before 2024, not a gap", () => {
   // Zero stays zero as a share of GDP too.
   const share = buildExternalPositionModel("reserves", facts, { ...defaultExternalPositionState("reserves"), view: "gdp" }, gdp);
   expect(share.series.find(s => s.id === "reserves.gold")!.valuesByYear[2010]).toBe(0);
+});
+
+const presentation = async (locale: "ka" | "en" = "en"): Promise<Presentation> => ({ locale, englishLabels: {}, messages: await getMessages(locale, ["workbook", "format", "external"]) });
+const SOURCES = ["nbg_gross_external_debt_bpm6", "nbg_official_reserve_assets"].map(sourceId => ({
+  sourceId, years: Array.from({ length: 32 }, (_, i) => 1995 + i), title: sourceId, organization: "National Bank of Georgia", retrievedAt: "2026-10-14",
+  downloadHref: `/downloads/methodology/external/files/${sourceId}.xlsx` as const,
+}));
+const GDP_SOURCES = [{ years: [1996, 2025], title: "Geostat GDP", organization: "Geostat", downloadHref: "https://www.geostat.ge/media/gdp.xlsx" as const, retrievedAt: "2026-08-13" }];
+const workbookFor = async (section: Parameters<typeof externalPositionSeries>[0], view: ExternalPositionState["view"], selectedIds: string[], start: number, end: number, locale: "ka" | "en" = "en") => {
+  const p = await presentation(locale);
+  const model = buildExternalPositionModel(section, facts, { mode: "table", view, range: { kind: "manual", start, end }, selectedIds }, gdp);
+  return buildExternalPositionWorkbookExportModel({
+    section, facts, gdp, gdpSources: GDP_SOURCES, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: Object.fromEntries(selectedIds.map(id => [id, id])),
+    state: { mode: "table", view, range: { kind: "manual", start, end }, selectedIds },
+    latestLabel: model.latestYears.length ? `${model.latest.year} (${externalPositionLatestMonth(model.latest.periodEnd, p.messages)})` : undefined,
+  }, p);
+};
+
+test("the latest point's month is localized from its period end", async () => {
+  expect(externalPositionLatestMonth("2026-09-30", (await presentation("en")).messages)).toBe("Sep");
+  expect(externalPositionLatestMonth("2026-06-30", (await presentation("en")).messages)).toBe("Jun");
+  expect(externalPositionLatestMonth("2026-09-30", (await presentation("ka")).messages)).toBe("სექტ.");
+  expect(externalPositionLatestMonth("2026-06-30", (await presentation("ka")).messages)).toBe("ივნ.");
+});
+
+test("the Reserves workbook exports million USD for the four series, with the 2026 column named by its month", async () => {
+  const ids = externalPositionSeries("reserves").map(s => s.id);
+  const model = await workbookFor("reserves", "amount", ids, 2020, 2026);
+  expect(model.filename).toBe("fiscal-reserves-2020-2026-en.xlsx");
+  expect(model.readable.title).toBe("Reserves · Amount");
+  expect(model.readable.unitLabel).toBe("million USD");
+  expect(model.readable.numberFormat).toBe("#,##0.0");
+  expect(model.readable.years).toHaveLength(7);
+  expect(model.readable.rows).toHaveLength(4);
+  expect(model.readable.rows.map(row => row.kind)).toEqual(["total", "item", "item", "item"]);
+  // Million USD to one decimal, with no float noise from the dollar conversion.
+  expect(model.readable.rows[0].valuesByYear[2025]).toBe(6159.3);
+  expect(model.readable.rows[2].valuesByYear[2020]).toBe(0);
+  expect(model.readable.rows[2].basisByYear[2020]).toBe("actual");
+  expect(model.readable.headerLabels).toEqual({ category: "Series", columns: ["2020", "2021", "2022", "2023", "2024", "2025", "2026 (Sep)"], wrap: true });
+  expect(model.analysis.rows).toHaveLength(28);
+  expect(model.analysis.headers).toEqual(["Year", "Series", "million USD", "Status"]);
+  expect(model.analysis.numericFormats).toEqual({ 3: "#,##0.0" });
+  const status = (year: number) => model.analysis.rows.find(r => r[0] === year && r[1] === "reserves.total")![3];
+  expect(status(2025)).toBe("Published");
+  expect(status(2026)).toBe("Latest published amount, not a 31 December value");
+  expect(model.sources.map(source => source.title)).toEqual(["nbg_official_reserve_assets"]);
+  expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/external/files/nbg_official_reserve_assets.xlsx");
+});
+
+test("the Foreign debt % of GDP workbook has no 2026 column and cites the GDP source beside the NBG file", async () => {
+  const model = await workbookFor("foreign-debt", "gdp", ["ext_debt.total", "ext_debt.banks"], 2020, 2026);
+  expect(model.filename).toBe("fiscal-foreign-debt-gdp-2020-2025-en.xlsx");
+  expect(model.readable.years).toEqual([2020, 2021, 2022, 2023, 2024, 2025]);
+  expect(model.readable.headerLabels!.columns).toEqual(["2020", "2021", "2022", "2023", "2024", "2025"]);
+  expect(model.readable.unitLabel).toBe("% of GDP");
+  expect(model.readable.numberFormat).toBe("0.0");
+  expect(model.analysis.headers[2]).toBe("Share of GDP (%)");
+  expect(model.analysis.numericFormats).toEqual({ 3: "0.0" });
+  expect(model.analysis.rows.some(row => row[0] === 2026)).toBe(false);
+  const debt2025 = facts.find(f => f.indicatorId === "ext_debt.total" && f.year === 2025)!;
+  expect(model.readable.rows[0].valuesByYear[2025]).toBeCloseTo(debt2025.value / GDP_2025 * 100, 10);
+  expect(model.sources.map(source => source.title)).toEqual(["nbg_gross_external_debt_bpm6", "Geostat GDP"]);
+  // The amounts cite only the NBG file.
+  expect((await workbookFor("foreign-debt", "amount", ["ext_debt.total"], 2020, 2026)).sources.map(source => source.title)).toEqual(["nbg_gross_external_debt_bpm6"]);
+});
+
+test("the Georgian workbook names its 2026 column with the Georgian month", async () => {
+  const model = await workbookFor("foreign-debt", "amount", ["ext_debt.total"], 2024, 2026, "ka");
+  expect(model.readable.headerLabels!.columns).toEqual(["2024", "2025", "2026 (ივნ.)"]);
+  expect(model.filename).toBe("fiscal-foreign-debt-2024-2026.xlsx");
 });

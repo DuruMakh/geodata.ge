@@ -1,5 +1,7 @@
 import type { ClientExternalPositionFact, ExternalPositionIndicator } from "../data/externalPosition/types";
 import type { CurrentAccountGdp } from "./currentAccount";
+import { message } from "../i18n/messages";
+import type { Messages } from "../i18n/types";
 import { refitRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicState } from "./topicSeries";
 
@@ -97,4 +99,9 @@ export function buildExternalPositionModel(section: ExternalPositionSectionId, a
     latestYears: state.view === "gdp" ? [] : model.years.filter(year => facts.some(f => f.year === year && f.latestPeriod)),
     latest: { year: reference.year, periodEnd: reference.periodEnd, value: reference.value, latestPeriod: reference.latestPeriod },
   };
+}
+
+/** The short month of a latest-period point, from its `periodEnd` (`2026-09-30` gives September's abbreviation). */
+export function externalPositionLatestMonth(periodEnd: string, messages: Messages): string {
+  return message(messages, `external.position.latestMonth.${periodEnd.slice(5, 7)}`);
 }
