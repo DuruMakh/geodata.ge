@@ -1,7 +1,7 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-10-13
+Last updated: 2026-10-15
 Status: Production visual system for Fiscal.ge
 Scope: Explorer product UI (the twelve dataset hubs of §6.7), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -1346,7 +1346,7 @@ All four pages reuse the Poverty workspace: the latest-value line, the editorial
 - **No page has tabs** (owner decision, 2026-10-11). Each page has one chart and one series list; breakdowns nest under the total they break down (fuels under supply and imports, plants under production, users under final consumption, meats under meat) as caret-expanded subcategories. Only the page's main total is selected by default (domestic supply, total production, final consumption, wheat); it stays first, selectable and removable.
 - **Units.** Energy supply and Energy use show thousand tonnes of oil equivalent and Electricity shows GWh, at one decimal; Food self-sufficiency shows whole-number percents, so its table passes the shared table's optional `percentDecimals` as 0. On the energy pages axis ticks and table cells carry numbers only and the chart panel names the unit; food ticks and cells keep their `%` sign. The latest-value line adds ` GWh` (Electricity) or `%` (food) to its value, and on Energy supply and Electricity it ends with the latest imports (and exports) as a short note.
 - **Colour.** The reference series is drawn in ink and the others take the editorial palette by their position in the list, so no colour repeats on a page. Energy supply has 16 non-reference series, two more than the palette holds, so the hub appends two hexes already used for economic sectors, `#0D89C2` and `#474A02`.
-- **State.** Chart or table, the years and the selection (including an empty one) live in the URL hash through the shared hook `components/explorer-shell/use-hash-explorer-state.ts` and survive reloads and language switches.
+- **State.** Chart or table, the years and the selection (including an empty one) live in the URL hash through the shared hook `components/explorer-shell/use-hash-state.ts` and survive reloads and language switches.
 
 Only yearly data is shown. Household energy prices are excluded because Geostat publishes them half-yearly. The authoritative scope is `Project_Definition.md` §2I; bounded decisions are in `docs/superpowers/specs/2026-10-11-energy-food-design.md`.
 
@@ -1380,6 +1380,6 @@ Doctors and hospitals and Illnesses reuse the Money and banks workspace; the Cau
 
 **Units and colour.** Axis ticks and table cells carry numbers only and the chart panel names the unit; the table shows the most decimals among the selected series, while the list and tooltip show each series to its own. Values show as Geostat publishes them. The reference series (doctors, all deaths) is drawn in ink and the others take the editorial palette by their position in the list.
 
-**State.** The measure (under the `tab` key, Doctors and hospitals only), chart/table, years and selection (including an empty one) live in the URL hash through the shared hook `components/explorer-shell/use-hash-explorer-state.ts` and survive reloads and language switches. The lists of at most eight rows show no search box.
+**State.** The measure (under the `tab` key, Doctors and hospitals only), chart/table, years and selection (including an empty one) live in the URL hash through the shared hook `components/explorer-shell/use-hash-state.ts` and survive reloads and language switches. The lists of at most eight rows show no search box.
 
 Only yearly data is shown and the pages state no causes. Excel keeps the stored units and per-cell number formats. The authoritative scope is `Project_Definition.md` §2K; bounded decisions are in `docs/superpowers/specs/2026-10-15-health-design.md`.

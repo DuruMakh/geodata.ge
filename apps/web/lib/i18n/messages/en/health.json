@@ -120,7 +120,6 @@
   "health.series": "Series",
   "health.value": "Value",
   "health.unit": "Unit",
-  "health.status.published": "Published",
   "health.emptySelection": "Select one or more series to compare.",
   "health.nestedSelected": "Subcategories",
   "health.subcategoriesFor": "Subcategories of {label}"

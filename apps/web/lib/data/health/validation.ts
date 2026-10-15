@@ -14,8 +14,8 @@ const CAUSES = HEALTH_INDICATORS.filter(id => id.startsWith("health.deaths.") &&
 const REGIONS = HEALTH_AREAS.filter(area => area !== "georgia");
 
 /** Every key the serving package must contain, exactly once, from the research package's `coverage.csv`. */
-export function expectedHealthKeys(): Set<string> {
-  const file = path.resolve(process.cwd(), "../..", HEALTH_RESEARCH_DIRECTORY, "coverage.csv");
+export function expectedHealthKeys(repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..")): Set<string> {
+  const file = path.join(/* turbopackIgnore: true */ repositoryRoot, HEALTH_RESEARCH_DIRECTORY, "coverage.csv");
   const keys = new Set<string>();
   for (const line of parse(fs.readFileSync(file), { columns: true, bom: true, skip_empty_lines: true }) as Record<string, string>[]) {
     const first = Number(line.first_year), last = Number(line.last_year);
@@ -87,8 +87,8 @@ const ANCHORS: ReadonlyArray<readonly [HealthIndicator, HealthArea, number, stri
   ["health.death_rate.total", "region.racha_lechkhumi_kvemo_svaneti", 2025, "19.7"],
 ];
 
-export function validateHealthFacts(facts: readonly HealthFact[]): void {
-  const expected = expectedHealthKeys();
+export function validateHealthFacts(facts: readonly HealthFact[], repositoryRoot?: string): void {
+  const expected = expectedHealthKeys(repositoryRoot);
   const seen = new Map<string, Decimal>();
   const published = new Map<string, string>();
   for (const fact of facts) {

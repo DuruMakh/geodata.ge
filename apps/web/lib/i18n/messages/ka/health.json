@@ -120,7 +120,6 @@
   "health.series": "სერია",
   "health.value": "მნიშვნელობა",
   "health.unit": "ერთეული",
-  "health.status.published": "გამოქვეყნებული",
   "health.emptySelection": "შესადარებლად აირჩიეთ ერთი ან მეტი სერია.",
   "health.nestedSelected": "ქვეკატეგორიები",
   "health.subcategoriesFor": "{label} — ქვეკატეგორიები"

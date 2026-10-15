@@ -26,7 +26,7 @@ export async function loadHealthFacts(repositoryRoot = path.resolve(/* turbopack
     unit: row.unit as HealthFact["unit"], basis: row.basis as "actual", valueStatus: row.value_status as "published",
     sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell, sourceNumberFormat: row.source_number_format, lastReviewedAt: row.last_reviewed_at,
   }));
-  validateHealthFacts(facts);
+  validateHealthFacts(facts, repositoryRoot);
   if (facts.length !== report.observations) throw new Error("Health acceptance count mismatch");
   return facts;
 }

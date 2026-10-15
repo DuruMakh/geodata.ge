@@ -8,7 +8,7 @@ import type { BreakRow } from "../../../lib/data/demography/breaks";
 import { assertHealthParity, loadHealthBreaks, loadHealthFacts, loadServedHealthData, toClientHealthFact } from "../../../lib/data/health/importHealth";
 import { healthMirrorCreateRows, loadHealthFactsFromMirror } from "../../../lib/db/mirrorRows";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { HEALTH_AREAS, HEALTH_INDICATORS, HEALTH_PUBLIC_SOURCES, HEALTH_SOURCES, HEALTH_UNITS, type HealthFact, type HealthSeriesBreak } from "../../../lib/data/health/types";
+import { HEALTH_AREAS, HEALTH_INDICATORS, HEALTH_PUBLIC_SOURCES, HEALTH_RESEARCH_DIRECTORY, HEALTH_SOURCES, HEALTH_UNITS, type HealthFact, type HealthSeriesBreak } from "../../../lib/data/health/types";
 import { HEALTH_CSV_HEADERS, prepareHealthData } from "../../../lib/data/health/prepareHealth";
 import { expectedHealthKeys, healthDisplayDecimals, healthPublishedValue, validateHealthFacts } from "../../../lib/data/health/validation";
 
@@ -139,7 +139,7 @@ describe("loading and parity", () => {
     await expect(loadHealthFacts()).resolves.toHaveLength(4204);
     const copy = fs.mkdtempSync(path.join(os.tmpdir(), "health-"));
     try {
-      for (const relative of ["data/imports/health-annual.csv", "data/reports/health-validation.json"]) {
+      for (const relative of ["data/imports/health-annual.csv", "data/reports/health-validation.json", path.join(HEALTH_RESEARCH_DIRECTORY, "coverage.csv")]) {
         fs.mkdirSync(path.dirname(path.join(copy, relative)), { recursive: true });
         fs.copyFileSync(path.join(root, relative), path.join(copy, relative));
       }
