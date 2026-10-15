@@ -134,7 +134,6 @@ During implementation, also update `Project_Definition.md` §2 (External flows s
 
 - **Used as is:** `ExplorerWorkspace`, `ExplorerHeading`, `LatestValueLine`, `EditorialLineChart` (with its `hollowPreliminary` option), `ExplorerTable`, `RangeStrip`, `FlatSeriesPanel`, `SegmentedTabs`, `ControlTooltip`, `SourceNote`, `ExcelDownloadButton`, the three-sheet workbook writer, the topic-series model (`topicSeries.ts`), `useHashState`, `readVerifiedPackageFile`, `assertGeneratedArtifactMatches`, the served-rows parity check, the served nominal GDP in USD, and the source archive and methodology components.
 - **Small additions:**
-  - The Money and banks explorer (`components/money-banks/money-banks-explorer.tsx`) and its model gain the two sections, with a USD amount unit and the USD GDP share. Defaults leave the four Money and banks pages unchanged.
   - The hub card builder (`externalHubCards.ts`) gets cards 04 and 05.
   - The import script and mirror read and compare the new table.
   - External flows messages, methodology content and source-archive rows.
@@ -142,6 +141,7 @@ During implementation, also update `Project_Definition.md` §2 (External flows s
   - The research package, prepare script and validation.
   - The Prisma model and migration.
   - The two routes (Georgian and English), sidebar rows and messages.
+  - A thin page component and model (`components/external/external-position.tsx`, `lib/explorer/externalPosition.ts`), laid out exactly like the Money and banks explorer and built on the same shared pieces, as each hub's page (Poverty, Wages, Energy and food, Money and banks) has its own. Considered: extending `MoneyBanksExplorer` itself. It's tied to the Money and banks messages, lari amounts, GEL-based GDP and its methodology link, and it has no dated latest point. Adding all of that would put new switches into four live pages for no gain to them.
   - A separate data package, not more rows in `money-banks-annual.csv`, because these pages belong to another hub and need a period-end date column that the Money and banks table doesn't have.
 
 ## 11. Coordination
