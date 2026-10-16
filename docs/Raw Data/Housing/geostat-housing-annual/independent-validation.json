@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 6,
+  "observations": 3222,
+  "stored_values_matched": 3222,
+  "published_values_matched_rounding": 3222,
+  "rows_with_matching_year_heading_and_label_context": 3222,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "neighbouring_column_detected": true,
+    "type_column_swapped_detected": true,
+    "area_row_read_as_count_detected": true,
+    "wrong_region_row_detected": true,
+    "number_row_read_as_area_detected": true,
+    "wrong_year_sheet_detected": true,
+    "regional_year_column_detected": true,
+    "swapped_sheets_detected": true,
+    "third_quarter_detected": true,
+    "index_row_swapped_detected": true,
+    "unrounded_published_value_detected": true,
+    "rounding_wrong_way_detected": true,
+    "no_data_cell_served_detected": true
+  },
+  "failures": []
+}
