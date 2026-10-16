@@ -69,7 +69,8 @@ describe("the series lists", () => {
       expect(list[0].reference).toBe(true);
       expect(list.filter(s => s.reference)).toHaveLength(1);
       expect(new Set(list.map(s => s.id)).size).toBe(list.length);
-      expect(list.map(s => s.id)).toEqual(CRIME_INDICATORS.filter(i => list.some(s => s.id === i)));
+      // Road accidents list people killed before injured, the reverse of the table.
+      if (id !== "road-accidents") expect(list.map(s => s.id)).toEqual(CRIME_INDICATORS.filter(i => list.some(s => s.id === i)));
     }
     expect(CRIME_SECTIONS.flatMap(s => crimeSeries(s.id)).map(s => s.id).sort()).toEqual([...CRIME_INDICATORS].sort());
     expect(crimeSeries("recorded")[0]).toEqual({ id: "crime.recorded.total", reference: true });
@@ -90,6 +91,7 @@ describe("the series lists", () => {
     expect(crimeSeries("road-accidents")).toHaveLength(4);
     expect(headings("road-accidents")).toEqual(["accidents", "accidents", "people", "people"]);
     expect(crimeSeries("road-accidents").map(s => s.reference)).toEqual([true, false, false, false]);
+    expect(crimeSeries("road-accidents").map(s => s.id)).toEqual(["crime.road.accidents", "crime.road.accidents_drunk", "crime.road.killed", "crime.road.injured"]);
   });
 });
 
@@ -173,7 +175,7 @@ describe("gaps are null, never zero", () => {
 describe("the hash", () => {
   test("a selection mixing units keeps the first one's unit", () => {
     expect(parseCrimeHash("#sel=crime.road.accidents,crime.road.killed", "road-accidents", facts).selectedIds).toEqual(["crime.road.accidents"]);
-    expect(parseCrimeHash("#sel=crime.road.killed,crime.road.injured", "road-accidents", facts).selectedIds).toEqual(["crime.road.injured", "crime.road.killed"]);
+    expect(parseCrimeHash("#sel=crime.road.killed,crime.road.injured", "road-accidents", facts).selectedIds).toEqual(["crime.road.killed", "crime.road.injured"]);
   });
 
   test("tab names the measure and an unknown one is count", () => {

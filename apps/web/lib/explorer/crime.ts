@@ -24,7 +24,7 @@ const total = (id: CrimeIndicator): CrimeSeriesDefinition => ({ id, reference: t
 const under = (heading: CrimeHeading, list: readonly CrimeIndicator[], reference = false): CrimeSeriesDefinition[] =>
   list.map((id, index) => ({ id, reference: reference && index === 0, heading }));
 
-/** The series a section offers, in the table order of the data, the page total first. */
+/** The series a section offers, in the table order of the data (road accidents list people killed before injured), the page total first. */
 export function crimeSeries(section: CrimeSectionId): CrimeSeriesDefinition[] {
   switch (section) {
     case "recorded": return [total("crime.recorded.total"), ...under("type", ids("crime.recorded.").filter(id => id !== "crime.recorded.total"))];
@@ -33,7 +33,7 @@ export function crimeSeries(section: CrimeSectionId): CrimeSeriesDefinition[] {
     case "prisons": return [total("crime.prison.total"), ...under("sex", ["crime.prison.women", "crime.prison.men"]), ...under("age", ["crime.prison.adults", "crime.prison.juveniles"]),
       ...under("status", ["crime.prison.sentenced", "crime.prison.pretrial"])];
     case "victims": return [total("crime.victims.total"), ...under("sex", ids("crime.victims.sex_")), ...under("age", ids("crime.victims.age_")), ...under("citizenship", ids("crime.victims.citizenship_"))];
-    case "road-accidents": return [...under("accidents", ["crime.road.accidents", "crime.road.accidents_drunk"], true), ...under("people", ["crime.road.injured", "crime.road.killed"])];
+    case "road-accidents": return [...under("accidents", ["crime.road.accidents", "crime.road.accidents_drunk"], true), ...under("people", ["crime.road.killed", "crime.road.injured"])];
   }
 }
 
