@@ -1,4 +1,5 @@
 import { BUSINESS_REGIONS, businessIndicator, type BusinessMeasure, type ClientBusinessFact } from "../data/business/types";
+import { areaRoutes } from "./areaRoutes";
 import { BUSINESS_SECTIONS, buildBusinessSeriesModel, businessListCoverage, parseBusinessListHash, type BusinessModel, type BusinessSeriesDefinition } from "./business";
 import type { TopicState } from "./topicSeries";
 
@@ -7,15 +8,8 @@ export const BUSINESS_AREAS = ["georgia", ...BUSINESS_REGIONS] as const;
 export type BusinessArea = typeof BUSINESS_AREAS[number];
 /** The Regions index, whose map and list open the area pages. */
 export const BUSINESS_REGIONS_HREF = BUSINESS_SECTIONS.find(section => section.id === "regions")!.href;
-/** An area's URL slug: a region's drops the `region_` prefix. */
-export const businessAreaSlug = (area: BusinessArea) => area.replace(/^region_/, "");
-export const businessAreaHref = (area: BusinessArea): `/${string}` => `${BUSINESS_REGIONS_HREF}/${businessAreaSlug(area)}`;
-/** An area's id on the shared region map and picker: `georgia`, or a region's `region.<id>`, whose names the shared region labels carry. */
-export const businessMapId = (area: BusinessArea) => area === "georgia" ? area : area.replace(/^region_/, "region.");
-/** The area of a map, picker or list row id (`businessMapId`'s inverse). */
-export const businessAreaOfMapId = (id: string) => (id === "georgia" ? id : id.replace(/^region\./, "region_")) as BusinessArea;
-/** The area page of a map or list row (as `householdRegionHref` reads it). */
-export const businessRegionHref = (id: string): `/${string}` => businessAreaHref(businessAreaOfMapId(id));
+/** An area's slug and URL, its id on the shared region map and picker, the area of such an id and that area's page (`areaRoutes.ts`). */
+export const { areaSlug: businessAreaSlug, areaHref: businessAreaHref, mapId: businessMapId, areaOfMapId: businessAreaOfMapId, regionHref: businessRegionHref } = areaRoutes<BusinessArea>(BUSINESS_REGIONS_HREF);
 
 /** An area's list: the money measures (million GEL), jobs (thousand people) and the firm counts, each group under its heading. */
 const AREA_SERIES: readonly { heading: "money" | "jobs" | "firms"; measures: readonly BusinessMeasure[] }[] = [

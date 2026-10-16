@@ -1,5 +1,6 @@
 import { HOUSING_REGIONS, housingIndicator, type ClientHousingFact, type HousingGroup, type HousingMeasure } from "../data/housing/types";
 import { HOUSING_SECTIONS, buildHousingSeriesModel, changeHousingSelection, housingListCoverage, parseHousingListHash, type HousingHeading, type HousingModel, type HousingSeriesDefinition } from "./housing";
+import { areaRoutes } from "./areaRoutes";
 import { INK } from "./colors";
 import { topicSeriesColor, type TopicState } from "./topicSeries";
 
@@ -8,15 +9,8 @@ export const HOUSING_AREAS = ["georgia", ...HOUSING_REGIONS] as const;
 export type HousingArea = typeof HOUSING_AREAS[number];
 /** The Regions index, whose map and list open the area pages. */
 export const HOUSING_REGIONS_HREF = HOUSING_SECTIONS.find(section => section.id === "regions")!.href;
-/** An area's URL slug: a region's drops the `region_` prefix. */
-export const housingAreaSlug = (area: HousingArea) => area.replace(/^region_/, "");
-export const housingAreaHref = (area: HousingArea): `/${string}` => `${HOUSING_REGIONS_HREF}/${housingAreaSlug(area)}`;
-/** An area's id on the shared region map and picker: `georgia`, or a region's `region.<id>`, whose names the shared region labels carry. */
-export const housingMapId = (area: HousingArea) => area === "georgia" ? area : area.replace(/^region_/, "region.");
-/** The area of a map, picker or list row id (`housingMapId`'s inverse). */
-export const housingAreaOfMapId = (id: string) => (id === "georgia" ? id : id.replace(/^region\./, "region_")) as HousingArea;
-/** The area page of a map or list row. */
-export const housingRegionHref = (id: string): `/${string}` => housingAreaHref(housingAreaOfMapId(id));
+/** An area's slug and URL, its id on the shared region map and picker, the area of such an id and that area's page (`areaRoutes.ts`). */
+export const { areaSlug: housingAreaSlug, areaHref: housingAreaHref, mapId: housingMapId, areaOfMapId: housingAreaOfMapId, regionHref: housingRegionHref } = areaRoutes<HousingArea>(HOUSING_REGIONS_HREF);
 
 /** Georgia's page shows the national rows (all buildings `total`, homes `type_residential`), a region's page its own two. */
 const allBuildings = (area: HousingArea): HousingGroup => area === "georgia" ? "total" : area;
