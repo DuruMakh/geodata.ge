@@ -59,7 +59,7 @@ The district workbook's note reads: "The following table represents the median p
 
 ## Values as Geostat publishes them
 
-The pages show Geostat's published values and calculate nothing: no averages, shares, growth rates, differences or totals, and no filled gaps. Counts are whole numbers; floor area is stored in m² and shown in thousand m² to one decimal in charts, tables and lists (million m² to one decimal in the latest-value lines and hub cards); the index has one decimal; prices are whole GEL per m². Missing years are gaps, dashes and blank Excel cells, never zero. The pages describe the figures and state no causes.
+The pages show Geostat's published values and calculate nothing: no averages, shares, growth rates, differences or totals, and no filled gaps. Counts are whole numbers; floor area is stored in m² and shown in thousand m² to one decimal in charts, tables and lists (million m² to one decimal, thousand m² below one million, in the latest-value lines); the index has one decimal; prices are whole GEL per m². Missing years are gaps, dashes and blank Excel cells, never zero. The pages describe the figures and state no causes.
 
 ## Extraction and validation
 
@@ -69,7 +69,7 @@ The pages show Geostat's published values and calculate nothing: no averages, sh
 
 `npm run data:prepare-housing` writes `data/imports/housing-annual.csv` (UTF-8 with BOM) and `data/reports/housing-validation.json`; `npm run data:check-housing` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `HousingFact` (migration `20261016200000_housing`) is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
 
-Routes are `/explorer/housing` with `/permits`, `/completed`, `/prices`, `/regions` and `/regions/[area]` (Georgia and the 11 regions), plus `/methodology/housing`, each mirrored under `/en`. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, floor area in m², prices in GEL per m², the index to one decimal, empty cells for missing values and validated links to the archived Geostat workbooks the exported values come from (`data/methodology/source-archives/housing.csv`); only the six served workbooks are listed. Internal identifiers and cell references are not exported. `/methodology/housing` publishes all 21 originals; the HTML captures download as `.txt` files. The 21 `source.geostat_housing_*` rows of `data/sources/source-documents.csv` stay out of the fact-query snapshot.
+Routes are `/explorer/housing` with `/permits`, `/completed`, `/prices`, `/regions` and `/regions/[id]` (Georgia and the 11 regions), plus `/methodology/housing`, each mirrored under `/en`. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, floor area in m², prices in GEL per m², the index to one decimal, empty cells for missing values and validated links to the archived Geostat workbooks the exported values come from (`data/methodology/source-archives/housing.csv`); only the six served workbooks are listed. Internal identifiers and cell references are not exported. `/methodology/housing` publishes all 21 originals; the HTML captures download as `.txt` files. The 21 `source.geostat_housing_*` rows of `data/sources/source-documents.csv` stay out of the fact-query snapshot.
 
 ## Statistical limitations and future use
 

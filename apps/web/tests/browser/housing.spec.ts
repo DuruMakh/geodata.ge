@@ -67,7 +67,7 @@ test("prices: the index by default, and ticking a district under flats replaces 
   await ready(page);
   await expect(page.getByTestId("housing-latest")).toContainText("159.4");
   await expect(page.getByTestId("housing-latest")).toHaveText("საცხოვრებლის ფასების ინდექსი (2020 = 100) · 2025, IV კვარტალი: 159.4");
-  await expect(page.getByTestId("series-heading")).toHaveText(["ფასების ინდექსი · 2020 = 100", "თბილისი, ახალი ბინები · ლარი 1 მ²-ზე", "თბილისი, ახალი კერძო სახლები · ლარი 1 მ²-ზე"]);
+  await expect(page.getByTestId("series-heading")).toHaveText(["ფასების ინდექსი · 2020 = 100", "თბილისი, ახალი ბინები · ლარი 1 მ²\u2011ზე", "თბილისი, ახალი კერძო სახლები · ლარი 1 მ²\u2011ზე"]);
   await expect(ticked(page)).toHaveCount(1);
   await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
   await page.locator(pressed("housing.price_flat.district_vake")).click();

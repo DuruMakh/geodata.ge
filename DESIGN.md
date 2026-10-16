@@ -1,7 +1,7 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-10-15
+Last updated: 2026-10-16
 Status: Production visual system for Fiscal.ge
 Scope: Explorer product UI (the fourteen dataset hubs of §6.7), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -1446,7 +1446,7 @@ The three topic pages and the area pages reuse the Business workspace: the lates
 
 **Series colours.** The reference series is ink. A building type wears one colour under both headings and on both pages, keyed by its place in Geostat's order; four types (culture, pharmacies, holiday camps and other) have fixed colours so that none of the 17 repeats. A district wears one colour under flats and houses. On the area pages a row's colour follows its place among the four, so the number and the floor area of the same objects share it.
 
-**Units.** Counts are whole numbers, floor area is stored in m² and shown in thousand m² to one decimal in charts, tables and lists (million m² to one decimal in the latest-value lines and hub cards), the index has one decimal and prices are whole GEL per m². Axis ticks and table cells carry numbers only and the chart panel names the unit.
+**Units.** Counts are whole numbers, floor area is stored in m² and shown in thousand m² to one decimal in charts, tables and lists (million m² to one decimal, thousand m² below one million, in the latest-value lines), the index has one decimal and prices are whole GEL per m². Axis ticks and table cells carry numbers only and the chart panel names the unit.
 
 **State.** Chart/table, years and selection, including an empty one, live in the URL hash through `components/explorer-shell/use-hash-state.ts` and survive reloads and language switches. The three topic lists exceed the shared selector's threshold and show a search box; area pages list eight rows and show none.
 

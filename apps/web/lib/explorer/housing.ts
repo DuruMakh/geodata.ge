@@ -153,10 +153,10 @@ export function housingValueLabel(value: number | null | undefined, unit: Housin
   return unit === "area" || unit === "price" ? `${number} ${housingUnitLabel(unit, t)}` : number;
 }
 
-/** Floor area in a latest-value line: million m² to one decimal, thousand m² below a million. */
+/** Floor area in a latest-value line: million m² to one decimal, thousand m² below a million, kept on one line with its unit. */
 export function housingFloorArea(value: number, t: HousingTranslate): string {
-  return value >= 1_000_000 ? `${formatInUnit(value, { divisor: 1_000_000, label: "", decimals: 1 })} ${t("unitMillionSquareMetres")}`
-    : `${formatInUnit(value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandSquareMetres")}`;
+  return value >= 1_000_000 ? `${formatInUnit(value, { divisor: 1_000_000, label: "", decimals: 1 })}\u00a0${t("unitMillionSquareMetres")}`
+    : `${formatInUnit(value, { divisor: 1_000, label: "", decimals: 1 })}\u00a0${t("unitThousandSquareMetres")}`;
 }
 
 /** Headings whose rows repeat one another's names in one unit: a Tbilisi district under flats and houses, an area page's all buildings and residential buildings under permits and completed. */
