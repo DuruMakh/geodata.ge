@@ -1,13 +1,19 @@
+import ExcelJS from "exceljs";
 import { beforeAll, describe, expect, test } from "vitest";
 import { loadServedCrimeData, toClientCrimeFact } from "../../lib/data/crime/importCrime";
-import { CRIME_INDICATORS, type ClientCrimeFact, type CrimeSeriesBreak } from "../../lib/data/crime/types";
+import { CRIME_INDICATORS, CRIME_SOURCES, type ClientCrimeFact, type CrimeSeriesBreak } from "../../lib/data/crime/types";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
-import { SERIES } from "../../lib/data/demography/series";
+import { SERIES, SOURCE_ID } from "../../lib/data/demography/series";
 import { INK } from "../../lib/explorer/colors";
 import {
   CRIME_HUB_PATH, CRIME_SECTIONS, buildCrimeModel, changeCrimeMeasure, crimeCoverage, crimeDefaultSelection, crimeMeasureFacts, crimeSeries,
   crimeSeriesColor, crimeUnitKey, defaultCrimeState, parseCrimeHash, serializeCrimeHash, type CrimeMeasure, type CrimePopulation, type CrimeSectionId,
 } from "../../lib/explorer/crime";
+import { buildCrimeHubCards } from "../../lib/explorer/crimeHubCards";
+import { buildCrimeWorkbookExportModel } from "../../lib/explorer/crimeWorkbook";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Locale, Presentation } from "../../lib/i18n/types";
 
 let facts: ClientCrimeFact[];
 let breaks: CrimeSeriesBreak[];
@@ -212,5 +218,116 @@ describe("colour", () => {
   test("the reference is drawn in ink, others keep a stable colour", () => {
     expect(crimeSeriesColor({ id: "crime.recorded.total", reference: true }, 0)).toBe(INK);
     expect(crimeSeriesColor({ id: "crime.recorded.life", reference: false }, 1)).not.toBe(INK);
+  });
+});
+
+// The workbook and the cards read the shipped copy; the crime keys arrive with the namespace, so the test supplies the ones it needs.
+const CRIME_COPY: Record<Locale, Record<string, string>> = {
+  en: {
+    "common.crimeRecorded": "Recorded crime", "common.crimeConvictions": "Convictions", "common.crimePrisons": "Prisons", "common.crimeVictims": "Victims", "common.crimeRoadAccidents": "Road accidents",
+    "crime.series": "Series", "crime.value": "Value", "crime.unit": "Unit",
+    "crime.unitCrimes": "crimes", "crime.unitPersons": "persons", "crime.unitAccidents": "accidents", "crime.unitPer100k": "per 100,000 people",
+    "crime.workbook.ratesNote": "Rates per 100,000 people are calculated by fiscal.ge from Geostat's counts and Georgia's population on 1 January.",
+    ...Object.fromEntries(CRIME_SECTIONS.map(s => [`crime.page.${s.id}.summary`, `Summary of ${s.id}`])),
+  },
+  ka: {
+    "common.crimeRecorded": "რეგისტრირებული დანაშაული", "common.crimeConvictions": "მსჯავრდებულები", "common.crimePrisons": "პატიმრები", "common.crimeVictims": "დაზარალებულები", "common.crimeRoadAccidents": "საგზაო-სატრანსპორტო შემთხვევები",
+    "crime.series": "სერია", "crime.value": "მნიშვნელობა", "crime.unit": "ერთეული",
+    "crime.unitCrimes": "დანაშაული", "crime.unitPersons": "პირი", "crime.unitAccidents": "შემთხვევა", "crime.unitPer100k": "100 000 მოსახლეზე",
+    "crime.workbook.ratesNote": "100 000 მოსახლეზე მაჩვენებლები fiscal.ge-მ გამოთვალა საქსტატის მონაცემებითა და საქართველოს მოსახლეობით 1 იანვრის მდგომარეობით.",
+    ...Object.fromEntries(CRIME_SECTIONS.map(s => [`crime.page.${s.id}.summary`, `შეჯამება ${s.id}`])),
+  },
+};
+const presentationFor = async (locale: Locale): Promise<Presentation> => ({
+  locale, englishLabels: {}, messages: { ...await getMessages(locale, ["workbook", "format", "common"]), ...CRIME_COPY[locale] },
+});
+const sourceFor = (sourceId: string, years: number[]) => ({
+  sourceId, years, title: sourceId, organization: "Geostat", retrievedAt: "2026-10-16", downloadHref: `/downloads/methodology/crime/files/${sourceId}.xlsx` as const,
+});
+const YEARS_2001_2025 = Array.from({ length: 25 }, (_, i) => 2001 + i);
+const SOURCES = [...CRIME_SOURCES.map(id => sourceFor(id, YEARS_2001_2025)), sourceFor(SOURCE_ID.populationUnits, Array.from({ length: 23 }, (_, i) => 2004 + i))];
+const LABELS: Record<string, string> = { "crime.convicted.total": "People convicted", "crime.victims.sex_women": "Women", "crime.victims.total": "Victims" };
+const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
+
+describe("Excel workbooks", () => {
+  test("a convictions per-100,000 workbook leaves the years without population blank", async () => {
+    const model = buildCrimeWorkbookExportModel({
+      section: "convictions", facts, population, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Convictions",
+      state: state("convictions", ["crime.convicted.total"], "per100k", { kind: "manual", start: 2001, end: 2025 }),
+    }, await presentationFor("en"));
+    expect(model.filename).toBe("fiscal-crime-convictions-per-100k-2001-2025-en.xlsx");
+    const [row] = model.readable.rows;
+    for (const year of [2001, 2002, 2003]) expect(row.valuesByYear[year], String(year)).toBeNull();
+    expect(row.valuesByYear[2004]).toBe(230.4);
+    expect(model.readable.numberFormat).toBe("#,##0.0");
+    expect(model.readable.unitLabel).toBe("per 100,000 people");
+    expect(model.readable.subtitle).toContain("calculated by fiscal.ge");
+    expect(model.analysis.headers).toEqual(["Year", "Series", "Value", "Unit", "Status"]);
+    expect(model.analysis.rows).toHaveLength(25);
+    expect(model.analysis.rows.find(r => r[0] === 2002)).toEqual([2002, "People convicted", null, "per 100,000 people", "Not available"]);
+    expect(model.analysis.rows.find(r => r[0] === 2004)).toEqual([2004, "People convicted", 230.4, "per 100,000 people", "Published"]);
+    // The population workbook is cited for the years it supplied, besides the convictions workbooks.
+    expect(model.sources.map(source => source.title).sort()).toEqual(["geostat_crime_convicts_types", "source.geostat_municipal_population"]);
+    expect(model.sources.find(source => source.title === "source.geostat_municipal_population")!.years).toEqual(Array.from({ length: 22 }, (_, i) => 2004 + i));
+    const excel = await loadWorkbook(model);
+    const data = excel.getWorksheet(model.sheetNames[1])!;
+    const rowOf = (year: number) => model.analysis.rows.findIndex(r => r[0] === year) + 2;
+    expect(data.getCell(rowOf(2002), 3).value).toBeNull();
+    expect(data.getCell(rowOf(2004), 3).value).toBe(230.4);
+    expect(data.getCell(rowOf(2004), 3).numFmt).toBe("#,##0.0");
+    expect(String(excel.getWorksheet(model.sheetNames[0])!.getCell("A2").value)).toContain("Rates per 100,000 people are calculated by fiscal.ge");
+  });
+
+  test("the rates note is in the reader's language and only on rates", async () => {
+    const input = {
+      section: "convictions", facts, population, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Convictions",
+    } as const;
+    const range = { kind: "manual", start: 2010, end: 2020 } as const;
+    const ka = buildCrimeWorkbookExportModel({ ...input, state: state("convictions", ["crime.convicted.total"], "per100k", range) }, await presentationFor("ka"));
+    expect(ka.readable.subtitle).toContain("100 000 მოსახლეზე მაჩვენებლები fiscal.ge-მ გამოთვალა");
+    expect(ka.filename).toBe("fiscal-crime-convictions-per-100k-2010-2020.xlsx");
+    const count = buildCrimeWorkbookExportModel({ ...input, state: state("convictions", ["crime.convicted.total"], "count", range) }, await presentationFor("en"));
+    expect(count.readable.subtitle).not.toContain("calculated");
+    expect(count.sources.map(source => source.title)).toEqual(["geostat_crime_convicts_types"]);
+  });
+
+  test("a victims count workbook leaves 2012-2014 blank", async () => {
+    const model = buildCrimeWorkbookExportModel({
+      section: "victims", facts, population, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Victims",
+      state: state("victims", ["crime.victims.sex_women"], "count", { kind: "manual", start: 2010, end: 2016 }),
+    }, await presentationFor("en"));
+    expect(model.filename).toBe("fiscal-crime-victims-2010-2016-en.xlsx");
+    const [row] = model.readable.rows;
+    for (const year of [2012, 2013, 2014]) expect(row.valuesByYear[year], String(year)).toBeNull();
+    expect(row.valuesByYear[2015]).toBeGreaterThan(0);
+    expect(model.readable.numberFormat).toBe("#,##0");
+    const data = (await loadWorkbook(model)).getWorksheet(model.sheetNames[1])!;
+    const rowOf = (year: number) => model.analysis.rows.findIndex(r => r[0] === year) + 2;
+    for (const year of [2012, 2013, 2014]) expect(data.getCell(rowOf(year), 3).value, String(year)).toBeNull();
+    expect(model.analysis.rows.find(r => r[0] === 2013)).toEqual([2013, "Women", null, "persons", "Not available"]);
+    expect(model.analysis.rows.find(r => r[0] === 2015)![4]).toBe("Published");
+    expect(model.sources.map(source => source.title)).toEqual(["geostat_crime_victims"]);
+  });
+
+  test("a value without its source link fails loudly", async () => {
+    expect(() => buildCrimeWorkbookExportModel({
+      section: "victims", facts, population, sources: [], siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Victims", state: state("victims", ["crime.victims.total"]),
+    }, { locale: "en", englishLabels: {}, messages: CRIME_COPY.en })).toThrow(/geostat_crime_victims/);
+  });
+});
+
+describe("hub cards", () => {
+  test("five cards with each section's default series and its latest count", async () => {
+    const cards = buildCrimeHubCards(facts, await presentationFor("en"));
+    expect(cards.map(card => card.href)).toEqual(CRIME_SECTIONS.map(s => s.href));
+    expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04", "05"]);
+    expect(cards.map(card => card.title)).toEqual(["Recorded crime", "Convictions", "Prisons", "Victims", "Road accidents"]);
+    expect(cards.map(card => card.description)).toEqual(CRIME_SECTIONS.map(s => `Summary of ${s.id}`));
+    expect(cards.map(card => card.footer)).toEqual([
+      "2025 · 54,134 · 2015–2025", "2025 · 22,767 · 2001–2025", "2025 · 11,153 · 2001–2025", "2025 · 17,209 · 2007–2025", "2025 · 5,969 · 2001–2025",
+    ]);
+    expect(cards.map(card => card.series!.at(-1))).toEqual([54134, 22767, 11153, 17209, 5969]);
+    expect(cards.map(card => card.series!.length)).toEqual([11, 25, 25, 19, 25]);
+    expect(cards.every(card => card.comingSoon === false && card.seriesColor === INK)).toBe(true);
   });
 });
