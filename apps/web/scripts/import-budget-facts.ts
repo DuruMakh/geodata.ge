@@ -18,6 +18,8 @@ import { loadBusinessFacts, assertBusinessParity } from "../lib/data/business/im
 import { businessSourceDocumentId } from "../lib/data/business/types";
 import { loadHouseholdFacts, assertHouseholdParity } from "../lib/data/household/importHousehold";
 import { householdSourceDocumentId } from "../lib/data/household/types";
+import { loadHealthFacts, assertHealthParity } from "../lib/data/health/importHealth";
+import { healthSourceDocumentId } from "../lib/data/health/types";
 import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tradePartners/importTradePartners";
 import { TRADE_PARTNER_DOCUMENT_IDS } from "../lib/data/tradePartners/types";
 import { loadMoneyTransfersData, assertMoneyTransfersParity } from "../lib/data/externalFlows/importMoneyTransfers";
@@ -68,6 +70,8 @@ import {
   businessMirrorCreateRows,
   loadHouseholdFactsFromMirror,
   householdMirrorCreateRows,
+  loadHealthFactsFromMirror,
+  healthMirrorCreateRows,
   tradePartnerEntityMirrorCreateRows,
   tradePartnerFactMirrorCreateRows,
   loadTradePartnersDataFromMirror,
@@ -345,6 +349,8 @@ async function main() {
   assertSubset("Household source IDs", householdFacts.map(f => householdSourceDocumentId(f.sourceId)), sourceIds);
   const externalPositionFacts = await loadExternalPositionFacts();
   assertSubset("External position source IDs", externalPositionFacts.map(f => externalPositionSourceDocumentId(f.sourceId)), sourceIds);
+  const healthFacts = await loadHealthFacts();
+  assertSubset("Health source IDs", healthFacts.map(f => healthSourceDocumentId(f.sourceId)), sourceIds);
   const tradePartners = await loadTradePartnersData();
   assertSubset("Trade partner source IDs", Object.values(TRADE_PARTNER_DOCUMENT_IDS), sourceIds);
   const moneyTransfers = await loadMoneyTransfersData();
@@ -549,6 +555,7 @@ async function main() {
         await tx.externalPositionFact.deleteMany();
         await tx.businessFact.deleteMany();
         await tx.householdIncomeSpendingFact.deleteMany();
+        await tx.healthFact.deleteMany();
         await tx.tradePartnerFact.deleteMany();
         await tx.tradePartnerEntity.deleteMany();
         await tx.moneyTransferFact.deleteMany();
@@ -858,6 +865,9 @@ async function main() {
         await tx.householdIncomeSpendingFact.createMany({ data: householdMirrorCreateRows(householdFacts, run.id) });
         const mirrorHouseholdFacts = await loadHouseholdFactsFromMirror(tx);
         assertHouseholdParity(householdFacts, mirrorHouseholdFacts);
+        await tx.healthFact.createMany({ data: healthMirrorCreateRows(healthFacts, run.id) });
+        const mirrorHealthFacts = await loadHealthFactsFromMirror(tx);
+        assertHealthParity(healthFacts, mirrorHealthFacts);
         await tx.tradePartnerEntity.createMany({ data: tradePartnerEntityMirrorCreateRows(tradePartners.entities, run.id) });
         await tx.tradePartnerFact.createMany({ data: tradePartnerFactMirrorCreateRows(tradePartners.facts, run.id) });
         const mirrorTradePartners = await loadTradePartnersDataFromMirror(tx);
@@ -1198,6 +1208,7 @@ async function main() {
             { table: "ExternalPositionFact", csvRows: externalPositionFacts.length, dbRows: mirrorExternalPositionFacts.length },
             { table: "BusinessFact", csvRows: businessFacts.length, dbRows: mirrorBusinessFacts.length },
             { table: "HouseholdIncomeSpendingFact", csvRows: householdFacts.length, dbRows: mirrorHouseholdFacts.length },
+            { table: "HealthFact", csvRows: healthFacts.length, dbRows: mirrorHealthFacts.length },
             { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
             { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },
             { table: "MoneyTransferEntity", csvRows: moneyTransfers.entities.length, dbRows: mirrorMoneyTransfers.entities.length },

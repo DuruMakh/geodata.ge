@@ -363,6 +363,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  health: {
+    keywords: {
+      ka: ["ჯანდაცვა", "ექიმები", "საავადმყოფოები", "დაავადებები", "სიკვდილის მიზეზები", "საქართველო"],
+      en: ["Georgia", "health", "doctors", "hospitals", "illnesses", "causes of death"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის ჯანდაცვისა და გარდაცვალების ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
+      en: "Reviewed extraction from Geostat's official published healthcare and deaths statistics.",
+    },
+    sources: ["geostat"],
+  },
 };
 
 /** A dataset whose figures are official statistics Fiscal.ge reads from a named producer (`sourceAgenciesFor`). */

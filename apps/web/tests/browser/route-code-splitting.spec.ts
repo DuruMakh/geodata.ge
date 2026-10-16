@@ -39,7 +39,7 @@ test("the inflation hub loads no explorer chunk", async ({ request }) => {
 // Every explorer renders a chart panel; no hub does.
 test("no topic hub loads explorer code", async ({ request }) => {
   expect(await testIdsShipped(request, "/explorer/wages/overview", ["chart-panel"])).toEqual(["chart-panel"]);
-  for (const hub of ["trade", "wages", "unemployment", "external", "money", "energy-food", "economy", "demography", "living-standards"]) {
+  for (const hub of ["trade", "wages", "unemployment", "external", "money", "energy-food", "economy", "demography", "living-standards", "health"]) {
     expect(await testIdsShipped(request, `/explorer/${hub}`, ["chart-panel"]), hub).toEqual([]);
   }
 });
@@ -52,11 +52,14 @@ test("expenditure and revenue load no analysis view, and the analysis no multi-y
   expect(await testIdsShipped(request, "/explorer/analysis", testIds)).toEqual(["budget-radar"]);
 });
 
-test("the wages and household map indexes load no explorer, and their pages no map index", async ({ request }) => {
+test("the wages, household and causes-of-death map indexes load no explorer, and their pages no map index", async ({ request }) => {
   const wages = ["wages-region-map", "wages-excel-download"];
   expect(await testIdsShipped(request, "/explorer/wages/regions", wages)).toEqual(["wages-region-map"]);
   expect(await testIdsShipped(request, "/explorer/wages/regions/imereti", wages)).toEqual(["wages-excel-download"]);
   const household = ["household-region-map", "household-excel-download"];
   expect(await testIdsShipped(request, "/explorer/living-standards/income", household)).toEqual(["household-region-map"]);
   expect(await testIdsShipped(request, "/explorer/living-standards/income/regions/georgia", household)).toEqual(["household-excel-download"]);
+  const health = ["health-region-map", "health-excel-download"];
+  expect(await testIdsShipped(request, "/explorer/health/causes-of-death", health)).toEqual(["health-region-map"]);
+  expect(await testIdsShipped(request, "/explorer/health/causes-of-death/regions/georgia", health)).toEqual(["health-excel-download"]);
 });

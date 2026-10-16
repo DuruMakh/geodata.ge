@@ -136,6 +136,8 @@
     "data:check-poverty": "tsx scripts/prepare-poverty.ts --check",
     "data:prepare-energy-food": "tsx scripts/prepare-energy-food.ts --write",
     "data:check-energy-food": "tsx scripts/prepare-energy-food.ts --check",
+    "data:prepare-health": "tsx scripts/prepare-health.ts --write",
+    "data:check-health": "tsx scripts/prepare-health.ts --check",
     "data:prepare-money": "tsx scripts/prepare-money-banks.ts --write",
     "data:check-money": "tsx scripts/prepare-money-banks.ts --check",
     "data:prepare-business": "tsx scripts/prepare-business.ts --write",
