@@ -79,7 +79,7 @@
   "housing.regionMapEntityAria": "{name}: {amount}, {year}",
   "housing.sourceNote.permits": "წყარო: საქსტატი, მშენებლობაზე გაცემული ნებართვები",
   "housing.sourceNote.completed": "წყარო: საქსტატი, ექსპლუატაციაში მიღებული ობიექტები",
-  "housing.sourceNote.prices": "წყარო: საქსტატი, საცხოვრებელი უძრავი ქონების ფასები · თბილისის უბნების ფასები შეთავაზების ფასებია",
+  "housing.sourceNote.prices": "წყარო: საქსტატი, საცხოვრებელი უძრავი ქონების ფასები",
   "housing.sourceNoteRegions": "წყარო: საქსტატი, მშენებლობაზე გაცემული ნებართვები და ექსპლუატაციაში მიღებული ობიექტები",
   "housing.methodology": "მეთოდოლოგია და წყაროები",
   "housing.series": "სერია",

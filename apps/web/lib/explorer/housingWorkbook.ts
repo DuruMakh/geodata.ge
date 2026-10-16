@@ -2,7 +2,7 @@ import { housingFactKey, type ClientHousingFact } from "../data/housing/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
-import { buildHousingModel, type HousingModel, type HousingSeriesModel, type HousingState, type HousingTopicId } from "./housing";
+import { buildHousingModel, housingSeriesLabel, type HousingModel, type HousingSeriesModel, type HousingState, type HousingTopicId } from "./housing";
 import { buildHousingAreaModel, housingAreaSlug, type HousingArea, type HousingAreaState } from "./housingAreas";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
@@ -26,8 +26,7 @@ export function buildHousingWorkbookExportModel(input: HousingWorkbookInput, pre
   const numberFormat = model.unit === "index" ? "0.0" : "#,##0";
   const status = (id: string, year: number) => byCell.has(`${id}:${year}`) ? t("status.official") : workbookMessage(locale, "workbook.unavailable");
   // A Tbilisi district sits under both flats and houses with the same label, so its name carries the heading (the text before the heading's unit).
-  const labelled = (series: HousingSeriesModel) => series.heading === "flats" || series.heading === "houses"
-    ? `${labels[series.id]} — ${t(`heading.${series.heading}`).split(" · ")[0]}` : labels[series.id];
+  const labelled = (series: HousingSeriesModel) => housingSeriesLabel(series, labels, t);
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series })));
   return {
     locale, filename: workbookFilename(`${stem}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],

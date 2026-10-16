@@ -79,7 +79,7 @@
   "housing.regionMapEntityAria": "{name}: {amount}, {year}",
   "housing.sourceNote.permits": "Source: Geostat, construction permits",
   "housing.sourceNote.completed": "Source: Geostat, completed buildings",
-  "housing.sourceNote.prices": "Source: Geostat, residential property prices · Tbilisi district prices are asking prices",
+  "housing.sourceNote.prices": "Source: Geostat, residential property prices",
   "housing.sourceNoteRegions": "Source: Geostat, construction permits and completed buildings",
   "housing.methodology": "Methodology and sources",
   "housing.series": "Series",

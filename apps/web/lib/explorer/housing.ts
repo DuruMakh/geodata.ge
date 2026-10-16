@@ -158,5 +158,13 @@ export function housingFloorArea(value: number, t: HousingTranslate): string {
     : `${formatInUnit(value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandSquareMetres")}`;
 }
 
+/**
+ * A series' name outside the list (chart, table, workbook): a Tbilisi district is listed under flats and under houses with
+ * one name, so it carries its heading's text before the unit; every other series keeps its own name.
+ */
+export function housingSeriesLabel(series: Pick<HousingSeriesDefinition, "id" | "heading">, labels: Readonly<Record<string, string>>, t: HousingTranslate): string {
+  return series.heading === "flats" || series.heading === "houses" ? `${labels[series.id]} — ${t(`heading.${series.heading}`).split(" · ")[0]}` : labels[series.id];
+}
+
 /** A whole number of permits or buildings. */
 export const housingCount = (value: number) => formatInUnit(value, { divisor: 1, label: "", decimals: 0 });

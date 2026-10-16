@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientHousingFact } from "../../lib/data/housing/types";
-import { buildHousingModel, changeHousingSelection, housingCount, housingCoverage, housingFloorArea, housingTopicSeries, housingUnitLabel, housingValueLabel, housingValueUnit, parseHousingHash, serializeHousingHash, type HousingSeriesModel, type HousingTopicId, type HousingTranslate } from "../../lib/explorer/housing";
+import { buildHousingModel, changeHousingSelection, housingCount, housingCoverage, housingFloorArea, housingSeriesLabel, housingTopicSeries, housingUnitLabel, housingValueLabel, housingValueUnit, parseHousingHash, serializeHousingHash, type HousingSeriesModel, type HousingTopicId, type HousingTranslate } from "../../lib/explorer/housing";
 import { buildHousingWorkbookExportModel } from "../../lib/explorer/housingWorkbook";
 import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -50,8 +50,7 @@ export function HousingExplorer({ section, facts, labels, sources, lastReviewedA
   const unitLabel = housingUnitLabel(model.unit, t);
   const valueLabel = (value: number | null | undefined) => housingValueLabel(value, model.unit, t);
   // A Tbilisi district is listed under flats and under houses with one name; outside the list it carries its heading (as in the workbook).
-  const fullLabel = (series: HousingSeriesModel) => series.heading === "flats" || series.heading === "houses"
-    ? `${labels[series.id]} — ${t(`heading.${series.heading}`).split(" · ")[0]}` : labels[series.id];
+  const fullLabel = (series: HousingSeriesModel) => housingSeriesLabel(series, labels, t);
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: fullLabel(series), color: series.color, valuesByYear: series.valuesByYear }));
   // A district's house row wears its flat row's colour and a dashed stroke.
   const lineSeries = model.selected.map(series => ({ id: series.id, label: fullLabel(series), color: series.color, vals: model.years.map(year => series.valuesByYear[year]), dashed: series.stroke === "dashed" }));

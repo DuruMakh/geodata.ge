@@ -92,7 +92,11 @@ test("regions is the map and list with Georgia first, and a region opens its own
   await expect(rows.first()).toContainText("საქართველო");
   await expect(rows.first()).toHaveAttribute("href", "/explorer/housing/regions/georgia");
   await expect(rows.nth(1)).toHaveAttribute("data-region-id", "region.tbilisi");
-  for (const text of await rows.allInnerTexts()) expect(text).toMatch(/[\d,]+\.\d ათასი მ²/);
+  // The list reads bare numbers in thousand m², named by the legend and the source line.
+  for (const text of await rows.allInnerTexts()) expect(text).toMatch(/\d[\d,]*\.\d/);
+  for (const text of await rows.allInnerTexts()) expect(text).not.toContain("ათასი მ²");
+  await expect(rows.first()).toContainText("11,397.2");
+  await expect(page.getByTestId("regional-source-note")).toContainText("ათასი მ²");
   // No map switch and no chart workspace: the one source line is the index footer.
   await expect(page.locator('[data-testid^="housing-map-"]')).toHaveCount(0);
   for (const id of ["chart-panel", "series-status", "housing-excel-download", "source-label"]) await expect(page.getByTestId(id)).toHaveCount(0);

@@ -60,9 +60,9 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
   const reference = model.series.find(series => series.reference && series.unit === model.unit);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   // The latest-value line is the page's headline: its own area's permits and their floor area, whatever is chosen below.
-  const [countId, , , , areaId] = housingAreaSeries(area).map(series => series.id);
-  const latest = facts.filter(f => f.indicatorId === countId).sort((a, b) => a.year - b.year).at(-1)!;
-  const latestArea = facts.find(f => f.indicatorId === areaId && f.year === latest.year);
+  const permitsOf = (heading: "count" | "area") => housingAreaSeries(area).find(series => series.reference && series.heading === heading)!.id;
+  const latest = facts.filter(f => f.indicatorId === permitsOf("count")).sort((a, b) => a.year - b.year).at(-1)!;
+  const latestArea = facts.find(f => f.indicatorId === permitsOf("area") && f.year === latest.year);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The chart is named after the heading of the selection's unit (its text before the unit).

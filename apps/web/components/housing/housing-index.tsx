@@ -1,6 +1,7 @@
 "use client";
 import type { ClientHousingFact } from "../../lib/data/housing/types";
-import { housingFloorArea, housingValueLabel } from "../../lib/explorer/housing";
+import { formatInUnit } from "../../lib/explorer/format";
+import { housingFloorArea, housingValueLabel, housingValueUnit } from "../../lib/explorer/housing";
 import { housingRegionHref } from "../../lib/explorer/housingAreas";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -24,7 +25,7 @@ export function HousingIndex({ facts, regionMap }: {
   const { locale, messages, englishLabels } = useI18n();
   useAppReady();
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `housing.${key}`, values);
-  // The map and list read in thousand m² to one decimal; the line keeps million m².
+  // The map and list read in thousand m² to one decimal, named by the legend and the source line; the line keeps million m².
   const unitLabel = t("unitThousandSquareMetres"), mapLabel = t("mapLabel");
   const valueLabel = (value: number) => housingValueLabel(value, "area", t);
   const largest = regionMap.regions[0];
@@ -36,7 +37,7 @@ export function HousingIndex({ facts, regionMap }: {
     <section data-testid="housing-region-index" className="mt-4">
       <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
-          hrefForRegion: housingRegionHref, formatValue: valueLabel, legend: `${mapLabel} · ${unitLabel}`, testId: "housing-region-map",
+          hrefForRegion: housingRegionHref, formatValue: value => formatInUnit(value, housingValueUnit("area")), legend: `${mapLabel} · ${unitLabel}`, testId: "housing-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
         }} />
     </section>
