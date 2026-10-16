@@ -328,3 +328,26 @@ test("the hub has four cards: three headline series with their latest values and
   expect(cards[3]).toMatchObject({ series: null, seriesColor: null, comingSoon: false });
   expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04"]);
 });
+
+test("the workbook Sources sheet lists the six served Geostat workbooks, archived at fiscal.ge and named in the page's language", async () => {
+  const { loadHousingWorkbookSources } = await import("../../lib/pages/housing-shared");
+  const en = await loadHousingWorkbookSources("en");
+  // Keyed by the facts' raw source id, so a page's facts find their file, and the .xls files are listed with the .xlsx ones.
+  expect(en.map(source => source.sourceId).sort()).toEqual([...HOUSING_SOURCES].sort());
+  expect(en.find(source => source.sourceId === "geostat_housing_permits_regions")).toEqual({
+    sourceId: "geostat_housing_permits_regions", years: Array.from({ length: 20 }, (_, i) => 2006 + i), title: "Permissions granted for construction by region",
+    organization: "National Statistics Office of Georgia (Geostat)", downloadHref: "/downloads/methodology/housing/files/0503en020101_permissions.xls", retrievedAt: "2026-10-16",
+  });
+  expect(en.find(source => source.sourceId === "geostat_housing_price_index")).toMatchObject({ years: [2020, 2021, 2022, 2023, 2024, 2025], title: "Residential property price index, 2020 average = 100" });
+  expect(en.find(source => source.sourceId === "geostat_housing_tbilisi_prices")).toMatchObject({ years: [2021, 2022, 2023, 2024, 2025] });
+  expect(en.every(source => source.downloadHref.startsWith("/downloads/methodology/housing/files/"))).toBe(true);
+  const ka = await loadHousingWorkbookSources("ka");
+  expect(ka.find(source => source.sourceId === "geostat_housing_tbilisi_prices")).toMatchObject({ title: "საცხოვრებელი უძრავი ქონების ფასები თბილისის უბნების მიხედვით", organization: "საქსტატი" });
+  // The workbook cites only the files behind the exported values, here the regional file for a permits count.
+  const model = await buildHousingWorkbookExportModel({
+    section: "permits", facts, sources: en, siteOrigin: "https://fiscal.ge", labels: labelsFor(["housing.permits_count.total"]), title: "Title",
+    state: { mode: "table", range: { kind: "manual", start: 2010, end: 2025 }, selectedIds: ["housing.permits_count.total"] },
+  }, await presentation());
+  expect(model.sources.map(source => source.title)).toEqual(["Permissions granted for construction by region"]);
+  expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/housing/files/0503en020101_permissions.xls");
+});

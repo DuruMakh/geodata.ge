@@ -38,7 +38,7 @@ function housingLabels(presentation: Presentation, section: HousingTopicId): Rec
 
 export async function renderHousingPage(locale: Locale, section: HousingTopicId) {
   const [data, presentation, sources] = await Promise.all([
-    loadServedHousingData(), getPresentation(locale, ["housing", "format", "main", "workbook"], []), loadHousingWorkbookSources(),
+    loadServedHousingData(), getPresentation(locale, ["housing", "format", "main", "workbook"], []), loadHousingWorkbookSources(locale),
   ]);
   // Each page receives only the observations its list can show.
   const ids = new Set<string>(housingTopicSeries(section).map(series => series.id));

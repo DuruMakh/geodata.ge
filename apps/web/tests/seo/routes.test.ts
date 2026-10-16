@@ -107,7 +107,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Foreign debt and Reserves add two further bilingual pairs.
     // Business adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs; Health its hub, three pages, 12 area pages and its methodology page: 17 more.
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
-    expect(urls).toHaveLength(692);
+    // The Housing methodology adds one more bilingual pair.
+    expect(urls).toHaveLength(694);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -126,6 +127,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/money");
     expect(urls).toContain("https://fiscal.ge/methodology/business");
     expect(urls).toContain("https://fiscal.ge/en/methodology/business");
+    expect(urls).toContain("https://fiscal.ge/methodology/housing");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/housing");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
@@ -190,6 +193,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/economic-sectors",
       "/methodology/regional-economies",
       "/methodology/business",
+      "/methodology/housing",
       "/methodology/inflation",
       "/methodology/money",
       "/methodology/unemployment",

@@ -5542,5 +5542,320 @@
       "reviewedAt": "2026-10-15"
     },
     "documentLanguage": "en"
+  },
+  "geostat_housing_permits_regions": {
+    "title": {
+      "text": "Permissions granted for construction by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_zip": {
+    "title": {
+      "text": "Permissions granted for construction by type and municipality (English zip archive)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_regions": {
+    "title": {
+      "text": "Completed construction objects by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_zip": {
+    "title": {
+      "text": "Completed construction objects by type (English zip archive)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_municipalities": {
+    "title": {
+      "text": "Permissions granted for construction and completed objects by municipality",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_quarterly": {
+    "title": {
+      "text": "Permissions granted for construction by type, quarterly 2019–2026",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_types": {
+    "title": {
+      "text": "Permissions granted for construction by type, 2006–2025",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_quarterly": {
+    "title": {
+      "text": "Completed construction objects by type, quarterly 2019–2026",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_types": {
+    "title": {
+      "text": "Completed construction objects by type, 2006–2025",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index_quarterly": {
+    "title": {
+      "text": "Residential property price index, previous quarter = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index_annual": {
+    "title": {
+      "text": "Residential property price index, same quarter of the previous year = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index": {
+    "title": {
+      "text": "Residential property price index, 2020 average = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_tbilisi_prices": {
+    "title": {
+      "text": "Residential property prices in Tbilisi by district",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_monthly": {
+    "title": {
+      "text": "Construction cost index, previous month = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_2022": {
+    "title": {
+      "text": "Construction cost index, February 2022 = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_annual": {
+    "title": {
+      "text": "Construction cost index, same month of the previous year = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_construction": {
+    "title": {
+      "text": "Construction by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_infrastructure": {
+    "title": {
+      "text": "Infrastructure of dwellings by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_page": {
+    "title": {
+      "text": "Permissions and completed objects (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_prices_page": {
+    "title": {
+      "text": "Residential property price index (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cost_page": {
+    "title": {
+      "text": "Construction cost index (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
   }
 }

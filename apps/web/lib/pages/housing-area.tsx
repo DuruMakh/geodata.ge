@@ -9,7 +9,7 @@ import { AREA_PAGES, areaForSlug, loadHousingWorkbookSources, renderHousingRegio
 /** An area's page: Georgia's or a region's permits and completed buildings (the frame is housing-shared.tsx's). */
 export async function renderHousingAreaPage(locale: Locale, slug: string) {
   const area = areaForSlug(slug);
-  const sources = await loadHousingWorkbookSources();
+  const sources = await loadHousingWorkbookSources(locale);
   const series = housingAreaSeries(area);
   const ids = new Set<string>(series.map(item => item.id));
   const areaFacts = (facts: HousingFact[]) => facts.map(toClientHousingFact).filter(f => ids.has(f.indicatorId));

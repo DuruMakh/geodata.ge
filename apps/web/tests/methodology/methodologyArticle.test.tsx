@@ -125,6 +125,7 @@ describe("methodology footer attribution", () => {
     ["demography", "Geostat"],
     ["household-income", "Geostat"],
     ["business", "Geostat"],
+    ["housing", "Geostat"],
     ["health", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
@@ -166,6 +167,27 @@ describe("health methodology", () => {
     expect(markup).toContain("/downloads/methodology/health/files/23-2-deaths-by-chapters-regions.xlsx");
     expect(markup).toContain("/downloads/methodology/health/files/deaths-page.html.txt");
     expect(markup).not.toContain("geostat.ge/media");
+  });
+});
+
+describe("housing methodology", () => {
+  it.each([
+    ["ka", "საცხოვრებელი და მშენებლობა", ["შეთავაზების ფასებია და არა გაყიდვის ფასები", "IV კვარტლის მნიშვნელობა და არა წლის ოთხი კვარტლის საშუალო", "69 ნებართვა"]],
+    ["en", "Housing and construction", ["asking prices, not sale prices", "fourth-quarter value, not an average of the year’s four quarters", "has issued 69 permits for construction and reconstruction of special significance buildings in 2025"]],
+  ] as const)("renders the %s article with its 21 archived originals, the asking-price and fourth-quarter notes and Dataset markup", async (locale, title, statements) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "housing" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2006–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    for (const statement of statements) expect(markup).toContain(statement);
+    // Geostat's own metadata is linked, in the page's language, because it is not one of the archived originals.
+    // Both language editions of Geostat's metadata are linked on both pages, so the two translations keep one link structure.
+    expect(markup).toContain("https://www.geostat.ge/media/78697/0509_300426_GE.PDF");
+    expect(markup).toContain("https://www.geostat.ge/media/78698/0509_300426_EN.PDF");
+    for (const file of ["0503en020101_permissions.xls", "permissions_eng.zip", "0503en020102c_permissions-by-type_2006-2025-eng.xls", "residential-property-prices-in-tbilisi-by-district.xlsx", "geostat-category-698-2026-10-16.html.txt"]) {
+      expect(markup).toContain(`/downloads/methodology/housing/files/${file}`);
+    }
   });
 });
 

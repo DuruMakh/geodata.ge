@@ -96,6 +96,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Economic sectors methodology](https://fiscal.ge/methodology/economic-sectors) — sector GVA versus GDP, GDP shares, annual real growth and preliminary status.
 - [Regional economies methodology](https://fiscal.ge/methodology/regional-economies) — regional GVA at basic prices, regional GDP at market prices, calculations and original sources.
 - [Business methodology](https://fiscal.ge/methodology/business) — Geostat's survey of enterprises and business demography: turnover, persons employed, investment, profit and loss, firm sizes, the 2006 coverage change, regions and original files.
+- [Housing methodology](https://fiscal.ge/methodology/housing) — Geostat's building permits and completed buildings, the home price index (fourth quarter of each year), Tbilisi asking prices, definitions, gaps and original files.
 - [Inflation methodology](https://fiscal.ge/methodology/inflation) — Geostat CPI definitions, validation, the NBG target and original files.
 - [Money and banks methodology](https://fiscal.ge/methodology/money) — National Bank of Georgia money, loan, deposit, interest-rate and bank-health definitions and original files.
 - [Unemployment methodology](https://fiscal.ge/methodology/unemployment) — Labour Force Survey definitions, age-band and regional changes, and original files.

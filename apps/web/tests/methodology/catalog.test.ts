@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "business", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "trade", "external-flows", "energy-food", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "trade", "external-flows", "energy-food", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -356,6 +356,7 @@ describe("methodology catalog", () => {
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },
+      housing: { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2006, maxYear: 2025 },
       debt: { fileCount: 10, totalBytes: 400, latestRetrievedAt: "2026-09-01", validated: true },
     };
 
@@ -400,6 +401,7 @@ describe("methodology catalog", () => {
       {id:"economic-sectors",title:METHODOLOGY_CONTENT["economic-sectors"].title,summary:METHODOLOGY_CONTENT["economic-sectors"].summary,href:"/methodology/economic-sectors",coverage:{firstYear:2010,lastYear:2025},originalFileCount:3,reviewedAt:METHODOLOGY_CONTENT["economic-sectors"].reviewedAt},
       {id:"regional-economies",title:METHODOLOGY_CONTENT["regional-economies"].title,summary:METHODOLOGY_CONTENT["regional-economies"].summary,href:"/methodology/regional-economies",coverage:{firstYear:2010,lastYear:2024},originalFileCount:2,reviewedAt:METHODOLOGY_CONTENT["regional-economies"].reviewedAt},
       { id: "business", title: METHODOLOGY_CONTENT.business.title, summary: METHODOLOGY_CONTENT.business.summary, href: "/methodology/business", coverage: { firstYear: 1999, lastYear: 2025 }, originalFileCount: 26, reviewedAt: METHODOLOGY_CONTENT.business.reviewedAt },
+      { id: "housing", title: METHODOLOGY_CONTENT.housing.title, summary: METHODOLOGY_CONTENT.housing.summary, href: "/methodology/housing", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 21, reviewedAt: METHODOLOGY_CONTENT.housing.reviewedAt },
       {
         id: "inflation",
         title: METHODOLOGY_CONTENT.inflation.title,
@@ -442,6 +444,7 @@ describe("methodology catalog", () => {
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },
+      housing: { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2006, maxYear: 2025 },
       debt: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true },
     } satisfies Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary>;
 

@@ -8,6 +8,7 @@ import { HEALTH_PUBLIC_SOURCES, healthSourceDocumentId } from "../../lib/data/he
 import { MONEY_BANKS_PUBLIC_SOURCES, moneyBanksSourceDocumentId } from "../../lib/data/moneyBanks/types";
 import { EXTERNAL_POSITION_PUBLIC_SOURCES, externalPositionSourceDocumentId } from "../../lib/data/externalPosition/types";
 import { BUSINESS_PUBLIC_SOURCES, businessSourceDocumentId } from "../../lib/data/business/types";
+import { HOUSING_PUBLIC_SOURCES, housingSourceDocumentId } from "../../lib/data/housing/types";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
@@ -40,6 +41,9 @@ describe("buildFactQuerySnapshot", () => {
     expect(snapshot.sources.some(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_housing_"))).toBe(false);
+    // All 21 registered housing sources are in the registry, and none of them reaches the snapshot.
+    expect(HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
+    expect(snapshot.sources.some(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([

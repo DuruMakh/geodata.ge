@@ -5,13 +5,12 @@ import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedHousingData } from "../data/housing/importHousing";
-import type { HousingFact } from "../data/housing/types";
+import { HOUSING_SOURCES, type HousingFact } from "../data/housing/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HOUSING_HUB_PATH } from "../explorer/housing";
 import { HOUSING_AREAS, HOUSING_REGIONS_HREF, housingAreaHref, housingAreaSlug, housingMapId, type HousingArea } from "../explorer/housingAreas";
 import { coverageLabel } from "../explorer/coverageLabel";
-import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
@@ -19,6 +18,7 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
+import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -27,11 +27,12 @@ import { resolveSiteUrl } from "../siteUrl";
 // ships only its own explorer: keep explorer components out of this file.
 
 /**
- * The Sources sheet of a Housing workbook: the archived Geostat workbooks behind the exported values, keyed by the facts'
- * `sourceId`. Housing's source archive is not published yet, so the sheet lists none until it is.
+ * The Sources sheet of a Housing workbook: the archived Geostat workbooks behind the exported values, in the page's language
+ * and keyed by the facts' `sourceId`. Only the six workbooks the values are read from are listed, not the files kept for reference
+ * (the spreadsheet default would drop Geostat's `.xls` files).
  */
-export async function loadHousingWorkbookSources(): Promise<(WorkbookPublicSource & { sourceId: string })[]> {
-  return [];
+export async function loadHousingWorkbookSources(locale: Locale): Promise<SourcedWorkbookPublicSource[]> {
+  return loadSourcedWorkbookSources("housing", locale, row => HOUSING_SOURCES.includes(row.source_id));
 }
 
 /** Georgia and the eleven regions, in the picker's and previous/next order; Georgia's English name is the catalogue's `georgia` label. */
