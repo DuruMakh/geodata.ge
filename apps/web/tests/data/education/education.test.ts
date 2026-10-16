@@ -209,6 +209,14 @@ test("client facts carry persons, with Georgia's pupils taken from thousands, an
   expect(toClientEducationFact(find(facts, "education.pupils.total", "region.tbilisi", 2025))).toMatchObject({ value: 232134, unit: "persons", decimals: 0 });
 });
 
+test("Georgia's pupils convert from thousands to whole persons without floating-point drift", async () => {
+  const facts = await loadFacts();
+  expect(toClientEducationFact(find(facts, "education.pupils_national.public", EDUCATION_GEORGIA, 2011)).value).toBe(516700);
+  const thousands = facts.filter(f => f.unit === "persons_thousand");
+  expect(thousands.length).toBeGreaterThan(0);
+  expect(thousands.filter(f => !Number.isInteger(toClientEducationFact(f).value))).toEqual([]);
+});
+
 test("shown facts hold no old vocational field, and the file keeps all 170 hidden rows", async () => {
   const facts = await loadFacts();
   const shown = shownEducationFacts(facts);

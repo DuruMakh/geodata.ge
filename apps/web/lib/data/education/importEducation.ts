@@ -65,6 +65,6 @@ export function toClientEducationFact(fact: EducationFact): ClientEducationFact 
   const published = Number(fact.publishedValue);
   const decimals = educationDisplayDecimals(indicatorId);
   return fact.unit === "persons_thousand"
-    ? { year, indicatorId, geographyId, sourceId, value: published * 1000, unit: "persons", decimals }
+    ? { year, indicatorId, geographyId, sourceId, value: Number(new Decimal(fact.publishedValue).times(1000).toFixed()), unit: "persons", decimals }
     : { year, indicatorId, geographyId, sourceId, value: published, unit: fact.unit, decimals };
 }
