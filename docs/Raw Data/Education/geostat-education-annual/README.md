@@ -1,6 +1,6 @@
 # Annual education statistics (National Statistics Office of Georgia)
 
-Research package for the Fiscal.ge "Education" hub. Approved design: `docs/superpowers/specs/2026-10-16-education-design.md`. Everything here is reproducible from the files in `official/`, which are never edited. All tables credit the Ministry of Education, Science and Youth of Georgia.
+Research package for the Fiscal.ge "Education" hub. Approved design: `docs/superpowers/specs/2026-10-16-education-design.md`. Everything here is reproducible from the files in `official/`, which are never edited. The school tables (01, 06 and 11) and the vocational table end with "Source: Ministry of Education, Science and Youth of Georgia."; the kindergarten and higher education workbooks name no source.
 
 ## Sources
 
