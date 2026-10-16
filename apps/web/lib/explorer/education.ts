@@ -52,7 +52,7 @@ export function educationDefaultSelection(section: EducationTopicId): string[] {
 }
 
 /** Measures charted one heading at a time (the place pages), so each heading's total is that chart's only total. */
-const PLACE_MEASURES: ReadonlySet<EducationMeasure> = new Set(["schools", "pupils_national", "teachers", "pupils", "kindergartens", "kg_children", "kg_staff"]);
+const PLACE_MEASURES: ReadonlySet<EducationMeasure> = new Set(["schools", "teachers", "pupils", "kindergartens", "kg_children", "kg_staff"]);
 
 /**
  * The reference is ink, and so is a place page's heading total, which never shares a chart with another heading. Every other
@@ -107,8 +107,16 @@ export function buildEducationSeriesModel(definitions: readonly EducationSeriesD
   const byCell = new Map(facts.map(f => [educationFactKey(f), f]));
   const first = new Map<string, ClientEducationFact>();
   for (const fact of facts) if (fact.geographyId === geographyId && !first.has(fact.indicatorId)) first.set(fact.indicatorId, fact);
+  const firstOf = (id: string) => {
+    const fact = first.get(id);
+    if (!fact) throw new Error(`No ${id} facts for ${geographyId}`);
+    return fact;
+  };
   const model = buildTopicModel({ range: state.range, coverage, selectedIds: state.selectedIds, color: educationSeriesColor,
-    definitions: definitions.map(definition => ({ ...definition, decimals: first.get(definition.id)?.decimals ?? 0, unit: first.get(definition.id)!.unit })),
+    definitions: definitions.map(definition => {
+      const { decimals, unit } = firstOf(definition.id);
+      return { ...definition, decimals, unit };
+    }),
     value: (definition, year) => byCell.get(educationFactKey({ indicatorId: definition.id as ClientEducationFact["indicatorId"], geographyId, year }))?.value });
   const lead = model.selected[0] ?? model.series[0];
   return { ...model, unit: lead.unit, heading: lead.heading };

@@ -36,6 +36,26 @@ export function educationPlaceDefaultSelection(set: EducationPlaceSet, placeId: 
   return [educationPlaceSeries(set, placeId)[0].id];
 }
 
+/** The measure that stands for a row's measure at a place that does not list it: Georgia's national pupils and every other place's pupils. */
+const COUNTERPART: Partial<Record<string, string>> = { pupils_national: "pupils", pupils: "pupils_national" };
+
+/**
+ * The hash a link to another place's page carries: this page's selection, moved to that place, as `serializeTopicHash` writes it.
+ * A row the target does not list becomes its counterpart there: Georgia's pupils and the place's pupils swap, and a split Geostat
+ * publishes only nationally (public, private) becomes its measure's total. The moved rows keep the target's list order, once
+ * each; the default selection carries none, and an empty selection stays empty.
+ */
+export function educationPlaceSelectionHash(selectedIds: readonly string[], set: EducationPlaceSet, targetPlaceId: string): string {
+  const listed = educationPlaceSeries(set, targetPlaceId).map(definition => definition.id);
+  const moved = new Set(selectedIds.map(id => {
+    if (listed.includes(id)) return id;
+    const measure = id.split(".")[1]!;
+    return `education.${COUNTERPART[measure] ?? measure}.total`;
+  }));
+  const ids = listed.filter(id => moved.has(id));
+  return ids.join(",") === educationPlaceDefaultSelection(set, targetPlaceId).join(",") ? "" : `#${new URLSearchParams({ sel: ids.join(",") })}`;
+}
+
 /** The list's one-heading rule: a row's group is its heading. */
 const headingOf = (definitions: readonly EducationSeriesDefinition[]) => {
   const headings = new Map(definitions.map(definition => [definition.id, definition.heading]));

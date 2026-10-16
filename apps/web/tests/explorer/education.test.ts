@@ -10,7 +10,7 @@ import {
 } from "../../lib/explorer/education";
 import {
   buildEducationIndexModel, buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection,
-  educationPlaceSeries, parseEducationPlaceHash,
+  educationPlaceSelectionHash, educationPlaceSeries, parseEducationPlaceHash,
 } from "../../lib/explorer/educationPlaces";
 
 let facts: ClientEducationFact[];
@@ -154,4 +154,39 @@ test("the Schools and Kindergartens indexes rank the latest year's places, Georg
   expect(kindergartens.year).toBe(2025);
   expect(kindergartens.country).toMatchObject({ id: "country.georgia", valueGel: 130337 });
   expect(kindergartens.municipalities).toHaveLength(64);
+});
+
+test("a link to another place carries the selection, moved to that place's rows", () => {
+  const sel = (ids: string[]) => `#${new URLSearchParams({ sel: ids.join(",") })}`;
+  // Leaving Georgia: the national pupils become the place's pupils, the ownership split its total.
+  expect(educationPlaceSelectionHash(["education.pupils_national.total"], "schools", "region.guria")).toBe("");
+  expect(educationPlaceSelectionHash(["education.pupils_national.public", "education.pupils_national.private"], "schools", "55")).toBe("");
+  expect(educationPlaceSelectionHash(["education.teachers.public", "education.teachers.private", "education.teachers.women"], "schools", "region.guria"))
+    .toBe(sel(["education.teachers.total", "education.teachers.women"]));
+  expect(educationPlaceSelectionHash(["education.teachers.men", "education.teachers.total"], "schools", "55")).toBe(sel(["education.teachers.total", "education.teachers.men"]));
+  // Going to Georgia: the place's pupils become the national pupils; rows Georgia also lists stay.
+  expect(educationPlaceSelectionHash(["education.pupils.total"], "schools", "country.georgia")).toBe("");
+  expect(educationPlaceSelectionHash(["education.teachers.women", "education.teachers.men"], "schools", "country.georgia")).toBe(sel(["education.teachers.women", "education.teachers.men"]));
+  // Kindergartens list the same rows at every place.
+  expect(educationPlaceSelectionHash(["education.kg_staff.total"], "kindergartens", "55")).toBe(sel(["education.kg_staff.total"]));
+  expect(educationPlaceSelectionHash(["education.kg_children.total"], "kindergartens", "country.georgia")).toBe("");
+  // An empty selection stays empty, as on Business.
+  expect(educationPlaceSelectionHash([], "schools", "region.guria")).toBe("#sel=");
+  for (const [hash, place] of [[sel(["education.teachers.total", "education.teachers.women"]), "region.guria"], ["#sel=", "55"]] as const) {
+    expect(parseEducationPlaceHash(hash, "schools", place, facts).selectedIds).toEqual(hash === "#sel=" ? [] : ["education.teachers.total", "education.teachers.women"]);
+  }
+});
+
+test("a place model names a listed series missing from the facts", () => {
+  const without = facts.filter(f => !(f.indicatorId === "education.schools.total" && f.geographyId === "region.guria"));
+  expect(() => buildEducationPlaceModel("schools", "region.guria", without, { ...line, selectedIds: ["education.pupils.total"] }))
+    .toThrow("No education.schools.total facts for region.guria");
+});
+
+test("ticking a graduates row on Universities keeps a manual range clamped, neither widened nor collapsed", () => {
+  const manual = { mode: "line" as const, range: { kind: "manual" as const, start: 2011, end: 2025 }, selectedIds: ["education.he_students.total"] };
+  const next = changeEducationSelection(manual, "universities", ["education.he_students.total", "education.he_graduates.women"], facts);
+  expect(next).toEqual({ ...manual, selectedIds: ["education.he_students.total", "education.he_graduates.women"] });
+  const model = buildEducationModel("universities", facts, next);
+  expect([model.range.min, model.range.start, model.range.end]).toEqual([2010, 2011, 2025]);
 });
