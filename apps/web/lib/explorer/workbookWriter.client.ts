@@ -58,7 +58,7 @@ function wrappedLineCount(text: string, width: number): number {
   return Math.max(1, Math.ceil(units / width));
 }
 
-function formatYearRanges(years: number[]): string {
+function formatYearRanges(years: number[], label: (year: number) => string = String): string {
   const sorted = [...new Set(years)].sort((left, right) => left - right);
   const ranges: string[] = [];
   for (let index = 0; index < sorted.length;) {
@@ -68,7 +68,7 @@ function formatYearRanges(years: number[]): string {
       index += 1;
       end = sorted[index]!;
     }
-    ranges.push(start === end ? String(start) : `${start}–${end}`);
+    ranges.push(start === end ? label(start) : `${label(start)}–${label(end)}`);
     index += 1;
   }
   return ranges.join(", ");
@@ -187,11 +187,12 @@ function writeSourcesSheet(
   sources: WorkbookExportModel["sources"],
   years: number[],
   locale: Locale,
+  periodLabel?: (year: number) => string,
 ): void {
   worksheet.mergeCells("A1:E1");
   worksheet.mergeCells("A2:E2");
   worksheet.getCell("A1").value = workbookMessage(locale, "workbook.sources");
-  worksheet.getCell("A2").value = workbookMessage(locale, "workbook.originalSources", { years: formatYearRanges(years) });
+  worksheet.getCell("A2").value = workbookMessage(locale, "workbook.originalSources", { years: formatYearRanges(years, periodLabel) });
   for (let column = 1; column <= 5; column += 1) {
     const titleCell = worksheet.getCell(1, column);
     titleCell.fill = TITLE_FILL;
@@ -210,7 +211,7 @@ function writeSourcesSheet(
 
   sources.forEach((source, index) => {
     const rowNumber = index + 4;
-    worksheet.getCell(rowNumber, 1).value = formatYearRanges(source.years);
+    worksheet.getCell(rowNumber, 1).value = formatYearRanges(source.years, periodLabel);
     worksheet.getCell(rowNumber, 2).value = source.title;
     worksheet.getCell(rowNumber, 3).value = source.organization;
     worksheet.getCell(rowNumber, 4).value = {
@@ -283,7 +284,7 @@ export async function createWorkbookBuffer(model: WorkbookExportModel): Promise<
   for (const [rowIndex, format] of Object.entries(model.analysis.rowNumberFormats ?? {})) {
     for (const column of Object.keys(model.analysis.numericFormats ?? {})) analysis.getCell(Number(rowIndex)+2,Number(column)).numFmt=format;
   }
-  writeSourcesSheet(sources, model.sources, model.sourceYears ?? model.readable.years, model.locale);
+  writeSourcesSheet(sources, model.sources, model.sourceYears ?? model.readable.years, model.locale, model.periodLabel);
 
   const bytes = await workbook.xlsx.writeBuffer();
   return new Uint8Array(bytes).buffer;
