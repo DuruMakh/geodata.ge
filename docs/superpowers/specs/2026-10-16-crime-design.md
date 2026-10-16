@@ -3,6 +3,12 @@
 Date: 2026-10-16
 Status: Written for Duru's review. Duru asked for a crime thread on 2026-10-16 ("three threads for education, housing and crime"). On the "Choose which pages the Crime and justice hub gets" card, Duru picked "Five pages". On the "Approve this layout for the five crime pages?" card, Duru picked "Approve". This document covers both the data foundation and the pages.
 
+**Amended while planning (2026-10-16).** Where the body below differs, this note wins. None of it changes what a reader sees:
+
+- The per-100,000 figures are calculated on the page from the served counts and the served population, as Money and banks calculates its share of GDP (`moneyBanksViewFacts`), and marked calculated. They are not stored as rows, so `crime-annual.csv` and the `CrimeFact` table hold only Geostat's counts, every one with value status `official`, and there are no `.per_100k` IDs.
+- The line under each heading uses the site's `LatestValueLine` form, "{measure} · {year}: {value}", for example "Recorded crimes · 2025: 54,134". Road accidents adds the killed as the line's note ("469 killed").
+- The research package reads the old `.xls` workbooks with `xlrd` 2.0.1 in its Python transcription and with the repository's SheetJS (`xlsx`) in the TypeScript prepare step and the independent verifier. No production dependency is added.
+
 ## 1. Intended result
 
 Readers of fiscal.ge should be able to see, year by year, how many crimes are recorded in Georgia and of what kind, how many people the courts convict and how they are sentenced, how many people are in prison, who the victims are, and how many road accidents there are and how many people they kill and injure. Every count can also be read per 100,000 people.
