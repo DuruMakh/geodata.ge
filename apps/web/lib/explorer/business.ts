@@ -5,6 +5,7 @@ import {
 import { INK, OTHER_COLOR } from "./colors";
 import { refitRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { keepOneUnit } from "./unitList";
 
 export const BUSINESS_HUB_PATH = "/explorer/business";
 export const BUSINESS_SECTIONS = [
@@ -105,16 +106,9 @@ const unitsOf = (facts: readonly ClientBusinessFact[]) => {
   return (id: string) => units.get(id);
 };
 
-/**
- * Series of different units never share a chart. A tick (or the bulk selection) that adds a series of another unit than
- * the rows already ticked keeps only the rows of the added series' unit; with several added at once, the first one's
- * unit wins, so selecting all from an empty list selects the first unit group's top-level rows in list order.
- * Unticking keeps the rest as it is.
- */
+/** Series of different units never share a chart; the rule is `keepOneUnit`. */
 export function keepOneBusinessUnit(next: readonly string[], previous: readonly string[], facts: readonly ClientBusinessFact[]): string[] {
-  const unitOf = unitsOf(facts);
-  const added = next.filter(id => !previous.includes(id));
-  return added.length ? next.filter(id => unitOf(id) === unitOf(added[0])) : [...next];
+  return keepOneUnit(next, previous, facts);
 }
 
 /** A list's years: every year any series of the selection's unit has a value, or any of its series when nothing is selected. */
