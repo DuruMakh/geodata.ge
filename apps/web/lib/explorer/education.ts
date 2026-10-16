@@ -45,6 +45,11 @@ export function educationSeriesLabel(messages: Messages, id: string): string {
   return message(messages, Object.hasOwn(messages, own) ? own : `education.group.${group}`);
 }
 
+/** A row's name outside the list: `Heading — Row` ("Teachers — Women"), or the row's name alone where it is the heading's ("Teachers"). */
+export function educationFullLabel(headingLabel: string, rowLabel: string): string {
+  return headingLabel === rowLabel ? rowLabel : `${headingLabel} — ${rowLabel}`;
+}
+
 /** `heading` is the measure a row is listed under; a list shows every row under its heading. */
 export type EducationSeriesDefinition = { id: string; reference: boolean; heading: EducationMeasure };
 

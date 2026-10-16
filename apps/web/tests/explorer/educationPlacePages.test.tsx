@@ -54,6 +54,12 @@ describe("the indexes", () => {
     expect(html).toContain('href="/en/explorer/education/schools/region/tbilisi"');
     expect(html).toContain('href="/en/explorer/education/schools/lanchkhuti"');
     expect(text(html)).toContain("Source: Geostat, general education · 2025/26 · Methodology and sources.");
+    // Abkhazia AR and the occupied-territory units count in Georgia's totals but get no row and no page.
+    const listed = [...html.matchAll(/data-testid="municipal-row-name"[^>]*>([^<]*)</g)].map(row => row[1]);
+    expect(listed.length).toBeGreaterThan(0);
+    for (const name of ["Abkhazia", "Akhalgori", "Eredvi", "Tighva", "Kurta"]) expect(listed.join("|"), name).not.toContain(name);
+    // (The map's occupied-territory overlay is drawn from its own definitions file, not linked.)
+    expect(html).not.toMatch(/href="\/en\/explorer\/education[^"]*(unit\.|abkhazia|akhalgori|eredvi|tighva|kurta)/i);
     expect(html).not.toMatch(GEORGIAN);
   });
 
@@ -80,8 +86,9 @@ describe("place pages", () => {
     expect(count(html, /data-testid="series-row"/g)).toBe(5);
     expect(html).toContain('data-testid="education-excel-download"');
     expect(html).toContain('data-testid="municipal-entity-navigation"');
-    expect(html).toContain('href="/en/explorer/education/schools/region/adjara"');
-    expect(html).toContain('href="/en/explorer/education/schools/region/imereti"');
+    // Previous and next carry the page's mode, years and selection (Review Focus 5).
+    expect(html).toContain('href="/en/explorer/education/schools/region/adjara#view=line&amp;sel=education.pupils.total&amp;range=all"');
+    expect(html).toContain('href="/en/explorer/education/schools/region/imereti#view=line&amp;sel=education.pupils.total&amp;range=all"');
     const rows = [...html.matchAll(/<a([^>]*data-testid="region-member-row"[^>]*)>(.*?)<\/a>/g)].map(row => [row[1]!.match(/href="([^"]*)"/)?.[1], row[2]!.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()]);
     expect(rows).toEqual([
       ["/en/explorer/education/schools/ozurgeti", "01 Ozurgeti 8,065"],
@@ -105,6 +112,9 @@ describe("place pages", () => {
     expect(html).not.toContain('data-testid="municipal-entity-navigation"');
     expect(html).not.toContain("region-member-row");
     expect(html).toContain("2000/01");
+    // The list prints Georgia's pupils as Geostat's thousands.
+    expect(html).toMatch(/>644\.2</);
+    expect(html).not.toContain("644,200");
   });
 
   it("a municipality: its crumbs pass through its region; Tbilisi and unknown places are not found", async () => {
@@ -154,6 +164,10 @@ describe("what each page hands on", () => {
       "country.georgia": "/explorer/education/schools/georgia",
     });
     expect(explorer?.props.pickerOverrides.countryDetail).toBe("644.2 thousand · 64 municipalities");
+    // The places with no page are offered nowhere: not as an address, not in the picker's groups.
+    const offered = [...Object.keys(explorer?.props.pickerOverrides.hrefById ?? {}), ...(explorer?.props.pickerGroups ?? []).flatMap(group => [group.regionId, ...group.members.map(member => member.code)])];
+    expect(offered).toHaveLength(Object.keys(explorer?.props.pickerOverrides.hrefById ?? {}).length + 11 + 64);
+    expect(offered.filter(id => id.startsWith("unit."))).toEqual([]);
     expect(explorer?.props.labels["education.teachers.women"]).toBe("Women");
     expect(explorer?.props.headingLabels.teachers).toBe("Teachers");
   });

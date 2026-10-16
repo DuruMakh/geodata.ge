@@ -2,7 +2,7 @@ import { EDUCATION_GEORGIA, educationIndicator, type ClientEducationFact, type E
 import type { Municipality, MunicipalRegion } from "../data/municipal/types";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { placeIndexRows } from "./demographyPopulationIndex";
-import { EDUCATION_HUB_PATH, buildEducationSeriesModel, type EducationModel, type EducationSeriesDefinition, type EducationState } from "./education";
+import { EDUCATION_HUB_PATH, buildEducationSeriesModel, serializeEducationHash, type EducationModel, type EducationSeriesDefinition, type EducationState } from "./education";
 import { formatInUnit, UNIT_PERSONS } from "./format";
 import type { MunicipalListRow } from "./municipalData";
 import { buildMunicipalityValueMapModel, type MunicipalityMapModel } from "./municipalityMapData";
@@ -40,20 +40,24 @@ export function educationPlaceDefaultSelection(set: EducationPlaceSet, placeId: 
 const COUNTERPART: Partial<Record<string, string>> = { pupils_national: "pupils", pupils: "pupils_national" };
 
 /**
- * The hash a link to another place's page carries: this page's selection, moved to that place, as `serializeTopicHash` writes it.
- * A row the target does not list becomes its counterpart there: Georgia's pupils and the place's pupils swap, and a split Geostat
- * publishes only nationally (public, private) becomes its measure's total. The moved rows keep the target's list order, once
- * each; the default selection carries none, and an empty selection stays empty.
+ * This page's selection, moved to another place (a fact-side id, or a municipality code: 04 is Tbilisi). A row the target
+ * does not list becomes its counterpart there: Georgia's pupils and the place's pupils swap, and a split Geostat publishes
+ * only nationally (public, private) becomes its measure's total. The moved rows keep the target's list order, once each;
+ * an empty selection stays empty.
  */
-export function educationPlaceSelectionHash(selectedIds: readonly string[], set: EducationPlaceSet, targetPlaceId: string): string {
-  const listed = educationPlaceSeries(set, targetPlaceId).map(definition => definition.id);
+export function educationPlaceMovedSelection(selectedIds: readonly string[], set: EducationPlaceSet, targetPlaceId: string): string[] {
+  const listed = educationPlaceSeries(set, placeIdForMunicipalityCode(targetPlaceId)).map(definition => definition.id);
   const moved = new Set(selectedIds.map(id => {
     if (listed.includes(id)) return id;
     const measure = id.split(".")[1]!;
     return `education.${COUNTERPART[measure] ?? measure}.total`;
   }));
-  const ids = listed.filter(id => moved.has(id));
-  return ids.join(",") === educationPlaceDefaultSelection(set, targetPlaceId).join(",") ? "" : `#${new URLSearchParams({ sel: ids.join(",") })}`;
+  return listed.filter(id => moved.has(id));
+}
+
+/** The hash a link to another place's page carries: this page's mode and years, and its selection moved to that place. The target's parse refits the years to its own. */
+export function educationPlaceLinkHash(state: EducationState, set: EducationPlaceSet, targetPlaceId: string): string {
+  return `#${serializeEducationHash({ ...state, selectedIds: educationPlaceMovedSelection(state.selectedIds, set, targetPlaceId) })}`;
 }
 
 /** The list's one-heading rule: a row's group is its heading. */

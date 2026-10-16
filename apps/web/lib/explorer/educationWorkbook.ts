@@ -3,7 +3,7 @@ import { EDUCATION_GEORGIA, educationFactKey, type ClientEducationFact } from ".
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
-import { buildEducationModel, educationPeriodLabel, type EducationModel, type EducationState, type EducationTopicId } from "./education";
+import { buildEducationModel, educationFullLabel, educationPeriodLabel, type EducationModel, type EducationState, type EducationTopicId } from "./education";
 import { buildEducationPlaceModel, type EducationPlaceSet } from "./educationPlaces";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
@@ -45,8 +45,15 @@ export function buildEducationWorkbookExportModel(input: EducationWorkbookInput,
   const numberFormat = inThousands ? "#,##0.0" : "#,##0";
   const toExport = (value: number | null) => value === null ? null : inThousands ? new Decimal(value).dividedBy(1000).toNumber() : value;
   const status = (id: string, year: number) => cellOf(id, year) ? t("status.official") : workbookMessage(locale, "workbook.unavailable");
-  const headingOf = (series: { heading: string }) => headingLabels[series.heading] ?? null;
-  const labelled = (series: { id: string; heading: string }) => headingOf(series) === null ? labels[series.id] : `${headingOf(series)} — ${labels[series.id]}`;
+  // A row whose name is its heading's ("Teachers" under Teachers) is named alone, never "Teachers — Teachers".
+  const headingOf = (series: { id: string; heading: string }) => {
+    const heading = headingLabels[series.heading];
+    return heading === undefined || heading === labels[series.id] ? null : heading;
+  };
+  const labelled = (series: { id: string; heading: string }) => {
+    const heading = headingOf(series);
+    return heading === null ? labels[series.id] : educationFullLabel(heading, labels[series.id]);
+  };
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series })));
   return {
     locale, filename: workbookFilename(stem, locale), sheetNames: SHEET_NAMES[locale],

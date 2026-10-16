@@ -21,6 +21,16 @@ export function placePageHref<Base extends `/${string}`>(basePath: Base, placeId
 /** The address of a place's own Population page. */
 export const populationPlaceHref = (placeId: string): `${typeof POPULATION_PATH}/${string}` => placePageHref(POPULATION_PATH, placeId);
 
+/** A place page's route: Georgia, a region by id, or a municipality by its Budget slug. */
+export type PlaceRoute = { kind: "country" } | { kind: "region"; id: string } | { kind: "municipality"; slug: string };
+
+/** The place a route names, or null: Georgia, `region.{id}`, or the municipality behind a slug (never Tbilisi's). */
+export function placeIdForRoute(route: PlaceRoute): string | null {
+  if (route.kind === "country") return GEORGIA_PLACE_ID;
+  if (route.kind === "region") return `region.${route.id}`;
+  return populationMunicipalityCodeForSlug(route.slug);
+}
+
 /** The 63 municipality slugs: every Budget slug except Tbilisi's. */
 export function populationMunicipalitySlugs(): string[] {
   return MUNICIPALITY_ROUTES.filter((route) => route.slug !== TBILISI_SLUG).map((route) => route.slug);

@@ -13,7 +13,7 @@ import { EDUCATION_GEORGIA, educationIndicator, type ClientEducationFact } from 
 import { loadServedMunicipalData } from "../data/servedData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
-import { placeHrefById, placeNeighbours, placePageHref, populationMunicipalityCodeForSlug, populationMunicipalitySlugs } from "../explorer/demographyPlaceRoutes";
+import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
 import { EDUCATION_HUB_PATH, educationCountLabel, educationPeriodLabel, educationSeriesLabel } from "../explorer/education";
 import { buildEducationIndexModel, educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection, educationPlaceSeries, type EducationPlaceSet } from "../explorer/educationPlaces";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
@@ -27,26 +27,10 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
-import type { PopulationPlaceRoute } from "./demography-population-place";
 
-/** The same three kinds of place page as Population: Georgia, a region by id, a municipality by its Budget slug. */
-export type EducationPlaceRoute = PopulationPlaceRoute;
-
-export async function educationRegionParams() {
-  const { regions } = await loadServedMunicipalData();
-  return regions.map(region => ({ id: region.id.replace("region.", "") }));
-}
-
-export function educationMunicipalityParams() {
-  return populationMunicipalitySlugs().map(slug => ({ slug }));
-}
-
-/** The place a route names, or null: Georgia, `region.{id}`, or the municipality behind a slug (never Tbilisi's). */
-function placeIdFor(route: EducationPlaceRoute): string | null {
-  if (route.kind === "country") return GEORGIA_PLACE_ID;
-  if (route.kind === "region") return `region.${route.id}`;
-  return populationMunicipalityCodeForSlug(route.slug);
-}
+/** The same three kinds of place page as Population, with the same 11 region ids and 63 municipality slugs. */
+export type EducationPlaceRoute = PlaceRoute;
+export { populationMunicipalityParams as educationMunicipalityParams, populationRegionParams as educationRegionParams } from "./demography-population-place";
 
 function workbookScopeFor(route: EducationPlaceRoute): string {
   if (route.kind === "country") return "georgia";
@@ -72,6 +56,13 @@ function latestOf(facts: readonly ClientEducationFact[], indicatorId: string, pl
   const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
   if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
   return latest;
+}
+
+/** Georgia's value of a series in one year (the index's map year), or a descriptive error. */
+function georgiaFactAt(facts: readonly ClientEducationFact[], indicatorId: string, year: number): ClientEducationFact {
+  const fact = facts.find(f => f.indicatorId === indicatorId && f.geographyId === EDUCATION_GEORGIA && f.year === year);
+  if (!fact) throw new Error(`No ${year} ${indicatorId} value for Georgia`);
+  return fact;
 }
 
 /** The figure a latest line or a Georgia row prints: Georgia's pupils in thousands, every other count whole. */
@@ -105,10 +96,9 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
   const georgia = places.find(candidate => candidate.id === GEORGIA_PLACE_ID)!;
   // Georgia's headline (national pupils, or kindergarten children) and the institutions counted in the same year.
   const headline = latestOf(facts, educationPlaceDefaultSelection(set, EDUCATION_GEORGIA)[0], EDUCATION_GEORGIA);
-  const institutions = facts.find(f => f.indicatorId === educationIndicator(set === "schools" ? "schools" : "kindergartens", "total") && f.geographyId === EDUCATION_GEORGIA && f.year === headline.year);
-  if (!institutions) throw new Error(`No ${headline.year} ${set} count for Georgia`);
+  const institutions = georgiaFactAt(facts, educationIndicator(set === "schools" ? "schools" : "kindergartens", "total"), headline.year);
   const figures = set === "schools" ? { pupils: headline, schools: institutions } : { children: headline, kindergartens: institutions };
-  const country = facts.find(f => f.indicatorId === headline.indicatorId && f.geographyId === EDUCATION_GEORGIA && f.year === index.year)!;
+  const country = georgiaFactAt(facts, headline.indicatorId, index.year);
   const { first, last } = placeCoverage(set, EDUCATION_GEORGIA, facts);
   const title = t(`page.${set}.title`);
   const measure = t(`heading.${educationPlaceSeries(set, EDUCATION_GEORGIA)[0].heading}`);
@@ -163,7 +153,7 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
 
 export async function educationPlaceMetadata(route: EducationPlaceRoute, locale: Locale, set: EducationPlaceSet) {
   const { presentation, places } = await loadEducationPlaceBasics(locale);
-  const place = places.find(candidate => candidate.id === placeIdFor(route));
+  const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const values = { section: message(presentation.messages, `education.page.${set}.title`), place: placeLabel(place, locale) };
   return fiscalMetadata({
@@ -177,7 +167,7 @@ export async function educationPlaceMetadata(route: EducationPlaceRoute, locale:
 /** A place's page: the heading with the picker and its latest line, the chart workspace and, on a region's page, its municipalities. */
 export async function renderEducationPlacePage(route: EducationPlaceRoute, locale: Locale, set: EducationPlaceSet) {
   const { facts, municipal, presentation, places, lastReviewedAt } = await loadEducationPlaceBasics(locale);
-  const place = places.find(candidate => candidate.id === placeIdFor(route));
+  const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `education.${key}`, values);
@@ -209,7 +199,7 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
       }
     : undefined;
   const georgia = places.find(candidate => candidate.id === GEORGIA_PLACE_ID)!;
-  const country = facts.find(f => f.indicatorId === educationPlaceDefaultSelection(set, EDUCATION_GEORGIA)[0] && f.geographyId === EDUCATION_GEORGIA && f.year === index.year)!;
+  const country = georgiaFactAt(facts, educationPlaceDefaultSelection(set, EDUCATION_GEORGIA)[0], index.year);
   // A region lists its municipalities ranked by the index's measure; Tbilisi is its own one municipality and lists none.
   const memberRows = place.level === "region" && place.id !== TBILISI_PLACE_ID
     ? index.municipalities.filter(row => row.regionId === place.id).map((row, position) => ({

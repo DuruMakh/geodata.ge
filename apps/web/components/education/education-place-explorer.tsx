@@ -3,10 +3,10 @@ import Link from "next/link";
 import { useCallback, type ReactNode } from "react";
 import type { ClientEducationFact } from "../../lib/data/education/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
-import { placeIdForMunicipalityCode, placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
-import { educationPeriodLabel, serializeEducationHash } from "../../lib/explorer/education";
+import { placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
+import { educationFullLabel, educationPeriodLabel, serializeEducationHash } from "../../lib/explorer/education";
 import {
-  buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceCoverage, educationPlaceSelectionHash, parseEducationPlaceHash, type EducationPlaceSet,
+  buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceCoverage, educationPlaceLinkHash, parseEducationPlaceHash, type EducationPlaceSet,
 } from "../../lib/explorer/educationPlaces";
 import { buildEducationWorkbookExportModel } from "../../lib/explorer/educationWorkbook";
 import { formatInUnit, thousandsUnit, UNIT_PERSONS, type ValueUnit } from "../../lib/explorer/format";
@@ -80,7 +80,7 @@ export function EducationPlaceExplorer({
   const unitLabel = t(inThousands(lead) ? "unitThousandPupils" : model.unit === "institutions" ? "unitInstitutions" : "unitPersons");
   const valueLabel = (value: number | null | undefined) => value == null ? "—" : `${formatInUnit(value, unit)} ${unitLabel}`;
   // Outside the list a row is named in full, "Teachers — Women"; a heading's total that bears the heading's name keeps it alone.
-  const fullLabel = (series: { id: string; heading: string }) => labels[series.id] === headingLabels[series.heading] ? labels[series.id] : `${headingLabels[series.heading]} — ${labels[series.id]}`;
+  const fullLabel = (series: { id: string; heading: string }) => educationFullLabel(headingLabels[series.heading], labels[series.id]);
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: fullLabel(series), color: series.color, valuesByYear: series.valuesByYear }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: fullLabel(series), color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   // The selection's heading total, when ticked, leads the table.
@@ -88,12 +88,12 @@ export function EducationPlaceExplorer({
   const reference = model.series.find(series => series.reference);
   const placeName = placeLabel(place, locale);
   const chartLabel = `${headingLabels[model.heading]} · ${placeName}`;
-  // Links to another place's page carry the selection, moved to that place, and nothing else.
-  const withSelection = (href: string, placeId: string) => `${href}${educationPlaceSelectionHash(state.selectedIds, set, placeIdForMunicipalityCode(placeId))}`;
-  const overrides = { ...pickerOverrides, hrefById: Object.fromEntries(Object.entries(pickerOverrides.hrefById).map(([id, href]) => [id, withSelection(href, id)])) };
+  // Links to another place's page carry the mode, the years and the selection, moved to that place (its parse refits the years).
+  const withState = (href: string, placeId: string) => `${href}${educationPlaceLinkHash(state, set, placeId)}`;
+  const overrides = { ...pickerOverrides, hrefById: Object.fromEntries(Object.entries(pickerOverrides.hrefById).map(([id, href]) => [id, withState(href, id)])) };
   const neighbours = navigation && {
-    prev: { label: navigation.prev.label, href: withSelection(navigation.prev.href, navigation.prev.id) },
-    next: { label: navigation.next.label, href: withSelection(navigation.next.href, navigation.next.id) },
+    prev: { label: navigation.prev.label, href: withState(navigation.prev.href, navigation.prev.id) },
+    next: { label: navigation.next.label, href: withState(navigation.next.href, navigation.next.id) },
   };
   return <div data-testid={`education-place-${set}`}>
     <EntityHeading title={title} triggerLabel={placeName} metaLine={<LatestValueLine testId="education-latest" sentence={metaLine} />} entityId={place.id}
