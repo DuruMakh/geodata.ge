@@ -3,7 +3,10 @@ import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, type DemographyPlace } from "../../lib/explorer/demographyAreas";
 import {
   POPULATION_PATH,
+  placeHrefById,
   placeNeighbours,
+  placePageHref,
+  placePagePaths,
   populationHrefById,
   populationMunicipalityCodeForSlug,
   populationMunicipalitySlugs,
@@ -82,5 +85,33 @@ describe("neighbours", () => {
     expect(municipalities).toHaveLength(63);
     expect(placeNeighbours(municipalities[0]!, places)?.prev.id).toBe(municipalities.at(-1)!.id);
     expect(municipalities.some((p) => p.id === TBILISI_PLACE_ID)).toBe(false);
+  });
+});
+
+describe("place pages under another base path", () => {
+  const SCHOOLS = "/explorer/education/schools";
+
+  test("Georgia, a region and a municipality take the base path; Tbilisi is the region, municipality 04 included", () => {
+    expect(placePageHref(SCHOOLS, "04")).toBe("/explorer/education/schools/region/tbilisi");
+    expect(placePageHref(SCHOOLS, GEORGIA_PLACE_ID)).toBe("/explorer/education/schools/georgia");
+    expect(placePageHref(SCHOOLS, "06")).toBe("/explorer/education/schools/batumi");
+    expect(() => placePageHref(SCHOOLS, "99")).toThrow(/No schools page for 99/);
+  });
+
+  test("75 paths and 76 addresses, as under Population", () => {
+    const paths = placePagePaths(SCHOOLS, regionIds);
+    expect(paths).toHaveLength(75);
+    expect(new Set(paths).size).toBe(75);
+    expect(paths.every((path) => path.startsWith(`${SCHOOLS}/`))).toBe(true);
+    const table = placeHrefById(SCHOOLS, places);
+    expect(Object.keys(table)).toHaveLength(76);
+    expect(table["04"]).toBe(table[TBILISI_PLACE_ID]);
+    expect(new Set(Object.values(table))).toEqual(new Set(paths));
+  });
+
+  test("Population's addresses are the base-path ones with its own path, byte for byte", () => {
+    for (const p of places) expect(populationPlaceHref(p.id)).toBe(placePageHref(POPULATION_PATH, p.id));
+    expect(populationPlacePaths(regionIds)).toEqual(placePagePaths(POPULATION_PATH, regionIds));
+    expect(populationHrefById(places)).toEqual(placeHrefById(POPULATION_PATH, places));
   });
 });
