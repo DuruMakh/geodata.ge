@@ -5,7 +5,7 @@ import { INK } from "./colors";
 import { formatInUnit } from "./format";
 import type { HubCardModel } from "./hubCards";
 import { HOUSING_SECTIONS, type HousingSectionId } from "./housing";
-import { buildHousingRegionMapModel } from "./housingAreas";
+import { buildHousingRegionMapModel } from "./housingRegionMap";
 
 /** Each card's sparkline and footer years follow one series: all permits, all completed buildings and the price index. Regions has none, only the map's years. */
 const HEADLINE: Record<Exclude<HousingSectionId, "regions">, string> = {

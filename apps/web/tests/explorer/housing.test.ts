@@ -8,10 +8,11 @@ import {
   parseHousingHash, serializeHousingHash, type HousingTopicId,
 } from "../../lib/explorer/housing";
 import {
-  HOUSING_AREAS, buildHousingAreaModel, buildHousingRegionMapModel, housingAreaDefaultSelection, housingAreaHref, housingAreaOfMapId, housingAreaSelectionHash, housingAreaSeries,
+  HOUSING_AREAS, buildHousingAreaModel, housingAreaDefaultSelection, housingAreaHref, housingAreaOfMapId, housingAreaSelectionHash, housingAreaSeries,
   housingAreaSlug, housingMapId, housingRegionHref, parseHousingAreaHash,
 } from "../../lib/explorer/housingAreas";
 import { buildHousingHubCards } from "../../lib/explorer/housingHubCards";
+import { buildHousingRegionMapModel } from "../../lib/explorer/housingRegionMap";
 import { buildHousingWorkbookExportModel } from "../../lib/explorer/housingWorkbook";
 import { serializeTopicHash } from "../../lib/explorer/topicSeries";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";

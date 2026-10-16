@@ -38,7 +38,8 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  */
 export type TopicDatasetId =
   | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
-  | "inflation-products";
+  | "inflation-products"
+  | "housing";
 
 /** An official statistics producer whose published figures a dataset is read from. */
 export type SourceAgencyId = "geostat" | "nbg";
@@ -305,6 +306,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     measurementTechnique: {
       ka: "გადამოწმებული ამოღება საქსტატის ბიზნეს სტატისტიკის ოფიციალური გამოქვეყნებული ფაილებიდან.",
       en: "Reviewed extraction from Geostat's official published business statistics files.",
+    },
+    sources: ["geostat"],
+  },
+  housing: {
+    keywords: {
+      ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],
+      en: ["Georgia", "housing", "construction", "building permits", "completed buildings", "home prices"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის მშენებლობისა და საცხოვრებელი უძრავი ქონების ფასების ოფიციალური გამოქვეყნებული ფაილებიდან.",
+      en: "Reviewed extraction from Geostat's official published construction and residential property price files.",
     },
     sources: ["geostat"],
   },

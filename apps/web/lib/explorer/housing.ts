@@ -1,5 +1,6 @@
 import { HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_TYPES, housingFactKey, housingIndicator, type ClientHousingFact, type HousingGroup, type HousingIndicator, type HousingMeasure } from "../data/housing/types";
 import { INK, OTHER_COLOR } from "./colors";
+import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
 import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
@@ -130,3 +131,32 @@ export function buildHousingSeriesModel(
 
 export const buildHousingModel = (section: HousingTopicId, facts: readonly ClientHousingFact[], state: HousingState): HousingModel =>
   buildHousingSeriesModel(housingTopicSeries(section), facts, state);
+
+/** Reads a `housing.*` message. */
+export type HousingTranslate = (key: string, values?: Record<string, string | number>) => string;
+
+/** How a unit reads in charts, tables and lists: whole objects, thousand m² to one decimal, the index to one decimal, whole GEL per m². */
+export function housingValueUnit(unit: HousingUnit): ValueUnit {
+  return unit === "area" ? { divisor: 1_000, label: "", decimals: 1 } : { divisor: 1, label: "", decimals: unit === "index" ? 1 : 0 };
+}
+
+/** The unit's name beside a chart or table. */
+export function housingUnitLabel(unit: HousingUnit, t: HousingTranslate): string {
+  return t({ count: "unitCount", area: "unitThousandSquareMetres", index: "unitIndex", price: "unitGelPerSquareMetre" }[unit]);
+}
+
+/** A tooltip or list value: floor area and prices name their unit, a count or the index stands alone. */
+export function housingValueLabel(value: number | null | undefined, unit: HousingUnit, t: HousingTranslate): string {
+  if (value == null) return MISSING;
+  const number = formatInUnit(value, housingValueUnit(unit));
+  return unit === "area" || unit === "price" ? `${number} ${housingUnitLabel(unit, t)}` : number;
+}
+
+/** Floor area in a latest-value line: million m² to one decimal, thousand m² below a million. */
+export function housingFloorArea(value: number, t: HousingTranslate): string {
+  return value >= 1_000_000 ? `${formatInUnit(value, { divisor: 1_000_000, label: "", decimals: 1 })} ${t("unitMillionSquareMetres")}`
+    : `${formatInUnit(value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandSquareMetres")}`;
+}
+
+/** A whole number of permits or buildings. */
+export const housingCount = (value: number) => formatInUnit(value, { divisor: 1, label: "", decimals: 0 });
