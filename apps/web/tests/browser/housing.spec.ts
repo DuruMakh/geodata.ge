@@ -27,7 +27,7 @@ test("the hub shows four cards, each opening its page", async ({ page }) => {
 test("permits selects all buildings by number, lists number and floor area under two headings, and keeps one unit", async ({ page }) => {
   await page.goto("/explorer/housing/permits");
   await ready(page);
-  await expect(page.getByTestId("housing-latest")).toHaveText("მშენებლობის ნებართვები · 2025: 11,578 · ფართობი 11.4 მლნ მ²");
+  await expect(page.getByTestId("housing-latest")).toHaveText("ნებართვები · 2025: 11,578");
   await expect(ticked(page)).toHaveCount(1);
   await expect(page.locator(pressed("housing.permits_count.total"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("series-heading")).toHaveText(["რაოდენობა", "ფართობი · ათასი მ²"]);
@@ -66,7 +66,7 @@ test("prices: the index by default, and ticking a district under flats replaces 
   await page.goto("/explorer/housing/prices");
   await ready(page);
   await expect(page.getByTestId("housing-latest")).toContainText("159.4");
-  await expect(page.getByTestId("housing-latest")).toHaveText("საცხოვრებლის ფასების ინდექსი (2020 = 100) · 2025, IV კვარტალი: 159.4");
+  await expect(page.getByTestId("housing-latest")).toHaveText("ფასების ინდექსი · 2025, IV კვ.: 159.4");
   await expect(page.getByTestId("series-heading")).toHaveText(["ფასების ინდექსი · 2020 = 100", "თბილისი, ახალი ბინები · ლარი 1 მ²\u2011ზე", "თბილისი, ახალი კერძო სახლები · ლარი 1 მ²\u2011ზე"]);
   await expect(ticked(page)).toHaveCount(1);
   await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
@@ -84,7 +84,7 @@ test("prices: the index by default, and ticking a district under flats replaces 
 test("regions is the map and list with Georgia first, and a region opens its own page", async ({ page }) => {
   await page.goto("/explorer/housing/regions");
   await ready(page);
-  await expect(page.getByTestId("housing-latest")).toHaveText("ნებართვების ფართობი · თბილისი · 2025: 6.4 მლნ მ²");
+  await expect(page.getByTestId("housing-latest")).toHaveText("ნებართვები · თბილისი · 2025: 6.4 მლნ მ²");
   await expect(page.getByTestId("housing-region-map").getByTestId("regional-map-path")).toHaveCount(11);
   const rows = page.getByTestId("regional-list-row");
   await expect(rows).toHaveCount(12);
@@ -113,7 +113,7 @@ test("the Guria page: picker, neighbours carrying the selection, the language sw
   const heading = page.getByRole("heading", { level: 1 });
   await expect(heading).toContainText("საცხოვრებელი და მშენებლობა —");
   await expect(heading.getByTestId("region-picker-trigger")).toHaveText("გურია");
-  await expect(page.getByTestId("housing-latest")).toHaveText("მშენებლობის ნებართვები · 2025: 150 · ფართობი 92.6 ათასი მ² · გურია");
+  await expect(page.getByTestId("housing-latest")).toHaveText("ნებართვები · 2025: 150 · გურია");
   // Four headings name what the rows count and the unit; each lists all buildings and residential buildings by their plain names.
   await expect(page.getByTestId("series-heading")).toHaveText(["მშენებლობის ნებართვები · რაოდენობა", "ექსპლუატაციაში მიღებული ობიექტები · რაოდენობა", "მშენებლობის ნებართვები · ფართობი, ათასი მ²", "ექსპლუატაციაში მიღებული ობიექტები · ფართობი, ათასი მ²"]);
   for (const group of await page.getByTestId("series-heading-group").all()) await expect(group.getByTestId("series-label")).toHaveText(["ყველა შენობა", "საცხოვრებელი შენობები"]);
@@ -164,7 +164,7 @@ test("the language switch keeps the selection, years and table mode on permits",
   await expect(page).toHaveURL(/\/en\/explorer\/housing\/permits#/);
   expect(new URL(page.url()).hash).toBe(hash);
   await ready(page);
-  await expect(page.getByTestId("housing-latest")).toHaveText("Building permits · 2025: 11,578 · floor area 11.4 million m²");
+  await expect(page.getByTestId("housing-latest")).toHaveText("Permits · 2025: 11,578");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "area");
   await expect(ticked(page)).toHaveCount(2);
@@ -174,7 +174,7 @@ test("the language switch keeps the selection, years and table mode on permits",
 test("the topic Excel download is a workbook", async ({ page }) => {
   await page.goto("/explorer/housing/completed");
   await ready(page);
-  await expect(page.getByTestId("housing-latest")).toHaveText("ექსპლუატაციაში მიღებული ობიექტები · 2025: 3,393 · ფართობი 3.5 მლნ მ²");
+  await expect(page.getByTestId("housing-latest")).toHaveText("ექსპლუატაციაში მიღებული · 2025: 3,393");
   const promise = page.waitForEvent("download");
   await page.getByTestId("housing-excel-download").click();
   const download = await promise;

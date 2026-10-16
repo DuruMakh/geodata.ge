@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useCallback, useId, useRef, useState } from "react";
 import type { ClientHousingFact } from "../../lib/data/housing/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { housingCount, housingFloorArea, housingSeriesLabel, housingUnitLabel, housingValueLabel, housingValueUnit, serializeHousingHash, type HousingSeriesModel, type HousingTranslate } from "../../lib/explorer/housing";
+import { housingCount, housingSeriesLabel, housingUnitLabel, housingValueLabel, housingValueUnit, serializeHousingHash, type HousingSeriesModel, type HousingTranslate } from "../../lib/explorer/housing";
 import { HOUSING_REGIONS_HREF, buildHousingAreaModel, changeHousingAreaSelection, housingAreaCoverage, housingAreaOfMapId, housingAreaSelectionHash, housingAreaSeries, housingMapId, housingRegionHref, parseHousingAreaHash, type HousingArea } from "../../lib/explorer/housingAreas";
 import { buildHousingWorkbookExportModel } from "../../lib/explorer/housingWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
@@ -61,10 +61,9 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
   // The table's total is the permits row of the selection's unit.
   const reference = model.series.find(series => series.reference && series.unit === model.unit);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
-  // The latest-value line is the page's headline: its own area's permits and their floor area, whatever is chosen below.
-  const permitsOf = (heading: "permitsCount" | "permitsArea") => housingAreaSeries(area).find(series => series.reference && series.heading === heading)!.id;
-  const latest = facts.filter(f => f.indicatorId === permitsOf("permitsCount")).sort((a, b) => a.year - b.year).at(-1)!;
-  const latestArea = facts.find(f => f.indicatorId === permitsOf("permitsArea") && f.year === latest.year);
+  // The latest-value line is the page's headline: its own area's permits, whatever is chosen below.
+  const permitsId = housingAreaSeries(area).find(series => series.reference && series.heading === "permitsCount")!.id;
+  const latest = facts.filter(f => f.indicatorId === permitsId).sort((a, b) => a.year - b.year).at(-1)!;
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The chart is named after the heading of the selection's unit (its text before the unit).
@@ -89,7 +88,7 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
         next={{ href: pageHref(areaHref(neighbours.next.id), locale), label: nameOf(neighbours.next.id) }} />
     </div>
     <LatestValueLine testId="housing-latest" measure={t("latest.area")} period={latest.year} value={housingCount(latest.value)}
-      note={latestArea ? `${t("latestNote.floorArea", { value: housingFloorArea(latestArea.value, t) })} · ${areaName}` : areaName} />
+      note={areaName} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={area} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">

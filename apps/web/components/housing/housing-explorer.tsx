@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientHousingFact } from "../../lib/data/housing/types";
-import { buildHousingModel, changeHousingSelection, housingCount, housingCoverage, housingFloorArea, housingSeriesLabel, housingTopicSeries, housingUnitLabel, housingValueLabel, housingValueUnit, parseHousingHash, serializeHousingHash, type HousingSeriesModel, type HousingTopicId, type HousingTranslate } from "../../lib/explorer/housing";
+import { buildHousingModel, changeHousingSelection, housingCount, housingCoverage, housingSeriesLabel, housingTopicSeries, housingUnitLabel, housingValueLabel, housingValueUnit, parseHousingHash, serializeHousingHash, type HousingSeriesModel, type HousingTopicId, type HousingTranslate } from "../../lib/explorer/housing";
 import { buildHousingWorkbookExportModel } from "../../lib/explorer/housingWorkbook";
 import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -30,7 +30,6 @@ const parseHousingState = (hash: string, data: HousingHashData) => parseHousingH
 
 /** The headline series: the number of objects (with their floor area beside it) or the price index. */
 const LATEST_ID: Record<HousingTopicId, string> = { permits: "housing.permits_count.total", completed: "housing.completed_count.total", prices: "housing.price_index.total" };
-const LATEST_AREA_ID: Partial<Record<HousingTopicId, string>> = { permits: "housing.permits_area.total", completed: "housing.completed_area.total" };
 
 export type HousingExplorerProps = {
   section: HousingTopicId; facts: ClientHousingFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
@@ -60,8 +59,6 @@ export function HousingExplorer({ section, facts, labels, sources, lastReviewedA
   // The latest-value line is the page's headline, whatever the list shows.
   const latestOf = (id: string) => facts.filter(f => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
   const latest = latestOf(LATEST_ID[section]);
-  const areaId = LATEST_AREA_ID[section];
-  const latestArea = areaId ? facts.find(f => f.indicatorId === areaId && f.year === latest.year) : undefined;
   const latestValue = section === "prices" ? formatInUnit(latest.value, housingValueUnit("index")) : housingCount(latest.value);
   const title = t(`page.${section}.title`);
   const downloadAction = <ExcelDownloadButton testId="housing-excel-download" disabled={!model.selected.length} onDownload={async () => {
@@ -70,8 +67,7 @@ export function HousingExplorer({ section, facts, labels, sources, lastReviewedA
   }} />;
   return <div data-testid={`housing-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
-    <LatestValueLine testId="housing-latest" measure={t(`latest.${section}`)} period={section === "prices" ? t("latestPeriod.prices", { year: latest.year }) : latest.year} value={latestValue}
-      note={latestArea ? t("latestNote.floorArea", { value: housingFloorArea(latestArea.value, t) }) : undefined} />
+    <LatestValueLine testId="housing-latest" measure={t(`latest.${section}`)} period={section === "prices" ? t("latestPeriod.prices", { year: latest.year }) : latest.year} value={latestValue} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">
