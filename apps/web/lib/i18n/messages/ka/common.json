@@ -97,10 +97,17 @@
   "common.moneyLoansDeposits": "სესხები და დეპოზიტები",
   "common.moneyInterestRates": "საპროცენტო განაკვეთები",
   "common.moneyBankHealth": "ბანკების მდგრადობა",
+  "common.business": "ბიზნესი",
+  "common.businessSales": "ბრუნვა",
+  "common.businessJobs": "დასაქმებულები",
+  "common.businessInvestmentProfit": "ინვესტიციები და მოგება",
+  "common.businessFirms": "გახსნილი და დახურული საწარმოები",
+  "common.businessRegions": "რეგიონები",
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე",
   "common.dataEnergyFood": "მონაცემები · ენერგეტიკა და სურსათი",
   "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები",
+  "common.dataBusiness": "მონაცემები · ბიზნესი",
   "common.dataLoading": "მონაცემები იტვირთება…",
   "common.dataLoadError": "მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან."
 }

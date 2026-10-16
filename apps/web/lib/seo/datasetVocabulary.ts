@@ -297,6 +297,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["nbg"],
   },
+  business: {
+    keywords: {
+      ka: ["ბიზნესი", "საწარმოები", "ბრუნვა", "დასაქმებულები", "ინვესტიციები", "საქართველო"],
+      en: ["Georgia", "business", "firms", "turnover", "employment", "investment"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის ბიზნეს სტატისტიკის ოფიციალური გამოქვეყნებული ფაილებიდან.",
+      en: "Reviewed extraction from Geostat's official published business statistics files.",
+    },
+    sources: ["geostat"],
+  },
   unemployment: {
     keywords: {
       ka: ["უმუშევრობა", "დასაქმება", "სამუშაო ძალა", "საქართველო"],

@@ -19,4 +19,5 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   "household-income": "2026-10-11",
   "energy-food": "2026-10-11",
   money: "2026-10-11",
+  business: "2026-10-15",
 };

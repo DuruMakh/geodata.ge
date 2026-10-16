@@ -138,6 +138,8 @@
     "data:check-energy-food": "tsx scripts/prepare-energy-food.ts --check",
     "data:prepare-money": "tsx scripts/prepare-money-banks.ts --write",
     "data:check-money": "tsx scripts/prepare-money-banks.ts --check",
+    "data:prepare-business": "tsx scripts/prepare-business.ts --write",
+    "data:check-business": "tsx scripts/prepare-business.ts --check",
     "data:prepare-household-income": "tsx scripts/prepare-household-income.ts --write",
     "data:check-household-income": "tsx scripts/prepare-household-income.ts --check",
     "data:prepare-money-transfers": "tsx scripts/prepare-money-transfers.ts --write",

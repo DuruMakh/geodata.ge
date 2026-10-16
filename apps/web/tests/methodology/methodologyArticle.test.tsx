@@ -124,6 +124,7 @@ describe("methodology footer attribution", () => {
     ["regional-economies", "Geostat"],
     ["demography", "Geostat"],
     ["household-income", "Geostat"],
+    ["business", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
@@ -146,6 +147,30 @@ describe("household income and spending methodology", () => {
     expect(markup).toContain("/downloads/methodology/household-income/files/104-income-per-household.xlsx");
     expect(markup).toContain("/downloads/methodology/household-income/files/income-page-2026-10-11.html.txt");
     expect(markup).not.toContain("/official/ka/");
+  });
+});
+
+describe("business methodology", () => {
+  it.each([["ka", "ბიზნესი"], ["en", "Business"]] as const)("renders the %s article with its 26 archived originals and Dataset markup", async (locale, title) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "business" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("1999–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    expect(markup).toContain("/downloads/methodology/business/files/0502en0101_turnover.xlsx");
+    expect(markup).toContain("/downloads/methodology/business/files/0502_011026_en.pdf");
+    expect(markup).toContain("/downloads/methodology/business/files/0502_011026_ge.pdf");
+    expect(markup).toContain("/downloads/methodology/business/files/0519_200225_ge.pdf");
+    expect(markup).toContain("/downloads/methodology/business/files/geostat-category-326-2026-10-15.html.txt");
+  });
+
+  it("quotes Geostat's own Georgian definitions from its Georgian metadata", async () => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle("ka", { params: Promise.resolve({ dataset: "business" }) }));
+    expect(markup).toContain("„საწარმოს მიერ პროდუქტის ან მომსახურების გაყიდვებიდან მიღებული შემოსავალი (დღგ-ის და აქციზის გადასახადის გარეშე)“");
+    expect(markup).toContain("„მატერიალური ძირითადი საშუალებების შეძენას და კაპიტალის გაუმჯობესებას, საიდანაც გამოიქვითება ძირითადი საშუალებების გაყიდვები და გადაცემა“");
+    expect(markup).toContain("ინვესტიციები ფიქსირებულ აქტივებში");
+    expect(markup).not.toContain("ძირითად კაპიტალში");
   });
 });
 

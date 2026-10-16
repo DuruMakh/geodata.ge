@@ -280,3 +280,29 @@ source.nbg_official_reserve_assets,NBG Official Reserve Assets (OIR),docs/Raw Da
 source.nbg_api_category_24,NBG file list for category 24 (external sector),docs/Raw Data/External/nbg-external-position/official/api-category-24.json,2026-10-15
 source.geostat_services_georgian_exports_of_services_by_countries,"მომსახურების ექსპორტი ქვეყნების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Exports-of-services-by-countries.xlsx,2026-10-14
 source.geostat_services_georgian_imports_of_services_by_countries,"მომსახურების იმპორტი ქვეყნების მიხედვით, 2020–2024",docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Georgian-Imports-of-services-by-countries.xlsx,2026-10-14
+source.geostat_business_turnover,ბრუნვა (0502EN0101),docs/Raw Data/Business/geostat-business-annual/official/0502EN0101_Turnover.xlsx,2026-10-15
+source.geostat_business_production_value,გამოშვებული პროდუქციის ღირებულება (0502EN0102),docs/Raw Data/Business/geostat-business-annual/official/0502EN0102_Production-value.xlsx,2026-10-15
+source.geostat_business_employed,დასაქმებულთა რაოდენობა (0502EN0103),docs/Raw Data/Business/geostat-business-annual/official/0502EN0103_Number-of-persons-employed.xlsx,2026-10-15
+source.geostat_business_employees,დაქირავებულთა რაოდენობა (0502EN0104),docs/Raw Data/Business/geostat-business-annual/official/0502EN0104_Number-of-employees.xlsx,2026-10-15
+source.geostat_business_earnings,საშუალო თვიური ხელფასი (0502EN0105),docs/Raw Data/Business/geostat-business-annual/official/0502EN0105_Average-monthly-earnings.xlsx,2026-10-15
+source.geostat_business_value_added,დამატებული ღირებულება (0502EN0106),docs/Raw Data/Business/geostat-business-annual/official/0502EN0106_Value-added.xlsx,2026-10-15
+source.geostat_business_intermediate_consumption,შუალედური მოხმარება (0502EN0107),docs/Raw Data/Business/geostat-business-annual/official/0502EN0107_Intermediate-consumption.xlsx,2026-10-15
+source.geostat_business_personnel_costs,პერსონალის ხარჯები (0502EN0108),docs/Raw Data/Business/geostat-business-annual/official/0502EN0108_Personnel-costs.xlsx,2026-10-15
+source.geostat_business_purchases,საქონლისა და მომსახურების შესყიდვები (0502EN0109),docs/Raw Data/Business/geostat-business-annual/official/0502EN0109_Purchase-of-goods-and-services.xlsx,2026-10-15
+source.geostat_business_purchases_for_resale,გადაყიდვისთვის შესყიდული საქონელი და მომსახურება (0502EN0110),docs/Raw Data/Business/geostat-business-annual/official/0502EN0110_Purchase-of-goods-and-services-for-resale.xlsx,2026-10-15
+source.geostat_business_investment,ინვესტიციები ფიქსირებულ აქტივებში (0502EN0111),docs/Raw Data/Business/geostat-business-annual/official/0502EN0111_Investments-in-fixed-assets.xlsx,2026-10-15
+source.geostat_business_gender,ბიზნეს სტატისტიკა გენდერის მიხედვით (0502EN0112),docs/Raw Data/Business/geostat-business-annual/official/0502EN0112_BS_Gender_ENG.xlsx,2026-10-15
+source.geostat_business_fixed_assets,ძირითადი კაპიტალი (0502EN0113),docs/Raw Data/Business/geostat-business-annual/official/0502EN0113_fixed-assets.xlsx,2026-10-15
+source.geostat_business_profit_loss,მოგება და ზარალი (0502EN0114),docs/Raw Data/Business/geostat-business-annual/official/0502EN0114_Profit-and-loss.xlsx,2026-10-15
+source.geostat_business_labour_productivity,შრომის ნაყოფიერება (0502EN0115),docs/Raw Data/Business/geostat-business-annual/official/0502EN0115_Labor-productivity.xlsx,2026-10-15
+source.geostat_business_remarks,ბიზნეს სტატისტიკის შენიშვნები,docs/Raw Data/Business/geostat-business-annual/official/Remark_eng.pdf,2026-10-15
+source.geostat_business_demography,ბიზნეს დემოგრაფია: ძირითადი შედეგები,docs/Raw Data/Business/geostat-business-annual/official/Main-results.xlsx,2026-10-15
+source.geostat_business_demography_other,ბიზნეს დემოგრაფია: სხვა მაჩვენებლები,docs/Raw Data/Business/geostat-business-annual/official/Other-indicators.xlsx,2026-10-15
+source.geostat_business_demography_births,ბიზნეს დემოგრაფია: საწარმოთა დაბადება,docs/Raw Data/Business/geostat-business-annual/official/Enterprise-births.xlsx,2026-10-15
+source.geostat_business_demography_deaths,ბიზნეს დემოგრაფია: საწარმოთა გარდაცვალება,docs/Raw Data/Business/geostat-business-annual/official/Enterprise-deaths.xlsx,2026-10-15
+source.geostat_business_survey_page,საწარმოთა სტატისტიკური კვლევა (წყაროს გვერდი),docs/Raw Data/Business/geostat-business-annual/official/geostat-category-326-2026-10-15.html,2026-10-15
+source.geostat_business_demography_page,ბიზნეს დემოგრაფიის მაჩვენებლები (წყაროს გვერდი),docs/Raw Data/Business/geostat-business-annual/official/geostat-category-69-2026-10-15.html,2026-10-15
+source.geostat_business_survey_metadata,მეტამონაცემები: საწარმოთა სტატისტიკური კვლევა (წლიური),docs/Raw Data/Business/geostat-business-annual/official/0502_011026_EN.PDF,2026-10-15
+source.geostat_business_demography_metadata,მეტამონაცემები: ბიზნეს დემოგრაფია,docs/Raw Data/Business/geostat-business-annual/official/0519_200225_EN.PDF,2026-10-15
+source.geostat_business_survey_metadata_ka,"მეტამონაცემები: საწარმოთა სტატისტიკური კვლევა (წლიური), ქართული ვერსია",docs/Raw Data/Business/geostat-business-annual/official/0502_011026_GE.PDF,2026-10-15
+source.geostat_business_demography_metadata_ka,"მეტამონაცემები: ბიზნეს დემოგრაფია, ქართული ვერსია",docs/Raw Data/Business/geostat-business-annual/official/0519_200225_GE.PDF,2026-10-15

@@ -89,6 +89,7 @@ model SourceDocument {
   energyFoodFacts EnergyFoodFact[]
   moneyBanksFacts MoneyBanksFact[]
   externalPositionFacts ExternalPositionFact[]
+  businessFacts BusinessFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
@@ -138,6 +139,7 @@ model ImportRun {
   energyFoodFacts EnergyFoodFact[]
   moneyBanksFacts MoneyBanksFact[]
   externalPositionFacts ExternalPositionFact[]
+  businessFacts BusinessFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
@@ -923,6 +925,28 @@ model EnergyFoodFact {
 // Mirror of data/imports/money-banks-annual.csv: NBG's yearly money, loan, deposit,
 // interest-rate and bank-health figures, exact stored decimals with their published rounding.
 model MoneyBanksFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/business-annual.csv: Geostat's yearly enterprise survey and business demography
+// figures, exact stored decimals with their published rounding.
+model BusinessFact {
   year             Int
   indicatorId      String
   value            Decimal        @db.Decimal(40, 30)

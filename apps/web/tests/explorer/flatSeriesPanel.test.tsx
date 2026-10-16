@@ -45,4 +45,26 @@ describe("FlatSeriesPanel", () => {
     expect(render({ asideLabel: "Series" })).toMatch(/<aside aria-label="Series"/);
     expect(render({})).not.toContain("<aside");
   });
+
+  it("prints each heading once, before the first listed row under it, and drops one whose rows a search hides", () => {
+    const grouped: FlatSeriesRow[] = [rows[0], { ...rows[1], heading: "Size" }, { ...rows[2], heading: "Size" }, { id: "c", label: "Gamma", color: "#333", value: "1", heading: "Industry" }];
+    const html = render({ rows: grouped });
+    expect(html.match(/data-testid="series-heading"/g) ?? []).toHaveLength(2);
+    expect(html).toMatch(/role="presentation"[^>]*>Size<\/p>/);
+    // Each heading names a group holding its rows, so a screen reader announces it.
+    expect(html.match(/role="group" aria-label="Size"[^>]*>.*?<\/p>(.*?)role="group" aria-label="Industry"/)?.[1]).toMatch(/Alpha.*Beta/);
+    expect(html).toMatch(/role="group" aria-label="Industry"[^>]*>.*Gamma/);
+    expect(html.indexOf(">Size<")).toBeLessThan(html.indexOf("Alpha"));
+    expect(html.indexOf("Beta")).toBeLessThan(html.indexOf(">Industry<"));
+    expect(html.indexOf(">Industry<")).toBeLessThan(html.indexOf("Gamma"));
+    const searched = render({ rows: grouped, pinTotal: true, query: "gam", onQueryChange: () => {} });
+    expect(searched).not.toContain(">Size<");
+    expect(searched).toContain(">Industry<");
+    // Nested lists print headings on their top-level rows too.
+    expect(render({ rows: grouped, nesting: { selectedLabel: "Sub", expansionLabel: label => label } }).match(/data-testid="series-heading"/g) ?? []).toHaveLength(2);
+  });
+
+  it("renders a list without headings as before", () => {
+    expect(render({})).not.toContain("series-heading");
+  });
 });

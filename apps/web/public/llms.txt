@@ -1,6 +1,6 @@
 # Fiscal.ge
 
-> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, GDP, national economic sectors, regional economies, money and banks, unemployment, wages, poverty and inequality, trade in goods and services, external flows, energy and food, and population, and to Geostat's monthly consumer-price inflation.
+> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, GDP, national economic sectors, regional economies, business, money and banks, unemployment, wages, poverty and inequality, trade in goods and services, external flows, energy and food, and population, and to Geostat's monthly consumer-price inflation.
 
 **When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
 
@@ -21,6 +21,12 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Economy overview](https://fiscal.ge/explorer/economy/gdp) — real GDP, annual real growth, nominal GDP and nominal GDP per person.
 - [Economic sectors](https://fiscal.ge/explorer/economy/sectors) — 20 national economic activities plus a Total GDP reference.
 - [Regional economies](https://fiscal.ge/explorer/economy/regions) — choose one of 11 regions and explore total regional GDP plus 20 activities, 2010–2024.
+- [Business](https://fiscal.ge/explorer/business) — the business section: Geostat's annual business statistics on firms' sales, jobs, investment, profit and loss, and firms opened and closed, 1999–2025. Browse-only: there is no MCP tool and no bulk file for business.
+- [Sales](https://fiscal.ge/explorer/business/sales) — firms' turnover in million GEL, 1999–2025, in total, by firm size (large, medium, small) and by Geostat's 14 industry groups.
+- [Jobs](https://fiscal.ge/explorer/business/jobs) — persons employed in the firms Geostat surveys, 1999–2025, in total, by firm size and by industry; not the household survey's employment.
+- [Investment and profit](https://fiscal.ge/explorer/business/investment-profit) — firms' investment in fixed assets, the profit of profit-making firms and the loss of loss-making firms, 2006–2025, each by firm size and industry; no net figure is calculated.
+- [Firms opened and closed](https://fiscal.ge/explorer/business/firms) — active, new and closed firms by NACE section, 2014–2024, and Geostat's published birth and death rates.
+- [Business by region](https://fiscal.ge/explorer/business/regions) — firms' sales and jobs by region on a map, with a page for Georgia and each of the 11 regions (regions from 2006; a firm's figures are counted in the region of its head office, so Tbilisi's figures can be overstated; the 11 regions do not add up to Georgia).
 - [Inflation](https://fiscal.ge/explorer/inflation) — the inflation section.
 - [Inflation overview](https://fiscal.ge/explorer/inflation/overview) — monthly national CPI inflation, core inflation, the price index and the National Bank of Georgia's target, as Geostat and the NBG publish them. The [inflation CSV](https://fiscal.ge/downloads/data/inflation-cpi-national.csv) carries every value; percentages are percentages (2.4 means 2.4%).
 - [Inflation categories](https://fiscal.ge/explorer/inflation/categories) — the national CPI by its 12 COICOP divisions and 43 subgroups, the annual consumer-basket weights, and each group's contribution to annual inflation as derived by Fiscal.ge.
@@ -80,6 +86,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [GDP methodology](https://fiscal.ge/methodology/gdp) — price bases, series coverage, preliminary status and original sources.
 - [Economic sectors methodology](https://fiscal.ge/methodology/economic-sectors) — sector GVA versus GDP, GDP shares, annual real growth and preliminary status.
 - [Regional economies methodology](https://fiscal.ge/methodology/regional-economies) — regional GVA at basic prices, regional GDP at market prices, calculations and original sources.
+- [Business methodology](https://fiscal.ge/methodology/business) — Geostat's survey of enterprises and business demography: turnover, persons employed, investment, profit and loss, firm sizes, the 2006 coverage change, regions and original files.
 - [Inflation methodology](https://fiscal.ge/methodology/inflation) — Geostat CPI definitions, validation, the NBG target and original files.
 - [Money and banks methodology](https://fiscal.ge/methodology/money) — National Bank of Georgia money, loan, deposit, interest-rate and bank-health definitions and original files.
 - [Unemployment methodology](https://fiscal.ge/methodology/unemployment) — Labour Force Survey definitions, age-band and regional changes, and original files.
