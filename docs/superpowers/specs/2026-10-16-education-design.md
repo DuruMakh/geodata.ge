@@ -114,7 +114,7 @@ One series list, in persons, under two headings, **Admitted** (ჩარიც�
 - All (the Admitted total is selected), Women, Men, 2013–2025.
 - The 9 fields of study in Geostat's current list: Agriculture, forestry, fisheries and veterinary; Art and humanities; Business, administration and law; Education; Engineering, manufacturing and construction; Health and social welfare; ICT; Services; Social sciences, journalism and information. Each starts in the year Geostat first publishes it: 2019 for most, 2016 for Education and 2020 for Social sciences, journalism and information.
 
-Geostat changed its list of fields in 2019 and phased the old one out over 2019–2022 (the last old-field graduates are in 2022). Following Duru's Health ruling, the 9 old fields (Agricultural sciences, Business administration, Engineering, Natural sciences, Inter-directional specialties, Law, Social sciences, Art, Health) stay in the data file and are not shown on the page or in Excel. The zeros Geostat prints for a field in years before or after its list was in use are not served as zeros. The methodology page explains that in 2019–2022 some students were still counted under the old fields, so the current fields add up to less than the total in those years.
+Geostat changed its list of fields in 2019 and phased the old one out over 2019–2022 (the last old-field graduates are in 2022). Following Duru's Health ruling, the 9 old fields (Agricultural sciences, Business administration, Engineering, Natural sciences, Inter-directional specialties, Law, Social sciences, Art, Health) stay in the data file and are not shown on the page or in Excel. The zeros Geostat prints for a field in years before or after its list was in use are not served as zeros. The methodology page explains that some students were still counted under the old fields, so the current fields add up to less than the total for admissions up to 2020 and for graduates up to 2022 (before 2019, Education is the only current field).
 
 Age groups are archived, not shown.
 
@@ -131,7 +131,7 @@ The hub at `/explorer/education` reuses the hub cards:
 
 ### Sources
 
-The files come from Geostat's Education pages (categories 58, 59, 60 and 61), downloaded from the cloud workspace on 2026-10-16. Copies are in `/mnt/project-files/education-sources/`. All tables credit the Ministry of Education, Science and Youth of Georgia.
+The files come from Geostat's Education pages (categories 58, 59, 60 and 61), downloaded from the cloud workspace on 2026-10-16. Copies are in `/mnt/project-files/education-sources/`. The school and vocational tables credit the Ministry of Education, Science and Youth of Georgia; the kindergarten and higher-education workbooks name no source.
 
 | Geostat file | Used for | Years |
 | --- | --- | --- |
