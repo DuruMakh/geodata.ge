@@ -225,6 +225,11 @@ test("Universities: one row selected, search keeps the count, and graduates' mis
   expect(name).toBe("fiscal-education-universities-2010-11-2025-26-en.xlsx");
   expect(workbook.worksheets).toHaveLength(3);
   expect(sheetText(workbook.worksheets[0])).toContain("2024/25");
+  // The Sources sheet links to the fiscal.ge archive copies of the Geostat workbooks.
+  const links: string[] = [];
+  workbook.worksheets[2].eachRow(row => row.eachCell(cell => { const value = cell.value as { hyperlink?: string } | null; if (value && typeof value === "object" && value.hyperlink) links.push(value.hyperlink); }));
+  expect(links.length).toBeGreaterThan(0);
+  for (const link of links) expect(link).toContain("/downloads/methodology/education/files/");
 });
 
 test("Vocational colleges: 24 rows, no old field, calendar years", async ({ page }) => {
@@ -250,6 +255,23 @@ test("a place page's Excel download is a workbook in school years", async ({ pag
   expect(name).toBe("fiscal-education-schools-guria-2005-06-2025-26.xlsx");
   expect(workbook.worksheets).toHaveLength(3);
   expect(sheetText(workbook.worksheets[0])).toContain("2025/26");
+  // The Sources sheet links to the fiscal.ge archive copies of the Geostat workbooks.
+  const links: string[] = [];
+  workbook.worksheets[2].eachRow(row => row.eachCell(cell => { const value = cell.value as { hyperlink?: string } | null; if (value && typeof value === "object" && value.hyperlink) links.push(value.hyperlink); }));
+  expect(links.length).toBeGreaterThan(0);
+  for (const link of links) expect(link).toContain("/downloads/methodology/education/files/");
+});
+
+for (const prefix of ["", "/en"]) test(`the methodology link opens the education methodology with its original files ${prefix || "ka"}`, async ({ page }) => {
+  await page.goto(`${prefix}/explorer/education/universities`);
+  await ready(page);
+  await page.getByTestId("source-label").getByRole("link").click();
+  await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/education$`));
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Education" : "განათლება");
+  const archived = page.locator('a[href^="/downloads/methodology/education/files/"]');
+  expect(await archived.count()).toBeGreaterThan(0);
+  const response = await page.request.get(await archived.first().getAttribute("href") as string);
+  expect(response.status()).toBe(200);
 });
 
 for (const prefix of ["", "/en"]) test(`education pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {

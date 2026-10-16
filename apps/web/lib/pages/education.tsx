@@ -5,7 +5,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedEducationData, shownEducationFacts, toClientEducationFact } from "../data/education/importEducation";
-import { EDUCATION_GEORGIA } from "../data/education/types";
+import { EDUCATION_GEORGIA, EDUCATION_SOURCES } from "../data/education/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import {
   EDUCATION_HUB_PATH, EDUCATION_SECTIONS, educationCountLabel, educationCoverage, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage, educationTopicSeries, schoolYearLabel,
@@ -54,9 +54,9 @@ export async function educationTopicMetadata(locale: Locale, section: EducationT
 
 /** Universities or Vocational colleges: the latest line, then the chart workspace over Georgia's series. */
 export async function renderEducationTopicPage(locale: Locale, section: EducationTopicId) {
-  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/education.csv) behind the exported values.
+  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/education.csv) the values are read from.
   const [{ facts: served }, presentation, sources] = await Promise.all([
-    loadServedEducationData(), getPresentation(locale, ["education", "format", "main", "workbook"], []), loadSourcedWorkbookSources("education", locale),
+    loadServedEducationData(), getPresentation(locale, ["education", "format", "main", "workbook"], []), loadSourcedWorkbookSources("education", locale, row => EDUCATION_SOURCES.includes(row.source_id)),
   ]);
   const { messages } = presentation;
   const t = (key: string) => message(messages, `education.${key}`);

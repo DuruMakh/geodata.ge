@@ -306,7 +306,8 @@ test("a Guria Schools pupils workbook is whole persons and cites table 11 alone"
 
 test("the pages' workbooks cite the archived Geostat originals in the reader's language", async () => {
   // What lib/pages/education.tsx and education-places.tsx hand to the explorers.
-  const [en, ka] = await Promise.all([loadSourcedWorkbookSources("education", "en"), loadSourcedWorkbookSources("education", "ka")]);
+  const served = (row: { source_id: string }) => EDUCATION_SOURCES.includes(row.source_id);
+  const [en, ka] = await Promise.all([loadSourcedWorkbookSources("education", "en", served), loadSourcedWorkbookSources("education", "ka", served)]);
   const build = (sources: typeof en, input: { section: "universities" } | { set: "schools"; placeId: string; scope: string }, selectedIds: string[], start: number, end: number) => presentation().then(p =>
     buildEducationWorkbookExportModel({ ...input, facts, sources, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), headingLabels: HEADINGS, title: "Title", state: { mode: "table", range: { kind: "manual", start, end }, selectedIds } } as Parameters<typeof buildEducationWorkbookExportModel>[0], p));
   const universities = await build(en, { section: "universities" }, ["education.he_students.total", "education.he_graduates.total"], 2010, 2025);
@@ -322,8 +323,8 @@ test("the pages' workbooks cite the archived Geostat originals in the reader's l
   ]]);
   const guriaKa = await build(ka, { set: "schools", placeId: "region.guria", scope: "guria" }, ["education.pupils.total"], 2005, 2025);
   expect(guriaKa.sources.map(s => [s.title, s.organization])).toEqual([["სკოლების, მოსწავლეებისა და მასწავლებლების რაოდენობა მუნიციპალიტეტების მიხედვით (ცხრილი 11)", "საქსტატი"]]);
-  // Every served source has its archived copy.
-  expect(EDUCATION_SOURCES.every(id => en.some(source => source.sourceId === id))).toBe(true);
+  // The pages load exactly the six served workbooks, each from its archived copy.
+  expect(en.map(source => source.sourceId).sort()).toEqual([...EDUCATION_SOURCES].sort());
 });
 
 test("a Georgia pupils workbook is in thousands to one decimal, with every cell Geostat's published value and no drift", async () => {

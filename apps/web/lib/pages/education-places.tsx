@@ -10,7 +10,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedEducationData, shownEducationFacts, toClientEducationFact } from "../data/education/importEducation";
-import { EDUCATION_GEORGIA, educationIndicator, type ClientEducationFact } from "../data/education/types";
+import { EDUCATION_GEORGIA, EDUCATION_SOURCES, educationIndicator, type ClientEducationFact } from "../data/education/types";
 import { loadServedMunicipalData } from "../data/servedData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
@@ -181,8 +181,8 @@ export async function educationPlaceMetadata(route: EducationPlaceRoute, locale:
 
 /** A place's page: the heading with the picker and its latest line, the chart workspace and, on a region's page, its municipalities. */
 export async function renderEducationPlacePage(route: EducationPlaceRoute, locale: Locale, set: EducationPlaceSet) {
-  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/education.csv) behind the exported values.
-  const [{ facts, municipal, presentation, places, lastReviewedAt }, sources] = await Promise.all([loadEducationPlaceBasics(locale), loadSourcedWorkbookSources("education", locale)]);
+  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/education.csv) the values are read from.
+  const [{ facts, municipal, presentation, places, lastReviewedAt }, sources] = await Promise.all([loadEducationPlaceBasics(locale), loadSourcedWorkbookSources("education", locale, row => EDUCATION_SOURCES.includes(row.source_id))]);
   const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const { messages } = presentation;

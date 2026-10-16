@@ -30,7 +30,7 @@ Students, admitted students and graduates come from the Public-and-Private block
 
 ## Vocational colleges
 
-Admitted students and graduates come from the vocational table by calendar year, total, women, men and fields. Geostat replaced its list of fields in 2019 and phased the old list out by 2022 (last admissions 2020). The nine current fields are shown; the nine old fields are kept in the canonical CSV with `shown=false` and never reach a page, the client or Excel. Within 2019–2022 the shown fields therefore add up to less than the total. A field's zeros outside its active span (first to last year with a non-zero total) produce no row.
+Admitted students and graduates come from the vocational table by calendar year, total, women, men and fields. Geostat replaced its list of fields in 2019 and phased the old list out by 2022 (last admissions 2020). The nine current fields are shown; the nine old fields are kept in the canonical CSV with `shown=false` and never reach a page, the client or Excel. Before 2019 Education (from 2016) is the only current field with figures. Until the old fields end, the shown fields therefore add up to less than the total: for admissions up to 2020, for graduates up to 2022; from 2021 for admissions and 2023 for graduates they add up to it (shortfall of admissions 5,696 in 2019 and 119 in 2020, of graduates 10,434, 2,079, 421 and 546 in 2019–2022, per `validation-report.json`). A field's zeros outside its active span (first to last year with a non-zero total) produce no row.
 
 ## Places
 
