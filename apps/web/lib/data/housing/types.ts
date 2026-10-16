@@ -85,3 +85,6 @@ export type HousingAcceptance = {
 export function housingFactKey(fact: Pick<HousingFact, "indicatorId" | "year">): string {
   return `${fact.indicatorId}:${fact.year}`;
 }
+export function housingSourceDocumentId(sourceId: string): string {
+  return `source.${sourceId}`;
+}

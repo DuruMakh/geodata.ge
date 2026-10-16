@@ -1,13 +1,17 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { BUSINESS_REGIONS } from "../../../lib/data/business/types";
+import { assertHousingParity, loadHousingFacts, toClientHousingFact } from "../../../lib/data/housing/importHousing";
+import { housingMirrorCreateRows, loadHousingFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { HOUSING_CSV_HEADERS, REVIEWED_AT, prepareHousingData } from "../../../lib/data/housing/prepareHousing";
 import {
   HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_MEASURES, HOUSING_PUBLIC_SOURCES, HOUSING_REGIONS, HOUSING_SOURCES, HOUSING_TYPES,
-  type HousingFact, type HousingIndicator,
+  housingSourceDocumentId, type HousingFact, type HousingIndicator,
 } from "../../../lib/data/housing/types";
 import { expectedHousingKeys, housingDisplayDecimals, validateHousingFacts } from "../../../lib/data/housing/validation";
 
@@ -109,4 +113,74 @@ test.each([
   validateHousingFacts(facts);
   mutate(facts);
   expect(() => validateHousingFacts(facts)).toThrow(error);
+});
+
+test("loading serves the same 3,222 values as the canonical file, keeping the trailing space of the 2012 sheet name", async () => {
+  const facts = await loadHousingFacts();
+  expect(facts).toHaveLength(3222);
+  expect(facts).toEqual(await loadFacts());
+  expect(find(facts, "housing.completed_count.type_residential", 2012).sourceSheet).toBe("2012 ");
+});
+
+test("loading refuses a canonical file whose fingerprint differs from the report", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "housing-"));
+  try {
+    await fs.mkdir(path.join(dir, "apps/web"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/imports"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/reports"), { recursive: true });
+    const csv = await fs.readFile(path.join(root, "data/imports/housing-annual.csv"), "utf8");
+    const altered = csv.replace("2025,housing.permits_count.total,11578,11578", "2025,housing.permits_count.total,11579,11579");
+    expect(altered).not.toBe(csv);
+    await fs.writeFile(path.join(dir, "data/imports/housing-annual.csv"), altered);
+    await fs.copyFile(path.join(root, "data/reports/housing-validation.json"), path.join(dir, "data/reports/housing-validation.json"));
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.join(dir, "apps/web"));
+    try {
+      await expect(loadHousingFacts()).rejects.toThrow(/fingerprint/);
+    } finally {
+      cwd.mockRestore();
+    }
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadFacts();
+  const at = facts.findIndex(f => f.indicatorId === "housing.completed_count.total" && f.year === 2025);
+  expect(facts[at].value).toBe("3393");
+  expect(() => assertHousingParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const padded = facts.map(f => ({ ...f }));
+  padded[at].value = "3393.0";
+  expect(() => assertHousingParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[at].value = "3394";
+  changed[at].publishedValue = "3394";
+  expect(() => assertHousingParity(facts, changed)).toThrow();
+  expect(() => assertHousingParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry numeric values with their unit family and display precision", async () => {
+  const facts = await loadFacts();
+  expect(toClientHousingFact(find(facts, "housing.permits_area.total", 2025))).toMatchObject({ year: 2025, indicatorId: "housing.permits_area.total", value: 11397190, unit: "area", decimals: 0 });
+  expect(toClientHousingFact(find(facts, "housing.price_index.total", 2025))).toMatchObject({ value: 159.4, unit: "index", decimals: 1 });
+  expect(toClientHousingFact(find(facts, "housing.permits_count.total", 2025))).toMatchObject({ value: 11578, unit: "count", decimals: 0 });
+  expect(toClientHousingFact(find(facts, "housing.price_flat.district_vake", 2025))).toMatchObject({ unit: "price", decimals: 0 });
+});
+
+test("the database mirror round-trips exact decimals, the 2012 sheet name and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = housingMirrorCreateRows(facts, "housing-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ housingFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "housingFact">;
+  const mirror = await loadHousingFactsFromMirror(db(rows));
+  expect(() => assertHousingParity(facts, mirror)).not.toThrow();
+  expect(mirror).toEqual(facts);
+  expect(rows[0].importRunId).toBe("housing-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadHousingFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(HOUSING_PUBLIC_SOURCES.filter(id => !ids.has(housingSourceDocumentId(id)))).toEqual([]);
 });
