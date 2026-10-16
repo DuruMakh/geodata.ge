@@ -7,6 +7,7 @@ import { LatestFigure, LatestValueLine } from "../../components/explorer-shell/l
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedEducationData, shownEducationFacts, toClientEducationFact } from "../data/education/importEducation";
 import { EDUCATION_GEORGIA, educationIndicator, type ClientEducationFact } from "../data/education/types";
@@ -14,8 +15,9 @@ import { loadServedMunicipalData } from "../data/servedData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
-import { EDUCATION_HUB_PATH, educationCountLabel, educationPeriodLabel, educationSeriesLabel } from "../explorer/education";
-import { buildEducationIndexModel, educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection, educationPlaceSeries, type EducationPlaceSet } from "../explorer/educationPlaces";
+import { EDUCATION_HUB_PATH, educationCountLabel, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage } from "../explorer/education";
+import { buildEducationIndexModel } from "../explorer/educationIndex";
+import { educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection, educationPlaceSeries, type EducationPlaceSet } from "../explorer/educationPlaces";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { Message } from "../i18n/message";
@@ -26,6 +28,7 @@ import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
 /** The same three kinds of place page as Population, with the same 11 region ids and 63 municipality slugs. */
@@ -80,6 +83,11 @@ function placeCoverage(set: EducationPlaceSet, placeId: string, facts: readonly 
   return { first: period(min), last: period(max) };
 }
 
+/** The names of the headings (measures) a place's list shows, for its Dataset node. */
+function headingNames(messages: Messages, set: EducationPlaceSet, placeId: string): string[] {
+  return [...new Set(educationPlaceSeries(set, placeId).map(({ heading }) => message(messages, `education.heading.${heading}`)))];
+}
+
 export async function educationIndexMetadata(locale: Locale, set: EducationPlaceSet) {
   const messages = await getMessages(locale, ["education"]);
   return fiscalMetadata({ locale, path: educationPlaceBase(set), title: message(messages, `education.page.${set}.metaTitle`), description: message(messages, `education.page.${set}.summary`) });
@@ -108,8 +116,14 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
     { label: t("title"), href: pageHref(EDUCATION_HUB_PATH, locale) },
     { label: title },
   ];
+  const years = educationPlaceCoverage(set, EDUCATION_GEORGIA, facts);
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      {/* The index is the set's dataset; each place page is a slice of it. */}
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+        locale, origin: resolveSiteUrl(), path: base, datasetId: "education", name: title, description: t(`page.${set}.summary`),
+        ...educationTemporalCoverage(set, years.min, years.max), dateModified: lastReviewedAt, variableMeasured: headingNames(messages, set, EDUCATION_GEORGIA),
+      })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
         { name: crumbs[2].label, path: pageHref(EDUCATION_HUB_PATH, locale) },
@@ -207,8 +221,16 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
         label: placeLabel(places.find(candidate => candidate.id === row.id)!, locale), value: formatInUnit(row.valueGel, UNIT_PERSONS),
       }))
     : [];
+  const years = educationPlaceCoverage(set, place.id, facts);
+  const pageValues = { section: sectionTitle, place: name };
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+        locale, origin: resolveSiteUrl(), path: placePageHref(base, place.id), datasetId: "education",
+        name: t("place.metaTitle", pageValues), description: t("place.metaDescription", pageValues),
+        ...educationTemporalCoverage(set, years.min, years.max), dateModified: lastReviewedAt, variableMeasured: headingNames(messages, set, place.id),
+        spatialCoverageName: name, withinGeorgia: place.id !== GEORGIA_PLACE_ID, partOf: { path: base, name: sectionTitle, description: t(`page.${set}.summary`) },
+      })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
         { name: crumbs[2].label, path: pageHref(EDUCATION_HUB_PATH, locale) },

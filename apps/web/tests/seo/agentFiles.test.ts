@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { catalogueData } from "../../lib/factQuery/publications";
+import { schoolYearLabel } from "../../lib/explorer/education";
 
 const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
 // Pages are checked both ways against the sitemap in routes.test.ts ("links only to public sitemap pages",
@@ -57,6 +58,24 @@ function moneyFirstYears() {
     money("bank-health", /^banks\.(capital|tier1)_ratio$/, from("the two capital ratios")),
   ];
 }
+/** The Education lines: school years read `2025/26` (stored as 2025), vocational calendar years plain; never the old vocational fields. */
+function educationCoverage() {
+  const shown = (pattern: RegExp) => (row: CsvRow) => row.shown === "true" && pattern.test(row.indicator_id);
+  const schoolYears = (first: number, last: number) => `${schoolYearLabel(first)}–${schoolYearLabel(last)}`;
+  const education = (url: string, pattern: RegExp, text: (first: number, last: number) => string = schoolYears) =>
+    ({ url: `/explorer/education${url}`, file: "education-annual.csv", rows: shown(pattern), text });
+  return [
+    education("", /^education\.(schools|pupils_national|pupils|teachers)\./, (first, last) => `schools (${schoolYears(first, last)})`),
+    education("", /^education\.(kindergartens|kg_children|kg_staff)\./, (first, last) => `kindergartens (${schoolYears(first, last)})`),
+    education("", /^education\.he_/, (first, last) => `universities (${schoolYears(first, last)})`),
+    education("", /^education\.vet_/, (first, last) => `vocational colleges (${first}–${last})`),
+    education("/schools", /^education\.(schools|pupils_national)\./, (first) => `Georgia from ${schoolYearLabel(first)}`),
+    education("/kindergartens", /^education\.(kindergartens|kg_children|kg_staff)\./),
+    education("/universities", /^education\.he_(students|admitted)\./),
+    education("/universities", /^education\.he_graduates\./),
+    education("/vocational", /^education\.vet_/, (first, last) => `${first}–${last}`),
+  ];
+}
 /**
  * Coverage years llms.txt states in prose, each checked against the reviewed CSV it describes: the line that
  * links `url` must contain the first and last year of the matching rows (Task 19 review follow-up, D283).
@@ -81,6 +100,7 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/health/illnesses", file: "health-annual.csv", rows: (row) => row.indicator_id.startsWith("health.illness.") },
   { url: "/explorer/health/illnesses", file: "health-annual.csv", rows: (row) => /^health\.illness\.(diabetes|anaemia)$/.test(row.indicator_id), text: (first) => `diabetes and anaemia from ${first}` },
   { url: "/explorer/health/causes-of-death", file: "health-annual.csv", rows: (row) => /^health\.death/.test(row.indicator_id) },
+  ...educationCoverage(),
   { url: "/explorer/trade/overview", file: "trade-overview-annual.csv" },
   { url: "/explorer/trade/partners", file: "trade-partners-annual.csv" },
   { url: "/explorer/trade/products", file: "trade-products-annual.csv", rows: (row) => row.source_block === "2020-2025" },

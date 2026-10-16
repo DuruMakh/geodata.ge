@@ -31,6 +31,14 @@ export function educationPeriodLabel(section: EducationSectionId): (year: number
 }
 
 /**
+ * A Dataset node's years (`temporalCoverage`): a school year stored as its start year runs into the next calendar year,
+ * so 2005/06–2025/26 covers 2005–2026; vocational calendar years are their own.
+ */
+export function educationTemporalCoverage(section: EducationSectionId, first: number, last: number): { firstYear: number; lastYear: number } {
+  return { firstYear: first, lastYear: section === "vocational" ? last : last + 1 };
+}
+
+/**
  * A count as the pages print it: whole persons or institutions, and Georgia's pupils, which Geostat publishes in thousands to
  * one decimal (the client holds them as whole persons), as `644.2 thousand` with the page's word for thousand.
  */

@@ -16,6 +16,7 @@ test("the header, footer and 404 list every sidebar hub, in sidebar order", () =
     "/explorer/wages",
     "/explorer/living-standards",
     "/explorer/health",
+    "/explorer/education",
     "/explorer/trade",
     "/explorer/external",
     "/explorer/energy-food",

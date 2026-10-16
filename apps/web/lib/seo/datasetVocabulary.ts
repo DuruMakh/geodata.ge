@@ -38,7 +38,9 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  */
 export type TopicDatasetId =
   | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
-  | "inflation-products";
+  | "inflation-products"
+  // Named here until its methodology page joins `MethodologyDatasetId`.
+  | "education";
 
 /** An official statistics producer whose published figures a dataset is read from. */
 export type SourceAgencyId = "geostat" | "nbg";
@@ -371,6 +373,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     measurementTechnique: {
       ka: "გადამოწმებული ამოღება საქსტატის ჯანდაცვისა და გარდაცვალების ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
       en: "Reviewed extraction from Geostat's official published healthcare and deaths statistics.",
+    },
+    sources: ["geostat"],
+  },
+  education: {
+    keywords: {
+      ka: ["განათლება", "სკოლები", "მოსწავლეები", "საბავშვო ბაღები", "უნივერსიტეტები", "პროფესიული კოლეჯები", "საქართველო"],
+      en: ["Georgia", "education", "schools", "pupils", "kindergartens", "universities", "vocational colleges"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის განათლების ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
+      en: "Reviewed extraction from Geostat's official published education statistics.",
     },
     sources: ["geostat"],
   },

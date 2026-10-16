@@ -10,9 +10,10 @@ import {
   educationPeriodLabel, educationSeriesColor, educationTopicSeries, parseEducationHash, schoolYearLabel, serializeEducationHash,
 } from "../../lib/explorer/education";
 import {
-  buildEducationIndexModel, buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection,
+  buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection,
   educationPlaceLinkHash, educationPlaceMovedSelection, educationPlaceSeries, parseEducationPlaceHash,
 } from "../../lib/explorer/educationPlaces";
+import { buildEducationIndexModel } from "../../lib/explorer/educationIndex";
 
 import { buildEducationHubCards } from "../../lib/explorer/educationHubCards";
 import { buildEducationWorkbookExportModel } from "../../lib/explorer/educationWorkbook";
