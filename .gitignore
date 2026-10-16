@@ -42,6 +42,7 @@ data/reports/*.json
 !data/reports/health-validation.json
 !data/reports/money-banks-validation.json
 !data/reports/business-validation.json
+!data/reports/housing-validation.json
 !data/reports/household-income-spending-validation.json
 data/reports/*.txt
 
