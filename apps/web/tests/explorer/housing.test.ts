@@ -1,6 +1,7 @@
+import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadHousingFacts, toClientHousingFact } from "../../lib/data/housing/importHousing";
-import { HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_REGIONS, HOUSING_TYPES, type ClientHousingFact } from "../../lib/data/housing/types";
+import { HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_REGIONS, HOUSING_SOURCES, HOUSING_TYPES, type ClientHousingFact } from "../../lib/data/housing/types";
 import { INK, OTHER_COLOR } from "../../lib/explorer/colors";
 import {
   HOUSING_HUB_PATH, HOUSING_SECTIONS, buildHousingModel, changeHousingSelection, housingCoverage, housingDefaultSelection, housingSeriesColor, housingTopicSeries,
@@ -10,7 +11,12 @@ import {
   HOUSING_AREAS, buildHousingAreaModel, buildHousingRegionMapModel, housingAreaDefaultSelection, housingAreaHref, housingAreaOfMapId, housingAreaSelectionHash, housingAreaSeries,
   housingAreaSlug, housingMapId, housingRegionHref, parseHousingAreaHash,
 } from "../../lib/explorer/housingAreas";
+import { buildHousingHubCards } from "../../lib/explorer/housingHubCards";
+import { buildHousingWorkbookExportModel } from "../../lib/explorer/housingWorkbook";
 import { serializeTopicHash } from "../../lib/explorer/topicSeries";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Locale, Presentation } from "../../lib/i18n/types";
 
 let facts: ClientHousingFact[];
 beforeAll(async () => { facts = (await loadHousingFacts()).map(toClientHousingFact); });
@@ -239,4 +245,85 @@ test("a district's house row is dashed and every other row solid", () => {
   expect(strokes("prices").filter(s => s.stroke === "solid")).toHaveLength(13);
   for (const section of ["permits", "completed"] as const) expect(strokes(section).every(s => s.stroke === "solid")).toBe(true);
   expect(buildHousingAreaModel("georgia", facts, state([])).series.every(s => s.stroke === "solid")).toBe(true);
+});
+
+const presentation = async (locale: Locale = "en"): Promise<Presentation> => ({ locale, englishLabels: {}, messages: await getMessages(locale, ["workbook", "format", "common", "housing"]) });
+const SOURCES = HOUSING_SOURCES.map(sourceId => ({
+  sourceId, years: Array.from({ length: 20 }, (_, i) => 2006 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-16",
+  downloadHref: `/downloads/methodology/housing/files/${sourceId}.xlsx` as const,
+}));
+// The page hands over a label for every series it lists; a district has the same one under flats and houses.
+const labelsFor = (ids: readonly string[]) => Object.fromEntries(ids.map(id => [id, id.includes("district_") ? id.split("district_")[1].replace(/^./, c => c.toUpperCase()) : id]));
+const topicWorkbook = async (section: HousingTopicId, selectedIds: string[], start: number, end: number, locale: Locale = "en") =>
+  buildHousingWorkbookExportModel({
+    section, facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), title: "Title",
+    state: { mode: "table", range: { kind: "manual", start, end }, selectedIds },
+  }, await presentation(locale));
+
+test("a permits floor-area workbook exports square metres, leaves a year Geostat left blank empty and cites only the sources behind it", async () => {
+  const ids = ["housing.permits_area.total", "housing.permits_area.type_preschool"];
+  const model = await topicWorkbook("permits", ids, 2006, 2025);
+  expect(model.filename).toBe("fiscal-housing-permits-2006-2025-en.xlsx");
+  expect(model.readable.unitLabel).toBe("m²");
+  expect(model.readable.numberFormat).toBe("#,##0");
+  expect(model.readable.years).toHaveLength(20);
+  expect(model.readable.rows.map(row => [row.label, row.kind])).toEqual([[ids[0], "total"], [ids[1], "item"]]);
+  expect(model.readable.rows[0].valuesByYear[2025]).toBe(11397190);
+  expect(model.readable.rows[1].valuesByYear[2008]).toBeNull();
+  expect(model.readable.rows[1].basisByYear[2008]).toBeNull();
+  expect(model.readable.rows[1].valuesByYear[2009]).toBe(83);
+  expect(model.analysis.rows).toHaveLength(40);
+  expect(model.analysis.rows.find(r => r[0] === 2025 && r[1] === ids[0])).toEqual([2025, ids[0], 11397190, "Official"]);
+  expect(model.analysis.rows.find(r => r[0] === 2008 && r[1] === ids[1])!.slice(2)).toEqual([null, "Not available"]);
+  expect(model.analysis.numericFormats).toEqual({ 3: "#,##0" });
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_housing_permits_regions", "geostat_housing_permits_types"]);
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+  expect(excel.worksheets).toHaveLength(3);
+  expect(excel.worksheets[1].getCell(2, 3).numFmt).toBe("#,##0");
+});
+
+test("a prices workbook keeps district prices to whole GEL, tells a district's flat row from its house row, and cites the Tbilisi prices file alone", async () => {
+  const ids = ["housing.price_flat.district_vake", "housing.price_house.district_vake"];
+  const model = await topicWorkbook("prices", ids, 2021, 2025);
+  expect(model.filename).toBe("fiscal-housing-prices-2021-2025-en.xlsx");
+  expect(model.readable.unitLabel).toBe("GEL per m²");
+  expect(model.readable.numberFormat).toBe("#,##0");
+  const [flats, houses] = model.readable.rows.map(row => row.label);
+  expect(flats).toBe("Vake — Tbilisi new flats");
+  expect(houses).toBe("Vake — Tbilisi new houses");
+  expect(flats).not.toBe(houses);
+  expect(new Set(model.analysis.rows.map(row => row[1]))).toEqual(new Set([flats, houses]));
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_housing_tbilisi_prices"]);
+  const ka = await topicWorkbook("prices", ids, 2021, 2025, "ka");
+  expect(ka.readable.rows.map(row => row.label)).toEqual(["Vake — თბილისი, ახალი ბინები", "Vake — თბილისი, ახალი კერძო სახლები"]);
+  const index = await topicWorkbook("prices", ["housing.price_index.total"], 2020, 2025);
+  expect(index.readable.unitLabel).toBe("index, 2020 = 100");
+  expect(index.readable.numberFormat).toBe("0.0");
+  expect(index.readable.rows[0].label).toBe("housing.price_index.total");
+  expect(index.sources.map(s => s.title)).toEqual(["geostat_housing_price_index"]);
+});
+
+test("an area workbook is named for its slug, and an empty selection exports nothing", async () => {
+  const ids = ["housing.permits_count.region_guria", "housing.completed_count.region_guria"];
+  const model = await buildHousingWorkbookExportModel({
+    area: "region_guria", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), title: "Title",
+    state: { mode: "table", range: { kind: "manual", start: 2010, end: 2025 }, selectedIds: ids },
+  }, await presentation());
+  expect(model.filename).toBe("fiscal-housing-guria-2010-2025-en.xlsx");
+  expect(model.readable.unitLabel).toBe("number");
+  expect(model.readable.rows[0].valuesByYear[2025]).toBe(facts.find(f => f.indicatorId === ids[0] && f.year === 2025)!.value);
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_housing_permits_regions", "geostat_housing_completed_regions"]);
+  const empty = await topicWorkbook("permits", [], 2020, 2025);
+  expect(empty.readable.rows).toEqual([]); expect(empty.analysis.rows).toEqual([]); expect(empty.sources).toEqual([]);
+});
+
+test("the hub has four cards: three headline series with their latest values and years, then Regions with its years only", async () => {
+  const cards = buildHousingHubCards(facts, await presentation());
+  expect(cards.map(card => card.href)).toEqual(HOUSING_SECTIONS.map(section => section.href));
+  expect(cards.map(card => card.title)).toEqual(["Building permits", "Completed buildings", "Home prices", "Regions"]);
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 11,578 · 2006–2025", "2025 · 3,393 · 2006–2025", "2025 · 159.4 · 2020–2025", "2006–2025"]);
+  expect(cards.map(card => card.series?.length ?? null)).toEqual([20, 20, 6, null]);
+  expect(cards[0].series!.at(-1)).toBe(11578);
+  expect(cards[3]).toMatchObject({ series: null, seriesColor: null, comingSoon: false });
+  expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04"]);
 });
