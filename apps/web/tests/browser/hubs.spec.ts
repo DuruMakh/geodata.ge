@@ -81,6 +81,23 @@ test("the energy and food hub shows one card per page, each linking to it", asyn
   for (const [index, section] of ENERGY_FOOD_SECTIONS.entries()) await expect(cards.nth(index)).toHaveAttribute("href", `/explorer/energy-food/${section}`);
 });
 
+test("the health hub shows one card per page, each linking to it, and the sidebar lists Health after Living standards", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${prefix}/explorer/health`);
+    const cards = page.getByTestId("health-hub").locator("a");
+    await expect(cards).toHaveCount(3);
+    expect(await cards.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(["doctors-hospitals", "illnesses", "causes-of-death"].map(section => `${prefix}/explorer/health/${section}`));
+    for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+    const entry = page.getByTestId("health-link");
+    await expect(entry).toHaveAttribute("aria-current", "page");
+    expect(await page.getByTestId("living-standards-link").evaluate((living, health) => Boolean(living.compareDocumentPosition(health!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    for (const id of ["doctors-hospitals", "illnesses", "causes-of-death"]) await expect(page.getByTestId(`health-${id}-link`)).toBeVisible();
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Health and social protection");
+  await expect(page.getByTestId("health-hub").locator("a").first()).toContainText("2025 · 22,491 · 2002–2025");
+});
+
 // One hub test for the five external pages (moved from the 18 page-spec defaults runs): count, hrefs and a click to each.
 for (const prefix of ["", "/en"]) {
   test(`the external hub links Money from abroad, Foreign investment, Current account, Foreign debt and Reserves ${prefix || "ka"}`, async ({ page }) => {

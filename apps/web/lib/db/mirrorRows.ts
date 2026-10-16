@@ -37,6 +37,8 @@ import type { RegionalEconomyObservation } from "../data/regionalEconomies/types
 import { wagesSourceDocumentId, type WagesFact } from "../data/wages/types";
 import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types";
 import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyFood/types";
+import { healthSourceDocumentId, type HealthFact } from "../data/health/types";
+import { healthDisplayDecimals } from "../data/health/validation";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
 import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
@@ -721,6 +723,26 @@ export async function loadEnergyFoodFactsFromMirror(db: Pick<MirrorClient, "ener
     return {
       year: row.year, indicatorId: row.indicatorId as EnergyFoodFact["indicatorId"], value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
       unit: row.unit as EnergyFoodFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as EnergyFoodFact["valueStatus"],
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function healthMirrorCreateRows(facts: readonly HealthFact[], importRunId: string): Prisma.HealthFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: healthSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadHealthFactsFromMirror(db: Pick<MirrorClient, "healthFact">): Promise<HealthFact[]> {
+  const rows = await db.healthFact.findMany({ orderBy: [{ indicatorId: "asc" }, { areaId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== healthSourceDocumentId(row.sourceId)) throw new Error("Health source relation mismatch");
+    const unit = row.unit as HealthFact["unit"];
+    return {
+      year: row.year, indicatorId: row.indicatorId as HealthFact["indicatorId"], areaId: row.areaId as HealthFact["areaId"], value: row.value.toFixed(),
+      publishedValue: row.publishedValue.toFixed(healthDisplayDecimals(row.sourceNumberFormat, row.value.toFixed(), unit)),
+      unit, basis: row.basis as "actual", valueStatus: row.valueStatus as "published",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, sourceNumberFormat: row.sourceNumberFormat, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });

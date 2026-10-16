@@ -102,9 +102,11 @@ describe("indexable Fiscal.ge routes", () => {
     // Money and banks adds its hub, four pages and methodology page: 6 bilingual pairs.
     // Services trade adds one further bilingual pair.
     // Trade composition adds one further bilingual pair.
+    // Health adds its hub, three pages and a causes-of-death page for Georgia and each of the 11 regions: 16 bilingual pairs.
+    // The Health methodology adds one more bilingual pair.
     // Foreign debt and Reserves add two further bilingual pairs.
-    // Business adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
-    expect(urls).toHaveLength(624);
+    // Business adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs; Health its hub, three pages, 12 area pages and its methodology page: 17 more.
+    expect(urls).toHaveLength(658);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -139,6 +141,11 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
     }
+    for (const page of ["", "/doctors-hospitals", "/illnesses", "/causes-of-death", "/causes-of-death/regions/georgia", "/causes-of-death/regions/guria", "/causes-of-death/regions/racha_lechkhumi_kvemo_svaneti"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/health${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
+    }
+    expect(urls.filter((url) => url.includes("/explorer/health/causes-of-death/regions/"))).toHaveLength(24);
     for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);
@@ -183,6 +190,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/wages",
       "/methodology/poverty",
       "/methodology/household-income",
+      "/methodology/health",
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",

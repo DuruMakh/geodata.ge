@@ -26,6 +26,8 @@ import { WAGES_REGIONS } from "../data/wages/types";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdRegionHref } from "../explorer/household";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
+import { HEALTH_DEATH_AREAS, healthDeathsAreaHref } from "../explorer/healthDeaths";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { EXTERNAL_POSITION_SECTIONS } from "../explorer/externalPosition";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
@@ -44,6 +46,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
     LIVING_STANDARDS_HUB_PATH, ...LIVING_STANDARDS_SECTIONS.map(section => section.href),
     ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => householdRegionHref(section.id, id))),
+    HEALTH_HUB_PATH, ...HEALTH_SECTIONS.map(section => section.href), ...HEALTH_DEATH_AREAS.map(healthDeathsAreaHref),
     ENERGY_FOOD_HUB_PATH, ...ENERGY_FOOD_SECTIONS.map(section => section.href),
     "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
     BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),

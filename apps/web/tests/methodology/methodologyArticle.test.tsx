@@ -125,6 +125,7 @@ describe("methodology footer attribution", () => {
     ["demography", "Geostat"],
     ["household-income", "Geostat"],
     ["business", "Geostat"],
+    ["health", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
@@ -147,6 +148,24 @@ describe("household income and spending methodology", () => {
     expect(markup).toContain("/downloads/methodology/household-income/files/104-income-per-household.xlsx");
     expect(markup).toContain("/downloads/methodology/household-income/files/income-page-2026-10-11.html.txt");
     expect(markup).not.toContain("/official/ka/");
+  });
+});
+
+describe("health methodology", () => {
+  it.each([
+    ["ka", "ჯანდაცვა და სიკვდილის მიზეზები", "24 შემთხვევა დაკავშირებულია COVID-19-თან"],
+    ["en", "Healthcare and causes of death", "In 2021, 24 cases of maternal deaths are related to COVID-19"],
+  ] as const)("renders the %s article with its 36 archived originals, Geostat's notes and Dataset markup", async (locale, title, maternalNote) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "health" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2002–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    expect(markup).toContain(maternalNote);
+    expect(markup).toContain("/downloads/methodology/health/files/number-of-physicians-by-occupations.xlsx");
+    expect(markup).toContain("/downloads/methodology/health/files/23-2-deaths-by-chapters-regions.xlsx");
+    expect(markup).toContain("/downloads/methodology/health/files/deaths-page.html.txt");
+    expect(markup).not.toContain("geostat.ge/media");
   });
 });
 

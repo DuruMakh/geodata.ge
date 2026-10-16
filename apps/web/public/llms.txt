@@ -51,6 +51,10 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Household spending](https://fiscal.ge/explorer/living-standards/spending) — average monthly household spending in Georgia by category, with towns, villages and regions compared, and one page per region.
 - [Poverty](https://fiscal.ge/explorer/living-standards/poverty) — the share of people below the absolute poverty line (Georgia, towns, villages, age groups, women and men) and below 60% and 40% of median consumption, 2004–2025, and below the World Bank's international lines as republished by Geostat, 2004–2024.
 - [Inequality](https://fiscal.ge/explorer/living-standards/inequality) — six Gini coefficients of income and expenditure, 2006–2025.
+- [Health and social protection](https://fiscal.ge/explorer/health) — the health section: Geostat's annual healthcare statistics, 2002–2025, and registered deaths by cause for Georgia and its 11 regions, 2014–2025. Browse-only: there is no MCP tool and no bulk file for health.
+- [Doctors and hospitals](https://fiscal.ge/explorer/health/doctors-hospitals) — doctors by speciality and nursing staff, hospitals and out-patient clinics, hospital beds and out-patient visits for Georgia, 2002–2025; staff counting changed in 2012 and 2020, and four nursing groups stop in 2011.
+- [Illnesses](https://fiscal.ge/explorer/health/illnesses) — new cases diagnosed each year by ICD-10 disease group, in thousands, and six single diseases (tuberculosis, HIV, diabetes, anaemia, syphilis and gonorrhoea), 2002–2025; diabetes and anaemia from 2016. Fiscal.ge adds no total of all new cases.
+- [Causes of death](https://fiscal.ge/explorer/health/causes-of-death) — the crude death rate per 1,000 people of the 11 regions on a map, and one page each for Georgia and the regions with registered deaths by 20 groups of causes, COVID-19 included from 2020, 2014–2025.
 - [Trade](https://fiscal.ge/explorer/trade) — the trade section: Geostat's annual trade in goods and in services, in nominal USD. Browse-only: there is no MCP tool and no bulk file for trade.
 - [Trade overview](https://fiscal.ge/explorer/trade/overview) — total trade, exports, imports and the trade balance, 1995–2025.
 - [Trading partners](https://fiscal.ge/explorer/trade/partners) — 212 countries and five published country groups (EU, CIS, BSEC, OECD, GUAM), 1995–2025, with end-year rankings; groups overlap and are never added up.
@@ -93,6 +97,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Wages methodology](https://fiscal.ge/methodology/wages) — average and median earnings, gross nominal lari, NACE Rev.2 sections and original files.
 - [Household income and spending methodology](https://fiscal.ge/methodology/household-income) — Geostat's household survey, per-household and per-person averages, income sources, spending categories and original files.
 - [Poverty methodology](https://fiscal.ge/methodology/poverty) — absolute, relative and international poverty lines, the Gini coefficients and original files.
+- [Health methodology](https://fiscal.ge/methodology/health) — Geostat's healthcare and causes-of-death tables, the 2012 and 2020 staff counting changes, new cases, ICD-10 chapters, the death rate and original files.
 - [Trade methodology](https://fiscal.ge/methodology/trade) — FOB exports, CIF imports, partner and product identities, re-exports and original files.
 - [External flows methodology](https://fiscal.ge/methodology/external-flows) — money transfers, BPM6 balance of payments, Geostat FDI and original files.
 - [Energy and food methodology](https://fiscal.ge/methodology/energy-food) — Geostat's energy balance and food balance sheets, units and original files.

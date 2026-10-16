@@ -87,6 +87,7 @@ model SourceDocument {
   wagesFacts WagesFact[]
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
+  healthFacts HealthFact[]
   moneyBanksFacts MoneyBanksFact[]
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
@@ -138,6 +139,7 @@ model ImportRun {
   wagesFacts WagesFact[]
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
+  healthFacts HealthFact[]
   moneyBanksFacts MoneyBanksFact[]
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
@@ -922,6 +924,31 @@ model EnergyFoodFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/health-annual.csv: Geostat's annual health staff, facilities,
+// illness and causes-of-death figures for Georgia and its regions, exact stored decimals
+// with their published rounding. The counting-change register stays in the CSV.
+model HealthFact {
+  year               Int
+  indicatorId        String
+  areaId             String
+  value              Decimal        @db.Decimal(30, 20)
+  publishedValue     Decimal        @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, areaId, year])
 }
 
 // Mirror of data/imports/money-banks-annual.csv: NBG's yearly money, loan, deposit,
