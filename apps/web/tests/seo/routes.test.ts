@@ -106,7 +106,8 @@ describe("indexable Fiscal.ge routes", () => {
     // The Health methodology adds one more bilingual pair.
     // Foreign debt and Reserves add two further bilingual pairs.
     // Business adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs; Health its hub, three pages, 12 area pages and its methodology page: 17 more.
-    expect(urls).toHaveLength(658);
+    // Crime and justice adds its hub and five pages: 6 bilingual pairs.
+    expect(urls).toHaveLength(670);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -146,6 +147,10 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
     }
     expect(urls.filter((url) => url.includes("/explorer/health/causes-of-death/regions/"))).toHaveLength(24);
+    for (const page of ["", "/recorded", "/convictions", "/prisons", "/victims", "/road-accidents"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/crime${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/crime${page}`);
+    }
     for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);

@@ -3,6 +3,7 @@ import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { WAGES_SECTIONS } from "../explorer/wages";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
+import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
@@ -118,6 +119,14 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(HEALTH_SECTIONS, "health"),
   },
   {
+    href: CRIME_HUB_PATH,
+    labelKey: "common.crime",
+    railLabelKey: "common.dataCrime",
+    testId: "crime-link",
+    spaced: true,
+    sections: sectionRows(CRIME_SECTIONS, "crime"),
+  },
+  {
     href: "/explorer/trade",
     labelKey: "common.trade",
     railLabelKey: "common.dataTrade",
@@ -211,6 +220,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/wages": "common.geostatSourceNote",
   [LIVING_STANDARDS_HUB_PATH]: "common.geostatSourceNote",
   [HEALTH_HUB_PATH]: "common.geostatSourceNote",
+  [CRIME_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/trade": "common.geostatSourceNote",
   "/explorer/external": "common.nbgSourceNote",
   [ENERGY_FOOD_HUB_PATH]: "common.geostatSourceNote",
