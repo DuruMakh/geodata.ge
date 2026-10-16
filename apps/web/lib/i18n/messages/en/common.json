@@ -107,12 +107,18 @@
   "common.businessInvestmentProfit": "Investment and profit",
   "common.businessFirms": "Firms opened and closed",
   "common.businessRegions": "Regions",
+  "common.education": "Education",
+  "common.educationSchools": "Schools",
+  "common.educationKindergartens": "Kindergartens",
+  "common.educationUniversities": "Universities",
+  "common.educationVocational": "Vocational colleges",
   "common.dataWages": "Data · Wages",
   "common.dataLivingStandards": "Data · Living standards",
   "common.dataHealth": "Data · Health and social protection",
   "common.dataEnergyFood": "Data · Energy and food",
   "common.dataMoneyBanks": "Data · Money and banks",
   "common.dataBusiness": "Data · Business",
+  "common.dataEducation": "Data · Education",
   "common.dataLoading": "Loading the data…",
   "common.dataLoadError": "The data could not be loaded. Reload the page to try again."
 }

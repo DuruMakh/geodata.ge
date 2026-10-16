@@ -107,12 +107,18 @@
   "common.businessInvestmentProfit": "ინვესტიციები და მოგება",
   "common.businessFirms": "გახსნილი და დახურული საწარმოები",
   "common.businessRegions": "რეგიონები",
+  "common.education": "განათლება",
+  "common.educationSchools": "სკოლები",
+  "common.educationKindergartens": "საბავშვო ბაღები",
+  "common.educationUniversities": "უნივერსიტეტები",
+  "common.educationVocational": "პროფესიული კოლეჯები",
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე",
   "common.dataHealth": "მონაცემები · ჯანდაცვა და სოციალური დაცვა",
   "common.dataEnergyFood": "მონაცემები · ენერგეტიკა და სურსათი",
   "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები",
   "common.dataBusiness": "მონაცემები · ბიზნესი",
+  "common.dataEducation": "მონაცემები · განათლება",
   "common.dataLoading": "მონაცემები იტვირთება…",
   "common.dataLoadError": "მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან."
 }
