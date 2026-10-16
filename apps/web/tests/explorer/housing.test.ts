@@ -74,11 +74,11 @@ test("the lists have the expected rows under their headings, in order", () => {
   for (const section of TOPICS) for (const s of housingTopicSeries(section)) expect(HOUSING_INDICATORS).toContain(s.id);
 });
 
-test("an area lists its homes and all buildings, completed and permitted, as counts then floor area", () => {
+test("an area lists all buildings and homes under four headings: permits and completed by number, then by floor area", () => {
   for (const area of HOUSING_AREAS) {
     const series = housingAreaSeries(area);
     expect(series).toHaveLength(8);
-    expect(series.map(s => s.heading)).toEqual([...Array(4).fill("count"), ...Array(4).fill("area")]);
+    expect(series.map(s => s.heading)).toEqual(["permitsCount", "completedCount", "permitsArea", "completedArea"].flatMap(heading => [heading, heading]));
     for (const s of series) expect(HOUSING_INDICATORS).toContain(s.id);
   }
   expect(housingAreaSeries("region_guria").map(s => s.id)).toEqual([
@@ -236,7 +236,9 @@ test("no two rows of one list share a colour, wherever a type appears", () => {
   }
   for (const area of HOUSING_AREAS) {
     const own = buildHousingAreaModel(area, facts, state([])).series;
-    for (const heading of ["count", "area"]) expect(new Set(own.filter(s => s.heading === heading).map(s => s.color)).size).toBe(4);
+    for (const unit of ["count", "area"]) expect(new Set(own.filter(s => s.unit === unit).map(s => s.color)).size).toBe(4);
+    // The number and the floor area of the same objects share a colour.
+    expect(own.slice(0, 4).map(s => s.color)).toEqual(own.slice(4).map(s => s.color));
   }
 });
 
@@ -304,14 +306,18 @@ test("a prices workbook keeps district prices to whole GEL, tells a district's f
   expect(index.sources.map(s => s.title)).toEqual(["geostat_housing_price_index"]);
 });
 
-test("an area workbook is named for its slug, and an empty selection exports nothing", async () => {
+test("an area workbook is named for its slug, tells permits from completed buildings, and an empty selection exports nothing", async () => {
   const ids = ["housing.permits_count.region_guria", "housing.completed_count.region_guria"];
-  const model = await buildHousingWorkbookExportModel({
-    area: "region_guria", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: labelsFor(ids), title: "Title",
+  // The page names both rows "All buildings"; their headings tell them apart.
+  const areaWorkbook = async (locale: Locale = "en") => buildHousingWorkbookExportModel({
+    area: "region_guria", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: Object.fromEntries(ids.map(id => [id, "All buildings"])), title: "Title",
     state: { mode: "table", range: { kind: "manual", start: 2010, end: 2025 }, selectedIds: ids },
-  }, await presentation());
+  }, await presentation(locale));
+  const model = await areaWorkbook();
   expect(model.filename).toBe("fiscal-housing-guria-2010-2025-en.xlsx");
   expect(model.readable.unitLabel).toBe("number");
+  expect(model.readable.rows.map(row => row.label)).toEqual(["All buildings — Building permits", "All buildings — Completed buildings"]);
+  expect((await areaWorkbook("ka")).readable.rows.map(row => row.label)).toEqual(["All buildings — მშენებლობის ნებართვები", "All buildings — ექსპლუატაციაში მიღებული ობიექტები"]);
   expect(model.readable.rows[0].valuesByYear[2025]).toBe(facts.find(f => f.indicatorId === ids[0] && f.year === 2025)!.value);
   expect(model.sources.map(s => s.title)).toEqual(["geostat_housing_permits_regions", "geostat_housing_completed_regions"]);
   const empty = await topicWorkbook("permits", [], 2020, 2025);

@@ -114,7 +114,9 @@ test("the Guria page: picker, neighbours carrying the selection, the language sw
   await expect(heading).toContainText("საცხოვრებელი და მშენებლობა —");
   await expect(heading.getByTestId("region-picker-trigger")).toHaveText("გურია");
   await expect(page.getByTestId("housing-latest")).toHaveText("მშენებლობის ნებართვები · 2025: 150 · ფართობი 92.6 ათასი მ² · გურია");
-  await expect(page.getByTestId("series-heading")).toHaveText(["რაოდენობა", "ფართობი · ათასი მ²"]);
+  // Four headings name what the rows count and the unit; each lists all buildings and residential buildings by their plain names.
+  await expect(page.getByTestId("series-heading")).toHaveText(["მშენებლობის ნებართვები · რაოდენობა", "ექსპლუატაციაში მიღებული ობიექტები · რაოდენობა", "მშენებლობის ნებართვები · ფართობი, ათასი მ²", "ექსპლუატაციაში მიღებული ობიექტები · ფართობი, ათასი მ²"]);
+  for (const group of await page.getByTestId("series-heading-group").all()) await expect(group.getByTestId("series-label")).toHaveText(["ყველა შენობა", "საცხოვრებელი შენობები"]);
   await expect(ticked(page)).toHaveCount(1);
   await expect(page.getByTestId("year-range-strip")).toContainText("2006–2025");
   // The picker lists Georgia first and returns to the index.
@@ -142,6 +144,8 @@ test("the Guria page: picker, neighbours carrying the selection, the language sw
   await expect(page).toHaveURL(/\/en\/explorer\/housing\/regions\/guria#view=line&sel=housing\.permits_count\.region_guria%2Chousing\.completed_count\.region_guria_residential/);
   await ready(page);
   await expect(page.getByTestId("region-picker-trigger")).toHaveText("Guria");
+  await expect(page.getByTestId("series-heading")).toHaveText(["Building permits · number", "Completed buildings · number", "Building permits · floor area, thousand m²", "Completed buildings · floor area, thousand m²"]);
+  await expect(page.getByTestId("series-heading-group").first().getByTestId("series-label")).toHaveText(["All buildings", "Residential buildings"]);
   await expect(ticked(page)).toHaveCount(2);
   await page.getByTestId("housing-region-navigation").getByRole("link", { name: "Imereti →" }).click();
   await expect(page).toHaveURL(/\/en\/explorer\/housing\/regions\/imereti#sel=housing\.permits_count\.region_imereti%2Chousing\.completed_count\.region_imereti_residential$/);

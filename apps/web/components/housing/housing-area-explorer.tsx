@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useCallback, useId, useRef, useState } from "react";
 import type { ClientHousingFact } from "../../lib/data/housing/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { housingCount, housingFloorArea, housingUnitLabel, housingValueLabel, housingValueUnit, serializeHousingHash, type HousingTranslate } from "../../lib/explorer/housing";
+import { housingCount, housingFloorArea, housingSeriesLabel, housingUnitLabel, housingValueLabel, housingValueUnit, serializeHousingHash, type HousingSeriesModel, type HousingTranslate } from "../../lib/explorer/housing";
 import { HOUSING_REGIONS_HREF, buildHousingAreaModel, changeHousingAreaSelection, housingAreaCoverage, housingAreaOfMapId, housingAreaSelectionHash, housingAreaSeries, housingMapId, housingRegionHref, parseHousingAreaHash, type HousingArea } from "../../lib/explorer/housingAreas";
 import { buildHousingWorkbookExportModel } from "../../lib/explorer/housingWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
@@ -54,15 +54,17 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
   const unit = housingValueUnit(model.unit);
   const unitLabel = housingUnitLabel(model.unit, t);
   const valueLabel = (value: number | null | undefined) => housingValueLabel(value, model.unit, t);
-  const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
-  const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
+  // All buildings and residential buildings are listed under permits and under completed; outside the list a row carries its heading (as in the workbook).
+  const fullLabel = (series: HousingSeriesModel) => housingSeriesLabel(series, labels, t);
+  const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: fullLabel(series), color: series.color, valuesByYear: series.valuesByYear }));
+  const lineSeries = model.selected.map(series => ({ id: series.id, label: fullLabel(series), color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   // The table's total is the permits row of the selection's unit.
   const reference = model.series.find(series => series.reference && series.unit === model.unit);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   // The latest-value line is the page's headline: its own area's permits and their floor area, whatever is chosen below.
-  const permitsOf = (heading: "count" | "area") => housingAreaSeries(area).find(series => series.reference && series.heading === heading)!.id;
-  const latest = facts.filter(f => f.indicatorId === permitsOf("count")).sort((a, b) => a.year - b.year).at(-1)!;
-  const latestArea = facts.find(f => f.indicatorId === permitsOf("area") && f.year === latest.year);
+  const permitsOf = (heading: "permitsCount" | "permitsArea") => housingAreaSeries(area).find(series => series.reference && series.heading === heading)!.id;
+  const latest = facts.filter(f => f.indicatorId === permitsOf("permitsCount")).sort((a, b) => a.year - b.year).at(-1)!;
+  const latestArea = facts.find(f => f.indicatorId === permitsOf("permitsArea") && f.year === latest.year);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The chart is named after the heading of the selection's unit (its text before the unit).
@@ -105,7 +107,7 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
           <Link href={pageHref("/methodology/housing", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      {/* Numbers and floor area each sit under a heading that names their unit, so the caption gives the year only. */}
+      {/* Permits and completed buildings, by number and by floor area, each sit under a heading that names its unit, so the caption gives the year only. */}
       <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={model.range.end}
         rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(series.endValue, housingValueUnit(series.unit)), heading: t(`heading.${series.heading}`) }))}
         totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeHousingAreaSelection(area, s, selectedIds, facts), true)} searchable={false}

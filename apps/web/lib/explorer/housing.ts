@@ -17,10 +17,11 @@ export type HousingSectionId = typeof HOUSING_SECTIONS[number]["id"];
 export type HousingTopicId = Exclude<HousingSectionId, "regions">;
 
 /**
- * The heading a row sits under: a number or floor-area group on Permits, Completed and the area pages, or the price
- * index, flat prices and house prices on Prices. Rows under one heading share one unit.
+ * The heading a row sits under: a number or floor-area group on Permits and Completed, permits or completed buildings by
+ * number or floor area on the area pages, or the price index, flat prices and house prices on Prices. Rows under one
+ * heading share one unit.
  */
-export type HousingHeading = "count" | "area" | "index" | "flats" | "houses";
+export type HousingHeading = "count" | "area" | "permitsCount" | "completedCount" | "permitsArea" | "completedArea" | "index" | "flats" | "houses";
 export type HousingSeriesDefinition = { id: HousingIndicator; reference: boolean; heading: HousingHeading };
 
 /** A page's group of rows: its total (the ink reference), then Geostat's building types in `HOUSING_TYPES` order. */
@@ -158,12 +159,15 @@ export function housingFloorArea(value: number, t: HousingTranslate): string {
     : `${formatInUnit(value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandSquareMetres")}`;
 }
 
+/** Headings whose rows repeat one another's names in one unit: a Tbilisi district under flats and houses, an area page's all buildings and residential buildings under permits and completed. */
+const NAMED_BY_HEADING: ReadonlySet<HousingHeading> = new Set(["flats", "houses", "permitsCount", "completedCount", "permitsArea", "completedArea"]);
+
 /**
- * A series' name outside the list (chart, table, workbook): a Tbilisi district is listed under flats and under houses with
- * one name, so it carries its heading's text before the unit; every other series keeps its own name.
+ * A series' name outside the list (chart, table, workbook): a row whose name repeats under another heading of its unit
+ * carries its heading's text before the unit; every other series keeps its own name.
  */
 export function housingSeriesLabel(series: Pick<HousingSeriesDefinition, "id" | "heading">, labels: Readonly<Record<string, string>>, t: HousingTranslate): string {
-  return series.heading === "flats" || series.heading === "houses" ? `${labels[series.id]} — ${t(`heading.${series.heading}`).split(" · ")[0]}` : labels[series.id];
+  return NAMED_BY_HEADING.has(series.heading) ? `${labels[series.id]} — ${t(`heading.${series.heading}`).split(" · ")[0]}` : labels[series.id];
 }
 
 /** A whole number of permits or buildings. */

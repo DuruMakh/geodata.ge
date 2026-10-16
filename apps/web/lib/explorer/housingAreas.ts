@@ -1,5 +1,5 @@
-import { HOUSING_REGIONS, housingIndicator, type ClientHousingFact, type HousingGroup } from "../data/housing/types";
-import { HOUSING_SECTIONS, buildHousingSeriesModel, changeHousingSelection, housingListCoverage, parseHousingListHash, type HousingModel, type HousingSeriesDefinition } from "./housing";
+import { HOUSING_REGIONS, housingIndicator, type ClientHousingFact, type HousingGroup, type HousingMeasure } from "../data/housing/types";
+import { HOUSING_SECTIONS, buildHousingSeriesModel, changeHousingSelection, housingListCoverage, parseHousingListHash, type HousingHeading, type HousingModel, type HousingSeriesDefinition } from "./housing";
 import { INK } from "./colors";
 import { topicSeriesColor, type TopicState } from "./topicSeries";
 
@@ -22,17 +22,23 @@ export const housingRegionHref = (id: string): `/${string}` => housingAreaHref(h
 const allBuildings = (area: HousingArea): HousingGroup => area === "georgia" ? "total" : area;
 const homes = (area: HousingArea): HousingGroup => area === "georgia" ? "type_residential" : `${area}_residential`;
 
-/** An area's list: permits and completed objects (all buildings, then homes) as numbers, then the same four as floor area. Permits are the ink reference of each group. */
+/** An area's four headings, in list order: permits and completed objects as numbers, then the same two as floor area. */
+const AREA_HEADINGS = [
+  { heading: "permitsCount", measure: "permits_count" },
+  { heading: "completedCount", measure: "completed_count" },
+  { heading: "permitsArea", measure: "permits_area" },
+  { heading: "completedArea", measure: "completed_area" },
+] as const satisfies readonly { heading: HousingHeading; measure: HousingMeasure }[];
+
+/** An area's list: all buildings, then homes, under each of its four headings. All permitted buildings are the ink reference of each unit. */
 export function housingAreaSeries(area: HousingArea): HousingSeriesDefinition[] {
-  return (["count", "area"] as const).flatMap(heading => [
-    { id: housingIndicator(`permits_${heading}`, allBuildings(area)), reference: true, heading },
-    { id: housingIndicator(`permits_${heading}`, homes(area)), reference: false, heading },
-    { id: housingIndicator(`completed_${heading}`, allBuildings(area)), reference: false, heading },
-    { id: housingIndicator(`completed_${heading}`, homes(area)), reference: false, heading },
+  return AREA_HEADINGS.flatMap(({ heading, measure }) => [
+    { id: housingIndicator(measure, allBuildings(area)), reference: measure.startsWith("permits_"), heading },
+    { id: housingIndicator(measure, homes(area)), reference: false, heading },
   ]);
 }
 
-/** A row wears the colour of its place in its group, so the number and the floor area of the same objects share one. */
+/** A row wears the colour of its place among its unit's four rows, so the number and the floor area of the same objects share one. */
 const housingAreaColor = (series: HousingSeriesDefinition, index: number) => series.reference ? INK : topicSeriesColor(series, index % 4, `housing.area.${index % 4}`);
 
 export const housingAreaDefaultSelection = (area: HousingArea): string[] => [housingAreaSeries(area)[0].id];

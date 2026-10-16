@@ -9,7 +9,7 @@ import { HOUSING_SOURCES, type HousingFact } from "../data/housing/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HOUSING_HUB_PATH } from "../explorer/housing";
-import { HOUSING_AREAS, HOUSING_REGIONS_HREF, housingAreaHref, housingAreaSlug, housingMapId, type HousingArea } from "../explorer/housingAreas";
+import { HOUSING_AREAS, HOUSING_REGIONS_HREF, housingAreaHref, housingAreaSeries, housingAreaSlug, housingMapId, type HousingArea } from "../explorer/housingAreas";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -38,8 +38,6 @@ export async function loadHousingWorkbookSources(locale: Locale): Promise<Source
 /** Georgia and the eleven regions, in the picker's and previous/next order; Georgia's English name is the catalogue's `georgia` label. */
 export const AREA_PAGES: readonly MunicipalRegion[] = HOUSING_AREAS.map(area => area === "georgia" ? { id: area, kaLabel: "საქართველო", sortOrder: 0 } : REGIONAL_ECONOMY_REGIONS.find(region => region.id === housingMapId(area))!);
 const AREA_LABEL_IDS = AREA_PAGES.map(area => area.id);
-/** An area list's row names, in `housingAreaSeries` order: permits and completed, all buildings then homes, under each heading. */
-export const AREA_SERIES_KEYS = ["permits", "permitsHomes", "completed", "completedHomes"] as const;
 
 export const housingAreaStaticParams = () => HOUSING_AREAS.map(area => ({ id: housingAreaSlug(area) }));
 export function areaForSlug(slug: string): HousingArea {
@@ -80,8 +78,8 @@ export async function renderHousingRegionsFrame(locale: Locale, area: HousingAre
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const hubTitle = t("title");
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(HOUSING_HUB_PATH, locale) }, ...(area ? [{ label: regionsTitle, href: pageHref(HOUSING_REGIONS_HREF, locale) }] : []), { label: area ? regionName : title }];
-  // The measures the page shows, by name: an area's four rows, or the index map's permitted floor area.
-  const measures = area ? AREA_SERIES_KEYS.map(key => t(`series.area.${key}`)) : [t("mapLabel")];
+  // The measures the page shows, by name: an area's four headings, or the index map's permitted floor area.
+  const measures = area ? [...new Set(housingAreaSeries(area).map(series => t(`heading.${series.heading}`)))] : [t("mapLabel")];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "housing", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
