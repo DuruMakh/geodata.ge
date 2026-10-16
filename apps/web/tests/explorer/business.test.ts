@@ -9,7 +9,7 @@ import {
 } from "../../lib/explorer/business";
 import {
   BUSINESS_AREAS, buildBusinessAreaModel, businessAreaCoverage, businessAreaDefaultSelection, businessAreaHref, businessAreaSelectionHash, businessAreaSeries,
-  businessMapHash, businessRegionHref, parseBusinessAreaHash, parseBusinessMapMeasure, serializeBusinessMapMeasure,
+  businessListLatest, businessMapHash, businessRegionHref, parseBusinessAreaHash, parseBusinessMapMeasure, serializeBusinessMapMeasure,
 } from "../../lib/explorer/businessAreas";
 import { buildBusinessRegionMapModel } from "../../lib/explorer/businessRegionMap";
 import { buildBusinessHubCards } from "../../lib/explorer/businessHubCards";
@@ -284,6 +284,14 @@ test("area pages start with sales selected, and their years follow the selection
   expect(firms.unit).toBe("enterprises");
   expect([firms.years[0], firms.years.at(-1)]).toEqual([2014, 2024]);
   expect(buildBusinessAreaModel("georgia", facts, parseBusinessAreaHash("#sel=", "georgia", facts)).unit).toBe("gel");
+});
+
+test("an area list row shows its latest figure up to the chart's last year, so unticked firm counts are never blank", () => {
+  expect(businessListLatest(facts, "business.births.region_guria", 2025)?.year).toBe(2024);
+  expect(businessListLatest(facts, "business.births.region_guria", 2025)?.value).toBeGreaterThan(0);
+  expect(businessListLatest(facts, "business.turnover.region_guria", 2025)?.year).toBe(2025);
+  expect(businessListLatest(facts, "business.turnover.region_guria", 2020)?.year).toBe(2020);
+  expect(businessListLatest(facts, "business.births.region_guria", 2010)).toBeUndefined();
 });
 
 test("the area hash round-trips, ignores the old measure key, keeps one unit and fits the years to it", () => {

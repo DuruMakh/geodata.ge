@@ -5,11 +5,11 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { businessHeadingLabel, changeBusinessSelection, serializeBusinessHash, type BusinessUnit } from "../../lib/explorer/business";
-import { BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaOfMapId, businessAreaSelectionHash, businessAreaSeries, businessMapId, businessRegionHref, parseBusinessAreaHash, type BusinessArea } from "../../lib/explorer/businessAreas";
+import { BUSINESS_REGIONS_HREF, businessListLatest, buildBusinessAreaModel, businessAreaCoverage, businessAreaOfMapId, businessAreaSelectionHash, businessAreaSeries, businessMapId, businessRegionHref, parseBusinessAreaHash, type BusinessArea } from "../../lib/explorer/businessAreas";
 import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatAmount, formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
-import { rangeFromPatch } from "../../lib/explorer/periodRange";
+import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -62,6 +62,10 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   const reference = model.series.find(series => series.reference);
+  // The list reads at the chosen years' end over the whole page's years, so ticking a row of another unit (firm counts stop a
+  // year earlier) never changes the numbers it shows.
+  const listEnd = resolveRange(state.range, businessAreaCoverage(area, facts)).end;
+  const listLatest = Object.fromEntries(model.series.map(series => [series.id, businessListLatest(facts, series.id, listEnd)]));
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   // The latest-value line is the page's headline: its own area's sales, whatever is chosen below.
   const latest = facts.filter(f => f.indicatorId === `business.turnover.${area === "georgia" ? "total" : area}`).sort((a, b) => a.year - b.year).at(-1)!;
@@ -107,10 +111,15 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
           <Link href={pageHref("/methodology/business", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      {/* Money, jobs and firms each sit under a heading that names their unit, so the caption gives the year only. */}
-      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={model.range.end}
-        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(series.endValue, valueUnit(series.unit)),
-          heading: series.heading && businessHeadingLabel(series.heading, series.unit, t, unitLabels) }))}
+      {/* Money, jobs and firms each sit under a heading that names their unit, so the caption gives the year only; a group whose
+          latest figures are older than that year names their year in its heading. */}
+      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={listEnd}
+        rows={model.series.map(series => {
+          const groupYear = Math.max(...model.series.filter(other => other.heading === series.heading).map(other => listLatest[other.id]?.year ?? 0));
+          const heading = series.heading && businessHeadingLabel(series.heading, series.unit, t, unitLabels);
+          return { id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(listLatest[series.id]?.value, valueUnit(series.unit)),
+            heading: heading && groupYear && groupYear !== listEnd ? `${heading} · ${groupYear}` : heading };
+        })}
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeBusinessSelection(s, businessAreaSeries(area), selectedIds, facts), true)} searchable={false}
         downloadAction={<ExcelDownloadButton testId="business-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {
           const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
