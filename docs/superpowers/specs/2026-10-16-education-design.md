@@ -58,7 +58,7 @@ These rules apply to every Education page:
 
 **Index** (`/explorer/education/schools`), following the Population index:
 
-- Line under the heading: "2025/26: 644,243 pupils in 2,292 schools".
+- Line under the heading: "2025/26: 644.2 thousand pupils in 2,292 schools". Georgia's figures on every Schools page (index row, Georgia page, hub card) come from Geostat's national tables, so Georgia's pupils read in thousands everywhere; the municipal table's own Georgia row (644,243) is used only as a cross-check.
 - The shared `MunicipalitiesIndex` municipality map and list, shaded by pupils in the latest school year, with the occupied-territory overlays. Georgia is the list's first, unranked row. Every region and municipality on the map or in the list links to its own Schools page, and Tbilisi opens `region/tbilisi`.
 - There is no chart workspace on the index. The one source line names the source, the map's school year and the geoBoundaries credit, as on Population.
 
