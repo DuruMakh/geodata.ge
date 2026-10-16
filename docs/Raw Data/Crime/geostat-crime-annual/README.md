@@ -129,7 +129,7 @@ python3 -I -B prepare.py --check && python3 -I -B test_validation.py -v && node 
 ## Rules and notes
 
 - **Nothing is derived.** No shares, per-capita rates, sums of series or interpolation. `imputed_values` and `calculated_values` are 0. The per-100,000 rates of the design spec are computed later, in the TypeScript prepare step.
-- **Real zeros are values.** Several cells hold `0` (for example corrective labour in most years and women among juvenile inmates in 2001); they are published zeros, not placeholders.
+- **Real zeros are values.** Several cells hold `0` (for example corrective labour in 12 of the 25 years 2001-2025 and women among juvenile inmates in 2001); they are published zeros, not placeholders.
 - **Text numbers.** Twelve served cells are whole numbers printed as text with a space: ten recorded-crime cells for 2024 (`K3`, `K5`-`K7`, `K9`-`K12`, `K14`, `K15`) and two road cells for 2023 (`X3`, `X5`). `validation-report.json` lists them with the printed text.
 - **Sources and gaps.** Convictions come from the Supreme Court; prison figures are end-of-year counts, from the Ministry of Justice (2001-2007), the Ministry of Corrections (2008-2017) and the Ministry of Justice again (from 2018); victims come from the Ministry of Internal Affairs (2007-2011) and the Prosecutor's Office (from 2015), and Geostat prints no 2012-2014 columns. Geostat's May 2005 procedure change applies only to the unserved 2001-2011 recorded-crimes table.
 - **Recorded crimes** cover all investigative agencies of Georgia, from the Ministry of Internal Affairs.
