@@ -1,9 +1,14 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
-import { expect, test } from "vitest";
+import Decimal from "decimal.js";
+import { describe, expect, test } from "vitest";
 import type { BreakRow } from "../../../lib/data/demography/breaks";
-import { CRIME_INDICATORS, CRIME_PUBLIC_SOURCES, CRIME_RESEARCH_DIRECTORY, CRIME_SOURCES, CRIME_UNITS, crimeFactKey, type CrimeFact, type CrimeSeriesBreak } from "../../../lib/data/crime/types";
+import { assertCrimeParity, loadCrimeBreaks, loadCrimeFacts, loadServedCrimeData, toClientCrimeFact } from "../../../lib/data/crime/importCrime";
+import { crimeMirrorCreateRows, loadCrimeFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
+import { CRIME_INDICATORS, CRIME_PUBLIC_SOURCES, CRIME_RESEARCH_DIRECTORY, CRIME_SOURCES, CRIME_UNITS, crimeFactKey, crimeSourceDocumentId, type CrimeFact, type CrimeSeriesBreak } from "../../../lib/data/crime/types";
 import { CRIME_CSV_HEADERS, REVIEWED_AT, prepareCrimeData } from "../../../lib/data/crime/prepareCrime";
 import { expectedCrimeKeys, validateCrimeFacts } from "../../../lib/data/crime/validation";
 
@@ -96,4 +101,82 @@ test("a real zero is a value, and a gap is no row", () => {
   expect(facts.some(f => f.indicatorId === "crime.victims.total" && f.year >= 2012 && f.year <= 2014)).toBe(false);
   expect(facts.some(f => f.indicatorId === "crime.road.accidents_drunk" && f.year === 2002)).toBe(false);
   expect(() => validateCrimeFacts(facts, root)).not.toThrow();
+});
+
+describe("loading and parity", () => {
+  test("loadCrimeFacts serves the canonical rows and rejects a file that no longer matches its acceptance fingerprint", async () => {
+    await expect(loadCrimeFacts()).resolves.toHaveLength(1262);
+    const copy = fs.mkdtempSync(path.join(os.tmpdir(), "crime-"));
+    try {
+      for (const relative of ["data/imports/crime-annual.csv", "data/reports/crime-validation.json", path.join(CRIME_RESEARCH_DIRECTORY, "coverage.csv")]) {
+        fs.mkdirSync(path.dirname(path.join(copy, relative)), { recursive: true });
+        fs.copyFileSync(path.join(root, relative), path.join(copy, relative));
+      }
+      await expect(loadCrimeFacts(copy)).resolves.toHaveLength(1262);
+      fs.appendFileSync(path.join(copy, "data/imports/crime-annual.csv"), "\n");
+      await expect(loadCrimeFacts(copy)).rejects.toThrow(/fingerprint/);
+    } finally {
+      fs.rmSync(copy, { recursive: true, force: true });
+    }
+  });
+
+  test("the breaks load from the CSV only, as the package's two registers", async () => {
+    const breaks = await loadCrimeBreaks();
+    expect(breaks.map(b => b.breakId)).toEqual(["registration_2018", "drunk_driving_coverage_2025"]);
+    expect(breaks[0].appliesTo).toHaveLength(12);
+    expect(await loadServedCrimeData()).toMatchObject({ facts: expect.any(Array), breaks });
+  });
+
+  test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+    const facts = await loadCrimeFacts();
+    expect(() => assertCrimeParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+    // A stored value written as "22767.0" is the same figure as "22767".
+    const padded = facts.map(f => ({ ...f }));
+    const convicts = find(padded, "crime.convicted.total", 2025);
+    expect(convicts.value).toBe("22767");
+    convicts.value = "22767.0";
+    expect(() => assertCrimeParity(facts, padded)).not.toThrow();
+    expect(new Decimal("22767").eq("22767.0")).toBe(true);
+    const changed = facts.map(f => ({ ...f }));
+    plusOne(find(changed, "crime.prison.total", 2025));
+    expect(() => assertCrimeParity(facts, changed)).toThrow();
+    expect(() => assertCrimeParity(facts, facts.slice(1))).toThrow();
+  });
+
+  test("client facts carry the published whole count and nothing internal", async () => {
+    const facts = await loadCrimeFacts();
+    expect(toClientCrimeFact(find(facts, "crime.prison.total", 2025))).toEqual({
+      year: 2025, indicatorId: "crime.prison.total", sourceId: "geostat_crime_prison", unit: "persons", value: 11153,
+    });
+    expect(facts.every(f => toClientCrimeFact(f).value === Number(f.publishedValue))).toBe(true);
+    expect(Object.keys(toClientCrimeFact(facts[0])).sort()).toEqual(["indicatorId", "sourceId", "unit", "value", "year"]);
+  });
+
+  test("the database mirror round-trips exact decimals and source relations", async () => {
+    const facts = await loadCrimeFacts();
+    const rows = crimeMirrorCreateRows(facts, "crime-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+    const db = (list: typeof rows) => ({ crimeFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "crimeFact">;
+    const mirror = await loadCrimeFactsFromMirror(db(rows));
+    expect(() => assertCrimeParity(facts, mirror)).not.toThrow();
+    expect(rows[0].importRunId).toBe("crime-run-1");
+    expect(rows.every(row => row.sourceDocumentId === crimeSourceDocumentId(row.sourceId))).toBe(true);
+    expect(rows.every(row => !("areaId" in row))).toBe(true);
+    await expect(loadCrimeFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+  });
+});
+
+test("every public source has one source-document row with a Georgian title and the local file", () => {
+  const documents = new Map(records(path.join(root, "data/sources/source-documents.csv")).map(row => [row.source_id, row]));
+  const manifest = records(path.join(research, "source-manifest.csv"));
+  expect(new Set(manifest.map(row => row.source_id))).toEqual(new Set(CRIME_PUBLIC_SOURCES));
+  expect(manifest).toHaveLength(CRIME_PUBLIC_SOURCES.length);
+  for (const row of manifest) {
+    const document = documents.get(crimeSourceDocumentId(row.source_id));
+    expect(document, row.source_id).toBeDefined();
+    expect(document!.source_name, row.source_id).toMatch(/^[^A-Za-z]*[ა-ჿ]/);
+    expect(document!.source_url_or_file).toBe(`${CRIME_RESEARCH_DIRECTORY}/${row.local_file}`);
+    expect(document!.last_reviewed_at).toBe(REVIEWED_AT);
+  }
+  // The Unified Report PDF is linked from the methodology page, not archived or registered here.
+  expect([...documents.keys()].filter(id => id.startsWith("source.geostat_crime_"))).toHaveLength(CRIME_PUBLIC_SOURCES.length);
 });

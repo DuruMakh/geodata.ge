@@ -342,3 +342,25 @@ source.geostat_deaths_23_5_deaths_by_causes_age_sex,"გარდაცვლი
 source.geostat_deaths_23_8_maternal_mortality_rate_by_regions,დედათა მოკვდაობის კოეფიციენტი (100 000 ცოცხლად დაბადებულზე) რეგიონების მიხედვით,docs/Raw Data/Health/geostat-health-annual/official/deaths/23-8-Maternal--mortality-rate-by-regions.xlsx,2026-10-15
 source.geostat_health_page,ჯანდაცვა (წყაროს გვერდი),docs/Raw Data/Health/geostat-health-annual/official/health-page.html,2026-10-15
 source.geostat_deaths_page,გარდაცვალება (წყაროს გვერდი),docs/Raw Data/Health/geostat-health-annual/official/deaths-page.html,2026-10-15
+source.geostat_crime_recorded,რეგისტრირებული დანაშაულის რაოდენობა,docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes.xlsx,2026-10-16
+source.geostat_crime_recorded_2001_2011,რეგისტრირებული დანაშაულები 2001-2011 წწ. (ძველი კლასიფიკაცია),docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes_2011.xls,2026-10-16
+source.geostat_crime_convicts_types,მსჯავრდებულთა რიცხოვნობა დანაშაულებათა სახეების მიხედვით,docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Convicts-by-Types-of-Crime.xls,2026-10-16
+source.geostat_crime_convicts_age_sex,მსჯავრდებულთა შემადგენლობა ასაკის და სქესის მიხედვით,docs/Raw Data/Crime/geostat-crime-annual/official/Composition-of-Convicts-by-Age-and-Sex.XLS,2026-10-16
+source.geostat_crime_convicts_penalties,მსჯავრდებულთა რიცხოვნობა სასჯელის ღონისძიებების მიხედვით,docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Convicts-and-Penalties-Prescribed-by-Court.XLS,2026-10-16
+source.geostat_crime_juvenile,არასრულწლოვანი მსჯავრდებულები ჩადენილი დანაშაულის მიხედვით,docs/Raw Data/Crime/geostat-crime-annual/official/Juvenile-Offenders-Convicted-by-Type-of-Offence.XLS,2026-10-16
+source.geostat_crime_prison,პატიმართა რიცხოვნობა,docs/Raw Data/Crime/geostat-crime-annual/official/Prison-Population.xls,2026-10-16
+source.geostat_crime_victims,დაზარალებულთა რაოდენობა,docs/Raw Data/Crime/geostat-crime-annual/official/Data-on-Victim-Statistics.xlsx,2026-10-16
+source.geostat_crime_road,მონაცემები ავტოსაგზაო შემთხვევების შესახებ,docs/Raw Data/Crime/geostat-crime-annual/official/Accidents.xlsx,2026-10-16
+source.geostat_crime_trafficking,ტრეფიკინგის მუხლით ჩადენილი დანაშაულის რაოდენობა,docs/Raw Data/Crime/geostat-crime-annual/official/Trafficking.xlsx,2026-10-16
+source.geostat_crime_registrirebuli_danasaulis_raodenoba_ka,"რეგისტრირებული დანაშაულის რაოდენობა, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/registrirebuli-danaSaulis-raodenoba.xlsx,2026-10-16
+source.geostat_crime_registrirebuli_danasauli_2011_ka,"რეგისტრირებული დანაშაულები 2001-2011 წწ. (ძველი კლასიფიკაცია), ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/registrirebuli-danaSauli_2011.xls,2026-10-16
+source.geostat_crime_msjavrdebulta_ricxovnoba_danasaulis_saxeebis_mixedvit_ka,"მსჯავრდებულთა რიცხოვნობა დანაშაულებათა სახეების მიხედვით, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/msjavrdebulTa-ricxovnoba-danaSaulis-saxeebis-mixedviT.XLS,2026-10-16
+source.geostat_crime_msjavrdebulta_ricxovnoba_asakisa_da_skesis_mixedvit_ka,"მსჯავრდებულთა შემადგენლობა ასაკის და სქესის მიხედვით, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/msjavrdebulTa-ricxovnoba-asakisa-da-skesis-mixedviT.XLS,2026-10-16
+source.geostat_crime_msjavrdebulta_ricxovnoba_sasjelis_ronisziebebis_mixedvit_ka,"მსჯავრდებულთა რიცხოვნობა სასჯელის ღონისძიებების მიხედვით, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/msjavrdebulTa-ricxovnoba-sasjelis-RonisZiebebis-mixedviT.XLS,2026-10-16
+source.geostat_crime_arasrulwlovani_msjavrdebulebis_raodenoba_cadenili_danasaulis_saxeebis_mi_ka,"არასრულწლოვანი მსჯავრდებულები ჩადენილი დანაშაულის მიხედვით, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/arasrulwlovani-msjavrdebulebis-raodenoba-Cadenili-danaSaulis-saxeebis-mi....xls,2026-10-16
+source.geostat_crime_patimarta_ricxovnoba_ka,"პატიმართა რიცხოვნობა, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/patimarta-ricxovnoba.xls,2026-10-16
+source.geostat_crime_dazaralebulta_raodenoba_ka,"დაზარალებულთა რაოდენობა, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/dazaralebulta-raodenoba.xlsx,2026-10-16
+source.geostat_crime_avtosagzao_semtxvevebi_ka,"მონაცემები ავტოსაგზაო შემთხვევების შესახებ, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/avtosagzao-SemTxvevebi.xlsx,2026-10-16
+source.geostat_crime_trefikingi_ka,"ტრეფიკინგის მუხლით ჩადენილი დანაშაულის რაოდენობა, ქართული ვერსია",docs/Raw Data/Crime/geostat-crime-annual/official/trefikingi.xlsx,2026-10-16
+source.geostat_crime_page,სისხლის სამართლის სტატისტიკა (წყაროს გვერდი),docs/Raw Data/Crime/geostat-crime-annual/official/crime-page.html,2026-10-16
+source.geostat_crime_page_ka,"სისხლის სამართლის სტატისტიკა (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Crime/geostat-crime-annual/official/crime-page-ka.html,2026-10-16
