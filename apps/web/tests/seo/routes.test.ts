@@ -106,8 +106,8 @@ describe("indexable Fiscal.ge routes", () => {
     // The Health methodology adds one more bilingual pair.
     // Foreign debt and Reserves add two further bilingual pairs.
     // Business adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs; Health its hub, three pages, 12 area pages and its methodology page: 17 more.
-    // Crime and justice adds its hub and five pages: 6 bilingual pairs.
-    expect(urls).toHaveLength(670);
+    // Crime and justice adds its hub and five pages: 6 bilingual pairs; its methodology one more.
+    expect(urls).toHaveLength(672);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -196,6 +196,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/poverty",
       "/methodology/household-income",
       "/methodology/health",
+      "/methodology/crime",
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",

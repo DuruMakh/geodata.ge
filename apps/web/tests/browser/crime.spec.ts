@@ -130,7 +130,21 @@ test("Excel downloads an .xlsx of the selection, citing the population table for
     workbook.worksheets[2].eachRow(row => row.eachCell(cell => { const value = cell.value as { hyperlink?: string } | null; if (value && typeof value === "object" && value.hyperlink) links.push(value.hyperlink); }));
     expect(links.length).toBeGreaterThan(0);
     expect(links.some(link => link.includes("/downloads/methodology/demography/files/")), path).toBe(rates);
+    // Every other link is a fiscal.ge archive copy of a Geostat crime workbook.
+    expect(links.filter(link => !link.includes("/downloads/methodology/demography/files/")).every(link => link.includes("/downloads/methodology/crime/files/")), path).toBe(true);
   }
+});
+
+for (const prefix of ["", "/en"]) test(`the methodology link opens the crime methodology with its original files ${prefix || "ka"}`, async ({ page }) => {
+  await page.goto(`${prefix}/explorer/crime/recorded`);
+  await ready(page);
+  await page.getByTestId("source-label").getByRole("link").click();
+  await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/crime$`));
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Crime and justice" : "დანაშაული და მართლმსაჯულება");
+  const archived = page.locator('a[href^="/downloads/methodology/crime/files/"]');
+  expect(await archived.count()).toBeGreaterThan(0);
+  const response = await page.request.get(await archived.first().getAttribute("href") as string);
+  expect(response.status()).toBe(200);
 });
 
 for (const prefix of ["", "/en"]) test(`crime pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {

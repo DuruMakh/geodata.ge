@@ -321,3 +321,23 @@ describe("hub cards", () => {
     expect(cards.every(card => card.comingSoon === false && card.seriesColor === INK)).toBe(true);
   });
 });
+
+describe("workbook sources", () => {
+  test("cite the fiscal.ge archive copies of the Geostat workbooks a page's values come from, then the population table", async () => {
+    const { crimeSources } = await import("../../lib/pages/crime-shared");
+    const used = [{ sourceId: "geostat_crime_prison", year: 2002 }, { sourceId: "geostat_crime_recorded", year: 2015 }, { sourceId: "geostat_crime_prison", year: 2001 }];
+    const en = await crimeSources("en", used);
+    expect(en.slice(0, 2)).toEqual([
+      { sourceId: "geostat_crime_prison", years: [2001, 2002], title: "Prison population", organization: "National Statistics Office of Georgia (Geostat)", downloadHref: "/downloads/methodology/crime/files/prison-population.xls", retrievedAt: "2026-10-16" },
+      { sourceId: "geostat_crime_recorded", years: [2015], title: "Number of recorded crimes", organization: "National Statistics Office of Georgia (Geostat)", downloadHref: "/downloads/methodology/crime/files/number-of-recorded-crimes.xlsx", retrievedAt: "2026-10-16" },
+    ]);
+    // The per-100,000 view divides by the demography archive's 1 January population table.
+    expect(en.slice(2).map(source => [source.sourceId, source.downloadHref])).toEqual([[SOURCE_ID.populationUnits, "/downloads/methodology/demography/files/01-population-by-self-governed-unit.xlsx"]]);
+    const ka = await crimeSources("ka", used);
+    expect(ka.slice(0, 2).map(source => [source.title, source.organization])).toEqual([["პატიმართა რიცხოვნობა", "საქსტატი"], ["რეგისტრირებული დანაშაულის რაოდენობა", "საქსტატი"]]);
+    // Every served crime source has an archived copy.
+    const all = await crimeSources("en", facts);
+    expect(all.slice(0, -1).every(source => source.downloadHref.startsWith("/downloads/methodology/crime/files/"))).toBe(true);
+    expect(all).toHaveLength(new Set(facts.map(f => f.sourceId)).size + 1);
+  });
+});

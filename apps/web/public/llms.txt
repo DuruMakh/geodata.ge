@@ -104,6 +104,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Household income and spending methodology](https://fiscal.ge/methodology/household-income) — Geostat's household survey, per-household and per-person averages, income sources, spending categories and original files.
 - [Poverty methodology](https://fiscal.ge/methodology/poverty) — absolute, relative and international poverty lines, the Gini coefficients and original files.
 - [Health methodology](https://fiscal.ge/methodology/health) — Geostat's healthcare and causes-of-death tables, the 2012 and 2020 staff counting changes, new cases, ICD-10 chapters, the death rate and original files.
+- [Crime and justice methodology](https://fiscal.ge/methodology/crime) — Geostat's criminal justice tables and the agencies behind them, what a recorded crime is, the 2018 counting change, sentence types, prisoners on 31 December, the rates per 100,000 people and original files.
 - [Trade methodology](https://fiscal.ge/methodology/trade) — FOB exports, CIF imports, partner and product identities, re-exports and original files.
 - [External flows methodology](https://fiscal.ge/methodology/external-flows) — money transfers, BPM6 balance of payments, Geostat FDI and original files.
 - [Energy and food methodology](https://fiscal.ge/methodology/energy-food) — Geostat's energy balance and food balance sheets, units and original files.
