@@ -1,7 +1,7 @@
 import { beforeAll, expect, test } from "vitest";
 import { loadHousingFacts, toClientHousingFact } from "../../lib/data/housing/importHousing";
 import { HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_REGIONS, HOUSING_TYPES, type ClientHousingFact } from "../../lib/data/housing/types";
-import { INK } from "../../lib/explorer/colors";
+import { INK, OTHER_COLOR } from "../../lib/explorer/colors";
 import {
   HOUSING_HUB_PATH, HOUSING_SECTIONS, buildHousingModel, changeHousingSelection, housingCoverage, housingDefaultSelection, housingSeriesColor, housingTopicSeries,
   parseHousingHash, serializeHousingHash, type HousingTopicId,
@@ -84,15 +84,23 @@ test("an area lists its homes and all buildings, completed and permitted, as cou
   expect(housingAreaSeries("georgia").filter(s => s.reference).map(s => s.id)).toEqual(["housing.permits_count.total", "housing.permits_area.total"]);
 });
 
-test("a link mixing units keeps one unit: the first row's in the hash, with the years clamped to its coverage", () => {
+test("a link mixing units keeps the first row in list order, with the years clamped to its coverage (Review Focus 2)", () => {
   const mixed = (...ids: string[]) => `#sel=${ids.join(",")}`;
   expect(parseHousingHash(mixed("housing.permits_count.total", "housing.permits_area.total"), "permits", facts).selectedIds).toEqual(["housing.permits_count.total"]);
-  expect(parseHousingHash(mixed("housing.price_index.total", "housing.price_flat.district_vake"), "prices", facts).selectedIds).toEqual(["housing.price_index.total"]);
-  const districts = parseHousingHash(`${mixed("housing.price_flat.district_vake", "housing.price_index.total")}&start=2020&end=2023`, "prices", facts);
+  expect(parseHousingHash(mixed("housing.permits_area.total", "housing.permits_count.total"), "permits", facts).selectedIds).toEqual(["housing.permits_count.total"]);
+  // The index is listed before the districts, so it wins whichever comes first in the link, and its years are 2020-2025.
+  for (const ids of [["housing.price_index.total", "housing.price_flat.district_vake"], ["housing.price_flat.district_vake", "housing.price_index.total"]]) {
+    const parsed = parseHousingHash(`${mixed(...ids)}&start=2020&end=2025`, "prices", facts);
+    expect(parsed.selectedIds).toEqual(["housing.price_index.total"]);
+    expect(parsed.range).toEqual({ kind: "all" });
+    expect(housingCoverage("prices", facts, parsed.selectedIds)).toMatchObject({ min: 2020, max: 2025 });
+  }
+  // A district-only link clamps the years to the districts' 2021-2025.
+  const districts = parseHousingHash("#sel=housing.price_flat.district_vake&start=2020&end=2023", "prices", facts);
   expect(districts.selectedIds).toEqual(["housing.price_flat.district_vake"]);
   expect(districts.range).toEqual({ kind: "manual", start: 2021, end: 2023 });
-  // A range that spans the index's years is all of the districts' (2021-2025), so it reads as "all".
-  expect(parseHousingHash(`${mixed("housing.price_flat.district_vake", "housing.price_index.total")}&start=2020&end=2025`, "prices", facts).range).toEqual({ kind: "all" });
+  expect(parseHousingHash("#sel=housing.price_flat.district_vake&start=2020&end=2025", "prices", facts).range).toEqual({ kind: "all" });
+  expect(buildHousingModel("prices", facts, districts).years).toEqual([2021, 2022, 2023]);
   // The default applies without a selection in the hash, and an explicit empty selection stays empty.
   expect(parseHousingHash("", "permits", facts).selectedIds).toEqual(["housing.permits_count.total"]);
   const empty = state([]);
@@ -193,4 +201,42 @@ test("colours: the reference is ink, and a type or district keeps one colour whe
   expect(color("housing.permits_count.type_hotels")).not.toBe(color("housing.permits_count.type_cafes"));
   const model = buildHousingModel("permits", facts, state([]));
   expect(model.series.find(s => s.id === "housing.permits_count.type_hotels")!.color).toBe(model.series.find(s => s.id === "housing.permits_area.type_hotels")!.color);
+});
+
+test("no two rows of one list share a colour, wherever a type appears", () => {
+  const colors = (section: HousingTopicId) => buildHousingModel(section, facts, state([])).series.map(s => [s.heading, s.id, s.color] as const);
+  for (const section of ["permits", "completed"] as const) {
+    const rows = colors(section);
+    for (const heading of ["count", "area"]) {
+      const own = rows.filter(([h]) => h === heading);
+      expect(own).toHaveLength(section === "permits" ? 18 : 17);
+      expect(new Set(own.map(([, , color]) => color)).size).toBe(own.length);
+    }
+    // A type keeps one colour under both headings.
+    for (const type of section === "permits" ? HOUSING_TYPES : HOUSING_TYPES.filter(t => t !== "holiday_camps")) {
+      expect(new Set(rows.filter(([, id]) => id.endsWith(`.type_${type}`)).map(([, , color]) => color)).size).toBe(1);
+    }
+  }
+  expect(colors("permits").find(([, id]) => id === "housing.permits_count.type_other")![2]).toBe(OTHER_COLOR);
+  // Prices: the index rows, and each unit's districts, are distinct; a district keeps its colour under flats and houses.
+  const prices = colors("prices");
+  for (const heading of ["index", "flats", "houses"]) {
+    const own = prices.filter(([h]) => h === heading);
+    expect(new Set(own.map(([, , color]) => color)).size).toBe(own.length);
+  }
+  for (const district of HOUSING_DISTRICTS) {
+    expect(new Set(prices.filter(([, id]) => id.endsWith(`.district_${district}`)).map(([, , color]) => color)).size).toBe(1);
+  }
+  for (const area of HOUSING_AREAS) {
+    const own = buildHousingAreaModel(area, facts, state([])).series;
+    for (const heading of ["count", "area"]) expect(new Set(own.filter(s => s.heading === heading).map(s => s.color)).size).toBe(4);
+  }
+});
+
+test("a district's house row is dashed and every other row solid", () => {
+  const strokes = (section: HousingTopicId) => buildHousingModel(section, facts, state([])).series;
+  expect(strokes("prices").filter(s => s.stroke === "dashed").map(s => s.id)).toEqual(HOUSING_DISTRICTS.map(d => `housing.price_house.district_${d}`));
+  expect(strokes("prices").filter(s => s.stroke === "solid")).toHaveLength(13);
+  for (const section of ["permits", "completed"] as const) expect(strokes(section).every(s => s.stroke === "solid")).toBe(true);
+  expect(buildHousingAreaModel("georgia", facts, state([])).series.every(s => s.stroke === "solid")).toBe(true);
 });

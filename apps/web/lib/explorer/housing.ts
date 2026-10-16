@@ -1,8 +1,8 @@
 import { HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_TYPES, housingFactKey, housingIndicator, type ClientHousingFact, type HousingGroup, type HousingIndicator, type HousingMeasure } from "../data/housing/types";
-import { INK } from "./colors";
+import { INK, OTHER_COLOR } from "./colors";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, keepOneUnit, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
 
 export const HOUSING_HUB_PATH = "/explorer/housing";
 export const HOUSING_SECTIONS = [
@@ -48,11 +48,20 @@ export function housingDefaultSelection(section: HousingTopicId): string[] {
   return [housingTopicSeries(section)[0].id];
 }
 
+/**
+ * Four types have a fixed colour: the palette (14 hexes, the last of which is the shared "other" colour) cannot colour 17 types
+ * by position. Culture, pharmacy and holiday camps wear three existing site hexes that no palette hex is within 15 CIEDE2000 of
+ * (and that keep 3:1 on paper and tint); other wears the shared "other" colour. They stay out of SERIES_COLORS, where the
+ * sector colours already use #C16671 and #0D89C2. The other 13 types take the palette by position in `HOUSING_TYPES`.
+ */
+const FIXED_TYPE_COLORS: Readonly<Record<string, string>> = { culture: "#C16671", pharmacy: "#667722", holiday_camps: "#0D89C2", other: OTHER_COLOR };
+
 const groupOf = (id: string) => id.split(".")[2] as HousingGroup;
 
 /**
  * The reference is ink. A building type wears one colour under every heading and page (the number and the floor area of
- * hotels share it), and a Tbilisi district one under flats and houses, each keyed by its position in its fixed list.
+ * hotels share it), and a Tbilisi district one under flats and houses (a house row is told apart by its dashed stroke),
+ * each keyed by its position in its fixed list; four types have fixed colours, so none of a list's 17 repeats.
  * The price index's flats and houses take their colour by position.
  */
 export function housingSeriesColor(series: HousingSeriesDefinition, index: number): string {
@@ -60,7 +69,7 @@ export function housingSeriesColor(series: HousingSeriesDefinition, index: numbe
   if (series.reference) return INK;
   if (group.startsWith("type_")) {
     const type = group.slice("type_".length);
-    return topicSeriesColor(series, HOUSING_TYPES.indexOf(type as typeof HOUSING_TYPES[number]), `housing.type.${type}`);
+    return FIXED_TYPE_COLORS[type] ?? topicSeriesColor(series, HOUSING_TYPES.indexOf(type as typeof HOUSING_TYPES[number]), `housing.type.${type}`);
   }
   if (group.startsWith("district_")) {
     const district = group.slice("district_".length);
@@ -78,18 +87,9 @@ const noHousingYears = (definitions: readonly HousingSeriesDefinition[]) => `No 
 export const housingListCoverage = (definitions: readonly HousingSeriesDefinition[], selectedIds: readonly string[], facts: readonly ClientHousingFact[]) =>
   unitListCoverage(definitions, selectedIds, facts, noHousingYears(definitions));
 
-/**
- * Reads a list's hash. A selection that mixes units keeps the unit of the first row *in the hash* (a saved link
- * `sel=<district>,<index>` keeps the district), and the years fit that unit's coverage.
- */
-export function parseHousingListHash(hash: string, definitions: readonly HousingSeriesDefinition[], fallback: readonly string[], facts: readonly ClientHousingFact[]): TopicState {
-  const p = new URLSearchParams(hash.replace(/^#/, ""));
-  if (p.has("sel")) {
-    const listed = new Set<string>(definitions.map(definition => definition.id));
-    p.set("sel", keepOneUnit(p.get("sel")!.split(",").filter(id => listed.has(id)), [], facts).join(","));
-  }
-  return parseUnitListHash(p.toString(), definitions, fallback, facts, noHousingYears(definitions));
-}
+/** Reads a list's hash: a selection that mixes units keeps only its first row's unit (in list order), and the years fit that unit's coverage. */
+export const parseHousingListHash = (hash: string, definitions: readonly HousingSeriesDefinition[], fallback: readonly string[], facts: readonly ClientHousingFact[]): TopicState =>
+  parseUnitListHash(hash, definitions, fallback, facts, noHousingYears(definitions));
 
 /** A list's new selection, kept to one unit; the years stay, clamped to the selection's coverage (never collapsed to "all"). */
 export const changeHousingSelection = (state: TopicState, definitions: readonly HousingSeriesDefinition[], next: readonly string[], facts: readonly ClientHousingFact[]): TopicState =>
@@ -105,7 +105,9 @@ export const parseHousingHash = (hash: string, section: HousingTopicId, facts: r
 /** A topic or area page's hash: the keys every topic page shares, and nothing else. */
 export const serializeHousingHash = (state: TopicState) => serializeTopicHash(state);
 
-export type HousingSeriesModel = TopicSeriesModel<HousingSeriesDefinition & { decimals: number; unit: HousingUnit }>;
+export type HousingStroke = "solid" | "dashed";
+/** `stroke` tells a district's house row from its flat row, which wears the same colour. */
+export type HousingSeriesModel = TopicSeriesModel<HousingSeriesDefinition & { decimals: number; unit: HousingUnit; stroke: HousingStroke }>;
 /** `unit` is the selection's (the list's first series' when nothing is selected). */
 export type HousingModel = { range: ResolvedPeriodRange; years: number[]; series: HousingSeriesModel[]; selected: HousingSeriesModel[]; unit: HousingUnit };
 
@@ -120,7 +122,8 @@ export function buildHousingSeriesModel(
   const first = new Map<string, ClientHousingFact>();
   for (const fact of facts) if (!first.has(fact.indicatorId)) first.set(fact.indicatorId, fact);
   const model = buildTopicModel({ range: state.range, coverage: housingListCoverage(definitions, state.selectedIds, facts), selectedIds: state.selectedIds, color,
-    definitions: definitions.map(definition => ({ ...definition, decimals: first.get(definition.id)?.decimals ?? 0, unit: first.get(definition.id)!.unit })),
+    definitions: definitions.map(definition => ({ ...definition, decimals: first.get(definition.id)?.decimals ?? 0, unit: first.get(definition.id)!.unit,
+      stroke: definition.heading === "houses" ? "dashed" as const : "solid" as const })),
     value: (definition, year) => byCell.get(housingFactKey({ indicatorId: definition.id, year }))?.value });
   return { ...model, unit: (model.selected[0] ?? model.series[0]).unit };
 }
