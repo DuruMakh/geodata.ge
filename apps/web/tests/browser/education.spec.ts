@@ -192,7 +192,7 @@ test("Universities: one row selected, search keeps the count, and graduates' mis
   await expect(page.getByTestId("education-latest")).toHaveText("2025/26: 195,426 სტუდენტი უნივერსიტეტებში");
   // Graduates end a school year before students: their heading names 2024/25 and their rows show it, never a dash.
   await expect(page.getByTestId("series-heading")).toHaveText(["სტუდენტები", "მიღებული სტუდენტები", "კურსდამთავრებულები · 2024/25"]);
-  await expect(page.locator('[data-series-id="education.he_graduates.total"]').first()).toContainText("32,494");
+  await expect(page.locator('[data-testid="series-row"][data-series-id="education.he_graduates.total"]')).toContainText("32,494");
   await expect(page.getByTestId("series-row")).toHaveCount(48);
   await expect(pressedRows(page)).toHaveCount(1);
   await expect(page.locator(toggle("education.he_students.total"))).toHaveAttribute("aria-pressed", "true");
@@ -223,7 +223,7 @@ test("Universities: one row selected, search keeps the count, and graduates' mis
   await expect(pressedRows(page)).toHaveCount(2);
   await expect(await cell(page, "Graduates — All", "2025/26")).toHaveText("—");
   await expect(page.getByTestId("series-heading").last()).toHaveText("Graduates · 2024/25");
-  await expect(page.locator('[data-series-id="education.he_graduates.total"]').first()).toContainText("32,494");
+  await expect(page.locator('[data-testid="series-row"][data-series-id="education.he_graduates.total"]')).toContainText("32,494");
   // Excel: the selection, in school years.
   const { name, workbook } = await download(page);
   expect(name).toBe("fiscal-education-universities-2010-11-2025-26-en.xlsx");
