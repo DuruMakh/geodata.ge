@@ -308,6 +308,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  housing: {
+    keywords: {
+      ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],
+      en: ["Georgia", "housing", "construction", "building permits", "completed buildings", "home prices"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის მშენებლობისა და საცხოვრებელი უძრავი ქონების ფასების ოფიციალური გამოქვეყნებული ფაილებიდან.",
+      en: "Reviewed extraction from Geostat's official published construction and residential property price files.",
+    },
+    sources: ["geostat"],
+  },
   unemployment: {
     keywords: {
       ka: ["უმუშევრობა", "დასაქმება", "სამუშაო ძალა", "საქართველო"],

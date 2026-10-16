@@ -6,6 +6,7 @@ import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
+import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 
 /** A page under a hub: its sidebar row. `labelKey` is a `common` message. */
@@ -64,6 +65,13 @@ export const NAV_TREE: readonly NavHub[] = [
     railLabelKey: "common.dataBusiness",
     testId: "business-link",
     sections: sectionRows(BUSINESS_SECTIONS, "business"),
+  },
+  {
+    href: HOUSING_HUB_PATH,
+    labelKey: "common.housing",
+    railLabelKey: "common.dataHousing",
+    testId: "housing-link",
+    sections: sectionRows(HOUSING_SECTIONS, "housing"),
   },
   {
     href: "/explorer/inflation",
@@ -206,6 +214,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/economy/regions": "common.geostatSourceNote",
   "/explorer/inflation": "common.inflationSourceNote",
   [BUSINESS_HUB_PATH]: "common.geostatSourceNote",
+  [HOUSING_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/money": "common.nbgSourceNote",
   "/explorer/unemployment": "common.geostatSourceNote",
   "/explorer/wages": "common.geostatSourceNote",

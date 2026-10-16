@@ -43,6 +43,8 @@ import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBa
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
 import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
 import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
+import { housingSourceDocumentId, type HousingFact } from "../data/housing/types";
+import { housingDisplayDecimals } from "../data/housing/validation";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
@@ -813,6 +815,24 @@ export async function loadBusinessFactsFromMirror(db: Pick<MirrorClient, "busine
     return {
       year: row.year, indicatorId: row.indicatorId as BusinessFact["indicatorId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(businessDisplayDecimals(row.indicatorId)), unit: row.unit as BusinessFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function housingMirrorCreateRows(facts: readonly HousingFact[], importRunId: string): Prisma.HousingFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: housingSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadHousingFactsFromMirror(db: Pick<MirrorClient, "housingFact">): Promise<HousingFact[]> {
+  const rows = await db.housingFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== housingSourceDocumentId(row.sourceId)) throw new Error("Housing source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as HousingFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(housingDisplayDecimals(row.indicatorId)), unit: row.unit as HousingFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
