@@ -3,9 +3,11 @@ import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { WAGES_SECTIONS } from "../explorer/wages";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
+import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
+import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 
@@ -67,6 +69,13 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(BUSINESS_SECTIONS, "business"),
   },
   {
+    href: HOUSING_HUB_PATH,
+    labelKey: "common.housing",
+    railLabelKey: "common.dataHousing",
+    testId: "housing-link",
+    sections: sectionRows(HOUSING_SECTIONS, "housing"),
+  },
+  {
     href: "/explorer/inflation",
     labelKey: "common.inflation",
     railLabelKey: "common.dataInflation",
@@ -125,6 +134,14 @@ export const NAV_TREE: readonly NavHub[] = [
     testId: "education-link",
     spaced: true,
     sections: sectionRows(EDUCATION_SECTIONS, "education"),
+  },
+  {
+    href: CRIME_HUB_PATH,
+    labelKey: "common.crime",
+    railLabelKey: "common.dataCrime",
+    testId: "crime-link",
+    spaced: true,
+    sections: sectionRows(CRIME_SECTIONS, "crime"),
   },
   {
     href: "/explorer/trade",
@@ -215,12 +232,14 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/economy/regions": "common.geostatSourceNote",
   "/explorer/inflation": "common.inflationSourceNote",
   [BUSINESS_HUB_PATH]: "common.geostatSourceNote",
+  [HOUSING_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/money": "common.nbgSourceNote",
   "/explorer/unemployment": "common.geostatSourceNote",
   "/explorer/wages": "common.geostatSourceNote",
   [LIVING_STANDARDS_HUB_PATH]: "common.geostatSourceNote",
   [HEALTH_HUB_PATH]: "common.geostatSourceNote",
   [EDUCATION_HUB_PATH]: "common.geostatSourceNote",
+  [CRIME_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/trade": "common.geostatSourceNote",
   "/explorer/external": "common.nbgSourceNote",
   [ENERGY_FOOD_HUB_PATH]: "common.geostatSourceNote",

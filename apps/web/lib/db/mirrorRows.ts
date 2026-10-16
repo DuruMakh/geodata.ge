@@ -39,10 +39,13 @@ import { povertySourceDocumentId, type PovertyFact } from "../data/poverty/types
 import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyFood/types";
 import { healthSourceDocumentId, type HealthFact } from "../data/health/types";
 import { healthDisplayDecimals } from "../data/health/validation";
+import { crimeSourceDocumentId, type CrimeFact } from "../data/crime/types";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
 import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
 import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
+import { housingSourceDocumentId, type HousingFact } from "../data/housing/types";
+import { housingDisplayDecimals } from "../data/housing/validation";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
 import { educationDisplayDecimals } from "../data/education/validation";
@@ -815,6 +818,42 @@ export async function loadBusinessFactsFromMirror(db: Pick<MirrorClient, "busine
     return {
       year: row.year, indicatorId: row.indicatorId as BusinessFact["indicatorId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(businessDisplayDecimals(row.indicatorId)), unit: row.unit as BusinessFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function crimeMirrorCreateRows(facts: readonly CrimeFact[], importRunId: string): Prisma.CrimeFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: crimeSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadCrimeFactsFromMirror(db: Pick<MirrorClient, "crimeFact">): Promise<CrimeFact[]> {
+  const rows = await db.crimeFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== crimeSourceDocumentId(row.sourceId)) throw new Error("Crime source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as CrimeFact["indicatorId"], value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
+      unit: row.unit as CrimeFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function housingMirrorCreateRows(facts: readonly HousingFact[], importRunId: string): Prisma.HousingFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: housingSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadHousingFactsFromMirror(db: Pick<MirrorClient, "housingFact">): Promise<HousingFact[]> {
+  const rows = await db.housingFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== housingSourceDocumentId(row.sourceId)) throw new Error("Housing source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as HousingFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(housingDisplayDecimals(row.indicatorId)), unit: row.unit as HousingFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });

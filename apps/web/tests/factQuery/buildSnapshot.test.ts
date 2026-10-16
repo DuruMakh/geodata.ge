@@ -4,10 +4,12 @@ import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
 import { loadSourceDocuments } from "../../lib/data/sources";
+import { CRIME_PUBLIC_SOURCES, crimeSourceDocumentId } from "../../lib/data/crime/types";
 import { HEALTH_PUBLIC_SOURCES, healthSourceDocumentId } from "../../lib/data/health/types";
 import { MONEY_BANKS_PUBLIC_SOURCES, moneyBanksSourceDocumentId } from "../../lib/data/moneyBanks/types";
 import { EXTERNAL_POSITION_PUBLIC_SOURCES, externalPositionSourceDocumentId } from "../../lib/data/externalPosition/types";
 import { BUSINESS_PUBLIC_SOURCES, businessSourceDocumentId } from "../../lib/data/business/types";
+import { HOUSING_PUBLIC_SOURCES, housingSourceDocumentId } from "../../lib/data/housing/types";
 import { EDUCATION_PUBLIC_SOURCES, educationSourceDocumentId } from "../../lib/data/education/types";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 
@@ -22,8 +24,8 @@ describe("buildFactQuerySnapshot", () => {
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 42 Energy and food sources, the twenty Money and banks documents, the 26 Business documents, the 36 Health archived sources, the 46 Education documents, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
-    expect(sources).toHaveLength(389);
+    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 42 Energy and food sources, the twenty Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 46 Education documents, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
+    expect(sources).toHaveLength(432);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId).sort()).toEqual([
       "source.geostat_services_georgian_exports_of_services_by_countries",
       "source.geostat_services_georgian_exports_of_services_by_types",
@@ -35,11 +37,16 @@ describe("buildFactQuerySnapshot", () => {
     const compositionSources = ["source.geostat_trade_export_sitc_2000_2026", "source.geostat_trade_import_sitc_2000_2026", "source.geostat_trade_export_bec_2000_2026", "source.geostat_trade_import_bec_2000_2026"];
     expect(sources.filter(source => compositionSources.includes(source.sourceId)).map(source => source.sourceId).sort()).toEqual([...compositionSources].sort());
     expect(snapshot.sources.filter(source => compositionSources.includes(source.sourceId))).toEqual([]);
-    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_food_") && !["source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId), ...EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId), ...BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId), ...HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId), ...EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId).sort());
+    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_food_") && !["source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId), ...EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId), ...BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId), ...HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId), ...CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId), ...EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId).sort());
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_trade_"))).toBe(false);
     expect(snapshot.sources.some(source => MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_housing_"))).toBe(false);
+    // All 21 registered housing sources are in the registry, and none of them reaches the snapshot.
+    expect(HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
+    expect(snapshot.sources.some(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);

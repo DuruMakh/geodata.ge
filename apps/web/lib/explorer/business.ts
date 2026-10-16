@@ -4,8 +4,8 @@ import {
 } from "../data/business/types";
 import { INK, OTHER_COLOR } from "./colors";
 import type { ResolvedPeriodRange } from "./periodRange";
-import { changeUnitListSelection, keepOneUnit, parseUnitListHash, unitListCoverage } from "./unitList";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { changeUnitListSelection, keepOneUnit, parseUnitListHash, unitListCoverage } from "./unitList";
 
 export const BUSINESS_HUB_PATH = "/explorer/business";
 export const BUSINESS_SECTIONS = [
@@ -100,17 +100,22 @@ export function businessHeadingLabel(heading: BusinessHeading, unit: BusinessUni
   return unit === "enterprises" ? t(`measure.${heading}`) : `${t(`measure.${heading}`)} · ${unitLabels[unit]}`;
 }
 
-/** Series of different units never share a chart (the rule is shared with the other hubs, `unitList.ts`). */
+const noBusinessYears = (definitions: readonly BusinessSeriesDefinition[]) => `No business years for ${definitions[0]?.id}`;
+
+/** Series of different units never share a chart (the shared rule, unitList.ts). */
 export const keepOneBusinessUnit = (next: readonly string[], previous: readonly string[], facts: readonly ClientBusinessFact[]): string[] => keepOneUnit(next, previous, facts);
 
 /** A list's years: every year any series of the selection's unit has a value, or any of its series when nothing is selected. */
-export const businessListCoverage = (definitions: readonly BusinessSeriesDefinition[], selectedIds: readonly string[], facts: readonly ClientBusinessFact[]) => unitListCoverage(definitions, selectedIds, facts, `No business years for ${definitions[0]?.id}`);
+export const businessListCoverage = (definitions: readonly BusinessSeriesDefinition[], selectedIds: readonly string[], facts: readonly ClientBusinessFact[]) =>
+  unitListCoverage(definitions, selectedIds, facts, noBusinessYears(definitions));
 
 /** Reads a list's hash: a selection that mixes units keeps only its first row's unit, and the years fit that unit's coverage. */
-export const parseBusinessListHash = (hash: string, definitions: readonly BusinessSeriesDefinition[], fallback: readonly string[], facts: readonly ClientBusinessFact[]): TopicState => parseUnitListHash(hash, definitions, fallback, facts);
+export const parseBusinessListHash = (hash: string, definitions: readonly BusinessSeriesDefinition[], fallback: readonly string[], facts: readonly ClientBusinessFact[]): TopicState =>
+  parseUnitListHash(hash, definitions, fallback, facts, noBusinessYears(definitions));
 
 /** A list's new selection, kept to one unit; the years stay, clamped to the selection's coverage (never collapsed to "all"). */
-export const changeBusinessSelection = (state: TopicState, definitions: readonly BusinessSeriesDefinition[], next: readonly string[], facts: readonly ClientBusinessFact[]): TopicState => changeUnitListSelection(state, definitions, next, facts);
+export const changeBusinessSelection = (state: TopicState, definitions: readonly BusinessSeriesDefinition[], next: readonly string[], facts: readonly ClientBusinessFact[]): TopicState =>
+  changeUnitListSelection(state, definitions, next, facts, noBusinessYears(definitions));
 
 /** A topic page's years for its selection (all of its series' years when nothing is selected). */
 export function businessCoverage(section: BusinessTopicId, facts: readonly ClientBusinessFact[], selectedIds: readonly string[] = []) {

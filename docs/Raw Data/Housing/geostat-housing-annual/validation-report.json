@@ -1,0 +1,194 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-16",
+  "scope": "Annual research only: permits granted and completed objects (number and square metres) for Georgia and its 11 regions and by building type, 2006-2025, from the declared-data workbooks; the residential property price index (2020 average = 100), 2020-2025, and Tbilisi district prices per square metre, 2021-2025, both from the fourth quarter; no 2026 columns, no quarters, no municipalities, no construction cost index",
+  "primary_observation_count": 3222,
+  "observations_by_measure": {
+    "completed_area": 771,
+    "completed_count": 771,
+    "permits_area": 781,
+    "permits_count": 781,
+    "price_flat": 50,
+    "price_house": 50,
+    "price_index": 18
+  },
+  "observations_by_source": {
+    "geostat_housing_completed_regions": 480,
+    "geostat_housing_completed_types": 1062,
+    "geostat_housing_permits_regions": 480,
+    "geostat_housing_permits_types": 1082,
+    "geostat_housing_price_index": 18,
+    "geostat_housing_tbilisi_prices": 100
+  },
+  "indicator_count": 181,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": {
+    "coverage_matches_year_ranges": true,
+    "values_match_source_cells": true,
+    "published_values_are_rounded_stored_values_at_cell_precision": true,
+    "regions_add_up_to_total": {
+      "count": "0",
+      "square_metres": "1"
+    },
+    "recorded_differences_parts_minus_total": {
+      "permits_area.region": {
+        "2024": "-1"
+      },
+      "completed_area.region": {
+        "2024": "1"
+      }
+    },
+    "types_add_up_to_total": {
+      "count": "0",
+      "square_metres": "1"
+    },
+    "by_type_totals_equal_regional_workbooks": 960,
+    "residential_never_exceeds_region_total": true,
+    "prices_are_fourth_quarter_cells": true,
+    "no_2026_or_quarter_rows": true,
+    "type_columns_found_by_header_text": true,
+    "anchor_values": {
+      "housing.permits_count.total:2025": "11578",
+      "housing.permits_area.total:2025": "11397190",
+      "housing.completed_count.total:2025": "3393",
+      "housing.completed_area.total:2025": "3509126",
+      "housing.permits_area.region_tbilisi:2025": "6423329",
+      "housing.permits_count.region_guria:2025": "150",
+      "housing.price_index.total:2020": "107.2",
+      "housing.price_index.total:2025": "159.4"
+    },
+    "workbook_value_anchors": {
+      "housing.price_flat.district_vake:2025": "5873.77"
+    }
+  },
+  "source_checks": [
+    {
+      "source_id": "geostat_housing_permits_regions",
+      "sha256": "FC7200972FF38153BF3EE6DF27A9F53045D88D45D66ADB6A9D10F77C5EE2F882",
+      "bytes": 34304,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_permits_zip",
+      "sha256": "B4A2567B92C85CE8C91847ABA68B29617A7B4CBFF999AD6D31C56BD12167F1D1",
+      "bytes": 161882,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_completed_regions",
+      "sha256": "50C240F046E8C9A9A174982B8BA964B8082C5B85097240971E0B729DED6E13F1",
+      "bytes": 33792,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_completed_zip",
+      "sha256": "0A8699CAE91374209776901A385091718758895465AAB3A8F9EDE90A62923A99",
+      "bytes": 120084,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_permits_municipalities",
+      "sha256": "0189B33747E9E2844EC071980D6B0F83055CD1903D8321F52E03D66FA9AC5B81",
+      "bytes": 97280,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_permits_quarterly",
+      "sha256": "B2FEEEB9950C3C54DD2819F714502083BEFE6A636CCFD6E45036B872BCAB4BE1",
+      "bytes": 445440,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_permits_types",
+      "sha256": "B6996C6B41934056F2DA77F61D1B162BE78E8D0F02126392F019B8AE88D4571C",
+      "bytes": 177152,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_completed_quarterly",
+      "sha256": "C77CCF0E88AA4C3BF0CA14F04AFA433A0C6C9687249EE6A8992F0350C337F44E",
+      "bytes": 423424,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_completed_types",
+      "sha256": "5CE17F687CF33245B3B5578F7612906F3559302DDE1532BE3A57C44061A40CF2",
+      "bytes": 188416,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_price_index_quarterly",
+      "sha256": "F1616A89D46CA9E07927F54759DC0F5CAEAA99E28681E2ED922D7C39E720EB9F",
+      "bytes": 12287,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_price_index_annual",
+      "sha256": "8BC3253C265E352AF69A55AFE06DCEB4305E338831D78D1AEA4BCD0513FDD000",
+      "bytes": 12030,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_price_index",
+      "sha256": "AE95664D31A847C7C76193A6ED14673E44D43F1B8181C86992D2A79DBBED2CE2",
+      "bytes": 12174,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_tbilisi_prices",
+      "sha256": "A4723F94A71763CF647C6EF1E36032ECCAB34B82AC86E5BEE12A79744B4E157F",
+      "bytes": 17151,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_cci_monthly",
+      "sha256": "D42BB784C4529F1E6BB0B4C8529543429BEDDF30513E60D4EB96F19C7D645BC9",
+      "bytes": 15784,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_cci_2022",
+      "sha256": "AC3BF19D8BAC30607A3ED12524427B333B0D3E07FE4B512FBAC761EB373A515C",
+      "bytes": 15670,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_cci_annual",
+      "sha256": "FAE9BD9D2E0E358B404F9C8AE3A7D15D216FD0D229E6105713FFE4688438BC39",
+      "bytes": 14807,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_construction",
+      "sha256": "135FAFE03473DCACB0EC9578AFD397E708AA597698439E6C506701BECA3F65E5",
+      "bytes": 62709,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_infrastructure",
+      "sha256": "200F80FA96BB14BC67BB0C06F96028AB0AC85960FB273E558317DFC018BC1EEC",
+      "bytes": 60383,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_permits_page",
+      "sha256": "EADDF0252F6F960519452BB5A4833711FF8DFC9C34692ABB978C7E0598B55674",
+      "bytes": 69971,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_prices_page",
+      "sha256": "B150383483B5DCD64AF8D6A22D640BDC4F80B32A1F9524EB5BC4148B6BF69C55",
+      "bytes": 70741,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_housing_cost_page",
+      "sha256": "F719F682F6ADB9AC7D38A4BCF864C22320DB74912BD2FD4EC14771FE661C4618",
+      "bytes": 76623,
+      "passed": true
+    }
+  ]
+}

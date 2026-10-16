@@ -99,7 +99,7 @@
 ### Task 3: Loader, mirror table and parity
 
 **Files:**
-- Create: `apps/web/lib/data/education/importEducation.ts`, `apps/web/prisma/migrations/20261016170000_education/migration.sql`.
+- Create: `apps/web/lib/data/education/importEducation.ts`, `apps/web/prisma/migrations/20261016220000_education/migration.sql`.
 - Modify: `apps/web/prisma/schema.prisma` (`EducationFact`, `@@id([indicatorId, geographyId, year])`), `lib/db/mirrorRows.ts`, `lib/db/servedDataDb.ts`, `scripts/import-budget-facts.ts`, `data/sources/source-documents.csv`, `docs/deployment.md` (`EducationFact` wherever `BusinessFact` appears).
 - Test: extend `tests/data/education/education.test.ts`.
 

@@ -61,23 +61,24 @@ const headingOf = (definitions: readonly EducationSeriesDefinition[]) => {
   return (id: string) => headings.get(id);
 };
 const placeFacts = (facts: readonly ClientEducationFact[], placeId: string) => facts.filter(f => f.geographyId === placeId);
+const noEducationYears = (placeId: string) => `No education years for ${placeId}`;
 
 /** A place's years for a selection: every year any row of the selection's heading has a value (any of its rows when nothing is selected). */
 export function educationPlaceCoverage(set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[], selectedIds: readonly string[] = []) {
   const definitions = educationPlaceSeries(set, placeId);
-  return unitListCoverage(definitions, selectedIds, placeFacts(facts, placeId), `No education years for ${placeId}`, headingOf(definitions));
+  return unitListCoverage(definitions, selectedIds, placeFacts(facts, placeId), noEducationYears(placeId), headingOf(definitions));
 }
 
 /** Reads a place page's hash: a selection that mixes headings keeps only its first row's heading, and the years fit that heading. */
 export function parseEducationPlaceHash(hash: string, set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[]): EducationState {
   const definitions = educationPlaceSeries(set, placeId);
-  return parseUnitListHash(hash, definitions, educationPlaceDefaultSelection(set, placeId), placeFacts(facts, placeId), headingOf(definitions));
+  return parseUnitListHash(hash, definitions, educationPlaceDefaultSelection(set, placeId), placeFacts(facts, placeId), noEducationYears(placeId), headingOf(definitions));
 }
 
 /** A place page's new selection: a row under another heading replaces it. The years stay, clamped to the heading's (never collapsed to "all"). */
 export function changeEducationPlaceSelection(state: EducationState, set: EducationPlaceSet, placeId: string, next: readonly string[], facts: readonly ClientEducationFact[]): EducationState {
   const definitions = educationPlaceSeries(set, placeId);
-  return changeUnitListSelection(state, definitions, next, placeFacts(facts, placeId), headingOf(definitions));
+  return changeUnitListSelection(state, definitions, next, placeFacts(facts, placeId), noEducationYears(placeId), headingOf(definitions));
 }
 
 export function buildEducationPlaceModel(set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[], state: EducationState): EducationModel {

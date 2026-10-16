@@ -308,6 +308,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  housing: {
+    keywords: {
+      ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],
+      en: ["Georgia", "housing", "construction", "building permits", "completed buildings", "home prices"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის მშენებლობისა და საცხოვრებელი უძრავი ქონების ფასების ოფიციალური გამოქვეყნებული ფაილებიდან.",
+      en: "Reviewed extraction from Geostat's official published construction and residential property price files.",
+    },
+    sources: ["geostat"],
+  },
   unemployment: {
     keywords: {
       ka: ["უმუშევრობა", "დასაქმება", "სამუშაო ძალა", "საქართველო"],
@@ -371,6 +382,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     measurementTechnique: {
       ka: "გადამოწმებული ამოღება საქსტატის ჯანდაცვისა და გარდაცვალების ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
       en: "Reviewed extraction from Geostat's official published healthcare and deaths statistics.",
+    },
+    sources: ["geostat"],
+  },
+  crime: {
+    keywords: {
+      ka: ["დანაშაული", "მსჯავრდებულები", "პატიმრები", "დაზარალებულები", "საგზაო-სატრანსპორტო შემთხვევები", "საქართველო"],
+      en: ["Georgia", "crime", "convictions", "prisoners", "victims", "road accidents"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის სისხლის სამართლის ოფიციალური გამოქვეყნებული სტატისტიკიდან; 100 000 მოსახლეზე მაჩვენებელს fiscal.ge ითვლის 1 იანვრის მოსახლეობიდან.",
+      en: "Reviewed extraction from Geostat's official published criminal justice statistics; rates per 100,000 people are calculated by fiscal.ge from the population on 1 January.",
     },
     sources: ["geostat"],
   },

@@ -26,12 +26,15 @@ import { WAGES_REGIONS } from "../data/wages/types";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdRegionHref } from "../explorer/household";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
 import { HEALTH_DEATH_AREAS, healthDeathsAreaHref } from "../explorer/healthDeaths";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { EXTERNAL_POSITION_SECTIONS } from "../explorer/externalPosition";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
+import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
+import { HOUSING_AREAS, housingAreaHref } from "../explorer/housingAreas";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { educationPlaceBase } from "../explorer/educationPlaces";
 
@@ -49,9 +52,11 @@ export async function listPublicPagePaths(): Promise<string[]> {
     LIVING_STANDARDS_HUB_PATH, ...LIVING_STANDARDS_SECTIONS.map(section => section.href),
     ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => householdRegionHref(section.id, id))),
     HEALTH_HUB_PATH, ...HEALTH_SECTIONS.map(section => section.href), ...HEALTH_DEATH_AREAS.map(healthDeathsAreaHref),
+    CRIME_HUB_PATH, ...CRIME_SECTIONS.map(section => section.href),
     ENERGY_FOOD_HUB_PATH, ...ENERGY_FOOD_SECTIONS.map(section => section.href),
     "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
     BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),
+    HOUSING_HUB_PATH, ...HOUSING_SECTIONS.map(section => section.href), ...HOUSING_AREAS.map(housingAreaHref),
     EDUCATION_HUB_PATH, ...EDUCATION_SECTIONS.map(section => section.href), ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map(({ id }) => id))),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",

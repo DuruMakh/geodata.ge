@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 7,
+  "observations": 1262,
+  "cells_found_again_from_labels": 1262,
+  "source_cells_matched": 1262,
+  "stored_values_matched": 1262,
+  "published_values_matched": 1262,
+  "units_matched": 1262,
+  "basis_and_status_matched": 1262,
+  "cross_checks": [
+    "11 recorded crime groups = all recorded crimes, 2015-2025",
+    "convicts by type, age, sex and sentence = total, 2001-2025",
+    "the three convictions workbooks print the same total, 2001-2025 (the age-sex workbook twice)",
+    "prison: women + men and adults + juveniles = all inmates, 2001-2025; convicted + defendants = all inmates, 2010-2025",
+    "victims by sex, age and citizenship = total, every printed year"
+  ],
+  "georgian_copies": {
+    "pairs": 10,
+    "numeric_cells_compared": 2922,
+    "differences": 0
+  },
+  "manifest_files_matched": 22,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "altered_published_value_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "wrong_cell_detected": true,
+    "wrong_unit_detected": true,
+    "extra_2026_row_detected": true,
+    "recorded_sum_break_detected": true,
+    "convicts_sum_break_detected": true,
+    "convicts_total_break_detected": true,
+    "prison_sum_break_detected": true,
+    "victims_sum_break_detected": true
+  },
+  "failures": []
+}

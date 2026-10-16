@@ -106,8 +106,11 @@ describe("indexable Fiscal.ge routes", () => {
     // The Health methodology adds one more bilingual pair.
     // Foreign debt and Reserves add two further bilingual pairs.
     // Business adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs; Health its hub, three pages, 12 area pages and its methodology page: 17 more.
+    // Crime and justice adds its hub and five pages: 6 bilingual pairs; its methodology one more.
+    // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
+    // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
-    expect(urls).toHaveLength(970);
+    expect(urls).toHaveLength(1020);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -126,6 +129,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/money");
     expect(urls).toContain("https://fiscal.ge/methodology/business");
     expect(urls).toContain("https://fiscal.ge/en/methodology/business");
+    expect(urls).toContain("https://fiscal.ge/methodology/housing");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/housing");
     expect(urls).toContain("https://fiscal.ge/methodology/education");
     expect(urls).toContain("https://fiscal.ge/en/methodology/education");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
@@ -149,6 +154,10 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
     }
     expect(urls.filter((url) => url.includes("/explorer/health/causes-of-death/regions/"))).toHaveLength(24);
+    for (const page of ["", "/recorded", "/convictions", "/prisons", "/victims", "/road-accidents"]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/crime${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/crime${page}`);
+    }
     for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);
@@ -158,6 +167,11 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/explorer/business${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/business${page}`);
     }
+    for (const page of ["", "/permits", "/completed", "/prices", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/housing${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/housing${page}`);
+    }
+    expect(urls.filter((url) => url.includes("/explorer/housing"))).toHaveLength(34);
     const educationRegions = ["tbilisi", "adjara", "guria", "imereti", "kakheti", "mtskheta_mtianeti", "racha_lechkhumi_kvemo_svaneti", "samegrelo_zemo_svaneti", "samtskhe_javakheti", "kvemo_kartli", "shida_kartli"];
     for (const page of ["", "/universities", "/vocational", ...["schools", "kindergartens"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/education${page}`);
@@ -198,6 +212,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/economic-sectors",
       "/methodology/regional-economies",
       "/methodology/business",
+      "/methodology/housing",
       "/methodology/inflation",
       "/methodology/money",
       "/methodology/unemployment",
@@ -206,6 +221,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/household-income",
       "/methodology/health",
       "/methodology/education",
+      "/methodology/crime",
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",

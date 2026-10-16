@@ -5543,6 +5543,651 @@
     },
     "documentLanguage": "en"
   },
+  "geostat_housing_permits_regions": {
+    "title": {
+      "text": "Permissions granted for construction by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_zip": {
+    "title": {
+      "text": "Permissions granted for construction by type and municipality (English zip archive)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_regions": {
+    "title": {
+      "text": "Completed construction objects by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_zip": {
+    "title": {
+      "text": "Completed construction objects by type (English zip archive)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_municipalities": {
+    "title": {
+      "text": "Permissions granted for construction and completed objects by municipality",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_quarterly": {
+    "title": {
+      "text": "Permissions granted for construction by type, quarterly 2019–2026",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_types": {
+    "title": {
+      "text": "Permissions granted for construction by type, 2006–2025",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_quarterly": {
+    "title": {
+      "text": "Completed construction objects by type, quarterly 2019–2026",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_types": {
+    "title": {
+      "text": "Completed construction objects by type, 2006–2025",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index_quarterly": {
+    "title": {
+      "text": "Residential property price index, previous quarter = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index_annual": {
+    "title": {
+      "text": "Residential property price index, same quarter of the previous year = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index": {
+    "title": {
+      "text": "Residential property price index, 2020 average = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_tbilisi_prices": {
+    "title": {
+      "text": "Residential property prices in Tbilisi by district",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_monthly": {
+    "title": {
+      "text": "Construction cost index, previous month = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_2022": {
+    "title": {
+      "text": "Construction cost index, February 2022 = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_annual": {
+    "title": {
+      "text": "Construction cost index, same month of the previous year = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_construction": {
+    "title": {
+      "text": "Construction by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_infrastructure": {
+    "title": {
+      "text": "Infrastructure of dwellings by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_page": {
+    "title": {
+      "text": "Permissions and completed objects (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_prices_page": {
+    "title": {
+      "text": "Residential property price index (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cost_page": {
+    "title": {
+      "text": "Construction cost index (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_recorded": {
+    "title": {
+      "text": "Number of recorded crimes",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_recorded_2001_2011": {
+    "title": {
+      "text": "Number of recorded crimes 2001-2011 (old classification)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_convicts_types": {
+    "title": {
+      "text": "Number of convicts by types of crime",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_convicts_age_sex": {
+    "title": {
+      "text": "Composition of convicts by age and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_convicts_penalties": {
+    "title": {
+      "text": "Number of convicts and penalties prescribed by court",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_juvenile": {
+    "title": {
+      "text": "Juvenile offenders convicted by type of offence",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_prison": {
+    "title": {
+      "text": "Prison population",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_victims": {
+    "title": {
+      "text": "Data on victim statistics",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_road": {
+    "title": {
+      "text": "Data on road traffic accidents",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_trafficking": {
+    "title": {
+      "text": "Human trafficking",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_registrirebuli_danasaulis_raodenoba_ka": {
+    "title": {
+      "text": "Number of recorded crimes (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_registrirebuli_danasauli_2011_ka": {
+    "title": {
+      "text": "Number of recorded crimes 2001-2011 (old classification) (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_msjavrdebulta_ricxovnoba_danasaulis_saxeebis_mixedvit_ka": {
+    "title": {
+      "text": "Number of convicts by types of crime (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_msjavrdebulta_ricxovnoba_asakisa_da_skesis_mixedvit_ka": {
+    "title": {
+      "text": "Composition of convicts by age and sex (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_msjavrdebulta_ricxovnoba_sasjelis_ronisziebebis_mixedvit_ka": {
+    "title": {
+      "text": "Number of convicts and penalties prescribed by court (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_arasrulwlovani_msjavrdebulebis_raodenoba_cadenili_danasaulis_saxeebis_mi_ka": {
+    "title": {
+      "text": "Juvenile offenders convicted by type of offence (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_patimarta_ricxovnoba_ka": {
+    "title": {
+      "text": "Prison population (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_dazaralebulta_raodenoba_ka": {
+    "title": {
+      "text": "Data on victim statistics (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_avtosagzao_semtxvevebi_ka": {
+    "title": {
+      "text": "Data on road traffic accidents (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_trefikingi_ka": {
+    "title": {
+      "text": "Human trafficking (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_page": {
+    "title": {
+      "text": "Criminal justice statistics (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_page_ka": {
+    "title": {
+      "text": "Criminal justice statistics, Georgian (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
   "geostat_education_schools_national": {
     "title": {
       "text": "Number of general education schools and pupils (table 01)",

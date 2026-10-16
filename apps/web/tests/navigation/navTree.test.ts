@@ -20,6 +20,8 @@ describe("the navigation tree", () => {
     expect(openHub("/explorer/external/money-from-abroad").href).toBe("/explorer/external");
     expect(openHub("/explorer/business/regions/guria").href).toBe("/explorer/business");
     expect(currentEntry("/explorer/business/regions/guria")).toBe("/explorer/business/regions");
+    expect(openHub("/explorer/housing/regions/guria").href).toBe("/explorer/housing");
+    expect(currentEntry("/explorer/housing/regions/guria")).toBe("/explorer/housing/regions");
     expect(openHub("/explorer/demography/population/region/imereti").href).toBe("/explorer/demography");
     expect(openHub("/explorer/education/schools/region/guria").href).toBe("/explorer/education");
     expect(currentEntry("/explorer/education/schools/region/guria")).toBe("/explorer/education/schools");
@@ -56,6 +58,14 @@ describe("the navigation tree", () => {
     expect(sourceNoteKey("/explorer/trade/composition")).toBe("common.geostatSourceNote");
   });
 
+  it("places Housing and construction directly after Business, with its four pages", () => {
+    const hubs = NAV_TREE.map((hub) => hub.href);
+    expect(hubs.indexOf("/explorer/housing")).toBe(hubs.indexOf("/explorer/business") + 1);
+    const hub = NAV_TREE.find((entry) => entry.href === "/explorer/housing")!;
+    expect(hub).toMatchObject({ labelKey: "common.housing", railLabelKey: "common.dataHousing", testId: "housing-link" });
+    expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["permits", "completed", "prices", "regions"].map((id) => [`/explorer/housing/${id}`, `housing-${id}-link`]));
+  });
+
   it("matches a row's own page and the pages below it, not a sibling that shares its start", () => {
     expect(isActivePath("/explorer/wages/regions", "/explorer/wages/regions")).toBe(true);
     expect(isActivePath("/explorer/wages/regions/adjara", "/explorer/wages/regions")).toBe(true);
@@ -90,6 +100,8 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/money/supply")).toBe("common.nbgSourceNote");
     expect(sourceNoteKey("/explorer/business")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/business/regions/guria")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/housing/prices")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/housing/regions/guria")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/external")).toBe("common.externalHubSourceNote");
     expect(sourceNoteKey("/explorer/external/current-account")).toBe("common.nbgSourceNote");
     expect(sourceNoteKey("/explorer/external/foreign-debt")).toBe("common.nbgSourceNote");

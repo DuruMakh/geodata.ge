@@ -16,12 +16,16 @@ import { HOUSEHOLD_INCOME_METHODOLOGY_CONTENT as EN_HOUSEHOLD_INCOME } from "./c
 import { ENERGY_FOOD_METHODOLOGY_CONTENT } from "./content/energyFood";
 import { HEALTH_METHODOLOGY_CONTENT } from "./content/health";
 import { HEALTH_METHODOLOGY_CONTENT as EN_HEALTH } from "./content/en/health";
+import { CRIME_METHODOLOGY_CONTENT } from "./content/crime";
+import { CRIME_METHODOLOGY_CONTENT as EN_CRIME } from "./content/en/crime";
 import { EDUCATION_METHODOLOGY_CONTENT } from "./content/education";
 import { EDUCATION_METHODOLOGY_CONTENT as EN_EDUCATION } from "./content/en/education";
 import { ENERGY_FOOD_METHODOLOGY_CONTENT as EN_ENERGY_FOOD } from "./content/en/energyFood";
 import { MONEY_BANKS_METHODOLOGY_CONTENT as EN_MONEY_BANKS } from "./content/en/moneyBanks";
 import { BUSINESS_METHODOLOGY_CONTENT } from "./content/business";
 import { BUSINESS_METHODOLOGY_CONTENT as EN_BUSINESS } from "./content/en/business";
+import { HOUSING_METHODOLOGY_CONTENT } from "./content/housing";
+import { HOUSING_METHODOLOGY_CONTENT as EN_HOUSING } from "./content/en/housing";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
@@ -61,6 +65,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
   business: BUSINESS_METHODOLOGY_CONTENT,
+  housing: HOUSING_METHODOLOGY_CONTENT,
   inflation: INFLATION_METHODOLOGY_CONTENT,
   money: MONEY_BANKS_METHODOLOGY_CONTENT,
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
@@ -69,6 +74,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   "household-income": HOUSEHOLD_INCOME_METHODOLOGY_CONTENT,
   health: HEALTH_METHODOLOGY_CONTENT,
   education: EDUCATION_METHODOLOGY_CONTENT,
+  crime: CRIME_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
   "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
   "energy-food": ENERGY_FOOD_METHODOLOGY_CONTENT,
@@ -88,9 +94,11 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   "household-income": EN_HOUSEHOLD_INCOME,
   health: EN_HEALTH,
   education: EN_EDUCATION,
+  crime: EN_CRIME,
   "energy-food": EN_ENERGY_FOOD,
   money: EN_MONEY_BANKS,
   business: EN_BUSINESS,
+  housing: EN_HOUSING,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {

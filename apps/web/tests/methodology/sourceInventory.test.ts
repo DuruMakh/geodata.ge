@@ -52,6 +52,17 @@ describe("original-source inventory", () => {
     ]));
   });
 
+  it("inventories the 21 housing originals, the zips with their members and the page captures alike", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "housing");
+    expect(rows).toHaveLength(21);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Housing/geostat-housing-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Housing/geostat-housing-annual/official/Permissions_ENG.zip",
+      "docs/Raw Data/Housing/geostat-housing-annual/official/Permissions_ENG/0503EN020102c_Permissions by type_ 2006-2025 ENG.xls",
+      "docs/Raw Data/Housing/geostat-housing-annual/official/geostat-category-698-2026-10-16.html",
+    ]));
+  });
+
   it("inventories the 45 education originals: 41 workbooks and the four category page captures", async () => {
     const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "education");
     expect(rows).toHaveLength(45);
@@ -63,6 +74,18 @@ describe("original-source inventory", () => {
     const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "business");
     expect(rows).toHaveLength(26);
     expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Business/geostat-business-annual/official/"))).toBe(true);
+  });
+
+  it("inventories the 22 crime and justice originals: the English and Georgian workbooks and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "crime");
+    expect(rows).toHaveLength(22);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Crime/geostat-crime-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes.xlsx",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/registrirebuli-danaSaulis-raodenoba.xlsx",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/crime-page.html",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/crime-page-ka.html",
+    ]));
   });
 
   it("returns forward-slash paths in lexical order", async () => {

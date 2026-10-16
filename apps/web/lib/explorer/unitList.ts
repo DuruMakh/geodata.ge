@@ -1,7 +1,10 @@
 import { refitRange } from "./periodRange";
 import { parseTopicHash, topicCoverage, type TopicState } from "./topicSeries";
 
-/** What a list's one-group rule needs of a fact: which series it belongs to, its year and its unit. */
+// The "one unit at a time" rule of a list whose rows have different units (Business, Housing, Crime and justice, and
+// Education's place pages by heading), and a list row's latest figure: the rules live here once.
+
+/** What a list needs of a fact: its series, year and unit. */
 export type UnitFact = { indicatorId: string; year: number; unit: string };
 /** What a list row's figure needs of a fact. */
 type ValueFact = { indicatorId: string; year: number; value: number };
@@ -30,11 +33,12 @@ export function listLatestByHeading(facts: readonly ValueFact[], series: readonl
 }
 
 /**
- * Every function takes an optional last `groupOf`, which replaces "the fact's unit" as the grouping key (a series id to a
- * group, undefined for an unknown series). Omitted, the unit is the group.
+ * The one-unit functions take an optional last `groupOf`, which replaces "the fact's unit" as the grouping key (a series
+ * id to a group, undefined for an unknown series). Omitted, the unit is the group.
  */
 type GroupOf = (id: string) => string | undefined;
 
+/** Each series' group: `groupOf` when given, else its unit as its facts give it. */
 const groupsOf = (facts: readonly UnitFact[], groupOf?: GroupOf) => {
   if (groupOf) return groupOf;
   const units = new Map<string, string>(facts.map(f => [f.indicatorId, f.unit]));
@@ -53,23 +57,24 @@ export function keepOneUnit(next: readonly string[], previous: readonly string[]
   return added.length ? next.filter(id => unitOf(id) === unitOf(added[0])) : [...next];
 }
 
-/** A list's years: every year any series of the selection's unit has a value, or any of its series when nothing is selected. */
+/** A list's years: every year any series of the selection's unit has a value, or any of its series when nothing is selected. `missing` words the error for a list with no year. */
 export function unitListCoverage(definitions: readonly { id: string }[], selectedIds: readonly string[], facts: readonly UnitFact[], missing: string, groupOf?: GroupOf) {
   const unitOf = groupsOf(facts, groupOf);
   const ids = new Set<string>(definitions.filter(s => !selectedIds.length || unitOf(s.id) === unitOf(selectedIds[0])).map(s => s.id));
   return topicCoverage(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year), missing);
 }
 
-/** Reads a list's hash: a selection that mixes units keeps only its first row's unit, and the years fit that unit's coverage. */
-export function parseUnitListHash(hash: string, definitions: readonly { id: string }[], fallback: readonly string[], facts: readonly UnitFact[], groupOf?: GroupOf): TopicState {
-  const missing = `No years for ${definitions[0]?.id}`;
+const noYears = (definitions: readonly { id: string }[]) => `No years for ${definitions[0]?.id}`;
+
+/** Reads a list's hash: a selection that mixes units keeps only its first row's unit, and the years fit that unit's coverage. `missing` words the error for a list with no year. */
+export function parseUnitListHash(hash: string, definitions: readonly { id: string }[], fallback: readonly string[], facts: readonly UnitFact[], missing = noYears(definitions), groupOf?: GroupOf): TopicState {
   const parsed = parseTopicHash(new URLSearchParams(hash.replace(/^#/, "")), definitions, fallback, unitListCoverage(definitions, [], facts, missing, groupOf));
   const selectedIds = keepOneUnit(parsed.selectedIds, [], facts, groupOf);
   return { ...parsed, selectedIds, range: refitRange(parsed.range, unitListCoverage(definitions, selectedIds, facts, missing, groupOf), { collapseToAll: true }) };
 }
 
 /** A list's new selection, kept to one unit; the years stay, clamped to the selection's coverage (never collapsed to "all"). */
-export function changeUnitListSelection(state: TopicState, definitions: readonly { id: string }[], next: readonly string[], facts: readonly UnitFact[], groupOf?: GroupOf): TopicState {
+export function changeUnitListSelection(state: TopicState, definitions: readonly { id: string }[], next: readonly string[], facts: readonly UnitFact[], missing = noYears(definitions), groupOf?: GroupOf): TopicState {
   const selectedIds = keepOneUnit(next, state.selectedIds, facts, groupOf);
-  return { ...state, selectedIds, range: refitRange(state.range, unitListCoverage(definitions, selectedIds, facts, `No years for ${definitions[0]?.id}`, groupOf), { collapseToAll: false }) };
+  return { ...state, selectedIds, range: refitRange(state.range, unitListCoverage(definitions, selectedIds, facts, missing, groupOf), { collapseToAll: false }) };
 }

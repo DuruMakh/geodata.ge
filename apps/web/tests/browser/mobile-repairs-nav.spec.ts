@@ -70,8 +70,8 @@ test("tapping a menu link from mid-page closes the menu on arrival", async ({ pa
 });
 
 for (const { path, menu, datasets, other } of [
-  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "დემოგრაფია"], other: "EN English" },
-  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Business", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Trade", "External flows", "Energy and food", "Demography"], other: "KA ქართული" },
+  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "საცხოვრებელი და მშენებლობა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "დანაშაული და მართლმსაჯულება", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "დემოგრაფია"], other: "EN English" },
+  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Crime and justice", "Trade", "External flows", "Energy and food", "Demography"], other: "KA ქართული" },
 ]) {
   test(`${path} ☰ menu lists every dataset as 44px rows`, async ({ page }) => {
     await page.goto(path);
@@ -81,7 +81,7 @@ for (const { path, menu, datasets, other } of [
     await expect(group.getByRole("link")).toHaveText(datasets);
     const hrefs = await group.getByRole("link").evaluateAll((links) => links.map((link) => new URL((link as HTMLAnchorElement).href).pathname));
     const prefix = path === "/en" ? "/en" : "";
-    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/business", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/demography"].map((href) => `${prefix}${href}`));
+    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/crime", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/demography"].map((href) => `${prefix}${href}`));
     for (const row of await heights(header.getByRole("navigation").getByRole("link"))) expect(row.height, row.text).toBeGreaterThanOrEqual(44);
     // On a phone the link shows "EN"/"KA"; its name starts with that and adds the full language name.
     const switchBox = await header.getByRole("group").getByRole("link", { name: other, exact: true }).boundingBox();
@@ -125,8 +125,8 @@ for (const width of [390, 768, 1280]) test(`landing calls to action are 44px tap
 });
 
 for (const { path, labels } of [
-  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "დემოგრაფია", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
-  { path: "/en", labels: ["Budget", "Economy", "Business", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Trade", "External flows", "Energy and food", "Demography", "Methodology", "AI connection", "About"] },
+  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "საცხოვრებელი და მშენებლობა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "დანაშაული და მართლმსაჯულება", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "დემოგრაფია", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
+  { path: "/en", labels: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Crime and justice", "Trade", "External flows", "Energy and food", "Demography", "Methodology", "AI connection", "About"] },
 ]) {
   test(`${path} footer names every dataset in a compact two-column grid`, async ({ page }) => {
     await page.goto(path);
@@ -141,8 +141,8 @@ for (const { path, labels } of [
     // The data line no longer repeats its own heading.
     await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
     const height = (await footer.boundingBox())?.height ?? 0;
-    // ~616px since the footer lists all fourteen hubs (Q3, 2026-10-12; Business, Health and Education added 2026-10-15/16; re-measured 615-616px on 2026-10-16): seventeen links make nine 44px rows in two columns.
-    expect(height).toBeLessThanOrEqual(628);
+    // ~660px since the footer lists all sixteen hubs (Q3, 2026-10-12; Business, Health, Housing, Crime and justice and Education added 2026-10-15/16): nineteen links make ten 44px rows in two columns.
+    expect(height).toBeLessThanOrEqual(672);
     const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
     expect(marginTop).toBeLessThanOrEqual(48);
   });
@@ -152,7 +152,7 @@ test("404 recovers to every dataset with no top band on a phone", async ({ page 
   await page.goto("/this-page-does-not-exist");
   const recovery = page.getByTestId("not-found-recovery");
   const hrefs = await recovery.getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/demography", "/methodology"]);
+  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/crime", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/demography", "/methodology"]);
   expect((await recovery.boundingBox())?.y ?? 999).toBeLessThanOrEqual(40);
   await expect(page.locator('a[href="/sitemap.xml"], a[href="/llms.txt"]')).toHaveCount(0);
 });

@@ -39,14 +39,14 @@ test("coverage fits the selection's group; an empty selection covers every serie
 test("a saved link that mixes groups keeps the first row's group and refits the years", () => {
   const hash = "#sel=pupils.total,teachers.women&start=2011&end=2017";
   expect(parseUnitListHash(hash, definitions, ["pupils.total"], facts).selectedIds).toEqual(["pupils.total", "teachers.women"]);
-  const state = parseUnitListHash(hash, definitions, ["pupils.total"], facts, heading);
+  const state = parseUnitListHash(hash, definitions, ["pupils.total"], facts, "none", heading);
   expect(state.selectedIds).toEqual(["pupils.total"]);
   expect(state.range).toEqual({ kind: "manual", start: 2011, end: 2012 });
 });
 
 test("changing the selection keeps one group and clamps, never collapsing, the range", () => {
   const state: TopicState = { mode: "line", range: { kind: "manual", start: 2010, end: 2012 }, selectedIds: ["pupils.total"] };
-  const next = changeUnitListSelection(state, definitions, ["pupils.total", "teachers.women"], facts, heading);
+  const next = changeUnitListSelection(state, definitions, ["pupils.total", "teachers.women"], facts, "none", heading);
   expect(next.selectedIds).toEqual(["teachers.women"]);
   expect(next.range).toEqual({ kind: "all" });
 });
