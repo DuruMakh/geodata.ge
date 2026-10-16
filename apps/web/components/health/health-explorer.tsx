@@ -2,9 +2,9 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
-import { BedDouble, Hospital, Stethoscope, Users, type LucideIcon } from "lucide-react";
+import { Hospital, Users, type LucideIcon } from "lucide-react";
 import type { ClientHealthFact, HealthSeriesBreak } from "../../lib/data/health/types";
-import { buildHealthModel, changeHealthView, healthCoverage, healthDisplay, healthViews, healthViewSeries, parseHealthHash, scaled, serializeHealthHash, type HealthNationalSectionId, type HealthState, type HealthView } from "../../lib/explorer/health";
+import { buildHealthModel, changeHealthView, healthCoverage, healthDisplay, healthViews, healthViewSeries, keepOneHealthUnit, parseHealthHash, scaled, serializeHealthHash, type HealthNationalSectionId, type HealthState, type HealthView } from "../../lib/explorer/health";
 import { buildHealthWorkbookExportModel } from "../../lib/explorer/healthWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -39,23 +39,23 @@ const parseHealthState = (hash: string, data: HealthHashData) => parseHealthHash
 const serializeHealthState = (state: HealthState, data: HealthHashData) => serializeHealthHash(state, data.section);
 
 /** The Doctors and hospitals measure switch: icons only, named by their tooltips (DESIGN §7.2a). */
-const VIEW_ICONS: Partial<Record<HealthView, LucideIcon>> = { staff: Users, hospitals: Hospital, beds: BedDouble, visits: Stethoscope };
+const VIEW_ICONS: Partial<Record<HealthView, LucideIcon>> = { staff: Users, hospitals: Hospital };
 /** The latest-value line on Illnesses names respiratory disease, the largest group, whatever is selected. */
 const ILLNESSES_HEADLINE = "health.illness.respiratory";
 
-/** Doctors and hospitals (four measures) or Illnesses (disease groups and single diseases under their headings), for Georgia. */
+/** Doctors and hospitals (staff, or hospitals with beds and visits) or Illnesses (disease groups and single diseases), each list under its headings, for Georgia. */
 export function HealthExplorer({ section, facts, breaks, labels, sources, lastReviewedAt, siteOrigin }: HealthExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `health.${key}`, values);
   const hashData = useMemo(() => ({ section, facts }), [section, facts]);
   const { state, update } = useHashState(hashData, parseHealthState, serializeHealthState);
   const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildHealthModel(section, facts, state, breaks);
   // The panel names the unit, so axis ticks and cells carry numbers only. The table shows the most decimals among the
   // selected series; the list, the tooltip and the latest line show each series to its own.
   const unit: ValueUnit = { divisor: 1, label: "", decimals: model.decimals };
   const unitLabel = message(messages, model.unitKey);
+  const mixedUnits = new Set(model.series.map(series => healthDisplay(series.id).unitKey)).size > 1;
   const decimalsOf = (id: string) => model.series.find(series => series.id === id)?.decimals ?? model.decimals;
   const format = (value: number | null | undefined, decimals = model.decimals) => formatInUnit(value, { ...unit, decimals });
   const valueLabel = (value: number | null | undefined, id: string) => value == null ? "—" : format(value, decimalsOf(id));
@@ -70,13 +70,13 @@ export function HealthExplorer({ section, facts, breaks, labels, sources, lastRe
   const headline = section === "illnesses" ? ILLNESSES_HEADLINE : healthViewSeries(section, state.view)[0].id;
   const latest = facts.filter(f => f.indicatorId === headline).sort((a, b) => a.year - b.year).at(-1)!;
   const latestValue = section === "illnesses" ? `${format(latest.value, 1)} ${t("thousand")}`
-    : `${format(scaled(latest.value, healthDisplay(state.view, headline).multiplier), decimalsOf(headline))}${state.view === "visits" ? ` ${message(messages, "format.mln")}` : ""}`;
+    : format(scaled(latest.value, healthDisplay(headline).multiplier), decimalsOf(headline));
   const measureLabel = section === "illnesses" || state.view === views[0] ? t(`latest.${section}`) : labels[headline];
   const title = t(`page.${section}.title`);
   const chartLabel = views.length > 1 ? t(`view.${state.view}`) : title;
   const changeView = (view: HealthView) => {
     if (view === state.view) return;
-    setExpanded({}); setQuery("");
+    setQuery("");
     update(s => changeHealthView(s, section, view, facts), true);
   };
   const downloadAction = <ExcelDownloadButton testId="health-excel-download" disabled={!model.selected.length} onDownload={async () => {
@@ -109,12 +109,11 @@ export function HealthExplorer({ section, facts, breaks, labels, sources, lastRe
         <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span> · <Link href={pageHref("/methodology/health", locale)} prefetch={false} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      {/* Staff nest under Doctors and Nurses; illnesses sit under their two headings. */}
-      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{model.range.end} · {unitLabel}</>} downloadAction={downloadAction}
-        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue, series.decimals), parentId: series.parentId, heading: series.heading ? t(`heading.${series.heading}`) : undefined }))}
-        totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)}
-        query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS}
-        nesting={model.series.some(series => series.parentId) ? { selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }), expanded, onExpandedChange: setExpanded } : undefined} />
+      {/* Each list sits under small headings. The hospitals view mixes units, so its headings name them and its caption gives the year only. */}
+      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={mixedUnits ? model.range.end : <>{model.range.end} · {unitLabel}</>} downloadAction={downloadAction}
+        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue, series.decimals), heading: series.heading ? t(`heading.${series.heading}`) : undefined }))}
+        totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: keepOneHealthUnit(selectedIds, s.selectedIds) }), true)}
+        query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS} />
     </ExplorerWorkspace>
   </div>;
 }

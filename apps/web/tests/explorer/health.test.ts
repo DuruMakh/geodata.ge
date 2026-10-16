@@ -5,7 +5,7 @@ import { HEALTH_AREAS, HEALTH_INDICATORS, HEALTH_SOURCES, type ClientHealthFact,
 import { INK } from "../../lib/explorer/colors";
 import {
   HEALTH_HUB_PATH, HEALTH_SECTIONS, buildHealthModel, changeHealthView, defaultHealthState, healthCoverage, healthDefaultSelection, healthDisplay, healthSeriesColor,
-  healthViewSeries, healthViews, parseHealthHash, serializeHealthHash, type HealthState,
+  healthViewSeries, healthViews, keepOneHealthUnit, parseHealthHash, serializeHealthHash, type HealthState,
 } from "../../lib/explorer/health";
 import {
   HEALTH_DEATH_AREAS, buildHealthDeathsModel, defaultHealthDeathsState, healthDeathsAreaForSlug, healthDeathsAreaHref, healthDeathsSeries,
@@ -38,21 +38,23 @@ describe("sections and views", () => {
       { id: "illnesses", href: "/explorer/health/illnesses", labelKey: "common.healthIllnesses" },
       { id: "causes-of-death", href: "/explorer/health/causes-of-death", labelKey: "common.healthCausesOfDeath" },
     ]);
-    expect(healthViews("doctors-hospitals")).toEqual(["staff", "hospitals", "beds", "visits"]);
+    expect(healthViews("doctors-hospitals")).toEqual(["staff", "hospitals"]);
     expect(healthViews("illnesses")).toEqual(["main"]);
   });
 
-  test("staff nests 14 specialities under doctors and 6 groups under nurses", () => {
+  test("staff lists doctors and 14 specialities, then nurses and the two groups still published, flat under two headings", () => {
     const staff = healthViewSeries("doctors-hospitals", "staff");
-    const parents = staff.filter(s => !s.parentId);
-    expect(parents.map(s => [s.id, s.reference])).toEqual([["health.staff.doctors", true], ["health.staff.nurses", false]]);
-    expect(staff.filter(s => s.parentId === "health.staff.doctors")).toHaveLength(14);
-    expect(staff.filter(s => s.parentId === "health.staff.nurses")).toHaveLength(6);
+    expect(staff.map(s => s.heading)).toEqual([...Array(15).fill("doctors"), ...Array(3).fill("nurses")]);
+    expect(staff.filter(s => s.reference).map(s => s.id)).toEqual(["health.staff.doctors"]);
     expect(staff[0].id).toBe("health.staff.doctors");
-    expect(staff[15].id).toBe("health.staff.nurses");
-    expect(healthViewSeries("doctors-hospitals", "hospitals").map(s => s.id)).toEqual(["health.facilities.hospitals", "health.facilities.outpatient_clinics"]);
-    expect(healthViewSeries("doctors-hospitals", "beds").map(s => s.id)).toEqual(["health.facilities.beds"]);
-    expect(healthViewSeries("doctors-hospitals", "visits").map(s => s.id)).toEqual(["health.visits.outpatient"]);
+    expect(staff.slice(15).map(s => s.id)).toEqual(["health.staff.nurses", "health.staff.nurses_medical", "health.staff.nurses_midwives"]);
+    expect(staff.map(s => s.id)).not.toContain("health.staff.nurses_doctor_assistants");
+  });
+
+  test("hospitals list the facilities, beds and visits under their own headings", () => {
+    expect(healthViewSeries("doctors-hospitals", "hospitals").map(s => [s.id, s.heading])).toEqual([
+      ["health.facilities.hospitals", "facilities"], ["health.facilities.outpatient_clinics", "facilities"], ["health.facilities.beds", "beds"], ["health.visits.outpatient", "visits"],
+    ]);
   });
 
   test("illnesses list 19 groups, then 6 single diseases, all top level", () => {
@@ -60,7 +62,7 @@ describe("sections and views", () => {
     expect(series.filter(s => s.heading === "groups")).toHaveLength(19);
     expect(series.filter(s => s.heading === "single")).toHaveLength(6);
     expect(series.map(s => s.heading)).toEqual([...Array(19).fill("groups"), ...Array(6).fill("single")]);
-    expect(series.every(s => !s.parentId && !s.reference)).toBe(true);
+    expect(series.every(s => !s.reference)).toBe(true);
     expect(series.map(s => s.id)).toEqual(HEALTH_INDICATORS.filter(id => id.startsWith("health.illness.")));
   });
 });
@@ -72,8 +74,6 @@ describe("defaults and coverage", () => {
     const coverage = healthCoverage("doctors-hospitals", "staff", facts);
     expect([coverage.min, coverage.max]).toEqual([2002, 2025]);
     expect(healthDefaultSelection("doctors-hospitals", "hospitals", facts)).toEqual(["health.facilities.hospitals"]);
-    expect(healthDefaultSelection("doctors-hospitals", "beds", facts)).toEqual(["health.facilities.beds"]);
-    expect(healthDefaultSelection("doctors-hospitals", "visits", facts)).toEqual(["health.visits.outpatient"]);
   });
 
   test("illnesses start on the five largest groups of the latest year", () => {
@@ -107,16 +107,28 @@ describe("defaults and coverage", () => {
 
 describe("display", () => {
   test("units and multipliers", () => {
-    expect(healthDisplay("staff", "health.staff.doctors")).toEqual({ multiplier: 1, unitKey: "health.unitPersons" });
-    expect(healthDisplay("hospitals", "health.facilities.hospitals")).toEqual({ multiplier: 1, unitKey: "health.unitUnits" });
-    expect(healthDisplay("beds", "health.facilities.beds")).toEqual({ multiplier: 1000, unitKey: "health.unitBeds" });
-    expect(healthDisplay("visits", "health.visits.outpatient")).toEqual({ multiplier: 0.001, unitKey: "health.unitMillionVisits" });
-    expect(healthDisplay("main", "health.illness.respiratory")).toEqual({ multiplier: 1, unitKey: "health.unitThousandCases" });
-    expect(healthDisplay("main", "health.illness.tuberculosis")).toEqual({ multiplier: 0.001, unitKey: "health.unitThousandCases" });
+    expect(healthDisplay("health.staff.doctors")).toEqual({ multiplier: 1, unitKey: "health.unitPersons" });
+    expect(healthDisplay("health.facilities.hospitals")).toEqual({ multiplier: 1, unitKey: "health.unitUnits" });
+    expect(healthDisplay("health.facilities.outpatient_clinics")).toEqual({ multiplier: 1, unitKey: "health.unitUnits" });
+    expect(healthDisplay("health.facilities.beds")).toEqual({ multiplier: 1000, unitKey: "health.unitBeds" });
+    expect(healthDisplay("health.visits.outpatient")).toEqual({ multiplier: 0.001, unitKey: "health.unitMillionVisits" });
+    expect(healthDisplay("health.illness.respiratory")).toEqual({ multiplier: 1, unitKey: "health.unitThousandCases" });
+    expect(healthDisplay("health.illness.tuberculosis")).toEqual({ multiplier: 0.001, unitKey: "health.unitThousandCases" });
+  });
+
+  test("a tick of another unit replaces the selection; unticking keeps the rest", () => {
+    const facilities = ["health.facilities.hospitals", "health.facilities.outpatient_clinics"];
+    expect(keepOneHealthUnit([...facilities, "health.facilities.beds"], facilities)).toEqual(["health.facilities.beds"]);
+    expect(keepOneHealthUnit(facilities, ["health.facilities.hospitals"])).toEqual(facilities);
+    expect(keepOneHealthUnit(["health.facilities.hospitals"], facilities)).toEqual(["health.facilities.hospitals"]);
+    // Select all from an empty list keeps the first group's unit.
+    expect(keepOneHealthUnit(healthViewSeries("doctors-hospitals", "hospitals").map(s => s.id), [])).toEqual(facilities);
+    // A link that mixes units keeps the unit of its first row in list order.
+    expect(parseHealthHash("#tab=hospitals&sel=health.facilities.beds,health.facilities.hospitals", "doctors-hospitals", facts).selectedIds).toEqual(["health.facilities.hospitals"]);
   });
 
   test("beds are whole beds", () => {
-    const model = buildHealthModel("doctors-hospitals", facts, withIds("doctors-hospitals", "beds", ["health.facilities.beds"]), breaks);
+    const model = buildHealthModel("doctors-hospitals", facts, withIds("doctors-hospitals", "hospitals", ["health.facilities.beds"]), breaks);
     expect(model.selected[0].valuesByYear[2025]).toBe(15232);
     expect(model.selected[0].decimals).toBe(0);
     expect(model.decimals).toBe(0);
@@ -124,7 +136,7 @@ describe("display", () => {
   });
 
   test("visits are millions with one decimal", () => {
-    const model = buildHealthModel("doctors-hospitals", facts, withIds("doctors-hospitals", "visits", ["health.visits.outpatient"]), breaks);
+    const model = buildHealthModel("doctors-hospitals", facts, withIds("doctors-hospitals", "hospitals", ["health.visits.outpatient"]), breaks);
     expect(model.selected[0].valuesByYear[2025]).toBe(16.760072);
     expect(model.decimals).toBe(1);
     expect(model.unitKey).toBe("health.unitMillionVisits");
@@ -172,15 +184,6 @@ describe("counting changes", () => {
 });
 
 describe("gaps are nulls, never zeros", () => {
-  test("nurses' sub-groups stop in 2011 while total nurses runs on", () => {
-    const model = buildHealthModel("doctors-hospitals", facts, withIds("doctors-hospitals", "staff", ["health.staff.nurses", "health.staff.nurses_doctor_assistants"]), breaks);
-    const assistants = model.selected.find(s => s.id === "health.staff.nurses_doctor_assistants")!, nurses = model.selected.find(s => s.id === "health.staff.nurses")!;
-    for (let year = 2012; year <= 2025; year++) {
-      expect(assistants.valuesByYear[year]).toBeNull();
-      expect(nurses.valuesByYear[year]).toEqual(expect.any(Number));
-    }
-    expect(assistants.valuesByYear[2011]).toEqual(expect.any(Number));
-  });
   test("the combined nervous group ends in 2005 and the three classes start in 2006", () => {
     const model = buildHealthModel("illnesses", facts, withIds("illnesses", "main", ["health.illness.nervous_sense_organs", "health.illness.nervous", "health.illness.eye", "health.illness.ear"]), breaks);
     const [combined, nervous, eye, ear] = ["nervous_sense_organs", "nervous", "eye", "ear"].map(k => model.selected.find(s => s.id === `health.illness.${k}`)!);
@@ -204,9 +207,9 @@ describe("gaps are nulls, never zeros", () => {
 
 describe("hash", () => {
   test("a link from another view drops what it cannot show", () => {
-    const state = parseHealthHash("#tab=beds&sel=health.staff.doctors", "doctors-hospitals", facts);
-    expect(state.view).toBe("beds");
-    expect(state.selectedIds).toEqual(["health.facilities.beds"]);
+    const state = parseHealthHash("#tab=hospitals&sel=health.staff.doctors", "doctors-hospitals", facts);
+    expect(state.view).toBe("hospitals");
+    expect(state.selectedIds).toEqual(["health.facilities.hospitals"]);
   });
   test("an unknown tab is staff", () => {
     const state = parseHealthHash("#tab=xyz", "doctors-hospitals", facts);
@@ -231,10 +234,10 @@ describe("hash", () => {
   });
   test("changing view selects the new default, keeps mode, and refits the range without collapsing it", () => {
     const state: HealthState = { mode: "table", range: { kind: "manual", start: 2002, end: 2025 }, view: "staff", selectedIds: ["health.staff.nurses"] };
-    const next = changeHealthView(state, "doctors-hospitals", "beds", facts);
-    expect(next.view).toBe("beds");
+    const next = changeHealthView(state, "doctors-hospitals", "hospitals", facts);
+    expect(next.view).toBe("hospitals");
     expect(next.mode).toBe("table");
-    expect(next.selectedIds).toEqual(["health.facilities.beds"]);
+    expect(next.selectedIds).toEqual(["health.facilities.hospitals"]);
     expect(next.range).toEqual({ kind: "manual", start: 2002, end: 2025 });
   });
   test("an area page drops ids from another page and keeps an explicit empty selection", () => {
@@ -284,43 +287,37 @@ const sourceFor = (sourceId: string) => ({
 });
 const SOURCES = HEALTH_SOURCES.map(sourceFor);
 const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
-const LABELS: Record<string, string> = { "health.staff.nurses": "Nurses", "health.staff.nurses_doctor_assistants": "Doctor's assistants", "health.facilities.beds": "Hospital beds", "health.deaths.total": "All deaths" };
+const LABELS: Record<string, string> = { "health.staff.nurses": "Nurses", "health.staff.nurses_midwives": "Midwives", "health.facilities.beds": "Hospital beds", "health.deaths.total": "All deaths" };
 
 describe("Excel workbooks", () => {
-  test("a staff workbook keeps the published persons, and a group that stopped in 2011 is blank afterwards", async () => {
+  test("a staff workbook keeps the published persons", async () => {
     const model = buildHealthWorkbookExportModel({
       section: "doctors-hospitals", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Doctors and hospitals",
-      state: withIds("doctors-hospitals", "staff", ["health.staff.nurses", "health.staff.nurses_doctor_assistants"], { kind: "manual", start: 2002, end: 2025 }),
+      state: withIds("doctors-hospitals", "staff", ["health.staff.nurses", "health.staff.nurses_midwives"], { kind: "manual", start: 2002, end: 2025 }),
     }, await presentationFor("en"));
     expect(model.filename).toBe("fiscal-health-doctors-hospitals-2002-2025-en.xlsx");
     expect(model.readable.years).toHaveLength(24);
-    expect(model.readable.rows.map(row => row.label)).toEqual(["Nurses", "Doctor's assistants"]);
-    const [nurses, assistants] = model.readable.rows;
+    expect(model.readable.rows.map(row => row.label)).toEqual(["Nurses", "Midwives"]);
+    const [nurses] = model.readable.rows;
     expect(nurses.valuesByYear[2025]).toBe(21262);
     expect(Object.values(nurses.valuesByYear).every(value => value !== null)).toBe(true);
-    expect(assistants.valuesByYear[2011]).toEqual(expect.any(Number));
-    for (let year = 2012; year <= 2025; year++) expect(assistants.valuesByYear[year], String(year)).toBeNull();
     const analysis = model.analysis;
     expect(analysis.headers).toEqual(["Year", "Series", "Value", "Unit", "Status"]);
     expect(analysis.rows).toHaveLength(48);
     expect(analysis.rows.find(r => r[0] === 2025 && r[1] === "Nurses")).toEqual([2025, "Nurses", 21262, "persons", "Published"]);
-    expect(analysis.rows.find(r => r[0] === 2025 && r[1] === "Doctor's assistants")).toEqual([2025, "Doctor's assistants", null, "persons", "Not available"]);
     expect(model.sources.map(source => source.title)).toEqual(["geostat_health_nurses"]);
     const sheet = (await loadWorkbook(model)).getWorksheet(model.sheetNames[1])!;
     const rowOf = (year: number, label: string) => analysis.rows.findIndex(r => r[0] === year && r[1] === label) + 2;
     expect(sheet.getCell(rowOf(2025, "Nurses"), 3).value).toBe(21262);
     expect(sheet.getCell(rowOf(2025, "Nurses"), 3).numFmt).toBe("#,##0");
-    expect(sheet.getCell(rowOf(2025, "Doctor's assistants"), 3).value).toBeNull();
-    const summary = (await loadWorkbook(model)).getWorksheet(model.sheetNames[0])!;
-    expect(summary.getCell(5, 2 + 23).value).toBeNull();
   });
 
   test("a beds workbook exports the thousands as published, to the decimals each year is published with", async () => {
     const model = buildHealthWorkbookExportModel({
       section: "doctors-hospitals", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Doctors and hospitals",
-      state: withIds("doctors-hospitals", "beds", ["health.facilities.beds"], { kind: "manual", start: 2024, end: 2025 }),
+      state: withIds("doctors-hospitals", "hospitals", ["health.facilities.beds"], { kind: "manual", start: 2024, end: 2025 }),
     }, await presentationFor("en"));
-    expect(model.filename).toBe("fiscal-health-doctors-hospitals-beds-2024-2025-en.xlsx");
+    expect(model.filename).toBe("fiscal-health-doctors-hospitals-hospitals-2024-2025-en.xlsx");
     const beds2025 = facts.find(f => f.indicatorId === "health.facilities.beds" && f.year === 2025)!;
     expect(beds2025.value).toBe(15.232);
     expect(model.analysis.rows.find(r => r[0] === 2025)).toEqual([2025, "Hospital beds", 15.232, "thousand beds", "Published"]);

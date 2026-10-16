@@ -29,7 +29,7 @@ test("doctors and hospitals selects Doctors, marks both staff counting changes a
   await expect(page.getByTestId("health-latest")).toHaveText("Doctors · 2025: 22,491");
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
   await expect(page.locator(toggle("health.staff.doctors"))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 2");
+  await expect(page.getByTestId("series-status")).toContainText("1 / 18");
   await expect(page.locator('[data-testid^="health-tab"]')).toHaveCount(0);
   const breaks = page.getByTestId("chart-panel").getByTestId("chart-break");
   await expect(breaks).toHaveCount(2);
@@ -48,42 +48,51 @@ test("doctors and hospitals selects Doctors, marks both staff counting changes a
   expect(await header.evaluate(element => getComputedStyle(element).borderLeftWidth)).toBe("2px");
 });
 
-test("the measure switch is four named icons; Beds selects Hospital beds and states the latest beds", async ({ page }) => {
+test("the measure switch is two named icons; Hospitals lists beds and visits, and a tick of another unit replaces the selection", async ({ page }) => {
   await page.goto("/en/explorer/health/doctors-hospitals");
   await ready(page);
-  for (const [view, name] of [["staff", "Staff"], ["hospitals", "Hospitals and clinics"], ["beds", "Beds"], ["visits", "Visits"]] as const) {
+  await expect(page.locator('[data-testid^="health-view-"]')).toHaveCount(2);
+  for (const [view, name] of [["staff", "Staff"], ["hospitals", "Hospitals and clinics"]] as const) {
     await expect(page.getByTestId(`health-view-${view}`)).toHaveAccessibleName(name);
     await expect(page.getByTestId(`health-view-${view}`).locator("svg")).toHaveCount(1);
   }
   await expect(page.getByTestId("health-view-staff")).toHaveAttribute("aria-pressed", "true");
-  await page.getByTestId("health-view-beds").click();
-  await expect(page.getByTestId("health-view-beds")).toHaveAttribute("aria-pressed", "true");
-  await expect(page).toHaveURL(/tab=beds/);
-  await expect(page.locator(toggle("health.facilities.beds"))).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("health-view-hospitals").click();
+  await expect(page.getByTestId("health-view-hospitals")).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/tab=hospitals/);
+  await expect(page.getByTestId("series-heading")).toHaveText(["Facilities", "Beds", "Visits · million"]);
+  await expect(page.locator(toggle("health.facilities.hospitals"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("health-unit-label")).toHaveText("units");
+  await page.locator(toggle("health.facilities.outpatient_clinics")).click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(2);
+  // Beds are another unit: ticking them replaces the facilities.
+  await page.locator(toggle("health.facilities.beds")).click();
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
-  await expect(page.getByTestId("health-latest")).toHaveText("Hospital beds · 2025: 15,232");
+  await expect(page.locator(toggle("health.facilities.beds"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("health-unit-label")).toHaveText("beds");
   await expect(page.getByTestId("chart-break")).toHaveCount(0);
+  await page.locator(toggle("health.visits.outpatient")).click();
+  await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+  await expect(page.getByTestId("health-unit-label")).toHaveText("million visits");
   // A saved link from another view falls back to that view's default (Review Focus 4).
-  await page.goto("/en/explorer/health/doctors-hospitals#tab=beds&sel=health.staff.doctors");
+  await page.goto("/en/explorer/health/doctors-hospitals#tab=hospitals&sel=health.staff.doctors");
   await ready(page);
-  await expect(page.locator(toggle("health.facilities.beds"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(toggle("health.facilities.hospitals"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(toggle("health.staff.doctors"))).toHaveCount(0);
 });
 
-test("doctor's assistants stop in 2011: the table shows a dash for 2015, not a zero (Review Focus 2)", async ({ page }) => {
+test("staff list doctors and nurses flat under two headings, without the groups that ended in 2011", async ({ page }) => {
   await page.goto("/en/explorer/health/doctors-hospitals");
   await ready(page);
-  await page.locator(caret("health.staff.nurses")).click();
-  await page.locator(toggle("health.staff.nurses_doctor_assistants")).click();
-  await expect(page.locator(toggle("health.staff.nurses_doctor_assistants"))).toHaveAttribute("aria-pressed", "true");
-  // A nested tick is counted apart; the top-level count stays.
-  await expect(page.getByTestId("series-status")).toContainText("1 / 2");
+  await expect(page.getByTestId("series-heading")).toHaveText(["Doctors", "Nursing staff"]);
+  for (const id of ["health.staff.doctors", "health.staff.nurses"]) await expect(page.locator(caret(id))).toHaveCount(0);
+  await expect(page.locator('[data-series-id="health.staff.doctors_surgery"]')).toBeVisible();
+  await expect(page.locator('[data-series-id="health.staff.nurses_medical"]')).toBeVisible();
+  await expect(page.locator('[data-series-id="health.staff.nurses_doctor_assistants"]')).toHaveCount(0);
+  await page.locator(toggle("health.staff.nurses_medical")).click();
+  await expect(page.getByTestId("series-status")).toContainText("2 / 18");
   await page.getByTestId("chart-mode-table").click();
-  const table = page.getByTestId("explorer-table");
-  await expect(await cell(table, "Doctors’ assistants", 2015)).toHaveText("—");
-  await expect(await cell(table, "Doctors’ assistants", 2011)).not.toHaveText("—");
-  await expect(await cell(table, "Doctors", 2015)).not.toHaveText("—");
+  await expect(await cell(page.getByTestId("explorer-table"), "Medical nurses", 2025)).not.toHaveText("—");
 });
 
 test("illnesses select the five largest disease groups under their two headings, and search keeps the count", async ({ page }) => {

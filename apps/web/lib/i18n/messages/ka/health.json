@@ -17,10 +17,13 @@
   "health.page.area.regionSummary": "{region} — რეგისტრირებული გარდაცვალებები მიზეზების ძირითადი კლასების მიხედვით.",
   "health.heading.groups": "დაავადებათა ჯგუფები",
   "health.heading.single": "ცალკეული დაავადებები",
+  "health.heading.doctors": "ექიმები",
+  "health.heading.nurses": "საექთნო პერსონალი",
+  "health.heading.facilities": "დაწესებულებები",
+  "health.heading.beds": "საწოლები",
+  "health.heading.visits": "ვიზიტები · მილიონი",
   "health.view.staff": "პერსონალი",
   "health.view.hospitals": "საავადმყოფოები და ამბულატორიები",
-  "health.view.beds": "საწოლები",
-  "health.view.visits": "ვიზიტები",
   "health.measure": "მაჩვენებელი",
   "health.series.health.staff.doctors": "ექიმები",
   "health.series.health.staff.doctors_internal": "შინაგანი მედიცინის ექიმები (თერაპევტები)",
@@ -120,7 +123,5 @@
   "health.series": "სერია",
   "health.value": "მნიშვნელობა",
   "health.unit": "ერთეული",
-  "health.emptySelection": "შესადარებლად აირჩიეთ ერთი ან მეტი სერია.",
-  "health.nestedSelected": "ქვეკატეგორიები",
-  "health.subcategoriesFor": "{label} — ქვეკატეგორიები"
+  "health.emptySelection": "შესადარებლად აირჩიეთ ერთი ან მეტი სერია."
 }

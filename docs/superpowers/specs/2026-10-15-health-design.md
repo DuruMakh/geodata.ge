@@ -52,14 +52,12 @@ These rules apply to every Health page, as on Money and banks and Business:
 
 The line under the heading reads "2025: 22,491 doctors".
 
-The page covers 2002–2025 for Georgia as a whole. An icon measure switch offers four views:
+The page covers 2002–2025 for Georgia as a whole. An icon measure switch offers two views (changed on 2026-10-16 after the owner's preview review: the four groups that end in 2011 are dropped, the lists are flat under headings, and beds and visits join the hospitals view):
 
-- **Staff** (Lucide `Users`, initial), in persons:
-  - **Doctors** (selected), with Geostat's 14 doctor specialities nested under it: internal medicine, surgeons, obstetrician-gynaecologists, paediatricians, eye, ear-nose-throat, neurologists, psychiatrists, tuberculosis doctors, skin and venereal disease doctors, radiologists, rehabilitation and sports medicine, dentists, and other doctors.
-  - **Nurses**, with Geostat's sub-groups nested under it: midwives, medical nurses, doctor's assistants, laboratory assistants, X-ray assistants and others. The last four stop in 2011 because the 2012 definitions folded them into other groups. They show as gaps, not zeros.
-- **Hospitals and clinics** (Lucide `Hospital`), as a count: **Hospitals** (selected) and Out-patient clinics.
-- **Beds** (Lucide `BedDouble`), as a count: **Hospital beds** (selected).
-- **Visits** (Lucide `Stethoscope`), in million: **Out-patient visits** (selected).
+- **Staff** (Lucide `Users`, initial), in persons, flat under two headings:
+  - **Doctors**: **Doctors** (selected), then Geostat's 14 doctor specialities: internal medicine, surgeons, obstetrician-gynaecologists, paediatricians, eye, ear-nose-throat, neurologists, psychiatrists, tuberculosis doctors, skin and venereal disease doctors, radiologists, rehabilitation and sports medicine, dentists, and other doctors.
+  - **Nursing staff**: Nursing staff, medical nurses and midwives. Doctor's assistants, laboratory assistants, X-ray assistants and others stop in 2011 (the 2012 definitions folded them into other groups); they stay in the data file but are not listed.
+- **Hospitals and clinics** (Lucide `Hospital`), flat under three headings, one unit each: **Facilities**, as a count: **Hospitals** (selected) and Out-patient clinics; **Beds**, as a count: Hospital beds; **Visits · million**: Out-patient visits. A chart shows one unit at a time: ticking a row of another unit replaces the selection.
 
 Each view selects its bold series when it is first chosen. Switching keeps the years. Doctor and nurse values come from the two staff tables in persons; the totals equal Geostat's "main characteristics" table, which the checks confirm.
 

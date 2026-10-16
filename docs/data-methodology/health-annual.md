@@ -67,7 +67,7 @@ Indicator IDs are stable lowercase ASCII `health.{topic}.{item}`; Georgian and E
 | --- | --- | --- | --- |
 | `health.staff.doctors` and 14 `health.staff.doctors_*` specialities | persons | georgia | 2002–2025 |
 | `health.staff.nurses`, `health.staff.nurses_midwives`, `health.staff.nurses_medical` | persons | georgia | 2002–2025 |
-| `health.staff.nurses_{doctor_assistants, lab_assistants, xray_assistants, other}` | persons | georgia | 2002–2011 |
+| `health.staff.nurses_{doctor_assistants, lab_assistants, xray_assistants, other}` | persons | georgia | 2002–2011 (kept in the file; not listed on the page) |
 | `health.facilities.hospitals`, `health.facilities.outpatient_clinics` | units | georgia | 2002–2025 |
 | `health.facilities.beds` | units_thousand | georgia | 2002–2025 |
 | `health.visits.outpatient` | visits_thousand | georgia | 2002–2025 |

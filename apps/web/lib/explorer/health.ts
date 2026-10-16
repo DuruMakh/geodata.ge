@@ -13,51 +13,60 @@ export type HealthSectionId = typeof HEALTH_SECTIONS[number]["id"];
 /** The sections that read national figures; causes of death have an index map and a page per area (see `healthDeaths.ts`). */
 export type HealthNationalSectionId = Exclude<HealthSectionId, "causes-of-death">;
 
-/** Doctors and hospitals switch between four measures; illnesses have one. */
-export type HealthView = "staff" | "hospitals" | "beds" | "visits" | "main";
-const VIEWS: Record<HealthNationalSectionId, readonly HealthView[]> = { "doctors-hospitals": ["staff", "hospitals", "beds", "visits"], "illnesses": ["main"] };
+/** Doctors and hospitals switch between staff and hospitals (which also lists beds and visits); illnesses have one view. */
+export type HealthView = "staff" | "hospitals" | "main";
+const VIEWS: Record<HealthNationalSectionId, readonly HealthView[]> = { "doctors-hospitals": ["staff", "hospitals"], "illnesses": ["main"] };
 
 export function healthViews(section: HealthNationalSectionId): readonly HealthView[] {
   return VIEWS[section];
 }
 
-export type HealthSeriesDefinition = { id: HealthIndicator; reference: boolean; parentId?: HealthIndicator; heading?: "groups" | "single" };
+/** `heading` names the group a row is listed under; on the hospitals view each group has its own unit. */
+export type HealthHeading = "groups" | "single" | "doctors" | "nurses" | "facilities" | "beds" | "visits";
+export type HealthSeriesDefinition = { id: HealthIndicator; reference: boolean; heading?: HealthHeading };
 
 const ids = (prefix: string) => HEALTH_INDICATORS.filter(id => id.startsWith(prefix));
 /** The six diseases published as persons rather than as ICD-10 groups in thousands. */
 const SINGLE_DISEASES: readonly HealthIndicator[] = ["health.illness.tuberculosis", "health.illness.hiv", "health.illness.diabetes", "health.illness.anaemia", "health.illness.syphilis", "health.illness.gonorrhoea"];
 const ILLNESS_GROUPS = ids("health.illness.").filter(id => !SINGLE_DISEASES.includes(id));
+/** The nurse groups still published; doctors' assistants, laboratory and X-ray assistants and other nursing staff end in 2011 and are not listed. */
+const NURSE_PARTS: readonly HealthIndicator[] = ["health.staff.nurses_medical", "health.staff.nurses_midwives"];
 const top = (id: HealthIndicator, reference = false): HealthSeriesDefinition => ({ id, reference });
-/** A total followed by the parts that nest under it. */
-const withParts = (id: HealthIndicator, reference: boolean, parts: readonly HealthIndicator[]): HealthSeriesDefinition[] =>
-  [top(id, reference), ...parts.map(part => ({ id: part, reference: false, parentId: id }))];
+/** Rows listed under one heading, the first of them the reference if `reference` is set. */
+const under = (heading: HealthHeading, ids: readonly HealthIndicator[], reference = false): HealthSeriesDefinition[] =>
+  ids.map((id, index) => ({ ...top(id, reference && index === 0), heading }));
 
 /** The series a view offers, reference first. */
 export function healthViewSeries(section: HealthNationalSectionId, view: HealthView): HealthSeriesDefinition[] {
   switch (view) {
-    case "staff": return [...withParts("health.staff.doctors", true, ids("health.staff.doctors_")), ...withParts("health.staff.nurses", false, ids("health.staff.nurses_"))];
-    case "hospitals": return [top("health.facilities.hospitals"), top("health.facilities.outpatient_clinics")];
-    case "beds": return [top("health.facilities.beds")];
-    case "visits": return [top("health.visits.outpatient")];
-    case "main": return section === "illnesses"
-      ? [...ILLNESS_GROUPS.map(id => ({ ...top(id), heading: "groups" as const })), ...SINGLE_DISEASES.map(id => ({ ...top(id), heading: "single" as const }))]
-      : [];
+    case "staff": return [...under("doctors", ["health.staff.doctors", ...ids("health.staff.doctors_")], true), ...under("nurses", ["health.staff.nurses", ...NURSE_PARTS])];
+    case "hospitals": return [...under("facilities", ["health.facilities.hospitals", "health.facilities.outpatient_clinics"]), ...under("beds", ["health.facilities.beds"]), ...under("visits", ["health.visits.outpatient"])];
+    case "main": return section === "illnesses" ? [...under("groups", ILLNESS_GROUPS), ...under("single", SINGLE_DISEASES)] : [];
   }
 }
 
 /**
- * How a series is shown: the stored figure times `multiplier` (an exact power of ten), in the unit `unitKey` names.
- * Beds are stored in thousand and shown as beds, visits in thousand and shown in million, single diseases in persons
- * and shown in thousand.
+ * How a national series is shown: the stored figure times `multiplier` (an exact power of ten), in the unit `unitKey`
+ * names. Beds are stored in thousand and shown as beds, visits in thousand and shown in million, single diseases in
+ * persons and shown in thousand.
  */
-export function healthDisplay(view: HealthView, indicatorId: HealthIndicator): { multiplier: number; unitKey: string } {
-  switch (view) {
-    case "staff": return { multiplier: 1, unitKey: "health.unitPersons" };
-    case "hospitals": return { multiplier: 1, unitKey: "health.unitUnits" };
-    case "beds": return { multiplier: 1000, unitKey: "health.unitBeds" };
-    case "visits": return { multiplier: 0.001, unitKey: "health.unitMillionVisits" };
-    case "main": return { multiplier: SINGLE_DISEASES.includes(indicatorId) ? 0.001 : 1, unitKey: "health.unitThousandCases" };
-  }
+export function healthDisplay(indicatorId: HealthIndicator): { multiplier: number; unitKey: string } {
+  if (indicatorId.startsWith("health.staff.")) return { multiplier: 1, unitKey: "health.unitPersons" };
+  if (indicatorId === "health.facilities.beds") return { multiplier: 1000, unitKey: "health.unitBeds" };
+  if (indicatorId.startsWith("health.facilities.")) return { multiplier: 1, unitKey: "health.unitUnits" };
+  if (indicatorId === "health.visits.outpatient") return { multiplier: 0.001, unitKey: "health.unitMillionVisits" };
+  return { multiplier: SINGLE_DISEASES.includes(indicatorId) ? 0.001 : 1, unitKey: "health.unitThousandCases" };
+}
+
+const unitOf = (id: string) => healthDisplay(id as HealthIndicator).unitKey;
+/**
+ * Series of different units never share a chart. A tick (or the bulk selection) that adds a series of another unit than
+ * the rows already ticked keeps only the rows of the added series' unit; with several added at once, the first one's
+ * unit wins. Unticking keeps the rest as it is.
+ */
+export function keepOneHealthUnit(next: readonly string[], previous: readonly string[]): string[] {
+  const added = next.filter(id => !previous.includes(id));
+  return added.length ? next.filter(id => unitOf(id) === unitOf(added[0])) : [...next];
 }
 
 /** A power of ten applied to a published figure; rounding to 15 digits removes the binary noise (933 x 0.001 is 0.933). */
@@ -79,6 +88,7 @@ export function healthCoverage(section: HealthNationalSectionId, view: HealthVie
 const ILLNESS_DEFAULT_COUNT = 5;
 /** Out-patient visits are always shown in million with one decimal. */
 const VISITS_DECIMALS = 1;
+const VISITS: HealthIndicator = "health.visits.outpatient";
 
 /**
  * A view's initial selection: its first series. Illnesses start on the five disease groups with the largest value in
@@ -115,7 +125,7 @@ export function parseHealthHash(hash: string, section: HealthNationalSectionId, 
   const view = topicHashView(p, healthViews(section));
   const fallback = healthDefaultSelection(section, view, facts);
   const { selectedIds, ...rest } = parseTopicHash(p, healthViewSeries(section, view), fallback, healthCoverage(section, view, facts));
-  return { ...rest, view, selectedIds: selectedIds.length || p.get("sel") === "" ? selectedIds : fallback };
+  return { ...rest, view, selectedIds: selectedIds.length || p.get("sel") === "" ? keepOneHealthUnit(selectedIds, []) : fallback };
 }
 
 export function serializeHealthHash(state: HealthState, section: HealthNationalSectionId): string {
@@ -136,7 +146,7 @@ export type HealthSeriesModel<D extends { id: string; reference: boolean } = Hea
  * series is always shown with the same number of decimals, that number (visits). Otherwise the decimals are the
  * published ones less the multiplier's power of ten, never below 0: beds 3 less 3, single diseases 0 less -3.
  */
-export function buildHealthSeriesModel<D extends { id: string; reference: boolean; parentId?: string }>(input: {
+export function buildHealthSeriesModel<D extends { id: string; reference: boolean }>(input: {
   facts: readonly ClientHealthFact[]; area: HealthArea; range: PeriodRange; coverage: TopicCoverage; definitions: readonly D[]; selectedIds: readonly string[];
   scale: (definition: D) => { multiplier: number; fixedDecimals?: number };
 }): { range: ResolvedPeriodRange; years: number[]; series: HealthSeriesModel<D>[]; selected: HealthSeriesModel<D>[]; decimals: number } {
@@ -173,13 +183,13 @@ export function buildHealthModel(section: HealthNationalSectionId, facts: readon
   const model = buildHealthSeriesModel({
     facts, area: "georgia", range: state.range, coverage: healthCoverage(section, state.view, facts), definitions, selectedIds: state.selectedIds,
     scale: definition => {
-      const { multiplier } = healthDisplay(state.view, definition.id);
-      return { multiplier, fixedDecimals: state.view === "visits" ? VISITS_DECIMALS : undefined };
+      const { multiplier } = healthDisplay(definition.id);
+      return { multiplier, fixedDecimals: definition.id === VISITS ? VISITS_DECIMALS : undefined };
     },
   });
   const selected = new Set(state.selectedIds);
   const years = breaks.filter(item => !UNDRAWN_BREAKS.includes(item.breakId) && item.appliesTo.some(id => selected.has(id)))
     .map(item => Number(item.referenceDate.slice(0, 4))).filter(year => year > model.range.start && year <= model.range.end);
-  const unitKey = healthDisplay(state.view, definitions[0].id).unitKey;
+  const unitKey = healthDisplay((model.selected[0] ?? definitions[0]).id).unitKey;
   return { ...model, unitKey, breaks: [...new Set(years)].sort((a, b) => a - b).map(year => ({ year, label: "newCounting" as const })) };
 }
