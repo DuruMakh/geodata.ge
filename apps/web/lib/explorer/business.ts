@@ -5,7 +5,7 @@ import {
 import { INK, OTHER_COLOR } from "./colors";
 import { refitRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { keepOneUnit } from "./unitList";
+import { keepOneUnit, unitsOf } from "./unitList";
 
 export const BUSINESS_HUB_PATH = "/explorer/business";
 export const BUSINESS_SECTIONS = [
@@ -99,12 +99,6 @@ export function businessHeadingLabel(heading: BusinessHeading, unit: BusinessUni
   if (heading === "size" || heading === "industry") return t(`heading.${heading}`);
   return unit === "enterprises" ? t(`measure.${heading}`) : `${t(`measure.${heading}`)} · ${unitLabels[unit]}`;
 }
-
-/** Each series' unit, as its facts give it. */
-const unitsOf = (facts: readonly ClientBusinessFact[]) => {
-  const units = new Map<string, BusinessUnit>(facts.map(f => [f.indicatorId, f.unit]));
-  return (id: string) => units.get(id);
-};
 
 /** Series of different units never share a chart; the rule is `keepOneUnit`. */
 export function keepOneBusinessUnit(next: readonly string[], previous: readonly string[], facts: readonly ClientBusinessFact[]): string[] {

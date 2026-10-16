@@ -38,6 +38,8 @@ export function buildCrimeWorkbookExportModel(input: CrimeWorkbookInput, present
   const numberFormat = rates ? "#,##0.0" : "#,##0";
   // A rate is written to the one decimal the page shows it with, so the cell holds the figure the reader sees.
   const valueOf = (value: number | null) => value === null ? null : Number(value.toFixed(model.decimals));
+  // As on Money and banks, a rate fiscal.ge divides out is marked calculated; a count is Geostat's published figure.
+  const status = (fact: ReturnType<typeof cell>) => !fact ? workbookMessage(locale, "workbook.unavailable") : fact.calculated ? t("status.calculated") : t("status.published");
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series, fact: cell(series.id, year) })));
   const stem = `crime-${section}${rates ? "-per-100k" : ""}-${model.range.start}-${model.range.end}`;
   const header: Record<typeof ANALYSIS_COLUMNS[number], string> = {
@@ -56,7 +58,7 @@ export function buildCrimeWorkbookExportModel(input: CrimeWorkbookInput, present
     },
     analysis: {
       headers: ANALYSIS_COLUMNS.map(column => header[column]),
-      rows: cells.map(({ year, series, fact }) => [year, labels[series.id], valueOf(series.valuesByYear[year]), unitLabel(series.id), fact ? workbookMessage(locale, "workbook.published") : workbookMessage(locale, "workbook.unavailable")]),
+      rows: cells.map(({ year, series, fact }) => [year, labels[series.id], valueOf(series.valuesByYear[year]), unitLabel(series.id), status(fact)]),
       numericFormats: { [VALUE_COLUMN]: numberFormat },
     },
     sources: withAbsoluteUrls(originals, input.siteOrigin),

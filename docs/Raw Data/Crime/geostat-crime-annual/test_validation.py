@@ -311,9 +311,11 @@ class CrimePackageTests(unittest.TestCase):
         self.assertEqual(list(lines[0]), ['break_id', 'applies_to', 'reference_date', 'reason', 'source_note'])
         self.assertEqual(lines[0]['reference_date'], '2018-01-01')
         self.assertEqual(lines[0]['applies_to'].split(';'), ['crime.recorded.total'] + [f'crime.recorded.{n}' for n in RECORDED])
-        for text in ('37,944', '58,412', '1,119', '1,486', 'article 115', 'incitement to suicide', 'not comparable',
-                     'https://geostat.ge/media/76844/Unified-Report-on-Criminal-Justice-Statistics-%28Dec%2C-2025%29.pdf'):
+        for text in ('37,944', '58,412', 'not comparable', '2015-2017', 'Number-of-Recorded-Crimes.xlsx'):
             self.assertIn(text, lines[0]['reason'] + lines[0]['source_note'])
+        # No explanation is attributed to anyone: none was found in an official text.
+        for text in ('Ministry said', 'Interior', 'each suicide'):
+            self.assertNotIn(text, lines[0]['reason'] + lines[0]['source_note'])
         self.assertEqual(self.values('crime.recorded.total')[2017], 37944)
         self.assertEqual(self.values('crime.recorded.total')[2018], 58412)
         self.assertEqual((lines[1]['reference_date'], lines[1]['applies_to']), ('2025-01-01', 'crime.road.accidents_drunk'))

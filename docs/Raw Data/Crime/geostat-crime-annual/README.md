@@ -69,17 +69,17 @@ Served rows by family: recorded 132, convicted 650, prison 157, victims 224, roa
 
 ## Series breaks
 
-- `registration_2018` (2018-01-01; all 12 `crime.recorded.*` IDs): recorded crimes rose from 37,944 in 2017 to 58,412 in 2018 in almost every group (all but public security and order, which fell from 1,575 to 1,570, and drug-related offences, which fell from 4,762 to 4,239). Values before and after 2018 are not comparable. The reason quotes the Unified Report figure (article 115: 1,119 of the 1,486 crimes against life in 2025). It does not say how much of the rise is real.
+- `registration_2018` (2018-01-01; all 12 `crime.recorded.*` IDs): recorded crimes rose from 37,944 in 2017 to 58,412 in 2018 in almost every group (all but public security and order, which fell from 1,575 to 1,570, and drug-related offences, which fell from 4,762 to 4,239). The reason says that counts from 2018 are not comparable with those for 2015-2017, that no change is calculated across 2018, and that Fiscal.ge does not say how much of the rise is a real increase in crime. It attributes no explanation to anyone, because none was found in an official text (below).
 - `drunk_driving_coverage_2025` (2025-01-01; `crime.road.accidents_drunk`): the reason quotes Geostat's footnote in full (below). `prepare.py` fails if the quoted footnote is not printed in the workbook, or if the 2017 and 2018 totals in the 2018 reason are not the served ones.
 
-**Search for an official statement on the 2018 change.** The Interior Ministry's explanation (that from 2018 it no longer left minor offences, such as damage to property, out of the figures) comes from the design spec, which attributes it to what the Ministry said at the time. I could not find or quote an official text of it:
+**Search for an official statement on the 2018 change.** The design spec attributed an explanation of the change to the Interior Ministry. I could not find or quote an official text of it, so it is not used anywhere (the break reason, the methodology page and `docs/data-methodology/crime-annual.md` give no explanation):
 
 - Geostat's two category pages (captured in `official/`) list only the workbooks and the Unified Report; they carry no methodology note on crime registration.
 - No Geostat workbook or footnote mentions 2018 for recorded crimes. The one 2018 reference in the served workbooks is the prison table's source line ("from 2018 Ministry of Justice of Georgia"), which concerns the prison source, not crime registration.
 - `police.ge` returns an "Access Denied" page and `mia.gov.ge` resets the connection when asked from this cloud workspace, so the Ministry's own site could not be searched.
 - The December 2025 Unified Report has no note on 2018 either.
 
-The methodology page should therefore cite the Unified Report figure and name the Ministry's explanation as the Ministry's, as the spec says, until someone with access to `police.ge` finds the original statement.
+As context only, the methodology page states two facts from Geostat's data and publications, without drawing a cause from them: crimes against life rose from 1,013 in 2017 to 2,154 in 2018 in the served data, and the Unified Report's table 1-2 for 2025 (below) lists 1,119 of the 1,486 crimes against life as "Incitement to suicide article 115 *", with its note quoted.
 
 ## Footnotes Geostat prints under the served tables
 

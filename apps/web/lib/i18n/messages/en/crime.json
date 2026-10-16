@@ -109,6 +109,8 @@
   "crime.sourceNote.victims": "Source: Geostat, Ministry of Internal Affairs and Prosecutor’s Office",
   "crime.sourceNote.road-accidents": "Source: Geostat, Ministry of Internal Affairs",
   "crime.workbook.ratesNote": "Rates per 100,000 people are calculated by fiscal.ge from Geostat's counts and Georgia's population on 1 January.",
+  "crime.status.published": "Published",
+  "crime.status.calculated": "Calculated by Fiscal.ge",
   "crime.methodology": "Methodology and sources",
   "crime.search": "Search",
   "crime.series": "Series",

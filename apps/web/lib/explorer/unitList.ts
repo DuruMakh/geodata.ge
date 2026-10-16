@@ -2,7 +2,7 @@
 export type UnitFact = { indicatorId: string; year: number; unit: string };
 
 /** Each series' unit, as its facts give it. */
-const unitsOf = (facts: readonly UnitFact[]) => {
+export const unitsOf = (facts: readonly UnitFact[]) => {
   const units = new Map<string, string>(facts.map(f => [f.indicatorId, f.unit]));
   return (id: string) => units.get(id);
 };

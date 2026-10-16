@@ -248,7 +248,7 @@ describe("Excel workbooks", () => {
     expect(model.analysis.headers).toEqual(["Year", "Series", "Value", "Unit", "Status"]);
     expect(model.analysis.rows).toHaveLength(25);
     expect(model.analysis.rows.find(r => r[0] === 2002)).toEqual([2002, "People convicted", null, "per 100,000 people", "Not available"]);
-    expect(model.analysis.rows.find(r => r[0] === 2004)).toEqual([2004, "People convicted", 230.4, "per 100,000 people", "Published"]);
+    expect(model.analysis.rows.find(r => r[0] === 2004)).toEqual([2004, "People convicted", 230.4, "per 100,000 people", "Calculated by Fiscal.ge"]);
     // The population workbook is cited for the years it supplied, besides the convictions workbooks.
     expect(model.sources.map(source => source.title).sort()).toEqual(["geostat_crime_convicts_types", "source.geostat_municipal_population"]);
     expect(model.sources.find(source => source.title === "source.geostat_municipal_population")!.years).toEqual(Array.from({ length: 22 }, (_, i) => 2004 + i));
@@ -269,6 +269,7 @@ describe("Excel workbooks", () => {
     const ka = buildCrimeWorkbookExportModel({ ...input, state: state("convictions", ["crime.convicted.total"], "per100k", range) }, await presentationFor("ka"));
     expect(ka.readable.subtitle).toContain("100 000 მოსახლეზე მაჩვენებლები fiscal.ge-მ გამოთვალა");
     expect(ka.filename).toBe("fiscal-crime-convictions-per-100k-2010-2020.xlsx");
+    expect(ka.analysis.rows.find(r => r[2] !== null)![4]).toBe("Fiscal.ge-ის მიერ გამოთვლილი");
     const count = buildCrimeWorkbookExportModel({ ...input, state: state("convictions", ["crime.convicted.total"], "count", range) }, await presentationFor("en"));
     expect(count.readable.subtitle).not.toContain("calculated");
     expect(count.sources.map(source => source.title)).toEqual(["geostat_crime_convicts_types"]);

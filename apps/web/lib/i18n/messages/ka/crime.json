@@ -109,6 +109,8 @@
   "crime.sourceNote.victims": "წყარო: საქსტატი, შინაგან საქმეთა სამინისტრო და გენერალური პროკურატურა",
   "crime.sourceNote.road-accidents": "წყარო: საქსტატი, შინაგან საქმეთა სამინისტრო",
   "crime.workbook.ratesNote": "100 000 მოსახლეზე მაჩვენებლები fiscal.ge-მ გამოთვალა საქსტატის მონაცემებითა და საქართველოს მოსახლეობით 1 იანვრის მდგომარეობით.",
+  "crime.status.published": "გამოქვეყნებული",
+  "crime.status.calculated": "Fiscal.ge-ის მიერ გამოთვლილი",
   "crime.methodology": "მეთოდოლოგია და წყაროები",
   "crime.search": "ძიება",
   "crime.series": "სერია",

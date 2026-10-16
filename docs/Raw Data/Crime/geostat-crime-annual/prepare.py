@@ -40,7 +40,6 @@ NS = {'x': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
 PLACEHOLDERS = ('…', '...', '-')  # Geostat's marks for "not published" and "none"
 GROUPED = re.compile(r'\d{1,3}(?: \d{3})+')  # a whole number printed as text with a space for thousands, such as "49 976"
 QUARTER = re.compile(r'I-II (?:Q\.|quarters), 2026')  # the one part-year column; it is never served
-UNIFIED_REPORT = 'https://geostat.ge/media/76844/Unified-Report-on-Criminal-Justice-Statistics-%28Dec%2C-2025%29.pdf'
 
 # (English media id, English file, Georgian media id, Georgian file, source ID of the English file, title)
 FILES = [
@@ -550,15 +549,11 @@ def series_breaks(rows):
     recorded = ['crime.recorded.total'] + [name for name in SPECS if name.startswith('crime.recorded.') and name != 'crime.recorded.total']
     return [
         {'break_id': 'registration_2018', 'applies_to': ';'.join(recorded), 'reference_date': '2018-01-01',
-         'reason': 'Recorded crimes rose from 37,944 in 2017 to 58,412 in 2018, in almost every group of crimes. At the time the Interior '
-                   'Ministry said that from 2018 it no longer left minor offences, such as damage to property, out of the figures. One sign in '
-                   'Geostat\'s own data: from 2018 each suicide is registered as an "incitement to suicide" investigation (Criminal Code '
-                   'article 115), which accounted for 1,119 of the 1,486 crimes against life in 2025 (December 2025 Unified Report on Criminal '
-                   'Justice Statistics, table 1-2, rows 2 and 12). The values before and after 2018 are therefore not comparable. How much of the '
-                   'rise is real is not known.',
-         'source_note': f'Geostat Number-of-Recorded-Crimes.xlsx (2017 and 2018 totals); Unified Report on Criminal Justice Statistics (Dec, 2025), '
-                        f'table 1-2: {UNIFIED_REPORT}. The Ministry\'s explanation is reported as the Ministry\'s: no official Ministry or Geostat '
-                        f'text on the 2018 change was reachable when this package was built (see README)'},
+         'reason': 'Recorded crimes rose from 37,944 in 2017 to 58,412 in 2018, in almost every group of crimes. Counts from 2018 are not '
+                   'comparable with those for 2015-2017, and no change is calculated across 2018. Fiscal.ge does not say how much of the rise '
+                   'is a real increase in crime.',
+         'source_note': 'Geostat Number-of-Recorded-Crimes.xlsx (2017 and 2018 totals). No official statement explaining the change was '
+                        'found when this package was built (see README)'},
         {'break_id': 'drunk_driving_coverage_2025', 'applies_to': 'crime.road.accidents_drunk', 'reference_date': '2025-01-01',
          'reason': f'Geostat footnote: "{FOOTNOTE_QUOTES["drunk_driving"][1]}"',
          'source_note': 'Geostat footnote * on Accidents.xlsx (row "of which were caused by alcohol intoxication*", cell A7)'},
