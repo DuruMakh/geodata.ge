@@ -40,6 +40,7 @@ data/reports/*.json
 !data/reports/poverty-validation.json
 !data/reports/energy-food-validation.json
 !data/reports/health-validation.json
+!data/reports/crime-validation.json
 !data/reports/money-banks-validation.json
 !data/reports/business-validation.json
 !data/reports/housing-validation.json

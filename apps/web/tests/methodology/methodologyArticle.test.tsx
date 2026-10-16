@@ -127,6 +127,7 @@ describe("methodology footer attribution", () => {
     ["business", "Geostat"],
     ["housing", "Geostat"],
     ["health", "Geostat"],
+    ["crime", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
@@ -167,6 +168,29 @@ describe("health methodology", () => {
     expect(markup).toContain("/downloads/methodology/health/files/23-2-deaths-by-chapters-regions.xlsx");
     expect(markup).toContain("/downloads/methodology/health/files/deaths-page.html.txt");
     expect(markup).not.toContain("geostat.ge/media");
+  });
+});
+
+describe("crime methodology", () => {
+  it.each([
+    ["ka", "დანაშაული და მართლმსაჯულება", "შესაბამისად 2025 წლის მონაცემები შესადარისი არ არის 2001-2024 წლების მონაცემებთან.", "მოიცავს ყველა საგამოძიებო უწყების მონაცემებს."],
+    ["en", "Crime and justice", "Accordingly, the 2025 data is not comparable with data from previous years.", "Note: Includes all investigative agencies of Georgia."],
+  ] as const)("renders the %s article with its 22 archived originals, Geostat's notes, the Unified Report link and Dataset markup", async (locale, title, drunkDrivingNote, recordedNote) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "crime" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2001–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    expect(markup).toContain(drunkDrivingNote);
+    expect(markup).toContain(recordedNote);
+    expect(markup).toContain("/downloads/methodology/crime/files/number-of-recorded-crimes.xlsx");
+    expect(markup).toContain("/downloads/methodology/crime/files/prison-population.xls");
+    expect(markup).toContain("/downloads/methodology/crime/files/registrirebuli-danasaulis-raodenoba.xlsx");
+    expect(markup).toContain("/downloads/methodology/crime/files/crime-page.html.txt");
+    // The Unified Report is linked on geostat.ge, not archived; the workbooks link only to their archive copies.
+    expect(markup).toContain("https://geostat.ge/media/76844/Unified-Report-on-Criminal-Justice-Statistics-%28Dec%2C-2025%29.pdf");
+    expect(markup).not.toContain("/downloads/methodology/crime/files/unified-report");
+    expect(markup).not.toContain("geostat.ge/media/81890");
   });
 });
 

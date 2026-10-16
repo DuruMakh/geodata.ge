@@ -98,6 +98,24 @@ test("the health hub shows one card per page, each linking to it, and the sideba
   await expect(page.getByTestId("health-hub").locator("a").first()).toContainText("2025 · 22,491 · 2002–2025");
 });
 
+test("the crime hub shows one card per page, each linking to it, and the sidebar lists Crime and justice after Health", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const sections = ["recorded", "convictions", "prisons", "victims", "road-accidents"];
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${prefix}/explorer/crime`);
+    const cards = page.getByTestId("crime-hub").locator("a");
+    await expect(cards).toHaveCount(5);
+    expect(await cards.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(sections.map(section => `${prefix}/explorer/crime/${section}`));
+    for (let index = 0; index < 5; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+    const entry = page.getByTestId("crime-link");
+    await expect(entry).toHaveAttribute("aria-current", "page");
+    expect(await page.getByTestId("health-link").evaluate((health, crime) => Boolean(health.compareDocumentPosition(crime!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    for (const id of sections) await expect(page.getByTestId(`crime-${id}-link`)).toBeVisible();
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Crime and justice");
+  await expect(page.getByTestId("crime-hub").locator("a").first()).toContainText("2025 · 54,134 · 2015–2025");
+});
+
 test("the housing hub shows one card per page, each linking to it, and the sidebar lists Housing after Business", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   for (const prefix of ["", "/en"]) {

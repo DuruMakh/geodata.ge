@@ -24,6 +24,7 @@ import { renderExpenditurePage } from "../../lib/pages/expenditure";
 import { renderCurrentAccountPage, renderForeignInvestmentPage, renderMoneyFromAbroadPage } from "../../lib/pages/external";
 import { renderGdpPage } from "../../lib/pages/gdp";
 import { renderHealthPage } from "../../lib/pages/health";
+import { renderCrimePage } from "../../lib/pages/crime";
 import { renderHealthDeathsAreaPage } from "../../lib/pages/health-deaths";
 import { renderHealthDeathsIndex } from "../../lib/pages/health-deaths-index";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
@@ -31,6 +32,7 @@ import { renderHubPage, TopicHub } from "../../lib/pages/hub";
 import { renderEnergyFoodHub } from "../../lib/pages/hubs/energy-food";
 import { renderExternalHub } from "../../lib/pages/hubs/external";
 import { renderHealthHub } from "../../lib/pages/hubs/health";
+import { renderCrimeHub } from "../../lib/pages/hubs/crime";
 import { renderInflationHub } from "../../lib/pages/hubs/inflation";
 import { renderMoneyBanksHub } from "../../lib/pages/hubs/moneyBanks";
 import { renderTradeHub } from "../../lib/pages/hubs/trade";
@@ -109,6 +111,8 @@ const pages: PageRender[] = [
   ["health", (locale) => renderHealthPage(locale, "doctors-hospitals"), 1],
   ["causes of death", renderHealthDeathsIndex, 1],
   ["causes of death area", (locale) => renderHealthDeathsAreaPage(locale, "guria"), 1],
+  ["crime hub", renderCrimeHub, 0],
+  ["crime", (locale) => renderCrimePage(locale, "road-accidents"), 1],
   ["trade hub", renderTradeHub, 0],
   ["trade overview", renderTradeOverviewPage, 1],
   ["trade partners", renderTradePartnersPage, 1],

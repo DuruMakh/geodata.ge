@@ -69,6 +69,18 @@ describe("original-source inventory", () => {
     expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Business/geostat-business-annual/official/"))).toBe(true);
   });
 
+  it("inventories the 22 crime and justice originals: the English and Georgian workbooks and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "crime");
+    expect(rows).toHaveLength(22);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Crime/geostat-crime-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes.xlsx",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/registrirebuli-danaSaulis-raodenoba.xlsx",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/crime-page.html",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/crime-page-ka.html",
+    ]));
+  });
+
   it("returns forward-slash paths in lexical order", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     for (const rows of Object.values(inventory)) {

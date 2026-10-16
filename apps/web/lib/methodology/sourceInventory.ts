@@ -60,6 +60,8 @@ const inventoryRules = {
   "energy-food": [{ root: "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official", include: () => true }],
   // The healthcare and deaths workbooks (official/deaths/) and both page captures; served and archived-only alike.
   health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
+  // The English workbooks, their Georgian versions (kept for the Georgian labels) and both page captures; served and archived-only alike.
+  crime: [{ root: "docs/Raw Data/Crime/geostat-crime-annual/official", include: () => true }],
   money: [{ root: "docs/Raw Data/Money/nbg-money-banks-annual/official", include: () => true }],
   business: [{ root: "docs/Raw Data/Business/geostat-business-annual/official", include: () => true }],
   // The six served workbooks, the two zips and their members, the other price and cost workbooks, and the three page captures.

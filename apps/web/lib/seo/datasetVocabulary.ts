@@ -385,6 +385,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  crime: {
+    keywords: {
+      ka: ["დანაშაული", "მსჯავრდებულები", "პატიმრები", "დაზარალებულები", "საგზაო-სატრანსპორტო შემთხვევები", "საქართველო"],
+      en: ["Georgia", "crime", "convictions", "prisoners", "victims", "road accidents"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის სისხლის სამართლის ოფიციალური გამოქვეყნებული სტატისტიკიდან; 100 000 მოსახლეზე მაჩვენებელს fiscal.ge ითვლის 1 იანვრის მოსახლეობიდან.",
+      en: "Reviewed extraction from Geostat's official published criminal justice statistics; rates per 100,000 people are calculated by fiscal.ge from the population on 1 January.",
+    },
+    sources: ["geostat"],
+  },
 };
 
 /** A dataset whose figures are official statistics Fiscal.ge reads from a named producer (`sourceAgenciesFor`). */

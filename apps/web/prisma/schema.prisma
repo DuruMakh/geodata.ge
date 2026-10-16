@@ -88,6 +88,7 @@ model SourceDocument {
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
   healthFacts HealthFact[]
+  crimeFacts CrimeFact[]
   moneyBanksFacts MoneyBanksFact[]
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
@@ -140,6 +141,7 @@ model ImportRun {
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
   healthFacts HealthFact[]
+  crimeFacts CrimeFact[]
   moneyBanksFacts MoneyBanksFact[]
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
@@ -949,6 +951,28 @@ model HealthFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, areaId, year])
+}
+
+// Mirror of data/imports/crime-annual.csv: Geostat's annual recorded-crime, conviction, prison,
+// victim and road-accident counts, whole numbers. The counting-change register stays in the CSV.
+model CrimeFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
 }
 
 // Mirror of data/imports/money-banks-annual.csv: NBG's yearly money, loan, deposit,

@@ -345,5 +345,12 @@
   "/explorer/housing/regions/samtskhe_javakheti": "2026-10-16",
   "/explorer/housing/regions/kvemo_kartli": "2026-10-16",
   "/explorer/housing/regions/shida_kartli": "2026-10-16",
-  "/methodology/housing": "2026-10-16"
+  "/methodology/housing": "2026-10-16",
+  "/explorer/crime": "2026-10-16",
+  "/explorer/crime/recorded": "2026-10-16",
+  "/explorer/crime/convictions": "2026-10-16",
+  "/explorer/crime/prisons": "2026-10-16",
+  "/explorer/crime/victims": "2026-10-16",
+  "/explorer/crime/road-accidents": "2026-10-16",
+  "/methodology/crime": "2026-10-16"
 }

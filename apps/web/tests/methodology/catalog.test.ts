@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "trade", "external-flows", "energy-food", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "crime", "trade", "external-flows", "energy-food", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -354,6 +354,7 @@ describe("methodology catalog", () => {
       poverty: { fileCount: 7, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2004, maxYear: 2025 },
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
+      crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },
       housing: { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2006, maxYear: 2025 },
@@ -417,6 +418,7 @@ describe("methodology catalog", () => {
       { id: "poverty", title: METHODOLOGY_CONTENT.poverty.title, summary: METHODOLOGY_CONTENT.poverty.summary, href: "/methodology/poverty", coverage: { firstYear: 2004, lastYear: 2025 }, originalFileCount: 7, reviewedAt: METHODOLOGY_CONTENT.poverty.reviewedAt },
       { id: "household-income", title: METHODOLOGY_CONTENT["household-income"].title, summary: METHODOLOGY_CONTENT["household-income"].summary, href: "/methodology/household-income", coverage: { firstYear: 2002, lastYear: 2025 }, originalFileCount: 21, reviewedAt: METHODOLOGY_CONTENT["household-income"].reviewedAt },
       { id: "health", title: METHODOLOGY_CONTENT.health.title, summary: METHODOLOGY_CONTENT.health.summary, href: "/methodology/health", coverage: { firstYear: 2002, lastYear: 2025 }, originalFileCount: 36, reviewedAt: METHODOLOGY_CONTENT.health.reviewedAt },
+      { id: "crime", title: METHODOLOGY_CONTENT.crime.title, summary: METHODOLOGY_CONTENT.crime.summary, href: "/methodology/crime", coverage: { firstYear: 2001, lastYear: 2025 }, originalFileCount: 22, reviewedAt: METHODOLOGY_CONTENT.crime.reviewedAt },
       { id: "trade", title: METHODOLOGY_CONTENT.trade.title, summary: METHODOLOGY_CONTENT.trade.summary, href: "/methodology/trade", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT.trade.reviewedAt },
       { id: "external-flows", title: METHODOLOGY_CONTENT["external-flows"].title, summary: METHODOLOGY_CONTENT["external-flows"].summary, href: "/methodology/external-flows", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT["external-flows"].reviewedAt },
       { id: "energy-food", title: METHODOLOGY_CONTENT["energy-food"].title, summary: METHODOLOGY_CONTENT["energy-food"].summary, href: "/methodology/energy-food", coverage: { firstYear: 2013, lastYear: 2025 }, originalFileCount: 42, reviewedAt: METHODOLOGY_CONTENT["energy-food"].reviewedAt },
@@ -442,6 +444,7 @@ describe("methodology catalog", () => {
       poverty: { fileCount: 7, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2004, maxYear: 2025 },
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
+      crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },
       housing: { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2006, maxYear: 2025 },
