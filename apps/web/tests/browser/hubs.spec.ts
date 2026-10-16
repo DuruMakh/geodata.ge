@@ -116,6 +116,26 @@ test("the crime hub shows one card per page, each linking to it, and the sidebar
   await expect(page.getByTestId("crime-hub").locator("a").first()).toContainText("2025 · 54,134 · 2015–2025");
 });
 
+test("the housing hub shows one card per page, each linking to it, and the sidebar lists Housing after Business", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${prefix}/explorer/housing`);
+    const cards = page.getByTestId("housing-hub").locator("a");
+    await expect(cards).toHaveCount(4);
+    expect(await cards.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(["permits", "completed", "prices", "regions"].map(section => `${prefix}/explorer/housing/${section}`));
+    // Three sparklines; Regions shows only its years.
+    for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+    const entry = page.getByTestId("housing-link");
+    await expect(entry).toHaveAttribute("aria-current", "page");
+    expect(await page.getByTestId("business-link").evaluate((business, housing) => Boolean(business.compareDocumentPosition(housing!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    for (const id of ["permits", "completed", "prices", "regions"]) await expect(page.getByTestId(`housing-${id}-link`)).toBeVisible();
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Housing and construction");
+  await expect(page.getByTestId("housing-hub").locator("a").first()).toContainText("2025 · 11,578 · 2006–2025");
+  await expect(page.getByTestId("housing-hub").locator("a").nth(2)).toContainText("2025 · 159.4 · 2020–2025");
+  await expect(page.getByTestId("housing-hub").locator("a").nth(3)).toContainText("2006–2025");
+});
+
 // One hub test for the five external pages (moved from the 18 page-spec defaults runs): count, hrefs and a click to each.
 for (const prefix of ["", "/en"]) {
   test(`the external hub links Money from abroad, Foreign investment, Current account, Foreign debt and Reserves ${prefix || "ka"}`, async ({ page }) => {

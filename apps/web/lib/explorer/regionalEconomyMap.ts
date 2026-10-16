@@ -146,6 +146,20 @@ export function regionalMapGeometry() {
 }
 
 /**
+ * The latest year in which every series of `regionOf` (a series id to its region's map id) has a value, each region's
+ * value in it and the first year any of them has one, for `buildLatestValueRegionMapModel` (Business, Housing).
+ * `missing` words the error when no year is complete.
+ */
+export function latestCompleteRegionYear(facts: readonly { indicatorId: string; year: number; value: number }[], regionOf: ReadonlyMap<string, string>, missing: string) {
+  const regional = facts.filter(f => regionOf.has(f.indicatorId));
+  const complete = [...new Set(regional.map(f => f.year))].filter(year => regional.filter(f => f.year === year).length === regionOf.size);
+  if (!complete.length) throw new Error(missing);
+  const year = Math.max(...complete);
+  const latest = new Map(regional.filter(f => f.year === year).map(f => [regionOf.get(f.indicatorId)!, f.value]));
+  return { latest, year, firstYear: Math.min(...regional.map(f => f.year)) };
+}
+
+/**
  * The eleven regions coloured by one latest-year value each and ranked from the highest (Unemployment, Wages). Every
  * listed region needs a value and a shape, and every value a listed region; `measure` names the value in errors.
  */

@@ -113,6 +113,11 @@
   "common.businessInvestmentProfit": "ინვესტიციები და მოგება",
   "common.businessFirms": "გახსნილი და დახურული საწარმოები",
   "common.businessRegions": "რეგიონები",
+  "common.housing": "საცხოვრებელი და მშენებლობა",
+  "common.housingPermits": "მშენებლობის ნებართვები",
+  "common.housingCompleted": "ექსპლუატაციაში მიღებული ობიექტები",
+  "common.housingPrices": "საცხოვრებლის ფასები",
+  "common.housingRegions": "რეგიონები",
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე",
   "common.dataHealth": "მონაცემები · ჯანდაცვა და სოციალური დაცვა",
@@ -120,6 +125,7 @@
   "common.dataEnergyFood": "მონაცემები · ენერგეტიკა და სურსათი",
   "common.dataMoneyBanks": "მონაცემები · ფული და ბანკები",
   "common.dataBusiness": "მონაცემები · ბიზნესი",
+  "common.dataHousing": "მონაცემები · საცხოვრებელი და მშენებლობა",
   "common.dataLoading": "მონაცემები იტვირთება…",
   "common.dataLoadError": "მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან."
 }
