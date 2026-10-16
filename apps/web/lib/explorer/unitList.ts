@@ -3,6 +3,31 @@ import { parseTopicHash, topicCoverage, type TopicState } from "./topicSeries";
 
 /** What a list's one-group rule needs of a fact: which series it belongs to, its year and its unit. */
 export type UnitFact = { indicatorId: string; year: number; unit: string };
+/** What a list row's figure needs of a fact. */
+type ValueFact = { indicatorId: string; year: number; value: number };
+type ListLatest = { value: number; year: number };
+
+/**
+ * A list row's value: its latest year up to the list's last year. A list's groups can end in different years (firm counts
+ * stop a year before sales, university graduates a school year before students), so a row still shows its newest figure
+ * instead of a blank.
+ */
+export function listLatest(facts: readonly ValueFact[], id: string, endYear: number): ListLatest | undefined {
+  const latest = facts.filter(f => f.indicatorId === id && f.year <= endYear).sort((a, b) => a.year - b.year).at(-1);
+  return latest && { value: latest.value, year: latest.year };
+}
+
+/**
+ * Every listed row's latest value up to `endYear` (`listLatest`), and the year its heading names: the newest of the heading's
+ * rows' latest years where that is older than `endYear` (none where a row reaches `endYear` or the heading has no value).
+ */
+export function listLatestByHeading(facts: readonly ValueFact[], series: readonly { id: string; heading?: string }[], endYear: number): Record<string, { latest: ListLatest | undefined; headingYear: number | undefined }> {
+  const latest = new Map(series.map(row => [row.id, listLatest(facts, row.id, endYear)]));
+  return Object.fromEntries(series.map(row => {
+    const groupYear = Math.max(...series.filter(other => other.heading === row.heading).map(other => latest.get(other.id)?.year ?? 0));
+    return [row.id, { latest: latest.get(row.id), headingYear: groupYear && groupYear !== endYear ? groupYear : undefined }];
+  }));
+}
 
 /**
  * Every function takes an optional last `groupOf`, which replaces "the fact's unit" as the grouping key (a series id to a

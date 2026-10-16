@@ -244,7 +244,7 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
           key={place.id}
           set={set}
           place={place}
-          facts={facts.filter(f => f.geographyId === place.id)}
+          facts={facts.filter(f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId))}
           labels={Object.fromEntries(series.map(({ id }) => [id, educationSeriesLabel(messages, id)]))}
           headingLabels={Object.fromEntries(series.map(({ heading }) => [heading, t(`heading.${heading}`)]))}
           title={t(`place.headingLead.${set}`)}

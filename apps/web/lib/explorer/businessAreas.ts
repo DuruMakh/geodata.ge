@@ -31,15 +31,6 @@ export function businessAreaSeries(area: BusinessArea): BusinessSeriesDefinition
   return AREA_SERIES.flatMap(({ heading, measures }) => measures.map(item => ({ id: businessIndicator(item, areaGroup(area)), reference: item === "turnover", heading })));
 }
 
-/**
- * A list row's value: its latest year up to the list's last year. The groups end in different years (firm counts stop a
- * year before sales), so a row still shows its newest figure instead of a blank.
- */
-export function businessListLatest(facts: readonly ClientBusinessFact[], id: string, endYear: number): { value: number; year: number } | undefined {
-  const latest = facts.filter(f => f.indicatorId === id && f.year <= endYear).sort((a, b) => a.year - b.year).at(-1);
-  return latest && { value: latest.value, year: latest.year };
-}
-
 export function businessAreaDefaultSelection(area: BusinessArea): string[] {
   return [businessIndicator("turnover", areaGroup(area))];
 }

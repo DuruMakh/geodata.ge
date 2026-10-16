@@ -12,7 +12,7 @@ import {
   EDUCATION_GEORGIA, EDUCATION_HE_GROUPS, EDUCATION_INDICATORS, EDUCATION_MEASURES, EDUCATION_PUBLIC_SOURCES, EDUCATION_SOURCES, EDUCATION_VET_FIELDS, EDUCATION_VET_OLD_FIELDS,
   educationFactKey, educationIndicator, educationSourceDocumentId, type EducationFact, type EducationIndicator,
 } from "../../../lib/data/education/types";
-import { educationDisplayDecimals, educationPeriodLabel, expectedEducationKeys, validateEducationFacts } from "../../../lib/data/education/validation";
+import { educationDisplayDecimals, educationFactPeriodLabel, expectedEducationKeys, validateEducationFacts } from "../../../lib/data/education/validation";
 
 const root = path.resolve(process.cwd(), "../..");
 const research = path.join(root, "docs/Raw Data/Education/geostat-education-annual");
@@ -82,10 +82,10 @@ test("text numbers, odd stored decimals and unavailable cells are served exactly
 });
 
 test("school years carry their label and vocational years stay plain", () => {
-  expect(educationPeriodLabel("pupils", 2009)).toBe("2009/10");
-  expect(educationPeriodLabel("pupils", 1999)).toBe("1999/00");
-  expect(educationPeriodLabel("schools", 2025)).toBe("2025/26");
-  expect(educationPeriodLabel("vet_admitted", 2025)).toBe("2025");
+  expect(educationFactPeriodLabel("pupils", 2009)).toBe("2009/10");
+  expect(educationFactPeriodLabel("pupils", 1999)).toBe("1999/00");
+  expect(educationFactPeriodLabel("schools", 2025)).toBe("2025/26");
+  expect(educationFactPeriodLabel("vet_admitted", 2025)).toBe("2025");
   expect(educationIndicator("pupils_national", "total")).toBe("education.pupils_national.total");
   expect(educationFactKey({ indicatorId: "education.pupils.total", geographyId: "region.tbilisi", year: 2025 })).toBe("education.pupils.total:region.tbilisi:2025");
 });

@@ -6,8 +6,9 @@ import { message } from "../i18n/messages";
 import type { Messages } from "../i18n/types";
 import { INK } from "./colors";
 import { formatInUnit, UNIT_PERSONS } from "./format";
-import { refitRange, type ResolvedPeriodRange } from "./periodRange";
+import { refitRange, resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { listLatestByHeading } from "./unitList";
 
 export const EDUCATION_HUB_PATH = "/explorer/education";
 export const EDUCATION_SECTIONS = [
@@ -155,4 +156,19 @@ export function buildEducationSeriesModel(definitions: readonly EducationSeriesD
 
 export function buildEducationModel(section: EducationTopicId, facts: readonly ClientEducationFact[], state: EducationState): EducationModel {
   return buildEducationSeriesModel(educationTopicSeries(section), facts, EDUCATION_GEORGIA, state, educationCoverage(section, facts, state.selectedIds));
+}
+
+/**
+ * A series list's figures, as Business's area list reads them: the list ends at the chosen years' end over all of the place's
+ * years (`coverage`, never the selection's, so ticking a row never changes the numbers it shows), each row shows its latest
+ * value up to then, and a heading whose rows stop earlier (graduates, a school year before students) names their year.
+ * Shared by the topic and place pages.
+ */
+export function buildEducationList(definitions: readonly EducationSeriesDefinition[], facts: readonly ClientEducationFact[], geographyId: string, state: EducationState, coverage: TopicCoverage) {
+  const end = resolveRange(state.range, coverage).end;
+  return { end, rows: listLatestByHeading(facts.filter(f => f.geographyId === geographyId), definitions, end) };
+}
+
+export function educationTopicList(section: EducationTopicId, facts: readonly ClientEducationFact[], state: EducationState) {
+  return buildEducationList(educationTopicSeries(section), facts, EDUCATION_GEORGIA, state, educationCoverage(section, facts));
 }

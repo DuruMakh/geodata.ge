@@ -18,6 +18,7 @@ import {
   renderEducationIndexPage,
   renderEducationPlacePage,
 } from "../../lib/pages/education-places";
+import { educationPlaceSeries } from "../../lib/explorer/educationPlaces";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
@@ -170,6 +171,16 @@ describe("what each page hands on", () => {
     expect(offered.filter(id => id.startsWith("unit."))).toEqual([]);
     expect(explorer?.props.labels["education.teachers.women"]).toBe("Women");
     expect(explorer?.props.headingLabels.teachers).toBe("Teachers");
+  });
+
+  it("only the facts of the series the place lists", async () => {
+    const shipped = async (route: Route, set: "schools" | "kindergartens") => new Set(explorerIn(await renderEducationPlacePage(route, "en", set))?.props.facts.map(f => f.indicatorId));
+    const georgia = await shipped({ kind: "country" }, "schools");
+    expect(georgia).toEqual(new Set(educationPlaceSeries("schools", "country.georgia").map(series => series.id)));
+    expect(georgia.size).toBe(11);
+    expect([...georgia].filter(id => /\.(he|vet|kg)_|\.kindergartens\.|\.pupils\./.test(id))).toEqual([]);
+    const guria = await shipped({ kind: "region", id: "guria" }, "kindergartens");
+    expect(guria).toEqual(new Set(["education.kg_children.total", "education.kg_staff.total", "education.kindergartens.total"]));
   });
 
   it("builds every place page of both sets", async () => {

@@ -4,7 +4,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import type { ClientEducationFact } from "../../lib/data/education/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import {
-  buildEducationModel, changeEducationSelection, educationCoverage, educationFullLabel, educationPeriodLabel, parseEducationHash, serializeEducationHash,
+  buildEducationModel, changeEducationSelection, educationCoverage, educationFullLabel, educationPeriodLabel, educationTopicList, parseEducationHash, serializeEducationHash,
   type EducationTopicId,
 } from "../../lib/explorer/education";
 import { buildEducationWorkbookExportModel } from "../../lib/explorer/educationWorkbook";
@@ -56,6 +56,9 @@ export function EducationExplorer({ section, facts, labels, headingLabels, lates
   const { state, update } = useHashState(data, parseEducationState, serializeEducationHash);
   const [query, setQuery] = useState("");
   const model = buildEducationModel(section, facts, state);
+  // The list reads at the chosen years' end over all of the page's years: a row shows its latest value up to then, and a
+  // heading whose rows stop earlier (graduates) names their year.
+  const list = educationTopicList(section, facts, state);
   const period = educationPeriodLabel(section);
   const unit = UNIT_PERSONS;
   const unitLabel = t("unitPersons");
@@ -92,8 +95,12 @@ export function EducationExplorer({ section, facts, labels, headingLabels, lates
           <Link href={pageHref("/methodology/education", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{period(model.range.end)} · {unitLabel}</>} downloadAction={downloadAction}
-        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(series.endValue, unit), heading: headingLabels[series.heading] }))}
+      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{period(list.end)} · {unitLabel}</>} downloadAction={downloadAction}
+        rows={model.series.map(series => {
+          const { latest, headingYear } = list.rows[series.id]!;
+          return { id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(latest?.value, unit),
+            heading: headingYear ? `${headingLabels[series.heading]} · ${period(headingYear)}` : headingLabels[series.heading] };
+        })}
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeEducationSelection(s, section, selectedIds, facts), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable />
     </ExplorerWorkspace>

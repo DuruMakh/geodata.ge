@@ -50,7 +50,7 @@ const UNIT_IDS = Object.keys(EDUCATION_UNITS);
 const EARLY_UNITS = ["unit.eredvi", "unit.tighva", "unit.kurta"];
 const PLACE_TABLE_MEASURES = ["schools", "pupils", "teachers", "kindergartens", "kg_children", "kg_staff"] as const;
 
-export function educationPeriodLabel(measure: EducationMeasure, year: number): string {
+export function educationFactPeriodLabel(measure: EducationMeasure, year: number): string {
   return measure.startsWith("vet_") ? String(year) : `${year}/${String((year + 1) % 100).padStart(2, "0")}`;
 }
 
@@ -126,7 +126,7 @@ export function validateEducationFacts(facts: readonly EducationFact[], municipa
     if (values.has(key)) throw new Error(`Duplicate education observation: ${key}`);
     if (fact.unit !== UNITS[measure] || fact.basis !== "actual" || fact.valueStatus !== "official" || fact.sourceId !== expectedSource(measure, group, fact.geographyId)
       || !fact.sourceSheet || !/^[A-Z]+\d+$/.test(fact.sourceCell) || !/^\d{4}-\d{2}-\d{2}$/.test(fact.lastReviewedAt)) throw new Error(`Invalid education source contract: ${key}`);
-    if (fact.periodLabel !== educationPeriodLabel(measure, fact.year)) throw new Error(`Invalid education period label: ${key}`);
+    if (fact.periodLabel !== educationFactPeriodLabel(measure, fact.year)) throw new Error(`Invalid education period label: ${key}`);
     if (fact.shown !== !group.startsWith("old_")) throw new Error(`Invalid education shown flag (only the old vocational fields are hidden): ${key}`);
     let value: Decimal;
     try { value = new D(fact.value); } catch { throw new Error(`Invalid education value: ${key}`); }

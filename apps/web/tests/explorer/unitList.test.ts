@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { changeUnitListSelection, keepOneUnit, parseUnitListHash, unitListCoverage } from "../../lib/explorer/unitList";
+import { changeUnitListSelection, keepOneUnit, listLatest, listLatestByHeading, parseUnitListHash, unitListCoverage } from "../../lib/explorer/unitList";
 import type { TopicState } from "../../lib/explorer/topicSeries";
 
 // Two measures in one unit (persons), plus one count of another unit.
@@ -49,4 +49,25 @@ test("changing the selection keeps one group and clamps, never collapsing, the r
   const next = changeUnitListSelection(state, definitions, ["pupils.total", "teachers.women"], facts, heading);
   expect(next.selectedIds).toEqual(["teachers.women"]);
   expect(next.range).toEqual({ kind: "all" });
+});
+
+test("a list row shows its latest value up to the list's last year, and a heading whose rows stop earlier names their year", () => {
+  // Students reach 2025; graduates stop at 2024, the women's row a year earlier still.
+  const valued = [
+    ...[2023, 2024, 2025].map(year => ({ indicatorId: "students.total", year, value: year })),
+    ...[2023, 2024].map(year => ({ indicatorId: "graduates.total", year, value: year })),
+    { indicatorId: "graduates.women", year: 2023, value: 1 },
+  ];
+  expect(listLatest(valued, "graduates.total", 2025)).toEqual({ value: 2024, year: 2024 });
+  expect(listLatest(valued, "students.total", 2023)).toEqual({ value: 2023, year: 2023 });
+  expect(listLatest(valued, "students.total", 2022)).toBeUndefined();
+  const series = [{ id: "students.total", heading: "students" }, { id: "graduates.total", heading: "graduates" }, { id: "graduates.women", heading: "graduates" }, { id: "schools.total", heading: "schools" }];
+  expect(listLatestByHeading(valued, series, 2025)).toEqual({
+    "students.total": { latest: { value: 2025, year: 2025 }, headingYear: undefined },
+    "graduates.total": { latest: { value: 2024, year: 2024 }, headingYear: 2024 },
+    "graduates.women": { latest: { value: 1, year: 2023 }, headingYear: 2024 },
+    // A heading with no value at all names no year.
+    "schools.total": { latest: undefined, headingYear: undefined },
+  });
+  expect(listLatestByHeading(valued, series, 2024)["graduates.total"]).toEqual({ latest: { value: 2024, year: 2024 }, headingYear: undefined });
 });

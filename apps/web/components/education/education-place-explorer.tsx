@@ -6,7 +6,7 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
 import { educationFullLabel, educationPeriodLabel, serializeEducationHash } from "../../lib/explorer/education";
 import {
-  buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceCoverage, educationPlaceLinkHash, parseEducationPlaceHash, type EducationPlaceSet,
+  buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceCoverage, educationPlaceLinkHash, educationPlaceList, parseEducationPlaceHash, type EducationPlaceSet,
 } from "../../lib/explorer/educationPlaces";
 import { buildEducationWorkbookExportModel } from "../../lib/explorer/educationWorkbook";
 import { formatInUnit, thousandsUnit, UNIT_PERSONS, type ValueUnit } from "../../lib/explorer/format";
@@ -71,6 +71,8 @@ export function EducationPlaceExplorer({
   const parse = useCallback((hash: string, f: ClientEducationFact[]) => parseEducationPlaceHash(hash, set, place.id, f), [set, place.id]);
   const { state, update } = useHashState(facts, parse, serializeEducationHash);
   const model = buildEducationPlaceModel(set, place.id, facts, state);
+  // The list reads at the chosen years' end over all of the place's years, each row its latest value up to then (`buildEducationList`).
+  const list = educationPlaceList(set, place.id, facts, state);
   const period = educationPeriodLabel(set);
   // Counts are whole numbers; Georgia's pupils are Geostat's thousands to one decimal (the client holds whole persons).
   const inThousands = (series: { decimals: number }) => series.decimals === 1;
@@ -117,9 +119,13 @@ export function EducationPlaceExplorer({
         </SourceNote></div>
         {children}
       </>}
-      aside={<FlatSeriesPanel caption={period(model.range.end)}
-        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(series.endValue, valueUnit(series)),
-          heading: inThousands(series) ? `${headingLabels[series.heading]} · ${t("unitThousandPupils")}` : headingLabels[series.heading] }))}
+      aside={<FlatSeriesPanel caption={period(list.end)}
+        rows={model.series.map(series => {
+          const { latest, headingYear } = list.rows[series.id]!;
+          const heading = inThousands(series) ? `${headingLabels[series.heading]} · ${t("unitThousandPupils")}` : headingLabels[series.heading];
+          return { id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(latest?.value, valueUnit(series)),
+            heading: headingYear ? `${heading} · ${period(headingYear)}` : heading };
+        })}
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeEducationPlaceSelection(s, set, place.id, selectedIds, facts), true)} searchable={false}
         downloadAction={<ExcelDownloadButton testId="education-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {
           const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");

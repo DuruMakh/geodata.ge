@@ -7,11 +7,11 @@ import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { INK } from "../../lib/explorer/colors";
 import {
   EDUCATION_HUB_PATH, EDUCATION_SECTIONS, buildEducationModel, changeEducationSelection, defaultEducationState, educationCoverage, educationDefaultSelection,
-  educationPeriodLabel, educationSeriesColor, educationTopicSeries, parseEducationHash, schoolYearLabel, serializeEducationHash,
+  educationPeriodLabel, educationSeriesColor, educationTopicList, educationTopicSeries, parseEducationHash, schoolYearLabel, serializeEducationHash,
 } from "../../lib/explorer/education";
 import {
   buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection,
-  educationPlaceLinkHash, educationPlaceMovedSelection, educationPlaceSeries, parseEducationPlaceHash,
+  educationPlaceLinkHash, educationPlaceList, educationPlaceMovedSelection, educationPlaceSeries, parseEducationPlaceHash,
 } from "../../lib/explorer/educationPlaces";
 import { buildEducationIndexModel } from "../../lib/explorer/educationIndex";
 
@@ -148,6 +148,27 @@ test("a hash round-trips on a topic page, and Universities mixes Students and Gr
   expect(graduates.color).not.toBe(INK);
   const vocational = buildEducationModel("vocational", facts, defaultEducationState("vocational"));
   expect([vocational.range.start, vocational.range.end, vocational.selected[0].valuesByYear[2025]]).toEqual([2013, 2025, 19690]);
+});
+
+test("the Universities list reads graduates at their latest school year, named in their heading, on arrival", () => {
+  const list = educationTopicList("universities", facts, defaultEducationState("universities"));
+  expect(list.end).toBe(2025);
+  expect(list.rows["education.he_graduates.total"]).toEqual({ latest: { value: 32494, year: 2024 }, headingYear: 2024 });
+  expect(list.rows["education.he_students.total"]).toEqual({ latest: { value: 195426, year: 2025 }, headingYear: undefined });
+  // Every row has a figure; none is a dash.
+  for (const series of educationTopicSeries("universities")) expect(list.rows[series.id]?.latest, series.id).toBeDefined();
+  // The list ignores the selection: graduates alone keep the same figures and the same end.
+  expect(educationTopicList("universities", facts, { ...line, selectedIds: ["education.he_graduates.total"] })).toEqual(list);
+});
+
+test("a place list reads each row at or before its chosen end year, never another place's facts", () => {
+  const state = { mode: "line" as const, range: { kind: "manual" as const, start: 2005, end: 2017 }, selectedIds: ["education.pupils.total"] };
+  const list = educationPlaceList("schools", "region.guria", facts, state);
+  expect(list.end).toBe(2017);
+  expect(list.rows["education.pupils.total"]?.latest?.year).toBe(2017);
+  expect(list.rows["education.teachers.women"]?.latest?.year).toBe(2017);
+  expect(list.rows["education.pupils.total"]?.latest?.value).toBe(buildEducationPlaceModel("schools", "region.guria", facts, state).selected[0].valuesByYear[2017]);
+  for (const series of educationPlaceSeries("schools", "region.guria")) expect(list.rows[series.id]?.latest, series.id).toBeDefined();
 });
 
 test("the Schools and Kindergartens indexes rank the latest year's places, Georgia first and unranked", () => {

@@ -1,6 +1,6 @@
 import { EDUCATION_GEORGIA, educationIndicator, type ClientEducationFact, type EducationGroup, type EducationMeasure } from "../data/education/types";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
-import { EDUCATION_HUB_PATH, buildEducationSeriesModel, serializeEducationHash, type EducationModel, type EducationSeriesDefinition, type EducationState } from "./education";
+import { EDUCATION_HUB_PATH, buildEducationList, buildEducationSeriesModel, serializeEducationHash, type EducationModel, type EducationSeriesDefinition, type EducationState } from "./education";
 import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
 
 /** The two Education page sets with a map index and a page per place (Georgia, the 11 regions and the 63 other municipalities). */
@@ -82,4 +82,9 @@ export function changeEducationPlaceSelection(state: EducationState, set: Educat
 
 export function buildEducationPlaceModel(set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[], state: EducationState): EducationModel {
   return buildEducationSeriesModel(educationPlaceSeries(set, placeId), placeFacts(facts, placeId), placeId, state, educationPlaceCoverage(set, placeId, facts, state.selectedIds));
+}
+
+/** A place's series list: each row's latest value up to the list's end, with a heading's older year (`buildEducationList`). */
+export function educationPlaceList(set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[], state: EducationState) {
+  return buildEducationList(educationPlaceSeries(set, placeId), facts, placeId, state, educationPlaceCoverage(set, placeId, facts));
 }
