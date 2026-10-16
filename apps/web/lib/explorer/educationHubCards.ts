@@ -2,8 +2,7 @@ import { EDUCATION_GEORGIA, type ClientEducationFact } from "../data/education/t
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { INK } from "./colors";
-import { EDUCATION_SECTIONS, educationPeriodLabel, type EducationSectionId } from "./education";
-import { formatInUnit, UNIT_PERSONS } from "./format";
+import { EDUCATION_SECTIONS, educationCountLabel, educationPeriodLabel, type EducationSectionId } from "./education";
 import type { HubCardModel } from "./hubCards";
 
 /** Each card's sparkline and footer follow one Georgia series: pupils, kindergarten children, university students and vocational admissions. */
@@ -17,8 +16,7 @@ export function buildEducationHubCards(facts: readonly ClientEducationFact[], pr
     const headline = facts.filter(f => f.indicatorId === HEADLINE[section.id] && f.geographyId === EDUCATION_GEORGIA).sort((a, b) => a.year - b.year);
     const last = headline.at(-1)!;
     const period = educationPeriodLabel(section.id);
-    // Georgia's pupils: Geostat prints thousands to one decimal; the client holds whole persons.
-    const value = last.decimals === 1 ? `${formatInUnit(last.value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousand")}` : formatInUnit(last.value, UNIT_PERSONS);
+    const value = educationCountLabel(last, t("unitThousand"));
     return {
       index: String(index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false,

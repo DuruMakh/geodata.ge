@@ -2,7 +2,10 @@ import {
   EDUCATION_GEORGIA, EDUCATION_HE_GROUPS, EDUCATION_VET_FIELDS, educationFactKey, educationIndicator,
   type ClientEducationFact, type EducationGroup, type EducationMeasure,
 } from "../data/education/types";
+import { message } from "../i18n/messages";
+import type { Messages } from "../i18n/types";
 import { INK } from "./colors";
+import { formatInUnit, UNIT_PERSONS } from "./format";
 import { refitRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
 
@@ -25,6 +28,21 @@ export function schoolYearLabel(year: number): string {
 /** A section's year label: vocational colleges count calendar years, every other section school years. */
 export function educationPeriodLabel(section: EducationSectionId): (year: number) => string {
   return section === "vocational" ? String : schoolYearLabel;
+}
+
+/**
+ * A count as the pages print it: whole persons or institutions, and Georgia's pupils, which Geostat publishes in thousands to
+ * one decimal (the client holds them as whole persons), as `644.2 thousand` with the page's word for thousand.
+ */
+export function educationCountLabel(fact: Pick<ClientEducationFact, "value" | "decimals">, thousand: string): string {
+  return fact.decimals === 1 ? `${formatInUnit(fact.value, { divisor: 1_000, label: "", decimals: 1 })} ${thousand}` : formatInUnit(fact.value, UNIT_PERSONS);
+}
+
+/** A row's name: its own (`education.series.<measure>.<group>`) where the messages give one, otherwise its group's (`education.group.<group>`). */
+export function educationSeriesLabel(messages: Messages, id: string): string {
+  const [, measure, group] = id.split(".");
+  const own = `education.series.${measure}.${group}`;
+  return message(messages, Object.hasOwn(messages, own) ? own : `education.group.${group}`);
 }
 
 /** `heading` is the measure a row is listed under; a list shows every row under its heading. */

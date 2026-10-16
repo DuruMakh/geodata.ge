@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { EntityNeighbourLinks } from "../explorer-shell/entity-neighbour-links";
 import { EntityPicker, type EntityPickerCountry, type EntityPickerGroup, type EntityPickerOverrides } from "./entity-picker";
 
@@ -9,7 +9,8 @@ export type EntityNavigation = { prev: { label: string; href: string }; next: { 
 type EntityHeadingProps = {
   title: string;
   triggerLabel: string;
-  metaLine: string;
+  /** The line under the title: text, or a page's latest-value line. */
+  metaLine: ReactNode;
   entityId: string;
   navigation?: EntityNavigation;
   pickerCountry: EntityPickerCountry;
