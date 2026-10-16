@@ -54,6 +54,18 @@ Road accidents, accidents caused by drunk driving, people killed and people inju
 
 The per 100,000 people view is the only figure Fiscal.ge calculates. Each count is divided by `demography.population_total` for `country.georgia` (Geostat's population on 1 January of the same year, served by the Demography pages and archived as `source.geostat_municipal_population`) and multiplied by 100,000; it is shown and exported to one decimal and marked as calculated. For prisons the end-of-year count is divided by the population on 1 January of that year. The population starts on 1 January 2004, so 2001–2003 have no rate and are gaps, never zero. The 1 January 2025 population is census-based (the existing `census_recalculation_2025` break), so every rate series shows that break whenever a series is selected. No other ratio is computed: no shares, solved rates, growth rates or interpolation. Rates are calculated in the explorer model from the served counts and the served population, as Money and banks calculates its shares of GDP; they are not stored in `crime-annual.csv` or the mirror.
 
+## Series breaks
+
+Three counting changes are registered; each is described in the section named. `crime-series-breaks.csv` holds the first two in the demography break format (`break_id, applies_to, reference_date, reason, source_note`); the third is the existing `census_recalculation_2025` of the Demography register.
+
+| Break | Applies to | Date | Section |
+| --- | --- | --- | --- |
+| `registration_2018` | the 12 `crime.recorded.*` series | 2018-01-01 | [The 2018 counting change](#the-2018-counting-change) |
+| `drunk_driving_coverage_2025` | `crime.road.accidents_drunk` | 2025-01-01 | [Road accidents and drunk driving](#road-accidents-and-drunk-driving) |
+| `census_recalculation_2025` | every series, in the per-100,000 view only | 2025-01-01 | [Per 100,000 people](#per-100000-people) |
+
+On a chart a break is a gap in the line and a dashed rule labelled "new counting"; in a table the year is marked. No change is computed across a break. The change of reporting agency on the prisons and victims pages is not a break, because Geostat does not call it one.
+
 ## No map
 
 Geostat publishes none of these tables by region. The monthly Unified Report splits prosecutions and convictions by prosecutor's districts, which do not match the 11 regions, so the pages show Georgia as a whole and have no map.
