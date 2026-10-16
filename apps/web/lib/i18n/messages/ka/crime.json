@@ -1,6 +1,6 @@
 {
   "crime.title": "დანაშაული და მართლმსაჯულება",
-  "crime.hubSummary": "რეგისტრირებული დანაშაული, მსჯავრდებულები, პატიმრები, დაზარალებულები, საგზაო შემთხვევები",
+  "crime.hubSummary": "რეგისტრირებული დანაშაული, მსჯავრდებულები, პატიმრები, დაზარალებულები, საგზაო-სატრანსპორტო შემთხვევები",
   "crime.metaTitle": "დანაშაული და მართლმსაჯულება საქართველოში",
   "crime.metaDescription": "რეგისტრირებული დანაშაული, მსჯავრდებულები, პატიმრები, დაზარალებულები და საგზაო-სატრანსპორტო შემთხვევები საქართველოში წლების მიხედვით და 100 000 მოსახლეზე (საქსტატი).",
   "crime.page.recorded.title": "რეგისტრირებული დანაშაული",
@@ -79,8 +79,8 @@
   "crime.series.crime.victims.sex_women": "ქალი",
   "crime.series.crime.victims.sex_unknown": "სქესი უცნობია",
   "crime.series.crime.victims.age_under_17": "17 წელზე უმცროსი",
-  "crime.series.crime.victims.age_17_24": "17–24",
-  "crime.series.crime.victims.age_25_44": "25–44",
+  "crime.series.crime.victims.age_17_24": "17–24 წლის",
+  "crime.series.crime.victims.age_25_44": "25–44 წლის",
   "crime.series.crime.victims.age_45_plus": "44 წელზე უფროსი",
   "crime.series.crime.victims.age_unknown": "ასაკი უცნობია",
   "crime.series.crime.victims.citizenship_georgia": "საქართველოს მოქალაქე",
