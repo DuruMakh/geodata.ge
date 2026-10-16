@@ -140,6 +140,8 @@
     "data:check-money": "tsx scripts/prepare-money-banks.ts --check",
     "data:prepare-business": "tsx scripts/prepare-business.ts --write",
     "data:check-business": "tsx scripts/prepare-business.ts --check",
+    "data:prepare-education": "tsx scripts/prepare-education.ts --write",
+    "data:check-education": "tsx scripts/prepare-education.ts --check",
     "data:prepare-household-income": "tsx scripts/prepare-household-income.ts --write",
     "data:check-household-income": "tsx scripts/prepare-household-income.ts --check",
     "data:prepare-money-transfers": "tsx scripts/prepare-money-transfers.ts --write",
