@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 6,
+  "observations": 8815,
+  "cells_reextracted": 8815,
+  "stored_values_matched": 8815,
+  "published_values_matched_rounding": 8815,
+  "rows_with_matching_cell_heading_label_and_flags": 8815,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "neighbouring_column_detected": true,
+    "wrong_place_row_detected": true,
+    "swapped_sheets_detected": true,
+    "graduate_year_not_shifted_detected": true,
+    "unavailable_cell_served_detected": true,
+    "zero_outside_field_span_served_detected": true,
+    "old_field_shown_detected": true,
+    "wrong_unit_detected": true,
+    "unrounded_published_value_detected": true
+  },
+  "failures": []
+}
