@@ -2015,5 +2015,89 @@
       "reviewedAt": "2026-10-15"
     },
     "derivation": null
+  },
+  "source.geostat_housing_permits_regions": {
+    "name": { "text": "Permissions granted for construction by regions (0503EN020101)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_permits_zip": {
+    "name": { "text": "Permissions by type and municipality, English (zip)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_completed_regions": {
+    "name": { "text": "Completed construction objects by regions (0503EN020103)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_completed_zip": {
+    "name": { "text": "Completed objects by type, English (zip)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_permits_municipalities": {
+    "name": { "text": "Permissions: completed municipalities (0503EN020102a)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_permits_quarterly": {
+    "name": { "text": "Permissions by type, 2019-2026 (0503EN020102b)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_permits_types": {
+    "name": { "text": "Permissions granted for construction by type, 2006-2025 (0503EN020102c)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_completed_quarterly": {
+    "name": { "text": "Completed objects by type, 2019-2026 (0503EN020104a)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_completed_types": {
+    "name": { "text": "Completed construction objects by type, 2006-2025 (0503EN020104b)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_price_index_quarterly": {
+    "name": { "text": "Residential property price index, compared to the previous quarter", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_price_index_annual": {
+    "name": { "text": "Residential property price index, compared to the same quarter of the previous year", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_price_index": {
+    "name": { "text": "Residential property price index, compared to the 2020 average", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_tbilisi_prices": {
+    "name": { "text": "Residential property prices in Tbilisi by district", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_cci_monthly": {
+    "name": { "text": "Construction cost index, previous month = 100", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_cci_2022": {
+    "name": { "text": "Construction cost index, 2022 February = 100", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_cci_annual": {
+    "name": { "text": "Construction cost index, same month of the previous year = 100", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_construction": {
+    "name": { "text": "Construction by region (Construction.xlsx)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_infrastructure": {
+    "name": { "text": "Infrastructure of dwellings by region (Infrastructure-.xlsx)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_permits_page": {
+    "name": { "text": "Geostat page: permissions and completed objects (category 621)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_prices_page": {
+    "name": { "text": "Geostat page: residential property price index (category 698)", "reviewedAt": "2026-10-16" },
+    "derivation": null
+  },
+  "source.geostat_housing_cost_page": {
+    "name": { "text": "Geostat page: construction cost index (category 655)", "reviewedAt": "2026-10-16" },
+    "derivation": null
   }
 }
