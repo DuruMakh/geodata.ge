@@ -221,25 +221,8 @@ describe("colour", () => {
   });
 });
 
-// The workbook and the cards read the shipped copy; the crime keys arrive with the namespace, so the test supplies the ones it needs.
-const CRIME_COPY: Record<Locale, Record<string, string>> = {
-  en: {
-    "common.crimeRecorded": "Recorded crime", "common.crimeConvictions": "Convictions", "common.crimePrisons": "Prisons", "common.crimeVictims": "Victims", "common.crimeRoadAccidents": "Road accidents",
-    "crime.series": "Series", "crime.value": "Value", "crime.unit": "Unit",
-    "crime.unitCrimes": "crimes", "crime.unitPersons": "persons", "crime.unitAccidents": "accidents", "crime.unitPer100k": "per 100,000 people",
-    "crime.workbook.ratesNote": "Rates per 100,000 people are calculated by fiscal.ge from Geostat's counts and Georgia's population on 1 January.",
-    ...Object.fromEntries(CRIME_SECTIONS.map(s => [`crime.page.${s.id}.summary`, `Summary of ${s.id}`])),
-  },
-  ka: {
-    "common.crimeRecorded": "რეგისტრირებული დანაშაული", "common.crimeConvictions": "მსჯავრდებულები", "common.crimePrisons": "პატიმრები", "common.crimeVictims": "დაზარალებულები", "common.crimeRoadAccidents": "საგზაო-სატრანსპორტო შემთხვევები",
-    "crime.series": "სერია", "crime.value": "მნიშვნელობა", "crime.unit": "ერთეული",
-    "crime.unitCrimes": "დანაშაული", "crime.unitPersons": "პირი", "crime.unitAccidents": "შემთხვევა", "crime.unitPer100k": "100 000 მოსახლეზე",
-    "crime.workbook.ratesNote": "100 000 მოსახლეზე მაჩვენებლები fiscal.ge-მ გამოთვალა საქსტატის მონაცემებითა და საქართველოს მოსახლეობით 1 იანვრის მდგომარეობით.",
-    ...Object.fromEntries(CRIME_SECTIONS.map(s => [`crime.page.${s.id}.summary`, `შეჯამება ${s.id}`])),
-  },
-};
 const presentationFor = async (locale: Locale): Promise<Presentation> => ({
-  locale, englishLabels: {}, messages: { ...await getMessages(locale, ["workbook", "format", "common"]), ...CRIME_COPY[locale] },
+  locale, englishLabels: {}, messages: await getMessages(locale, ["workbook", "format", "common", "crime"]),
 });
 const sourceFor = (sourceId: string, years: number[]) => ({
   sourceId, years, title: sourceId, organization: "Geostat", retrievedAt: "2026-10-16", downloadHref: `/downloads/methodology/crime/files/${sourceId}.xlsx` as const,
@@ -310,9 +293,10 @@ describe("Excel workbooks", () => {
   });
 
   test("a value without its source link fails loudly", async () => {
+    const presentation = await presentationFor("en");
     expect(() => buildCrimeWorkbookExportModel({
       section: "victims", facts, population, sources: [], siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Victims", state: state("victims", ["crime.victims.total"]),
-    }, { locale: "en", englishLabels: {}, messages: CRIME_COPY.en })).toThrow(/geostat_crime_victims/);
+    }, presentation)).toThrow(/geostat_crime_victims/);
   });
 });
 
@@ -321,8 +305,14 @@ describe("hub cards", () => {
     const cards = buildCrimeHubCards(facts, await presentationFor("en"));
     expect(cards.map(card => card.href)).toEqual(CRIME_SECTIONS.map(s => s.href));
     expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04", "05"]);
-    expect(cards.map(card => card.title)).toEqual(["Recorded crime", "Convictions", "Prisons", "Victims", "Road accidents"]);
-    expect(cards.map(card => card.description)).toEqual(CRIME_SECTIONS.map(s => `Summary of ${s.id}`));
+    expect(cards.map(card => card.title)).toEqual(["Recorded crimes", "Convictions", "Prisons", "Victims", "Road accidents"]);
+    expect(cards.map(card => card.description)).toEqual([
+      "Crimes recorded each year in Georgia, by type of crime.",
+      "People convicted by Georgian courts each year, by type of crime, age, sex and sentence.",
+      "People in prison at the end of each year in Georgia, by sex, age and whether they are sentenced or awaiting trial.",
+      "Victims of crime in Georgia each year, by sex, age and citizenship.",
+      "Road accidents in Georgia each year, with the people killed and injured.",
+    ]);
     expect(cards.map(card => card.footer)).toEqual([
       "2025 · 54,134 · 2015–2025", "2025 · 22,767 · 2001–2025", "2025 · 11,153 · 2001–2025", "2025 · 17,209 · 2007–2025", "2025 · 5,969 · 2001–2025",
     ]);

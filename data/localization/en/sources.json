@@ -2015,5 +2015,159 @@
       "reviewedAt": "2026-10-15"
     },
     "derivation": null
+  },
+  "source.geostat_crime_recorded": {
+    "name": {
+      "text": "Number of recorded crimes",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_recorded_2001_2011": {
+    "name": {
+      "text": "Number of recorded crimes 2001-2011 (old classification)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_convicts_types": {
+    "name": {
+      "text": "Number of convicts by types of crime",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_convicts_age_sex": {
+    "name": {
+      "text": "Composition of convicts by age and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_convicts_penalties": {
+    "name": {
+      "text": "Number of convicts and penalties prescribed by court",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_juvenile": {
+    "name": {
+      "text": "Juvenile offenders convicted by type of offence",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_prison": {
+    "name": {
+      "text": "Prison population",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_victims": {
+    "name": {
+      "text": "Data on victim statistics",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_road": {
+    "name": {
+      "text": "Data on road traffic accidents",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_trafficking": {
+    "name": {
+      "text": "Human trafficking",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_registrirebuli_danasaulis_raodenoba_ka": {
+    "name": {
+      "text": "Number of recorded crimes (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_registrirebuli_danasauli_2011_ka": {
+    "name": {
+      "text": "Number of recorded crimes 2001-2011 (old classification) (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_msjavrdebulta_ricxovnoba_danasaulis_saxeebis_mixedvit_ka": {
+    "name": {
+      "text": "Number of convicts by types of crime (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_msjavrdebulta_ricxovnoba_asakisa_da_skesis_mixedvit_ka": {
+    "name": {
+      "text": "Composition of convicts by age and sex (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_msjavrdebulta_ricxovnoba_sasjelis_ronisziebebis_mixedvit_ka": {
+    "name": {
+      "text": "Number of convicts and penalties prescribed by court (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_arasrulwlovani_msjavrdebulebis_raodenoba_cadenili_danasaulis_saxeebis_mi_ka": {
+    "name": {
+      "text": "Juvenile offenders convicted by type of offence (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_patimarta_ricxovnoba_ka": {
+    "name": {
+      "text": "Prison population (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_dazaralebulta_raodenoba_ka": {
+    "name": {
+      "text": "Data on victim statistics (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_avtosagzao_semtxvevebi_ka": {
+    "name": {
+      "text": "Data on road traffic accidents (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_trefikingi_ka": {
+    "name": {
+      "text": "Human trafficking (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_page": {
+    "name": {
+      "text": "Criminal justice statistics (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_crime_page_ka": {
+    "name": {
+      "text": "Criminal justice statistics, Georgian (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
   }
 }
