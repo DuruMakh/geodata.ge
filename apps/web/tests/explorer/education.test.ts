@@ -19,6 +19,7 @@ import { buildEducationHubCards } from "../../lib/explorer/educationHubCards";
 import { buildEducationWorkbookExportModel } from "../../lib/explorer/educationWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
+import { loadSourcedWorkbookSources } from "../../lib/methodology/workbookSources";
 import type { Presentation } from "../../lib/i18n/types";
 
 let facts: ClientEducationFact[];
@@ -301,6 +302,28 @@ test("a Guria Schools pupils workbook is whole persons and cites table 11 alone"
   const schools = await placeWorkbook("schools", "region.guria", "guria", ["education.schools.total"], 2005, 2025);
   expect(schools.readable.unitLabel).toBe("institutions");
   expect(schools.readable.numberFormat).toBe("#,##0");
+});
+
+test("the pages' workbooks cite the archived Geostat originals in the reader's language", async () => {
+  // What lib/pages/education.tsx and education-places.tsx hand to the explorers.
+  const [en, ka] = await Promise.all([loadSourcedWorkbookSources("education", "en"), loadSourcedWorkbookSources("education", "ka")]);
+  const build = (sources: typeof en, input: { section: "universities" } | { set: "schools"; placeId: string; scope: string }, selectedIds: string[], start: number, end: number) => presentation().then(p =>
+    buildEducationWorkbookExportModel({ ...input, facts, sources, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), headingLabels: HEADINGS, title: "Title", state: { mode: "table", range: { kind: "manual", start, end }, selectedIds } } as Parameters<typeof buildEducationWorkbookExportModel>[0], p));
+  const universities = await build(en, { section: "universities" }, ["education.he_students.total", "education.he_graduates.total"], 2010, 2025);
+  expect(universities.sources.map(s => [s.title, s.organization, s.absoluteUrl, s.years[0], s.years.at(-1)])).toEqual([[
+    "Admission, number of students and graduates in public and private higher education institutions by programme and sex",
+    "National Statistics Office of Georgia (Geostat)",
+    "https://fiscal.ge/downloads/methodology/education/files/01number-of-students-admission-graduates-by-programmes-and-sex.xlsx", 2010, 2025,
+  ]]);
+  const guria = await build(en, { set: "schools", placeId: "region.guria", scope: "guria" }, ["education.pupils.total"], 2005, 2025);
+  expect(guria.sources.map(s => [s.title, s.absoluteUrl])).toEqual([[
+    "Number of public and private schools, pupils and teachers by municipality (table 11)",
+    "https://fiscal.ge/downloads/methodology/education/files/11_number-of-schools_pupils_teachers-by-municipalities.xlsx",
+  ]]);
+  const guriaKa = await build(ka, { set: "schools", placeId: "region.guria", scope: "guria" }, ["education.pupils.total"], 2005, 2025);
+  expect(guriaKa.sources.map(s => [s.title, s.organization])).toEqual([["სკოლების, მოსწავლეებისა და მასწავლებლების რაოდენობა მუნიციპალიტეტების მიხედვით (ცხრილი 11)", "საქსტატი"]]);
+  // Every served source has its archived copy.
+  expect(EDUCATION_SOURCES.every(id => en.some(source => source.sourceId === id))).toBe(true);
 });
 
 test("a Georgia pupils workbook is in thousands to one decimal, with every cell Geostat's published value and no drift", async () => {

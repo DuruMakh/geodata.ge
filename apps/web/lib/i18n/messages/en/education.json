@@ -86,7 +86,6 @@
   "education.sourceNote.universities": "Source: Geostat, higher education",
   "education.sourceNote.vocational": "Source: Geostat, vocational education",
   "education.mapAria": "Map: {measure} by municipality, {year}",
-  "education.mapEntityAria": "{name}: {amount}, {year}",
   "education.mapLegend.schools": "pupils, {year}",
   "education.mapLegend.kindergartens": "children, {year}",
   "education.methodology": "Methodology and sources",

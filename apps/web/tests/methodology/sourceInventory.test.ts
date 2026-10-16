@@ -52,6 +52,13 @@ describe("original-source inventory", () => {
     ]));
   });
 
+  it("inventories the 45 education originals: 41 workbooks and the four category page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "education");
+    expect(rows).toHaveLength(45);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Education/geostat-education-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.endsWith(".html")).map((row) => path.posix.basename(row.path))).toEqual([58, 59, 60, 61].map((category) => `geostat-category-${category}-2026-10-16.html`));
+  });
+
   it("inventories the 26 business originals", async () => {
     const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "business");
     expect(rows).toHaveLength(26);

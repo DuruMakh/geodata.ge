@@ -1,4 +1,4 @@
-import { EducationExplorer, type EducationExplorerProps } from "../../components/education/education-explorer";
+import { EducationExplorer } from "../../components/education/education-explorer";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { LatestFigure } from "../../components/explorer-shell/latest-value-line";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
@@ -19,6 +19,7 @@ import { clientPresentation, getPresentation } from "../i18n/presentation.server
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
+import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -53,7 +54,10 @@ export async function educationTopicMetadata(locale: Locale, section: EducationT
 
 /** Universities or Vocational colleges: the latest line, then the chart workspace over Georgia's series. */
 export async function renderEducationTopicPage(locale: Locale, section: EducationTopicId) {
-  const [{ facts: served }, presentation] = await Promise.all([loadServedEducationData(), getPresentation(locale, ["education", "format", "main", "workbook"], [])]);
+  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/education.csv) behind the exported values.
+  const [{ facts: served }, presentation, sources] = await Promise.all([
+    loadServedEducationData(), getPresentation(locale, ["education", "format", "main", "workbook"], []), loadSourcedWorkbookSources("education", locale),
+  ]);
   const { messages } = presentation;
   const t = (key: string) => message(messages, `education.${key}`);
   const series = educationTopicSeries(section);
@@ -68,8 +72,6 @@ export async function renderEducationTopicPage(locale: Locale, section: Educatio
   const lastReviewedAt = shown.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const headingLabels = Object.fromEntries(series.map(({ heading }) => [heading, t(`heading.${heading}`)]));
   const latest = facts.filter(f => f.indicatorId === series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
-  // The archived Geostat workbooks join with the education methodology (Task 10); until then the Sources sheet lists none.
-  const sources: EducationExplorerProps["sources"] = [];
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
     { label: message(messages, "common.data") },

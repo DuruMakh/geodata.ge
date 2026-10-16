@@ -2015,5 +2015,327 @@
       "reviewedAt": "2026-10-15"
     },
     "derivation": null
+  },
+  "source.geostat_education_schools_national": {
+    "name": {
+      "text": "Number of general education schools and pupils (table 01)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_teachers_national": {
+    "name": {
+      "text": "Number of general education school teachers (table 06)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_municipal": {
+    "name": {
+      "text": "Number of public and private schools, pupils and teachers by municipality (table 11)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_kindergartens": {
+    "name": {
+      "text": "Indicators on public preschool education and care (PEC) institutions",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher": {
+    "name": {
+      "text": "Admission, number of students and graduates in public and private higher education institutions by programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_vocational": {
+    "name": {
+      "text": "Number of students in public and private vocational education institutions' education programmes",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_schools_by_stage_region": {
+    "name": {
+      "text": "Number of schools by stage and region (table 02)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_pupils_by_grade_age": {
+    "name": {
+      "text": "Number of general education school pupils by grade and age (table 04)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_pupils_by_level_grade": {
+    "name": {
+      "text": "Distribution of public and private general school pupils by level of education and grade (table 05)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_pupils_suspended": {
+    "name": {
+      "text": "Pupils whose status was suspended or terminated, by grade and sex (table 08)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_pupils_ict": {
+    "name": {
+      "text": "Number of pupils studying ICT (table 10)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_school_graduates": {
+    "name": {
+      "text": "Graduates from primary, basic and secondary schools (table 12)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_pupils_social_status": {
+    "name": {
+      "text": "Number of general education school pupils by social status (table 13)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_enrolment_rates": {
+    "name": {
+      "text": "Net and gross enrolment rates by sex and level of education",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_proficiency": {
+    "name": {
+      "text": "Percentage of students at each proficiency level",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_grade_progression": {
+    "name": {
+      "text": "Grade progression rates in general education schools (table 14)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_school_to_vet": {
+    "name": {
+      "text": "Graduates of basic general education who entered vocational education institutions in their graduation year (table 15)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_school_to_vet_sen": {
+    "name": {
+      "text": "Persons with special educational needs who completed basic education and enrolled in vocational education institutions (table 16)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_vet_institutions": {
+    "name": {
+      "text": "Number of educational institutions that conducted admission of students in vocational education programmes",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_vet_regions_sex": {
+    "name": {
+      "text": "Indicators of vocational education by region and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_vet_employees": {
+    "name": {
+      "text": "Number of employees in public and private educational institutions",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_vet_sen": {
+    "name": {
+      "text": "Number of admitted students with special educational needs by sex and region",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_types": {
+    "name": {
+      "text": "Secondary professional schools and number of pupils by type of studies",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_private": {
+    "name": {
+      "text": "Private secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_specialization": {
+    "name": {
+      "text": "Secondary professional schools and enrolment by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_regions": {
+    "name": {
+      "text": "Number of secondary professional schools by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_pupils_regions": {
+    "name": {
+      "text": "Pupils of secondary professional schools by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_admitted": {
+    "name": {
+      "text": "Students admitted to secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_admitted_specialization": {
+    "name": {
+      "text": "Students admitted to secondary professional schools by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_graduates": {
+    "name": {
+      "text": "Graduates from secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_graduates_specialization": {
+    "name": {
+      "text": "Graduates from secondary professional schools by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_secondary_professional_teachers": {
+    "name": {
+      "text": "Number of teachers of secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher_subprogrammes": {
+    "name": {
+      "text": "Admission, number of students and graduates in higher education institutions by sub-programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher_age_citizenship": {
+    "name": {
+      "text": "Students in higher education institutions by age, sex and citizenship",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher_foreign_students": {
+    "name": {
+      "text": "Foreign students in higher education institutions by programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher_abroad": {
+    "name": {
+      "text": "Georgian citizens studying abroad and foreign students by sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher_professors": {
+    "name": {
+      "text": "Professors in higher education institutions by form of ownership",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher_institutions": {
+    "name": {
+      "text": "Higher education institutions by form of ownership and region",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_doctoral": {
+    "name": {
+      "text": "Doctoral studies: admission, doctoral students and graduates by programme",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_doctoral_age": {
+    "name": {
+      "text": "Doctoral students by age and citizenship",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_doctoral_heads": {
+    "name": {
+      "text": "Scientific heads of doctoral candidates",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_doctoral_foreign": {
+    "name": {
+      "text": "Foreign doctoral students by country",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_preschool_page": {
+    "name": {
+      "text": "Early and preschool education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_general_page": {
+    "name": {
+      "text": "General education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_vocational_page": {
+    "name": {
+      "text": "Professional education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
+  },
+  "source.geostat_education_higher_page": {
+    "name": {
+      "text": "Higher education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "derivation": null
   }
 }

@@ -86,7 +86,6 @@
   "education.sourceNote.universities": "წყარო: საქსტატი, უმაღლესი განათლება",
   "education.sourceNote.vocational": "წყარო: საქსტატი, პროფესიული განათლება",
   "education.mapAria": "რუკა: {measure} მუნიციპალიტეტების მიხედვით, {year}",
-  "education.mapEntityAria": "{name}: {amount}, {year}",
   "education.mapLegend.schools": "მოსწავლე, {year}",
   "education.mapLegend.kindergartens": "ბავშვი, {year}",
   "education.methodology": "მეთოდოლოგია და წყაროები",

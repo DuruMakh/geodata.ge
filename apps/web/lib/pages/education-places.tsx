@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EducationPlaceExplorer, type EducationPlaceExplorerProps } from "../../components/education/education-place-explorer";
+import { EducationPlaceExplorer } from "../../components/education/education-place-explorer";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { LatestFigure, LatestValueLine } from "../../components/explorer-shell/latest-value-line";
@@ -27,6 +27,7 @@ import { clientPresentation, getPresentation } from "../i18n/presentation.server
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
+import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -180,7 +181,8 @@ export async function educationPlaceMetadata(route: EducationPlaceRoute, locale:
 
 /** A place's page: the heading with the picker and its latest line, the chart workspace and, on a region's page, its municipalities. */
 export async function renderEducationPlacePage(route: EducationPlaceRoute, locale: Locale, set: EducationPlaceSet) {
-  const { facts, municipal, presentation, places, lastReviewedAt } = await loadEducationPlaceBasics(locale);
+  // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/education.csv) behind the exported values.
+  const [{ facts, municipal, presentation, places, lastReviewedAt }, sources] = await Promise.all([loadEducationPlaceBasics(locale), loadSourcedWorkbookSources("education", locale)]);
   const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const { messages } = presentation;
@@ -193,8 +195,6 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
   const headline = latestOf(facts, series[0].id, place.id);
   const name = placeLabel(place, locale);
   const { first, last } = placeCoverage(set, place.id, facts);
-  // The Excel Sources sheet lists the archived Geostat workbooks once the education methodology publishes them; until then it lists none.
-  const sources: EducationPlaceExplorerProps["sources"] = [];
   const sectionTitle = t(`page.${set}.title`);
   const region = place.regionId === null ? null : places.find(candidate => candidate.id === place.regionId)!;
   const crumbs = [
