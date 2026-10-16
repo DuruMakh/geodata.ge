@@ -1,12 +1,16 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+import { assertEducationParity, loadEducationFacts, shownEducationFacts, toClientEducationFact } from "../../../lib/data/education/importEducation";
+import { educationMirrorCreateRows, loadEducationFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { EDUCATION_CSV_HEADERS, REVIEWED_AT, prepareEducationData } from "../../../lib/data/education/prepareEducation";
 import {
   EDUCATION_GEORGIA, EDUCATION_HE_GROUPS, EDUCATION_INDICATORS, EDUCATION_MEASURES, EDUCATION_PUBLIC_SOURCES, EDUCATION_SOURCES, EDUCATION_VET_FIELDS, EDUCATION_VET_OLD_FIELDS,
-  educationFactKey, educationIndicator, type EducationFact, type EducationIndicator,
+  educationFactKey, educationIndicator, educationSourceDocumentId, type EducationFact, type EducationIndicator,
 } from "../../../lib/data/education/types";
 import { educationDisplayDecimals, educationPeriodLabel, expectedEducationKeys, validateEducationFacts } from "../../../lib/data/education/validation";
 
@@ -150,4 +154,83 @@ test("a changed table 11 Georgia row is caught by the cross-checks and the sum o
   expect(() => validateEducationFacts(facts, bump("pupils", 2020))).toThrow(/Georgia pupils|do not add up/);
   expect(() => validateEducationFacts(facts, bump("schools", 2020))).toThrow(/Georgia schools|do not add up/);
   expect(() => validateEducationFacts(facts, bump("teachers", 2020))).toThrow(/Georgia teachers|do not add up/);
+});
+
+test("loading serves the same 8,815 values as the canonical file, hidden rows included", async () => {
+  const facts = await loadEducationFacts();
+  expect(facts).toHaveLength(8815);
+  expect(facts).toEqual(await loadFacts());
+});
+
+test("loading refuses a canonical file whose fingerprint differs from the report", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "education-"));
+  try {
+    await fs.mkdir(path.join(dir, "apps/web"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/imports"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/reports"), { recursive: true });
+    const csv = await fs.readFile(path.join(root, "data/imports/education-annual.csv"), "utf8");
+    const altered = csv.replace("644.20000000000005", "644.30000000000005");
+    expect(altered).not.toBe(csv);
+    await fs.writeFile(path.join(dir, "data/imports/education-annual.csv"), altered);
+    await fs.copyFile(path.join(root, "data/reports/education-validation.json"), path.join(dir, "data/reports/education-validation.json"));
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.join(dir, "apps/web"));
+    try {
+      await expect(loadEducationFacts()).rejects.toThrow(/fingerprint/);
+    } finally {
+      cwd.mockRestore();
+    }
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadFacts();
+  const pupils = facts.findIndex(f => f.indicatorId === "education.pupils_national.total" && f.geographyId === EDUCATION_GEORGIA && f.year === 2025);
+  expect(facts[pupils].publishedValue).toBe("644.2");
+  expect(() => assertEducationParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const padded = facts.map(f => ({ ...f }));
+  // Validation requires the published value at its display precision, so the same decimal is written differently in the exact value.
+  padded[pupils].value = "644.200000000000050";
+  expect(() => assertEducationParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[pupils].value = "644.30000000000005";
+  changed[pupils].publishedValue = "644.3";
+  expect(() => assertEducationParity(facts, changed)).toThrow();
+  expect(() => assertEducationParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry persons, with Georgia's pupils taken from thousands, and institutions with their display precision", async () => {
+  const facts = await loadFacts();
+  expect(toClientEducationFact(find(facts, "education.pupils_national.total", EDUCATION_GEORGIA, 2025))).toEqual({
+    year: 2025, indicatorId: "education.pupils_national.total", geographyId: EDUCATION_GEORGIA, sourceId: "geostat_education_schools_national", value: 644200, unit: "persons", decimals: 1,
+  });
+  expect(toClientEducationFact(find(facts, "education.schools.total", EDUCATION_GEORGIA, 2025))).toMatchObject({ value: 2292, unit: "institutions", decimals: 0 });
+  expect(toClientEducationFact(find(facts, "education.pupils.total", "region.tbilisi", 2025))).toMatchObject({ value: 232134, unit: "persons", decimals: 0 });
+});
+
+test("shown facts hold no old vocational field, and the file keeps all 170 hidden rows", async () => {
+  const facts = await loadFacts();
+  const shown = shownEducationFacts(facts);
+  expect(shown).toHaveLength(8815 - 170);
+  expect(shown.some(f => f.indicatorId.split(".")[2].startsWith("old_"))).toBe(false);
+  expect(facts.filter(f => f.indicatorId.split(".")[2].startsWith("old_"))).toHaveLength(170);
+});
+
+test("the database mirror round-trips exact decimals, the shown flag and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = educationMirrorCreateRows(facts, "education-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ educationFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "educationFact">;
+  const mirror = await loadEducationFactsFromMirror(db(rows));
+  expect(() => assertEducationParity(facts, mirror)).not.toThrow();
+  expect(mirror.filter(f => !f.shown)).toHaveLength(170);
+  expect(rows[0].importRunId).toBe("education-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadEducationFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(EDUCATION_PUBLIC_SOURCES.filter(id => !ids.has(educationSourceDocumentId(id)))).toEqual([]);
 });

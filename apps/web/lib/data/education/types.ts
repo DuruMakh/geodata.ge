@@ -144,3 +144,6 @@ export type EducationSeriesBreak = BreakRow;
 export function educationFactKey(fact: Pick<EducationFact, "indicatorId" | "geographyId" | "year">): string {
   return `${fact.indicatorId}:${fact.geographyId}:${fact.year}`;
 }
+export function educationSourceDocumentId(sourceId: string): string {
+  return `source.${sourceId}`;
+}
