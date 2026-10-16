@@ -343,7 +343,7 @@ source.geostat_deaths_23_8_maternal_mortality_rate_by_regions,დედათა
 source.geostat_health_page,ჯანდაცვა (წყაროს გვერდი),docs/Raw Data/Health/geostat-health-annual/official/health-page.html,2026-10-15
 source.geostat_deaths_page,გარდაცვალება (წყაროს გვერდი),docs/Raw Data/Health/geostat-health-annual/official/deaths-page.html,2026-10-15
 source.geostat_housing_permits_regions,მშენებლობაზე გაცემული ნებართვები რეგიონების მიხედვით,docs/Raw Data/Housing/geostat-housing-annual/official/0503EN020101_Permissions.xls,2026-10-16
-source.geostat_housing_permits_zip,"მშენებლობაზე გაცემული ნებართვები ობიექტების ტიპების მიხედვით (zip არქივი, ინგლისური ვერსია)",docs/Raw Data/Housing/geostat-housing-annual/official/Permissions_ENG.zip,2026-10-16
+source.geostat_housing_permits_zip,"მშენებლობაზე გაცემული ნებართვები ობიექტების ტიპების და მუნიციპალიტეტების მიხედვით (zip არქივი, ინგლისური ვერსია)",docs/Raw Data/Housing/geostat-housing-annual/official/Permissions_ENG.zip,2026-10-16
 source.geostat_housing_completed_regions,ექსპლუატაციაში მიღებული ობიექტები რეგიონების მიხედვით,docs/Raw Data/Housing/geostat-housing-annual/official/0503EN020103_Completed-objects.xls,2026-10-16
 source.geostat_housing_completed_zip,"ექსპლუატაციაში მიღებული ობიექტები ტიპების მიხედვით (zip არქივი, ინგლისური ვერსია)",docs/Raw Data/Housing/geostat-housing-annual/official/Completed_ENG.zip,2026-10-16
 source.geostat_housing_permits_municipalities,მშენებლობაზე გაცემული ნებართვები და ექსპლუატაციაში მიღებული ობიექტები მუნიციპალიტეტების მიხედვით,docs/Raw Data/Housing/geostat-housing-annual/official/Permissions_ENG/0503EN020102a_Permissions_ completed municipalities_ENG.xls,2026-10-16
