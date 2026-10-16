@@ -7,9 +7,33 @@ import { SeriesAside } from "./series-aside";
 
 /**
  * One row of a series list; `value` is already formatted for the end year. `parentId` nests it under that row in a `nesting` list.
- * `heading` names the group a row belongs to in a flat list: the panel prints it once, as a small label, above the first shown row of each group.
+ * `heading`, on a top-level row, places it under a small label the panel prints before the first listed row of each new heading.
  */
 export type FlatSeriesRow = { id: string; label: string; color: string; value: string; searchTerms?: string[]; parentId?: string; heading?: string };
+
+/**
+ * The listed rows with each `heading` label before the first of its rows: a muted caption, not a checkbox. The label and
+ * its listed rows form a group named after the label (as nested rows form one named after their parent), so a screen
+ * reader announces the heading. A heading whose rows a search hides lists nothing, so its label is left out too. Rows
+ * without a heading render as they always have.
+ */
+function withHeadings(entries: { row: FlatSeriesRow; node: ReactNode }[]): ReactNode[] {
+  const listed: ReactNode[] = [];
+  for (let index = 0; index < entries.length; index += 1) {
+    const { row, node } = entries[index];
+    // A hidden row stays an empty slot, so a list without headings keeps its children (and their ids) as they were.
+    if (!row.heading) { listed.push(node); continue; }
+    let last = index;
+    while (last + 1 < entries.length && entries[last + 1].row.heading === row.heading) last += 1;
+    const shown = entries.slice(index, last + 1).map((entry) => entry.node).filter((item) => item !== null);
+    if (shown.length) listed.push(<div key={`heading-${index}`} role="group" aria-label={row.heading} data-testid="series-heading-group">
+      <p role="presentation" data-testid="series-heading" className="mt-3 mb-1 px-0.5 text-[11px] text-[var(--muted)]">{row.heading}</p>
+      {shown}
+    </div>);
+    index = last;
+  }
+  return listed;
+}
 
 /**
  * Nests each row with a `parentId` under that row's caret. The counter and the bulk action then cover the
@@ -86,11 +110,6 @@ export function FlatSeriesPanel({
   const expanded = nesting?.expanded ?? ownExpanded;
   const setExpanded = nesting?.onExpandedChange ?? setOwnExpanded;
   const hasCarets = rows.some((row) => row.parentId);
-  // A group's label goes above the first of its rows still shown, so a search that hides all of them hides it too.
-  const withHeadings = (shown: FlatSeriesRow[], render: (row: FlatSeriesRow) => ReactNode): ReactNode[] => shown.flatMap((row, index) => [
-    row.heading && row.heading !== shown[index - 1]?.heading ? <p key={`heading:${row.id}`} role="presentation" data-testid="series-heading" className="pt-3 pb-1 text-[11px] text-[var(--muted)]">{row.heading}</p> : null,
-    render(row),
-  ]);
   function nestedRow(row: FlatSeriesRow, labels: SeriesNesting): ReactNode {
     const children = rows.filter((child) => child.parentId === row.id);
     if (!pinned(row) && !matches(row) && !children.some(matches)) return null;
@@ -106,8 +125,8 @@ export function FlatSeriesPanel({
   const panel = <>
     <p className="mb-3 text-[11px] text-[var(--muted)]">{caption}</p>
     <SeriesSelector controls={controls} query={query} onQueryChange={setQuery} searchPlaceholder={searchPlaceholder} searchable={searchable} selectedCount={counted} totalCount={countedOf} supplementalSelected={nestedSelected} hasSelection={hasSelection} allSelected={counted === countedOf} onToggleAll={() => onSelectionChange(hasSelection ? [] : topRows.map((row) => row.id))} hasVisibleMatches={rows.some(matches)}>
-      {nesting ? topRows.map((row) => nestedRow(row, nesting))
-        : withHeadings(rows.filter((row) => pinned(row) || matches(row)), (row) => <SeriesSelectorRow key={row.id} id={row.id} label={row.label} color={row.color} value={row.value} selected={selectedIds.includes(row.id)} level={row.id === totalId ? "total" : "item"} wrapLabel={wrapLabel} onToggle={() => toggle(row.id)} />)}
+      {withHeadings(nesting ? topRows.map((row) => ({ row, node: nestedRow(row, nesting) }))
+        : rows.filter((row) => pinned(row) || matches(row)).map((row) => ({ row, node: <SeriesSelectorRow key={row.id} id={row.id} label={row.label} color={row.color} value={row.value} selected={selectedIds.includes(row.id)} level={row.id === totalId ? "total" : "item"} wrapLabel={wrapLabel} onToggle={() => toggle(row.id)} /> })))}
     </SeriesSelector>
     {downloadAction}
   </>;

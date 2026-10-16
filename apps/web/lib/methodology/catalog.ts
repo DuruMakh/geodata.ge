@@ -18,6 +18,8 @@ import { HEALTH_METHODOLOGY_CONTENT } from "./content/health";
 import { HEALTH_METHODOLOGY_CONTENT as EN_HEALTH } from "./content/en/health";
 import { ENERGY_FOOD_METHODOLOGY_CONTENT as EN_ENERGY_FOOD } from "./content/en/energyFood";
 import { MONEY_BANKS_METHODOLOGY_CONTENT as EN_MONEY_BANKS } from "./content/en/moneyBanks";
+import { BUSINESS_METHODOLOGY_CONTENT } from "./content/business";
+import { BUSINESS_METHODOLOGY_CONTENT as EN_BUSINESS } from "./content/en/business";
 import { REGIONAL_ECONOMIES_METHODOLOGY as EN_REGIONAL_ECONOMIES } from "./content/en/regional-economies";
 import { REGIONAL_ECONOMIES_METHODOLOGY } from "./content/regional-economies";
 import { UNEMPLOYMENT_METHODOLOGY_CONTENT } from "./content/unemployment";
@@ -56,6 +58,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   gdp: GDP_METHODOLOGY_CONTENT,
   "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
+  business: BUSINESS_METHODOLOGY_CONTENT,
   inflation: INFLATION_METHODOLOGY_CONTENT,
   money: MONEY_BANKS_METHODOLOGY_CONTENT,
   unemployment: UNEMPLOYMENT_METHODOLOGY_CONTENT,
@@ -83,6 +86,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   health: EN_HEALTH,
   "energy-food": EN_ENERGY_FOOD,
   money: EN_MONEY_BANKS,
+  business: EN_BUSINESS,
 };
 
 export function getMethodologyContent(id: MethodologyDatasetId, locale: Locale): MethodologyContent {

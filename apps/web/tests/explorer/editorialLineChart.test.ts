@@ -213,6 +213,16 @@ describe("EditorialLineChart monthly periods", () => {
     expect(markup).not.toContain("chart-series-cpi-dashed");
   });
 
+  it("dots a dotted series without an end dot, and draws nothing dotted unless asked", () => {
+    expect(markup).not.toContain("-dotted");
+    const dotted = renderGeorgianMarkup(createElement(EditorialLineChart, {
+      years: [2024, 2025], share: false, unit: UNIT_BN, shareLabel: "%",
+      series: [{ id: "loss", label: "Loss", color: "#B3402A", vals: [1e9, 2e9], dotted: true }],
+    }));
+    expect(dotted).toMatch(/data-testid="chart-series-loss-dotted"[^>]*stroke-dasharray="0.1 4.5"/);
+    expect(dotted).not.toMatch(/<circle[^>]*r="3.5"[^>]*fill="#B3402A"/);
+  });
+
   it("spaces lattice columns by half-years", () => {
     const width = Number(/<pattern[^>]*\swidth="([\d.]+)"/.exec(chartGeometry(markup, "desktop"))?.[1]);
     expect(width).toBeCloseTo((816 / 271) * 6, 3);

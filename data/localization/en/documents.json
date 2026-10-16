@@ -4613,6 +4613,396 @@
     },
     "documentLanguage": "en"
   },
+  "geostat_business_turnover": {
+    "title": {
+      "text": "Turnover (0502EN0101)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_production_value": {
+    "title": {
+      "text": "Production value (0502EN0102)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_employed": {
+    "title": {
+      "text": "Number of persons employed (0502EN0103)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_employees": {
+    "title": {
+      "text": "Number of employees (0502EN0104)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_earnings": {
+    "title": {
+      "text": "Average monthly earnings (0502EN0105)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_value_added": {
+    "title": {
+      "text": "Value added (0502EN0106)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_intermediate_consumption": {
+    "title": {
+      "text": "Intermediate consumption (0502EN0107)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_personnel_costs": {
+    "title": {
+      "text": "Personnel costs (0502EN0108)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_purchases": {
+    "title": {
+      "text": "Purchase of goods and services (0502EN0109)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_purchases_for_resale": {
+    "title": {
+      "text": "Purchase of goods and services for resale (0502EN0110)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_investment": {
+    "title": {
+      "text": "Investments in fixed assets (0502EN0111)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_gender": {
+    "title": {
+      "text": "Business statistics by gender (0502EN0112)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_fixed_assets": {
+    "title": {
+      "text": "Fixed assets (0502EN0113)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_profit_loss": {
+    "title": {
+      "text": "Profit and loss (0502EN0114)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_labour_productivity": {
+    "title": {
+      "text": "Labour productivity (0502EN0115)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_remarks": {
+    "title": {
+      "text": "Business statistics remarks",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography": {
+    "title": {
+      "text": "Business demography: main results",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_other": {
+    "title": {
+      "text": "Business demography: other indicators",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_births": {
+    "title": {
+      "text": "Business demography: enterprise births",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_deaths": {
+    "title": {
+      "text": "Business demography: enterprise deaths",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_survey_page": {
+    "title": {
+      "text": "Statistical survey of enterprises (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_page": {
+    "title": {
+      "text": "Business demography indicators (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_survey_metadata": {
+    "title": {
+      "text": "Metadata: statistical survey of enterprises (annual)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_metadata": {
+    "title": {
+      "text": "Metadata: business demography",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_survey_metadata_ka": {
+    "title": {
+      "text": "Metadata: statistical survey of enterprises (annual), Georgian edition",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_business_demography_metadata_ka": {
+    "title": {
+      "text": "Metadata: business demography, Georgian edition",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "ka"
+  },
   "geostat_health_main": {
     "title": {
       "text": "Main characteristics of public health",

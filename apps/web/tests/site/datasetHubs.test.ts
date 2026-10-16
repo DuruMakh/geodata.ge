@@ -9,6 +9,7 @@ test("the header, footer and 404 list every sidebar hub, in sidebar order", () =
   expect(DATASET_HUBS.map((hub) => hub.href)).toEqual([
     "/explorer",
     "/explorer/economy",
+    "/explorer/business",
     "/explorer/inflation",
     "/explorer/money",
     "/explorer/unemployment",

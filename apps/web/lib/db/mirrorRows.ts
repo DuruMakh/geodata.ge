@@ -42,6 +42,8 @@ import { healthDisplayDecimals } from "../data/health/validation";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
 import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
+import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
+import { businessDisplayDecimals } from "../data/business/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
@@ -793,6 +795,24 @@ export async function loadExternalPositionFactsFromMirror(db: Pick<MirrorClient,
     return {
       year: row.year, indicatorId: row.indicatorId as ExternalPositionFact["indicatorId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(1), unit: row.unit as "usd_million", periodEnd: row.periodEnd, basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function businessMirrorCreateRows(facts: readonly BusinessFact[], importRunId: string): Prisma.BusinessFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: businessSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadBusinessFactsFromMirror(db: Pick<MirrorClient, "businessFact">): Promise<BusinessFact[]> {
+  const rows = await db.businessFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== businessSourceDocumentId(row.sourceId)) throw new Error("Business source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as BusinessFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(businessDisplayDecimals(row.indicatorId)), unit: row.unit as BusinessFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });

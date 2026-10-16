@@ -42,6 +42,8 @@ export type ChartSeries = {
   forecastFromYear?: number;
   /** Reference lines (the NBG target) draw dashed and without an end dot. */
   dashed?: boolean;
+  /** Draws dotted and, like a dashed line, without an end dot: a third pattern beside solid and dashed. */
+  dotted?: boolean;
   /** Draws a hollow point on each `preliminary` value, so it is marked without hovering. */
   hollowPreliminary?: boolean;
 };
@@ -511,12 +513,14 @@ export function EditorialLineChart({
                     ? { "data-testid": `chart-series-${line.id}-actual` }
                     : line.dashed
                       ? { "data-testid": `chart-series-${line.id}-dashed` }
-                      : {})}
+                      : line.dotted
+                        ? { "data-testid": `chart-series-${line.id}-dotted` }
+                        : {})}
                   d={actualPath}
                   fill="none"
                   stroke={line.color}
                   strokeWidth={2.2}
-                  strokeDasharray={line.dashed ? "6 5" : undefined}
+                  strokeDasharray={line.dashed ? "6 5" : line.dotted ? "0.1 4.5" : undefined}
                   strokeLinejoin="round"
                   strokeLinecap="round"
                 />
@@ -536,7 +540,7 @@ export function EditorialLineChart({
               {isolated.map(([px, py, index]) => (
                 <circle key={`isolated-${index}`} cx={px} cy={py} r={2.5} fill={line.color} />
               ))}
-              {line.dashed ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
+              {line.dashed || line.dotted ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
               {points
                 .filter(([, , index]) => line.planned?.[index] || (line.hollowPreliminary && line.preliminary?.[index]))
                 .map(([px, py, index]) => (

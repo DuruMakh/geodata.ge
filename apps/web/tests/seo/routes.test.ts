@@ -105,7 +105,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Health adds its hub, three pages and a causes-of-death page for Georgia and each of the 11 regions: 16 bilingual pairs.
     // The Health methodology adds one more bilingual pair.
     // Foreign debt and Reserves add two further bilingual pairs.
-    expect(urls).toHaveLength(620);
+    // Business adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs; Health its hub, three pages, 12 area pages and its methodology page: 17 more.
+    expect(urls).toHaveLength(658);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -122,6 +123,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/poverty");
     expect(urls).toContain("https://fiscal.ge/methodology/money");
     expect(urls).toContain("https://fiscal.ge/en/methodology/money");
+    expect(urls).toContain("https://fiscal.ge/methodology/business");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/business");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
@@ -146,6 +149,11 @@ describe("indexable Fiscal.ge routes", () => {
     for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);
+    }
+    const businessAreas = ["georgia", "tbilisi", "adjara", "guria", "imereti", "kakheti", "mtskheta_mtianeti", "racha_lechkhumi_kvemo_svaneti", "samegrelo_zemo_svaneti", "samtskhe_javakheti", "kvemo_kartli", "shida_kartli"];
+    for (const page of ["", "/sales", "/jobs", "/investment-profit", "/firms", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/business${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/business${page}`);
     }
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
@@ -175,6 +183,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/gdp",
       "/methodology/economic-sectors",
       "/methodology/regional-economies",
+      "/methodology/business",
       "/methodology/inflation",
       "/methodology/money",
       "/methodology/unemployment",

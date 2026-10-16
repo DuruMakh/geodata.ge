@@ -61,6 +61,7 @@ const DATASET_SCHEMA_IDS = {
   health: "health",
   "energy-food": "energy-food",
   money: "money",
+  business: "business",
 } as const;
 
 const DATASET_SOURCE_NOTES = {
@@ -82,6 +83,7 @@ const DATASET_SOURCE_NOTES = {
   health: "common.geostatSourceNote",
   "energy-food": "common.geostatSourceNote",
   money: "common.nbgSourceNote",
+  business: "common.geostatSourceNote",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -104,6 +106,7 @@ const DATASET_DOWNLOADS = {
   health: null,
   "energy-food": null,
   money: null,
+  business: null,
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -130,6 +133,7 @@ const DATASET_JSON_DOWNLOADS = {
   health: [],
   "energy-food": [],
   money: [],
+  business: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
     { href: "/downloads/data/government-debt-rates.json", labelKey: "methodology.jsonRates" },
@@ -161,6 +165,7 @@ const DATASET_JSON_DISTRIBUTIONS = {
   health: [],
   "energy-food": [],
   money: [],
+  business: [],
 } as const;
 
 const METHODOLOGY_WORD = /methodology|მეთოდოლოგია/i;

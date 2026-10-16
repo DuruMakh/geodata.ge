@@ -20,4 +20,5 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   health: "2026-10-15",
   "energy-food": "2026-10-11",
   money: "2026-10-11",
+  business: "2026-10-15",
 };

@@ -41,6 +41,7 @@ data/reports/*.json
 !data/reports/energy-food-validation.json
 !data/reports/health-validation.json
 !data/reports/money-banks-validation.json
+!data/reports/business-validation.json
 !data/reports/household-income-spending-validation.json
 data/reports/*.txt
 

@@ -65,6 +65,8 @@ function moneyFirstYears() {
 const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boolean; alsoIn?: string; text?: (first: number, last: number) => string }[] = [
   { url: "/explorer/economy/regions", file: "regional-economies-annual.csv" },
   { url: "/explorer/money", file: "money-banks-annual.csv" },
+  { url: "/explorer/business", file: "business-annual.csv" },
+  { url: "/explorer/business/firms", file: "business-annual.csv", rows: (row) => /^business\.(active|births|deaths|birth_rate|death_rate)\./.test(row.indicator_id) },
   ...moneyFirstYears(),
   { url: "/explorer/unemployment", file: "unemployment-annual.csv" },
   { url: "/explorer/living-standards", file: "household-income-spending-annual.csv", text: (first) => `household income and spending from ${first}` },
