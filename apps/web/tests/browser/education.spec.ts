@@ -201,6 +201,7 @@ test("Universities: one row selected, search keeps the count, and graduates' mis
   // Search shows the three Women rows (and keeps the pinned total); it never changes the count.
   await page.getByTestId("series-search").fill("ქალ");
   await expect(page.locator('[data-series-id$=".women"]:visible')).toHaveCount(3);
+  await expect(page.locator('[data-series-id$=".men"]:visible')).toHaveCount(0);
   await expect(page.getByTestId("series-status")).toContainText("1 / 48");
   await page.getByTestId("series-search").fill("");
   // Graduates of calendar 2025 sit under 2024/25: the students-and-graduates mix spans 2010/11–2025/26 with gaps, not zeros.
