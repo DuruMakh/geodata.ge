@@ -191,9 +191,11 @@ test("the Guria page: picker, neighbours, the one list, the language switch and 
   await expect(page.getByTestId("business-latest")).toHaveText(/^ბრუნვა · 2025: 1\.\d მლრდ ₾ · გურია$/);
   await expect(page.getByTestId("business-unit-label")).toHaveText("მლნ ₾");
   await expect(page.locator('[data-series-id="business.turnover.region_guria"]')).toContainText("1,078.7");
-  // No measure switch: money, jobs and firms are one list under three headings, each naming its unit.
+  // No measure switch: money, jobs and firms are one list under three headings, each naming its unit; the firm counts,
+  // which end a year earlier, name their year and show it unticked.
   await expect(page.locator('[data-testid^="business-area-measure-"]')).toHaveCount(0);
-  await expect(page.getByTestId("series-heading")).toHaveText(["ბრუნვა, ინვესტიციები, მოგება და ზარალი · მლნ ₾", "დასაქმებულები · ათასი ადამიანი", "საწარმოების რაოდენობა"]);
+  await expect(page.getByTestId("series-heading")).toHaveText(["ბრუნვა, ინვესტიციები, მოგება და ზარალი · მლნ ₾", "დასაქმებულები · ათასი ადამიანი", "საწარმოების რაოდენობა · 2024"]);
+  await expect(page.locator('[data-series-id="business.births.region_guria"]').first()).not.toContainText("—");
   await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
   await expect(page.locator(pressed("business.turnover.region_guria"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2006–2025");
