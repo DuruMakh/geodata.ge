@@ -129,6 +129,7 @@
   "documents.source.imf_weo_april_2026_general_government_balance.publisher": "International Monetary Fund",
   "documents.source.imf_weo_april_2026_general_government_balance.title": "World Economic Outlook",
   "errors.dataVersionChanged": "The data version has changed since expectedDataVersion was captured; call again without it or with the current dataVersion.",
+  "errors.internalError": "The service could not complete this request. Try again later, or use the published files at {bulkUrl}.",
   "errors.invalidParameters": "Invalid parameters: {issues}",
   "errors.measureSeriesMismatch": "Measure \"{measure}\" does not apply to series: {mismatched}.",
   "errors.rankAmountChanges": "absolute_change and percentage_change apply to GEL amounts; use percentage_point_change for a percentage measure.",

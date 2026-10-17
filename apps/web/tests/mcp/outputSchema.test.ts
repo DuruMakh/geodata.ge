@@ -134,6 +134,7 @@ describe("every tool's structured output matches its declared schema", () => {
 
       const result = toolResult(response);
       expect(result.structuredContent).toBeDefined();
+      expect(outputSchemaFor(tool.name).parse(result.structuredContent)).toEqual(result.structuredContent);
 
       const parsed = toolOutput.safeParse(result.structuredContent);
       if (!parsed.success) {

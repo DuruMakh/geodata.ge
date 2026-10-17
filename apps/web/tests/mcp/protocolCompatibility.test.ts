@@ -207,8 +207,8 @@ describe("wire validation and finite exchanges", () => {
     }));
     expect(response.status).toBe(202);
     expect(await response.text()).toBe("");
-    const getRequest = new Request("https://fiscal.ge/mcp", { headers: { accept: "text/event-stream" } });
-    const deleteRequest = new Request("https://fiscal.ge/mcp", { method: "DELETE" });
+    const getRequest = new Request("https://fiscal.ge/mcp", { headers: { host: "fiscal.ge", accept: "text/event-stream" } });
+    const deleteRequest = new Request("https://fiscal.ge/mcp", { method: "DELETE", headers: { host: "fiscal.ge" } });
     expect((await GET(getRequest)).status).toBe(405);
     expect((await DELETE(deleteRequest)).status).toBe(405);
   });

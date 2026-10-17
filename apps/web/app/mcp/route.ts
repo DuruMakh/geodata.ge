@@ -380,6 +380,12 @@ export function OPTIONS(request: Request): Response {
   return withResponseHeaders(request, preflight(request));
 }
 function unsupportedMethod(request: Request): Response {
-  return withResponseHeaders(request, methodNotAllowed());
+  const verdict = checkRequest(request);
+  const response = verdict.ok ? methodNotAllowed() : rpcError(
+    verdict.status, verdict.code,
+    "მოთხოვნა უარყოფილია.",
+    "Request rejected: origin or host is not configured for this deployment.",
+  );
+  return withResponseHeaders(request, response);
 }
 export { unsupportedMethod as GET, unsupportedMethod as DELETE };

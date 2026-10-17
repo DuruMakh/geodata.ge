@@ -129,6 +129,7 @@
   "documents.source.imf_weo_april_2026_general_government_balance.publisher": "საერთაშორისო სავალუტო ფონდი",
   "documents.source.imf_weo_april_2026_general_government_balance.title": "მსოფლიო ეკონომიკური პერსპექტივები",
   "errors.dataVersionChanged": "მონაცემთა ვერსია შეიცვალა; გამოიძახეთ თავიდან expectedDataVersion-ის გარეშე ან განახლებული ვერსიით.",
+  "errors.internalError": "სერვისმა მოთხოვნის შესრულება ვერ შეძლო. სცადეთ მოგვიანებით, ან გამოიყენეთ გამოქვეყნებული ფაილები: {bulkUrl}.",
   "errors.invalidParameters": "მოთხოვნის პარამეტრები არასწორია.",
   "errors.measureSeriesMismatch": "ზომა \"{measure}\" არ ეხება სერიას: {mismatched}.",
   "errors.rankAmountChanges": "აბსოლუტური და პროცენტული ცვლილება მხოლოდ ლარის მაჩვენებელზეა განსაზღვრული; პროცენტისთვის გამოიყენეთ percentage_point_change.",

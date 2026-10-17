@@ -4,6 +4,7 @@ import { compare } from "../../lib/factQuery/compare";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { queryInflation } from "../../lib/factQuery/queryInflation";
+import * as resultModule from "../../lib/mcp/result";
 import { LIMITS, boundedToolResult, toolResult, tooLargeResponse } from "../../lib/mcp/result";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
@@ -22,6 +23,18 @@ beforeAll(async () => {
 const size = (value: unknown) => Buffer.byteLength(JSON.stringify(value), "utf8");
 
 describe("MCP tool results", () => {
+  it("prepares a fixed bilingual retryable internal error with the published-file fallback", () => {
+    expect(resultModule).toHaveProperty("internalErrorResult");
+    const result = resultModule.internalErrorResult(snapshot);
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+    expect(result.content[0]!.text).toContain("error internal_error (retryable: true)");
+    expect(result.content[0]!.text).toContain("Try again later");
+    expect(result.content[0]!.text).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    expect(result.content[0]!.text).toMatch(/[Ⴀ-ჿ]/);
+    expect(result.content[0]!.text).toContain(`dataVersion ${snapshot.dataVersion}`);
+  });
+
   it("explains all four actual source-filter outcomes in Georgian and English", () => {
     const grouped = "source.municipal_mof_annual_and_history_workbooks";
     for (const [input, outcome, narrowed, phrases] of [

@@ -323,6 +323,21 @@ export function toolResult(response: FactQueryResponse): ToolResult {
       { structuredContent: response as unknown as Record<string, unknown>, content, isError: false };
 }
 
+/** Prepare before tool execution so a failing formatter is never retried. */
+export function internalErrorResult(snapshot: FactQuerySnapshot): ToolResult {
+  return toolResult({
+    kind: "error",
+    status: "error",
+    error: {
+      code: "internal_error",
+      messageKa: serviceMessage(snapshot, "ka", "errors.internalError", { bulkUrl: BULK_DATA_URL }),
+      messageEn: serviceMessage(snapshot, "en", "errors.internalError", { bulkUrl: BULK_DATA_URL }),
+      retryable: true,
+    },
+    meta: buildResponseMeta(snapshot),
+  });
+}
+
 export function tooLargeResponse(
   snapshot: FactQuerySnapshot,
   detail: { returned: number; bytes: number },
