@@ -48,6 +48,8 @@ describe("MCP tool surface", () => {
     for (const required of [
       "69 reviewed budgets", "64 territorial municipalities", "net Adjara adjustment exactly once",
       "manifest.json inventories publication files", "sources.json contains the complete original-document catalogue",
+      "When asked for all underlying evidence", "https://fiscal.ge/downloads/data/sources.json",
+      "first/last examples alone are not a complete citation path",
       "inflation-products.csv", "index_100", "mom_index_100", "yoy_index_100", "100 means no price change",
       "Unemployment is not served by this MCP", "https://fiscal.ge/explorer/unemployment/overview",
       "https://fiscal.ge/en/explorer/unemployment/overview",

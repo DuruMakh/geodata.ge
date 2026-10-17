@@ -261,6 +261,8 @@ particular answer rests on. Cite from those. Both structured observations and
 text rows carry documentIds for the specific figure, resolved by the source
 evidence in the same response. For static evidence, manifest.json inventories publication files
 with their hashes and byte sizes; sources.json contains the complete original-document catalogue.
+When asked for all underlying evidence, include https://fiscal.ge/downloads/data/sources.json
+alongside the relevant source groups; first/last examples alone are not a complete citation path.
 Do not describe the manifest as the original-document list. The data is
 published under CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/); attribute Fiscal.ge.
