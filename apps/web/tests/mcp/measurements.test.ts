@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -17,6 +18,44 @@ type Report = {
   memory: { distinctProductBaseKeys: number; supportedStartYears: number[]; stages: { phase: string; heapUsedBytes: number }[]; gcExposed: boolean };
   wire: { name: string; protocol: string; bytes: number; status: number; isError: boolean }[];
 };
+
+it("measures an unprimed complete query in five fresh processes with executing file identities", () => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), "mcp-unprimed-"));
+  try {
+    const output = path.join(directory, "report.json");
+    execFileSync(process.execPath, ["--import", "tsx", "scripts/measure-bilingual-mcp.ts", "--unprimed", "--implementation-state", "cached-test", "--output", output], {
+      cwd: process.cwd(), encoding: "utf8", timeout: 60_000,
+    });
+    const report = JSON.parse(readFileSync(output, "utf8")) as {
+      mode: string; implementationState: string; harnessSha256: string; implementationSha256: string; snapshotSha256: string;
+      sampleCount: number; samples: { pid: number; dataVersion: string; input: { seriesIds: string[] }; resultBytes: number; resultSha256: string;
+        harnessSha256: string; implementationSha256: string; snapshotSha256: string; readMs: number; parseMs: number; inputPreparationMs: number;
+        firstQueryMs: number; shapingMs: number; serializationMs: number; queryThroughShapingMs: number; readThroughShapingMs: number; processElapsedMs: number }[];
+    };
+    const hash = (file: string) => createHash("sha256").update(readFileSync(file)).digest("hex");
+    expect(report.mode).toBe("unprimed-full-query");
+    expect(report.implementationState).toBe("cached-test");
+    expect(report.harnessSha256).toBe(hash("scripts/measure-bilingual-mcp.ts"));
+    expect(report.implementationSha256).toBe(hash("lib/factQuery/inflationProductData.ts"));
+    expect(report.snapshotSha256).toBe(hash("lib/factQuery/generated/snapshot.json"));
+    expect(report.sampleCount).toBe(5);
+    expect(new Set(report.samples.map(sample => sample.pid)).size).toBe(5);
+    expect(new Set(report.samples.map(sample => sample.resultSha256)).size).toBe(1);
+    for (const sample of report.samples) {
+      expect(sample.harnessSha256).toBe(report.harnessSha256);
+      expect(sample.implementationSha256).toBe(report.implementationSha256);
+      expect(sample.snapshotSha256).toBe(report.snapshotSha256);
+      expect(sample.input.seriesIds).toHaveLength(200);
+      expect(sample.resultBytes).toBeLessThanOrEqual(524_288);
+      for (const field of ["readMs", "parseMs", "inputPreparationMs", "firstQueryMs", "shapingMs", "serializationMs"] as const) expect(sample[field]).toBeGreaterThan(0);
+      expect(sample.queryThroughShapingMs).toBeGreaterThanOrEqual(sample.firstQueryMs + sample.shapingMs + sample.serializationMs - 0.001);
+      expect(sample.readThroughShapingMs).toBeGreaterThan(sample.queryThroughShapingMs);
+      expect(sample.processElapsedMs).toBeGreaterThan(sample.readThroughShapingMs);
+    }
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+}, 60_000);
 
 describe("packaged MCP measurement CLI", () => {
   let report: Report;

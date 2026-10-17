@@ -90,6 +90,85 @@ function coldSample() {
   };
 }
 
+function measurementIdentity() {
+  const stateIndex = process.argv.indexOf("--implementation-state");
+  if (stateIndex < 0 || !process.argv[stateIndex + 1]) throw new Error("Unprimed measurement requires --implementation-state <label>");
+  const hash = (file: string) => createHash("sha256").update(readFileSync(file)).digest("hex");
+  return {
+    implementationState: process.argv[stateIndex + 1],
+    implementationSha256: hash(path.join(process.cwd(), "lib/factQuery/inflationProductData.ts")),
+    harnessSha256: hash(fileURLToPath(import.meta.url)),
+    snapshotSha256: hash(SNAPSHOT_PATH),
+    checkoutCommit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+  };
+}
+
+// Select the same endpoint request from serialized facts alone. Calling the
+// index or coverage helpers here would prime the query this mode must measure.
+function unprimedSample() {
+  const start = performance.now();
+  const raw = readFileSync(SNAPSHOT_PATH, "utf8");
+  const readEnd = performance.now();
+  const snapshot = JSON.parse(raw) as FactQuerySnapshot;
+  const parseEnd = performance.now();
+  if (snapshot.schemaVersion !== SCHEMA_VERSION || !/^[0-9a-f]{64}$/.test(snapshot.dataVersion)) throw new Error("snapshot_incompatible");
+  const validationEnd = performance.now();
+  let first = "9999-12";
+  let last = "0000-01";
+  for (const fact of snapshot.inflationProducts.facts) {
+    if (fact.period < first) first = fact.period;
+    if (fact.period > last) last = fact.period;
+  }
+  const input: QueryInflationProductsInput = {
+    seriesIds: snapshot.inflationProducts.catalogue.filter(product => product.firstPeriod <= first).map(product => product.productId).sort().slice(0, LIMITS.series),
+    measure: "cumulative_pct", startYear: Number(first.slice(0, 4)), fromPeriod: last, toPeriod: last,
+  };
+  const queryStart = performance.now();
+  // The first index build, lazy prefixes and availability fill occur only
+  // inside this complete query. Nothing above calls product arithmetic.
+  const response = queryInflationProducts(snapshot, input);
+  const queryEnd = performance.now();
+  const result = boundedToolResult(snapshot, response);
+  const shapingEnd = performance.now();
+  const serialized = JSON.stringify(result);
+  const end = performance.now();
+  if (response.kind !== "observations" || result.isError) throw new Error("Unprimed query must return observations within the result limit");
+  return {
+    ...measurementIdentity(), pid: process.pid, dataVersion: snapshot.dataVersion, schemaVersion: snapshot.schemaVersion,
+    snapshotBytes: Buffer.byteLength(raw, "utf8"), input,
+    readMs: readEnd - start, parseMs: parseEnd - readEnd, validationMs: validationEnd - parseEnd,
+    inputPreparationMs: queryStart - validationEnd, firstQueryMs: queryEnd - queryStart,
+    shapingMs: shapingEnd - queryEnd, serializationMs: end - shapingEnd,
+    queryThroughShapingMs: end - queryStart, readThroughShapingMs: end - start,
+    resultBytes: Buffer.byteLength(serialized, "utf8"), resultSha256: createHash("sha256").update(serialized).digest("hex"),
+  };
+}
+
+async function unprimedMain() {
+  const outputIndex = process.argv.indexOf("--output");
+  if (outputIndex < 0 || !process.argv[outputIndex + 1]) throw new Error("Unprimed measurement requires --output <report.json>");
+  const identity = measurementIdentity();
+  const samples = Array.from({ length: COLD_SAMPLES }, () => {
+    const start = performance.now();
+    const sample = JSON.parse(execFileSync(process.execPath, ["--import", "tsx", fileURLToPath(import.meta.url), "--unprimed-sample", "--implementation-state", identity.implementationState], {
+      cwd: process.cwd(), encoding: "utf8", timeout: LIMITS.durationMs,
+    })) as ReturnType<typeof unprimedSample>;
+    if (sample.harnessSha256 !== identity.harnessSha256 || sample.implementationSha256 !== identity.implementationSha256 || sample.snapshotSha256 !== identity.snapshotSha256) throw new Error("Measurement files changed during the unprimed run");
+    return { ...sample, processElapsedMs: performance.now() - start };
+  });
+  const phases = ["readMs", "parseMs", "validationMs", "inputPreparationMs", "firstQueryMs", "shapingMs", "serializationMs", "queryThroughShapingMs", "readThroughShapingMs", "processElapsedMs"] as const;
+  const output = path.resolve(process.argv[outputIndex + 1]);
+  await mkdir(path.dirname(output), { recursive: true });
+  await writeFile(output, `${JSON.stringify({
+    mode: "unprimed-full-query", ...identity, measuredAt: new Date().toISOString(),
+    dataVersion: samples[0].dataVersion, schemaVersion: samples[0].schemaVersion,
+    environment: { node: process.version, platform: process.platform, arch: process.arch, osRelease: os.release(), cpu: os.cpus()[0]?.model, logicalCpus: os.cpus().length, totalMemoryBytes: os.totalmem(), freeMemoryBytes: os.freemem() },
+    methodology: "Five fresh processes. Read/parse/validate snapshot, prepare input from plain facts, then run the first complete query once without index/arithmetic/availability priming. firstQueryMs includes initial index, lazy prefixes and availability fill. Shaping and JSON serialization are separate phases. Contiguous totals are directly timed, never sums of medians. processElapsedMs also includes Node/tsx/module startup and post-timing identity/result hashing. No HTTP/SDK/limiter or hosted latency claim; OS page cache/load uncontrolled.",
+    sampleCount: COLD_SAMPLES, samples, timings: Object.fromEntries(phases.map(key => [key, summarize(samples.map(sample => sample[key]))])),
+  }, null, 2)}\n`);
+  console.log(`Measured ${COLD_SAMPLES} unprimed fresh processes; report: ${output}`);
+}
+
 async function main() {
   const outputIndex = process.argv.indexOf("--output");
   if (outputIndex < 0 || !process.argv[outputIndex + 1]) throw new Error("Usage: tsx scripts/measure-bilingual-mcp.ts --output <report.json>");
@@ -333,5 +412,7 @@ async function main() {
   console.log(`Measured ${measurements.length} scenarios; report: ${output}`);
 }
 
-if (process.argv.includes("--cold-sample")) console.log(JSON.stringify(coldSample()));
+if (process.argv.includes("--unprimed-sample")) console.log(JSON.stringify(unprimedSample()));
+else if (process.argv.includes("--unprimed")) void unprimedMain();
+else if (process.argv.includes("--cold-sample")) console.log(JSON.stringify(coldSample()));
 else void main();
