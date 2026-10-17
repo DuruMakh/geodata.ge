@@ -1,6 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { readFileSync, statSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { setFlagsFromString } from "node:v8";
+import { runInNewContext } from "node:vm";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,7 +16,9 @@ import { queryDeficit } from "../lib/factQuery/queryDeficit";
 import { compare } from "../lib/factQuery/compare";
 import { rank } from "../lib/factQuery/rank";
 import { getSources } from "../lib/factQuery/getSources";
-import { inflationProductIndex } from "../lib/factQuery/inflationProductData";
+import { inflationProductIndex, productQueryCoverage } from "../lib/factQuery/inflationProductData";
+import { productCumulative } from "../lib/explorer/inflationProducts";
+import type { QueryInflationProductsInput } from "../lib/factQuery/schemas";
 import { queryInflationProducts } from "../lib/factQuery/queryInflationProducts";
 import { periodFromKey, periodKey } from "../lib/data/inflation/periods";
 import type { Observation } from "../lib/factQuery/observations";
@@ -22,16 +27,31 @@ import { LIMITS, boundedToolResult, toolResult } from "../lib/mcp/result";
 import { loadPackagedSnapshot } from "../lib/mcp/snapshot";
 
 const COLD_SAMPLES = 5;
-const WARM_SAMPLES = 10;
+const WARM_SAMPLES = 21;
 const SNAPSHOT_PATH = path.join(process.cwd(), "lib/factQuery/generated/snapshot.json");
 const bytes = (value: unknown) => Buffer.byteLength(JSON.stringify(value), "utf8");
+// Collect only at heap checkpoints, outside every timed phase. The same setting
+// is used for before/after and in each fresh child process.
+setFlagsFromString("--expose_gc");
+const collectGarbage = runInNewContext("gc") as () => void;
+const heap = (phase: string) => { collectGarbage(); return { phase, heapUsedBytes: process.memoryUsage().heapUsed }; };
+
+function representativeInput(snapshot: FactQuerySnapshot): QueryInflationProductsInput {
+  const index = inflationProductIndex(snapshot);
+  const first = periodKey(Math.min(...[...index.annual.values(), ...index.monthly.values()].map(run => run.start)));
+  const last = periodKey(index.latestPeriod);
+  return {
+    seriesIds: [...index.productById.keys()].sort().filter(id => index.productById.get(id)!.firstPeriod <= first).slice(0, LIMITS.series),
+    measure: "cumulative_pct", startYear: Number(first.slice(0, 4)), fromPeriod: last, toPeriod: last,
+  };
+}
 
 function summarize(samples: number[]) {
   const sorted = [...samples].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
   return {
     min: sorted[0], median: sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2,
-    p95: sorted[Math.ceil(sorted.length * 0.95) - 1], max: sorted.at(-1), samples,
+    max: sorted.at(-1), samples,
   };
 }
 
@@ -46,11 +66,25 @@ function coldSample() {
   if (snapshot.schemaVersion !== SCHEMA_VERSION || !/^[0-9a-f]{64}$/.test(snapshot.dataVersion)) throw new Error("snapshot_incompatible");
   const indexStart = performance.now();
   const index = inflationProductIndex(snapshot);
+  const indexEnd = performance.now();
+  const input = representativeInput(snapshot);
+  const arithmeticStart = performance.now();
+  for (const id of input.seriesIds) productCumulative(index, id, input.startYear!, index.latestPeriod);
+  const arithmeticEnd = performance.now();
+  productQueryCoverage(snapshot, input);
+  const availabilityEnd = performance.now();
+  const response = queryInflationProducts(snapshot, input);
+  const queryEnd = performance.now();
+  const result = boundedToolResult(snapshot, response);
+  JSON.stringify(result);
   const end = performance.now();
   return {
     pid: process.pid, snapshotBytes: Buffer.byteLength(raw, "utf8"), dataVersion: snapshot.dataVersion,
     readMs: readEnd - start, parseMs: parseEnd - readEnd, validationMs: indexStart - parseEnd,
-    indexMs: end - indexStart, totalMs: end - start,
+    indexMs: indexEnd - indexStart, firstArithmeticMs: arithmeticEnd - arithmeticStart,
+    firstAvailabilityMs: availabilityEnd - arithmeticEnd, firstQueryMs: queryEnd - availabilityEnd,
+    firstShapingMs: end - queryEnd, totalMs: end - start,
+    firstQueryCells: input.seriesIds.length, firstResultBytes: bytes(result),
     productCount: index.productById.size, factCount: snapshot.inflationProducts.facts.length,
     annualRunCount: index.annual.size, monthlyRunCount: index.monthly.size,
   };
@@ -67,7 +101,35 @@ async function main() {
     return { ...sample, processElapsedMs: performance.now() - start };
   });
   const snapshot = loadPackagedSnapshot();
+  const memoryStages = [heap("loaded")];
   inflationProductIndex(snapshot);
+  memoryStages.push(heap("indexed"));
+  const representative = representativeInput(snapshot);
+  queryInflationProducts(snapshot, representative);
+  const availabilitySamples: number[] = [];
+  const arithmeticSamples: number[] = [];
+  const index = inflationProductIndex(snapshot);
+  for (let sample = 0; sample < WARM_SAMPLES; sample++) {
+    const arithmeticStart = performance.now();
+    for (const id of representative.seriesIds) productCumulative(index, id, representative.startYear!, index.latestPeriod);
+    arithmeticSamples.push(performance.now() - arithmeticStart);
+    const start = performance.now();
+    productQueryCoverage(snapshot, representative);
+    availabilitySamples.push(performance.now() - start);
+  }
+  memoryStages.push(heap("representative-warm"));
+  const supportedStartYears = Array.from({ length: Number(representative.toPeriod.slice(0, 4)) - index.earliestYear + 1 }, (_, offset) => index.earliestYear + offset);
+  const productIdsForMemory = [...index.productById.keys()].sort();
+  function exerciseKeys() {
+    for (const id of productIdsForMemory) {
+      productQueryCoverage(snapshot, { ...representative, seriesIds: [id], measure: "yoy_pct", startYear: undefined });
+      for (const startYear of supportedStartYears) productQueryCoverage(snapshot, { ...representative, seriesIds: [id], startYear });
+    }
+  }
+  exerciseKeys();
+  memoryStages.push(heap("distinct-keys"));
+  exerciseKeys();
+  memoryStages.push(heap("repeat-keys"));
   const queries = { describeCoverage, queryNational, queryMinistries, queryMunicipal, queryDebt, queryDeficit, queryInflationProducts, compare, rank, getSources };
   const measurements: Record<string, unknown>[] = [];
   function measure(name: string, tool: string, input: unknown, response: FactQueryResponse, requestedCells: number | null = null, runQuery?: () => FactQueryResponse) {
@@ -131,6 +193,9 @@ async function main() {
     return response;
   }
   const catalogue = run("catalogue-default", "describeCoverage", {});
+  run("product-search-milk", "describeCoverage", { datasetId: "inflation-products", search: "milk" });
+  run("product-search-rice", "describeCoverage", { datasetId: "inflation-products", search: "rice" });
+  run("city-discovery-batumi", "describeCoverage", { datasetId: "inflation", entityType: "city", search: "Batumi" });
   if (catalogue.kind !== "catalogue") throw new Error("Default catalogue failed");
   const datasets = (catalogue.data as CoverageData).datasets;
   const catalogues = new Map<string, CoverageData>();
@@ -158,6 +223,7 @@ async function main() {
   const entityIds = municipal.entities!.filter(entity => entity.entityType === "municipality").map(entity => entity.entityId).sort();
   const years = [...total.years].sort((a, b) => a - b);
   const latestYear = years.at(-1)!;
+  run("national-one-cell", "queryNational", { side: "expenditure", seriesIds: ["expenditure.total"], years: [2024], measure: "amount_gel" });
   run("municipal-one-all-years", "queryMunicipal", { entityIds: entityIds.slice(0, 1), seriesIds: [total.seriesId], years, measure: "amount_gel" });
   run("municipal-all-latest-year", "queryMunicipal", { entityIds, seriesIds: [total.seriesId], years: [latestYear], measure: "amount_gel" });
   for (const entity of [municipal.entities!.find(entity => entity.entityType === "region" && entity.entityId !== "region.adjara")!, municipal.entities!.find(entity => entity.entityId === "region.adjara")!]) {
@@ -222,20 +288,47 @@ async function main() {
   const sourceIds = snapshot.sources.map(source => source.sourceId).sort();
   for (let index = 0; index < sourceIds.length; index += LIMITS.sourceIds) run(`sources-all-batch-${index / LIMITS.sourceIds + 1}`, "getSources", { sourceIds: sourceIds.slice(index, index + LIMITS.sourceIds) });
   const output = path.resolve(process.argv[outputIndex + 1]);
+  // Real route/SDK envelopes, measured separately from pure query timings. This
+  // local in-memory limiter makes no network calls; it is not hosted latency.
+  process.env.MCP_ENABLED = "true";
+  process.env.MCP_RATE_LIMITER = "memory";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
+  const { POST } = await import("../app/mcp/route");
+  const wire = [];
+  for (const name of ["national-one-cell", "product-search-milk", "product-search-rice", "city-discovery-batumi", "catalogue-inflation-products", "products-cumulative-endpoints", "products-cumulative-rank-100", "products-500-output-cells"]) {
+    const scenario = measurements.find(sample => sample.name === name)!;
+    const toolName = { queryNational: "query_national", queryInflationProducts: "query_inflation_products", describeCoverage: "describe_coverage", rank: "rank" }[scenario.tool as string]!;
+    for (const protocol of ["2025-11-25", "2026-07-28"]) {
+      const modern = protocol === "2026-07-28";
+      const start = performance.now();
+      const response = await POST(new Request("https://fiscal.ge/mcp", {
+        method: "POST", headers: { host: "fiscal.ge", "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": protocol, ...(modern ? { "mcp-method": "tools/call", "mcp-name": toolName } : {}) },
+        body: JSON.stringify({ jsonrpc: "2.0", id: "measure", method: "tools/call", params: { name: toolName, arguments: scenario.input, ...(modern ? { _meta: { "io.modelcontextprotocol/protocolVersion": protocol, "io.modelcontextprotocol/clientInfo": { name: "measurement", version: "1" }, "io.modelcontextprotocol/clientCapabilities": {} } } : {}) } }),
+      }));
+      const text = await response.text();
+      const body = JSON.parse(text);
+      wire.push({ name, protocol, status: response.status, bytes: Buffer.byteLength(text, "utf8"), isError: body.result?.isError ?? true, localRouteElapsedMs: performance.now() - start });
+    }
+  }
   await mkdir(path.dirname(output), { recursive: true });
   await writeFile(output, `${JSON.stringify({
     measuredAt: new Date().toISOString(), dataVersion: snapshot.dataVersion, schemaVersion: snapshot.schemaVersion,
     releaseCommit: snapshot.releaseCommit, generatedAt: snapshot.generatedAt, snapshotBytes: statSync(SNAPSHOT_PATH).size,
+    snapshotSha256: createHash("sha256").update(readFileSync(SNAPSHOT_PATH)).digest("hex"),
+    checkoutCommit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
     environment: { node: process.version, platform: process.platform, arch: process.arch, osRelease: os.release(), cpu: os.cpus()[0]?.model, logicalCpus: os.cpus().length, totalMemoryBytes: os.totalmem(), freeMemoryBytes: os.freemem() },
     methodology: {
-      cold: "5 sequential fresh Node processes; sync read/JSON parse/schema-version validation/product index measured separately; processElapsedMs includes Node/tsx/module startup. OS page cache is uncontrolled.",
-      warm: "10 sequential samples after 1 unmeasured warmup per query; shared parsed snapshot and product WeakMap index. Samples retain outliers; p95 is nearest-rank.",
-      bytes: "UTF-8 complete unbounded and bounded tool results, including both languages, source documents and caveats. No HTTP/JSON-RPC/SDK framing; actual era wire evidence is Task 7. A refusal replaces the entire result, never trims evidence.",
+      cold: "5 sequential fresh Node processes: read, parse, schema validation, index, first endpoint arithmetic (including lazy prefixes), initial availability fill, first full query (already primed arithmetic/availability), complete bounded shaping/serialization. totalMs is measured wall time, never a sum of medians; processElapsedMs adds Node/tsx/module startup. OS page cache uncontrolled.",
+      warm: "21 sequential samples after 1 unmeasured query warmup; shared snapshot/index. Focused availability and endpoint arithmetic timed separately, before distinct-key exercise. General query timings follow distinct-key exercise. Retain outliers and report median/range, no local p95 claim.",
+      bytes: "UTF-8 tool-result bytes plus real local POST route/SDK JSON-RPC envelopes for both protocol generations. Wire elapsed includes route/security/in-memory limiter/SDK validation/query/shaping/serialization, no network or hosted boot. A refusal replaces the entire result, never trims evidence.",
+      memory: "Explicit GC at five untimed heap checkpoints; exercise each supported product x annual or cumulative start year, then repeat the same keys. Snapshot and prefix/index allocations included; allocator/GC noise prevents exact cache attribution. No arbitrary combination/window keys.",
       limits: "Local stage measurements, not a hosted latency guarantee. Request total excludes boot/HTTP/rate limiting. The unchanged ten-second platform ceiling is not a benchmark timeout promise.",
     },
     productScenarios: { firstProductPeriod, lastProductPeriod, startYear, historyMonthCount: periodFromKey(lastProductPeriod) - periodFromKey(firstProductPeriod) + 1, rosterCount: productIds.length, fullHistoryProductCount: fullHistoryIds.length, missingHeavyPeriod, missingHeavyAvailableCount: annualCounts.get(missingHeavyPeriod) },
-    cold: { sampleCount: COLD_SAMPLES, samples: cold, timings: Object.fromEntries(["readMs", "parseMs", "indexMs", "totalMs", "processElapsedMs"].map(key => [key, summarize(cold.map(sample => sample[key as keyof typeof sample] as number))])) },
-    limits: LIMITS, measurements,
+    cold: { sampleCount: COLD_SAMPLES, samples: cold, timings: Object.fromEntries(["readMs", "parseMs", "indexMs", "firstArithmeticMs", "firstAvailabilityMs", "firstQueryMs", "firstShapingMs", "totalMs", "processElapsedMs"].map(key => [key, summarize(cold.map(sample => sample[key as keyof typeof sample] as number))])) },
+    availability: { input: representative, requestedCells: representative.seriesIds.length, sampleCount: WARM_SAMPLES, timings: summarize(availabilitySamples), arithmeticTimings: summarize(arithmeticSamples) },
+    memory: { distinctProductBaseKeys: productIdsForMemory.length * (supportedStartYears.length + 1), supportedStartYears, gcExposed: true, stages: memoryStages },
+    limits: LIMITS, measurements, wire,
   }, null, 2)}\n`);
   console.log(`Measured ${measurements.length} scenarios; report: ${output}`);
 }
