@@ -60,6 +60,12 @@ export type ToolResult = {
 
 export const BULK_DATA_URL = "https://fiscal.ge/downloads/data/manifest.json";
 
+type ResultSizeKind = "cells" | "sources" | "catalogue";
+
+export function resultSizeKind(toolName: string): ResultSizeKind {
+  return toolName === "get_sources" ? "sources" : toolName === "describe_coverage" ? "catalogue" : "cells";
+}
+
 function line(...cells: (string | number | null)[]): string {
   return cells.map((cell) => (cell === null ? "" : String(cell))).join("\t");
 }
@@ -140,7 +146,7 @@ const SOURCE_NARROWING_EXPLANATIONS: Record<ResolvedSourceView["narrowingOutcome
 };
 
 function sourceView(source: ResolvedSourceView): string {
-  return line(source.sourceId, source.name, source.documents.length, source.documentCount, source.narrowed, source.narrowingOutcome);
+  return line(source.sourceId, source.name, source.documents.length, source.documentCount, String(source.narrowed), source.narrowingOutcome);
 }
 
 type Defined = { valueDefinitionId: string; valueDefinition: string; valueDefinitionEn: string };
@@ -340,10 +346,14 @@ export function internalErrorResult(snapshot: FactQuerySnapshot): ToolResult {
 
 export function tooLargeResponse(
   snapshot: FactQuerySnapshot,
-  detail: { returned: number; bytes: number },
+  detail: { returned: number; bytes: number; kind?: ResultSizeKind },
 ): FactQueryResponse {
-  const key = detail.bytes > 0 ? "errors.resultTooLargeBytes" : "errors.resultTooLargeCells";
-  const values = { cells: detail.returned, ...(detail.bytes > 0 ? { kib: Math.round(detail.bytes / 1024) } : {}), bulkUrl: BULK_DATA_URL };
+  const key = detail.kind === "sources" ? "errors.resultTooLargeSources"
+    : detail.kind === "catalogue" ? "errors.resultTooLargeCatalogue"
+    : detail.bytes > 0 ? "errors.resultTooLargeBytes" : "errors.resultTooLargeCells";
+  const values = detail.kind === "sources" || detail.kind === "catalogue"
+    ? { bulkUrl: BULK_DATA_URL }
+    : { cells: detail.returned, ...(detail.bytes > 0 ? { kib: Math.round(detail.bytes / 1024) } : {}), bulkUrl: BULK_DATA_URL };
 
   return {
     kind: "error",
@@ -358,7 +368,7 @@ export function tooLargeResponse(
   };
 }
 
-function cellCount(response: FactQueryResponse): number {
+export function cellCount(response: FactQueryResponse): number {
   if (response.kind === "observations") {
     return (response.data as { observations: unknown[] }).observations.length;
   }
@@ -372,7 +382,11 @@ function cellCount(response: FactQueryResponse): number {
  * answer is a wrong answer wearing a correct one's shape, and section 11.3
  * forbids silently dropping sources or warnings to fit.
  */
-export function boundedToolResult(snapshot: FactQuerySnapshot, response: FactQueryResponse): ToolResult {
+export function boundedToolResult(
+  snapshot: FactQuerySnapshot,
+  response: FactQueryResponse,
+  kind: ResultSizeKind = response.kind === "sources" ? "sources" : response.kind === "catalogue" ? "catalogue" : "cells",
+): ToolResult {
   const returned = cellCount(response);
   // A comparison row is two endpoint cells, which is exactly why 11.3 gives it
   // its own smaller ceiling. Gating comparisons at `cells` allowed 500 rows -
@@ -383,5 +397,5 @@ export function boundedToolResult(snapshot: FactQuerySnapshot, response: FactQue
 
   const result = toolResult(response);
   const bytes = Buffer.byteLength(JSON.stringify(result), "utf8");
-  return bytes > LIMITS.resultBytes ? toolResult(tooLargeResponse(snapshot, { returned, bytes })) : result;
+  return bytes > LIMITS.resultBytes ? toolResult(tooLargeResponse(snapshot, { returned, bytes, kind })) : result;
 }

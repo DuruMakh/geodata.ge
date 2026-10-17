@@ -40,7 +40,7 @@ import { SECTOR_QUERY_MEASURES, sectorMeasureYearSpans } from "../factQuery/econ
 import { MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
 import { serverInstructions, type SectorMeasureYears } from "./instructions";
 import { outputSchemaFor } from "./outputSchema";
-import { boundedToolResult, internalErrorResult, LIMITS, tooLargeResponse, toolResult } from "./result";
+import { boundedToolResult, internalErrorResult, LIMITS, resultSizeKind, tooLargeResponse, toolResult } from "./result";
 import { loadPackagedSnapshot } from "./snapshot";
 import type { DatasetId, FactQueryResponse, FactQuerySnapshot } from "../factQuery/types";
 
@@ -443,7 +443,7 @@ export function createMcpServer(): McpServer {
                 : 0;
           const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
           if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0 }));
-          const result = boundedToolResult(snapshot, tool.run(snapshot, args));
+          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name));
           if (!result.isError && result.structuredContent === undefined) throw new Error(safeValidationError);
           return result;
         } catch {

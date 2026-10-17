@@ -37,6 +37,22 @@ limit counts both structured and text output; a source-heavy request can now
 require fewer sources. `result_too_large` preserves narrower-query and shared
 bulk-manifest guidance. No evidence is silently removed to make an answer fit.
 
+City-scoped inflation discovery uses the existing city vocabulary and reviewed
+city facts: headline annual, monthly and twelve-month average rates, plus annual
+and monthly rates for the twelve divisions. Series and dataset coverage combine
+the published city histories; individual cities and series can start later or
+have missing months. National-only measures and subgroups are excluded from this
+scope, including global searches restricted to cities. Unfiltered and country
+catalogues retain their national coverage.
+
+Oversized source lists suggest fewer source IDs and relevant dataset/year/entity
+filters, while warning that derived calculations may require all input documents.
+Oversized catalogues suggest a dataset, short search term or supported type/level
+filter. Observation, comparison and ranking refusals retain cell-count guidance.
+Both the tool-result and complete protocol-response limits use the same recovery
+kind and published-file fallback; the 512 KiB limit and complete evidence rule
+are unchanged.
+
 Both `/connect` and `/en/connect` retain budget/economy examples and add national,
 city and current-product inflation examples derived from the snapshot's available
 months. Annual-rate comparisons describe percentage points. Product cumulative

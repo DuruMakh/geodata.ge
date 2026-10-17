@@ -13,6 +13,15 @@ beforeAll(async () => {
   snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-04T00:00:00.000Z" });
 });
 
+it("validates scoped city discovery without changing the catalogue contract", () => {
+  const response = describeCoverage(snapshot, { datasetId: "inflation", entityType: "city" });
+  expect(outputSchemaFor("describe_coverage").safeParse(response).success).toBe(true);
+  expect(response).toMatchObject({ kind: "catalogue", data: { datasets: [{ entityTypes: ["city"], measures: ["yoy_pct", "mom_pct", "avg12_pct"] }] } });
+  const result = toolResult(response);
+  expect(result.isError).toBe(false);
+  expect(result.structuredContent).toEqual(response);
+});
+
 it("retains two-element period/year ranges with exact element types", () => {
   const response = TOOLS.find(tool => tool.name === "describe_coverage")!.run(snapshot, { datasetId: "inflation" });
   if (response.kind !== "catalogue") throw new Error("Expected catalogue");

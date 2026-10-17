@@ -144,6 +144,8 @@
   "errors.rankValueYearOnly": "A value ranking takes a single year, not a year range.",
   "errors.resultTooLargeBytes": "Result too large: {cells} cells, {kib} KiB. Narrow the request and ask again: fewer years first, then fewer entities, then fewer series. For a whole dataset, download the published file instead: {bulkUrl}",
   "errors.resultTooLargeCells": "Result too large: {cells} cells. Narrow the request and ask again: fewer years first, then fewer entities, then fewer series. For a whole dataset, download the published file instead: {bulkUrl}",
+  "errors.resultTooLargeSources": "Source list too large. Request fewer source IDs, then narrow by relevant dataset, years or entities. Derived calculations may retain all their input documents. For bulk evidence, use the published files: {bulkUrl}",
+  "errors.resultTooLargeCatalogue": "Catalogue too large. Choose a dataset, use a short search term, or narrow by a supported entity type or series level. For a whole dataset, use the published files: {bulkUrl}",
   "errors.sourceYearsOutOfRange": "Requested year(s) {outOfRangeYears} fall outside the covered range ({minYear}-{maxYear}).",
   "errors.unknownEntity": "Unknown entity id(s): {unknownEntityIds}.",
   "errors.unknownSeries": "Unknown series id(s): {unknownSeriesIds}.",

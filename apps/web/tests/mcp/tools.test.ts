@@ -43,6 +43,31 @@ const TOOL_NAMES = [
 ];
 
 describe("MCP tool surface", () => {
+  it.each([
+    { name: "get_sources", args: { sourceIds: ["source.geostat_cpi_yoy"] }, guidance: "fewer source IDs" },
+    { name: "describe_coverage", args: { datasetId: "inflation" }, guidance: "short search term" },
+  ])("preserves $name recovery through the registered tool callback", async ({ name, args, guidance }) => {
+    const tool = TOOLS.find(tool => tool.name === name)!;
+    const response = tool.run(loadPackagedSnapshot(), args);
+    if (response.kind === "error") throw new Error("Expected data");
+    response.meta.generatedAt += "x".repeat(512 * 1024);
+    const run = vi.spyOn(tool, "run").mockReturnValue(response);
+    const client = await connected();
+    try {
+      const result = await client.callTool({ name, arguments: args });
+      expect(result.isError).toBe(true);
+      expect(result.structuredContent).toBeUndefined();
+      const text = (result.content as { text: string }[])[0]!.text;
+      expect(text).toContain("result_too_large");
+      expect(text).toContain(guidance);
+      expect(text).not.toContain("0 cells");
+      expect(text).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    } finally {
+      run.mockRestore();
+      await client.close();
+    }
+  });
+
   it("preflights 501 product output cells before calculation while accepting a long input span", async () => {
     const product = TOOLS.find(tool => tool.name === "query_inflation_products");
     expect(product).toBeDefined();

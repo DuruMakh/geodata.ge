@@ -14,11 +14,14 @@ beforeAll(() => {
 });
 afterAll(() => { process.env = { ...original }; vi.restoreAllMocks(); });
 
-it.each(["legacy", "modern"])("counts the final SDK bytes before returning a %s result", async era => {
-  const tool = TOOLS.find(tool => tool.name === "query_national")!;
-  const args = { side: "expenditure", seriesIds: ["expenditure.total"], years: [2024], measure: "amount_gel" };
+it.each(["legacy", "modern"].flatMap(era => [
+  { era, name: "query_national", args: { side: "expenditure", seriesIds: ["expenditure.total"], years: [2024], measure: "amount_gel" }, guidance: "1 cells" },
+  { era, name: "get_sources", args: { sourceIds: ["source.geostat_cpi_yoy"] }, guidance: "fewer source IDs" },
+  { era, name: "describe_coverage", args: { datasetId: "inflation" }, guidance: "short search term" },
+]))("counts the final SDK bytes for $era $name with matching recovery", async ({ era, name, args, guidance }) => {
+  const tool = TOOLS.find(tool => tool.name === name)!;
   const response = tool.run(loadPackagedSnapshot(), args);
-  if (response.kind !== "observations") throw new Error("Expected observations");
+  if (response.kind === "error") throw new Error("Expected data");
   // A valid metadata string whose final size is ten bytes below the tool cap.
   // The SDK adds its envelope/identity afterward, so the HTTP reply must refuse.
   const bytes = Buffer.byteLength(JSON.stringify(toolResult(response)), "utf8");
@@ -44,6 +47,8 @@ it.each(["legacy", "modern"])("counts the final SDK bytes before returning a %s 
     expect(body.result.structuredContent).toBeUndefined();
     expect(body.result.content[0].text).toContain("result_too_large");
     expect(body.result.content[0].text).toContain("/downloads/data/manifest.json");
+    expect(body.result.content[0].text).toContain(guidance);
+    expect(body.result.content[0].text).not.toContain("0 cells");
     if (modern) expect(body.result.resultType).toBe("complete");
   } finally { run.mockRestore(); }
 });

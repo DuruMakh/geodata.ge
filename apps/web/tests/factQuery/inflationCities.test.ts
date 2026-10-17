@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { compare } from "../../lib/factQuery/compare";
-import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { describeCoverage, type CoverageData } from "../../lib/factQuery/describeCoverage";
 import { queryInflation, inflationCellCount } from "../../lib/factQuery/queryInflation";
 import { rank } from "../../lib/factQuery/rank";
 import { SCHEMA_VERSION, type FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -183,6 +183,40 @@ describe("city query to original-source lookup", () => {
 });
 
 describe("city rankings, comparisons and coverage", () => {
+  it("city discovery advertises only queryable combinations", () => {
+    const response = describeCoverage(snapshot, { datasetId: "inflation", entityType: "city" });
+    if (response.kind !== "catalogue") throw new Error("Expected catalogue");
+    const coverage = response.data as CoverageData;
+    const seriesIds = coverage.series!.map(series => series.seriesId);
+    const expectedCitySeriesIds = ["cpi.headline", ...Array.from({ length: 12 }, (_, i) => `cpi.cat.${String(i + 1).padStart(2, "0")}`)];
+    expect(seriesIds).toEqual(expectedCitySeriesIds);
+    expect(coverage.entities!.map(entity => entity.entityId).sort()).toEqual(["city.batumi", "city.gori", "city.kutaisi", "city.tbilisi", "city.telavi", "city.zugdidi"]);
+    for (const series of coverage.series!) {
+      const measures = series.seriesId === "cpi.headline" ? ["yoy_pct", "mom_pct", "avg12_pct"] : ["yoy_pct", "mom_pct"];
+      expect(Object.keys(series.periodsByMeasure!)).toEqual(measures);
+      expect(series.yearsByMeasure).toBeUndefined();
+      const facts = snapshot.inflation.cities.filter(fact => fact.seriesId === series.seriesId);
+      expect(series.years).toEqual([...new Set(facts.map(fact => Number(fact.period.slice(0, 4))))].sort((a, b) => a - b));
+      for (const measure of measures) {
+        const periods = facts.filter(fact => fact.measure === measure).map(fact => fact.period).sort();
+        expect(series.periodsByMeasure![measure]).toEqual([periods[0], periods.at(-1)]);
+        for (const entity of coverage.entities!) {
+          const available = facts.find(fact => fact.cityId === entity.entityId && fact.measure === measure)!;
+          expect(available).toBeDefined();
+          const query = queryInflation(snapshot, { entityIds: [entity.entityId], seriesIds: [series.seriesId], measure, fromPeriod: available.period, toPeriod: available.period });
+          expect(query.status).toBe("ok");
+          expect(observations(query)[0]!.value).toBe(available.value);
+        }
+      }
+    }
+    const periods = snapshot.inflation.cities.map(fact => fact.period).sort();
+    expect(coverage.datasets).toEqual([expect.objectContaining({ entityTypes: ["city"], measures: ["yoy_pct", "mom_pct", "avg12_pct"], periods: [periods[0], periods.at(-1)], years: [Number(periods[0].slice(0, 4)), Number(periods.at(-1)!.slice(0, 4))] })]);
+    for (const entity of coverage.entities!) {
+      const cityPeriods = snapshot.inflation.cities.filter(fact => fact.cityId === entity.entityId).map(fact => fact.period).sort();
+      expect(entity.periods).toEqual([cityPeriods[0], cityPeriods.at(-1)]);
+    }
+  });
+
   it("ranks the six cities for one series and month, without Georgia", () => {
     const response = rank(snapshot, { datasetId: "inflation", dimension: "entities", entityType: "city", seriesId: "cpi.cat.01", period: "2026-08", measure: "yoy_pct", metric: "value", limit: 3 });
     const data = (response as { data: { entries: { entityId: string; value: number }[]; universe: { candidateCount: number } } }).data;

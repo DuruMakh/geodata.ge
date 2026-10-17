@@ -23,6 +23,28 @@ beforeAll(async () => {
 const size = (value: unknown) => Buffer.byteLength(JSON.stringify(value), "utf8");
 
 describe("MCP tool results", () => {
+  it.each([
+    ["sources", "fewer source IDs"],
+    ["catalogue", "short search term"],
+    ["observations", "1 cells"],
+  ] as const)("gives actionable recovery for oversized %s", (kind, guidance) => {
+    const response = kind === "sources"
+      ? getSources(snapshot, { sourceIds: ["source.geostat_cpi_yoy"] })
+      : kind === "catalogue"
+        ? describeCoverage(snapshot, { datasetId: "inflation" })
+        : queryNational(snapshot, { side: "expenditure", seriesIds: ["expenditure.total"], years: [2024], measure: "amount_gel" });
+    expect(response.kind).toBe(kind);
+    response.meta.generatedAt += "x".repeat(LIMITS.resultBytes);
+    const result = boundedToolResult(snapshot, response);
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+    expect(result.content[0]!.text).toContain("error result_too_large (retryable: true)");
+    expect(result.content[0]!.text).toContain(guidance);
+    expect(result.content[0]!.text).not.toContain("0 cells");
+    expect(result.content[0]!.text).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    expect(size(result)).toBeLessThanOrEqual(LIMITS.resultBytes);
+  });
+
   it("prepares a fixed bilingual retryable internal error with the published-file fallback", () => {
     expect(resultModule).toHaveProperty("internalErrorResult");
     const result = resultModule.internalErrorResult(snapshot);

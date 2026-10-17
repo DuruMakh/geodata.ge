@@ -115,6 +115,8 @@ export const SERVICE_MESSAGE_KEYS = [
   "errors.rankValueYearOnly",
   "errors.resultTooLargeBytes",
   "errors.resultTooLargeCells",
+  "errors.resultTooLargeSources",
+  "errors.resultTooLargeCatalogue",
   "errors.sourceYearsOutOfRange",
   "errors.unknownEntity",
   "errors.unknownSeries",
@@ -244,6 +246,14 @@ export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka:
       "bulkUrl",
       "cells"
     ]
+  },
+  "errors.resultTooLargeSources": {
+    "ka": ["bulkUrl"],
+    "en": ["bulkUrl"]
+  },
+  "errors.resultTooLargeCatalogue": {
+    "ka": ["bulkUrl"],
+    "en": ["bulkUrl"]
   },
   "errors.sourceYearsOutOfRange": {
     "ka": [
