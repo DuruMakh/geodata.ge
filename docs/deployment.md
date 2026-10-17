@@ -200,6 +200,52 @@ update the compatible dependency chain, verify lint/audit and remove this
 exception and its tests. Extending acceptance beyond expiry requires explicit
 owner approval and fresh exposure evidence. No automatic renewal is permitted.
 
+## Current dependency-security review (2026-10-17)
+
+The reviewed maintenance updates standalone `fast-uri` **3.1.7 → 3.1.8**
+([advisory](https://github.com/advisories/GHSA-hrr3-gc8f-f4qj)) and the existing
+development-only Hono resolution **4.13.5 → 4.13.7**
+([advisory](https://github.com/advisories/GHSA-hxh3-vqpv-xpqv)). Hono stays
+within legacy SDK 1.31.0's declared `^4.11.4` range; no direct dependency or
+additional override is introduced. Its affected JSX rendering operation was
+not found in Fiscal's application path; the legacy SDK imports Hono only in
+its example server.
+
+The full npm audit, including development tools, now reports **7 package
+findings: 2 moderate, 5 high, 0 critical**. The two moderate findings are
+`uuid@8.3.2` and its parent `exceljs@4.4.0`, from the
+[same advisory](https://github.com/advisories/GHSA-w5hq-g745-h8pq); they are
+not two independent vulnerabilities. ExcelJS remains on its latest supported
+release and declares uuid `^8.3.0`, which has no patched in-range version.
+The inspected ExcelJS path calls only zero-argument `uuidv4()`, rather than
+the advisory's affected v3/v5/v6 output-buffer operations. ExcelJS still ships
+for workbook downloads, so retain the finding and recheck upstream releases.
+Do not apply npm's suggested ExcelJS downgrade or a cross-major uuid override
+without separate compatibility review of workbook and browser exports.
+
+The npm report does **not** enumerate the SDK's embedded parser. Server and
+client remain **2.2.0**, with the legacy test SDK **1.31.0**. Official 2.3.1
+server/client tarballs were inspected and integrity-checked: the candidate
+server's AJV provider is byte-for-byte identical to installed 2.2.0 and both
+candidates retain executable `fast-uri@3.1.0` code. Actual resolver probes
+still return host `A.com` for `//%41.com`, whereas standalone 3.1.8 returns
+`a.com`. The advisory's separate `equal() === false` example did not reproduce;
+the observed parser discrepancy remains unresolved. The server uses this
+provider for schema validation. Fiscal owns the schemas, uses native `URL`
+and exact allowlists for Host/Origin checks, and fetches no caller URL; these
+limit the demonstrated exposure but do not establish a universal guarantee.
+Keep this embedded residual open until an upstream artifact actually fixes it.
+
+The five high findings are the exact temporary lint-chain exception above.
+The policy and its expiry remain unchanged: **2026-11-02 00:00 UTC / 04:00
+Tbilisi**. Before then, recheck an official braces patch or supported lint-chain
+replacement; if none exists, raise the unresolved release blocker for an
+explicit owner decision. Passing the policy command does not mean all findings
+are fixed. The focused policy, MCP failure/privacy, legacy/modern protocol,
+output-schema, security and unchanged reference tests verify this maintenance;
+the integrated completion gate and production function-size check remain
+separate release requirements.
+
 ## Methodology archive release checks
 
 `npm run build` runs `npm run data:prepare-methodology-archives` through
