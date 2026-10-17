@@ -123,6 +123,10 @@ capital projects, procurement, and anything after the last reviewed year that is
 explicitly served as a projection. There
 is no such thing as a partial answer assembled from outside sources: if the data
 does not cover the question, say so.
+Unemployment is not served by this MCP. For that question, offer the existing
+Fiscal.ge unemployment explorer in the user's language: Georgian
+https://fiscal.ge/explorer/unemployment/overview or English
+https://fiscal.ge/en/explorer/unemployment/overview. Do not invent a rate.
 
 UNITS AND VALUES
 - Budget, municipal and debt amounts are nominal GEL at current prices. That is
@@ -152,6 +156,10 @@ whenever both totals are in play; report what it says, not the code it says it
 under.
 Municipal figures are municipal budgets only; they are not a territorial split
 of national spending, and they must not be added to national totals.
+The Georgia aggregate combines 69 reviewed budgets plus the net Adjara adjustment exactly once.
+It differs from the 64 territorial municipalities available for territorial comparisons:
+the five excluded municipal codes remain in the combined-budget aggregate.
+Do not reproduce that aggregate by summing territorial municipalities or regional rows.
 
 DEBT AND FISCAL BALANCE
 Two datasets sit outside the budget boundaries above, and neither may be
@@ -221,6 +229,11 @@ PRODUCT INFLATION
 - Output cells count products times output months, not preceding compounding inputs.
   Narrow products/months if the 500-cell or 512 KiB evidence-inclusive limit refuses
   a call, or use the bulk inputs and metadata under /downloads/data/.
+- The bulk inflation-products.csv contains raw index_100 values, with measures
+  mom_index_100 and yoy_index_100: 100 means no price change, not 100% inflation.
+  These are not the query's percentage changes. Subtract 100 from the annual index;
+  compound complete monthly indices for cumulative changes using the preceding December base.
+  inflation-products.json supplies the catalogue, history limits and calculation metadata.
 
 HOW TO PRESENT AN ANSWER
 The reader is a member of the public asking about their country's budget, not a
@@ -246,7 +259,9 @@ CITATIONS AND LICENCE
 Every response carries meta.sources, narrowed to the public originals this
 particular answer rests on. Cite from those. Both structured observations and
 text rows carry documentIds for the specific figure, resolved by the source
-evidence in the same response. The data is
+evidence in the same response. For static evidence, manifest.json inventories publication files
+with their hashes and byte sizes; sources.json contains the complete original-document catalogue.
+Do not describe the manifest as the original-document list. The data is
 published under CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/); attribute Fiscal.ge.
 

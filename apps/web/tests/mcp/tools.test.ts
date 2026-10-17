@@ -43,6 +43,17 @@ const TOOL_NAMES = [
 ];
 
 describe("MCP tool surface", () => {
+  it("explains aggregate scope, bulk evidence and the existing unsupported-dataset alternative", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    for (const required of [
+      "69 reviewed budgets", "64 territorial municipalities", "net Adjara adjustment exactly once",
+      "manifest.json inventories publication files", "sources.json contains the complete original-document catalogue",
+      "inflation-products.csv", "index_100", "mom_index_100", "yoy_index_100", "100 means no price change",
+      "Unemployment is not served by this MCP", "https://fiscal.ge/explorer/unemployment/overview",
+      "https://fiscal.ge/en/explorer/unemployment/overview",
+    ]) expect(instructions).toContain(required);
+  });
+
   it("puts the complete discovery-to-evidence workflow in the opening 512 characters", () => {
     const instructions = serverInstructions({}, ENTITY_COUNTS);
     const opening = instructions.split("\n\n")[0]!;
