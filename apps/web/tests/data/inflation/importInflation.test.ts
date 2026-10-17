@@ -52,7 +52,9 @@ describe("inflation serving", () => {
 
   it("serves the city facts as numbers", async () => {
     const { cities } = await loadServedInflationData();
-    expect(cities).toHaveLength(20570);
+    expect(cities).toHaveLength(20732);
+    expect(cities.filter(fact => fact.period <= "2026-08")).toHaveLength(20570);
+    expect(cities.filter(fact => fact.period === "2026-09")).toHaveLength(162);
     expect(typeof cities[0]!.value).toBe("number");
   });
 });

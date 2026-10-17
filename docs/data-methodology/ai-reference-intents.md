@@ -1,6 +1,6 @@
 # AI reference intents
 
-Thirty-four questions, each asked in Georgian and in English, with the answer
+Forty-eight questions, each asked in Georgian and in English, with the answer
 Fiscal.ge must give and the limitation that answer must carry. This is the
 acceptance list for the query service: if one of these regresses, the service is
 wrong, not merely different.
@@ -13,9 +13,9 @@ client then *says* the right thing in either language needs a separate real-clie
 check; the service itself makes no AI calls. SDK transport tests do not establish
 an external assistant's language understanding.
 
-No reference intent requests a real GDP series, so `gdp_world_bank_preliminary_basis` does not appear in the 34-intent fixture. A future intent that asks for `real_usd_2015` or `real_growth_percent` in a Geostat-preliminary year must expect it.
+No reference intent requests a real GDP overview series, so `gdp_world_bank_preliminary_basis` does not appear in the 48-intent fixture. A future intent that asks for `real_usd_2015` or `real_growth_percent` in a Geostat-preliminary year must expect it.
 
-**Questions and responses are bilingual in schema 1.1.0.** Reviewed Georgian and
+**Questions and responses are bilingual; the current data schema is 1.6.0.** Reviewed Georgian and
 English labels, definitions, missingness, comparisons, ranking explanations and
 source descriptions travel with the same figures. Clients use the appropriate
 `*Ka`/`*En` fields. The existing numerical, source and comparability expectations
@@ -76,9 +76,15 @@ hide one.
 | 33 | Change in annual inflation, August 2025 → August 2026 | +0.9983 percentage **points** | A point change between two published months |
 | 34 | Highest annual price growth by division, August 2026 | Division 07 (transport) 15.1989%, then 04 (housing and utilities) 8.4682%, 12 (miscellaneous) 7.1272% | Twelve eligible divisions; the headline, target and residual are excluded |
 
+The table above records the first 34 intents. The executable fixture additionally
+covers regional GDP (#35–37), city inflation and early missingness (#38–40), and
+product annual/cumulative values, history limits, rankings and refusals (#41–48).
+Its source-checked expectations are authoritative; the separate eleven-pair
+`mcpAssistantIntents.ts` rubric assesses actual assistant behavior.
+
 ## What the list is designed to catch
 
-Six of the twenty expect the service to **decline or qualify** rather than
+Six of the original twenty expect the service to **decline or qualify** rather than
 answer plainly. That is deliberate: the failures that matter here are not wrong
 arithmetic but confident answers to questions the data cannot support.
 
@@ -106,10 +112,9 @@ in separately named fields; `rank` collapses both into one value-and-unit pair,
 so it has to choose.
 
 Fixed, with regression tests, in `apps/web/lib/factQuery/rank.ts`. Percentage
-changes now report `percent`. Percentage-point changes also report `percent`,
-which is imprecise — the unit vocabulary has no percentage-point member, and
-adding one changes the shared schema. That remains an open contract decision;
-the ranking's own definition string names the exact metric in the meantime.
+changes report `percent`. The schema 1.6.0 remediation also gives share-change
+rankings the explicit `percentage_points` unit; absolute changes retain their
+endpoint unit. Inflation's existing percentage-point behavior is preserved.
 
 ## Related
 

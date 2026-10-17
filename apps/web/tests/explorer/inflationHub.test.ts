@@ -27,7 +27,10 @@ describe("inflation hub", () => {
       "Cities",
     ]);
     expect(cards.every((card) => !card.comingSoon)).toBe(true);
-    expect(cards[2]!.footer).toMatch(/Tomato.*57\.5%/);
+    expect(cards[2]!.footer).toMatch(/Newspaper.*63\.3%/);
+    const augustProducts = buildLatestProductHubSummary({ ...products, facts: products.facts.filter(fact => fact.period <= "2026-08") });
+    const augustCards = buildInflationHubCards(facts, { locale: "en", messages, englishLabels: {} }, categories, weights, augustProducts, cities.map(cityFactInput));
+    expect(augustCards[2]!.footer).toMatch(/Tomato.*57\.5%/);
     expect(cards[2]!.series?.length ?? 0).toBeGreaterThan(100);
     const yoy = facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct");
     const last = yoy.reduce((latest, fact) => (fact.period > latest.period ? fact : latest));
@@ -63,6 +66,8 @@ describe("inflation hub", () => {
     const messages = await getMessages("en", ["inflation"]);
     const cards = buildInflationHubCards(facts, { locale: "en", messages, englishLabels: {} }, categories, weights, null, cities.map(cityFactInput));
     expect(cards[3]!.comingSoon).toBe(false);
-    expect(cards[3]!.footer).toMatch(/Batumi 7\.1%$/);
+    expect(cards[3]!.footer).toMatch(/Batumi 6\.5%$/);
+    const augustCards = buildInflationHubCards(facts, { locale: "en", messages, englishLabels: {} }, categories, weights, null, cities.filter(fact => fact.period <= "2026-08").map(cityFactInput));
+    expect(augustCards[3]!.footer).toMatch(/Batumi 7\.1%$/);
   });
 });

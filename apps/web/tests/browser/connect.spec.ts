@@ -97,11 +97,8 @@ for (const prefix of ["", "/en"]) {
         await copy.press("Enter");
         await expect(copy).toHaveAttribute("aria-label", label!);
         await expect(text).toBeVisible();
-        expect(await text.evaluate(element => {
-          const selection = window.getSelection()!;
-          selection.selectAllChildren(element);
-          return selection.toString();
-        })).toBe(before);
+        await text.click({ clickCount: 3 });
+        expect(await page.evaluate(() => window.getSelection()!.toString().trim())).toBe(before.trim());
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
       expect(errors).toEqual([]);

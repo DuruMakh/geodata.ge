@@ -54,19 +54,19 @@ test.each(["ka", "en"] as const)("Connect advertises monthly inflation coverage 
 test.each(["ka", "en"] as const)("Connect includes real national, city and product examples with calculation limits in %s", async locale => {
   const html = await connectHtml(locale);
   const item = (id: string) => html.match(new RegExp(`data-testid="connect-example-${id}">(.*?)</li>`))?.[1] ?? "";
-  expect(item("inflation-national")).toContain("2026-08");
-  expect(item("inflation-cities")).toContain("2026-08");
+  expect(item("inflation-national")).toContain("2026-09");
+  expect(item("inflation-cities")).toContain("2026-09");
   expect(item("inflation-cities")).toContain("6");
-  expect(item("inflation-batumi")).toContain("2026-07");
   expect(item("inflation-batumi")).toContain("2026-08");
+  expect(item("inflation-batumi")).toContain("2026-09");
   expect(item("inflation-batumi")).toMatch(/percentage points|პროცენტული პუნქტ/);
-  expect(item("products-annual")).toContain("2026-08");
+  expect(item("products-annual")).toContain("2026-09");
   expect(item("products-cumulative")).toContain("2015-01");
-  expect(item("products-cumulative")).toContain("2026-08");
+  expect(item("products-cumulative")).toContain("2026-09");
   expect(item("products-cumulative")).toContain("2014-12");
   const products = html.match(/data-testid="connect-product-coverage">(.*?)<\/li>/)?.[1];
   expect(products).toContain("305");
-  expect(products).toContain("2015-01–2026-08");
+  expect(products).toContain("2015-01–2026-09");
   expect(html).toContain("query_inflation_products");
   for (const name of ["inflation-products.csv", "inflation-products.json"]) expect(html).toContain(`href="/downloads/data/${name}"`);
   expect(item("products-cumulative")).toMatch(/December|დეკემბ/);

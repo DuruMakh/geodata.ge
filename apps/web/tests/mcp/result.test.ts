@@ -84,9 +84,9 @@ describe("MCP tool results", () => {
   });
 
   it.each([
-    { name: "Batumi", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2016-01", "2026-08"], years: Array.from({ length: 11 }, (_, i) => 2016 + i) },
-    { name: "Zugdidi average", entityIds: ["city.zugdidi"], measure: "avg12_pct", periods: ["2017-12", "2026-08"], years: Array.from({ length: 10 }, (_, i) => 2017 + i) },
-    { name: "country and city", entityIds: ["country.georgia", "city.batumi"], measure: "yoy_pct", periods: ["2004-01", "2026-08"], years: Array.from({ length: 23 }, (_, i) => 2004 + i) },
+    { name: "Batumi", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2016-01", "2026-09"], years: Array.from({ length: 11 }, (_, i) => 2016 + i) },
+    { name: "Zugdidi average", entityIds: ["city.zugdidi"], measure: "avg12_pct", periods: ["2017-12", "2026-09"], years: Array.from({ length: 10 }, (_, i) => 2017 + i) },
+    { name: "country and city", entityIds: ["country.georgia", "city.batumi"], measure: "yoy_pct", periods: ["2004-01", "2026-09"], years: Array.from({ length: 23 }, (_, i) => 2004 + i) },
     { name: "no city facts", entityIds: ["city.batumi"], measure: "yoy_pct", periods: null, years: [], synthetic: "empty" },
     { name: "sparse city years", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2018-02", "2020-03"], years: [2018, 2020], synthetic: "sparse" },
   ])("preserves $name availability in the text a client reads", ({ entityIds, measure, periods, years, synthetic }) => {

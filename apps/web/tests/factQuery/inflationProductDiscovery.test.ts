@@ -51,7 +51,7 @@ describe("product discovery", () => {
   it("returns the entire compact catalogue with reviewed notes and conditional cumulative coverage", () => {
     const result = catalogue(real, { datasetId: "inflation-products" });
     expect(result.series).toHaveLength(real.inflationProducts.catalogue.length);
-    expect(result.datasets[0]?.periods).toEqual(["2015-01", "2026-08"]);
+    expect(result.datasets[0]?.periods).toEqual(["2015-01", "2026-09"]);
     expect(result.datasets[0]?.measureNotesEn?.cumulative_pct).toMatch(/startYear.*complete|complete.*startYear/);
     const noted = result.series?.find(row => row.seriesId === "cpi.product.p0088") as { historyNotes?: { noteKa: string; noteEn: string }[] };
     expect(noted.historyNotes?.some(note => note.noteEn.includes("generic mineral water") && note.noteKa.length > 0)).toBe(true);

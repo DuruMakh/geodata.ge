@@ -79,10 +79,13 @@ describe("inflation publications", () => {
     const json = JSON.parse(files.find((file) => file.fileName === "inflation-cities.json")!.bytes.toString("utf8"));
     const text = csv.bytes.toString("utf8");
     expect(text.startsWith("﻿entity_id,series_id,measure,period,value,unit,status,source_ids\n")).toBe(true);
-    expect(csv.rowCount).toBe(20570);
+    expect(csv.rowCount).toBe(20732);
+    const cityRows = parse(csv.bytes, { bom: true, columns: true }) as Record<string, string>[];
+    expect(cityRows.filter(row => row.period! <= "2026-08")).toHaveLength(20570);
+    expect(cityRows.filter(row => row.period === "2026-09")).toHaveLength(162);
     expect(text).toContain("city.batumi,cpi.headline,yoy_pct,2026-08,7.0857,percent,published,source.geostat_cpi_yoy");
     expect(text).not.toContain("country.georgia");
-    expect(json).toMatchObject({ datasetId: "inflation", data: { url: "/downloads/data/inflation-cities.csv", rowCount: 20570 } });
+    expect(json).toMatchObject({ datasetId: "inflation", data: { url: "/downloads/data/inflation-cities.csv", rowCount: 20732 } });
     // Two fields legitimately say "weight" in prose without publishing any
     // city weight: `catalogue` is the shared inflation-dataset catalogue
     // (also embedded in inflation-categories.json and inflation-national.json)
