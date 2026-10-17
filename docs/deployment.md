@@ -621,11 +621,15 @@ Official documentation was checked **2026-10-17**. [OpenAI's Codex MCP guide](ht
 documents remote Streamable HTTP and shared configuration across desktop/CLI/IDE.
 The documented app path is Settings → MCP servers → Add server, name/transport/URL,
 then save/restart. Local `codex --version` reports **codex-cli 0.146.1** and
-`codex login status` reports an existing ChatGPT login. These establish client
-readiness only; a successful model request, selected protocol, current desktop
-menus and personal account/workspace eligibility remain unverified. The local
-help supports ephemeral read-only execution and per-run MCP configuration, so
-acceptance can use an isolated run without persisted configuration or new credentials.
+`codex login status` reports an existing ChatGPT login. Subsequent authenticated
+[staged CLI acceptance](superpowers/reviews/2026-10-17-mcp-remediation-verification.md)
+executed all 22 English/Georgian prompts in isolated, ephemeral read-only runs:
+initially 16 passed/6 failed; six affected repeats yielded 4 passes/2 failures,
+then the final two yielded 2 passes/0 failures.
+These are staged observations, not one fresh clean 22-case run on the final build.
+The selected model and negotiated protocol were not visible. Authenticated desktop,
+Claude and ChatGPT acceptance, current desktop menus, and account/workspace
+eligibility for those other application setups remain unverified.
 
 [Claude's current remote-connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
 documents remote connectors for Free/Pro/Max/Team/Enterprise, with one custom
