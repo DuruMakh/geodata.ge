@@ -128,7 +128,7 @@ describe("original-source inventory", () => {
     expect(productRows.map((row) => row.source_id).sort()).toEqual([
       "source.geostat_product_mom", "source.geostat_product_mom_ka", "source.geostat_product_yoy", "source.geostat_product_yoy_ka",
     ]);
-    expect(productRows.every((row) => row.repository_source_path.includes("geostat-products/2026-08/") &&
+    expect(productRows.every((row) => row.repository_source_path.includes("geostat-products/2026-09/") &&
       row.downloadHref.startsWith("/downloads/methodology/inflation/files/"))).toBe(true);
   });
 

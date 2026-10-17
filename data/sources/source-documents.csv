@@ -129,8 +129,8 @@ source.geostat_regional_gdp,Geostat regional GDP at current market prices,docs/R
 source.geostat_regional_gdp_by_activity,Geostat regional GDP by economic activity at current basic prices,docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx,2026-09-13
 source.fiscal_regional_economy_share,Fiscal.ge regional activity share derived from reviewed Geostat regional GDP sources,docs/data-methodology/regional-economies.md,2026-09-13
 source.geostat_basket_weights,"Geostat consumer basket weights, %",docs/Raw Data/Inflation/geostat-basket-weights/2026/en/basket-weights.xlsx,2026-09-12
-source.geostat_product_mom,"Geostat detailed product price index, mom (en)",docs/Raw Data/Inflation/geostat-products/2026-08/en/products-mom.xlsx,2026-09-26
-source.geostat_product_yoy,"Geostat detailed product price index, yoy (en)",docs/Raw Data/Inflation/geostat-products/2026-08/en/products-yoy.xlsx,2026-09-26
+source.geostat_product_mom,"Geostat detailed product price index, mom (en)",docs/Raw Data/Inflation/geostat-products/2026-09/en/products-mom.xlsx,2026-10-17
+source.geostat_product_yoy,"Geostat detailed product price index, yoy (en)",docs/Raw Data/Inflation/geostat-products/2026-09/en/products-yoy.xlsx,2026-10-17
 source.geostat_demography_population_age_sex,Population as of 1 January by age group and sex,docs/Raw Data/Demography/geostat-demography/2026-10/official/02-population-by-age-groups-and-sex.xlsx,2026-10-01
 source.geostat_demography_births,Live births by regions and self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/09-number-of-live-births-by-self-governed-units.xlsx,2026-10-01
 source.geostat_demography_crude_birth_rate,Crude birth rate,docs/Raw Data/Demography/geostat-demography/2026-10/official/15-crude-birth-rate.xlsx,2026-10-01
