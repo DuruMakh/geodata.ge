@@ -761,6 +761,9 @@ tool error inside HTTP 200, malformed output or failed expected refusal. Its
 compact JSON stores only checks, validated identities, timings, statuses, sizes
 and safe classifications; no query/response bodies, target addresses, tokens or
 provider messages. Use an existing ignored output directory, not a public folder.
+Run it as a standalone process: tool discovery temporarily replaces process-wide
+`console.warn`, restores it in `finally`, and classifies an SDK warning
+as a protocol failure. Do not embed this operator command in a concurrent server.
 
 Pinned modern `2026-07-28` executes all 14 advertised required tools; automatic
 modern and real legacy `2025-11-25` repeat the sourced historical Batumi answer,

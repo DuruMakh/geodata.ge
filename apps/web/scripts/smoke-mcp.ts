@@ -202,7 +202,16 @@ export async function runSmoke(options: Options, dependencies: Dependencies = {}
         await client.connect(new StreamableHTTPClientTransport(url, { fetch: countedFetch }));
         assert(client.getProtocolEra() === "modern");
       }
-      const advertised = (await client.listTools()).tools.map(tool => tool.name).sort();
+      // Standalone operator only: this SDK prints untrusted schema details directly.
+      // Restore the process-wide handler after discovery; do not embed in a concurrent app.
+      const warning = console.warn;
+      let sdkWarning = false;
+      let advertised: string[];
+      try {
+        console.warn = () => { sdkWarning = true; };
+        advertised = (await client.listTools()).tools.map(tool => tool.name).sort();
+        assert(!sdkWarning, "protocol_error");
+      } finally { console.warn = warning; }
       assert(isDeepStrictEqual(advertised, [...REQUIRED].sort()), "inventory_mismatch");
       const names: readonly Tool[] = era === "pinned-modern" ? REQUIRED : ["query_inflation", "get_sources"];
       for (const name of names) {

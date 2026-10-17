@@ -3,7 +3,9 @@ import { POST, GET, DELETE } from "../../app/mcp/route";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { httpBridge } from "../mcp/httpBridge";
 import type { SmokeReport } from "../../scripts/smoke-mcp";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, rmdirSync, unlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
 const original = { ...process.env };
@@ -12,7 +14,6 @@ beforeAll(() => {
   process.env.MCP_RATE_LIMITER = "memory";
   process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
   vi.spyOn(process.stdout, "write").mockImplementation(() => true);
-  vi.spyOn(console, "warn").mockImplementation(() => {});
 });
 afterAll(() => { process.env = { ...original }; vi.restoreAllMocks(); });
 
@@ -32,6 +33,7 @@ const localFetch: typeof fetch = async (input, init) => route(new Request(input,
 
 it("executes every advertised required tool", async () => {
   const { main } = await import("../../scripts/smoke-mcp");
+  const warning = console.warn;
   const exchanges: string[] = [];
   const bridge = await httpBridge(async request => {
     exchanges.push(request.method === "POST" ? (await request.clone().json()).method : request.method);
@@ -61,6 +63,7 @@ it("executes every advertised required tool", async () => {
     expect(exchanges).not.toContain("DELETE");
     expect(signals).toHaveLength(29);
     expect(signals.every(signal => signal.aborted)).toBe(true);
+    expect(console.warn).toBe(warning);
   } finally { await bridge.close(); }
 });
 
@@ -278,4 +281,59 @@ it("runs as an operator CLI and returns safe nonzero argument failure", () => {
   expect(result.status).toBe(1);
   expect(result.stderr).toBe("");
   expect(JSON.parse(result.stdout)).toMatchObject({ ok: false, failure: "invalid_arguments", httpRequestCount: 0 });
+});
+
+it("contains untrusted SDK discovery warnings inside the operator process", async () => {
+  const markers = ["synthetic-private-tool", "synthetic-private-field", "synthetic private header"];
+  const directory = mkdtempSync(path.join(tmpdir(), "mcp-warning-"));
+  const output = path.join(directory, "report.json");
+  const bridge = await httpBridge(async request => {
+    const call = request.method === "POST" ? await request.clone().json() : undefined;
+    const response = await route(request);
+    if (call?.method !== "tools/list") return response;
+    const payload = await response.json();
+    payload.result.tools[0].name = markers[0];
+    payload.result.tools[0].inputSchema = { type: "object", properties: { [markers[1]!]: { type: "string", "x-mcp-header": markers[2] } } };
+    return Response.json(payload);
+  });
+  try {
+    const cli = path.join(process.cwd(), "node_modules", "tsx", "dist", "cli.mjs");
+    const child = spawn(process.execPath, [cli, "scripts/smoke-mcp.ts", "--url", bridge.url.href, "--expected-schema", "1.6.0", "--expected-data-version", snapshot.dataVersion, "--output", output], { cwd: process.cwd(), timeout: 10_000 });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8").on("data", chunk => { stdout += chunk; });
+    child.stderr.setEncoding("utf8").on("data", chunk => { stderr += chunk; });
+    const code = await new Promise<number | null>((resolve, reject) => { child.once("error", reject); child.once("close", resolve); });
+    expect(code).toBe(1);
+    const json = readFileSync(output, "utf8");
+    for (const marker of markers) {
+      expect(stderr).not.toContain(marker);
+      expect(stdout).not.toContain(marker);
+      expect(json).not.toContain(marker);
+    }
+    expect(stderr).toBe("");
+    expect(stdout).toBe("");
+    expect(JSON.parse(json)).toMatchObject({ ok: false, failure: "protocol_error", httpRequestCount: 2 });
+  } finally {
+    await bridge.close();
+    if (existsSync(output)) unlinkSync(output);
+    rmdirSync(directory);
+  }
+});
+
+it.each(["invalid-json", "unsafe-schema"])("restores the warning handler after failed discovery: %s", async mode => {
+  const { runSmoke } = await import("../../scripts/smoke-mcp");
+  const warning = console.warn;
+  const fetch: typeof globalThis.fetch = async (input, init) => {
+    const request = new Request(input, init);
+    const call = await request.clone().json();
+    if (call.method !== "tools/list") return route(request);
+    if (mode === "invalid-json") return new Response("invalid-json");
+    const payload = await (await route(request)).json();
+    payload.result.tools[0].inputSchema = { type: "object", properties: { field: { type: "string", "x-mcp-header": "invalid header" } } };
+    return Response.json(payload);
+  };
+  const report = await runSmoke({ url: "https://fiscal.ge/mcp", ...identities }, { fetch, paceMs: 0 });
+  expect(report.ok).toBe(false);
+  expect(console.warn).toBe(warning);
 });
