@@ -476,11 +476,21 @@ from a different release.
 
 ### Shared production rate limiter
 
-The `fiscal-mcp-limits` Upstash Redis resource is linked to `geodata-ge` Production
-through the Vercel Marketplace. It uses the **free** plan, primary region `iad1`,
+The setup record links `fiscal-mcp-limits` to `geodata-ge` Production
+through the Vercel Marketplace, on the **free** plan in `iad1`,
 with `autoUpgrade=false`, `eviction=false`, and `prodPack=false`. The user accepted
 the Marketplace terms and authorized production rate limiting. No paid SDK,
 subscription, or automatic plan upgrade is required.
+
+Read-only inspection on **17 October 2026** did not independently establish the
+current Upstash resource binding, assigned plan, billing period, allowance or
+command usage. The authenticated installation was identified, but resource-list
+inspection failed with a CLI error and the dashboard returned no usable content.
+These unavailable surfaces do not establish an absent resource or zero usage.
+Treat the plan/region/settings above and the 500,000-command setup allowance below
+as historical setup evidence. The project owner must provide a functioning
+resource/account inspection or dated account evidence before reporting current
+headroom or applying the proposed 70%/90% quota-pressure review thresholds.
 
 Set `MCP_RATE_LIMITER=upstash`. The integration provides `KV_REST_API_URL` and
 `KV_REST_API_TOKEN`. The adapter uses native HTTPS with a 1.5-second timeout and
@@ -658,9 +668,133 @@ tool and method names are recorded as fixed unknown labels, never echoed.
 
 Do not log raw prompts, request bodies, invalid parameter strings, credentials,
 addresses, or provider error text. The temporary hashed counter key is not an
-application log field. Retain detailed application events for 14 days and
-aggregated metrics for 90 days. Vercel/Upstash infrastructure logs are separate;
+application log field. The operating target is **14 days of detailed allowlisted
+application events and 90 days of aggregates**. Vercel/Upstash infrastructure logs are separate;
 do not claim providers never process request addresses.
+
+**Observed 17 October 2026:** authenticated Vercel inspection confirmed production
+`dpl_Erifm5Fm3H6i9s4kx5GKH9mmq5nh`, READY at
+`4a55558aa7da5ef2197186b3ffab5d2ee0b68474`, for `geodata-ge` in
+`durumakh-1974s-projects`. This is a dated observation, not the identity of a later
+release. A deployment-scoped two-hour runtime query was refused with an explicit
+Hobby **one-hour retention** limit. A 30-minute aggregate query without full-text
+`/mcp` filtering succeeded but returned no groups; it proves query access, not
+healthy MCP traffic. Application errors can be HTTP 200 and infrastructure `info`.
+The project drains API returned 404; external retention and alert delivery remain
+**unverified**, rather than proven absent. Smoke reports sample release checks and
+do not satisfy continuous production-log retention.
+
+The project owner assigns an operations maintainer to close this gap or explicitly
+accept a different target. Until then, operational verification remains outstanding.
+The current option is the accessible Vercel window, manual incident-evidence
+preservation and **$0 incremental cost**; continuous capture and alerts are unproved.
+First inspect any owner-identified, already-authorized destination, its retained
+records and actual alert path. Older Hobby drains may be grandfathered; a failed
+inspection is no reason to purchase a replacement.
+
+### Proposed monitoring arrangement — owner decision pending
+
+If no existing authorized arrangement meets the target, the minimum researched
+alternative is Vercel Pro provider-side export of this project's production
+function logs, without sampling, to a project-owned Better Stack HTTP source,
+proposed name `fiscal-mcp-production`, Germany region. The actual source/ingestion
+hostname and recipient have not been created or selected. No application log
+shipping is added: MCP runtime networking remains limited to Upstash.
+[Vercel Drains](https://vercel.com/docs/drains) requires Pro or Enterprise for new
+drains and charges $0.50/GB export; Hobby/Pro Trial cannot create this path.
+[Vercel Pro](https://vercel.com/pricing) starts at $20/month for one deploying seat,
+plus usage; this is not a capped $20 bill.
+
+As researched on 17 October, [Better Stack pricing](https://betterstack.com/pricing)
+lists logs at $0.10/GB ingest and $0.05/GB-month retention, with standard queries
+included; free logs last three days. Email/Slack appears in its personal free offer;
+a monthly responder licence is $34 if needed. Do not assume personal eligibility
+or custom retention is free. [EU metrics billing](https://betterstack.com/docs/logs/billing-for-metrics/)
+includes 30 GB retained metrics, then $0.50/GB-month. Obtain an actual account quote
+for 14-day logs, 90-day metrics, email alerts, limits and any minimum commitment
+before approval; volume and account entitlement are unverified, so no total bill
+is promised. No paid plan, destination, recipient, schedule or subscription is
+authorized by this proposal.
+
+Use the [documented Vercel integration](https://betterstack.com/docs/logs/vercel/log-drain/)
+and configure both retentions explicitly. Parse only the existing application
+allowlist plus an operational timestamp; discard other function messages and
+provider envelope fields. Extract bounded tool/outcome/error counts, bytes and
+duration aggregates that survive deletion of original logs. A provider drain
+envelope may reach the vendor with request metadata before filtering: approval
+must cover that processing. Vercel's IP-hiding setting is team-wide and needs its
+own authorization. The application-event source must never retain raw bodies,
+prompts, authorization, addresses, user agents or provider error text.
+
+The project owner adopts cost, processing/retention and a real operations email
+recipient. The operations maintainer configures and recovers delivery. Proposed
+starting signals are three `internal_error` events in five minutes, two consecutive
+failed bounded probes/repeated 503, quota review at 70%/90% of verified allowance,
+and repeated latency over two seconds or twice a comparable baseline. These are
+proposals, not validated norms. Ordinary expected bad-input refusals and sparse
+legitimate traffic alone must not trigger outage alerts.
+
+After authorization, prove the Vercel-to-destination path with a labelled drain
+test and safe fixtures from an isolated test deployment/source. Three synthetic
+internal failures (including an HTTP-200 tool error) must open one deduplicated
+alert at the actual approved recipient; ordinary bad input must not. Healthy
+fixtures must produce recovery after the configured window. Record rule/event
+identities, timestamps, receipt, parser rejection and delivery failure handling;
+direct sink injection alone does not prove Vercel delivery. Verify effective
+14/90 settings and retained records, then observe raw expiry and aggregate survival
+at their elapsed retention checkpoints. Backdated fixtures do not prove 90 days of
+durability. Never inject faults or exhaust quota in production. Retention and
+actual alert/recovery delivery must be demonstrated before operations is verified.
+
+### Bounded release probe
+
+From `apps/web`, use an explicit target and independently reviewed release identity:
+
+```text
+npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.6.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
+```
+
+The operator command has no production default, authentication input, new secret
+or schedule. HTTPS is required remotely; loopback HTTP is permitted for local
+tests. It exits nonzero for a failed required check, wrong schema/data identity,
+tool error inside HTTP 200, malformed output or failed expected refusal. Its
+compact JSON stores only checks, validated identities, timings, statuses, sizes
+and safe classifications; no query/response bodies, target addresses, tokens or
+provider messages. Use an existing ignored output directory, not a public folder.
+
+Pinned modern `2026-07-28` executes all 14 advertised required tools; automatic
+modern and real legacy `2025-11-25` repeat the sourced historical Batumi answer,
+city-filtered originals and stale-version refusal. The ranking checks share changes
+in **percentage points**. Historical query values stay fixed; returned coverage is
+validated against that query and the supplied release identity, allowing later
+clean source vintages. Listing a tool alone is insufficient. The real-client
+fixture measures **29 HTTP requests total**, including legacy initialization,
+initialized notification and its refused optional GET. Closing stateless clients
+aborts transport resources; it does not add a DELETE. Every transport uses one
+counting fetch, including implicit requests/retries/cleanup: **request 31 is never
+sent**. Any future compatibility expansion must use explicitly reported separate
+runs if necessary. This is not a load test.
+
+Calls run sequentially, at least 1.1 seconds apart, with a ten-second deadline
+covering headers and body, no redirects and at most 512 KiB per response. A 429/503
+stops every queued request and records bounded numeric Retry-After information.
+The default probe fetches no publication/archive sample, preserving budget margin.
+Verify provider READY/SHA separately: the probe's data identities do not establish
+the production deployment commit by themselves.
+
+For built-local proof, preserve build-time `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`.
+Set only the dedicated server process to `MCP_ENABLED=true`,
+`MCP_RATE_LIMITER=memory`, `VERCEL_ENV=preview`, `VERCEL_URL=localhost:3100`;
+confirm discovery succeeds before the full probe. This uses the existing local
+Host allowance. Restore that process environment and stop its process tree after
+verification; never loosen production guards or change production settings.
+
+The data maintainer role separately reviews official CPI and product availability.
+Proposed, **not yet owner-adopted**, targets are availability review within two
+business days of publication and clean review/release within five business days
+after every required original is available. Record incomplete sources, revisions
+awaiting review or release blockers and a next review date. Scheduling and
+notifications need a separately approved owner/channel; this runbook creates none.
 
 Rollback restores the route and snapshot together. The Redis counters contain
 no budget data and require no migration when a code release is rolled back.

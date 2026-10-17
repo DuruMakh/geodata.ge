@@ -30,6 +30,16 @@ The September refresh was independently checked against all 84,056 previously co
 
 ## Refresh and delivery boundary
 
+The data maintainer role checks this package separately from national/category/city
+CPI and records complete sources, incomplete originals, revisions awaiting review
+or a blocked release, with a next review date. The project owner assigns a named
+maintainer. Proposed, **not yet owner-adopted**, targets are availability review
+within two business days of official publication and a clean review/release within
+five business days after all four originals are available. Retain the last
+validated product vintage if the package is incomplete; report its actual lag.
+These are review targets, not service guarantees or authorization for an automated
+fetch, schedule or notification. See `docs/deployment.md` for operating evidence.
+
 1. Archive all four new untouched Geostat editions in a new `<YYYY-MM>` vintage with their official URLs, byte sizes and hashes. Keep the earlier vintage recoverable in Git history.
 2. Run `npx tsx scripts/audit-inflation-products.ts --check` from `apps/web`; review any current-roster or name boundary and update `decisions.csv` with source names and reasons before preparing facts.
 3. Run `npm run data:prepare-inflation-products`, inspect the canonical diff and validation report, then run `npm run data:check-inflation-products` and the repository checks. Historical source revisions require an explicit review; do not silently overwrite them.

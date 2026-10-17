@@ -161,6 +161,17 @@ Basket weights, inflation targets and the individual-product package are unchang
 
 ## Monthly refresh
 
+The data maintainer role reviews official availability and records whether the
+shared national/category/city package is complete, awaiting revision review or
+blocked, with missing evidence and the next review date. The project owner must
+assign the named maintainer. Proposed targets, **not yet adopted guarantees**, are
+review within two business days of official publication and a clean review/release
+within five business days after all twelve required originals are available.
+Product inflation is a separately reviewed package; record its actual lag rather
+than treating the headline release as proof every original is ready. This adds no
+automated fetch, schedule or notification. Operations ownership and evidence gaps
+are recorded in `docs/deployment.md`.
+
 Geostat publishes on the 2nd–5th. 1) Download the twelve files into a new vintage folder and write its `source-manifest.csv` and `README.md`. 2) Delete the previous vintage folder (retention below). 3) Update the six Geostat paths in `source-documents.csv` and, in the methodology archive CSV (`data/methodology/source-archives/inflation.csv`), each row's `repository_source_path`, `byte_size`, `sha256`, `retrieved_at` and note; `public_download_path` stays the same. 4) `npm run data:prepare-inflation`. 5) Review the diff: exactly one new month per series. 6) Commit; the standard pipeline imports and deploys. No automated fetching. Categories need no extra step: the same `yoy` and `mom` files carry them, so `prepare-inflation` rewrites `cpi-categories-monthly.csv` in the same run. The weights file is not part of the monthly refresh (see the annual refresh above).
 
 A revision error is a stop-and-review event. Recover the previous vintage from git and compare the listed months with Geostat's release. If the revision is genuine, record each month with its old and new value under Known revisions below and in the commit message. Then delete `data/imports/cpi-national-monthly.csv` and rerun `npm run data:prepare-inflation`: with no committed CSV the guard has nothing to compare against. The CSV diff must show exactly the listed months plus the new one.
