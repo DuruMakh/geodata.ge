@@ -149,7 +149,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "actually exist. Optional `search` matches reviewed Georgian and English labels and Latin slugs, and works WITHOUT " +
       `a datasetId — search alone looks across all ${facts.datasetCount} datasets and each match names the dataset ` +
       "it belongs to, so you can find an id before you know where it lives. A search answers with the matches and " +
-      "the datasets they belong to, not the whole catalogue. Georgian case endings " +
+      "the datasets they belong to, not the whole catalogue. Use one meaningful keyword; if a phrase returns no matches, " +
+      "try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
     schema: describeCoverageInput,
     run: (snapshot, input) => describeCoverage(snapshot, input),

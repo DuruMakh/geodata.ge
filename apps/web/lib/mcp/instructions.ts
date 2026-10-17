@@ -46,7 +46,11 @@ export function serverInstructions(
   // still reads, it just states no number.
   const counted = (count: number | undefined) => (count === undefined ? "" : `${count} `);
 
-  return `Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government
+  return `Use describe_coverage with short keywords before querying. Use returned IDs and supported measures; keep expectedDataVersion consistent. Preserve units, missing values, projections and caveats. Cite the returned original documents and Fiscal.ge. For product questions, search first and request only the required series and dates. Use the published files for bulk analysis.
+
+Search with one meaningful keyword. If a phrase returns no matches, try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent.
+
+Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government
 debt and fiscal balance, GDP and national economic sectors (all annual), and monthly
 consumer-price inflation.
 

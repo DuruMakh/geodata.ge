@@ -607,32 +607,47 @@ After Vercel reports READY for the merge commit:
 
 ### Human application guidance and evidence boundary
 
-Official documentation was checked **2026-10-02**. [OpenAI's Codex MCP guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
+Official documentation was checked **2026-10-17**. [OpenAI's Codex MCP guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
 documents remote Streamable HTTP and shared configuration across desktop/CLI/IDE.
 The documented app path is Settings → MCP servers → Add server, name/transport/URL,
-then save/restart. [OpenAI's docs-MCP quickstart](https://developers.openai.com/learn/docs-mcp)
-also documents `codex mcp add <name> --url <url>`. Local `codex --version` reports
-**codex-cli 0.146.1**; that is executable-version evidence only. Current desktop
-menus, account/plan eligibility, selected protocol and a completed sourced model
-question were not tested. No configuration, login, credentials or model request
-was touched.
+then save/restart. Local `codex --version` reports **codex-cli 0.146.1** and
+`codex login status` reports an existing ChatGPT login. These establish client
+readiness only; a successful model request, selected protocol, current desktop
+menus and personal account/workspace eligibility remain unverified. The local
+help supports ephemeral read-only execution and per-run MCP configuration, so
+acceptance can use an isolated run without persisted configuration or new credentials.
 
 [Claude's current remote-connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
 documents remote connectors for Free/Pro/Max/Team/Enterprise, with one custom
 connector on Free; organization owners manage workspace permissions. The individual
 flow documented for Pro/Max is Customize → Connectors → Add → Add custom connector,
-then name/URL/authentication and confirmation. Fiscal.ge itself requires no bearer
+then name/URL/authentication and confirmation. Its official
+[connected-services guidance](https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities)
+then requires opening the conversation's **+ → Connectors** menu and switching on
+the saved connector for that conversation. The two official pages differ slightly
+on the creation menu; `/connect` retains its version-dependent-menu caveat.
+Fiscal.ge itself requires no bearer
 token or extra headers; the documented No sign in option applies to this public
 server. Claude's authenticated application/version, personal eligibility, negotiated
 protocol and one sourced question remain unverified. SDK compatibility is not proof
 of an application's account access or menus.
 
 `/connect` labels these steps as official guidance and links the primary guides.
+After setup it points to the existing national-inflation example, whose latest
+month comes from reviewed data and whose question asks for the original source
+and limitations. It does not hardcode a release month.
 Historical owner clickthroughs are earlier provenance, not current app proof.
 Direct ChatGPT custom-connector setup remains unverified and is not advertised;
 the page retains its separate web-reading prompt and static-file fallback. Future
 human proof must record app/version, account eligibility, date, protocol and a
 completed question citing Fiscal.ge's source/limitations, without collecting secrets.
+The eleven paired English/Georgian prompts and review requirements live separately
+from the 48 numerical references in
+`apps/web/tests/factQuery/fixtures/mcpAssistantIntents.ts`. Record actual tool
+selection, units, original citations, caveats, missingness, version consistency
+and any required recovery in an authorized real client before marking a case
+passed. Task 10 supplies the rubric; Task 12 owns execution. SDK/unit tests do not
+establish assistant acceptance, and no acceptance prompts have been run by Task 10.
 
 ### Logs and privacy
 

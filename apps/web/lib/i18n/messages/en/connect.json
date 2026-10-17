@@ -17,6 +17,8 @@
   "connect.claudeStep1": "Open Customize → Connectors; organization owners manage workspace connectors.",
   "connect.claudeStep2": "Choose Add → Add custom connector.",
   "connect.claudeStep3": "Name the connector, paste the address above, choose No sign in when prompted and finish adding it. Fiscal.ge needs no token or extra headers.",
+  "connect.claudeStep4": "In your conversation, open + → Connectors and switch on Fiscal.ge (or the name you gave the connector) for that conversation.",
+  "connect.tryExample": "Try the latest national-inflation question below. Ask for the original source and any limits on the figure.",
   "connect.codexNote": "Official MCP guidance; availability depends on your application and workspace settings",
   "connect.codexStep1": "Open the app's Settings → MCP servers.",
   "connect.codexStep2": "Choose Add server and enter a name.",

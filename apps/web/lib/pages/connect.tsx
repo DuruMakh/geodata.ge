@@ -110,7 +110,7 @@ function coverage(): {
 }
 
 // Earlier owner clickthroughs are historical provenance. These steps follow
-// current official documentation; Task 9 records account/application proof
+// current official documentation; Task 12 records account/application proof
 // separately from SDK compatibility and the local CLI version check.
 const CLIENTS = [
   {
@@ -121,6 +121,7 @@ const CLIENTS = [
       "connect.claudeStep1",
       "connect.claudeStep2",
       "connect.claudeStep3",
+      "connect.claudeStep4",
     ],
   },
   {
@@ -238,6 +239,9 @@ export async function renderConnectPage(locale: Locale) {
             <p className="mt-8 max-w-[820px] text-[0.8125rem] leading-[1.8] text-[var(--muted)]">
               {message(messages, "connect.otherClients")}
             </p>
+            <a href="#connect-example-inflation-national" data-testid="connect-try-example" className="mt-3 inline-flex min-h-11 max-w-[820px] items-center text-[0.8125rem] leading-[1.8] text-[var(--accent)] underline">
+              {message(messages, "connect.tryExample")}
+            </a>
           </section>
 
           {/* Public files retain evidence too; the connection adds direct queries. */}
@@ -276,7 +280,7 @@ export async function renderConnectPage(locale: Locale) {
             {/* Three questions up front, one per kind of data; the rest wait behind
                 a toggle so a phone reader is not handed ten at once. */}
             <ul className="mt-3 grid max-w-[820px] list-disc gap-2 pl-5 text-[0.84375rem] leading-[1.8] text-[var(--body)]">
-              {examples.slice(0, 3).map(example => <li key={example.id} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
+              {examples.slice(0, 3).map(example => <li key={example.id} id={`connect-example-${example.id}`} data-testid={`connect-example-${example.id}`}>{message(messages, example.key, example.values)}</li>)}
             </ul>
             <details data-testid="connect-more-examples" className="mt-1 max-w-[820px]">
               <summary className="inline-flex min-h-11 cursor-pointer items-center text-[0.8125rem] font-semibold text-[var(--accent)]">{message(messages, "connect.moreExamples")}</summary>

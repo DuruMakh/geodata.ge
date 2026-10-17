@@ -41,6 +41,23 @@ for (const prefix of ["", "/en"]) {
     await expect(productDiscovery.locator(`a[href="${prefix}/methodology/inflation"]`)).toHaveCount(1);
     const clients = page.getByTestId("connect-client");
     await expect(clients.filter({ hasText: "Codex" })).not.toContainText("ChatGPT");
+    const claude = clients.filter({ has: page.getByRole("heading", { name: "Claude", exact: true }) });
+    await expect(claude.locator("li")).toHaveCount(4);
+    await expect(claude.locator("li").last()).toContainText("+ → Connectors");
+    await expect(claude.locator("li").last()).toContainText(prefix ? "for that conversation" : "ამ საუბრისთვის");
+    await expect(claude.locator("li").last()).toContainText("Fiscal.ge");
+    await expect(claude).toContainText("No sign in");
+    const followUp = page.getByTestId("connect-try-example");
+    await expect(followUp).toContainText(prefix ? "original source" : "ორიგინალი წყარო");
+    await expect(followUp).toContainText(prefix ? "limits" : "შეზღუდვების");
+    await expect(followUp).toHaveAttribute("href", "#connect-example-inflation-national");
+    await followUp.click();
+    const nationalExample = page.getByTestId("connect-example-inflation-national");
+    await expect(nationalExample).toBeInViewport();
+    const inflation = catalogue.datasets.find((dataset: { datasetId: string }) => dataset.datasetId === "inflation");
+    const latestAnnual = inflation.series.find((series: { seriesId: string }) => series.seriesId === "cpi.headline").periodsByMeasure.yoy_pct[1];
+    await expect(nationalExample).toContainText(latestAnnual);
+    await expect(nationalExample).toContainText(prefix ? "original source and any limits" : "ორიგინალი წყარო და შეზღუდვები");
     const endpointCopy = page.getByTestId("connect-copy");
     await endpointCopy.focus();
     await endpointCopy.press("Enter");
@@ -58,6 +75,38 @@ for (const prefix of ["", "/en"]) {
     if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
     else await expect(bilingual).toContainText("ხულოს");
   });
+
+  for (const clipboard of ["unavailable", "refused"]) {
+    test(`selectable fallback when clipboard is ${clipboard} on ${prefix}/connect`, async ({ page }) => {
+      const errors: string[] = [];
+      page.on("pageerror", error => errors.push(error.message));
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.addInitScript(mode => {
+        Object.defineProperty(navigator, "clipboard", {
+          configurable: true,
+          value: mode === "unavailable" ? undefined : { writeText: async () => { throw new Error("Clipboard refused"); } },
+        });
+      }, clipboard);
+      await page.goto(`${BASE_URL}${prefix}/connect`);
+      for (const [textId, copyId] of [["connect-endpoint", "connect-copy"], ["connect-prompt", "connect-copy-prompt"]]) {
+        const text = page.getByTestId(textId!);
+        const before = await text.innerText();
+        const copy = page.getByTestId(copyId!);
+        const label = await copy.getAttribute("aria-label");
+        await copy.focus();
+        await copy.press("Enter");
+        await expect(copy).toHaveAttribute("aria-label", label!);
+        await expect(text).toBeVisible();
+        expect(await text.evaluate(element => {
+          const selection = window.getSelection()!;
+          selection.selectAllChildren(element);
+          return selection.toString();
+        })).toBe(before);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+    });
+  }
 }
 
 test.describe("connection page", () => {
