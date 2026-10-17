@@ -54,7 +54,8 @@ describe("getSources", () => {
 
     expect(source?.derivation).not.toBeNull();
     expect((source?.derivation ?? "").length).toBeGreaterThan(0);
-    expect(source?.documents.length).toBe(2);
+    expect(source?.documents.map(document => document.documentId)).toEqual(snapshot.sources.find(source => source.sourceId === "source.adjara_consolidated_budget")!.documents.map(document => document.documentId));
+    expect(source?.documents).toHaveLength(89);
   });
 
   it("leaves an ordinary source's derivation null", () => {
@@ -240,9 +241,10 @@ describe("getSources", () => {
         years: [2020],
       });
 
-      // Both upstreams stay: the derivation sentence describes a calculation
-      // over both, so showing one would leave it unsupported.
-      expect(data(result).sources[0]!.documents.length).toBe(2);
+      // All upstreams stay: the derivation sentence describes a calculation
+      // over the complete set, so omitting inputs would leave it unsupported.
+      expect(data(result).sources[0]!.documents.map(document => document.documentId)).toEqual(snapshot.sources.find(source => source.sourceId === "source.adjara_consolidated_budget")!.documents.map(document => document.documentId));
+      expect(data(result).sources[0]!.documents).toHaveLength(89);
       expect(data(result).sources[0]!.narrowingOutcome).toBe("not_requested");
     });
   });

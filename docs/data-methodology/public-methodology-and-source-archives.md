@@ -87,6 +87,12 @@ For every category:
 
 Both `predev` and `prebuild` run the write alias automatically. The entire generated download tree and `data/reports/*.json` are ignored build artifacts, not a second source of truth; they must remain unstaged.
 
+The municipal MCP calculation evidence reuses the existing municipal originals and
+eleven Treasury revenue forms (2015–2025). Logical derived sources compose these
+reviewed sets without creating duplicate manifest entries or changing original bytes,
+hashes or public paths. Country evidence includes all 69 constituent budgets;
+municipal and regional evidence remains scoped to eligible members and the reviewed year.
+
 ## Adding or updating a source year
 
 A new data year is one coordinated change, not an archive-only update:

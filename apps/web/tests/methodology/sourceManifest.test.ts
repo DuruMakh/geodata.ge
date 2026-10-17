@@ -86,6 +86,17 @@ afterEach(async () => {
 });
 
 describe("reviewed source manifest", () => {
+  it("retains all eleven reviewed Treasury originals with their exact annual scope", async () => {
+    const rows = await loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "revenue");
+    const transfers = rows.filter(row => row.years[0]! >= 2015).sort((a, b) => a.year.localeCompare(b.year));
+    expect(transfers.map(row => [row.source_id, row.years, row.repository_source_path, row.downloadHref])).toEqual(
+      Array.from({ length: 11 }, (_, index) => {
+        const year = 2015 + index;
+        return [`source.mof.revenue.${year}.form_1`, [year], `docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`, `/downloads/methodology/revenue/files/${year}/mof-revenue-form-1.pdf`];
+      }),
+    );
+  });
+
   it("loads the two reviewed Regional GDP originals from their existing repository locations", async () => {
     const repositoryRoot = path.resolve(process.cwd(), "../..");
     const rows = await loadReviewedSourceManifest(repositoryRoot, "regional-economies" as never);

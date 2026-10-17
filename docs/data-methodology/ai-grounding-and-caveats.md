@@ -742,8 +742,12 @@ municipality from a missing one.
 budget-history source archives one workbook per municipality, so a single
 municipality's figure cites its own workbook plus the cross-municipality
 functional-classification workbook for that year — not all 75. A region cites
-its members' workbooks; the Georgia row cites every served municipality's,
-because it really is built from all of them.
+its members' workbooks; the Georgia row covers all 69 constituent budgets, including
+the five aggregate-only budgets that remain excluded from territorial queries.
+Named municipal originals must match both the entity and observation year. The
+consolidated total and share denominators also cite the year's republican-payment
+and Treasury transfer originals; their derived source resolves through the existing
+logical-source sets and retains `derivation_upstream` roles.
 
 ### Regeneration and staleness
 

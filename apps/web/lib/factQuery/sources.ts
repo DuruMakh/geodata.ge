@@ -88,13 +88,19 @@ const EXTRACTED_FILE_ALIASES: Readonly<Record<string, string>> = {
  * drift.
  */
 const DERIVED_SOURCE_UPSTREAMS: Readonly<Record<string, readonly string[]>> = {
-  "source.adjara_consolidated_budget": [
-    "source.adjara.republic.2015.actual_payments",
-    "source.adjara.republic.2016_2025.actual_payments",
-  ],
   "source.fiscal_regional_economy_share": [
     "source.geostat_regional_gdp",
     "source.geostat_regional_gdp_by_activity",
+  ],
+};
+
+/** Logical-source sets contributing every term of the reviewed consolidation. */
+const DERIVED_LOGICAL_SOURCE_UPSTREAMS: Readonly<Record<string, readonly string[]>> = {
+  "source.adjara_consolidated_budget": [
+    "source.municipal_portal_archive",
+    "source.municipal_mof_annual_and_history_workbooks",
+    "source.adjara_republic_budget_actual",
+    "source.treasury_consolidated_revenue_actual",
   ],
 };
 
@@ -187,6 +193,11 @@ export function findSourceProvenanceFailures(
 export function resolvePublicSources(input: ResolvePublicSourcesInput): RawResolvedSource[] {
   const { sourceDocuments, manifestDocuments } = input;
   const documentsById = new Map(manifestDocuments.map((doc) => [doc.documentId, doc]));
+  // Resolve ordinary path/alias sets once, then compose the bounded derived sets.
+  // Source ids and document ids remain separate; no recursive dependency graph.
+  const ordinaryDocuments = new Map(sourceDocuments
+    .filter(row => !DERIVED_SOURCE_UPSTREAMS[row.sourceId] && !DERIVED_LOGICAL_SOURCE_UPSTREAMS[row.sourceId])
+    .map(row => [row.sourceId, splitFilePaths(row.sourceUrlOrFile).flatMap(filePath => matchDocuments(filePath, manifestDocuments))]));
 
   return sourceDocuments.map((row): RawResolvedSource => {
     const seenDocumentIds = new Set<string>();
@@ -202,7 +213,16 @@ export function resolvePublicSources(input: ResolvePublicSourcesInput): RawResol
     };
 
     const upstreamIds = DERIVED_SOURCE_UPSTREAMS[row.sourceId];
-    if (upstreamIds) {
+    const logicalUpstreamIds = DERIVED_LOGICAL_SOURCE_UPSTREAMS[row.sourceId];
+    if (logicalUpstreamIds) {
+      for (const id of logicalUpstreamIds) {
+        const upstream = ordinaryDocuments.get(id);
+        if (!upstream || upstream.length === 0) {
+          throw new Error(`Derived source ${row.sourceId} names logical upstream "${id}", but it is missing or has no archived documents.`);
+        }
+        for (const doc of upstream) push(doc, "derivation_upstream");
+      }
+    } else if (upstreamIds) {
       for (const id of upstreamIds) {
         const doc = documentsById.get(id);
         // Throws rather than skipping: this map is hand-authored, so an id that
@@ -218,9 +238,7 @@ export function resolvePublicSources(input: ResolvePublicSourcesInput): RawResol
         push(doc, "derivation_upstream");
       }
     } else {
-      for (const filePath of splitFilePaths(row.sourceUrlOrFile)) {
-        for (const doc of matchDocuments(filePath, manifestDocuments)) push(doc);
-      }
+      for (const doc of ordinaryDocuments.get(row.sourceId) ?? []) push(doc);
     }
 
     return {
@@ -231,7 +249,7 @@ export function resolvePublicSources(input: ResolvePublicSourcesInput): RawResol
       // ("Reviewed consolidated Adjara calculation - municipalities plus
       // republican payments minus internal transfers"); reusing it keeps one
       // wording under review instead of two that can drift.
-      derivation: upstreamIds ? row.sourceName : null,
+      derivation: upstreamIds || logicalUpstreamIds ? row.sourceName : null,
       documents,
     };
   });

@@ -1,4 +1,7 @@
 // apps/web/tests/factQuery/queryMunicipal.test.ts
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { parse } from "csv-parse/sync";
 import { beforeAll, describe, expect, it } from "vitest";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
@@ -670,43 +673,55 @@ describe("an observation cites only the originals that support it", () => {
     expect(documentIds.some((id) => members.some((code) => id.endsWith(`_${code}`)))).toBe(true);
   });
 
-  it("still cites every document behind the country aggregate", () => {
-    // The country row really is built from all served municipalities, so
-    // narrowing must not silently drop provenance here. Asserting a loose
-    // ">50" passed at BOTH revisions (75 before the fix, 65 after) and so
-    // proved nothing: a bug dropping ten served codes would leave 55 and still
-    // pass. Pin the exact membership instead.
-    const result = queryMunicipal(snapshot, {
-      entityIds: [COUNTRY],
-      seriesIds: ["municipal.education"],
-      years: [2020],
-      measure: "amount_gel",
-    });
-    const documentIds = data(result).observations[0]!.documentIds;
-    const served = snapshot.municipal.municipalities.map((municipality) => municipality.code);
-
-    for (const code of served) {
-      expect(
-        documentIds.some((id) => id.endsWith(`_${code}`)),
-        `country row must cite municipality ${code}`,
-      ).toBe(true);
+  it("country evidence covers every constituent in the observation year", () => {
+    const municipalManifest = parse(readFileSync(path.resolve(process.cwd(), "../../data/methodology/source-archives/municipalities.csv"), "utf8"), { columns: true, bom: true }) as { source_id: string; year: string }[];
+    const supportsYear = (coverage: string, year: number) => {
+      const [first, last = first] = coverage.split("-").map(Number);
+      return year >= first! && year <= last!;
+    };
+    // Independent reviewed manifest inventory: all 69 history books, the shared
+    // portal/annual inputs, republican payments, and that year's transfer form.
+    const history = municipalManifest.filter(row => /budget_history_\d{2}$/.test(row.source_id));
+    expect(history).toHaveLength(69);
+    const municipalIds = (year: number) => municipalManifest.filter(row =>
+      !row.source_id.startsWith("source.adjara.") &&
+      !row.source_id.endsWith("portal_functional_basic_types") && supportsYear(row.year, year),
+    ).map(row => row.source_id).sort();
+    const consolidatedIds = (year: number) => [...municipalIds(year),
+      year === 2015 ? "source.adjara.republic.2015.actual_payments" : "source.adjara.republic.2016_2025.actual_payments",
+      `source.mof.revenue.${year}.form_1`,
+    ].sort();
+    for (let year = 2015; year <= 2025; year++) {
+      for (const measure of ["amount_gel", "share_of_total_pct"] as const) {
+        const response = queryMunicipal(snapshot, { entityIds: [COUNTRY], seriesIds: [TOTAL, ...FUNCTION_SERIES], years: [year], measure });
+        for (const observation of data(response).observations) {
+          const expectedDocumentIds = observation.seriesId === TOTAL || measure === "share_of_total_pct"
+            ? consolidatedIds(year)
+            : municipalIds(year).filter(id => year >= 2020 || id.endsWith("portal_functionals"));
+          const actualDocumentIds = [...observation.documentIds].sort();
+          expect(actualDocumentIds, `${observation.observationId}`).toEqual(expectedDocumentIds);
+        }
+      }
+      const adjara = queryMunicipal(snapshot, { entityIds: [ADJARA], seriesIds: [TOTAL, "municipal.education"], years: [year], measure: "share_of_total_pct" });
+      const members = snapshot.municipal.municipalities.filter(row => row.regionId === ADJARA).map(row => row.code);
+      const expectedAdjara = consolidatedIds(year).filter(id => !/budget_history_\d{2}$/.test(id) || members.some(code => id.endsWith(`_${code}`)));
+      for (const observation of data(adjara).observations) {
+        const expected = expectedAdjara.filter(id => observation.seriesId !== TOTAL || year === 2015 || !id.endsWith("portal_functionals"));
+        expect([...observation.documentIds].sort(), observation.observationId).toEqual(expected);
+      }
     }
-    expect(documentIds.filter((id) => /budget_history_\d{2}$/.test(id))).toHaveLength(served.length);
   });
 
-  it("never cites an excluded municipality's workbook", () => {
-    // Codes 05/42/43/46/64 are not territorially attributable (spec 5.4), so
-    // their workbooks must not surface as an original behind a public figure.
-    const result = queryMunicipal(snapshot, {
-      entityIds: [COUNTRY],
-      seriesIds: ["municipal.education"],
-      years: [2020],
-      measure: "amount_gel",
-    });
-    const documentIds = data(result).observations[0]!.documentIds;
-
-    for (const code of AGGREGATE_ONLY_MUNICIPAL_CODES) {
-      expect(documentIds).not.toContain(`source.mof.municipalities.2016_2025.budget_history_${code}`);
+  it("territorial rows exclude unrelated and aggregate-only originals", () => {
+    for (const entityId of [KHULO, ADJARA, "region.guria"]) {
+      const response = queryMunicipal(snapshot, { entityIds: [entityId], seriesIds: [TOTAL, "municipal.education"], years: [2015, 2020], measure: "amount_gel" });
+      const members = entityId === KHULO ? [KHULO] : snapshot.municipal.municipalities.filter(row => row.regionId === entityId).map(row => row.code);
+      for (const observation of data(response).observations) {
+        const actual = observation.documentIds.filter(id => /budget_history_\d{2}$/.test(id)).sort();
+        const expected = observation.year === 2015 ? [] : members.map(code => `source.mof.municipalities.2016_2025.budget_history_${code}`).sort();
+        expect(actual).toEqual(expected);
+        for (const code of AGGREGATE_ONLY_MUNICIPAL_CODES) expect(observation.documentIds).not.toContain(`source.mof.municipalities.2016_2025.budget_history_${code}`);
+      }
     }
   });
 });

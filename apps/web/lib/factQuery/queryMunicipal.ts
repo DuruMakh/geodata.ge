@@ -183,7 +183,7 @@ export function queryMunicipal(
   // files and would be cited on every row of the matching year.
   const allMunicipalityCodes = [...servedCodes, ...AGGREGATE_ONLY_MUNICIPAL_CODES];
   const codesByEntityId = new Map<string, readonly string[]>([
-    [MUNICIPAL_COUNTRY_ID, servedCodes],
+    [MUNICIPAL_COUNTRY_ID, allMunicipalityCodes],
     ...municipal.regions.map((region) => [region.id, membersOf.get(region.id) ?? []] as const),
     ...servedCodes.map((code) => [code, [code]] as const),
   ]);

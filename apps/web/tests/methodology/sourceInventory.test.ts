@@ -18,6 +18,17 @@ afterEach(async () => {
 });
 
 describe("original-source inventory", () => {
+  it("already contains every 2015–2025 transfer original and all 69 municipal history books", async () => {
+    const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
+    expect(inventory.revenue.filter(row => /\/(201[5-9]|202[0-5])-jan-dec-consolidated-revenue\.pdf$/.test(row.path)).map(row => row.path)).toEqual(
+      Array.from({ length: 11 }, (_, index) => `docs/Raw Data/Revenue/${2015 + index}-jan-dec-consolidated-revenue.pdf`),
+    );
+    const history = inventory.municipalities.filter(row => row.path.includes("/mof-municipality-budget-history-2016-2025/"));
+    const reviewed = (await loadReviewedSourceManifest(REPOSITORY_ROOT, "municipalities")).filter(row => /budget_history_\d{2}$/.test(row.source_id));
+    expect(history).toHaveLength(69);
+    expect(history.map(row => [row.path, row.byteSize])).toEqual(reviewed.map(row => [row.repository_source_path, row.byte_size]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
+  });
+
   it("includes every approved original and no prepared derivative", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     expect(inventory.expenditure).toHaveLength(79);
