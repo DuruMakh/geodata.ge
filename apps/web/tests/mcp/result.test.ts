@@ -12,6 +12,8 @@ import { rank } from "../../lib/factQuery/rank";
 import type { Observation } from "../../lib/factQuery/observations";
 import type { RankData } from "../../lib/factQuery/rank";
 
+import { getSources, type GetSourcesData } from "../../lib/factQuery/getSources";
+
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
   snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-02T00:00:00.000Z" });
@@ -20,6 +22,32 @@ beforeAll(async () => {
 const size = (value: unknown) => Buffer.byteLength(JSON.stringify(value), "utf8");
 
 describe("MCP tool results", () => {
+  it("explains all four actual source-filter outcomes in Georgian and English", () => {
+    const grouped = "source.municipal_mof_annual_and_history_workbooks";
+    for (const [input, outcome, narrowed, phrases] of [
+      [{ sourceIds: [grouped] }, "not_requested", false, ["ფილტრები არ მოთხოვნილა", "No filters were requested"]],
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2017] }, "applied", false, ["დოკუმენტები შეესაბამება მოთხოვნილ ფილტრებს", "Documents match the requested filters"]],
+      [{ sourceIds: [grouped], entityIds: ["11"] }, "applied", true, ["დოკუმენტები შეესაბამება მოთხოვნილ ფილტრებს", "Documents match the requested filters"]],
+      [{ sourceIds: [grouped], datasetId: "national-revenue" }, "dropped_no_match", false, ["მოთხოვნილ ფილტრებს არცერთი დოკუმენტი არ შეესაბამება", "No document matched the requested filters"]],
+      [{ sourceIds: ["source.adjara_consolidated_budget"], years: [2020] }, "preserved_derived", false, ["გამოთვლის სრული მტკიცებულების შესანარჩუნებლად", "Preserving all inputs to the derived calculation"]],
+    ] as const) {
+      const response = getSources(snapshot, input);
+      if (response.kind !== "sources") throw new Error("Expected sources");
+      const data = response.data as GetSourcesData;
+      const source = data.sources[0]!;
+      expect(source).toMatchObject({ narrowingOutcome: outcome, narrowed, documentCount: snapshot.sources.find(original => original.sourceId === source.sourceId)!.documents.length });
+      expect(source.documents.length < source.documentCount).toBe(narrowed);
+      const result = toolResult(response);
+      expect(result.structuredContent).toEqual(response);
+      const text = result.content[0]!.text;
+      for (const phrase of phrases) expect(text).toContain(phrase);
+      expect(text).toContain(`\t${source.documents.length}\t${source.documentCount}\t${source.narrowed}\t${outcome}`);
+      if (data.narrowedBy === null) expect(text).not.toContain("requested filters:");
+      else expect(text).toContain(`requested filters: ${JSON.stringify(data.narrowedBy)}`);
+      for (const document of source.documents) expect(text).toContain(document.documentId);
+    }
+  });
+
   it.each([
     { name: "Batumi", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2016-01", "2026-08"], years: Array.from({ length: 11 }, (_, i) => 2016 + i) },
     { name: "Zugdidi average", entityIds: ["city.zugdidi"], measure: "avg12_pct", periods: ["2017-12", "2026-08"], years: Array.from({ length: 10 }, (_, i) => 2017 + i) },

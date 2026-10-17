@@ -93,6 +93,19 @@ reviewed sets without creating duplicate manifest entries or changing original b
 hashes or public paths. Country evidence includes all 69 constituent budgets;
 municipal and regional evidence remains scoped to eligible members and the reviewed year.
 
+The existing 2015 expenditure workbook also supplies the reviewed 2014 ministry
+actuals from column 4. Its manifest coverage is `2014-2015`, so a 2014 source
+lookup matches that original. Its 2015 publication title, filename, bytes and
+source-cell mapping remain unchanged.
+
+Inflation city source lookup uses the six registered cities and the source IDs on
+their reviewed facts to retain shared CPI workbooks; dataset and document-year
+constraints still apply. Source lookup reports whether filters were absent,
+applied (even if the list stayed the same), dropped because no document matched,
+or left unapplied to preserve a derived calculation's complete inputs. The last
+case is `preserved_derived`; readable output explains all four cases in Georgian
+and English, with the requested filters and original/returned document counts.
+
 ## Adding or updating a source year
 
 A new data year is one coordinated change, not an archive-only update:

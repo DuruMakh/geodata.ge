@@ -6,6 +6,9 @@ import { rank } from "../../lib/factQuery/rank";
 import { SCHEMA_VERSION, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 
+import { getSources, type GetSourcesData } from "../../lib/factQuery/getSources";
+import type { Observation } from "../../lib/factQuery/observations";
+
 const snapshot = loadPackagedSnapshot();
 type Obs = { observationId: string; entityType: string; value: number | null; availability: string; missingReasonEn: string | null; caveatIds: string[] };
 const observations = (response: ReturnType<typeof queryInflation>) => (response as { data: { observations: Obs[] } }).data.observations;
@@ -132,6 +135,50 @@ describe("query_inflation for cities", () => {
 
   it("counts cells across entities", () => {
     expect(inflationCellCount({ entityIds: ["city.gori", "city.telavi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-01", toPeriod: "2026-08" })).toBe(16);
+  });
+});
+
+describe("city query to original-source lookup", () => {
+  it.each(["city.tbilisi", "city.kutaisi", "city.batumi", "city.gori", "city.telavi", "city.zugdidi"])("resolves %s originals for every supported headline measure", (cityId) => {
+    for (const measure of ["yoy_pct", "mom_pct", "avg12_pct"]) {
+      const response = queryInflation(snapshot, { entityIds: [cityId], seriesIds: ["cpi.headline"], measure, fromPeriod: "2026-08", toPeriod: "2026-08" });
+      expect(response.status).toBe("ok");
+      if (response.kind !== "observations") throw new Error("Expected city observations");
+      const observation = (response.data as { observations: Observation[] }).observations[0]!;
+      expect(observation.sourceIds.length).toBeGreaterThan(0);
+      for (const datasetId of [undefined, "inflation"]) {
+        const result = getSources(snapshot, { sourceIds: observation.sourceIds, entityIds: [cityId], years: [2026], ...(datasetId ? { datasetId } : {}) });
+        expect(result.kind).toBe("sources");
+        const data = (result as { data: GetSourcesData }).data;
+        expect(data.narrowedBy).toMatchObject({ entityIds: [cityId], years: [2026], ...(datasetId ? { datasetId } : {}) });
+        expect(data.sources.flatMap(source => source.documents.map(document => document.documentId))).toEqual(observation.documentIds);
+        for (const source of data.sources) {
+          expect(source).toMatchObject({ narrowingOutcome: "applied", narrowed: false, documentCount: source.documents.length });
+          expect(source.documents).toEqual(snapshot.sources.find(original => original.sourceId === source.sourceId)!.documents);
+          for (const document of source.documents) {
+            expect(document.archiveUrl).toMatch(/^https:\/\/fiscal.ge\/downloads\//);
+            expect(document.sha256).toMatch(/^[0-9a-f]{64}$/);
+            expect(document.byteSize).toBeGreaterThan(0);
+          }
+        }
+      }
+    }
+  });
+
+  it("rejects an unregistered city and preserves explicit no-match outcomes for unrelated originals, datasets and years", () => {
+    expect(getSources(snapshot, { sourceIds: ["source.geostat_cpi_yoy"], entityIds: ["city.rustavi"] })).toMatchObject({ kind: "error", error: { code: "unknown_entity" } });
+    for (const filters of [
+      { sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2017] },
+      { sourceIds: ["source.geostat_cpi_index_2010"], datasetId: "inflation", years: [2026] },
+      { sourceIds: ["source.geostat_cpi_yoy"], datasetId: "national-revenue", years: [2026] },
+      { sourceIds: ["source.geostat_cpi_yoy"], datasetId: "inflation", years: [1995] },
+    ]) {
+      const result = getSources(snapshot, { ...filters, entityIds: ["city.batumi"] });
+      expect(result.kind).toBe("sources");
+      const source = (result as { data: GetSourcesData }).data.sources[0]!;
+      expect(source).toMatchObject({ narrowingOutcome: "dropped_no_match", narrowed: false, documentCount: source.documents.length });
+      expect(source.documents).toEqual(snapshot.sources.find(original => original.sourceId === source.sourceId)!.documents);
+    }
   });
 });
 

@@ -74,6 +74,21 @@ const CALLS: Record<string, unknown> = {
 };
 
 describe("every tool's structured output matches its declared schema", () => {
+  it("validates all four outcomes emitted by the source lookup", () => {
+    const getSourcesTool = TOOLS.find(tool => tool.name === "get_sources")!;
+    for (const [input, outcome] of [
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"] }, "not_requested"],
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2017] }, "applied"],
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2020] }, "dropped_no_match"],
+      [{ sourceIds: ["source.adjara_consolidated_budget"], years: [2020] }, "preserved_derived"],
+    ]) {
+      const response = getSourcesTool.run(snapshot, input);
+      expect(response).toMatchObject({ kind: "sources", data: { sources: [{ narrowingOutcome: outcome, narrowed: false }] } });
+      expect(outputSchemaFor("get_sources").parse(response)).toEqual(response);
+      expect(toolOutput.parse(response)).toEqual(response);
+    }
+  });
+
   it("accepts preserved derived evidence alongside every existing narrowing outcome", () => {
     const response = TOOLS.find(tool => tool.name === "get_sources")!.run(snapshot, CALLS.get_sources);
     if (response.kind !== "sources") throw new Error("Expected sources");

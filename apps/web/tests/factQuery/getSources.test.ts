@@ -6,6 +6,9 @@ import { envelopeSchema } from "../../lib/factQuery/schemas";
 import type { GetSourcesData } from "../../lib/factQuery/getSources";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
+import { queryMinistries } from "../../lib/factQuery/queryMinistries";
+import type { Observation } from "../../lib/factQuery/observations";
+
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
@@ -186,6 +189,18 @@ describe("getSources", () => {
     });
   });
 
+  it("matches the reviewed 2014 ministry column in its original 2015 workbook", () => {
+    const response = queryMinistries(snapshot, { level: "admin_category", seriesIds: ["admin_spending.defence"], years: [2014], measure: "amount_gel" });
+    expect(response.status).toBe("ok");
+    if (response.kind !== "observations") throw new Error("Expected ministries observations");
+    const observation = (response.data as { observations: Observation[] }).observations[0]!;
+    expect(observation.sourceIds).toContain("source.mof_2014_programmatic_fact_actual");
+    const result = getSources(snapshot, { sourceIds: observation.sourceIds, datasetId: "ministries", years: [2014] });
+    expect(data(result).sources[0]).toMatchObject({ narrowingOutcome: "applied", narrowed: false, documentCount: 1, documents: [{ documentId: "source.mof.expenditure.2015.mof_excel_fact", years: [2014, 2015] }] });
+    expect(data(result).sources[0]!.documents.map(document => document.documentId)).toEqual(observation.documentIds);
+    expect(data(result).narrowedBy).toEqual({ datasetId: "ministries", years: [2014] });
+  });
+
   it("rejects a stale expectedDataVersion", () => {
     const result = getSources(snapshot, {
       sourceIds: ["source.mof_2017_revenue_form1_pdf"],
@@ -235,7 +250,7 @@ describe("getSources", () => {
       expect(result.kind).toBe("sources");
     });
 
-    it("does not narrow a derived source away from its stated inputs", () => {
+    it("reports preserved derived evidence when filters were requested", () => {
       const result = getSources(snapshot, {
         sourceIds: ["source.adjara_consolidated_budget"],
         years: [2020],
@@ -245,7 +260,8 @@ describe("getSources", () => {
       // over the complete set, so omitting inputs would leave it unsupported.
       expect(data(result).sources[0]!.documents.map(document => document.documentId)).toEqual(snapshot.sources.find(source => source.sourceId === "source.adjara_consolidated_budget")!.documents.map(document => document.documentId));
       expect(data(result).sources[0]!.documents).toHaveLength(89);
-      expect(data(result).sources[0]!.narrowingOutcome).toBe("not_requested");
+      expect(data(result).sources[0]!).toMatchObject({ narrowingOutcome: "preserved_derived", narrowed: false, documentCount: 89 });
+      expect(data(result).narrowedBy).toEqual({ years: [2020] });
     });
   });
 });

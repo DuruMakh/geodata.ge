@@ -27,11 +27,13 @@ export type ResolvedSourceView = ResolvedSource & {
    * Whether the requested narrowing was applied, and if not, why.
    *
    * "not_requested"      - no filter was given.
-   * "applied"            - the filter matched and the list is narrowed.
+   * "applied"            - the filter matched; the list may be unchanged.
    * "dropped_no_match"   - the filter matched NOTHING, so it was dropped and
    *                        the full list is returned instead.
    *
-   * `narrowed` alone could not express the third case: it is computed as "the
+   * "preserved_derived" - filters were supplied, but all calculation inputs stay.
+   *
+   * `narrowed` alone could not express these cases: it is computed as "the
    * list got shorter", which the fallback makes false by construction. A
    * request for a year no document covers therefore returned a document from
    * another year, byte-identical to a genuine match. On the one surface whose
@@ -130,6 +132,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   // so a caller asking about a municipality that does not exist got a
   // confident-looking answer about a different one.
   const knownEntityIds = new Set<string>([
+    ...snapshot.inflation.cityEntities.map((city) => city.id),
     MUNICIPAL_COUNTRY_ID,
     ...snapshot.municipal.regions.map((region) => region.id),
     ...snapshot.municipal.municipalities.map((municipality) => municipality.code),
@@ -203,15 +206,21 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
                 : [],
   );
 
+  // City originals are shared workbooks: their IDs do not name each city.
+  // Use the source associations on reviewed city facts, never a city.* prefix
+  // or a blanket exemption for inflation documents.
+  const citySourceIds = new Set(snapshot.inflation.cities
+    .filter((fact) => input.entityIds?.includes(fact.cityId))
+    .map((fact) => fact.sourceId));
+
   const sources: ResolvedSourceView[] = resolved.map((source) => {
     let documents = source.documents;
 
-    let narrowingOutcome: ResolvedSourceView["narrowingOutcome"] = "not_requested";
+    let narrowingOutcome: ResolvedSourceView["narrowingOutcome"] = hasNarrowing && source.derivation !== null ? "preserved_derived" : "not_requested";
 
     // A derived source is exempt. Its documents are the inputs to the stated
-    // calculation, so showing one of the two Adjara republican-payments
-    // originals beside a derivation reading "members plus republican payments"
-    // would leave the sentence unsupported by what is displayed.
+    // calculation. Removing any input would leave that calculation unsupported
+    // by the displayed evidence, so explain why its complete chain is kept.
     if (hasNarrowing && source.derivation === null) {
       const filtered = source.documents.filter((document) => {
         if (input.datasetId === "inflation-products" && !["source.geostat_product_yoy", "source.geostat_product_mom"].includes(source.sourceId)) return false;
@@ -228,7 +237,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
         if (input.entityIds !== undefined && input.entityIds.length > 0) {
           // Every source in this catalogue concerns Georgia. A country filter
           // includes both national originals and the complete municipal panel.
-          if (!input.entityIds.includes(MUNICIPAL_COUNTRY_ID) && !matchesEntity(document, entityCodes)) return false;
+          if (!input.entityIds.includes(MUNICIPAL_COUNTRY_ID) && !matchesEntity(document, entityCodes) && !citySourceIds.has(source.sourceId)) return false;
         }
         return true;
       });

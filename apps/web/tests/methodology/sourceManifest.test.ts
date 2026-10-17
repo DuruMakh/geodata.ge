@@ -86,6 +86,16 @@ afterEach(async () => {
 });
 
 describe("reviewed source manifest", () => {
+  it("covers the reviewed 2014 column without renaming the 2015 workbook", async () => {
+    const rows = await loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "expenditure");
+    expect(rows.find(row => row.source_id === "source.mof.expenditure.2015.mof_excel_fact")).toMatchObject({
+      year: "2014-2015", years: [2014, 2015], official_filename: "2015-fact.xlsx",
+      display_title_ka: "2015 წლის სახელმწიფო ბიუჯეტის შესრულების სამუშაო წიგნი",
+      repository_source_path: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2015-fact.xlsx",
+      byte_size: 85702, sha256: "47f9c22fffcae56faecb79bc0cfe84bcddb42db265ff4da7089ba84abdb0906e",
+    });
+  });
+
   it("retains all eleven reviewed Treasury originals with their exact annual scope", async () => {
     const rows = await loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "revenue");
     const transfers = rows.filter(row => row.years[0]! >= 2015).sort((a, b) => a.year.localeCompare(b.year));

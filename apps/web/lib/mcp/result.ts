@@ -132,8 +132,15 @@ function comparisonLine(comparison: Comparison): string {
   );
 }
 
+const SOURCE_NARROWING_EXPLANATIONS: Record<ResolvedSourceView["narrowingOutcome"], string> = {
+  not_requested: "ფილტრები არ მოთხოვნილა; ნაჩვენებია სრული წყარო. / No filters were requested; showing the full source.",
+  applied: "დოკუმენტები შეესაბამება მოთხოვნილ ფილტრებს; სია შესაძლოა სრულ წყაროს ემთხვეოდეს. / Documents match the requested filters; the matching list may equal the full source.",
+  dropped_no_match: "მოთხოვნილ ფილტრებს არცერთი დოკუმენტი არ შეესაბამება; ნაჩვენებია სრული წყარო. / No document matched the requested filters; showing the full source instead.",
+  preserved_derived: "გამოთვლის სრული მტკიცებულების შესანარჩუნებლად ყველა საწყისი დოკუმენტი ნაჩვენებია; მოთხოვნილი ფილტრები არ გამოყენებულა. / Preserving all inputs to the derived calculation; the requested filters were not applied.",
+};
+
 function sourceView(source: ResolvedSourceView): string {
-  return line(source.sourceId, source.name, source.documents.length, source.narrowingOutcome);
+  return line(source.sourceId, source.name, source.documents.length, source.documentCount, source.narrowed, source.narrowingOutcome);
 }
 
 type Defined = { valueDefinitionId: string; valueDefinition: string; valueDefinitionEn: string };
@@ -215,10 +222,10 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "sources") {
     const { sources, narrowedBy } = data as GetSourcesData;
     return [
-      "# sourceId\tname\tdocuments\tscope",
+      "# sourceId\tname\tdocuments\tdocumentCount\tnarrowed\tscope",
       ...sources.flatMap((source) => [
         sourceView(source),
-        ...(source.narrowingOutcome === "dropped_no_match" ? ["No document matched the requested filters; showing the full source instead."] : []),
+        SOURCE_NARROWING_EXPLANATIONS[source.narrowingOutcome],
         ...sourceLines(source),
       ]),
       ...(narrowedBy === null ? [] : [`requested filters: ${JSON.stringify(narrowedBy)}`]),

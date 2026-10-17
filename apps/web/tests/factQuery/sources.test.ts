@@ -76,6 +76,15 @@ describe("public source resolution", () => {
     }
   });
 
+  it("retains the 2015 workbook identity and reviewed 2014-2015 coverage", () => {
+    const source = snapshot.sources.find(source => source.sourceId === "source.mof_2014_programmatic_fact_actual")!;
+    expect(source.documents).toMatchObject([{
+      documentId: "source.mof.expenditure.2015.mof_excel_fact", years: [2014, 2015],
+      archiveUrl: "https://fiscal.ge/downloads/methodology/expenditure/files/2015/mof-excel-fact.xlsx",
+      byteSize: 85702, sha256: "47f9c22fffcae56faecb79bc0cfe84bcddb42db265ff4da7089ba84abdb0906e",
+    }]);
+  });
+
   it("never emits a sentinel source id", async () => {
     for (const source of snapshot.sources) {
       expect(source.sourceId).not.toMatch(/^mixed:/);
