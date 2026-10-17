@@ -37,7 +37,7 @@ export type ResolvedSourceView = ResolvedSource & {
    * another year, byte-identical to a genuine match. On the one surface whose
    * whole job is letting a reader check a figure, that is not survivable.
    */
-  narrowingOutcome: "not_requested" | "applied" | "dropped_no_match";
+  narrowingOutcome: "not_requested" | "applied" | "dropped_no_match" | "preserved_derived";
 };
 
 export type GetSourcesData = {

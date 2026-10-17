@@ -2,6 +2,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { rank } from "../../lib/factQuery/rank";
+import { compare, type Comparison } from "../../lib/factQuery/compare";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import type { RankData } from "../../lib/factQuery/rank";
@@ -379,6 +380,49 @@ describe("rank", () => {
   });
 
   describe("change rankings", () => {
+    it.each([
+      { datasetId: "national-revenue", measure: "share_of_total_pct" },
+      { datasetId: "national-revenue", measure: "share_of_gdp_pct" },
+      { datasetId: "national-expenditure", measure: "share_of_total_pct" },
+      { datasetId: "national-expenditure", measure: "share_of_gdp_pct" },
+      { datasetId: "ministries", measure: "share_of_total_pct", level: "admin_category" },
+      { datasetId: "ministries", measure: "share_of_gdp_pct", level: "admin_category" },
+      { datasetId: "municipal-expenditure", measure: "share_of_total_pct", entityType: "municipality", seriesId: "municipal.education" },
+      { datasetId: "ministries", measure: "share_of_total_pct", level: "major_program", parentSeriesId: "admin_spending.health_social_affairs" },
+      { datasetId: "municipal-expenditure", measure: "share_of_total_pct", entityType: "region", seriesId: "municipal.education" },
+    ])("uses percentage points for share-change rankings: $datasetId $measure $level $entityType", (scope) => {
+      const municipal = scope.datasetId === "municipal-expenditure";
+      const result = rank(snapshot, { ...scope, dimension: municipal ? "entities" : "series", fromYear: 2019, toYear: 2023, metric: "percentage_point_change", limit: 100 });
+      expect(result.kind).toBe("ranking");
+      const entries = data(result).entries;
+      expect(entries.length).toBeGreaterThan(0);
+      for (const entry of entries) {
+        const response = compare(snapshot, {
+          target: municipal ? { dataset: "municipal", entityIds: [entry.entityId], seriesIds: [entry.seriesId] }
+            : scope.datasetId === "ministries" ? { dataset: "ministries", level: scope.level, seriesIds: [entry.seriesId] }
+              : { dataset: "national", side: scope.datasetId === "national-revenue" ? "revenue" : "expenditure", seriesIds: [entry.seriesId] },
+          fromYear: 2019, toYear: 2023, measure: scope.measure,
+        });
+        if (response.kind !== "comparisons") throw new Error(JSON.stringify(response));
+        const [comparison] = (response.data as { comparisons: Comparison[] }).comparisons;
+        expect(entry.value).toBe(comparison!.percentagePointChange);
+        expect(entry.unit).toBe("percentage_points");
+        expect(entry.basis).toBe(comparison!.to.basis);
+        expect(entry.caveatIds).toEqual(comparison!.caveatIds);
+      }
+      const values = entries.map(entry => entry.value!);
+      expect(values).toEqual([...values].sort((a, b) => b - a));
+    });
+
+    it.each([
+      { measure: "amount_gel", unit: "GEL" },
+    ])("retains endpoint units for absolute changes: $measure", ({ measure, unit }) => {
+      const result = rank(snapshot, { datasetId: "municipal-expenditure", dimension: "entities", entityType: "municipality", seriesId: "municipal.total", fromYear: 2019, toYear: 2023, measure, metric: "absolute_change" });
+      expect(result.kind).toBe("ranking");
+      expect(data(result).entries.length).toBeGreaterThan(0);
+      for (const entry of data(result).entries) expect(entry.unit).toBe(unit);
+    });
+
     it("ranks municipalities by percentage change and reuses compare", () => {
       const result = rank(snapshot, {
         datasetId: "municipal-expenditure",
@@ -394,6 +438,7 @@ describe("rank", () => {
 
       expect(result.kind).toBe("ranking");
       expect(data(result).entries.length).toBeGreaterThan(0);
+      expect(data(result).entries.every(entry => entry.unit === "percent")).toBe(true);
       const values = data(result).entries.map((e) => e.value ?? 0);
       for (let index = 1; index < values.length; index += 1) {
         expect(values[index - 1]!).toBeGreaterThanOrEqual(values[index]!);
@@ -439,7 +484,7 @@ describe("rank", () => {
 
       expect(result.kind).toBe("ranking");
       expect(data(result).entries.length).toBeGreaterThan(0);
-      expect(data(result).entries[0]?.unit).toBe("percent");
+      expect(data(result).entries[0]?.unit).toBe("percentage_points");
     });
   });
 

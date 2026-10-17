@@ -132,7 +132,7 @@ const dataShapes = {
   }),
   sources: z.object({
     sources: z.array(z.object({
-      sourceId: z.string(), name: z.string(), lastReviewedAt: z.string(), derivation: z.string().nullable(), documentCount: z.number(), narrowed: z.boolean(), narrowingOutcome: z.enum(["not_requested", "applied", "dropped_no_match"]),
+      sourceId: z.string(), name: z.string(), lastReviewedAt: z.string(), derivation: z.string().nullable(), documentCount: z.number(), narrowed: z.boolean(), narrowingOutcome: z.enum(["not_requested", "applied", "dropped_no_match", "preserved_derived"]),
       nameKa: z.string().min(1), nameEn: z.string().min(1), derivationKa: z.string().nullable(), derivationEn: z.string().nullable(),
       documents: z.array(responseDocument.extend({ sha256: z.string(), byteSize: z.number() })),
     })),

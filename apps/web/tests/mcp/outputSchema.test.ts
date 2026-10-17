@@ -74,6 +74,20 @@ const CALLS: Record<string, unknown> = {
 };
 
 describe("every tool's structured output matches its declared schema", () => {
+  it("accepts preserved derived evidence alongside every existing narrowing outcome", () => {
+    const response = TOOLS.find(tool => tool.name === "get_sources")!.run(snapshot, CALLS.get_sources);
+    if (response.kind !== "sources") throw new Error("Expected sources");
+    const schema = outputSchemaFor("get_sources");
+    for (const outcome of ["not_requested", "applied", "dropped_no_match", "preserved_derived"]) {
+      const sample = structuredClone(response);
+      (sample.data as { sources: { narrowingOutcome: string }[] }).sources[0]!.narrowingOutcome = outcome;
+      expect(schema.safeParse(sample).success, outcome).toBe(true);
+      expect(toolOutput.safeParse(sample).success, outcome).toBe(true);
+    }
+    const invalid = structuredClone(response);
+    (invalid.data as { sources: { narrowingOutcome: string }[] }).sources[0]!.narrowingOutcome = "invented_outcome";
+    expect(schema.safeParse(invalid).success).toBe(false);
+  });
   it("declares and retains every public product catalogue field", () => {
     const response = describeCoverage(snapshot, { datasetId: "inflation-products" });
     if (response.kind !== "catalogue") throw new Error("Expected product catalogue");

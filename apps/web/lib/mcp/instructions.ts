@@ -65,7 +65,7 @@ WHAT IS SERVED
 - GDP overview, ${range("gdp-overview")}, through query_gdp. Choose one or more of
   six discovered series IDs; each fixes its units and price basis. Real GDP is
   constant-2015 USD; nominal GDP and nominal GDP per capita are current GEL/USD.
-  Annual real growth is percentage points (7.5 means 7.5%), not a fraction.
+  Annual real growth is percent (7.5 means 7.5%), not a fraction.
   Values are published or preliminary, never budget planned values. Per-capita
   GDP is output per person, not income. Preserve historical and revision caveats.
   Individual series have shorter year coverage. GDP ranking and cumulative
@@ -90,6 +90,7 @@ Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
 LANGUAGES AND COMPATIBILITY
+Schema 1.6.0 adds internal_error and the preserved_derived source narrowing outcome.
 Schema 1.5.0 adds reviewed product inflation, cumulative_pct and optional
 calculationBasePeriod on cumulative observations and rankings. Schema 1.4.0 added
 inflation cities (the city entity type and query_inflation entityIds) after schema 1.3.0 added regional economies and schema 1.2.0 introduced the optional period (YYYY-MM) on inflation observations, comparison endpoints and ranking entries, while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
@@ -101,8 +102,9 @@ translated companions describe it without replacing it. documentLanguage is null
 when unverified; a translated title does not mean the source document was translated.
 Translation corrections change dataVersion because the text is part of the pinned
 data identity. Reuse a dataVersion only with responses from that same snapshot.
-Clients must accept additive fields and schema 1.5.0; exact-version or unknown-field
-validators need updating. Byte-for-byte response compatibility is not promised.
+Clients must accept additive fields and schema 1.6.0. Strict cached output-enum
+validators must refresh discovery; exact-version or unknown-field validators need
+updating. Byte-for-byte response compatibility is not promised.
 Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
 publications. Static publications carry the same bilingual evidence and remain
 available without an MCP connection. Text rows include both languages; values and

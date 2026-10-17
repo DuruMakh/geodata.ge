@@ -466,13 +466,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         // instead of "+464%". compare() escapes this because its unit describes
         // the two endpoints and its changes sit in separately named fields;
         // rank collapses both into one value/unit pair, so it has to choose.
-        //
-        // percentage_point_change is reported as "percent" too: the Unit union
-        // has no percentage-point member, and adding one changes the shared
-        // schema. "percent" is imprecise for points but no longer false about
-        // the order of magnitude, and `rankingDefinition` names the exact
-        // metric. Adding a distinct unit is an open contract decision.
-        unit: input.metric === "absolute_change" ? comparison.unit : isInflation ? "percentage_points" : "percent",
+        unit: input.metric === "absolute_change" ? comparison.unit : input.metric === "percentage_point_change" ? "percentage_points" : "percent",
         basis: comparison.to.basis,
         caveatIds: comparison.caveatIds,
         stableId,

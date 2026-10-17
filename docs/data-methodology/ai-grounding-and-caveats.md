@@ -4,7 +4,7 @@ This document is the single owner of the caveat catalogue used by the fact-query
 
 **A code appearing in this document is not evidence that its trigger is correct.** The firing and non-firing tests under `apps/web/tests/factQuery/caveats/` are what establish that, and they have twice caught a rule attaching a warning to figures it did not describe. Read this document to learn what a code means; read the tests to learn when it fires.
 
-## Bilingual response contract, schema 1.5.0
+## Bilingual response contract, schema 1.6.0
 
 The shared `/mcp` endpoint and the manifest-listed `/downloads/data/` publications
 use one reviewed snapshot. `tools/list`, `catalogue.json` and `manifest.json` own
@@ -26,9 +26,11 @@ evidence and shared document defaults retain both languages. Full source records
 retain the archived byte sizes and hashes.
 
 No language input is needed. Existing valid requests continue to work; catalogue
-search accepts either language. Schema 1.5.0 adds the reviewed current-product
-dataset, annual/cumulative query and optional `calculationBasePeriod`. Clients
-rejecting additive fields or requiring an earlier exact schema must update.
+search accepts either language. Schema 1.6.0 adds `internal_error` and the
+`preserved_derived` source narrowing outcome, retaining the current-product
+dataset, annual/cumulative query and optional `calculationBasePeriod`. Strict
+clients caching output enums must refresh discovery; clients rejecting additive
+fields or requiring an earlier exact schema must update their validation.
 Translation corrections change `dataVersion`, just as other snapshot changes do.
 Responses are not byte-identical to older schemas. The unchanged 512 KiB complete-result
 limit counts both structured and text output; a source-heavy request can now
@@ -44,7 +46,7 @@ cumulative percentage is Fiscal.ge's calculation. Missing inputs stay unavailabl
 not zero, and annual/cumulative rankings preserve every exclusion.
 
 MCP modern `2026-07-28` and legacy `2025-11-25` are transport revisions, separate
-from schema 1.5.0. SDK tests prove protocol, serialization and response contracts;
+from schema 1.6.0. SDK tests prove protocol, serialization and response contracts;
 they do not prove an external AI client's menus, account eligibility or interpretation.
 Current official application guidance and the unverified human-flow boundary are
 recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary`.
