@@ -149,6 +149,16 @@ The site shows annual inflation only: a Georgia page comparing the six cities' t
 
 **Refresh.** Cities arrive in the same workbooks as the national series; `prepare-inflation` rewrites `cpi-cities-monthly.csv` in the same run. Review: exactly one new month per city series.
 
+## Reviewed September 2026 refresh
+
+The current shared CPI vintage is **2026-09**, released by Geostat on 2026-10-02 and retrieved on 2026-10-17. The twelve untouched English/Georgian originals were checked against their manifest sizes and SHA-256 hashes before and after archiving. They replace the August folder under the latest-only retention rule; earlier bytes remain recoverable in Git and public download paths remain stable.
+
+The existing preparation and validation owners produced 1,968 national, 27,774 category and 20,732 city observations: respectively **8, 106 and 162 new September observations**. An independent key-by-key comparison against the pre-refresh canonical CSVs found no historical additions, removals, value changes or changes to status, source IDs, locators, labels or availability. Historical `last_reviewed_at` dates alone advance from 2026-09-11 to 2026-10-17. Every active national combination, 53 active categories in both measures, and all 162 city combinations now end in September; the two ended categories still end in December 2011. All first months and four recorded category gaps remain unchanged.
+
+English/Georgian parity and the revision guards pass. Headline recomputation errors remain 0.0002 / 0.0001 / 0.0001 pp; contribution reconstruction remains within the existing limits (worst 0.5848 pp, mean 0.0815 pp over 165 months); city consistency error is at most 0.000348 pp. Batumi August annual inflation remains exactly 7.0857%; Zugdidi June 2016 annual inflation is still missing, with annual coverage starting December 2016 and twelve-month-average coverage December 2017. The independently reviewed reference fixture changes only its two available-coverage endpoints to September under explicit owner approval. No historical numerical revision was accepted.
+
+Basket weights, inflation targets and the individual-product package are unchanged. This source refresh and local snapshot verification do not constitute a database import or production release.
+
 ## Monthly refresh
 
 Geostat publishes on the 2nd–5th. 1) Download the twelve files into a new vintage folder and write its `source-manifest.csv` and `README.md`. 2) Delete the previous vintage folder (retention below). 3) Update the six Geostat paths in `source-documents.csv` and, in the methodology archive CSV (`data/methodology/source-archives/inflation.csv`), each row's `repository_source_path`, `byte_size`, `sha256`, `retrieved_at` and note; `public_download_path` stays the same. 4) `npm run data:prepare-inflation`. 5) Review the diff: exactly one new month per series. 6) Commit; the standard pipeline imports and deploys. No automated fetching. Categories need no extra step: the same `yoy` and `mom` files carry them, so `prepare-inflation` rewrites `cpi-categories-monthly.csv` in the same run. The weights file is not part of the monthly refresh (see the annual refresh above).

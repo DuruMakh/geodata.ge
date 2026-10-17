@@ -29,8 +29,9 @@ describe("readGeostatCpiCitySheets", () => {
   it("rebases the =100 index to percentage change", async () => {
     const batumi = readGeostatCpiCitySheets(await workbook("en", "cpi-yoy.xlsx"), "yoy", "en", ["Batumi"]).get("Batumi")!;
     const total = batumi.find((row) => row.seriesId === "cpi.headline")!;
-    expect(periodKey(total.cells.at(-1)!.period)).toBe("2026-08");
-    expect(total.cells.at(-1)!.value).toBe("7.0857");
+    const august = total.cells.find((cell) => periodKey(cell.period) === "2026-08")!;
+    expect(august.value).toBe("7.0857");
+    expect(periodKey(total.cells.at(-1)!.period)).toBe("2026-09");
   });
 
   it("accepts Zugdidi's late starts instead of treating them as gaps", async () => {
